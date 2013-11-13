@@ -19,7 +19,15 @@ public final class TssDetectionParamsVisualPanel extends JPanel {
     public TssDetectionParamsVisualPanel(String wizardName) {
         initComponents();
         this.wizardName = wizardName;
-        this.updateCheckBoxes();
+        this.fractionTextPane.setText("How many false positives would you like to accept?");
+        this.fractionTextPane.setEditable(false);
+        this.downstreamTextPane.setText("How many bases downstream the transcription start site would you like to have?");
+        this.downstreamTextPane.setEditable(false);
+        this.upstreamTextPane.setText("How many bases upstream the transcription start site would you like to have?");
+        this.upstreamTextPane.setEditable(false);
+        this.ratioTextPane.setText("Ration of the read starts on position i and i-1.");
+        this.ratioTextPane.setEditable(false);
+        this.updateFields();
     }
 
     @Override
@@ -60,7 +68,7 @@ public final class TssDetectionParamsVisualPanel extends JPanel {
      * settings for this wizard. If no settings were stored, the default
      * configuration is chosen.
      */
-    private void updateCheckBoxes() {
+    private void updateFields() {
         Preferences pref = NbPreferences.forModule(Object.class);
         fractionTextField.setText(pref.get(wizardName+TranscriptomeAnalysisWizardIterator.PROP_Fraction, "0.05"));
         upstreamRegionTextField.setText(pref.get(wizardName+TranscriptomeAnalysisWizardIterator.PROP_UPSTREAM, "60"));
@@ -121,6 +129,11 @@ public final class TssDetectionParamsVisualPanel extends JPanel {
         org.openide.awt.Mnemonics.setLocalizedText(jLabel4, org.openide.util.NbBundle.getMessage(TssDetectionParamsVisualPanel.class, "TssDetectionParamsVisualPanel.jLabel4.text")); // NOI18N
 
         rationValueTextField.setText(org.openide.util.NbBundle.getMessage(TssDetectionParamsVisualPanel.class, "TssDetectionParamsVisualPanel.rationValueTextField.text")); // NOI18N
+        rationValueTextField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rationValueTextFieldActionPerformed(evt);
+            }
+        });
 
         jScrollPane1.setViewportView(fractionTextPane);
 
@@ -167,7 +180,7 @@ public final class TssDetectionParamsVisualPanel extends JPanel {
                             .addComponent(jLabel4))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(fractionTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+                            .addComponent(fractionTextField)
                             .addComponent(upstreamRegionTextField)
                             .addComponent(downstreamRegionTextField)
                             .addComponent(rationValueTextField)))
@@ -183,7 +196,7 @@ public final class TssDetectionParamsVisualPanel extends JPanel {
                         .addGap(8, 8, 8))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(keepInternalTSSLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 268, Short.MAX_VALUE)
                         .addComponent(keepInternalTssDistanceTF, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
@@ -256,6 +269,11 @@ public final class TssDetectionParamsVisualPanel extends JPanel {
     private void limitationOfDistanceToGeneTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_limitationOfDistanceToGeneTFActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_limitationOfDistanceToGeneTFActionPerformed
+
+    private void rationValueTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rationValueTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_rationValueTextFieldActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField downstreamRegionTextField;
     private javax.swing.JTextPane downstreamTextPane;

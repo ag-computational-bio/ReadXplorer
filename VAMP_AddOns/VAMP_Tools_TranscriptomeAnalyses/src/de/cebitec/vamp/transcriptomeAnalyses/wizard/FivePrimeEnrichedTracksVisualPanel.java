@@ -26,7 +26,6 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
         jScrollPane1.setBorder(BorderFactory.createTitledBorder("TSS-detection"));
         jTextArea1.setEditable(false);
         jTextArea1.setText(tssDetectionText);
-        antisenseCheckBox.setEnabled(false);
     }
 
     @Override
@@ -53,7 +52,7 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
      */
     private void updateCheckBoxes() {
         Preferences pref = NbPreferences.forModule(Object.class);
-        this.tssCheckBox.setSelected(pref.getBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_TSS_ANALYSIS, false));
+        this.tssCheckBox.setSelected(pref.getBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_TSS_ANALYSIS, true));
         this.antisenseCheckBox.setSelected(pref.getBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_ANTISENSE_ANALYSIS, false));
     }
 

@@ -49,7 +49,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
     private NewRegionDetection newRegionDetection;
     private ResultPanelTranscriptionStart transcriptionStartResultPanel;
     private final ReferenceViewer refViewer;
-    private TranscriptomeAnalysesTopComponent transcAnalysesTopComp;
+    private TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
     private HashMap<Integer, PersistantTrack> trackMap;
     /**
      * Key: featureID , Value: PersistantFeature
@@ -59,7 +59,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
     private NovelRegionResultPanel novelRegionResult;
     private ResultPanelOperonDetection operonResultPanel;
 
-    public WholeTranscriptDataAnalysisHandler(PersistantTrack selectedTrack, Integer refGenomeID, ParameterSetWholeTranscriptAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponent transcAnalysesTopComp, HashMap<Integer, PersistantTrack> trackMap) {
+    public WholeTranscriptDataAnalysisHandler(PersistantTrack selectedTrack, Integer refGenomeID, ParameterSetWholeTranscriptAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, HashMap<Integer, PersistantTrack> trackMap) {
         this.selectedTrack = selectedTrack;
         this.refGenomeID = refGenomeID;
         this.fraction = parameterset.getFraction();

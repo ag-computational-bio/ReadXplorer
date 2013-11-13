@@ -72,25 +72,23 @@ public class WholeTranscriptTracksPanel implements WizardDescriptor.ValidatingPa
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
-            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_RPKM_ANALYSIS, (boolean) component.isLogRPKM());
+            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_RPKM_ANALYSIS, (boolean) component.isRPKM());
             wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_NOVEL_ANALYSIS, (boolean) component.isNewRegions());
             wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_OPERON_ANALYSIS, (boolean) component.isOperonDetection());
-            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_NORMAL_RPKM_ANALYSIS, (boolean) component.isNormalRPKM());
             storePrefs();
     }
     
     private void storePrefs() {
         Preferences pref = NbPreferences.forModule(Object.class);
-        pref.putBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_RPKM_ANALYSIS, component.isLogRPKM());
+        pref.putBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_RPKM_ANALYSIS, component.isRPKM());
         pref.putBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_NOVEL_ANALYSIS, component.isNewRegions());
         pref.putBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_OPERON_ANALYSIS, component.isOperonDetection());
-        pref.putBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_NORMAL_RPKM_ANALYSIS, component.isNormalRPKM());
     }
 
     @Override
     public void validate() throws WizardValidationException {
         
-        if (!this.component.isLogRPKM() && !this.component.isOperonDetection() && !this.component.isNewRegions() && !this.component.isNormalRPKM()) {
+        if (!this.component.isRPKM() && !this.component.isOperonDetection() && !this.component.isNewRegions()) {
             throw new WizardValidationException(null, "Please selct at least one of the given analysis types.", null);
         }
     }

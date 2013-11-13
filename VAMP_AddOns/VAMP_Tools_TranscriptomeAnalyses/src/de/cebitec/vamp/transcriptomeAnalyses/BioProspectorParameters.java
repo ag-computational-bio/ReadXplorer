@@ -5,7 +5,9 @@
 package de.cebitec.vamp.transcriptomeAnalyses;
 
 import java.io.File;
+import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
+import org.openide.util.NbPreferences;
 
 /**
  *
@@ -363,12 +365,15 @@ public class BioProspectorParameters extends javax.swing.JPanel {
     }//GEN-LAST:event_workingDirectoryTFActionPerformed
 
     private void startFileChooserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startFileChooserButtonActionPerformed
+        Preferences prefs = NbPreferences.forModule(Object.class);
+        String currentDirPath = prefs.get(de.cebitec.readxplorer.transcriptomeAnalyses.enums.Preferences.CURRENT_DIR.toString(), null);
         JFileChooser fc = new JFileChooser();
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         int returnValue = fc.showOpenDialog(null);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             this.workingDirectoryTF.setText(fc.getSelectedFile().getAbsolutePath().toString());
             this.setWorkingDir(fc.getSelectedFile());
+            prefs.put(de.cebitec.readxplorer.transcriptomeAnalyses.enums.Preferences.CURRENT_DIR.toString(), fc.getSelectedFile().getAbsolutePath());
         }
     }//GEN-LAST:event_startFileChooserButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables

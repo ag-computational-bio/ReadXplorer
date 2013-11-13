@@ -227,8 +227,6 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
             if ((boolean) wiz.getProperty(PROP_TSS_ANALYSIS) && !fivePrimeSelectedAnalyses.contains(this.allPanels.get(3))) {
                 fivePrimeSelectedAnalyses.add(this.allPanels.get(3));
                 contentData.add(allPanels.get(3).getComponent().getName());
-            }
-            if ((boolean) wiz.getProperty(PROP_LEADERLESS_ANALYSIS) && !fivePrimeSelectedAnalyses.contains(this.allPanels.get(6))) {
                 fivePrimeSelectedAnalyses.add(this.allPanels.get(6));
                 contentData.add(allPanels.get(6).getComponent().getName());
             }

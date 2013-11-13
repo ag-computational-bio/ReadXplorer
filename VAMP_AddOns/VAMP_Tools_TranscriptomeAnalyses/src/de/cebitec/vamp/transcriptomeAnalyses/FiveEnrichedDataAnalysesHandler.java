@@ -45,14 +45,14 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
     private OperonDetection operonDetection;
     private ResultPanelTranscriptionStart transcriptionStartResultPanel;
     private final ReferenceViewer refViewer;
-    private TranscriptomeAnalysesTopComponent transcAnalysesTopComp;
+    private TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
     private HashMap<Integer, PersistantTrack> trackMap;
     /**
      * Key: featureID , Value: PersistantFeature
      */
     private HashMap<Integer, PersistantFeature> allRegionsInHash;
 
-    public FiveEnrichedDataAnalysesHandler(PersistantTrack selectedTrack, Integer refGenomeID, ParameterSetFiveEnrichedAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponent transcAnalysesTopComp, HashMap<Integer, PersistantTrack> trackMap) {
+    public FiveEnrichedDataAnalysesHandler(PersistantTrack selectedTrack, Integer refGenomeID, ParameterSetFiveEnrichedAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, HashMap<Integer, PersistantTrack> trackMap) {
 
         this.selectedTrack = selectedTrack;
         this.refGenomeID = refGenomeID;

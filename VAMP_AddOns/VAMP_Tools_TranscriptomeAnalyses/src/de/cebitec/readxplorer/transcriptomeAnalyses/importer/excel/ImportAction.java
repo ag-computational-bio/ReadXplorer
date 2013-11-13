@@ -4,7 +4,7 @@
  */
 package de.cebitec.readxplorer.transcriptomeAnalyses.importer.excel;
 
-import de.cebitec.vamp.transcriptomeAnalyses.TranscriptomeAnalysesTopComponent;
+import de.cebitec.vamp.transcriptomeAnalyses.TranscriptomeAnalysesTopComponentTopComponent;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -25,17 +25,17 @@ import org.openide.windows.WindowManager;
 public final class ImportAction implements ActionListener {
 
     private final ReferenceViewer refViewer;
-     private TranscriptomeAnalysesTopComponent transcAnalysesTopComp;
+     private TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
     private int referenceId;
     
     public ImportAction (ReferenceViewer reference) {
         this.refViewer = reference;
         this.referenceId = this.refViewer.getReference().getId();
-        TopComponent findTopComponent = WindowManager.getDefault().findTopComponent(TranscriptomeAnalysesTopComponent.PREFERRED_ID);
+        TopComponent findTopComponent = WindowManager.getDefault().findTopComponent(TranscriptomeAnalysesTopComponentTopComponent.PREFERRED_ID);
         if (findTopComponent != null) {
-        this.transcAnalysesTopComp = (TranscriptomeAnalysesTopComponent) findTopComponent;
+        this.transcAnalysesTopComp = (TranscriptomeAnalysesTopComponentTopComponent) findTopComponent;
         } else {
-            transcAnalysesTopComp = new TranscriptomeAnalysesTopComponent();
+            transcAnalysesTopComp = new TranscriptomeAnalysesTopComponentTopComponent();
         }
         
     }

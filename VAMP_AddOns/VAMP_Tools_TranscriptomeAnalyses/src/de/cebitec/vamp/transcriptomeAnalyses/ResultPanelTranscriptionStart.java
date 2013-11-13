@@ -208,14 +208,14 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(thresholdLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(thresholdLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
-                .addComponent(mappingsPerMillionLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 136, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(mappingsPerMillionLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
-                .addComponent(mappingCoverageLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(mappingCoverageLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 117, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
-                .addComponent(mappingMeanLengthLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 41, Short.MAX_VALUE)
+                .addComponent(mappingMeanLengthLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 129, Short.MAX_VALUE)
+                .addGap(41, 41, 41)
                 .addComponent(startBioProspectorButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(statisticsButton)
@@ -249,14 +249,20 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
         List<TranscriptionStart> tss = tssResult.getResults();
 
-        for (int i = 0; i < tSSTable.getRowCount(); i++) {
-//            Wenn die Position in tss nicht mit der Pos an der stelle in der Tabelle 
-//            übereinstimmt, dann soll der tss aus der tssList raus!
-            while (tss.get(i).getPos() != tSSTable.getValueAt(i, 0)) {
-                tss.remove(i);
-            }
+        HashMap<Integer, TranscriptionStart> tmpHash = new HashMap<>();
+            tmpHash.putAll(this.tssInHash);
 
-        }
+            for (int i = 0; i < tSSTable.getRowCount(); i++) {
+                Integer posTableAti = (Integer) tSSTable.getValueAt(i, 0);
+                if (tmpHash.containsKey(posTableAti)) {
+                    tmpHash.remove(posTableAti);
+                }
+            }
+            for (Integer key : tmpHash.keySet()) {
+                TranscriptionStart ts = tmpHash.get(key);
+                tssInHash.remove(key);
+                tss.remove(ts);
+            }
         tssResult.setResults(tss);
 
         ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", tssResult);

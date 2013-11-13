@@ -4,10 +4,6 @@
  */
 package de.cebitec.vamp.transcriptomeAnalyses;
 
-import java.util.HashMap;
-import java.util.List;
-import javax.swing.ButtonModel;
-
 /**
  *
  * @author jritter
@@ -23,6 +19,7 @@ public class PromotorSelectionPanel extends javax.swing.JPanel {
         initComponents();
         buttonGroup1.add(promotor);
         buttonGroup1.add(leaderless);
+        buttonGroup1.add(rbsCB);
         promotor.setSelected(true);
     }
     
@@ -46,6 +43,7 @@ public class PromotorSelectionPanel extends javax.swing.JPanel {
         buttonGroup1 = new javax.swing.ButtonGroup();
         leaderless = new javax.swing.JRadioButton();
         promotor = new javax.swing.JRadioButton();
+        rbsCB = new javax.swing.JRadioButton();
 
         org.openide.awt.Mnemonics.setLocalizedText(leaderless, org.openide.util.NbBundle.getMessage(PromotorSelectionPanel.class, "PromotorSelectionPanel.leaderless.text")); // NOI18N
         leaderless.addActionListener(new java.awt.event.ActionListener() {
@@ -56,6 +54,8 @@ public class PromotorSelectionPanel extends javax.swing.JPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(promotor, org.openide.util.NbBundle.getMessage(PromotorSelectionPanel.class, "PromotorSelectionPanel.promotor.text")); // NOI18N
 
+        org.openide.awt.Mnemonics.setLocalizedText(rbsCB, org.openide.util.NbBundle.getMessage(PromotorSelectionPanel.class, "PromotorSelectionPanel.rbsCB.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -64,7 +64,8 @@ public class PromotorSelectionPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(leaderless)
-                    .addComponent(promotor))
+                    .addComponent(promotor)
+                    .addComponent(rbsCB))
                 .addContainerGap(13, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -74,6 +75,8 @@ public class PromotorSelectionPanel extends javax.swing.JPanel {
                 .addComponent(leaderless)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(promotor)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(rbsCB)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -86,5 +89,6 @@ public class PromotorSelectionPanel extends javax.swing.JPanel {
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JRadioButton leaderless;
     private javax.swing.JRadioButton promotor;
+    private javax.swing.JRadioButton rbsCB;
     // End of variables declaration//GEN-END:variables
 }

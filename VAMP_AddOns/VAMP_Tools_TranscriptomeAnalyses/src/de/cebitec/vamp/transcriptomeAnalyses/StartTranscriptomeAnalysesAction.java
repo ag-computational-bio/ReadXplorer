@@ -49,14 +49,14 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
     private double fraction;
     private boolean cdsShift, excludeInternalTss;
     private int ratio, upstream, downstream, leaderlessDistance, excludeTSSDistance, keepingInternalTssDistance;
-    private TranscriptomeAnalysesTopComponent transcAnalysesTopComp;
+    private TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
     private boolean putativeUnAnnotated;
 
     public StartTranscriptomeAnalysesAction(ReferenceViewer reference) {
         this.refViewer = reference;
         this.referenceId = this.refViewer.getReference().getId();
-        TopComponent findTopComponent = WindowManager.getDefault().findTopComponent(TranscriptomeAnalysesTopComponent.PREFERRED_ID);
-        this.transcAnalysesTopComp = (TranscriptomeAnalysesTopComponent) findTopComponent;
+        TopComponent findTopComponent = WindowManager.getDefault().findTopComponent(TranscriptomeAnalysesTopComponentTopComponent.PREFERRED_ID);
+        this.transcAnalysesTopComp = (TranscriptomeAnalysesTopComponentTopComponent) findTopComponent;
     }
 
     @Override
@@ -130,7 +130,6 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
                 this.fraction = (double) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_Fraction);
                 this.upstream = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_UPSTREAM);
                 this.downstream = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_DOWNSTREAM);
-                this.performLeaderless = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_ANALYSIS);
                 this.performTSSAnalysis = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_TSS_ANALYSIS);
                 this.performAntisense = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_ANTISENSE_ANALYSIS);
                 this.performPutativeUnAnno = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_PUTATIVE_UNANNOTATED);

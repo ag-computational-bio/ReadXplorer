@@ -33,11 +33,7 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
         return this.operonsCheckBox.isSelected();
     }
     
-    public boolean isLogRPKM () {
-        return this.logRpkmCheckBox.isSelected();
-    }
-    
-    public boolean isNormalRPKM () {
+    public boolean isRPKM () {
         return this.rpkmCheckBox.isSelected();
     }
     
@@ -48,7 +44,6 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
      */
     private void updateCheckBoxes() {
         Preferences pref = NbPreferences.forModule(Object.class);
-        this.logRpkmCheckBox.setSelected(pref.getBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_RPKM_ANALYSIS, false));
         this.rpkmCheckBox.setSelected(pref.getBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_NORMAL_RPKM_ANALYSIS, false));
         this.operonsCheckBox.setSelected(pref.getBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_OPERON_ANALYSIS, false));
         this.newRegionsCheckBox.setSelected(pref.getBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_NOVEL_ANALYSIS, false));
@@ -61,7 +56,6 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        logRpkmCheckBox = new javax.swing.JCheckBox();
         newRegionsCheckBox = new javax.swing.JCheckBox();
         operonsCheckBox = new javax.swing.JCheckBox();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -74,8 +68,6 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
         jSeparator2 = new javax.swing.JSeparator();
         jLabel1 = new javax.swing.JLabel();
         rpkmCheckBox = new javax.swing.JCheckBox();
-
-        org.openide.awt.Mnemonics.setLocalizedText(logRpkmCheckBox, org.openide.util.NbBundle.getMessage(WholeTranscriptTracksVisualPanel.class, "WholeTranscriptTracksVisualPanel.logRpkmCheckBox.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(newRegionsCheckBox, org.openide.util.NbBundle.getMessage(WholeTranscriptTracksVisualPanel.class, "WholeTranscriptTracksVisualPanel.newRegionsCheckBox.text")); // NOI18N
         newRegionsCheckBox.addActionListener(new java.awt.event.ActionListener() {
@@ -132,12 +124,11 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
                         .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(logRpkmCheckBox)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(53, 53, 53)
                                 .addComponent(jLabel1))
                             .addComponent(rpkmCheckBox))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 112, Short.MAX_VALUE)
                         .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 352, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
@@ -166,9 +157,7 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(logRpkmCheckBox, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(24, 24, 24)
                         .addComponent(rpkmCheckBox))
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
@@ -197,7 +186,6 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextArea jTextArea2;
     private javax.swing.JTextArea jTextArea3;
-    private javax.swing.JCheckBox logRpkmCheckBox;
     private javax.swing.JCheckBox newRegionsCheckBox;
     private javax.swing.JCheckBox operonsCheckBox;
     private javax.swing.JCheckBox rpkmCheckBox;
