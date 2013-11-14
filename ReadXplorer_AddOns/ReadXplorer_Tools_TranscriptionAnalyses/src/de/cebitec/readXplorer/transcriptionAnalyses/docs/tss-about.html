@@ -1,0 +1,17 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Transcription Start Site (TSS) Detection</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <p style="text-align: center;"><span style="font-size: 14pt;"><strong>Transcription Start Site (TSS) Detection:</strong></span></p>
+        <p style="text-align: justify;">The TSS detection (enabled by checking the "<span style="text-decoration: underline;">TSS detection</span>" box in the wizard) has two default parameters.<br /> A) The <span style="text-decoration: underline;">minimal number of read starts</span> at the investigated position (default = 50 reads).<br /> B) The <span style="text-decoration: underline;">minimal coverage increase in percent</span> from one position to the neighboring one (default = 50%). <br /><br /> In order to output currently unannotated transcript information along with the detected TSS, you can choose the "<span style="text-decoration: underline;"><span>Unannotated transcript detection</span></span>". For detected TSS which do not have neighboring features, it adds the information, that this is an unannotated transcript and further a transcript stop is inferred by the coverage threshold "<span style="text-decoration: underline;"><span>Minimal transcript extension coverage"</span></span>, which has to be set, if the unannotated transcript detection checkbox is selected.<br /><br /> Additionally, two more parameters can be set for TSS detection in low coverage regions:<br /> C) The <span style="text-decoration: underline;">maximal initial read count</span> (default = 8 reads) can be set<br /> D) The <span style="text-decoration: underline;">minimal coverage increase</span> (default = 23%) for predicted TSS with less than x (in the default case 8) reads at the position directly in front of the TSS has to be set. It can be the same as the mandatory first parameter, but it is recommended to choose a lower value, depending on your analysis and data quality. If one of these two additional paramters is &gt; 0 the other one also has to be set correctly. By checking the <span style="text-decoration: underline;">Automatic parameter estimation</span> box, the parameters are estimated from the data in the track. In this case only the mandatory parameters are set.</p>
+        <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readXplorer.transcriptionAnalyses/de/cebitec/readXplorer/transcriptionAnalyses/docs/TSS-detection.jpg" alt="tss-detection-result" /></p>
+        <p style="text-align: justify;">This is an exemplary result of a TSS detection. The highlighted position in the table is centered in the Reference and Track Viewers. Obviously, the start of the gene is annotated correctly and we have a leaderless transcript at the inspected position. The statistics window displays the overall statistics of this TSS detection. TSS with a downstream feature can either have a wrong annotated CDS start, or we can observe a 5'UTR in this experiment.</p>
+    </body>
+</html>

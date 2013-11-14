@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: de.cebitec.vamp.tools.twoTrackViewer
-OpenIDE-Module-Layer: de/cebitec/vamp/tools/twoTrackViewer/layer.xml
-OpenIDE-Module-Localizing-Bundle: de/cebitec/vamp/tools/twoTrackViewer/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.0
-

@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: de.cebitec.readXplorer.transcriptomeAnalyses
+OpenIDE-Module-Localizing-Bundle: de/cebitec/readXplorer/transcriptomeAnalyses/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+

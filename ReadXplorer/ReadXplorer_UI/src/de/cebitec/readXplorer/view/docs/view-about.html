@@ -1,0 +1,158 @@
+<html>
+    <head>
+        <title>Main Window</title>
+        <link rel="stylesheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <p style="text-align: justify;">ReadXplorer is a client software. The project data for each ReadXplorer 
+            project is stored in a database (<a href="http://www.h2database.com/html/main.html">h2</a> or 
+            <a href="http://www.mysql.com/">MySQL</a>, we recommend h2 here). The database (DB) contains the reference 
+            genome and the basic track (= mapping data set) information. Therefore, the reference sequence and 
+            annotations are stored in the DB for the reference. For the tracks only the basic information, 
+            such as name and path to the corresponding <a href="http://samtools.sourceforge.net/SAM1.pdf">BAM</a> file, 
+            is stored in the DB.</p>
+        <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readXplorer.view/de/cebitec/readXplorer/view/docs/startup.jpg" /></p>
+        <p></p>
+        <p style="text-align: center;"><span style="font-size: 14pt;"><strong>ReadXplorer - Main Window:</strong></span></p>
+        <p style="text-align: justify;">This is the main window of ReadXplorer with one opened reference and three 
+            (two of them are visible) opened track data sets. The different items are explained below.</p>
+        <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readXplorer.view/de/cebitec/readXplorer/view/docs/readxplorer-main-small-marked-high.jpg" alt="mainViewMarked"/>
+            <br /></p>
+        <p style="text-align: justify;">a) <span style="text-decoration: underline;">Global Toolbar</span> and context 
+            dependent toolbar buttons. From left to right:</p>
+        <ol>
+            <li style="text-align: justify;">Open reference</li>
+            <li style="text-align: justify;">Close the currently selected/viewed reference</li>
+            <li style="text-align: justify;">Open track(s) (also in Multiple Track Viewer)</li>
+            <li style="text-align: justify;">Close all opened tracks for the currently selected/viewed reference</li>
+            <li style="text-align: justify;">Open save screenshot wizard</li>
+            <li style="text-align: justify;">Start a SNP and DIP detection via a wizard</li>
+            <li style="text-align: justify;">Start different transcription analyses via a wizard</li>
+            <li style="text-align: justify;">Start a feature coverage analysis via a wizard</li>
+            <li style="text-align: justify;">Start a general coverage analysis via a wizard</li>
+            <li style="text-align: justify;">Open the detailed viewer for a track belonging to the currently viewed 
+                reference (Histogram Viewer, Alignment Viewer and Read Pair Viewer)</li>
+            <li style="text-align: justify;">Open the double track viewer for selected tracks belonging to 
+                the currently viewed reference</li>
+            <li style="text-align: justify;">Open the reference sequence editor</li>
+            <li style="text-align: justify;">Open the Thumbnail Viewer</li>
+            <li style="text-align: justify;">Import data into the opened DB</li>
+            <li style="text-align: justify;">Delete data from the opened DB<br /></li>
+        </ol>
+        <p style="text-align: justify;">b) <span style="text-decoration: underline;">Position navigator</span>: 
+            By clicking "Jump to Pos", the entered position is centered for the currently viewed reference.justify;">
+        <p style="text-align: justify;">c) <span style="text-decoration: underline;">Pattern filter</span>: Searches and 
+            centers the next occurrence of the entered pattern/sequence and highlights all occurrences in the currently 
+            visible interval on the sequence bar of the Reference Viewer in blue. By clicking the "Search Pattern" button 
+            a second time, the next occurrence of the pattern, which is currently beyond the viewed reference interval, 
+            is centered.</p>
+        <p style="text-align: justify;">d) <span style="text-decoration: underline;">Reference feature filter</span>: 
+            Filters the currently selected column of the reference feature table below for the regular expression or plain 
+            text entered in the "RegEx Filter" field. By clicking any of the features in the table, its start position is 
+            centered in the viewers.</p>
+        <p style="text-align: justify;">e) <span style="text-decoration: underline;">Reference Viewer and its 
+                legend</span>: It displays the reference features in a six frame view, with a sequence bar in the middle. 
+            The legend displays the coloring of each available feature type and contains a checkbox to enable or disable 
+            viewing of the respective feature type. In the example all features are shown, except the features of the 
+            type "unknown".</p>
+        <p style="text-align: justify;">f) <span style="text-decoration: underline;">Scrollbar and zoom slider</span>: 
+            They are included in each viewer. The scrollbar allows to scroll to each reference position and the zoom slider 
+            allows to adjust the zoom level of the currently viewed reference interval.</p>
+        <p style="text-align: justify;">g) <span style="text-decoration: underline;">Selected reference feature</span>: A 
+            feature selected by a left click is highlighted in blue and its details are shown in the ReferenceFeature Window 
+            (<em>i)</em>). If start and stop codons are currently shown, then only the codons in the reading frame of the 
+            selected feature are shown. Only one feature can be selected at a time.</p>
+        <p style="text-align: justify;">h) <span style="text-decoration: underline;">Sequence bar and interactive start 
+                codons</span>: In the middle of the reference viewer, the sequence bar is shown. When zoomed in completely, 
+            the reference sequence of both strands is visible. The sequence bar also offers to select a sequence of 
+            interest by holding the left mouse button on the sequence bar and selecting the sequence of interest. After 
+            selecting a sequence, the right-click menu offers the options shown in the screenshot below. E.g.
+            copying or storing (as fasta) the sequence of interest and predicting the RNA secondary structure (see 
+            <em>RNA Secondary Structure Prediction</em>). Furthermore, the sequence bar displays start and stop 
+        codons, if they are selected in (<em>o)</em>). By clicking on a highlighted start codon (red) the reference 
+        interval from the start to the next in-frame stop codon is highlighted in light blue. By clicking the start 
+        codon again, the highlighting disappears. For more details see <em>Options - Genetic Code</em>.</p>
+    <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readXplorer.view/de/cebitec/readXplorer/view/docs/seq-selection.jpg" alt="seqSelection" />
+            <br /></p>
+            <p style="text-align: justify;">i) <span style="text-decoration: underline;">Reference Feature Window</span>: 
+                Displays the details of the currently selected reference feature. Here, the list of "
+                <span style="text-decoration: underline;">Parents</span>" is the list of reference features placed directly 
+                upward in the feature hierarchy and the list of "<span style="text-decoration: underline;">Subfeatures</span>" 
+                contains all features placed directly downward in the feature hierarchy. The hierarchy is based on the 
+                attribution in the original reference file (e.g. GFF3 feature hierarchy). When other import formats are used 
+                (Genbank, EMBL), a gene is the top parent feature and can contain exons, CDS and different RNAs. An exon can 
+                again contain CDS or RNA annotations.</p>
+            <p style="text-align: justify;">j) <span style="text-decoration: underline;">Track Viewer and its Legend</span>: 
+                Displays the coloring of the three mapping classes used by ReadXplorer. The green area (perfect) depicts reads 
+                that perfectly map to the reference sequence, the yellow area (best match) depicts reads that map to the 
+                respective location of the reference with the least possible number of mismatches in the whole reference. But 
+                there can be more than one mapping for one read on the reference with e.g. 2 mismatches. In this case both are 
+                shown in yellow. A red area (common) depicts reads that still match to the red colored region of the reference 
+                with less than the maximum allowed mismatches during the mapping process, but there is another position in the 
+                reference, where they fit with less mismatches. The three mapping classes are proper subsets of each other. For 
+                further details see <em>Read Classification</em>. The options menu of the Track Viewer is described in 
+                <em>m)</em>.<br /></p>
+            <p style="text-align: justify;">k) <span style="text-decoration: underline;">Track Viewer tooltip</span>: The 
+                tooltip shows the coverage of the hovered reference position for all three supported mapping classes separated 
+                by strand.</p>
+            <p style="text-align: justify;">l) <span style="text-decoration: underline;">Track Statistics Window</span>: 
+                Displays the global data set statistics of the currently selected track. </p>
+            <ol>
+                <li style="text-align: justify;">Mappings: The total number of mappings in the whole data set, which were 
+                    mapped to this reference.</li>
+                <li style="text-align: justify;">Unique mappings: The total number of mappings among the number of "Mappings", 
+                    which where only mapped once to the reference.</li>
+                <li style="text-align: justify;">Best match mappings: The total number of mappings belonging to the best match 
+                    class in the whole track data set.</li>
+                <li style="text-align: justify;">Perfect mappings: The total number of mappings belonging to the perfect match 
+                    class in the whole track data set.</li>
+                <li style="text-align: justify;">Perfect coverage: The percentage of the reference sequence, covered with at 
+                    least one mapping of the perfect match mapping class.</li>
+                <li style="text-align: justify;">Best match coverage: The percentage of the reference sequence, covered with 
+                    at least one mapping of the best match mapping class.</li>
+                <li style="text-align: justify;">Common coverage: The percentage of the reference sequence, covered with at 
+                    least one mapping of the common match mapping class.<br /></li>
+            </ol>
+            <p style="text-align: justify;">If the currently viewed track is a read pair (paired-end or mate pair) data set, 
+                the read pair statistic is displayed:</p>
+            <ol>
+                <li style="text-align: justify;">Read Pairs: The total number of read pairs successfully (= at 
+                    least one read of the pair) mapped to the reference sequence in the whole track data set.</li>
+                <li style="text-align: justify;">Perfect read pairs: The number of perfect read pairs, whose distance is 
+                    within a given range and whose orientation is as expected.</li>
+                <li style="text-align: justify;">Smaller read pairs: The number of read pairs whose distance is smaller than
+                    the minimum allowed distance of a perfect pair.</li>
+                <li style="text-align: justify;">Larger read pairs: The number of read pairs whose distance is larger than 
+                    the maximum allowed distance of a perfect pair.</li>
+                <li style="text-align: justify;">Single mappings: The number of mappings whose partner either did not map to 
+                    the reference at all, or is already contained in a perfect or smaller distance pair with the read of this 
+                    mapping and its partner. The latter can occur, when e.g. one read of a read pair maps to two or more 
+                    positions in the reference, but in one position it can form a perfect or smaller distance pair with its 
+                    partner. Then all other mappings of the multi mapped read are classified as single mappings.
+                    <br data-mce-bogus="1" /></li>
+            </ol>
+            <p style="text-align: justify;">m) <span style="text-decoration: underline;">Track 
+                        Viewer Options</span>: Here, automatic scaling of the coverage can be enabled, to adapt the coverage 
+                    plot to fit the viewer area. Besides that, a normalization method can be applied to the coverage of the 
+                    track: either by log2 or by a chosen factor x with 0 &lt; x &lt; 10.</p>
+            <p style="text-align: justify;">n) <span style="text-decoration: underline;">Reference Interval Window</span>: 
+                It summarizes information about the currently viewed reference interval.
+            <p style="text-align: justify;">o) <span style="text-decoration: underline;">Start and stop codon 
+                    selection</span>: Allows the selection of start and stop codons, which are then highlighted in the 
+                sequence bar of the reference viewer (h). If you want to change the start and stop codons to fit another 
+                organism (see <em>Options - Genetic Code</em>).</p>
+                </body>
+                </html>
+                <!--
+                Tip: to create a link which will open in an external web browser, try:
+                <object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+                    <param name="content" value="http://www.netbeans.org/">
+                    <param name="text" value="<html><u>http://www.netbeans.org/</u></html>">
+                    <param name="textFontSize" value="medium">
+                    <param name="textColor" value="blue">
+                </object>
+                To create a link to a help set from another module, you need to know the code name base and path, e.g.:
+                <a href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/configure/configure_options.html">Using the Options Window</a>
+                (This link will behave sanely if that module is disabled or missing.)
+                -->

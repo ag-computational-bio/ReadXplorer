@@ -1,0 +1,35 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Read (Pair) Classification</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <div><p style="text-align: center;"><span style="font-size: 14pt;"><strong>Read Classification:</strong></span></p>
+        <p style="text-align: justify;">Read mapping data has to be provided in SAM, BAM or SARUMAN (JOK) output format. 
+                ReadXplorer classifies the reads during the import process by mapping quality and read pair concordance. A 
+                read mapped to a certain reference position is called "mapping". <b>For each read, the number of mappings</b> 
+                on the reference is counted along with the <b>lowest number of mismatches</b> found among the various mappings 
+                of that read. <b>Uniquely mapped reads</b> or reads with a certain amount of mismatches can thus easily be queried.<br/>
+                <b>mappings</b> are <b>classified into three classes</b>: All mappings without any mismatches belong to the 
+                <b>Perfect Match</b> class (<b>green</b>). A mapping that maps nowhere else on the reference 
+                with fewer mismatches than at the current position is called co-optimal. All co-optimal mappings belong 
+                to the <b>Best Match</b> class (<b>yellow</b>). All remaining mappings belong to the 
+                <b>Common Match</b> class (<b>red</b>). Beginning with the Perfect Match class, these classes 
+                are proper subsets of the next larger class. Note that the same read can map to different reference 
+                positions with the same number of mismatches. Therefore, also the Perfect and Best Match classes do 
+                not necessarily contain reads that are uniquely mapped to one position of the reference. 
+                <b>Unique mappings</b> can easily be accessed by the 
+                <b>mapping count</b> stored in each mapping for each read. The 
+                mapping classes are displayed in the different data viewers (see <i>
+                    Main Window j)</i>) and can be selected explicitly for each analysis as shown in the screenshot below 
+                for the SNP and DIP detection (see e.g. <i>SNP and DIP Detection 4.</i>).</p>
+        <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readXplorer.view/de/cebitec/readXplorer/view/docs/snp-det-readclass.jpg" alt="ReadClassificationPic" /></p>
+        <p style="text-align: center;"><br /><span style="font-size: 14pt;"><strong>Read Pair Classification:</strong></span></p>
+        <p style="text-align: justify;" >For paired end or mate pair mappings a read pair classification algorithm takes into account all occurrences of each read during the import process. In the following we distinguish between <b>all mappings of the two reads of a read pair, which we call "mapping pair",</b> and <b>two mappings of a mapping pair classified as "read pair"</b>. In general, the algorithm classifies the mappings into three different classes: "Perfect" read pairs with correct orientation and a pair distance within a given range defined by the user (see <i>Import one or more paired end or mate pair track(s)</i>), "Distorted" read pairs, whose distance deviates from the perfect distance interval and/or whose orientation is incorrect, and "Single Mappings", whose partner could not be mapped on the reference. A special case of Single Mappings occurs when one or both reads of a mapping pair also map to other regions of the reference, but they cannot be associated to a Perfect or Distorted read pair. There might be more than one Perfect read pair for the same mapping pair. Further, the mapping classes Perfect, Best Match and Common are considered in the read pair identification algorithm to improve the accuracy of correct predictions. For each mapping pair, Perfect mapping read pairs are preferred to Best Match and both are preferred to Common mapping read pairs. The read pairs are visualized in a special Read Pair Viewer (see <i>Read Pair Viewer</i>). <br /></p></div>
+    </body>
+</html>

@@ -1,0 +1,62 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>SNP and DIP Detection</title>
+        <link rel="stylesheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <p style="text-align: center;"><span style="font-size: 14pt;"><strong>SNP and DIP Detection:</strong></span></p>
+        <p style="text-align: justify;">It becomes available after opening a reference. Then it can be carried out for any or multiple tracks, belonging to that reference. In short we just call it SNP detection from here on. An example result is shown in the screenshot below.<br /></p>
+        <ol>
+            <li style="text-align: justify;">Click the corresponding toolbar icon (see <em>Main Window a)</em>) or choose "<span style="text-decoration: underline;">Tools -&gt; SNP detection</span>".</li>
+            <li style="text-align: justify;">Select the track(s) to analyze with a left click.</li>
+            <li style="text-align: justify;">Select the SNP detection parameters. They are explained in the text field above the parameter selection.</li>
+            <li style="text-align: justify;">Select the mapping classes (see <em>Read Classification</em>) to include in the analysis. </li>
+            <li style="text-align: justify;">Select the feature types, for which the codon translation shall be activated. The other features types are ignored and the SNP or DIP is marked as "intergenic".</li>
+            <li style="text-align: justify;">Click "<span style="text-decoration: underline;">Finish</span>" to start the SNP and DIP detection</li>
+        </ol>
+        <p style="text-align: justify;">Then the whole bam file(s) is/are analyzed for SNPs and DIPs with the given parameters. <br /></p>
+        <p style="text-align: justify;">Features:<br data-mce-bogus="1" /></p>
+        <ul>
+            <li style="text-align: justify;">Multiple consecutive insertions or deletions are each listed as one result.</li>
+            <li style="text-align: justify;">Exon, intron structure is taken into account: If a feature has subfeatures a SNP is only translated, if it is located in an exon or CDS. The translation uses the length of all corresponding subfeatures of the parent feature to determine the correct triplet around a SNP.</li>
+            <li style="text-align: justify;">If a feature (e.g. gene) has no subfeatures, then all SNPs in that feature are translated with respect to reading frame and strand.<br /></li>
+        </ul>
+        <p style="text-align: justify;">The Result table contains the following content:</p>
+        <ol>
+            <li style="text-align: justify; margin-bottom:13"><span style="text-decoration: underline;">Pos</span>: The <b>absolute position</b> of the SNP in the reference genome.</li>
+            <li style="text-align: justify; margin-bottom:13"><span style="text-decoration: underline;">Gap Index:</span> Value &gt;0 for insertions. Describes the <b>position of the insertion</b> in the read for consecutive insertions.</li>
+            <li style="text-align: justify; margin-bottom:13"><span style="text-decoration: underline;">Track:</span> The <b>name</b> of the track, this SNP is belonging to. </li>
+            <li style="text-align: justify; margin-bottom:13"><span style="text-decoration: underline;">Base:</span> The <b>consensus base</b> found in the mappings at the current position. Meaning the base with the highest coverage.</li>
+            <li style="text-align: justify; margin-bottom:13"><span style="text-decoration: underline;">Ref:</span> The <b>reference base</b> at the current position.</li>
+            <li style="text-align: justify; margin-bottom:13"><span style="text-decoration: underline;">A/C/G/T/N/_:</span> <b>Number of occurrences</b> of each of these bases or a gap at the current position. </li>
+            <li style="text-align: justify; margin-bottom:13"><span style="text-decoration: underline;">RefCov:</span> <b>Complete coverage</b> of the reference genome by this track at this position. For an insertion the coverage of the position directly after is taken into account.</li>
+            <li style="text-align: justify; margin-bottom:13"><span style="text-decoration: underline;">Freq:</span> The <b>frequency</b> of all mismatching bases among the complete coverage at the current position. For an insertion the coverage of the position directly after is taken into account.</li>
+            <li style="text-align: justify; margin-bottom:13"><span style="text-decoration: underline;">Type:</span> <b>Effect type</b> of the SNP. <b>M</b> = Match, <b>S</b> = Substitution, <b>I</b> = Insertion, <b>D</b> = Deletion of the reference base.</li>
+            <li style="text-align: justify; margin-bottom:13"><span style="text-decoration: underline;">AA Ref: </span>If the current position lies within a feature (e.g. gene) and is not an insertion or deletion the amino acid is calculated for the reference codon including the current position. The <b>amino acid</b> is represented in <b>one-character-code</b> together with its main <b>chemical property</b>. </li>
+            <li style="text-align: justify; margin-bottom:13"><span style="text-decoration: underline;">AA SNP:</span> If the current position lies within a feature (e.g. gene) and is not an insertion or deletion the amino acid is calculated for the codon at the current position including the SNP base. The <b>amino acid</b> is represented in <b>one-character-code</b> together with its main <b>chemical property</b>. </li>
+            <li style="text-align: justify; margin-bottom:13"><span style="text-decoration: underline;">Codon Ref:</span> If the current position lies within a feature (e.g. gene) and is not an insertion or deletion the corresponding amino acid codon of the reference is shown here.</li>
+            <li style="text-align: justify; margin-bottom:13"><span style="text-decoration: underline;">Codon SNP:</span> If the current position lies within a feature (e.g. gene) and is not an insertion or deletion the corresponding amino acid codon emerging from the SNP is shown here. the SNP position within the codon is depicted by a lowercase letter. </li>
+            <li style="text-align: justify; margin-bottom:13"><span style="text-decoration: underline;">Effect on AA: </span>Constitutes the <b>effect</b> of the SNP on the amino acid sequence of its protein. <b>M</b> = match, <b>I</b> = frame shift +1, <b>D</b> = frame shift -1, <b>N</b> = chemically <span style="text-decoration: underline;">n</span>eutral substitution, <b>E</b> = ch<span style="text-decoration: underline;">e</span>mically different substitution. </li>
+            <li style="text-align: justify; margin-bottom:13"><span style="text-decoration: underline;">Feature (Gene):</span> Either the <b>name</b> of the underlying gene, or, if the name is not available, its <b>locus tag </b>or <strong>EC number</strong>. Always shown, if the SNP is located in a gene.<br /></li>
+        </ol>
+        <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readXplorer.tools.snp/de/cebitec/readXplorer/tools/snp/docs/snp-det-result.jpg" alt="snp-detection-result" /></p>
+        <p style="text-align: justify;">In this example we have centered the marked insertion position in the table by clicking on it. We examine the position in the reference and histogram viewers. We have a look at the statistics window. It shows the number of SNPs and DIPs in the different categories and gives a comprehensive overview for the result.</p>
+    </body>
+</html>
+<!--
+Tip: to create a link which will open in an external web browser, try:
+<object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+    <param name="content" value="http://www.netbeans.org/">
+    <param name="text" value="<html><u>http://www.netbeans.org/</u></html>">
+    <param name="textFontSize" value="medium">
+    <param name="textColor" value="blue">
+</object>
+To create a link to a help set from another module, you need to know the code name base and path, e.g.:
+<a href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/configure/configure_options.html">Using the Options Window</a>
+(This link will behave sanely if that module is disabled or missing.)
+-->
