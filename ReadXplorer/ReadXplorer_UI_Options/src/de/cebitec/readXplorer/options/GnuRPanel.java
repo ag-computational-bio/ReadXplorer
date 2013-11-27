@@ -39,9 +39,9 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
     private File zipFile;
     private String user_dir = System.getProperty("netbeans.user");
     private File r_dir = new File(user_dir + File.separator + "R");
-    private static final String SOURCE_URI = "ftp://ftp.cebitec.uni-bielefeld.de/pub/readXplorer_repo/R/R.tar.gz";
-    private static final String R_ZIP = "ftp://ftp.cebitec.uni-bielefeld.de/pub/readXplorer_repo/R/R.zip";
-    private static final String DEFAULT_CRAN_MIRROR = "ftp://ftp.cebitec.uni-bielefeld.de/pub/readXplorer_repo/R/";
+    private static final String SOURCE_URI = "ftp://ftp.cebitec.uni-bielefeld.de/pub/vamp_repo/R/R.tar.gz";
+    private static final String R_ZIP = "ftp://ftp.cebitec.uni-bielefeld.de/pub/vamp_repo/R/R.zip";
+    private static final String DEFAULT_CRAN_MIRROR = "ftp://ftp.cebitec.uni-bielefeld.de/pub/vamp_repo/R/";
     private String license = "		    GNU GENERAL PUBLIC LICENSE\n"
             + "		       Version 2, June 1991\n"
             + "\n"
