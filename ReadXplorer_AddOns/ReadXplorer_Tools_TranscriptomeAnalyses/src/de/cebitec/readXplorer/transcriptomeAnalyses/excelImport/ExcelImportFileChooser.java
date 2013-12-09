@@ -1,12 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.readXplorer.transcriptomeAnalyses.excelImport;
 
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import javax.swing.table.DefaultTableModel;
 import org.openide.util.Exceptions;
 
@@ -18,6 +15,8 @@ public class ExcelImportFileChooser extends ReadXplorerFileChooser {
 
     DefaultTableModel model;
     ExcelToTable importer;
+    HashMap<String, String> secondSheet;
+    private File selectedFileForExport;
 
     public ExcelImportFileChooser(String[] fileExtensions, String fileDescription) {
         super(fileExtensions, fileDescription);
@@ -31,20 +30,6 @@ public class ExcelImportFileChooser extends ReadXplorerFileChooser {
 
     @Override
     public void open(final String filelocation) {
-        try {
-            this.importer = new ExcelToTable(new File(filelocation));
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-        setModel(importer.dataToDataTableImport());
-
-    }
-
-    public DefaultTableModel getModel() {
-        return model;
-    }
-
-    public void setModel(DefaultTableModel model) {
-        this.model = model;
+        this.setSelectedFile(new File(filelocation));
     }
 }

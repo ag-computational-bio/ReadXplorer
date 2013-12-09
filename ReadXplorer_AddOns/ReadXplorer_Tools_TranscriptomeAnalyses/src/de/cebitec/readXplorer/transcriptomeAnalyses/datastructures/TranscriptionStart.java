@@ -12,7 +12,7 @@ import de.cebitec.readXplorer.databackend.dataObjects.TrackResultEntry;
  */
 public class TranscriptionStart extends TrackResultEntry {
 
-    private int pos;
+    private int startPosition;
     private boolean isFwdStrand;
     private int readStarts;
     private double relCount;
@@ -22,10 +22,10 @@ public class TranscriptionStart extends TrackResultEntry {
     private PersistantFeature nextGene;
     private int nextOffset;
     private String sequence;
-    private int[] beforeCounts;
-    private boolean leaderless, cdsShift, putativeUnannotated;
+    private boolean leaderless, cdsShift;
     private String detectedFeatStart, detectedFeatStop;
     private boolean internalTSS;
+    private boolean putativeAntisense;
 
     /**
      * Data structure for storing a gene start.
@@ -35,7 +35,7 @@ public class TranscriptionStart extends TrackResultEntry {
      * strand, false otherwise.
      * @param readStarts The number of read starts at the detected tss position
      * @param percentIncrease The coverage at the detected gene start position
-     * (getPos()).
+     * (getStartPosition()).
      * @param coverageIncrease the coverage increase from the position before
      * the TSS to the detected TSS position
      * @param detFeatures object containing the features associated to this
@@ -43,7 +43,7 @@ public class TranscriptionStart extends TrackResultEntry {
      */
     public TranscriptionStart(int pos, boolean isFwdStrand, int readStarts, DetectedFeatures detFeatures, int trackId) {
         super(trackId);
-        this.pos = pos;
+        this.startPosition = pos;
         this.isFwdStrand = isFwdStrand;
         this.readStarts = readStarts;
     }
@@ -51,7 +51,7 @@ public class TranscriptionStart extends TrackResultEntry {
     /**
      * Data structure for storing a gene start.
      *
-     * @param pos The position at which the gene start was detected
+     * @param tssStartPosition The position at which the gene start was detected
      * @param isFwdStrand true, if the transcript start was detected on the fwd
      * strand, false otherwise.
      * @param readStarts The number of read starts at the detected tss position
@@ -65,9 +65,9 @@ public class TranscriptionStart extends TrackResultEntry {
      * @param sequence
      * @param trackId
      */
-    public TranscriptionStart(int pos, boolean isFwdStrand, int readStarts, double relCount, int[] before, PersistantFeature detectedGene, int offset, int dist2start, int dist2stop, PersistantFeature nextGene, int nextOffset, String sequence, boolean leaderless, boolean cdsShift, boolean putativeUnannotated, String detectedFeatStart, String detectedFeatStop, boolean isInternal, int trackId) {
+    public TranscriptionStart(int tssStartPosition, boolean isFwdStrand, int readStarts, double relCount, PersistantFeature detectedGene, int offset, int dist2start, int dist2stop, PersistantFeature nextGene, int nextOffset, String sequence, boolean leaderless, boolean cdsShift, String detectedFeatStart, String detectedFeatStop, boolean isInternal, boolean putAS, int trackId) {
         super(trackId);
-        this.pos = pos;
+        this.startPosition = tssStartPosition;
         this.isFwdStrand = isFwdStrand;
         this.readStarts = readStarts;
         this.relCount = relCount;
@@ -78,24 +78,19 @@ public class TranscriptionStart extends TrackResultEntry {
         this.nextGene = nextGene;
         this.nextOffset = nextOffset;
         this.sequence = sequence;
-        this.beforeCounts = before;
         this.leaderless = leaderless;
         this.cdsShift = cdsShift;
-        this.putativeUnannotated = putativeUnannotated;
         this.detectedFeatStart = detectedFeatStart;
         this.detectedFeatStop = detectedFeatStop;
         this.internalTSS = isInternal;
-    }
-
-    public int[] getBeforeCounts() {
-        return beforeCounts;
+        this.putativeAntisense = putAS;
     }
 
     /**
      * @return The position at which the gene start was detected
      */
-    public int getPos() {
-        return this.pos;
+    public int getStartPosition() {
+        return this.startPosition;
     }
 
     /**
@@ -118,6 +113,15 @@ public class TranscriptionStart extends TrackResultEntry {
         return readStarts;
     }
 
+    public boolean isPutativeAntisense() {
+        return putativeAntisense;
+    }
+
+    public void setPutativeAntisense(boolean putativeAntisense) {
+        this.putativeAntisense = putativeAntisense;
+    }
+
+    
     public void setReadStarts(int readStarts) {
         this.readStarts = readStarts;
     }
@@ -136,10 +140,6 @@ public class TranscriptionStart extends TrackResultEntry {
 
     public boolean isCdsShift() {
         return cdsShift;
-    }
-
-    public boolean isPutativeUnannotated() {
-        return putativeUnannotated;
     }
 
     public PersistantFeature getDetectedGene() {
@@ -216,10 +216,10 @@ public class TranscriptionStart extends TrackResultEntry {
     public String toString() {
 
         if (isFwdStrand) {
-            return this.pos + "\t" + "fwd\t" + this.readStarts + "\t" + this.relCount + "\t" + this.beforeCounts + "\t" + this.detectedGene.getFeatureName() + "\t" + this.offset + "\t" + this.dist2start + "\t" + this.dist2stop + "\t" + this.nextGene + "\t" + this.nextOffset + "\t" + this.sequence + "\t" + 0;
+            return this.startPosition + "\t" + "fwd\t" + this.readStarts + "\t" + this.relCount + "\t" + this.detectedGene.getFeatureName() + "\t" + this.offset + "\t" + this.dist2start + "\t" + this.dist2stop + "\t" + this.nextGene + "\t" + this.nextOffset + "\t" + this.sequence + "\t" + 0;
 
         } else {
-            return this.pos + "\t" + "rev\t" + this.readStarts + "\t" + this.relCount + "\t" + this.beforeCounts + "\t" + this.detectedGene.getFeatureName() + "\t" + this.offset + "\t" + this.dist2start + "\t" + this.dist2stop + "\t" + this.nextGene + "\t" + this.nextOffset + "\t" + this.sequence + "\t" + 0;
+            return this.startPosition + "\t" + "rev\t" + this.readStarts + "\t" + this.relCount + "\t" + this.detectedGene.getFeatureName() + "\t" + this.offset + "\t" + this.dist2start + "\t" + this.dist2stop + "\t" + this.nextGene + "\t" + this.nextOffset + "\t" + this.sequence + "\t" + 0;
 
         }
     }

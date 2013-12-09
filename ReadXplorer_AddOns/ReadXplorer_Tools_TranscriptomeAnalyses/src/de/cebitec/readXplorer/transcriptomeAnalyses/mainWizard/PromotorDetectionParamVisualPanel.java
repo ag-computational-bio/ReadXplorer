@@ -38,10 +38,10 @@ public final class PromotorDetectionParamVisualPanel extends JPanel {
      */
     private void updateFields() {
         Preferences pref = NbPreferences.forModule(Object.class);
-        this.spacer1LengthTF.setText(pref.get(wizardName+TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER1, "6"));
-        this.spacer2LengthTF.setText(pref.get(wizardName+TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER2, "17"));
-        this.lengthofPutativeMinusTenTF.setText(pref.get(wizardName+TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SEQOFINTREST1, "9"));
-        this.lengthForPutativeMinusThirtyFiveTF.setText(pref.get(wizardName+TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SEQOFINTREST2, "9"));
+//        this.spacer1LengthTF.setText(pref.get(wizardName+TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER1, "6"));
+//        this.spacer2LengthTF.setText(pref.get(wizardName+TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER2, "17"));
+//        this.lengthofPutativeMinusTenTF.setText(pref.get(wizardName+TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SEQOFINTREST1, "9"));
+//        this.lengthForPutativeMinusThirtyFiveTF.setText(pref.get(wizardName+TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SEQOFINTREST2, "9"));
     }
     
     @Override
@@ -107,8 +107,8 @@ public final class PromotorDetectionParamVisualPanel extends JPanel {
 
         lengthForPutativeMinusThirtyFiveTF.setText(org.openide.util.NbBundle.getMessage(PromotorDetectionParamVisualPanel.class, "PromotorDetectionParamVisualPanel.lengthForPutativeMinusThirtyFiveTF.text")); // NOI18N
 
-        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cebitec/readxplorer/transcriptomeAnaylses/resources/promotorAnalysis.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel6, org.openide.util.NbBundle.getMessage(PromotorDetectionParamVisualPanel.class, "PromotorDetectionParamVisualPanel.jLabel6.text")); // NOI18N
+        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cebitec/readXplorer/transcriptomeAnalyses/resources/promotorAnalysis.png"))); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel6, org.openide.util.NbBundle.getMessage(PromotorDetectionParamVisualPanel.class, "PromotorDetectionParamVisualPanel.jLabel6.text_1")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -125,7 +125,7 @@ public final class PromotorDetectionParamVisualPanel extends JPanel {
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(spacer2LengthTF)
-                            .addComponent(spacer1LengthTF, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE))
+                            .addComponent(spacer1LengthTF))
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -135,7 +135,7 @@ public final class PromotorDetectionParamVisualPanel extends JPanel {
                                 .addComponent(jLabel5)
                                 .addGap(21, 21, 21)))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(lengthofPutativeMinusTenTF, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+                            .addComponent(lengthofPutativeMinusTenTF)
                             .addComponent(lengthForPutativeMinusThirtyFiveTF)))
                     .addComponent(jScrollPane1))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -161,7 +161,7 @@ public final class PromotorDetectionParamVisualPanel extends JPanel {
                     .addComponent(lengthForPutativeMinusThirtyFiveTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(21, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 

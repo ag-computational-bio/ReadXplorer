@@ -73,10 +73,10 @@ public class PromotorDetectionParamPanel implements WizardDescriptor.Panel<Wizar
     private void storePrefs() {
         Preferences pref = NbPreferences.forModule(Object.class);
         
-        pref.put(wizardName+TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER1, component.getSpacer1Length().toString());
-        pref.put(wizardName+TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER2, component.getSpacer2Length().toString());
-        pref.put(wizardName+TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SEQOFINTREST1, component.getPutativeMinusTenLength().toString());
-        pref.put(wizardName+TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SEQOFINTREST2, component.getPutativeMinusThirtyFiveLength().toString());
+//        pref.put(wizardName+TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER1, component.getSpacer1Length().toString());
+//        pref.put(wizardName+TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER2, component.getSpacer2Length().toString());
+//        pref.put(wizardName+TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SEQOFINTREST1, component.getPutativeMinusTenLength().toString());
+//        pref.put(wizardName+TranscriptomeAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SEQOFINTREST2, component.getPutativeMinusThirtyFiveLength().toString());
         // TODO store workingDirectoryPath!
     }
     

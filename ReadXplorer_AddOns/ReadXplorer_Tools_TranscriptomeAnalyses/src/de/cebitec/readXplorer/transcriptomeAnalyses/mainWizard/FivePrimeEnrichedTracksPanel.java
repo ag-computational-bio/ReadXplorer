@@ -15,9 +15,11 @@ public class FivePrimeEnrichedTracksPanel implements WizardDescriptor.Validating
      */
     private FivePrimeEnrichedTracksVisualPanel component;
     private final String wizardName;
+    private final int referenceId;
 
-    public FivePrimeEnrichedTracksPanel(String wizardName) {
+    public FivePrimeEnrichedTracksPanel(String wizardName, int referenceID) {
         this.wizardName = wizardName;
+        this.referenceId = referenceID;
     }
 
     // Get the visual component for the panel. In this template, the component
@@ -27,7 +29,7 @@ public class FivePrimeEnrichedTracksPanel implements WizardDescriptor.Validating
     @Override
     public FivePrimeEnrichedTracksVisualPanel getComponent() {
         if (component == null) {
-            component = new FivePrimeEnrichedTracksVisualPanel(wizardName);
+            component = new FivePrimeEnrichedTracksVisualPanel(wizardName, this.referenceId);
         }
         return component;
     }
@@ -66,23 +68,33 @@ public class FivePrimeEnrichedTracksPanel implements WizardDescriptor.Validating
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
-        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_TSS_ANALYSIS, (boolean) this.component.isTSSSelected());
-        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_ANTISENSE_ANALYSIS, (boolean) this.component.isAntisenseSelected());
-        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_PUTATIVE_UNANNOTATED, (boolean) this.component.isPutativeUnAnnoSelected());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_Fraction, component.getFraction());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_RATIO, component.getRatio());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_UPSTREAM, component.getUpstrteam());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_DOWNSTREAM, component.getDownstream());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_INTERNAL_TSS, component.isExcludeInternalTSS());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_TSS_DISTANCE, component.getExcludeTssDistance());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_KEEPINTERNAL_DISTANCE, component.getKeepingInternalTssDistance());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_LIMIT, component.getLeaderlessDistance());
         storePrefs();
     }
 
     private void storePrefs() {
         Preferences pref = NbPreferences.forModule(Object.class);
-        pref.putBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_TSS_ANALYSIS, this.component.isTSSSelected());
-        pref.putBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_ANTISENSE_ANALYSIS, this.component.isAntisenseSelected());
-        pref.putBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_PUTATIVE_UNANNOTATED, this.component.isPutativeUnAnnoSelected());
+        pref.put(wizardName+TranscriptomeAnalysisWizardIterator.PROP_Fraction, component.getFraction().toString());
+        pref.put(wizardName+TranscriptomeAnalysisWizardIterator.PROP_UPSTREAM, component.getUpstrteam().toString());
+        pref.put(wizardName+TranscriptomeAnalysisWizardIterator.PROP_DOWNSTREAM, component.getDownstream().toString());
+        pref.put(wizardName+TranscriptomeAnalysisWizardIterator.PROP_RATIO, component.getRatio().toString());
+        pref.putBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_INTERNAL_TSS, component.isExcludeInternalTSS());
+        pref.putInt(wizardName+TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_TSS_DISTANCE, component.getExcludeTssDistance());
+        pref.putInt(wizardName+TranscriptomeAnalysisWizardIterator.PROP_KEEPINTERNAL_DISTANCE, component.getKeepingInternalTssDistance());
+        pref.put(wizardName+TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_LIMIT, component.getLeaderlessDistance().toString());
     }
 
     @Override
     public void validate() throws WizardValidationException {
-        if (!this.component.isAntisenseSelected() && !this.component.isPutativeUnAnnoSelected() && !this.component.isTSSSelected()) {
-            throw new WizardValidationException(null, "Please selct at least one of the given analysis types.", null);
-        }
+//        if () {
+//            throw new WizardValidationException(null, "Please selct at least one of the given analysis types.", null);
+//        }
     }
 }

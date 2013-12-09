@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.JOptionPane;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Exceptions;
 
 /**
@@ -47,6 +49,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
     private final ReferenceViewer refViewer;
     private TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
     private HashMap<Integer, PersistantTrack> trackMap;
+    private ProgressHandle progressHandle;
     /**
      * Key: featureID , Value: PersistantFeature
      */
@@ -67,19 +70,31 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
 
     private void startAnalysis() throws FileNotFoundException {
 
-        TrackConnector connector = null;
         try {
-            connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(selectedTrack);
+            this.trackConnector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(selectedTrack);
         } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
             JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
         }
-        this.featureParser = new GenomeFeatureParser(connector);
+
+        String handlerTitle = "Creating data structures from feature-information of the reference: " + trackConnector.getAssociatedTrackName();
+        this.progressHandle = ProgressHandleFactory.createHandle(handlerTitle);
+        this.progressHandle.start(120);
+        this.featureParser = new GenomeFeatureParser(this.trackConnector, progressHandle);
         this.featureParser.parseFeatureInformation(featureParser.getGenomeFeatures());
 
         this.region2Exclude = this.featureParser.getRegion2Exclude();
         this.forwardCDSs = this.featureParser.getForwardCDSs();
         this.reverseCDSs = this.featureParser.getReverseCDSs();
         this.allRegionsInHash = this.featureParser.getAllRegionsInHash();
+        if (parameters.isPerformNovelRegionDetection()) {
+            this.progressHandle.progress("Loading additional feature information ... ", 105);
+            featureParser.generateAllFeatureStrandInformation();
+            this.progressHandle.progress(120);
+            this.progressHandle.finish();
+        } else {
+            this.progressHandle.progress(120);
+            this.progressHandle.finish();
+        }
 
         // geting Mappings and calculate statistics on mappings.
         try {
@@ -158,16 +173,16 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
         }
 
         if (parameters.isPerformNovelRegionDetection()) {
-            newRegionDetection = new NewRegionDetection();
-            newRegionDetection.runningNewRegionsDetection(featureParser.getRefSeqLength(), forwardCDSs, 
-                    reverseCDSs, allRegionsInHash, this.stats.getFwdCoverage(), this.stats.getRevCoverage(), 
-                    this.stats.getForward(), this.stats.getReverse(), this.stats.getMm(), this.stats.getBg());
-            
+            newRegionDetection = new NewRegionDetection(this.trackConnector.getRefGenome().getSequence());
+            newRegionDetection.runningNewRegionsDetection(featureParser.getRefSeqLength(), featureParser.getAllFwdFeatures(),
+                    featureParser.getAllRevFeatures(), allRegionsInHash, this.stats.getFwdCoverage(), this.stats.getRevCoverage(),
+                    this.stats.getForward(), this.stats.getReverse(), this.stats.getMm(), this.stats.getBg(), this.selectedTrack.getId());
+            System.out.println("Out of computing NewRegion detection...");
             String trackNames;
 
             if (novelRegionResult == null) {
                 novelRegionResult = new NovelRegionResultPanel();
-                novelRegionResult.setBoundsInfoManager(refViewer.getBoundsInformationManager());
+                novelRegionResult.setReferenceViewer(refViewer);
             }
 
             NovelRegionResult newRegionResult = new NovelRegionResult(trackMap, newRegionDetection.getNovelRegions(), false);
@@ -175,7 +190,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
             trackNames = GeneralUtils.generateConcatenatedString(newRegionResult.getTrackNameList(), 120);
             String panelName = "Novel region detection results" + trackNames + " (" + novelRegionResult.getResultSize() + " hits)";
             transcAnalysesTopComp.openAnalysisTab(panelName, novelRegionResult);
-            
+
         }
 
         if (parameters.isPerformOperonDetection()) {

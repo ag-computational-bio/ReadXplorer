@@ -11,13 +11,13 @@ import org.openide.util.NbBundle;
 public class TssDetectionStatsPanel extends javax.swing.JPanel {
     
     private static final long serialVersionUID = 1L;
-    private HashMap<String, Integer> tssStatisticsMap;
+    private HashMap<String, Object> tssStatisticsMap;
 
     /**
      * Panel for showing the the statistics of a TSS detection result.
      * @param tssStatisticsMap the snp results statistics to display
      */
-    public TssDetectionStatsPanel(HashMap<String, Integer> tssStatisticsMap) {
+    public TssDetectionStatsPanel(HashMap<String, Object> tssStatisticsMap) {
         this.tssStatisticsMap = tssStatisticsMap;
         initComponents();
         this.initAdditionalComponents();
@@ -91,6 +91,12 @@ public class TssDetectionStatsPanel extends javax.swing.JPanel {
                 {ResultPanelTranscriptionStart.TSS_FWD, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_FWD))},
                 {ResultPanelTranscriptionStart.TSS_REV, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_REV))},
                 {ResultPanelTranscriptionStart.TSS_LEADERLESS, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_LEADERLESS))},
+                {ResultPanelTranscriptionStart.TSS_INTERNAL, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_INTERNAL))},
+                {ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE))},
+                {ResultPanelTranscriptionStart.MAPPINGS_COUNT, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT))},
+                {ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH))},
+                {ResultPanelTranscriptionStart.MAPPINGS_MILLION, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MILLION))},
+                {ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD))},
             },
             new String [] {
                 NbBundle.getMessage(TssDetectionStatsPanel.class, "TssDetectionStatsPanel.tssDetectionStatsTable.columnModel.title0"), 

@@ -19,18 +19,23 @@ public class PlottChoicePanel extends javax.swing.JPanel {
     public Integer getRange() {
         return Integer.valueOf(this.rangeTF.getText());
     }
-    
+
     public boolean isBaseDistribution() {
         return this.BaseDistributionCB.isSelected();
     }
-    
+
     public boolean isTssDistribution() {
         return this.tssDistanceDistributionCB.isSelected();
     }
-    
-    public boolean isAbsoluteFrequency()    {
+
+    public boolean isAbsoluteFrequency() {
         return this.absoluteFrequency.isSelected();
     }
+
+    public int getBin() {
+        return Integer.valueOf(this.binTF.getText());
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -44,6 +49,7 @@ public class PlottChoicePanel extends javax.swing.JPanel {
         rangeTF = new javax.swing.JTextField();
         tssDistanceDistributionCB = new javax.swing.JCheckBox();
         absoluteFrequency = new javax.swing.JCheckBox();
+        binTF = new javax.swing.JTextField();
 
         org.openide.awt.Mnemonics.setLocalizedText(BaseDistributionCB, org.openide.util.NbBundle.getMessage(PlottChoicePanel.class, "PlottChoicePanel.BaseDistributionCB.text")); // NOI18N
 
@@ -52,6 +58,13 @@ public class PlottChoicePanel extends javax.swing.JPanel {
         org.openide.awt.Mnemonics.setLocalizedText(tssDistanceDistributionCB, org.openide.util.NbBundle.getMessage(PlottChoicePanel.class, "PlottChoicePanel.tssDistanceDistributionCB.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(absoluteFrequency, org.openide.util.NbBundle.getMessage(PlottChoicePanel.class, "PlottChoicePanel.absoluteFrequency.text")); // NOI18N
+
+        binTF.setText(org.openide.util.NbBundle.getMessage(PlottChoicePanel.class, "PlottChoicePanel.binTF.text")); // NOI18N
+        binTF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                binTFActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -64,8 +77,12 @@ public class PlottChoicePanel extends javax.swing.JPanel {
                         .addComponent(BaseDistributionCB)
                         .addGap(18, 18, 18)
                         .addComponent(rangeTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(tssDistanceDistributionCB)
-                    .addComponent(absoluteFrequency))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                            .addComponent(absoluteFrequency)
+                            .addGap(18, 18, 18)
+                            .addComponent(binTF))
+                        .addComponent(tssDistanceDistributionCB, javax.swing.GroupLayout.Alignment.LEADING)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -78,13 +95,20 @@ public class PlottChoicePanel extends javax.swing.JPanel {
                 .addGap(18, 18, 18)
                 .addComponent(tssDistanceDistributionCB)
                 .addGap(18, 18, 18)
-                .addComponent(absoluteFrequency)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(absoluteFrequency)
+                    .addComponent(binTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(16, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void binTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_binTFActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_binTFActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox BaseDistributionCB;
     private javax.swing.JCheckBox absoluteFrequency;
+    private javax.swing.JTextField binTF;
     private javax.swing.JTextField rangeTF;
     private javax.swing.JCheckBox tssDistanceDistributionCB;
     // End of variables declaration//GEN-END:variables

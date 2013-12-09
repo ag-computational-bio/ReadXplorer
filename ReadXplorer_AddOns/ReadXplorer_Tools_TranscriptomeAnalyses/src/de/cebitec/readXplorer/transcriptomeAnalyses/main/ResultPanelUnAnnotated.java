@@ -69,7 +69,7 @@ public class ResultPanelUnAnnotated extends ResultTablePanel {
 
             },
             new String [] {
-                "TSS Position", "Direction", "Offste to next Feature", "BLAST Result", "Track ID"
+                "Start", "Direction", "Dropoff pos", "Site", "Track ID"
             }
         ) {
             Class[] types = new Class [] {
@@ -88,11 +88,11 @@ public class ResultPanelUnAnnotated extends ResultTablePanel {
             }
         });
         jScrollPane1.setViewportView(unAnnotatedTable);
-        unAnnotatedTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title0")); // NOI18N
-        unAnnotatedTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title3_1")); // NOI18N
-        unAnnotatedTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title1")); // NOI18N
-        unAnnotatedTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title2")); // NOI18N
-        unAnnotatedTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title4")); // NOI18N
+        unAnnotatedTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title0_1")); // NOI18N
+        unAnnotatedTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title3_1_1")); // NOI18N
+        unAnnotatedTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title1_1")); // NOI18N
+        unAnnotatedTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title2_1")); // NOI18N
+        unAnnotatedTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title4_1")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.jButton1.text")); // NOI18N
 
@@ -102,7 +102,7 @@ public class ResultPanelUnAnnotated extends ResultTablePanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .addComponent(jScrollPane1)
             .addGroup(layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(jButton2)
@@ -164,8 +164,8 @@ public class ResultPanelUnAnnotated extends ResultTablePanel {
                 rowData[0] = position;
                 rowData[1] = strand;
 
-                rowData[2] = nR.getOffset();
-
+                rowData[2] = nR.getDropOffPos();
+                rowData[3] = nR.getSite();
                 rowData[4] = nR.getTrackId();
 
                 SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread

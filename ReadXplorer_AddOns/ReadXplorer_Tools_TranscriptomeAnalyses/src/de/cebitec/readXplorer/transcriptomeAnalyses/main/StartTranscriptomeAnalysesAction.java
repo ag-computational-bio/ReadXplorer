@@ -112,8 +112,6 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
      */
     @SuppressWarnings("unchecked")
     private void startTranscriptomeAnalyses(WizardDescriptor wiz) {
-        System.out.println("Start transcriptome analyses now!");
-
         for (PersistantTrack track : this.tracks) {
             // Here we parse the genome
             // 1. getting region2Exclude 
@@ -129,17 +127,13 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
                 this.fraction = (double) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_Fraction);
                 this.upstream = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_UPSTREAM);
                 this.downstream = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_DOWNSTREAM);
-                this.performTSSAnalysis = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_TSS_ANALYSIS);
-                this.performAntisense = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_ANTISENSE_ANALYSIS);
-                this.performPutativeUnAnno = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_PUTATIVE_UNANNOTATED);
                 this.excludeInternalTss = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_INTERNAL_TSS);
                 this.excludeTSSDistance = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_TSS_DISTANCE);
                 this.leaderlessDistance = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_LIMIT);
                 this.keepingInternalTssDistance = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_KEEPINTERNAL_DISTANCE);
-                this.cdsShift = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_CDSSHIFT);
 
-                this.parameterSetFiveprime = new ParameterSetFiveEnrichedAnalyses(this.performTSSAnalysis, this.performAntisense, this.performPutativeUnAnno, this.fraction, this.ratio, this.upstream,
-                        this.downstream, this.excludeInternalTss, this.excludeTSSDistance, this.leaderlessDistance, this.cdsShift, this.keepingInternalTssDistance);
+                this.parameterSetFiveprime = new ParameterSetFiveEnrichedAnalyses(this.fraction, this.ratio, this.upstream,
+                        this.downstream, this.excludeInternalTss, this.excludeTSSDistance, this.leaderlessDistance, this.keepingInternalTssDistance);
 
                 // start five prime transcripts analyses handler
                 this.fifePrimeAnalysesHandler = new FiveEnrichedDataAnalysesHandler(
@@ -152,8 +146,8 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
                 // get needed params
                 this.performOperonDetection = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_OPERON_ANALYSIS);
                 this.performNovelRegionDetection = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_NOVEL_ANALYSIS);
-                if(this.performNovelRegionDetection || this.performOperonDetection) {
-                this.fraction = (double) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_Fraction);
+                if (this.performNovelRegionDetection || this.performOperonDetection) {
+                    this.fraction = (double) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_Fraction);
                 }
                 this.rPKMs = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_RPKM_ANALYSIS);
                 this.parameterSetWholeTranscripts = new ParameterSetWholeTranscriptAnalyses(this.performWholeTrascriptomeAnalyses,

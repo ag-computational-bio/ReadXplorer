@@ -29,6 +29,8 @@ public class GenomeFeatureParser {
     private List<PersistantFeature> genomeFeatures;
     private final ProgressHandle progressHandle;
     private String handlerTitle;
+    private HashMap<Integer, List<Integer>> allFwdFeatures;
+    private HashMap<Integer, List<Integer>> allRevFeatures;
 
     /**
      * Constructor for Genome-feature parser. Produces different needed data
@@ -36,20 +38,17 @@ public class GenomeFeatureParser {
      *
      * @param trackConnector
      */
-    public GenomeFeatureParser(TrackConnector trackConnector) {
+    public GenomeFeatureParser(TrackConnector trackConnector, ProgressHandle progressHandle) {
         this.trackConnector = trackConnector;
-
-        this.handlerTitle = "Initializing data structures from feature information of reference: " + trackConnector.getAssociatedTrackName();
-        this.progressHandle = ProgressHandleFactory.createHandle(handlerTitle);
-
         this.refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackConnector.getRefGenome().getId());
         this.refSeqLength = trackConnector.getRefSequenceLength();
         this.genomeFeatures = refConnector.getFeaturesForClosedInterval(0, this.refSeqLength);
-
         this.region2Exclude = new int[this.refSeqLength];
         this.forwardCDSs = new HashMap<>();
         this.reverseCDSs = new HashMap<>();
+        this.progressHandle = progressHandle;
         this.allRegionsInHash = getGenomeFeaturesInHash(this.genomeFeatures);
+        
     }
 
     /**
@@ -139,16 +138,16 @@ public class GenomeFeatureParser {
             // tRNA and rRNA regions are entered into the "mask array"
             if (type.equals(FeatureType.RRNA) || type.equals(FeatureType.TRNA)) {
                 maskingRegions(type, isFwd, start, stop);
-            }
-
-            // store the regions in arrays of arrays (allows for overlapping regions)
-            if (!type.equals(FeatureType.RRNA) && !type.equals(FeatureType.TRNA)) {
-                createCDSsStrandInformation(id, start, stop, isFwd);
+            } else {
+                // store the regions in arrays of arrays (allows for overlapping regions)
+                if (isFwd) {
+                    createCDSsStrandInformation(this.forwardCDSs, id, start, stop, isFwd);
+                } else {
+                    createCDSsStrandInformation(this.reverseCDSs, id, start, stop, isFwd);
+                }
             }
         }
-
         this.progressHandle.progress("Parsing Feature Information", 100);
-        this.progressHandle.finish();
     }
 
     /**
@@ -163,24 +162,24 @@ public class GenomeFeatureParser {
      * @param stop Stopposition of feature.
      * @param isFwd Feature direction is forward if true, otherwise false.
      */
-    private void createCDSsStrandInformation(int featureID, int start, int stop, boolean isFwd) {
+    private void createCDSsStrandInformation(HashMap<Integer, List<Integer>> list, int featureID, int start, int stop, boolean isFwd) {
 
         for (int i = 0; (i + start - 1) < stop; i++) {
             if (isFwd) {
-                if (this.forwardCDSs.get(i + start - 1) != null) {
-                    this.forwardCDSs.get(i + start - 1).add(featureID);
+                if (list.get(i + start - 1) != null) {
+                    list.get(i + start - 1).add(featureID);
                 } else {
                     ArrayList<Integer> tmp = new ArrayList<>();
                     tmp.add(featureID);
-                    this.forwardCDSs.put(i + start - 1, tmp);
+                    list.put(i + start - 1, tmp);
                 }
             } else {
-                if (this.reverseCDSs.get(i + start - 1) != null) {
-                    this.reverseCDSs.get(i + start - 1).add(featureID);
+                if (list.get(i + start - 1) != null) {
+                    list.get(i + start - 1).add(featureID);
                 } else {
                     ArrayList<Integer> tmp = new ArrayList<>();
                     tmp.add(featureID);
-                    this.reverseCDSs.put(i + start - 1, tmp);
+                    list.put(i + start - 1, tmp);
                 }
             }
         }
@@ -231,15 +230,35 @@ public class GenomeFeatureParser {
      * @return a HashMap<FeatureID, Feature> with all genome features.
      */
     private HashMap<Integer, PersistantFeature> getGenomeFeaturesInHash(List<PersistantFeature> genomeFeatures) {
-        this.progressHandle.start(100);
         this.progressHandle.progress("Hashing of Features", 10);
         HashMap<Integer, PersistantFeature> regions = new HashMap<>();
+        this.allFwdFeatures = new HashMap<>();
+        this.allRevFeatures = new HashMap<>();
 
         for (PersistantFeature gf : genomeFeatures) {
             regions.put(gf.getId(), gf);
         }
         this.progressHandle.progress("Hashing of Features", 20);
         return regions;
+    }
+
+    public void generateAllFeatureStrandInformation() {
+        this.allFwdFeatures = new HashMap<>();
+        this.allRevFeatures = new HashMap<>();
+
+        for (PersistantFeature feature : genomeFeatures) {
+
+            int start = feature.getStart();
+            int stop = feature.getStop();
+            boolean isFwd = feature.isFwdStrand();
+            int id = feature.getId();
+            // store the regions in arrays of arrays (allows for overlapping regions)
+            if (isFwd) {
+                createCDSsStrandInformation(this.allFwdFeatures, id, start, stop, isFwd);
+            } else {
+                createCDSsStrandInformation(this.allRevFeatures, id, start, stop, isFwd);
+            }
+        }
     }
 
     /**
@@ -276,5 +295,21 @@ public class GenomeFeatureParser {
      */
     public List<PersistantFeature> getGenomeFeatures() {
         return genomeFeatures;
+    }
+
+    public HashMap<Integer, List<Integer>> getAllFwdFeatures() {
+        return allFwdFeatures;
+    }
+
+    public void setAllFwdFeatures(HashMap<Integer, List<Integer>> allFwdFeatures) {
+        this.allFwdFeatures = allFwdFeatures;
+    }
+
+    public HashMap<Integer, List<Integer>> getAllRevFeatures() {
+        return allRevFeatures;
+    }
+
+    public void setAllRevFeatures(HashMap<Integer, List<Integer>> allRevFeatures) {
+        this.allRevFeatures = allRevFeatures;
     }
 }
