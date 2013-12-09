@@ -4,12 +4,13 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.excelImport;
 
-import de.cebitec.readXplorer.transcriptomeAnalyses.main.ResultPanelTranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.TranscriptomeAnalysesTopComponentTopComponent;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.JOptionPane;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
@@ -27,37 +28,41 @@ import org.openide.windows.WindowManager;
 public final class ImportAction implements ActionListener {
 
     private final ReferenceViewer refViewer;
-     private TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
-    private int referenceId;
-    
-    public ImportAction (ReferenceViewer reference) {
+    private ProgressHandle progressHandle;
+    private TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
+
+    public ImportAction(ReferenceViewer reference) {
         this.refViewer = reference;
-        this.referenceId = this.refViewer.getReference().getId();
         TopComponent findTopComponent = WindowManager.getDefault().findTopComponent(TranscriptomeAnalysesTopComponentTopComponent.PREFERRED_ID);
         if (findTopComponent != null) {
-        this.transcAnalysesTopComp = (TranscriptomeAnalysesTopComponentTopComponent) findTopComponent;
+            this.transcAnalysesTopComp = (TranscriptomeAnalysesTopComponentTopComponent) findTopComponent;
         } else {
             transcAnalysesTopComp = new TranscriptomeAnalysesTopComponentTopComponent();
         }
-        
     }
-    
+
     @Override
     public void actionPerformed(ActionEvent e) {
-        
+        final ExcelImportFileChooser fc = new ExcelImportFileChooser(new String[]{"xls"}, "xls");
+        this.progressHandle = ProgressHandleFactory.createHandle("Import progress ...");
         this.transcAnalysesTopComp.open();
+        Thread exportThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                progressHandle.start(30);
+                ExcelImporter importer = new ExcelImporter(progressHandle);
+                importer.startExcelToTableConverter(fc.getSelectedFile());
+                progressHandle.progress(11);
+                importer.setUpTSSDataStructuresAndTable(refViewer, transcAnalysesTopComp);
+                progressHandle.progress(30);
+                
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successfull!",
+                "Import was successfull!", JOptionPane.INFORMATION_MESSAGE);
+                
+                progressHandle.finish();
+            }
+        });
+        exportThread.start();
         
-        // hier noch einen NotifyDescriptor, damit der user die Info geben kann, welche 
-        // Art von TranscriptomeAnalyse Excel er importieren möchte.
-        
-        
-        ExcelImportFileChooser fc = new ExcelImportFileChooser(new String[]{"xls"}, "xls");
-       
-        DefaultTableModel model = fc.getModel();
-        ResultPanelTranscriptionStart importPanel = new ResultPanelTranscriptionStart();
-        importPanel.setDefaultTableModelToTable(model);
-        importPanel.setReferenceViewer(refViewer);
-//        ImportPanel importPanel = new ImportPanel(model);
-        transcAnalysesTopComp.openAnalysisTab("Name", importPanel);
     }
 }

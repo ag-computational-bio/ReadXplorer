@@ -24,8 +24,14 @@
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="rangeTF" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="tssDistanceDistributionCB" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="absoluteFrequency" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
+                      <Group type="102" alignment="0" attributes="0">
+                          <Component id="absoluteFrequency" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace type="separate" max="-2" attributes="0"/>
+                          <Component id="binTF" max="32767" attributes="0"/>
+                      </Group>
+                      <Component id="tssDistanceDistributionCB" alignment="0" min="-2" max="-2" attributes="0"/>
+                  </Group>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -42,7 +48,10 @@
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="tssDistanceDistributionCB" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="absoluteFrequency" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="absoluteFrequency" min="-2" max="-2" attributes="0"/>
+                  <Component id="binTF" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace pref="16" max="32767" attributes="0"/>
           </Group>
       </Group>
@@ -76,6 +85,16 @@
           <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/Bundle.properties" key="PlottChoicePanel.absoluteFrequency.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="binTF">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/main/Bundle.properties" key="PlottChoicePanel.binTF.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="binTFActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

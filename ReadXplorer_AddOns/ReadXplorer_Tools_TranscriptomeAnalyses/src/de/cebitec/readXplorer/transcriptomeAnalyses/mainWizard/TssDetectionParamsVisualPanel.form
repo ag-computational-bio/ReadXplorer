@@ -25,30 +25,35 @@
                   </Group>
                   <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" alignment="0" attributes="0">
+                          <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                  <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Group type="103" groupAlignment="0" attributes="0">
+                                          <Component id="jLabel2" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="jLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
+                                      </Group>
+                                      <EmptySpace type="unrelated" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                                       <EmptySpace max="32767" attributes="0"/>
-                                      <Component id="fractionTextField" min="-2" max="-2" attributes="0"/>
+                                      <Component id="fractionTextField" min="-2" pref="30" max="-2" attributes="0"/>
+                                      <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
                                   </Group>
-                                  <Component id="jLabel3" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="jLabel4" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace type="separate" max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="1" attributes="0">
-                                  <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                                      <Component id="upstreamRegionTextField" max="32767" attributes="0"/>
-                                      <Component id="downstreamRegionTextField" max="32767" attributes="0"/>
-                                      <Component id="rationValueTextField" alignment="0" max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                                      <Component id="downstreamRegionTextField" alignment="0" pref="0" max="32767" attributes="0"/>
+                                      <Component id="upstreamRegionTextField" alignment="0" pref="0" max="32767" attributes="0"/>
+                                      <Component id="rationValueTextField" pref="30" max="32767" attributes="0"/>
                                   </Group>
                                   <Component id="resultLabel" min="-2" pref="34" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <Component id="exclusionOfInternalTSSChcekbox" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="exclusionOfInternalTSSChcekbox" min="-2" pref="262" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace type="separate" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="keepInternalTSSLabel" min="-2" max="-2" attributes="0"/>
@@ -113,7 +118,7 @@
                   </Group>
                   <Component id="jScrollPane4" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel9" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="limitationOfDistanceToGeneTF" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -124,7 +129,7 @@
                   <Component id="keepInternalTssDistanceTF" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="exclusionOfInternalTSSChcekbox" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace pref="16" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -282,10 +287,10 @@
     <Component class="javax.swing.JLabel" name="fractionDescriptionLabel">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/de/cebitec/readxplorer/transcriptomeAnaylses/resources/fractionDescription.PNG"/>
+          <Image iconType="3" name="/de/cebitec/readXplorer/transcriptomeAnalyses/resources/fractionDescription.PNG"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/wizard/Bundle.properties" key="TssDetectionParamsVisualPanel.fractionDescriptionLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/mainWizard/Bundle.properties" key="TssDetectionParamsVisualPanel.fractionDescriptionLabel.text_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>

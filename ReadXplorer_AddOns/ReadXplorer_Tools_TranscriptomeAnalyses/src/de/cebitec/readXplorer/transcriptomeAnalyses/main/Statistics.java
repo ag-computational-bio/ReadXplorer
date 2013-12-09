@@ -66,6 +66,10 @@ public class Statistics implements Observer {
         this.putativeOperonAdjacenciesREV = new HashMap<>();
         this.mappingsOnRrnAndTrna = new HashMap<>();
     }
+    
+    public Statistics(double mml, double mm, double mc, double bg) {
+        
+    }
 
     /**
      *

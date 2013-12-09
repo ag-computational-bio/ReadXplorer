@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.JOptionPane;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 
 /**
  *
@@ -28,7 +30,6 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
     private TrackConnector trackConnector;
     private PersistantTrack selectedTrack;
     private List<PersistantMapping> mappings;
-    private double fraction;
     private List<de.cebitec.readXplorer.util.Observer> observer = new ArrayList<>();
     private int[] region2Exclude;
     protected HashMap<Integer, List<Integer>> forwardCDSs, reverseCDSs;
@@ -44,6 +45,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
     private final ReferenceViewer refViewer;
     private TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
     private HashMap<Integer, PersistantTrack> trackMap;
+    private ProgressHandle progressHandle;
     /**
      * Key: featureID , Value: PersistantFeature
      */
@@ -52,7 +54,6 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
     public FiveEnrichedDataAnalysesHandler(PersistantTrack selectedTrack, ParameterSetFiveEnrichedAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, HashMap<Integer, PersistantTrack> trackMap) {
 
         this.selectedTrack = selectedTrack;
-        this.fraction = parameterset.getFraction();
         this.parameters = parameterset;
         this.refViewer = refViewer;
         this.transcAnalysesTopComp = transcAnalysesTopComp;
@@ -61,13 +62,15 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
 
     private void startAnalysis() {
 
-        TrackConnector connector = null;
         try {
-            connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(selectedTrack);
+            this.trackConnector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(selectedTrack);
         } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
             JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
         }
-        this.featureParser = new GenomeFeatureParser(connector);
+        String handlerTitle = "Creating data structures from feature-information of the reference: " + trackConnector.getAssociatedTrackName();
+        this.progressHandle = ProgressHandleFactory.createHandle(handlerTitle);
+        this.progressHandle.start(100);
+        this.featureParser = new GenomeFeatureParser(this.trackConnector, this.progressHandle);
         this.featureParser.parseFeatureInformation(this.featureParser.getGenomeFeatures());
 
         // Initiation of important structures
@@ -75,25 +78,16 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
         this.forwardCDSs = this.featureParser.getForwardCDSs();
         this.reverseCDSs = this.featureParser.getReverseCDSs();
         this.allRegionsInHash = this.featureParser.getAllRegionsInHash();
-
+        this.progressHandle.finish();
 
         // geting Mappings and calculate statistics on mappings.
-        try {
-            this.trackConnector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(this.selectedTrack);
-            this.stats = new Statistics(featureParser.getRefSeqLength(), this.fraction, this.forwardCDSs, this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
-            de.cebitec.readXplorer.databackend.AnalysesHandler handler = new de.cebitec.readXplorer.databackend.AnalysesHandler(trackConnector, this, "Collecting coverage data of track number "
-                    + this.selectedTrack.getId(), new ParametersReadClasses(true, false, false, false)); // TODO: ParameterReadClasses noch in den Wizard einbauen und die parameter hier mit übergeben!
-            handler.setMappingsNeeded(true);
-            handler.setDesiredData(Properties.REDUCED_MAPPINGS);
-            handler.registerObserver(this.stats);
-            handler.startAnalysis();
-        } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-            JOptionPane.showMessageDialog(null, "The path of one of the selected tracks could not be resolved. The analysis will be canceled now.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
-            notifyObservers(AnalysisStatus.ERROR);
-            this.interrupt();
-        }
-
-        // Next Steps in showData method!
+        this.stats = new Statistics(featureParser.getRefSeqLength(), parameters.getFraction(), this.forwardCDSs, this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
+        de.cebitec.readXplorer.databackend.AnalysesHandler handler = new de.cebitec.readXplorer.databackend.AnalysesHandler(trackConnector, this, "Collecting coverage data of track number "
+                + this.selectedTrack.getId(), new ParametersReadClasses(true, false, false, false)); // TODO: ParameterReadClasses noch in den Wizard einbauen und die parameter hier mit übergeben!
+        handler.setMappingsNeeded(true);
+        handler.setDesiredData(Properties.REDUCED_MAPPINGS);
+        handler.registerObserver(this.stats);
+        handler.startAnalysis();
     }
 
     @Override
@@ -136,56 +130,57 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
         this.stats.setBg(this.backgroundCutoff);
 
         this.stats.initMappingsStatistics();
-        if (parameters.isPerformTSSAnalysis()) {
-            this.tssDetection = new TssDetection(this.trackConnector.getRefGenome().getSequence(), trackId);
-            this.tssDetection.runningTSSDetection(this.featureParser.getRefSeqLength(), this.forwardCDSs, this.reverseCDSs,
-                    this.allRegionsInHash, this.stats, this.parameters);
+        this.tssDetection = new TssDetection(this.trackConnector.getRefGenome().getSequence(), trackId);
+        this.tssDetection.runningTSSDetection(this.featureParser.getRefSeqLength(), this.forwardCDSs, this.reverseCDSs,
+                this.allRegionsInHash, this.stats, this.parameters);
 
-            String trackNames;
-            if (transcriptionStartResultPanel == null) {
-                transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
-                transcriptionStartResultPanel.setReferenceViewer(refViewer);
-            }
-
-            TSSDetectionResults tssResult = new TSSDetectionResults(this.stats, this.tssDetection.getResults(), getTrackMap());
-            tssResult.setParameters(this.parameters);
-            transcriptionStartResultPanel.addResult(tssResult);
-
-            trackNames = GeneralUtils.generateConcatenatedString(tssResult.getTrackNameList(), 120);
-            String panelName = "Detected TSSs for " + trackNames + " (" + transcriptionStartResultPanel.getResultSize() + " hits)";
-            transcAnalysesTopComp.openAnalysisTab(panelName, transcriptionStartResultPanel);
-
-            if (parameters.isPerformUnAnnotatedRegionsAnalysis()) {
-                if (novelRegionResultPanel == null) {
-                    novelRegionResultPanel = new NovelRegionResultPanel();
-                    novelRegionResultPanel.setReferenceViewer(refViewer);
-                }
-
-                NovelRegionResult nrResult = new NovelRegionResult(trackMap, this.tssDetection.getDetectedPutativeNewRegions(), false);
-                nrResult.setParameters(this.parameters);
-                novelRegionResultPanel.addResult(nrResult);
-
-                trackNames = GeneralUtils.generateConcatenatedString(nrResult.getTrackNameList(), 120);
-                panelName = "Detected Novel Regions for " + trackNames + " (" + novelRegionResultPanel.getResultSize() + " hits)";
-                transcAnalysesTopComp.openAnalysisTab(panelName, novelRegionResultPanel);
-            }
-            if (parameters.isPerformAntisenseAnalysis()) {
-
-
-                if (antisenseResultPanel == null) {
-                    antisenseResultPanel = new ResultsPanelAntisense();
-                    antisenseResultPanel.setReferenceViewer(refViewer);
-                }
-
-                ResultsAntisense asResult = new ResultsAntisense(trackMap, this.tssDetection.getDetectedPutativeAntisenseTSS(), false);
-                asResult.setParameters(this.parameters);
-                antisenseResultPanel.addResult(asResult);
-
-                trackNames = GeneralUtils.generateConcatenatedString(asResult.getTrackNameList(), 120);
-                panelName = "Detected Antisense TSS for " + trackNames + " (" + antisenseResultPanel.getResultSize() + " hits)";
-                transcAnalysesTopComp.openAnalysisTab(panelName, antisenseResultPanel);
-            }
+        String trackNames;
+        if (transcriptionStartResultPanel == null) {
+            transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
+            transcriptionStartResultPanel.setReferenceViewer(refViewer);
         }
+
+        TSSDetectionResults tssResult = new TSSDetectionResults(this.stats, this.tssDetection.getResults(), getTrackMap());
+        tssResult.setParameters(this.parameters);
+        transcriptionStartResultPanel.addResult(tssResult);
+
+        trackNames = GeneralUtils.generateConcatenatedString(tssResult.getTrackNameList(), 120);
+        String panelName = "Detected TSSs for " + trackNames + " (" + transcriptionStartResultPanel.getResultSize() + " hits)";
+        transcAnalysesTopComp.openAnalysisTab(panelName, transcriptionStartResultPanel);
+
+
+
+
+//        if (novelRegionResultPanel == null) {
+//            novelRegionResultPanel = new NovelRegionResultPanel();
+//            novelRegionResultPanel.setReferenceViewer(refViewer);
+//        }
+//
+//        NovelRegionResult nrResult = new NovelRegionResult(trackMap, this.tssDetection.getDetectedPutativeNewRegions(), false);
+//        nrResult.setParameters(this.parameters);
+//        novelRegionResultPanel.addResult(nrResult);
+//
+//        trackNames = GeneralUtils.generateConcatenatedString(nrResult.getTrackNameList(), 120);
+//        panelName = "Detected Novel Regions for " + trackNames + " (" + novelRegionResultPanel.getResultSize() + " hits)";
+//        transcAnalysesTopComp.openAnalysisTab(panelName, novelRegionResultPanel);
+
+
+
+
+//        if (antisenseResultPanel == null) {
+//            antisenseResultPanel = new ResultsPanelAntisense();
+//            antisenseResultPanel.setReferenceViewer(refViewer);
+//        }
+
+//        ResultsAntisense asResult = new ResultsAntisense(trackMap, this.tssDetection.getDetectedPutativeAntisenseTSS(), false);
+//        asResult.setParameters(this.parameters);
+//        antisenseResultPanel.addResult(asResult);
+//
+//        trackNames = GeneralUtils.generateConcatenatedString(asResult.getTrackNameList(), 120);
+//        panelName = "Detected Antisense TSS for " + trackNames + " (" + antisenseResultPanel.getResultSize() + " hits)";
+//        transcAnalysesTopComp.openAnalysisTab(panelName, antisenseResultPanel);
+
+
         notifyObservers(AnalysisStatus.FINISHED);
     }
 

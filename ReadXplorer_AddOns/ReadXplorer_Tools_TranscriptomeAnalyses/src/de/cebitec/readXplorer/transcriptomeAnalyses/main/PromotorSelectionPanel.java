@@ -5,9 +5,6 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.main;
  * @author jritter
  */
 public class PromotorSelectionPanel extends javax.swing.JPanel {
-
-    
-    
     /**
      * Creates new form PromotorSelectionPanel
      */
