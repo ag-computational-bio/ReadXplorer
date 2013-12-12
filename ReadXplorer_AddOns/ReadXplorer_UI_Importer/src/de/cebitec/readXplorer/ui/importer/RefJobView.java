@@ -22,7 +22,7 @@ public class RefJobView extends javax.swing.JPanel implements ListSelectionListe
     /** Creates new form TaskViewerTemplate */
     public RefJobView() {
         initComponents();
-        this.jobs = new ArrayList<ReferenceJob>();
+        this.jobs = new ArrayList<>();
     }
 
     public ReferenceJob getSelectedItem() {

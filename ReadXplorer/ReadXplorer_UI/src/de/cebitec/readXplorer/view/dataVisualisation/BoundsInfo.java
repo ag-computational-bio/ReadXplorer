@@ -5,7 +5,7 @@ package de.cebitec.readXplorer.view.dataVisualisation;
  * example by an AbstractViewer. It stores left and right borders, current position,
  * current width and zoom level and also maximal left and right values.
  * 
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class BoundsInfo {
 
@@ -16,20 +16,28 @@ public class BoundsInfo {
     private int zoomValue;
     private int maxLogRight;
     private int maxLogLeft;
+    private int currentChromId;
 
     /**
      * This class stores information about a region that should be displayed for
      * example by an AbstractViewer. It stores left and right borders, current
      * position, current width and zoom level and also maximal left and right
      * values.
+     * @param maxLogLeft the leftmost position of the reference to be shown
+     * @param maxLogRight the maximal position of the reference that can be
+     * displayed. Normally equals the size of the reference.
+     * @param currentLogPos the current position that should be displayed
+     * @param zoomValue The current zoom value.
+     * @param currentChromId The id of the currently visible chromosome/reference sequence.
      */
-    public BoundsInfo(int maxLogLeft, int maxLogRight, int currentLogPos, int zoomValue){
+    public BoundsInfo(int maxLogLeft, int maxLogRight, int currentLogPos, int zoomValue, int currentChromId){
         this.maxLogLeft = maxLogLeft;
         this.maxLogRight = maxLogRight;
         this.currentLogPos = currentLogPos;
         this.zoomValue = zoomValue;
         logWidth = 200;
         updateLeftAndRight();
+        this.currentChromId = currentChromId;
     }
 
     /**
@@ -37,18 +45,26 @@ public class BoundsInfo {
      * example by an AbstractViewer. It stores left and right borders, current
      * position, current width and zoom level and also maximal left and right
      * values.
+     * @param maxLogLeft the leftmost position of the reference to be shown
+     * @param maxLogRight the maximal position of the reference that can be
+     * displayed. Normally equals the size of the reference.
+     * @param currentLogPos the current position that should be displayed
+     * @param zoomValue The current zoom value.
+     * @param currentChromId The id of the currently visible chromosome/reference sequence.
+     * @param width  
      */
-    public BoundsInfo(int maxLogLeft, int maxLogRight, int currentLogPos, int zoomValue, int width){
+    public BoundsInfo(int maxLogLeft, int maxLogRight, int currentLogPos, int zoomValue, int currentChromId, int width){
         this.maxLogLeft = maxLogLeft;
         this.maxLogRight = maxLogRight;
         this.currentLogPos = currentLogPos;
         this.zoomValue = zoomValue;
-        logWidth = width;
+        this.currentChromId = currentChromId;
+        this.logWidth = width;
         updateLeftAndRight();
     }
 
     /**
-     * @return the left most position of the genome to be shown
+     * @return the leftmost position of the genome to be shown
      */
     public int getMaxLogLeft() {
         return maxLogLeft;
@@ -81,14 +97,14 @@ public class BoundsInfo {
     }
 
     /**
-     * @return the left most position of the area currently visible
+     * @return the leftmost position of the area currently visible
      */
     public int getLogLeft() {
         return logLeft;
     }
 
     /**
-     * @return the right most position of the area currently visible
+     * @return the rightmost position of the area currently visible
      */
     public int getLogRight() {
         return logRight;
@@ -110,6 +126,10 @@ public class BoundsInfo {
         updateLeftAndRight();
     }
 
+    /**
+     * @param newLogRight The value, which shall replace the old logRight value.
+     * logWidth is updated automatically.
+     */
     public void correctLogRight(int newLogRight){
         this.logRight = newLogRight;
         this.logWidth = this.logRight - logLeft +1;
@@ -142,9 +162,25 @@ public class BoundsInfo {
         }
     }
 
-
+    /**
+     * @return The current zoom value.
+     */
     public int getZoomValue() {
         return zoomValue;
+    }
+
+    /**
+     * @return The id of the currently visible chromosome/reference sequence.
+     */
+    public int getCurrentChromId() {
+        return currentChromId;
+    }
+
+    /**
+     * @param currentChromId The id of the new visible chromosome/reference sequence.
+     */
+    public void setCurrentChromId(int currentChromId) {
+        this.currentChromId = currentChromId;
     }
     
     @Override
@@ -157,7 +193,8 @@ public class BoundsInfo {
                 && otherBounds.getLogWidth() == this.getLogWidth()
                 && otherBounds.getMaxLogLeft() == this.getMaxLogLeft() 
                 && otherBounds.getMaxLogRight() == this.getMaxLogRight()
-                && otherBounds.getZoomValue() == this.getZoomValue();
+                && otherBounds.getZoomValue() == this.getZoomValue()
+                && otherBounds.getCurrentChromId() == this.getCurrentChromId();
         }
         return false;
     }
@@ -172,6 +209,7 @@ public class BoundsInfo {
         hash = 13 * hash + this.zoomValue;
         hash = 13 * hash + this.maxLogRight;
         hash = 13 * hash + this.maxLogLeft;
+        hash = 13 * hash + this.currentChromId;
         return hash;
     }
 

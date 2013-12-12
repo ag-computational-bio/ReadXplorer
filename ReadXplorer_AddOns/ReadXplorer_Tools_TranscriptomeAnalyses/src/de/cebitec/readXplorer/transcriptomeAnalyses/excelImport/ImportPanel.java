@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.readXplorer.transcriptomeAnalyses.excelImport;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
@@ -42,7 +38,9 @@ public class ImportPanel extends ResultTablePanel {
         model.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                TableUtils.showPosition(inputTable, 0, boundsInfoManager);
+                int posColumnIdx = 0;
+                int chromColumnIdx = 1; //TODO: set correct table column for chrom
+                TableUtils.showPosition(inputTable, posColumnIdx, chromColumnIdx, boundsInfoManager);
             }
         });
     }
@@ -102,7 +100,7 @@ public class ImportPanel extends ResultTablePanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(inputTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .addComponent(inputTableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 426, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(chartsButton)

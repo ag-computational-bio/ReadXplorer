@@ -10,7 +10,6 @@ import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.readXplorer.view.dialogMenus.OpenTracksVisualPanel;
 import de.cebitec.readXplorer.view.dialogMenus.OpenTracksWizardPanel;
 import de.cebitec.readXplorer.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
 import de.cebitec.readXplorer.view.dialogMenus.SelectFeatureTypeWizardPanel;
@@ -211,7 +210,8 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
                 ++finishedCovAnalyses;
 
                 AnalysisSNPs analysisSNPs = trackToAnalysisMap.get(trackId);
-                final SnpDetectionResult result = new SnpDetectionResult(analysisSNPs.getResults(), trackMap, combineTracks);
+                final SnpDetectionResult result = new SnpDetectionResult(analysisSNPs.getResults(), 
+                        trackMap, referenceId, combineTracks);
                 result.setParameters(parametersSNPs);
 
                 SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread

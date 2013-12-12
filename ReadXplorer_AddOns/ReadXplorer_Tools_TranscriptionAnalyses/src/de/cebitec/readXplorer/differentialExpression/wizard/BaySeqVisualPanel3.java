@@ -16,7 +16,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
     private DefaultListModel<PersistantTrack> trackListModel = new DefaultListModel<>();
     private DefaultListModel<String> groupListModel = new DefaultListModel<>();
     private List<Group> createdGroups = new ArrayList<>();
-    private List<PersistantTrack> selectedTraks = new ArrayList<>();
+    private List<PersistantTrack> selectedTracks = new ArrayList<>();
     private Integer[] currentGroupBeingCreated = null;
     private int currentGroupNumber = 1;
     private int selectedIndex = -1;
@@ -28,19 +28,19 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
         initComponents();
     }
 
-    public void updateTrackList(List<PersistantTrack> selectedTraks) {
-        if (!this.selectedTraks.equals(selectedTraks)) {
-            this.selectedTraks = selectedTraks;
+    public void updateTrackList(List<PersistantTrack> selectedTracks) {
+        if (!this.selectedTracks.equals(selectedTracks)) {
+            this.selectedTracks = selectedTracks;
             currentGroupNumber = 1;
             selectedIndex = -1;
             currentGroupBeingCreated = null;
             createdGroups.clear();
             groupListModel.clear();
-            Integer[] defaultGroup = new Integer[selectedTraks.size()];
+            Integer[] defaultGroup = new Integer[selectedTracks.size()];
             StringBuilder strBuilder = new StringBuilder("{");
-            for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
+            for (Iterator<PersistantTrack> it = selectedTracks.iterator(); it.hasNext();) {
                 PersistantTrack persistantTrack = it.next();
-                defaultGroup[selectedTraks.indexOf(persistantTrack)] = currentGroupNumber;
+                defaultGroup[selectedTracks.indexOf(persistantTrack)] = currentGroupNumber;
                 strBuilder.append(persistantTrack.getDescription());
                 if (it.hasNext()) {
                     strBuilder.append(",");
@@ -53,7 +53,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
             infoText.setText("The group "+strBuilder.toString()+" is created automatically.");
         }
         trackListModel.clear();
-        for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
+        for (Iterator<PersistantTrack> it = selectedTracks.iterator(); it.hasNext();) {
             PersistantTrack persistantTrack = it.next();
             trackListModel.addElement(persistantTrack);
         }
@@ -193,14 +193,14 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         if (currentGroupBeingCreated == null) {
-            currentGroupBeingCreated = new Integer[selectedTraks.size()];
+            currentGroupBeingCreated = new Integer[selectedTracks.size()];
         }
         if (!trackList.isSelectionEmpty()) {
             List<PersistantTrack> tracks = trackList.getSelectedValuesList();
             StringBuilder strBuilder = new StringBuilder(groupCreationField.getText() + "{");
             for (Iterator<PersistantTrack> it = tracks.iterator(); it.hasNext();) {
                 PersistantTrack persistantTrack = it.next();
-                currentGroupBeingCreated[selectedTraks.indexOf(persistantTrack)] = currentGroupNumber;
+                currentGroupBeingCreated[selectedTracks.indexOf(persistantTrack)] = currentGroupNumber;
                 strBuilder.append(persistantTrack.getDescription());
                 trackListModel.removeElement(persistantTrack);
                 if (it.hasNext()) {
@@ -224,7 +224,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
         currentGroupBeingCreated = null;
         groupListModel.addElement(groupCreationField.getText());
         groupCreationField.setText("");
-        updateTrackList(selectedTraks);
+        updateTrackList(selectedTracks);
         addButton.setEnabled(true);
         addModelButton.setEnabled(false);
         jScrollPane5.updateUI();

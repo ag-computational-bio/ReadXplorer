@@ -299,9 +299,6 @@ public class NewTrackDialogPanel extends ImportTrackBasePanel implements NewJobD
                     for (int i = 0; i < files.length; ++i) {
                         addFile(files[i], mappingFileField);
                         nameField.setText(files[i].getName());
-                        if (!(getCurrentParser() instanceof JokToBamDirectParser)) {
-                            checkSeqDictonary(files[i]);
-                        }
                     }
 
                     mappingFileField.setText(getMappingFiles().size() + " tracks to import");
@@ -313,9 +310,6 @@ public class NewTrackDialogPanel extends ImportTrackBasePanel implements NewJobD
                     File file = this.getSelectedFile();
                     addFile(file, mappingFileField);
                     nameField.setText(file.getName());
-                    if (!(getCurrentParser() instanceof JokToBamDirectParser)) {
-                        checkSeqDictonary(file);
-                    }
                 }
             }
         };

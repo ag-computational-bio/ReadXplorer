@@ -21,10 +21,12 @@ public class TransStartUnannotated extends TranscriptionStart {
      * the detected TSS position
      * @param detFeatures object containing the features associated to this predicted gene start
      * @param detectedStop The stop position of the predicted unannotated transcript
+     * @param trackId The id of the track to which the TSS belongs
+     * @param chromId The id of the chromosome to which the TSS belongs
      */
     public TransStartUnannotated(int pos, boolean isFwdStrand, int readStarts, int percentIncrease,
-            int coverageIncrease, DetectedFeatures detFeatures, int detectedStop, int trackId) {
-        super(pos, isFwdStrand, readStarts, percentIncrease, coverageIncrease, detFeatures, trackId);
+            int coverageIncrease, DetectedFeatures detFeatures, int detectedStop, int trackId, int chromId) {
+        super(pos, isFwdStrand, readStarts, percentIncrease, coverageIncrease, detFeatures, trackId, chromId);
         this.detectedStop = detectedStop;
     }
 

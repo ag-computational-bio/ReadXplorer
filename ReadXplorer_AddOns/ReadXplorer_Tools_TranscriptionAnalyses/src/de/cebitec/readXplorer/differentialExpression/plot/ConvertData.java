@@ -22,11 +22,11 @@ public class ConvertData {
     private static final int CUT_OFF = 30;
 
     public static Map<PersistantFeature, Pair<Double, Double>> ratioABagainstConfidence(ResultDeAnalysis result) {
-        return createDataPairForFeature(result.getTableContents(), 0, 7, 9);
+        return createDataPairForFeature(result.getTableContents(), 0, 8, 10);
     }
 
     public static Map<PersistantFeature, Pair<Double, Double>> ratioBAagainstConfidence(ResultDeAnalysis result) {
-        return createDataPairForFeature(result.getTableContents(), 0, 8, 9);
+        return createDataPairForFeature(result.getTableContents(), 0, 9, 10);
     }
 
     public static Map<PersistantFeature, Pair<Double, Double>> createMAvalues(ResultDeAnalysis result, DeAnalysisHandler.Tool usedTool, Integer[] sampleA, Integer[] sampleB) {
@@ -36,10 +36,10 @@ public class ConvertData {
                 input = convertBaySeqResults(result.getTableContents(), sampleA, sampleB);
                 break;
             case DeSeq:
-                input = createDataPairForFeature(result.getTableContents(), 0, 2, 3);
+                input = createDataPairForFeature(result.getTableContents(), 0, 3, 4);
                 break;
             case ExpressTest:
-                input = createDataPairForFeature(result.getTableContents(), 0, 3, 5);
+                input = createDataPairForFeature(result.getTableContents(), 0, 4, 6);
                 break;
         }
         Map<PersistantFeature, Pair<Double, Double>> ret = new HashMap<>();

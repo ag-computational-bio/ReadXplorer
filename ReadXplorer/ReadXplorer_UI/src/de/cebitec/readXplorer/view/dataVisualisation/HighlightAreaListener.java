@@ -2,6 +2,7 @@ package de.cebitec.readXplorer.view.dataVisualisation;
 
 import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
 import de.cebitec.common.sequencetools.geneticcode.GeneticCodeFactory;
+import de.cebitec.readXplorer.databackend.dataObjects.ChromosomeObserver;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.SequenceUtils;
@@ -43,6 +44,7 @@ public class HighlightAreaListener extends MouseAdapter {
     private int seqStart;
     private int seqEnd;
     private String refName;
+    private ChromosomeObserver chromObserver;
     
     /**
      * @param parentComponent the component the listener is associated to
@@ -60,6 +62,7 @@ public class HighlightAreaListener extends MouseAdapter {
         this.freezeRect = false;
         this.isFwdStrand = true;
         this.specialRegionList = new HashMap<>();
+        this.chromObserver = new ChromosomeObserver();
        // this.feature = parentComponent.getPersistantReference()
     }
 
@@ -187,8 +190,8 @@ public class HighlightAreaListener extends MouseAdapter {
     /**
      * Sets the current rectangle both in this class and in the parent
      * component.
-     *
-     * @param rectangle
+     * @param rectangle the currently highlighted rectangle both in this class
+     * and in the parent component.
      */
     private void setHighlightRectangle(final Rectangle rectangle) {
         this.highlightRect = rectangle;
@@ -197,21 +200,20 @@ public class HighlightAreaListener extends MouseAdapter {
 
     /**
      * Returns the highlighted sequence.
-     *
      * @return the highlighted sequence
      */
     private String getMarkedSequence() {
         BoundsInfo bounds = parentComponent.getViewerBoundsInfo();
         final double baseWidth = parentComponent.getBaseWidth();
-        final String seq = parentComponent.getPersistantReference().getSequence();
-        final int refLength = parentComponent.getPersistantReference().getRefLength();
+        String chromSeq = parentComponent.getPersistantReference().getActiveChromSequence(chromObserver);
+        final int chromLength = chromSeq.length();
         int logleft = bounds.getLogLeft() - 1 + Math.round((float) ((highlightRect.x - parentComponent.getViewerHorizontalMargin()) / baseWidth));
         int logright = logleft + (int) (Math.round(highlightRect.width / baseWidth));
         logleft = logleft < 0 ? 0 : logleft;
-        logleft = logleft > refLength ? refLength : logleft;
+        logleft = logleft > chromLength ? chromLength : logleft;
         logright = logright < 0 ? 0 : logright;
-        logright = logright > refLength ? refLength : logright;
-        String selSequence = seq.substring(logleft, logright);
+        logright = logright > chromLength ? chromLength : logright;
+        String selSequence = chromSeq.substring(logleft, logright);
         this.seqStart = logleft + 1;
         this.seqEnd = logright;
         
@@ -352,7 +354,7 @@ public class HighlightAreaListener extends MouseAdapter {
         List<Integer> results = new ArrayList<>();
         
         int searchStart = isFwdStrand ? start + 3 : start - 3;
-        PatternFilter patternFilter = new PatternFilter(searchStart, reference.getRefLength(), reference);
+        PatternFilter patternFilter = new PatternFilter(searchStart, reference.getActiveChromLength(), reference);
         for (String stop : stopCodons) {
             patternFilter.setPattern(stop.toUpperCase());
             int stopPos = patternFilter.findNextOccurrenceOnStrand(isFwdStrand);
@@ -376,9 +378,9 @@ public class HighlightAreaListener extends MouseAdapter {
 
     private List<String> generateCdsString(List<Region> cdsRegions) {
         List<String> cdsStrings = new ArrayList<>();
-        String refSeq = parentComponent.getPersistantReference().getSequence();
+        String chromSeq = parentComponent.getPersistantReference().getActiveChromSequence(chromObserver);
         for (Region cds : cdsRegions) {
-            String cdsSeq = refSeq.substring(cds.getStart() - 1, cds.getStop()).toUpperCase(); //-1 because its an index, not genome pos
+            String cdsSeq = chromSeq.substring(cds.getStart() - 1, cds.getStop()).toUpperCase(); //-1 because its an index, not genome pos
             if (!isFwdStrand) {
                 cdsSeq = SequenceUtils.getReverseComplement(cdsSeq);
             }

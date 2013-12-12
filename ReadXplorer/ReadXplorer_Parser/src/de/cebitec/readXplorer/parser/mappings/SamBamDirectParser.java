@@ -24,8 +24,7 @@ import org.openide.util.NbBundle;
 
 /**
  * Sam/Bam parser for the data needed for a direct file access track. This means
- * the classification of the reads has to be carried out. The sam/bam file has
- * to be sorted by readname for this classification.
+ * the classification of the reads has to be carried out. 
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
@@ -39,7 +38,8 @@ public class SamBamDirectParser implements MappingParserI, Observer {
     private StatsContainer statsContainer;
 
     /**
-     * Parser for parsing sam and bam data files for direct access in readXplorer.
+     * Sam/Bam parser for the data needed for a direct file access track. This
+     * means the classification of the reads has to be carried out.
      */
     public SamBamDirectParser() {
         this.observers = new ArrayList<>();
@@ -65,13 +65,14 @@ public class SamBamDirectParser implements MappingParserI, Observer {
     /**
      * Does nothing, as the sam bam direct parser currently does not need any conversions.
      * @param trackJob
-     * @param referenceSequence
+     * @param chromLengthMap the mapping of chromosome name to chromosome length
+     * for this track
      * @return true
      * @throws ParsingException
      * @throws OutOfMemoryError
      */
     @Override
-    public Object convert(TrackJob trackJob, String referenceSequence) throws ParsingException, OutOfMemoryError {
+    public Object convert(TrackJob trackJob, Map<String, Integer> chromLengthMap) throws ParsingException, OutOfMemoryError {
         return true;
     }
 
@@ -91,11 +92,10 @@ public class SamBamDirectParser implements MappingParserI, Observer {
     }
 
     /**
-     * First calls the preprocessing method, which sorts the sam/bam file by
-     * readname in this implementation and then parses the input determined by 
-     * the track job.
+     * First calls the preprocessing method, which currently does nothing and 
+     * then parses the input determined by the track job.
      * @param trackJob the track job to parse
-     * @param refSeqWhole the reference sequence
+     * @param chromSeqMap the map of chromosome names to chromosome sequence
      * @return a direct access data container constisting of:
      * a classification map: The key is the readname and each name
      * links to a pair consisting of the number of occurrences of the read name
@@ -106,12 +106,11 @@ public class SamBamDirectParser implements MappingParserI, Observer {
      * @throws OutOfMemoryError
      */
     @Override
-    public DirectAccessDataContainer parseInput(TrackJob trackJob, String refSeqWhole) throws ParsingException, OutOfMemoryError {
+    public DirectAccessDataContainer parseInput(TrackJob trackJob, Map<String, String> chromSeqMap) throws ParsingException, OutOfMemoryError {
 
         boolean success = (boolean) this.preprocessData(trackJob);
         
         String fileName = trackJob.getFile().getName();
-        String refName = trackJob.getRefGen().getName();
         long startTime = System.currentTimeMillis();
         this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class, "Parser.Parsing.Start", fileName));
 
@@ -143,15 +142,15 @@ public class SamBamDirectParser implements MappingParserI, Observer {
                     ++lineno;
 
                     record = samItor.next();
-                    if (!record.getReadUnmappedFlag() && record.getReferenceName().equals(refName)) {
+                    if (!record.getReadUnmappedFlag() && chromSeqMap.containsKey(record.getReferenceName())) {
 
                         cigar = record.getCigarString();
                         readSeq = record.getReadString();
                         start = record.getAlignmentStart();
                         stop = record.getAlignmentEnd();
-                        refSeq = refSeqWhole.substring(start - 1, stop);
+                        refSeq = chromSeqMap.get(record.getReferenceName()).substring(start - 1, stop);
 
-                        if (!ParserCommonMethods.checkReadSam(this, readSeq, refSeqWhole.length(), cigar, start, stop, fileName, lineno)) {
+                        if (!CommonsMappingParser.checkReadSam(this, readSeq, chromSeqMap.get(record.getReferenceName()).length(), cigar, start, stop, fileName, lineno)) {
                             continue; //continue, and ignore read, if it contains inconsistent information
                         }
 
@@ -165,9 +164,9 @@ public class SamBamDirectParser implements MappingParserI, Observer {
                          */
                         //count differences to reference
                         isRevStrand = record.getReadNegativeStrandFlag();
-                        diffGapResult = ParserCommonMethods.createDiffsAndGaps(cigar, readSeq, refSeq, isRevStrand, start);
+                        diffGapResult = CommonsMappingParser.createDiffsAndGaps(cigar, readSeq, refSeq, isRevStrand, start);
                         mismatches = diffGapResult.getDifferences();
-                        readName = ParserCommonMethods.elongatePairedReadName(record);
+                        readName = CommonsMappingParser.elongatePairedReadName(record);
                         if (!classificationMap.containsKey(readName)) {
                             classificationMap.put(readName, new ParsedClassification(sortOrder));
                         }

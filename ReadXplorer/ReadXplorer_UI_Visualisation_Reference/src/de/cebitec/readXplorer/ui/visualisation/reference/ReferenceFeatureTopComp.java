@@ -414,7 +414,7 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended implemen
            }
        }
        if (featureVect.isEmpty()) {
-           featureVect.add(new PersistantFeature(0, "", "", replacement, "", 0, 0, true, FeatureType.UNDEFINED, ""));
+           featureVect.add(new PersistantFeature(0, 0, "", "", replacement, "", 0, 0, true, FeatureType.UNDEFINED, ""));
        }
        return featureVect;
    }

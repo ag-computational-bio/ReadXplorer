@@ -5,7 +5,7 @@ import de.cebitec.readXplorer.parser.TrackJob;
 import de.cebitec.readXplorer.parser.common.ParsedClassification;
 import de.cebitec.readXplorer.parser.common.ParsedReadPairContainer;
 import de.cebitec.readXplorer.parser.common.ParsingException;
-import de.cebitec.readXplorer.parser.mappings.ParserCommonMethods;
+import de.cebitec.readXplorer.parser.mappings.CommonsMappingParser;
 import de.cebitec.readXplorer.util.Benchmark;
 import de.cebitec.readXplorer.util.DiscreteCountingDistribution;
 import de.cebitec.readXplorer.util.Properties;
@@ -37,12 +37,12 @@ public class SamBamDirectReadPairStatsParser extends SamBamDirectReadPairClassif
      * track. This parser is mainly used for track, which have already been
      * imported into another ReadXplorer DB and are now reimported.
      * @param seqPairJobContainer container with both track jobs of this pair
-     * @param refSeq the complete reference sequence
+     * @param chromSeqMap mapping of chromosome names to their sequence
      * @param classificationMap the classification map of the track - not needed
      * in this parser until now
      */
-    public SamBamDirectReadPairStatsParser(ReadPairJobContainer seqPairJobContainer, String refSeq, Map<String, ParsedClassification> classificationMap) {
-        super(seqPairJobContainer, refSeq, classificationMap);
+    public SamBamDirectReadPairStatsParser(ReadPairJobContainer seqPairJobContainer, Map<String,String> chromSeqMap, Map<String, ParsedClassification> classificationMap) {
+        super(seqPairJobContainer, chromSeqMap, classificationMap);
         this.trackJob = seqPairJobContainer.getTrackJob1();
         this.dist = seqPairJobContainer.getDistance();
         int maxDist = this.calculateMinAndMaxDist(dist, seqPairJobContainer.getDeviation());
@@ -77,7 +77,7 @@ public class SamBamDirectReadPairStatsParser extends SamBamDirectReadPairClassif
                 //separate all mappings of same pair by seq pair tag and hand it over to classification then
                 record = samItor.next();
                 if (!record.getReadUnmappedFlag() && record.getReferenceName().equals(refName)) {
-                    pairTag = ParserCommonMethods.getReadPairTag(record);
+                    pairTag = CommonsMappingParser.getReadPairTag(record);
                     
                     if (pairTag == Properties.EXT_A1) {
                         

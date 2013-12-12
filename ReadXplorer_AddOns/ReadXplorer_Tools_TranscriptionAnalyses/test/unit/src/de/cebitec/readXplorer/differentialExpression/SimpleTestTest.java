@@ -33,7 +33,7 @@ package de.cebitec.readXplorer.differentialExpression;
 //    private static List<String> loci;
 //    private static List<String> tracks;
 //    private static List<List<Integer>> allCountData;
-//    private static List<PersistantTrack> selectedTraks;
+//    private static List<PersistantTrack> selectedTracks;
 //    private static int[] groupA;
 //    private static int[] groupB;
 //    private static File saveFile = new File("C:\\Users\\Kai\\Desktop\\newTest.rdata");
@@ -96,10 +96,10 @@ package de.cebitec.readXplorer.differentialExpression;
 //        allCountData.add(countData6);
 //        allCountData.add(countData7);
 //
-//        selectedTraks = new ArrayList<>();
+//        selectedTracks = new ArrayList<>();
 //        for (int i = 0; i < tracks.size(); i++) {
 //            Timestamp currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-//            selectedTraks.add(new PersistantTrack(i, "", tracks.get(i), currentTimestamp, 0, 0));
+//            selectedTracks.add(new PersistantTrack(i, "", tracks.get(i), currentTimestamp, 0, 0));
 //        }
 //
 //        numberOfFeatures = loci.size();
@@ -141,7 +141,7 @@ package de.cebitec.readXplorer.differentialExpression;
 //            analysisData.addCountDataForTrack(current.toArray(new Integer[current.size()]));
 //        }
 //        analysisData.setLoci(loci.toArray(new String[loci.size()]));
-//        analysisData.setSelectedTraks(new ArrayList<>(selectedTraks));
+//        analysisData.setSelectedTracks(new ArrayList<>(selectedTracks));
 //        List expResult = null;
 //        List result = null;
 //        try {

@@ -33,8 +33,8 @@ import java.util.Map;
      * @param combineTracks true, if the tracks in the list are combined, false
      * otherwise 
      */
-    public RPKMAnalysisResult(Map<Integer, PersistantTrack> trackMap, List<RPKMvalue> rpkmResults, boolean combineTracks) {
-        super(trackMap, combineTracks);
+    public RPKMAnalysisResult(Map<Integer, PersistantTrack> trackMap, List<RPKMvalue> rpkmResults, int refId, boolean combineTracks) {
+        super(trackMap, refId, combineTracks);
         this.rpkmResults = rpkmResults;
     }
     
@@ -62,6 +62,7 @@ import java.util.Map;
         dataColumnDescriptions.add("Feature");
         dataColumnDescriptions.add("Feature Type");
         dataColumnDescriptions.add("Track");
+        dataColumnDescriptions.add("Chromosome");
         dataColumnDescriptions.add("Start");
         dataColumnDescriptions.add("Stop");
         dataColumnDescriptions.add("Length");
@@ -98,6 +99,7 @@ import java.util.Map;
             rpkmRow.add(feat);
             rpkmRow.add(feat.getType());
             rpkmRow.add(this.getTrackEntry(rpkmValue.getTrackId(), true));
+            rpkmRow.add(this.getChromosomeMap().get(feat.getChromId()));
             rpkmRow.add(feat.isFwdStrand() ? feat.getStart() : feat.getStop());
             rpkmRow.add(feat.isFwdStrand() ? feat.getStop() : feat.getStart());
             rpkmRow.add(feat.getStop() - feat.getStart());

@@ -338,8 +338,8 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
     }//GEN-LAST:event_fileGffChooserButtonActionPerformed
 
     private void referenceBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_referenceBoxActionPerformed
-        this.referenceName = (String) this.referenceBox.getSelectedItem();
-        this.nameField.setText(this.referenceName);
+//        this.referenceName = (String) this.referenceBox.getSelectedItem();
+//        this.nameField.setText(this.referenceName);
     }//GEN-LAST:event_referenceBoxActionPerformed
 
     private void nameFieldPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_nameFieldPropertyChange
@@ -430,8 +430,8 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
 //                        @Override
 //                        public void run() {
             referenceBox.setModel(new DefaultComboBoxModel<>(refSeqIds));
-            referenceName = referenceBox.getSelectedItem().toString();
-            this.nameField.setText(referenceName);
+//            referenceName = referenceBox.getSelectedItem().toString();
+//            this.nameField.setText(referenceName);
 //                        }
 //                    });
         } catch (ParsingException ex) {

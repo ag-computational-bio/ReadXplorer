@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import org.openide.util.Lookup;
 
 /**
  * Viewer for genome sequences / chromosomes.
@@ -42,6 +43,7 @@ public class ReferenceViewer extends AbstractViewer {
     public final static String PROP_FEATURE_SELECTED = "feat selected";
     public static final String PROP_EXCLUDED_FEATURE_EVT = "excl feat evt";
     private int trackCount = 0;
+    private Lookup viewerLookup;
     
     /**
      * Creates a new reference viewer. 
@@ -124,9 +126,12 @@ public class ReferenceViewer extends AbstractViewer {
         if (this.hasSequenceBar()) {
             this.add(this.getSequenceBar());
         }
+        if (this.hasChromSelectionPanel()) {
+            this.add(this.getChromSelectionPanel());
+        }
 
         List<PersistantFeature> featureList = refGenConnector.getFeaturesForRegion(
-                getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight(), FeatureType.ANY);
+                getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight(), FeatureType.ANY, this.getReference().getActiveChromId());
         List<Polytree> featureTrees = PersistantFeature.Utils.createFeatureTrees(featureList);
         
         int frame = 0;
@@ -348,6 +353,14 @@ public class ReferenceViewer extends AbstractViewer {
      */
     public int getTrackCount(){
         return this.trackCount;
+    }
+
+    /**
+     * @param viewerLookup A lookup containing all viewers associated with this
+     * reference viewer.
+     */
+    public void setViewerLookup(Lookup viewerLookup) {
+        this.viewerLookup = viewerLookup;
     }
     
     /**

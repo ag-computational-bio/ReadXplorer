@@ -9,7 +9,7 @@ package de.cebitec.readXplorer.databackend;
 public abstract class RequestThread extends Thread {
     
     private IntervalRequest latestRequest;
-    private IntervalRequest lastRequest = new IntervalRequest(0, 0, null, false);
+    private IntervalRequest lastRequest = new IntervalRequest(0, 0, -1, null, false);
 
     /**
      * @return the latest request (e.g. latest request added to the request
@@ -79,10 +79,10 @@ public abstract class RequestThread extends Thread {
         int currentMiddle = calcCenterMiddle(request);
         
         // rounding error somewhere....
-        if (
-            (currentMiddle - 1 <= latestMiddle && latestMiddle <= currentMiddle + 1)
-                || (request.getDesiredData() != latestRequest.getDesiredData())
-                || (request.getSender() != latestRequest.getSender())
+        if (currentMiddle - 1 <= latestMiddle && latestMiddle <= currentMiddle + 1
+                || request.getDesiredData() != latestRequest.getDesiredData()
+                || request.getSender() != latestRequest.getSender()
+                || request.getChromId() != latestRequest.getChromId()
                 ) {
             return true;
         } else {

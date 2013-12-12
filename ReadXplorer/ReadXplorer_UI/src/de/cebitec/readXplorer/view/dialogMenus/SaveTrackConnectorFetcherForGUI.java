@@ -174,7 +174,7 @@ public class SaveTrackConnectorFetcherForGUI {
                     newTrackFile.getAbsolutePath(), track.getDescription(), track.getTimestamp(),
                     track.getRefGenID(), track.getReadPairId());
             try {
-                SamBamFileReader reader = new SamBamFileReader(newTrackFile, track.getId());
+                SamBamFileReader reader = new SamBamFileReader(newTrackFile, track.getId(), connector.getRefGenomeConnector(track.getRefGenID()).getRefGenome());
                 try {
                     connector.resetTrackPath(newTrack);
                 } catch (StorageException ex) {

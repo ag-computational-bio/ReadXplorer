@@ -5,6 +5,7 @@ import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistant;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.RPKMvalue;
@@ -18,13 +19,14 @@ import java.util.List;
 import java.util.Set;
 
 /**
+ * Carries out the logic behind the RPKM anaylsis.
+ * 
  * @author Martin Tötsches, Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
     
     private TrackConnector trackConnector;
     private List<RPKMvalue> rpkmValues;
-    private int refSeqLength;
     private List<PersistantFeature> genomeFeatures;
     private HashMap<Integer, RPKMvalue> featureReadCount;
     private double totalMappedReads = 0;
@@ -37,6 +39,11 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
 //    private Map<FeatureType, Integer> featureCountMap; //can be used, if counts for single feature types are needed
     private int noSelectedFeatures;
     
+    /**
+     * Carries out the logic behind the RPKM anaylsis.
+     * @param trackConnector The trackConnector of the track for this analysis
+     * @param parametersRPKM 
+     */
     public AnalysisRPKM(TrackConnector trackConnector, ParameterSetRPKM parametersRPKM) {
         this.trackConnector = trackConnector;
         this.rpkmValues = new ArrayList<>();
@@ -50,30 +57,33 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
     /**
      * Initializes the genome features and all corresponding data structures.
      */
-     private void initDatastructures() {
+    private void initDatastructures() {
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackConnector.getRefGenome().getId());
-        this.refSeqLength = this.trackConnector.getRefSequenceLength();
-        List<PersistantFeature> allGenomeFeatures = refConnector.getFeaturesForClosedInterval(0, refSeqLength);  
-        PersistantFeature.Utils.addParentFeatures(allGenomeFeatures);
         
+        for (PersistantChromosome chrom : refConnector.getChromosomesForGenome().values()) {
+            int chromLength = chrom.getLength();
+            List<PersistantFeature> chromFeatures = refConnector.getFeaturesForClosedInterval(0, chromLength, chrom.getId());
+            PersistantFeature.Utils.addParentFeatures(chromFeatures);
+
 //        this.featureCountMap = this.fillInFeatureTypes();
-        
-        for (PersistantFeature feature : allGenomeFeatures) {
-            this.featureReadCount.put(feature.getId(), new RPKMvalue(feature, 0, 0, trackConnector.getTrackID()));
-            if (parametersRPKM.getSelFeatureTypes().contains(feature.getType())) {
-                this.genomeFeatures.add(feature);
+
+            for (PersistantFeature feature : chromFeatures) {
+                this.featureReadCount.put(feature.getId(), new RPKMvalue(feature, 0, 0, trackConnector.getTrackID()));
+                if (parametersRPKM.getSelFeatureTypes().contains(feature.getType())) {
+                    this.genomeFeatures.add(feature);
 //                featureCountMap.put(feature.getType(), featureCountMap.get(feature.getType()) + 1);
+                }
             }
+            this.noSelectedFeatures = this.genomeFeatures.size();
         }
-        this.noSelectedFeatures = this.genomeFeatures.size();
     }
     
     @Override
     public void update(Object data) {
-         MappingResultPersistant mappingResult = new MappingResultPersistant(null, 0, 0);
+         MappingResultPersistant mappingResult = new MappingResultPersistant(null, null);
         
         if (data.getClass() == mappingResult.getClass()) {
-            List<PersistantMapping> mappings = ((MappingResultPersistant) data).getMappings();
+            MappingResultPersistant mappings = (MappingResultPersistant) data;
             this.updateReadCountForFeatures(mappings);
         } else
         if (data instanceof Byte && ((Byte) data) == 2) { //2 means mapping analysis is finished
@@ -92,14 +102,18 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
     /**
      * Updates the read count for all features in the genomeFeatures list by
      * all mappings in the mappings list.
-     * @param mappings the list of mappings to add to the feature count
+     * @param mappingResult the result containing all mappings to add to the feature count
      */
-    public void updateReadCountForFeatures(List<PersistantMapping> mappings) {
-            PersistantFeature feature;
-            boolean fstFittingMapping;
-            
-            for (int i = 0; i < this.genomeFeatures.size(); ++i) {
-                feature = this.genomeFeatures.get(i);
+    public void updateReadCountForFeatures(MappingResultPersistant mappingResult) {
+        List<PersistantMapping> mappings = mappingResult.getMappings();
+        PersistantFeature feature;
+        boolean fstFittingMapping;
+        int currentChromId = mappingResult.getRequest().getChromId();
+
+        for (int i = 0; i < this.genomeFeatures.size(); ++i) {
+            feature = this.genomeFeatures.get(i);
+            if (feature.getChromId() == currentChromId) {
+                
                 int featStart = feature.getStart();
                 int featStop = feature.getStop();
                 fstFittingMapping = true;
@@ -132,16 +146,18 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
                 this.totalMappedReads += this.currentCount;
                 this.currentCount = 0;
             }
-            
-            this.lastMappingIdx = 0;
-            //TODO: solution for more than one feature overlapping mapping request boundaries
+        }
+
+        this.lastMappingIdx = 0;
+        //TODO: solution for more than one feature overlapping mapping request boundaries
     }
-    
+
     /**
-     * Calculates the RPKM value for a given feature/gene according to the formula
-     * given in Mortazavi et al. 2008, Mapping and quantifying mammalian transcriptomes by RNA-Seq:
-     * 
-     * <br>R = 10^9 * C / (N * L) where 
+     * Calculates the RPKM value for a given feature/gene according to the
+     * formula given in Mortazavi et al. 2008, Mapping and quantifying mammalian
+     * transcriptomes by RNA-Seq:
+     *
+     * <br>R = 10^9 * C / (N * L) where
      * <br>C = number of mappable reads for gene
      * <br>N = total number of mappable reads for experiment/data set
      * <br>L = sum of gene base pairs
@@ -167,18 +183,18 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
         for (Integer id : this.featureReadCount.keySet()) {
             feature = this.featureReadCount.get(id).getFeature();
             readCount = this.featureReadCount.get(id).getReadCount();
-            if (    selFeatureTypes.contains(feature.getType()) && 
-                    readCount >= parametersRPKM.getMinReadCount() && 
-                    readCount <= parametersRPKM.getMaxReadCount()) {
-                
+            if (selFeatureTypes.contains(feature.getType())
+                    && readCount >= parametersRPKM.getMinReadCount()
+                    && readCount <= parametersRPKM.getMaxReadCount()) {
+
                 geneExonLength = 0; //gene length or sum of the exon length of a gene in bp
                 noFeatureReads = 0; //no read for the feature itself or for gene/mRNA of the corresponding exons
-                
+
                 //special handling of gene/mRNA/tRNA/rRNA - if they have exons, only the exon reads are counted
-                if (    feature.getType() == FeatureType.GENE || feature.getType() == FeatureType.MRNA || 
-                        feature.getType() == FeatureType.RRNA || feature.getType() == FeatureType.TRNA) {
-                    this.calcFeatureData(feature, FeatureType.EXON);                   
-                } 
+                if (feature.getType() == FeatureType.GENE || feature.getType() == FeatureType.MRNA
+                        || feature.getType() == FeatureType.RRNA || feature.getType() == FeatureType.TRNA) {
+                    this.calcFeatureData(feature, FeatureType.EXON);
+                }
                 if (geneExonLength == 0 && feature.getType() == FeatureType.GENE) {
                     this.calcFeatureData(feature, FeatureType.MRNA);
                     if (geneExonLength == 0) { //if the gene has a rRNA or tRNA instead of an mRNA, we have to check this, too
@@ -188,17 +204,17 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
                         this.calcFeatureData(feature, FeatureType.TRNA);
                     }
                 }
-                
+
                 /* calc gene/mRNA length/ sum of exon length for gene/mRNA for prokaryotes or
                  * gene where no exons are given and all other features */
-                if (geneExonLength <= 0) { 
+                if (geneExonLength <= 0) {
                     geneExonLength = (feature.getStop() - feature.getStart()); //feature length in bp
                     noFeatureReads = this.featureReadCount.get(id).getReadCount();
                 }
-                
+
                 rpkm = 0;
                 if (noFeatureReads > 0) {
-                    rpkm = noFeatureReads * 1000000000 / (this.totalMappedReads * geneExonLength); 
+                    rpkm = noFeatureReads * 1000000000 / (this.totalMappedReads * geneExonLength);
                 }//1000000000 = 1000000 -> normalization factor * 1000 -> factor for KB of exon length
                 this.rpkmValues.add(new RPKMvalue(feature, rpkm, (int) noFeatureReads, trackConnector.getTrackID()));
             }
@@ -236,18 +252,6 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
 //            featureTypeMap.put(allFeatTypes[i], 0);
 //        }
 //        return featureTypeMap;
-//    }
-//    
-//    /**
-//     * Calculates the number of selected genome features of the analyzed reference
-//     * genome.
-//     */
-//    public void calcNoGenomeFeatures() {        
-//        Iterator<FeatureType> featIt = this.featureCountMap.keySet().iterator();
-//        this.noSelectedFeatures = 0;
-//        while (featIt.hasNext()) {
-//            this.noSelectedFeatures += this.featureCountMap.get(featIt.next());
-//        }
 //    }
     
     /**

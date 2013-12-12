@@ -215,7 +215,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
             this.setNewDataRequestNeeded(false);
             this.coverageLoaded = true;
             //we need to load the diffs seperately for tracks completely stored in the db
-            this.diffsLoaded = trackConnector.addDiffRequest(new IntervalRequest(from, to, totalFrom, totalTo, this, true, Properties.DIFFS, Properties.NORMAL));
+            this.diffsLoaded = trackConnector.addDiffRequest(new IntervalRequest(from, to, totalFrom, totalTo, refGen.getActiveChromId(), this, true, Properties.DIFFS, Properties.NORMAL));
             if (this.diffsLoaded) {
                 this.setupData();
             }
@@ -228,8 +228,8 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
             boolean commonCovWanted = !this.getExcludedFeatureTypes().contains(FeatureType.COMMON_COVERAGE);
             boolean multipleMappedReadsWanted = this.getExcludedFeatureTypes().contains(FeatureType.MULTIPLE_MAPPED_READ);
             ParametersReadClasses readClassParams = new ParametersReadClasses(perfectCovWanted, bestMatchCovWanted, commonCovWanted, multipleMappedReadsWanted);
-            trackConnector.addCoverageRequest(new IntervalRequest(from, to, totalFrom, totalTo, this, true, readClassParams));
-            trackConnector.addDiffRequest(new IntervalRequest(from, to, totalFrom, totalTo, this, true, Properties.DIFFS, Properties.NORMAL));
+            trackConnector.addCoverageRequest(new IntervalRequest(from, to, totalFrom, totalTo, refGen.getActiveChromId(), this, true, readClassParams));
+            trackConnector.addDiffRequest(new IntervalRequest(from, to, totalFrom, totalTo, refGen.getActiveChromId(), this, true, Properties.DIFFS, Properties.NORMAL));
         }
     }
 
@@ -241,11 +241,11 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
 
                 @Override
                 public void run() {
-                    if (!coverageLoaded && result.getCoverage().getRightBound() != 0 && result.getLowerBound() <= lowerBound && result.getUpperBound() >= upperBound) {
+                    if (!coverageLoaded && result.getCoverage().getRightBound() != 0 && result.getRequest().getFrom() <= lowerBound && result.getRequest().getTo() >= upperBound) {
                         cov = result.getCoverage();
                         coverageLoaded = true;
                     }
-                    if (result.isDiffsAndGapsUsed() && !diffsLoaded && result.getLowerBound() <= lowerBound && result.getUpperBound() >= upperBound) {
+                    if (result.getRequest().isDiffsAndGapsNeeded() && !diffsLoaded && result.getRequest().getFrom() <= lowerBound && result.getRequest().getTo() >= upperBound) {
                         diffs = result.getDiffs();
                         gaps = result.getGaps();
                         Collections.sort(diffs);
@@ -282,7 +282,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
 
     @Override
     public void boundsChangedHook() {
-        if (super.getBoundsInfo().getLogLeft() != lowerBound || super.getBoundsInfo().getLogRight() != upperBound
+        if (this.getBoundsInfo().getLogLeft() != lowerBound || this.getBoundsInfo().getLogRight() != upperBound
                 || this.isNewDataRequestNeeded()) {
             this.lowerBound = super.getBoundsInfo().getLogLeft();
             this.upperBound = super.getBoundsInfo().getLogRight();
@@ -435,7 +435,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         double value;
         Color c;
         int y = (isForwardStrand ? getPaintingAreaInfo().getForwardLow() : getPaintingAreaInfo().getReverseLow());
-        char base = refGen.getSequence().charAt(absPos - 1);
+        char base = refGen.getActiveChromSequence(this.getChromosomeObserver()).charAt(absPos - 1);
         PhysicalBaseBounds bounds = getPhysBoundariesForLogPos(absPos);
         
         value = logoData.getNumOfMatchesAt(relPos, isForwardStrand);

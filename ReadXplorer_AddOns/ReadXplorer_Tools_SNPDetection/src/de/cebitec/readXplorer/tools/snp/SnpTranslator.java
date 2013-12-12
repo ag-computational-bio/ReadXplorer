@@ -3,9 +3,10 @@ package de.cebitec.readXplorer.tools.snp;
 import de.cebitec.common.sequencetools.geneticcode.AminoAcidProperties;
 import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
 import de.cebitec.common.sequencetools.geneticcode.GeneticCodeFactory;
+import de.cebitec.readXplorer.databackend.dataObjects.ChromosomeObserver;
 import de.cebitec.readXplorer.databackend.dataObjects.CodonSnp;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.Snp;
 import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.Properties;
@@ -66,12 +67,13 @@ public class SnpTranslator {
      * @param refSeq the reference sequence
      * @param selectedFeatureTypes The set of selected feature types to include in the translation
      */
-    public SnpTranslator(List<PersistantFeature> genomicFeatures, PersistantReference reference, Set<FeatureType> selectedFeatureTypes) {
+    public SnpTranslator(List<PersistantFeature> genomicFeatures, PersistantChromosome chromosome, Set<FeatureType> selectedFeatureTypes) {
         this.selectedFeatureTypes = selectedFeatureTypes;
         PersistantFeature.Utils.addParentFeatures(genomicFeatures);
         this.genomicFeatures = PersistantFeature.filterFeatureTypes(genomicFeatures, this.selectedFeatureTypes);
-        this.refSeq = reference.getSequence();
-        this.refLength = reference.getRefLength();
+        ChromosomeObserver chromObserver = new ChromosomeObserver();
+        this.refSeq = chromosome.getSequence(chromObserver);
+        this.refLength = refSeq.length();
         index = 0;
         this.pref = NbPreferences.forModule(Object.class);
         GeneticCodeFactory genCodeFactory = GeneticCodeFactory.getDefault();

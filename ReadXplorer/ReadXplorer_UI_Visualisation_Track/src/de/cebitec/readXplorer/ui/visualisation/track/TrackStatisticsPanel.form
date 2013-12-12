@@ -26,7 +26,7 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="seqPairPanel" alignment="0" max="32767" attributes="0"/>
+          <Component id="readPairPanel" alignment="0" max="32767" attributes="0"/>
           <Component id="progressbar" alignment="0" pref="188" max="32767" attributes="0"/>
           <Group type="102" attributes="0">
               <Group type="103" groupAlignment="0" attributes="0">
@@ -121,7 +121,7 @@
                   <Component id="compPercentageLabel" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="seqPairPanel" min="-2" max="-2" attributes="0"/>
+              <Component id="readPairPanel" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="progressbar" min="-2" pref="16" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
@@ -242,7 +242,7 @@
         <Property name="horizontalTextPosition" type="int" value="2"/>
       </Properties>
     </Component>
-    <Container class="javax.swing.JPanel" name="seqPairPanel">
+    <Container class="javax.swing.JPanel" name="readPairPanel">
       <Properties>
         <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
           <Connection code="javax.swing.BorderFactory.createTitledBorder(&quot;Read Pair Statistics&quot;)" type="code"/>
@@ -256,8 +256,8 @@
                   <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="1" attributes="0">
                       <Component id="singleMappingsLabel" min="-2" max="-2" attributes="0"/>
-                      <Component id="numPerfSeqPairsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                      <Component id="numSeqPairsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+                      <Component id="numPerfReadPairsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
+                      <Component id="numReadPairsLabel" alignment="1" min="-2" max="-2" attributes="0"/>
                       <Component id="numSmallerPairsLabel" min="-2" max="-2" attributes="0"/>
                       <Component id="numLargerPairsLabel" min="-2" max="-2" attributes="0"/>
                   </Group>
@@ -266,8 +266,8 @@
                       <Component id="nummallerPairsAbsLabel" alignment="0" pref="67" max="32767" attributes="0"/>
                       <Component id="numLargerPairsAbsLabel" alignment="0" pref="67" max="32767" attributes="0"/>
                       <Component id="singleMappings" pref="67" max="32767" attributes="0"/>
-                      <Component id="numSeqPairsAbsLabel" alignment="0" pref="67" max="32767" attributes="0"/>
-                      <Component id="numPerfSeqPairsAbsLabel" alignment="0" pref="67" max="32767" attributes="0"/>
+                      <Component id="numReadPairsAbsLabel" alignment="0" pref="67" max="32767" attributes="0"/>
+                      <Component id="numPerfReadPairsAbsLabel" alignment="0" pref="67" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
               </Group>
@@ -278,13 +278,13 @@
               <Group type="102" alignment="1" attributes="0">
                   <EmptySpace max="32767" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="numSeqPairsLabel" min="-2" max="-2" attributes="0"/>
-                      <Component id="numSeqPairsAbsLabel" min="-2" pref="17" max="-2" attributes="0"/>
+                      <Component id="numReadPairsLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="numReadPairsAbsLabel" min="-2" pref="17" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
-                      <Component id="numPerfSeqPairsLabel" min="-2" max="-2" attributes="0"/>
-                      <Component id="numPerfSeqPairsAbsLabel" min="-2" pref="17" max="-2" attributes="0"/>
+                      <Component id="numPerfReadPairsLabel" min="-2" max="-2" attributes="0"/>
+                      <Component id="numPerfReadPairsAbsLabel" min="-2" pref="17" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
@@ -307,23 +307,23 @@
         </DimensionLayout>
       </Layout>
       <SubComponents>
-        <Component class="javax.swing.JLabel" name="numSeqPairsLabel">
+        <Component class="javax.swing.JLabel" name="numReadPairsLabel">
           <Properties>
             <Property name="text" type="java.lang.String" value="Read Pairs:"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="numSeqPairsAbsLabel">
+        <Component class="javax.swing.JLabel" name="numReadPairsAbsLabel">
           <Properties>
             <Property name="horizontalAlignment" type="int" value="2"/>
             <Property name="horizontalTextPosition" type="int" value="2"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="numPerfSeqPairsLabel">
+        <Component class="javax.swing.JLabel" name="numPerfReadPairsLabel">
           <Properties>
             <Property name="text" type="java.lang.String" value="Perfect Read Pairs:"/>
           </Properties>
         </Component>
-        <Component class="javax.swing.JLabel" name="numPerfSeqPairsAbsLabel">
+        <Component class="javax.swing.JLabel" name="numPerfReadPairsAbsLabel">
           <Properties>
             <Property name="horizontalAlignment" type="int" value="2"/>
             <Property name="horizontalTextPosition" type="int" value="2"/>

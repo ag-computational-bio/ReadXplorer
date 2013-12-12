@@ -14,7 +14,6 @@ import de.cebitec.readXplorer.differentialExpression.plot.DeSeqGraphicsTopCompon
 import de.cebitec.readXplorer.differentialExpression.plot.ExpressTestGraphicsTopComponent;
 import de.cebitec.readXplorer.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.readXplorer.exporter.excel.TableToExcel;
-import de.cebitec.readXplorer.differentialExpression.Bundle;
 import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.readXplorer.util.GenerateRowSorter;
 import de.cebitec.readXplorer.util.Observer;
@@ -122,7 +121,9 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
             ViewController tmpVCon = it.next();
             BoundsInfoManager bm = tmpVCon.getBoundsManager(); 
             if (bm != null) {
-                TableUtils.showPosition(topCountsTable, 0, bm);
+                int posIdx = 0;
+                int chromIdx = 1;
+                TableUtils.showPosition(topCountsTable, posIdx, chromIdx, bm);
             }
         }
         refComp.showTableFeature(topCountsTable, 0);

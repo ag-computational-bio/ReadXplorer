@@ -20,6 +20,7 @@ import java.util.Set;
 public class PersistantFeature extends Node implements PersistantFeatureI, Comparable<PersistantFeature> {
     
     private int id;
+    private int chromId;
     private String ecNumber;
     private String locus;
     private String product;
@@ -34,6 +35,7 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
 
     /**
      * @param id id of the feature in db 
+     * @param chromId Chromosome id of the feature
      * @param parentIds The string containing all ids of the parents of this 
      * feature separated by ";", if it has at least one. If not this string is 
      * empty.
@@ -47,11 +49,12 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
      * @param ecnum ec number
      * @param featureName name of the feature, if it exists (e.g. "dnaA")
      */
-    public PersistantFeature(int id, String parentIds, String ecnum, String locus, String product, 
-                int start, int stop, boolean isFwdStrand, FeatureType type, String featureName) {
+    public PersistantFeature(int id, int chromId, String parentIds, String ecnum, String locus, String product,
+            int start, int stop, boolean isFwdStrand, FeatureType type, String featureName) {
         super(type, null);
 //        this.subFeatures = new ArrayList<>();
         this.id = id;
+        this.chromId = chromId;
         this.parentIds = this.separateParentIds(parentIds);
         this.ecNumber = ecnum;
         this.locus = locus;
@@ -95,6 +98,13 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
      */
     public int getId() {
         return id;
+    }
+
+    /**
+     * @return The chromosome id of this feature.
+     */
+    public int getChromId() {
+        return chromId;
     }
 
     /**

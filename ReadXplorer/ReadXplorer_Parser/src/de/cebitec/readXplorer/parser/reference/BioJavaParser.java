@@ -1,6 +1,7 @@
 package de.cebitec.readXplorer.parser.reference;
 
 import de.cebitec.readXplorer.parser.ReferenceJob;
+import de.cebitec.readXplorer.parser.common.ParsedChromosome;
 import de.cebitec.readXplorer.parser.common.ParsedFeature;
 import de.cebitec.readXplorer.parser.common.ParsedReference;
 import de.cebitec.readXplorer.parser.common.ParsingException;
@@ -16,8 +17,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import org.biojava.bio.BioException;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Feature;
 import org.biojava.bio.seq.io.SymbolTokenization;
@@ -106,6 +111,10 @@ public class BioJavaParser implements ReferenceParserI {
             SymbolTokenization dna = DNATools.getDNA().getTokenization("token");
             RichSequenceBuilderFactory factory = RichSequenceBuilderFactory.THRESHOLD;
 
+            refGenome.setDescription(refGenJob.getDescription());
+            refGenome.setName(refGenJob.getName());
+            refGenome.setTimestamp(refGenJob.getTimestamp());
+
             RichStreamReader seqIter = new RichStreamReader(in, seqFormat, dna, factory, ns);
             RichSequence seq;
             Iterator<Feature> featIt;
@@ -130,20 +139,14 @@ public class BioJavaParser implements ReferenceParserI {
             String pos;
             String[] posArray;
             ParsedFeature currentFeature;
+            ParsedChromosome chrom;
 
-            // take only the first sequence from file, if exists
             while (seqIter.hasNext()) {
                 try {
+                    chrom = new ParsedChromosome();
                     seq = seqIter.nextRichSequence();
-
-                    if (seq.seqString() == null || seq.seqString().isEmpty()) {
-                        throw  new ParsingException("On of the imported references does not contain any sequence data!");
-                    }
-
-                    refGenome.setDescription(refGenJob.getDescription());
-                    refGenome.setName(refGenJob.getName());
-                    refGenome.setTimestamp(refGenJob.getTimestamp());
-                    refGenome.setSequence(seq.seqString().toUpperCase());
+                    chrom.setName(seq.getName());
+                    chrom.setSequence(seq.seqString());
 
                     // iterate through all features
                     featIt = seq.getFeatureSet().iterator();
@@ -251,13 +254,15 @@ public class BioJavaParser implements ReferenceParserI {
 
                     }
                     Logger.getLogger(this.getClass().getName()).log(Level.INFO, "File successfully read");
-                } catch (Exception ex) {
-                    this.sendErrorMsg(ex.getMessage());
-                    seqIter.nextRichSequence();
-                }
 
-                refGenome.addAllFeatures(this.createFeatureHierarchy(featMap));
+                    chrom.addAllFeatures(this.createFeatureHierarchy(featMap));
+                    refGenome.addChromosome(chrom);
 
+                } catch (BioException | NoSuchElementException e) {
+                    JOptionPane.showMessageDialog(new JPanel(), "One of the imported chromosomes does not contain any sequence data!",
+                            "Chromosome Parsing Error", JOptionPane.ERROR_MESSAGE);
+                    continue;
+            }
             }
 
         } catch (Exception ex) {
@@ -269,7 +274,6 @@ public class BioJavaParser implements ReferenceParserI {
 
     /**
      * Creates the hierarchy of the given features.
-     *
      * @param featureMap the map of features, whose hierarchy is to be known
      * @return The list of top level features containing all subfeatures
      */
@@ -325,7 +329,6 @@ public class BioJavaParser implements ReferenceParserI {
     /**
      * Add a list of subfeatures to their corresponding parent features. If a
      * feature has no parent, it is added to the return list of features.
-     *
      * @param subFeatures The subfeatures to add to their parents
      * @param features The feature list containing the parents
      * @return The feature list with the parents, now knowing their children and

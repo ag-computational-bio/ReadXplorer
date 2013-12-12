@@ -1,11 +1,12 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
+import de.cebitec.readXplorer.databackend.AnalysesHandler;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.AnalysisStatus;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
+import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistant;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
 import de.cebitec.readXplorer.util.GeneralUtils;
@@ -30,11 +31,11 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
 
     private TrackConnector trackConnector;
     private PersistantTrack selectedTrack;
-    private List<PersistantMapping> mappings;
+    private List<MappingResultPersistant> mappingResults;
     private Integer refGenomeID;
     private double fraction;
     private List<de.cebitec.readXplorer.util.Observer> observer = new ArrayList<>();
-    private int[] region2Exclude;
+    private List<int[]> region2Exclude;
     protected HashMap<Integer, List<Integer>> forwardCDSs, reverseCDSs;
     private Statistics stats;
     private double backgroundCutoff;
@@ -84,8 +85,9 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
         // geting Mappings and calculate statistics on mappings.
         try {
             trackConnector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(this.selectedTrack);
-            this.stats = new Statistics(featureParser.getRefSeqLength(), this.fraction, this.forwardCDSs, this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
-            de.cebitec.readXplorer.databackend.AnalysesHandler handler = new de.cebitec.readXplorer.databackend.AnalysesHandler(trackConnector, this, "Collecting coverage data of track number "
+            this.stats = new Statistics(refViewer.getReference(), this.fraction, this.forwardCDSs, 
+                    this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
+            AnalysesHandler handler = new AnalysesHandler(trackConnector, this, "Collecting coverage data of track number "
                     + this.selectedTrack.getId(), new ParametersReadClasses(true, false, false, false)); // TODO: ParameterReadClasses noch in den Wizard einbauen und die parameter hier mit übergeben!
             handler.setMappingsNeeded(true);
             handler.setDesiredData(Properties.REDUCED_MAPPINGS);
@@ -132,15 +134,15 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
 
     @Override
     public void showData(Object data) {
-        this.mappings = this.stats.getMappings();
-        this.stats.parseMappings(this.mappings);
-        this.backgroundCutoff = this.stats.calculateBackgroundCutoff(this.parameters.getFraction(), this.featureParser.getRefSeqLength());
+        this.mappingResults = this.stats.getMappingResults();
+        this.stats.parseMappings(this.mappingResults);
+        this.backgroundCutoff = this.stats.calculateBackgroundCutoff(this.parameters.getFraction());
         this.stats.setBg(this.backgroundCutoff);
 
 
         this.stats.initMappingsStatistics();
         if (parameters.isPerformingRPKMs()) {
-            rpkmCalculation = new RPKMValuesCalculation(this.allRegionsInHash, this.stats, selectedTrack.getId());
+            rpkmCalculation = new RPKMValuesCalculation(this.allRegionsInHash, this.stats);
             rpkmCalculation.calculationExpressionValues();
 
             String trackNames;
@@ -150,7 +152,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
                 rpkmResultPanel.setBoundsInfoManager(refViewer.getBoundsInformationManager());
             }
 
-            RPKMAnalysisResult rpkmAnalysisResult = new RPKMAnalysisResult(trackMap, rpkmCalculation.getRpkmValues(), false);
+            RPKMAnalysisResult rpkmAnalysisResult = new RPKMAnalysisResult(trackMap, rpkmCalculation.getRpkmValues(), refGenomeID, false);
             rpkmResultPanel.addResult(rpkmAnalysisResult);
             trackNames = GeneralUtils.generateConcatenatedString(rpkmAnalysisResult.getTrackNameList(), 120);
             String panelName = "RPKM and read count values for " + trackNames + " (" + rpkmResultPanel.getResultSize() + " hits)";
@@ -158,10 +160,16 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
         }
 
         if (parameters.isPerformNovelRegionDetection()) {
-            newRegionDetection = new NewRegionDetection();
-            newRegionDetection.runningNewRegionsDetection(featureParser.getRefSeqLength(), forwardCDSs, 
-                    reverseCDSs, allRegionsInHash, this.stats.getFwdCoverage(), this.stats.getRevCoverage(), 
-                    this.stats.getForward(), this.stats.getReverse(), this.stats.getMm(), this.stats.getBg());
+            newRegionDetection = new NewRegionDetection(refViewer.getReference());
+            
+            /* TODO: call this method once for each chromosome and generate a list of forwardCDSs and reverseCDSs
+             * (one for each chromosome) like this: List<HashMap<Integer, List<Integer>>> forwardCDSs
+             */
+            int chromNo = 0; //TODO: correctly set these values
+            int chromLength = 0;
+            newRegionDetection.runningNewRegionsDetection(chromLength, forwardCDSs, reverseCDSs, allRegionsInHash, 
+                    this.stats.getFwdCoverage()[chromNo], this.stats.getRevCoverage()[chromNo], 
+                    this.stats.getForward()[chromNo], this.stats.getReverse()[chromNo], this.stats.getMm(), this.stats.getBg());
             
             String trackNames;
 
@@ -170,7 +178,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
                 novelRegionResult.setBoundsInfoManager(refViewer.getBoundsInformationManager());
             }
 
-            NovelRegionResult newRegionResult = new NovelRegionResult(trackMap, newRegionDetection.getNovelRegions(), false);
+            NovelRegionResult newRegionResult = new NovelRegionResult(trackMap, newRegionDetection.getNovelRegions(), refGenomeID, false);
             novelRegionResult.addResult(newRegionResult);
             trackNames = GeneralUtils.generateConcatenatedString(newRegionResult.getTrackNameList(), 120);
             String panelName = "Novel region detection results" + trackNames + " (" + novelRegionResult.getResultSize() + " hits)";
@@ -188,8 +196,8 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
             operonDetection = new OperonDetection();
             fwdOperons = operonDetection.concatOperonAdjacenciesToOperons(stats.getPutativeOperonAdjacenciesFWD(), this.trackConnector, stats.getBg());
             revOperons = operonDetection.concatOperonAdjacenciesToOperons(stats.getPutativeOperonAdjacenciesREV(), this.trackConnector, this.stats.getBg());
-            List<Operon> detectedOpeons = new ArrayList<>(fwdOperons);
-            detectedOpeons.addAll(revOperons);
+            List<Operon> detectedOperons = new ArrayList<>(fwdOperons);
+            detectedOperons.addAll(revOperons);
             String trackNames;
 
             if (operonResultPanel == null) {
@@ -197,7 +205,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
                 operonResultPanel.setBoundsInfoManager(refViewer.getBoundsInformationManager());
             }
 
-            OperonDetectionResult operonDetectionResult = new OperonDetectionResult(trackMap, detectedOpeons, false);
+            OperonDetectionResult operonDetectionResult = new OperonDetectionResult(trackMap, detectedOperons, refGenomeID, false);
             operonResultPanel.addResult(operonDetectionResult);
             trackNames = GeneralUtils.generateConcatenatedString(operonDetectionResult.getTrackNameList(), 120);
             String panelName = "Operon detection results " + trackNames + " (" + operonResultPanel.getResultSize() + " hits)";

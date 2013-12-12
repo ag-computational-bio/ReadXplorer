@@ -1,21 +1,14 @@
 package CoverageAnalysis;
 
-import de.cebitec.readXplorer.coverageAnalysis.AnalysisCoverage;
-import de.cebitec.readXplorer.coverageAnalysis.CoverageInterval;
 import de.cebitec.readXplorer.coverageAnalysis.ParameterSetCoverageAnalysis;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
-import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistant;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantCoverage;
-import java.io.FileNotFoundException;
-import java.util.List;
-import junit.framework.Assert;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.openide.util.Exceptions;
 
 /**
  *
@@ -111,7 +104,7 @@ public class AnalysisCoverageTest {
             coverage.setBestMatchRevMult(bmArrayRev);
             coverage.setCommonFwdMult(commonArrayFwd);
             coverage.setCommonRevMult(commonArrayRev);
-            CoverageAndDiffResultPersistant coverageResult = new CoverageAndDiffResultPersistant(coverage, null, null, false);
+            CoverageAndDiffResultPersistant coverageResult = new CoverageAndDiffResultPersistant(coverage, null, null, null);
             
             coverage2.setPerfectFwdMult(perfArrayFwd2);
             coverage2.setPerfectRevMult(perfArrayRev2);
@@ -119,7 +112,7 @@ public class AnalysisCoverageTest {
             coverage2.setBestMatchRevMult(bmArrayRev2);
             coverage2.setCommonFwdMult(commonArrayFwd2);
             coverage2.setCommonRevMult(commonArrayRev2);
-            CoverageAndDiffResultPersistant coverageResult2 = new CoverageAndDiffResultPersistant(coverage2, null, null, false);
+            CoverageAndDiffResultPersistant coverageResult2 = new CoverageAndDiffResultPersistant(coverage2, null, null, null);
             
             coverage3.setPerfectFwdMult(perfArrayFwd3);
             coverage3.setPerfectRevMult(perfArrayRev3);
@@ -127,7 +120,7 @@ public class AnalysisCoverageTest {
             coverage3.setBestMatchRevMult(bmArrayRev3);
             coverage3.setCommonFwdMult(commonArrayFwd3);
             coverage3.setCommonRevMult(commonArrayRev3);
-            CoverageAndDiffResultPersistant coverageResult3 = new CoverageAndDiffResultPersistant(coverage3, null, null, false);
+            CoverageAndDiffResultPersistant coverageResult3 = new CoverageAndDiffResultPersistant(coverage3, null, null, null);
             
             coverage4.setPerfectFwdMult(perfArrayFwd4);
             coverage4.setPerfectRevMult(perfArrayRev4);
@@ -135,7 +128,7 @@ public class AnalysisCoverageTest {
             coverage4.setBestMatchRevMult(bmArrayRev4);
             coverage4.setCommonFwdMult(commonArrayFwd4);
             coverage4.setCommonRevMult(commonArrayRev4);
-            CoverageAndDiffResultPersistant coverageResult4 = new CoverageAndDiffResultPersistant(coverage4, null, null, false);
+            CoverageAndDiffResultPersistant coverageResult4 = new CoverageAndDiffResultPersistant(coverage4, null, null, null);
             
             //standard order
 //            instanceSumPerfect.update(coverageResult);

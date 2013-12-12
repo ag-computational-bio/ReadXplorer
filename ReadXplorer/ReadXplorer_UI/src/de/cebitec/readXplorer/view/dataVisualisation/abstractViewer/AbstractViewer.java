@@ -1,5 +1,6 @@
 package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
 
+import de.cebitec.readXplorer.databackend.dataObjects.ChromosomeObserver;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.FeatureType;
@@ -71,6 +72,8 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     private MenuLabel optionsLabel;
     private JPanel options;
     private boolean hasOptions;
+    private JPanel chromSelectionPanel;
+    private boolean hasChromSelection;
     private List<FeatureType> excludedFeatureTypes;
     private boolean pAInfoIsAvailable = false;
     public static final String PROP_MOUSEPOSITION_CHANGED = "mousePos changed";
@@ -79,6 +82,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     private JScrollBar scrollBar; /* Scrollbar, which should adapt, when component is repainted. */
     private boolean centerScrollBar = false;
     private BufferedImage loadingIndicator;
+    private ChromosomeObserver chromObserver;
     private boolean newDataRequestNeeded = false;
 
     public AbstractViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference reference) {
@@ -92,6 +96,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
             Exceptions.printStackTrace(ex);
         }
         
+        this.chromObserver = new ChromosomeObserver();
         this.excludedFeatureTypes = new ArrayList<>();
         this.setLayout(null);
         this.setBackground(AbstractViewer.backgroundColor);
@@ -118,7 +123,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         printMouseOver = false;
         // setup all components
         this.initComponents();
-        bounds = new BoundsInfo(0, 0, 0, 0);
+        bounds = new BoundsInfo(0, 0, 0, 0, 0);
 
         this.calcBaseWidth();
         this.recalcCorrelationFactor();
@@ -135,48 +140,71 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         boundsManager.removeBoundListener(this);
     }
 
+    /**
+     * Carries out the setup of a legend panel.
+     * @param label The menu to display including a title.
+     * @param legend The legend panel to display
+     */
     public void setupLegend(MenuLabel label, JPanel legend) {
         this.hasLegend = true;
 
         int labelX = 2;
         int labelY = 0;
 
+        this.setupMenu(label, legend, labelX, labelY);
+        
         this.legendLabel = label;
-        this.legendLabel.setSize(new Dimension(70, 20));
-        this.legendLabel.setBounds(labelX, labelY, this.legendLabel.getSize().width, this.legendLabel.getSize().height);
-
         this.legend = legend;
-        int legendY = labelY + legendLabel.getSize().height + 2;
-
-        this.legend.setBounds(labelX, legendY, legend.getPreferredSize().width, legend.getPreferredSize().height);
-        this.legend.setVisible(false);
     }
     
     /**
-     * Setup an option panel in the right top corner of the viewer.
-     * @param label 
-     * @param options 
+     * Setup an option panel next to the legend panel.
+     * @param label The menu to display including a title.
+     * @param options The options panel to display
      */
     public void setupOptions(MenuLabel label, JPanel options) {
         this.hasOptions = true;
 
         int labelX = 70; // this.getWidth() - 72;
         int labelY = 0;
+        
+        this.setupMenu(label, options, labelX, labelY);
 
         this.optionsLabel = label;
-        this.optionsLabel.setSize(new Dimension(70, 20));
-        this.optionsLabel.setBounds(labelX, labelY, this.optionsLabel.getSize().width, this.optionsLabel.getSize().height);
-
         this.options = options;
-        int legendY = labelY + optionsLabel.getSize().height + 2;
+    }
+    
+    /**
+     * Setup a menu panel somewhere.
+     * @param menuLabel The menu to display including a title.
+     * @param menu The menu panel to display
+     */
+    private void setupMenu(MenuLabel menuLabel, JPanel menu, int x, int y) {
 
-        this.options.setBounds(labelX, legendY, options.getPreferredSize().width, options.getPreferredSize().height);
-        this.options.setVisible(false);
+        menuLabel.setSize(new Dimension(70, 20));
+        menuLabel.setBounds(x, y, menuLabel.getSize().width, menuLabel.getSize().height);
+
+        int menuY = y + menuLabel.getSize().height + 2;
+
+        menu.setBounds(x, menuY, menu.getPreferredSize().width, menu.getPreferredSize().height);
+        menu.setVisible(false);
+    }
+    
+    /**
+     * Setup a chromosome selection panel next to the legend panel.
+     * @param chromSelectionPanel the chromosome selection panel to display
+     */
+    public void setupChromSelectionPanel(JPanel chromSelectionPanel) {
+        
+        this.hasChromSelection = true;
+        chromSelectionPanel.setBounds(72, 0, chromSelectionPanel.getSize().width, chromSelectionPanel.getSize().height);
+        chromSelectionPanel.setVisible(true);
+        this.chromSelectionPanel = chromSelectionPanel;
     }
 
     public void showSequenceBar(boolean showSeqBar, boolean centerSeqBar) {
         if (showSeqBar) {
-            this.seqBar = new SequenceBar(this, reference);
+            this.seqBar = new SequenceBar(this);
             this.centerSeqBar = centerSeqBar;
         } else {
             seqBar = null;
@@ -491,7 +519,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     public void updatePhysicalBounds() {
         this.setSizes();
         this.adjustPaintingAreaInfo();
-        this.boundsManager.getUpdatedBoundsInfo((LogicalBoundsListener) this);
+        this.boundsManager.getUpdatedBoundsInfo(this);
     }
 
     /**
@@ -503,7 +531,8 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      */
     @Override
     public void updateLogicalBounds(BoundsInfo bounds) {
-//        if (!this.bounds.equals(bounds)) {
+        if (this.isActive() && !this.bounds.equals(bounds)) {
+            this.newDataRequestNeeded = true;
             this.bounds = bounds;
             this.calcBaseWidth();
             this.recalcCorrelationFactor();
@@ -516,11 +545,9 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
             if (this.seqBar != null) {
                 this.seqBar.boundsChanged();
             }
-            if (this.isActive()) {
-                this.boundsChangedHook();
-                this.repaint();
-            }
-//        }
+            this.boundsChangedHook();
+            this.repaint();
+        }
 
         if (this.scrollBar != null && this.centerScrollBar) {
             this.scrollBar.setValue(this.scrollBar.getMaximum() / 2 - this.getParent().getHeight() / 2);
@@ -638,7 +665,6 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      */
     public BoundsInfo getBoundsInfo() {
         return this.bounds;
-
     }
 
     /**
@@ -693,6 +719,9 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         this.inDrawingMode = inDrawingMode;
     }
 
+    /**
+     * @return The reference genome associated with this ReferenceViewer instance.
+     */
     public PersistantReference getReference() {
         return this.reference;
     }
@@ -729,10 +758,6 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     public JPanel getLegendPanel() {
         return this.legend;
     }
-
-    public boolean isLegendVisisble() {
-        return this.legend.isVisible();
-    }
     
     public MenuLabel getOptionsLabel() {
         return this.optionsLabel;
@@ -746,8 +771,19 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         return this.options;
     }
     
-    public boolean isOptionsVisible() {
-        return this.options.isVisible();
+    /**
+     * @return true, if this viewer has a chromosome selection panel, false
+     * otherwise.
+     */
+    public boolean hasChromSelectionPanel() {
+        return hasChromSelection;
+    }
+    
+    /**
+     * @return the chromosome selection panel of this viewer. Might be null.
+     */
+    public JPanel getChromSelectionPanel() {
+        return this.chromSelectionPanel;
     }
 
     public List<FeatureType> getExcludedFeatureTypes() {
@@ -812,6 +848,14 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      */
     public BufferedImage getLoadingIndicator() {
         return loadingIndicator;
+    }
+    
+    /**
+     * @return The chromosome observer of this viewer. It shall be used
+     * to querry data from the reference genome.
+     */
+    public ChromosomeObserver getChromosomeObserver() {
+        return this.chromObserver;
     }
 
     /**

@@ -36,7 +36,7 @@ public class StatsContainer {
     public static final String NO_UNIQ_WRNG_ORIENT_SMALL_PAIRS = "Unique Wrong Orient. Smaller Pairs";
     public static final String NO_UNIQ_WRNG_ORIENT_LARGE_PAIRS = "Unique Wrong Orient. Larger Pairs";
     public static final String AVERAGE_READ_LENGTH = "Average Read Length";
-    public static final String AVERAGE_SEQ_PAIR_SIZE = "Average Seq. Pair Size";
+    public static final String AVERAGE_READ_PAIR_SIZE = "Average Seq. Pair Size";
     public static final String COVERAGE_BM_GENOME = "Best Match Coverage";
     public static final String COVERAGE_COMPLETE_GENOME = "Complete Coverage";
     public static final String COVERAGE_PERFECT_GENOME = "Perfect Coverage";
@@ -132,7 +132,7 @@ public class StatsContainer {
         statsMap.put(NO_UNIQ_ORIENT_WRONG_PAIRS, 0);
         statsMap.put(NO_UNIQ_WRNG_ORIENT_SMALL_PAIRS, 0);
         statsMap.put(NO_UNIQ_WRNG_ORIENT_LARGE_PAIRS, 0);
-        statsMap.put(AVERAGE_SEQ_PAIR_SIZE, 0);
+        statsMap.put(AVERAGE_READ_PAIR_SIZE, 0);
     }
 
     /**

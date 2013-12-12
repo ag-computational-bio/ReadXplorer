@@ -1,13 +1,8 @@
 package de.cebitec.readXplorer.parser.common;
 
-import de.cebitec.readXplorer.parser.mappings.ParserCommonMethods;
-import de.cebitec.readXplorer.util.Properties;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import net.sf.samtools.SAMFileHeader;
-import net.sf.samtools.SAMRecord;
-import net.sf.samtools.SAMTag;
 
 /**
  * Class for the classification data of a read.

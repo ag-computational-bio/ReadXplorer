@@ -1,6 +1,7 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelRegion;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,25 +14,27 @@ import java.util.List;
 public class NewRegionDetection {
 
     private List<NovelRegion> novelRegions;
+    private final PersistantReference refGenome;
 
-    public NewRegionDetection() {
+    public NewRegionDetection(PersistantReference refGenome) {
         this.novelRegions = new ArrayList<>();
+        this.refGenome = refGenome;
     }
 
-    public void runningNewRegionsDetection(int length, HashMap<Integer, List<Integer>> forwardCDSs, 
+    public void runningNewRegionsDetection(int chromLength, HashMap<Integer, List<Integer>> forwardCDSs, 
             HashMap<Integer, List<Integer>> reverseCDSs, HashMap<Integer, PersistantFeature> allRegionsInHash,
             int[] fwdCoverage, int[] revCoverage, int[] forward, int[] reverse, double mm, double bg) {
 
 
         NovelRegion newRegion = null;
         
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < chromLength; i++) {
 
             int fwdcount = forward[i];
 //    # for the reverse side, we have to come "from the right"
 //    # to avoid code duplication, @reverse is searched backwards
 
-            int rev_i = length - i - 1;
+            int rev_i = chromLength - i - 1;
             int revcount = reverse[rev_i];
 
 //    # got through possible forward hits first
@@ -41,8 +44,8 @@ public class NewRegionDetection {
 
 //	# check if the hits can be attributed to a region (up to 700bp downstream)
                 while (forwardCDSs.containsKey(i + j - end) || j > 700) {
-                    if ((i + j) > length) {
-                        end = length;
+                    if ((i + j) > chromLength) {
+                        end = chromLength;
                     }
                     j++;
                 }

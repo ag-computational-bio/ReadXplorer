@@ -30,25 +30,26 @@ public class AntisenseDetection {
         Integer distanceForExcludingTss = parameters.getExclusionOfTSSDistance();
         int keepingInternalTssDistance = parameters.getKeepingInternalTssDistance();
         double bg = stats.getBg(); // Background cutoff
-        int[] forward = stats.getForward(); // Array with startsite count information for forward mapping positions.
-        int[] reverse = stats.getReverse(); // Array with startsite count information for reverse mapping positions.
-        int[] fwdCov = stats.getFwdCoverage(); // Array with coverage counts of mappings in forward direction.
-        int[] revCov = stats.getRevCoverage(); // Array with coverage counts of mappings in reverse direction.
+        int[][] forward = stats.getForward(); // Array with startsite count information for forward mapping positions.
+        int[][] reverse = stats.getReverse(); // Array with startsite count information for reverse mapping positions.
+        int[][] fwdCov = stats.getFwdCoverage(); // Array with coverage counts of mappings in forward direction.
+        int[][] revCov = stats.getRevCoverage(); // Array with coverage counts of mappings in reverse direction.
         for (int i = 0; i < length; i++) {
 
-            if ((forward[i] > bg) || (reverse[i] > bg)) { // background cutoff is passed
-                int f_before = forward[i - 1] + 1;
-                int r_before = reverse[i + 1] + 1;
+            //TODO: first getChromosome, chromId and chromNo to access the first dimension (chromNo) of the two-dim-arrays.
+            //You can use
+            antisenseTSS.get(0).getChromId();
+            //to access the chromosome and have to make the chromosome available here.
 
-                int f_ratio = (forward[i] + 1) / f_before;
-                int r_ratio = (reverse[i] + 1) / r_before;
-
-                if (f_ratio >= ratio) {
-                }
-
-                if (r_ratio >= ratio) {
-                }
-            }
+//                int f_ratio = (forward[i] + 1) / f_before;
+//                int r_ratio = (reverse[i] + 1) / r_before;
+//
+//                if (f_ratio >= ratio) {
+//                }
+//
+//                if (r_ratio >= ratio) {
+//                }
+//            }
         }
 
 

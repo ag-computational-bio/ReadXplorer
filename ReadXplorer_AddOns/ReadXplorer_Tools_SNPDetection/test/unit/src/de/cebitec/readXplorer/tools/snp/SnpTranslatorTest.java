@@ -1,9 +1,8 @@
 package de.cebitec.readXplorer.tools.snp;
 
-import de.cebitec.readXplorer.tools.snp.SnpTranslator;
 import de.cebitec.readXplorer.databackend.dataObjects.CodonSnp;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantSubFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.Snp;
 import de.cebitec.readXplorer.util.FeatureType;
@@ -73,13 +72,13 @@ public class SnpTranslatorTest {
     @Test
     public void testCalcSnpList() {
         System.out.println("CalcSnpListTest");
-        PersistantFeature feat1 = new PersistantFeature(1, "0", "ec1", "locus1", "product1", 1, 205, true, FeatureType.CDS, "name1");
-        PersistantFeature feat2 = new PersistantFeature(2, "0", "ec2", "locus2", "product2", 2, 320, false, FeatureType.CDS, "name2");
-        PersistantFeature feat3 = new PersistantFeature(3, "0", "ec3", "locus3", "product3", 430, 650, false, FeatureType.CDS, "name3");
-        PersistantFeature feat4 = new PersistantFeature(4, "0", "ec4", "locus4", "product4", 570, 810, true, FeatureType.CDS, "name4");
-        PersistantFeature feat5 = new PersistantFeature(5, "0", "ec5", "miRnaL5", "miRnaP5", 1000, 1100, true, FeatureType.MIRNA, "miRnaN5");
-        PersistantFeature feat6 = new PersistantFeature(6, "0", "ec6", "locus6", "product6", 11000, 11130, true, FeatureType.CDS, "name6");
-        PersistantFeature feat7 = new PersistantFeature(7, "0", "ec7", "locus7", "product7", 10800, 11129, false, FeatureType.CDS, "name7");
+        PersistantFeature feat1 = new PersistantFeature(1, 1, "0", "ec1", "locus1", "product1", 1, 205, true, FeatureType.CDS, "name1");
+        PersistantFeature feat2 = new PersistantFeature(2, 2, "0", "ec2", "locus2", "product2", 2, 320, false, FeatureType.CDS, "name2");
+        PersistantFeature feat3 = new PersistantFeature(3, 3, "0", "ec3", "locus3", "product3", 430, 650, false, FeatureType.CDS, "name3");
+        PersistantFeature feat4 = new PersistantFeature(4, 4, "0", "ec4", "locus4", "product4", 570, 810, true, FeatureType.CDS, "name4");
+        PersistantFeature feat5 = new PersistantFeature(5, 5, "0", "ec5", "miRnaL5", "miRnaP5", 1000, 1100, true, FeatureType.MIRNA, "miRnaN5");
+        PersistantFeature feat6 = new PersistantFeature(6, 6, "0", "ec6", "locus6", "product6", 11000, 11130, true, FeatureType.CDS, "name6");
+        PersistantFeature feat7 = new PersistantFeature(7, 7, "0", "ec7", "locus7", "product7", 10800, 11129, false, FeatureType.CDS, "name7");
         PersistantSubFeature subfeat1 = new PersistantSubFeature(1, 1, 7, FeatureType.EXON); //ttt aaa g
         PersistantSubFeature subfeat2 = new PersistantSubFeature(1, 10, 100, FeatureType.EXON); //ac cgg cga ttc tag tga aat cga acg ggc agg tca att tcc aac cag cga tga cgt aat aga tag ata caa gga agt cat ttt tct ttt aa
         PersistantSubFeature subfeat3 = new PersistantSubFeature(2, 2, 100, FeatureType.EXON); //current snp base is not incorporated in snp calculation a att tct ctg gcc gct aag atc act tta gct tgc ccg tcc agt taa agg ttg gtc gct act gca tta tct atc tat gtt cct tca gta aaa aga aaa tt
@@ -124,28 +123,28 @@ public class SnpTranslatorTest {
         featuresFound.add(feat5);
         featuresFound.add(feat6);
         featuresFound.add(feat7);           //A, C, G, T, N, Gap, cov, freq
-        Snp snp1 = new Snp(1, 1, 'A', 'T', 20, 0, 0, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp2 = new Snp(2, 1, 'G', 'T', 0, 0, 30, 5, 0, 0, 35, 83, SequenceComparison.SUBSTITUTION);
-        Snp snp3 = new Snp(3, 1, 'C', 'T', 0, 20, 0, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp4 = new Snp(10, 1, 'T', 'A', 0, 0, 0, 25, 0, 0, 25, 100, SequenceComparison.SUBSTITUTION);
-        Snp snp5 = new Snp(11, 1, 'A', 'C', 20, 5, 0, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp6 = new Snp(500, 1, 'A', 'G', 20, 0, 0, 0, 0, 0, 20, 100, SequenceComparison.SUBSTITUTION); //right base of triplet, test for suspended snp
-        Snp snp7 = new Snp(501, 1, 'A', 'C', 20, 5, 0, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp8 = new Snp(620, 1, 'A', 'C', 20, 5, 0, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp8b = new Snp(630, 1, 'C', 'T', 0, 20, 0, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp8c = new Snp(751, 1, 'C', 'T', 0, 20, 0, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp9 = new Snp(1000, 1, 'A', 'T', 20, 0, 5, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp10 = new Snp(1001, 1, 'T', 'G', 0, 0, 5, 15, 0, 0, 20, 75, SequenceComparison.SUBSTITUTION);
-        Snp snp11 = new Snp(1002, 1, 'T', 'A', 5, 0, 0, 15, 0, 0, 25, 75, SequenceComparison.SUBSTITUTION); //to high coverage
-        Snp snp12 = new Snp(1003, 1, 'G', 'A', 5, 0, 20, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp13 = new Snp(1098, 1, 'A', 'T', 20, 0, 0, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp14 = new Snp(1099, 1, 'G', 'A', 5, 0, 20, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp15 = new Snp(1100, 1, 'A', 'C', 20, 5, 0, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp16 = new Snp(1101, 1, 'T', 'A', 0, 0, 0, 25, 0, 0, 25, 100, SequenceComparison.SUBSTITUTION);
-        Snp snp17 = new Snp(11127, 1, 'T', 'A', 5, 0, 0, 20, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp18 = new Snp(11128, 1, 'N', 'T', 0, 0, 0, 5, 20, 0, 25, 80, SequenceComparison.SUBSTITUTION); //contains an N
-        Snp snp19 = new Snp(11129, 1, 'G', 'C', 0, 0, 20, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION); 
-        Snp snp20 = new Snp(11130, 1, '_', 'G', 20, 0, 5, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION); //contains a _
+        Snp snp1 = new Snp(1, 1, 1, 'A', 'T', 20, 0, 0, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
+        Snp snp2 = new Snp(2, 1, 1, 'G', 'T', 0, 0, 30, 5, 0, 0, 35, 83, SequenceComparison.SUBSTITUTION);
+        Snp snp3 = new Snp(3, 1, 1, 'C', 'T', 0, 20, 0, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
+        Snp snp4 = new Snp(10, 1, 1, 'T', 'A', 0, 0, 0, 25, 0, 0, 25, 100, SequenceComparison.SUBSTITUTION);
+        Snp snp5 = new Snp(11, 1, 1, 'A', 'C', 20, 5, 0, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
+        Snp snp6 = new Snp(500, 1, 1, 'A', 'G', 20, 0, 0, 0, 0, 0, 20, 100, SequenceComparison.SUBSTITUTION); //right base of triplet, test for suspended snp
+        Snp snp7 = new Snp(501, 1, 1, 'A', 'C', 20, 5, 0, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
+        Snp snp8 = new Snp(620, 1, 1, 'A', 'C', 20, 5, 0, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
+        Snp snp8b = new Snp(630, 1, 1, 'C', 'T', 0, 20, 0, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
+        Snp snp8c = new Snp(751, 1, 1, 'C', 'T', 0, 20, 0, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
+        Snp snp9 = new Snp(1000, 1, 1, 'A', 'T', 20, 0, 5, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
+        Snp snp10 = new Snp(1001, 1, 1, 'T', 'G', 0, 0, 5, 15, 0, 0, 20, 75, SequenceComparison.SUBSTITUTION);
+        Snp snp11 = new Snp(1002, 1, 1, 'T', 'A', 5, 0, 0, 15, 0, 0, 25, 75, SequenceComparison.SUBSTITUTION); //to high coverage
+        Snp snp12 = new Snp(1003, 1, 1, 'G', 'A', 5, 0, 20, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
+        Snp snp13 = new Snp(1098, 1, 1, 'A', 'T', 20, 0, 0, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
+        Snp snp14 = new Snp(1099, 1, 1, 'G', 'A', 5, 0, 20, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
+        Snp snp15 = new Snp(1100, 1, 1, 'A', 'C', 20, 5, 0, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
+        Snp snp16 = new Snp(1101, 1, 1, 'T', 'A', 0, 0, 0, 25, 0, 0, 25, 100, SequenceComparison.SUBSTITUTION);
+        Snp snp17 = new Snp(11127, 1, 1, 'T', 'A', 5, 0, 0, 20, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
+        Snp snp18 = new Snp(11128, 1, 1, 'N', 'T', 0, 0, 0, 5, 20, 0, 25, 80, SequenceComparison.SUBSTITUTION); //contains an N
+        Snp snp19 = new Snp(11129, 1, 1, 'G', 'C', 0, 0, 20, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION); 
+        Snp snp20 = new Snp(11130, 1, 1, '_', 'G', 20, 0, 5, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION); //contains a _
         
         List<Snp> snps = new ArrayList<>();
         snps.add(snp1);
@@ -175,7 +174,7 @@ public class SnpTranslatorTest {
         featureTypes.add(FeatureType.CDS);
         featureTypes.add(FeatureType.EXON);
         featureTypes.add(FeatureType.MIRNA);
-        SnpTranslator snpTranslator = new SnpTranslator(featuresFound, new PersistantReference(1, "genome", "genome", refSeq, null), featureTypes);
+        SnpTranslator snpTranslator = new SnpTranslator(featuresFound, new PersistantChromosome(1, 1, 1, "genome", 1), featureTypes);
         for (Snp snp : snps){
             snpTranslator.checkForFeature(snp);
         }

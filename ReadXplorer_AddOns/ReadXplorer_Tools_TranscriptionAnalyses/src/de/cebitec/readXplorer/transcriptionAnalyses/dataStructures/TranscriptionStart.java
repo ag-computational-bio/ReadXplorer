@@ -1,6 +1,6 @@
 package de.cebitec.readXplorer.transcriptionAnalyses.dataStructures;
 
-import de.cebitec.readXplorer.databackend.dataObjects.TrackResultEntry;
+import de.cebitec.readXplorer.databackend.dataObjects.TrackChromResultEntry;
 
 /**
  * Data structure for storing a gene start with position, strand, initial coverage
@@ -9,7 +9,7 @@ import de.cebitec.readXplorer.databackend.dataObjects.TrackResultEntry;
  *
  * @author -Rolf Hilker-
  */
-public class TranscriptionStart extends TrackResultEntry {
+public class TranscriptionStart extends TrackChromResultEntry {
     
     private int pos;
     private boolean isFwdStrand;
@@ -30,8 +30,8 @@ public class TranscriptionStart extends TrackResultEntry {
      * @param detFeatures object containing the features associated to this predicted gene start
      */
     public TranscriptionStart(int pos, boolean isFwdStrand, int readStarts, int percentIncrease,
-            int coverageIncrease, DetectedFeatures detFeatures, int trackId) {
-        super(trackId);
+            int coverageIncrease, DetectedFeatures detFeatures, int trackId, int chromId) {
+        super(trackId, chromId);
         this.pos = pos;
         this.isFwdStrand = isFwdStrand;
         this.readStarts = readStarts;

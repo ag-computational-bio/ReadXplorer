@@ -15,8 +15,8 @@ public class NovelRegionResult extends ResultTrackAnalysis<ParameterSetFiveEnric
     private List<NovelRegion> novelRegions;
     private ParameterSetFiveEnrichedAnalyses parameters;
 
-    public NovelRegionResult(Map<Integer, PersistantTrack> trackMap, List<NovelRegion> novelRegions, boolean combineTracks) {
-        super(trackMap, combineTracks);
+    public NovelRegionResult(Map<Integer, PersistantTrack> trackMap, List<NovelRegion> novelRegions, int refId, boolean combineTracks) {
+        super(trackMap, refId, combineTracks);
         this.novelRegions = novelRegions;
     }
 

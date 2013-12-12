@@ -62,7 +62,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
         layerHeight = blockHeight + 2;
         minSaturationAndBrightness = 0.3f;
         maxSaturationAndBrightness = 0.9f;
-        mappingResult = new MappingResultPersistant(new ArrayList<PersistantMapping>(), 0, 0);
+        mappingResult = new MappingResultPersistant(new ArrayList<PersistantMapping>(), null);
         completeCoverage = new HashMap<>();
         this.setHorizontalMargin(10);
         this.setActive(false);
@@ -70,35 +70,38 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
         setupComponents();
     }
 
+    
     @Override
     public int getMaximalHeight() {
         return this.getHeight();
     }
 
+    
     @Override
     public void changeToolTipText(int logPos) {
     }
 
+    
     @Override
     public void boundsChangedHook() {
-       
         if (this.isInMaxZoomLevel() && isActive()) {
-           //  updatePhysicalBounds();
+            //  updatePhysicalBounds();
             setInDrawingMode(true);
         } else {
             setInDrawingMode(false);
-        }    
-
-         this.setupComponents();
+        }
+        this.setupComponents();
     }
 
+    /**
+     * Sets up all components of the alignment viewer = the alignments.
+     */
     private void setupComponents() {
 
-
+        // at least sufficient horizontal zoom level to show bases
         if (!this.isInMaxZoomLevel()) {
             this.getBoundsInformationManager().zoomLevelUpdated(1);
         }
-        // at least sufficient horizontal zoom level to show bases
 
         if (isInDrawingMode()) { //request the data to show, receiveData method calls draw methods
              this.requestData(super.getBoundsInfo().getLogLeft(), super.getBoundsInfo().getLogRight());
@@ -113,11 +116,11 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
         
         int logLeft = this.getBoundsInfo().getLogLeft();
         int logRight = this.getBoundsInfo().getLogRight();
-        if (logLeft != this.oldLogLeft || logRight != this.oldLogRight) {
+        if (logLeft != this.oldLogLeft || logRight != this.oldLogRight || this.isNewDataRequestNeeded()) {
             
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
             this.mappingsLoading = true;
-            this.trackConnector.addMappingRequest(new IntervalRequest(from, to, this, true));
+            this.trackConnector.addMappingRequest(new IntervalRequest(from, to, this.getReference().getActiveChromId(), this, true));
             this.oldLogLeft = logLeft;
             this.oldLogRight = logRight;
         } else { //needed when e.g. mapping classes are deselected
@@ -148,7 +151,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
             this.findMinAndMaxCount(mappingResult.getMappings()); //for currently shown mappingResult
             this.findMaxCoverage(completeCoverage);
             this.setViewerHeight();
-            this.layout = new Layout(mappingResult.getLowerBound(), mappingResult.getUpperBound(), mappingResult.getMappings(), getExcludedFeatureTypes());
+            this.layout = new Layout(mappingResult.getRequest().getFrom(), mappingResult.getRequest().getTo(), mappingResult.getMappings(), getExcludedFeatureTypes());
 
             this.removeAll();
             this.addBlocks(layout);

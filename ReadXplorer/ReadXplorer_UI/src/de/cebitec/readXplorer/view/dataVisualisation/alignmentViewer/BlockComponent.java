@@ -133,7 +133,7 @@ public class BlockComponent extends JComponent {
         int start = ((PersistantMapping) block.getPersistantObject()).getStart();
         int stop = ((PersistantMapping) block.getPersistantObject()).getStop();
         //string first pos is zero
-        String readSequence = parentViewer.getReference().getSequence().substring(start-1, stop);
+        String readSequence = parentViewer.getReference().getActiveChromSequence(parentViewer.getChromosomeObserver()).substring(start-1, stop);
         return readSequence;
     }
 

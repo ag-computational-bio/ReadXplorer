@@ -5,8 +5,10 @@ import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistant;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.DetectedFeatures;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.TranscriptionStart;
 import de.cebitec.readXplorer.util.DiscreteCountingDistribution;
@@ -18,19 +20,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Carries out the logic behind the transcription start site (TSS) anaylsis.
  * When executing the transcription start site detection increaseReadCount is always active
  * and maxInitialReadCount + increaseReadCount2 are optional parameters. They can
  * further constrain the search space (e.g. inc = 100, max = 10, inc2 = 50 means 
- * that coverage increases above 50 with an initial read count of 0-10 are detected
+ * that read starts above 50 with an initial read count of 0-10 are detected
  * as transcription start sites, but also all increases of 100 and bigger. When the parameters are
  * switched, e.g. inc = 50, max = 10, inc2 = 100, then all coverage increases above 100 
  * with an initial read count of 0-10 are detected as transcription start sites, but for all positions
  * with an initial read count > 10 an increase of 50 read counts is enough to be detected.
  * 
- * 1. Nach Coverage: a) Coverage Increase larger than threshold of 99,75% increases in data set
+ * 1. Nach Coverage: a) More read starts than threshold of 99,75% of read starts in data set
 		     b) Coverage Increase in percent larger than 99,75% of the increase percentages
  2. Nach Mappingstarts: a) Nach Chernoff-Formel
 			b) Nach Wahrscheinlichkeitsformel (Binomialverteilung)
@@ -42,9 +45,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
 
     private TrackConnector trackConnector;
     private final ParameterSetTSS parametersTSS;
-    private int refSeqLength;
-    private List<PersistantFeature> genomeFeatures;
-    protected List<TranscriptionStart> detectedStarts; //stores position and true for fwd, false for rev strand
+    protected List<TranscriptionStart> detectedStarts;
     private DiscreteCountingDistribution readStartDistribution;
     private DiscreteCountingDistribution covIncPercentDistribution;
     private boolean calcCoverageDistributions;
@@ -61,11 +62,13 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
     private int commonReadStartsLastRevPos;
     private int lastFeatureIdxGenStartsFwd;
     private int lastFeatureIdxGenStartsRev;
+    private ReferenceConnector refConnector;
     
-    private HashMap<Integer, Integer> exactReadStartDist = new HashMap<>(); //exact coverage increase distribution
+    private HashMap<Integer, Integer> exactReadStartDist = new HashMap<>(); //exact read start distribution
     private HashMap<Integer, Integer> exactCovIncPercDist = new HashMap<>(); //exact coverage increase percent distribution
     
     protected PersistantCoverage currentCoverage;
+    private Map<Integer, PersistantChromosome> chromosomes;
 
     /**
      * Carries out the logic behind the transcription start site analysis.
@@ -106,26 +109,28 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      */
     private void initDatastructures() {
         
-        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackConnector.getRefGenome().getId());
-        this.refSeqLength = trackConnector.getRefSequenceLength();
-        this.genomeFeatures = refConnector.getFeaturesForClosedInterval(0, this.refSeqLength);   
-        
+        refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackConnector.getRefGenome().getId());
+        chromosomes = refConnector.getChromosomesForGenome();
+
         this.readStartDistribution = trackConnector.getCountDistribution(Properties.READ_START_DISTRIBUTION);
         this.covIncPercentDistribution = trackConnector.getCountDistribution(Properties.COVERAGE_INC_PERCENT_DISTRIBUTION);
         this.calcCoverageDistributions = this.readStartDistribution.isEmpty();
-        
+
         if (this.parametersTSS.isAutoTssParamEstimation()) {
             this.parametersTSS.setMaxLowCovInitCount(0); //set these values as default for the transcription start site automatic
             this.parametersTSS.setMinLowCovIncrease(0); //avoids loosing smaller, low coverage increases, can only be set by the user
+            this.parametersTSS.setMinNoReadStarts(0);
+            this.parametersTSS.setMinPercentIncrease(0);
             if (!this.calcCoverageDistributions) {
-                this.parametersTSS.setMinNoReadStarts(this.estimateCutoff(this.readStartDistribution, 0)); //+ 0,05%
-                this.parametersTSS.setMinPercentIncrease(this.estimateCutoff(this.covIncPercentDistribution, 0));// (int) (this.genomeSize / 1000)); //0,1%
+                int genomeLength = PersistantReference.calcWholeGenomeLength(chromosomes);
+                parametersTSS.setMinNoReadStarts(this.estimateCutoff(genomeLength, readStartDistribution, 0)); //+ 0,05%
+                parametersTSS.setMinPercentIncrease(this.estimateCutoff(genomeLength, covIncPercentDistribution, 0));// (int) (this.genomeSize / 1000)); //0,1%
             } else {
                 this.parametersTSS.setMinNoReadStarts(10); //lowest default values for new data sets without an inital distribution
                 this.parametersTSS.setMinPercentIncrease(30); //in the database
             }
         }
-        
+
         //the minimal increase is initially set to 10%, if the coverage distributions were not calculated yet
         parametersTSS.setMinPercentIncrease(calcCoverageDistributions ? 10 : parametersTSS.getMinPercentIncrease());
     }
@@ -166,6 +171,9 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         
         PersistantCoverage coverage = result.getCoverage();
         PersistantCoverage readStarts = result.getReadStarts();
+        int chromId = result.getRequest().getChromId();
+        int chromLength = chromosomes.get(chromId).getLength();
+        List<PersistantFeature> chromFeatures = refConnector.getFeaturesForClosedInterval(0, chromLength, chromId);
         this.currentCoverage = coverage;
         
         int leftBound = coverage.getLeftBound();
@@ -232,7 +240,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                 this.covIncPercentDistribution.increaseDistribution(percentIncFwd);
                 this.covIncPercentDistribution.increaseDistribution(percentIncRev);
                 
-                this.detectStart(i, readStartsFwd, readStartsRev, increaseFwd, increaseRev, percentIncFwd, percentIncRev);
+                this.detectStart(i, chromId, chromLength, chromFeatures, readStartsFwd, readStartsRev, increaseFwd, increaseRev, percentIncFwd, percentIncRev);
             }
         } else {
             for (int i = fixedLeftBound; i < rightBound; ++i) {
@@ -264,7 +272,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                 percentIncFwd = GeneralUtils.calculatePercentageIncrease(fwdCov1, fwdCov2);
                 percentIncRev = GeneralUtils.calculatePercentageIncrease(revCov2, revCov1);
                 
-                this.detectStart(i, readStartsFwd, readStartsRev, increaseFwd, increaseRev, percentIncFwd, percentIncRev);
+                this.detectStart(i, chromId, chromLength, chromFeatures, readStartsFwd, readStartsRev, increaseFwd, increaseRev, percentIncFwd, percentIncRev);
             }
         }
 
@@ -293,24 +301,28 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      * @param diffFwd 
      * @param diffRev 
      */
-    private void detectStart(int pos, int readStartsFwd, int readStartsRev, int increaseFwd, int increaseRev,
-                             int percentIncreaseFwd, int percentIncreaseRev) {
+    private void detectStart(int pos, int chromId, int chromLength, List<PersistantFeature> chromFeatures, int readStartsFwd, 
+                    int readStartsRev, int increaseFwd, int increaseRev, int percentIncreaseFwd, int percentIncreaseRev) {
 
+        if (pos == 1190041 && chromId == 3) {
+            System.out.println("e");
+        }
+        
         if ( ((readStartsFwd <= parametersTSS.getMaxLowCovReadStarts() && readStartsFwd >= parametersTSS.getMinLowCovReadStarts())
             || readStartsFwd >  parametersTSS.getMaxLowCovReadStarts() && readStartsFwd >= parametersTSS.getMinNoReadStarts())
                 && percentIncreaseFwd > parametersTSS.getMinPercentIncrease()) {
             
-            DetectedFeatures detFeatures = this.findNextFeatures(pos + 1, true);
+            DetectedFeatures detFeatures = this.findNextFeatures(pos + 1, chromLength, chromFeatures, true);
             this.checkAndAddDetectedStart(new TranscriptionStart(pos + 1, true,
-                    readStartsFwd, percentIncreaseFwd, increaseFwd, detFeatures, trackConnector.getTrackID()));
+                    readStartsFwd, percentIncreaseFwd, increaseFwd, detFeatures, trackConnector.getTrackID(), chromId));
         }
         if ( ((readStartsRev <= parametersTSS.getMaxLowCovReadStarts() && readStartsRev >= parametersTSS.getMinLowCovReadStarts())
             || readStartsRev >  parametersTSS.getMaxLowCovReadStarts() && readStartsRev >= parametersTSS.getMinNoReadStarts())
                  && percentIncreaseRev > parametersTSS.getMinPercentIncrease()) {
             
-            DetectedFeatures detFeatures = this.findNextFeatures(pos, false);
+            DetectedFeatures detFeatures = this.findNextFeatures(pos, chromLength, chromFeatures, false);
             this.checkAndAddDetectedStart(new TranscriptionStart(pos, false,
-                    readStartsRev, percentIncreaseRev, increaseRev, detFeatures, trackConnector.getTrackID()));
+                    readStartsRev, percentIncreaseRev, increaseRev, detFeatures, trackConnector.getTrackID(), chromId));
         }
 
         if (this.parametersTSS.isAutoTssParamEstimation()) {
@@ -335,17 +347,17 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      * @return the genomic features, which can be associated to the
      * given transcription start site and strand.
      */
-    private DetectedFeatures findNextFeatures(int tssPos, boolean isFwdStrand) {
+    private DetectedFeatures findNextFeatures(int tssPos, int chromLength, List<PersistantFeature> chromFeatures, boolean isFwdStrand) {
         final int maxDeviation = 1000;
         int minStartPos = tssPos - maxDeviation < 0 ? 0 : tssPos - maxDeviation;
-        int maxStartPos = tssPos + maxDeviation > this.refSeqLength ? refSeqLength : tssPos + maxDeviation;
+        int maxStartPos = tssPos + maxDeviation > chromLength ? chromLength : tssPos + maxDeviation;
         PersistantFeature feature;
         DetectedFeatures detectedFeatures = new DetectedFeatures();
         int start;
         boolean fstFittingFeature = true;
         if (isFwdStrand) {
-            for (int i = this.lastFeatureIdxGenStartsFwd; i < this.genomeFeatures.size(); ++i) {
-                feature = this.genomeFeatures.get(i);
+            for (int i = this.lastFeatureIdxGenStartsFwd; i < chromFeatures.size(); ++i) {
+                feature = chromFeatures.get(i);
                 start = feature.getStart();
 
                 /*
@@ -392,10 +404,10 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                          * except the current feature is a CDS feature and no gene feature is present for
                          * that gene, starting earlier.
                          */
-                        if (feature.getType() == FeatureType.CDS && i+1 < genomeFeatures.size() &&
-                                feature.getStart() == this.genomeFeatures.get(i+1).getStart() &&
-                                this.genomeFeatures.get(i+1).getType() == FeatureType.GENE) {
-                            detectedFeatures.setDownstreamFeature(this.genomeFeatures.get(i+1));
+                        if (feature.getType() == FeatureType.CDS && i+1 < chromFeatures.size() &&
+                                feature.getStart() == chromFeatures.get(i+1).getStart() &&
+                                chromFeatures.get(i+1).getType() == FeatureType.GENE) {
+                            detectedFeatures.setDownstreamFeature(chromFeatures.get(i+1));
 //                            System.out.println("Gene covers CDS with same annotated TSS Fwd");
                         } else {
                             detectedFeatures.setDownstreamFeature(feature);
@@ -413,8 +425,8 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
             }
         } else { //means: strand == SequenceUtils.STRAND_REV
 
-            for (int i = this.lastFeatureIdxGenStartsRev; i < this.genomeFeatures.size(); ++i) {
-                feature = this.genomeFeatures.get(i);
+            for (int i = this.lastFeatureIdxGenStartsRev; i < chromFeatures.size(); ++i) {
+                feature = chromFeatures.get(i);
                 start = feature.getStop();
 
                 if (start >= minStartPos && feature.isFwdStrand() == isFwdStrand && start <= maxStartPos) {
@@ -453,10 +465,10 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                     } else if (start > tssPos && feature.getStart() < tssPos) {
                         //store next upstream feature, translation start is further in gene
                         
-                        if (    feature.getType() == FeatureType.CDS && i+1 < genomeFeatures.size() && 
-                                this.genomeFeatures.get(i+1).getType() == FeatureType.GENE &&
-                                this.genomeFeatures.get(i+1).getStart() <= feature.getStart()) {
-                            detectedFeatures.setUpstreamFeature(this.genomeFeatures.get(i+1));
+                        if (    feature.getType() == FeatureType.CDS && i+1 < chromFeatures.size() && 
+                                chromFeatures.get(i+1).getType() == FeatureType.GENE &&
+                                chromFeatures.get(i+1).getStart() <= feature.getStart()) {
+                            detectedFeatures.setUpstreamFeature(chromFeatures.get(i+1));
 //                            System.out.println("Gene covers CDS with same annotated TSS Rev");
                         } else {                      
                             detectedFeatures.setUpstreamFeature(feature);
@@ -504,7 +516,10 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                 int noReadStartsTSS = tss.getReadStartsAtPos();
                 
                 if (noReadStartsLastStart < noReadStartsTSS) {
-                    this.detectedStarts.remove(this.detectedStarts.size() - 1);
+                    if (this.detectedStarts.get(this.detectedStarts.size() - 1).getPos() == 1190041) {
+                        System.out.println("e");
+                    }
+                    this.detectedStarts.remove(index);
                     this.addDetectStart(tss);
                 }
                 //else, we keep the lastDetectedStart, but discard the current transcription start site
@@ -543,9 +558,9 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      * @return The calculated threshold returns an index from the coverage increase distribution
      * and the smallest total coverage increase (in total or percent) value for the calculated index is returned by this method.
      */
-    private int estimateCutoff(DiscreteCountingDistribution distribution, int thresholdEnlarger) {
+    private int estimateCutoff(int genomeLength, DiscreteCountingDistribution distribution, int thresholdEnlarger) {
         //genomeSize = total number of positions contributing to the increase distribution
-        int maxEstimatedNbOfActiveGenes = (int) (this.refSeqLength * 0.0025) + thresholdEnlarger; // 0,25% = 2,5 Genes per 1KB Genome size. This allows for variability.
+        int maxEstimatedNbOfActiveGenes = (int) (genomeLength * 0.0025) + thresholdEnlarger; // 0,25% = 2,5 Genes per 1KB Genome size. This allows for variability.
         int[] distributionValues = distribution.getDiscreteCountingDistribution();
         
         int nbTSSs = 0;
@@ -595,8 +610,14 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
             ProjectConnector.getInstance().insertCountDistribution(readStartDistribution, this.trackConnector.getTrackID());
             ProjectConnector.getInstance().insertCountDistribution(covIncPercentDistribution, this.trackConnector.getTrackID());
             if (this.parametersTSS.isAutoTssParamEstimation()) {
-                parametersTSS.setMinNoReadStarts(this.estimateCutoff(this.readStartDistribution, 0));//(int) (this.genomeSize * 0.0005));
-                parametersTSS.setMinPercentIncrease(this.estimateCutoff(this.covIncPercentDistribution, 0));//(int) (this.genomeSize * 0.0005));
+                for (PersistantChromosome chrom : chromosomes.values()) {
+                    parametersTSS.setMinNoReadStarts(parametersTSS.getMinNoReadStarts()
+                            + this.estimateCutoff(chrom.getLength(), readStartDistribution, 0)); //+ 0,05%
+                    parametersTSS.setMinPercentIncrease(parametersTSS.getMinPercentIncrease()
+                            + this.estimateCutoff(chrom.getLength(), covIncPercentDistribution, 0));// (int) (this.genomeSize / 1000)); //0,1%
+                }
+                parametersTSS.setMinNoReadStarts(parametersTSS.getMinNoReadStarts() / chromosomes.values().size());
+                parametersTSS.setMinPercentIncrease(parametersTSS.getMinPercentIncrease() / chromosomes.values().size());
                 this.correctTSSList();
             }
         }
@@ -612,6 +633,9 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
             tss = this.detectedStarts.get(i);
             if (tss.getReadStartsAtPos() < parametersTSS.getMinNoReadStarts()
                     || tss.getPercentIncrease() < parametersTSS.getMinPercentIncrease()) {
+                if (tss.getPos() == 1190041) {
+                    System.out.println("e");
+                }
                 this.detectedStarts.remove(tss);
             }
         }
@@ -635,6 +659,10 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         //remove detected starts with too low coverage increases
         List<TranscriptionStart> copiedDetectedStarts = new ArrayList<>(this.detectedStarts);
         for (TranscriptionStart tss : this.detectedStarts) {
+            
+            if (tss.getPos() == 1190041) {
+                System.out.println("e");
+            }
             if ((   tss.getReadStartsAtPos() < parametersTSS.getMinNoReadStarts() ||
                     tss.getPercentIncrease() < parametersTSS.getMinPercentIncrease()) 
 //                    && tss.getReadStartsAtPos() > parametersTSS.getMaxLowCovReadStarts()
@@ -653,7 +681,8 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      * @return 
      */
     private int getNewThreshold(HashMap<Integer, Integer> distribution, int thresholdEnlarger) {
-        int maxValue = (int) (this.refSeqLength * 0.0025 + thresholdEnlarger); // = 0,25% + thresholdEnlarger
+        int maxValue = (int) (PersistantReference.calcWholeGenomeLength(chromosomes) * 0.0025 + thresholdEnlarger);
+        maxValue /= chromosomes.values().size();
         int nbValues = 0;
         List<Integer> keyList = new ArrayList<>(distribution.keySet());
         Collections.sort(keyList);

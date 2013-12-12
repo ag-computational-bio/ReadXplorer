@@ -1,6 +1,7 @@
 package de.cebitec.readXplorer.parser.reference;
 
 import de.cebitec.readXplorer.parser.ReferenceJob;
+import de.cebitec.readXplorer.parser.common.ParsedChromosome;
 import de.cebitec.readXplorer.parser.common.ParsedFeature;
 import de.cebitec.readXplorer.parser.common.ParsedReference;
 import de.cebitec.readXplorer.parser.common.ParsingException;
@@ -54,7 +55,7 @@ public class BioJavaGff3Parser extends FastaReferenceParser {
         
         final ParsedReference refGenome = super.parseReference(referenceJob, filter);
         refGenome.setFeatureFilter(filter);
-        refGenome.setHasSubFeatures(false);
+        final Map<String, ParsedChromosome> chromMap = CommonsRefParser.generateStringMap(refGenome.getChromosomes());
 
         try (BufferedReader reader = new BufferedReader(new FileReader(referenceJob.getGffFile()))) {
             GFF3Parser gff3Parser = new GFF3Parser();
@@ -91,13 +92,10 @@ public class BioJavaGff3Parser extends FastaReferenceParser {
                     int stop;
                     int strand;
                     List<String> parentIds = new ArrayList<>();
-//                    String name;
-//                    int subStart;
-//                    int subStop;
-//                    String pos;
-//                    String[] posArray;
+                    ParsedChromosome currentChrom;
                     
-                    if (gffr.getSequenceID().equals(refGenome.getName())) {
+                    if (chromMap.containsKey(gffr.getSequenceID())) {
+                        currentChrom = chromMap.get(gffr.getSequenceID());
 
                         parsedType = gffr.getType().getName();
                         start = gffr.getStart();
@@ -183,9 +181,8 @@ public class BioJavaGff3Parser extends FastaReferenceParser {
                         
                         ParsedFeature currentFeature = new ParsedFeature(type, start, stop, strand, 
                                 locusTag, product, ecNumber, geneName, null, parentIds, identifier);
-                        refGenome.addFeature(currentFeature);
+                        currentChrom.addFeature(currentFeature);
                     }
-                    
                 }
             }, new Ontology.Impl("Ontologyname", "name of ontology"));
             

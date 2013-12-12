@@ -19,11 +19,11 @@ import org.openide.util.TaskListener;
 
 
 /**
+ * The track cacher allows to cache the coverage for a track, which whose 
+ * coverage is completely stored in the db.
  *
  * @author jeff
  */
-
-
 public final class TrackCacher {
     
     
@@ -39,7 +39,7 @@ public final class TrackCacher {
     private final static Logger LOG = Logger.getLogger(TrackCacher.class.getName());
     private RequestProcessor.Task theTask = null;
 
-    public TrackCacher(final TrackConnector tc, final int refLength) {
+    public TrackCacher(final TrackConnector tc, final int chromLength) {
         final ProgressHandle ph = ProgressHandleFactory.createHandle("Compute cache for track '" + tc.getAssociatedTrackName() +/*track.getDescription()+*/ "'", new Cancellable() {
             
             public boolean cancel() {
@@ -74,8 +74,7 @@ public final class TrackCacher {
                 }
 
                 
-                tc.addCoverageRequest(new IntervalRequest(currentPosition, currentPosition + MINIMUMINTERVALLENGTH, tl, false));
-
+                tc.addCoverageRequest(new IntervalRequest(currentPosition, currentPosition + MINIMUMINTERVALLENGTH, -1, tl, false));
 
                 currentStep++;
                 //make sure, that we do not show too many steps
@@ -112,7 +111,7 @@ public final class TrackCacher {
                     }
                 };
 
-                steps = (int) Math.ceil((double) refLength / (double) MINIMUMINTERVALLENGTH) * SCANFACTOR;
+                steps = (int) Math.ceil((double) chromLength / (double) MINIMUMINTERVALLENGTH) * SCANFACTOR;
                 ph.start(); //we must start the PH before we swith to determinate
                 ph.switchToDeterminate(steps);
 

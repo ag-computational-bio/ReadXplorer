@@ -2,8 +2,10 @@ package de.cebitec.readXplorer.differentialExpression.wizard;
 
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.util.FeatureType;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
@@ -57,9 +59,12 @@ public class ExpressTestWizardPanelNormalization implements WizardDescriptor.Val
         int id = (int) wiz.getProperty("genomeID");
         List<FeatureType> usedFeatures = (List<FeatureType>) wiz.getProperty("featureType");
         ReferenceConnector referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(id);
-        int genomeSize = referenceConnector.getRefGenome().getRefLength();
-        List<PersistantFeature> persFeatures = referenceConnector.getFeaturesForRegion(1, genomeSize, usedFeatures);
-        getComponent().setFeatureList(persFeatures);
+        List<PersistantFeature> allRefFeatures = new ArrayList<>();
+        for (PersistantChromosome chrom : referenceConnector.getChromosomesForGenome().values()) {
+            int chromLength = chrom.getLength();
+            allRefFeatures.addAll(referenceConnector.getFeaturesForRegion(1, chromLength, usedFeatures, chrom.getId()));
+        }
+        getComponent().setFeatureList(allRefFeatures);
     }
 
     @Override

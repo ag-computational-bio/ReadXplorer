@@ -1,13 +1,11 @@
-
-
 /*
- * ReferenzeEditor.java
+ * ReferenceEditor.java
  *
  * Created on 13.01.2011, 11:38:35
  */
-
 package de.cebitec.readXplorer.tools.referenceEditor;
 
+import de.cebitec.readXplorer.databackend.dataObjects.ChromosomeObserver;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import java.util.logging.Level;
@@ -15,35 +13,43 @@ import java.util.logging.Logger;
 import org.openide.NotifyDescriptor;
 
 /**
+ * An editor showing a part of the currently viewed chromosome sequence. It 
+ * allows to edit the sequence and copy or store it.
  *
- * @author jstraube
+ * @author jstraube, rhilker
  */
 public class ReferenceEditor extends javax.swing.JFrame {
+    private static final long serialVersionUID = 1L;
 
     private PersistantReference refGen;
     public String currentRefGen;
-    public String wholeGenome;
+    public String activeChromSeq;
 
 
 
-    /** Creates new form ReferenzeEditor */
+    /** 
+     * An editor showing a part of the currently viewed chromosome sequence. It
+     * allows to edit the sequence and copy or store it.
+     */
     public ReferenceEditor(PersistantReference reference) {
-        this.setSize(300,300);
-  
-         if(reference!= null){
-             this.refGen = reference;
-             this.setTitle(refGen.getName());
-             wholeGenome = refGen.getSequence();
-         }else{
-             Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "PersistanceReference is null {0}!");
+        this.setSize(300, 300);
+
+        if (reference != null) {
+            this.refGen = reference;
+            this.setTitle(refGen.getName());
+            ChromosomeObserver chromObserver = new ChromosomeObserver();
+            activeChromSeq = refGen.getActiveChromSequence(chromObserver);
+            refGen.getChromosome(refGen.getActiveChromId()).removeObserver(chromObserver);
+        } else {
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "PersistanceReference is null {0}!");
         }
-      myInit();
-      this.setLocation(100, 300);
-      this.setVisible(true);
+        myInit();
+        this.setLocation(100, 300);
+        this.setVisible(true);
     }
 
-    public void myInit(){
-    jLabel1 = new javax.swing.JLabel();
+    private void myInit() {
+        jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         fromSpinner = new javax.swing.JSpinner();
@@ -53,7 +59,7 @@ public class ReferenceEditor extends javax.swing.JFrame {
         genomeTextArea = new javax.swing.JTextArea();
         getSequenceButton = new javax.swing.JButton();
 
-       // setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        // setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabel1.setText(org.openide.util.NbBundle.getMessage(ReferenceEditor.class, "ReferenceEditor.jLabel1.text")); // NOI18N
 
@@ -78,53 +84,51 @@ public class ReferenceEditor extends javax.swing.JFrame {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(fromSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(layout.createSequentialGroup()
-                                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(toSpinner, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE))
-                                .addComponent(revComlementCheckBox)))
-                        .addGap(110, 110, 110)
-                        .addComponent(getSequenceButton))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 363, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(15, Short.MAX_VALUE))
-        );
+                .addComponent(jLabel1)
+                .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(fromSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(toSpinner, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE))
+                .addComponent(revComlementCheckBox)))
+                .addGap(110, 110, 110)
+                .addComponent(getSequenceButton))
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 363, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(15, Short.MAX_VALUE)));
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 127, Short.MAX_VALUE)
                 .addGap(12, 12, 12)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(getSequenceButton)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(fromSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
-                            .addComponent(toSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addComponent(revComlementCheckBox)))
-                .addContainerGap())
-        );
+                .addComponent(getSequenceButton)
+                .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(fromSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jLabel2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addComponent(jLabel3)
+                .addComponent(toSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(revComlementCheckBox)))
+                .addContainerGap()));
 
         pack();
-      
+
     }
 
 
@@ -223,8 +227,8 @@ public class ReferenceEditor extends javax.swing.JFrame {
         int from = (Integer) fromSpinner.getValue();
         int to = (Integer) toSpinner.getValue();
 
-        if(from > 0 && to > 0 && from <= wholeGenome.length() && to <wholeGenome.length()&& from < to ){
-            currentRefGen = wholeGenome.substring(from -1, to);
+        if(from > 0 && to > 0 && from <= activeChromSeq.length() && to <activeChromSeq.length()&& from < to ){
+            currentRefGen = activeChromSeq.substring(from -1, to);
 
             if(revComlementCheckBox.isSelected()){
                currentRefGen = reverseComplement(currentRefGen);

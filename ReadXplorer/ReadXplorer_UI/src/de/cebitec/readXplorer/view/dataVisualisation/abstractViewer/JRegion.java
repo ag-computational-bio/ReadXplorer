@@ -2,7 +2,6 @@ package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
 
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.Properties;
-import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfo;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
