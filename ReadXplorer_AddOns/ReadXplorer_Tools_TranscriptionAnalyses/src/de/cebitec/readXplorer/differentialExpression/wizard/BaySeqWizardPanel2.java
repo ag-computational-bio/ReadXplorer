@@ -56,8 +56,8 @@ public class BaySeqWizardPanel2 implements WizardDescriptor.ValidatingPanel<Wiza
     @Override
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state
-        List<PersistantTrack> selectedTraks = (List<PersistantTrack>) wiz.getProperty("tracks");
-        getComponent().updateTrackList(selectedTraks);
+        List<PersistantTrack> selectedTracks = (List<PersistantTrack>) wiz.getProperty("tracks");
+        getComponent().updateTrackList(selectedTracks);
     }
 
     @Override

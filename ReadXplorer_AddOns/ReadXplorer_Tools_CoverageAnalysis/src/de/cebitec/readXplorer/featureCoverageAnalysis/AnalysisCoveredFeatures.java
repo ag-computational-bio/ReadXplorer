@@ -7,6 +7,7 @@ import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistant;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.util.Observer;
@@ -23,7 +24,6 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
 
     private TrackConnector trackConnector;
     private ParameterSetCoveredFeatures analysisParams;
-    private int refSeqLength;
     private List<PersistantFeature> genomeFeatures;
     private HashMap<Integer, CoveredFeature> coveredFeatureCount; //feature id to count of covered positions for feature
     private List<CoveredFeature> detectedFeatures;
@@ -50,6 +50,7 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
         this.analysisParams = featureCoverageParameters;
         this.detectedFeatures = new ArrayList<>();
         this.coveredFeatureCount = new HashMap<>();
+        this.genomeFeatures = new ArrayList<>();
         this.lastFeatureIdx = 0;
         
         this.initDatastructures();
@@ -60,21 +61,23 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
      */
     private void initDatastructures() {
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackConnector.getRefGenome().getId());
-        this.refSeqLength = trackConnector.getRefSequenceLength();
-        this.genomeFeatures = refConnector.getFeaturesForClosedInterval(0, refSeqLength);
-        List<Integer> removeList = new ArrayList<>();
-        
-        PersistantFeature feature;
-        for (int i = 0; i < this.genomeFeatures.size(); ++i) {
-            feature = this.genomeFeatures.get(i);
-            if (analysisParams.getSelFeatureTypes().contains(feature.getType())) {
-                this.coveredFeatureCount.put(feature.getId(), new CoveredFeature(feature, trackConnector.getTrackID()));
-            } else {
-                removeList.add(i);
+        for (PersistantChromosome chrom : refConnector.getChromosomesForGenome().values()) {
+            int chromLength = chrom.getLength();
+            this.genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(0, chromLength, chrom.getId()));
+            List<Integer> removeList = new ArrayList<>();
+
+            PersistantFeature feature;
+            for (int i = 0; i < this.genomeFeatures.size(); ++i) {
+                feature = this.genomeFeatures.get(i);
+                if (analysisParams.getSelFeatureTypes().contains(feature.getType())) {
+                    this.coveredFeatureCount.put(feature.getId(), new CoveredFeature(feature, trackConnector.getTrackID()));
+                } else {
+                    removeList.add(i);
+                }
             }
-        }
-        for (int i = removeList.size() - 1; i >= 0; --i) {
-            this.genomeFeatures.remove((int) removeList.get(i));
+            for (int i = removeList.size() - 1; i >= 0; --i) {
+                this.genomeFeatures.remove((int) removeList.get(i));
+            }
         }
     }
     
@@ -84,7 +87,7 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
      */
     @Override
     public void update(Object data) {
-        CoverageAndDiffResultPersistant coverageAndDiffResult = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0), null, null, true);
+        CoverageAndDiffResultPersistant coverageAndDiffResult = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0), null, null, null);
         
         if (data.getClass() == coverageAndDiffResult.getClass()) {
             coverageAndDiffResult = (CoverageAndDiffResultPersistant) data;
@@ -101,6 +104,7 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
      */
     public void updateCoverageCountForFeatures(CoverageAndDiffResultPersistant coverageAndDiffResult) {
 
+        int chromId = coverageAndDiffResult.getRequest().getChromId();
         PersistantCoverage coverage = coverageAndDiffResult.getCoverage();
         int rightBound = coverage.getRightBound();
 
@@ -110,37 +114,40 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
         int featureStop;
         int coveredBases;
 
-          //coverage identified within an feature
-        for (int i = this.lastFeatureIdx; i < this.genomeFeatures.size(); ++i) {
+        //coverage identified within an feature
+        for (int i = 0; i < this.genomeFeatures.size(); ++i) {
             noCoveredBases = 0;
             feature = this.genomeFeatures.get(i);
-            featureStart = feature.getStart();
-            featureStop = feature.getStop();
             
-            if (featureStart < rightBound) {
-                if (featureStop >= rightBound) {
-                    this.lastFeatureIdx = i;
-                }
-                
-                if (analysisParams.isWhateverStrand()) {
-                    for (int j = featureStart; j < featureStop; ++j) {
-                        if (this.checkCanIncreaseBothStrands(coverage, j)) {
-                            ++noCoveredBases;
+            if (feature.getChromId() == coverageAndDiffResult.getRequest().getChromId()) {
+                featureStart = feature.getStart();
+                featureStop = feature.getStop();
+
+                if (featureStart < rightBound) {
+//                    if (featureStop >= rightBound) {
+//                        this.lastFeatureIdx = i; //still works, since one result only contains results for one chromosome
+//                    }
+
+                    if (analysisParams.isWhateverStrand()) {
+                        for (int j = featureStart; j < featureStop; ++j) {
+                            if (this.checkCanIncreaseBothStrands(coverage, j)) {
+                                ++noCoveredBases;
+                            }
                         }
-                    }                    
-                } else {
-                    for (int j = featureStart; j < featureStop; ++j) {
-                        if (this.checkCanIncreaseOneStrand(coverage, j, feature.isFwdStrand())) {
-                            ++noCoveredBases;
+                    } else {
+                        for (int j = featureStart; j < featureStop; ++j) {
+                            if (this.checkCanIncreaseOneStrand(coverage, j, feature.isFwdStrand())) {
+                                ++noCoveredBases;
+                            }
                         }
                     }
-                }
 
-                //store covered features
-                coveredBases = this.coveredFeatureCount.get(feature.getId()).getNoCoveredBases();
-                this.coveredFeatureCount.get(feature.getId()).setNoCoveredBases(coveredBases + noCoveredBases);
-            } else {
-                break;
+                    //store covered features
+                    coveredBases = this.coveredFeatureCount.get(feature.getId()).getNoCoveredBases();
+                    this.coveredFeatureCount.get(feature.getId()).setNoCoveredBases(coveredBases + noCoveredBases);
+                } else {
+                    break;
+                }
             }
     }
 }

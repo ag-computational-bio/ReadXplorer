@@ -41,7 +41,7 @@ public class MappingThreadAnalyses extends MappingThread {
                 } else {
                     currentMappings = this.loadMappings(request);
                 }
-                request.getSender().receiveData(new MappingResultPersistant(currentMappings, request.getFrom(), request.getTo()));
+                request.getSender().receiveData(new MappingResultPersistant(currentMappings, request));
 
             } else {
                 try {

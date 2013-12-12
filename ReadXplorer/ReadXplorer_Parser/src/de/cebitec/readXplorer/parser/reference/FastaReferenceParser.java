@@ -1,6 +1,7 @@
 package de.cebitec.readXplorer.parser.reference;
 
 import de.cebitec.readXplorer.parser.ReferenceJob;
+import de.cebitec.readXplorer.parser.common.ParsedChromosome;
 import de.cebitec.readXplorer.parser.common.ParsedReference;
 import de.cebitec.readXplorer.parser.common.ParsingException;
 import de.cebitec.readXplorer.parser.reference.Filter.FeatureFilter;
@@ -33,39 +34,62 @@ public class FastaReferenceParser implements ReferenceParserI {
     @Override
     public ParsedReference parseReference(ReferenceJob referenceJob, FeatureFilter filter) throws ParsingException {
         ParsedReference refGenome = new ParsedReference();
-        StringBuilder sBuilder = new StringBuilder();
+        int chromCounter = 0;
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start reading file  \"{0}\"", referenceJob.getFile());
         try {
 
-            BufferedReader in = new BufferedReader(new FileReader(referenceJob.getFile()));
             refGenome.setDescription(referenceJob.getDescription());
             refGenome.setName(referenceJob.getName());
             refGenome.setTimestamp(referenceJob.getTimestamp());
+            
+            BufferedReader in = new BufferedReader(new FileReader(referenceJob.getFile()));
+            StringBuilder chromBuilder = new StringBuilder(1000);
             String line;
-            boolean parseData = false;
-            boolean finished = false;
+            boolean parseData = false; //only start parsing after first ">"
+            String chromName = "";
 
             while ((line = in.readLine()) != null) {
-                if (line.startsWith(">" + refGenome.getName())) {
-                    parseData = true;
-                    finished = false;
+                if (parseData && !line.startsWith(">")) {
+                    chromBuilder.append(line);
                 } else if (line.startsWith(">")) {
-                    finished = true;
-                } else if (parseData && !finished) {
-                    sBuilder.append(line);
+                    if (chromCounter > 0) {
+                        this.createChromosome(chromName, chromBuilder, refGenome);
+                        chromBuilder = new StringBuilder(1000);
+                    }
+                    ++chromCounter;
+                    parseData = true;
+                    chromName = line.substring(1);
                 }
             }
-            in.close();
 
-            refGenome.setSequence(sBuilder.substring(0).toUpperCase());
+            if (chromCounter > 0) {
+                this.createChromosome(chromName, chromBuilder, refGenome);
+            }
+            
+            in.close();
 
         } catch (Exception ex) {
             this.sendErrorMsg(ex.getMessage());
         }
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished reading file  \"{0}" + "\"" + "genome length:" + "{1}", new Object[]{referenceJob.getFile(), sBuilder.length()});
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished reading file  \"{0}" + "\"" + "genome with: {1} chromosomes", new Object[]{referenceJob.getFile(), chromCounter});
         return refGenome;
 
+    }
+
+    /**
+     * Creates a chromosomes from a chromosome string builder and adds it to the
+     * given reference.
+     * @param chromName name of the chromosome
+     * @param chromBuilder the builder holding the chromosome sequence.
+     * @param reference reference genome to which the chromosome shall be added
+     */
+    private void createChromosome(String chromName, StringBuilder chromBuilder, ParsedReference reference) {
+        ParsedChromosome chrom = new ParsedChromosome();
+        chrom.setHasSubFeatures(false);
+        chrom.setName(chromName);
+        chrom.setSequence(chromBuilder.toString().toUpperCase());
+        reference.addChromosome(chrom);
     }
 
     /*

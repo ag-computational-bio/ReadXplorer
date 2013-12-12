@@ -1,20 +1,35 @@
 package de.cebitec.readXplorer.correlationAnalysis;
 
+import de.cebitec.readXplorer.databackend.dataObjects.TrackChromResultEntry;
+
 /**
  * CorrelatedInterval is a data class, that saves the data about a correlation 
  * between the data of two track in a defined interval
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
-public class CorrelatedInterval {
+public class CorrelatedInterval extends TrackChromResultEntry {
     private CorrelationAnalysisProcessor.StrandDirection direction;
     
     private int from; 
     private int to;
+    private int track2Id;
     private double correlation;
     private double minPeakCoverage;
     
+    /**
+     * CorrelatedInterval is a data class, that saves the data about a
+     * correlation between the data of two tracks in a defined interval.
+     * @param direction
+     * @param track1Id
+     * @param chromId
+     * @param from
+     * @param to
+     * @param correlation
+     * @param minPeakCoverage 
+     */
     public CorrelatedInterval(CorrelationAnalysisProcessor.StrandDirection direction,
-            int from, int to, double correlation, double minPeakCoverage) {
+            int track1Id, int track2Id, int chromId, int from, int to, double correlation, double minPeakCoverage) {
+        super(track1Id, chromId);
         this.direction = direction;
         this.from = from;
         this.to = to;
@@ -90,5 +105,9 @@ public class CorrelatedInterval {
      */
     public void setMinPeakCoverage(double minPeakCoverage) {
         this.minPeakCoverage = minPeakCoverage;
+    }
+
+    public int getTrack2Id() {
+        return track2Id;
     }
 }

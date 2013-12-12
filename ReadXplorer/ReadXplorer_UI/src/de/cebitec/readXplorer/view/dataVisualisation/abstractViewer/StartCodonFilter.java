@@ -2,6 +2,7 @@ package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
 
 import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
 import de.cebitec.common.sequencetools.geneticcode.GeneticCodeFactory;
+import de.cebitec.readXplorer.databackend.dataObjects.ChromosomeObserver;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.util.CodonUtilities;
 import de.cebitec.readXplorer.util.Properties;
@@ -37,6 +38,7 @@ public class StartCodonFilter implements RegionFilterI {
     private int frameCurrFeature;
     private int nbGeneticCodes;
     private GeneticCodeFactory genCodeFactory;
+    private ChromosomeObserver chromObserver;
 
     /**
      * Filters for start and stop codons in two ways: First for all available start 
@@ -46,7 +48,8 @@ public class StartCodonFilter implements RegionFilterI {
      * @param absStop end of the region to search in
      * @param refGen the reference in which to search
      */
-    public StartCodonFilter(int absStart, int absStop, PersistantReference refGen){
+    public StartCodonFilter(int absStart, int absStop, PersistantReference refGen) {
+        this.chromObserver = new ChromosomeObserver();
         this.pref = NbPreferences.forModule(Object.class);
         this.regions = new ArrayList<>();
         this.absStart = absStart;
@@ -73,7 +76,8 @@ public class StartCodonFilter implements RegionFilterI {
             int offset = 3;
             int start = absStart - offset;
             int stop = absStop + 2;
-            int genomeLength = refGen.getRefLength();
+            String chromSeq = refGen.getActiveChromSequence(chromObserver);
+            int genomeLength = chromSeq.length();
 
             if (stop > 0) {
                 if (start < 0) {
@@ -84,7 +88,7 @@ public class StartCodonFilter implements RegionFilterI {
                     stop = genomeLength;
                 }
 
-                sequence = refGen.getSequence().substring(start, stop);
+                sequence = chromSeq.substring(start, stop);
                 boolean isFeatureSelected = this.frameCurrFeature != INIT;
 
                 int index = 0;

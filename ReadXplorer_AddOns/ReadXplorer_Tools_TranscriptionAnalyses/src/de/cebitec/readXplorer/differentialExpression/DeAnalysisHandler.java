@@ -6,6 +6,7 @@ import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.differentialExpression.GnuR.JRILibraryNotInPathException;
@@ -29,7 +30,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 
 /**
  * @author kstaderm
@@ -37,11 +37,10 @@ import javax.swing.SwingUtilities;
 public abstract class DeAnalysisHandler extends Thread implements Observable, DataVisualisationI {
 
     private ReferenceConnector referenceConnector;
-    private int genomeSize;
-    private List<PersistantFeature> persAnno;
+    private List<PersistantFeature> genomeAnnos;
     private List<PersistantTrack> selectedTracks;
     private Map<Integer, CollectCoverageData> collectCoverageDataInstances;
-    private Integer refGenomeID;
+    private int refGenomeID;
     private List<ResultDeAnalysis> results;
     private List<de.cebitec.readXplorer.util.Observer> observerList = new ArrayList<>();
     private File saveFile = null;
@@ -84,7 +83,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         RUNNING, FINISHED, ERROR;
     }
 
-    public DeAnalysisHandler(List<PersistantTrack> selectedTracks, Integer refGenomeID,
+    public DeAnalysisHandler(List<PersistantTrack> selectedTracks, int refGenomeID,
             File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset,
             ParametersReadClasses readClassParams, boolean regardReadOrientation) {
         ProcessingLog.getInstance().resetLog();
@@ -98,22 +97,31 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         this.regardReadOrientation = regardReadOrientation;
     }
 
+    /**
+     * Acutally starts the differential gene expression analysis.
+     */
     private void startAnalysis() {
         collectCoverageDataInstances = new HashMap<>();
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Starting to collect the necessary data for the differential expression analysis.", currentTimestamp);
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Starting to collect the necessary data for the differential gene expression analysis.", currentTimestamp);
         referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenomeID);
-        genomeSize = referenceConnector.getRefGenome().getRefLength();
-        persAnno = referenceConnector.getFeaturesForRegion(1, genomeSize, selectedFeatures);
         List<AnalysesHandler> allHandler = new ArrayList<>();
+        genomeAnnos = new ArrayList<>();
+        
+        for (PersistantChromosome chrom : referenceConnector.getRefGenome().getChromosomes().values()) {
+            genomeAnnos.addAll(referenceConnector.getFeaturesForRegion(1, chrom.getLength(), selectedFeatures, chrom.getId()));
+        }
+        
         for (Iterator<PersistantTrack> it = selectedTracks.iterator(); it.hasNext();) {
+            
             PersistantTrack currentTrack = it.next();
             try {
                 TrackConnector tc = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(currentTrack);
-                CollectCoverageData collCovData = new CollectCoverageData(persAnno, startOffset, stopOffset, regardReadOrientation);
+
+                CollectCoverageData collCovData = new CollectCoverageData(genomeAnnos, startOffset, stopOffset, regardReadOrientation);
                 collectCoverageDataInstances.put(currentTrack.getId(), collCovData);
-                AnalysesHandler handler = new AnalysesHandler(tc, this, "Collecting coverage data of track number "
-                        + currentTrack.getId() + ".", readClassParams);
+                AnalysesHandler handler = new AnalysesHandler(tc, this, "Collecting coverage data for track "
+                        + currentTrack.getDescription() + ".", readClassParams);
                 handler.setMappingsNeeded(true);
                 handler.setDesiredData(Properties.REDUCED_MAPPINGS);
                 handler.registerObserver(collCovData);
@@ -126,6 +134,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
                 return;
             }
         }
+        
         for (Iterator<AnalysesHandler> it = allHandler.iterator(); it.hasNext();) {
             AnalysesHandler handler = it.next();
             handler.startAnalysis();
@@ -133,8 +142,8 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
     }
 
     protected void prepareFeatures(DeAnalysisData analysisData) {
-        analysisData.setFeatures(persAnno);
-        analysisData.setSelectedTraks(selectedTracks);
+        analysisData.setFeatures(genomeAnnos);
+        analysisData.setSelectedTracks(selectedTracks);
     }
 
     protected void prepareCountData(DeAnalysisData analysisData, Map<Integer, Map<PersistantFeature, Integer>> allCountData) {
@@ -175,14 +184,6 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         this.results = results;
     }
 
-    public int getGenomeSize() {
-        return genomeSize;
-    }
-
-    public Integer getRefGenomeID() {
-        return refGenomeID;
-    }
-
     public Map<Integer, Map<PersistantFeature, Integer>> getAllCountData() {
         return allCountData;
     }
@@ -192,7 +193,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
     }
 
     public List<PersistantFeature> getPersAnno() {
-        return persAnno;
+        return genomeAnnos;
     }
 
     public List<PersistantTrack> getSelectedTracks() {
@@ -263,4 +264,11 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
             notifyObservers(AnalysisStatus.FINISHED);
         }
     }
+
+    /**
+     * @return Id of the reference, for which the analysis is carried out.
+     */
+    public int getRefGenomeID() {
+        return refGenomeID;
+    }    
 }

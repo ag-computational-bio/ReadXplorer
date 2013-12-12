@@ -1,22 +1,23 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.datastructures;
 
+import de.cebitec.readXplorer.databackend.dataObjects.TrackChromResultEntry;
+
 /**
  *
  * @author jritter
  */
-public class NovelRegion {
+public class NovelRegion extends TrackChromResultEntry {
 
     private boolean isFWD;
     private int flag;
     private int start;
     private Integer offset;
-    private Integer trackID;
 
-    public NovelRegion(boolean isFWD, int start, Integer offset, Integer trackID) {
+    public NovelRegion(boolean isFWD, int start, Integer offset, int trackId, int chromId) {
+        super(trackId, chromId);
         this.isFWD = isFWD;
         this.start = start;
         this.offset = offset;
-        this.trackID = trackID;
     }
 
     public boolean isFWD() {
@@ -25,10 +26,6 @@ public class NovelRegion {
 
     public void setFWD(boolean isFWD) {
         this.isFWD = isFWD;
-    }
-
-    public Object getTrackId() {
-        return this.trackID;
     }
 
     public Object getOffset() {

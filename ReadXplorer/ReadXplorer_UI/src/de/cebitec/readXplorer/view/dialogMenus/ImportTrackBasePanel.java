@@ -41,19 +41,22 @@ public abstract class ImportTrackBasePanel extends FileSelectionPanel {
     }
     
     /**
+     * 
      * Checks a given sam/bam file for the currently selected reference and 
      * displays an error message in case the selected reference does not occur
      * in the sequence dictionary of the sam/bam file.
-     * @param smaBamFile the sam/bam file to check for the reference 
+     * @param samBamFile the sam/bam file to check for the reference 
+     * @deprecated Use this method again, after refining it for single chromosomes
      */
-    public void checkSeqDictonary(File smaBamFile) {
-        try (SAMFileReader samReader = new SAMFileReader(smaBamFile)) {
+    @Deprecated
+    public void checkSeqDictonary(File samBamFile) {
+        try (SAMFileReader samReader = new SAMFileReader(samBamFile)) {
             SAMFileHeader header = samReader.getFileHeader();
-            SAMSequenceRecord refSeq = header.getSequenceDictionary().getSequence(this.getReferenceJob().getName());
-            if (refSeq == null) {
+            int refIdx = header.getSequenceDictionary().getSequenceIndex(this.getReferenceJob().getName());
+            if (refIdx != -1) {
                 String msg = NbBundle.getMessage(ImportTrackBasePanel.class, "MSG_ErrorReference",
                         this.getReferenceJob().getName(),
-                        smaBamFile.getAbsolutePath(),
+                        samBamFile.getAbsolutePath(),
                         this.createRefDictionaryString(header.getSequenceDictionary()));
                 NotifyDescriptor nd = new NotifyDescriptor.Message(msg, NotifyDescriptor.ERROR_MESSAGE);
                 nd.setTitle(NbBundle.getMessage(ImportTrackBasePanel.class, "TITLE_ErrorReference"));
@@ -88,10 +91,10 @@ public abstract class ImportTrackBasePanel extends FileSelectionPanel {
 
         refJobList.addAll(jobs);
 
-        ReferenceJob[] references = new ReferenceJob[1];
-        references = refJobList.toArray(references);
+        ReferenceJob[] refJobs = new ReferenceJob[1];
+        refJobs = refJobList.toArray(refJobs);
         
-        return references;
+        return refJobs;
     }
 
     /**
@@ -100,10 +103,10 @@ public abstract class ImportTrackBasePanel extends FileSelectionPanel {
     public ReferenceJob[] getReferenceJobs() {
         List<ReferenceJob> refJobList = this.getRefJobList();
         
-        ReferenceJob[] references = new ReferenceJob[1];
-        references = refJobList.toArray(references);
+        ReferenceJob[] refJobs = new ReferenceJob[1];
+        refJobs = refJobList.toArray(refJobs);
 
-        return references;
+        return refJobs;
     }
     
     /**

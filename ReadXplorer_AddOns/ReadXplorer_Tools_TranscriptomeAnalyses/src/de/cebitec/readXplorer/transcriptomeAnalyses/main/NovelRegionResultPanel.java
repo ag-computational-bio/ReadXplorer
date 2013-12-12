@@ -45,7 +45,9 @@ public class NovelRegionResultPanel extends ResultTablePanel {
         model.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                TableUtils.showPosition(novelRegionTable, 0, boundsInfoManager);
+                int posColumnIdx = 0;
+                int chromColumnIdx = 2;
+                TableUtils.showPosition(novelRegionTable, posColumnIdx, chromColumnIdx, boundsInfoManager);
             }
         });
     }
@@ -68,14 +70,14 @@ public class NovelRegionResultPanel extends ResultTablePanel {
 
             },
             new String [] {
-                "TSS start", "Direction", "False positive", "Best Blast hit", "Track ID"
+                "TSS start", "Track", "Chromosome", "Direction", "False positive", "Best Blast Hit", "Track ID"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.Boolean.class, java.lang.String.class, java.lang.Integer.class
+                java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Boolean.class, java.lang.String.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, true, false, true
+                false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -88,10 +90,12 @@ public class NovelRegionResultPanel extends ResultTablePanel {
         });
         jScrollPane1.setViewportView(novelRegionTable);
         novelRegionTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title0")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title1")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title3_1")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title2_1")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title4")); // NOI18N
+        novelRegionTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title6")); // NOI18N
+        novelRegionTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title5")); // NOI18N
+        novelRegionTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title1")); // NOI18N
+        novelRegionTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title3_1_1")); // NOI18N
+        novelRegionTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title2_1")); // NOI18N
+        novelRegionTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title4_1")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.jButton1.text")); // NOI18N
 
@@ -99,11 +103,13 @@ public class NovelRegionResultPanel extends ResultTablePanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jButton1)
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 538, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -154,11 +160,14 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                 final Object[] rowData = new Object[nbColumns];
                 int position = nr.getPos();
                 this.nrInHash.put(position, nr);
-                rowData[0] = position;
-                rowData[1] = strand;
-                rowData[2] = false;
-                rowData[3] = "-";
-                rowData[4] = nr.getTrackId();
+                int i = 0;
+                rowData[i++] = position;
+                rowData[i++] = strand;
+                rowData[i++] = novelRegResults.getTrackMap().get(nr.getTrackId());
+                rowData[i++] = novelRegResults.getChromosomeMap().get(nr.getChromId());
+                rowData[i++] = false;
+                rowData[i++] = "-";
+                rowData[i++] = nr.getTrackId();
 
                 SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
                     @Override

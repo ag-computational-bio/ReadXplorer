@@ -28,7 +28,6 @@ public class SamBamCombiner implements CombinerI {
     private final TrackJob trackJob2;
     private boolean sortCoordinate;
     private List<Observer> observers;
-    private String referenceSeq;
     
     /**
      * Allows to combine two mapping files (e.g. read 1 and read2 of the same
@@ -42,14 +41,12 @@ public class SamBamCombiner implements CombinerI {
      *      an its file path is reset to an empty string afterwards
      * @param sortCoordinate true, if the combined file should be sorted by 
      * coordinate and false otherwise
-     * @param referenceSeq the complete reference sequence 
      */
-    public SamBamCombiner(TrackJob trackJob1, TrackJob trackJob2, boolean sortCoordinate, String referenceSeq) {
+    public SamBamCombiner(TrackJob trackJob1, TrackJob trackJob2, boolean sortCoordinate) {
         this.trackJob1 = trackJob1;
         this.trackJob2 = trackJob2;
         this.sortCoordinate = sortCoordinate;
         this.observers = new ArrayList<>();
-        this.referenceSeq = referenceSeq;
     }
     
     /**

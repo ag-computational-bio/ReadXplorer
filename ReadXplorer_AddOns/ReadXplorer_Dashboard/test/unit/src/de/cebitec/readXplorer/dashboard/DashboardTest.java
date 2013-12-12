@@ -1,10 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.readXplorer.dashboard;
 
-import de.cebitec.readXplorer.databackend.FieldNames;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import java.io.ByteArrayInputStream;
@@ -22,10 +17,10 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import org.junit.After;
 import org.junit.AfterClass;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -54,9 +49,9 @@ public class DashboardTest {
     
     @Test
     public void testEquals() {
-        PersistantReference r1 = new PersistantReference(1, "", "", "", new Timestamp(111111111));
-        PersistantReference r2 = new PersistantReference(1, "", "", "", new Timestamp(111111111));
-        PersistantReference r3 = new PersistantReference(2, "", "", "", new Timestamp(111111111));
+        PersistantReference r1 = new PersistantReference(1, "", "", new Timestamp(111111111));
+        PersistantReference r2 = new PersistantReference(1, "", "", new Timestamp(111111111));
+        PersistantReference r3 = new PersistantReference(2, "", "", new Timestamp(111111111));
         assertTrue(r1.equals(r2));
         assertFalse(r1.equals(r3));
         
@@ -69,7 +64,7 @@ public class DashboardTest {
     
     @Test
     public void testMap() {
-        HashMap<Value,Integer> map = new HashMap<Value,Integer>();
+        HashMap<Value,Integer> map = new HashMap<>();
         Value v1 = new Value();
         Value v2 = new Value();
         map.put(v1, 1);
@@ -78,11 +73,10 @@ public class DashboardTest {
     
     @Test
     public void testMap2() {
-        Hashtable<PersistantReference, List<PersistantTrack>> tracks_by_reference
-               = new Hashtable<PersistantReference, List<PersistantTrack>>();
-        PersistantReference r1 = new PersistantReference(1, "", "", "", new Timestamp(111111111));
-        PersistantReference r2 = new PersistantReference(1, "", "", "", new Timestamp(111111111));
-        List<PersistantTrack> list = new ArrayList<PersistantTrack>();
+        Hashtable<PersistantReference, List<PersistantTrack>> tracks_by_reference = new Hashtable<>();
+        PersistantReference r1 = new PersistantReference(1, "", "", new Timestamp(111111111));
+        PersistantReference r2 = new PersistantReference(1, "", "", new Timestamp(111111111));
+        List<PersistantTrack> list = new ArrayList<>();
         tracks_by_reference.put(r1, list);
         assertNotNull(tracks_by_reference.get(r2));
         
@@ -102,8 +96,7 @@ public class DashboardTest {
         oos.close(); 
         byte[] array = baos.toByteArray();
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, 
-        "created byte representation ("+array.length+" bytes)");
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "created byte representation ({0} bytes)", array.length);
         
         ByteArrayInputStream bais;
         GZIPInputStream gzi;

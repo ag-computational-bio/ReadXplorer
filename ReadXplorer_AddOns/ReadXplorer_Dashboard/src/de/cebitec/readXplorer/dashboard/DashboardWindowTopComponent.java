@@ -1,7 +1,6 @@
 package de.cebitec.readXplorer.dashboard;
   
 import de.cebitec.readXplorer.controller.ViewController;
-import de.cebitec.readXplorer.dashboard.Bundle;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference; 
@@ -500,7 +499,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended impl
         this.openLoginAction(Bundle.ChooseDB(), evt);
     }//GEN-LAST:event_openDBButtonActionPerformed
 
-    @Messages({"CreateDB=Create database at"})
+    @Messages({"CreateDB=Choose new DB location"})
     private void createDBButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createDBButtonActionPerformed
         this.openLoginAction(Bundle.CreateDB(), evt);
     }//GEN-LAST:event_createDBButtonActionPerformed

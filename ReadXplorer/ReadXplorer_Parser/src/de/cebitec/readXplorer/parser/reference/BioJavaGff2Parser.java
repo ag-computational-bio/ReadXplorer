@@ -1,6 +1,7 @@
 package de.cebitec.readXplorer.parser.reference;
 
 import de.cebitec.readXplorer.parser.ReferenceJob;
+import de.cebitec.readXplorer.parser.common.ParsedChromosome;
 import de.cebitec.readXplorer.parser.common.ParsedFeature;
 import de.cebitec.readXplorer.parser.common.ParsedReference;
 import de.cebitec.readXplorer.parser.common.ParsingException;
@@ -28,7 +29,7 @@ import org.biojava.utils.ParserException;
  * ReferenceJob and the GFF2 annotations from the GFF2 file contained in the
  * ReferenceJob.
  *
- * @author marie-theres, Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
+ * @author marie-theres, @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
  */
 public class BioJavaGff2Parser extends FastaReferenceParser {
     
@@ -54,7 +55,7 @@ public class BioJavaGff2Parser extends FastaReferenceParser {
         
         final ParsedReference refGenome = super.parseReference(referenceJob, filter);
         refGenome.setFeatureFilter(filter);
-        refGenome.setHasSubFeatures(false);
+        final Map<String, ParsedChromosome> chromMap = CommonsRefParser.generateStringMap(refGenome.getChromosomes());
 
         try (BufferedReader reader = new BufferedReader(new FileReader(referenceJob.getGffFile()))) {
             GFFParser gffParser = new GFFParser();
@@ -90,14 +91,11 @@ public class BioJavaGff2Parser extends FastaReferenceParser {
                     int start;
                     int stop;
                     int strand;
+                    ParsedChromosome currentChrom;
                     List<String> parentIds = new ArrayList<>();
-                //    String name;
-//                    int subStart;
-//                    int subStop;
-//                    String pos;
-//                    String[] posArray;
                     
-                    if (gffr.getSeqName().equals(refGenome.getName())) {
+                    if (chromMap.containsKey(gffr.getSeqName())) {
+                        currentChrom = chromMap.get(gffr.getSeqName());
 
                         parsedType = gffr.getFeature();
                         start = gffr.getStart();
@@ -189,7 +187,7 @@ public class BioJavaGff2Parser extends FastaReferenceParser {
                         
                         ParsedFeature currentFeature = new ParsedFeature(type, start, stop, strand, 
                                 locusTag, product, ecNumber, geneName, null, parentIds, identifier);
-                        refGenome.addFeature(currentFeature);
+                        currentChrom.addFeature(currentFeature);
                     }
                     
                 }

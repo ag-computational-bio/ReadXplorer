@@ -4,10 +4,11 @@ import de.cebitec.readXplorer.parser.TrackJob;
 import de.cebitec.readXplorer.parser.common.ParsedClassification;
 import de.cebitec.readXplorer.parser.common.ParserI;
 import de.cebitec.readXplorer.parser.common.ParsingException;
-import de.cebitec.readXplorer.parser.mappings.ParserCommonMethods;
+import de.cebitec.readXplorer.parser.mappings.CommonsMappingParser;
 import de.cebitec.readXplorer.util.*;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.sf.samtools.*;
@@ -30,8 +31,7 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
     private static String[] fileExtension = new String[]{"bam", "BAM", "Bam", "sam", "SAM", "Sam"};
     private static String fileDescription = "SAM/BAM Input, extended SAM/BAM Output";
     private List<Observer> observers;
-    private String refGenome;
-    private int refSeqLength;
+    private Map<String, String> chromSeqMap;
 
     /**
      * Extends a SAM/BAM file !!sorted by read sequence!! with ReadXplorer
@@ -59,11 +59,13 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
      * A SamBamExtender needs exactly two arguments:
      * - trackJob the track job including a sam or bam file for
      * extension with more data.
-     * - refGenome the reference genome belonging to the trackJob
+     * - chromSeqMap mapping of chromosome names to their chromosome sequences
      */
     @Override
+    @SuppressWarnings("unchecked")
     public void setDataToConvert(Object... data) {
         this.observers = new ArrayList<>();
+        this.chromSeqMap = new HashMap<>();
         boolean works = true;
         if (data.length >= 2) {
             if (data[0] instanceof TrackJob) {
@@ -71,9 +73,8 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
             } else {
                 works = false;
             }
-            if (data[1] instanceof String) {
-                this.refGenome = (String) data[1];
-                this.refSeqLength = this.refGenome.length();
+            if (this.chromSeqMap.getClass().equals(data[1].getClass())) {
+                this.chromSeqMap = (Map<String, String>) data[1];
             } else {
                 works = false;
             }
@@ -93,7 +94,6 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
      */
     private boolean extendSamBamFile() throws ParsingException {
         File fileToExtend = trackJob.getFile();
-        String refName = trackJob.getRefGen().getName();
 
         File outputFile;
         SAMFileWriter samBamFileWriter;
@@ -126,21 +126,22 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
 
                 try {
                     record = samBamItor.next();
-                    if (!record.getReadUnmappedFlag() && record.getReferenceName().equals(refName)) {
+                    if (!record.getReadUnmappedFlag() && chromSeqMap.containsKey(record.getReferenceName())) {
                         cigar = record.getCigarString();
                         readSeq = record.getReadString();
                         start = record.getAlignmentStart();
                         stop = record.getAlignmentEnd();
-                        refSeq = this.refGenome.substring(start - 1, stop);
+                        refSeq = chromSeqMap.get(record.getReferenceName()).substring(start - 1, stop);
 
-                        if (!ParserCommonMethods.checkReadSam(this, readSeq, this.refSeqLength, cigar, start, stop, fileToExtend.getName(), lineno)) {
+                        if (!CommonsMappingParser.checkReadSam(this, readSeq, chromSeqMap.get(record.getReferenceName()).length(), 
+                                cigar, start, stop, fileToExtend.getName(), lineno)) {
                             continue; //continue, and ignore read, if it contains inconsistent information
                         }
                         
                         //count differences to reference
-                        differences = ParserCommonMethods.countDiffsAndGaps(cigar, readSeq, refSeq, record.getReadNegativeStrandFlag());
+                        differences = CommonsMappingParser.countDiffsAndGaps(cigar, readSeq, refSeq, record.getReadNegativeStrandFlag());
 
-                        ParserCommonMethods.addClassificationData(record, differences, classificationMap);
+                        CommonsMappingParser.addClassificationData(record, differences, classificationMap);
                     }
 
                     samBamFileWriter.addAlignment(record);

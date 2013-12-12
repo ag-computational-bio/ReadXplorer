@@ -32,7 +32,7 @@ public class DeAnalysisData {
     /**
      * The tracks selected by the user to perform the analysis on.
      */
-    private List<PersistantTrack> selectedTraks;
+    private List<PersistantTrack> selectedTracks;
     /**
      * Track Descriptions. Each description just appears one time.
      */
@@ -151,8 +151,8 @@ public class DeAnalysisData {
      *
      * @return List of PersistantTrack containing the selected tracks.
      */
-    public List<PersistantTrack> getSelectedTraks() {
-        return selectedTraks;
+    public List<PersistantTrack> getSelectedTracks() {
+        return selectedTracks;
     }
 
     public String[] getTrackDescriptions() {
@@ -180,13 +180,13 @@ public class DeAnalysisData {
         }
     }
 
-    public void setSelectedTraks(List<PersistantTrack> selectedTraks) {
-        this.selectedTraks = selectedTraks;
+    public void setSelectedTracks(List<PersistantTrack> selectedTracks) {
+        this.selectedTracks = selectedTracks;
         Set<String> tmpSet = new LinkedHashSet<>();
         int counter = 1;
-        for (int i = 0; i < selectedTraks.size(); i++) {
-            if (!tmpSet.add(selectedTraks.get(i).getDescription())) {
-                tmpSet.add(selectedTraks.get(i).getDescription() + "_DN_" + counter++);
+        for (int i = 0; i < selectedTracks.size(); i++) {
+            if (!tmpSet.add(selectedTracks.get(i).getDescription())) {
+                tmpSet.add(selectedTracks.get(i).getDescription() + "_DN_" + counter++);
             }
         }
         trackDescriptions = tmpSet.toArray(new String[tmpSet.size()]);

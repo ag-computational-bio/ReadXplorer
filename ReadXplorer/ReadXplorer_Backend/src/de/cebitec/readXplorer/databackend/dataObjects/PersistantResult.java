@@ -1,5 +1,6 @@
 package de.cebitec.readXplorer.databackend.dataObjects;
 
+import de.cebitec.readXplorer.databackend.IntervalRequest;
 import java.io.Serializable;
 
 /**
@@ -10,38 +11,27 @@ import java.io.Serializable;
 public class PersistantResult implements Serializable {
     private static final long serialVersionUID = 1L;
     
-    private int lowerBound;
-    private int upperBound;
+    private IntervalRequest request;
 
     /**
      * Common functionality of a persistant result.
-     * @param lowerBound the lower bound of the interval of this request
-     * @param upperBound the upper bound of the interval of this request
+     * @param request the interval request for which the result was created
      */
-    public PersistantResult(int lowerBound, int upperBound) {
-        this.lowerBound = lowerBound;
-        this.upperBound = upperBound;
+    public PersistantResult(IntervalRequest request) {
+        this.request = request;
     }
     
     /** a parameterless constructor is needed to enable deserialization 
      *  of child classed */
     public PersistantResult() {
-        this.lowerBound = 0;
-        this.upperBound = 0;
+        this.request = new IntervalRequest(-1, -1, -1, null, false);
     }
     
     /**
-     * @return the lower bound of the interval of this request
+     * @return the interval request for which the result was created
      */
-    public int getLowerBound() {
-        return this.lowerBound;
-    }
-
-    /**
-     * @return the upper bound of the interval of this request
-     */
-    public int getUpperBound() {
-        return this.upperBound;
+    public IntervalRequest getRequest() {
+        return this.request;
     }
     
 }

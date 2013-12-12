@@ -3,11 +3,13 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.util.FeatureType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 
@@ -20,12 +22,11 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 public class GenomeFeatureParser {
 
     private TrackConnector trackConnector;
-    private final int[] region2Exclude;
-    private final HashMap<Integer, List<Integer>> forwardCDSs;
-    private final HashMap<Integer, List<Integer>> reverseCDSs;
-    private final HashMap<Integer, PersistantFeature> allRegionsInHash;
+    private List<int[]> region2Exclude;
+    private HashMap<Integer, List<Integer>> forwardCDSs;
+    private HashMap<Integer, List<Integer>> reverseCDSs;
+    private HashMap<Integer, PersistantFeature> allRegionsInHash;
     private ReferenceConnector refConnector;
-    private int refSeqLength;
     private List<PersistantFeature> genomeFeatures;
     private final ProgressHandle progressHandle;
     private String handlerTitle;
@@ -38,17 +39,21 @@ public class GenomeFeatureParser {
      */
     public GenomeFeatureParser(TrackConnector trackConnector) {
         this.trackConnector = trackConnector;
-
+        this.genomeFeatures = new ArrayList<>();
+        this.forwardCDSs = new HashMap<>();
+        this.reverseCDSs = new HashMap<>();
+        this.region2Exclude = new ArrayList<>();
         this.handlerTitle = "Initializing data structures from feature information of reference: " + trackConnector.getAssociatedTrackName();
         this.progressHandle = ProgressHandleFactory.createHandle(handlerTitle);
 
         this.refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackConnector.getRefGenome().getId());
-        this.refSeqLength = trackConnector.getRefSequenceLength();
-        this.genomeFeatures = refConnector.getFeaturesForClosedInterval(0, this.refSeqLength);
 
-        this.region2Exclude = new int[this.refSeqLength];
-        this.forwardCDSs = new HashMap<>();
-        this.reverseCDSs = new HashMap<>();
+        Map<Integer, PersistantChromosome> chroms = refConnector.getChromosomesForGenome();
+        for (PersistantChromosome chrom : chroms.values()) {
+            this.genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
+                    0, chrom.getLength(), chrom.getId()));
+            this.region2Exclude.add(new int[chrom.getLength()]);
+        }
         this.allRegionsInHash = getGenomeFeaturesInHash(this.genomeFeatures);
     }
 
@@ -58,7 +63,7 @@ public class GenomeFeatureParser {
      * @return int array, 1 at position means that this region does not have to
      * be used in further analyses.
      */
-    public int[] getRegion2Exclude() {
+    public List<int[]> getRegion2Exclude() {
         return region2Exclude;
     }
 
@@ -100,12 +105,12 @@ public class GenomeFeatureParser {
      */
     public void parseFeatureInformation(List<PersistantFeature> genomeFeatures) {
         //at first we need connection to the reference (Projectconnector->ReferenceConnector)
-        // Vamp has already all information we need here
+        // ReadXplorer already has all information we need here
 
         this.progressHandle.progress("Parsing Feature Information", 30);
 
         int size = genomeFeatures.size();
-        double intervall = size / 7;
+        double interval = size / 7;
         int progress = 40;
         int start, stop, id;
         int count = 0;
@@ -116,9 +121,9 @@ public class GenomeFeatureParser {
         for (PersistantFeature feature : genomeFeatures) {
 
             count++;
-            if (count >= intervall) {
+            if (count >= interval) {
                 this.progressHandle.progress("Parsing Feature Information", progress);
-                intervall = intervall + intervall;
+                interval = interval + interval;
                 progress += 10;
             }
 
@@ -138,7 +143,7 @@ public class GenomeFeatureParser {
             // create a blocked region (sense & antisense) masking stable (tRNA, rRNA) RNAs
             // tRNA and rRNA regions are entered into the "mask array"
             if (type.equals(FeatureType.RRNA) || type.equals(FeatureType.TRNA)) {
-                maskingRegions(type, isFwd, start, stop);
+                maskingRegions(type, isFwd, start, stop, feature.getChromId());
             }
 
             // store the regions in arrays of arrays (allows for overlapping regions)
@@ -153,14 +158,14 @@ public class GenomeFeatureParser {
 
     /**
      * This method fills a Map of Lists. If there is a feature on Position i,
-     * than the list is mapped to that position. The List contains the feature
-     * ids corrisponding to that Position. Each list can containing max. three
+     * then the list is mapped to that position. The List contains the feature
+     * ids corresponding to that Position. Each list can contain max. three
      * different feature ids because of the three reading frames for the forward
      * and reverse direction.
      *
      * @param featureID Persistant feature id.
-     * @param start Startposition of feature.
-     * @param stop Stopposition of feature.
+     * @param start Start position of feature.
+     * @param stop Stop position of feature.
      * @param isFwd Feature direction is forward if true, otherwise false.
      */
     private void createCDSsStrandInformation(int featureID, int start, int stop, boolean isFwd) {
@@ -198,27 +203,28 @@ public class GenomeFeatureParser {
      * @param isFwdDirection Direction of feature is forward if true, false
      * otherwise.
      */
-    private void maskingRegions(FeatureType type, boolean isFwd, int startFeature, int stopFeature) {
+    private void maskingRegions(FeatureType type, boolean isFwd, int startFeature, int stopFeature,
+            int chromId) {
 
         if (type.equals(FeatureType.TRNA)) {
             if (isFwd) {
                 for (startFeature -= 21; startFeature < (stopFeature + 20); startFeature++) {
-                    this.region2Exclude[startFeature] = 1;
+                    this.region2Exclude.get(chromId)[startFeature] = 1;
                 }
             } else {
                 for (startFeature -= 20; startFeature < (stopFeature + 21); stopFeature++) {
-                    this.region2Exclude[startFeature] = 1;
+                    this.region2Exclude.get(chromId)[startFeature] = 1;
                 }
             }
         } else if (type.equals(FeatureType.RRNA)) {
 
             if (isFwd) {
                 for (startFeature -= 520; startFeature > (stopFeature + 5); startFeature++) {
-                    this.region2Exclude[startFeature] = 1;
+                    this.region2Exclude.get(chromId)[startFeature] = 1;
                 }
             } else {
                 for (startFeature -= 5; startFeature > (stopFeature + 520); stopFeature++) {
-                    this.region2Exclude[startFeature] = 1;
+                    this.region2Exclude.get(chromId)[startFeature] = 1;
                 }
             }
         }
@@ -258,15 +264,6 @@ public class GenomeFeatureParser {
      */
     public ReferenceConnector getRefConnector() {
         return refConnector;
-    }
-
-    /**
-     * Returns the length of the reference.
-     *
-     * @return length of reference
-     */
-    public int getRefSeqLength() {
-        return refSeqLength;
     }
 
     /**

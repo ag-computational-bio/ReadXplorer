@@ -36,7 +36,7 @@ package de.cebitec.readXplorer.differentialExpression;
 //    private static DeSeq instance = new DeSeq();
 //    private static int numberOfFeatures;
 //    private static int numberOfTracks;
-//    private static List<PersistantTrack> selectedTraks;
+//    private static List<PersistantTrack> selectedTracks;
 //    private static List<String> loci;
 //    private static List<String> tracks;
 //    private static List<List<Integer>> allCountData;
@@ -120,10 +120,10 @@ package de.cebitec.readXplorer.differentialExpression;
 //        fit2.add("libType");
 //
 //
-//        selectedTraks = new ArrayList<>();
+//        selectedTracks = new ArrayList<>();
 //        for (int i = 0; i < tracks.size(); i++) {
 //            Timestamp currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-//            selectedTraks.add(new PersistantTrack(i, "", tracks.get(i), currentTimestamp, 0, 0));
+//            selectedTracks.add(new PersistantTrack(i, "", tracks.get(i), currentTimestamp, 0, 0));
 //        }
 //
 //        numberOfFeatures = loci.size();
@@ -153,7 +153,7 @@ package de.cebitec.readXplorer.differentialExpression;
 //        int expResult = 4;
 //        DeSeqAnalysisData analysisData = new DeSeqAnalysisData(tracks.size(), new HashMap<>(MultiFactorDesign), true, new ArrayList<>(fit1), new ArrayList<>(fit2), false);
 //        analysisData.setLoci(loci.toArray(new String[loci.size()]));
-//        analysisData.setSelectedTraks(new ArrayList<>(selectedTraks));
+//        analysisData.setSelectedTracks(new ArrayList<>(selectedTracks));
 //        for (Iterator<List<Integer>> it = allCountData.iterator(); it.hasNext();) {
 //            List<Integer> current = it.next();
 //            analysisData.addCountDataForTrack(current.toArray(new Integer[current.size()]));            
@@ -171,29 +171,29 @@ package de.cebitec.readXplorer.differentialExpression;
 //        analysisData = new DeSeqAnalysisData(tracks.size(), new HashMap<>(TwoFactorDesign), false, new ArrayList<>(fit1), new ArrayList<>(fit2), false);
 //        analysisData.setLoci(loci.toArray(new String[loci.size()]));
 //        
-//        List<PersistantTrack> selectedTraksTwoFactor = new ArrayList<>();
+//        List<PersistantTrack> selectedTracksTwoFactor = new ArrayList<>();
 //        
 //        List<Integer> current = allCountData.get(2);
 //        analysisData.addCountDataForTrack(current.toArray(new Integer[current.size()])); 
 //        Timestamp currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-//        selectedTraksTwoFactor.add(new PersistantTrack(2, "", tracks.get(2), currentTimestamp, 0, 0));
+//        selectedTracksTwoFactor.add(new PersistantTrack(2, "", tracks.get(2), currentTimestamp, 0, 0));
 //        
 //        current = allCountData.get(3);
 //        analysisData.addCountDataForTrack(current.toArray(new Integer[current.size()]));
 //        currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-//        selectedTraksTwoFactor.add(new PersistantTrack(3, "", tracks.get(3), currentTimestamp, 0, 0));
+//        selectedTracksTwoFactor.add(new PersistantTrack(3, "", tracks.get(3), currentTimestamp, 0, 0));
 //        
 //        current = allCountData.get(5);
 //        analysisData.addCountDataForTrack(current.toArray(new Integer[current.size()])); 
 //        currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-//        selectedTraksTwoFactor.add(new PersistantTrack(5, "", tracks.get(5), currentTimestamp, 0, 0));
+//        selectedTracksTwoFactor.add(new PersistantTrack(5, "", tracks.get(5), currentTimestamp, 0, 0));
 //        
 //        current = allCountData.get(6);
 //        analysisData.addCountDataForTrack(current.toArray(new Integer[current.size()]));  
 //        currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-//        selectedTraksTwoFactor.add(new PersistantTrack(6, "", tracks.get(6), currentTimestamp, 0, 0));
+//        selectedTracksTwoFactor.add(new PersistantTrack(6, "", tracks.get(6), currentTimestamp, 0, 0));
 //        
-//        analysisData.setSelectedTraks(selectedTraksTwoFactor);
+//        analysisData.setSelectedTracks(selectedTracksTwoFactor);
 //        try {
 //            result = instance.process(analysisData, numberOfFeatures, numberOfTracks, null);
 //        } catch (PackageNotLoadableException | JRILibraryNotInPathException | UnknownGnuRException ex) {

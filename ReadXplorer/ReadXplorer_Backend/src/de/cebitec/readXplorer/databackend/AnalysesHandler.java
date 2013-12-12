@@ -4,6 +4,7 @@ import de.cebitec.readXplorer.api.objects.JobI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.util.Benchmark;
 import de.cebitec.readXplorer.util.Observable;
@@ -14,6 +15,7 @@ import de.cebitec.readXplorer.util.StatsContainer;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 
@@ -26,12 +28,13 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
 
     public static final String DATA_TYPE_COVERAGE = "Coverage";
     public static final String DATA_TYPE_MAPPINGS = "Mappings";
+    /** Returns 1 and means that all coverage querries are finished. */
     public static final byte COVERAGE_QUERRIES_FINISHED = 1;
+    /** Returns 2 and means that all mapping querries are finished. */
     public static final byte MAPPING_QUERRIES_FINISHED = 2;
     private final ProgressHandle progressHandle;
     private DataVisualisationI parent;
     private TrackConnector trackConnector;
-    private int refSeqLength;
     private int nbCovRequests;
     private int nbMappingRequests;
     private int nbRequests;
@@ -43,7 +46,6 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
     private boolean mappingsNeeded;
     private byte desiredData = Properties.NORMAL;
     private ParametersReadClasses readClassParams;
-    
     private long start;
 
     /**
@@ -86,36 +88,35 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
         this.nbRequests = 0;
         this.progressHandle.start();
         this.start = System.currentTimeMillis();
-
-        this.refSeqLength = trackConnector.getRefSequenceLength();
+        Map<Integer, PersistantChromosome> chroms = trackConnector.getRefGenome().getChromosomes();
 
         if (this.coverageNeeded) {
 
             //decide upon stepSize of a single request and analyse coverage of whole genome
             final int stepSize = 200000;
-            int from = 1;
-            int to = this.refSeqLength > stepSize ? stepSize : this.refSeqLength;
-            int additionalRequest = this.refSeqLength % stepSize == 0 ? 0 : 1;
-            this.nbCovRequests = this.refSeqLength / stepSize + additionalRequest;
-            this.nbRequests += this.nbCovRequests;
-            this.progressHandle.switchToDeterminate(this.nbRequests);
-            this.progressHandle.progress("Request " + (nbCarriedOutRequests + 1) + " of " + nbRequests, nbCarriedOutRequests);
 
-            while (to < this.refSeqLength) {
-                trackConnector.addCoverageAnalysisRequest(new IntervalRequest(from, to, this, diffsAndGapsNeeded, desiredData, readClassParams));
+            for (PersistantChromosome chrom : chroms.values()) {
 
-                from = to + 1;
-                to += stepSize;
+                int chromLength = chrom.getLength();
+                int from = 1;
+                int to = this.calcRightBoundary(chromLength, stepSize, COVERAGE_QUERRIES_FINISHED);
+
+                while (to < chromLength) {
+                    trackConnector.addCoverageAnalysisRequest(new IntervalRequest(from, to, chrom.getId(), this, diffsAndGapsNeeded, desiredData, readClassParams));
+
+                    from = to + 1;
+                    to += stepSize;
+                }
+
+                //calc last interval until genomeSize
+                to = chromLength;
+                trackConnector.addCoverageAnalysisRequest(new IntervalRequest(from, to, chrom.getId(), this, diffsAndGapsNeeded, desiredData, readClassParams));
             }
-
-            //calc last interval until genomeSize
-            to = this.refSeqLength;
-            trackConnector.addCoverageAnalysisRequest(new IntervalRequest(from, to, this, diffsAndGapsNeeded, desiredData, readClassParams));
 
 
         } else if (this.mappingsNeeded) {
 
-            int stepSize = 100000;
+            int stepSize = 150000;
 
             if (trackConnector.isDbUsed()) {
                 //calculate which mappings are needed from the db
@@ -149,31 +150,33 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
                 this.nbRequests += this.nbMappingRequests;
                 this.progressHandle.switchToDeterminate(this.nbRequests);
                 this.progressHandle.progress("Request " + (nbCarriedOutRequests + 1) + " of " + nbRequests, nbCarriedOutRequests);
+                int chromId = trackConnector.getRefGenome().getActiveChromId();
 
                 while (to < numInterestingMappings) {
-                    trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this, false, desiredData, readClassParams));
+                    trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, chromId, this, false, desiredData, readClassParams));
                     from = to + 1;
                     to += stepSize;
                 }
 
                 //calc last interval until genomeSize
                 to = numInterestingMappings;
-                trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this, false, desiredData, readClassParams));
+                trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, chromId, this, false, desiredData, readClassParams));
             } else {
-                this.nbRequests = this.refSeqLength / stepSize + 1;
-                this.progressHandle.switchToDeterminate(this.nbRequests);
-                this.progressHandle.progress("Request " + (nbCarriedOutRequests + 1) + " of " + nbRequests, nbCarriedOutRequests);
-                int from = 0;
-                int to = stepSize;
-                while (to < this.refSeqLength) {
-                    trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this, false, desiredData, readClassParams));
-                    from = to + 1;
-                    to += stepSize;
-                }
+                for (PersistantChromosome chrom : chroms.values()) {
 
-                //calc last interval until genomeSize
-                to = this.refSeqLength;
-                trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, this, false, desiredData, readClassParams));
+                    int chromLength = chrom.getLength();
+                    int from = 1;
+                    int to = this.calcRightBoundary(chromLength, stepSize, MAPPING_QUERRIES_FINISHED);
+                    while (to < chromLength) {
+                        trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, chrom.getId(), this, false, desiredData, readClassParams));
+                        from = to + 1;
+                        to += stepSize;
+                    }
+
+                    //calc last interval until genomeSize
+                    to = chromLength;
+                    trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, chrom.getId(), this, false, desiredData, readClassParams));
+                }
             }
         } else {
             this.progressHandle.finish();
@@ -289,7 +292,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
             observer.update(data);
             if (this.nbCarriedOutRequests == this.nbCovRequests) {
                 observer.update(COVERAGE_QUERRIES_FINISHED);
-            } else if (this.nbCarriedOutRequests == this.nbRequests) {
+            } else if (this.nbCarriedOutRequests == this.nbMappingRequests) {
                 observer.update(MAPPING_QUERRIES_FINISHED);
             }
         }
@@ -298,5 +301,29 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
     @Override
     public void notifySkipped() {
         //throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    /**
+     * Calculates the right interval boundary for a request, claculates the 
+     * number of needed total requests and updates the progress handle of this
+     * analysis handler.
+     * @param chromLength length of the chromosome under investigation
+     * @param stepSize size of each step
+     * @param neededData The data type. Determines, which requests are counted.
+     * @return the right interval boundary for a request
+     */
+    private int calcRightBoundary(int chromLength, int stepSize, byte neededData) {
+        int to = chromLength > stepSize ? stepSize : chromLength;
+        int additionalRequest = chromLength % stepSize == 0 ? 0 : 1;
+        if (neededData == COVERAGE_QUERRIES_FINISHED) {
+            this.nbCovRequests += chromLength / stepSize + additionalRequest;
+            this.nbRequests = this.nbCovRequests;
+        } else if (neededData == MAPPING_QUERRIES_FINISHED) {
+            this.nbMappingRequests += chromLength / stepSize + additionalRequest;
+            this.nbRequests = this.nbMappingRequests;
+        }
+        this.progressHandle.switchToDeterminate(this.nbRequests);
+        this.progressHandle.progress("Request " + (nbCarriedOutRequests + 1) + " of " + nbRequests, nbCarriedOutRequests);
+        return to;
     }
 }

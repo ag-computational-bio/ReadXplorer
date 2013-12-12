@@ -24,10 +24,15 @@ public class CorrelationResult extends ResultTrackAnalysis<CorrelationResult> {
     /**
      * New CorrelationResult data object.
      * @param correlationsList list of found correlations
-     * @param trackNames hashmap of track ids to track names used in the analysis
+     * @param trackMap hashmap of track ids to tracks used in the analysis
+     * @param referenceId id of the reference genome, for which this result was
+     * generated
+     * @param combineTracks <cc>true</cc>, if the tracks in the list are
+     * combined, <cc>false</cc> otherwise
      */
-    public CorrelationResult(List<CorrelatedInterval> correlationsList, Map<Integer, PersistantTrack> trackNames, boolean combineTracks) {
-        super(trackNames, combineTracks);
+    public CorrelationResult(List<CorrelatedInterval> correlationsList, Map<Integer, PersistantTrack> trackMap, 
+            int referenceId, boolean combineTracks) {
+        super(trackMap, referenceId, combineTracks);
         this.correlationsList = correlationsList;
     }
     
@@ -51,6 +56,7 @@ public class CorrelationResult extends ResultTrackAnalysis<CorrelationResult> {
         for (CorrelatedInterval correlation : this.correlationsList) {
             exportLine = new ArrayList<>(); 
             
+            exportLine.add(correlation.getChromId());
             exportLine.add(correlation.getDirection());
             exportLine.add(correlation.getFrom());
             exportLine.add(correlation.getTo());
@@ -89,6 +95,7 @@ public class CorrelationResult extends ResultTrackAnalysis<CorrelationResult> {
         
         List<String> dataColumnDescriptions = new ArrayList<>();
 //        dataColumnDescriptions.add("Track");
+        dataColumnDescriptions.add("Chromosome");
         dataColumnDescriptions.add("Strand Direction");
         dataColumnDescriptions.add("Pos From");
         dataColumnDescriptions.add("Pos To");

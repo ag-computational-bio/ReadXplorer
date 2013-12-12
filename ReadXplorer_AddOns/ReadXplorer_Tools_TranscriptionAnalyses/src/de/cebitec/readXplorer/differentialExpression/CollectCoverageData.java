@@ -57,7 +57,8 @@ public class CollectCoverageData implements Observer {
      *
      * @param mappings the mappings
      */
-    private void updateReadCountForFeatures(List<PersistantMapping> mappings) {
+    private void updateReadCountForFeatures(MappingResultPersistant result) {
+        List<PersistantMapping> mappings = result.getMappings();
         Collections.sort(mappings);
         int lastMappingIdx = 0;
         PersistantFeature feature;
@@ -65,37 +66,39 @@ public class CollectCoverageData implements Observer {
 
         for (int i = 0; i < this.genomeFeatures.size(); ++i) {
             feature = this.genomeFeatures.get(i);
-            int featStart = feature.getStart() - startOffset;
-            int featStop = feature.getStop() + stopOffset;
-            fstFittingMapping = true;
-            //If no matching mapping is found, we still need to know that by
-            //writing down a count of zero for this feature.
-            if (!countData.containsKey(feature)) {
-                countData.put(feature, 0);
-            }
-            for (int j = lastMappingIdx; j < mappings.size(); ++j) {
-                PersistantMapping mapping = mappings.get(j);
-
-                //If the orientation of the read does not matter this one is always true.
-                boolean onSameStrand = true;
-                //If orientation should be taken into account, this is done here.
-                if (regardReadOrientation) {
-                    onSameStrand = feature.isFwdStrand() == mapping.isFwdStrand();
+            if (feature.getChromId() == result.getRequest().getChromId()) {
+                
+                int featStart = feature.getStart() - startOffset;
+                int featStop = feature.getStop() + stopOffset;
+                fstFittingMapping = true;
+                //If no matching mapping is found, we still need to know that by
+                //writing down a count of zero for this feature.
+                if (!countData.containsKey(feature)) {
+                    countData.put(feature, 0);
                 }
-                //mappings identified within a feature
-                if (mapping.getStop() > featStart && onSameStrand
-                        && mapping.getStart() < featStop) {
-
-                    if (fstFittingMapping == true) {
-                        lastMappingIdx = j;
-                        fstFittingMapping = false;
+                for (int j = lastMappingIdx; j < mappings.size(); ++j) {
+                    PersistantMapping mapping = mappings.get(j);
+                    //If the orientation of the read does not matter this one is always true.
+                    boolean onSameStrand = true;
+                    //If orientation should be taken into account, this is done here.
+                    if (regardReadOrientation) {
+                        onSameStrand = feature.isFwdStrand() == mapping.isFwdStrand();
                     }
-                    int value = countData.get(feature) + mapping.getNbReplicates();
-                    countData.put(feature, value);
+                    //mappings identified within a feature
+                    if (mapping.getStop() > featStart && onSameStrand
+                            && mapping.getStart() < featStop) {
 
-                    //still mappings left, but need next feature
-                } else if (mapping.getStart() > featStop) {
-                    break;
+                        if (fstFittingMapping) {
+                            lastMappingIdx = j;
+                            fstFittingMapping = false;
+                        }
+                        int value = countData.get(feature) + mapping.getNbReplicates();
+                        countData.put(feature, value);
+
+                        //still mappings left, but need next feature
+                    } else if (mapping.getStart() > featStop) {
+                        break;
+                    }
                 }
             }
         }
@@ -104,8 +107,8 @@ public class CollectCoverageData implements Observer {
     @Override
     public void update(Object args) {
         if (args instanceof MappingResultPersistant) {
-            MappingResultPersistant results = (MappingResultPersistant) args;
-            updateReadCountForFeatures(results.getMappings());
+            MappingResultPersistant result = (MappingResultPersistant) args;
+            updateReadCountForFeatures(result);
         }
     }
 

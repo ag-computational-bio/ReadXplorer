@@ -13,7 +13,7 @@ import javax.swing.JPanel;
 
 public final class BaySeqVisualPanel2 extends JPanel {
 
-    private List<PersistantTrack> selectedTraks = new ArrayList<>();
+    private List<PersistantTrack> selectedTracks = new ArrayList<>();
     private DefaultListModel<PersistantTrack> trackListModel = new DefaultListModel<>();
     private int[] replicateStructure = new int[1];
     private int currentReplicateNumber = 1;
@@ -30,9 +30,9 @@ public final class BaySeqVisualPanel2 extends JPanel {
         return "Define replicates structure";
     }
 
-    public void updateTrackList(List<PersistantTrack> selectedTraks) {
-        if (!this.selectedTraks.equals(selectedTraks)) {
-            this.selectedTraks = selectedTraks;
+    public void updateTrackList(List<PersistantTrack> selectedTracks) {
+        if (!this.selectedTracks.equals(selectedTracks)) {
+            this.selectedTracks = selectedTracks;
             resetTrackList();
         }
 
@@ -40,7 +40,7 @@ public final class BaySeqVisualPanel2 extends JPanel {
     
     private void resetTrackList() {
         trackListModel.clear();
-        for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
+        for (Iterator<PersistantTrack> it = selectedTracks.iterator(); it.hasNext();) {
             PersistantTrack persistantTrack = it.next();
             trackListModel.addElement(persistantTrack);
             replicateStructure = new int[1];
@@ -132,14 +132,14 @@ public final class BaySeqVisualPanel2 extends JPanel {
 
     private void addAsReplicatesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addAsReplicatesActionPerformed
         if (replicateStructure.length < 2) {
-            replicateStructure = new int[selectedTraks.size()];
+            replicateStructure = new int[selectedTracks.size()];
         }
         if (!trackList.isSelectionEmpty()) {
             List<PersistantTrack> tracks = trackList.getSelectedValuesList();
             StringBuilder strBuilder = new StringBuilder(replicateStructureField.getText() + "{");
             for (Iterator<PersistantTrack> it = tracks.iterator(); it.hasNext();) {
                 PersistantTrack persistantTrack = it.next();
-                replicateStructure[selectedTraks.indexOf(persistantTrack)] = currentReplicateNumber;
+                replicateStructure[selectedTracks.indexOf(persistantTrack)] = currentReplicateNumber;
                 strBuilder.append(persistantTrack.getDescription());
                 trackListModel.removeElement(persistantTrack);
                 if (it.hasNext()) {

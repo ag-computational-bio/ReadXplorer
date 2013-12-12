@@ -5,15 +5,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Data structure for storing operons. Operons consist of a list of
+ * OperonAdjacencies, since each operon can contain more than two genes.
+ * 
  * @author MKD, rhilker
  * 
- * Data structure for storing operons. Operons consist of a list of OperonAdjacencies, since
- * each operon can contain more than two genes.
  */
 public class Operon extends TrackResultEntry {
     
     private List<OperonAdjacency> operonAdjacencies;
    
+    /**
+     * Data structure for storing operons. Operons consist of a list of
+     * OperonAdjacencies, since each operon can contain more than two genes.
+     * @param trackId The id of the track whose reads are analyzed here
+     */
     public Operon(int trackId) {
         super(trackId);
         this.operonAdjacencies = new ArrayList<>();
@@ -54,5 +60,5 @@ public class Operon extends TrackResultEntry {
      */
     public void addAllOperonAdjacencies(List<OperonAdjacency> operonAdjacencies) {
         this.operonAdjacencies.addAll(operonAdjacencies);
-    }
+    }    
 }

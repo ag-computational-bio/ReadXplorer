@@ -2,10 +2,12 @@ package de.cebitec.readXplorer.view.dataVisualisation.basePanel;
 
 import de.cebitec.readXplorer.controller.ViewController;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfo;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
@@ -20,6 +22,8 @@ import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.CoverageZoomSli
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.MultipleTrackViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.TrackOptionsPanel;
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.TrackViewer;
+import de.cebitec.readXplorer.view.dialogMenus.ChromosomeVisualizationHelper;
+import de.cebitec.readXplorer.view.dialogMenus.ChromosomeVisualizationHelper.ChromosomeListener;
 import de.cebitec.readXplorer.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -63,23 +67,28 @@ public class BasePanelFactory {
      * @param refGenome the reference genome to visualize
      * @return a base panel for reference sequences (genomes).
      */
-    public BasePanel getGenomeViewerBasePanel(PersistantReference refGenome) {
+    public BasePanel getRefViewerBasePanel(PersistantReference refGenome) {
 
         this.refGenome = refGenome;
         BasePanel b = new BasePanel(boundsManager, viewController);
         viewController.addMousePositionListener(b);
+        int maxSliderValue = 500;
+        AdjustmentPanel adjustmentPanel = this.createAdjustmentPanel(true, true, maxSliderValue);
 
         // create viewer
-        ReferenceViewer genomeViewer = new ReferenceViewer(boundsManager, b, refGenome);
+        ReferenceViewer refViewer = new ReferenceViewer(boundsManager, b, refGenome);
 
-        // show a color legend
-        JPanel genomePanelLegend = this.getGenomeViewerLegend(genomeViewer);
-        genomeViewer.setupLegend(new MenuLabel(genomePanelLegend, MenuLabel.TITLE_LEGEND), genomePanelLegend);
+        // show a legend
+        JPanel genomePanelLegend = this.getRefViewerLegend(refViewer);
+        refViewer.setupLegend(new MenuLabel(genomePanelLegend, MenuLabel.TITLE_LEGEND), genomePanelLegend);
+        
+        //show chromosome selection panel
+        JPanel chromSelectionPanel = this.getRefChromSelectionPanel(refViewer, adjustmentPanel);
+        refViewer.setupChromSelectionPanel(chromSelectionPanel);
 
         // add panels to basepanel
-        int maxSliderValue = 500;
-        b.setViewer(genomeViewer);
-        b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true, maxSliderValue));
+        b.setViewer(refViewer);
+        b.setHorizontalAdjustmentPanel(adjustmentPanel);
 
         return b;
     }
@@ -298,16 +307,30 @@ public class BasePanelFactory {
         return b;
     }
 
+    /**
+     * Create an <code>AdjustmentPanel</code> for the given parameters. This
+     * panel may contain a scrollbar for scrolling along a reference and 
+     * a slider for zooming in and out.
+     * @param hasScrollbar true, if a scrollbar for the reference sequence is 
+     * needed, false otherwise
+     * @param hasSlider true, if a zoom slider is needed, false otherwise
+     * @param sliderMax maximum slider value
+     * @return <code>AdjustmentPanel</code> for the given parameters.
+     */
     private AdjustmentPanel createAdjustmentPanel(boolean hasScrollbar, boolean hasSlider, int sliderMax) {
         // create control panel
         BoundsInfo bounds = boundsManager.getUpdatedBoundsInfo(new Dimension(10, 10));
-        AdjustmentPanel control = new AdjustmentPanel(1, refGenome.getRefLength(),
+        AdjustmentPanel control = new AdjustmentPanel(1, refGenome.getActiveChromLength(),
                 bounds.getCurrentLogPos(), bounds.getZoomValue(), sliderMax, hasScrollbar, hasSlider);
         control.addAdjustmentListener(boundsManager);
         boundsManager.addSynchronousNavigator(control);
         return control;
     }
 
+    /**
+     * @param title a title to display  on a panel
+     * @return The panel displaying the title on a gray background
+     */
     private JPanel getTitlePanel(String title) {
         JPanel p = new JPanel();
         p.add(new JLabel(title));
@@ -401,7 +424,12 @@ public class BasePanelFactory {
         return entry;
     }
 
-    private JPanel getGenomeViewerLegend(AbstractViewer viewer) {
+    /**
+     * Creates a legend JPanel for the reference viewer.
+     * @param viewer the viewer to which the legend shall be added.
+     * @return the new legend Panel for the reference viewer.
+     */
+    private JPanel getRefViewerLegend(AbstractViewer viewer) {
         JPanel legend = new JPanel();
         JPanel legend1 = new JPanel();
         JPanel legend2 = new JPanel();
@@ -466,6 +494,49 @@ public class BasePanelFactory {
         legend.add(this.getLegendEntry(ColorProperties.BEST_MATCH, FeatureType.MULTIPLE_MAPPED_READ, viewer));
 
         return legend;
+    }
+    
+    /**
+     * Creates a JPanel containing a JComboBox for the selection of the
+     * currently active chromosome.
+     * @param viewer the viewer, for which the active chromosome shall be
+     * controlled.
+     * @return A JPanel containing a JComboBox for the selection of the
+     * currently active chromosome.
+     */
+    private JPanel getRefChromSelectionPanel(final AbstractViewer viewer, final AdjustmentPanel adjustmentPanel) {
+        JPanel selectionPanel = new JPanel(new BorderLayout());
+        selectionPanel.setBackground(ColorProperties.LEGEND_BACKGROUND);
+        
+        ChromosomeVisualizationHelper chromHelper = new ChromosomeVisualizationHelper();
+        final JComboBox<PersistantChromosome> chromSelectionBox = new JComboBox<>();
+        chromHelper.createChromBoxWithObserver(chromSelectionBox, refGenome);
+        ChromosomeListener chromListener = chromHelper.new ChromosomeListener(chromSelectionBox, viewer) {
+        
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        super.actionPerformed(e);
+                        PersistantChromosome activeChrom = (PersistantChromosome) chromSelectionBox.getSelectedItem();
+                        adjustmentPanel.setNavigatorMax(activeChrom.getLength());
+                    }
+        };
+        chromSelectionBox.addActionListener(chromListener);
+        chromSelectionBox.setSize(chromSelectionBox.getPreferredSize());
+        chromSelectionBox.setVisible(true);
+        selectionPanel.add(chromSelectionBox, BorderLayout.CENTER);
+        selectionPanel.setSize(chromSelectionBox.getPreferredSize());
+        
+        Observer chromChangeObserver = new Observer() { //observer for chromosome changes from elsewhere
+
+            @Override
+            public void update(Object args) {
+                chromSelectionBox.setSelectedItem(refGenome.getActiveChromosome());
+                chromSelectionBox.repaint();
+            }
+        };
+        refGenome.registerObserver(chromChangeObserver);
+        
+        return selectionPanel;
     }
 
     /**

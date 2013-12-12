@@ -217,7 +217,8 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
                 ++finishedCovAnalyses;
 
                 AnalysisCoveredFeatures analysisCoveredFeatures = trackToAnalysisMap.get(trackId);
-                final CoveredFeatureResult result = new CoveredFeatureResult(analysisCoveredFeatures.getResults(), trackMap, combineTracks);
+                final CoveredFeatureResult result = new CoveredFeatureResult(analysisCoveredFeatures.getResults(), 
+                        trackMap, referenceId, combineTracks);
                 result.setParameters(parameters);
                 Map<String, Integer> statsMap = new HashMap<>();
                 statsMap.put(ResultPanelCoveredFeatures.FEATURES_TOTAL, analysisCoveredFeatures.getNoGenomeFeatures());

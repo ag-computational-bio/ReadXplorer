@@ -37,7 +37,7 @@ public class CoverageThreadAnalyses extends CoverageThread {
             while (!interrupted()) {
 
                 IntervalRequest request = requestQueue.poll();
-                CoverageAndDiffResultPersistant currentCov = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0), null, null, false);
+                CoverageAndDiffResultPersistant currentCov = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0), null, null, request);
                 if (request != null) {
                     if (request.getDesiredData() == Properties.READ_STARTS) {
                         currentCov = this.loadReadStartsAndCoverageMultiple(request);

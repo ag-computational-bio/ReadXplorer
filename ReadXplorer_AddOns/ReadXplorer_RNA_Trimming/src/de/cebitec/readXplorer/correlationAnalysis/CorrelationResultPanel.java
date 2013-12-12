@@ -62,14 +62,14 @@ public class CorrelationResultPanel extends JPanel {
 
             },
             new String [] {
-                "Direction", "From", "To", "Correlation", "MinPeakCoverage"
+                "Chromosome", "Direction", "From", "To", "Correlation", "MinPeakCoverage"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Double.class
+                java.lang.Object.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Double.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false
+                false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -81,11 +81,12 @@ public class CorrelationResultPanel extends JPanel {
             }
         });
         jScrollPane1.setViewportView(correlationTable);
-        correlationTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title0")); // NOI18N
-        correlationTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title1")); // NOI18N
-        correlationTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title2")); // NOI18N
-        correlationTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title3")); // NOI18N
-        correlationTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title4")); // NOI18N
+        correlationTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title5")); // NOI18N
+        correlationTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title0")); // NOI18N
+        correlationTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title1")); // NOI18N
+        correlationTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title2")); // NOI18N
+        correlationTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title3")); // NOI18N
+        correlationTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title4")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.jLabel1.text")); // NOI18N
 

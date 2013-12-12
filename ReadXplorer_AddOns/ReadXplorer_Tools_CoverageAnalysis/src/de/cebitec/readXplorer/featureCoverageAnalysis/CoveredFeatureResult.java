@@ -29,8 +29,8 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
      * feature detection was carried out
      * @param currentTrack the track on which this analysis result was generated
      */
-    public CoveredFeatureResult(List<CoveredFeature> results, HashMap<Integer, PersistantTrack> trackMap, boolean combineTracks) {
-        super(trackMap, combineTracks);
+    public CoveredFeatureResult(List<CoveredFeature> results, HashMap<Integer, PersistantTrack> trackMap, int referenceId, boolean combineTracks) {
+        super(trackMap, referenceId, combineTracks);
         this.results = results;
         
     }
@@ -63,6 +63,7 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
         
         resultDescriptions.add(coveredString + " Feature");
         resultDescriptions.add("Track");
+        resultDescriptions.add("Chromosome");
         resultDescriptions.add("Strand");
         resultDescriptions.add("Start");
         resultDescriptions.add("Stop");
@@ -92,6 +93,7 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
             feature = coveredFeature.getCoveredFeature();
             coveredFeatureRow.add(feature.toString());
             coveredFeatureRow.add(this.getTrackEntry(coveredFeature.getTrackId(), true));
+            coveredFeatureRow.add(this.getChromosomeMap().get(feature.getChromId()));
             coveredFeatureRow.add(feature.isFwdStrandString());
             coveredFeatureRow.add(feature.isFwdStrand() ? feature.getStart() : feature.getStop());
             coveredFeatureRow.add(feature.isFwdStrand() ? feature.getStop() : feature.getStart());

@@ -81,7 +81,7 @@ public class AnalysisCoverage implements Observer, AnalysisI<CoverageIntervalCon
 
         PersistantCoverage coverage = coverageResult.getCoverage();
 
-        //since read classes are inclusive, we only check which array to use, starting with the larges read class
+        //since read classes are inclusive, we simply check which array to use, starting with the larges read class
         if (this.parameters.getReadClassesParams().isCommonMatchUsed()) {
             coverageArraySumOrFwd = coverage.getCommonFwdMult();
             coverageArrayRev = coverage.getCommonRevMult();
@@ -97,18 +97,19 @@ public class AnalysisCoverage implements Observer, AnalysisI<CoverageIntervalCon
             coverageArraySumOrFwd = this.sumValues(coverageArraySumOrFwd, coverageArrayRev);
         }
         
-        /* check temp intervals at first, which might be elongated by the
-         * new result */
+        /* check temp intervals at first, which might be elongated by the new result */
+        int chromId = coverageResult.getRequest().getChromId();
         byte strandFwdOrBoth = this.parameters.isSumCoverageOfBothStrands() ? SequenceUtils.STRAND_BOTH : SequenceUtils.STRAND_FWD;
-        CoverageInterval overlapIntervalSumOrFwdStart = new CoverageInterval(connector.getTrackID(), strandFwdOrBoth);
-        CoverageInterval overlapIntervalRevStart = new CoverageInterval(connector.getTrackID(), SequenceUtils.STRAND_REV);
-        CoverageInterval overlapIntervalSumOrFwdEnd = new CoverageInterval(connector.getTrackID(), strandFwdOrBoth);
-        CoverageInterval overlapIntervalRevEnd = new CoverageInterval(connector.getTrackID(), SequenceUtils.STRAND_REV);
+        
+        CoverageInterval overlapIntervalSumOrFwdStart = new CoverageInterval(connector.getTrackID(), chromId, strandFwdOrBoth);
+        CoverageInterval overlapIntervalRevStart = new CoverageInterval(connector.getTrackID(), chromId, SequenceUtils.STRAND_REV);
+        CoverageInterval overlapIntervalSumOrFwdEnd = new CoverageInterval(connector.getTrackID(), chromId, strandFwdOrBoth);
+        CoverageInterval overlapIntervalRevEnd = new CoverageInterval(connector.getTrackID(), chromId, SequenceUtils.STRAND_REV);
         CoverageInterval currentTempInterval;
-        int startPos = coverageResult.getLowerBound();
+        int startPos = coverageResult.getRequest().getFrom();
         for (int i = 0; i < tempIntervals.size(); i++) {
             currentTempInterval = tempIntervals.get(i);
-            if (startPos - 1 == currentTempInterval.getStop()) {
+            if (startPos - 1 == currentTempInterval.getStop() && currentTempInterval.getChromId() == chromId) {
                 if (    currentTempInterval.getStrandString().equals(SequenceUtils.STRAND_BOTH_STRING)
                      || currentTempInterval.getStrandString().equals(SequenceUtils.STRAND_FWD_STRING)) {
 
@@ -117,7 +118,7 @@ public class AnalysisCoverage implements Observer, AnalysisI<CoverageIntervalCon
                     overlapIntervalRevStart = tempIntervals.get(i);
                 }
             }
-            if (coverageResult.getUpperBound() + 1 == currentTempInterval.getStart()) {
+            if (coverageResult.getRequest().getTo() + 1 == currentTempInterval.getStart()) {
                 if (currentTempInterval.getStrandString().equals(SequenceUtils.STRAND_BOTH_STRING)
                         || currentTempInterval.getStrandString().equals(SequenceUtils.STRAND_FWD_STRING)) {
 
@@ -128,9 +129,11 @@ public class AnalysisCoverage implements Observer, AnalysisI<CoverageIntervalCon
             }
         }
         
-        this.calculateIntervals(overlapIntervalSumOrFwdStart, overlapIntervalSumOrFwdEnd, coverageArraySumOrFwd, strandFwdOrBoth, coverageResult.getLowerBound(), intervalsSumOrFwd);
+        this.calculateIntervals(chromId, overlapIntervalSumOrFwdStart, overlapIntervalSumOrFwdEnd, coverageArraySumOrFwd, 
+                strandFwdOrBoth, coverageResult.getRequest().getFrom(), intervalsSumOrFwd);
         if (!this.parameters.isSumCoverageOfBothStrands()) {
-            this.calculateIntervals(overlapIntervalRevStart, overlapIntervalRevEnd, coverageArrayRev, SequenceUtils.STRAND_REV, coverageResult.getLowerBound(), intervalsRev);
+            this.calculateIntervals(chromId, overlapIntervalRevStart, overlapIntervalRevEnd, coverageArrayRev, 
+                    SequenceUtils.STRAND_REV, coverageResult.getRequest().getFrom(), intervalsRev);
         }
         
         intervalContainer.setIntervalsSumOrFwd(intervalsSumOrFwd);
@@ -149,7 +152,7 @@ public class AnalysisCoverage implements Observer, AnalysisI<CoverageIntervalCon
      * @param intervalListToAddTo the interval list, to which detected intervals 
      * shall be added
      */
-    private void calculateIntervals(CoverageInterval currentInterval, CoverageInterval tempEndInterval, int[] coverageArray, byte strand, 
+    private void calculateIntervals(int chromId, CoverageInterval currentInterval, CoverageInterval tempEndInterval, int[] coverageArray, byte strand, 
             int refIntervalStart, List<CoverageInterval> intervalListToAddTo) {
         
         int summedCoverage = 0;
@@ -164,7 +167,7 @@ public class AnalysisCoverage implements Observer, AnalysisI<CoverageIntervalCon
         if (startPos > 0 && !isCoverageOk) {
             intervalListToAddTo.add(currentInterval);
             tempIntervals.remove(currentInterval);
-            currentInterval = new CoverageInterval(connector.getTrackID(), strand);
+            currentInterval = new CoverageInterval(connector.getTrackID(), chromId, strand);
             startPos = currentInterval.getStart();
         } else if (startPos < 0 && isCoverageOk) {
             addToTempIntervals = true; //an interval possibly overlapping the left boundary of the interval, needs to be stored in temp intervals
@@ -196,7 +199,7 @@ public class AnalysisCoverage implements Observer, AnalysisI<CoverageIntervalCon
                     }
                     //no reinitialization of currentInterval needed, since we are at the end of the data package
                 }
-            } else { 
+            } else {
                 if (isInInterval) { //check if this is the first position which is below (over) given threshold
                     if (addToTempIntervals) { //i - 1, because current position does not satisfy the preliminaries anymore
                         this.storeInterval(currentInterval, startPos, refIntervalStart + i - 1, summedCoverage, tempIntervals);
@@ -205,7 +208,7 @@ public class AnalysisCoverage implements Observer, AnalysisI<CoverageIntervalCon
                         this.storeInterval(currentInterval, startPos, refIntervalStart + i - 1, summedCoverage, intervalListToAddTo);
                     }
                     //reinitialize currentInterval for next interval
-                    currentInterval = new CoverageInterval(connector.getTrackID(), strand);
+                    currentInterval = new CoverageInterval(connector.getTrackID(), chromId, strand);
                     startPos = currentInterval.getStart();
                     isInInterval = false;
                     summedCoverage = 0;

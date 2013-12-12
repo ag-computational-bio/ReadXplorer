@@ -8,6 +8,7 @@ package de.cebitec.readXplorer.transcriptionAnalyses;
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
+import de.cebitec.readXplorer.databackend.dataObjects.ChromosomeObserver;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.exporter.excel.ExcelExportFileChooser;
@@ -73,7 +74,9 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                TableUtils.showPosition(tSSTable, 0, getBoundsInfoManager());
+                int posColumnIdx = 0;
+                int chroColumnIdx = 2;
+                TableUtils.showPosition(tSSTable, posColumnIdx, chroColumnIdx, getBoundsInfoManager());
             }
         });
     }
@@ -112,14 +115,14 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
             },
             new String [] {
-                "Position", "Track", "Strand", "Initial Coverage", "Coverage Increase", "Coverage Increase %", "Correct Feature", "Next Upstream Feature", "Next Downstream Feature", "Novel Transcript", "Transcript Stop"
+                "Position", "Track", "Chromosome", "Strand", "Initial Coverage", "Coverage Increase", "Coverage Increase %", "Correct Feature", "Next Upstream Feature", "Next Downstream Feature", "Novel Transcript", "Transcript Stop"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.Object.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Boolean.class, java.lang.Integer.class
+                java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Boolean.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -131,28 +134,29 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
             }
         });
         tssScrollPane.setViewportView(tSSTable);
-        tSSTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title0")); // NOI18N
-        tSSTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title11")); // NOI18N
-        tSSTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title1")); // NOI18N
-        tSSTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title2")); // NOI18N
-        tSSTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title4")); // NOI18N
-        tSSTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title5")); // NOI18N
-        tSSTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title6")); // NOI18N
-        tSSTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title7")); // NOI18N
-        tSSTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title8")); // NOI18N
-        tSSTable.getColumnModel().getColumn(9).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title9")); // NOI18N
-        tSSTable.getColumnModel().getColumn(10).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title10")); // NOI18N
+        tSSTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title0_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title11_2")); // NOI18N
+        tSSTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title11_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title1_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title2_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title4_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title5_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title6_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title7_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(9).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title8_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(10).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title9_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(11).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title10_1")); // NOI18N
 
-        exportButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.exportButton.text")); // NOI18N
+        exportButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.exportButton.text_1")); // NOI18N
         exportButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 exportButtonActionPerformed(evt);
             }
         });
 
-        parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.parametersLabel.text")); // NOI18N
+        parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.parametersLabel.text_1")); // NOI18N
 
-        statisticsButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.statisticsButton.text")); // NOI18N
+        statisticsButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.statisticsButton.text_1")); // NOI18N
         statisticsButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 statisticsButtonActionPerformed(evt);
@@ -164,7 +168,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(parametersLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 664, Short.MAX_VALUE)
+                .addComponent(parametersLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 1032, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(statisticsButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -222,7 +226,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                 @Override
                 public void run() {
 
-                    final int nbColumns = 11;
+                    final int nbColumns = 12;
 
                     int noCorrectStarts = 0;
                     int noUpstreamFeature = 0;
@@ -248,40 +252,42 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                         }
 
                         Object[] rowData = new Object[nbColumns];
-                        rowData[0] = tSS.getPos();
-                        rowData[1] = tssResultNew.getTrackEntry(tSS.getTrackId(), false);
-                        rowData[2] = strand;
-                        rowData[3] = tSS.getReadStartsAtPos();
-                        rowData[4] = tSS.getCoverageIncrease();
-                        rowData[5] = tSS.getPercentIncrease();
+                        int i = 0;
+                        rowData[i++] = tSS.getPos();
+                        rowData[i++] = tssResultNew.getTrackMap().get(tSS.getTrackId());
+                        rowData[i++] = tssResult.getChromosomeMap().get(tSS.getChromId());
+                        rowData[i++] = strand;
+                        rowData[i++] = tSS.getReadStartsAtPos();
+                        rowData[i++] = tSS.getCoverageIncrease();
+                        rowData[i++] = tSS.getPercentIncrease();
 
                         detFeatures = tSS.getDetFeatures();
                         feature = detFeatures.getCorrectStartFeature();
                         if (feature != null) {
-                            rowData[6] = feature.toString();
+                            rowData[i++] = feature.toString();
                             ++noCorrectStarts;
                         } else {
-                            rowData[6] = "-";
+                            rowData[i++] = "-";
                         }
                         feature = detFeatures.getUpstreamFeature();
                         if (feature != null) {
-                            rowData[7] = feature.toString();
+                            rowData[i++] = feature.toString();
                             ++noUpstreamFeature;
                         } else {
-                            rowData[7] = "-";
+                            rowData[i++] = "-";
                         }
                         feature = detFeatures.getDownstreamFeature();
                         if (feature != null) {
-                            rowData[8] = feature.toString();
+                            rowData[i++] = feature.toString();
                             ++noDownstreamFeature;
                         } else {
-                            rowData[8] = "-";
+                            rowData[i++] = "-";
                         }
 
                         if (tSS instanceof TransStartUnannotated) {
                             tSSU = (TransStartUnannotated) tSS;
-                            rowData[9] = true;
-                            rowData[10] = tSSU.getDetectedStop();
+                            rowData[i++] = true;
+                            rowData[i++] = tSSU.getDetectedStop();
                             ++noUnannotatedTranscripts;
                         } else {
                         }
@@ -311,7 +317,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
                     String unannotatedTranscriptDet = tssParameters.isPerformUnannotatedTranscriptDet() ? "yes" : "no";
                     parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class,
-                            "ResultPanelTranscriptionStart.parametersLabel.text", tssParameters.getMinNoReadStarts(), tssParameters.getMinPercentIncrease(),
+                            "ResultPanelTranscriptionStart.parametersLabel.text_1", tssParameters.getMinNoReadStarts(), tssParameters.getMinPercentIncrease(),
                             tssParameters.getMaxLowCovReadStarts(), tssParameters.getMinLowCovReadStarts(), unannotatedTranscriptDet,
                             tssParameters.getMinTranscriptExtensionCov()));
 
@@ -350,24 +356,26 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
         //get reference sequence for promotor regions
         PersistantReference ref = this.referenceViewer.getReference();
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(ref.getId());
-        String sequence = refConnector.getRefGenome().getSequence();
+        ChromosomeObserver chromObserver = new ChromosomeObserver();
+        String chromSeq = refConnector.getRefGenome().getActiveChromSequence(chromObserver);
         String promotor;
         
         //get the promotor region for each TSS
         int promotorStart;
-        int refSeqLength = ref.getRefLength();
+        int chromLength = chromSeq.length();
         for (TranscriptionStart tSS : this.tssResult.getResults()) {
             if (tSS.isFwdStrand()) {
                 promotorStart = tSS.getPos() - 70;
                 promotorStart = promotorStart < 0 ? 0 : promotorStart;
-                promotor = sequence.substring(promotorStart, tSS.getPos());
+                promotor = chromSeq.substring(promotorStart, tSS.getPos());
             } else {
                 promotorStart = tSS.getPos() + 70;
-                promotorStart = promotorStart > refSeqLength ? refSeqLength : promotorStart;
-                promotor = SequenceUtils.getReverseComplement(sequence.substring(tSS.getPos(), promotorStart));
+                promotorStart = promotorStart > chromLength ? chromLength : promotorStart;
+                promotor = SequenceUtils.getReverseComplement(chromSeq.substring(tSS.getPos(), promotorStart));
             }
             this.promotorRegions.add(promotor);
         }
         tssResult.setPromotorRegions(promotorRegions);
+        refConnector.getRefGenome().getActiveChromosome().removeObserver(chromObserver);
     }
 }

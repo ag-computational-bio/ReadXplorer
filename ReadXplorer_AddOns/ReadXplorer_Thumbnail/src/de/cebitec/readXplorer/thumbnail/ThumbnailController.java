@@ -2,7 +2,6 @@ package de.cebitec.readXplorer.thumbnail;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readXplorer.controller.ViewController;
-import de.cebitec.readXplorer.databackend.IntervalRequest;
 import de.cebitec.readXplorer.databackend.connector.MultiTrackConnector;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;

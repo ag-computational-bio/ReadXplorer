@@ -38,7 +38,8 @@ public class RPKMvalue extends TrackResultEntry {
      * @param coverageRpkm
      * @param trackId Track id.
      */
-    public RPKMvalue(PersistantFeature feature, double rpkm, double logRpkm, double coverageRpkm, double coverageLogRpkm, int readstarts, int coverage, int trackId) {
+    public RPKMvalue(PersistantFeature feature, double rpkm, double logRpkm, double coverageRpkm, double coverageLogRpkm, 
+            int readstarts, int coverage, int trackId) {
         super(trackId);
         this.feature = feature;
         this.rpkm = rpkm;

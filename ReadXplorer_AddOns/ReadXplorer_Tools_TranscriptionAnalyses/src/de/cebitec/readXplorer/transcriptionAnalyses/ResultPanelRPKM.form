@@ -18,7 +18,7 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
               <Component id="parametersLabel" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="230" max="32767" attributes="0"/>
+              <EmptySpace pref="568" max="32767" attributes="0"/>
               <Component id="statisticsButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="histogramButton" min="-2" max="-2" attributes="0"/>
@@ -47,14 +47,14 @@
     <Component class="javax.swing.JLabel" name="parametersLabel">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.parametersLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.parametersLabel.text_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="histogramButton">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.histogramButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.histogramButton.text_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <Events>
@@ -68,10 +68,11 @@
         <Component class="javax.swing.JTable" name="rpkmTable">
           <Properties>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-              <Table columnCount="9" rowCount="0">
+              <Table columnCount="10" rowCount="0">
                 <Column editable="false" title="Feature" type="java.lang.Object"/>
                 <Column editable="false" title="Feature Type" type="java.lang.Object"/>
                 <Column editable="false" title="Track" type="java.lang.Object"/>
+                <Column editable="false" title="Chromosome" type="java.lang.Object"/>
                 <Column editable="false" title="Strand" type="java.lang.String"/>
                 <Column editable="false" title="Start" type="java.lang.Long"/>
                 <Column editable="false" title="Stop" type="java.lang.Long"/>
@@ -84,63 +85,70 @@
               <TableColumnModel selectionModel="0">
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title0" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title0_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title5" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title5_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title8" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title8_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title4" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title9" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title4_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title2" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title1_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title7" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title2_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title3" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title7_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title6" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title3_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title6_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
@@ -157,7 +165,7 @@
     <Component class="javax.swing.JButton" name="exportButton">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.exportButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.exportButton.text_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <Events>
@@ -167,7 +175,7 @@
     <Component class="javax.swing.JButton" name="statisticsButton">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.statisticsButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/Bundle.properties" key="ResultPanelRPKM.statisticsButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <Events>

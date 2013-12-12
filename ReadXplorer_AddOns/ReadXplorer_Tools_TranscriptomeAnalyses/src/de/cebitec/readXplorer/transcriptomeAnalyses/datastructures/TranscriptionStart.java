@@ -1,7 +1,7 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.datastructures;
 
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.TrackResultEntry;
+import de.cebitec.readXplorer.databackend.dataObjects.TrackChromResultEntry;
 
 /**
  * Data structure for storing a gene start with position, strand, initial
@@ -10,7 +10,7 @@ import de.cebitec.readXplorer.databackend.dataObjects.TrackResultEntry;
  *
  * @author -Rolf Hilker-, modified by -jritter-
  */
-public class TranscriptionStart extends TrackResultEntry {
+public class TranscriptionStart extends TrackChromResultEntry {
 
     private int pos;
     private boolean isFwdStrand;
@@ -41,8 +41,9 @@ public class TranscriptionStart extends TrackResultEntry {
      * @param detFeatures object containing the features associated to this
      * predicted gene start
      */
-    public TranscriptionStart(int pos, boolean isFwdStrand, int readStarts, DetectedFeatures detFeatures, int trackId) {
-        super(trackId);
+    public TranscriptionStart(int pos, boolean isFwdStrand, int readStarts, 
+            DetectedFeatures detFeatures, int trackId, int chromId) {
+        super(trackId, chromId);
         this.pos = pos;
         this.isFwdStrand = isFwdStrand;
         this.readStarts = readStarts;
@@ -64,9 +65,13 @@ public class TranscriptionStart extends TrackResultEntry {
      * @param nextOffset
      * @param sequence
      * @param trackId
+     * @param chromId 
      */
-    public TranscriptionStart(int pos, boolean isFwdStrand, int readStarts, double relCount, int[] before, PersistantFeature detectedGene, int offset, int dist2start, int dist2stop, PersistantFeature nextGene, int nextOffset, String sequence, boolean leaderless, boolean cdsShift, boolean putativeUnannotated, String detectedFeatStart, String detectedFeatStop, boolean isInternal, int trackId) {
-        super(trackId);
+    public TranscriptionStart(int pos, boolean isFwdStrand, int readStarts, double relCount, int[] before, 
+            PersistantFeature detectedGene, int offset, int dist2start, int dist2stop, PersistantFeature nextGene, 
+            int nextOffset, String sequence, boolean leaderless, boolean cdsShift, boolean putativeUnannotated, 
+            String detectedFeatStart, String detectedFeatStop, boolean isInternal, int trackId, int chromId) {
+        super(trackId, chromId);
         this.pos = pos;
         this.isFwdStrand = isFwdStrand;
         this.readStarts = readStarts;

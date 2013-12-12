@@ -18,8 +18,8 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetWhole
     
     private final List<Operon> detectedOperons;
 
-    public OperonDetectionResult(Map<Integer, PersistantTrack> trackList, List<Operon> detectedOperons, boolean combineTracks) {//, PersistantTrack currentTrack) {
-        super(trackList, combineTracks);
+    public OperonDetectionResult(Map<Integer, PersistantTrack> trackList, List<Operon> detectedOperons, int refId, boolean combineTracks) {//, PersistantTrack currentTrack) {
+        super(trackList, refId, combineTracks);
         this.detectedOperons = detectedOperons;
     }
 
@@ -35,6 +35,7 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetWhole
         dataColumnDescriptions.add("Feature 1");
         dataColumnDescriptions.add("Feature 2");
         dataColumnDescriptions.add("Track");
+        dataColumnDescriptions.add("Chromosome");
         dataColumnDescriptions.add("Strand");
         dataColumnDescriptions.add("Start Anno 1");
         dataColumnDescriptions.add("Start Anno 2");
@@ -85,6 +86,7 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetWhole
             operonsRow.add(annoName1);
             operonsRow.add(annoName2);
             operonsRow.add(this.getTrackEntry(operon.getTrackId(), true));
+            operonsRow.add(this.getChromosomeMap().get(operon.getOperonAdjacencies().get(0).getFeature1().getChromId()));
             operonsRow.add(strand);
             operonsRow.add(startAnno1);
             operonsRow.add(startAnno2);

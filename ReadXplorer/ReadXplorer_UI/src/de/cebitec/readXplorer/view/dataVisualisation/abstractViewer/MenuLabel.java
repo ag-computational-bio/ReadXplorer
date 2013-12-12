@@ -14,6 +14,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
+ * A MenuLabel only displays a "closed menu" icon, as long as the menu is
+ * closed. When the MenuLabel is clicked, the menu is displayed below the menu
+ * "expanded" icon.
  *
  * @author ddoppmeier, rhilker
  */
@@ -31,9 +34,16 @@ public class MenuLabel extends JLabel implements Observer, Observable {
     private List<Observer> observers;
     
 
+    /**
+     * A MenuLabel only displays a "closed menu" icon, as long as the menu is
+     * closed. When the MenuLabel is clicked, the menu is displayed below the
+     * menu "expanded" icon.
+     * @param associatedPanel The menu panel to display.
+     * @param title The title of the menu.
+     */
     public MenuLabel(JPanel associatedPanel, String title){
         super(title);
-        this.observers = new ArrayList<Observer>();
+        this.observers = new ArrayList<>();
         this.associatedPanel = associatedPanel;
         isShowingLabel = false;
         expandIcon = new ImageIcon(this.getClass().getClassLoader().getResource("de/cebitec/readXplorer/resources/expandIcon.png"));

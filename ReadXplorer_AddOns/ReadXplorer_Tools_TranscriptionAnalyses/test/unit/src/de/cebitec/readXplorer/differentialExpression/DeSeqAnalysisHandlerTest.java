@@ -25,7 +25,7 @@ package de.cebitec.readXplorer.differentialExpression;
 //
 //    private DeSeqAnalysisHandler instance;
 //    private static final int numberOfTracks = 4;
-//    private static List<PersistantTrack> selectedTraks;
+//    private static List<PersistantTrack> selectedTracks;
 //    private static Map<String, String[]> MultiFactorDesign;
 //    private static Map<String, String[]> TwoFactorDesign;
 //
@@ -35,10 +35,10 @@ package de.cebitec.readXplorer.differentialExpression;
 //    @BeforeClass
 //    public static void setUpClass() {
 //        DeAnalysisHandler.TESTING_MODE = true;
-//        selectedTraks = new ArrayList<>();
+//        selectedTracks = new ArrayList<>();
 //        for (int i = 0; i < numberOfTracks; i++) {
 //            Timestamp currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-//            selectedTraks.add(new PersistantTrack(i, "", "track" + i, currentTimestamp, 0, 0));
+//            selectedTracks.add(new PersistantTrack(i, "", "track" + i, currentTimestamp, 0, 0));
 //        }
 //
 //        MultiFactorDesign = new HashMap<>();
@@ -72,13 +72,13 @@ package de.cebitec.readXplorer.differentialExpression;
 //    @Test
 //    public void testPerformAnalysis() {
 //        System.out.println("perform single analysis");
-//        instance = new DeSeqAnalysisHandler(selectedTraks, TwoFactorDesign, false, null, null, 0, true, null, FeatureType.ANY, 300, 0);
+//        instance = new DeSeqAnalysisHandler(selectedTracks, TwoFactorDesign, false, null, null, 0, true, null, FeatureType.ANY, 300, 0);
 //        instance.registerObserver(this);
 //        instance.start();
 //        instance.endAnalysis();
 //
 //        System.out.println("perform multi analysis");
-//        instance = new DeSeqAnalysisHandler(selectedTraks, MultiFactorDesign, true, null, null, 0, true, null, FeatureType.ANY, 300, 0);
+//        instance = new DeSeqAnalysisHandler(selectedTracks, MultiFactorDesign, true, null, null, 0, true, null, FeatureType.ANY, 300, 0);
 //        instance.registerObserver(this);
 //        instance.start();
 //        instance.endAnalysis();

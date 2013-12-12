@@ -48,9 +48,10 @@
         <Component class="javax.swing.JTable" name="coveredFeaturesTable">
           <Properties>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-              <Table columnCount="8" rowCount="0">
+              <Table columnCount="9" rowCount="0">
                 <Column editable="false" title="Feature" type="java.lang.Object"/>
                 <Column editable="false" title="Track" type="java.lang.Object"/>
+                <Column editable="false" title="Chromosome" type="java.lang.Object"/>
                 <Column editable="false" title="Strand" type="java.lang.String"/>
                 <Column editable="false" title="Start" type="java.lang.Integer"/>
                 <Column editable="false" title="Stop" type="java.lang.Integer"/>
@@ -70,49 +71,56 @@
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/genomeAnalyses/Bundle.properties" key="ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title7_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/featureCoverageAnalysis/Bundle.properties" key="ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title7_1_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/genomeAnalyses/Bundle.properties" key="ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title7" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/featureCoverageAnalysis/Bundle.properties" key="ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title8_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/genomeAnalyses/Bundle.properties" key="ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title8" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/featureCoverageAnalysis/Bundle.properties" key="ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title7_2" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/genomeAnalyses/Bundle.properties" key="ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title9" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/featureCoverageAnalysis/Bundle.properties" key="ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title8_2" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/genomeAnalyses/Bundle.properties" key="ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title10" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/featureCoverageAnalysis/Bundle.properties" key="ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title9_2" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/genomeAnalyses/Bundle.properties" key="ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title11" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/featureCoverageAnalysis/Bundle.properties" key="ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title10_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/genomeAnalyses/Bundle.properties" key="ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title12" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/featureCoverageAnalysis/Bundle.properties" key="ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title11_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/readXplorer/featureCoverageAnalysis/Bundle.properties" key="ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title12_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>

@@ -1,8 +1,10 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistant;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.OperonAdjacency;
 import de.cebitec.readXplorer.util.Observer;
 import java.util.ArrayList;
@@ -20,11 +22,11 @@ import jsc.distributions.Normal;
 public class Statistics implements Observer {
 
     private double bg;
-    List<PersistantMapping> mappings;
+    List<MappingResultPersistant> mappingResults;
     /*
-     * uniqueCounts are just counted mappings in font of CDSs
-     * totalCounts are all counted mappings
-     * basetotal are counted bases in all mappings together
+     * uniqueCounts are just counted mappingResults in font of CDSs
+     * totalCounts are all counted mappingResults
+     * basetotal are counted bases in all mappingResults together
      */
     private int totalCount, uniqueCounts, basetotal;
     /**
@@ -35,9 +37,9 @@ public class Statistics implements Observer {
     /*
      * arrays used to store the positions of regionsccounts
      * */
-    private int[] forward, reverse;
-    private int[] fwdCoverage, revCoverage;
-    private int[] region2Exclude;
+    private int[][] forward, reverse;
+    private int[][] fwdCoverage, revCoverage;
+    private List<int[]> region2Exclude;
     protected HashMap<Integer, List<Integer>> forwardCDSs, reverseCDSs;
     /**
      * Key: featureID , Value: PersistantFeature
@@ -47,21 +49,25 @@ public class Statistics implements Observer {
      * Key, FeatureID of the first Feature,
      */
     private HashMap<Integer, OperonAdjacency> putativeOperonAdjacenciesFWD, putativeOperonAdjacenciesREV;
+    private final PersistantReference refGenome;
 
-    public Statistics(int refSeqLength, double fraction, HashMap<Integer, List<Integer>> forwardCDSs, HashMap<Integer, List<Integer>> reverseCDSs, HashMap<Integer, PersistantFeature> allRegionsInHash, int[] region2Exclude) {
+    public Statistics(PersistantReference refGenome, double fraction, HashMap<Integer, List<Integer>> forwardCDSs, 
+            HashMap<Integer, List<Integer>> reverseCDSs, HashMap<Integer, PersistantFeature> allRegionsInHash, List<int[]> region2Exclude) {
 
+        this.refGenome = refGenome;
         this.totalCount = 0;
         this.uniqueCounts = 0;
         this.basetotal = 0;
-        this.forward = new int[refSeqLength];
-        this.reverse = new int[refSeqLength];
-        this.fwdCoverage = new int[refSeqLength];
-        this.revCoverage = new int[refSeqLength];
+        int chromCount = refGenome.getNoChromosomes();
+        this.forward = new int[chromCount][];
+        this.reverse = new int[chromCount][];
+        this.fwdCoverage = new int[chromCount][];
+        this.revCoverage = new int[chromCount][];
         this.forwardCDSs = forwardCDSs;
         this.reverseCDSs = reverseCDSs;
         this.allRegionsInHash = allRegionsInHash;
         this.region2Exclude = region2Exclude;
-        this.mappings = new ArrayList<>();
+        this.mappingResults = new ArrayList<>();
         this.putativeOperonAdjacenciesFWD = new HashMap<>();
         this.putativeOperonAdjacenciesREV = new HashMap<>();
         this.mappingsOnRrnAndTrna = new HashMap<>();
@@ -77,13 +83,13 @@ public class Statistics implements Observer {
     }
 
     /**
-     * Parses all mappings of one Track. Generates a forward and reverse CDS
+     * Parses all mappingResults of one Track. Generates a forward and reverse CDS
      * mapping Arrays, where the information of the covered features is stored.
-     * It also counts all unique mappings and the total base count of the
-     * mappings. By the way it cunstructs a List with OperonAdjacencies for
+     * It also counts all unique mappingResults and the total base count of the
+     * mappingResults. By the way it cunstructs a List with OperonAdjacencies for
      * further analyses.
      *
-     * @param mappings List of PersistenMappings.
+     * @param mappingResults List of PersistenMappings.
      * @param forwardCDSs List of Lists, whereby the intern List a list of the
      * featureIDs of features in forward direction is, that occure on
      * thatPosition.
@@ -96,10 +102,24 @@ public class Statistics implements Observer {
      * @param region2Exclude int[] in genomesize length. 1 on position i means,
      * that on these position a feature occur which we want to exclude.
      */
-    public void parseMappings(List<PersistantMapping> mappings) {
+    public void parseMappings(List<MappingResultPersistant> mappingResults) {
 
-        // Sorting all mappings
+        // Sorting all mappingResults
+        for (MappingResultPersistant result : mappingResults) {
+            int chromId = result.getRequest().getChromId();
+            int chromNo = refGenome.getChromosome(chromId).getChromNumber();
+            int chromLength = refGenome.getChromosome(chromId).getLength();
+            int chromFwd[] = new int[chromLength];
+            int chromRev[] = new int[chromLength];
+            int chromFwdCov[] = new int[chromLength];
+            int chromRevCov[] = new int[chromLength];
+            forward[chromNo] = chromFwd;
+            reverse[chromNo] = chromRev;
+            fwdCoverage[chromNo] = chromFwdCov;
+            revCoverage[chromNo] = chromRevCov;
+            List<PersistantMapping> mappings = result.getMappings();
         Collections.sort(mappings);
+            
         for (PersistantMapping mapping : mappings) {
             this.totalCount++;
             int start = mapping.getStart();
@@ -109,25 +129,25 @@ public class Statistics implements Observer {
             boolean directionFWD = mapping.isFwdStrand();
 
             if (start < stop) {
-                // count only non t/rRNA mappings
-                if (region2Exclude[start] == 0) {
+                    // count only non t/rRNA mappingResults
+                    if (region2Exclude.get(chromNo)[start] == 0) {
                     this.uniqueCounts++;
                 }
                 // count the bases in total
-                if (region2Exclude[start] == 0 || region2Exclude[stop] == 0) {
+                    if (region2Exclude.get(chromNo)[start] == 0 || region2Exclude.get(chromNo)[stop] == 0) {
                     this.basetotal += stop - start + 1;
                 }
                 
-                // Hash is in preparation for mappings which covers a r or t RNA 
+                    // Hash is in preparation for mappingResults which covers a r or t RNA 
                 // this hashmap needed for excluding TSSs of a r or t RNA
-                if (region2Exclude[start] != 0 || region2Exclude[stop] != 0) {
+                    if (region2Exclude.get(chromNo)[start] != 0 || region2Exclude.get(chromNo)[stop] != 0) {
                     int pos;
-                    if(region2Exclude[start] != 0) {
+                        if (region2Exclude.get(chromNo)[start] != 0) {
                         pos = start;
                     } else {
                         pos = stop;
                     }
-                    if(mappingsOnRrnAndTrna.containsKey(pos)) {
+                        if (mappingsOnRrnAndTrna.containsKey(pos)) {
                         mappingsOnRrnAndTrna.get(pos).add(id);
                     } else {
                         List<Long> list = new ArrayList<>();
@@ -140,9 +160,9 @@ public class Statistics implements Observer {
                 //	# sum up the total coverage at each positions
                 //	# (this is needed for extending genes later)
                 if (directionFWD) {
-                    this.forward[start]++;
+                        chromFwd[start]++;
                     for (int i = start; i < stop; i++) {// map {$_++} @{$coverage{fwd}}[$sstart..$sstop];
-                        this.fwdCoverage[i]++;
+                            chromFwdCov[i]++;
                     }
                     if (forwardCDSs.containsKey(Integer.valueOf(start)) && forwardCDSs.containsKey(Integer.valueOf(stop))) {
                         for (int featureIDfwd1 : forwardCDSs.get(start)) {
@@ -161,9 +181,9 @@ public class Statistics implements Observer {
                     }
 
                 } else {
-                    this.reverse[stop]++;
+                        chromRev[stop]++;
                     for (int i = start; i < stop; i++) {// map {$_++} @{$coverage{rev}}[$sstart..$sstop];
-                        this.revCoverage[i]++;
+                            chromRevCov[i]++;
                     }
 
                     if (reverseCDSs.containsKey(Integer.valueOf(stop)) && reverseCDSs.containsKey(Integer.valueOf(start))) {
@@ -184,6 +204,8 @@ public class Statistics implements Observer {
                 }
             }
         }
+
+    }
     }
 
     /**
@@ -233,17 +255,17 @@ public class Statistics implements Observer {
 
     /**
      * Calculates the inverse of the normal distribution. The mean is count of
-     * unique mappings divided by the length of the reference * 2. The variance
+     * unique mappingResults divided by the length of the reference * 2. The variance
      * is equals mean.
      *
      * @param fraction Fraction needed for calculation of allowed false
      * pasitives.
-     * @param refSeqLength length of reference genome.
      * @return
      */
-    public double calculateBackgroundCutoff(double fraction, int refSeqLength) {
+    public double calculateBackgroundCutoff(double fraction) {
 //        int length = refSeqLength * 2;
-        double mean = (double) this.uniqueCounts / refSeqLength;
+        int wholeGenomeLength = PersistantReference.calcWholeGenomeLength(refGenome.getChromosomes());
+        double mean = (double) this.uniqueCounts / wholeGenomeLength;
         double standardDiviation = Math.sqrt(mean);
         double inverseCdf = 0;
         jsc.distributions.Normal normal = new Normal(mean, standardDiviation);
@@ -289,19 +311,19 @@ public class Statistics implements Observer {
         return this.bg;
     }
 
-    public int[] getForward() {
+    public int[][] getForward() {
         return forward;
     }
 
-    public int[] getReverse() {
+    public int[][] getReverse() {
         return reverse;
     }
 
-    public int[] getFwdCoverage() {
+    public int[][] getFwdCoverage() {
         return fwdCoverage;
     }
 
-    public int[] getRevCoverage() {
+    public int[][] getRevCoverage() {
         return revCoverage;
     }
 
@@ -325,20 +347,18 @@ public class Statistics implements Observer {
         return basetotal;
     }
 
-    public List<PersistantMapping> getMappings() {
-        return mappings;
+    public List<MappingResultPersistant> getMappingResults() {
+        return mappingResults;
     }
 
-    public void setMappings(List<PersistantMapping> mappings) {
-        this.mappings.addAll(mappings);
+    public void addMappingResult(MappingResultPersistant result) {
+        this.mappingResults.add(result);
     }
 
     @Override
     public void update(Object args) {
         if (args instanceof MappingResultPersistant) {
-            MappingResultPersistant results = (MappingResultPersistant) args;
-//            parseMappings(results.getMappings());
-            setMappings(results.getMappings());
+            addMappingResult((MappingResultPersistant) args);
         }
     }
 

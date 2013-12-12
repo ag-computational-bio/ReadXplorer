@@ -82,7 +82,7 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
         this.setHorizontalMargin(10);
         this.setupComponents();
         this.setActive(false);
-        this.readPairs = new ReadPairResultPersistant(null, 0, 0);
+        this.readPairs = new ReadPairResultPersistant(null, null);
     }
 
     @Override
@@ -113,7 +113,7 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
         if (this.isInDrawingMode()) {
             int from = this.getBoundsInfo().getLogLeft();
             int to = this.getBoundsInfo().getLogRight();
-            if (from != this.oldLogLeft || to != this.oldLogRight) {                
+            if (from != this.oldLogLeft || to != this.oldLogRight || this.isNewDataRequestNeeded()) {                
                 this.requestData(from, to);
             }
         }
@@ -131,11 +131,11 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
         this.removeAll();
         //check for feature types in the exclusion list and adapt database query for performance
         List<FeatureType> excludedFeatureTypes = this.getExcludedFeatureTypes();
-        //TODO: add unique filter to seq pair viewer
+        //TODO: add unique filter to read pair viewer
         this.mappingsLoading = true;
         ParametersReadClasses readClassParams = new ParametersReadClasses(!excludedFeatureTypes.contains(FeatureType.PERFECT_PAIR),
                 !excludedFeatureTypes.contains(FeatureType.DISTORTED_PAIR), !excludedFeatureTypes.contains(FeatureType.SINGLE_MAPPING), false);
-        trackConnector.addMappingRequest(new IntervalRequest(from, to, from - 1000, to + 1000, this, false, 
+        trackConnector.addMappingRequest(new IntervalRequest(from, to, from - 1000, to + 1000, this.getRefGen().getActiveChromId(), this, false, 
                 Properties.READ_PAIRS, Byte.valueOf("0"), readClassParams));
         this.oldLogLeft = from;
         this.oldLogRight = to;

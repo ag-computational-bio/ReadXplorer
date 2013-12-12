@@ -1,12 +1,11 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
-import de.cebitec.readXplorer.transcriptomeAnalyses.enums.AnalysisStatus;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.AnalysisStatus;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Pair;
@@ -27,10 +26,10 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
 
     private TrackConnector trackConnector;
     private PersistantTrack selectedTrack;
-    private List<PersistantMapping> mappings;
+    private int refGenomeID;
     private double fraction;
     private List<de.cebitec.readXplorer.util.Observer> observer = new ArrayList<>();
-    private int[] region2Exclude;
+    private List<int[]> region2Exclude;
     protected HashMap<Integer, List<Integer>> forwardCDSs, reverseCDSs;
     private Statistics stats;
     private double backgroundCutoff;
@@ -52,6 +51,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
     public FiveEnrichedDataAnalysesHandler(PersistantTrack selectedTrack, ParameterSetFiveEnrichedAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, HashMap<Integer, PersistantTrack> trackMap) {
 
         this.selectedTrack = selectedTrack;
+        this.refGenomeID = refViewer.getReference().getId();
         this.fraction = parameterset.getFraction();
         this.parameters = parameterset;
         this.refViewer = refViewer;
@@ -80,7 +80,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
         // geting Mappings and calculate statistics on mappings.
         try {
             this.trackConnector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(this.selectedTrack);
-            this.stats = new Statistics(featureParser.getRefSeqLength(), this.fraction, this.forwardCDSs, this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
+            this.stats = new Statistics(trackConnector.getRefGenome(), this.fraction, this.forwardCDSs, this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
             de.cebitec.readXplorer.databackend.AnalysesHandler handler = new de.cebitec.readXplorer.databackend.AnalysesHandler(trackConnector, this, "Collecting coverage data of track number "
                     + this.selectedTrack.getId(), new ParametersReadClasses(true, false, false, false)); // TODO: ParameterReadClasses noch in den Wizard einbauen und die parameter hier mit übergeben!
             handler.setMappingsNeeded(true);
@@ -109,6 +109,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
         }
     }
 
+
     @Override
     public void run() {
         notifyObservers(AnalysisStatus.RUNNING);
@@ -130,15 +131,14 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
         final int trackId = dataTypePair.getFirst();
         final String dataType = dataTypePair.getSecond();
 
-        this.mappings = this.stats.getMappings();
-        this.stats.parseMappings(this.mappings);
-        this.backgroundCutoff = this.stats.calculateBackgroundCutoff(this.parameters.getFraction(), this.featureParser.getRefSeqLength());
+        this.stats.parseMappings(this.stats.getMappingResults());
+        this.backgroundCutoff = this.stats.calculateBackgroundCutoff(this.parameters.getFraction());
         this.stats.setBg(this.backgroundCutoff);
 
         this.stats.initMappingsStatistics();
         if (parameters.isPerformTSSAnalysis()) {
-            this.tssDetection = new TssDetection(this.trackConnector.getRefGenome().getSequence(), trackId);
-            this.tssDetection.runningTSSDetection(this.featureParser.getRefSeqLength(), this.forwardCDSs, this.reverseCDSs,
+            this.tssDetection = new TssDetection(this.trackConnector.getRefGenome(), trackId);
+            this.tssDetection.runningTSSDetection(this.forwardCDSs, this.reverseCDSs,
                     this.allRegionsInHash, this.stats, this.parameters);
 
             String trackNames;
@@ -147,7 +147,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
                 transcriptionStartResultPanel.setReferenceViewer(refViewer);
             }
 
-            TSSDetectionResults tssResult = new TSSDetectionResults(this.stats, this.tssDetection.getResults(), getTrackMap());
+            TSSDetectionResults tssResult = new TSSDetectionResults(this.stats, this.tssDetection.getResults(), getTrackMap(), refGenomeID);
             tssResult.setParameters(this.parameters);
             transcriptionStartResultPanel.addResult(tssResult);
 
@@ -161,7 +161,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
                     novelRegionResultPanel.setReferenceViewer(refViewer);
                 }
 
-                NovelRegionResult nrResult = new NovelRegionResult(trackMap, this.tssDetection.getDetectedPutativeNewRegions(), false);
+                NovelRegionResult nrResult = new NovelRegionResult(trackMap, this.tssDetection.getDetectedPutativeNewRegions(), refGenomeID, false);
                 nrResult.setParameters(this.parameters);
                 novelRegionResultPanel.addResult(nrResult);
 
@@ -177,7 +177,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
                     antisenseResultPanel.setReferenceViewer(refViewer);
                 }
 
-                ResultsAntisense asResult = new ResultsAntisense(trackMap, this.tssDetection.getDetectedPutativeAntisenseTSS(), false);
+                ResultsAntisense asResult = new ResultsAntisense(trackMap, this.tssDetection.getDetectedPutativeAntisenseTSS(), refGenomeID, false);
                 asResult.setParameters(this.parameters);
                 antisenseResultPanel.addResult(asResult);
 
@@ -197,7 +197,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
         return reverseCDSs;
     }
 
-    public int[] getRegion2Exclude() {
+    public List<int[]> getRegion2Exclude() {
         return region2Exclude;
     }
 

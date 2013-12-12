@@ -30,11 +30,13 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
      * @param trackMap the map of track ids to the PersistantTrack used for this
      * analysis
      * @param rpkmResults The result list of RPKM values and read counts
-     * @param combineTracks true, if the tracks in the list are combined, false
-     * otherwise 
+     * @param referenceId id of the reference genome, for which this result was
+     * generated
+     * @param combineTracks <cc>true</cc>, if the tracks in the list are
+     * combined, <cc>false</cc> otherwise
      */
-    public RPKMAnalysisResult(Map<Integer, PersistantTrack> trackMap, List<RPKMvalue> rpkmResults, boolean combineTracks) {
-        super(trackMap, combineTracks);
+    public RPKMAnalysisResult(Map<Integer, PersistantTrack> trackMap, List<RPKMvalue> rpkmResults, int referenceId, boolean combineTracks) {
+        super(trackMap, referenceId, combineTracks);
         this.rpkmResults = rpkmResults;
     }
     

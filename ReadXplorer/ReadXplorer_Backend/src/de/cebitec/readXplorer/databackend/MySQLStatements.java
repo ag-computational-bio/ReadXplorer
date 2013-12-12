@@ -16,9 +16,22 @@ public class MySQLStatements {
             FieldNames.REF_GEN_ID+" BIGINT PRIMARY KEY, " +
             FieldNames.REF_GEN_NAME+" VARCHAR(200) NOT NULL, " +
             FieldNames.REF_GEN_DESCRIPTION+" VARCHAR(200) NOT NULL," +
-            FieldNames.REF_GEN_SEQUENCE+" LONGTEXT NOT NULL, " +
+      //      FieldNames.REF_GEN_SEQUENCE+" LONGTEXT NOT NULL, " +
             FieldNames.REF_GEN_TIMESTAMP+" DATETIME NOT NULL" +
             ") ";
+
+    
+    public final static String SETUP_CHROMOSOME =
+            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_CHROMOSOME + " "
+            + "("
+            + FieldNames.CHROM_ID + " BIGINT PRIMARY KEY, "
+            + FieldNames.CHROM_NUMBER + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.CHROM_REFERENCE_ID + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.CHROM_NAME + " VARCHAR(200) NOT NULL, "
+            + FieldNames.CHROM_LENGTH + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.CHROM_SEQUENCE + " LONGTEXT NOT NULL, "
+            + "INDEX (" + FieldNames.CHROM_REFERENCE_ID + ") "
+            + ") ";
 
     public final static String SETUP_POSITIONS =
             "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_POSITIONS + " "
@@ -80,7 +93,7 @@ public class MySQLStatements {
             "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_FEATURES +
             " (" +
             FieldNames.FEATURE_ID+" BIGINT PRIMARY KEY, " +
-            FieldNames.FEATURE_REFGEN_ID+" BIGINT UNSIGNED NOT NULL, "+
+            FieldNames.FEATURE_CHROMOSOME_ID+" BIGINT UNSIGNED NOT NULL, "+
             FieldNames.FEATURE_PARENT_IDS + " VARCHAR (1000) NOT NULL, " +
             FieldNames.FEATURE_TYPE+" TINYINT UNSIGNED NOT NULL, " +
             FieldNames.FEATURE_START+" BIGINT UNSIGNED NOT NULL, " +
@@ -90,7 +103,7 @@ public class MySQLStatements {
             FieldNames.FEATURE_EC_NUM+" VARCHAR (20), " +
             FieldNames.FEATURE_STRAND+" TINYINT NOT NULL, " +
             FieldNames.FEATURE_GENE+" VARCHAR (20), " +
-            "INDEX ("+FieldNames.FEATURE_REFGEN_ID+") " +
+            "INDEX ("+FieldNames.FEATURE_CHROMOSOME_ID+") " +
             ") ";
 
     
@@ -117,7 +130,7 @@ public class MySQLStatements {
             "( " +
             FieldNames.TRACK_ID+ " BIGINT UNSIGNED PRIMARY KEY, " +
             FieldNames.TRACK_REFERENCE_ID+" BIGINT UNSIGNED NOT NULL, " +
-            FieldNames.TRACK_SEQUENCE_PAIR_ID+" BIGINT UNSIGNED, " + //only for paired sequences
+            FieldNames.TRACK_READ_PAIR_ID+" BIGINT UNSIGNED, " + //only for paired sequences
             FieldNames.TRACK_DESCRIPTION+" VARCHAR (1000) NOT NULL, " +
             FieldNames.TRACK_TIMESTAMP+" DATETIME NOT NULL, " +
             //FieldNames.TRACK_RUN+" BIGINT UNSIGNED NOT NULL, "+

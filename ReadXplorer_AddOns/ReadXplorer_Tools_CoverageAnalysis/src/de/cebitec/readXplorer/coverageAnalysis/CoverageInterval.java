@@ -11,6 +11,7 @@ public class CoverageInterval {
 
     private boolean isFwdStrand;
     private int trackId;
+    private int chromId;
     private byte strand;
     private int start;
     private int stop;
@@ -20,13 +21,15 @@ public class CoverageInterval {
     /**
      * A complete coverage interval object.
      * @param trackId the track id of the track to which the interval belongs
+     * @param chromId The id of the chromosome to which this interval belongs
      * @param strand the strand, for which the interval shall be created
      * @param start the start position of the interval
      * @param stop the stop position of the interval
      * @param meanCoverage the mean coverage of the interval
      */
-    public CoverageInterval(int trackId, byte strand, int start, int stop, int meanCoverage) {
+    public CoverageInterval(int trackId, int chromId, byte strand, int start, int stop, int meanCoverage) {
         this.trackId = trackId;
+        this.chromId = chromId;
         this.strand = strand;
         this.start = start;
         this.stop = stop;
@@ -39,10 +42,11 @@ public class CoverageInterval {
      * Constructor for a blank coverage interval. Start and stop are -1, length
      * and meanCoverage are 0.
      * @param trackId the track id of the track to which the interval belongs
+     * @param chromId The id of the chromosome to which this interval belongs
      * @param strand the strand, for which the interval shall be created
      */
-    public CoverageInterval(int trackId, byte strand) {
-        this(trackId, strand, -1, -1, 0);
+    public CoverageInterval(int trackId, int chromId, byte strand) {
+        this(trackId, chromId, strand, -1, -1, 0);
     }
 
     /**
@@ -73,6 +77,13 @@ public class CoverageInterval {
      */
     public int getTrackId() {
         return trackId;
+    }
+
+    /**
+     * @return The id of the chromosome to which this interval belongs.
+     */
+    public int getChromId() {
+        return chromId;
     }
 
     /**
@@ -108,6 +119,13 @@ public class CoverageInterval {
      */
     public void setTrack(int trackId) {
         this.trackId = trackId;
+    }
+
+    /**
+     * @param chromId The id of the chromosome to which this interval belongs
+     */
+    public void setChromId(int chromId) {
+        this.chromId = chromId;
     }
 
     /**

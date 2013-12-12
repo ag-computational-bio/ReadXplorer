@@ -16,7 +16,7 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="inputTableScrollPane" alignment="0" pref="0" max="32767" attributes="0"/>
+          <Component id="inputTableScrollPane" alignment="0" pref="426" max="32767" attributes="0"/>
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="32767" attributes="0"/>
               <Component id="chartsButton" min="-2" max="-2" attributes="0"/>
@@ -63,14 +63,14 @@
     <Component class="javax.swing.JButton" name="exportButton">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readxplorer/transcriptomeAnalyses/importer/excel/Bundle.properties" key="ImportPanel.exportButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/excelImport/Bundle.properties" key="ImportPanel.exportButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="chartsButton">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readxplorer/transcriptomeAnalyses/importer/excel/Bundle.properties" key="ImportPanel.chartsButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/excelImport/Bundle.properties" key="ImportPanel.chartsButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>

@@ -5,12 +5,12 @@
  */
 package de.cebitec.readXplorer.ui.importer;
 
-import de.cebitec.readXplorer.parser.mappings.JokToBamDirectParser;
-import de.cebitec.readXplorer.parser.mappings.MappingParserI;
-import de.cebitec.readXplorer.parser.mappings.SamBamDirectParser;
 import de.cebitec.readXplorer.api.objects.NewJobDialogI;
 import de.cebitec.readXplorer.parser.ReferenceJob;
 import de.cebitec.readXplorer.parser.common.ParserI;
+import de.cebitec.readXplorer.parser.mappings.JokToBamDirectParser;
+import de.cebitec.readXplorer.parser.mappings.MappingParserI;
+import de.cebitec.readXplorer.parser.mappings.SamBamDirectParser;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readXplorer.view.dialogMenus.ImportTrackBasePanel;
 import java.awt.Component;
@@ -441,9 +441,6 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel implement
                     
                     for (int i = 0; i < files.length; ++i) {
                         this.addFile(files[i]);
-                        if (!(getCurrentParser() instanceof JokToBamDirectParser)) {
-                            checkSeqDictonary(files[i]);
-                        }
                     }
 
                     mappingFile1Field.setText(getMappingFiles().size() + " tracks to import");
@@ -456,9 +453,6 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel implement
                 } else {
                     File file = this.getSelectedFile();
                     this.addFile(file);
-                    if (!(getCurrentParser() instanceof JokToBamDirectParser)) {
-                        checkSeqDictonary(file);
-                    }
 
 //                    String path = mappingFiles1 == null ? mappingFiles2.get(mappingFiles2.size() - 1).getAbsolutePath()
 //                            : mappingFiles1.get(mappingFiles1.size() - 1).getAbsolutePath();

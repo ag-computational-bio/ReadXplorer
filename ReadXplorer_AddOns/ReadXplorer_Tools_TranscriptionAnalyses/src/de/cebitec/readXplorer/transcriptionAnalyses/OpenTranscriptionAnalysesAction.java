@@ -296,7 +296,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                             transcriptionStartResultPanel.setReferenceViewer(refViewer);
                         }
 
-                        TssDetectionResult tssResult = new TssDetectionResult(analysisTSS.getResults(), trackMap, combineTracks);
+                        TssDetectionResult tssResult = new TssDetectionResult(analysisTSS.getResults(), trackMap, referenceId, combineTracks);
                         tssResult.setParameters(parametersTss);
                         transcriptionStartResultPanel.addResult(tssResult);
 
@@ -316,7 +316,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                                 operonResultPanel.setBoundsInfoManager(refViewer.getBoundsInformationManager());
                             }
                             OperonDetectionResult operonDetectionResult = new OperonDetectionResult(trackMap,
-                                    trackToAnalysisMap.get(trackId).getAnalysisOperon().getResults(), combineTracks);
+                                    trackToAnalysisMap.get(trackId).getAnalysisOperon().getResults(), referenceId, combineTracks);
                             operonDetectionResult.setParameters(parametersOperonDet);
                             operonResultPanel.addResult(operonDetectionResult);
 
@@ -334,7 +334,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                                 rpkmResultPanel.setBoundsInfoManager(refViewer.getBoundsInformationManager());
                             }
                             RPKMAnalysisResult rpkmAnalysisResult = new RPKMAnalysisResult(trackMap,
-                                    trackToAnalysisMap.get(trackId).getAnalysisRPKM().getResults(), combineTracks);
+                                    trackToAnalysisMap.get(trackId).getAnalysisRPKM().getResults(), referenceId, combineTracks);
                             rpkmAnalysisResult.setParameters(parametersRPKM);
                             rpkmAnalysisResult.setNoGenomeFeatures(rpkmAnalysis.getNoGenomeFeatures());
                             rpkmResultPanel.addResult(rpkmAnalysisResult);

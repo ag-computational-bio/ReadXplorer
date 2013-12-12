@@ -1,5 +1,6 @@
 package de.cebitec.readXplorer.databackend.dataObjects;
 
+import de.cebitec.readXplorer.databackend.IntervalRequest;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,6 @@ public class CoverageAndDiffResultPersistant extends PersistantResult implements
     private PersistantCoverage readStarts;
     private List<PersistantDiff> diffs;
     private List<PersistantReferenceGap> gaps;
-    private boolean diffsAndGapsUsed;
     
     /**
      * Data storage for coverage, diffs and gaps.
@@ -30,16 +30,15 @@ public class CoverageAndDiffResultPersistant extends PersistantResult implements
      *      or an empty list.
      * @param gaps the list of gaps to store, if they are not use, you can add null
      *      or an empty list
-     * @param diffsAndGapsUsed true, if this is a result from querying also diffs and gaps
+     * @param request the interval request for which this result was generated
      */
     public CoverageAndDiffResultPersistant(PersistantCoverage coverage, List<PersistantDiff> diffs, List<PersistantReferenceGap> gaps, 
-            boolean diffsAndGapsUsed) {
-        super(coverage.getLeftBound(), coverage.getRightBound());
+            IntervalRequest request) {
+        super(request);
         this.coverage = coverage;
         this.readStarts = null;
         this.diffs = diffs;
         this.gaps = gaps;
-        this.diffsAndGapsUsed = diffsAndGapsUsed;
     }
     
     /**
@@ -90,13 +89,5 @@ public class CoverageAndDiffResultPersistant extends PersistantResult implements
      */
     public void setReadStarts(PersistantCoverage readStarts) {
         this.readStarts = readStarts;
-    }
-    
-
-    /**
-     * @return true, if diffs and gaps were querried, false, if not
-     */
-    public boolean isDiffsAndGapsUsed() {
-        return this.diffsAndGapsUsed;
     }       
 }

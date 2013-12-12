@@ -12,7 +12,7 @@ public final class TssDetectionParamsVisualPanel extends JPanel {
     private final String wizardName;
     private ReferenceConnector refGenConnector;
     private int nbOfFeatures;
-    private int referenceLength;
+    private int chromLength;
 
     /**
      * Creates new form TssDetectionParamsVisualPanel
@@ -28,8 +28,9 @@ public final class TssDetectionParamsVisualPanel extends JPanel {
         this.ratioTextPane.setEditable(false);
         this.updateFields();
         this.refGenConnector = ProjectConnector.getInstance().getRefGenomeConnector(referenceID);
-        this.referenceLength = refGenConnector.getRefGenome().getRefLength();
-        this.nbOfFeatures = refGenConnector.getFeaturesForClosedInterval(0, this.referenceLength - 1).size();
+        this.chromLength = refGenConnector.getRefGenome().getActiveChromLength();
+        this.nbOfFeatures = refGenConnector.getFeaturesForClosedInterval(0, this.chromLength - 1, 
+                refGenConnector.getRefGenome().getActiveChromId()).size();
     }
 
     @Override
@@ -316,7 +317,7 @@ public final class TssDetectionParamsVisualPanel extends JPanel {
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             if (Double.valueOf(fractionTextField.getText()) > 0.0) {
                 double fraction = Double.parseDouble(fractionTextField.getText());
-                double result = (this.referenceLength / this.nbOfFeatures) * fraction;
+                double result = (this.chromLength / this.nbOfFeatures) * fraction;
                 this.resultLabel.setText("" + result);
             }
         }

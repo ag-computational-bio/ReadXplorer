@@ -8,7 +8,6 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.readXplorer.view.dialogMenus.OpenTracksVisualPanel;
 import de.cebitec.readXplorer.view.dialogMenus.OpenTracksWizardPanel;
 import de.cebitec.readXplorer.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
 import de.cebitec.readXplorer.view.dialogMenus.SelectReadClassWizardPanel;
@@ -199,7 +198,7 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
 
                 AnalysisCoverage analysisCoverage = trackToAnalysisMap.get(trackId);
                 analysisCoverage.finishAnalysis();
-                final CoverageAnalysisResult result = new CoverageAnalysisResult(analysisCoverage.getResults(), trackMap, combineTracks);
+                final CoverageAnalysisResult result = new CoverageAnalysisResult(analysisCoverage.getResults(), trackMap, referenceId, combineTracks);
            
                 result.setParameters(parameters);
                 

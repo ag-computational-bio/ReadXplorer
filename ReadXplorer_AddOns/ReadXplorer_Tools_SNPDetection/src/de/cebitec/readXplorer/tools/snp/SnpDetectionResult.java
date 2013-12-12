@@ -27,10 +27,14 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
     /**
      * New snp data object.
      * @param snpList list of snps of the analysis
-     * @param trackNames hashmap of track ids to track names used in the analysis
+     * @param trackMap hashmap of track ids to the tracks used in the analysis
+     * @param referenceId id of the reference genome, for which this result was
+     * generated
+     * @param combineTracks <cc>true</cc>, if the tracks in the list are
+     * combined, <cc>false</cc> otherwise
      */
-    public SnpDetectionResult(List<SnpI> snpList, Map<Integer, PersistantTrack> trackNames, boolean combineTracks) {
-        super(trackNames, combineTracks);
+    public SnpDetectionResult(List<SnpI> snpList, Map<Integer, PersistantTrack> trackMap, int referenceId, boolean combineTracks) {
+        super(trackMap, referenceId, combineTracks);
         this.snpList = snpList;
     }
     
@@ -69,6 +73,7 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
             snpExport.add(snp.getPosition());
             snpExport.add(snp.getGapOrderIndex());
             snpExport.add(this.getTrackEntry(snp.getTrackId(), true));
+            snpExport.add(this.getChromosomeMap().get(snp.getChromId()));
             snpExport.add(snp.getBase());
             snpExport.add(snp.getRefBase());
             snpExport.add(snp.getARate());
@@ -204,6 +209,7 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
         dataColumnDescriptions.add("Position");
         dataColumnDescriptions.add("Gap Index");
         dataColumnDescriptions.add("Track");
+        dataColumnDescriptions.add("Chromosome");
         dataColumnDescriptions.add("Base");
         dataColumnDescriptions.add("Reference");
         dataColumnDescriptions.add("A");

@@ -9,10 +9,9 @@ import java.util.List;
  *
  * @author ddoppmeier, jhess, rhilker
  */
-public class Snp implements SnpI {
+public class Snp extends TrackChromResultEntry implements SnpI {
     
     private int position;
-    private int trackId;
     private char base;
     private char refBase;
     private int aRate;
@@ -31,7 +30,8 @@ public class Snp implements SnpI {
     /**
      * A SNP. The data structure for storing a basic SNP.
      * @param position
-     * @param trackId
+     * @param trackId The track id of this SNP.
+     * @param chromId The chromosome id of this SNP.
      * @param base
      * @param refBase
      * @param aRate
@@ -45,16 +45,17 @@ public class Snp implements SnpI {
      * @param type type can be among S = substitution, I = insertion, D = deletion, M = match according to
      *  Snp.SUB, Snp.INS, Snp.DEL, Snp.MATCH
      */
-    public Snp(int position,int trackId, char base, char refBase, int aRate, int cRate, 
+    public Snp(int position, int trackId, int chromId, char base, char refBase, int aRate, int cRate, 
                     int gRate, int tRate, int nRate, int gapRate, int coverage,
                     int frequency, SequenceComparison type) {
-        this(position, trackId, base, refBase, aRate, cRate, gRate, tRate, nRate, gapRate, coverage, frequency, type, 0);
+        this(position, trackId, chromId, base, refBase, aRate, cRate, gRate, tRate, nRate, gapRate, coverage, frequency, type, 0);
     }
 
     /**
      * A SNP. The data structure for storing a basic SNP.
      * @param position
-     * @param trackId
+     * @param trackId The track id of this SNP.
+     * @param chromId The chromosome id of this SNP.
      * @param base
      * @param refBase
      * @param aRate
@@ -69,12 +70,12 @@ public class Snp implements SnpI {
      *  Snp.SUB, Snp.INS, Snp.DEL, Snp.MATCH
      * @param gapOrderIndex 
      */
-    public Snp(int position, int trackId, char base, char refBase, int aRate, int cRate,
+    public Snp(int position, int trackId, int chromId, char base, char refBase, int aRate, int cRate,
             int gRate, int tRate, int nRate, int gapRate, int coverage,
             int frequency, SequenceComparison type, int gapOrderIndex) {
+        super(trackId, chromId);
         
         this.position = position;
-        this.trackId = trackId;
         this.base = base;
         this.refBase = refBase;
         this.aRate = aRate;
@@ -94,12 +95,7 @@ public class Snp implements SnpI {
     @Override
     public int getPosition() {
         return position;
-    }
-    
-    public int getTrackId() {
-        return trackId;
     }    
-    
     
     @Override
     public String getBase() {
@@ -210,9 +206,9 @@ public class Snp implements SnpI {
 
     @Override
     public String toString(){
-        return "position: "+position+"\tbase: "+base+"\trefBase: "+refBase+"\taRate: "+aRate+"\tcRate: "
-                +cRate+"\tgRate: "+gRate+ "\ttRate: "+tRate+"\tnRate: "+nRate+"\tgapRate: "
-                +gapRate+"\tcoverage: "+coverage+"\tfrequency: "+frequency+"%\ttype: "+type;
+        return "position: "+position+"\ttrack: "+this.getTrackId()+"\tchromosome: "+this.getChromId()+"\trefBase: "+refBase
+                +"\taRate: "+aRate+"\tcRate: "+cRate+"\tgRate: "+gRate+ "\ttRate: "+tRate+"\tnRate: "+nRate
+                +"\tgapRate: "+gapRate+"\tcoverage: "+coverage+"\tfrequency: "+frequency+"%\ttype: "+type;
     }
 
     @Override

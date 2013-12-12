@@ -59,7 +59,9 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                TableUtils.showPosition(operonDetectionTable, 4, getBoundsInfoManager());
+                int posColumnIdx = 5;
+                int chromColumnIdx = 4;
+                TableUtils.showPosition(operonDetectionTable, posColumnIdx, chromColumnIdx, getBoundsInfoManager());
             }
         });
     }
@@ -94,14 +96,14 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
 
             },
             new String [] {
-                "Feature 1", "Feature 2", "Track", "Strand", "Start Feature 1", "Start Feature 2", "Spanning Reads", "Operon string"
+                "Feature 1", "Feature 2", "Track", "Chromosome", "Strand", "Start Feature 1", "Start Feature 2", "Spanning Reads", "Operon String"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.String.class, java.lang.String.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -116,11 +118,12 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
         operonDetectionTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "ResultPanelOperonDetection.operonDetectionTable.columnModel.title0")); // NOI18N
         operonDetectionTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title7")); // NOI18N
         operonDetectionTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "ResultPanelOperonDetection.operonDetectionTable.columnModel.title9")); // NOI18N
-        operonDetectionTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title1")); // NOI18N
-        operonDetectionTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title2")); // NOI18N
-        operonDetectionTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title8")); // NOI18N
-        operonDetectionTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title6")); // NOI18N
-        operonDetectionTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "ResultPanelOperonDetection.operonDetectionTable.columnModel.title10")); // NOI18N
+        operonDetectionTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "ResultPanelOperonDetection.operonDetectionTable.columnModel.title8")); // NOI18N
+        operonDetectionTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title1")); // NOI18N
+        operonDetectionTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title2")); // NOI18N
+        operonDetectionTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title8")); // NOI18N
+        operonDetectionTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title6")); // NOI18N
+        operonDetectionTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "ResultPanelOperonDetection.operonDetectionTable.columnModel.title10")); // NOI18N
 
         exportButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "ResultPanelOperonDetection.exportButton.text")); // NOI18N
         exportButton.addActionListener(new java.awt.event.ActionListener() {
@@ -144,7 +147,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(parametersLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 439, Short.MAX_VALUE)
                 .addComponent(statisticsButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(exportButton))

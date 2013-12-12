@@ -23,8 +23,10 @@ public class OperonAdjacency {
      * features, which might form an operon. It also contains the read counts
      * only associated to feature1/2, the spanning and the internal read
      * counts.
+     * @param feature1 First genomic feature of the operon adjacency.
+     * @param feature2 Second genomic feature of the operon adjacency.
      */
-    public OperonAdjacency(PersistantFeature feature1, PersistantFeature feature2) {
+    public OperonAdjacency(PersistantFeature feature1, PersistantFeature feature2, int chromId) {
         this.feature1 = feature1;
         this.feature2 = feature2;
     }

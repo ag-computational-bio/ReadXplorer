@@ -117,12 +117,8 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         });
         this.setViewerSize();
         
-        //if (trackCon.)
-        
-        TrackCacher tc = new TrackCacher(trackCon, refGen.getRefLength());
-        //tc.cache();
-        
-                    
+        TrackCacher tc = new TrackCacher(trackCon, refGen.getActiveChromLength());
+          
     }
 
     private void setColors(Preferences pref) {
@@ -430,7 +426,9 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
                 getBoundsInfo().getLogLeft(), 
                 getBoundsInfo().getLogRight(), 
                 totalFrom ,
-                totalTo , this, false, new ParametersReadClasses(perfectCovWanted, bestMatchCovWanted, commonCovWanted, onlyUniqueReadsWanted)));
+                totalTo , 
+                this.getReference().getActiveChromId(),
+                this, false, new ParametersReadClasses(perfectCovWanted, bestMatchCovWanted, commonCovWanted, onlyUniqueReadsWanted)));
     }
 
     @Override
