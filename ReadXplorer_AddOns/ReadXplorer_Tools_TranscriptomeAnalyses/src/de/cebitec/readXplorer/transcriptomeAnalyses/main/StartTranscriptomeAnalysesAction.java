@@ -46,8 +46,10 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
     private boolean performFivePrimeAnalyses, performTSSAnalysis, performLeaderless, performAntisense, performPutativeUnAnno, performRBSDetection, performPromotorDetection;
     private boolean performWholeTrascriptomeAnalyses, performOperonDetection, performNovelRegionDetection, rPKMs;
     private double fraction = 0.05;
+    private double fractionForNewRegionDetection = 0.05;
     private boolean cdsShift, excludeInternalTss;
     private int ratio, upstream, downstream, leaderlessDistance, excludeTSSDistance, keepingInternalTssDistance;
+    private int minBoundaryLength;
     private TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
     private boolean putativeUnAnnotated;
 
@@ -146,13 +148,19 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
                 // get needed params
                 this.performOperonDetection = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_OPERON_ANALYSIS);
                 this.performNovelRegionDetection = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_NOVEL_ANALYSIS);
-                if (this.performNovelRegionDetection || this.performOperonDetection) {
+                this.fractionForNewRegionDetection = (double) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_FRACTION_NOVELREGION_DETECTION);
+                this.minBoundaryLength = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_MIN_BOUNDRY_LENGTH);
+                if (this.performOperonDetection) {
                     this.fraction = (double) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_Fraction);
+                }
+
+                if (this.performNovelRegionDetection) {
+                    this.fraction = (double) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_FRACTION_NOVELREGION_DETECTION);
                 }
                 this.rPKMs = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_RPKM_ANALYSIS);
                 this.parameterSetWholeTranscripts = new ParameterSetWholeTranscriptAnalyses(this.performWholeTrascriptomeAnalyses,
                         this.performOperonDetection, this.performNovelRegionDetection,
-                        this.rPKMs, this.fraction);
+                        this.rPKMs, this.fraction, this.minBoundaryLength);
                 // start whole transcript analyses handler
                 this.wholeTranscriptAnalysesHandler = new WholeTranscriptDataAnalysisHandler(track, this.referenceId,
                         this.parameterSetWholeTranscripts, this.refViewer,

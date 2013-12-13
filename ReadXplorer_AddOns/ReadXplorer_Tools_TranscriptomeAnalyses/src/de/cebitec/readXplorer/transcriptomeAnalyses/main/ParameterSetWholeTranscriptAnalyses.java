@@ -6,17 +6,19 @@ import de.cebitec.readXplorer.databackend.ParameterSetI;
  *
  * @author jritter
  */
-class ParameterSetWholeTranscriptAnalyses implements ParameterSetI<ParameterSetWholeTranscriptAnalyses> {
-    
-    private boolean performWholeTrascriptomeAnalyses, performOperonDetection, performNovelRegionDetection, performRPKMs;
-    private double fraction;
+public class ParameterSetWholeTranscriptAnalyses implements ParameterSetI<ParameterSetWholeTranscriptAnalyses> {
 
-    public ParameterSetWholeTranscriptAnalyses(boolean performWholeTrascriptomeAnalyses, boolean performOperonDetection, boolean performNovelRegionDetection, boolean rPKMs, double fraction) {
+    private boolean performWholeTrascriptomeAnalyses, performOperonDetection, performNovelRegionDetection, performRPKMs;
+    private double fraction, fractionForNewRegionDetection;
+    private int minLengthBoundary;
+
+    public ParameterSetWholeTranscriptAnalyses(boolean performWholeTrascriptomeAnalyses, boolean performOperonDetection, boolean performNovelRegionDetection, boolean rPKMs, double fraction, int minBoundary) {
         this.performWholeTrascriptomeAnalyses = performWholeTrascriptomeAnalyses;
         this.performOperonDetection = performOperonDetection;
         this.performNovelRegionDetection = performNovelRegionDetection;
         this.performRPKMs = rPKMs;
         this.fraction = fraction;
+        this.minLengthBoundary = minBoundary;
     }
 
     public boolean isPerformWholeTrascriptomeAnalyses() {
@@ -57,5 +59,17 @@ class ParameterSetWholeTranscriptAnalyses implements ParameterSetI<ParameterSetW
 
     public void setFraction(double fraction) {
         this.fraction = fraction;
+    }
+
+    public int getMinLengthBoundary() {
+        return minLengthBoundary;
+    }
+
+    public void setMinLengthBoundary(int minLengthBoundary) {
+        this.minLengthBoundary = minLengthBoundary;
+    }
+
+    public double getFractionForNewRegionDetection() {
+        return fractionForNewRegionDetection;
     }
 }

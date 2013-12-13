@@ -7,6 +7,7 @@ import org.openide.util.NbPreferences;
 public final class WholeTranscriptTracksVisualPanel extends JPanel {
 
     private final String wizardName;
+
     /**
      * Creates new form WholeTranscriptTracksVisualPanel
      */
@@ -21,23 +22,30 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
         return "Analyses for whole transcripts Track";
     }
 
-    public boolean isNewRegions () {
+    public boolean isNewRegions() {
         return this.newRegionsCheckBox.isSelected();
     }
-    
-    public boolean isOperonDetection () {
+
+    public boolean isOperonDetection() {
         return this.operonsCheckBox.isSelected();
     }
-    
-    public boolean isRPKM () {
+
+    public boolean isRPKM() {
         return this.rpkmCheckBox.isSelected();
     }
-    
-    public double getFraction () {
-        return Double.valueOf(this.fractionTF.getText());
+
+    public double getFractionForOperonDetection() {
+        return Double.valueOf(this.fractionOperonDetectionTF.getText());
     }
-            
-    
+
+    public Double getFractionForNewRegionDetection() {
+        return Double.valueOf(this.fractionNovelRegionTF.getText());
+    }
+
+    public Integer getMinBoundaryForNovelRegionDetection() {
+        return Integer.valueOf(this.minBoundaryNovelRegionTF.getText());
+    }
+
     /**
      * Updates the checkboxes for the read classes with the globally stored
      * settings for this wizard. If no settings were stored, the default
@@ -45,10 +53,14 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
      */
     private void updateCheckBoxes() {
         Preferences pref = NbPreferences.forModule(Object.class);
-        this.rpkmCheckBox.setSelected(pref.getBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_NORMAL_RPKM_ANALYSIS, false));
-        this.operonsCheckBox.setSelected(pref.getBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_OPERON_ANALYSIS, false));
-        this.newRegionsCheckBox.setSelected(pref.getBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_NOVEL_ANALYSIS, false));
+        this.rpkmCheckBox.setSelected(pref.getBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_NORMAL_RPKM_ANALYSIS, false));
+        this.operonsCheckBox.setSelected(pref.getBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_OPERON_ANALYSIS, false));
+        this.newRegionsCheckBox.setSelected(pref.getBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_NOVEL_ANALYSIS, false));
+        this.fractionNovelRegionTF.setText(pref.get(wizardName + TranscriptomeAnalysisWizardIterator.PROP_FRACTION_NOVELREGION_DETECTION, "0.05"));
+        this.minBoundaryNovelRegionTF.setText(pref.get(wizardName + TranscriptomeAnalysisWizardIterator.PROP_MIN_BOUNDRY_LENGTH, "100"));
+        this.fractionOperonDetectionTF.setText(pref.get(wizardName + TranscriptomeAnalysisWizardIterator.PROP_Fraction, "100"));
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -57,153 +69,154 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        newRegionParamsPanel = new javax.swing.JPanel();
+        fractionNovelRegionTF = new javax.swing.JTextField();
+        minBoundaryNovelRegionTF = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
+        operonDetectionParamsPanel = new javax.swing.JPanel();
+        fractionOperonDetectionTF = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        jSeparator2 = new javax.swing.JSeparator();
         newRegionsCheckBox = new javax.swing.JCheckBox();
         operonsCheckBox = new javax.swing.JCheckBox();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea2 = new javax.swing.JTextArea();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jTextArea3 = new javax.swing.JTextArea();
-        jSeparator1 = new javax.swing.JSeparator();
-        jSeparator2 = new javax.swing.JSeparator();
-        jLabel1 = new javax.swing.JLabel();
         rpkmCheckBox = new javax.swing.JCheckBox();
-        jLabel2 = new javax.swing.JLabel();
-        fractionTF = new javax.swing.JTextField();
+        jSeparator3 = new javax.swing.JSeparator();
 
-        org.openide.awt.Mnemonics.setLocalizedText(newRegionsCheckBox, org.openide.util.NbBundle.getMessage(WholeTranscriptTracksVisualPanel.class, "WholeTranscriptTracksVisualPanel.newRegionsCheckBox.text")); // NOI18N
-        newRegionsCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                newRegionsCheckBoxActionPerformed(evt);
-            }
-        });
+        fractionNovelRegionTF.setText(org.openide.util.NbBundle.getMessage(WholeTranscriptTracksVisualPanel.class, "WholeTranscriptTracksVisualPanel.fractionNovelRegionTF.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(operonsCheckBox, org.openide.util.NbBundle.getMessage(WholeTranscriptTracksVisualPanel.class, "WholeTranscriptTracksVisualPanel.operonsCheckBox.text")); // NOI18N
-        operonsCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                operonsCheckBoxActionPerformed(evt);
-            }
-        });
-
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
-
-        jTextArea2.setColumns(20);
-        jTextArea2.setRows(5);
-        jScrollPane2.setViewportView(jTextArea2);
-
-        jTextArea3.setColumns(20);
-        jTextArea3.setRows(5);
-        jScrollPane3.setViewportView(jTextArea3);
+        minBoundaryNovelRegionTF.setText(org.openide.util.NbBundle.getMessage(WholeTranscriptTracksVisualPanel.class, "WholeTranscriptTracksVisualPanel.minBoundaryNovelRegionTF.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(WholeTranscriptTracksVisualPanel.class, "WholeTranscriptTracksVisualPanel.jLabel1.text")); // NOI18N
 
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(WholeTranscriptTracksVisualPanel.class, "WholeTranscriptTracksVisualPanel.jLabel5.text")); // NOI18N
+
+        javax.swing.GroupLayout newRegionParamsPanelLayout = new javax.swing.GroupLayout(newRegionParamsPanel);
+        newRegionParamsPanel.setLayout(newRegionParamsPanelLayout);
+        newRegionParamsPanelLayout.setHorizontalGroup(
+            newRegionParamsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(newRegionParamsPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(newRegionParamsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(newRegionParamsPanelLayout.createSequentialGroup()
+                        .addComponent(jLabel5)
+                        .addGap(108, 108, 108)
+                        .addComponent(minBoundaryNovelRegionTF, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(newRegionParamsPanelLayout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(18, 18, 18)
+                        .addComponent(fractionNovelRegionTF, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        newRegionParamsPanelLayout.setVerticalGroup(
+            newRegionParamsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(newRegionParamsPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(newRegionParamsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(fractionNovelRegionTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(newRegionParamsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(minBoundaryNovelRegionTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        fractionOperonDetectionTF.setText(org.openide.util.NbBundle.getMessage(WholeTranscriptTracksVisualPanel.class, "WholeTranscriptTracksVisualPanel.fractionOperonDetectionTF.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(WholeTranscriptTracksVisualPanel.class, "WholeTranscriptTracksVisualPanel.jLabel3.text")); // NOI18N
+
+        javax.swing.GroupLayout operonDetectionParamsPanelLayout = new javax.swing.GroupLayout(operonDetectionParamsPanel);
+        operonDetectionParamsPanel.setLayout(operonDetectionParamsPanelLayout);
+        operonDetectionParamsPanelLayout.setHorizontalGroup(
+            operonDetectionParamsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(operonDetectionParamsPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel3)
+                .addGap(18, 18, 18)
+                .addComponent(fractionOperonDetectionTF, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(15, Short.MAX_VALUE))
+        );
+        operonDetectionParamsPanelLayout.setVerticalGroup(
+            operonDetectionParamsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(operonDetectionParamsPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(operonDetectionParamsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(fractionOperonDetectionTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel3))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
+        org.openide.awt.Mnemonics.setLocalizedText(newRegionsCheckBox, org.openide.util.NbBundle.getMessage(WholeTranscriptTracksVisualPanel.class, "WholeTranscriptTracksVisualPanel.newRegionsCheckBox.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(operonsCheckBox, org.openide.util.NbBundle.getMessage(WholeTranscriptTracksVisualPanel.class, "WholeTranscriptTracksVisualPanel.operonsCheckBox.text")); // NOI18N
+
         org.openide.awt.Mnemonics.setLocalizedText(rpkmCheckBox, org.openide.util.NbBundle.getMessage(WholeTranscriptTracksVisualPanel.class, "WholeTranscriptTracksVisualPanel.rpkmCheckBox.text")); // NOI18N
-        rpkmCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rpkmCheckBoxActionPerformed(evt);
-            }
-        });
-
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(WholeTranscriptTracksVisualPanel.class, "WholeTranscriptTracksVisualPanel.jLabel2.text")); // NOI18N
-
-        fractionTF.setText(org.openide.util.NbBundle.getMessage(WholeTranscriptTracksVisualPanel.class, "WholeTranscriptTracksVisualPanel.fractionTF.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
+            .addGroup(layout.createSequentialGroup()
+                .addGap(14, 14, 14)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jSeparator1)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(8, 8, 8)
-                        .addComponent(newRegionsCheckBox)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(operonsCheckBox)
+                            .addComponent(rpkmCheckBox)
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(20, 20, 20)
-                                .addComponent(jLabel2)
-                                .addGap(18, 18, 18)
-                                .addComponent(fractionTF, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(111, 140, Short.MAX_VALUE)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 350, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(newRegionsCheckBox)
+                                    .addComponent(operonsCheckBox))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(operonDetectionParamsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(46, 46, 46)
+                                        .addComponent(newRegionParamsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addGap(0, 13, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(53, 53, 53)
-                                .addComponent(jLabel1))
-                            .addComponent(rpkmCheckBox))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 352, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+                            .addComponent(jSeparator2)
+                            .addComponent(jSeparator3))
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(14, 14, 14)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap()
+                        .addComponent(newRegionParamsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(35, 35, 35)
-                        .addComponent(newRegionsCheckBox, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(newRegionsCheckBox)))
+                .addGap(18, 18, 18)
+                .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(operonsCheckBox, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel2)
-                            .addComponent(fractionTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 104, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(11, 11, 11)
+                    .addComponent(operonDetectionParamsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(operonsCheckBox))
+                .addGap(18, 18, 18)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(24, 24, 24)
-                        .addComponent(rpkmCheckBox))
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(rpkmCheckBox)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void operonsCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_operonsCheckBoxActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_operonsCheckBoxActionPerformed
-
-    private void newRegionsCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newRegionsCheckBoxActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_newRegionsCheckBoxActionPerformed
-
-    private void rpkmCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rpkmCheckBoxActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_rpkmCheckBoxActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTextField fractionTF;
+    private javax.swing.JTextField fractionNovelRegionTF;
+    private javax.swing.JTextField fractionOperonDetectionTF;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JTextArea jTextArea1;
-    private javax.swing.JTextArea jTextArea2;
-    private javax.swing.JTextArea jTextArea3;
+    private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JTextField minBoundaryNovelRegionTF;
+    private javax.swing.JPanel newRegionParamsPanel;
     private javax.swing.JCheckBox newRegionsCheckBox;
+    private javax.swing.JPanel operonDetectionParamsPanel;
     private javax.swing.JCheckBox operonsCheckBox;
     private javax.swing.JCheckBox rpkmCheckBox;
     // End of variables declaration//GEN-END:variables

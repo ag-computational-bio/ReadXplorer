@@ -235,7 +235,6 @@ public final class FivePrimeUTRPromotorSettingsVisualPanel extends JPanel {
                                             .addGap(18, 18, 18)
                                             .addComponent(minus10MotifWidthTF, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                     .addGroup(layout.createSequentialGroup()
-                                        .addGap(0, 0, 0)
                                         .addComponent(minSpacer2TF, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(18, 18, 18)
                                         .addComponent(jLabel2)

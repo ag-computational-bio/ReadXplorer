@@ -22,14 +22,13 @@ public class NewRegionDetection {
 
     public void runningNewRegionsDetection(int length, HashMap<Integer, List<Integer>> forwardCDSs,
             HashMap<Integer, List<Integer>> reverseCDSs, HashMap<Integer, PersistantFeature> allRegionsInHash,
-            int[] fwdCoverage, int[] revCoverage, int[] forward, int[] reverse, double mm, double bg, int trackID) {
+            int[] fwdCoverage, int[] revCoverage, int[] forward, int[] reverse, double bg, int minLengthBoundary, int trackID) {
 
 
         // Key is flag and Value the count of this flag
         HashMap<Integer, Integer> dropdownsFwd = new HashMap<>();
         HashMap<Integer, Integer> dropdownsRev = new HashMap<>();
         NovelRegion newRegion = null;
-        int minBoundary = 100;
 
         for (int i = 0; i < length; i++) {
 
@@ -72,9 +71,9 @@ public class NewRegionDetection {
                     }
 
                     int lengthOfNewRegion = flag - i;
-                    if (dropdownsFwd.get(flag) == 1 && lengthOfNewRegion >= minBoundary) {
+                    if (dropdownsFwd.get(flag) == 1 && lengthOfNewRegion >= minLengthBoundary) {
 //                            push(@{$new_regs{out}{$start}}, "$pos\t+\t$fwd\t$site") unless ($new_regs{fwd}{$flag} > 1);
-                        newRegion = new NovelRegion(true, start, possibleStop, site, (possibleStop - start), getSubSeq(true, start, possibleStop), trackID);
+                        newRegion = new NovelRegion(true, start, possibleStop, site, (possibleStop - start), getSubSeq(true, start, possibleStop), false, false, trackID);
                         System.out.println(newRegion.toString());
                         novelRegions.add(newRegion);
                     }
@@ -115,11 +114,11 @@ public class NewRegionDetection {
                             site = "cis-antisense";
                         }
                         int lengthOfNewRegion = i - flag;
-                        if (dropdownsRev.get(flag) == 1 && lengthOfNewRegion >= minBoundary) { // unless ($new_regs{rev}{$flag} > 1) {
+                        if (dropdownsRev.get(flag) == 1 && lengthOfNewRegion >= minLengthBoundary) { // unless ($new_regs{rev}{$flag} > 1) {
 //                          push(@{$new_regs{out}{$start}}, "$pos\t-\t$rev\t$site");
                             String reversedSeq = new StringBuffer(getSubSeq(false, possibleStop, start)).reverse().toString();
                             String revComplement = getComplement(reversedSeq);
-                            newRegion = new NovelRegion(false, start, possibleStop, site, (start - possibleStop), revComplement, trackID);
+                            newRegion = new NovelRegion(false, start, possibleStop, site, (start - possibleStop), revComplement, false, false, trackID);
                             novelRegions.add(newRegion);
                         }
                     }

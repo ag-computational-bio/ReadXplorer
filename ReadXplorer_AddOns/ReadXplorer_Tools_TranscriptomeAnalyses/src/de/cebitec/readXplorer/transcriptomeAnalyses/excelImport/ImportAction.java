@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.readXplorer.transcriptomeAnalyses.excelImport;
 
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.TranscriptomeAnalysesTopComponentTopComponent;
@@ -44,25 +40,30 @@ public final class ImportAction implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         final ExcelImportFileChooser fc = new ExcelImportFileChooser(new String[]{"xls"}, "xls");
-        this.progressHandle = ProgressHandleFactory.createHandle("Import progress ...");
-        this.transcAnalysesTopComp.open();
-        Thread exportThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                progressHandle.start(30);
-                ExcelImporter importer = new ExcelImporter(progressHandle);
-                importer.startExcelToTableConverter(fc.getSelectedFile());
-                progressHandle.progress(11);
-                importer.setUpTSSDataStructuresAndTable(refViewer, transcAnalysesTopComp);
-                progressHandle.progress(30);
-                
-                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successfull!",
-                "Import was successfull!", JOptionPane.INFORMATION_MESSAGE);
-                
-                progressHandle.finish();
-            }
-        });
-        exportThread.start();
-        
+        if (fc.getSelectedFile() != null) {
+            this.progressHandle = ProgressHandleFactory.createHandle("Import progress ...");
+            this.transcAnalysesTopComp.open();
+            Thread exportThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    progressHandle.start(30);
+                    ExcelImporter importer = new ExcelImporter(progressHandle);
+                    importer.startExcelToTableConverter(fc.getSelectedFile());
+                    progressHandle.progress(11);
+                    if (importer.isTssDataTable()) {
+                        importer.setUpTSSDataStructuresAndTable(refViewer, transcAnalysesTopComp);
+                    } else {
+                        importer.setUpNewRegionStructuresAndTable(refViewer, transcAnalysesTopComp);
+                    }
+                    progressHandle.progress(30);
+
+                    JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successfull!",
+                            "Import was successfull!", JOptionPane.INFORMATION_MESSAGE);
+
+                    progressHandle.finish();
+                }
+            });
+            exportThread.start();
+        }
     }
 }

@@ -2,10 +2,8 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.excelImport;
 
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import javax.swing.table.DefaultTableModel;
-import org.openide.util.Exceptions;
 
 /**
  *

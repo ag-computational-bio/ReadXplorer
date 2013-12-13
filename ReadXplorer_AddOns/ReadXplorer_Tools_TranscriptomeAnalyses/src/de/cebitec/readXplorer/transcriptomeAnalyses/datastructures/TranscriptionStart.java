@@ -19,7 +19,7 @@ public class TranscriptionStart extends TrackResultEntry {
     private PersistantFeature detectedGene;
     private int offset;
     private int dist2start, dist2stop;
-    private PersistantFeature nextGene;
+    private PersistantFeature nextDownstreamFeature;
     private int nextOffset;
     private String sequence;
     private boolean leaderless, cdsShift;
@@ -75,7 +75,7 @@ public class TranscriptionStart extends TrackResultEntry {
         this.offset = offset;
         this.dist2start = dist2start;
         this.dist2stop = dist2stop;
-        this.nextGene = nextGene;
+        this.nextDownstreamFeature = nextGene;
         this.nextOffset = nextOffset;
         this.sequence = sequence;
         this.leaderless = leaderless;
@@ -175,11 +175,11 @@ public class TranscriptionStart extends TrackResultEntry {
     }
 
     public PersistantFeature getNextGene() {
-        return nextGene;
+        return nextDownstreamFeature;
     }
 
     public void setNextGene(PersistantFeature nextGene) {
-        this.nextGene = nextGene;
+        this.nextDownstreamFeature = nextGene;
     }
 
     public int getNextOffset() {
@@ -216,10 +216,10 @@ public class TranscriptionStart extends TrackResultEntry {
     public String toString() {
 
         if (isFwdStrand) {
-            return this.startPosition + "\t" + "fwd\t" + this.readStarts + "\t" + this.relCount + "\t" + this.detectedGene.getFeatureName() + "\t" + this.offset + "\t" + this.dist2start + "\t" + this.dist2stop + "\t" + this.nextGene + "\t" + this.nextOffset + "\t" + this.sequence + "\t" + 0;
+            return this.startPosition + "\t" + "fwd\t" + this.readStarts + "\t" + this.relCount + "\t" + this.detectedGene.getFeatureName() + "\t" + this.offset + "\t" + this.dist2start + "\t" + this.dist2stop + "\t" + this.nextDownstreamFeature + "\t" + this.nextOffset + "\t" + this.sequence + "\t" + 0;
 
         } else {
-            return this.startPosition + "\t" + "rev\t" + this.readStarts + "\t" + this.relCount + "\t" + this.detectedGene.getFeatureName() + "\t" + this.offset + "\t" + this.dist2start + "\t" + this.dist2stop + "\t" + this.nextGene + "\t" + this.nextOffset + "\t" + this.sequence + "\t" + 0;
+            return this.startPosition + "\t" + "rev\t" + this.readStarts + "\t" + this.relCount + "\t" + this.detectedGene.getFeatureName() + "\t" + this.offset + "\t" + this.dist2start + "\t" + this.dist2stop + "\t" + this.nextDownstreamFeature + "\t" + this.nextOffset + "\t" + this.sequence + "\t" + 0;
 
         }
     }

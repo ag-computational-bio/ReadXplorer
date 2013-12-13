@@ -6,7 +6,7 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.datastructures;
  */
 public class NovelRegion {
 
-    private boolean isFWD;
+    private boolean isFWD, isFalsePositive, isSelected;
     private int start;
     private Integer dropoff;
     private Integer trackID;
@@ -14,7 +14,7 @@ public class NovelRegion {
     private Integer length;
     private String sequence;
 
-    public NovelRegion(boolean isFWD, int start, Integer dropoff, String site, int length, String sequence, Integer trackID) {
+    public NovelRegion(boolean isFWD, int start, Integer dropoff, String site, int length, String sequence, boolean isFP, boolean isSelected, Integer trackID) {
         this.isFWD = isFWD;
         this.start = start;
         this.dropoff = dropoff;
@@ -22,6 +22,8 @@ public class NovelRegion {
         this.site = site;
         this.length = length;
         this.sequence = sequence;
+        this.isFalsePositive = isFP;
+        this.isSelected = isSelected;
     }
 
     @Override
@@ -75,5 +77,13 @@ public class NovelRegion {
 
     public void setSequence(String sequence) {
         this.sequence = sequence;
+    }
+
+    public boolean isFalsePositive() {
+        return isFalsePositive;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
     }
 }

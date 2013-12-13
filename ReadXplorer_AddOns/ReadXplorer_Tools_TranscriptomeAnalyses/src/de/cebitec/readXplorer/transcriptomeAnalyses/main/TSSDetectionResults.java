@@ -56,6 +56,7 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
         dataColumnDescriptions.add("dist. to stop");
         dataColumnDescriptions.add("Sequence");
         dataColumnDescriptions.add("Leaderless");
+        dataColumnDescriptions.add("Putative CDS-Shift");
         dataColumnDescriptions.add("Internal TSS");
         dataColumnDescriptions.add("Putative antisense");
         dataColumnDescriptions.add("Gene start");
@@ -108,6 +109,7 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
             tssRow.add(tss.getDist2stop());
             tssRow.add(tss.getSequence());
             tssRow.add(tss.isLeaderless());
+            tssRow.add(tss.isCdsShift());
             tssRow.add(tss.isInternalTSS());
             tssRow.add(tss.isPutativeAntisense());
 
@@ -180,6 +182,8 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.TSS_INTERNAL)));
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE,
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE)));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_NO_PUTATIVE_CDS_SHIFTS,
+                getStatsAndParametersMap().get(ResultPanelTranscriptionStart.TSS_NO_PUTATIVE_CDS_SHIFTS)));
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.MAPPINGS_COUNT,
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.MAPPINGS_COUNT)));
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH,

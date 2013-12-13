@@ -19,8 +19,6 @@ public class WholeTranscriptTracksPanel implements WizardDescriptor.ValidatingPa
     public WholeTranscriptTracksPanel(String wizardName) {
         this.wizardName = wizardName;
     }
-    
-    
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -67,19 +65,23 @@ public class WholeTranscriptTracksPanel implements WizardDescriptor.ValidatingPa
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
-            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_RPKM_ANALYSIS, (boolean) component.isRPKM());
-            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_NOVEL_ANALYSIS, (boolean) component.isNewRegions());
-            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_OPERON_ANALYSIS, (boolean) component.isOperonDetection());
-            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_Fraction, (double) component.getFraction());
-            storePrefs();
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_RPKM_ANALYSIS, (boolean) component.isRPKM());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_NOVEL_ANALYSIS, (boolean) component.isNewRegions());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_OPERON_ANALYSIS, (boolean) component.isOperonDetection());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_Fraction, (double) component.getFractionForOperonDetection());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_FRACTION_NOVELREGION_DETECTION, (double) component.getFractionForNewRegionDetection());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_MIN_BOUNDRY_LENGTH, (int) component.getMinBoundaryForNovelRegionDetection());
+        storePrefs();
     }
-    
+
     private void storePrefs() {
         Preferences pref = NbPreferences.forModule(Object.class);
-        pref.putBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_RPKM_ANALYSIS, component.isRPKM());
-        pref.putBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_NOVEL_ANALYSIS, component.isNewRegions());
-        pref.putBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_OPERON_ANALYSIS, component.isOperonDetection());
-        pref.putDouble(wizardName+TranscriptomeAnalysisWizardIterator.PROP_Fraction, component.getFraction());
+        pref.putBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_RPKM_ANALYSIS, component.isRPKM());
+        pref.putBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_NOVEL_ANALYSIS, component.isNewRegions());
+        pref.putBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_OPERON_ANALYSIS, component.isOperonDetection());
+        pref.putDouble(wizardName + TranscriptomeAnalysisWizardIterator.PROP_Fraction, component.getFractionForOperonDetection());
+        pref.putDouble(wizardName + TranscriptomeAnalysisWizardIterator.PROP_FRACTION_NOVELREGION_DETECTION, component.getFractionForNewRegionDetection());
+        pref.putInt(wizardName + TranscriptomeAnalysisWizardIterator.PROP_MIN_BOUNDRY_LENGTH, component.getMinBoundaryForNovelRegionDetection());
     }
 
     @Override

@@ -176,7 +176,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
             newRegionDetection = new NewRegionDetection(this.trackConnector.getRefGenome().getSequence());
             newRegionDetection.runningNewRegionsDetection(featureParser.getRefSeqLength(), featureParser.getAllFwdFeatures(),
                     featureParser.getAllRevFeatures(), allRegionsInHash, this.stats.getFwdCoverage(), this.stats.getRevCoverage(),
-                    this.stats.getForward(), this.stats.getReverse(), this.stats.getMm(), this.stats.getBg(), this.selectedTrack.getId());
+                    this.stats.getForward(), this.stats.getReverse(), this.stats.getBg(), this.parameters.getMinLengthBoundary(), this.selectedTrack.getId());
             System.out.println("Out of computing NewRegion detection...");
             String trackNames;
 
@@ -185,8 +185,10 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
                 novelRegionResult.setReferenceViewer(refViewer);
             }
 
-            NovelRegionResult newRegionResult = new NovelRegionResult(trackMap, newRegionDetection.getNovelRegions(), false);
+            NovelRegionResult newRegionResult = new NovelRegionResult(this.stats, trackMap, newRegionDetection.getNovelRegions(), false);
+            newRegionResult.setParameters(this.parameters);
             novelRegionResult.addResult(newRegionResult);
+            
             trackNames = GeneralUtils.generateConcatenatedString(newRegionResult.getTrackNameList(), 120);
             String panelName = "Novel region detection results" + trackNames + " (" + novelRegionResult.getResultSize() + " hits)";
             transcAnalysesTopComp.openAnalysisTab(panelName, novelRegionResult);

@@ -25,14 +25,15 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
     public static final String PROP_RBS_ANALYSIS_BASES_AFTER_I = "numberOfBasesAfterI";
     public static final String PROP_RBS_ANALYSIS_WORKINGDIRECTORY_PATH = "pathToWorkinigDir";
     public static final String PROP_PROMOTOR_ANALYSIS = "promotorAnalysis";
-    
     public static final String PROP_LEADERLESS_ANALYSIS = "leaderlessAnalysis";
     public static final String PROP_ANTISENSE_ANALYSIS = "antiseseAnalysis";
     // Whole genome data set analyses
     public static final String PROP_NOVEL_ANALYSIS = "novel";
     public static final String PROP_OPERON_ANALYSIS = "operon";
     public static final String PROP_RPKM_ANALYSIS = "rpkm";
-    public static final String PROP_LOGRPKM_ANALYSIS = "logRpkm";
+//    public static final String PROP_LOGRPKM_ANALYSIS = "logRpkm";
+    public static final String PROP_MIN_BOUNDRY_LENGTH = "minimum boundry for length of new region";
+    public static final String PROP_FRACTION_NOVELREGION_DETECTION = "fraction for novel region detection background calculations";
     // TSS, Leaderless, Antisense - detection params
     public static final String PROP_Fraction = "fraction";
     public static final String PROP_UPSTREAM = "upstream";
@@ -76,19 +77,10 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
             allPanels.add(new DataSetChoicePanel(PROP_WIZARD_NAME));// 0
             allPanels.add(new WholeTranscriptTracksPanel(PROP_WIZARD_NAME)); // 1
             allPanels.add(new FivePrimeEnrichedTracksPanel(PROP_WIZARD_NAME, referenceId)); // 2
-//            allPanels.add(new TssDetectionParamsPanel(PROP_WIZARD_NAME, referenceId)); // 3
-//            allPanels.add(new RbsDetectionParamsPanel(PROP_WIZARD_NAME)); // 4
-//            allPanels.add(new PromotorDetectionParamPanel(PROP_WIZARD_NAME)); // 5
-//            allPanels.add(new LeaderlessDetectionPanel(PROP_WIZARD_NAME)); // 6
-            allPanels.add(new AntisenseDetectionParamsPanel(PROP_WIZARD_NAME)); // 7 ,3
-            allPanels.add(new NewRegionDetectionParamsPanel(PROP_WIZARD_NAME)); // 8, 4
-            allPanels.add(new OperonsDetectionParamsPanel(PROP_WIZARD_NAME)); // 9, 5
+            allPanels.add(new AntisenseDetectionParamsPanel(PROP_WIZARD_NAME)); // 3
+            allPanels.add(new OperonsDetectionParamsPanel(PROP_WIZARD_NAME)); // 4
             openTracksPanel = new OpenTracksWizardPanel(PROP_WIZARD_NAME, referenceId);
-            allPanels.add(openTracksPanel); // 10, 6
-//            readClassPanel = new SelectReadClassWizardPanel(PROP_WIZARD_NAME);
-//            allPanels.add(readClassPanel); // 11
-//            featTypePanel = new SelectFeatureTypeWizardPanel(PROP_WIZARD_NAME);
-//            allPanels.add(featTypePanel); // 12
+            allPanels.add(openTracksPanel); // 5
 
 
             String[] steps = new String[allPanels.size()];
@@ -99,8 +91,6 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
                 if (c instanceof JComponent) { // assume Swing components
                     JComponent jc = (JComponent) c;
                     jc.putClientProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, i);
-//                    initPanelsIndex = new String[]{steps[0], allPanels.get(1).getComponent().getName(), allPanels.get(2).getComponent().getName(), "..."};
-//                    jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DATA, steps);
                     jc.putClientProperty(WizardDescriptor.PROP_AUTO_WIZARD_STYLE, true);
                     jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DISPLAYED, true);
                     jc.putClientProperty(WizardDescriptor.PROP_CONTENT_NUMBERED, true);
@@ -110,44 +100,44 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
 
 
             initPanels = new ArrayList<>();
-            initPanels.add(this.allPanels.get(6));
+            initPanels.add(this.allPanels.get(5));
             initPanels.add(this.allPanels.get(0));
             initPanels.add(this.allPanels.get(1));
 
-            initPanelsIndex = new String[]{steps[6], steps[0], steps[1], "..."};
+            initPanelsIndex = new String[]{steps[5], steps[0], steps[1], "..."};
 
 
             fivePrimeAnalyses = new ArrayList<>();
-            fivePrimeAnalyses.add(this.allPanels.get(6));
+            fivePrimeAnalyses.add(this.allPanels.get(5));
             fivePrimeAnalyses.add(this.allPanels.get(0));
             fivePrimeAnalyses.add(this.allPanels.get(2));
 //            fivePrimeAnalyses.add(this.allPanels.get(3));
 
 
-            fivePrimeIndex = new String[]{steps[6], steps[0], steps[2], "..."};
+            fivePrimeIndex = new String[]{steps[5], steps[0], steps[2], "..."};
 
             wholegenomeAnalyses = new ArrayList<>();
-            wholegenomeAnalyses.add(this.allPanels.get(6));
+            wholegenomeAnalyses.add(this.allPanels.get(5));
             wholegenomeAnalyses.add(this.allPanels.get(0));
             wholegenomeAnalyses.add(this.allPanels.get(1));
 
 
-            wholeGenomeIndex = new String[]{steps[6], steps[0], steps[1], "..."};
+            wholeGenomeIndex = new String[]{steps[5], steps[0], steps[1], "..."};
 
             fivePrimeSelectedAnalyses = new ArrayList<>();
-            fivePrimeSelectedAnalyses.add(this.allPanels.get(6));
+            fivePrimeSelectedAnalyses.add(this.allPanels.get(5));
             fivePrimeSelectedAnalyses.add(this.allPanels.get(0));
             fivePrimeSelectedAnalyses.add(this.allPanels.get(2));
 
 
 
             wholeGenomeSelectedAnayses = new ArrayList<>();
-            wholeGenomeSelectedAnayses.add(this.allPanels.get(6));
+            wholeGenomeSelectedAnayses.add(this.allPanels.get(5));
             wholeGenomeSelectedAnayses.add(this.allPanels.get(0));
             wholeGenomeSelectedAnayses.add(this.allPanels.get(1));
 
             this.currentPanels = initPanels;
-            Component c = allPanels.get(6).getComponent();
+            Component c = allPanels.get(5).getComponent();
             if (c instanceof JComponent) {
                 JComponent jc = (JComponent) c;
                 jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DATA, initPanelsIndex);
@@ -202,7 +192,7 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
 
         if (index == 2 && (boolean) wiz.getProperty(PROP_FIVEPRIME_DATASET)) { // we are in fifeprime analyses   
             List<String> contentData = new ArrayList<>();
-            contentData.add(allPanels.get(6).getComponent().getName());
+            contentData.add(allPanels.get(5).getComponent().getName());
             contentData.add(allPanels.get(0).getComponent().getName());
             contentData.add(allPanels.get(2).getComponent().getName());
             if ((boolean) wiz.getProperty(PROP_TSS_ANALYSIS) && !fivePrimeSelectedAnalyses.contains(this.allPanels.get(3))) {
@@ -224,7 +214,7 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
 
         if (index == 2 && (boolean) wiz.getProperty(PROP_WHOLEGENOME_DATASET)) { // we are in wholegenome analyses
             List<String> contentData = new ArrayList<>();
-            contentData.add(allPanels.get(6).getComponent().getName());
+            contentData.add(allPanels.get(5).getComponent().getName());
             contentData.add(allPanels.get(0).getComponent().getName());
             contentData.add(allPanels.get(1).getComponent().getName());
             if ((boolean) wiz.getProperty(PROP_NOVEL_ANALYSIS) && !wholeGenomeSelectedAnayses.contains(this.allPanels.get(8))) {

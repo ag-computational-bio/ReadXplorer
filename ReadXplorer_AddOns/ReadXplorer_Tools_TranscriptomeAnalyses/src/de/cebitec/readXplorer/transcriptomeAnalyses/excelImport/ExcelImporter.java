@@ -9,12 +9,17 @@ import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelRegion;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
+import de.cebitec.readXplorer.transcriptomeAnalyses.main.NovelRegionResult;
+import de.cebitec.readXplorer.transcriptomeAnalyses.main.NovelRegionResultPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.ParameterSetFiveEnrichedAnalyses;
+import de.cebitec.readXplorer.transcriptomeAnalyses.main.ParameterSetWholeTranscriptAnalyses;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.ResultPanelTranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.Statistics;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.TSSDetectionResults;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.TranscriptomeAnalysesTopComponentTopComponent;
+import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.TranscriptomeAnalysisWizardIterator;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.readXplorer.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
 import java.io.File;
@@ -35,7 +40,8 @@ public class ExcelImporter {
 
     private DefaultTableModel model;
     private ProgressHandle progressHandle;
-    HashMap<String, String> secondSheetMap;
+    private HashMap<String, String> secondSheetMap;
+    private boolean isTssDataTable;
 
     public ExcelImporter(ProgressHandle progressHandle) {
         this.progressHandle = progressHandle;
@@ -56,20 +62,25 @@ public class ExcelImporter {
         }
 
         this.model = exlToTable.dataToDataTableImport();
+        if (model.getColumnCount() == 23) {
+            isTssDataTable = true;
+        } else {
+            isTssDataTable = false;
+        }
         this.secondSheetMap = exlToTable.getSecondSheetData();
         progressHandle.progress(10);
     }
 
     /**
-     * 
+     *
      * @param refViewer
-     * @param transcAnalysesTopComp 
+     * @param transcAnalysesTopComp
      */
     public void setUpTSSDataStructuresAndTable(ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp) {
         ResultPanelTranscriptionStart tssResultsPanel = new ResultPanelTranscriptionStart();
         tssResultsPanel.setReferenceViewer(refViewer);
 
-        String referenceID = (String) model.getValueAt(1, 20);
+        String referenceID = (String) model.getValueAt(1, model.getColumnCount() - 1);
         int refID = Integer.valueOf(referenceID);
         PersistantTrack track = ProjectConnector.getInstance().getTrack(refID);
         TrackConnector connector = null;
@@ -202,6 +213,16 @@ public class ExcelImporter {
                 isLeaderless = true;
             }
 
+            String cdsShiftBool = (String) model.getValueAt(row, 11);
+            boolean isCdsShift;
+            if (leaderlessBool.equals("false")) {
+                isCdsShift = false;
+            } else {
+                isCdsShift = true;
+            }
+
+
+
             String antisenseBool = (String) model.getValueAt(row, 12);
             boolean isPutAntisense;
             if (antisenseBool.equals("false")) {
@@ -224,5 +245,115 @@ public class ExcelImporter {
         tssResult.setResults(tss);
         tssResultsPanel.addResult(tssResult);
         transcAnalysesTopComp.openAnalysisTab(refConnector.getAssociatedTrackNames().get(track.getId()), tssResultsPanel);
+    }
+
+    public boolean isTssDataTable() {
+        return isTssDataTable;
+    }
+
+    public void setUpNewRegionStructuresAndTable(ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp) {
+        NovelRegionResultPanel novelRegionsResultsPanel = new NovelRegionResultPanel();
+        novelRegionsResultsPanel.setReferenceViewer(refViewer);
+
+        String referenceID = (String) model.getValueAt(1, model.getColumnCount() - 1);
+        int refID = Integer.valueOf(referenceID);
+        PersistantTrack track = ProjectConnector.getInstance().getTrack(refID);
+        HashMap<Integer, PersistantTrack> trackMap = new HashMap<>();
+        trackMap.put(track.getId(), track);
+        TrackConnector connector = null;
+        try {
+            connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
+        } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+            JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+        }
+
+        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(connector.getRefGenome().getId());
+        int refSeqLength = refConnector.getRefSequence().length();
+        List<PersistantFeature> genomeFeatures = refConnector.getFeaturesForClosedInterval(0, refSeqLength);
+        HashMap<String, PersistantFeature> featureMap = new HashMap();
+        for (PersistantFeature persistantFeature : genomeFeatures) {
+            featureMap.put(persistantFeature.getLocus(), persistantFeature);
+        }
+
+
+        progressHandle.progress("Load Statistics from file ... ", 15);
+        String tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT);
+        String replaced = tmp.replaceAll(",", ".");
+        double mappingCount = Double.valueOf(replaced);
+
+        tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH);
+        replaced = tmp.replaceAll(",", ".");
+        double mappingMeanLength = Double.valueOf(replaced);
+
+        tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.MAPPINGS_MILLION);
+        replaced = tmp.replaceAll(",", ".");
+        double mappingsPerMillion = Double.valueOf(replaced);
+
+        tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD);
+        replaced = tmp.replaceAll(",", ".");
+        double backgroundThreshold = Double.valueOf(replaced);
+
+        tmp = (String) secondSheetMap.get(TranscriptomeAnalysisWizardIterator.PROP_FRACTION_NOVELREGION_DETECTION);
+        replaced = tmp.replaceAll(",", ".");
+        double fraction = Double.valueOf(replaced);
+
+        tmp = (String) secondSheetMap.get(NovelRegionResultPanel.NOVELREGION_DETECTION_MIN_LENGTH);
+        int minBoundary = Integer.valueOf(tmp);
+
+
+        ParameterSetWholeTranscriptAnalyses params = new ParameterSetWholeTranscriptAnalyses(true, false, true, false, fraction, minBoundary);
+        Statistics stats = new Statistics(mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
+
+
+        NovelRegionResult novelRegionResults = new NovelRegionResult(stats, trackMap, null, false);
+        novelRegionResults.setParameters(params);
+        List<NovelRegion> novelRegions = new ArrayList<>();
+        NovelRegion novelRegion = null;
+        progressHandle.progress("Initialize table ... ", 20);
+        for (int row = 1; row < model.getRowCount(); row++) {
+
+            String position = (String) model.getValueAt(row, 0);
+            int novelRegStartPos = Integer.valueOf(position);
+
+            boolean isFwd;
+            String strand = (String) model.getValueAt(row, 1);
+            if (strand.equals("Fwd")) {
+                isFwd = true;
+            } else {
+                isFwd = false;
+            }
+
+            boolean isFP;
+            String falsePositive = (String) model.getValueAt(row, 2);
+            if (falsePositive.equals("false")) {
+                isFP = false;
+            } else {
+                isFP = true;
+            }
+
+            boolean isSelectedForBlast;
+            String selected = (String) model.getValueAt(row, 3);
+            if (falsePositive.equals("false")) {
+                isSelectedForBlast = false;
+            } else {
+                isSelectedForBlast = true;
+            }
+
+            int dropOff;
+            String dropOffString = (String) model.getValueAt(row, 5);
+            dropOff = Integer.valueOf(dropOffString);
+
+            int length;
+            String lengthString = (String) model.getValueAt(row, 6);
+            length = Integer.valueOf(lengthString);
+
+            novelRegion = new NovelRegion(isFwd, novelRegStartPos, dropOff, (String) model.getValueAt(row, 4),
+                    length, (String) model.getValueAt(row, 7), isFP, isSelectedForBlast, refID);
+            novelRegions.add(novelRegion);
+        }
+        progressHandle.progress(27);
+        novelRegionResults.setResults(novelRegions);
+        novelRegionsResultsPanel.addResult(novelRegionResults);
+        transcAnalysesTopComp.openAnalysisTab(refConnector.getAssociatedTrackNames().get(track.getId()), novelRegionsResultsPanel);
     }
 }
