@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import org.openide.util.Exceptions;
 
 /**
  * A persistant reference containing an id, name, description & timestamp of a 
@@ -128,9 +129,6 @@ public class PersistantReference implements Observable {
     }
 
     /**
-     * @param observer The observer of the chromosome. It is added to the
-     * chromosome and should remain in the observer list, as long, as the
-     * observer needs the sequence of the chromosome.
      * @return The chromosome sequence for the given chromosome id.
      */
     public int getActiveChromLength() {

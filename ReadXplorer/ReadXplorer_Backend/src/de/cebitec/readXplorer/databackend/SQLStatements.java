@@ -249,7 +249,7 @@ public class SQLStatements {
     /**
      * Update exisiting row of track statistics with sequence pair statistics
      */
-    public static String INSERT_SEQPAIR_STATISTICS =
+    public static String INSERT_READPAIR_STATISTICS =
             "UPDATE " + FieldNames.TABLE_STATISTICS
             + " SET "
             + FieldNames.STATISTICS_NUM_SEQUENCE_PAIRS + " = ?, "
@@ -398,13 +398,27 @@ public class SQLStatements {
             ")";
     
     
-    public final static String DELETE_FEATURES_FROM_GENOME =
+    /**
+     * Delete all genomic features of a chromosome from the feature table.
+     */
+    public final static String DELETE_FEATURES_FROM_CHROMOSOME =
             "DELETE FROM "
             + FieldNames.TABLE_FEATURES
             + " WHERE " +
                 FieldNames.FEATURE_CHROMOSOME_ID+" = ?";
     
+    /**
+     * Delete a chromosome from the chromosome table.
+     */
+    public static String DELETE_CHROMOSOME =
+            "DELETE FROM "
+            + FieldNames.TABLE_CHROMOSOME
+            + " WHERE "
+            + FieldNames.CHROM_ID + " = ?";
     
+    /**
+     * Delete a reference genome from the reference table.
+     */
     public final static String DELETE_GENOME =
             "DELETE FROM "
             + FieldNames.TABLE_REFERENCE

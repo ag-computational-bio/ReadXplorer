@@ -53,17 +53,20 @@ public class ParsedChromosome {
     }
 
     /**
-     * @return The sequence string of this chromosome.
+     * @return The upper case sequence string of this chromosome.
      */
     public String getSequence() {
         return sequence;
     }
 
     /**
+     * Sets the chromosome sequence and transforms it to upper case. Thus, a
+     * chromosome sequence will be only available as upper case in the whole
+     * software.
      * @param sequence The sequence string of this chromosome.
      */
     public void setSequence(String sequence) {
-        this.sequence = sequence;
+        this.sequence = sequence.toUpperCase();
     }
 
     /**

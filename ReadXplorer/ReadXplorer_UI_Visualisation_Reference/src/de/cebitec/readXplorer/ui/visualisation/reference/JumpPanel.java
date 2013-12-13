@@ -473,9 +473,9 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
             //Update the listener for changes to the chromosome selection in this box
             chromListener = chromHelper.new ChromosomeListener(chromComboBox, viewer);
         } else {
-            chromHelper.updateChromBoxContent(chromComboBox, refGenome);
             this.chromObserver.setRefGenome(refGenome);
             this.chromListener.setViewer(viewer);
+            chromHelper.updateChromBoxContent(chromComboBox, refGenome);
         }        
         
         this.chromComboBox.repaint();

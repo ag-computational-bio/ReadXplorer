@@ -43,7 +43,7 @@ public class StatsContainer {
     
     private Map<String, Integer> statsMap;
     private DiscreteCountingDistribution readLengthDistribution;
-    private DiscreteCountingDistribution seqPairSizeDistribution;
+    private DiscreteCountingDistribution readPairSizeDistribution;
     
     /**
      * Statistics container for a track and sequence pair track.
@@ -51,9 +51,9 @@ public class StatsContainer {
     public StatsContainer() {
         statsMap = new HashMap<>();
         readLengthDistribution = new DiscreteCountingDistribution();
-        seqPairSizeDistribution = new DiscreteCountingDistribution();
+        readPairSizeDistribution = new DiscreteCountingDistribution();
         readLengthDistribution.setType(Properties.READ_LENGTH_DISTRIBUTION);
-        seqPairSizeDistribution.setType(Properties.READ_PAIR_SIZE_DISTRIBUTION);
+        readPairSizeDistribution.setType(Properties.READ_PAIR_SIZE_DISTRIBUTION);
     }
 
     /**
@@ -73,17 +73,17 @@ public class StatsContainer {
 
     /**
      * Sets the sequence pair distance distribution for the data set.
-     * @param seqPairSizeDistribution The sequence pair distribution to set
+     * @param readPairSizeDistribution The sequence pair distribution to set
      */
-    public void setSeqPairDistribution(DiscreteCountingDistribution seqPairSizeDistribution) {
-        this.seqPairSizeDistribution = seqPairSizeDistribution;
+    public void setReadPairDistribution(DiscreteCountingDistribution readPairSizeDistribution) {
+        this.readPairSizeDistribution = readPairSizeDistribution;
     }
 
     /**
      * @return The sequence pair size distribution of the data set.
      */
-    public DiscreteCountingDistribution getSeqPairSizeDistribution() {
-        return seqPairSizeDistribution;
+    public DiscreteCountingDistribution getReadPairSizeDistribution() {
+        return readPairSizeDistribution;
     }
 
     /**
@@ -116,7 +116,7 @@ public class StatsContainer {
     /**
      * Fills the stats map with all available entries for a sequence pair track.
      */
-    public void prepareForSeqPairTrack() {
+    public void prepareForReadPairTrack() {
         statsMap.put(NO_SEQ_PAIRS, 0);
         statsMap.put(NO_PERF_PAIRS, 0);
         statsMap.put(NO_ORIENT_WRONG_PAIRS, 0);
@@ -150,7 +150,7 @@ public class StatsContainer {
      * @param type the sequence pair type of the stats to increase
      * @param value the value to add to the corresponding stats
      */
-    public void incSeqPairStats(ReadPairType type, int value) {
+    public void incReadPairStats(ReadPairType type, int value) {
         
         if (type == ReadPairType.PERFECT_PAIR || type == ReadPairType.PERFECT_UNQ_PAIR) {
             this.increaseValue(NO_SEQ_PAIRS, value);

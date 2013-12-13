@@ -88,7 +88,7 @@ public class FastaReferenceParser implements ReferenceParserI {
         ParsedChromosome chrom = new ParsedChromosome();
         chrom.setHasSubFeatures(false);
         chrom.setName(chromName);
-        chrom.setSequence(chromBuilder.toString().toUpperCase());
+        chrom.setSequence(chromBuilder.toString());
         reference.addChromosome(chrom);
     }
 

@@ -218,7 +218,7 @@ public class TrackConnector {
     public StatsContainer getTrackStats(int wantedTrackId) {
         StatsContainer statsContainer = new StatsContainer();
         statsContainer.prepareForTrack();
-        statsContainer.prepareForSeqPairTrack();
+        statsContainer.prepareForReadPairTrack();
 
         try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_STATS_FOR_TRACK)) {
             fetch.setInt(1, wantedTrackId);
@@ -371,17 +371,17 @@ public class TrackConnector {
 
 //    /**
 //     * Store the sequence pair statistics for a sequence pair data set.
-//     * @param numSeqPairs
-//     * @param numPerfectSeqPairs
-//     * @param numUniqueSeqPairs
-//     * @param numUniquePerfectSeqPairs
+//     * @param numReadPairs
+//     * @param numPerfectReadPairs
+//     * @param numUniqueReadPairs
+//     * @param numUniquePerfectReadPairs
 //     * @param numSingleMappings 
 //     */
-//    public void addSeqPairStatistics(int numSeqPairs, int numPerfectSeqPairs, int numUniqueSeqPairs,
-//            int numUniquePerfectSeqPairs, int numSingleMappings) {
+//    public void addReadPairStatistics(int numReadPairs, int numPerfectReadPairs, int numUniqueReadPairs,
+//            int numUniquePerfectReadPairs, int numSingleMappings) {
 //        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing sequence pair statistics");
 //        
-//        try (PreparedStatement addSeqPairStats = con.prepareStatement(SQLStatements.INSERT_SEQPAIR_STATISTICS);
+//        try (PreparedStatement addReadPairStats = con.prepareStatement(SQLStatements.INSERT_READPAIR_STATISTICS);
 //             PreparedStatement latestID = con.prepareStatement(SQLStatements.GET_LATEST_STATISTICS_ID)) {
 //            
 //            // get latest id for track
@@ -392,13 +392,13 @@ public class TrackConnector {
 //            }
 //            id++;
 //                
-//            addSeqPairStats.setLong(1, id);
-//            addSeqPairStats.setInt(2, numSeqPairs);
-//            addSeqPairStats.setInt(3, numPerfectSeqPairs);
-//            addSeqPairStats.setInt(4, numUniqueSeqPairs);
-//            addSeqPairStats.setInt(5, numUniquePerfectSeqPairs);
-//            addSeqPairStats.setInt(6, numSingleMappings);
-//            addSeqPairStats.execute();
+//            addReadPairStats.setLong(1, id);
+//            addReadPairStats.setInt(2, numReadPairs);
+//            addReadPairStats.setInt(3, numPerfectReadPairs);
+//            addReadPairStats.setInt(4, numUniqueReadPairs);
+//            addReadPairStats.setInt(5, numUniquePerfectReadPairs);
+//            addReadPairStats.setInt(6, numSingleMappings);
+//            addReadPairStats.execute();
 //
 //        } catch (SQLException ex) {
 //            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
@@ -548,7 +548,7 @@ public class TrackConnector {
      * @return all data belonging to this sequence pair id (all mappings and
      * pair replicates)
      */
-    public PersistantReadPairGroup getMappingsForSeqPairId(long seqPairId) {
+    public PersistantReadPairGroup getMappingsForReadPairId(long seqPairId) {
 
         PersistantReadPairGroup readPairData = new PersistantReadPairGroup();
         readPairData.setReadPairId(seqPairId);

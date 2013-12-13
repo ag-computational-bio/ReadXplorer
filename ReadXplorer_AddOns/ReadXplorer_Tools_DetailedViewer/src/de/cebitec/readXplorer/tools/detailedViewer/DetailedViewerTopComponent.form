@@ -33,10 +33,10 @@
                       <Component id="alignmentButton" alignment="0" max="32767" attributes="1"/>
                       <Component id="readPairButton" alignment="0" max="32767" attributes="1"/>
                   </Group>
-                  <EmptySpace pref="74" max="32767" attributes="0"/>
+                  <EmptySpace pref="284" max="32767" attributes="0"/>
               </Group>
               <Group type="102" alignment="0" attributes="0">
-                  <Component id="colorHistogramBox" pref="121" max="32767" attributes="0"/>
+                  <Component id="colorHistogramBox" pref="331" max="32767" attributes="0"/>
                   <EmptySpace min="-2" pref="46" max="-2" attributes="0"/>
               </Group>
           </Group>
@@ -61,7 +61,7 @@
         <Component class="javax.swing.JButton" name="histogramButton">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/cebitec/vamp/tools/detailedViewer/Bundle.properties" key="DetailedViewerTopComponent.histogramButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="de/cebitec/readXplorer/tools/detailedViewer/Bundle.properties" key="DetailedViewerTopComponent.histogramButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>
@@ -71,7 +71,7 @@
         <Component class="javax.swing.JButton" name="alignmentButton">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/cebitec/vamp/tools/detailedViewer/Bundle.properties" key="DetailedViewerTopComponent.alignmentButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="de/cebitec/readXplorer/tools/detailedViewer/Bundle.properties" key="DetailedViewerTopComponent.alignmentButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>
@@ -84,7 +84,7 @@
               <Font name="Dialog" size="10" style="1"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/cebitec/vamp/tools/detailedViewer/Bundle.properties" key="DetailedViewerTopComponent.colorHistogramBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="de/cebitec/readXplorer/tools/detailedViewer/Bundle.properties" key="DetailedViewerTopComponent.colorHistogramBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
             <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[50, 22]"/>
@@ -100,7 +100,7 @@
         <Component class="javax.swing.JButton" name="readPairButton">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/cebitec/vamp/tools/detailedViewer/Bundle.properties" key="DetailedViewerTopComponent.readPairButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="de/cebitec/readXplorer/tools/detailedViewer/Bundle.properties" key="DetailedViewerTopComponent.readPairButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>
