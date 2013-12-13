@@ -106,7 +106,7 @@ public class SamBamDirectReadPairClassifier implements ReadPairClassifierI, Obse
      * @throws ParsingException  
      */
     @Override
-    public ParsedReadPairContainer classifySeqPairs() throws ParsingException, OutOfMemoryError {
+    public ParsedReadPairContainer classifyReadPairs() throws ParsingException, OutOfMemoryError {
         
         this.preprocessData(trackJob);
         File oldWorkFile = trackJob.getFile();
@@ -195,7 +195,7 @@ public class SamBamDirectReadPairClassifier implements ReadPairClassifierI, Obse
             
             trackJob.setFile(outputFile);
             
-            this.statsContainer.setSeqPairDistribution(this.readPairSizeDistribution);
+            this.statsContainer.setReadPairDistribution(this.readPairSizeDistribution);
             
         } catch (Exception e) {
             this.notifyObservers(NbBundle.getMessage(SamBamDirectReadPairClassifier.class, "Classifier.Error", e.getMessage()));
@@ -521,7 +521,7 @@ public class SamBamDirectReadPairClassifier implements ReadPairClassifierI, Obse
         this.samBamFileWriter.addAlignment(mapping1);
         this.samBamFileWriter.addAlignment(mapping2);
         this.readPairSizeDistribution.increaseDistribution(readPair.getDistance());
-        this.statsContainer.incSeqPairStats(readPair.getType(), 1);
+        this.statsContainer.incReadPairStats(readPair.getType(), 1);
     }
     
     /**
@@ -561,7 +561,7 @@ public class SamBamDirectReadPairClassifier implements ReadPairClassifierI, Obse
         record.setAttribute(Properties.TAG_SEQ_PAIR_TYPE, ReadPairType.UNPAIRED_PAIR);
         record.setAttribute(Properties.TAG_SEQ_PAIR_ID, readPairId);
         this.samBamFileWriter.addAlignment(record);
-        this.statsContainer.incSeqPairStats(ReadPairType.UNPAIRED_PAIR, 1);
+        this.statsContainer.incReadPairStats(ReadPairType.UNPAIRED_PAIR, 1);
     }
 
     /**

@@ -62,7 +62,7 @@ public class ProjectConnector extends Observable implements Observer {
     private int containerCount = 0;
     private boolean isLastTrack = false;
     private DiscreteCountingDistribution readLengthDistribution;
-    private DiscreteCountingDistribution seqPairLengthDistribution;
+    private DiscreteCountingDistribution readPairLengthDistribution;
     
     /**
      * Responsible for the connection between user interface and data base.
@@ -814,9 +814,9 @@ public class ProjectConnector extends Observable implements Observer {
                     if (!readLengthDistribution.isEmpty()) {
                         this.insertCountDistribution(readLengthDistribution, trackID);
                     }
-                    seqPairLengthDistribution = statsContainer.getSeqPairSizeDistribution();
-                    if (!seqPairLengthDistribution.isEmpty()) {
-                        this.insertCountDistribution(seqPairLengthDistribution, trackID);
+                    readPairLengthDistribution = statsContainer.getReadPairSizeDistribution();
+                    if (!readPairLengthDistribution.isEmpty()) {
+                        this.insertCountDistribution(readPairLengthDistribution, trackID);
                     }
                 }
                 
@@ -862,20 +862,20 @@ public class ProjectConnector extends Observable implements Observer {
     }
     
     /**
-     * Stores sequence pair statistics
+     * Stores read pair statistics
      * @param statsContainer container with the statistics
      * @param trackId track id 
      */
-    public void storeSeqPairTrackStatistics(StatsContainer statsContainer, int trackId) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing sequence pair statistics...");
+    public void storeReadPairTrackStatistics(StatsContainer statsContainer, int trackId) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing read pair statistics...");
 
         Map<String, Integer> statsMap = statsContainer.getStatsMap();
 
         try {
-            long numSeqPairs = statsMap.get(StatsContainer.NO_SEQ_PAIRS);
-            long numUniqueSeqPairs = statsMap.get(StatsContainer.NO_UNIQUE_PAIRS);
-            long numPerfSeqPairs = statsMap.get(StatsContainer.NO_PERF_PAIRS);
-            long numUniquePerfSeqPairs = statsMap.get(StatsContainer.NO_UNIQ_PERF_PAIRS);
+            long numReadPairs = statsMap.get(StatsContainer.NO_SEQ_PAIRS);
+            long numUniqueReadPairs = statsMap.get(StatsContainer.NO_UNIQUE_PAIRS);
+            long numPerfReadPairs = statsMap.get(StatsContainer.NO_PERF_PAIRS);
+            long numUniquePerfReadPairs = statsMap.get(StatsContainer.NO_UNIQ_PERF_PAIRS);
             long numSmallDistPairs = statsMap.get(StatsContainer.NO_SMALL_DIST_PAIRS);
             long numSmallUniqPairs = statsMap.get(StatsContainer.NO_UNIQ_SMALL_PAIRS);
             long numLargeDistPairs = statsMap.get(StatsContainer.NO_LARGE_DIST_PAIRS);
@@ -888,13 +888,13 @@ public class ProjectConnector extends Observable implements Observer {
             long numLargeOrientUniqPairs = statsMap.get(StatsContainer.NO_UNIQ_WRNG_ORIENT_LARGE_PAIRS);
             long numSingleMappings = statsMap.get(StatsContainer.NO_SINGLE_MAPPIGNS);
 
-            try (PreparedStatement addStatistics = con.prepareStatement(SQLStatements.INSERT_SEQPAIR_STATISTICS)) {
+            try (PreparedStatement addStatistics = con.prepareStatement(SQLStatements.INSERT_READPAIR_STATISTICS)) {
 
                 // store track stats in table
-                addStatistics.setLong(1, numSeqPairs);
-                addStatistics.setLong(2, numUniqueSeqPairs);
-                addStatistics.setLong(3, numPerfSeqPairs);
-                addStatistics.setLong(4, numUniquePerfSeqPairs);
+                addStatistics.setLong(1, numReadPairs);
+                addStatistics.setLong(2, numUniqueReadPairs);
+                addStatistics.setLong(3, numPerfReadPairs);
+                addStatistics.setLong(4, numUniquePerfReadPairs);
                 addStatistics.setLong(5, numSmallDistPairs);
                 addStatistics.setLong(6, numSmallUniqPairs);
                 addStatistics.setLong(7, numLargeDistPairs);
@@ -906,7 +906,7 @@ public class ProjectConnector extends Observable implements Observer {
                 addStatistics.setLong(13, numLargeOrientWrongPairs);
                 addStatistics.setLong(14, numLargeOrientUniqPairs);
                 addStatistics.setLong(15, numSingleMappings);
-                addStatistics.setLong(16, statsContainer.getSeqPairSizeDistribution().getAverageValue());
+                addStatistics.setLong(16, statsContainer.getReadPairSizeDistribution().getAverageValue());
                 addStatistics.setLong(17, trackId);
 
                 addStatistics.execute();
@@ -927,20 +927,20 @@ public class ProjectConnector extends Observable implements Observer {
      * @param track1Id track id of first track of the pair
      * @param track2Id track id of second track of the pair
      */
-    public void setSeqPairIdsForTrackIds(long track1Id, long track2Id) {
+    public void setReadPairIdsForTrackIds(long track1Id, long track2Id) {
 
         try {
             //not 0, because 0 is the value when a track is not a sequence pair track!
-            int seqPairId = (int) GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_TRACK_SEQUENCE_PAIR_ID, con);
+            int readPairId = (int) GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_TRACK_SEQUENCE_PAIR_ID, con);
 
-            try (PreparedStatement setSeqPairIds = con.prepareStatement(SQLStatements.INSERT_TRACK_SEQ_PAIR_ID)) {
-                setSeqPairIds.setInt(1, seqPairId);
-                setSeqPairIds.setLong(2, track1Id);
-                setSeqPairIds.execute();
+            try (PreparedStatement setReadPairIds = con.prepareStatement(SQLStatements.INSERT_TRACK_SEQ_PAIR_ID)) {
+                setReadPairIds.setInt(1, readPairId);
+                setReadPairIds.setLong(2, track1Id);
+                setReadPairIds.execute();
 
-                setSeqPairIds.setInt(1, seqPairId);
-                setSeqPairIds.setLong(2, track2Id);
-                setSeqPairIds.execute();
+                setReadPairIds.setInt(1, readPairId);
+                setReadPairIds.setLong(2, track2Id);
+                setReadPairIds.execute();
             }
 
         } catch (SQLException ex) {
@@ -958,7 +958,7 @@ public class ProjectConnector extends Observable implements Observer {
     /**
      * Locks all tables involved when adding seq pair data in mysql fashion.
      */
-    private void lockSeqPairDomainTables() {
+    private void lockReadPairDomainTables() {
         this.lockDomainTables(MySQLStatements.LOCK_TABLE_SEQUENCE_PAIRS_DOMAIN, "seq pair");
     }
 
@@ -1035,11 +1035,11 @@ public class ProjectConnector extends Observable implements Observer {
         }
     }
 
-    private void disableSeqPairDomainIndices() {
+    private void disableReadPairDomainIndices() {
         this.disableDomainIndices(MySQLStatements.DISABLE_SEQUENCE_PAIR_INDICES, "seq pair");
     }
 
-    private void enableSeqPairDomainIndices() {
+    private void enableReadPairDomainIndices() {
         this.enableDomainIndices(MySQLStatements.ENABLE_SEQUENCE_PAIR_INDICES, "seq pair");
     }
 
@@ -1298,8 +1298,8 @@ public class ProjectConnector extends Observable implements Observer {
                 Timestamp date = rs.getTimestamp(FieldNames.TRACK_TIMESTAMP);
                 int refGenID = rs.getInt(FieldNames.TRACK_REFERENCE_ID);
                 String filePath = rs.getString(FieldNames.TRACK_PATH);
-                int seqPairId = rs.getInt(FieldNames.TRACK_READ_PAIR_ID);
-                track = new PersistantTrack(id, filePath, description, date, refGenID, seqPairId);
+                int readPairId = rs.getInt(FieldNames.TRACK_READ_PAIR_ID);
+                track = new PersistantTrack(id, filePath, description, date, refGenID, readPairId);
             }
 
         } catch (SQLException ex) {
@@ -1325,9 +1325,9 @@ public class ProjectConnector extends Observable implements Observer {
     public void deleteTrack(int trackID) throws StorageException {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting deletion of track with id \"{0}\"", trackID);
         try (PreparedStatement deleteDiffs = con.prepareStatement(SQLStatements.DELETE_DIFFS_FROM_TRACK);
-             PreparedStatement deleteSeqPairPivot = con.prepareStatement(SQLStatements.DELETE_SEQUENCE_PAIR_PIVOT);
-             PreparedStatement deleteSeqPairReplicates = con.prepareStatement(SQLStatements.DELETE_SEQUENCE_PAIR_REPLICATE);
-             PreparedStatement deleteSeqPairs = con.prepareStatement(SQLStatements.DELETE_SEQUENCE_PAIRS);
+             PreparedStatement deleteReadPairPivot = con.prepareStatement(SQLStatements.DELETE_SEQUENCE_PAIR_PIVOT);
+             PreparedStatement deleteReadPairReplicates = con.prepareStatement(SQLStatements.DELETE_SEQUENCE_PAIR_REPLICATE);
+             PreparedStatement deleteReadPairs = con.prepareStatement(SQLStatements.DELETE_SEQUENCE_PAIRS);
              PreparedStatement deleteMappings = con.prepareStatement(SQLStatements.DELETE_MAPPINGS_FROM_TRACK);
              PreparedStatement deleteCoverage = con.prepareStatement(SQLStatements.DELETE_COVERAGE_FROM_TRACK);
              PreparedStatement deleteStatistics = con.prepareStatement(SQLStatements.DELETE_STATISTIC_FROM_TRACK);
@@ -1337,19 +1337,19 @@ public class ProjectConnector extends Observable implements Observer {
             
             con.setAutoCommit(false);
             boolean isDBused = this.getTrack(trackID).isDbUsed();
-            int seqPairTrack = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_READ_PAIR_TO_TRACK_ID, SQLStatements.GET_NUM, con, trackID);
+            int readPairTrack = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_READ_PAIR_TO_TRACK_ID, SQLStatements.GET_NUM, con, trackID);
             if (isDBused) {
-                if (seqPairTrack > 0) {
-                    deleteSeqPairPivot.setLong(1, trackID);
-                    deleteSeqPairReplicates.setLong(1, trackID);
-                    deleteSeqPairs.setLong(1, trackID);
+                if (readPairTrack > 0) {
+                    deleteReadPairPivot.setLong(1, trackID);
+                    deleteReadPairReplicates.setLong(1, trackID);
+                    deleteReadPairs.setLong(1, trackID);
 
                     Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Seq Pair Pivot data...");
-                    deleteSeqPairPivot.execute();
+                    deleteReadPairPivot.execute();
                     Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Seq Pair Replicate data...");
-                    deleteSeqPairReplicates.execute();
+                    deleteReadPairReplicates.execute();
                     Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Seq Pair Main data...");
-                    deleteSeqPairs.execute();
+                    deleteReadPairs.execute();
 
                     con.commit();
                 }
@@ -1405,17 +1405,29 @@ public class ProjectConnector extends Observable implements Observer {
      */
     public void deleteGenome(int refGenID) throws StorageException {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting deletion of reference genome with id \"{0}\"", refGenID);
-        try (PreparedStatement deleteFeatures = con.prepareStatement(SQLStatements.DELETE_FEATURES_FROM_GENOME);
-             PreparedStatement deleteGenome = con.prepareStatement(SQLStatements.DELETE_GENOME);) {
+        ReferenceConnector refCon = this.getRefGenomeConnector(refGenID);
+        try (PreparedStatement deleteFeatures = con.prepareStatement(SQLStatements.DELETE_FEATURES_FROM_CHROMOSOME);
+             PreparedStatement deleteChrom = con.prepareStatement(SQLStatements.DELETE_CHROMOSOME);
+             PreparedStatement deleteGenome = con.prepareStatement(SQLStatements.DELETE_GENOME)) {
             
             con.setAutoCommit(false);
             
-            deleteFeatures.setLong(1, refGenID);
+            Map<Integer,PersistantChromosome> chroms = refCon.getChromosomesForGenome();
+            for (PersistantChromosome chrom : chroms.values()) {
+                
+                deleteFeatures.setLong(1, chrom.getId());
+                deleteChrom.setInt(1, chrom.getId());
+                
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting features for chromosome {0}...", chrom.getName());
+                deleteFeatures.execute();
+                
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting chromosome {0}...", chrom.getName());
+                deleteChrom.execute();
+                
+            }
+            
             deleteGenome.setLong(1, refGenID);
-
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting features...");
-            deleteFeatures.execute();
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Genome...");
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Genome {0}...", refCon.getRefGenome().getName());
             deleteGenome.execute();
 
             con.commit();
@@ -1491,19 +1503,16 @@ public class ProjectConnector extends Observable implements Observer {
                 dbVersion = rs.getInt(FieldNames.DB_VERSION_DB_VERSION_NO);
             } 
             
-            //update DB = switch all references to upper case
-            if (dbVersion < 1) {
-                updateNeeded = true;
-                this.refsToUpperCase();
-            }
-            
             //move references to chromosome table
             if (dbVersion < 2) {
                 updateNeeded = true;
                 this.createChromsFromRefs();
-                PreparedStatement setDBVersion = con.prepareStatement(SQLStatements.INSERT_DB_VERSION_NO);
-                setDBVersion.setInt(1, DB_VERSION_NO);
-                setDBVersion.executeUpdate();
+            }
+            
+            //update DB = switch all references to upper case
+            if (dbVersion < 1) {
+                updateNeeded = true;
+                this.refsToUpperCase();
             }
             
             if (updateNeeded) {
@@ -1516,6 +1525,60 @@ public class ProjectConnector extends Observable implements Observer {
             Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Done checking DB version and updated to latest version");
+    }
+
+    /**
+     * Moves all reference sequences, still stored in the reference table into
+     * the chromosome table and creates corresponding ids and chromosome names.
+     * It also sets the corresponding chromosome id for all genomic features in 
+     * the feature table and removes the reference sequence column from the
+     * reference table.
+     * This method is intended for DBs < version 2.
+     */
+    private void createChromsFromRefs() {
+        List<PersistantReference> refList = this.getGenomes();
+        for (PersistantReference ref : refList) {
+            try (PreparedStatement fetchRefSeq = con.prepareStatement(SQLStatements.FETCH_REF_SEQ)) {
+                fetchRefSeq.setInt(1, ref.getId());
+                ResultSet rs = fetchRefSeq.executeQuery();
+                if (rs.next()) {
+
+                    String refSeq = rs.getString(FieldNames.REF_GEN_SEQUENCE);
+                    String chromName = rs.getString(FieldNames.REF_GEN_NAME);
+
+                    ParsedChromosome newChrom = new ParsedChromosome();
+                    newChrom.setSequence(refSeq);
+                    newChrom.setName(chromName);
+
+                    this.storeChromosome(newChrom, 1, ref.getId());
+
+
+                    //add column chromosome id to features
+                    this.runSqlStatement(GenericSQLQueries.genAddColumnString(FieldNames.TABLE_FEATURES,
+                            FieldNames.FEATURE_CHROMOSOME_ID, BIGINT_UNSIGNED));
+
+                    //Update chromosome ids of the features for this reference
+                    //Since there is exactly one chrom for the current genome, we can query it as follows:
+                    PersistantChromosome chrom = getRefGenomeConnector(ref.getId()).getChromosomesForGenome().values().iterator().next();
+
+                    PreparedStatement updateFeatureTable = con.prepareStatement(SQLStatements.UPDATE_FEATURE_TABLE);
+                    updateFeatureTable.setInt(1, chrom.getId());
+                    updateFeatureTable.setInt(2, ref.getId());
+                    updateFeatureTable.executeUpdate();
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        //after setting all chromosome ids of the features, now we can delete the REFGEN_ID
+        this.runSqlStatement(SQLStatements.NOT_NULL_CHROMOSOME_ID);
+        //Drop old REFGEN_ID column
+        this.runSqlStatement(GenericSQLQueries.genRemoveColumnString(
+                FieldNames.TABLE_FEATURES, "REFGEN_ID"));
+        //Drop old ref seq column for this DB
+        this.runSqlStatement(GenericSQLQueries.genRemoveColumnString(
+                FieldNames.TABLE_REFERENCE, FieldNames.REF_GEN_SEQUENCE));
     }
 
     /**
@@ -1537,52 +1600,6 @@ public class ProjectConnector extends Observable implements Observer {
                 }
             }
         }
-    }
-    
-    private void createChromsFromRefs() {
-        List<PersistantReference> refList = this.getGenomes();
-        for (PersistantReference ref : refList) {
-            try (PreparedStatement fetchRefSeq = con.prepareStatement(SQLStatements.FETCH_REF_SEQ)) {
-                fetchRefSeq.setInt(1, ref.getId());
-                ResultSet rs = fetchRefSeq.executeQuery();
-                if (rs.next()) {
-                    
-                    String refSeq = rs.getString(FieldNames.REF_GEN_SEQUENCE);
-                    String chromName = rs.getString(FieldNames.REF_GEN_NAME);
-                    
-                    ParsedChromosome newChrom = new ParsedChromosome();
-                    newChrom.setSequence(refSeq);
-                    newChrom.setName(chromName);
-                    
-                    this.storeChromosome(newChrom, 1, ref.getId());
-                    
-                    
-                    //add column chromosome id to features
-                    this.runSqlStatement(GenericSQLQueries.genAddColumnString(FieldNames.TABLE_FEATURES,
-                            FieldNames.FEATURE_CHROMOSOME_ID, BIGINT_UNSIGNED));
-                    
-                    //Update chromosome ids of the features for this reference
-                    //Since there is exactly one chrom for the current genome, we can query it as follows:
-                    PersistantChromosome chrom = getRefGenomeConnector(ref.getId()).getChromosomesForGenome().values().iterator().next();
-                    
-                    PreparedStatement updateFeatureTable = con.prepareStatement(SQLStatements.UPDATE_FEATURE_TABLE);
-                    updateFeatureTable.setInt(1, chrom.getId());
-                    updateFeatureTable.setInt(2, ref.getId());
-                    updateFeatureTable.executeUpdate();
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        
-        //after setting all chromosome ids of the features, now we can delete the REFGEN_ID
-        this.runSqlStatement(SQLStatements.NOT_NULL_CHROMOSOME_ID);
-        //Drop old REFGEN_ID column
-        this.runSqlStatement(GenericSQLQueries.genRemoveColumnString(
-                FieldNames.TABLE_FEATURES, "REFGEN_ID"));
-        //Drop old ref seq column for this DB
-        this.runSqlStatement(GenericSQLQueries.genRemoveColumnString(
-                FieldNames.TABLE_REFERENCE, FieldNames.REF_GEN_SEQUENCE));
     }
 
     @Override

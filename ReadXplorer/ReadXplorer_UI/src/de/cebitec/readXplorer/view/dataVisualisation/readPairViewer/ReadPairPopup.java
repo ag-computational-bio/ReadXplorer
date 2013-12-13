@@ -208,7 +208,7 @@ public class ReadPairPopup extends JPopupMenu {
         if (parentViewer instanceof ReadPairViewer){
             ReadPairViewer viewer = (ReadPairViewer) this.parentViewer;
             if (viewer.isDbViewer()) {
-                ((ReadPairViewer) this.parentViewer).getSeqPairInfoFromDB(this.block.getSeqPairId());
+                ((ReadPairViewer) this.parentViewer).getReadPairInfoFromDB(this.block.getSeqPairId());
             } else {
                 seqPairGroup = (PersistantReadPairGroup) this.block.getPersistantObject();
             }

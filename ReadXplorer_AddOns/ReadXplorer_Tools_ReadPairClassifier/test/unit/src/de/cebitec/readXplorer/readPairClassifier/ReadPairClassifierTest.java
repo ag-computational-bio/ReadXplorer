@@ -282,7 +282,7 @@ public class ReadPairClassifierTest {
     }
 
     /**
-     * Test of classifySeqPairs method, of class ReadPairClassifier.
+     * Test of classifyReadPairs method, of class ReadPairClassifier.
      * @throws Exception 
      */
     @Test
@@ -291,8 +291,8 @@ public class ReadPairClassifierTest {
         
         short orientation = 0; // 0 = fr, 1 = rf, 2 = ff/rr
         ReadPairClassifier seqPaircalc = new ReadPairClassifier(fwdTrack, revTrack, 500, 10, orientation);
-        ParsedReadPairContainer result = seqPaircalc.classifySeqPairs();
-        HashMap<Pair<Long, Long>, ParsedReadPairMapping> pairs = result.getParsedSeqPairs();
+        ParsedReadPairContainer result = seqPaircalc.classifyReadPairs();
+        HashMap<Pair<Long, Long>, ParsedReadPairMapping> pairs = result.getParsedReadPairs();
         List<Pair<Long,Long>> list = result.getMappingToPairIdList();
         
         //perfect pair
