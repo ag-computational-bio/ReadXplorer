@@ -5,6 +5,7 @@ import de.cebitec.readXplorer.parser.common.ParserI;
 import de.cebitec.readXplorer.parser.common.ParsingException;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.StatsContainer;
+import java.util.Map;
 
 /**
  * Interface to be implemented for all mapping parsers.
@@ -17,22 +18,23 @@ public interface MappingParserI extends ParserI, Observable, PreprocessorI {
     /**
      * Parses the input determined by the track job.
      * @param trackJob the track job to parse
-     * @param sequenceString the reference sequence
+     * @param chromSeqMap the map of chromosome names to chromosome sequences
      * @return the parsed data object
      * @throws ParsingException
      * @throws OutOfMemoryError 
      */
-    public Object parseInput(TrackJob trackJob, String sequenceString) throws ParsingException, OutOfMemoryError;
+    public Object parseInput(TrackJob trackJob, Map<String, String> chromSeqMap) throws ParsingException, OutOfMemoryError;
     
     /**
      * Converts some data for the given track job and the given reference.
      * @param trackJob the track job whose data needs to be converted
-     * @param referenceSequence the reference sequence associated to the track job
+     * @param chromLengthMap the mapping of chromosome name to chromosome length
+     * for this track
      * @return Any object the specific implementation needs
      * @throws ParsingException
      * @throws OutOfMemoryError  
      */
-    public Object convert(TrackJob trackJob, String referenceSequence) throws ParsingException, OutOfMemoryError;
+    public Object convert(TrackJob trackJob, Map<String, Integer> chromLengthMap) throws ParsingException, OutOfMemoryError;
         
     /**
      * Sets the given stats container to this parser. Then this parser can

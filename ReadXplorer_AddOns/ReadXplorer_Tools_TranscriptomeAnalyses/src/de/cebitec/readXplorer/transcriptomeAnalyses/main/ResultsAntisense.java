@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
@@ -19,8 +15,8 @@ public class ResultsAntisense extends ResultTrackAnalysis<ParameterSetFiveEnrich
     private List<Antisense> results;
     ParameterSetFiveEnrichedAnalyses parameters;
     
-    public ResultsAntisense(Map<Integer, PersistantTrack> trackMap, List<Antisense> asResults, boolean combineTracks) {
-        super(trackMap, combineTracks);
+    public ResultsAntisense(Map<Integer, PersistantTrack> trackMap, List<Antisense> asResults, int refId, boolean combineTracks) {
+        super(trackMap, refId, combineTracks);
         this.results = asResults;
     }
 

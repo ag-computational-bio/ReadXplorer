@@ -15,6 +15,7 @@ import de.cebitec.readXplorer.util.StatsContainer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMRecord;
@@ -54,15 +55,14 @@ public class SamBamStatsParser implements Observable {
      * to be sorted by position. The data to store is directly forwarded to the
      * observer, which should then further process it (store it in the db).
      * @param trackJob track job whose position table needs to be created
-     * @param refSeqWhole reference genome sequence
+     * @param chromLengthMap mapping of chromosome name 
      * @return  
      */
     @SuppressWarnings("fallthrough")
-    public ParsedTrack createTrackStats(TrackJob trackJob, String refSeqWhole) {
+    public ParsedTrack createTrackStats(TrackJob trackJob, Map<String, Integer> chromLengthMap) {
         
         long startTime = System.currentTimeMillis();
         String fileName = trackJob.getFile().getName();
-        String refName = trackJob.getRefGen().getName();
         this.notifyObservers(NbBundle.getMessage(SamBamStatsParser.class, "StatsParser.Start", fileName));
 
 //        int noMappings = 0;
@@ -104,14 +104,14 @@ public class SamBamStatsParser implements Observable {
 
                     record = samItor.next();
                     readName = record.getReadName();
-                    if (!record.getReadUnmappedFlag() && record.getReferenceName().equals(refName)) {
+                    if (!record.getReadUnmappedFlag() && chromLengthMap.containsKey(record.getReferenceName())) {
 
                         cigar = record.getCigarString();
                         start = record.getAlignmentStart();
                         stop = record.getAlignmentEnd();
                         readSeq = record.getReadString();
 
-                        if (!ParserCommonMethods.checkReadSam(this, readSeq, refSeqWhole.length(), cigar, start, stop, fileName, lineno)) {
+                        if (!CommonsMappingParser.checkReadSam(this, readSeq, chromLengthMap.get(record.getReferenceName()), cigar, start, stop, fileName, lineno)) {
                             continue; //continue, and ignore read, if it contains inconsistent information
                         }
 

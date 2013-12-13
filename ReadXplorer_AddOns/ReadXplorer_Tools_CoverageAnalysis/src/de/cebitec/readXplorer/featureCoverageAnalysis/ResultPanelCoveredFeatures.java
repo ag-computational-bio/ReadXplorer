@@ -6,6 +6,7 @@
 package de.cebitec.readXplorer.featureCoverageAnalysis;
 
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.readXplorer.util.UneditableTableModel;
@@ -42,6 +43,7 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
     private Map<String, Integer> coveredStatisticsMap;
     private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
     private ReferenceFeatureTopComp refFeatureComp;
+    private PersistantReference refGenome;
     
     
     /**
@@ -60,7 +62,9 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                TableUtils.showPosition(coveredFeaturesTable, 0, bim);
+                int posColumnIdx = 0;
+                int chromColumnIdx = 2;
+                TableUtils.showPosition(coveredFeaturesTable, posColumnIdx, chromColumnIdx, bim);
                 refFeatureComp.showTableFeature(coveredFeaturesTable, 0);
             }
         });
@@ -86,14 +90,14 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Feature", "Track", "Strand", "Start", "Stop", "Length", "Covered Percent", "Covered Bases"
+                "Feature", "Track", "Chromosome", "Strand", "Start", "Stop", "Length", "Covered Percent", "Covered Bases"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
+                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -106,13 +110,14 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
         });
         coveredFeaturesPane.setViewportView(coveredFeaturesTable);
         coveredFeaturesTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title0")); // NOI18N
-        coveredFeaturesTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title7_1")); // NOI18N
-        coveredFeaturesTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title7")); // NOI18N
-        coveredFeaturesTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title8")); // NOI18N
-        coveredFeaturesTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title9")); // NOI18N
-        coveredFeaturesTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title10")); // NOI18N
-        coveredFeaturesTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title11")); // NOI18N
-        coveredFeaturesTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title12")); // NOI18N
+        coveredFeaturesTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title7_1_1")); // NOI18N
+        coveredFeaturesTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title8_1")); // NOI18N
+        coveredFeaturesTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title7_2")); // NOI18N
+        coveredFeaturesTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title8_2")); // NOI18N
+        coveredFeaturesTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title9_2")); // NOI18N
+        coveredFeaturesTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title10_1")); // NOI18N
+        coveredFeaturesTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title11_1")); // NOI18N
+        coveredFeaturesTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title12_1")); // NOI18N
 
         exportButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.exportButton.text")); // NOI18N
         exportButton.addActionListener(new java.awt.event.ActionListener() {
@@ -180,7 +185,7 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
      * @param coveredFeaturesResultNew 
      */
     public void addCoveredFeatures(final CoveredFeatureResult coveredFeaturesResultNew) {
-        final int nbColumns = 8;
+        final int nbColumns = 9;
         final List<CoveredFeature> features = new ArrayList<>(coveredFeaturesResultNew.getResults());
         
         if (this.coveredFeaturesResult == null) {
@@ -197,15 +202,17 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
         for (CoveredFeature coveredFeature : features) {
 
             Object[] rowData = new Object[nbColumns];
+            int i = 0;
             feature = coveredFeature.getCoveredFeature();
-            rowData[0] = feature;
-            rowData[1] = coveredFeaturesResultNew.getTrackEntry(coveredFeature.getTrackId(), false);
-            rowData[2] = feature.isFwdStrandString();
-            rowData[3] = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
-            rowData[4] = feature.isFwdStrand() ? feature.getStop() : feature.getStart();
-            rowData[5] = feature.getStop() - feature.getStart();
-            rowData[6] = coveredFeature.getPercentCovered();
-            rowData[7] = coveredFeature.getNoCoveredBases();
+            rowData[i++] = feature;
+            rowData[i++] = coveredFeaturesResultNew.getTrackEntry(coveredFeature.getTrackId(), false);
+            rowData[i++] = coveredFeaturesResultNew.getChromosomeMap().get(feature.getChromId());
+            rowData[i++] = feature.isFwdStrandString();
+            rowData[i++] = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
+            rowData[i++] = feature.isFwdStrand() ? feature.getStop() : feature.getStart();
+            rowData[i++] = feature.getStop() - feature.getStart();
+            rowData[i++] = coveredFeature.getPercentCovered();
+            rowData[i++] = coveredFeature.getNoCoveredBases();
 
             model.addRow(rowData);
         }
@@ -231,5 +238,9 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
      */
     public int getResultSize() {
         return this.coveredFeaturesResult.getResults().size();
+    }
+    
+    public void setReferenceGenome(PersistantReference refGenome) {
+        this.refGenome = refGenome;
     }
 }

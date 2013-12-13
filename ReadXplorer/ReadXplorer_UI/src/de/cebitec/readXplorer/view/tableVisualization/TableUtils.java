@@ -1,5 +1,6 @@
 package de.cebitec.readXplorer.view.tableVisualization;
 
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.util.PositionUtils;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
@@ -42,18 +43,25 @@ public class TableUtils {
     }
     
     /**
-     * Updates the navigator bar of all viewers to the given position, which
-     * might be in String or Integer format or updates the viewers to the start
-     * position of a selected PersistantFeature with respect to the strand on
-     * which the feature is located.
+     * Updates the navigator bar of all viewers to the given position and
+     * chromosome, which might be in String or Integer format or updates the
+     * viewers to the start position of a selected PersistantFeature with
+     * respect to the strand on which the feature is located.
      * @param table the table whose selected element's position is to be shown
-     * @param featureColumnIndex the index of the table model column holding the position
+     * @param posColumnIndex the index of the table model column holding the
+     * position
+     * @param chromColumnIdx The index of the table model column holding the
+     * chromosome on which the position to show is located
      * @param bim the bounds information manager which should be updated
      */
-    public static void showPosition(JTable table, int featureColumnIndex, BoundsInfoManager bim) {
+    public static void showPosition(JTable table, int posColumnIndex, int chromColumnIdx, BoundsInfoManager bim) {
         int selectedModelRow = TableUtils.getSelectedModelRow(table);
         if (selectedModelRow > -1) {
-                Object value = table.getModel().getValueAt(selectedModelRow, featureColumnIndex);
+                Object value = table.getModel().getValueAt(selectedModelRow, posColumnIndex);
+                Object chromValue = table.getModel().getValueAt(selectedModelRow, chromColumnIdx);
+                if (chromValue instanceof PersistantChromosome) {
+                    bim.chromosomeChanged(((PersistantChromosome) chromValue).getId());
+                }
                 
                 if (value instanceof PersistantFeature) {
                     PersistantFeature feature = (PersistantFeature) value;

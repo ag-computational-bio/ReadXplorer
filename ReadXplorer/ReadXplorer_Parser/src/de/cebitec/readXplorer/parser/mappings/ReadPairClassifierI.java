@@ -17,6 +17,6 @@ public interface ReadPairClassifierI extends PreprocessorI {
      * @throws ParsingException
      * @throws OutOfMemoryError  
      */
-    public ParsedReadPairContainer classifySeqPairs() throws ParsingException, OutOfMemoryError;
+    public ParsedReadPairContainer classifyReadPairs() throws ParsingException, OutOfMemoryError;
 
 }

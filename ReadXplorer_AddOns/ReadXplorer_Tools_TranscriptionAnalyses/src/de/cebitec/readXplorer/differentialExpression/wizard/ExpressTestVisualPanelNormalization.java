@@ -102,24 +102,24 @@ public final class ExpressTestVisualPanelNormalization extends JPanel {
         featureTable = new javax.swing.JTable();
 
         calculateButton.setSelected(true);
-        org.openide.awt.Mnemonics.setLocalizedText(calculateButton, org.openide.util.NbBundle.getMessage(ExpressTestVisualPanelNormalization.class, "ExpressTestVisualPanelNormalization.calculateButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(calculateButton, org.openide.util.NbBundle.getMessage(ExpressTestVisualPanelNormalization.class, "ExpressTestVisualPanelNormalization.calculateButton.text_1")); // NOI18N
         calculateButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 calculateButtonActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(useHKGButton, org.openide.util.NbBundle.getMessage(ExpressTestVisualPanelNormalization.class, "ExpressTestVisualPanelNormalization.useHKGButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(useHKGButton, org.openide.util.NbBundle.getMessage(ExpressTestVisualPanelNormalization.class, "ExpressTestVisualPanelNormalization.useHKGButton.text_1")); // NOI18N
         useHKGButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 useHKGButtonActionPerformed(evt);
             }
         });
 
-        searchField.setText(org.openide.util.NbBundle.getMessage(ExpressTestVisualPanelNormalization.class, "ExpressTestVisualPanelNormalization.searchField.text")); // NOI18N
+        searchField.setText(org.openide.util.NbBundle.getMessage(ExpressTestVisualPanelNormalization.class, "ExpressTestVisualPanelNormalization.searchField.text_1")); // NOI18N
         searchField.setEnabled(false);
 
-        org.openide.awt.Mnemonics.setLocalizedText(searchLable, org.openide.util.NbBundle.getMessage(ExpressTestVisualPanelNormalization.class, "ExpressTestVisualPanelNormalization.searchLable.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(searchLable, org.openide.util.NbBundle.getMessage(ExpressTestVisualPanelNormalization.class, "ExpressTestVisualPanelNormalization.searchLable.text_1")); // NOI18N
         searchLable.setEnabled(false);
 
         jScrollPane2.setEnabled(false);
@@ -153,13 +153,13 @@ public final class ExpressTestVisualPanelNormalization extends JPanel {
                             .addComponent(searchField)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(searchLable)
-                                .addGap(0, 0, Short.MAX_VALUE)))
+                                .addGap(0, 243, Short.MAX_VALUE)))
                         .addGap(224, 224, 224))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(calculateButton)
                             .addComponent(useHKGButton))
-                        .addContainerGap(94, Short.MAX_VALUE))))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

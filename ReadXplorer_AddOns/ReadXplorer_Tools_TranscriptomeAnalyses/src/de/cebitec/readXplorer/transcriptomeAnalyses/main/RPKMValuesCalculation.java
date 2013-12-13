@@ -24,12 +24,11 @@ public class RPKMValuesCalculation {
      */
     private HashMap<Integer, PersistantFeature> allRegionsInHash;
     private Statistics stats;
-    private final int[] forwardStarts, reverseStarts;
-    private final int[] forwardCoverage, reverseCoverage;
+    private final int[][] forwardStarts, reverseStarts;
+    private final int[][] forwardCoverage, reverseCoverage;
     private final double mm, mc;
-    private int trackID;
 
-    public RPKMValuesCalculation(HashMap<Integer, PersistantFeature> persFeatures, Statistics stats, int trackID) {
+    public RPKMValuesCalculation(HashMap<Integer, PersistantFeature> persFeatures, Statistics stats) {
         this.allRegionsInHash = persFeatures;
         this.rpkmValues = new ArrayList<>();
         this.stats = stats;
@@ -39,7 +38,6 @@ public class RPKMValuesCalculation {
         this.reverseCoverage = this.stats.getRevCoverage();
         this.mm = this.stats.getMm();
         this.mc = this.stats.getMc();
-        this.trackID = trackID;
 
     }
 
@@ -51,11 +49,16 @@ public class RPKMValuesCalculation {
 
         Map<Integer, PersistantFeature> allRegionsSorted = new TreeMap<>(this.allRegionsInHash);
         Set<Integer> keys = allRegionsSorted.keySet();
-        PersistantFeature feature = null;
+        PersistantFeature feature;
+
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //TODO: pass referenceGenome to this method/class and get the list of chromosomes.
+        //The needed chromosome can be access via: feature.getChromId()
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         for (Integer id : keys) {
             feature = allRegionsSorted.get(id);
-            if(feature.getType() == FeatureType.RRNA || feature.getType() == FeatureType.TRNA) {
+            if (feature.getType() == FeatureType.RRNA || feature.getType() == FeatureType.TRNA) {
                 continue;
             }
 
@@ -64,13 +67,19 @@ public class RPKMValuesCalculation {
             boolean isFwd = feature.isFwdStrand();
             RPKMvalue rpkm = null;
             if (isFwd) {
-//                System.out.println("Feature fwd: " + feature.getFeatureName());
-                rpkm = this.calculateStatistics(start, stop, forwardStarts, forwardCoverage, this.mm, this.mc);
+                System.out.println("Feature fwd: " + feature.getFeatureName());
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                //TODO: Replace feature.getChromId() by appropriavte chromNo
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                rpkm = this.calculateStatistics(feature.getChromId(), start, stop, forwardStarts, forwardCoverage, this.mm, this.mc);
                 rpkm.setFeature(feature);
                 rpkmValues.add(rpkm);
             } else {
-//                System.out.println("Feature rev: " + feature.getFeatureName());
-                rpkm = this.calculateStatistics(start, stop, reverseStarts, reverseCoverage, this.mm, this.mc);
+                System.out.println("Feature rev: " + feature.getFeatureName());
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                //TODO: Replace feature.getChromId() by appropriavte chromNo
+                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                rpkm = this.calculateStatistics(feature.getChromId(), start, stop, reverseStarts, reverseCoverage, this.mm, this.mc);
                 rpkm.setFeature(feature);
                 rpkmValues.add(rpkm);
             }
@@ -128,7 +137,7 @@ public class RPKMValuesCalculation {
      * @param mc
      * @return RPKMvalue object with all rpkm values.
      */
-    private RPKMvalue calculateStatistics(int start, int stop, int[] starts, int[] covered, double mm, double mc) {
+    private RPKMvalue calculateStatistics(int chromNo, int start, int stop, int[][] starts, int[][] covered, double mm, double mc) {
 
         int length = stop - start;
         List<Double> logdata = new ArrayList<>();
@@ -146,7 +155,7 @@ public class RPKMValuesCalculation {
         int count = 0;
         int sum = 0;
         for (int i = start; i < stop; i++) {
-            int j = starts[i];
+            int j = starts[chromNo][i];
             if (j != 0) {
                 count++;
                 sum += j;
@@ -173,7 +182,7 @@ public class RPKMValuesCalculation {
         List<Double> sortedCoveredArr = new ArrayList<>();
         count = 0;
         for (int i = start; i < stop; i++) {
-            int j = covered[i];
+            int j = covered[chromNo][i];
             if (j != 0) {
                 count++;
                 covsum += j;
@@ -200,7 +209,7 @@ public class RPKMValuesCalculation {
             coverageLogRpkm = Math.exp(mean(covLogdata) * count / length * 1000 / mc);
         }
 
-        return new RPKMvalue(null, rpkm, logRpkm, coverageRpkm, coverageLogRpkm, sum, covsum, this.trackID);
+        return new RPKMvalue(null, rpkm, logRpkm, coverageRpkm, coverageLogRpkm, sum, covsum, 0);
     }
 
     /**
@@ -209,9 +218,9 @@ public class RPKMValuesCalculation {
      */
     private double median(List<Double> m) {
         int length = m.size();
-//        System.out.println("Length: " + length);
+        System.out.println("Length: " + length);
         int middle = length / 2;
-//        System.out.println("Middle: " + middle);
+        System.out.println("Middle: " + middle);
         if (length % 2 == 1) {
             return m.get(middle);
         } else {

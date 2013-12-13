@@ -7,6 +7,7 @@ import de.cebitec.readXplorer.api.cookies.OpenTrackCookie;
 import de.cebitec.readXplorer.controller.ViewController;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readXplorer.view.TopComponentExtended;
+import de.cebitec.readXplorer.view.TopComponentHelper;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.MultipleTrackViewer;
@@ -16,6 +17,7 @@ import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -37,6 +39,7 @@ import javax.swing.JScrollPane;
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.svggen.SVGGraphics2DIOException;
+import org.biojava.utils.xml.AppBeanRunner;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
@@ -255,6 +258,7 @@ public final class AppPanelTopComponent extends TopComponentExtended implements 
         // put the panels ReferenceViewer in lookup so it can be accessed
         BasePanel bp = (BasePanel) refGenPanel;
         ReferenceViewer rv = (ReferenceViewer) bp.getViewer();
+        rv.setViewerLookup(localLookup);
         content.add(rv);
         this.referenceViewer = rv;
 
@@ -343,7 +347,6 @@ public final class AppPanelTopComponent extends TopComponentExtended implements 
     /**
      * Checks all components recursively for a JPanel and returns the first one
      * found. If there is no JPanel among the components, null is returned.
-     *
      * @param comps component array to check for a JPanel
      * @return The first identified JPanel or null, if there is no JPanel
      */
@@ -380,7 +383,6 @@ public final class AppPanelTopComponent extends TopComponentExtended implements 
 
     /**
      * Updates the status of all track viewers belonging to this top component.
-     *
      * @param isActive true, if track viewers should be active, false, if not.
      */
     private void changeActiveTrackStatus(boolean isActive) {

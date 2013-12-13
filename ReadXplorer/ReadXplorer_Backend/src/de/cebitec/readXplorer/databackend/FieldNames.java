@@ -15,6 +15,7 @@ public class FieldNames {
     // names for various database tables
     public static final String TABLE_PROJECT_FOLDER = "PROJECT_FOLDER";
     public final static String TABLE_REFERENCE = "REFERENCE";
+    public final static String TABLE_CHROMOSOME = "CHROMOSOME";
     public final static String TABLE_DIFF = "DIFF";
     public final static String TABLE_COVERAGE = "COVERAGE";
     public final static String TABLE_FEATURES = "FEATURE";
@@ -55,8 +56,16 @@ public class FieldNames {
     public final static String REF_GEN_ID ="ID";
     public final static String REF_GEN_NAME = "NAME";
     public final static String REF_GEN_DESCRIPTION = "DESCRIPTION";
-    public final static String REF_GEN_SEQUENCE = "SEQUENCE";
+    public final static String REF_GEN_SEQUENCE = "SEQUENCE"; //still needed for old DBs... //TODO: check if it can be removed chromosomes
     public final static String REF_GEN_TIMESTAMP = "CREATIONTIME";
+
+    // chromosome table fields
+    public final static String CHROM_ID = "ID";
+    public final static String CHROM_NUMBER = "NUMBER";
+    public final static String CHROM_REFERENCE_ID = "REFERENCE_ID";
+    public final static String CHROM_NAME = "NAME";
+    public final static String CHROM_LENGTH = "LENGTH";
+    public final static String CHROM_SEQUENCE = "SEQUENCE";
 
     // diff table fields
     public final static String DIFF_ID = "ID";
@@ -109,7 +118,9 @@ public class FieldNames {
 
     //all feature table fields
     public static final String FEATURE_ID = "ID";
-    public static final String FEATURE_REFGEN_ID = "REFERENCE_ID";
+    /** Dont use this in new DBs, it is not available anmymore and was replaced by FEATURE_CHROMOSOME_ID!*/
+    public static final String FEATURE_REFGEN_ID = "REFERENCE_ID"; 
+    public static final String FEATURE_CHROMOSOME_ID = "CHROMOSOME_ID";
     public static final String FEATURE_PARENT_IDS = "PARENT_IDS"; //should be 0, if no parent exists
     public static final String FEATURE_TYPE = "TYPE";
     public static final String FEATURE_START = "START";
@@ -135,7 +146,7 @@ public class FieldNames {
     // track table fields
     public final static String TRACK_ID = "ID";
     public final static String TRACK_REFERENCE_ID = "REFERENCE_ID";
-    public static final String TRACK_SEQUENCE_PAIR_ID = "SEQUENCE_PAIR_ID";
+    public static final String TRACK_READ_PAIR_ID = "SEQUENCE_PAIR_ID";
     public final static String TRACK_DESCRIPTION = "DESCRIPTION";
     public final static String TRACK_TIMESTAMP = "CREATIONTIME";
     public final static String TRACK_PATH = "PATH";

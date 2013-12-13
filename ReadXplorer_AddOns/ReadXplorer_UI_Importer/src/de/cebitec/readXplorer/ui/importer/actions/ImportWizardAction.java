@@ -60,9 +60,9 @@ public final class ImportWizardAction implements ActionListener {
             List<ReferenceJob> refJobs = (List<ReferenceJob>) wizardDescriptor.getProperty(PROP_REFJOBLIST);
             List<TrackJob> trackJobs = (List<TrackJob>) wizardDescriptor.getProperty(PROP_TRACKJOBLIST);
              //since sequence pair jobs have their own parser it can be distinguished later
-            List<ReadPairJobContainer> seqPairJobs = (List<ReadPairJobContainer>) wizardDescriptor.getProperty(PROP_READPAIRJOBLIST);
+            List<ReadPairJobContainer> readPairJobs = (List<ReadPairJobContainer>) wizardDescriptor.getProperty(PROP_READPAIRJOBLIST);
 
-            ImportThread i = new ImportThread(refJobs, trackJobs, seqPairJobs);
+            ImportThread i = new ImportThread(refJobs, trackJobs, readPairJobs);
             RequestProcessor rp = new RequestProcessor("Import Threads", 2);
             rp.post(i);
         }

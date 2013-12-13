@@ -1,29 +1,44 @@
 package de.cebitec.readXplorer.view.dataVisualisation;
 
+import de.cebitec.readXplorer.databackend.dataObjects.ChromosomeObserver;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.AdjustmentPanelListenerI;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Manages the bounds information for a reference sequence.
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class BoundsInfoManager implements AdjustmentPanelListenerI {
 
     private int currentHorizontalPosition;
     private int zoomfactor;
-    private PersistantReference currentRefGen;
+    private PersistantReference refGenome;
     private List<LogicalBoundsListener> boundListeners;
     private List<SynchronousNavigator> syncedNavigators;
 
-    public BoundsInfoManager(PersistantReference refGen) {
-        this.currentRefGen = refGen;
+    /**
+     * Manages the bounds information for a reference sequence.
+     * @param refGenome The reference genome whose bounds are handled.
+     */
+    public BoundsInfoManager(PersistantReference refGenome) {
+        this.refGenome = refGenome;
         this.boundListeners = new ArrayList<>();
         this.syncedNavigators = new ArrayList<>();
         this.zoomfactor = 1;
         this.currentHorizontalPosition = 1;
+        Observer chromChangeObserver = new Observer() { //observer for chromosome changes from elsewhere
+            @Override
+            public void update(Object args) {
+                updateLogicalListeners();
+                updateSynchronousNavigators();
+            }
+        };
+        refGenome.registerObserver(chromChangeObserver);
     }
 
     public void addBoundsListener(LogicalBoundsListener a) {
@@ -39,12 +54,20 @@ public class BoundsInfoManager implements AdjustmentPanelListenerI {
         }
     }
 
+    /**
+     * Add a navigator (panel providing e.g. scrolling and zooming).
+     * @param navi navigator to add to the list of listeners
+     */
     public void addSynchronousNavigator(SynchronousNavigator navi) {
         syncedNavigators.add(navi);
         navi.setCurrentScrollValue(currentHorizontalPosition);
         navi.setCurrentZoomValue(zoomfactor);
     }
 
+    /**
+     * Remove a navigator (panel providing e.g. scrolling and zooming).
+     * @param navi navigator to remove from the list of listeners
+     */
     public void removeSynchronousNavigator(SynchronousNavigator navi) {
         if (syncedNavigators.contains(navi)) {
             syncedNavigators.remove(navi);
@@ -59,6 +82,10 @@ public class BoundsInfoManager implements AdjustmentPanelListenerI {
         }
     }
 
+    /**
+     * Update all navigators (panels providing e.g. scrolling and zooming) in
+     * the list.
+     */
     private void updateSynchronousNavigators() {
         for (SynchronousNavigator n : syncedNavigators) {
             n.setCurrentScrollValue(currentHorizontalPosition);
@@ -73,6 +100,11 @@ public class BoundsInfoManager implements AdjustmentPanelListenerI {
         }
     }
 
+    /**
+     * @param d
+     * @return The current horizontal bounds in connection to the reference 
+     * sequence.
+     */
     public BoundsInfo getUpdatedBoundsInfo(Dimension d) {
         return computeBounds(d);
     }
@@ -85,7 +117,11 @@ public class BoundsInfoManager implements AdjustmentPanelListenerI {
     private BoundsInfo computeBounds(Dimension d) {
         int logWidth = (int) (d.getWidth() * 0.1 * zoomfactor);
 
-        BoundsInfo bounds = new BoundsInfo(1, currentRefGen.getRefLength(), currentHorizontalPosition, zoomfactor, logWidth);
+        BoundsInfo bounds = new BoundsInfo(1, refGenome.getActiveChromLength(), 
+                currentHorizontalPosition, 
+                zoomfactor, 
+                refGenome.getActiveChromId(),
+                logWidth);
         return bounds;
     }
 
@@ -109,5 +145,14 @@ public class BoundsInfoManager implements AdjustmentPanelListenerI {
         this.currentHorizontalPosition = scrollbarValue;
         this.updateSynchronousNavigators();
         this.updateLogicalListeners();
+    }
+
+    /**
+     * Notify listeners of changes of the currently active chromosome.
+     * @param activeChromId Id of the new active chromosome
+     */
+    @Override
+    public void chromosomeChanged(int activeChromId) {
+        this.refGenome.setActiveChromId(activeChromId);
     }
 }

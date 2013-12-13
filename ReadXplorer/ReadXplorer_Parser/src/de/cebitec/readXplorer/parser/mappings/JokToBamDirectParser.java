@@ -9,6 +9,7 @@ import de.cebitec.readXplorer.util.StatsContainer;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A jok parser, which first reads the jok file, converts it into a bam file
@@ -51,13 +52,13 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
     
     
     @Override
-    public Object parseInput(TrackJob trackJob, String sequenceString) throws ParsingException, OutOfMemoryError {
+    public Object parseInput(TrackJob trackJob, Map<String, String> chromSeqMap) throws ParsingException, OutOfMemoryError {
         
         this.preprocessData(trackJob);
         
         //parse the newly converted bam file
         bamParser.registerObserver(this);
-        DirectAccessDataContainer trackData = bamParser.parseInput(trackJob, sequenceString);
+        DirectAccessDataContainer trackData = bamParser.parseInput(trackJob, chromSeqMap);
         bamParser.removeObserver(this);
         
         return trackData;
@@ -67,21 +68,22 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
      * Converts a jok file into a bam file sorted by mapping start position.
      * Also updates the file in the track job to the new file.
      * @param trackJob the track job containing the jok file
-     * @param referenceSequence the complete reference sequence string
+     * @param chromLengthMap the mapping of chromosome name to chromosome length
+     * for this track
      * @return true, if the conversion was successful, false otherwise
      * @throws ParsingException
      * @throws OutOfMemoryError 
      */
     @Override
-    public Object convert(TrackJob trackJob, String referenceSequence) throws ParsingException, OutOfMemoryError {
-        String refName = trackJob.getRefGen().getName();
+    public Object convert(TrackJob trackJob, Map<String, Integer> chromLengthMap) throws ParsingException, OutOfMemoryError {
+        String chromName = trackJob.getRefGen().getName(); //ok, since a jok file only contains reads for one chromosome
 
         //Convert jok file to bam
         JokToBamConverter jokConverter = new JokToBamConverter();
         List<File> jobs = new ArrayList<>();
         jobs.add(trackJob.getFile());
         jokConverter.registerObserver(this);
-        jokConverter.setDataToConvert(jobs, refName, referenceSequence.length());
+        jokConverter.setDataToConvert(jobs, chromName, chromLengthMap.get(chromName));
         boolean success = jokConverter.convert();
         jokConverter.removeObserver(this);
 

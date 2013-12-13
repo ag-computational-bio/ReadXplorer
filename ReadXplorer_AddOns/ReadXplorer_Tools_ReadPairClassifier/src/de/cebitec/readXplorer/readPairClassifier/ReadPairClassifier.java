@@ -49,7 +49,7 @@ public class ReadPairClassifier implements ReadPairClassifierI, Observer, Observ
 
     /**
      * Empty constructor, because nothing to do yet. But don't forget to set
-     * data before calling classifySeqPairs().
+     * data before calling classifyReadPairs().
      */
     public ReadPairClassifier() {
         //set data later
@@ -118,11 +118,11 @@ public class ReadPairClassifier implements ReadPairClassifierI, Observer, Observ
 //        ParsedMappingContainer mappingContainer1 = parser1.parseInput(this.trackJob1, "");
 //        ParsedMappingContainer mappingContainer2 = parser2.parseInput(this.trackJob2, "");
 //
-//        this.classifySeqPairs(mappingContainer1, mappingContainer2);
+//        this.classifyReadPairs(mappingContainer1, mappingContainer2);
     }
     
     @Override
-    public ParsedReadPairContainer classifySeqPairs() {
+    public ParsedReadPairContainer classifyReadPairs() {
         
         this.notifyObservers(NbBundle.getMessage(ReadPairClassifier.class, "Classifier.Classification.Start"));
         
@@ -267,7 +267,7 @@ public class ReadPairClassifier implements ReadPairClassifierI, Observer, Observ
                                             this.addPairedMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, ReadPairType.PERFECT_PAIR, currDist);
                                             omitIdList.add(parsedMappingA.getID());
                                             omitIdList.add(parsedMappingB.getID());
-                                            readPairContainer.getStatsContainer().getSeqPairSizeDistribution().increaseDistribution(currDist);
+                                            readPairContainer.getStatsContainer().getReadPairSizeDistribution().increaseDistribution(currDist);
                                         } else {//////////////// store potential perfect pair //////////////////////////
                                             potPairList.add(new ParsedReadPairMapping(parsedMappingA.getID(), parsedMappingB.getID(), interimSeqPairId, ReadPairType.PERFECT_PAIR, currDist));
                                         }
@@ -389,7 +389,7 @@ public class ReadPairClassifier implements ReadPairClassifierI, Observer, Observ
                 ++interimSeqPairId;
             }
         }
-        this.readPairContainer.getStatsContainer().incSeqPairStats(ReadPairType.UNPAIRED_PAIR, readPairContainer.getMappingToPairIdList().size());
+        this.readPairContainer.getStatsContainer().incReadPairStats(ReadPairType.UNPAIRED_PAIR, readPairContainer.getMappingToPairIdList().size());
         
         this.notifyObservers(NbBundle.getMessage(ReadPairClassifier.class, "Classifier.Classification.Finish"));
         
@@ -434,7 +434,7 @@ public class ReadPairClassifier implements ReadPairClassifierI, Observer, Observ
             omitIdList.add(id1);
             omitIdList.add(id2);
         }
-        readPairContainer.getStatsContainer().getSeqPairSizeDistribution().increaseDistribution(pairMapping.getDistance());
+        readPairContainer.getStatsContainer().getReadPairSizeDistribution().increaseDistribution(pairMapping.getDistance());
     }
     
     @Override

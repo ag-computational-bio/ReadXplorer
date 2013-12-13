@@ -17,27 +17,47 @@ public class PersistantTrack {
     private String description;
     private Timestamp date;
     private int refGenID;
-    private final int seqPairId;
+    private int activeChromId;
+    private final int readPairId;
 
     /**
      * Data storage for a track.
-     * @param id
+     * @param id unique db id of the track
      * @param path path of the track, if it is a direct file access track
      * @param description
      * @param date creation date
-     * @param refGenID
-     * @param seqPairId  
+     * @param refGenID id of the reference genome
+     * @param activeChromId id of the currently active chromosome.
+     * @param readPairId  
      */
-    public PersistantTrack(int id, String path, String description, Timestamp date, int refGenID, int seqPairId) {
+    public PersistantTrack(int id, String path, String description, Timestamp date, int refGenID, int activeChromId, int readPairId) {
         this.id = id;
         this.description = description;
         this.date = date;
         this.refGenID = refGenID;
-        this.seqPairId = seqPairId;
+        this.activeChromId = activeChromId;
+        this.readPairId = readPairId;
         path = path == null ? "" : path; //ensure that path is not null
         this.path = path;
     }
 
+    /**
+     * Data storage for a track. Use this constructor, if the currently active
+     * chromosome cannot be set yet.
+     * @param id unique db id of the track
+     * @param path path of the track, if it is a direct file access track
+     * @param description
+     * @param date creation date
+     * @param refGenID id of the reference genome
+     * @param readPairId
+     */
+    public PersistantTrack(int id, String path, String description, Timestamp date, int refGenID, int readPairId) {
+        this(id, path, description, date, refGenID, -1, readPairId);
+    }
+
+    /**
+     * @return Unique id of this track.
+     */
     public int getId() {
         return id;
     }
@@ -54,6 +74,14 @@ public class PersistantTrack {
      */
     public int getRefGenID() {
         return refGenID;
+    }
+
+    /**
+     * @return Id of the currently activate chromosome. Might be -1, if it was 
+     * not set yet.
+     */
+    public int getActiveChromId() {
+        return this.activeChromId;
     }
 
     /**
@@ -74,7 +102,7 @@ public class PersistantTrack {
      * @return The id of this paired data track.
      */
     public int getReadPairId() {
-        return seqPairId;
+        return readPairId;
     }
     
     /**
@@ -120,9 +148,11 @@ public class PersistantTrack {
                     && (otrack.getId() == this.id)
                     && (otrack.getFilePath().equals(this.path))
                     && (otrack.getRefGenID() == this.refGenID)
-                    && (otrack.getReadPairId() == this.seqPairId));
+                    && (otrack.getActiveChromId() == this.activeChromId)
+                    && (otrack.getReadPairId() == this.readPairId));
+        } else { 
+            return super.equals(o); 
         }
-        else { return super.equals(o); }
     }
     
     /**

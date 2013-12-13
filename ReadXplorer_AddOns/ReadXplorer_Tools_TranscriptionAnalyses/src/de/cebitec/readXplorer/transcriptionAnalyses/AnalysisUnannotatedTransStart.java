@@ -67,8 +67,8 @@ public class AnalysisUnannotatedTransStart extends AnalysisTranscriptionStart {
             }
             
             // instead of an ordinary TranscriptStart we add the TranscriptStart with unannotated transcript information
-            detectedStarts.add(new TransStartUnannotated(tss.getPos(), tss.isFwdStrand(), tss.getReadStartsAtPos(), 
-                    tss.getPercentIncrease(), tss.getCoverageIncrease(), tss.getDetFeatures(), currentPos, trackCon.getTrackID()));
+            detectedStarts.add(new TransStartUnannotated(tss.getPos(), tss.isFwdStrand(), tss.getReadStartsAtPos(), tss.getPercentIncrease(), 
+                    tss.getCoverageIncrease(), tss.getDetFeatures(), currentPos, trackCon.getTrackID(), tss.getChromId()));
             
         } else {
             detectedStarts.add(tss);

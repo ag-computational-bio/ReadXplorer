@@ -1,24 +1,25 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.datastructures;
 
+import de.cebitec.readXplorer.databackend.dataObjects.TrackChromResultEntry;
+
 /**
  *
  * @author jritter
  */
-public class NovelRegion {
+public class NovelRegion extends TrackChromResultEntry {
 
     private boolean isFWD, isFalsePositive, isSelected;
     private int start;
     private Integer dropoff;
-    private Integer trackID;
     private String site;
     private Integer length;
     private String sequence;
 
-    public NovelRegion(boolean isFWD, int start, Integer dropoff, String site, int length, String sequence, boolean isFP, boolean isSelected, Integer trackID) {
+    public NovelRegion(boolean isFWD, int start, Integer offset, int trackId, int chromId) {
+        super(trackId, chromId);
         this.isFWD = isFWD;
         this.start = start;
         this.dropoff = dropoff;
-        this.trackID = trackID;
         this.site = site;
         this.length = length;
         this.sequence = sequence;

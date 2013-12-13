@@ -1,5 +1,6 @@
 package de.cebitec.readXplorer.databackend.dataObjects;
 
+import de.cebitec.readXplorer.databackend.IntervalRequest;
 import java.util.List;
 
 /**
@@ -15,13 +16,13 @@ public class MappingResultPersistant extends PersistantResult {
     private List<PersistantMapping> mappings;
 
     /**
-     * Data storage for mappings.
+     * Able to store the result for mapping calls. Called persistant, because it
+     * needs the persistant data types from its own package.
      * @param mappings the list of mappings to store
-     * @param lowerBound the lower bound of the requested interval
-     * @param upperBound the upper bound of the requested interval
+     * @param request the request for which the result was generated 
      */
-    public MappingResultPersistant(List<PersistantMapping> mappings, int lowerBound, int upperBound) {
-        super(lowerBound, upperBound);
+    public MappingResultPersistant(List<PersistantMapping> mappings, IntervalRequest request) {
+        super(request);
         this.mappings = mappings;
     }
 

@@ -2,13 +2,18 @@ package de.cebitec.readXplorer.ui.visualisation.reference;
 
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.IThumbnailView;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import de.cebitec.readXplorer.view.dialogMenus.ChromosomeVisualizationHelper;
+import de.cebitec.readXplorer.view.dialogMenus.ChromosomeVisualizationHelper.ChromComboObserver;
+import de.cebitec.readXplorer.view.dialogMenus.ChromosomeVisualizationHelper.ChromosomeListener;
 import de.cebitec.readXplorer.view.dialogMenus.JTextFieldPasteable;
 import de.cebitec.readXplorer.view.dialogMenus.StandardMenuEvent;
 import java.awt.Dimension;
@@ -31,6 +36,7 @@ import org.openide.util.LookupListener;
 import org.openide.util.Utilities;
 
 /**
+ * Panel for navigating in the currently viewed chromosome sequence.
  *
  * @author ddoppmeier, rhilker
  */
@@ -39,18 +45,20 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
     private final static long serialVersionUID = 247246234;
     private int jumpPosition;
     private String searchPattern;
-    private PersistantReference refGen;
+    private PersistantReference refGenome;
     private ReferenceConnector refGenCon;
     private BoundsInfoManager boundsManager;
     private ReferenceViewer curRefViewer;
     private Lookup.Result<ReferenceViewer> res;
     private AbstractViewer viewer;
+    private FeatureTableObserver featTableObserver;
+    private ChromComboObserver chromObserver;
+    private ChromosomeListener chromListener;
 
-    public BoundsInfoManager getBoundsManager() {
-        return boundsManager;
-    }
-
-    /** Creates new form JumpPanel */
+    
+    /** Creates new Panel for navigating in the currently viewed chromosome 
+     *  sequence.
+     */
     public JumpPanel() {
         this.initComponents();
         this.completeComponents();
@@ -58,6 +66,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
         this.setPreferredSize(new Dimension(288, 500));
         this.setSize(new Dimension(288, 500));
         jumpPosition = 1;
+        featTableObserver = new FeatureTableObserver();
         filterTextfield.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
@@ -134,8 +143,6 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
-        jumpTextfield = new JTextFieldPasteable();
-        jumpButton = new javax.swing.JButton();
         featureGroundPanel = new javax.swing.JPanel();
         filterProperties = new javax.swing.JPanel();
         jumpFilterLabel = new javax.swing.JLabel();
@@ -148,28 +155,14 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
         tableScrollPane = new javax.swing.JScrollPane();
         featureTable = new javax.swing.JTable();
         searchPatternField = new JTextFieldPasteable();
+        jumpTextfield = new JTextFieldPasteable();
+        jumpButton = new javax.swing.JButton();
         searchPatternButton = new javax.swing.JButton();
+        chromCheckBox = new javax.swing.JCheckBox();
+        chromComboBox = new javax.swing.JComboBox<>();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Navigation"));
         setPreferredSize(new java.awt.Dimension(190, 500));
-
-        jumpTextfield.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jumpTextfieldActionPerformed(evt);
-            }
-        });
-        jumpTextfield.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                jumpTextfieldKeyTyped(evt);
-            }
-        });
-
-        jumpButton.setText("Jump to Pos");
-        jumpButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jumpButtonActionPerformed(evt);
-            }
-        });
 
         featureGroundPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
@@ -258,21 +251,6 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
 
         tableScrollPane.setViewportView(featureTable);
 
-        javax.swing.GroupLayout featureGroundPanelLayout = new javax.swing.GroupLayout(featureGroundPanel);
-        featureGroundPanel.setLayout(featureGroundPanelLayout);
-        featureGroundPanelLayout.setHorizontalGroup(
-            featureGroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(filterProperties, 0, 174, Short.MAX_VALUE)
-            .addComponent(tableScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-        );
-        featureGroundPanelLayout.setVerticalGroup(
-            featureGroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(featureGroundPanelLayout.createSequentialGroup()
-                .addComponent(filterProperties, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 330, Short.MAX_VALUE))
-        );
-
         searchPatternField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 searchPatternFieldActionPerformed(evt);
@@ -284,6 +262,24 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
             }
         });
 
+        jumpTextfield.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jumpTextfieldActionPerformed(evt);
+            }
+        });
+        jumpTextfield.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jumpTextfieldKeyTyped(evt);
+            }
+        });
+
+        jumpButton.setText("Jump to Pos");
+        jumpButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jumpButtonActionPerformed(evt);
+            }
+        });
+
         searchPatternButton.setText("Search Pattern");
         searchPatternButton.setToolTipText("<html>\n<b>First click</b> with new pattern searches the pattern. <b>Second click</b> with same pattern jumps to next occurrence beyond current interval. Fwd strand is checked first, then rev strand.\n</html>");
         searchPatternButton.addActionListener(new java.awt.event.ActionListener() {
@@ -292,33 +288,62 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
             }
         });
 
+        chromCheckBox.setText("Search all Chromosomes");
+
+        javax.swing.GroupLayout featureGroundPanelLayout = new javax.swing.GroupLayout(featureGroundPanel);
+        featureGroundPanel.setLayout(featureGroundPanelLayout);
+        featureGroundPanelLayout.setHorizontalGroup(
+            featureGroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(filterProperties, 0, 303, Short.MAX_VALUE)
+            .addComponent(tableScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addGroup(featureGroundPanelLayout.createSequentialGroup()
+                .addGroup(featureGroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(featureGroundPanelLayout.createSequentialGroup()
+                        .addComponent(chromCheckBox)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chromComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(featureGroundPanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(featureGroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(featureGroundPanelLayout.createSequentialGroup()
+                                .addComponent(jumpButton, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jumpTextfield))
+                            .addGroup(featureGroundPanelLayout.createSequentialGroup()
+                                .addComponent(searchPatternButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(searchPatternField)))))
+                .addContainerGap())
+        );
+        featureGroundPanelLayout.setVerticalGroup(
+            featureGroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(featureGroundPanelLayout.createSequentialGroup()
+                .addGroup(featureGroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(chromCheckBox)
+                    .addComponent(chromComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(featureGroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jumpButton)
+                    .addComponent(jumpTextfield, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(featureGroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(searchPatternButton)
+                    .addComponent(searchPatternField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(filterProperties, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(tableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jumpButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(searchPatternButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jumpTextfield, javax.swing.GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
-                    .addComponent(searchPatternField))
-                .addContainerGap())
             .addComponent(featureGroundPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jumpTextfield, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jumpButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(searchPatternField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(searchPatternButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(featureGroundPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(featureGroundPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -333,7 +358,9 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
             this.jumpPosition = Integer.parseInt(this.jumpTextfield.getText().trim());
             this.boundsManager.navigatorBarUpdated(this.jumpPosition);
         } else {
-            JOptionPane.showMessageDialog(this, "Please enter a valid position! (1-"+this.refGen.getRefLength()+")", "Invalid Position", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Please enter a valid position! (1-"
+                    + refGenome.getActiveChromLength()
+                    + ")", "Invalid Position", JOptionPane.ERROR_MESSAGE);
         }
 }//GEN-LAST:event_jumpButtonActionPerformed
 
@@ -395,7 +422,7 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     private boolean isValidNumberInput(String s) {
         try {
             int tmp = Integer.parseInt(s);
-            if (tmp >= 1 && tmp <= refGen.getSequence().length()) {
+            if (tmp >= 1 && tmp <= refGenome.getActiveChromLength()) {
                 return true;
             } else {
                 return false;
@@ -407,6 +434,8 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JCheckBox chromCheckBox;
+    private javax.swing.JComboBox<PersistantChromosome> chromComboBox;
     private javax.swing.JPanel featureGroundPanel;
     private javax.swing.JTable featureTable;
     private javax.swing.JLabel filterForLabel;
@@ -424,14 +453,72 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     private javax.swing.JScrollPane tableScrollPane;
     // End of variables declaration//GEN-END:variables
 
-    public void setReferenceGenome(PersistantReference refGen) {
-        this.refGen = refGen;
-        refGenCon = ProjectConnector.getInstance().getRefGenomeConnector(refGen.getId());
+    /**
+     * Set the viewer including the reference genome, for which the 
+     * navigation is currently available in this panel.
+     * @param viewer The viewer to navigate
+     */
+    public void setViewer(AbstractViewer viewer) {
+        boolean firstCall = this.viewer == null;
+        this.updateFeatTableObserver(this.refGenome, viewer, firstCall);
+        this.viewer = viewer;
+        this.refGenome = viewer.getReference();
+        refGenCon = ProjectConnector.getInstance().getRefGenomeConnector(refGenome.getId());
+        
+        ChromosomeVisualizationHelper chromHelper = new ChromosomeVisualizationHelper();
+        if (firstCall) {
+            //Update the observer for changes to the chromosome selection anywhere else
+            this.chromObserver = chromHelper.createChromBoxWithObserver(chromComboBox, refGenome);
+
+            //Update the listener for changes to the chromosome selection in this box
+            chromListener = chromHelper.new ChromosomeListener(chromComboBox, viewer);
+        } else {
+            this.chromObserver.setRefGenome(refGenome);
+            this.chromListener.setViewer(viewer);
+            chromHelper.updateChromBoxContent(chromComboBox, refGenome);
+        }        
+        
+        this.chromComboBox.repaint();
         this.fillFeatureList();
     }
+    
+    /**
+     * Updates the feature table observer, which updates the feature table
+     * depending on the chromosome.
+     * @param refGenome The OLD reference genome for which the navigation was
+     * handled until now.
+     * @param viewer The NEW viewer, for which the navigation will be handled
+     * from now on
+     * @param firstCall true, if the object variables are not set yet, false,
+     * if the JumpPanel had already displayed content for another reference.
+     */
+    private void updateFeatTableObserver(PersistantReference refGenome, AbstractViewer viewer, boolean firstCall) {
+        if (!firstCall) {
+            refGenome.removeObserver(this.featTableObserver);
+        }
+        this.featTableObserver = new FeatureTableObserver();
+        viewer.getReference().registerObserver(this.featTableObserver);
+    }
+    
+    /**
+     * An Observer for changes in the chromosome selection, which updates the 
+     * feature list of this JumpPanel.
+     */
+    private class FeatureTableObserver implements Observer {
 
+        @Override
+        public void update(Object args) {
+            fillFeatureList();
+        }
+    }
+
+    /**
+     * Querries all features for the currently selected reference and chromosome
+     * and displays the list in the featureTable.
+     */
     private void fillFeatureList() {
-        List<PersistantFeature> features = refGenCon.getFeaturesForRegion(0, refGen.getRefLength(), FeatureType.ANY);
+        List<PersistantFeature> features = refGenCon.getFeaturesForRegion(0, refGenome.getActiveChromLength(), 
+                FeatureType.ANY, refGenome.getActiveChromId());
         
         List<PersistantFeature> featList = new ArrayList<>(features);
         Collections.sort(featList, new FeatureNameSorter());
@@ -514,9 +601,5 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
                 return name1.compareTo(name2);
             }
         }
-    }
-
-    public void setGenomeViewer(AbstractViewer viewer) {
-        this.viewer = viewer;
     }
 }

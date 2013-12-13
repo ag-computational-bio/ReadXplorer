@@ -1,7 +1,7 @@
 package de.cebitec.readXplorer.parser.output;
 
 import de.cebitec.readXplorer.parser.common.ParsingException;
-import de.cebitec.readXplorer.parser.mappings.ParserCommonMethods;
+import de.cebitec.readXplorer.parser.mappings.CommonsMappingParser;
 import de.cebitec.readXplorer.util.Benchmark;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Observer;
@@ -18,7 +18,7 @@ import org.openide.util.NbBundle;
 
 /**
  * Converts a jok file from Saruman into a bam file sorted by read start positions 
- * on the reference genome. 
+ * for a single reference chromosome. 
  * 
  * @author -Rolf Hilker-
  */
@@ -37,7 +37,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
 
     /**
      * Converts a jok file from Saruman into a bam file sorted by read start positions 
-     * on the reference genome. 
+     * for a single reference chromosome.
      */
     public JokToBamConverter() {
         this.observers = new ArrayList<>();
@@ -46,8 +46,8 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
     /**
      * A JokToBamConverter needs exactly the following three parameters:
      * <br>param1 jokFiles a list of jok files to convert into BAM format.
-     * <br>param2 refSeqName name of the reference sequence
-     * <br>param3 refSeqLength length of the reference sequence
+     * <br>param2 refSeqName name of the single reference chromosome sequence
+     * <br>param3 refSeqLength length of the single reference chromosome sequence
      * @throws IllegalArgumentException
      */
     @Override
@@ -159,7 +159,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
                             refSeq = tokens[5];
                             
                             // report empty mappings saruman should not be producing anymore
-                            if (!ParserCommonMethods.checkReadJok(this, readSeq, readName, refSeq, refSeqLength, start, stop, direction, fileName, lineno)) {
+                            if (!CommonsMappingParser.checkReadJok(this, readSeq, readName, refSeq, refSeqLength, start, stop, direction, fileName, lineno)) {
                                 emtpy++;
                                 continue; //continue, and ignore read, if it contains inconsistent information
                             }

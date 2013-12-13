@@ -6,6 +6,7 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.differentialExpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.readXplorer.differentialExpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readXplorer.differentialExpression.GnuR.UnknownGnuRException;
+import de.cebitec.readXplorer.differentialExpression.expressTest.ExpressTest;
 import de.cebitec.readXplorer.differentialExpression.expressTest.ExpressTestI;
 import de.cebitec.readXplorer.differentialExpression.expressTest.ExpressTestObserver;
 import de.cebitec.readXplorer.differentialExpression.expressTest.ExpressTestStatus;
@@ -47,7 +48,7 @@ public class ExpressTestAnalysisHandler extends DeAnalysisHandler implements Exp
         super(selectedTracks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams, regardReadOrientation);
         expressTestAnalysisData = new ExpressTestAnalysisData(selectedTracks.size(),
                 groupA, groupB, workingWithoutReplicates, normalizationFeatures);
-        expressTestAnalysisData.setSelectedTraks(selectedTracks);
+        expressTestAnalysisData.setSelectedTracks(selectedTracks);
     }
 
     @Override
@@ -55,7 +56,7 @@ public class ExpressTestAnalysisHandler extends DeAnalysisHandler implements Exp
         prepareFeatures(expressTestAnalysisData);
         prepareCountData(expressTestAnalysisData, getAllCountData());
 
-        ExpressTestI st = new de.cebitec.readXplorer.differentialExpression.expressTest.ExpressTest();
+        ExpressTestI st = new ExpressTest(this.getRefGenomeID());
 
 
         st.addObserver(this);
@@ -105,8 +106,8 @@ public class ExpressTestAnalysisHandler extends DeAnalysisHandler implements Exp
     public void update(ExpressTestI origin, ExpressTestStatus status) {
         if (status == ExpressTestStatus.FINISHED) {
             ArrayList<ResultDeAnalysis> tmpRes = new ArrayList<>();
-            tmpRes.add(new ResultDeAnalysis(origin.getResults(), origin.getColumnNames(), origin.getRowNames(), "result"));
-            tmpRes.add(new ResultDeAnalysis(origin.getResultsNormalized(), origin.getColumnNames(), origin.getRowNames(), "normalized result"));
+            tmpRes.add(new ResultDeAnalysis(this.getRefGenomeID(), origin.getResults(), origin.getColumnNames(), origin.getRowNames(), "result"));
+            tmpRes.add(new ResultDeAnalysis(this.getRefGenomeID(), origin.getResultsNormalized(), origin.getColumnNames(), origin.getRowNames(), "normalized result"));
             results = new ArrayList<>();
             results.addAll(tmpRes);
         }

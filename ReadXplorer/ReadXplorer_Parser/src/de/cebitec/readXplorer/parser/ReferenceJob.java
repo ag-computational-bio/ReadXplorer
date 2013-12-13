@@ -122,12 +122,15 @@ public class ReferenceJob implements Job {
         return id != null;
     }
 
+    /**
+     * @param id Set this reference job persistant by setting its unique db id.
+     */
     public void setPersistant(int id){
         this.id = id;
     }
 
     /**
-     * @return reference id, if already available
+     * @return the unique reference id from the db, if already available
      */
     @Override
     public int getID(){

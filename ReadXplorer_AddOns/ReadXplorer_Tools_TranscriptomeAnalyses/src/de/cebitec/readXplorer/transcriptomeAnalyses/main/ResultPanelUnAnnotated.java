@@ -45,7 +45,9 @@ public class ResultPanelUnAnnotated extends ResultTablePanel {
         model.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                TableUtils.showPosition(unAnnotatedTable, 0, getBoundsInfoManager());
+                int posColumnIdx = 0;
+                int chromColumnIdx = 1;
+                TableUtils.showPosition(unAnnotatedTable, posColumnIdx, chromColumnIdx, getBoundsInfoManager());
             }
         });
     }
@@ -69,14 +71,14 @@ public class ResultPanelUnAnnotated extends ResultTablePanel {
 
             },
             new String [] {
-                "Start", "Direction", "Dropoff pos", "Site", "Track ID"
+                "TSS Position", "Chromosome", "Direction", "Offste to next Feature", "BLAST Result", "Track ID"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class
+                java.lang.Integer.class, java.lang.Object.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false
+                false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -89,10 +91,11 @@ public class ResultPanelUnAnnotated extends ResultTablePanel {
         });
         jScrollPane1.setViewportView(unAnnotatedTable);
         unAnnotatedTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title0_1")); // NOI18N
-        unAnnotatedTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title3_1_1")); // NOI18N
-        unAnnotatedTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title1_1")); // NOI18N
-        unAnnotatedTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title2_1")); // NOI18N
-        unAnnotatedTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title4_1")); // NOI18N
+        unAnnotatedTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title5")); // NOI18N
+        unAnnotatedTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title3_1_1")); // NOI18N
+        unAnnotatedTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title1_1")); // NOI18N
+        unAnnotatedTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title2_1")); // NOI18N
+        unAnnotatedTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title4_1")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.jButton1.text")); // NOI18N
 
@@ -139,7 +142,7 @@ public class ResultPanelUnAnnotated extends ResultTablePanel {
                 results.getResults().addAll(unAnnoResults.getResults());
             }
 
-            final int nbColumns = 5;
+            final int nbColumns = 6;
             int noFwdFeatures = 0;
             int noRevFeatures = 0;
 
@@ -161,12 +164,13 @@ public class ResultPanelUnAnnotated extends ResultTablePanel {
                 final Object[] rowData = new Object[nbColumns];
                 int position = nR.getPos();
                 this.nRInHash.put(position, nR);
-                rowData[0] = position;
-                rowData[1] = strand;
-
-                rowData[2] = nR.getDropOffPos();
-                rowData[3] = nR.getSite();
-                rowData[4] = nR.getTrackId();
+                int i = 0;
+                rowData[i++] = position;
+                rowData[i++] = newResult.getChromosomeMap().get(nR.getChromId());
+                rowData[i++] = strand;
+                rowData[i++] = strand;
+                rowData[i++] = nR.getOffset();
+                rowData[i++] = nR.getTrackId();
 
                 SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
                     @Override

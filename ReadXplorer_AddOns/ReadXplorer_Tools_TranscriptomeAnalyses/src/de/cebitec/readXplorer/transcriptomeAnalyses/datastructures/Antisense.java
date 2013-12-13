@@ -1,19 +1,20 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.datastructures;
 
+import de.cebitec.readXplorer.databackend.dataObjects.TrackChromResultEntry;
+
 /**
  *
  * @author jritter
  */
-public class Antisense {
+public class Antisense extends TrackChromResultEntry {
 
     private boolean isFwd;
-    private Integer trackID;
     private String type;
     private Integer position;
 
-    public Antisense(boolean isFwd, Integer trackID, String type, Integer position) {
+    public Antisense(boolean isFwd, int trackID, int chromId, String type, Integer position) {
+        super (trackID, chromId);
         this.isFwd = isFwd;
-        this.trackID = trackID;
         this.type = type;
         this.position = position;
     }
@@ -24,10 +25,6 @@ public class Antisense {
 
     public int getPos() {
         return this.position;
-    }
-
-    public Object getTrackId() {
-        return this.trackID;
     }
 
     public Object getType() {

@@ -19,8 +19,9 @@ public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCove
 
     private CoverageIntervalContainer results;
 
-    public CoverageAnalysisResult(CoverageIntervalContainer results, HashMap<Integer, PersistantTrack> trackMap, boolean combineTracks) {
-        super(trackMap, combineTracks);
+    public CoverageAnalysisResult(CoverageIntervalContainer results, HashMap<Integer, PersistantTrack> trackMap, 
+            int referenceId, boolean combineTracks) {
+        super(trackMap, referenceId, combineTracks);
         this.results = results;
     }
 
@@ -51,6 +52,7 @@ public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCove
         List<String> resultDescriptions = new ArrayList<>();
 
         resultDescriptions.add("Track");
+        resultDescriptions.add("Chromosome");
         resultDescriptions.add("Strand");
         resultDescriptions.add("Start");
         resultDescriptions.add("Stop");
@@ -120,6 +122,7 @@ public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCove
         for (CoverageInterval interval : coverageList) {
             List<Object> coveredIntervalRow = new ArrayList<>();
             coveredIntervalRow.add(this.getTrackEntry(interval.getTrackId(), true));
+            coveredIntervalRow.add(this.getChromosomeMap().get(interval.getChromId()));
             coveredIntervalRow.add(interval.getStrandString());
             coveredIntervalRow.add(interval.isFwdStrand() ? interval.getStart() : interval.getStop());
             coveredIntervalRow.add(interval.isFwdStrand() ? interval.getStop() : interval.getStart());

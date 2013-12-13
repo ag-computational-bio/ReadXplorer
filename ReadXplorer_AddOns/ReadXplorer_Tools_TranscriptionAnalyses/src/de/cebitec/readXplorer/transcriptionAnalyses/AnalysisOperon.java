@@ -5,6 +5,7 @@ import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistant;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.Operon;
@@ -29,8 +30,6 @@ import java.util.logging.Logger;
 public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
 
     private TrackConnector trackConnector;
-    private int genomeSize;
-    private List<PersistantFeature> genomeFeatures;
     private List<Operon> operonList; //final result list of OperonAdjacencies
     private HashMap<Integer, OperonAdjacency> featureToPutativeOperonMap; //feature id of mappings to count for features
     private List<OperonAdjacency> operonAdjacencies; 
@@ -42,6 +41,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
     private int readsFeature2 = 0;
     private int internalReads = 0;
     private final ParameterSetOperonDet operonDetParameters;
+    private ReferenceConnector refConnector;
 
     /**
      * Carries out the analysis of a data set for operons.
@@ -67,40 +67,43 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
     private void initDatastructures() {
         Map<String, Integer> statsMap = trackConnector.getTrackStats().getStatsMap();
         averageReadLength = statsMap.get(StatsContainer.AVERAGE_READ_LENGTH);
-        averageReadPairLength = statsMap.get(StatsContainer.AVERAGE_SEQ_PAIR_SIZE);
-        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackConnector.getRefGenome().getId());
-        this.genomeSize = trackConnector.getRefSequenceLength();
-        this.genomeFeatures = refConnector.getFeaturesForClosedInterval(0, genomeSize);
-        
-        ////////////////////////////////////////////////////////////////////////////
-        // detecting all neighboring features which are not overlapping more than 20bp and
-        // have a distance smaller than 1000 bp from stop of 1 to start of 2 as putative operons
-        ////////////////////////////////////////////////////////////////////////////
-        
-        for (int i = 0; i < this.genomeFeatures.size() - 1; i++) {
+        averageReadPairLength = statsMap.get(StatsContainer.AVERAGE_READ_PAIR_SIZE);
+        refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackConnector.getRefGenome().getId());
 
-            PersistantFeature feature1 = this.genomeFeatures.get(i);
-            boolean reachedEnd = false;
-            
-            if (operonDetParameters.getSelFeatureTypes().contains(feature1.getType())) {
+        for (PersistantChromosome chrom : refConnector.getChromosomesForGenome().values()) {
+            int chromLength = chrom.getLength();
+            List<PersistantFeature> chromFeatures = refConnector.getFeaturesForClosedInterval(0, chromLength, chrom.getId());
 
-                int featureIndex = i + 1; //find feature 2
-                while (feature1.isFwdStrand() != genomeFeatures.get(featureIndex).isFwdStrand()
-                        || !feature1.getType().equals(genomeFeatures.get(featureIndex).getType())) {
-                    if (featureIndex < genomeFeatures.size() - 1) {
-                        ++featureIndex;
-                    } else {
-                        reachedEnd = true;
-                        break;
+            ////////////////////////////////////////////////////////////////////////////
+            // detecting all neighboring features which are not overlapping more than 20bp and
+            // have a distance smaller than 1000 bp from stop of 1 to start of 2 as putative operons
+            ////////////////////////////////////////////////////////////////////////////
+
+            for (int i = 0; i < chromFeatures.size() - 1; i++) {
+
+                PersistantFeature feature1 = chromFeatures.get(i);
+                boolean reachedEnd = false;
+
+                if (operonDetParameters.getSelFeatureTypes().contains(feature1.getType())) {
+
+                    int featureIndex = i + 1; //find feature 2
+                    while (feature1.isFwdStrand() != chromFeatures.get(featureIndex).isFwdStrand()
+                            || !feature1.getType().equals(chromFeatures.get(featureIndex).getType())) {
+                        if (featureIndex < chromFeatures.size() - 1) {
+                            ++featureIndex;
+                        } else {
+                            reachedEnd = true;
+                            break;
+                        }
                     }
-                }
-                
-                if (!reachedEnd) {
-                    PersistantFeature feature2 = genomeFeatures.get(featureIndex);
 
-                    if (feature2.getStart() + 20 > feature1.getStop() && //features may overlap at the ends, happens quite often
-                            feature2.getStart() - feature1.getStop() < 1000) { //only features with a max. distance of 1000 are treated as putative operons
-                        this.featureToPutativeOperonMap.put(feature1.getId(), new OperonAdjacency(feature1, feature2));
+                    if (!reachedEnd) {
+                        PersistantFeature feature2 = chromFeatures.get(featureIndex);
+
+                        if (feature2.getStart() + 20 > feature1.getStop() && //features may overlap at the ends, happens quite often
+                                feature2.getStart() - feature1.getStop() < 1000) { //only features with a max. distance of 1000 are treated as putative operons
+                            this.featureToPutativeOperonMap.put(feature1.getId(), new OperonAdjacency(feature1, feature2, chrom.getId()));
+                        }
                     }
                 }
             }
@@ -114,10 +117,10 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
     @Override
     public void update(Object data) {
         //the mappings are sorted by their start position!
-        MappingResultPersistant mappingResult = new MappingResultPersistant(null, 0, 0);
+        MappingResultPersistant mappingResult = new MappingResultPersistant(null, null);
         if (data.getClass() == mappingResult.getClass()) {
 
-        List<PersistantMapping> mappings = ((MappingResultPersistant) data).getMappings();
+            MappingResultPersistant mappings = ((MappingResultPersistant) data);
             this.sumReadCounts(mappings);
         }
         if (data instanceof Byte && ((Byte) data) == 2) {
@@ -137,25 +140,29 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
 
     /**
      * Sums up the read counts for the features the mappings are located in.
-     * @param mappings the set of mappings to be investigated
+     * @param mappingResult the result containing the mappings to be investigated
      */
-    public void sumReadCounts(List<PersistantMapping> mappings) {
+    public void sumReadCounts(MappingResultPersistant mappingResult) {
 
+        List<PersistantMapping> mappings = mappingResult.getMappings();
         PersistantFeature feature1;
         PersistantFeature feature2;
         boolean fstFittingMapping;
         PersistantMapping mapping;
         OperonAdjacency putativeOperon;
+        PersistantChromosome chrom = refConnector.getChromosomeForGenome(mappingResult.getRequest().getChromId());
+        int chromLength = chrom.getLength();
 
-        for (int i = 0; i < this.genomeFeatures.size(); ++i) {
-            feature1 = this.genomeFeatures.get(i);
+        List<PersistantFeature> chromFeatures = refConnector.getFeaturesForClosedInterval(0, chromLength, chrom.getId());
+        for (int i = 0; i < chromFeatures.size(); ++i) {
+            feature1 = chromFeatures.get(i);
             int id1 = feature1.getId();
             fstFittingMapping = true;
 
             //we can already neglect all features not forming a putative operon
             if (this.featureToPutativeOperonMap.containsKey(id1)) {
                 feature2 = this.featureToPutativeOperonMap.get(id1).getFeature2();
-                
+
                 this.readsFeature1 = 0;
                 this.readsFeature2 = 0;
                 this.spanningReads = 0;
@@ -168,7 +175,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
                 for (int j = this.lastMappingIdx; j < mappings.size(); ++j) {
                     mapping = mappings.get(j);
 
-                    if (mapping.getStart() > feature2Stop ) {
+                    if (mapping.getStart() > feature2Stop) {
                         break; //since the mappings are sorted by start position
                     } else if (mapping.isFwdStrand() != feature1.isFwdStrand() || mapping.getStop() < feature1Stop) {
                         continue;
@@ -211,10 +218,10 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
         OperonAdjacency putativeOperon;
 
         /*
-         * If we have sequence pairs, we calculate the average seq pair length
+         * If we have read pairs, we calculate the average read pair length
          * and if we only have single reads, we use the average read length.
          */
-        //TODO: incorporate sequence pair handling in the detection. currently only reads are used
+        //TODO: incorporate read pair handling in the detection. currently only reads are used
         int minimumSpanningReads;
 //        if (trackCon.getNumOfSeqPairs() > 0 && operonDetectionAutomatic) {
 //            minimumSpanningReads = (numUniqueBmMappings * averageSeqPairLength) / transcritomeLength;

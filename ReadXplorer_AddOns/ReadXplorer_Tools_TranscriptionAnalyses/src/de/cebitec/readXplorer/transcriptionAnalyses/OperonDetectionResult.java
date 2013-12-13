@@ -18,8 +18,9 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetOpero
     
     private final List<Operon> detectedOperons;
 
-    public OperonDetectionResult(Map<Integer, PersistantTrack> trackList, List<Operon> detectedOperons, boolean combineTracks) {//, PersistantTrack currentTrack) {
-        super(trackList, combineTracks);
+    public OperonDetectionResult(Map<Integer, PersistantTrack> trackList, List<Operon> detectedOperons, 
+            int referenceId, boolean combineTracks) {
+        super(trackList, referenceId, combineTracks);
         this.detectedOperons = detectedOperons;
     }
 

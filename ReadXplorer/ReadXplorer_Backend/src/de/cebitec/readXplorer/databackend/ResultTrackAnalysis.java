@@ -1,5 +1,7 @@
 package de.cebitec.readXplorer.databackend;
 
+import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.exporter.excel.ExcelExportDataI;
 import java.util.ArrayList;
@@ -16,36 +18,44 @@ import java.util.Map;
 public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
     
     private Map<Integer, PersistantTrack> trackMap;
+    private Map<Integer, PersistantChromosome> chromMap;
     private List<String> trackNameList;
     private ParameterSetI<T> parameters;
     private Map<String, Integer> statsMap;
     private final boolean combineTracks;
 
     /**
-     * A result of an analysis for a list of tracks.
-     * @param trackMap the list of tracks for which the analysis was carried out
+     * A result of an analysis for a list of tracks. It also fetches and stores 
+     * the map of chromosomes for which the analysis was carried out hashed to 
+     * their respective chromosomes id.
+     * @param trackMap the map of track ids to the tracks for which the analysis was carried out
+     * @param referenceId id of the reference genome, for which this result was generated
      * @param combineTracks <cc>true</cc>, if the tracks in the list are 
      * combined, <cc>false</cc> otherwise
      */
-    public ResultTrackAnalysis(Map<Integer, PersistantTrack> trackMap, boolean combineTracks) {//, PersistantTrack currentTrack) {
+    public ResultTrackAnalysis(Map<Integer, PersistantTrack> trackMap, int referenceId, boolean combineTracks) {
         this.trackMap = trackMap;
+        this.chromMap = ProjectConnector.getInstance().getRefGenomeConnector(referenceId).getChromosomesForGenome();
         this.trackNameList = PersistantTrack.generateTrackDescriptionList(trackMap.values());
         this.statsMap = new HashMap<>();
         this.combineTracks = combineTracks;
     }
 
     /**
-     * @return the map of tracks for which the analysis was carried out hashed
-     * to their respective track id
+     * @return <cc>true</cc>, if the tracks in the list are combined,
+     * <cc>false</cc> otherwise
      */
-    public Map<Integer, PersistantTrack> getTrackMap() {
-        return trackMap;
-    }
-
     public boolean isCombineTracks() {
         return combineTracks;
     }
     
+    /**
+     * Concatenates all track names either in full length or each name trimmed 
+     * to 20 characters.
+     * @param fullLength <cc>true</cc>, if the track names shall appear in full 
+     * length, <cc>false</cc> otherwise
+     * @return The concatenated String containing all track names.
+     */
     private String getCombinedTrackNames(boolean fullLength) {
         String concatTrackNames = "";
         String description;
@@ -98,9 +108,25 @@ public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
      * to their respective track id
      * @param trackMap the map of tracks for which the analysis was carried out
      */
-    public void setTrackList(Map<Integer, PersistantTrack> trackMap) {
+    public void setTrackMap(Map<Integer, PersistantTrack> trackMap) {
         this.trackMap = trackMap;
         this.trackNameList = PersistantTrack.generateTrackDescriptionList(trackMap.values());
+    }
+
+    /**
+     * @return the map of tracks for which the analysis was carried out hashed
+     * to their respective track id
+     */
+    public Map<Integer, PersistantTrack> getTrackMap() {
+        return trackMap;
+    }
+    
+    /**
+     * @return The map of chromosomes for which the analysis was carried out 
+     * hashed to their respective chromosome id.
+     */
+    public Map<Integer, PersistantChromosome> getChromosomeMap() {
+        return chromMap;
     }
 
     /**

@@ -49,7 +49,9 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
         model.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                TableUtils.showPosition(coverageAnalysisTable, 2, bim);
+                int posColumnIdx = 3;
+                int chromColumnIdx = 1;
+                TableUtils.showPosition(coverageAnalysisTable, posColumnIdx, chromColumnIdx, bim);
             }
         });
     }
@@ -74,14 +76,14 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Track", "Strand", "Start", "Stop", "Length", "Mean Coverage"
+                "Track", "Chromosome", "Strand", "Start", "Stop", "Length", "Mean Coverage"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
+                java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false
+                false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -94,11 +96,12 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
         });
         coverageAnalysisPane.setViewportView(coverageAnalysisTable);
         coverageAnalysisTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoverageAnalysis.class, "ResultPanelCoverageAnalysis.coverageAnalysisTable.columnModel.title0")); // NOI18N
-        coverageAnalysisTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoverageAnalysis.class, "ResultPanelCoverageAnalysis.coverageAnalysisTable.columnModel.title1")); // NOI18N
-        coverageAnalysisTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoverageAnalysis.class, "ResultPanelCoverageAnalysis.coverageAnalysisTable.columnModel.title2")); // NOI18N
-        coverageAnalysisTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoverageAnalysis.class, "ResultPanelCoverageAnalysis.coverageAnalysisTable.columnModel.title3")); // NOI18N
-        coverageAnalysisTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoverageAnalysis.class, "ResultPanelCoverageAnalysis.coverageAnalysisTable.columnModel.title4")); // NOI18N
-        coverageAnalysisTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoverageAnalysis.class, "ResultPanelCoverageAnalysis.coverageAnalysisTable.columnModel.title5")); // NOI18N
+        coverageAnalysisTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoverageAnalysis.class, "ResultPanelCoverageAnalysis.coverageAnalysisTable.columnModel.title6")); // NOI18N
+        coverageAnalysisTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoverageAnalysis.class, "ResultPanelCoverageAnalysis.coverageAnalysisTable.columnModel.title1")); // NOI18N
+        coverageAnalysisTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoverageAnalysis.class, "ResultPanelCoverageAnalysis.coverageAnalysisTable.columnModel.title2")); // NOI18N
+        coverageAnalysisTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoverageAnalysis.class, "ResultPanelCoverageAnalysis.coverageAnalysisTable.columnModel.title3")); // NOI18N
+        coverageAnalysisTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoverageAnalysis.class, "ResultPanelCoverageAnalysis.coverageAnalysisTable.columnModel.title4")); // NOI18N
+        coverageAnalysisTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoverageAnalysis.class, "ResultPanelCoverageAnalysis.coverageAnalysisTable.columnModel.title5")); // NOI18N
 
         exportButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelCoverageAnalysis.class, "ResultPanelCoverageAnalysis.exportButton.text_1")); // NOI18N
         exportButton.addActionListener(new java.awt.event.ActionListener() {
@@ -158,6 +161,10 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
     private javax.swing.JButton statisticsButton;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     * @param boundsInformationManager The bounds info manager to update, when
+     * a result is clicked.
+     */
     public void setBoundsInfoManager(BoundsInfoManager boundsInformationManager) {
         this.bim = boundsInformationManager;
     }
@@ -184,7 +191,7 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
      * @param intervalList list to create the entries for
      */
     private void createTableEntries(List<CoverageInterval> intervalList) {
-        final int nbColumns = 6;
+        final int nbColumns = 7;
 
         DefaultTableModel model = (DefaultTableModel) coverageAnalysisTable.getModel();
         int meanIntervalLength = 0;
@@ -192,12 +199,14 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
 
         for (CoverageInterval interval : intervalList) {
             Object[] rowData = new Object[nbColumns];
-            rowData[0] = coverageAnalysisResult.getTrackEntry(interval.getTrackId(), false);
-            rowData[1] = interval.getStrandString();
-            rowData[2] = interval.isFwdStrand() ? interval.getStart() : interval.getStop();
-            rowData[3] = interval.isFwdStrand() ? interval.getStop() : interval.getStart();
-            rowData[4] = interval.getLength();
-            rowData[5] = interval.getMeanCoverage();
+            int i = 0;
+            rowData[i++] = coverageAnalysisResult.getTrackEntry(interval.getTrackId(), false);
+            rowData[i++] = coverageAnalysisResult.getChromosomeMap().get(interval.getChromId());
+            rowData[i++] = interval.getStrandString();
+            rowData[i++] = interval.isFwdStrand() ? interval.getStart() : interval.getStop();
+            rowData[i++] = interval.isFwdStrand() ? interval.getStop() : interval.getStart();
+            rowData[i++] = interval.getLength();
+            rowData[i++] = interval.getMeanCoverage();
             meanIntervalLength += interval.getLength();
             meanIntervalCoverage += interval.getMeanCoverage();
 

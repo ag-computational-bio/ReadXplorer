@@ -96,7 +96,9 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         model.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                TableUtils.showPosition(tSSTable, 0, boundsInfoManager);
+                int posColumnIdx = 0;
+                int chromColumnIdx = 1;
+                TableUtils.showPosition(tSSTable, posColumnIdx, chromColumnIdx, boundsInfoManager);
             }
         });
     }
@@ -147,14 +149,14 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
             },
             new String [] {
-                "Position", "Direction", "Read starts", "Rel. count", "Gene name", "Gene locus", "offset", "Sequence", "Leaderless", "CDS-Shift", "False positive", "Internal TSS", "Putative Antisense", "Upstream analysis", "Gene start", "Gene stop", "Gene length", "Gene Frame", "Gene product", "Start codon", "Stop codon", "Track ID"
+                "Position", "Chromosome", "Direction", "Read starts", "Rel. count", "Gene", "Gene locus", "offset", "Sequence", "Leaderless", "False positive?", "Internal TSS", "gene start", "gene stop", "length in bp", "Frame", "gene product", "start codon sequence", "stop codon sequence", "track IDl"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Double.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class
+                java.lang.Integer.class, java.lang.Object.class, java.lang.String.class, java.lang.Integer.class, java.lang.Double.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, true, true, true, true, true, true, false, false, false, false, false, false, false, false
+                false, true, false, false, false, false, false, false, false, true, true, true, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -805,30 +807,31 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                 final Object[] rowData = new Object[nbColumns];
                 int position = tSS.getStartPosition();
                 this.tssInHash.put(position, tSS);
-                rowData[0] = position;
-                rowData[1] = strand;
-                rowData[2] = tSS.getReadStarts();
-                rowData[3] = tSS.getRelCount();
+                int i = 0;
+                rowData[i++] = position;
+                rowData[i++] = newResult.getChromosomeMap().get(tSS.getChromId());
+                rowData[i++] = strand;
+                rowData[i++] = tSS.getReadStarts();
+                rowData[i++] = tSS.getRelCount();
 
                 feature = tSS.getDetectedGene();
                 nextGene = tSS.getNextGene();
 
                 if (feature != null) {
-                    rowData[4] = feature.toString();
-                    rowData[5] = feature.getLocus();
-                    rowData[6] = tSS.getOffset();
+                    rowData[i++] = feature.toString();
+                    rowData[i++] = feature.getLocus();
+                    rowData[i++] = tSS.getOffset();
                     ++noCorrectStarts;
                 } else {
-                    rowData[4] = nextGene.toString();
-                    rowData[5] = nextGene.getLocus();
-                    rowData[6] = tSS.getNextOffset();
+                    rowData[i++] = nextGene.toString();
+                    rowData[i++] = nextGene.getLocus();
+                    rowData[i++] = tSS.getNextOffset();
                 }
 
-                rowData[7] = tSS.getSequence();
-
-                rowData[8] = leaderless;
-
-                boolean cdsShift = tSS.isCdsShift();
+                rowData[i++] = tSS.getSequence();
+                rowData[i++] = leaderless;
+                rowData[i++] = false;
+                rowData[i++] = tSS.isInternalTSS();
                 rowData[9] = cdsShift;
                 if (cdsShift) {
                     noPutCdsShifts++;
@@ -848,36 +851,36 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                 rowData[13] = false;
                 // additionally informations about detected gene
                 if (feature != null) {
-                    rowData[14] = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
-                    rowData[15] = feature.isFwdStrand() ? feature.getStop() : feature.getStart();
-                    rowData[16] = feature.getStop() - feature.getStart();
+                    rowData[i++] = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
+                    rowData[i++] = feature.isFwdStrand() ? feature.getStop() : feature.getStart();
+                    rowData[i++] = feature.getStop() - feature.getStart();
                     int start = feature.getStart();
                     if ((start % 3) == 0) {
-                        rowData[17] = 3;
+                        rowData[i++] = 3;
                     } else if (start % 3 == 1) {
-                        rowData[17] = 1;
+                        rowData[i++] = 1;
                     } else if (start % 3 == 2) {
-                        rowData[17] = 2;
+                        rowData[i++] = 2;
                     }
-                    rowData[18] = feature.getProduct();
+                    rowData[i++] = feature.getProduct();
                 } else {
-                    rowData[14] = nextGene.isFwdStrand() ? nextGene.getStart() : nextGene.getStop();
-                    rowData[15] = nextGene.isFwdStrand() ? nextGene.getStop() : nextGene.getStart();
-                    rowData[16] = nextGene.getStop() - nextGene.getStart();
+                    rowData[i++] = nextGene.isFwdStrand() ? nextGene.getStart() : nextGene.getStop();
+                    rowData[i++] = nextGene.isFwdStrand() ? nextGene.getStop() : nextGene.getStart();
+                    rowData[i++] = nextGene.getStop() - nextGene.getStart();
                     int start = nextGene.getStart();
                     if ((start % 3) == 0) {
-                        rowData[17] = 2;
+                        rowData[i++] = 2;
                     } else if (start % 3 == 1) {
-                        rowData[17] = 1;
+                        rowData[i++] = 1;
                     } else if (start % 3 == 2) {
-                        rowData[17] = 3;
+                        rowData[i++] = 3;
                     }
-                    rowData[18] = nextGene.getProduct();
+                    rowData[i++] = nextGene.getProduct();
                 }
 
-                rowData[19] = tSS.getDetectedFeatStart();
-                rowData[20] = tSS.getDetectedFeatStop();
-                rowData[21] = tSS.getTrackId();
+                rowData[i++] = tSS.getDetectedFeatStart();
+                rowData[i++] = tSS.getDetectedFeatStop();
+                rowData[i++] = tSS.getTrackId();
 
                 SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
                     @Override

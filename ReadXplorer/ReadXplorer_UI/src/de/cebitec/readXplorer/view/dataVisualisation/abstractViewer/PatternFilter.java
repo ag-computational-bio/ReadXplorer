@@ -1,5 +1,6 @@
 package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
 
+import de.cebitec.readXplorer.databackend.dataObjects.ChromosomeObserver;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.SequenceUtils;
@@ -26,12 +27,14 @@ public class PatternFilter implements RegionFilterI {
     private String sequence;
     private Pattern pattern;
 //    private Pattern patternRev;
+    private ChromosomeObserver chromObserver;
 
     public PatternFilter(int absStart, int absStop, PersistantReference refGen) {
         this.matchedPatterns = new ArrayList<>();
         this.absStart = absStart;
         this.absStop = absStop;
         this.refGen = refGen;
+        this.chromObserver = new ChromosomeObserver();
     }
 
     /**
@@ -46,16 +49,17 @@ public class PatternFilter implements RegionFilterI {
             int offset = this.pattern.toString().length(); //shift by pattern length to left
             int start = this.absStart - offset;
             int stop = this.absStop + offset - 1;
+            String chromSeq = this.refGen.getActiveChromSequence(chromObserver);
 
             if (start < 0 ) {
                 offset -= Math.abs(start);
                 start = 0;
             }
-            if (stop > this.refGen.getRefLength()) {
-                stop = this.refGen.getRefLength();
+            if (stop > chromSeq.length()) {
+                stop = chromSeq.length();
             }
 
-            this.sequence = this.refGen.getSequence().substring(start, stop);
+            this.sequence = chromSeq.substring(start, stop);
             this.matchPattern(this.sequence, this.pattern, true, offset);
             this.sequence = SequenceUtils.getReverseComplement(this.sequence);
             this.matchPattern(this.sequence, this.pattern, false, offset);
@@ -71,9 +75,11 @@ public class PatternFilter implements RegionFilterI {
      */
     public int findNextOccurrence() {
 
-        int refLength = refGen.getRefLength();
+        String chromSeq = this.refGen.getActiveChromSequence(chromObserver);
+        
+        int refLength = chromSeq.length();
         int from = -1;
-        int from2 = -1;
+        int from2;
         if (!(this.pattern == null) && !this.pattern.toString().isEmpty()) {
 
             int start = this.absStop;
@@ -85,7 +91,7 @@ public class PatternFilter implements RegionFilterI {
                 start = 0;
             }
 
-            String seq = refGen.getSequence().substring(start, refLength);
+            String seq = chromSeq.substring(start, refLength);
             String seqRev = SequenceUtils.getReverseComplement(seq);
             
             //at first search from current position till end of sequence on both frames
@@ -94,7 +100,7 @@ public class PatternFilter implements RegionFilterI {
             
             //then search from 0 to current position on both frames
             if (from == -1 && from2 == -1 && start > 0) {
-                seq = refGen.getSequence().substring(0, start);
+                seq = chromSeq.substring(0, start);
                 start = 0;
                 
                 from = this.matchNextOccurrence(seq, this.pattern);
@@ -118,8 +124,8 @@ public class PatternFilter implements RegionFilterI {
      */
     public int findNextOccurrenceOnStrand(boolean isFwdStrand) {
 
-        String genomeSeq = refGen.getSequence();
-        int refLength = refGen.getRefLength();
+        String chromSeq = this.refGen.getActiveChromSequence(chromObserver);
+        int refLength = chromSeq.length();
         int from = -1;
         int start = this.absStart;
         if (!(this.pattern == null) && !this.pattern.toString().isEmpty()) {
@@ -128,14 +134,14 @@ public class PatternFilter implements RegionFilterI {
             //at first search from current position till end of sequence on selected strand
             if (isFwdStrand) { //start with the stop pos of current codon
                 while (++start < refLength && !isCorrectFrame) { //++, because otherwise we start at last start pos
-                    String seq = genomeSeq.substring(start, refLength);
+                    String seq = chromSeq.substring(start, refLength);
                     from = this.matchNextOccurrence(seq, this.pattern) + 1; // because we don't want index, but pos in genome
                     start += from;
                     isCorrectFrame = ((start) % 3 == this.absStart % 3) ? true : false;
                 }
                 ++start; //because we had fst pos of stop, then +2 and when exiting while loop -1. by +1 we move to last pos of stop
             } else { //reverse complement dna and start with the stop pos of current codon
-                String seq = genomeSeq.substring(0, this.absStart); //sequence we start with
+                String seq = chromSeq.substring(0, this.absStart); //sequence we start with
                 String seqRev = SequenceUtils.getReverseComplement(seq);
                 int nextStart = 0;
                 int fromRev = 0;

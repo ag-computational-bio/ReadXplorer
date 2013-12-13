@@ -1,8 +1,9 @@
 package de.cebitec.readXplorer.databackend;
 
 import de.cebitec.readXplorer.databackend.dataObjects.*;
-import de.cebitec.readXplorer.parser.mappings.ParserCommonMethods;
+import de.cebitec.readXplorer.parser.mappings.CommonsMappingParser;
 import de.cebitec.readXplorer.util.Observable;
+import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.ReadPairType;
 import de.cebitec.readXplorer.util.SamUtils;
@@ -10,7 +11,11 @@ import de.cebitec.readXplorer.util.SequenceUtils;
 import java.awt.Dialog;
 import java.io.File;
 import java.nio.BufferUnderflowException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.swing.JButton;
 import net.sf.samtools.SAMException;
 import net.sf.samtools.SAMFileReader;
@@ -32,10 +37,12 @@ public class SamBamFileReader implements Observable {
     public static final String cigarRegex = "[MIDNSPX=]+";
     private final File dataFile;
     private final int trackId;
+    private final PersistantReference reference;
     private SamUtils samUtils;
     private SAMFileReader samFileReader;
     private String header;
-    private List<de.cebitec.readXplorer.util.Observer> observers;
+    private List<Observer> observers;
+    private Observer chromosomeObserver;
 
     /**
      * A SamBamFileReader has different methods to read data from a bam or sam
@@ -43,12 +50,15 @@ public class SamBamFileReader implements Observable {
      * @param dataFile the file to read from
      * @param trackId the track id of the track whose data is stored in the
      * given file
+     * @param reference reference genome used in the bam file
      * @throws RuntimeIOException
      */
-    public SamBamFileReader(File dataFile, int trackId) throws RuntimeIOException {
+    public SamBamFileReader(File dataFile, int trackId, PersistantReference reference) throws RuntimeIOException {
+        this.chromosomeObserver = new ChromosomeObserver();
         this.observers = new ArrayList<>();
         this.dataFile = dataFile;
         this.trackId = trackId;
+        this.reference = reference;
         this.samUtils = new SamUtils();
         
         this.initializeReader();
@@ -104,15 +114,15 @@ public class SamBamFileReader implements Observable {
      * well
      * @return the mappings for the given interval
      */
-    public Collection<PersistantMapping> getMappingsFromBam(PersistantReference refGenome, IntervalRequest request, boolean needDiffs) {
+    public Collection<PersistantMapping> getMappingsFromBam(IntervalRequest request, boolean needDiffs) {
 
         Collection<PersistantMapping> mappings = new ArrayList<>();
         
         try {
             this.checkIndex();
             
-            SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), request.getTotalFrom(), request.getTotalTo(), false);
-            String refSeq = refGenome.getSequence();
+            SAMRecordIterator samRecordIterator = samFileReader.query(reference.getChromosome(request.getChromId()).getName(), request.getTotalFrom(), request.getTotalTo(), false);
+            String refSeq = reference.getChromSequence(request.getChromId(), chromosomeObserver);
             String refSubSeq;
             int id = 0;
             String cigar;
@@ -181,6 +191,8 @@ public class SamBamFileReader implements Observable {
             //do nothing
         }
         
+        reference.getChromosome(request.getChromId()).removeObserver(chromosomeObserver);
+        
         return mappings;
     }
 
@@ -193,7 +205,7 @@ public class SamBamFileReader implements Observable {
      * @return the reduced mappings for the given interval.  Diffs and gaps are 
      * never included.
      */
-    public Collection<PersistantMapping> getReducedMappingsFromBam(PersistantReference refGenome, IntervalRequest request) {
+    public Collection<PersistantMapping> getReducedMappingsFromBam(IntervalRequest request) {
         int from = request.getTotalFrom();
         int to = request.getTotalTo();
         Collection<PersistantMapping> mappings = new ArrayList<>();
@@ -201,7 +213,7 @@ public class SamBamFileReader implements Observable {
         try {
             this.checkIndex();
             
-            SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), from, to, false);
+            SAMRecordIterator samRecordIterator = samFileReader.query(reference.getChromosome(request.getChromId()).getName(), from, to, false);
             SAMRecord record;
             int start;
             int stop;
@@ -239,18 +251,14 @@ public class SamBamFileReader implements Observable {
     }
 
     /**
-     * Retrieves the sequence pair mappings from the given interval from the sam
+     * Retrieves the read pair mappings from the given interval from the sam
      * or bam file set for this data reader and the reference sequence with the
      * given name.
-     * @param refGenome reference genome used in the bam file
      * @param request request to carry out
-     * @param diffsAndGapsNeeded true, if the diffs and gaps have to be fetched
-     * from the file as well
      * @return the coverage for the given interval
      */
-    public Collection<PersistantReadPairGroup> getReadPairMappingsFromBam(PersistantReference refGenome,
-            IntervalRequest request, boolean diffsAndGapsNeeded) {
-        HashMap<Long, PersistantReadPairGroup> readPairs = new HashMap<>();
+    public Collection<PersistantReadPairGroup> getReadPairMappingsFromBam(IntervalRequest request) {
+        Map<Long, PersistantReadPairGroup> readPairs = new HashMap<>();
         Collection<PersistantReadPairGroup> readPairGroups = new ArrayList<>();
         
         int from = request.getTotalFrom();
@@ -259,8 +267,8 @@ public class SamBamFileReader implements Observable {
         try {
             this.checkIndex();
 
-            SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), from, to, false);
-            String refSeq = refGenome.getSequence();
+            SAMRecordIterator samRecordIterator = samFileReader.query(reference.getChromosome(request.getChromId()).getName(), from, to, false);
+            String refSeq = reference.getChromSequence(request.getChromId(), chromosomeObserver);
             String refSubSeq;
             int id = 0;
             String cigar;
@@ -328,7 +336,7 @@ public class SamBamFileReader implements Observable {
                             readPairs.get(readPairId).addPersistantDirectAccessMapping(mapping, mate, readPairType, bothVisible);
                         }
 
-                        if (diffsAndGapsNeeded && classification != Properties.PERFECT_COVERAGE) {
+                        if (request.isDiffsAndGapsNeeded() && classification != Properties.PERFECT_COVERAGE) {
                             this.createDiffsAndGaps(record.getCigarString(), startPos, isFwdStrand, numReplicates,
                                     record.getReadString(), refSubSeq, mapping);
                         }
@@ -344,6 +352,8 @@ public class SamBamFileReader implements Observable {
         } catch (BufferUnderflowException e) {
             //do nothing
         }
+
+        reference.getChromosome(request.getChromId()).removeObserver(chromosomeObserver);
 
         return readPairGroups;
     }
@@ -371,11 +381,10 @@ public class SamBamFileReader implements Observable {
      * Retrieves the coverage for the given interval from the bam file set for
      * this data reader and the reference sequence with the given name. If reads
      * become longer than 1000bp the offset in this method has to be enlarged!
-     * @param refGenome the reference genome used in the bam file
      * @param request the request to carry out
      * @return the coverage for the given interval
      */
-    public CoverageAndDiffResultPersistant getReadStartsFromBam(PersistantReference refGenome, IntervalRequest request) {
+    public CoverageAndDiffResultPersistant getReadStartsFromBam(IntervalRequest request) {
 
         byte trackNeeded = request.getWhichTrackNeeded();
         int from = request.getTotalFrom();
@@ -391,10 +400,10 @@ public class SamBamFileReader implements Observable {
         List<PersistantDiff> diffs = new ArrayList<>(); //both empty for read starts
         List<PersistantReferenceGap> gaps = new ArrayList<>();
 
-        CoverageAndDiffResultPersistant result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, false);
+        CoverageAndDiffResultPersistant result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, request);
         try {
             this.checkIndex();
-            SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), from, to, false);
+            SAMRecordIterator samRecordIterator = samFileReader.query(reference.getChromosome(request.getChromId()).getName(), from, to, false);
 
             SAMRecord record;
             boolean isFwdStrand;
@@ -420,7 +429,7 @@ public class SamBamFileReader implements Observable {
                 }
             }
             samRecordIterator.close();
-            result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, false);
+            result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, request);
 
         } catch (NullPointerException | IllegalArgumentException | SAMException | ArrayIndexOutOfBoundsException e) {
             this.notifyObservers(e);
@@ -434,14 +443,12 @@ public class SamBamFileReader implements Observable {
      * Retrieves the coverage for the given interval from the bam file set for
      * this data reader and the reference sequence with the given name. If reads
      * become longer than 1000bp the offset in this method has to be enlarged!
-     * @param refGenome the reference genome used in the bam file
      * @param request the request to carry out
      * @param diffsAndGapsNeeded true, if the diffs and gaps are needed, false
      * otherwise
      * @return the coverage for the given interval
      */
-    public CoverageAndDiffResultPersistant getCoverageAndReadStartsFromBam(PersistantReference refGenome, 
-            IntervalRequest request, boolean diffsAndGapsNeeded) {
+    public CoverageAndDiffResultPersistant getCoverageAndReadStartsFromBam(IntervalRequest request) {
 
         byte trackNeeded = request.getWhichTrackNeeded();
         int from = request.getTotalFrom();
@@ -462,14 +469,14 @@ public class SamBamFileReader implements Observable {
         PersistantDiffAndGapResult diffsAndGaps;
         String refSeq = "";
 
-        CoverageAndDiffResultPersistant result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, diffsAndGapsNeeded);
-        if (diffsAndGapsNeeded) {
-            refSeq = refGenome.getSequence();
+        CoverageAndDiffResultPersistant result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, request);
+        if (request.isDiffsAndGapsNeeded()) {
+            refSeq = reference.getChromSequence(request.getChromId(), chromosomeObserver);
         }
         try {
             this.checkIndex();
 
-            SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), from, to, false);
+            SAMRecordIterator samRecordIterator = samFileReader.query(reference.getChromosome(request.getChromId()).getName(), from, to, false);
 
             SAMRecord record;
             boolean isFwdStrand;
@@ -501,7 +508,7 @@ public class SamBamFileReader implements Observable {
                                     trackNeeded, isFwdStrand, stop, stop, readStarts);
                         }
 
-                        if (diffsAndGapsNeeded && classification != Properties.PERFECT_COVERAGE
+                        if (request.isDiffsAndGapsNeeded() && classification != Properties.PERFECT_COVERAGE
                                 && request.getReadClassParams().isClassificationAllowed(classification)) {
                             diffsAndGaps = this.createDiffsAndGaps(record.getCigarString(),
                                     startPos, isFwdStrand, 1, record.getReadString(),
@@ -513,7 +520,7 @@ public class SamBamFileReader implements Observable {
                 }
             }
             samRecordIterator.close();
-            result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, diffsAndGapsNeeded);
+            result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, request);
             result.setReadStarts(readStarts);
 
         } catch (NullPointerException | IllegalArgumentException | SAMException | ArrayIndexOutOfBoundsException e) {
@@ -522,6 +529,8 @@ public class SamBamFileReader implements Observable {
             //do nothing
         }
 
+        reference.getChromosome(request.getChromId()).removeObserver(chromosomeObserver);
+
         return result;
     }
 
@@ -529,13 +538,10 @@ public class SamBamFileReader implements Observable {
      * Retrieves the coverage for the given interval from the bam file set for
      * this data reader and the reference sequence with the given name. If reads
      * become longer than 1000bp the offset in this method has to be enlarged!
-     * @param refGenome the reference genome used in the bam file
      * @param request the request to carry out
-     * @param diffsAndGapsNeeded true, if the diffs and gaps are needed, false
-     * otherwise
      * @return the coverage for the given interval
      */
-    public CoverageAndDiffResultPersistant getCoverageFromBam(PersistantReference refGenome, IntervalRequest request) {
+    public CoverageAndDiffResultPersistant getCoverageFromBam(IntervalRequest request) {
         
         byte trackNeeded = request.getWhichTrackNeeded();
         int from = request.getTotalFrom();
@@ -553,14 +559,14 @@ public class SamBamFileReader implements Observable {
         PersistantDiffAndGapResult diffsAndGaps;
         String refSeq = "";
 
-        CoverageAndDiffResultPersistant result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, request.isDiffsAndGapsNeeded());
+        CoverageAndDiffResultPersistant result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, request);
         if (request.isDiffsAndGapsNeeded()) {
-            refSeq = refGenome.getSequence();
+            refSeq = reference.getChromSequence(request.getChromId(), chromosomeObserver);
         }
         try {
             this.checkIndex();
             
-            SAMRecordIterator samRecordIterator = samFileReader.query(refGenome.getName(), from, to, false);
+            SAMRecordIterator samRecordIterator = samFileReader.query(reference.getChromosome(request.getChromId()).getName(), from, to, false);
 
             SAMRecord record;
             boolean isFwdStrand;
@@ -597,13 +603,15 @@ public class SamBamFileReader implements Observable {
                 }
             }
             samRecordIterator.close();
-            result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, request.isDiffsAndGapsNeeded());
+            result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, request);
 
         } catch (NullPointerException | IllegalArgumentException | SAMException | ArrayIndexOutOfBoundsException e) {
             this.notifyObservers(e);
         } catch (BufferUnderflowException e) {
             //do nothing
         }
+
+        reference.getChromosome(request.getChromId()).removeObserver(chromosomeObserver);
 
         return result;
     }
@@ -803,7 +811,7 @@ public class SamBamFileReader implements Observable {
                         base = SequenceUtils.getDnaComplement(base);
                     }
                     PersistantReferenceGap gap = new PersistantReferenceGap(refPos + start, base, 
-                            ParserCommonMethods.getOrderForGap(refPos + start, gapOrderIndex), isFwdStrand, nbReplicates);
+                            CommonsMappingParser.getOrderForGap(refPos + start, gapOrderIndex), isFwdStrand, nbReplicates);
                     if (mapping != null) {
                         mapping.addGenomeGap(gap);
                     } else {
@@ -846,25 +854,28 @@ public class SamBamFileReader implements Observable {
     }
     
     /**
-     * Closes this reader.
+     * Closes this reader and remove its observer from all chromosomes.
      */
     public void close() {
-        samFileReader.close();
+        for (PersistantChromosome chrom : reference.getChromosomes().values()) {
+            chrom.removeObserver(chromosomeObserver);
+    }
+        this.samFileReader.close();
     }
 
     @Override
-    public void registerObserver(de.cebitec.readXplorer.util.Observer observer) {
+    public void registerObserver(Observer observer) {
         this.observers.add(observer);
     }
 
     @Override
-    public void removeObserver(de.cebitec.readXplorer.util.Observer observer) {
+    public void removeObserver(Observer observer) {
         this.observers.remove(observer);
     }
 
     @Override
     public void notifyObservers(Object data) {
-        for (de.cebitec.readXplorer.util.Observer observer : observers) {
+        for (Observer observer : observers) {
             observer.update(data);
         }
     }

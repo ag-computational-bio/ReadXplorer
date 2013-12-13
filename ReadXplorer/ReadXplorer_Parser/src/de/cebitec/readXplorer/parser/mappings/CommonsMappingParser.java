@@ -22,7 +22,7 @@ import org.openide.util.NbBundle;
  * 
  * @author jstraube, Rolf Hilker
  */
-public final class ParserCommonMethods {
+public final class CommonsMappingParser {
     
     /*
      * The cigar values are as follows: 0 (M) = alignment match (both, match or
@@ -36,7 +36,7 @@ public final class ParserCommonMethods {
     //option H-hard clipped not necessary, because it does not count into the alignment
     public static final String cigarRegex = "[MIDNSPX=]+";
     
-    private ParserCommonMethods(){
+    private CommonsMappingParser(){
         
     }
     
@@ -368,7 +368,7 @@ public final class ParserCommonMethods {
                     softclipped = Integer.parseInt(numOfBases);
                 }
             } else {
-                Logger.getLogger(ParserCommonMethods.class.getName()).log(Level.WARNING, NbBundle.getMessage(ParserCommonMethods.class, "CommonMethod.CIGAR ", op));
+                Logger.getLogger(CommonsMappingParser.class.getName()).log(Level.WARNING, NbBundle.getMessage(CommonsMappingParser.class, "CommonMethod.CIGAR ", op));
             }
         }
         newreadSeq = newreadSeq.substring(softclipped, newreadSeq.length());
@@ -400,18 +400,18 @@ public final class ParserCommonMethods {
             int lineno) {
         boolean isConsistent = true;
         if (readSeq == null || readSeq.isEmpty()) {
-            parent.notifyObservers(NbBundle.getMessage(ParserCommonMethods.class,
+            parent.notifyObservers(NbBundle.getMessage(CommonsMappingParser.class,
                     "Parser.checkMapping.ErrorReadEmpty", filename, lineno, readSeq));
             isConsistent = false;
         }
         if (refSeqLength < start || refSeqLength < stop) {
-            parent.notifyObservers(NbBundle.getMessage(ParserCommonMethods.class,
+            parent.notifyObservers(NbBundle.getMessage(CommonsMappingParser.class,
                     "Parser.checkMapping.ErrorReadPosition",
                     filename, lineno, start, stop, refSeqLength));
             isConsistent = false;
         }
         if (start >= stop) {
-            parent.notifyObservers(NbBundle.getMessage(ParserCommonMethods.class,
+            parent.notifyObservers(NbBundle.getMessage(CommonsMappingParser.class,
                     "Parser.checkMapping.ErrorStartStop", filename, lineno, start, stop));
             isConsistent = false;
         }
@@ -446,9 +446,9 @@ public final class ParserCommonMethods {
             String filename, 
             int lineno) {
         
-        boolean isConsistent = ParserCommonMethods.checkRead(parent, readSeq, refSeqLength, start, stop, filename, lineno);
+        boolean isConsistent = CommonsMappingParser.checkRead(parent, readSeq, refSeqLength, start, stop, filename, lineno);
         if (!cigar.matches("[MHISDPXN=\\d]+")) {
-            parent.notifyObservers(NbBundle.getMessage(ParserCommonMethods.class,
+            parent.notifyObservers(NbBundle.getMessage(CommonsMappingParser.class,
                     "Parser.checkMapping.ErrorCigar", cigar, filename, lineno));
             isConsistent = false;
         }
@@ -489,20 +489,20 @@ public final class ParserCommonMethods {
             String filename,
             int lineno) {
         
-        boolean isConsistent = ParserCommonMethods.checkRead(parent, readSeq, refSeqLength, start, stop, filename, lineno);
+        boolean isConsistent = CommonsMappingParser.checkRead(parent, readSeq, refSeqLength, start, stop, filename, lineno);
         
         if (readname == null || readname.isEmpty()) {
-            parent.notifyObservers(NbBundle.getMessage(ParserCommonMethods.class,
+            parent.notifyObservers(NbBundle.getMessage(CommonsMappingParser.class,
                     "Parser.checkMapping.ErrorReadname", filename, lineno, readname));
             isConsistent = false;
         }
         if (direction == 0) {
-            parent.notifyObservers(NbBundle.getMessage(ParserCommonMethods.class,
+            parent.notifyObservers(NbBundle.getMessage(CommonsMappingParser.class,
                     "Parser.checkMapping.ErrorDirectionJok", filename, lineno));
             isConsistent = false;
         }
         if (refSeq == null || refSeq.isEmpty()) {
-            parent.notifyObservers(NbBundle.getMessage(ParserCommonMethods.class,
+            parent.notifyObservers(NbBundle.getMessage(CommonsMappingParser.class,
                     "Parser.checkMapping.ErrorRef", filename, lineno, refSeq));
             isConsistent = false;
         }
@@ -674,7 +674,7 @@ public final class ParserCommonMethods {
     public static void addClassificationData(SAMRecord record, int differences,
             Map<String, ParsedClassification> classificationMap) throws AssertionError {
         
-        String readName = ParserCommonMethods.elongatePairedReadName(record);
+        String readName = CommonsMappingParser.elongatePairedReadName(record);
         ParsedClassification classification;
         int nextMappingPos;
         if (classificationMap.get(readName) != null) {

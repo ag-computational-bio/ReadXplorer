@@ -2,7 +2,6 @@ package de.cebitec.readXplorer.controller;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readXplorer.api.ApplicationFrameI;
-import de.cebitec.readXplorer.controller.Bundle;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
@@ -24,7 +23,7 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.util.Utilities;
 
 /**
- * Controls the view for one <code>ApplicationFrameI</code>
+ * Controls the view for one <code>ApplicationFrameI</code>.
  *
  * @author ddoppmeier
  */
@@ -39,8 +38,15 @@ public class ViewController implements de.cebitec.readXplorer.view.dataVisualisa
     private Map<PersistantTrack, BasePanel> trackToPanel;
     private List<BasePanel> currentTracks= new ArrayList<>();
     
+    private BoundsInfoManagerFactory boundsInfoManagerFactory;
+    
     private ApplicationFrameI app;
 
+    /**
+     * Controls the view for one <code>ApplicationFrameI</code>.
+     * @param app the <code>ApplicationFrameI</code> interface implementation,
+     * for which the view controller is created.
+     */
     public ViewController(ApplicationFrameI app){
         this.app = app;
 
@@ -48,21 +54,27 @@ public class ViewController implements de.cebitec.readXplorer.view.dataVisualisa
 
         trackToPanel = new HashMap<>();
         registerInLookup();
-        this.boundsinfomanagerfactory = new BoundsInfoManagerFactory();
+        this.boundsInfoManagerFactory = new BoundsInfoManagerFactory();
     }
     
+    /**
+     * Registers this <code>ViewController</code> in the 
+     * <code>CentralLookup</code>.
+     */
     private void registerInLookup(){
         CentralLookup.getDefault().add(this);
     }
     
-    private BoundsInfoManagerFactory boundsinfomanagerfactory;
-    
+    /**
+     * Opens a reference viewer for the given reference genome.
+     * @param genome the genome for which a viewer shall be opened.
+     */
     public void openGenome(PersistantReference genome) {
         currentRefGen = genome;
         
-        boundsManager = this.boundsinfomanagerfactory.get(currentRefGen);
+        boundsManager = this.boundsInfoManagerFactory.get(currentRefGen);
         basePanelFac = new BasePanelFactory(boundsManager, this);
-        genomeViewer = basePanelFac.getGenomeViewerBasePanel(currentRefGen);
+        genomeViewer = basePanelFac.getRefViewerBasePanel(currentRefGen);
         getApp().showRefGenPanel(genomeViewer);
     }
     
@@ -72,7 +84,7 @@ public class ViewController implements de.cebitec.readXplorer.view.dataVisualisa
      * corresponding reference viewer is opened.
      * @return true, if a reference genome is selected and OK was clicked in the dialog, false otherwise
      */
-    public boolean openRefGen(){
+    public boolean openRefGen() {
         OpenRefGenPanel orgp = new OpenRefGenPanel();
         DialogDescriptor dialogDescriptor = new DialogDescriptor(orgp, "Open Reference");
         Dialog openRefGenDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
@@ -88,7 +100,7 @@ public class ViewController implements de.cebitec.readXplorer.view.dataVisualisa
 
     /**
      * Closes all tracks, which are currently open for the reference viewer of
-     * this top component.
+     * this top component and the reference viewer.
      */
     public void closeRefGen() {
 

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
@@ -25,8 +21,8 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
     private Statistics stats;
     private Map<String, Object> statsMap;
 
-    public TSSDetectionResults(Statistics stats, List<TranscriptionStart> results, Map<Integer, PersistantTrack> trackMap) {
-        super(trackMap, false);
+    public TSSDetectionResults(Statistics stats, List<TranscriptionStart> results, Map<Integer, PersistantTrack> trackMap, int refId) {
+        super(trackMap, refId, false);
         this.results = results;
         this.stats = stats;
         this.statsMap = new HashMap<>();
@@ -46,7 +42,7 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
         List<String> dataColumnDescriptions = new ArrayList<>();
 
         dataColumnDescriptions.add("Position");
-        dataColumnDescriptions.add("Strand");
+        dataColumnDescriptions.add("Chromosome");
         dataColumnDescriptions.add("Read starts");
         dataColumnDescriptions.add("Rel. count");
         dataColumnDescriptions.add("Feature name");
@@ -89,7 +85,7 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
             List<Object> tssRow = new ArrayList<>();
 
             tssRow.add(tss.getStartPosition());
-            tssRow.add(tss.isFwdStrand() ? SequenceUtils.STRAND_FWD_STRING : SequenceUtils.STRAND_REV_STRING);
+            tssRow.add(this.getChromosomeMap().get(tss.getChromId()));
             tssRow.add(tss.getReadStarts());
             tssRow.add(tss.getRelCount());
 

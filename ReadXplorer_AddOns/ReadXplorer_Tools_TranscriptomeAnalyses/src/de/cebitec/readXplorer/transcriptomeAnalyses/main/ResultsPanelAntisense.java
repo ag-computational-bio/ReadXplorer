@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
@@ -49,7 +45,9 @@ public class ResultsPanelAntisense extends ResultTablePanel {
         model.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                TableUtils.showPosition(antisenseTable, 0, boundsInfoManager);
+                int posColumnIdx = 0;
+                int chromColumnIdx = 1;
+                TableUtils.showPosition(antisenseTable, posColumnIdx, chromColumnIdx, boundsInfoManager);
             }
         });
     }
@@ -73,14 +71,14 @@ public class ResultsPanelAntisense extends ResultTablePanel {
 
             },
             new String [] {
-                "Position", "Direction", "Type", "Track ID"
+                "Position", "Chromosome", "Direction", "Type", "Track ID"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class
+                java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false
+                false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -92,10 +90,11 @@ public class ResultsPanelAntisense extends ResultTablePanel {
             }
         });
         jScrollPane1.setViewportView(antisenseTable);
-        antisenseTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultsPanelAntisense.class, "ResultsPanelAntisense.antisenseTable.columnModel.title0")); // NOI18N
-        antisenseTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultsPanelAntisense.class, "ResultsPanelAntisense.antisenseTable.columnModel.title1")); // NOI18N
-        antisenseTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultsPanelAntisense.class, "ResultsPanelAntisense.antisenseTable.columnModel.title2")); // NOI18N
-        antisenseTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultsPanelAntisense.class, "ResultsPanelAntisense.antisenseTable.columnModel.title3")); // NOI18N
+        antisenseTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultsPanelAntisense.class, "ResultsPanelAntisense.antisenseTable.columnModel.title0_1")); // NOI18N
+        antisenseTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultsPanelAntisense.class, "ResultsPanelAntisense.antisenseTable.columnModel.title4")); // NOI18N
+        antisenseTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultsPanelAntisense.class, "ResultsPanelAntisense.antisenseTable.columnModel.title1_1")); // NOI18N
+        antisenseTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultsPanelAntisense.class, "ResultsPanelAntisense.antisenseTable.columnModel.title2_1")); // NOI18N
+        antisenseTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultsPanelAntisense.class, "ResultsPanelAntisense.antisenseTable.columnModel.title3_1")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(ResultsPanelAntisense.class, "ResultsPanelAntisense.jButton1.text")); // NOI18N
 
@@ -105,7 +104,7 @@ public class ResultsPanelAntisense extends ResultTablePanel {
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+            .addComponent(jScrollPane1)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jButton2)
@@ -165,10 +164,12 @@ public class ResultsPanelAntisense extends ResultTablePanel {
                 final Object[] rowData = new Object[nbColumns];
                 int position = aS.getPos();
                 this.aSInHash.put(position, aS);
-                rowData[0] = position;
-                rowData[1] = strand;
-                rowData[2] = aS.getType();
-                rowData[3] = aS.getTrackId();
+                int i = 0;
+                rowData[i++] = position;
+                rowData[i++] = newResult.getChromosomeMap().get(aS.getChromId());
+                rowData[i++] = strand;
+                rowData[i++] = aS.getType();
+                rowData[i++] = aS.getTrackId();
 
                 SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
                     @Override

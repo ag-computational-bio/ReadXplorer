@@ -16,6 +16,7 @@ public class IntervalRequest {
     private int to;
     private int totalFrom;
     private int totalTo;
+    private int chromId;
     private ThreadListener sender;
     private byte whichTrackNeeded;
     private byte desiredData;
@@ -29,6 +30,7 @@ public class IntervalRequest {
      * ThreadListener, who wants to receive the results of this request.
      * @param from start position of the coverage request
      * @param to stop position of the coverage request
+     * @param chromId id of the chromosome to querry data from
      * @param totalFrom The total lower boundary of the request which is used 
      * for preloading larger data amounts for faster access.
      * @param totalTo The total upper boundary of the request which is used for 
@@ -47,12 +49,13 @@ public class IntervalRequest {
      * concerning the usage of ReadXplorer's coverage classes and if only uniquely
      * mapped reads shall be used, or all reads.
      */
-    public IntervalRequest(int from, int to, int totalFrom, int totalTo, ThreadListener sender, 
+    public IntervalRequest(int from, int to, int totalFrom, int totalTo, int chromId, ThreadListener sender, 
             boolean diffsAndGapsNeeded, byte desiredData, byte whichTrackNeeded, ParametersReadClasses readClassParams) {
         this.from = from;
         this.to = to;
         this.totalFrom = totalFrom;
         this.totalTo = totalTo;
+        this.chromId = chromId;
         this.sender = sender;
         this.desiredData = desiredData;
         this.whichTrackNeeded = whichTrackNeeded;
@@ -67,6 +70,7 @@ public class IntervalRequest {
      * ThreadListener, who wants to receive the results of this request.
      * @param from start position of the coverage request
      * @param to stop position of the coverage request
+     * @param chromId id of the chromosome to querry data from
      * @param totalFrom The total lower boundary of the request which is used 
      * for preloading larger data amounts for faster access.
      * @param totalTo The total upper boundary of the request which is used for 
@@ -82,9 +86,9 @@ public class IntervalRequest {
      * track request.
      * @param trackNeeded  
      */
-    public IntervalRequest(int from, int to, int totalFrom, int totalTo, ThreadListener sender, 
+    public IntervalRequest(int from, int to, int totalFrom, int totalTo, int chromId, ThreadListener sender, 
             boolean diffsAndGapsNeeded, byte desiredData, byte trackNeeded) {
-        this(from, to, totalFrom, totalTo, sender, diffsAndGapsNeeded, desiredData, trackNeeded, new ParametersReadClasses());
+        this(from, to, totalFrom, totalTo, chromId, sender, diffsAndGapsNeeded, desiredData, trackNeeded, new ParametersReadClasses());
     }
     
     /**
@@ -96,6 +100,7 @@ public class IntervalRequest {
      * @param to stop position of the coverage request
      * @param totalFrom The total lower boundary of the request which is used 
      * for preloading larger data amounts for faster access.
+     * @param chromId id of the chromosome to querry data from
      * @param totalTo The total upper boundary of the request which is used for 
      * preloading larger data amounts for faster access.
      * @param sender the sending object, that wants to receive the result of the
@@ -106,9 +111,9 @@ public class IntervalRequest {
      * concerning the usage of ReadXplorer's coverage classes and if only uniquely
      * mapped reads shall be used, or all reads. 
      */
-    public IntervalRequest(int from, int to, int totalFrom, int totalTo, ThreadListener sender, 
+    public IntervalRequest(int from, int to, int totalFrom, int totalTo, int chromId, ThreadListener sender, 
             boolean diffsAndGapsNeeded, ParametersReadClasses readClassParams) {
-        this(from, to, totalFrom, totalTo, sender, diffsAndGapsNeeded, Properties.NORMAL, Properties.NORMAL, readClassParams);
+        this(from, to, totalFrom, totalTo, chromId, sender, diffsAndGapsNeeded, Properties.NORMAL, Properties.NORMAL, readClassParams);
     }
     
     /**
@@ -122,13 +127,14 @@ public class IntervalRequest {
      * for preloading larger data amounts for faster access.
      * @param totalTo The total upper boundary of the request which is used for 
      * preloading larger data amounts for faster access.
+     * @param chromId id of the chromosome to querry data from
      * @param sender the sending object, that wants to receive the result of the
      * request
      * @param diffsAndGapsNeeded true, if diffs and gaps shall be included in
      * the result, false otherwise
      */
-    public IntervalRequest(int from, int to, int totalFrom, int totalTo, ThreadListener sender, boolean diffsAndGapsNeeded) {
-        this(from, to, totalFrom, totalTo, sender, diffsAndGapsNeeded, Properties.NORMAL, Properties.NORMAL, new ParametersReadClasses());
+    public IntervalRequest(int from, int to, int totalFrom, int totalTo, int chromId, ThreadListener sender, boolean diffsAndGapsNeeded) {
+        this(from, to, totalFrom, totalTo, chromId, sender, diffsAndGapsNeeded, Properties.NORMAL, Properties.NORMAL, new ParametersReadClasses());
     }    
     
     /**
@@ -138,6 +144,7 @@ public class IntervalRequest {
      * ThreadListener, who wants to receive the results of this request.
      * @param from start position of the coverage request
      * @param to stop position of the coverage request
+     * @param chromId id of the chromosome to querry data from
      * @param sender the sending object, that wants to receive the result of the
      * request
      * @param diffsAndGapsNeeded true, if diffs and gaps shall be included in
@@ -148,8 +155,8 @@ public class IntervalRequest {
      * concerning the usage of ReadXplorer's coverage classes and if only uniquely
      * mapped reads shall be used, or all reads.
      */
-    public IntervalRequest(int from, int to, ThreadListener sender, boolean diffsAndGapsNeeded, byte desiredData, ParametersReadClasses readClassParams) {
-        this(from, to, from, to, sender, diffsAndGapsNeeded, desiredData, Properties.NORMAL, readClassParams);
+    public IntervalRequest(int from, int to, int chromId, ThreadListener sender, boolean diffsAndGapsNeeded, byte desiredData, ParametersReadClasses readClassParams) {
+        this(from, to, from, to, chromId, sender, diffsAndGapsNeeded, desiredData, Properties.NORMAL, readClassParams);
     }
     
     /**
@@ -159,6 +166,7 @@ public class IntervalRequest {
      * ThreadListener, who wants to receive the results of this request.
      * @param from start position of the coverage request
      * @param to stop position of the coverage request
+     * @param chromId id of the chromosome to querry data from
      * @param sender the sending object, that wants to receive the result of the
      * request
      * @param diffsAndGapsNeeded true, if diffs and gaps shall be included in
@@ -166,8 +174,8 @@ public class IntervalRequest {
      * @param desiredData Can be any byte value representing a filter flag for
      * the results.
      */
-    public IntervalRequest(int from, int to, ThreadListener sender, boolean diffsAndGapsNeeded, byte desiredData) {
-        this(from, to, from, to, sender, diffsAndGapsNeeded, desiredData, Properties.NORMAL, new ParametersReadClasses());
+    public IntervalRequest(int from, int to, int chromId, ThreadListener sender, boolean diffsAndGapsNeeded, byte desiredData) {
+        this(from, to, from, to, chromId, sender, diffsAndGapsNeeded, desiredData, Properties.NORMAL, new ParametersReadClasses());
     }
     
     /**
@@ -177,6 +185,7 @@ public class IntervalRequest {
      * ThreadListener, who wants to receive the results of this request.
      * @param from start position of the coverage request
      * @param to stop position of the coverage request
+     * @param chromId id of the chromosome to querry data from
      * @param sender the sending object, that wants to receive the result of the
      * request
      * @param diffsAndGapsNeeded true, if diffs and gaps shall be included in
@@ -185,8 +194,8 @@ public class IntervalRequest {
      * concerning the usage of ReadXplorer's coverage classes and if only uniquely
      * mapped reads shall be used, or all reads. 
      */
-    public IntervalRequest(int from, int to, ThreadListener sender, boolean diffsAndGapsNeeded, ParametersReadClasses readClassParams) {
-        this(from, to, from, to, sender, diffsAndGapsNeeded, Properties.NORMAL, Properties.NORMAL, readClassParams);
+    public IntervalRequest(int from, int to, int chromId, ThreadListener sender, boolean diffsAndGapsNeeded, ParametersReadClasses readClassParams) {
+        this(from, to, from, to, chromId, sender, diffsAndGapsNeeded, Properties.NORMAL, Properties.NORMAL, readClassParams);
     }
     
     /**
@@ -196,13 +205,14 @@ public class IntervalRequest {
      * ThreadListener, who wants to receive the results of this request.
      * @param from start position of the coverage request
      * @param to stop position of the coverage request
+     * @param chromId id of the chromosome to querry data from
      * @param sender the sending object, that wants to receive the result of the
      * request
      * @param diffsAndGapsNeeded true, if diffs and gaps shall be included in
      * the result, false otherwise
      */
-    public IntervalRequest(int from, int to, ThreadListener sender, boolean diffsAndGapsNeeded) {
-        this(from, to, from, to, sender, diffsAndGapsNeeded, Properties.NORMAL, Properties.NORMAL, new ParametersReadClasses());
+    public IntervalRequest(int from, int to, int chromId, ThreadListener sender, boolean diffsAndGapsNeeded) {
+        this(from, to, from, to, chromId, sender, diffsAndGapsNeeded, Properties.NORMAL, Properties.NORMAL, new ParametersReadClasses());
     }
 
     /**
@@ -275,6 +285,13 @@ public class IntervalRequest {
      */
     public boolean isDiffsAndGapsNeeded() {
         return this.diffsAndGapsNeeded;
+    }
+    
+    /**
+     * @return id of the chromosome to querry data from
+     */
+    public int getChromId() {
+        return this.chromId;
     }
     
 }

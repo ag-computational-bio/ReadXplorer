@@ -71,7 +71,9 @@ public class NovelRegionResultPanel extends ResultTablePanel {
         model.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                TableUtils.showPosition(novelRegionTable, 0, boundsInfoManager);
+                int posColumnIdx = 0;
+                int chromColumnIdx = 2;
+                TableUtils.showPosition(novelRegionTable, posColumnIdx, chromColumnIdx, boundsInfoManager);
             }
         });
     }
@@ -196,6 +198,9 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                 .addGap(18, 18, 18)
                 .addComponent(jButton1)
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 538, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -351,14 +356,14 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                 final Object[] rowData = new Object[nbColumns];
                 int position = nr.getPos();
                 this.nrInHash.put(position, nr);
-                rowData[0] = position;
-                rowData[1] = strand;
-                rowData[2] = false;
-                rowData[3] = false;
-                rowData[4] = nr.getSite();
-                rowData[5] = nr.getDropOffPos();
-                rowData[6] = nr.getLength();
-                rowData[7] = nr.getSequence();
+                int i = 0;
+                rowData[i++] = position;
+                rowData[i++] = strand;
+                rowData[i++] = novelRegResults.getTrackMap().get(nr.getTrackId());
+                rowData[i++] = novelRegResults.getChromosomeMap().get(nr.getChromId());
+                rowData[i++] = false;
+                rowData[i++] = "-";
+                rowData[i++] = nr.getTrackId();
                 rowData[8] = nr.getTrackId();
 
                 SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread

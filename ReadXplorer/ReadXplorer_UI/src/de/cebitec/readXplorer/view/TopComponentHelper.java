@@ -1,7 +1,8 @@
 package de.cebitec.readXplorer.view;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
@@ -16,7 +17,7 @@ public class TopComponentHelper {
     /**
      * Fetches the first <cc>TopComponent</cc>, which is currently visible on 
      * the screen and of the given subclass instance handed over to the method.
-     * @param <T> Class type of the TopCopmon
+     * @param <T> Class type of the TopComponent
      * @param activeTopCompToGet the specific subclass of <cc>TopComponent</cc>
      * which is desired.
      * @return The first <cc>TopComponent</cc>, which is currently visible on 
@@ -35,6 +36,29 @@ public class TopComponentHelper {
             }
         }
         return desiredTopComp;
+    }
+    
+    /**
+     * Fetches all <cc>TopComponent</cc>s of the given subclass instance  handed 
+     * over to the method, which are currently available.
+     * @param <T> Class type of the TopComponent
+     * @param topCompClassToGet the specific subclass of <cc>TopComponent</cc>
+     * which is desired.
+     * @return All <cc>TopComponent</cc>s of the given subclass instance  handed 
+     * over to the method, which are currently available.
+     */
+    @SuppressWarnings({"unchecked"})
+    public static <T> List<T> getTopComps(Class<? extends TopComponent> topCompClassToGet) {
+        List<T> topCompsOfClass = new ArrayList<>();
+        //Get all open Components and filter for AppPanelTopComponent
+        Set<TopComponent> topComps = WindowManager.getDefault().getRegistry().getOpened();
+        for (Iterator<TopComponent> it = topComps.iterator(); it.hasNext();) {
+            TopComponent topComponent = it.next();
+            if (topComponent.getClass().isAssignableFrom(topCompClassToGet)) {
+                topCompsOfClass.add((T) topComponent);
+            }
+        }
+        return topCompsOfClass;
     }
     
     /**

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
@@ -18,8 +14,8 @@ public class ResultsUnAnnotated extends ResultTrackAnalysis<ParameterSetFiveEnri
 
     private List<NovelRegion> results;
     
-    public ResultsUnAnnotated(Map<Integer, PersistantTrack> trackMap, boolean combineTracks) {
-        super(trackMap, combineTracks);
+    public ResultsUnAnnotated(Map<Integer, PersistantTrack> trackMap, int refId, boolean combineTracks) {
+        super(trackMap, refId, combineTracks);
     }
 
     

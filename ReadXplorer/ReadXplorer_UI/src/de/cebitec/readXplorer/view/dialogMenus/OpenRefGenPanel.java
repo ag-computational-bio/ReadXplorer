@@ -11,6 +11,7 @@ import de.cebitec.readXplorer.util.VisualisationUtils;
 import java.util.List;
 
 /**
+ * Panel for selecting and opening reference genomes.
  *
  * @author jwinneba, rhilker
  */

@@ -28,8 +28,10 @@ public class BaySeq {
      * infrastructure.
      */
     private static final int MAX_PROCESSORS = 6;
+    private final int referenceId;
 
-    public BaySeq() {
+    public BaySeq(int referenceId) {
+        this.referenceId = referenceId;
     }
 
     /**
@@ -122,7 +124,7 @@ public class BaySeq {
                 RVector rvec = result.asVector();
                 REXP colNames = gnuR.eval("colnames(tCounts" + resultIndex + ")");
                 REXP rowNames = gnuR.eval("rownames(tCounts" + resultIndex + ")");
-                results.add(new ResultDeAnalysis(rvec, colNames, rowNames, "Result of model " + j, bseqData));
+                results.add(new ResultDeAnalysis(referenceId, rvec, colNames, rowNames, "Result of model " + j, bseqData));
                 resultIndex++;
             }
             for (int j = 1; j <= numberofGroups; j++) {
@@ -131,7 +133,7 @@ public class BaySeq {
                 RVector rvec = result.asVector();
                 REXP colNames = gnuR.eval("colnames(tCounts" + resultIndex + ")");
                 REXP rowNames = gnuR.eval("rownames(tCounts" + resultIndex + ")");
-                results.add(new ResultDeAnalysis(rvec, colNames, rowNames, "Normalized result of model " + j, bseqData));
+                results.add(new ResultDeAnalysis(referenceId, rvec, colNames, rowNames, "Normalized result of model " + j, bseqData));
                 resultIndex++;
             }
             if (saveFile != null) {

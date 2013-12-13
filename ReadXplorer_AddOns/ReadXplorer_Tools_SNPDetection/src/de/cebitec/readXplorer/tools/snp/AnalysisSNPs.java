@@ -2,6 +2,7 @@ package de.cebitec.readXplorer.tools.snp;
 
 import de.cebitec.readXplorer.api.objects.AnalysisI;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
+import de.cebitec.readXplorer.databackend.dataObjects.ChromosomeObserver;
 import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistant;
 import de.cebitec.readXplorer.databackend.dataObjects.GapCount;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantCoverage;
@@ -58,7 +59,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
      */
     @Override
     public void update(Object data) {
-        CoverageAndDiffResultPersistant covAndDiffs = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0), null, null, true);
+        CoverageAndDiffResultPersistant covAndDiffs = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0), null, null, null);
 
         if (data.getClass() == covAndDiffs.getClass()) {
             covAndDiffs = (CoverageAndDiffResultPersistant) data;
@@ -146,6 +147,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
         List<PersistantDiff> diffs = covAndDiffs.getDiffs();
         List<PersistantReferenceGap> gaps = covAndDiffs.getGaps();
         
+        
         //in both arrays the first index is the relative position. The second index is the base index
         int[][] baseArray = new int[coverage.getRightBound() - coverage.getLeftBound() + 1][NO_FIELDS]; //+1 because sequence starts at 1 not 0
         GapCount[] gapCounts = new GapCount[coverage.getRightBound() - coverage.getLeftBound() + 1]; //right bound is excluded in PersistantCoverage
@@ -171,7 +173,8 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
             }
         }
         
-        String refSeq = trackConnector.getRefGenome().getSequence();
+        ChromosomeObserver chromObserver = new ChromosomeObserver();
+        String refSeq = trackConnector.getRefGenome().getChromSequence(covAndDiffs.getRequest().getChromId(), chromObserver);
         int absPos;
         int[] baseCounts;
         char refBase;
@@ -183,131 +186,135 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
         int frequency;
         SequenceComparison snpType;
         try {
-        
-        for (int i = 0; i < baseArray.length; ++i) {
-            absPos = i + coverage.getLeftBound();
-            baseCounts = baseArray[i];
-            
-            // i=0..5 is ACGTN_GAP (DIFFS) ...
-            diffCount = 0;
-            largestBaseCount = 0;
-            maxCount = 0;
-            maxBaseIdx = 0;
-            for (int j = 0; j <= BASE_GAP; j++) {
-                if (maxCount < baseCounts[j]) {
-                    maxCount = baseCounts[j];
-                    maxBaseIdx = j;
-                }
-                //because only contains diffs, no matches
-                diffCount += baseCounts[j];
-                largestBaseCount = largestBaseCount < baseCounts[j] ? baseCounts[j] : largestBaseCount;
-            }
-            
-            if (maxCount > 0 && !analysisParams.isUseMainBase() && diffCount >= analysisParams.getMinMismatchingBases() ||
-                                 analysisParams.isUseMainBase() && largestBaseCount >= analysisParams.getMinMismatchingBases()) {
-                cov = coverage.getBestMatchFwdMult(absPos) + coverage.getBestMatchRevMult(absPos);
-                if (cov == 0) {
-                    ++cov;
-                    Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found uncovered position in diffs: {0}", absPos);
-                }
-                frequency = (diffCount * 100) / cov;
 
-
-                if (frequency >= analysisParams.getMinPercentage()) {
-                    refBase = refSeq.charAt(absPos - 1);
-                    refBaseIdx = getBaseInt(refBase);
-                    //determine SNP type, can still be match, if match coverage is largest
-                    baseCounts[refBaseIdx] = cov - diffCount;
-                    if (maxBaseIdx == refBaseIdx) {
-                        continue;//snpType = SequenceComparison.MATCH; base = refBase;
-                    } else {
-                        snpType = this.getType(maxBaseIdx);
-                        base = this.getBase(maxBaseIdx);
-                    }
-
-                    this.snps.add(new Snp(
-                            absPos,
-                            trackConnector.getTrackID(),
-                            base,
-                            refBase,
-                            baseCounts[BASE_A],
-                            baseCounts[BASE_C],
-                            baseCounts[BASE_G],
-                            baseCounts[BASE_T],
-                            baseCounts[BASE_N],
-                            baseCounts[BASE_GAP],
-                            cov,
-                            frequency,
-                            snpType));
-                }
-            }
-        }
-        
-        List<int[]> gapOrderList;
-        int[] gapCountArray;
-        
-        for (int i = 0; i < gapCounts.length; ++i) {
-            if (gapCounts[i] != null) {
-                gapOrderList = gapCounts[i].getGapOrderCount();
+            for (int i = 0; i < baseArray.length; ++i) {
                 absPos = i + coverage.getLeftBound();
+                baseCounts = baseArray[i];
 
-                for (int j = 0; j < gapOrderList.size(); ++j) {
-                    gapCountArray = gapOrderList.get(j);
-
-                    // i=0..5 is ACGTN (DIFFS) ...
-                    diffCount = 0;
-                    largestBaseCount = 0;
-                    maxCount = 0;
-                    maxBaseIdx = 0;
-                    for (int k = 0; k < BASE_GAP; k++) { //here we only have bases including 'N'
-                        if (maxCount < gapCountArray[k]) {
-                            maxCount = gapCountArray[k];
-                            maxBaseIdx = k;
-                        }
-                        //because only contains gaps counts, no matches
-                        diffCount += gapCountArray[k];
-                        largestBaseCount = largestBaseCount < gapCountArray[k] ? gapCountArray[k] : largestBaseCount;
+                // i=0..5 is ACGTN_GAP (DIFFS) ...
+                diffCount = 0;
+                largestBaseCount = 0;
+                maxCount = 0;
+                maxBaseIdx = 0;
+                for (int j = 0; j <= BASE_GAP; j++) {
+                    if (maxCount < baseCounts[j]) {
+                        maxCount = baseCounts[j];
+                        maxBaseIdx = j;
                     }
-                    
-                    if (    !analysisParams.isUseMainBase() && diffCount >= analysisParams.getMinMismatchingBases() ||
-                            analysisParams.isUseMainBase() && largestBaseCount >= analysisParams.getMinMismatchingBases()) {
+                    //because only contains diffs, no matches
+                    diffCount += baseCounts[j];
+                    largestBaseCount = largestBaseCount < baseCounts[j] ? baseCounts[j] : largestBaseCount;
+                }
 
-                        cov = coverage.getBestMatchFwdMult(absPos) + coverage.getBestMatchRevMult(absPos);
-                        if (cov == 0) {
-                            ++cov;
-                            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found uncovered position in gaps: {0}", absPos);
-                        }
-                        frequency = (diffCount * 100) / cov;
+                if (maxCount > 0 && !analysisParams.isUseMainBase() && diffCount >= analysisParams.getMinMismatchingBases()
+                        || analysisParams.isUseMainBase() && largestBaseCount >= analysisParams.getMinMismatchingBases()) {
+                    cov = coverage.getBestMatchFwdMult(absPos) + coverage.getBestMatchRevMult(absPos);
+                    if (cov == 0) {
+                        ++cov;
+                        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found uncovered position in diffs: {0}", absPos);
+                    }
+                    frequency = (diffCount * 100) / cov;
 
-                        if (frequency >= analysisParams.getMinPercentage()) {
+
+                    if (frequency >= analysisParams.getMinPercentage()) {
+                        refBase = refSeq.charAt(absPos - 1);
+                        refBaseIdx = getBaseInt(refBase);
+                        //determine SNP type, can still be match, if match coverage is largest
+                        baseCounts[refBaseIdx] = cov - diffCount;
+                        if (maxBaseIdx == refBaseIdx) {
+                            continue;//snpType = SequenceComparison.MATCH; base = refBase;
+                        } else {
+                            snpType = this.getType(maxBaseIdx);
                             base = this.getBase(maxBaseIdx);
+                        }
 
-                            this.snps.add(new Snp(
-                                    absPos,
-                                    trackConnector.getTrackID(),
-                                    base,
-                                    '_',
-                                    gapCountArray[BASE_A],
-                                    gapCountArray[BASE_C],
-                                    gapCountArray[BASE_G],
-                                    gapCountArray[BASE_T],
-                                    gapCountArray[BASE_N],
-                                    0,
-                                    cov,
-                                    frequency,
-                                    SequenceComparison.INSERTION,
-                                    j));
+                        this.snps.add(new Snp(
+                                absPos,
+                                trackConnector.getTrackID(),
+                                covAndDiffs.getRequest().getChromId(),
+                                base,
+                                refBase,
+                                baseCounts[BASE_A],
+                                baseCounts[BASE_C],
+                                baseCounts[BASE_G],
+                                baseCounts[BASE_T],
+                                baseCounts[BASE_N],
+                                baseCounts[BASE_GAP],
+                                cov,
+                                frequency,
+                                snpType));
+                    }
+                }
+            }
+
+            List<int[]> gapOrderList;
+            int[] gapCountArray;
+
+            for (int i = 0; i < gapCounts.length; ++i) {
+                if (gapCounts[i] != null) {
+                    gapOrderList = gapCounts[i].getGapOrderCount();
+                    absPos = i + coverage.getLeftBound();
+
+                    for (int j = 0; j < gapOrderList.size(); ++j) {
+                        gapCountArray = gapOrderList.get(j);
+
+                        // i=0..5 is ACGTN (DIFFS) ...
+                        diffCount = 0;
+                        largestBaseCount = 0;
+                        maxCount = 0;
+                        maxBaseIdx = 0;
+                        for (int k = 0; k < BASE_GAP; k++) { //here we only have bases including 'N'
+                            if (maxCount < gapCountArray[k]) {
+                                maxCount = gapCountArray[k];
+                                maxBaseIdx = k;
+                            }
+                            //because only contains gaps counts, no matches
+                            diffCount += gapCountArray[k];
+                            largestBaseCount = largestBaseCount < gapCountArray[k] ? gapCountArray[k] : largestBaseCount;
+                        }
+
+                        if (!analysisParams.isUseMainBase() && diffCount >= analysisParams.getMinMismatchingBases()
+                                || analysisParams.isUseMainBase() && largestBaseCount >= analysisParams.getMinMismatchingBases()) {
+
+                            cov = coverage.getBestMatchFwdMult(absPos) + coverage.getBestMatchRevMult(absPos);
+                            if (cov == 0) {
+                                ++cov;
+                                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found uncovered position in gaps: {0}", absPos);
+                            }
+                            frequency = (diffCount * 100) / cov;
+
+                            if (frequency >= analysisParams.getMinPercentage()) {
+                                base = this.getBase(maxBaseIdx);
+
+                                this.snps.add(new Snp(
+                                        absPos,
+                                        trackConnector.getTrackID(),
+                                        covAndDiffs.getRequest().getChromId(),
+                                        base,
+                                        '_',
+                                        gapCountArray[BASE_A],
+                                        gapCountArray[BASE_C],
+                                        gapCountArray[BASE_G],
+                                        gapCountArray[BASE_T],
+                                        gapCountArray[BASE_N],
+                                        0,
+                                        cov,
+                                        frequency,
+                                        SequenceComparison.INSERTION,
+                                        j));
+                            }
                         }
                     }
                 }
             }
-        }
-        
+
 //        System.out.println(count++ + "size diffs: " + diffs.size());
 //        System.out.println(count++ + "size gaps: " + gaps.size());
         } catch (RuntimeIOException e) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Could not read data from track file: {0}", trackConnector.getTrackPath());
         }
+        
+        trackConnector.getRefGenome().getChromosome(covAndDiffs.getRequest().getChromId()).removeObserver(chromObserver);
     }
 
 //    private int getNeighboringCov(int absPos, PersistantCoverage coverage) {

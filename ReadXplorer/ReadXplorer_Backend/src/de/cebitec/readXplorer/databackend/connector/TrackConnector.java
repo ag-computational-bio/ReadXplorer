@@ -38,7 +38,6 @@ public class TrackConnector {
 
     private List<PersistantTrack> associatedTracks;
     private int trackID;
-    private int refSeqLength;
     private String adapter;
     private CoverageThread coverageThread;
     private CoverageThread diffThread;
@@ -99,7 +98,6 @@ public class TrackConnector {
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(
                 this.associatedTracks.get(0).getRefGenID());
         this.refGenome = refConnector.getRefGenome();
-        this.refSeqLength = this.refGenome.getRefLength();
 
         this.startDataThreads(combineTracks);
     }
@@ -137,7 +135,8 @@ public class TrackConnector {
      * of the request (the object that wants to receive the coverage) is handed
      * over to the CoverageThread, who will carry out the request as soon as
      * possible. Afterwards the coverage result is handed over to the receiver.
-     * (CAUTION: Only the latest request is carried out completely by the
+     * (CAUTION: 
+     * <br>1. Only the latest request is carried out completely by the
      * thread. This means when scrolling while a request is in progress the
      * current data is depleted and only data for the new request for the
      * currently visible interval is carried out)
@@ -219,7 +218,7 @@ public class TrackConnector {
     public StatsContainer getTrackStats(int wantedTrackId) {
         StatsContainer statsContainer = new StatsContainer();
         statsContainer.prepareForTrack();
-        statsContainer.prepareForSeqPairTrack();
+        statsContainer.prepareForReadPairTrack();
 
         try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_STATS_FOR_TRACK)) {
             fetch.setInt(1, wantedTrackId);
@@ -248,7 +247,7 @@ public class TrackConnector {
                 statsContainer.increaseValue(StatsContainer.NO_UNIQ_WRNG_ORIENT_LARGE_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_UNIQ_LARGE_ORIENT_WRNG_PAIRS));
                 statsContainer.increaseValue(StatsContainer.NO_UNIQ_WRNG_ORIENT_SMALL_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_UNIQ_SMALL_ORIENT_WRNG_PAIRS));
                 statsContainer.increaseValue(StatsContainer.AVERAGE_READ_LENGTH, rs.getInt(FieldNames.STATISTICS_AVERAGE_READ_LENGTH));
-                statsContainer.increaseValue(StatsContainer.AVERAGE_SEQ_PAIR_SIZE, rs.getInt(FieldNames.STATISTICS_AVERAGE_SEQ_PAIR_LENGTH));
+                statsContainer.increaseValue(StatsContainer.AVERAGE_READ_PAIR_SIZE, rs.getInt(FieldNames.STATISTICS_AVERAGE_SEQ_PAIR_LENGTH));
                 statsContainer.increaseValue(StatsContainer.COVERAGE_BM_GENOME, rs.getInt(FieldNames.STATISTICS_BM_COVERAGE_OF_GENOME));
                 statsContainer.increaseValue(StatsContainer.COVERAGE_COMPLETE_GENOME, rs.getInt(FieldNames.STATISTICS_COMPLETE_COVERAGE_OF_GENOME));
                 statsContainer.increaseValue(StatsContainer.COVERAGE_PERFECT_GENOME, rs.getInt(FieldNames.STATISTICS_PERFECT_COVERAGE_OF_GENOME));
@@ -294,20 +293,20 @@ public class TrackConnector {
     
     public double getPercentRefGenPerfectCoveredCalculate() {
         double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_OF_PERFECT_POSITIONS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
-        return absValue / refSeqLength * 100;
+        return absValue / refGenome.getActiveChromLength() * 100;
 
     }
 
     
     public double getPercentRefGenBmCoveredCalculate() {
         double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_BM_COVERAGE_OF_GENOME_CALCULATE, SQLStatements.GET_NUM, con, trackID);
-        return absValue / refSeqLength * 100;
+        return absValue / refGenome.getActiveChromLength() * 100;
     }
 
 
     public double getPercentRefGenNErrorCoveredCalculate() {
         double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_COVERED_POSITIONS, SQLStatements.GET_NUM, con, trackID);
-        return absValue / refSeqLength * 100;
+        return absValue / refGenome.getActiveChromLength() * 100;
     }
 
 //    public void setStatistics(int numMappings, int numUniqueMappings, int numUniqueSeq,
@@ -372,17 +371,17 @@ public class TrackConnector {
 
 //    /**
 //     * Store the sequence pair statistics for a sequence pair data set.
-//     * @param numSeqPairs
-//     * @param numPerfectSeqPairs
-//     * @param numUniqueSeqPairs
-//     * @param numUniquePerfectSeqPairs
+//     * @param numReadPairs
+//     * @param numPerfectReadPairs
+//     * @param numUniqueReadPairs
+//     * @param numUniquePerfectReadPairs
 //     * @param numSingleMappings 
 //     */
-//    public void addSeqPairStatistics(int numSeqPairs, int numPerfectSeqPairs, int numUniqueSeqPairs,
-//            int numUniquePerfectSeqPairs, int numSingleMappings) {
+//    public void addReadPairStatistics(int numReadPairs, int numPerfectReadPairs, int numUniqueReadPairs,
+//            int numUniquePerfectReadPairs, int numSingleMappings) {
 //        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing sequence pair statistics");
 //        
-//        try (PreparedStatement addSeqPairStats = con.prepareStatement(SQLStatements.INSERT_SEQPAIR_STATISTICS);
+//        try (PreparedStatement addReadPairStats = con.prepareStatement(SQLStatements.INSERT_READPAIR_STATISTICS);
 //             PreparedStatement latestID = con.prepareStatement(SQLStatements.GET_LATEST_STATISTICS_ID)) {
 //            
 //            // get latest id for track
@@ -393,13 +392,13 @@ public class TrackConnector {
 //            }
 //            id++;
 //                
-//            addSeqPairStats.setLong(1, id);
-//            addSeqPairStats.setInt(2, numSeqPairs);
-//            addSeqPairStats.setInt(3, numPerfectSeqPairs);
-//            addSeqPairStats.setInt(4, numUniqueSeqPairs);
-//            addSeqPairStats.setInt(5, numUniquePerfectSeqPairs);
-//            addSeqPairStats.setInt(6, numSingleMappings);
-//            addSeqPairStats.execute();
+//            addReadPairStats.setLong(1, id);
+//            addReadPairStats.setInt(2, numReadPairs);
+//            addReadPairStats.setInt(3, numPerfectReadPairs);
+//            addReadPairStats.setInt(4, numUniqueReadPairs);
+//            addReadPairStats.setInt(5, numUniquePerfectReadPairs);
+//            addReadPairStats.setInt(6, numSingleMappings);
+//            addReadPairStats.execute();
 //
 //        } catch (SQLException ex) {
 //            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
@@ -444,8 +443,9 @@ public class TrackConnector {
         boolean isContinous = true;
         try {
             //Die Coverage der naechsten 5 Basen links und rechts des SNPs wird verglichen
+            int refSeqLength = this.refGenome.getActiveChromLength();
             int fromPos = ((position - 5) < 0) ? 0 : (position - 5);
-            int toPos = ((position + 5) > this.refSeqLength) ? this.refSeqLength : (position + 5);
+            int toPos = ((position + 5) > refSeqLength) ? refSeqLength : (position + 5);
             PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK);
             fetch.setLong(3, trackID);
             fetch.setLong(1, fromPos);
@@ -478,19 +478,19 @@ public class TrackConnector {
         return this.coverageThread;
     }
 
-    public int getNumOfSeqPairsCalculate() {
-        return -1; //TODO: implement seq pair stats calculate
+    public int getNumOfReadPairsCalculate() {
+        return -1; //TODO: implement read pair stats calculate
     }
 
-    public int getNumOfPerfectSeqPairsCalculate() {
+    public int getNumOfPerfectReadPairsCalculate() {
         return -1;
     }
 
-    public int getNumOfUniqueSeqPairsCalculate() {
+    public int getNumOfUniqueReadPairsCalculate() {
         return -1;
     }
 
-    public int getNumOfUniquePerfectSeqPairsCalculate() {
+    public int getNumOfUniquePerfectReadPairsCalculate() {
         return -1;
     }
 
@@ -498,16 +498,16 @@ public class TrackConnector {
         return -1;
     }
 
-    public int getAverageSeqPairLengthCalculate() {
+    public int getAverageReadPairLengthCalculate() {
         return -1;
     }
 
     /**
-     * @return The sequence pair id belonging to the track connectors track id
-     * or <code>0</code> if this track is not a sequence pair track.
+     * @return The read pair id belonging to the track connectors track id
+     * or <code>0</code> if this track is not a read pair track.
      */
-    public Integer getSeqPairToTrackID() {
-        int value = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_SEQ_PAIR_TO_TRACK_ID, SQLStatements.GET_NUM, con, trackID);
+    public Integer getReadPairToTrackID() {
+        int value = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_READ_PAIR_TO_TRACK_ID, SQLStatements.GET_NUM, con, trackID);
         return value;
     }
 
@@ -515,19 +515,19 @@ public class TrackConnector {
      * @return True, if this is a sequence pair track, false otherwise.
      */
     public boolean isReadPairTrack() {
-        return this.getSeqPairToTrackID() != 0;
+        return this.getReadPairToTrackID() != 0;
     }
 
     /**
-     * @param seqPairId the sequence pair id to get the second track id for
-     * @return the second track id of a sequence pair beyond this track
+     * @param readPairId the read pair id to get the second track id for
+     * @return the second track id of a read pair beyond this track
      * connectors track id
      */
-    public int getTrackIdToSeqPairId(int seqPairId) {
+    public int getTrackIdToReadPairId(int readPairId) {
         int num = 0;
         try {
-            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_TRACK_ID_TO_SEQ_PAIR_ID);
-            fetch.setLong(1, seqPairId);
+            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_TRACK_ID_TO_READ_PAIR_ID);
+            fetch.setLong(1, readPairId);
             fetch.setLong(2, trackID);
 
             ResultSet rs = fetch.executeQuery();
@@ -548,7 +548,7 @@ public class TrackConnector {
      * @return all data belonging to this sequence pair id (all mappings and
      * pair replicates)
      */
-    public PersistantReadPairGroup getMappingsForSeqPairId(long seqPairId) {
+    public PersistantReadPairGroup getMappingsForReadPairId(long seqPairId) {
 
         PersistantReadPairGroup readPairData = new PersistantReadPairGroup();
         readPairData.setReadPairId(seqPairId);
@@ -689,8 +689,8 @@ public class TrackConnector {
      * @return the length of the reference sequence belonging to this track
      * connector
      */
-    public int getRefSequenceLength() {
-        return this.refSeqLength;
+    public int getActiveChromeLength() {
+        return this.refGenome.getActiveChromLength();
     }    
     
     /**

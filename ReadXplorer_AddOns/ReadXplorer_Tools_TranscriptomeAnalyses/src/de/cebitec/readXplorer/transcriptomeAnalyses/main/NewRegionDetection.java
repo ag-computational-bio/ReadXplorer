@@ -1,6 +1,7 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelRegion;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,14 +14,14 @@ import java.util.List;
 public class NewRegionDetection {
 
     private List<NovelRegion> novelRegions;
-    private String refSeq;
+    private final PersistantReference refGenome;
 
-    public NewRegionDetection(String refSeq) {
+    public NewRegionDetection(PersistantReference refGenome) {
         this.novelRegions = new ArrayList<>();
-        this.refSeq = refSeq;
+        this.refGenome = refGenome;
     }
 
-    public void runningNewRegionsDetection(int length, HashMap<Integer, List<Integer>> forwardCDSs,
+    public void runningNewRegionsDetection(int chromLength, HashMap<Integer, List<Integer>> forwardCDSs, 
             HashMap<Integer, List<Integer>> reverseCDSs, HashMap<Integer, PersistantFeature> allRegionsInHash,
             int[] fwdCoverage, int[] revCoverage, int[] forward, int[] reverse, double bg, int minLengthBoundary, int trackID) {
 
@@ -30,7 +31,7 @@ public class NewRegionDetection {
         HashMap<Integer, Integer> dropdownsRev = new HashMap<>();
         NovelRegion newRegion = null;
 
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < chromLength; i++) {
 
             int fwd_readstarts = forward[i];
             if (fwd_readstarts > bg) { // got through possible forward hits first

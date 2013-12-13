@@ -102,10 +102,12 @@ public class MappingThread extends RequestThread {
             Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Reading mapping data from file...", currentTimestamp);
 
+            PersistantTrack track;
             for (int i = 0; i < this.tracks.size(); ++i) {
-                if (!this.tracks.get(i).isDbUsed()) {
-                    SamBamFileReader externalDataReader = new SamBamFileReader(new File(tracks.get(i).getFilePath()), tracks.get(i).getId());
-                    Collection<PersistantMapping> intermedRes = externalDataReader.getMappingsFromBam(refGenome, request, true);
+                track = tracks.get(i);
+                if (!track.isDbUsed()) {
+                    SamBamFileReader externalDataReader = new SamBamFileReader(new File(track.getFilePath()), track.getId(), refGenome);
+                    Collection<PersistantMapping> intermedRes = externalDataReader.getMappingsFromBam(request, true);
                     externalDataReader.close();
                     mappingList.addAll(intermedRes);
                 }
@@ -405,8 +407,8 @@ public class MappingThread extends RequestThread {
             
             for (int i = 0; i < this.tracks.size(); ++i) {
                 if (!this.tracks.get(i).isDbUsed()) {
-                    SamBamFileReader externalDataReader = new SamBamFileReader(new File(tracks.get(i).getFilePath()), tracks.get(i).getId());
-                    Collection<PersistantMapping> intermedRes = externalDataReader.getReducedMappingsFromBam(refGenome, request);
+                    SamBamFileReader externalDataReader = new SamBamFileReader(new File(tracks.get(i).getFilePath()), tracks.get(i).getId(), refGenome);
+                    Collection<PersistantMapping> intermedRes = externalDataReader.getReducedMappingsFromBam(request);
                     externalDataReader.close();
                     mappings.addAll(intermedRes);
                 }
@@ -440,8 +442,8 @@ public class MappingThread extends RequestThread {
             } else {
                 for (int i = 0; i < this.tracks.size(); ++i) {
                     if (!this.tracks.get(i).isDbUsed()) {
-                        SamBamFileReader reader = new SamBamFileReader(new File(tracks.get(i).getFilePath()), tracks.get(i).getId());
-                        Collection<PersistantReadPairGroup> intermedRes = reader.getReadPairMappingsFromBam(refGenome, request, true);
+                        SamBamFileReader reader = new SamBamFileReader(new File(tracks.get(i).getFilePath()), tracks.get(i).getId(), refGenome);
+                        Collection<PersistantReadPairGroup> intermedRes = reader.getReadPairMappingsFromBam(request);
                         readPairs.addAll(intermedRes);
                     }
                 }
@@ -469,9 +471,9 @@ public class MappingThread extends RequestThread {
                     }
                     //switch between ordinary mappings and read pairs
                     if (request.getDesiredData() != Properties.READ_PAIRS) {
-                        request.getSender().receiveData(new MappingResultPersistant(currentMappings, request.getFrom(), request.getTo()));
+                        request.getSender().receiveData(new MappingResultPersistant(currentMappings, request));
                     } else {
-                        request.getSender().receiveData(new ReadPairResultPersistant(currentReadPairs, request.getFrom(), request.getTo()));
+                        request.getSender().receiveData(new ReadPairResultPersistant(currentReadPairs, request));
                     }
                 }
 

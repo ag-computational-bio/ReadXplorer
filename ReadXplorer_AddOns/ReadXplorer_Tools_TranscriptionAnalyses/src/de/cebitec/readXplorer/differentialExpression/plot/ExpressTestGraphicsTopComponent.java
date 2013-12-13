@@ -8,7 +8,6 @@ import static de.cebitec.readXplorer.plotting.ChartExporter.ChartExportStatus.FA
 import static de.cebitec.readXplorer.plotting.ChartExporter.ChartExportStatus.FINISHED;
 import static de.cebitec.readXplorer.plotting.ChartExporter.ChartExportStatus.RUNNING;
 import de.cebitec.readXplorer.plotting.CreatePlots;
-import de.cebitec.readXplorer.differentialExpression.plot.Bundle;
 import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Pair;
@@ -104,7 +103,7 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended 
         Random r = new Random(System.nanoTime());
         Map<PersistantFeature, Pair<Double, Double>> points = new HashMap<>();
         for (int i = 0; i < n; i++) {
-            PersistantFeature dummyFeature = new PersistantFeature(0, "", "", "", "", 0, 0, true, FeatureType.ANY, "");
+            PersistantFeature dummyFeature = new PersistantFeature(0, 0, "", "", "", "", 0, 0, true, FeatureType.ANY, "");
             double random = Math.random();
             if (random > 0.95) {
                 points.put(dummyFeature, new Pair<>(r.nextDouble() * 256.0d, Double.POSITIVE_INFINITY));
@@ -113,9 +112,9 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended 
                 points.put(dummyFeature, new Pair<>(2 * i + (r.nextGaussian() - 0.5d), r.nextDouble() * 256.0d));
             }
         }
-        PersistantFeature dummyFeature = new PersistantFeature(0, "", "", "", "", 0, 0, true, FeatureType.ANY, "");
+        PersistantFeature dummyFeature = new PersistantFeature(0, 0, "", "", "", "", 0, 0, true, FeatureType.ANY, "");
         points.put(dummyFeature, new Pair<>(200d, 300d));
-        dummyFeature = new PersistantFeature(0, "", "", "", "", 0, 0, true, FeatureType.ANY, "");
+        dummyFeature = new PersistantFeature(0, 0, "", "", "", "", 0, 0, true, FeatureType.ANY, "");
         points.put(dummyFeature, new Pair<>(100d, Double.POSITIVE_INFINITY));
         return points;
     }

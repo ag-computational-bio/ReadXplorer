@@ -4,7 +4,6 @@ import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readXplorer.api.cookies.LoginCookie;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.view.dialogMenus.LoadingDialog;
-import de.cebitec.readXplorer.view.login.Bundle;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;

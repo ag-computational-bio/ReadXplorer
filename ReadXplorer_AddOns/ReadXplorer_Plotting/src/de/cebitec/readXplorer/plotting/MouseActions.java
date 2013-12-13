@@ -58,6 +58,7 @@ public class MouseActions implements ChartMouseListener {
                 ViewController tmpVCon = it.next();
                 BoundsInfoManager bm = tmpVCon.getBoundsManager();
                 if (bm != null) {
+                    bm.chromosomeChanged(feature.getChromId());
                     bm.navigatorBarUpdated(pos);
                 }
             }

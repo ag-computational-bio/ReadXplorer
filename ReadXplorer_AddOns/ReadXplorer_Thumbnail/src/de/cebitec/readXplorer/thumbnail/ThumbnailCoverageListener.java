@@ -25,7 +25,12 @@ class ThumbnailCoverageListener implements ThreadListener {
            PersistantCoverage coverage = coverageResult.getCoverage();
            int middle = coverage.getLeftBound() + ((coverage.getRightBound() - coverage.getLeftBound()) / 2);
            int width = coverage.getRightBound() - coverage.getLeftBound();
-           trackViewer.updateLogicalBounds(new BoundsInfo(coverage.getLeftBound(), coverage.getRightBound(), middle, 1, width));
+           trackViewer.updateLogicalBounds(new BoundsInfo(coverage.getLeftBound(), 
+                   coverage.getRightBound(), 
+                   middle, 
+                   1, 
+                   trackViewer.getReference().getActiveChromId(), 
+                   width));
            trackViewer.receiveData(coverageResult);
        }
     }

@@ -61,12 +61,12 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
     private long stop;
 
     /**
-     * Creates a new viewer for displaying sequence pair information between two
+     * Creates a new viewer for displaying read pair information between two
      * tracks. Each of them must hold one sequence of the pair.
      * @param boundsInfoManager the bounds info manager
      * @param basePanel base panel on which to display this viewer
      * @param refGen the reference genome
-     * @param trackConnector track connector of one of the two sequence pair tracks
+     * @param trackConnector track connector of one of the two read pair tracks
      */
     public ReadPairViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGen, TrackConnector trackConnector) {
         super(boundsInfoManager, basePanel, refGen);
@@ -82,7 +82,7 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
         this.setHorizontalMargin(10);
         this.setupComponents();
         this.setActive(false);
-        this.readPairs = new ReadPairResultPersistant(null, 0, 0);
+        this.readPairs = new ReadPairResultPersistant(null, null);
     }
 
     @Override
@@ -113,7 +113,7 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
         if (this.isInDrawingMode()) {
             int from = this.getBoundsInfo().getLogLeft();
             int to = this.getBoundsInfo().getLogRight();
-            if (from != this.oldLogLeft || to != this.oldLogRight) {                
+            if (from != this.oldLogLeft || to != this.oldLogRight || this.isNewDataRequestNeeded()) {                
                 this.requestData(from, to);
             }
         }
@@ -131,11 +131,11 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
         this.removeAll();
         //check for feature types in the exclusion list and adapt database query for performance
         List<FeatureType> excludedFeatureTypes = this.getExcludedFeatureTypes();
-        //TODO: add unique filter to seq pair viewer
+        //TODO: add unique filter to read pair viewer
         this.mappingsLoading = true;
         ParametersReadClasses readClassParams = new ParametersReadClasses(!excludedFeatureTypes.contains(FeatureType.PERFECT_PAIR),
                 !excludedFeatureTypes.contains(FeatureType.DISTORTED_PAIR), !excludedFeatureTypes.contains(FeatureType.SINGLE_MAPPING), false);
-        trackConnector.addMappingRequest(new IntervalRequest(from, to, from - 1000, to + 1000, this, false, 
+        trackConnector.addMappingRequest(new IntervalRequest(from, to, from - 1000, to + 1000, this.getRefGen().getActiveChromId(), this, false, 
                 Properties.READ_PAIRS, Byte.valueOf("0"), readClassParams));
         this.oldLogLeft = from;
         this.oldLogRight = to;
@@ -218,7 +218,7 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
 
     /**
      * Creates a new visible component (BlockComponentPair) representing a
-     * sequence pair no matter if it only consists of a single mapping, one
+     * read pair no matter if it only consists of a single mapping, one
      * mapping of the pair, or both pair mappings and other single mappings.
      * @param block the pair data to show is stored in this object
      * @param layerCounter determines the y-position of the component
@@ -304,13 +304,13 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
     }
     
     /**
-     * returns all information belonging to the given sequence pair id. This
+     * returns all information belonging to the given read pair id. This
      * comprises all pair replicates and all single mappings associated with this id.
-     * @param seqPairId the id to receive all data for
-     * @return The PersistantReadPairGroup holding all information regarding this sequence pair id
+     * @param readPairId the id to receive all data for
+     * @return The PersistantReadPairGroup holding all information regarding this read pair id
      */
-    protected PersistantReadPairGroup getSeqPairInfoFromDB(long seqPairId){
-        return this.trackConnector.getMappingsForSeqPairId(seqPairId);
+    protected PersistantReadPairGroup getReadPairInfoFromDB(long readPairId){
+        return this.trackConnector.getMappingsForReadPairId(readPairId);
     }
     
     /**
@@ -345,22 +345,22 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
     //    /**
 //     * Determines the (min and) max count of mappings on a given set of mappings.
 //     * Minimum count is currently disabled as it was not needed.
-//     * @param seqPairs 
+//     * @param readPairs 
 //     */
-//    private void findMinAndMaxCount(Collection<PersistantSeqPairGroup> seqPairs) {
+//    private void findMinAndMaxCount(Collection<PersistantReadPairGroup> readPairs) {
 ////        this.minCountInInterval = Integer.MAX_VALUE; //uncomment all these lines to get min count
 //        this.maxCountInInterval = Integer.MIN_VALUE;
 ////        this.fwdMappingsInInterval = 0;
 //        this.pairCountInInterval = 0;
 //
-////        for (PersistantReadPairGroup pair : seqPairs) {
+////        for (PersistantReadPairGroup pair : readPairs) {
 //            ++this.pairCountInInterval;
 ////            if (pair.getVisibleMapping().isForwardStrand()){
 ////                ++this.fwdMappingsInInterval;
 ////            }
 //            
 //        }
-////        this.revMappingsInInterval = seqPairs.size() - this.fwdMappingsInInterval;
+////        this.revMappingsInInterval = readPairs.size() - this.fwdMappingsInInterval;
 //
 ////        percentSandBPerCovUnit = (maxSaturationAndBrightness - minSaturationAndBrightness) / maxCountInInterval;
 //    }

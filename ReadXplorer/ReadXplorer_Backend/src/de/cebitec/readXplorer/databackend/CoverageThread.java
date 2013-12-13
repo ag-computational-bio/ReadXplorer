@@ -71,21 +71,21 @@ public class CoverageThread extends RequestThread {
     private void singleCoverageThread(long trackID) {
         this.trackID = trackID;
         this.trackID2 = 0;
-        this.currentCov = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0), null, null, false);
+        this.currentCov = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0), null, null, null);
         this.isDbUsed = this.tracks.get(0).isDbUsed();
     }
 
     private void doubleCoverageThread(long trackID, long trackID2) {
         this.trackID = trackID;
         this.trackID2 = trackID2;
-        currentCov = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0, true), null, null, false);
+        currentCov = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0, true), null, null, null);
         this.isDbUsed = this.tracks.get(0).isDbUsed() || this.tracks.get(1).isDbUsed();
     }
 
     private void multipleCoverageThread() {
         this.trackID = 0;
         this.trackID2 = 0;
-        currentCov = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0), null, null, false);
+        currentCov = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0), null, null, null);
         for (PersistantTrack track : this.tracks) {
             if (track.isDbUsed()) {
                 this.isDbUsed = true;
@@ -113,9 +113,8 @@ public class CoverageThread extends RequestThread {
             ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(track.getRefGenID());
             this.referenceGenome = refConnector.getRefGenome();
         }
-        SamBamFileReader externalDataReader = new SamBamFileReader(file, track.getId());
-        CoverageAndDiffResultPersistant result = externalDataReader.getCoverageFromBam(
-                this.referenceGenome, request);
+        SamBamFileReader externalDataReader = new SamBamFileReader(file, track.getId(), referenceGenome);
+        CoverageAndDiffResultPersistant result = externalDataReader.getCoverageFromBam(request);
         externalDataReader.close();
         return result;
 
@@ -136,8 +135,8 @@ public class CoverageThread extends RequestThread {
             this.referenceGenome = refConnector.getRefGenome();
         }
 
-        SamBamFileReader externalDataReader = new SamBamFileReader(file, track.getId());
-        result = externalDataReader.getCoverageAndReadStartsFromBam(referenceGenome, request, false);
+        SamBamFileReader externalDataReader = new SamBamFileReader(file, track.getId(), referenceGenome);
+        result = externalDataReader.getCoverageAndReadStartsFromBam(request);
         externalDataReader.close();
         return result;
     }
@@ -232,7 +231,7 @@ public class CoverageThread extends RequestThread {
                         readStarts = this.mergeMultCoverages(readStarts, intermedRes.getReadStarts());
                     }
                 }
-                result = new CoverageAndDiffResultPersistant(cov, null, null, false);
+                result = new CoverageAndDiffResultPersistant(cov, null, null, request);
                 result.setReadStarts(readStarts);
             } else {
                 result = this.getCoverageAndReadStartsFromFile(request, tracks.get(0));
@@ -283,6 +282,7 @@ public class CoverageThread extends RequestThread {
                     request.getTo(), 
                     request.getTotalFrom(), 
                     request.getTotalTo(), 
+                    request.getChromId(),
                     request.getSender(), 
                     request.isDiffsAndGapsNeeded(),
                     Properties.NORMAL, PersistantCoverage.TRACK2);
@@ -325,6 +325,7 @@ public class CoverageThread extends RequestThread {
                     request.getTo(),
                     request.getTotalFrom(),
                     request.getTotalTo(), 
+                    request.getChromId(),
                     request.getSender(),
                     request.isDiffsAndGapsNeeded(),
                     Properties.NORMAL, PersistantCoverage.TRACK1);
@@ -351,7 +352,7 @@ public class CoverageThread extends RequestThread {
             
         }
         
-        return new CoverageAndDiffResultPersistant(cov, null, null, false);
+        return new CoverageAndDiffResultPersistant(cov, null, null, request);
     }
 
     /**
@@ -450,7 +451,7 @@ public class CoverageThread extends RequestThread {
             }
         }
 
-        return new CoverageAndDiffResultPersistant(cov, diffs, gaps, request.isDiffsAndGapsNeeded());
+        return new CoverageAndDiffResultPersistant(cov, diffs, gaps, request);
     }
 
     /**
@@ -579,7 +580,7 @@ public class CoverageThread extends RequestThread {
             }
         }
 
-        return new CoverageAndDiffResultPersistant(new PersistantCoverage(from, to), diffs, gaps, true);
+        return new CoverageAndDiffResultPersistant(new PersistantCoverage(from, to), diffs, gaps, request);
     }
 
     @Override
@@ -594,8 +595,10 @@ public class CoverageThread extends RequestThread {
                         currentCov = this.loadDiffsAndGaps(request);
 
                     //otherwise load the appropriate coverage (and diffs)
-                    } else if (!currentCov.getCoverage().coversBounds(request.getFrom(), request.getTo()) 
-                            || (!currentCov.isDiffsAndGapsUsed() && request.isDiffsAndGapsNeeded()) || !this.readClassParamsFulfilled(request)) {
+                    } else if (!currentCov.getCoverage().coversBounds(request.getFrom(), request.getTo())
+                            || currentCov.getRequest().getChromId() != request.getChromId() 
+                            || (!currentCov.getRequest().isDiffsAndGapsNeeded() && request.isDiffsAndGapsNeeded()) 
+                            || !this.readClassParamsFulfilled(request)) {
 //                        requestCounter++;
                         if (doesNotMatchLatestRequestBounds(request)) {
                             if (trackID2 != 0) {

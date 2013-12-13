@@ -29,10 +29,14 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
      * result.
      * @param results the results of the TSS detection
      * @param trackList the list of tracks, for which the TSS detection was carried out
-     * @param combineTracks true, if the tracks are combined, false otherwise 
+     * @param referenceId id of the reference genome, for which this result was
+     * generated
+     * @param combineTracks <cc>true</cc>, if the tracks in the list are
+     * combined, <cc>false</cc> otherwise
      */
-    public TssDetectionResult(List<TranscriptionStart> results, Map<Integer, PersistantTrack> trackList, boolean combineTracks) {//, PersistantTrack currentTrack) {
-        super(trackList, combineTracks);
+    public TssDetectionResult(List<TranscriptionStart> results, Map<Integer, PersistantTrack> trackList, 
+            int referenceId, boolean combineTracks) {
+        super(trackList, referenceId, combineTracks);
         this.results = results;
     }
 

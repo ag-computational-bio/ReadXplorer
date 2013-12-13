@@ -46,9 +46,25 @@ public class H2SQLStatements {
             + FieldNames.REF_GEN_ID + " BIGINT PRIMARY KEY, "
             + FieldNames.REF_GEN_NAME + " VARCHAR(200) NOT NULL, "
             + FieldNames.REF_GEN_DESCRIPTION + " VARCHAR(200) NOT NULL,"
-            + FieldNames.REF_GEN_SEQUENCE + " CLOB NOT NULL, "
             + FieldNames.REF_GEN_TIMESTAMP + " DATETIME NOT NULL"
             + ") ";
+    
+    
+    public final static String SETUP_CHROMOSOME = 
+            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_CHROMOSOME
+            + " (" 
+            + FieldNames.CHROM_ID + " BIGINT PRIMARY KEY, "
+            + FieldNames.CHROM_NUMBER + " BIGINT UNSIGNED NOT NULL, "             
+            + FieldNames.CHROM_REFERENCE_ID + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.CHROM_NAME + " VARCHAR(200) NOT NULL, "
+            + FieldNames.CHROM_LENGTH + " BIGINT UNSIGNED NOT NULL, " 
+            + FieldNames.CHROM_SEQUENCE + " CLOB NOT NULL, " 
+            + ") ";
+    
+    
+    public final static String INDEX_CHROMOSOME =
+            "CREATE INDEX IF NOT EXISTS INDEXCHROMOSOM ON " + FieldNames.TABLE_CHROMOSOME 
+            + " (" + FieldNames.CHROM_REFERENCE_ID + ") ";
     
     
     public final static String SETUP_DIFFS =
@@ -104,7 +120,7 @@ public class H2SQLStatements {
             "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_FEATURES
             + " ("
             + FieldNames.FEATURE_ID + " BIGINT PRIMARY KEY, "
-            + FieldNames.FEATURE_REFGEN_ID + " BIGINT UNSIGNED NOT NULL, "
+            + FieldNames.FEATURE_CHROMOSOME_ID + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.FEATURE_PARENT_IDS + " VARCHAR (1000) NOT NULL, "
             + FieldNames.FEATURE_TYPE + " TINYINT UNSIGNED NOT NULL, "
             + FieldNames.FEATURE_START + " BIGINT UNSIGNED NOT NULL, "
@@ -119,7 +135,7 @@ public class H2SQLStatements {
     
     public final static String INDEX_FEATURES = 
             "CREATE INDEX IF NOT EXISTS INDEXFEATURES ON " + FieldNames.TABLE_FEATURES 
-            + " (" + FieldNames.FEATURE_REFGEN_ID + ") ";
+            + " (" + FieldNames.FEATURE_CHROMOSOME_ID + ") ";
     
     
     public final static String SETUP_MAPPINGS =
@@ -162,7 +178,7 @@ public class H2SQLStatements {
             + " ( "
             + FieldNames.TRACK_ID + " BIGINT UNSIGNED PRIMARY KEY, "
             + FieldNames.TRACK_REFERENCE_ID + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.TRACK_SEQUENCE_PAIR_ID + " BIGINT UNSIGNED, " //only for paired sequences
+            + FieldNames.TRACK_READ_PAIR_ID + " BIGINT UNSIGNED, " //only for paired sequences
             + FieldNames.TRACK_DESCRIPTION + " VARCHAR (200) NOT NULL, "
             + FieldNames.TRACK_TIMESTAMP + " DATETIME NOT NULL,  "
             + FieldNames.TRACK_PATH + " VARCHAR(400) "
@@ -175,7 +191,7 @@ public class H2SQLStatements {
     
     public final static String INDEX_TRACK_SEQ_PAIR_ID =
             "CREATE INDEX IF NOT EXISTS INDEXTRACK ON " + FieldNames.TABLE_TRACK 
-            + " (" + FieldNames.TRACK_SEQUENCE_PAIR_ID + ") ";
+            + " (" + FieldNames.TRACK_READ_PAIR_ID + ") ";
     
     
     public static final String SETUP_SEQ_PAIRS =

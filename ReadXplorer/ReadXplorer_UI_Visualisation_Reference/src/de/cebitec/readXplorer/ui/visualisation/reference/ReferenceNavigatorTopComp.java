@@ -38,9 +38,8 @@ public final class ReferenceNavigatorTopComp extends TopComponentExtended implem
     }
 
     public void setRefViewer(ReferenceViewer viewer){
-        jumpPanel.setReferenceGenome(viewer.getReference());
+        jumpPanel.setViewer(viewer);
         jumpPanel.setBoundsInfoManager(viewer.getBoundsInformationManager());
-        jumpPanel.setGenomeViewer(viewer);
     }
 
     /** This method is called from within the constructor to

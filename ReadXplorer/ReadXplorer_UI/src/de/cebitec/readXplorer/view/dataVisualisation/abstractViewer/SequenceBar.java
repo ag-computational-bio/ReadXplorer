@@ -1,5 +1,6 @@
 package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
 
+import de.cebitec.readXplorer.databackend.dataObjects.ChromosomeObserver;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.SequenceUtils;
@@ -17,11 +18,11 @@ import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 
 /**
- * @author ddoppmeier, rhilker
+ * A sequence bar is used to display the sequence of a reference genome within
+ * another AbstractViewer. Further, it contains several options for highlighting
+ * areas, start or stop codons and patterns.
  * 
- * A sequence bar is used to display the sequence of a reference genome within another
- * AbstractViewer. Further, it contains several options for highlighting areas,
- * start or stop codons and patterns.
+ * @author ddoppmeier, rhilker
  */
 public class SequenceBar extends JComponent implements HighlightableI {
 
@@ -46,20 +47,20 @@ public class SequenceBar extends JComponent implements HighlightableI {
     private HighlightAreaListener highlightListener;
     private RegionManager regionManager;
     private byte frameCurrFeature;
+    private ChromosomeObserver chromObserver;
 
     /**
      * A sequence bar is used to display the sequence of a reference genome
      * within another AbstractViewer. Further, it contains several options for
      * highlighting areas, start or stop codons and patterns.
      * @param parentViewer the viewer containing the sequence bar
-     * @param refGen the reference genome object
      */
-    public SequenceBar(AbstractViewer parentViewer, PersistantReference refGen) {
+    public SequenceBar(AbstractViewer parentViewer) {
         super();
         this.parentViewer = parentViewer;
         this.setSize(new Dimension(0, this.height));
         this.font = new Font(Font.MONOSPACED, Font.PLAIN, 10);
-        this.refGen = refGen;
+        this.refGen = parentViewer.getReference();
         this.baseLineY = 30;
         this.offsetY = 10;
         this.largeBar = 11;
@@ -69,6 +70,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
         this.initMouseListener(); //this order has to be obeyed, otherwise the highlight listener
         this.initHighlightListener(); //will not be shown in the highlighted area!
         this.regionManager = new RegionManager(this, parentViewer, refGen, highlightListener);
+        this.chromObserver = new ChromosomeObserver();
     }
 
     /**
@@ -186,9 +188,11 @@ public class SequenceBar extends JComponent implements HighlightableI {
                 logleft = 1;
             }
             int logright = bounds.getLogRight();
+            String currentChromSeq = refGen.getChromSequence(refGen.getActiveChromId(), chromObserver);
+            refGen.getChromosome(refGen.getActiveChromId()).removeObserver(chromObserver);
             for (int i = logleft; i <= logright; i++) {
-                this.drawChar(g, i);
-                this.drawCharReverse(g, i);
+                this.drawChar(g, i, currentChromSeq);
+                this.drawCharReverse(g, i, currentChromSeq);
             }
         }
     }
@@ -198,8 +202,9 @@ public class SequenceBar extends JComponent implements HighlightableI {
      * @param g Graphics2D object to paint on
      * @param pos position of the base in the reference genome starting with 1 (not 0!).
      *      To get the correct base 1 is substracted from pos within this method.
+     * @param chromSeq complete chromosome sequence
      */
-    private void drawChar(Graphics2D g, int pos) {
+    private void drawChar(Graphics2D g, int pos, String chromSeq) {
         // pos depents on slider value and cannot be smaller 1
         // since counting in strings starts with 0, we have to substract 1
         int basePosition = pos - 1;
@@ -216,7 +221,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
             }
             physX += numOfGaps * bounds.getPhysWidth();
         }
-        String base = refGen.getSequence().substring(basePosition, basePosition + 1);
+        String base = chromSeq.substring(basePosition, basePosition + 1);
         int offset = metrics.stringWidth(base) / 2;
         /*BaseBackground b = new BaseBackground(12,5, base);
         b.setBounds((int)physX-offset,baseLineY-10,b.getSize().width, b.getSize().height);
@@ -228,8 +233,9 @@ public class SequenceBar extends JComponent implements HighlightableI {
      * draws the a character of the reverse strand of the sequence.
      * @param g the graphics object to paint on
      * @param pos position of the base in the reference genome
+     * @param chromSeq complete chromosome sequence
      */
-    private void drawCharReverse(Graphics2D g, int pos) {
+    private void drawCharReverse(Graphics2D g, int pos, String chromSeq) {
         // logX depents on slider value and cannot be smaller 1
         // since counting in strings starts with 0, we have to substract 1
         int basePosition = pos - 1;
@@ -248,7 +254,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
             }
             physX += numOfGaps * bounds.getPhysWidth();
         }
-        String base = refGen.getSequence().substring(basePosition, basePosition + 1);
+        String base = chromSeq.substring(basePosition, basePosition + 1);
         String revBase = SequenceUtils.complementDNA(base);
         int offset = metrics.stringWidth(revBase) / 2;
         g.drawString(revBase,
@@ -521,9 +527,9 @@ public class SequenceBar extends JComponent implements HighlightableI {
                 int numOfGaps = gapManager.getNumOfGapsAt(logX);
                 physX += numOfGaps * bounds.getPhysWidth();
             }
-
-            String base = refGen.getSequence().substring(basePosition, basePosition + 1);
-
+            String base = refGen.getChromSequence(refGen.getActiveChromId(), chromObserver).substring(basePosition, basePosition + 1);
+            refGen.getChromosome(refGen.getActiveChromId()).removeObserver(chromObserver);
+            
             if (base != null && metrics != null) {
                 int offset = metrics.stringWidth(base) / 2;
                 BaseBackground b = new BaseBackground(12, 12, base);

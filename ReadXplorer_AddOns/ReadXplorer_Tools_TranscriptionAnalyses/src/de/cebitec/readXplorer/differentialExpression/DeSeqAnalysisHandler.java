@@ -18,7 +18,7 @@ import java.util.UUID;
  */
 public class DeSeqAnalysisHandler extends DeAnalysisHandler {
 
-    private DeSeq deSeq = new DeSeq();
+    private DeSeq deSeq;
     private DeSeqAnalysisData deSeqAnalysisData;
     private UUID key;
 
@@ -48,12 +48,13 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
         }
     }
 
-    public DeSeqAnalysisHandler(List<PersistantTrack> selectedTraks, Map<String, String[]> design, boolean moreThanTwoConditions,
+    public DeSeqAnalysisHandler(List<PersistantTrack> selectedTracks, Map<String, String[]> design, boolean moreThanTwoConditions,
             List<String> fittingGroupOne, List<String> fittingGroupTwo, Integer refGenomeID, boolean workingWithoutReplicates,
             File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams, boolean regardReadOrientation, UUID key) {
-        super(selectedTraks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams, regardReadOrientation);
+        super(selectedTracks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams, regardReadOrientation);
+        deSeq = new DeSeq(this.getRefGenomeID());
         this.key = key;
-        deSeqAnalysisData = new DeSeqAnalysisData(selectedTraks.size(),
+        deSeqAnalysisData = new DeSeqAnalysisData(selectedTracks.size(),
                 design, moreThanTwoConditions, fittingGroupOne, fittingGroupTwo, 
                 workingWithoutReplicates);
     }

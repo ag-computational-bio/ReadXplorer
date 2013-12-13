@@ -1,5 +1,9 @@
 package de.cebitec.readXplorer.differentialExpression;
 
+import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import java.util.Map;
 import java.util.Vector;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.RFactor;
@@ -19,20 +23,23 @@ public class ResultDeAnalysis {
     private REXP rawRowNames;
     private Vector rowNames = null;
     private DeAnalysisData dEAdata;
+    private final Map<Integer, PersistantChromosome> chromMap;
 
-    public ResultDeAnalysis(RVector tableContents, REXP colnames, REXP rownames, String description, DeAnalysisData dEAdata) {
+    public ResultDeAnalysis(int referenceId, RVector tableContents, REXP colnames, REXP rownames, String description, DeAnalysisData dEAdata) {
         rawTableContents = tableContents;
         rawColNames = colnames;
         rawRowNames = rownames;
         this.description = description;
         this.dEAdata = dEAdata;
+        this.chromMap = ProjectConnector.getInstance().getRefGenomeConnector(referenceId).getChromosomesForGenome();
     }
 
-    public ResultDeAnalysis(Vector<Vector> tableContents, Vector colNames, Vector rowNames, String description) {
+    public ResultDeAnalysis(int referenceId, Vector<Vector> tableContents, Vector colNames, Vector rowNames, String description) {
         this.tableContents = tableContents;
         this.colNames = colNames;
         this.rowNames = rowNames;
         this.description = description;
+        this.chromMap = ProjectConnector.getInstance().getRefGenomeConnector(referenceId).getChromosomesForGenome();
     }
 
     public Vector<Vector> getTableContentsContainingRowNames() {
@@ -54,6 +61,7 @@ public class ResultDeAnalysis {
     public Vector getColnames() {
         if (colNames == null) {
             colNames = convertNames(rawColNames);
+            colNames.insertElementAt("Chromosome", 1);
         }
         return colNames;
     }
@@ -122,6 +130,12 @@ public class ResultDeAnalysis {
         return current;
     }
 
+    /**
+     * Converts and RVector of data into a Vector of Vectors = table content.
+     * @param currentRVector The RVector to convert
+     * @return A Vector of Vectors = table content, generated from the given
+     * RVector.
+     */
     private Vector<Vector> convertRresults(RVector currentRVector) {
         Vector<Vector> current = new Vector<>();
         for (int i = 0; i < currentRVector.size(); i++) {
@@ -135,6 +149,11 @@ public class ResultDeAnalysis {
                 }
                 current.get(j).add(converted.get(j));
             }
+        }
+        
+        //assign chromosomes to the column next to the PersistantFeature column
+        for (int i = 0; i < current.size(); i++) {
+            current.get(i).insertElementAt(chromMap.get(((PersistantFeature) current.get(i).get(0)).getChromId()), 1);
         }
         return current;
     }

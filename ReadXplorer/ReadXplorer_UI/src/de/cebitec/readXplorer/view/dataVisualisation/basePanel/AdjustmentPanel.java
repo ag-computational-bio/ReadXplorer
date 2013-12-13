@@ -17,8 +17,8 @@ public class AdjustmentPanel extends JPanel implements SynchronousNavigator {
 
     /**
      * Create an AdjustmentPanel used for managing the displayed area of listeners.
-     * @param navigatorMin 
-     * @param navigatorMax 
+     * @param navigatorMin mostly 1
+     * @param navigatorMax maximum value of the navigator, normally the chromosome length
      * @param positionInit 
      * @param zoomInit 
      * @param sliderMax maximal value of the zoom slider
@@ -40,6 +40,15 @@ public class AdjustmentPanel extends JPanel implements SynchronousNavigator {
             this.add(slider);
         }
         
+    }
+
+    /**
+     * Adjusts the navigator max value. Needed, when e.g. chromosomes are 
+     * switched.
+     * @param navigatorMax Sets the navigator max to this value.
+     */
+    public void setNavigatorMax(int navigatorMax) {
+        scrollbar.setMaximum(navigatorMax);
     }
 
     /**
