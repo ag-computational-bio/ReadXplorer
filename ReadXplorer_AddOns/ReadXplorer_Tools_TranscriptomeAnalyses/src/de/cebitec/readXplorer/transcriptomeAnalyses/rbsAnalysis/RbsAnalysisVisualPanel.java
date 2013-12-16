@@ -45,7 +45,7 @@ public final class RbsAnalysisVisualPanel extends JPanel {
         updateFields();
         this.referenceViewer = referenceViewer;
         this.tss = tss;
-        this.refSeq = referenceViewer.getReference().getSequence();
+//        this.refSeq = referenceViewer.getReference().getSequence();
     }
 
     @Override

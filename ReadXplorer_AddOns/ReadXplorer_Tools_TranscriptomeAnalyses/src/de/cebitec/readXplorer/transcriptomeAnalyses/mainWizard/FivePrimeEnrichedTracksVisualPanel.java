@@ -27,8 +27,8 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
         this.descriptionTextArea.setEditable(false);
         this.descriptionTextArea.setText(tssDetectionText);
         this.refGenConnector = ProjectConnector.getInstance().getRefGenomeConnector(referenceID);
-        this.referenceLength = refGenConnector.getRefGenome().getRefLength();
-        this.nbOfFeatures = refGenConnector.getFeaturesForClosedInterval(0, this.referenceLength - 1).size();
+//        this.referenceLength = refGenConnector.getRefGenome().getRefLength();
+//        this.nbOfFeatures = refGenConnector.getFeaturesForClosedInterval(0, this.referenceLength - 1).size();
     }
 
     @Override

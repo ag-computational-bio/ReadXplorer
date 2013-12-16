@@ -7,6 +7,7 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.excelImport;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelRegion;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import org.netbeans.api.progress.ProgressHandle;
@@ -80,8 +82,10 @@ public class ExcelImporter {
         ResultPanelTranscriptionStart tssResultsPanel = new ResultPanelTranscriptionStart();
         tssResultsPanel.setReferenceViewer(refViewer);
 
-        String referenceID = (String) model.getValueAt(1, model.getColumnCount() - 1);
+        String referenceID = (String) model.getValueAt(1, model.getColumnCount() - 2);
         int refID = Integer.valueOf(referenceID);
+        String chromID = (String) model.getValueAt(1, model.getColumnCount() - 1);
+        int chromId = Integer.valueOf(chromID);
         PersistantTrack track = ProjectConnector.getInstance().getTrack(refID);
         TrackConnector connector = null;
         try {
@@ -91,8 +95,13 @@ public class ExcelImporter {
         }
 
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(connector.getRefGenome().getId());
-        int refSeqLength = refConnector.getRefSequence().length();
-        List<PersistantFeature> genomeFeatures = refConnector.getFeaturesForClosedInterval(0, refSeqLength);
+        List<PersistantFeature> genomeFeatures = new ArrayList<>();
+        Map<Integer, PersistantChromosome> chroms = refConnector.getChromosomesForGenome();
+        for (PersistantChromosome chrom : chroms.values()) {
+            genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
+                    0, chrom.getLength(), chrom.getId()));
+        }
+
         HashMap<String, PersistantFeature> featureMap = new HashMap();
         for (PersistantFeature persistantFeature : genomeFeatures) {
             featureMap.put(persistantFeature.getLocus(), persistantFeature);
@@ -150,10 +159,10 @@ public class ExcelImporter {
         ParameterSetFiveEnrichedAnalyses params = new ParameterSetFiveEnrichedAnalyses(
                 fraction, ratio, upstream, downstream, isInternalExclusion,
                 rangeForKeepingTSS, rangeForLeaderlessDetection, keepingInternalRange);
-        Statistics stats = new Statistics(mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
+        Statistics stats = new Statistics(refConnector.getRefGenome(), mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
 
 
-        TSSDetectionResults tssResult = new TSSDetectionResults(stats, null, trackMap);
+        TSSDetectionResults tssResult = new TSSDetectionResults(stats, null, trackMap, refID);
         tssResult.setParameters(params);
         List<TranscriptionStart> tss = new ArrayList<>();
         TranscriptionStart ts = null;
@@ -238,7 +247,7 @@ public class ExcelImporter {
                     downstreamNextGene, offset,
                     (String) model.getValueAt(row, 9), isLeaderless, false,
                     (String) model.getValueAt(row, 18), (String) model.getValueAt(row, 19),
-                    isInternalTSS, isPutAntisense, refID);
+                    isInternalTSS, isPutAntisense, refID, chromId);
             tss.add(ts);
         }
         progressHandle.progress(27);
@@ -255,8 +264,10 @@ public class ExcelImporter {
         NovelRegionResultPanel novelRegionsResultsPanel = new NovelRegionResultPanel();
         novelRegionsResultsPanel.setReferenceViewer(refViewer);
 
-        String referenceID = (String) model.getValueAt(1, model.getColumnCount() - 1);
+        String referenceID = (String) model.getValueAt(1, model.getColumnCount() - 2);
         int refID = Integer.valueOf(referenceID);
+         String chromID = (String) model.getValueAt(1, model.getColumnCount() - 1);
+        int chromId = Integer.valueOf(chromID);
         PersistantTrack track = ProjectConnector.getInstance().getTrack(refID);
         HashMap<Integer, PersistantTrack> trackMap = new HashMap<>();
         trackMap.put(track.getId(), track);
@@ -268,8 +279,12 @@ public class ExcelImporter {
         }
 
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(connector.getRefGenome().getId());
-        int refSeqLength = refConnector.getRefSequence().length();
-        List<PersistantFeature> genomeFeatures = refConnector.getFeaturesForClosedInterval(0, refSeqLength);
+        List<PersistantFeature> genomeFeatures = new ArrayList<>();
+        Map<Integer, PersistantChromosome> chroms = refConnector.getChromosomesForGenome();
+        for (PersistantChromosome chrom : chroms.values()) {
+            genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
+                    0, chrom.getLength(), chrom.getId()));
+        }
         HashMap<String, PersistantFeature> featureMap = new HashMap();
         for (PersistantFeature persistantFeature : genomeFeatures) {
             featureMap.put(persistantFeature.getLocus(), persistantFeature);
@@ -302,7 +317,7 @@ public class ExcelImporter {
 
 
         ParameterSetWholeTranscriptAnalyses params = new ParameterSetWholeTranscriptAnalyses(true, false, true, false, fraction, minBoundary);
-        Statistics stats = new Statistics(mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
+        Statistics stats = new Statistics(refConnector.getRefGenome(), mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
 
 
         NovelRegionResult novelRegionResults = new NovelRegionResult(stats, trackMap, null, false);
@@ -348,7 +363,7 @@ public class ExcelImporter {
             length = Integer.valueOf(lengthString);
 
             novelRegion = new NovelRegion(isFwd, novelRegStartPos, dropOff, (String) model.getValueAt(row, 4),
-                    length, (String) model.getValueAt(row, 7), isFP, isSelectedForBlast, refID);
+                    length, (String) model.getValueAt(row, 7), isFP, isSelectedForBlast, refID, chromId);
             novelRegions.add(novelRegion);
         }
         progressHandle.progress(27);

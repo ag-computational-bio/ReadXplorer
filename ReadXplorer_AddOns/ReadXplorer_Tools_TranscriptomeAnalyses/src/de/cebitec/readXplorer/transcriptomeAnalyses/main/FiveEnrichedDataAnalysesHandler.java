@@ -1,9 +1,13 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
+import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
+import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistant;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.AnalysisStatus;
 import de.cebitec.readXplorer.util.GeneralUtils;
@@ -16,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import javax.swing.JOptionPane;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -44,7 +49,8 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
     private final ReferenceViewer refViewer;
     private TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
     private HashMap<Integer, PersistantTrack> trackMap;
-    private ProgressHandle progressHandle;
+    private ProgressHandle progressHandleParsingFeatures;
+    private List<MappingResultPersistant> mappings;
     /**
      * Key: featureID , Value: PersistantFeature
      */
@@ -68,9 +74,9 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
             JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
         }
         String handlerTitle = "Creating data structures from feature-information of the reference: " + trackConnector.getAssociatedTrackName();
-        this.progressHandle = ProgressHandleFactory.createHandle(handlerTitle);
-        this.progressHandle.start(100);
-        this.featureParser = new GenomeFeatureParser(this.trackConnector, this.progressHandle);
+        this.progressHandleParsingFeatures = ProgressHandleFactory.createHandle(handlerTitle);
+        this.progressHandleParsingFeatures.start(100);
+        this.featureParser = new GenomeFeatureParser(this.trackConnector, this.progressHandleParsingFeatures);
         this.featureParser.parseFeatureInformation(this.featureParser.getGenomeFeatures());
 
         // Initiation of important structures
@@ -78,11 +84,17 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
         this.forwardCDSs = this.featureParser.getForwardCDSs();
         this.reverseCDSs = this.featureParser.getReverseCDSs();
         this.allRegionsInHash = this.featureParser.getAllRegionsInHash();
-        this.progressHandle.finish();
+        
+
+        // Initiation of important structures
+        this.region2Exclude = this.featureParser.getRegion2Exclude();
+        this.forwardCDSs = this.featureParser.getForwardCDSs();
+        this.reverseCDSs = this.featureParser.getReverseCDSs();
+        this.allRegionsInHash = this.featureParser.getAllRegionsInHash();
+        this.progressHandleParsingFeatures.finish();
 
         // geting Mappings and calculate statistics on mappings.
-        this.stats = new Statistics(featureParser.getRefSeqLength(), parameters.getFraction(), this.forwardCDSs, this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
-            this.stats = new Statistics(trackConnector.getRefGenome(), this.fraction, this.forwardCDSs, this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
+        this.stats = new Statistics(trackConnector.getRefGenome(), parameters.getFraction(), this.forwardCDSs, this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
         de.cebitec.readXplorer.databackend.AnalysesHandler handler = new de.cebitec.readXplorer.databackend.AnalysesHandler(trackConnector, this, "Collecting coverage data of track number "
                 + this.selectedTrack.getId(), new ParametersReadClasses(true, false, false, false)); // TODO: ParameterReadClasses noch in den Wizard einbauen und die parameter hier mit übergeben!
         handler.setMappingsNeeded(true);
@@ -103,7 +115,6 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
             this.interrupt();
         }
     }
-
 
     @Override
     public void run() {
@@ -128,14 +139,12 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
 
         this.stats.parseMappings(this.stats.getMappingResults());
         this.backgroundCutoff = this.stats.calculateBackgroundCutoff(this.parameters.getFraction());
-        this.mappings = this.stats.getMappings();
-        this.stats.parseMappings(this.mappings);
-        this.backgroundCutoff = this.stats.calculateBackgroundCutoff(this.parameters.getFraction(), this.featureParser.getRefSeqLength());
+        this.mappings = this.stats.getMappingResults();
         this.stats.setBg(this.backgroundCutoff);
 
         this.stats.initMappingsStatistics();
-            this.tssDetection = new TssDetection(this.trackConnector.getRefGenome(), trackId);
-            this.tssDetection.runningTSSDetection(this.forwardCDSs, this.reverseCDSs,
+        this.tssDetection = new TssDetection(this.trackConnector.getRefGenome(), trackId);
+        this.tssDetection.runningTSSDetection(this.forwardCDSs, this.reverseCDSs,
                 this.allRegionsInHash, this.stats, this.parameters);
 
         String trackNames;
@@ -144,46 +153,13 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
             transcriptionStartResultPanel.setReferenceViewer(refViewer);
         }
 
-            TSSDetectionResults tssResult = new TSSDetectionResults(this.stats, this.tssDetection.getResults(), getTrackMap(), refGenomeID);
+        TSSDetectionResults tssResult = new TSSDetectionResults(this.stats, this.tssDetection.getResults(), getTrackMap(), refGenomeID);
         tssResult.setParameters(this.parameters);
         transcriptionStartResultPanel.addResult(tssResult);
 
         trackNames = GeneralUtils.generateConcatenatedString(tssResult.getTrackNameList(), 120);
         String panelName = "Detected TSSs for " + trackNames + " (" + transcriptionStartResultPanel.getResultSize() + " hits)";
         transcAnalysesTopComp.openAnalysisTab(panelName, transcriptionStartResultPanel);
-
-
-
-
-//        if (novelRegionResultPanel == null) {
-//            novelRegionResultPanel = new NovelRegionResultPanel();
-//            novelRegionResultPanel.setReferenceViewer(refViewer);
-//        }
-//
-//        NovelRegionResult nrResult = new NovelRegionResult(trackMap, this.tssDetection.getDetectedPutativeNewRegions(), false);
-//        nrResult.setParameters(this.parameters);
-//        novelRegionResultPanel.addResult(nrResult);
-//
-//        trackNames = GeneralUtils.generateConcatenatedString(nrResult.getTrackNameList(), 120);
-//        panelName = "Detected Novel Regions for " + trackNames + " (" + novelRegionResultPanel.getResultSize() + " hits)";
-//        transcAnalysesTopComp.openAnalysisTab(panelName, novelRegionResultPanel);
-
-
-
-
-//        if (antisenseResultPanel == null) {
-//            antisenseResultPanel = new ResultsPanelAntisense();
-//            antisenseResultPanel.setReferenceViewer(refViewer);
-//        }
-
-//        ResultsAntisense asResult = new ResultsAntisense(trackMap, this.tssDetection.getDetectedPutativeAntisenseTSS(), false);
-//        asResult.setParameters(this.parameters);
-//        antisenseResultPanel.addResult(asResult);
-//
-//        trackNames = GeneralUtils.generateConcatenatedString(asResult.getTrackNameList(), 120);
-//        panelName = "Detected Antisense TSS for " + trackNames + " (" + antisenseResultPanel.getResultSize() + " hits)";
-//        transcAnalysesTopComp.openAnalysisTab(panelName, antisenseResultPanel);
-
 
         notifyObservers(AnalysisStatus.FINISHED);
     }

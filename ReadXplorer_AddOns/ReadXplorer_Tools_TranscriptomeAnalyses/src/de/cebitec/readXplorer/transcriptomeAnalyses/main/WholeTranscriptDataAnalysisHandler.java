@@ -3,9 +3,11 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 import de.cebitec.readXplorer.databackend.AnalysesHandler;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.AnalysisStatus;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
+import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistant;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
@@ -20,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import javax.swing.JOptionPane;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -81,7 +84,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
         this.progressHandle = ProgressHandleFactory.createHandle(handlerTitle);
         this.progressHandle.start(120);
         this.featureParser = new GenomeFeatureParser(this.trackConnector, progressHandle);
-        this.featureParser.parseFeatureInformation(featureParser.getGenomeFeatures());
+        this.featureParser.parseFeatureInformation(this.featureParser.getGenomeFeatures());
 
         this.region2Exclude = this.featureParser.getRegion2Exclude();
         this.forwardCDSs = this.featureParser.getForwardCDSs();
@@ -100,7 +103,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
         // geting Mappings and calculate statistics on mappings.
         try {
             trackConnector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(this.selectedTrack);
-            this.stats = new Statistics(refViewer.getReference(), this.fraction, this.forwardCDSs, 
+            this.stats = new Statistics(refViewer.getReference(), this.fraction, this.forwardCDSs,
                     this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
             AnalysesHandler handler = new AnalysesHandler(trackConnector, this, "Collecting coverage data of track number "
                     + this.selectedTrack.getId(), new ParametersReadClasses(true, false, false, false)); // TODO: ParameterReadClasses noch in den Wizard einbauen und die parameter hier mit übergeben!
@@ -175,31 +178,30 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
         }
 
         if (parameters.isPerformNovelRegionDetection()) {
-            newRegionDetection = new NewRegionDetection(refViewer.getReference());
-            
-            /* TODO: call this method once for each chromosome and generate a list of forwardCDSs and reverseCDSs
-             * (one for each chromosome) like this: List<HashMap<Integer, List<Integer>>> forwardCDSs
-             */
-            int chromNo = 0; //TODO: correctly set these values
-            int chromLength = 0;
-            newRegionDetection.runningNewRegionsDetection(chromLength, forwardCDSs, reverseCDSs, allRegionsInHash, 
-                    this.stats.getFwdCoverage()[chromNo], this.stats.getRevCoverage()[chromNo], 
-                    this.stats.getForward()[chromNo], this.stats.getReverse()[chromNo], this.stats.getMm(), this.stats.getBg());
-            String trackNames;
-
-            if (novelRegionResult == null) {
-                novelRegionResult = new NovelRegionResultPanel();
-                novelRegionResult.setReferenceViewer(refViewer);
-            }
-
-            NovelRegionResult newRegionResult = new NovelRegionResult(trackMap, newRegionDetection.getNovelRegions(), refGenomeID, false);
-            newRegionResult.setParameters(this.parameters);
-            novelRegionResult.addResult(newRegionResult);
-            
-            trackNames = GeneralUtils.generateConcatenatedString(newRegionResult.getTrackNameList(), 120);
-            String panelName = "Novel region detection results" + trackNames + " (" + novelRegionResult.getResultSize() + " hits)";
-            transcAnalysesTopComp.openAnalysisTab(panelName, novelRegionResult);
-
+//            newRegionDetection = new NewRegionDetection(refViewer.getReference());
+//            
+//            /* TODO: call this method once for each chromosome and generate a list of forwardCDSs and reverseCDSs
+//             * (one for each chromosome) like this: List<HashMap<Integer, List<Integer>>> forwardCDSs
+//             */
+//            int chromNo = 0; //TODO: correctly set these values
+//            int chromLength = 0;
+//            newRegionDetection.runningNewRegionsDetection(chromLength, forwardCDSs, reverseCDSs, allRegionsInHash, 
+//                    this.stats.getFwdCoverage()[chromNo], this.stats.getRevCoverage()[chromNo], 
+//                    this.stats.getForward()[chromNo], this.stats.getReverse()[chromNo], this.stats.getMm(), this.stats.getBg());
+//            String trackNames;
+//
+//            if (novelRegionResult == null) {
+//                novelRegionResult = new NovelRegionResultPanel();
+//                novelRegionResult.setReferenceViewer(refViewer);
+//            }
+//
+//            NovelRegionResult newRegionResult = new NovelRegionResult(trackMap, newRegionDetection.getNovelRegions(), refGenomeID, false);
+//            newRegionResult.setParameters(this.parameters);
+//            novelRegionResult.addResult(newRegionResult);
+//            
+//            trackNames = GeneralUtils.generateConcatenatedString(newRegionResult.getTrackNameList(), 120);
+//            String panelName = "Novel region detection results" + trackNames + " (" + novelRegionResult.getResultSize() + " hits)";
+//            transcAnalysesTopComp.openAnalysisTab(panelName, novelRegionResult);
         }
 
         if (parameters.isPerformOperonDetection()) {

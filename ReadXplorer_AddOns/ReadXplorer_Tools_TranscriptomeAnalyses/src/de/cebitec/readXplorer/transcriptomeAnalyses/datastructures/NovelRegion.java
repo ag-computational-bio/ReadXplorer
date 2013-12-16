@@ -15,7 +15,7 @@ public class NovelRegion extends TrackChromResultEntry {
     private Integer length;
     private String sequence;
 
-    public NovelRegion(boolean isFWD, int start, Integer offset, int trackId, int chromId) {
+    public NovelRegion(boolean isFWD, int start, Integer dropoff, String site, int length, String sequence, boolean isFP, boolean isSelected, int trackId, int chromId) {
         super(trackId, chromId);
         this.isFWD = isFWD;
         this.start = start;
@@ -32,16 +32,13 @@ public class NovelRegion extends TrackChromResultEntry {
         return "Startpos: " + this.getPos() + "\tDirection " + this.isFWD + "\tDropoff Position: " + this.getDropOffPos() + "\tSite: " + this.getSite() + "\n";
     }
 
+    /**
+     * Strand information on which the novel region is located.
+     *
+     * @return <true> if forward strand else <false>.
+     */
     public boolean isFWD() {
         return isFWD;
-    }
-
-    public void setFWD(boolean isFWD) {
-        this.isFWD = isFWD;
-    }
-
-    public Object getTrackId() {
-        return this.trackID;
     }
 
     public Object getDropOffPos() {
@@ -60,26 +57,20 @@ public class NovelRegion extends TrackChromResultEntry {
         return site;
     }
 
-    public void setSite(String site) {
-        this.site = site;
-    }
-
     public Integer getLength() {
         return length;
-    }
-
-    public void setLength(Integer length) {
-        this.length = length;
     }
 
     public String getSequence() {
         return sequence;
     }
 
-    public void setSequence(String sequence) {
-        this.sequence = sequence;
-    }
-
+    /**
+     * Information about the correctness of the detection.
+     *
+     * @return <true> if it is a false positve detection of a novel region.
+     * Default is <false>.
+     */
     public boolean isFalsePositive() {
         return isFalsePositive;
     }

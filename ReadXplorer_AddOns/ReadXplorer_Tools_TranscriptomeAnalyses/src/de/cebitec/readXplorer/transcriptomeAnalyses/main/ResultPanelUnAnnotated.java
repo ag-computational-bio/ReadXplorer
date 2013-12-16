@@ -71,7 +71,7 @@ public class ResultPanelUnAnnotated extends ResultTablePanel {
 
             },
             new String [] {
-                "TSS Position", "Chromosome", "Direction", "Offste to next Feature", "BLAST Result", "Track ID"
+                "Start", "Chromosome", "Direction", "Dropoff pos", "Site", "Track ID"
             }
         ) {
             Class[] types = new Class [] {
@@ -91,13 +91,18 @@ public class ResultPanelUnAnnotated extends ResultTablePanel {
         });
         jScrollPane1.setViewportView(unAnnotatedTable);
         unAnnotatedTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title0_1")); // NOI18N
-        unAnnotatedTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title5")); // NOI18N
-        unAnnotatedTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title3_1_1")); // NOI18N
-        unAnnotatedTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title1_1")); // NOI18N
-        unAnnotatedTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title2_1")); // NOI18N
+        unAnnotatedTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title3_1_1")); // NOI18N
+        unAnnotatedTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title1_1")); // NOI18N
+        unAnnotatedTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title2_1")); // NOI18N
+        unAnnotatedTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title4_1")); // NOI18N
         unAnnotatedTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.unAnnotatedTable.columnModel.title4_1")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.jButton1.text")); // NOI18N
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton2, org.openide.util.NbBundle.getMessage(ResultPanelUnAnnotated.class, "ResultPanelUnAnnotated.jButton2.text")); // NOI18N
 
@@ -122,6 +127,11 @@ public class ResultPanelUnAnnotated extends ResultTablePanel {
                     .addComponent(jButton2)))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
@@ -169,7 +179,7 @@ public class ResultPanelUnAnnotated extends ResultTablePanel {
                 rowData[i++] = newResult.getChromosomeMap().get(nR.getChromId());
                 rowData[i++] = strand;
                 rowData[i++] = strand;
-                rowData[i++] = nR.getOffset();
+//                rowData[i++] = nR.getOffset();
                 rowData[i++] = nR.getTrackId();
 
                 SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread

@@ -5,13 +5,13 @@ import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.util.FeatureType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.netbeans.api.progress.ProgressHandle;
-import org.netbeans.api.progress.ProgressHandleFactory;
 
 /**
  * Genome-feature parser. Produces different needed data structures for further
@@ -29,9 +29,10 @@ public class GenomeFeatureParser {
     private ReferenceConnector refConnector;
     private List<PersistantFeature> genomeFeatures;
     private final ProgressHandle progressHandle;
-    private String handlerTitle;
     private HashMap<Integer, List<Integer>> allFwdFeatures;
     private HashMap<Integer, List<Integer>> allRevFeatures;
+    private Integer referenceLength;
+    private PersistantReference refGenome;
 
     /**
      * Constructor for Genome-feature parser. Produces different needed data
@@ -40,19 +41,23 @@ public class GenomeFeatureParser {
      * @param trackConnector
      */
     public GenomeFeatureParser(TrackConnector trackConnector, ProgressHandle progressHandle) {
+        this.progressHandle = progressHandle;
         this.trackConnector = trackConnector;
         this.forwardCDSs = new HashMap<>();
         this.reverseCDSs = new HashMap<>();
         this.region2Exclude = new ArrayList<>();
-        this.refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackConnector.getRefGenome().getId());
+        this.genomeFeatures = new ArrayList<>();
+        this.referenceLength = 0;
+        this.refGenome = trackConnector.getRefGenome();
+        this.refConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenome.getId());
         Map<Integer, PersistantChromosome> chroms = refConnector.getChromosomesForGenome();
         for (PersistantChromosome chrom : chroms.values()) {
             this.genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
                     0, chrom.getLength(), chrom.getId()));
             this.region2Exclude.add(new int[chrom.getLength()]);
+            this.referenceLength += chrom.getLength();
         }
         this.allRegionsInHash = getGenomeFeaturesInHash(this.genomeFeatures);
-        
     }
 
     /**
@@ -207,22 +212,22 @@ public class GenomeFeatureParser {
         if (type.equals(FeatureType.TRNA)) {
             if (isFwd) {
                 for (startFeature -= 21; startFeature < (stopFeature + 20); startFeature++) {
-                    this.region2Exclude.get(chromId)[startFeature] = 1;
+                    this.region2Exclude.get(chromId - 1)[startFeature] = 1;
                 }
             } else {
                 for (startFeature -= 20; startFeature < (stopFeature + 21); stopFeature++) {
-                    this.region2Exclude.get(chromId)[startFeature] = 1;
+                    this.region2Exclude.get(chromId - 1)[startFeature] = 1;
                 }
             }
         } else if (type.equals(FeatureType.RRNA)) {
 
             if (isFwd) {
                 for (startFeature -= 520; startFeature > (stopFeature + 5); startFeature++) {
-                    this.region2Exclude.get(chromId)[startFeature] = 1;
+                    this.region2Exclude.get(chromId - 1)[startFeature] = 1;
                 }
             } else {
                 for (startFeature -= 5; startFeature > (stopFeature + 520); stopFeature++) {
-                    this.region2Exclude.get(chromId)[startFeature] = 1;
+                    this.region2Exclude.get(chromId - 1)[startFeature] = 1;
                 }
             }
         }
@@ -307,5 +312,14 @@ public class GenomeFeatureParser {
 
     public void setAllRevFeatures(HashMap<Integer, List<Integer>> allRevFeatures) {
         this.allRevFeatures = allRevFeatures;
+    }
+
+    /**
+     * Returns the whole length of all Chromosomes together.
+     *
+     * @return Reference length.
+     */
+    public Integer getReferenceLength() {
+        return referenceLength;
     }
 }

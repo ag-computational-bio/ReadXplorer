@@ -26,7 +26,7 @@ public class NovelRegionResult extends ResultTrackAnalysis<ParameterSetWholeTran
     private Map<String, Object> statsMap;
 
     public NovelRegionResult(Statistics stats, Map<Integer, PersistantTrack> trackMap, List<NovelRegion> novelRegions, boolean combineTracks) {
-        super(trackMap, refId, combineTracks);
+        super(trackMap, 1, combineTracks);
         this.results = novelRegions;
         this.stats = stats;
     }

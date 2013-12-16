@@ -56,7 +56,7 @@ public class MotifSearchModel {
     private String handlerTitlePromotorAnalysis, handlerTitleRBSAnalysis;
 
     public MotifSearchModel(ReferenceViewer refViewer) {
-        this.refSeq = refViewer.getReference().getSequence();
+//        this.refSeq = refViewer.getReference().getSequence();
         this.handlerTitlePromotorAnalysis = "Processing promotor analysis";
         this.handlerTitleRBSAnalysis = "Processing rbs analysis";
         this.progressHandlePromotorAnalysis = ProgressHandleFactory.createHandle(handlerTitlePromotorAnalysis);

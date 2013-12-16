@@ -43,6 +43,7 @@ public class TranscriptionStart extends TrackChromResultEntry {
      */
     public TranscriptionStart(int pos, boolean isFwdStrand, int readStarts, 
             DetectedFeatures detFeatures, int trackId, int chromId) {
+        super(trackId, chromId);
         this.startPosition = pos;
         this.isFwdStrand = isFwdStrand;
         this.readStarts = readStarts;
@@ -60,17 +61,17 @@ public class TranscriptionStart extends TrackChromResultEntry {
      * @param offset
      * @param dist2start
      * @param dist2stop
-     * @param nextGene
-     * @param nextOffset
-     * @param sequence
+     * @param nextDownstreamGene 
+     * @param offsetToNextDownstreamGene
+     * @param promotorSequence
      * @param trackId
      * @param chromId 
      */
-    public TranscriptionStart(int pos, boolean isFwdStrand, int readStarts, double relCount, int[] before, 
-            PersistantFeature detectedGene, int offset, int dist2start, int dist2stop, PersistantFeature nextGene, 
-            int nextOffset, String sequence, boolean leaderless, boolean cdsShift, boolean putativeUnannotated, 
-            String detectedFeatStart, String detectedFeatStop, boolean isInternal, int trackId, int chromId) {
+    public TranscriptionStart(int pos, boolean isFwdStrand, int readStarts, double relCount, PersistantFeature detectedGene, int offset, int dist2start, int dist2stop, PersistantFeature nextDownstreamGene, 
+            int offsetToNextDownstreamGene, String promotorSequence, boolean leaderless, boolean cdsShift, 
+            String detectedFeatStart, String detectedFeatStop, boolean isInternal, boolean putAS, int trackId, int chromId) {
         super(trackId, chromId);
+        this.startPosition = pos;
         this.isFwdStrand = isFwdStrand;
         this.readStarts = readStarts;
         this.relCount = relCount;
@@ -78,9 +79,9 @@ public class TranscriptionStart extends TrackChromResultEntry {
         this.offset = offset;
         this.dist2start = dist2start;
         this.dist2stop = dist2stop;
-        this.nextDownstreamFeature = nextGene;
-        this.nextOffset = nextOffset;
-        this.sequence = sequence;
+        this.nextDownstreamFeature = nextDownstreamGene;
+        this.nextOffset = offsetToNextDownstreamGene;
+        this.sequence = promotorSequence;
         this.leaderless = leaderless;
         this.cdsShift = cdsShift;
         this.detectedFeatStart = detectedFeatStart;

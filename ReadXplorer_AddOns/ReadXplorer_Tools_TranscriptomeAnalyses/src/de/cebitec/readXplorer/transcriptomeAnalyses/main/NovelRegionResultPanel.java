@@ -117,14 +117,14 @@ public class NovelRegionResultPanel extends ResultTablePanel {
 
             },
             new String [] {
-                "start", "Direction", "FALSE POSITIVE", "Selection for Blast", "Site", "Dropoff Position", "Length", "Sequence", "Track ID"
+                "start", "Direction", "Track", "Chromosome", "FALSE POSITIVE", "Selection for Blast", "Site", "Dropoff Position", "Length", "Sequence", "Track ID"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, true, true, false, false, false, true, false
+                false, false, false, false, true, true, false, false, false, true, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -138,13 +138,15 @@ public class NovelRegionResultPanel extends ResultTablePanel {
         jScrollPane1.setViewportView(novelRegionTable);
         novelRegionTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title0_1")); // NOI18N
         novelRegionTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title1_1")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title3_1_1")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title7")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title2_1_1")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title5")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title6")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title8")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title4_1")); // NOI18N
+        novelRegionTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title9")); // NOI18N
+        novelRegionTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title10")); // NOI18N
+        novelRegionTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title3_1_1")); // NOI18N
+        novelRegionTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title7")); // NOI18N
+        novelRegionTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title2_1_1")); // NOI18N
+        novelRegionTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title5")); // NOI18N
+        novelRegionTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title6")); // NOI18N
+        novelRegionTable.getColumnModel().getColumn(9).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title8")); // NOI18N
+        novelRegionTable.getColumnModel().getColumn(10).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title4_1")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.jButton1.text_1")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -198,9 +200,6 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                 .addGap(18, 18, 18)
                 .addComponent(jButton1)
                 .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 538, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -332,7 +331,7 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                 novelRegionResults.getResults().addAll(novelRegResults.getResults());
             }
 
-            final int nbColumns = 9;
+            final int nbColumns = 11;
             int noFwdFeatures = 0;
             int noRevFeatures = 0;
             int noCisAntisense = 0;
@@ -362,9 +361,12 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                 rowData[i++] = novelRegResults.getTrackMap().get(nr.getTrackId());
                 rowData[i++] = novelRegResults.getChromosomeMap().get(nr.getChromId());
                 rowData[i++] = false;
-                rowData[i++] = "-";
+                rowData[i++] = false;
+                rowData[i++] = nr.getSite();
+                rowData[i++] = nr.getDropOffPos();
+                rowData[i++] = nr.getLength();
+                rowData[i++] = nr.getSequence();
                 rowData[i++] = nr.getTrackId();
-                rowData[8] = nr.getTrackId();
 
                 SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
                     @Override
