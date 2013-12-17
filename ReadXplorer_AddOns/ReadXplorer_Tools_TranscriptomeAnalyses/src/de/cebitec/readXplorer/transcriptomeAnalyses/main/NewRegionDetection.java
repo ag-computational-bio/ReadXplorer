@@ -29,21 +29,26 @@ public class NewRegionDetection implements Observer, AnalysisI<List<NovelRegion>
 
     public void runningNewRegionsDetection(HashMap<Integer, List<Integer>> forwardCDSs,
             HashMap<Integer, List<Integer>> reverseCDSs, HashMap<Integer, PersistantFeature> allRegionsInHash,
-            int[] fwdCoverage, int[] revCoverage, int[] forward, int[] reverse, double bg, int minLengthBoundary) {
+            Statistics stats, ParameterSetWholeTranscriptAnalyses params) {
 
 
         // Key is flag and Value the count of this flag
         HashMap<Integer, Integer> dropdownsFwd = new HashMap<>();
         HashMap<Integer, Integer> dropdownsRev = new HashMap<>();
         NovelRegion newRegion = null;
-
+        int[][] forward = stats.getForward(); // Array with startsite count information for forward mapping positions.
+        int[][] reverse = stats.getReverse(); // Array with startsite count information for reverse mapping positions.
+        int[][] fwdCov = stats.getFwdCoverage(); // Array with coverage counts of mappings in forward direction.
+        int[][] revCov = stats.getRevCoverage(); // Array with coverage counts of mappings in reverse direction.
+        double bg = stats.getBg(); // Background cutoff
+        int minLengthBoundary = params.getMinLengthBoundary();
         for (PersistantChromosome chrom : refGenome.getChromosomes().values()) {
             int chromId = chrom.getId();
             int chromNo = chrom.getChromNumber();
             int chromLength = chrom.getLength();
             for (int i = 0; i < chromLength; i++) {
 
-                int fwd_readstarts = forward[i];
+                int fwd_readstarts = forward[chromNo - 1][i];
                 if (fwd_readstarts > bg) { // got through possible forward hits first
                     int j = 0;
                     int end = 0;
@@ -62,7 +67,10 @@ public class NewRegionDetection implements Observer, AnalysisI<List<NovelRegion>
 //	    # if the count crosses the threshold far from a gene
                         int k = 0;
 //		# search for the drop off
-                        while (fwdCoverage[i + k - end] > bg) {
+                        while (fwdCov[chromNo - 1][i + k - end] > bg) {
+                            if ((i + k) > chromLength) {
+                                end = chromLength;
+                            }
                             k++;
                         }
                         int start = i;
@@ -92,7 +100,7 @@ public class NewRegionDetection implements Observer, AnalysisI<List<NovelRegion>
                 }
 // #############################################################################
 
-                int rev_readstarts = reverse[i];
+                int rev_readstarts = reverse[chromNo - 1][i];
                 if (rev_readstarts > bg) {
                     int j = 0;
                     int end = 0;
@@ -108,7 +116,10 @@ public class NewRegionDetection implements Observer, AnalysisI<List<NovelRegion>
                     if (!reverseCDSs.containsKey(end + i - j)) {
                         if (rev_readstarts > bg) {
                             int k = 0;
-                            while (revCoverage[end + i - k] > bg) {
+                            while (revCov[chromNo - 1][end + i - k] > bg) {
+                                if ((i - k) == 0) {
+                                    end = chromLength;
+                                }
                                 k++;
                             }
                             int start = i + 1;

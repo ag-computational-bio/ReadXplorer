@@ -1,8 +1,10 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
+import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -41,7 +43,7 @@ import org.openide.util.Exceptions;
  *
  * @author jritter
  */
-public class MotifSearchModel {
+public class MotifSearchModel implements Observer{
 
     private MotifSearchPanel promotorMotifSearchPanel;
     private RbsMotifSearchPanel rbsMotifSearchPanel;
@@ -49,14 +51,14 @@ public class MotifSearchModel {
     private File bioProspectorOutMinus10File, bioProspectorOutMinus35File, bioProspectorOutRbsFile;
     private File logoMinus10, logoMinus35, logoRbs;
     private Integer sequenceLengthForChartAnalysis;
-    private String refSeq;
+    HashMap<Integer, PersistantChromosome> chromosomes;
     private List<String> upstreamRegions;
     private int meanMinus10SpacerToTSS, meanMinus35SpacerToMinus10, meanSpacerLengthOfRBSMotif;
     private final ProgressHandle progressHandlePromotorAnalysis, progressHandleRbsAnalysis;
     private String handlerTitlePromotorAnalysis, handlerTitleRBSAnalysis;
 
     public MotifSearchModel(ReferenceViewer refViewer) {
-//        this.refSeq = refViewer.getReference().getSequence();
+        this.chromosomes = (HashMap<Integer, PersistantChromosome>) refViewer.getReference().getChromosomes();
         this.handlerTitlePromotorAnalysis = "Processing promotor analysis";
         this.handlerTitleRBSAnalysis = "Processing rbs analysis";
         this.progressHandlePromotorAnalysis = ProgressHandleFactory.createHandle(handlerTitlePromotorAnalysis);
@@ -880,21 +882,21 @@ public class MotifSearchModel {
                 if (tss.isFwdStrand()) {
                     if (tss.isLeaderless()) {
                         tssStart = tss.getStartPosition();
-                        substr = this.refSeq.substring(tssStart - (length + 1), tssStart - 1);
+                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart - (length + 1), tssStart - 1);
                         upstreamRegions.add(substr + "\n");
                     } else {
                         featureStart = currentFeature.getStart();
-                        substr = this.refSeq.substring(featureStart - (length + 1), featureStart - 1);
+                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart - (length + 1), featureStart - 1);
                         upstreamRegions.add(substr + "\n");
                     }
                 } else {
                     if (tss.isLeaderless()) {
                         tssStart = tss.getStartPosition();
-                        substr = this.refSeq.substring(tssStart + 1, tssStart + (length + 1));
+                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart + 1, tssStart + (length + 1));
                         upstreamRegions.add(substr + "\n");
                     } else {
                         featureStart = currentFeature.getStop();
-                        substr = this.refSeq.substring(featureStart + 1, featureStart + (length + 1));
+                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart + 1, featureStart + (length + 1));
                         upstreamRegions.add(substr + "\n");
                     }
                 }
@@ -904,10 +906,10 @@ public class MotifSearchModel {
                 this.upstreamRegions.add(">" + currentFeature.toString() + "\n");
 
                 if (tss.isFwdStrand()) {
-                    substr = this.refSeq.substring(tssStart - (length + 1), tssStart - 1);
+                    substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart - (length + 1), tssStart - 1);
                     upstreamRegions.add(substr + "\n");
                 } else {
-                    substr = this.refSeq.substring(tssStart + 1, tssStart + (length + 1));
+                    substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart + 1, tssStart + (length + 1));
                     upstreamRegions.add(substr + "\n");
                 }
             }
@@ -951,11 +953,11 @@ public class MotifSearchModel {
 
                     if (tss.isFwdStrand()) {
                         featureStart = currentFeature.getStart();
-                        substr = this.refSeq.substring(featureStart - (promotorLength + 1), featureStart - 1);
+                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart - (promotorLength + 1), featureStart - 1);
                         upstreamRegions.add(substr + "\n");
                     } else {
                         featureStart = currentFeature.getStop();
-                        substr = this.refSeq.substring(featureStart + 1, featureStart + (promotorLength + 1));
+                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart + 1, featureStart + (promotorLength + 1));
                         upstreamRegions.add(substr + "\n");
                     }
                 } else {
@@ -968,10 +970,10 @@ public class MotifSearchModel {
                     this.upstreamRegions.add(">" + currentFeature.toString() + "\n");
 
                     if (tss.isFwdStrand()) {
-                        substr = this.refSeq.substring(tssStart - (promotorLength + 1), tssStart - 1);
+                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart - (promotorLength + 1), tssStart - 1);
                         upstreamRegions.add(substr + "\n");
                     } else {
-                        substr = this.refSeq.substring(tssStart + 1, tssStart + (promotorLength + 1));
+                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart + 1, tssStart + (promotorLength + 1));
                         upstreamRegions.add(substr + "\n");
                     }
 
@@ -1014,10 +1016,10 @@ public class MotifSearchModel {
             if (tss.isLeaderless()) {
                 this.upstreamRegions.add(">" + currentFeature.toString() + "\n");
                 if (tss.isFwdStrand()) {
-                    substr = this.refSeq.substring(tssStart - (promotorLength + 1), tssStart - 1);
+                    substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart - (promotorLength + 1), tssStart - 1);
                     upstreamRegions.add(substr + "\n");
                 } else {
-                    substr = this.refSeq.substring(tssStart + 1, tssStart + (promotorLength + 1));
+                    substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart + 1, tssStart + (promotorLength + 1));
                     upstreamRegions.add(substr + "\n");
                 }
 
@@ -1064,11 +1066,11 @@ public class MotifSearchModel {
 
                     if (tss.isFwdStrand()) {
                         featureStart = currentFeature.getStart();
-                        substr = this.refSeq.substring(featureStart - (promotorLength + 1), featureStart - 1);
+                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart - (promotorLength + 1), featureStart - 1);
                         upstreamRegions.add(substr + "\n");
                     } else {
                         featureStart = currentFeature.getStop();
-                        substr = this.refSeq.substring(featureStart + 1, featureStart + (promotorLength + 1));
+                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart + 1, featureStart + (promotorLength + 1));
                         upstreamRegions.add(substr + "\n");
                     }
                 } else {
@@ -1080,10 +1082,10 @@ public class MotifSearchModel {
                     this.upstreamRegions.add(">" + currentFeature.toString() + "\n");
 
                     if (tss.isFwdStrand()) {
-                        substr = this.refSeq.substring(tssStart - (promotorLength + 1), tssStart - 1);
+                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart - (promotorLength + 1), tssStart - 1);
                         upstreamRegions.add(substr + "\n");
                     } else {
-                        substr = this.refSeq.substring(tssStart + 1, tssStart + (promotorLength + 1));
+                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart + 1, tssStart + (promotorLength + 1));
                         upstreamRegions.add(substr + "\n");
                     }
 
@@ -1130,11 +1132,11 @@ public class MotifSearchModel {
 
                     if (tss.isFwdStrand()) {
                         featureStart = currentFeature.getStart();
-                        substr = this.refSeq.substring(featureStart - (promotorLength + 1), featureStart - 1);
+                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart - (promotorLength + 1), featureStart - 1);
                         upstreamRegions.add(substr + "\n");
                     } else {
                         featureStart = currentFeature.getStop();
-                        substr = this.refSeq.substring(featureStart + 1, featureStart + (promotorLength + 1));
+                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart + 1, featureStart + (promotorLength + 1));
                         upstreamRegions.add(substr + "\n");
                     }
                 } else {
@@ -1146,10 +1148,10 @@ public class MotifSearchModel {
                     this.upstreamRegions.add(">" + currentFeature.toString() + "\n");
 
                     if (tss.isFwdStrand()) {
-                        substr = this.refSeq.substring(tssStart - (promotorLength + 1), tssStart - 1);
+                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart - (promotorLength + 1), tssStart - 1);
                         upstreamRegions.add(substr + "\n");
                     } else {
-                        substr = this.refSeq.substring(tssStart + 1, tssStart + (promotorLength + 1));
+                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart + 1, tssStart + (promotorLength + 1));
                         upstreamRegions.add(substr + "\n");
                     }
 
@@ -1191,21 +1193,21 @@ public class MotifSearchModel {
                     this.upstreamRegions.add(">" + currentFeature.toString() + "\n");
 
                     if (tss.isFwdStrand()) {
-                        substr = this.refSeq.substring(tssStart - (promotorLength + 1), tssStart - 1);
+                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart - (promotorLength + 1), tssStart - 1);
                         upstreamRegions.add(substr + "\n");
                     } else {
-                        substr = this.refSeq.substring(tssStart + 1, tssStart + (promotorLength + 1));
+                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart + 1, tssStart + (promotorLength + 1));
                         upstreamRegions.add(substr + "\n");
                     }
                 } else {
                     this.upstreamRegions.add(">" + currentFeature.toString() + "\n");
                     if (tss.isFwdStrand()) {
                         featureStart = currentFeature.getStart();
-                        substr = this.refSeq.substring(featureStart - (promotorLength + 1), featureStart - 1);
+                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart - (promotorLength + 1), featureStart - 1);
                         upstreamRegions.add(substr + "\n");
                     } else {
                         featureStart = currentFeature.getStop();
-                        substr = this.refSeq.substring(featureStart + 1, featureStart + (promotorLength + 1));
+                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart + 1, featureStart + (promotorLength + 1));
                         upstreamRegions.add(substr + "\n");
                     }
                 }
@@ -1213,10 +1215,10 @@ public class MotifSearchModel {
                 this.upstreamRegions.add(">" + currentFeature.toString() + "\n");
 
                 if (tss.isFwdStrand()) {
-                    substr = this.refSeq.substring(tssStart - (promotorLength + 1), tssStart - 1);
+                    substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart - (promotorLength + 1), tssStart - 1);
                     upstreamRegions.add(substr + "\n");
                 } else {
-                    substr = this.refSeq.substring(tssStart + 1, tssStart + (promotorLength + 1));
+                    substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart + 1, tssStart + (promotorLength + 1));
                     upstreamRegions.add(substr + "\n");
                 }
 
@@ -1238,5 +1240,10 @@ public class MotifSearchModel {
 
     public void setRbsMotifSearchPanel(RbsMotifSearchPanel rbsMotifSearchPanel) {
         this.rbsMotifSearchPanel = rbsMotifSearchPanel;
+    }
+
+    @Override
+    public void update(Object args) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

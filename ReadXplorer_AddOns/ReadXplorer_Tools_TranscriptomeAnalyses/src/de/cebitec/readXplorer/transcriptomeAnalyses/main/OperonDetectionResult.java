@@ -43,6 +43,7 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetWhole
 //        dataColumnDescriptions.add("Reads Overlap Start 2");
 //        dataColumnDescriptions.add("Internal Reads");
         dataColumnDescriptions.add("Spanning Reads");
+        dataColumnDescriptions.add("Operon");
 
         allSheetDescriptions.add(dataColumnDescriptions);
 

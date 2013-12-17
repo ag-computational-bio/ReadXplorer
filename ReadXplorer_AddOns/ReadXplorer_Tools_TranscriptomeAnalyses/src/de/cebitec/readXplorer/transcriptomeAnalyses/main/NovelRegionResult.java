@@ -3,10 +3,6 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelRegion;
-import static de.cebitec.readXplorer.transcriptomeAnalyses.main.NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_CISANTISENSE;
-import static de.cebitec.readXplorer.transcriptomeAnalyses.main.NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_FEATURES;
-import static de.cebitec.readXplorer.transcriptomeAnalyses.main.NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_FWD_FEATURES;
-import static de.cebitec.readXplorer.transcriptomeAnalyses.main.NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_REV_FEATURES;
 import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.TranscriptomeAnalysisWizardIterator;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.SequenceUtils;
@@ -48,14 +44,17 @@ public class NovelRegionResult extends ResultTrackAnalysis<ParameterSetWholeTran
         List<List<String>> allSheetDescriptions = new ArrayList<>();
         List<String> dataColumnDescriptions = new ArrayList<>();
 
-        dataColumnDescriptions.add("Start position");
-        dataColumnDescriptions.add("Direction");
+        dataColumnDescriptions.add("Putative Start Position");
+        dataColumnDescriptions.add("Strand");
+        dataColumnDescriptions.add("Track");
+        dataColumnDescriptions.add("Chromosome");
         dataColumnDescriptions.add("FALSE POSITIVE");
         dataColumnDescriptions.add("Selected for BLAST");
         dataColumnDescriptions.add("Site");
         dataColumnDescriptions.add("Coverage dropoff");
         dataColumnDescriptions.add("Length in bp");
         dataColumnDescriptions.add("Sequence");
+        dataColumnDescriptions.add("Chrom ID");
         dataColumnDescriptions.add("Track ID");
 
         allSheetDescriptions.add(dataColumnDescriptions);
@@ -80,12 +79,17 @@ public class NovelRegionResult extends ResultTrackAnalysis<ParameterSetWholeTran
 
             novelRegionRow.add(novelRegion.getPos());
             novelRegionRow.add(novelRegion.isFwdStrand() ? SequenceUtils.STRAND_FWD_STRING : SequenceUtils.STRAND_REV_STRING);
+
+            novelRegionRow.add(this.getTrackMap().get(novelRegion.getTrackId()));
+            novelRegionRow.add(this.getChromosomeMap().get(novelRegion.getChromId()));
+
             novelRegionRow.add(novelRegion.isFalsePositive());
             novelRegionRow.add(novelRegion.isSelected());
             novelRegionRow.add(novelRegion.getSite());
             novelRegionRow.add(novelRegion.getDropOffPos());
             novelRegionRow.add(novelRegion.getLength());
             novelRegionRow.add(novelRegion.getSequence());
+            novelRegionRow.add(novelRegion.getChromId());
             novelRegionRow.add(novelRegion.getTrackId());
 
             tSSResults.add(novelRegionRow);

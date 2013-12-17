@@ -5,7 +5,6 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.util.GeneralUtils;
-import de.cebitec.readXplorer.util.SequenceUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -62,6 +61,7 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
         dataColumnDescriptions.add("Gene product");
         dataColumnDescriptions.add("Start codon");
         dataColumnDescriptions.add("Stop codon");
+        dataColumnDescriptions.add("Chrom ID");
         dataColumnDescriptions.add("Track ID");
 
         allSheetDescriptions.add(dataColumnDescriptions);
@@ -90,7 +90,7 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
             tssRow.add(tss.getRelCount());
 
             PersistantFeature detectedGene = tss.getDetectedGene();
-            PersistantFeature nextGene = tss.getNextGene();
+            PersistantFeature nextDownstreamGene = tss.getNextGene();
             
             if (detectedGene != null) {
                 tssRow.add(tss.getDetectedGene().toString());
@@ -117,15 +117,16 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
                 tssRow.add(detectedGene.getFrame());
                 tssRow.add(detectedGene.getProduct());
             } else {
-                tssRow.add(nextGene.isFwdStrand() ? nextGene.getStart() : nextGene.getStop());
-                tssRow.add(nextGene.isFwdStrand() ? nextGene.getStop() : nextGene.getStart());
-                tssRow.add(nextGene.getStop() - nextGene.getStart());
-                tssRow.add(nextGene.getFrame());
-                tssRow.add(nextGene.getProduct());
+                tssRow.add(nextDownstreamGene.isFwdStrand() ? nextDownstreamGene.getStart() : nextDownstreamGene.getStop());
+                tssRow.add(nextDownstreamGene.isFwdStrand() ? nextDownstreamGene.getStop() : nextDownstreamGene.getStart());
+                tssRow.add(nextDownstreamGene.getStop() - nextDownstreamGene.getStart());
+                tssRow.add(nextDownstreamGene.getFrame());
+                tssRow.add(nextDownstreamGene.getProduct());
             }
 
             tssRow.add(tss.getDetectedFeatStart());
             tssRow.add(tss.getDetectedFeatStop());
+            tssRow.add(tss.getChromId());
             tssRow.add(tss.getTrackId());
             tSSResults.add(tssRow);
         }

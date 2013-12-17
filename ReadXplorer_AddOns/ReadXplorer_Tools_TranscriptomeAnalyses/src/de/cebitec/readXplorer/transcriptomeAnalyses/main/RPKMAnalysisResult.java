@@ -69,10 +69,6 @@ import java.util.Map;
         dataColumnDescriptions.add("Strand");
         dataColumnDescriptions.add("RPKM");
         dataColumnDescriptions.add("Log RPKM");
-        dataColumnDescriptions.add("Coverage RPKM");
-        dataColumnDescriptions.add("Log Coverage RPKM");
-        dataColumnDescriptions.add("Read count");
-        dataColumnDescriptions.add("Coverage");
 
         
         allSheetDescriptions.add(dataColumnDescriptions);
@@ -108,8 +104,6 @@ import java.util.Map;
             rpkmRow.add(rpkmValue.getLogRpkm());
             rpkmRow.add(rpkmValue.getCoverageRpkm());
             rpkmRow.add(rpkmValue.getCoverageLogRpkm());
-            rpkmRow.add(rpkmValue.getReadCount());
-            rpkmRow.add(rpkmValue.getCoverage());
             
             rpkmResultRows.add(rpkmRow);
         }

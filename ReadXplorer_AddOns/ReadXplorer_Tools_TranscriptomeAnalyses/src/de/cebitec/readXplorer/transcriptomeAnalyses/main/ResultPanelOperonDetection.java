@@ -12,6 +12,8 @@ import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.OperonAdjacen
 import de.cebitec.readXplorer.util.LineWrapCellRenderer;
 import de.cebitec.readXplorer.util.UneditableTableModel;
 import de.cebitec.readXplorer.view.analysis.ResultTablePanel;
+import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.readXplorer.view.tableVisualization.TableComparatorProvider;
 import de.cebitec.readXplorer.view.tableVisualization.TableUtils;
 import de.cebitec.readXplorer.view.tableVisualization.tableFilter.TableRightClickFilter;
@@ -40,6 +42,8 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
     public static final String OPERONS_WITH_OVERLAPPING_READS = "Operons with reads overlapping only one feature edge";
     public static final String OPERONS_WITH_INTERNAL_READS = "Operons with internal reads";
 
+    private BoundsInfoManager boundsInfoManager;
+    private ReferenceViewer referenceViewer;
     private OperonDetectionResult operonResult;
     private HashMap<String, Integer> operonDetStats;
     private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
@@ -47,9 +51,8 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
     /**
      * This panel is capable of showing a table with detected operons and
      * contains an export button, which exports the data into an excel file.
-     * @param operonDetParameters parameters used for this operon detection
      */
-    public ResultPanelOperonDetection(ParameterSetWholeTranscriptAnalyses operonDetParameters) {
+    public ResultPanelOperonDetection() {
         initComponents();
         this.operonDetectionTable.getTableHeader().addMouseListener(tableFilter);
         this.initStatsMap();        
@@ -60,7 +63,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 int posColumnIdx = 5;
-                int chromColumnIdx = 4;
+                int chromColumnIdx = 3;
                 TableUtils.showPosition(operonDetectionTable, posColumnIdx, chromColumnIdx, getBoundsInfoManager());
             }
         });
@@ -100,7 +103,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.String.class, java.lang.String.class, java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
                 false, false, false, false, false, false, false, false, false
@@ -118,7 +121,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
         operonDetectionTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "ResultPanelOperonDetection.operonDetectionTable.columnModel.title0")); // NOI18N
         operonDetectionTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title7")); // NOI18N
         operonDetectionTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "ResultPanelOperonDetection.operonDetectionTable.columnModel.title9")); // NOI18N
-        operonDetectionTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "ResultPanelOperonDetection.operonDetectionTable.columnModel.title8")); // NOI18N
+        operonDetectionTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "ResultPanelOperonDetection.operonDetectionTable.columnModel.title3")); // NOI18N
         operonDetectionTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title1")); // NOI18N
         operonDetectionTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title2")); // NOI18N
         operonDetectionTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title8")); // NOI18N
@@ -242,17 +245,19 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
                     
                 }
                 Object[] rowData = new Object[nbColumns];
-                rowData[0] = annoName1;
-                rowData[1] = annoName2;
-                rowData[2] = operonResultNew.getTrackEntry(operon.getTrackId(), false);
-                rowData[3] = strand;
-                rowData[4] = startAnno1;
-                rowData[5] = startAnno2;
+                int i = 0;
+                rowData[i++] = annoName1;
+                rowData[i++] = annoName2;
+                rowData[i++] = operonResultNew.getTrackMap().get(operon.getTrackId());
+                rowData[i++] = operonResultNew.getChromosomeMap().get(operon.getOperonAdjacencies().get(0).getFeature1().getChromId());
+                rowData[i++] = strand;
+                rowData[i++] = startAnno1;
+                rowData[i++] = startAnno2;
 //                rowData[6] = readsAnno1;
 //                rowData[7] = readsAnno2;
 //                rowData[8] = internalReads;
-                rowData[6] = spanningReads;
-                rowData[7] = operon.toOperonString();
+                rowData[i++] = spanningReads;
+                rowData[i++] = operon.toOperonString();
                 if (!annoName1.isEmpty() && !annoName2.isEmpty()) {
                     model.addRow(rowData);
                 }
@@ -291,5 +296,17 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
     @Override
     public int getResultSize() {
         return this.operonResult.getResults().size();
+    }
+    
+    /**
+     * Set the reference viewer needed for updating the currently shown position
+     * and extracting the reference sequence.
+     *
+     * @param referenceViewer the reference viewer belonging to this analysis
+     * result
+     */
+    public void setReferenceViewer(ReferenceViewer referenceViewer) {
+        this.boundsInfoManager = referenceViewer.getBoundsInformationManager();
+        this.referenceViewer = referenceViewer;
     }
 }

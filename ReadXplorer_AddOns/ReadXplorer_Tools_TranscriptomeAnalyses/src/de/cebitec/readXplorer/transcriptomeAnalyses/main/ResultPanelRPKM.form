@@ -52,79 +52,87 @@
         <Component class="javax.swing.JTable" name="rpkmTable">
           <Properties>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-              <Table columnCount="9" rowCount="0">
+              <Table columnCount="10" rowCount="0">
                 <Column editable="false" title="Feature" type="java.lang.Object"/>
                 <Column editable="false" title="Feature type" type="java.lang.Object"/>
-                <Column editable="false" title="Track" type="java.lang.Object"/>
+                <Column editable="false" title="Track" type="java.lang.String"/>
+                <Column editable="false" title="Chromosome" type="java.lang.String"/>
                 <Column editable="false" title="Strand" type="java.lang.String"/>
-                <Column editable="false" title="Feature start" type="java.lang.Long"/>
-                <Column editable="false" title="Feature stop" type="java.lang.Long"/>
-                <Column editable="false" title="length" type="java.lang.Long"/>
+                <Column editable="false" title="Feature Start" type="java.lang.Long"/>
+                <Column editable="false" title="Feature Stop" type="java.lang.Long"/>
+                <Column editable="false" title="Length" type="java.lang.Long"/>
                 <Column editable="false" title="RPKM" type="java.lang.Double"/>
-                <Column editable="false" title="Log RPKM" type="java.lang.Double"/>
+                <Column editable="false" title="Log-RPKM" type="java.lang.Double"/>
               </Table>
             </Property>
             <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
               <TableColumnModel selectionModel="0">
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title0" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/main/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title0_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title5" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/main/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title5_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title8" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/main/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title8_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title4" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/main/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title4_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/main/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title9_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title2" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/main/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title1_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title7_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/main/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title2_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title9" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/main/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title7_1_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/vamp/transcriptomeAnalyses/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title10" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                    <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/main/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title9_2" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/main/Bundle.properties" key="ResultPanelRPKM.rpkmTable.columnModel.title10_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>

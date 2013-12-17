@@ -117,14 +117,14 @@ public class NovelRegionResultPanel extends ResultTablePanel {
 
             },
             new String [] {
-                "start", "Direction", "Track", "Chromosome", "FALSE POSITIVE", "Selection for Blast", "Site", "Dropoff Position", "Length", "Sequence", "Track ID"
+                "Putative Start", "Strand", "Track", "Chromosome", "FALSE POSITIVE", "Selection for Blast", "Site", "Dropoff Position", "Length", "Sequence", "Chrom. ID", "Track ID"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, true, true, false, false, false, true, false
+                false, false, false, false, true, true, false, false, false, true, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -146,7 +146,8 @@ public class NovelRegionResultPanel extends ResultTablePanel {
         novelRegionTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title5")); // NOI18N
         novelRegionTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title6")); // NOI18N
         novelRegionTable.getColumnModel().getColumn(9).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title8")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(10).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title4_1")); // NOI18N
+        novelRegionTable.getColumnModel().getColumn(10).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title11")); // NOI18N
+        novelRegionTable.getColumnModel().getColumn(11).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title4_1")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.jButton1.text_1")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -331,7 +332,7 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                 novelRegionResults.getResults().addAll(novelRegResults.getResults());
             }
 
-            final int nbColumns = 11;
+            final int nbColumns = 12;
             int noFwdFeatures = 0;
             int noRevFeatures = 0;
             int noCisAntisense = 0;
@@ -366,6 +367,7 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                 rowData[i++] = nr.getDropOffPos();
                 rowData[i++] = nr.getLength();
                 rowData[i++] = nr.getSequence();
+                rowData[i++] = nr.getChromId();
                 rowData[i++] = nr.getTrackId();
 
                 SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread

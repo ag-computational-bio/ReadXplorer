@@ -1,6 +1,7 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.datastructures;
 
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.TrackChromResultEntry;
 import de.cebitec.readXplorer.databackend.dataObjects.TrackResultEntry;
 
 /**
@@ -8,7 +9,7 @@ import de.cebitec.readXplorer.databackend.dataObjects.TrackResultEntry;
  *
  * @author Martin Tötsches, Rolf Hilker
  */
-public class RPKMvalue extends TrackResultEntry {
+public class RPKMvalue extends TrackChromResultEntry {
     
     private PersistantFeature feature;
     private int readCount, coverage;
@@ -22,8 +23,8 @@ public class RPKMvalue extends TrackResultEntry {
      * @param readCount the raw read count for this feature
      * @param trackId the trackId for which these result values where calculated
      */
-    public RPKMvalue(PersistantFeature feature, double rpkm, int readCount, int trackId) {
-        super(trackId);
+    public RPKMvalue(PersistantFeature feature, double rpkm, int readCount, int trackId, int chromId) {
+        super(trackId, chromId);
         this.feature = feature;
         this.rpkm = rpkm;
         this.readCount = readCount;
@@ -39,8 +40,8 @@ public class RPKMvalue extends TrackResultEntry {
      * @param trackId Track id.
      */
     public RPKMvalue(PersistantFeature feature, double rpkm, double logRpkm, double coverageRpkm, double coverageLogRpkm, 
-            int readstarts, int coverage, int trackId) {
-        super(trackId);
+            int readstarts, int coverage, int trackId, int chromId) {
+        super(trackId, chromId);
         this.feature = feature;
         this.rpkm = rpkm;
         this.logRpkm = logRpkm;

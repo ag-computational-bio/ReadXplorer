@@ -149,14 +149,14 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
             },
             new String [] {
-                "Position", "Chromosome", "Direction", "Read starts", "Rel. count", "Gene name", "Gene locus", "offset", "Sequence", "Leaderless", "CDS-Shift", "False positive", "Internal TSS", "Putative Antisense", "Upstream analysis", "Gene start", "Gene stop", "Gene length", "Gene Frame", "Gene product", "Start codon", "Stop codon", "Track ID"
+                "Position", "Chromosome", "Direction", "Read starts", "Rel. count", "Gene name", "Gene locus", "offset", "Sequence", "Leaderless", "CDS-Shift", "False positive", "Internal TSS", "Putative Antisense", "Upstream analysis", "Gene start", "Gene stop", "Gene length", "Gene Frame", "Gene product", "Start codon", "Stop codon", "Chrom ID", "Track ID"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Double.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class
+                java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Double.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -195,7 +195,8 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         tSSTable.getColumnModel().getColumn(19).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title26_1")); // NOI18N
         tSSTable.getColumnModel().getColumn(20).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title27_1")); // NOI18N
         tSSTable.getColumnModel().getColumn(21).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title28_1")); // NOI18N
-        tSSTable.getColumnModel().getColumn(22).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title29_1_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(22).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title23_2")); // NOI18N
+        tSSTable.getColumnModel().getColumn(23).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title29_1_1")); // NOI18N
 
         exportButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.exportButton.text_1")); // NOI18N
         exportButton.addActionListener(new java.awt.event.ActionListener() {
@@ -774,7 +775,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                 tssResult.getResults().addAll(tssResultNew.getResults());
             }
 
-            final int nbColumns = 24;
+            final int nbColumns = 25;
 
             int noCorrectStarts = 0;
             int noFwdFeatures = 0;
@@ -883,6 +884,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
                 rowData[i++] = tSS.getDetectedFeatStart();
                 rowData[i++] = tSS.getDetectedFeatStop();
+                rowData[i++] = tSS.getChromId();
                 rowData[i++] = tSS.getTrackId();
 
                 SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread

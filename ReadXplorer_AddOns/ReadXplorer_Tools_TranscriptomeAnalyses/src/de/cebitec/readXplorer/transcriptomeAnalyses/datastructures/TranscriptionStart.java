@@ -69,7 +69,7 @@ public class TranscriptionStart extends TrackChromResultEntry {
      */
     public TranscriptionStart(int pos, boolean isFwdStrand, int readStarts, double relCount, PersistantFeature detectedGene, int offset, int dist2start, int dist2stop, PersistantFeature nextDownstreamGene, 
             int offsetToNextDownstreamGene, String promotorSequence, boolean leaderless, boolean cdsShift, 
-            String detectedFeatStart, String detectedFeatStop, boolean isInternal, boolean putAS, int trackId, int chromId) {
+            String detectedFeatStart, String detectedFeatStop, boolean isInternal, boolean putAS, int chromId, int trackId) {
         super(trackId, chromId);
         this.startPosition = pos;
         this.isFwdStrand = isFwdStrand;

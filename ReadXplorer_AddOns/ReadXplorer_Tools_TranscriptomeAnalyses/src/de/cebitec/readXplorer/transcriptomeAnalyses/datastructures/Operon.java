@@ -67,9 +67,9 @@ public class Operon extends TrackResultEntry {
             OperonAdjacency operonAdjacency = it.next();
 
             if (it.hasNext()) {
-                operon += "-" + operonAdjacency.getFeature1().toString();
+                operon +=  operonAdjacency.getFeature1().toString() + "-";
             } else {
-                operon += "-" + operonAdjacency.getFeature1().toString() + "-" + operonAdjacency.getFeature2().toString();
+                operon += operonAdjacency.getFeature1().toString() + "-" + operonAdjacency.getFeature2().toString();
             }
         }
 

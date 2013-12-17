@@ -14,6 +14,7 @@ import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Observer;
+import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.readXplorer.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
@@ -152,6 +153,8 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
 
     @Override
     public void showData(Object data) {
+        Pair<Integer, String> dataTypePair = (Pair<Integer, String>) data;
+        final int trackId = dataTypePair.getFirst();
         this.mappingResults = this.stats.getMappingResults();
         this.stats.parseMappings(this.mappingResults);
         this.backgroundCutoff = this.stats.calculateBackgroundCutoff(this.parameters.getFraction());
@@ -160,8 +163,8 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
 
         this.stats.initMappingsStatistics();
         if (parameters.isPerformingRPKMs()) {
-            rpkmCalculation = new RPKMValuesCalculation(this.allRegionsInHash, this.stats);
-            rpkmCalculation.calculationExpressionValues();
+            rpkmCalculation = new RPKMValuesCalculation(this.allRegionsInHash, this.stats, trackId);
+            rpkmCalculation.calculationExpressionValues(trackConnector.getRefGenome());
 
             String trackNames;
 
@@ -178,30 +181,29 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
         }
 
         if (parameters.isPerformNovelRegionDetection()) {
-//            newRegionDetection = new NewRegionDetection(refViewer.getReference());
-//            
-//            /* TODO: call this method once for each chromosome and generate a list of forwardCDSs and reverseCDSs
-//             * (one for each chromosome) like this: List<HashMap<Integer, List<Integer>>> forwardCDSs
-//             */
-//            int chromNo = 0; //TODO: correctly set these values
-//            int chromLength = 0;
-//            newRegionDetection.runningNewRegionsDetection(chromLength, forwardCDSs, reverseCDSs, allRegionsInHash, 
-//                    this.stats.getFwdCoverage()[chromNo], this.stats.getRevCoverage()[chromNo], 
-//                    this.stats.getForward()[chromNo], this.stats.getReverse()[chromNo], this.stats.getMm(), this.stats.getBg());
-//            String trackNames;
-//
-//            if (novelRegionResult == null) {
-//                novelRegionResult = new NovelRegionResultPanel();
-//                novelRegionResult.setReferenceViewer(refViewer);
-//            }
-//
-//            NovelRegionResult newRegionResult = new NovelRegionResult(trackMap, newRegionDetection.getNovelRegions(), refGenomeID, false);
-//            newRegionResult.setParameters(this.parameters);
-//            novelRegionResult.addResult(newRegionResult);
-//            
-//            trackNames = GeneralUtils.generateConcatenatedString(newRegionResult.getTrackNameList(), 120);
-//            String panelName = "Novel region detection results" + trackNames + " (" + novelRegionResult.getResultSize() + " hits)";
-//            transcAnalysesTopComp.openAnalysisTab(panelName, novelRegionResult);
+            newRegionDetection = new NewRegionDetection(trackConnector.getRefGenome(), trackId);
+
+            /* TODO: call this method once for each chromosome and generate a list of forwardCDSs and reverseCDSs
+             * (one for each chromosome) like this: List<HashMap<Integer, List<Integer>>> forwardCDSs
+             */
+            int chromNo = 0; //TODO: correctly set these values
+            int chromLength = 0;
+            newRegionDetection.runningNewRegionsDetection(featureParser.getAllFwdFeatures(), featureParser.getAllRevFeatures(), allRegionsInHash,
+                    this.stats, this.parameters);
+            String trackNames;
+
+            if (novelRegionResult == null) {
+                novelRegionResult = new NovelRegionResultPanel();
+                novelRegionResult.setReferenceViewer(refViewer);
+            }
+
+            NovelRegionResult newRegionResult = new NovelRegionResult(stats, trackMap, newRegionDetection.getNovelRegions(), false);
+            newRegionResult.setParameters(this.parameters);
+            novelRegionResult.addResult(newRegionResult);
+
+            trackNames = GeneralUtils.generateConcatenatedString(newRegionResult.getTrackNameList(), 120);
+            String panelName = "Novel region detection results" + trackNames + " (" + novelRegionResult.getResultSize() + " hits)";
+            transcAnalysesTopComp.openAnalysisTab(panelName, novelRegionResult);
         }
 
         if (parameters.isPerformOperonDetection()) {
@@ -219,7 +221,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
             String trackNames;
 
             if (operonResultPanel == null) {
-                operonResultPanel = new ResultPanelOperonDetection(parameters);
+                operonResultPanel = new ResultPanelOperonDetection();
                 operonResultPanel.setBoundsInfoManager(refViewer.getBoundsInformationManager());
             }
 

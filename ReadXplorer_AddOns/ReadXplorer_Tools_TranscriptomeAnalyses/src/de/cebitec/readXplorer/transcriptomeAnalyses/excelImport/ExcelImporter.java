@@ -11,11 +11,15 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelRegion;
+import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.NovelRegionResult;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.NovelRegionResultPanel;
+import de.cebitec.readXplorer.transcriptomeAnalyses.main.OperonDetectionResult;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.ParameterSetFiveEnrichedAnalyses;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.ParameterSetWholeTranscriptAnalyses;
+import de.cebitec.readXplorer.transcriptomeAnalyses.main.ResultPanelOperonDetection;
+import de.cebitec.readXplorer.transcriptomeAnalyses.main.ResultPanelRPKM;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.ResultPanelTranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.Statistics;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.TSSDetectionResults;
@@ -82,9 +86,9 @@ public class ExcelImporter {
         ResultPanelTranscriptionStart tssResultsPanel = new ResultPanelTranscriptionStart();
         tssResultsPanel.setReferenceViewer(refViewer);
 
-        String referenceID = (String) model.getValueAt(1, model.getColumnCount() - 2);
-        int refID = Integer.valueOf(referenceID);
-        String chromID = (String) model.getValueAt(1, model.getColumnCount() - 1);
+        String trackId = (String) model.getValueAt(1, model.getColumnCount() - 1);
+        int refID = Integer.valueOf(trackId);
+        String chromID = (String) model.getValueAt(1, model.getColumnCount() - 2);
         int chromId = Integer.valueOf(chromID);
         PersistantTrack track = ProjectConnector.getInstance().getTrack(refID);
         TrackConnector connector = null;
@@ -96,6 +100,7 @@ public class ExcelImporter {
 
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(connector.getRefGenome().getId());
         List<PersistantFeature> genomeFeatures = new ArrayList<>();
+        int genomeId = refConnector.getRefGenome().getId();
         Map<Integer, PersistantChromosome> chroms = refConnector.getChromosomesForGenome();
         for (PersistantChromosome chrom : chroms.values()) {
             genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
@@ -109,7 +114,10 @@ public class ExcelImporter {
 
         HashMap<Integer, PersistantTrack> trackMap = new HashMap<>();
         trackMap.put(track.getId(), track);
+        
         progressHandle.progress("Load Statistics from file ... ", 15);
+        
+        
         String tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT);
         String replaced = tmp.replaceAll(",", ".");
         double mappingCount = Double.valueOf(replaced);
@@ -162,7 +170,7 @@ public class ExcelImporter {
         Statistics stats = new Statistics(refConnector.getRefGenome(), mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
 
 
-        TSSDetectionResults tssResult = new TSSDetectionResults(stats, null, trackMap, refID);
+        TSSDetectionResults tssResult = new TSSDetectionResults(stats, null, trackMap, genomeId);
         tssResult.setParameters(params);
         List<TranscriptionStart> tss = new ArrayList<>();
         TranscriptionStart ts = null;
@@ -247,26 +255,111 @@ public class ExcelImporter {
                     downstreamNextGene, offset,
                     (String) model.getValueAt(row, 9), isLeaderless, false,
                     (String) model.getValueAt(row, 18), (String) model.getValueAt(row, 19),
-                    isInternalTSS, isPutAntisense, refID, chromId);
+                    isInternalTSS, isPutAntisense, chromId, refID);
             tss.add(ts);
         }
         progressHandle.progress(27);
         tssResult.setResults(tss);
         tssResultsPanel.addResult(tssResult);
-        transcAnalysesTopComp.openAnalysisTab(refConnector.getAssociatedTrackNames().get(track.getId()), tssResultsPanel);
+        transcAnalysesTopComp.openAnalysisTab("TSS-Detection for: " + refConnector.getAssociatedTrackNames().get(track.getId()), tssResultsPanel);
     }
 
     public boolean isTssDataTable() {
         return isTssDataTable;
     }
+    
+    public void setUpRpkmStructuresAndTable(TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp) {
+        ResultPanelRPKM resultPanel = new ResultPanelRPKM();
+        
+        // ...
+        
+    }
+    
+    public void setUpOperonStructuresAndTable(ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp) {
+        ResultPanelOperonDetection resultPanel = new ResultPanelOperonDetection();
+        resultPanel.setReferenceViewer(refViewer);
+        
+        String trackId = (String) model.getValueAt(1, model.getColumnCount() - 1);
+        int refID = Integer.valueOf(trackId);
+         String chromID = (String) model.getValueAt(1, model.getColumnCount() - 2);
+        int chromId = Integer.valueOf(chromID);
+        PersistantTrack track = ProjectConnector.getInstance().getTrack(refID);
+        HashMap<Integer, PersistantTrack> trackMap = new HashMap<>();
+        trackMap.put(track.getId(), track);
+        TrackConnector connector = null;
+        try {
+            connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
+        } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+            JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+        }
+        
+        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(connector.getRefGenome().getId());
+        List<PersistantFeature> genomeFeatures = new ArrayList<>();
+        Map<Integer, PersistantChromosome> chroms = refConnector.getChromosomesForGenome();
+        for (PersistantChromosome chrom : chroms.values()) {
+            genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
+                    0, chrom.getLength(), chrom.getId()));
+        }
+        HashMap<String, PersistantFeature> featureMap = new HashMap();
+        for (PersistantFeature persistantFeature : genomeFeatures) {
+            featureMap.put(persistantFeature.getLocus(), persistantFeature);
+        }
+
+
+        progressHandle.progress("Load Statistics from file ... ", 15);
+        String tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT);
+        String replaced = tmp.replaceAll(",", ".");
+        double mappingCount = Double.valueOf(replaced);
+
+        tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH);
+        replaced = tmp.replaceAll(",", ".");
+        double mappingMeanLength = Double.valueOf(replaced);
+
+        tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.MAPPINGS_MILLION);
+        replaced = tmp.replaceAll(",", ".");
+        double mappingsPerMillion = Double.valueOf(replaced);
+
+        tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD);
+        replaced = tmp.replaceAll(",", ".");
+        double backgroundThreshold = Double.valueOf(replaced);
+
+        tmp = (String) secondSheetMap.get(TranscriptomeAnalysisWizardIterator.PROP_FRACTION_NOVELREGION_DETECTION);
+        replaced = tmp.replaceAll(",", ".");
+        double fraction = Double.valueOf(replaced);
+
+        tmp = (String) secondSheetMap.get(NovelRegionResultPanel.NOVELREGION_DETECTION_MIN_LENGTH);
+        int minBoundary = Integer.valueOf(tmp);
+
+
+        ParameterSetWholeTranscriptAnalyses params = new ParameterSetWholeTranscriptAnalyses(true, false, true, false, fraction, minBoundary);
+        Statistics stats = new Statistics(refConnector.getRefGenome(), mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
+
+
+        
+        List<Operon> operons = new ArrayList<>();
+        Operon operon = null;
+        progressHandle.progress("Initialize table ... ", 20);
+        for (int row = 1; row < model.getRowCount(); row++) {
+
+            
+            operon = new Operon(chromId);
+            operons.add(operon);
+        }
+        progressHandle.progress(27);
+        OperonDetectionResult operonResults = new OperonDetectionResult(trackMap, operons, refConnector.getRefGenome().getId(), false);
+        operonResults.setParameters(params);
+        resultPanel.addResult(operonResults);
+        transcAnalysesTopComp.openAnalysisTab("Operon detection for track: " + refConnector.getAssociatedTrackNames().get(track.getId()), resultPanel);
+    
+    }
 
     public void setUpNewRegionStructuresAndTable(ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp) {
         NovelRegionResultPanel novelRegionsResultsPanel = new NovelRegionResultPanel();
         novelRegionsResultsPanel.setReferenceViewer(refViewer);
-
-        String referenceID = (String) model.getValueAt(1, model.getColumnCount() - 2);
-        int refID = Integer.valueOf(referenceID);
-         String chromID = (String) model.getValueAt(1, model.getColumnCount() - 1);
+        
+        String trackId = (String) model.getValueAt(1, model.getColumnCount() - 1);
+        int refID = Integer.valueOf(trackId);
+         String chromID = (String) model.getValueAt(1, model.getColumnCount() - 2);
         int chromId = Integer.valueOf(chromID);
         PersistantTrack track = ProjectConnector.getInstance().getTrack(refID);
         HashMap<Integer, PersistantTrack> trackMap = new HashMap<>();
@@ -339,7 +432,7 @@ public class ExcelImporter {
             }
 
             boolean isFP;
-            String falsePositive = (String) model.getValueAt(row, 2);
+            String falsePositive = (String) model.getValueAt(row, 4);
             if (falsePositive.equals("false")) {
                 isFP = false;
             } else {
@@ -347,7 +440,7 @@ public class ExcelImporter {
             }
 
             boolean isSelectedForBlast;
-            String selected = (String) model.getValueAt(row, 3);
+            String selected = (String) model.getValueAt(row, 5);
             if (falsePositive.equals("false")) {
                 isSelectedForBlast = false;
             } else {
@@ -355,20 +448,20 @@ public class ExcelImporter {
             }
 
             int dropOff;
-            String dropOffString = (String) model.getValueAt(row, 5);
+            String dropOffString = (String) model.getValueAt(row, 7);
             dropOff = Integer.valueOf(dropOffString);
 
             int length;
-            String lengthString = (String) model.getValueAt(row, 6);
+            String lengthString = (String) model.getValueAt(row, 8);
             length = Integer.valueOf(lengthString);
 
-            novelRegion = new NovelRegion(isFwd, novelRegStartPos, dropOff, (String) model.getValueAt(row, 4),
-                    length, (String) model.getValueAt(row, 7), isFP, isSelectedForBlast, refID, chromId);
+            novelRegion = new NovelRegion(isFwd, novelRegStartPos, dropOff, (String) model.getValueAt(row, 6),
+                    length, (String) model.getValueAt(row, 9), isFP, isSelectedForBlast, refID, chromId);
             novelRegions.add(novelRegion);
         }
         progressHandle.progress(27);
         novelRegionResults.setResults(novelRegions);
         novelRegionsResultsPanel.addResult(novelRegionResults);
-        transcAnalysesTopComp.openAnalysisTab(refConnector.getAssociatedTrackNames().get(track.getId()), novelRegionsResultsPanel);
+        transcAnalysesTopComp.openAnalysisTab("Novel Region detection for track: " + refConnector.getAssociatedTrackNames().get(track.getId()), novelRegionsResultsPanel);
     }
 }

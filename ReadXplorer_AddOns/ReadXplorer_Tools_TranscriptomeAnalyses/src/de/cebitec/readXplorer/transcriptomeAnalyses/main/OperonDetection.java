@@ -59,14 +59,4 @@ public class OperonDetection {
 
         return operons;
     }
-    
-        private void createOperonData() {
-////=============================================================
-////unless ($opt_O) {
-////    print STDERR "Writing operon data...\n";
-////    foreach my $pos (sort by_number(keys(%op2sort))) {
-//	print OP "$op2sort{$pos}\n";
-//    }
-//}
-    }
 }

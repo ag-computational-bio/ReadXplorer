@@ -1,6 +1,8 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.RPKMvalue;
 import de.cebitec.readXplorer.util.FeatureType;
 import java.util.ArrayList;
@@ -27,8 +29,9 @@ public class RPKMValuesCalculation {
     private final int[][] forwardStarts, reverseStarts;
     private final int[][] forwardCoverage, reverseCoverage;
     private final double mm, mc;
+    private int trackId;
 
-    public RPKMValuesCalculation(HashMap<Integer, PersistantFeature> persFeatures, Statistics stats) {
+    public RPKMValuesCalculation(HashMap<Integer, PersistantFeature> persFeatures, Statistics stats, int trackId) {
         this.allRegionsInHash = persFeatures;
         this.rpkmValues = new ArrayList<>();
         this.stats = stats;
@@ -38,23 +41,16 @@ public class RPKMValuesCalculation {
         this.reverseCoverage = this.stats.getRevCoverage();
         this.mm = this.stats.getMm();
         this.mc = this.stats.getMc();
+        this.trackId = trackId;
 
     }
 
-    public void calculationExpressionValues() {
-
-//print STDERR "Calculating and writing expression levels";
-//print STDERR " and writing region info" unless ($opt_E);
-//print STDERR "...\n";
+    public void calculationExpressionValues(PersistantReference refGenome) {
 
         Map<Integer, PersistantFeature> allRegionsSorted = new TreeMap<>(this.allRegionsInHash);
         Set<Integer> keys = allRegionsSorted.keySet();
         PersistantFeature feature;
-
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        //TODO: pass referenceGenome to this method/class and get the list of chromosomes.
-        //The needed chromosome can be access via: feature.getChromId()
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        HashMap<Integer, PersistantChromosome> chromosomes = (HashMap<Integer, PersistantChromosome>) refGenome.getChromosomes();
 
         for (Integer id : keys) {
             feature = allRegionsSorted.get(id);
@@ -65,66 +61,21 @@ public class RPKMValuesCalculation {
             int start = feature.getStart();
             int stop = feature.getStop();
             boolean isFwd = feature.isFwdStrand();
+            int chromId = feature.getChromId();
+            int chromNo = chromosomes.get(chromId).getChromNumber();
             RPKMvalue rpkm = null;
             if (isFwd) {
                 System.out.println("Feature fwd: " + feature.getFeatureName());
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                //TODO: Replace feature.getChromId() by appropriavte chromNo
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                rpkm = this.calculateStatistics(feature.getChromId(), start, stop, forwardStarts, forwardCoverage, this.mm, this.mc);
+                rpkm = this.calculateStatistics(chromNo, chromId, start, stop, forwardStarts, forwardCoverage, this.mm, this.mc);
                 rpkm.setFeature(feature);
                 rpkmValues.add(rpkm);
             } else {
                 System.out.println("Feature rev: " + feature.getFeatureName());
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                //TODO: Replace feature.getChromId() by appropriavte chromNo
-                //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                rpkm = this.calculateStatistics(feature.getChromId(), start, stop, reverseStarts, reverseCoverage, this.mm, this.mc);
+                rpkm = this.calculateStatistics(chromNo, chromId, start, stop, reverseStarts, reverseCoverage, this.mm, this.mc);
                 rpkm.setFeature(feature);
                 rpkmValues.add(rpkm);
             }
-
         }
-
-
-        // TODO: Den TrueStart Datensatz beschaffen.
-
-        //    my $offset = $all_regions{$gene}{start} - $all_regions{$gene}{truestart};
-        //    $offset = -$offset if ($offset < 0);
-
-        //    my $operon = 'OP ' . ($all_regions{$gene}{operon} ? $all_regions{$gene}{operon} : $gene);
-
-        //    print OUT "$gene\t$dir\t$start\t$operon\t$out\t$offset\n" unless ($opt_E);
-//    unless ($opt_R) {
-//	print REG "$gene\t$start\t$stop\t";
-//	print REG "yes" if ($static_regions{$gene}{start});
-//	print REG "\t";
-//	print REG "yes" if ($static_regions{$gene}{stop});
-//	print REG "\n";
-//    }
-//}
-//
-//print STDERR "Calculating and writing expression levels for new regions\n";
-//
-//foreach my $pos (sort by_number(keys(%{$new_regs{out}}))) {
-//    foreach my $entry (@{$new_regs{out}{$pos}}) {
-//	print NEW "$pos\t$entry\n" unless ($opt_N);
-//
-//	unless ($opt_E) {
-//
-//	    my ($stop) = (split(/\t/, $entry))[0] - 1;
-//	    my $start  = $pos - 1;
-//
-//	    my $dir = (($start < $stop) ? '+' : '-');
-//
-//	    my $out = &calculate_statistics($start, $stop);
-//
-//	    print OUT "\t$dir\t$pos\t\t$out\t0\n" 
-//	}
-//    }
-//}
-
-
     }
 
     /**
@@ -137,7 +88,7 @@ public class RPKMValuesCalculation {
      * @param mc
      * @return RPKMvalue object with all rpkm values.
      */
-    private RPKMvalue calculateStatistics(int chromNo, int start, int stop, int[][] starts, int[][] covered, double mm, double mc) {
+    private RPKMvalue calculateStatistics(int chromNo, int chromId, int start, int stop, int[][] starts, int[][] covered, double mm, double mc) {
 
         int length = stop - start;
         List<Double> logdata = new ArrayList<>();
@@ -155,7 +106,7 @@ public class RPKMValuesCalculation {
         int count = 0;
         int sum = 0;
         for (int i = start; i < stop; i++) {
-            int j = starts[chromNo][i];
+            int j = starts[chromNo - 1][i];
             if (j != 0) {
                 count++;
                 sum += j;
@@ -182,7 +133,7 @@ public class RPKMValuesCalculation {
         List<Double> sortedCoveredArr = new ArrayList<>();
         count = 0;
         for (int i = start; i < stop; i++) {
-            int j = covered[chromNo][i];
+            int j = covered[chromNo - 1][i];
             if (j != 0) {
                 count++;
                 covsum += j;
@@ -209,7 +160,7 @@ public class RPKMValuesCalculation {
             coverageLogRpkm = Math.exp(mean(covLogdata) * count / length * 1000 / mc);
         }
 
-        return new RPKMvalue(null, rpkm, logRpkm, coverageRpkm, coverageLogRpkm, sum, covsum, 0);
+        return new RPKMvalue(null, rpkm, logRpkm, coverageRpkm, coverageLogRpkm, sum, covsum, this.trackId , chromId);
     }
 
     /**
