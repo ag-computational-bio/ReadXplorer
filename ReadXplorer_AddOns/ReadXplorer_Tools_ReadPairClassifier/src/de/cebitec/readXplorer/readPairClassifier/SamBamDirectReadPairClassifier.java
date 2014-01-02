@@ -1,16 +1,5 @@
 package de.cebitec.readXplorer.readPairClassifier;
 
-import de.cebitec.readXplorer.util.Pair;
-import de.cebitec.readXplorer.util.DiscreteCountingDistribution;
-import de.cebitec.readXplorer.util.GeneralUtils;
-import de.cebitec.readXplorer.util.SequenceUtils;
-import de.cebitec.readXplorer.util.StatsContainer;
-import de.cebitec.readXplorer.util.SamUtils;
-import de.cebitec.readXplorer.util.Benchmark;
-import de.cebitec.readXplorer.util.Observable;
-import de.cebitec.readXplorer.util.Observer;
-import de.cebitec.readXplorer.util.Properties;
-import de.cebitec.readXplorer.util.ReadPairType;
 import de.cebitec.readXplorer.parser.ReadPairJobContainer;
 import de.cebitec.readXplorer.parser.TrackJob;
 import de.cebitec.readXplorer.parser.common.ParsedClassification;
@@ -19,6 +8,17 @@ import de.cebitec.readXplorer.parser.common.ParsingException;
 import de.cebitec.readXplorer.parser.mappings.CommonsMappingParser;
 import de.cebitec.readXplorer.parser.mappings.ReadPairClassifierI;
 import de.cebitec.readXplorer.parser.output.SamBamSorter;
+import de.cebitec.readXplorer.util.Benchmark;
+import de.cebitec.readXplorer.util.DiscreteCountingDistribution;
+import de.cebitec.readXplorer.util.GeneralUtils;
+import de.cebitec.readXplorer.util.Observable;
+import de.cebitec.readXplorer.util.Observer;
+import de.cebitec.readXplorer.util.Pair;
+import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readXplorer.util.ReadPairType;
+import de.cebitec.readXplorer.util.SamUtils;
+import de.cebitec.readXplorer.util.SequenceUtils;
+import de.cebitec.readXplorer.util.StatsContainer;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +30,7 @@ import org.openide.util.NbBundle;
 
 /**
  * Sam/Bam read pair classifier for a direct file access track. This means
- * the classification of the seq pairs has to be carried out. Besides the 
+ * the classification of the read pairs has to be carried out. Besides the 
  * classification this class also acts as extender for the given sam/bam file
  * and thus creates an extended copy of the original file after the
  * classification. The reads are be sorted by read name for efficient
@@ -495,16 +495,16 @@ public class SamBamDirectReadPairClassifier implements ReadPairClassifierI, Obse
     private void addPairedRecord(DirectReadPair readPair) {
         SAMRecord mapping1 = readPair.getRecord1();
         SAMRecord mapping2 = readPair.getRecord2();
-        this.setSeqPairForType(readPair);
-        mapping1.setAttribute(Properties.TAG_SEQ_PAIR_TYPE, readPair.getType());
-        mapping1.setAttribute(Properties.TAG_SEQ_PAIR_ID, readPair.getSeqPairId());
+        this.setReadPairForType(readPair);
+        mapping1.setAttribute(Properties.TAG_READ_PAIR_TYPE, readPair.getType());
+        mapping1.setAttribute(Properties.TAG_READ_PAIR_ID, readPair.getReadPairId());
         mapping1.setMateReferenceName(mapping2.getReferenceName());
         mapping1.setMateAlignmentStart(mapping2.getAlignmentStart());
         mapping1.setMateNegativeStrandFlag(mapping2.getReadNegativeStrandFlag());
         mapping1.setProperPairFlag(readPair.getType() == ReadPairType.PERFECT_PAIR || readPair.getType() == ReadPairType.PERFECT_UNQ_PAIR);
         
-        mapping2.setAttribute(Properties.TAG_SEQ_PAIR_TYPE, readPair.getType());
-        mapping2.setAttribute(Properties.TAG_SEQ_PAIR_ID, readPair.getSeqPairId());
+        mapping2.setAttribute(Properties.TAG_READ_PAIR_TYPE, readPair.getType());
+        mapping2.setAttribute(Properties.TAG_READ_PAIR_ID, readPair.getReadPairId());
         mapping2.setMateReferenceName(mapping1.getReferenceName());
         mapping2.setMateAlignmentStart(mapping1.getAlignmentStart());
         mapping2.setMateNegativeStrandFlag(mapping1.getReadNegativeStrandFlag());
@@ -558,8 +558,8 @@ public class SamBamDirectReadPairClassifier implements ReadPairClassifierI, Obse
         record.setMateUnmappedFlag(mateStart == 0);
         record.setNotPrimaryAlignmentFlag(mateStart != 0);
         this.addClassificationData(record);
-        record.setAttribute(Properties.TAG_SEQ_PAIR_TYPE, ReadPairType.UNPAIRED_PAIR);
-        record.setAttribute(Properties.TAG_SEQ_PAIR_ID, readPairId);
+        record.setAttribute(Properties.TAG_READ_PAIR_TYPE, ReadPairType.UNPAIRED_PAIR);
+        record.setAttribute(Properties.TAG_READ_PAIR_ID, readPairId);
         this.samBamFileWriter.addAlignment(record);
         this.statsContainer.incReadPairStats(ReadPairType.UNPAIRED_PAIR, 1);
     }
@@ -569,7 +569,7 @@ public class SamBamDirectReadPairClassifier implements ReadPairClassifierI, Obse
      * only mapped once, the corresponding unique read pair type is chosen.
      * @param readPair the read pair to update in case it is unique
      */
-    private void setSeqPairForType(DirectReadPair readPair) {
+    private void setReadPairForType(DirectReadPair readPair) {
         Integer mapCount1 = this.getMapCount(readPair.getRecord1());
         Integer mapCount2 = this.getMapCount(readPair.getRecord2());
         if (mapCount1 != null && mapCount2 != null && mapCount1 == 1 && mapCount2 == 1) {

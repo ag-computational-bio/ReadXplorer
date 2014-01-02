@@ -16,6 +16,7 @@ import de.cebitec.readXplorer.view.dialogMenus.ChromosomeVisualizationHelper.Chr
 import de.cebitec.readXplorer.view.dialogMenus.ChromosomeVisualizationHelper.ChromosomeListener;
 import de.cebitec.readXplorer.view.dialogMenus.JTextFieldPasteable;
 import de.cebitec.readXplorer.view.dialogMenus.StandardMenuEvent;
+import de.cebitec.readXplorer.view.tableVisualization.TableUtils;
 import java.awt.Dimension;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -91,16 +92,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                int[] selectedRows = featureTable.getSelectedRows();
-                if (selectedRows.length > 0) {
-                    int correctedRow = featureTable.convertRowIndexToModel(selectedRows[0]);
-                    PersistantFeature feature = (PersistantFeature) featureTable.getModel().getValueAt(correctedRow, 0);
-                    if (feature.isFwdStrand()) {
-                        boundsManager.navigatorBarUpdated(feature.getStart());
-                    } else {
-                        boundsManager.navigatorBarUpdated(feature.getStop());
-                    }
-                }
+                TableUtils.showFeaturePosition(featureTable, 0, boundsManager);
             }
         });
 
@@ -289,19 +281,24 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
         });
 
         chromCheckBox.setText("Search all Chromosomes");
+        chromCheckBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chromCheckBoxActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout featureGroundPanelLayout = new javax.swing.GroupLayout(featureGroundPanel);
         featureGroundPanel.setLayout(featureGroundPanelLayout);
         featureGroundPanelLayout.setHorizontalGroup(
             featureGroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(filterProperties, 0, 303, Short.MAX_VALUE)
+            .addComponent(filterProperties, 0, 174, Short.MAX_VALUE)
             .addComponent(tableScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .addGroup(featureGroundPanelLayout.createSequentialGroup()
                 .addGroup(featureGroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(featureGroundPanelLayout.createSequentialGroup()
                         .addComponent(chromCheckBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(chromComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(chromComboBox, 0, 1, Short.MAX_VALUE))
                     .addGroup(featureGroundPanelLayout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(featureGroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -332,7 +329,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(filterProperties, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE))
+                .addComponent(tableScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -414,6 +411,10 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     this.clearFilter();
 }//GEN-LAST:event_radioGeneActionPerformed
 
+    private void chromCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chromCheckBoxActionPerformed
+        this.fillFeatureList();
+    }//GEN-LAST:event_chromCheckBoxActionPerformed
+
     /**
      * Cecks if the input string is a valid number in the range of the reference genome.
      * @param s input string to check
@@ -459,26 +460,34 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
      * @param viewer The viewer to navigate
      */
     public void setViewer(AbstractViewer viewer) {
-        boolean firstCall = this.viewer == null;
+        boolean firstCall = this.viewer == null || this.chromObserver == null;
         this.updateFeatTableObserver(this.refGenome, viewer, firstCall);
         this.viewer = viewer;
         this.refGenome = viewer.getReference();
         refGenCon = ProjectConnector.getInstance().getRefGenomeConnector(refGenome.getId());
         
-        ChromosomeVisualizationHelper chromHelper = new ChromosomeVisualizationHelper();
-        if (firstCall) {
-            //Update the observer for changes to the chromosome selection anywhere else
-            this.chromObserver = chromHelper.createChromBoxWithObserver(chromComboBox, refGenome);
+        if (refGenome.getNoChromosomes() > 1) {
 
-            //Update the listener for changes to the chromosome selection in this box
-            chromListener = chromHelper.new ChromosomeListener(chromComboBox, viewer);
+            ChromosomeVisualizationHelper chromHelper = new ChromosomeVisualizationHelper();
+            if (firstCall) {
+                //Update the observer for changes to the chromosome selection anywhere else
+                this.chromObserver = chromHelper.createChromBoxWithObserver(chromComboBox, refGenome);
+
+                //Update the listener for changes to the chromosome selection in this box
+                chromListener = chromHelper.new ChromosomeListener(chromComboBox, viewer);
+            } else {
+                this.chromObserver.setRefGenome(refGenome);
+                this.chromListener.setViewer(viewer);
+                chromHelper.updateChromBoxContent(chromComboBox, refGenome);
+            }
+
+            this.chromComboBox.setVisible(true);
+            this.chromCheckBox.setVisible(true);
+            this.chromComboBox.repaint();
         } else {
-            this.chromObserver.setRefGenome(refGenome);
-            this.chromListener.setViewer(viewer);
-            chromHelper.updateChromBoxContent(chromComboBox, refGenome);
-        }        
-        
-        this.chromComboBox.repaint();
+            this.chromComboBox.setVisible(false);
+            this.chromCheckBox.setVisible(false);
+        }
         this.fillFeatureList();
     }
     
@@ -517,12 +526,18 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
      * and displays the list in the featureTable.
      */
     private void fillFeatureList() {
-        List<PersistantFeature> features = refGenCon.getFeaturesForRegion(0, refGenome.getActiveChromLength(), 
-                FeatureType.ANY, refGenome.getActiveChromId());
-        
-        List<PersistantFeature> featList = new ArrayList<>(features);
-        Collections.sort(featList, new FeatureNameSorter());
-        PersistantFeature[] featureData = featList.toArray(new PersistantFeature[featList.size()]);
+        List<PersistantFeature> features = new ArrayList<>();
+        if (this.chromCheckBox.isSelected()) { //TODO: improve performance or add waiting symbol somewhere
+            for (PersistantChromosome chrom: refGenome.getChromosomes().values()) {
+                features.addAll(refGenCon.getFeaturesForRegion(0, chrom.getLength(),
+                        FeatureType.ANY, chrom.getId()));
+            }
+        } else {
+            features = refGenCon.getFeaturesForRegion(0, refGenome.getActiveChromLength(),
+                    FeatureType.ANY, refGenome.getActiveChromId());
+        }
+        Collections.sort(features, new FeatureNameSorter());
+        PersistantFeature[] featureData = features.toArray(new PersistantFeature[features.size()]);
 
         //Create new Model for Table
         featureTable.setModel(new FeatureTableModel(featureData));

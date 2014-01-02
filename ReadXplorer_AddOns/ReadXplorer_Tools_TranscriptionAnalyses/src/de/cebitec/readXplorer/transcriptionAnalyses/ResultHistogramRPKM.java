@@ -2,6 +2,8 @@ package de.cebitec.readXplorer.transcriptionAnalyses;
 
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.RPKMvalue;
 import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
+import de.cebitec.readXplorer.util.GeneralUtils;
+import de.cebitec.readXplorer.view.TopComponentExtended;
 import java.awt.BorderLayout;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -27,7 +29,7 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements Component
     private static final long serialVersionUID = 1L;
 
     private JFXPanel fxPanel;
-    private AppPanelTopComponent appPanelTopComponent; //TODO: Create new TopComp for this histogram
+    private TopComponentExtended topComp;
     private JPanel mainPanel;
     private List<RPKMvalue> rpkmValues;
     private BarChart<String, Number> barChart;
@@ -36,17 +38,17 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements Component
 
     /**
      * Class for displaying a histogram of RPKM values.
-     * @param rpkmValues list of RPKM values to display
+     * @param rpkmResult list of RPKM values to display
      */
-    public ResultHistogramRPKM(List<RPKMvalue> rpkmValues) {
-        this.rpkmValues = rpkmValues;
-        this.appPanelTopComponent = new AppPanelTopComponent();
-        this.appPanelTopComponent.setLayout(new BorderLayout());
+    public ResultHistogramRPKM(RPKMAnalysisResult rpkmResult) {
+        this.rpkmValues = rpkmResult.getResults();
+        this.topComp = new TopComponentExtended();
+        this.topComp.setLayout(new BorderLayout());
         initSwingComponents();
         initFxComponents();
-        this.appPanelTopComponent.addComponentListener(this);
-        this.appPanelTopComponent.open();
-        this.appPanelTopComponent.setName("Histogram of RPKM values");
+        this.topComp.addComponentListener(this);
+        this.topComp.open();
+        this.topComp.setName("RPKM Value Histogram for " + GeneralUtils.generateConcatenatedString(rpkmResult.getTrackNameList(), 20));
     }
 
     private void initSwingComponents() {
@@ -54,7 +56,7 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements Component
         fxPanel = new JFXPanel();
         mainPanel.setSize(300, 300);
         mainPanel.add(fxPanel, BorderLayout.CENTER);
-        this.appPanelTopComponent.add(mainPanel, BorderLayout.CENTER);
+        this.topComp.add(mainPanel, BorderLayout.CENTER);
     }
 
     /**
@@ -180,7 +182,7 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements Component
     }
     
     public void close() {
-        this.appPanelTopComponent.close();
+        this.topComp.close();
     }
 
     @Override

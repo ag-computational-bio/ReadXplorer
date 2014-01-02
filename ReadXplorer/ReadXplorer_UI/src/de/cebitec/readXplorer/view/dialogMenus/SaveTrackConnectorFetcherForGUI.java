@@ -36,7 +36,7 @@ import org.openide.util.NbPreferences;
 public class SaveTrackConnectorFetcherForGUI {
 
     /**
-     * Blank constructor of the class.
+     * A class for GUI Components to safely fetch a TrackConnector.
      */
     public SaveTrackConnectorFetcherForGUI() {
     }
@@ -45,7 +45,6 @@ public class SaveTrackConnectorFetcherForGUI {
      * Returns the TrackConnector for the given track. If the track is stored in
      * a sam/bam file and the path to this file has changed, the method will
      * open a window and ask for the new file path.
-     *
      * @throws UserCanceledTrackPathUpdateException if the no track path could be resolved.
      * @param track Track the TrackConnector should be received for.
      * @return TrackConnector for the Track handed over
@@ -78,7 +77,6 @@ public class SaveTrackConnectorFetcherForGUI {
      * Returns the TrackConnector for multiple given tracks. If the tracks are
      * stored in a sam/bam file and the path to this file has changed, the
      * method will open a window and ask for the new file path.
-     *
      * @throws UserCanceledTrackPathUpdateException if the no track path could be resolved.
      * @param tracks List of tracks the TrackConnector should be received for.
      * @param combineTracks boolean if the Tracks should be combined or not.
@@ -132,12 +130,12 @@ public class SaveTrackConnectorFetcherForGUI {
      * track file paths and if it cannot be found it calls the
      * <tt>openResetFilePathDialog</tt> method to open a dialog for resetting
      * the file path to the current location of the file.
-     *
-     * @author rhilker, kstaderm
      * @param track the track whose path has to be reseted
      * @param connector the connector
      * @return the track connector for the updated track or null, if it did not
      * work
+     * 
+     * @author rhilker, kstaderm
      */
     private PersistantTrack getNewFilePath(PersistantTrack track, ProjectConnector connector) {
         PersistantTrack newTrack;
@@ -158,13 +156,12 @@ public class SaveTrackConnectorFetcherForGUI {
 
     /**
      * Checks if a file exists and creates a new track, if it exists.
-     *
-     * @author rhilker, kstaderm
-     *
      * @param basePath
      * @param oldTrackFile the old track file to replace
      * @param track the old track to replace
      * @return the new track, if the file exists, null otherwise
+     *
+     * @author rhilker, kstaderm
      */
     private PersistantTrack checkFileExists(String basePath, File oldTrackFile, PersistantTrack track, ProjectConnector connector) {
         PersistantTrack newTrack = null;
@@ -178,9 +175,7 @@ public class SaveTrackConnectorFetcherForGUI {
                 try {
                     connector.resetTrackPath(newTrack);
                 } catch (StorageException ex) {
-                    String msg = MSG_FileReset_StorageError();
-                    String title = TITLE_FileReset();
-                    JOptionPane.showMessageDialog(null, msg, title, JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, MSG_FileReset_StorageError(), TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE);
                 }
             } catch (RuntimeIOException e) {
                 //nothing to do, we return a null track
@@ -193,14 +188,14 @@ public class SaveTrackConnectorFetcherForGUI {
      * In case a direct access track was moved to another place and cannot be
      * found this method opens a dialog for resetting the file path to the
      * current location of the file.
-     *
-     * @author rhilker, kstaderm
-     *
      * @param track the track whose path has to be resetted
      * @param connector the connector
      * @return the track connector for the updated track or null, if it did not
      * work
+     *
+     * @author rhilker, kstaderm
      */
+    @Messages({"MSG_WrongFileChosen=You did not choose a \"bam\" file, please select a bam file to proceed."})
     private PersistantTrack openResetFilePathDialog(PersistantTrack track, ProjectConnector connector) {
         PersistantTrack newTrack = null;
         ResetTrackFilePanel resetPanel = new ResetTrackFilePanel(track.getFilePath());
@@ -211,7 +206,7 @@ public class SaveTrackConnectorFetcherForGUI {
         if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION))  {
             if (resetPanel.getNewFileLocation() != null) {
                 File selectedFile = new File(resetPanel.getNewFileLocation());
-                if (selectedFile.exists() && selectedFile.isFile()) {
+                if (selectedFile.exists() && selectedFile.isFile() && selectedFile.getName().endsWith(".bam")) {
                     try {
                         newTrack = new PersistantTrack(track.getId(),
                                 resetPanel.getNewFileLocation(), track.getDescription(), track.getTimestamp(),
@@ -220,21 +215,18 @@ public class SaveTrackConnectorFetcherForGUI {
                         try {
                             TrackConnector trackConnector = connector.getTrackConnector(newTrack);
                         } catch (FileNotFoundException ex) {
-                            String msg = MSG_FileReset();
-                            String title = TITLE_FileReset();
-                            JOptionPane.showMessageDialog(null, msg, title, JOptionPane.INFORMATION_MESSAGE);
+                            JOptionPane.showMessageDialog(null, MSG_FileReset(), TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE);
                         }
                     } catch (StorageException ex) {
-                        String msg = MSG_FileReset_StorageError();
-                        String title = TITLE_FileReset();
-                        JOptionPane.showMessageDialog(null, msg, title, JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(null, MSG_FileReset_StorageError(), TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE);
                     }
+                } else if (!selectedFile.getName().endsWith(".bam")) {
+                    JOptionPane.showMessageDialog(null, MSG_WrongFileChosen(), TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE);
+                    this.openResetFilePathDialog(track, connector);
                 }
             }
         } else {
-            String msg = MSG_FileReset();
-            String title = TITLE_FileReset();
-            JOptionPane.showMessageDialog(null, msg, title, JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, MSG_FileReset(), TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE);
         }
         return newTrack;
     }

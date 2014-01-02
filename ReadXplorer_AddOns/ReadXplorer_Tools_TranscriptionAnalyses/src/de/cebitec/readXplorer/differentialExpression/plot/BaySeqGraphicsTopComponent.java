@@ -12,7 +12,6 @@ import static de.cebitec.readXplorer.plotting.ChartExporter.ChartExportStatus.FA
 import static de.cebitec.readXplorer.plotting.ChartExporter.ChartExportStatus.FINISHED;
 import static de.cebitec.readXplorer.plotting.ChartExporter.ChartExportStatus.RUNNING;
 import de.cebitec.readXplorer.plotting.CreatePlots;
-import de.cebitec.readXplorer.differentialExpression.plot.Bundle;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readXplorer.view.TopComponentExtended;
@@ -52,7 +51,7 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 
 /**
- * Top component which displays something.
+ * TopComponent, which displays all graphics available for a baySeq analysis.
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.readXplorer.differentialExpression//BaySeqGraphics//EN",
         autostore = false)
@@ -65,7 +64,7 @@ import org.openide.windows.TopComponent;
         preferredID = "BaySeqGraphicsTopComponent")
 @Messages({
     "CTL_BaySeqGraphicsAction=BaySeqGraphics",
-    "CTL_BaySeqGraphicsTopComponent=Create graphics",
+    "CTL_BaySeqGraphicsTopComponent=BaySeq Graphics",
     "HINT_BaySeqGraphicsTopComponent=This is a baySeq graphics window"
 })
 public final class BaySeqGraphicsTopComponent extends TopComponentExtended implements Observer, ItemListener {
@@ -84,9 +83,16 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended imple
     private boolean SVGCanvasActive;
     private ProgressHandle svgExportProgressHandle;
 
+    /**
+     * TopComponent, which displays all graphics available for a baySeq analysis.
+     */
     public BaySeqGraphicsTopComponent() {
     }
 
+    /**
+     * TopComponent, which displays all graphics available for a baySeq analysis.
+     * @param handler The analysis handler containing the results
+     */
     public BaySeqGraphicsTopComponent(DeAnalysisHandler handler) {
         baySeqAnalysisHandler = (BaySeqAnalysisHandler) handler;
         List<ResultDeAnalysis> results = handler.getResults();

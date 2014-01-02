@@ -304,8 +304,8 @@ public class SamBamFileReader implements Observable {
 //            start = start < 0 ? 0 : start;
 //            stop = stop >= refSeq.length() ? refSeq.length() : stop;
                         isFwdStrand = !record.getReadNegativeStrandFlag();
-                        pairId = (Integer) record.getAttribute(Properties.TAG_SEQ_PAIR_ID);
-                        pairType = (Integer) record.getAttribute(Properties.TAG_SEQ_PAIR_TYPE);
+                        pairId = (Integer) record.getAttribute(Properties.TAG_READ_PAIR_ID);
+                        pairType = (Integer) record.getAttribute(Properties.TAG_READ_PAIR_TYPE);
                         mateStart = record.getMateAlignmentStart();
                         bothVisible = mateStart > from && mateStart < to;
 

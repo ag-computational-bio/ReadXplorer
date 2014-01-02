@@ -146,18 +146,6 @@ public class GeneralUtils {
      * appended.
      */
     public static String generateConcatenatedString(List<String> strings, int maxLength) {
-        /**StringBuilder concatString = new StringBuilder();
-        for (String string : strings) {
-            concatString = concatString.append(string).append(" and ");
-        }
-        if (concatString.length() > 5) {
-            concatString = concatString.delete(concatString.length() - 5, concatString.length());
-        }
-        return concatString.toString();
-        */
-        //Evgeny:
-        //generateConcatenatedString is a special case of the implode function, 
-        //so i would suggest to use it here to reduce code duplications :
         String concatString = implode(" and ", strings.toArray());
         if (maxLength > 0 && concatString.length() > maxLength) {
             concatString = concatString.substring(0, maxLength).concat("...");

@@ -23,7 +23,7 @@ import org.openide.util.NbBundle;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class SamBamExtender implements ConverterI, ParserI, Observable, Observer {
+public class SamBamExtender implements ConverterI, ParserI, Observable, Observer, MessageSenderI {
 
     private Map<String, ParsedClassification> classificationMap;
     private TrackJob trackJob;
@@ -32,6 +32,7 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
     private static String fileDescription = "SAM/BAM Input, extended SAM/BAM Output";
     private List<Observer> observers;
     private Map<String, String> chromSeqMap;
+    private ErrorLimit errorLimit;
 
     /**
      * Extends a SAM/BAM file !!sorted by read sequence!! with ReadXplorer
@@ -42,6 +43,7 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
      */
     public SamBamExtender(Map<String, ParsedClassification> classificationMap) {
         this.classificationMap = classificationMap;
+        this.errorLimit = new ErrorLimit(100);
     }
 
     /**
@@ -131,12 +133,13 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
                         readSeq = record.getReadString();
                         start = record.getAlignmentStart();
                         stop = record.getAlignmentEnd();
-                        refSeq = chromSeqMap.get(record.getReferenceName()).substring(start - 1, stop);
 
                         if (!CommonsMappingParser.checkReadSam(this, readSeq, chromSeqMap.get(record.getReferenceName()).length(), 
                                 cigar, start, stop, fileToExtend.getName(), lineno)) {
                             continue; //continue, and ignore read, if it contains inconsistent information
                         }
+                        
+                        refSeq = chromSeqMap.get(record.getReferenceName()).substring(start - 1, stop);
                         
                         //count differences to reference
                         differences = CommonsMappingParser.countDiffsAndGaps(cigar, readSeq, refSeq, record.getReadNegativeStrandFlag());
@@ -192,6 +195,13 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
     @Override
     public void update(Object args) {
         this.notifyObservers(args);
+    }
+
+    @Override
+    public void sendMsgIfAllowed(String msg) {
+        if (this.errorLimit.allowOutput()) {
+            this.notifyObservers(msg);
+        }
     }
 
     @Override

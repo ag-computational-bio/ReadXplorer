@@ -3,6 +3,8 @@ package de.cebitec.readXplorer.parser.output;
 import de.cebitec.readXplorer.parser.common.ParsingException;
 import de.cebitec.readXplorer.parser.mappings.CommonsMappingParser;
 import de.cebitec.readXplorer.util.Benchmark;
+import de.cebitec.readXplorer.util.ErrorLimit;
+import de.cebitec.readXplorer.util.MessageSenderI;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Properties;
@@ -22,7 +24,7 @@ import org.openide.util.NbBundle;
  * 
  * @author -Rolf Hilker-
  */
-public class JokToBamConverter implements ConverterI, Observable, Observer {
+public class JokToBamConverter implements ConverterI, Observable, Observer, MessageSenderI {
 
     private List<File> jokFiles;
     private String refSeqName;
@@ -34,6 +36,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
     private static String fileDescription = "Saruman Output (jok)";
     private ArrayList<Observer> observers;
     private String msg;
+    private ErrorLimit errorLimit;
 
     /**
      * Converts a jok file from Saruman into a bam file sorted by read start positions 
@@ -41,6 +44,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
      */
     public JokToBamConverter() {
         this.observers = new ArrayList<>();
+        this.errorLimit = new ErrorLimit(100);
     }
 
     /**
@@ -95,7 +99,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
             int noReads = 0;
             try {
 
-                this.sendMsg(NbBundle.getMessage(JokToBamConverter.class, "Converter.Convert.Start", fileName));
+                this.notifyObservers(NbBundle.getMessage(JokToBamConverter.class, "Converter.Convert.Start", fileName));
                 String outFileName;
                 try (BufferedReader br = new BufferedReader(new FileReader(currentFile))) {
                     outputFile = SamUtils.getFileWithBamExtension(currentFile, "");
@@ -138,12 +142,12 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
                                 ++stop; // some people (no names here...) start counting at 0, I count genome position starting with 1
                             } catch (NumberFormatException e) { //
                                 if (!tokens[1].equals("*")) {
-                                    this.sendMsg("Value for current start position in "
+                                    this.sendMsgIfAllowed("Value for current start position in "
                                             + outFileName + " line " + lineno + " is not a number or *. "
                                             + "Found start: " + tokens[1]);
                                 }
                                 if (!tokens[2].equals("*")) {
-                                    this.sendMsg("Value for current stop position in "
+                                    this.sendMsgIfAllowed("Value for current stop position in "
                                             + outFileName + " line " + lineno + " is not a number or *. "
                                             + "Found stop: " + tokens[2]);
                                 }
@@ -201,7 +205,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
                             //                    samFileWriter.addAlignment(samRecord);
 
                         } else {
-                            this.sendMsg(NbBundle.getMessage(JokToBamConverter.class, "Converter.Convert.MissingData", lineno, line));
+                            this.sendMsgIfAllowed(NbBundle.getMessage(JokToBamConverter.class, "Converter.Convert.MissingData", lineno, line));
                         }
 
                         // Reads with an error already skip this part because of "continue" statements
@@ -337,18 +341,21 @@ public class JokToBamConverter implements ConverterI, Observable, Observer {
         }
     }
 
-    /**
-     * Method setting and sending the msg to all observers.
-     * @param msg the msg to send (can be an error or any other message).
-     */
-    private void sendMsg(final String msg) {
-        this.msg = msg;
-        this.notifyObservers(this.msg);
-    }
-
     @Override
     public void update(Object data) {
         this.notifyObservers(data); //until now used to send progress and error data to observers
+    }
+    
+    /**
+     * Method sending the msg to all observers, if the maximum message count is
+     * not already reached.
+     * @param msg the msg to send (can be an error or any other message).
+     */
+    @Override
+    public void sendMsgIfAllowed(String msg) {
+        if (this.errorLimit.allowOutput()) {
+            this.notifyObservers(msg);
+        }
     }
     
     @Override

@@ -83,8 +83,10 @@ public class BasePanelFactory {
         refViewer.setupLegend(new MenuLabel(genomePanelLegend, MenuLabel.TITLE_LEGEND), genomePanelLegend);
         
         //show chromosome selection panel
-        JPanel chromSelectionPanel = this.getRefChromSelectionPanel(refViewer, adjustmentPanel);
-        refViewer.setupChromSelectionPanel(chromSelectionPanel);
+        if (refGenome.getNoChromosomes() > 1) {
+            JPanel chromSelectionPanel = this.getRefChromSelectionPanel(refViewer, adjustmentPanel);
+            refViewer.setupChromSelectionPanel(chromSelectionPanel);
+        }
 
         // add panels to basepanel
         b.setViewer(refViewer);
