@@ -64,7 +64,8 @@ import org.openide.windows.TopComponent;
         preferredID = "DiffExpResultViewerTopComponent")
 @Messages({
     "CTL_DiffExpResultViewerAction=DiffExpResultViewer",
-    "CTL_DiffExpResultViewerTopComponent=Differential Gene Expression Analysis - results",
+    "# {0} - tool",
+    "CTL_DiffExpResultViewerTopComponent={0} Differential Gene Expression Results",
     "HINT_DiffExpResultViewerTopComponent=This is a Differential Gene Expression Result Window"
 })
 public final class DiffExpResultViewerTopComponent extends TopComponentExtended implements Observer, ItemListener {
@@ -94,7 +95,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
         cbm = new DefaultComboBoxModel<>();
 
         initComponents();
-        setName(Bundle.CTL_DiffExpResultViewerTopComponent());
+        setName(Bundle.CTL_DiffExpResultViewerTopComponent(usedTool));
         setToolTipText(Bundle.HINT_DiffExpResultViewerTopComponent());
         topCountsTable.getTableHeader().addMouseListener(rktm);
         topCountsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -234,14 +235,14 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(resultComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(resultComboBox, 0, 253, Short.MAX_VALUE)
                         .addGap(18, 18, 18)
                         .addComponent(saveTableButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(createGraphicsButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(showLogButton))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 961, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1))
                 .addContainerGap())
         );
         layout.setVerticalGroup(

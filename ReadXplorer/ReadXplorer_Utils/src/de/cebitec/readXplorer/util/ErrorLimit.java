@@ -1,11 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.readXplorer.util;
 
 /**
- * A simple limit to set a maximum to how often an error message can be shown
+ * A simple limit to set a maximum to how often an error message can be shown.
+ * 
  * @author Evgeny Anisiforov
  */
 public class ErrorLimit {
@@ -13,20 +10,27 @@ public class ErrorLimit {
     private long errorCount;
     private long maxErrorCount;
     
+    /**
+     * A simple limit to set a maximum to how often an error message can be shown.
+     * @param maxErrorCount the maximum count for each error to be output
+     */
     public ErrorLimit(long maxErrorCount) {
         this.maxErrorCount = maxErrorCount;
         this.errorCount = 0;
     }
     
+    /**
+     * A simple limit to set a maximum to how often an error message can be shown.
+     * The default error limit for this constructor is 20.
+     */
     public ErrorLimit() {
-        this.maxErrorCount = 20;
-        this.errorCount = 0;
+        this(20);
     }
     
     //skip error messages, if too many occur to prevent bug in the output panel
     public boolean allowOutput() {
         this.setErrorCount(this.getErrorCount() + 1);
-        if (getErrorCount()<=getMaxErrorCount()) {
+        if (getErrorCount() <= getMaxErrorCount()) {
             return true;
         }
         else {

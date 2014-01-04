@@ -60,7 +60,6 @@ public class ProjectConnector extends Observable implements Observer {
     private int numBmMappings = 0;
     private int averageReadLengthPart = 0;
     private int containerCount = 0;
-    private boolean isLastTrack = false;
     private DiscreteCountingDistribution readLengthDistribution;
     private DiscreteCountingDistribution readPairLengthDistribution;
     
@@ -764,71 +763,69 @@ public class ProjectConnector extends Observable implements Observer {
 //            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "...can't get the statistics list (MappingInfos are null)");
 
         try {
-            if (!track.isStepwise() || this.isLastTrack) {
             // get latest id for statistic
             long latestID = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_STATISTICS_ID, con);
 
-                CoverageContainer cov = track.getCoverageContainer();
-                if (cov.getCoveredPerfectPositions() > 0) {
-                    coveragePerf = cov.getCoveredPerfectPositions();
-                } else {
-                    coveragePerf = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_OF_PERFECT_POSITIONS_FOR_TRACK, 
-                            SQLStatements.GET_NUM, con, trackID);
-                }
-                
-                if (cov.getCoveredBestMatchPositions() > 0) {
-                    coverageBM = cov.getCoveredBestMatchPositions();
-                } else {
-                    coverageBM = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_BM_COVERAGE_OF_GENOME_CALCULATE, 
-                            SQLStatements.GET_NUM, con, trackID);
-                }
-                
-                if (cov.getCoveredCommonMatchPositions() > 0) {
-                    coverageComplete = cov.getCoveredCommonMatchPositions();
-                } else {
-                    coverageComplete = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_COVERED_POSITIONS, 
-                            SQLStatements.GET_NUM, con, trackID);
-                }
-                
-                //calculate average read length
-                int averageReadLength = this.containerCount > 0 ? this.averageReadLengthPart / this.containerCount : 0;
-                try (PreparedStatement insertStatistics = con.prepareStatement(SQLStatements.INSERT_STATISTICS)) {
-                    insertStatistics.setLong(1, latestID);
-                    insertStatistics.setLong(2, trackID);
-                    insertStatistics.setInt(3, this.numMappings);
-                    insertStatistics.setInt(4, this.numPerfectMappings);
-                    insertStatistics.setInt(5, this.numBmMappings);
-                    insertStatistics.setInt(6, this.noUniqueMappings);
-                    insertStatistics.setInt(7, this.noUniqueBMMappings);
-                    insertStatistics.setInt(8, this.noUniquePerfectMappings);
-                    insertStatistics.setInt(9, coveragePerf);
-                    insertStatistics.setInt(10, coverageBM);
-                    insertStatistics.setInt(11, coverageComplete);
-                    insertStatistics.setInt(12, this.noUniqueSeq);
-                    insertStatistics.setInt(13, this.noRepeatedSeq);
-                    insertStatistics.setInt(14, this.numReads);
-                    insertStatistics.setInt(15, averageReadLength);
-                    insertStatistics.execute();
-                    
-                    readLengthDistribution = statsContainer.getReadLengthDistribution();
-                    if (!readLengthDistribution.isEmpty()) {
-                        this.insertCountDistribution(readLengthDistribution, trackID);
-                    }
-                    readPairLengthDistribution = statsContainer.getReadPairSizeDistribution();
-                    if (!readPairLengthDistribution.isEmpty()) {
-                        this.insertCountDistribution(readPairLengthDistribution, trackID);
-                    }
-                }
-                
-                this.numMappings = 0;
-                this.numPerfectMappings = 0;
-                this.numBmMappings = 0;
-                this.noUniqueSeq = 0;
-                this.noRepeatedSeq = 0;
-                this.noUniqueMappings = 0;
-                this.numReads = 0;
-                this.averageReadLengthPart = 0;
+            CoverageContainer cov = track.getCoverageContainer();
+            if (cov.getCoveredPerfectPositions() > 0) {
+                coveragePerf = cov.getCoveredPerfectPositions();
+            } else {
+                coveragePerf = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_OF_PERFECT_POSITIONS_FOR_TRACK,
+                        SQLStatements.GET_NUM, con, trackID);
             }
+
+            if (cov.getCoveredBestMatchPositions() > 0) {
+                coverageBM = cov.getCoveredBestMatchPositions();
+            } else {
+                coverageBM = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_BM_COVERAGE_OF_GENOME_CALCULATE,
+                        SQLStatements.GET_NUM, con, trackID);
+            }
+
+            if (cov.getCoveredCommonMatchPositions() > 0) {
+                coverageComplete = cov.getCoveredCommonMatchPositions();
+            } else {
+                coverageComplete = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_COVERED_POSITIONS,
+                        SQLStatements.GET_NUM, con, trackID);
+            }
+
+            //calculate average read length
+            int averageReadLength = this.containerCount > 0 ? this.averageReadLengthPart / this.containerCount : 0;
+            try (PreparedStatement insertStatistics = con.prepareStatement(SQLStatements.INSERT_STATISTICS)) {
+                insertStatistics.setLong(1, latestID);
+                insertStatistics.setLong(2, trackID);
+                insertStatistics.setInt(3, this.numMappings);
+                insertStatistics.setInt(4, this.numPerfectMappings);
+                insertStatistics.setInt(5, this.numBmMappings);
+                insertStatistics.setInt(6, this.noUniqueMappings);
+                insertStatistics.setInt(7, this.noUniqueBMMappings);
+                insertStatistics.setInt(8, this.noUniquePerfectMappings);
+                insertStatistics.setInt(9, coveragePerf);
+                insertStatistics.setInt(10, coverageBM);
+                insertStatistics.setInt(11, coverageComplete);
+                insertStatistics.setInt(12, this.noUniqueSeq);
+                insertStatistics.setInt(13, this.noRepeatedSeq);
+                insertStatistics.setInt(14, this.numReads);
+                insertStatistics.setInt(15, averageReadLength);
+                insertStatistics.execute();
+
+                readLengthDistribution = statsContainer.getReadLengthDistribution();
+                if (!readLengthDistribution.isEmpty()) {
+                    this.insertCountDistribution(readLengthDistribution, trackID);
+                }
+                readPairLengthDistribution = statsContainer.getReadPairSizeDistribution();
+                if (!readPairLengthDistribution.isEmpty()) {
+                    this.insertCountDistribution(readPairLengthDistribution, trackID);
+                }
+            }
+
+            this.numMappings = 0;
+            this.numPerfectMappings = 0;
+            this.numBmMappings = 0;
+            this.noUniqueSeq = 0;
+            this.noRepeatedSeq = 0;
+            this.noUniqueMappings = 0;
+            this.numReads = 0;
+            this.averageReadLengthPart = 0;
 
         } catch (SQLException ex) {
             this.rollbackOnError(this.getClass().getName(), ex);
@@ -1512,13 +1509,19 @@ public class ProjectConnector extends Observable implements Observer {
             //update DB = switch all references to upper case
             if (dbVersion < 1) {
                 updateNeeded = true;
-                this.refsToUpperCase();
+                this.chromsToUpperCase();
             }
             
             if (updateNeeded) {
-                PreparedStatement setDBVersion = con.prepareStatement(SQLStatements.INSERT_DB_VERSION_NO);
-                setDBVersion.setInt(1, DB_VERSION_NO);
-                setDBVersion.executeUpdate();
+                if (dbVersion == 0) {
+                    PreparedStatement setDBVersion = con.prepareStatement(SQLStatements.INSERT_DB_VERSION_NO);
+                    setDBVersion.setInt(1, DB_VERSION_NO);
+                    setDBVersion.executeUpdate();
+                } else { //the entry already exists and has to be replaced
+                    PreparedStatement updateDBVersion = con.prepareStatement(SQLStatements.UPDATE_DB_VERSION_NO);
+                    updateDBVersion.setInt(1, DB_VERSION_NO);
+                    updateDBVersion.executeUpdate();
+                }
             }
             
         } catch (SQLException ex) {
@@ -1538,7 +1541,7 @@ public class ProjectConnector extends Observable implements Observer {
     private void createChromsFromRefs() {
         List<PersistantReference> refList = this.getGenomes();
         for (PersistantReference ref : refList) {
-            try (PreparedStatement fetchRefSeq = con.prepareStatement(SQLStatements.FETCH_REF_SEQ)) {
+            try (@SuppressWarnings("deprecation") PreparedStatement fetchRefSeq = con.prepareStatement(SQLStatements.FETCH_REF_SEQ)) {
                 fetchRefSeq.setInt(1, ref.getId());
                 ResultSet rs = fetchRefSeq.executeQuery();
                 if (rs.next()) {
@@ -1585,15 +1588,15 @@ public class ProjectConnector extends Observable implements Observer {
      * Transforms all reference sequences to upper case and stores the new
      * sequences in the db.
      */
-    private void refsToUpperCase() {
+    private void chromsToUpperCase() {
         List<PersistantReference> refList = this.getGenomes();
         for (PersistantReference ref : refList) {
             for (PersistantChromosome chrom : ref.getChromosomes().values()) {
                 String chromSeq = chrom.getSequence(this).toUpperCase();
 
-                try (PreparedStatement updateRefGenome = con.prepareStatement(SQLStatements.UPDATE_REF_GENOME)) {
+                try (PreparedStatement updateRefGenome = con.prepareStatement(SQLStatements.UPDATE_CHROM_SEQ)) {
                     updateRefGenome.setString(1, chromSeq);
-                    updateRefGenome.setInt(2, ref.getId());
+                    updateRefGenome.setInt(2, chrom.getId());
                     updateRefGenome.executeUpdate();
                 } catch (SQLException ex) {
                     Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);

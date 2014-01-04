@@ -4,7 +4,7 @@ import de.cebitec.readXplorer.parser.common.DiffAndGapResult;
 import de.cebitec.readXplorer.parser.common.ParsedClassification;
 import de.cebitec.readXplorer.parser.common.ParsedDiff;
 import de.cebitec.readXplorer.parser.common.ParsedReferenceGap;
-import de.cebitec.readXplorer.util.Observable;
+import de.cebitec.readXplorer.util.MessageSenderI;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import java.util.ArrayList;
@@ -391,27 +391,28 @@ public final class CommonsMappingParser {
      * @param lineno the line number in the file
      * @return true, if the read is consistent, false otherwise
      */
-    public static boolean checkRead(Observable parent,
+    public static boolean checkRead(MessageSenderI parent,
             String readSeq,
             int refSeqLength,
             int start,
             int stop,
             String filename,
             int lineno) {
+        
         boolean isConsistent = true;
         if (readSeq == null || readSeq.isEmpty()) {
-            parent.notifyObservers(NbBundle.getMessage(CommonsMappingParser.class,
+            parent.sendMsgIfAllowed(NbBundle.getMessage(CommonsMappingParser.class,
                     "Parser.checkMapping.ErrorReadEmpty", filename, lineno, readSeq));
             isConsistent = false;
         }
         if (refSeqLength < start || refSeqLength < stop) {
-            parent.notifyObservers(NbBundle.getMessage(CommonsMappingParser.class,
+            parent.sendMsgIfAllowed(NbBundle.getMessage(CommonsMappingParser.class,
                     "Parser.checkMapping.ErrorReadPosition",
                     filename, lineno, start, stop, refSeqLength));
             isConsistent = false;
         }
         if (start >= stop) {
-            parent.notifyObservers(NbBundle.getMessage(CommonsMappingParser.class,
+            parent.sendMsgIfAllowed(NbBundle.getMessage(CommonsMappingParser.class,
                     "Parser.checkMapping.ErrorStartStop", filename, lineno, start, stop));
             isConsistent = false;
         }
@@ -437,7 +438,7 @@ public final class CommonsMappingParser {
      * @return true, if the read is consistent, false otherwise
      */
     public static boolean checkReadSam(
-            Observable parent, 
+            MessageSenderI parent, 
             String readSeq, 
             int refSeqLength, 
             String cigar,
@@ -448,8 +449,8 @@ public final class CommonsMappingParser {
         
         boolean isConsistent = CommonsMappingParser.checkRead(parent, readSeq, refSeqLength, start, stop, filename, lineno);
         if (!cigar.matches("[MHISDPXN=\\d]+")) {
-            parent.notifyObservers(NbBundle.getMessage(CommonsMappingParser.class,
-                    "Parser.checkMapping.ErrorCigar", cigar, filename, lineno));
+                parent.sendMsgIfAllowed(NbBundle.getMessage(CommonsMappingParser.class,
+                        "Parser.checkMapping.ErrorCigar", cigar, filename, lineno));
             isConsistent = false;
         }
         
@@ -478,7 +479,7 @@ public final class CommonsMappingParser {
      * @return true, if the read is consistent, false otherwise
      */
     public static boolean checkReadJok(
-            Observable parent,
+            MessageSenderI parent,
             String readSeq,
             String readname,
             String refSeq,
@@ -492,17 +493,17 @@ public final class CommonsMappingParser {
         boolean isConsistent = CommonsMappingParser.checkRead(parent, readSeq, refSeqLength, start, stop, filename, lineno);
         
         if (readname == null || readname.isEmpty()) {
-            parent.notifyObservers(NbBundle.getMessage(CommonsMappingParser.class,
+            parent.sendMsgIfAllowed(NbBundle.getMessage(CommonsMappingParser.class,
                     "Parser.checkMapping.ErrorReadname", filename, lineno, readname));
             isConsistent = false;
         }
         if (direction == 0) {
-            parent.notifyObservers(NbBundle.getMessage(CommonsMappingParser.class,
+            parent.sendMsgIfAllowed(NbBundle.getMessage(CommonsMappingParser.class,
                     "Parser.checkMapping.ErrorDirectionJok", filename, lineno));
             isConsistent = false;
         }
         if (refSeq == null || refSeq.isEmpty()) {
-            parent.notifyObservers(NbBundle.getMessage(CommonsMappingParser.class,
+            parent.sendMsgIfAllowed(NbBundle.getMessage(CommonsMappingParser.class,
                     "Parser.checkMapping.ErrorRef", filename, lineno, refSeq));
             isConsistent = false;
         }

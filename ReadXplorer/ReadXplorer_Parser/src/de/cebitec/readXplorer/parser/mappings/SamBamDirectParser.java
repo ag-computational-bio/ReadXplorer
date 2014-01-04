@@ -8,6 +8,7 @@ import de.cebitec.readXplorer.parser.common.ParsedClassification;
 import de.cebitec.readXplorer.parser.common.ParsingException;
 import de.cebitec.readXplorer.util.Benchmark;
 import de.cebitec.readXplorer.util.ErrorLimit;
+import de.cebitec.readXplorer.util.MessageSenderI;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.StatsContainer;
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ import org.openide.util.NbBundle;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class SamBamDirectParser implements MappingParserI, Observer {
+public class SamBamDirectParser implements MappingParserI, Observer, MessageSenderI {
 
     private static String name = "SAM/BAM Direct Access Parser";
     private static String[] fileExtension = new String[]{"sam", "SAM", "Sam", "bam", "BAM", "Bam"};
@@ -36,6 +37,7 @@ public class SamBamDirectParser implements MappingParserI, Observer {
     
     private List<Observer> observers;
     private StatsContainer statsContainer;
+    ErrorLimit errorLimit;
 
     /**
      * Sam/Bam parser for the data needed for a direct file access track. This
@@ -45,6 +47,7 @@ public class SamBamDirectParser implements MappingParserI, Observer {
         this.observers = new ArrayList<>();
         this.statsContainer = new StatsContainer();
         this.statsContainer.prepareForTrack();
+        this.errorLimit = new ErrorLimit(100);
     }
 
     @Override
@@ -129,7 +132,6 @@ public class SamBamDirectParser implements MappingParserI, Observer {
         String readName;
         ParsedClassification classificationData;
         DiffAndGapResult diffGapResult;
-        ErrorLimit errorLimit = new ErrorLimit();
 
         try (SAMFileReader sam = new SAMFileReader(trackJob.getFile())) {
             sam.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
@@ -148,11 +150,12 @@ public class SamBamDirectParser implements MappingParserI, Observer {
                         readSeq = record.getReadString();
                         start = record.getAlignmentStart();
                         stop = record.getAlignmentEnd();
-                        refSeq = chromSeqMap.get(record.getReferenceName()).substring(start - 1, stop);
 
                         if (!CommonsMappingParser.checkReadSam(this, readSeq, chromSeqMap.get(record.getReferenceName()).length(), cigar, start, stop, fileName, lineno)) {
                             continue; //continue, and ignore read, if it contains inconsistent information
                         }
+                        
+                        refSeq = chromSeqMap.get(record.getReferenceName()).substring(start - 1, stop);
 
                         /*
                          * The cigar values are as follows: 0 (M) = alignment match
@@ -177,17 +180,13 @@ public class SamBamDirectParser implements MappingParserI, Observer {
                         //saruman starts genome at 0 other algorithms like bwa start genome at 1
 
                     } else { // else read is unmapped or belongs to another reference
-                        if (errorLimit.allowOutput()) {
-                            this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
+                        this.sendMsgIfAllowed(NbBundle.getMessage(SamBamDirectParser.class,
                                 "Parser.Parsing.CorruptData", lineno, record.getReadName()));
-                        }
                     }
                 } catch (SAMFormatException e) {
-                    if (errorLimit.allowOutput()) {
-                        if (!e.getMessage().contains("MAPQ should be 0")) {
-                            this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class,
+                    if (!e.getMessage().contains("MAPQ should be 0")) {
+                        this.sendMsgIfAllowed(NbBundle.getMessage(SamBamDirectParser.class,
                                 "Parser.Parsing.CorruptData", lineno, e.toString()));
-                        }
                     } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
                 }
 
@@ -231,6 +230,18 @@ public class SamBamDirectParser implements MappingParserI, Observer {
     @Override
     public void update(Object args) {
         this.notifyObservers(args);
+    }
+    
+    /**
+     * Sends the given msg to all observers, if the error limit is not already
+     * reached for this instance of SamBamDirectParser.
+     * @param msg The message to send
+     */
+    @Override
+    public void sendMsgIfAllowed(String msg) {
+        if (this.errorLimit.allowOutput()) {
+            this.notifyObservers(msg);
+        }
     }
     
     /**

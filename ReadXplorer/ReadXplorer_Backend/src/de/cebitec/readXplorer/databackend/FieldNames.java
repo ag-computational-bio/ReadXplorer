@@ -56,7 +56,7 @@ public class FieldNames {
     public final static String REF_GEN_ID ="ID";
     public final static String REF_GEN_NAME = "NAME";
     public final static String REF_GEN_DESCRIPTION = "DESCRIPTION";
-    public final static String REF_GEN_SEQUENCE = "SEQUENCE"; //still needed for old DBs... //TODO: check if it can be removed chromosomes
+    public final static String REF_GEN_SEQUENCE = "SEQUENCE"; //still needed for old DBs...
     public final static String REF_GEN_TIMESTAMP = "CREATIONTIME";
 
     // chromosome table fields

@@ -39,7 +39,7 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 
 /**
- * Top component which displays something.
+ * TopComponent, which displays all graphics available for the express test.
  */
 @ConvertAsProperties(
         dtd = "-//de.cebitec.readXplorer.differentialExpression.plot//Plot//EN",
@@ -58,7 +58,7 @@ import org.openide.windows.TopComponent;
         preferredID = "PlotTopComponent")
 @Messages({
     "CTL_PlotAction=Plot",
-    "CTL_PlotTopComponent=Create graphics",
+    "CTL_PlotTopComponent=Express Test Graphics",
     "HINT_PlotTopComponent=This is a differential expression plot window"
 })
 public final class ExpressTestGraphicsTopComponent extends TopComponentExtended implements Observer {
@@ -73,6 +73,9 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended 
     private ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Creating plot");
     private ProgressHandle svgExportProgressHandle;
 
+    /**
+     * TopComponent, which displays all graphics available for the express test.
+     */
     public ExpressTestGraphicsTopComponent() {
         cbmDataSet = new DefaultComboBoxModel<>();
         initComponents();
@@ -84,6 +87,11 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended 
 
     }
 
+    /**
+     * TopComponent, which displays all graphics available for the express test.
+     * @param analysisHandler The analysis handler containing the results
+     * @param usedTool The tool used for the analysis (has to be the ExpressTest in this case)
+     */
     public ExpressTestGraphicsTopComponent(DeAnalysisHandler analysisHandler, DeAnalysisHandler.Tool usedTool) {
         this.analysisHandler = analysisHandler;
         this.usedTool = usedTool;

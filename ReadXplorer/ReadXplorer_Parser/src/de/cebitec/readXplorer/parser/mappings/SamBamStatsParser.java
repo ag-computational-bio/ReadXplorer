@@ -7,6 +7,7 @@ import de.cebitec.readXplorer.parser.common.ParsedTrack;
 import de.cebitec.readXplorer.util.Benchmark;
 import de.cebitec.readXplorer.util.DiscreteCountingDistribution;
 import de.cebitec.readXplorer.util.ErrorLimit;
+import de.cebitec.readXplorer.util.MessageSenderI;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Pair;
@@ -24,6 +25,7 @@ import net.sf.samtools.util.RuntimeEOFException;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
+    
 /**
  * Creates and stores the statistics for a track, which needs to be sorted by
  * position. The data to store is directly forwarded to the observer, which
@@ -31,12 +33,13 @@ import org.openide.util.NbBundle;
  *
  * @author -Rolf Hilker-
  */
-public class SamBamStatsParser implements Observable {
+public class SamBamStatsParser implements Observable, MessageSenderI {
 
     private List<Observer> observers;
     private CoverageContainer coverageContainer;
     private StatsContainer statsContainer;
     private DiscreteCountingDistribution readLengthDistribution;
+    private ErrorLimit errorLimit;
     
     /**
      * Creates and stores the statistics for a track, which needs
@@ -46,6 +49,7 @@ public class SamBamStatsParser implements Observable {
     public SamBamStatsParser() {
         this.observers = new ArrayList<>();
         this.coverageContainer = new CoverageContainer();
+        this.errorLimit = new ErrorLimit(100);
         this.readLengthDistribution = new DiscreteCountingDistribution(400);
         readLengthDistribution.setType(Properties.READ_LENGTH_DISTRIBUTION);
     }
@@ -195,11 +199,9 @@ public class SamBamStatsParser implements Observable {
                 } catch (Exception e) {
                     //skip error messages, if too many occur to prevent bug in the output panel
                     if (!e.getMessage().contains("MAPQ should be 0")) {
-                    //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
-                        if (errorLimit.allowOutput()) {
-                            this.notifyObservers(NbBundle.getMessage(SamBamStatsParser.class,
-                            "Parser.Parsing.CorruptData", lineno, e.toString()));
-                        }
+                        //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
+                        this.sendMsgIfAllowed(NbBundle.getMessage(SamBamStatsParser.class,
+                                "Parser.Parsing.CorruptData", lineno, e.toString()));
                     }
                 }
                 if ((lineno % 500000) == 0)  {//output process info only on every XX line
@@ -253,6 +255,13 @@ public class SamBamStatsParser implements Observable {
             observer.update(data);
         }
     }
+
+    @Override
+    public void sendMsgIfAllowed(String msg) {
+        if (this.errorLimit.allowOutput()) {
+            this.notifyObservers(msg);
+        }
+    }
     
     /**
      * Counts all  bases, which are covered by reads in this data set
@@ -299,5 +308,4 @@ public class SamBamStatsParser implements Observable {
     public StatsContainer getStatsContainer() {
         return statsContainer;
     }
-    
 }

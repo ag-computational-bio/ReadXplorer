@@ -11,6 +11,8 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The FastaReferenceParser can parse the reference genome from a fasta file.
@@ -47,6 +49,7 @@ public class FastaReferenceParser implements ReferenceParserI {
             String line;
             boolean parseData = false; //only start parsing after first ">"
             String chromName = "";
+            Pattern seqNameSplitter = Pattern.compile("\\s"); //split string on any whitespace character
 
             while ((line = in.readLine()) != null) {
                 if (parseData && !line.startsWith(">")) {
@@ -58,7 +61,13 @@ public class FastaReferenceParser implements ReferenceParserI {
                     }
                     ++chromCounter;
                     parseData = true;
-                    chromName = line.substring(1);
+                    Matcher matcher = seqNameSplitter.matcher(line);
+                    
+                    if (matcher.find()) {
+                        chromName = line.substring(1, matcher.end() - 1);
+                    } else {
+                        chromName = line.substring(1);
+                    }
                 }
             }
 

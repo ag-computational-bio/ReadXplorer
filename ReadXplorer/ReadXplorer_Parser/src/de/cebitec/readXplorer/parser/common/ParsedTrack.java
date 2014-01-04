@@ -95,13 +95,6 @@ public class ParsedTrack {
     public String getTrackName() {
         return trackJob.getName();
     }
-    
-    /**
-     * @return true, if this is a stepwise import into the db, false otherwise.
-     */
-    public boolean isStepwise() {
-        return trackJob.isStepwise();
-    }
 
     /**
      * @return true, if this is the first track of a stepwise import (which

@@ -44,7 +44,7 @@ public class PatternFilter implements RegionFilterI {
      */
     private List<Region> findPatternInInterval() {
 
-        if (!(this.pattern == null) && !this.pattern.toString().isEmpty()) {
+        if (this.pattern != null && !this.pattern.toString().isEmpty()) {
 
             int offset = this.pattern.toString().length(); //shift by pattern length to left
             int start = this.absStart - offset;

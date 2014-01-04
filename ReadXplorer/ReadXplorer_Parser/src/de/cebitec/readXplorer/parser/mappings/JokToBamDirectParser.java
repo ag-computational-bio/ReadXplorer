@@ -8,6 +8,7 @@ import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.StatsContainer;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -76,19 +77,25 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
      */
     @Override
     public Object convert(TrackJob trackJob, Map<String, Integer> chromLengthMap) throws ParsingException, OutOfMemoryError {
-        String chromName = trackJob.getRefGen().getName(); //ok, since a jok file only contains reads for one chromosome
+        Iterator<String> it = chromLengthMap.keySet().iterator();
+        boolean success;
+        if (it.hasNext()) {
+            String chromName = it.next(); //ok, since SARUMAN only supports mapping on a single reference sequence
 
-        //Convert jok file to bam
-        JokToBamConverter jokConverter = new JokToBamConverter();
-        List<File> jobs = new ArrayList<>();
-        jobs.add(trackJob.getFile());
-        jokConverter.registerObserver(this);
-        jokConverter.setDataToConvert(jobs, chromName, chromLengthMap.get(chromName));
-        boolean success = jokConverter.convert();
-        jokConverter.removeObserver(this);
+            //Convert jok file to bam
+            JokToBamConverter jokConverter = new JokToBamConverter();
+            List<File> jobs = new ArrayList<>();
+            jobs.add(trackJob.getFile());
+            jokConverter.registerObserver(this);
+            jokConverter.setDataToConvert(jobs, chromName, chromLengthMap.get(chromName));
+            success = jokConverter.convert();
+            jokConverter.removeObserver(this);
 
-        //update the track job with the new bam file
-        trackJob.setFile(jokConverter.getOutputFile());
+            //update the track job with the new bam file
+            trackJob.setFile(jokConverter.getOutputFile());
+        } else {
+            success = false;
+        }
         return success;
     }
 

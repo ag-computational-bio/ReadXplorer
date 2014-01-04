@@ -7,7 +7,7 @@ import java.sql.Timestamp;
 /**
  * A track job is a container for all necessary data for a track to be parsed.
  *
- * @author jstraube, rhilker
+ * @author ddoppmeier, rhilker
  */
 public class TrackJob implements Job {
 
@@ -18,12 +18,6 @@ public class TrackJob implements Job {
     private MappingParserI parser;
     private int trackID;
     private ReferenceJob refGen;
-    private boolean stepwise = false;
-    private boolean firstJob = false;
-    private int start;
-    private int stop;
-    private int stepSize;
-    private boolean isSorted = true;
     private boolean isAlreadyImported;
     
     /**
@@ -135,98 +129,6 @@ public class TrackJob implements Job {
     @Override
     public String toString() {
         return this.description + ":" + this.timestamp;
-    }
-    
-    /**
-     * @return true, if this trackjob should be imported stepwise. 
-     * This allows to adjust the ram load.
-     */
-    public boolean isStepwise() {
-        return this.stepwise;
-    }
-
-    /**
-     * @param isStepwise true, if this trackjob should be imported stepwise. 
-     * This allows to adjust the ram load.
-     */
-    public void setIsStepwise(boolean isStepwise) {
-        this.stepwise = isStepwise;
-    }
-
-    /**
-     * @return the start position in the genome, if this is a stepwise parser.
-     */
-    public int getStart() {
-        return this.start;
-    }
-
-    /**
-     * @param start the start position in the genome, if this is a stepwise parser.
-     */
-    public void setStart(int start) {
-        this.start = start;
-    }
-
-    /**
-     * @return the stop position in the genome, if this is a stepwise parser.
-     */
-    public int getStop() {
-        return this.stop;
-    }
-
-    /**
-     * @param stop the stop position in the genome, if this is a stepwise parser.
-     */
-    public void setStop(int stop) {
-        this.stop = stop;
-    }
-
-    /**
-     * @return true, if this is the first job of a stepwise import
-     * track job, false otherwise.
-     */
-    public boolean isFirstJob() {
-        return firstJob;
-    }
-
-    /**
-     * @param isFirstJob true, if this is the first job of a stepwise import
-     * track job, false otherwise.
-     */
-    public void setIsFirstJob(boolean isFirstJob) {
-        this.firstJob = isFirstJob;
-    }
-
-    /**
-     * @return true, if this trackJob is already sorted by read sequence, 
-     * false otherwise.
-     */
-    public boolean isSorted() {
-        return this.isSorted;
-    }
-
-    /**
-     * @param isSorted true, if this trackJob is already sorted by readsequence, 
-     * false otherwise.
-     */
-    public void setIsSorted(boolean isSorted) {
-        this.isSorted = isSorted;
-    }
-
-    /**
-     * @return stepSize the setp size of the import. The step size depicts the chunk of data,
-     * which is read in one chunk.
-     */
-    public int getStepSize() {
-        return this.stepSize;
-    }
-
-    /**
-     * @param stepSize the setp size of the import. The step size depicts the chunk of data,
-     * which is read in one chunk.
-     */
-    public void setStepSize(int stepSize) {
-        this.stepSize = stepSize;
     }
 
     /**

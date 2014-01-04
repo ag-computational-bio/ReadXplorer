@@ -74,14 +74,14 @@ public class SamBamDirectReadPairStatsParser extends SamBamDirectReadPairClassif
             ReadPairType pairClass;
             int insertSize;
             while (samItor.hasNext()) {
-                //separate all mappings of same pair by seq pair tag and hand it over to classification then
+                //separate all mappings of same pair by read pair tag and hand it over to classification then
                 record = samItor.next();
                 if (!record.getReadUnmappedFlag() && record.getReferenceName().equals(refName)) {
                     pairTag = CommonsMappingParser.getReadPairTag(record);
                     
                     if (pairTag == Properties.EXT_A1) {
                         
-                        classobj = record.getAttribute(Properties.TAG_SEQ_PAIR_TYPE);
+                        classobj = record.getAttribute(Properties.TAG_READ_PAIR_TYPE);
                         if (classobj != null) {
                             if (classobj instanceof Integer && ((int) classobj) >= -128 && ((int) classobj) <= 128) {
                                 pairClass = ReadPairType.getReadPairType(Integer.valueOf(classobj.toString()));
@@ -98,7 +98,7 @@ public class SamBamDirectReadPairStatsParser extends SamBamDirectReadPairClassif
                         
                     } else if (pairTag == Properties.EXT_A2) {
                         
-                        classobj = record.getAttribute(Properties.TAG_SEQ_PAIR_TYPE);
+                        classobj = record.getAttribute(Properties.TAG_READ_PAIR_TYPE);
                         if (classobj != null && classobj instanceof Integer) {
                             pairClass = ReadPairType.getReadPairType(Integer.valueOf(classobj.toString()));
                             if (pairClass == ReadPairType.UNPAIRED_PAIR) {

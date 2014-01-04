@@ -13,7 +13,7 @@ public class DirectReadPair {
 
     private SAMRecord record1;
     private SAMRecord record2;
-    private int seqPairId;
+    private int readPairId;
     private ReadPairType type;
     private int distance;
     
@@ -21,15 +21,15 @@ public class DirectReadPair {
      * A read pair of a direct access track.
      * @param record1 first sam record of the pair
      * @param record2 second sam record of the pair
-     * @param seqPairId the sequence pair id of this pair
+     * @param readPairId the read pair id of this pair
      * @param type the type of this pair (select among 
      *      ReadPairType.PERFECT_PAIR, ...)
      * @param distance The distance of the two mappings of the pair
      */
-    public DirectReadPair(SAMRecord record1, SAMRecord record2, int seqPairId, ReadPairType type, int distance) {
+    public DirectReadPair(SAMRecord record1, SAMRecord record2, int readPairId, ReadPairType type, int distance) {
         this.record1 = record1;
         this.record2 = record2;
-        this.seqPairId = seqPairId;
+        this.readPairId = readPairId;
         this.type = type;
         this.distance = distance;
     }
@@ -49,10 +49,10 @@ public class DirectReadPair {
     }
 
     /**
-     * @return the sequence pair id of this pair
+     * @return the read pair id of this pair
      */
-    public int getSeqPairId() {
-        return this.seqPairId;
+    public int getReadPairId() {
+        return this.readPairId;
     }
 
     /**
@@ -70,7 +70,7 @@ public class DirectReadPair {
     }
 
     /**
-     * Update the sequence pair type, if it changes.
+     * Update the read pair type, if it changes.
      * @param readPairType the new read pair type
      */
     public void setType(ReadPairType readPairType) {

@@ -51,26 +51,35 @@ public class TableUtils {
      * @param posColumnIndex the index of the table model column holding the
      * position
      * @param chromColumnIdx The index of the table model column holding the
-     * chromosome on which the position to show is located
+     * chromosome on which the position to show is located. If the position
+     * column contains PersistantFeatures, the chromColumnIdx can be set to -1
+     * and the chromosome information is obtained from the selected 
+     * PersistantFeature.
      * @param bim the bounds information manager which should be updated
      */
     public static void showPosition(JTable table, int posColumnIndex, int chromColumnIdx, BoundsInfoManager bim) {
         int selectedModelRow = TableUtils.getSelectedModelRow(table);
         if (selectedModelRow > -1) {
-                Object value = table.getModel().getValueAt(selectedModelRow, posColumnIndex);
+            Object value = table.getModel().getValueAt(selectedModelRow, posColumnIndex);
+
+            if (value instanceof PersistantFeature) {
+
+                //switch chromosome
+                PersistantFeature feature = (PersistantFeature) value;
+                bim.chromosomeChanged(feature.getChromId());
+                //jump to position
+                int pos = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
+                bim.navigatorBarUpdated(pos);
+
+            } else {
                 Object chromValue = table.getModel().getValueAt(selectedModelRow, chromColumnIdx);
                 if (chromValue instanceof PersistantChromosome) {
                     bim.chromosomeChanged(((PersistantChromosome) chromValue).getId());
                 }
-                
-                if (value instanceof PersistantFeature) {
-                    PersistantFeature feature = (PersistantFeature) value;
-                    int pos = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
-                    bim.navigatorBarUpdated(pos);
-                    
-                } else if (value instanceof Integer) {
+
+                if (value instanceof Integer) {
                     bim.navigatorBarUpdated((Integer) value);
-                    
+
                 } else if (value instanceof String) {
                     String[] posArray = ((String) value).split("\n");
                     try {
@@ -82,5 +91,20 @@ public class TableUtils {
                 }
             }
         }
+    }
+
+     /**
+     * Updates the navigator bar of all viewers to the start position of the
+     * selected PersistantFeature on the correct chromosome with respect to the
+     * strand on which the feature is located.
+     * @param table the table whose selected PersistantFeature position is to be
+     * shown
+     * @param featColumnIndex the index of the table model column holding the
+     * PersistantFeature
+     * @param bim the bounds information manager which should be updated
+     */
+    public static void showFeaturePosition(JTable table, int featColumnIndex, BoundsInfoManager bim) {
+        TableUtils.showPosition(table, featColumnIndex, -1, bim);
+    }
     
 }

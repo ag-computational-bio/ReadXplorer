@@ -168,7 +168,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
     private void histogramButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_histogramButtonActionPerformed
         if (!statistics) {
             try {
-                ResultHistogramRPKM hist = new ResultHistogramRPKM(this.rpkmCalcResult.getResults());
+                ResultHistogramRPKM hist = new ResultHistogramRPKM(this.rpkmCalcResult);
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             }
@@ -201,6 +201,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
 
         if (newResult instanceof RPKMAnalysisResult) {
             RPKMAnalysisResult rpkmCalcResultNew = (RPKMAnalysisResult) newResult;
+//            boolean moreThanOneChrom = rpkmCalcResultNew.getChromosomeMap().size() > 1;
             final int nbColumns = 10;
 
             if (this.rpkmCalcResult == null) {

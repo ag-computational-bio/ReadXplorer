@@ -175,12 +175,12 @@ public class ReferenceConnector {
         try {
             PreparedStatement fetch;
             if (featureType == FeatureType.ANY) {
-                fetch = con.prepareStatement(SQLStatements.FETCH_FEATURES_FOR_GENOME_INTERVAL);
+                fetch = con.prepareStatement(SQLStatements.FETCH_FEATURES_FOR_CHROM_INTERVAL);
                 fetch.setLong(1, chromId);
                 fetch.setInt(2, from);
                 fetch.setInt(3, to);
             } else {
-                fetch = con.prepareStatement(SQLStatements.FETCH_SPECIFIED_FEATURES_FOR_GENOME_INTERVAL);
+                fetch = con.prepareStatement(SQLStatements.FETCH_SPECIFIED_FEATURES_FOR_CHROM_INTERVAL);
                 fetch.setLong(1, chromId);
                 fetch.setInt(2, from);
                 fetch.setInt(3, to);

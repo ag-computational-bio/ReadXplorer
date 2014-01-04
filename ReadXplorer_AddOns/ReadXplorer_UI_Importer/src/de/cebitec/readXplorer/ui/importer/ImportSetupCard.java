@@ -233,7 +233,6 @@ public class ImportSetupCard extends javax.swing.JPanel {
                     for (File mappingFile : newTrackPanel.getMappingFiles()) {
 
                         TrackJob trackJob = this.createTrackJob(newTrackPanel, mappingFile);
-                        trackJob.setIsSorted(newTrackPanel.isFileSorted());
                         trackJobView.add(trackJob);
                     }
                 }

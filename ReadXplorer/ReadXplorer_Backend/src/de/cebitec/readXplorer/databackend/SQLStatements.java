@@ -231,7 +231,7 @@ public class SQLStatements {
             + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
     
     
-    public final static String UPDATE_STATISTICS =
+    public static final String UPDATE_STATISTICS =
             "UPDATE " + FieldNames.TABLE_STATISTICS + " "
             + "SET "
             + FieldNames.STATISTICS_NUMBER_OF_MAPPINGS + "= ?, "
@@ -249,7 +249,7 @@ public class SQLStatements {
     /**
      * Update exisiting row of track statistics with sequence pair statistics
      */
-    public static String INSERT_READPAIR_STATISTICS =
+    public static final String INSERT_READPAIR_STATISTICS =
             "UPDATE " + FieldNames.TABLE_STATISTICS
             + " SET "
             + FieldNames.STATISTICS_NUM_SEQUENCE_PAIRS + " = ?, "
@@ -275,7 +275,7 @@ public class SQLStatements {
      * Insert a new coverage distribution for a track with all 35 distribution
      * fields.
      */
-    public static String INSERT_COUNT_DISTRIBUTION =
+    public static final String INSERT_COUNT_DISTRIBUTION =
             "INSERT INTO " + FieldNames.TABLE_COUNT_DISTRIBUTION
             + " ("
             + FieldNames.COUNT_DISTRIBUTION_TRACK_ID + ", "
@@ -285,12 +285,16 @@ public class SQLStatements {
             + " ) "
             + "VALUES (?,?,?,?)";
     
-    public static String INSERT_DB_VERSION_NO = 
+    public static final String INSERT_DB_VERSION_NO = 
             "INSERT INTO " + FieldNames.TABLE_DB_VERSION
                 + " ("
                 + FieldNames.DB_VERSION_DB_VERSION_NO
                 + " )"
                 + " VALUES (?)";
+    
+    public static final String UPDATE_DB_VERSION_NO =
+            "UPDATE " + FieldNames.TABLE_DB_VERSION
+            + " SET " + FieldNames.DB_VERSION_DB_VERSION_NO + " = ? ";
     
     /**
      * Delete the track data.
@@ -492,12 +496,12 @@ public class SQLStatements {
     /**
      * Updates the reference genome sequence.
      */
-    public static final String UPDATE_REF_GENOME =
-            "UPDATE " + FieldNames.TABLE_REFERENCE
+    public static final String UPDATE_CHROM_SEQ =
+            "UPDATE " + FieldNames.TABLE_CHROMOSOME
             + " SET "
-            + FieldNames.REF_GEN_SEQUENCE + " = ? "
+            + FieldNames.CHROM_SEQUENCE + " = ? "
             + " WHERE "
-            + FieldNames.REF_GEN_ID + " = ? ";
+            + FieldNames.CHROM_ID + " = ? ";
     
     
     public static final String UPDATE_FEATURE_TABLE =
@@ -564,7 +568,7 @@ public class SQLStatements {
                 FieldNames.FEATURE_CHROMOSOME_ID+" = ? and " +
                 FieldNames.FEATURE_TYPE+" = ?";
     
-    public final static String FETCH_FEATURES_FOR_GENOME_INTERVAL =
+    public final static String FETCH_FEATURES_FOR_CHROM_INTERVAL =
             "SELECT " +
                 FieldNames.FEATURE_ID+", "+
                 FieldNames.FEATURE_PARENT_IDS+", "+
@@ -584,7 +588,7 @@ public class SQLStatements {
                 FieldNames.FEATURE_START+" <= ? " + 
             " ORDER BY " + FieldNames.FEATURE_START;
     
-    public final static String FETCH_SPECIFIED_FEATURES_FOR_GENOME_INTERVAL =
+    public final static String FETCH_SPECIFIED_FEATURES_FOR_CHROM_INTERVAL =
             "SELECT " +
                 FieldNames.FEATURE_ID+", "+
                 FieldNames.FEATURE_PARENT_IDS+", "+

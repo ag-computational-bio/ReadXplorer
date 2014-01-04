@@ -45,7 +45,7 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 
 /**
- * Top component which displays something.
+ * TopComponent, which displays all graphics available for a DESeq analysis.
  */
 @ConvertAsProperties(
         dtd = "-//de.cebitec.readXplorer.differentialExpression//DeSeqGraphics//EN",
@@ -62,10 +62,11 @@ import org.openide.windows.TopComponent;
         preferredID = "DeSeqGraphicsTopComponent")
 @Messages({
     "CTL_DeSeqGraphicsAction=DeSeqGraphics",
-    "CTL_DeSeqGraphicsTopComponent=Create graphics",
+    "CTL_DeSeqGraphicsTopComponent=DESeq Graphics",
     "HINT_DeSeqGraphicsTopComponent=This is a DESeq graphics window"
 })
 public final class DeSeqGraphicsTopComponent extends TopComponentExtended implements Observer, ItemListener {
+    private static final long serialVersionUID = 1L;
 
     private DeAnalysisHandler analysisHandler;
     private JSVGCanvas svgCanvas;
@@ -77,9 +78,18 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
     private ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Creating plot");
     private ProgressHandle svgExportProgressHandle;
 
+    /**
+     * TopComponent, which displays all graphics available for a DESeq analysis.
+     */
     public DeSeqGraphicsTopComponent() {
     }
 
+    /**
+     * TopComponent, which displays all graphics available for a DESeq analysis.
+     * @param analysisHandler The analysis handler containing the results
+     * @param usedTool The tool used for the analysis (has to be DESeq in this 
+     * case)
+     */
     public DeSeqGraphicsTopComponent(DeAnalysisHandler handler, boolean moreThanTwoConditions) {
         analysisHandler = handler;
         this.result = handler.getResults().get(0);
