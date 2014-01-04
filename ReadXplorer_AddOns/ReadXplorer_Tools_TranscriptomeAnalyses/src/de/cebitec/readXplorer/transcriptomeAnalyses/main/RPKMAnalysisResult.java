@@ -4,6 +4,7 @@ import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.RPKMvalue;
+import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.TableType;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,44 +15,47 @@ import java.util.Map;
  * Also converts the list of returned features into the format readable for the
  * ExcelExporter. Generates all three, the sheet names, headers and data to
  * write.
- * 
+ *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-    public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetWholeTranscriptAnalyses> {
+public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetWholeTranscriptAnalyses> {
 
     private List<RPKMvalue> rpkmResults;
     private int noGenomeFeatures;
-    
+    private Statistics stats;
+    private static final TableType TABLE_TYPE = TableType.RPKM_TABLE;
+
     /**
      * Container for all data belonging to an RPKM and read count analysis
      * result. Also converts the list of returned features into the format
      * readable for the ExcelExporter. Generates all three, the sheet names,
      * headers and data to write.
+     *
      * @param trackMap the map of track ids to the PersistantTrack used for this
      * analysis
      * @param rpkmResults The result list of RPKM values and read counts
-     * @param combineTracks true, if the tracks in the list are combined, false
-     * otherwise 
+     * otherwise
      */
-    public RPKMAnalysisResult(Map<Integer, PersistantTrack> trackMap, List<RPKMvalue> rpkmResults, int refId, boolean combineTracks) {
-        super(trackMap, refId, combineTracks);
+    public RPKMAnalysisResult(Map<Integer, PersistantTrack> trackMap, List<RPKMvalue> rpkmResults, int refId) {
+        super(trackMap, refId, false);
         this.rpkmResults = rpkmResults;
+        this.stats = stats;
     }
-    
+
     /**
      * @return The result list of RPKM values and read counts.
      */
     public List<RPKMvalue> getResults() {
         return rpkmResults;
     }
-    
+
     @Override
     public List<String> dataSheetNames() {
         List<String> sheetNames = new ArrayList<>();
         sheetNames.add("RPKM and Read Count Calculation Table");
         sheetNames.add("Parameters and Statistics");
         return sheetNames;
-        
+
     }
 
     @Override
@@ -69,8 +73,10 @@ import java.util.Map;
         dataColumnDescriptions.add("Strand");
         dataColumnDescriptions.add("RPKM");
         dataColumnDescriptions.add("Log RPKM");
+        dataColumnDescriptions.add("Chromosome ID");
+        dataColumnDescriptions.add("Track ID");
 
-        
+
         allSheetDescriptions.add(dataColumnDescriptions);
 
         //add tss detection statistic sheet header
@@ -92,7 +98,7 @@ import java.util.Map;
             List<Object> rpkmRow = new ArrayList<>();
 
             feat = rpkmValue.getFeature();
-            rpkmRow.add(feat);
+            rpkmRow.add(feat.getLocus());
             rpkmRow.add(feat.getType());
             rpkmRow.add(this.getTrackEntry(rpkmValue.getTrackId(), true));
             rpkmRow.add(this.getChromosomeMap().get(feat.getChromId()));
@@ -102,9 +108,9 @@ import java.util.Map;
             rpkmRow.add(feat.isFwdStrandString());
             rpkmRow.add(rpkmValue.getRPKM());
             rpkmRow.add(rpkmValue.getLogRpkm());
-            rpkmRow.add(rpkmValue.getCoverageRpkm());
-            rpkmRow.add(rpkmValue.getCoverageLogRpkm());
-            
+            rpkmRow.add(rpkmValue.getChromId());
+            rpkmRow.add(rpkmValue.getTrackId());
+
             rpkmResultRows.add(rpkmRow);
         }
 
@@ -114,25 +120,21 @@ import java.util.Map;
         ParameterSetWholeTranscriptAnalyses rpkmCalculationParameters = (ParameterSetWholeTranscriptAnalyses) this.getParameters();
         List<List<Object>> statisticsExportData = new ArrayList<>();
 
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("RPKM and raw read count calculation for tracks:", 
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("RPKM and raw read count calculation for tracks:",
                 GeneralUtils.generateConcatenatedString(this.getTrackNameList(), 0)));
 
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between title and parameters
-        
+
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("RPKM and read count calculation parameters:"));
-//        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Min read count value of a feature to be shown in the results:", 
-//                rpkmCalculationParameters.getMinReadCount()));
-//        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Max read count value of a feature to be shown in the results:", 
-//                rpkmCalculationParameters.getMaxReadCount()));
 
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between parameters and statistics
 
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("RPKM and read count calculation statistics:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelRPKM.RETURNED_FEATURES,
-                this.getStatsMap().get(ResultPanelRPKM.RETURNED_FEATURES)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelRPKM.FEATURES_TOTAL, 
-                this.getStatsMap().get(ResultPanelRPKM.FEATURES_TOTAL)));
 
+        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow(""));
+        
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Table Type", TABLE_TYPE.toString()));
+        
         exportData.add(statisticsExportData);
 
         return exportData;
@@ -151,5 +153,12 @@ import java.util.Map;
     public int getNoGenomeFeatures() {
         return this.noGenomeFeatures;
     }
-    
+
+    public Statistics getStats() {
+        return stats;
+    }
+
+    public void setStats(Statistics stats) {
+        this.stats = stats;
+    }
 }

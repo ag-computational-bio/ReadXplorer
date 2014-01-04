@@ -33,7 +33,6 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
     private HashMap<Integer, PersistantTrack> trackMap;
 //    private String readClassPropString;
 //    private String selFeatureTypesPropString;
-    private GenomeFeatureParser featureParser;
     private int referenceId;
     private FiveEnrichedDataAnalysesHandler fifePrimeAnalysesHandler;
     private WholeTranscriptDataAnalysisHandler wholeTranscriptAnalysesHandler;
@@ -158,8 +157,7 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
                         this.performOperonDetection, this.performNovelRegionDetection,
                         this.rPKMs, this.fraction, this.minBoundaryLength);
                 // start whole transcript analyses handler
-                this.wholeTranscriptAnalysesHandler = new WholeTranscriptDataAnalysisHandler(track, this.referenceId,
-                        this.parameterSetWholeTranscripts, this.refViewer,
+                this.wholeTranscriptAnalysesHandler = new WholeTranscriptDataAnalysisHandler(track, this.parameterSetWholeTranscripts, this.refViewer,
                         this.transcAnalysesTopComp, this.trackMap);
 
                 this.wholeTranscriptAnalysesHandler.start();

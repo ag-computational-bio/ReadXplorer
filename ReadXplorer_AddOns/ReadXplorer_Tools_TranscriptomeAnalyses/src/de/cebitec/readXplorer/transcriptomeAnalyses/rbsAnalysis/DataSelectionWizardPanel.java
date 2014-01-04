@@ -4,7 +4,7 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.rbsAnalysis;
 
-import de.cebitec.readXplorer.transcriptomeAnalyses.promotorAnalysis.PromotorAnalysisWizardIterator;
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ElementsOfInterest;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
@@ -63,13 +63,13 @@ public class DataSelectionWizardPanel implements WizardDescriptor.Panel<WizardDe
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
-        wiz.putProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_ANALYSIS_ALL_ELEMENTS, component.isAllElements());
-        wiz.putProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_ANALYSIS_ONLY_ANTISENSE, component.isOnlyAntisenseElements());
-        wiz.putProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_ANALYSIS_ONLY_LEADERLESS, component.isOnlyLeaderlessElements());
-        wiz.putProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_ANALYSIS_ONLY_NON_LEADERLESS, component.isOnlyNonLeaderlessElements());
-        wiz.putProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_ANALYSIS_REAL_TSS, component.isOnlyRealTSS());
+        wiz.putProperty(ElementsOfInterest.ALL.toString(), component.isAllElements());
+        wiz.putProperty(ElementsOfInterest.ONLY_ANTISENSE.toString(), component.isOnlyAntisenseElements());
+        wiz.putProperty(ElementsOfInterest.ONLY_LEADERLESS.toString(), component.isOnlyLeaderlessElements());
+        wiz.putProperty(ElementsOfInterest.ONLY_NONE_LEADERLESS.toString(), component.isOnlyNonLeaderlessElements());
+        wiz.putProperty(ElementsOfInterest.ONLY_REAL_TSS.toString(), component.isOnlyRealTSS());
         wiz.putProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_ANALYSIS_LENGTH_ALL_ELEMENTS, component.getLengthRelativeToTss());
-        wiz.putProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_ANALYSIS_ONLY_SELECTED, component.isOnlySelected());
+        wiz.putProperty(ElementsOfInterest.ONLY_SELECTED.toString(), component.isOnlySelected());
 
     }
 }

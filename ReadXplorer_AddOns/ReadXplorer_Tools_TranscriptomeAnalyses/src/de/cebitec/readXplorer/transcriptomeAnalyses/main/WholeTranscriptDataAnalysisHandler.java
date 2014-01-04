@@ -37,7 +37,6 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
 
     private TrackConnector trackConnector;
     private PersistantTrack selectedTrack;
-    private List<MappingResultPersistant> mappingResults;
     private Integer refGenomeID;
     private double fraction;
     private List<de.cebitec.readXplorer.util.Observer> observer = new ArrayList<>();
@@ -63,9 +62,9 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
     private NovelRegionResultPanel novelRegionResult;
     private ResultPanelOperonDetection operonResultPanel;
 
-    public WholeTranscriptDataAnalysisHandler(PersistantTrack selectedTrack, Integer refGenomeID, ParameterSetWholeTranscriptAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, HashMap<Integer, PersistantTrack> trackMap) {
+    public WholeTranscriptDataAnalysisHandler(PersistantTrack selectedTrack, ParameterSetWholeTranscriptAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, HashMap<Integer, PersistantTrack> trackMap) {
         this.selectedTrack = selectedTrack;
-        this.refGenomeID = refGenomeID;
+        this.refGenomeID = refViewer.getReference().getId();
         this.fraction = parameterset.getFraction();
         this.parameters = parameterset;
         this.refViewer = refViewer;
@@ -155,8 +154,8 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
     public void showData(Object data) {
         Pair<Integer, String> dataTypePair = (Pair<Integer, String>) data;
         final int trackId = dataTypePair.getFirst();
-        this.mappingResults = this.stats.getMappingResults();
-        this.stats.parseMappings(this.mappingResults);
+//        this.mappingResults = this.stats.getMappingResults();
+//        this.stats.parseMappings(this.mappingResults);
         this.backgroundCutoff = this.stats.calculateBackgroundCutoff(this.parameters.getFraction());
         this.stats.setBg(this.backgroundCutoff);
 
@@ -173,7 +172,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
                 rpkmResultPanel.setBoundsInfoManager(refViewer.getBoundsInformationManager());
             }
 
-            RPKMAnalysisResult rpkmAnalysisResult = new RPKMAnalysisResult(trackMap, rpkmCalculation.getRpkmValues(), refGenomeID, false);
+            RPKMAnalysisResult rpkmAnalysisResult = new RPKMAnalysisResult(trackMap, rpkmCalculation.getRpkmValues(), refGenomeID);
             rpkmResultPanel.addResult(rpkmAnalysisResult);
             trackNames = GeneralUtils.generateConcatenatedString(rpkmAnalysisResult.getTrackNameList(), 120);
             String panelName = "RPKM and read count values for " + trackNames + " (" + rpkmResultPanel.getResultSize() + " hits)";
@@ -213,7 +212,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
              * Operon.
              */
             List<Operon> fwdOperons, revOperons;
-            operonDetection = new OperonDetection();
+            operonDetection = new OperonDetection(trackId);
             fwdOperons = operonDetection.concatOperonAdjacenciesToOperons(stats.getPutativeOperonAdjacenciesFWD(), this.trackConnector, stats.getBg());
             revOperons = operonDetection.concatOperonAdjacenciesToOperons(stats.getPutativeOperonAdjacenciesREV(), this.trackConnector, this.stats.getBg());
             List<Operon> detectedOperons = new ArrayList<>(fwdOperons);
@@ -225,8 +224,10 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
                 operonResultPanel.setBoundsInfoManager(refViewer.getBoundsInformationManager());
             }
 
-            OperonDetectionResult operonDetectionResult = new OperonDetectionResult(trackMap, detectedOperons, refGenomeID, false);
+            OperonDetectionResult operonDetectionResult = new OperonDetectionResult(this.stats, this.trackMap, detectedOperons, refGenomeID);
+            operonDetectionResult.setParameters(this.parameters);
             operonResultPanel.addResult(operonDetectionResult);
+            
             trackNames = GeneralUtils.generateConcatenatedString(operonDetectionResult.getTrackNameList(), 120);
             String panelName = "Operon detection results " + trackNames + " (" + operonResultPanel.getResultSize() + " hits)";
             transcAnalysesTopComp.openAnalysisTab(panelName, operonResultPanel);

@@ -82,7 +82,7 @@ public class DataSetChoicePanel implements WizardDescriptor.ValidatingPanel<Wiza
     @Override
     public void validate() throws WizardValidationException {
         // one of the checkBoxes in component have to be choosen!
-        if (component.isFiveEnrichedTrack() && component.isWholeGenomeTrack()) {
+        if (!component.isFiveEnrichedTrack() && !component.isWholeGenomeTrack()) {
             throw new WizardValidationException(null, "Please selct one of the given data set types.", null);
         }
     }

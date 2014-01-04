@@ -4,7 +4,6 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.promotorAnalysis;
 
-import de.cebitec.readXplorer.transcriptomeAnalyses.rbsAnalysis.*;
 import javax.swing.JPanel;
 
 public final class DataSelectionVisualPanel extends JPanel {

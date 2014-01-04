@@ -29,23 +29,16 @@ import org.openide.util.NbPreferences;
 public final class RbsAnalysisVisualPanel extends JPanel {
 
     private String wizardName;
-    private int oldValue;
-    private ReferenceViewer referenceViewer;
-    private List<TranscriptionStart> tss;
-    private String refSeq;
     private File workingDir;
 
     /**
      * Creates new form RbsAnalysisVisualPanel
      */
-    public RbsAnalysisVisualPanel(String wizardName, ReferenceViewer referenceViewer, List<TranscriptionStart> tss) {
+    public RbsAnalysisVisualPanel(String wizardName) {
         this.wizardName = wizardName;
         initComponents();
         additionalSettings();
         updateFields();
-        this.referenceViewer = referenceViewer;
-        this.tss = tss;
-//        this.refSeq = referenceViewer.getReference().getSequence();
     }
 
     @Override
@@ -107,7 +100,6 @@ public final class RbsAnalysisVisualPanel extends JPanel {
         regionForMotifSearchTF = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         expectedMotifWidth = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
         directoryTF = new javax.swing.JTextField();
         chooseDirectory = new javax.swing.JButton();
@@ -126,13 +118,6 @@ public final class RbsAnalysisVisualPanel extends JPanel {
         org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(RbsAnalysisVisualPanel.class, "RbsAnalysisVisualPanel.jLabel5.text")); // NOI18N
 
         expectedMotifWidth.setText(org.openide.util.NbBundle.getMessage(RbsAnalysisVisualPanel.class, "RbsAnalysisVisualPanel.expectedMotifWidth.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(RbsAnalysisVisualPanel.class, "RbsAnalysisVisualPanel.jButton1.text")); // NOI18N
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel6, org.openide.util.NbBundle.getMessage(RbsAnalysisVisualPanel.class, "RbsAnalysisVisualPanel.jLabel6.text")); // NOI18N
 
@@ -181,9 +166,6 @@ public final class RbsAnalysisVisualPanel extends JPanel {
                                 .addComponent(jLabel4)
                                 .addGap(18, 18, 18)
                                 .addComponent(minSpacerTF, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(243, 243, 243)
-                                .addComponent(jButton1))
                             .addComponent(jLabel1)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel7)
@@ -197,9 +179,7 @@ public final class RbsAnalysisVisualPanel extends JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addComponent(jButton1)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -235,133 +215,10 @@ public final class RbsAnalysisVisualPanel extends JPanel {
         }
     }//GEN-LAST:event_chooseDirectoryActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        //        if (Integer.valueOf(this.seqLengthForChartAnalysisTF.getText()) > 0) {
-            ////                int newValue = Integer.valueOf(this.seqLengthForChartAnalysisTF.getText());
-            ////                this.firePropertyChange("newValue", this.oldValue, newValue);
-            //            StringBuffer buffer;
-            //            List<String> tmpSubstrings = new ArrayList<>();
-            //            String substr;
-            //            for (Integer startOfFeature : this.tss.keySet()) {
-                //                boolean isFwd = this.tss.get(startOfFeature);
-                //                if (isFwd) {
-                    //                    substr = this.refSeq.substring(startOfFeature + 2 - getSequenceLengthForBaseDistAnalysis() + 2, startOfFeature);
-                    //                    tmpSubstrings.add(substr);
-                    //                } else {
-                    //                    substr = this.refSeq.substring(startOfFeature - 2 - getSequenceLengthForBaseDistAnalysis() + 2, startOfFeature);
-                    //                    buffer = new StringBuffer(substr);
-                    //                    String reversedSubstr = buffer.reverse().toString();
-                    ////                        String complement = Complement(reversedSubstr);
-                    //                    tmpSubstrings.add(reversedSubstr);
-                    //                }
-                //            }
-            //            DataTable dataGA = new DataTable(Double.class, Double.class);
-            //            DataTable dataCT = new DataTable(Double.class, Double.class);
-            //            HashMap<Double, Double[]> map = new HashMap<>();
-            //            for (double i = 2; i > -(getSequenceLengthForBaseDistAnalysis() + 2); i--) {
-                //                map.put(i, new Double[]{0.0, 0.0});
-                //            }
-            //            for (String string : tmpSubstrings) {
-                //                double relativePosToFeatureStart = 2.0; // relative position to feature start
-                //                for (int i = string.length() - 1; i >= 0; i--) {
-                    //                    Double[] tmp = map.get(relativePosToFeatureStart);
-                    //                    if (string.charAt(i) == 'A' || string.charAt(i) == 'G') {
-                        //                        tmp[0]++;
-                        //                    } else {
-                        //                        tmp[1]++;
-                        //                    }
-                    //                    map.put(relativePosToFeatureStart, tmp);
-                    //                    relativePosToFeatureStart--;
-                    //                }
-                //            }
-            //
-            //            for (Double relPosToFeatureStart : map.keySet()) {
-                //                Double[] absoluteOccurenceOnPosition = map.get(relPosToFeatureStart);
-                //                dataGA.add(relPosToFeatureStart, absoluteOccurenceOnPosition[0]);
-                //                dataCT.add(relPosToFeatureStart, absoluteOccurenceOnPosition[1]);
-                //            }
-            //
-            //            BarPlot plot = new BarPlot();
-            //            plot.add(dataCT);
-            //            plot.add(dataGA);
-            //
-            //            double insetsTop = 20.0,
-            //                    insetsLeft = 40.0,
-            //                    insetsBottom = 60.0,
-            //                    insetsRight = 100.0;
-            //            plot.setInsets(new Insets2D.Double(
-                //                    insetsTop, insetsLeft, insetsBottom, insetsRight));
-        //
-        ////            plot.setSetting(Plot.LEGEND, true);
-        ////            plot.getLegend().setSetting(Legend.ORIENTATION, Orientation.HORIZONTAL);
-        ////            plot.getLegend().setSetting(Legend.ALIGNMENT_X, 1.0);
-        ////            plot.getLegend().setSetting(Legend.ALIGNMENT_Y, 1.0);
-        ////            plot.setSetting(Plot.LEGEND_DISTANCE, 2.0);
-        ////            plot.setSetting(Plot.LEGEND_LOCATION, Location.SOUTH);
-        //            plot.getAxisRenderer(BarPlot.AXIS_X).setSetting(LogarithmicRenderer2D.LABEL, "relative positions to feature start");
-        //            plot.getAxisRenderer(BarPlot.AXIS_Y).setSetting(LogarithmicRenderer2D.LABEL, "absolute occurence of bases");
-        //            plot.getPointRenderer(dataGA).setSetting(PointRenderer.COLOR, new Color(235, 152, 141, 100));
-        //            plot.getPointRenderer(dataCT).setSetting(PointRenderer.COLOR, new Color(145, 201, 229, 100));
-        //            plot.getAxisRenderer(BarPlot.AXIS_X).setSetting(AxisRenderer.INTERSECTION, 0.0);
-        //            plot.getAxisRenderer(BarPlot.AXIS_Y).setSetting(AxisRenderer.INTERSECTION, -getSequenceLengthForBaseDistAnalysis() - 2);
-        //            plot.getAxisRenderer(BarPlot.AXIS_Y).setSetting(AxisRenderer.TICK_LABELS_OUTSIDE, true);
-        //            plot.getAxisRenderer(BarPlot.AXIS_Y).setSetting(AxisRenderer.TICK_LABELS_OUTSIDE, true);
-        //
-        //            RbsPlotVisualPanel plotPanel = new RbsPlotVisualPanel();
-        //            plotPanel.addPlotToPlotPanel(new InteractivePanel(plot));
-        //            NotifyDescriptor nd = new NotifyDescriptor(
-            //                    plotPanel, // instance of your panel
-            //                    "Think about the range for RBS motif search ;)", (int) NotifyDescriptor.OK_OPTION, // it is Yes/No dialog ...
-            //                    NotifyDescriptor.INFORMATION_MESSAGE, // ... of a question type => a question mark icon
-            //                    null, // we have specified YES_NO_OPTION => can be null, options specified by L&F,
-            //                    // otherwise specify options as:
-            //                    //     new Object[] { NotifyDescriptor.YES_OPTION, ... etc. },
-            //                    NotifyDescriptor.OK_OPTION // default option is "Yes"
-            //                    );
-        //            if (DialogDisplayer.getDefault().notify(nd) == NotifyDescriptor.OK_OPTION) {
-            //            }
-        //        }
-    }//GEN-LAST:event_jButton1ActionPerformed
-
-    /**
-     * Gets a DNA String and complement it. A to T, T to A, G to C and C to G.
-     *
-     * @param seq is DNA String.
-     * @return the compliment of seq.
-     */
-    private String Complement(String seq) {
-        char BASE_A = 'A';
-        char BASE_C = 'C';
-        char BASE_G = 'G';
-        char BASE_T = 'T';
-        String a = "A";
-        String c = "C";
-        String g = "G";
-        String t = "T";
-        String compliment = "";
-
-        for (int i = 0; i < seq.length(); i++) {
-            if (BASE_A == seq.charAt(i)) {
-                compliment = compliment.concat(t);
-            } else if (BASE_C == (seq.charAt(i))) {
-                compliment = compliment.concat(g);
-
-            } else if (BASE_G == seq.charAt(i)) {
-                compliment = compliment.concat(c);
-
-            } else if (BASE_T == seq.charAt(i)) {
-                compliment = compliment.concat(a);
-            }
-        }
-
-        return compliment;
-
-    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton chooseDirectory;
     private javax.swing.JTextField directoryTF;
     private javax.swing.JTextField expectedMotifWidth;
-    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;

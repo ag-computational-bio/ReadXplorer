@@ -2,41 +2,60 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard;
 
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
+import de.cebitec.readXplorer.transcriptomeAnalyses.verifier.DoubleVerifier;
+import de.cebitec.readXplorer.transcriptomeAnalyses.verifier.IntegerVerifier;
 import java.awt.event.KeyEvent;
 import java.util.prefs.Preferences;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import org.openide.WizardValidationException;
+import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
 
 public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
-
+    
     private String tssDetectionText = "";
     private final String wizardName;
     private ReferenceConnector refGenConnector;
     private int nbOfFeatures;
     private int referenceLength;
-    
+
     /**
      * Creates new form FivePrimeEnrichedTracksVisualPanel
      */
     public FivePrimeEnrichedTracksVisualPanel(String wizardName, int referenceID) {
         initComponents();
+        setInputVerifier();
         updateCheckBoxes();
         this.wizardName = wizardName;
         this.jScrollPane1.setBorder(BorderFactory.createTitledBorder("TSS-detection"));
         this.descriptionTextArea.setEditable(false);
         this.descriptionTextArea.setText(tssDetectionText);
         this.refGenConnector = ProjectConnector.getInstance().getRefGenomeConnector(referenceID);
-//        this.referenceLength = refGenConnector.getRefGenome().getRefLength();
-//        this.nbOfFeatures = refGenConnector.getFeaturesForClosedInterval(0, this.referenceLength - 1).size();
+        for (PersistantChromosome persistantChromosome : refGenConnector.getRefGenome().getChromosomes().values()) {
+            this.referenceLength += persistantChromosome.getLength();
+            this.nbOfFeatures += refGenConnector.getFeaturesForClosedInterval(0, persistantChromosome.getLength(), persistantChromosome.getId()).size();
+        }
+        
     }
-
+    
+    private void setInputVerifier() {
+        this.UpstreamTF.setInputVerifier(new IntegerVerifier(this.UpstreamTF));
+        this.downstreamTF.setInputVerifier(new IntegerVerifier(this.downstreamTF));
+        this.fractionTF.setInputVerifier(new DoubleVerifier(this.fractionTF));
+        this.excludeTSSDistanceTF.setInputVerifier(new IntegerVerifier(this.excludeTSSDistanceTF));
+        this.keepingDistanceForInternalTssTF.setInputVerifier(new IntegerVerifier(this.keepingDistanceForInternalTssTF));
+        this.leaderlessDistanveTF.setInputVerifier(new IntegerVerifier(this.leaderlessDistanveTF));
+        this.ratioTF.setInputVerifier(new IntegerVerifier(this.ratioTF));
+    }
+    
     @Override
     public String getName() {
         return "Analyses for 5'-enriched Tracks";
     }
 
-        /**
+    /**
      * Updates the checkboxes for the read classes with the globally stored
      * settings for this wizard. If no settings were stored, the default
      * configuration is chosen.
@@ -44,31 +63,31 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
     private void updateCheckBoxes() {
         Preferences pref = NbPreferences.forModule(Object.class);
     }
-
+    
     public Double getFraction() {
         return Double.valueOf(fractionTF.getText());
     }
-
+    
     public Integer getRatio() {
         return Integer.valueOf(ratioTF.getText());
     }
-
+    
     public Integer getUpstrteam() {
         return Integer.valueOf(UpstreamTF.getText());
     }
-
+    
     public Integer getDownstream() {
         return Integer.valueOf(downstreamTF.getText());
     }
-
+    
     public boolean isExcludeInternalTSS() {
         return exclusionOfAllInternalTSSCB.isSelected();
     }
-
+    
     public Integer getExcludeTssDistance() {
         return Integer.valueOf(excludeTSSDistanceTF.getText());
     }
-
+    
     public Integer getKeepingInternalTssDistance() {
         return Integer.valueOf(keepingDistanceForInternalTssTF.getText());
     }
@@ -76,6 +95,7 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
     public Integer getLeaderlessDistance() {
         return Integer.valueOf(this.leaderlessDistanveTF.getText());
     }
+
     /**
      * Updates the checkboxes for the read classes with the globally stored
      * settings for this wizard. If no settings were stored, the default
@@ -90,6 +110,7 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
         excludeTSSDistanceTF.setText(pref.get(wizardName + TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_TSS_DISTANCE, "500"));
         keepingDistanceForInternalTssTF.setText(pref.get(wizardName + TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_TSS_DISTANCE, "100"));
     }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -306,7 +327,7 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
     private void downstreamTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_downstreamTFActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_downstreamTFActionPerformed
-
+    
     private void exclusionOfAllInternalTSSCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exclusionOfAllInternalTSSCBActionPerformed
         if (keepInternalLabel.isEnabled() && keepingDistanceForInternalTssTF.isEnabled()) {
             keepingDistanceForInternalTssTF.setEnabled(false);
@@ -316,20 +337,25 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
             keepInternalLabel.setEnabled(true);
         }
     }//GEN-LAST:event_exclusionOfAllInternalTSSCBActionPerformed
-
+    
     private void fractionTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fractionTFActionPerformed
     }//GEN-LAST:event_fractionTFActionPerformed
-
+    
     private void fractionTFKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_fractionTFKeyReleased
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            if (Double.valueOf(fractionTF.getText()) > 0.0) {
+            if (Double.valueOf(fractionTF.getText()) > 0.0 && Double.valueOf(fractionTF.getText()) < 1.0) {
                 double fraction = Double.parseDouble(fractionTF.getText());
                 double result = (this.referenceLength / this.nbOfFeatures) * fraction;
                 this.resultLabel.setText("" + result);
+            } else {
+                try {
+                    throw new WizardValidationException(null, "Please give a fraction biggen than 0.0.", null);
+                } catch (WizardValidationException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
             }
         }
     }//GEN-LAST:event_fractionTFKeyReleased
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField UpstreamTF;
     private javax.swing.JTextArea descriptionTextArea;
@@ -355,5 +381,4 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
     private javax.swing.JLabel resultLabel;
     private javax.swing.JPanel settingsPanel;
     // End of variables declaration//GEN-END:variables
-
 }

@@ -26,6 +26,7 @@ public class TranscriptionStart extends TrackChromResultEntry {
     private String detectedFeatStart, detectedFeatStop;
     private boolean internalTSS;
     private boolean putativeAntisense;
+    private boolean selected;
 
     /**
      * Data structure for storing a gene start.
@@ -41,7 +42,7 @@ public class TranscriptionStart extends TrackChromResultEntry {
      * @param detFeatures object containing the features associated to this
      * predicted gene start
      */
-    public TranscriptionStart(int pos, boolean isFwdStrand, int readStarts, 
+    public TranscriptionStart(int pos, boolean isFwdStrand, int readStarts,
             DetectedFeatures detFeatures, int trackId, int chromId) {
         super(trackId, chromId);
         this.startPosition = pos;
@@ -61,14 +62,14 @@ public class TranscriptionStart extends TrackChromResultEntry {
      * @param offset
      * @param dist2start
      * @param dist2stop
-     * @param nextDownstreamGene 
+     * @param nextDownstreamGene
      * @param offsetToNextDownstreamGene
      * @param promotorSequence
      * @param trackId
-     * @param chromId 
+     * @param chromId
      */
-    public TranscriptionStart(int pos, boolean isFwdStrand, int readStarts, double relCount, PersistantFeature detectedGene, int offset, int dist2start, int dist2stop, PersistantFeature nextDownstreamGene, 
-            int offsetToNextDownstreamGene, String promotorSequence, boolean leaderless, boolean cdsShift, 
+    public TranscriptionStart(int pos, boolean isFwdStrand, int readStarts, double relCount, PersistantFeature detectedGene, int offset, int dist2start, int dist2stop, PersistantFeature nextDownstreamGene,
+            int offsetToNextDownstreamGene, String promotorSequence, boolean leaderless, boolean cdsShift,
             String detectedFeatStart, String detectedFeatStop, boolean isInternal, boolean putAS, int chromId, int trackId) {
         super(trackId, chromId);
         this.startPosition = pos;
@@ -125,7 +126,6 @@ public class TranscriptionStart extends TrackChromResultEntry {
         this.putativeAntisense = putativeAntisense;
     }
 
-    
     public void setReadStarts(int readStarts) {
         this.readStarts = readStarts;
     }
@@ -213,8 +213,14 @@ public class TranscriptionStart extends TrackChromResultEntry {
     public boolean isInternalTSS() {
         return internalTSS;
     }
-    
-    
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
 
     @Override
     public String toString() {
@@ -225,6 +231,14 @@ public class TranscriptionStart extends TrackChromResultEntry {
         } else {
             return this.startPosition + "\t" + "rev\t" + this.readStarts + "\t" + this.relCount + "\t" + this.detectedGene.getFeatureName() + "\t" + this.offset + "\t" + this.dist2start + "\t" + this.dist2stop + "\t" + this.nextDownstreamFeature + "\t" + this.nextOffset + "\t" + this.sequence + "\t" + 0;
 
+        }
+    }
+
+    public PersistantFeature getAssignedFeature() {
+        if (getDetectedGene() != null) {
+            return getDetectedGene();
+        } else {
+            return getNextGene();
         }
     }
 }

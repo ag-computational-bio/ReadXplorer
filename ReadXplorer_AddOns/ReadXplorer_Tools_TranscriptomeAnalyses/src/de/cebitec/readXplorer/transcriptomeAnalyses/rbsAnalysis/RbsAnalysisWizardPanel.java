@@ -21,13 +21,9 @@ public class RbsAnalysisWizardPanel implements WizardDescriptor.Panel<WizardDesc
      */
     private RbsAnalysisVisualPanel component;
     private String wizardName;
-    private ReferenceViewer referenceViewer;
-    private List<TranscriptionStart> tss;
 
-    public RbsAnalysisWizardPanel(String wizardName, ReferenceViewer referenceViewer, List<TranscriptionStart> tss) {
+    public RbsAnalysisWizardPanel(String wizardName) {
         this.wizardName = wizardName;
-        this.referenceViewer = referenceViewer;
-        this.tss = tss;
     }
 
     // Get the visual component for the panel. In this template, the component
@@ -37,7 +33,7 @@ public class RbsAnalysisWizardPanel implements WizardDescriptor.Panel<WizardDesc
     @Override
     public RbsAnalysisVisualPanel getComponent() {
         if (component == null) {
-            component = new RbsAnalysisVisualPanel(this.wizardName, this.referenceViewer, this.tss);
+            component = new RbsAnalysisVisualPanel(this.wizardName);
         }
         return component;
     }

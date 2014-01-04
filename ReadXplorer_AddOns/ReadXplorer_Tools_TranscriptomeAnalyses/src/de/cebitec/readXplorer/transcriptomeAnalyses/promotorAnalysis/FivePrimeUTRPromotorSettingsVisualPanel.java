@@ -85,8 +85,8 @@ public final class FivePrimeUTRPromotorSettingsVisualPanel extends JPanel {
     }
 
     /**
-     * 
-     * @return 
+     *
+     * @return
      */
     public Integer getNoTrying() {
         return Integer.valueOf(this.noTimesTryingTF.getText());
@@ -94,6 +94,7 @@ public final class FivePrimeUTRPromotorSettingsVisualPanel extends JPanel {
 
     /**
      * Set the working directory.
+     *
      * @param inputFile File object.
      */
     public void setWorkingDir(File inputFile) {
@@ -102,6 +103,7 @@ public final class FivePrimeUTRPromotorSettingsVisualPanel extends JPanel {
 
     /**
      * Returns the working directory File object.
+     *
      * @return File object.
      */
     public File getWorkingDir() {
@@ -206,7 +208,7 @@ public final class FivePrimeUTRPromotorSettingsVisualPanel extends JPanel {
                     .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jSeparator1)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(layout.createSequentialGroup()
@@ -247,7 +249,7 @@ public final class FivePrimeUTRPromotorSettingsVisualPanel extends JPanel {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel8)
                                 .addGap(18, 18, 18)
-                                .addComponent(workingDirTF)
+                                .addComponent(workingDirTF, javax.swing.GroupLayout.PREFERRED_SIZE, 509, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
                                 .addComponent(jButton1)))
                         .addGap(0, 0, Short.MAX_VALUE))))
@@ -287,7 +289,7 @@ public final class FivePrimeUTRPromotorSettingsVisualPanel extends JPanel {
                     .addComponent(jLabel8)
                     .addComponent(workingDirTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1))
-                .addGap(13, 13, 13))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -314,8 +316,8 @@ public final class FivePrimeUTRPromotorSettingsVisualPanel extends JPanel {
 
     /**
      * Set all text fields to default values.
-     * 
-     * @param evt 
+     *
+     * @param evt
      */
     private void setToDefaultValuesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setToDefaultValuesButtonActionPerformed
         this.minSpacer1TF.setText("5");

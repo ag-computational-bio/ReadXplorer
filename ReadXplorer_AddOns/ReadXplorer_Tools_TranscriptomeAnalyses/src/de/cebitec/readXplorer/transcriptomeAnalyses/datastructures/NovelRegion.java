@@ -10,9 +10,9 @@ public class NovelRegion extends TrackChromResultEntry {
 
     private boolean isFWD, isFalsePositive, isSelected;
     private int start;
-    private Integer dropoff;
+    private int dropoff;
     private String site;
-    private Integer length;
+    private int length;
     private String sequence;
 
     public NovelRegion(boolean isFWD, int start, Integer dropoff, String site, int length, String sequence, boolean isFP, boolean isSelected, int trackId, int chromId) {
@@ -41,7 +41,7 @@ public class NovelRegion extends TrackChromResultEntry {
         return isFWD;
     }
 
-    public Object getDropOffPos() {
+    public int getDropOffPos() {
         return this.dropoff;
     }
 
@@ -57,7 +57,7 @@ public class NovelRegion extends TrackChromResultEntry {
         return site;
     }
 
-    public Integer getLength() {
+    public int getLength() {
         return length;
     }
 

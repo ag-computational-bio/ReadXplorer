@@ -23,8 +23,6 @@ import jsc.distributions.Normal;
 public class Statistics implements Observer {
 
     private double bg;
-    List<MappingResultPersistant> mappingResults;
-    HashMap<Integer, List<PersistantMapping>> mappingResultsForChromosomes;
     /*
      * uniqueCounts are just counted mappingResults in font of CDSs
      * totalCounts are all counted mappingResults
@@ -52,7 +50,6 @@ public class Statistics implements Observer {
     public Statistics(PersistantReference refGenome, double fraction, HashMap<Integer, List<Integer>> forwardCDSs,
             HashMap<Integer, List<Integer>> reverseCDSs, HashMap<Integer, PersistantFeature> allRegionsInHash, List<int[]> region2Exclude) {
 
-        this.mappingResultsForChromosomes = new HashMap<>();
         this.refGenome = refGenome;
         this.totalCount = 0;
         this.uniqueCounts = 0;
@@ -76,7 +73,6 @@ public class Statistics implements Observer {
         this.reverseCDSs = reverseCDSs;
         this.allRegionsInHash = allRegionsInHash;
         this.region2Exclude = region2Exclude;
-        this.mappingResults = new ArrayList<>();
         this.putativeOperonAdjacenciesFWD = new HashMap<>();
         this.putativeOperonAdjacenciesREV = new HashMap<>();
     }
@@ -118,7 +114,8 @@ public class Statistics implements Observer {
      * @param region2Exclude int[] in genomesize length. 1 on position i means,
      * that on these position a feature occur which we want to exclude.
      */
-    public void parseMappings(List<MappingResultPersistant> mappingResults) {
+//    public void parseMappings(List<MappingResultPersistant> mappingResults) {
+    private void parseMappings(MappingResultPersistant result) {
 
         /*
          * Das Problem das ich hier habe ist folgendermaßen: Ich benötige eigentlich
@@ -130,89 +127,80 @@ public class Statistics implements Observer {
          * Chromosom id mit angeben. 
          */
 
-
-
         // Sorting all mappingResults
-        for (MappingResultPersistant result : mappingResults) {
-            int chromId = result.getRequest().getChromId();
-            int chromNo = refGenome.getChromosome(chromId).getChromNumber();
+//        for (MappingResultPersistant result : mappingResults) {
+        int chromId = result.getRequest().getChromId();
+        int chromNo = refGenome.getChromosome(chromId).getChromNumber();
 //            int chromLength = refGenome.getChromosome(chromId).getLength();
-            List<PersistantMapping> mappings = result.getMappings();
-            System.out.println("MappingsSize in Method parseMappings: " + mappings.size());
-            Collections.sort(mappings);
+        List<PersistantMapping> mappings = result.getMappings();
+        System.out.println("MappingsSize in Method parseMappings: " + mappings.size());
+        Collections.sort(mappings);
 
-            for (PersistantMapping mapping : mappings) {
-                this.totalCount++;
-                int start = mapping.getStart();
-                int stop = mapping.getStop();
+        for (PersistantMapping mapping : mappings) {
+            this.totalCount++;
+            int start = mapping.getStart();
+            int stop = mapping.getStop();
 
-                boolean directionFWD = mapping.isFwdStrand();
+            boolean directionFWD = mapping.isFwdStrand();
 
-                // count only non t/rRNA mappingResults
-                if (region2Exclude.get(chromNo - 1)[start] == 0) {
-                    this.uniqueCounts++;
+            // count only non t/rRNA mappingResults
+            if (region2Exclude.get(chromNo - 1)[start] == 0) {
+                this.uniqueCounts++;
+            }
+            // count the bases in total
+            if (region2Exclude.get(chromNo - 1)[start] == 0 || region2Exclude.get(chromNo - 1)[stop] == 0) {
+                this.basetotal += stop - start + 1;
+            }
+
+            //	# sum up the total coverage at each positions
+            //	# (this is needed for extending genes later)
+            if (directionFWD) {
+                fwdReadStarts[chromNo - 1][start]++;
+                for (int i = start; i < stop; i++) {// map {$_++} @{$coverage{fwd}}[$sstart..$sstop];
+                    fwdCoverage[chromNo - 1][i]++;
                 }
-                // count the bases in total
-                if (region2Exclude.get(chromNo - 1)[start] == 0 || region2Exclude.get(chromNo - 1)[stop] == 0) {
-                    this.basetotal += stop - start + 1;
-                }
-
-                //	# sum up the total coverage at each positions
-                //	# (this is needed for extending genes later)
-                if (directionFWD) {
-                    fwdReadStarts[chromNo - 1][start]++;
-                    for (int i = start; i < stop; i++) {// map {$_++} @{$coverage{fwd}}[$sstart..$sstop];
-                        fwdCoverage[chromNo - 1][i]++;
-                    }
-                    if (forwardCDSs.containsKey(Integer.valueOf(start)) && forwardCDSs.containsKey(Integer.valueOf(stop))) {
-                        for (int featureIDfwd1 : forwardCDSs.get(start)) {
-                            for (int featureIDfwd2 : forwardCDSs.get(stop)) {
-                                if (featureIDfwd1 != featureIDfwd2) {
-                                    if (this.putativeOperonAdjacenciesFWD.get(featureIDfwd1) != null) {
-                                        this.putativeOperonAdjacenciesFWD.get(featureIDfwd1).setSpanningReads(this.putativeOperonAdjacenciesFWD.get(featureIDfwd1).getSpanningReads() + 1);
-                                    } else {
-                                        OperonAdjacency operonA = new OperonAdjacency(allRegionsInHash.get(featureIDfwd1), allRegionsInHash.get(featureIDfwd2));
-                                        operonA.setSpanningReads(operonA.getSpanningReads() + 1);
-                                        this.putativeOperonAdjacenciesFWD.put(featureIDfwd1, operonA);
-                                    }
+                if (forwardCDSs.containsKey(Integer.valueOf(start)) && forwardCDSs.containsKey(Integer.valueOf(stop))) {
+                    for (int featureIDfwd1 : forwardCDSs.get(start)) {
+                        for (int featureIDfwd2 : forwardCDSs.get(stop)) {
+                            if (featureIDfwd1 != featureIDfwd2) {
+                                if (this.putativeOperonAdjacenciesFWD.get(featureIDfwd1) != null) {
+                                    this.putativeOperonAdjacenciesFWD.get(featureIDfwd1).setSpanningReads(this.putativeOperonAdjacenciesFWD.get(featureIDfwd1).getSpanningReads() + 1);
+                                } else {
+                                    OperonAdjacency operonA = new OperonAdjacency(allRegionsInHash.get(featureIDfwd1), allRegionsInHash.get(featureIDfwd2));
+                                    operonA.setSpanningReads(operonA.getSpanningReads() + 1);
+                                    this.putativeOperonAdjacenciesFWD.put(featureIDfwd1, operonA);
                                 }
                             }
                         }
                     }
+                }
 
-                } else {
-                    revReadStarts[chromNo - 1][stop]++;
-                    for (int i = start; i < stop; i++) {// map {$_++} @{$coverage{rev}}[$sstart..$sstop];
-                        revCoverage[chromNo - 1][i]++;
-                    }
+            } else {
+                revReadStarts[chromNo - 1][stop]++;
+                for (int i = start; i < stop; i++) {// map {$_++} @{$coverage{rev}}[$sstart..$sstop];
+                    revCoverage[chromNo - 1][i]++;
+                }
 
-                    if (reverseCDSs.containsKey(Integer.valueOf(stop)) && reverseCDSs.containsKey(Integer.valueOf(start))) {
-                        for (int featureIDrev1 : reverseCDSs.get(stop)) {
-                            for (int featureIDrev2 : reverseCDSs.get(start)) {
-                                if (featureIDrev1 != featureIDrev2) {
-                                    if (this.putativeOperonAdjacenciesREV.get(featureIDrev1) != null) {
-                                        this.putativeOperonAdjacenciesREV.get(featureIDrev1).setSpanningReads(this.putativeOperonAdjacenciesREV.get(featureIDrev1).getSpanningReads() + 1);
-                                    } else {
-                                        OperonAdjacency operonA = new OperonAdjacency(allRegionsInHash.get(featureIDrev1), allRegionsInHash.get(featureIDrev2));
-                                        operonA.setSpanningReads(operonA.getSpanningReads() + 1);
-                                        this.putativeOperonAdjacenciesREV.put(featureIDrev1, operonA);
-                                    }
+                if (reverseCDSs.containsKey(Integer.valueOf(stop)) && reverseCDSs.containsKey(Integer.valueOf(start))) {
+                    for (int featureIDrev1 : reverseCDSs.get(stop)) {
+                        for (int featureIDrev2 : reverseCDSs.get(start)) {
+                            if (featureIDrev1 != featureIDrev2) {
+                                if (this.putativeOperonAdjacenciesREV.get(featureIDrev1) != null) {
+                                    this.putativeOperonAdjacenciesREV.get(featureIDrev1).setSpanningReads(this.putativeOperonAdjacenciesREV.get(featureIDrev1).getSpanningReads() + 1);
+                                } else {
+                                    OperonAdjacency operonA = new OperonAdjacency(allRegionsInHash.get(featureIDrev1), allRegionsInHash.get(featureIDrev2));
+                                    operonA.setSpanningReads(operonA.getSpanningReads() + 1);
+                                    this.putativeOperonAdjacenciesREV.put(featureIDrev1, operonA);
                                 }
                             }
                         }
                     }
                 }
             }
-//            setArrays(chromNo, chromFwd, chromRev, chromFwdCov, chromRevCov);
+//            }
         }
     }
 
-//    private void setArrays(int chromNo, int[] chromFwd, int[] chromRev, int[] chromFwdCov, int[] chromRevCov) {
-//        fwdReadStarts[chromNo - 1] = chromFwd;
-//        revReadStarts[chromNo - 1] = chromRev;
-//        fwdCoverage[chromNo - 1] = chromFwdCov;
-//        revCoverage[chromNo - 1] = chromRevCov;
-//    }
     /**
      * TODO not yet implemented right!
      *
@@ -296,7 +284,7 @@ public class Statistics implements Observer {
 
     /**
      * Calculates the median of a given array with values of type double.
-     * 
+     *
      * @param m Array of values from type double. The array must be sorted!
      * @return median value.
      */
@@ -311,7 +299,7 @@ public class Statistics implements Observer {
 
     /**
      * Return the background threshold value.
-     * 
+     *
      * @return background threshold
      */
     public double getBg() {
@@ -354,20 +342,11 @@ public class Statistics implements Observer {
         return basetotal;
     }
 
-    public List<MappingResultPersistant> getMappingResults() {
-        return mappingResults;
-    }
-
-    public void addMappingResult(MappingResultPersistant result) {
-        this.mappingResults.add(result);
-//        this.mappingCount += result.getMappings().size();
-//        System.out.println("MappingCount:" + this.mappingCount);
-    }
-
     @Override
     public void update(Object args) {
         if (args instanceof MappingResultPersistant) {
-            addMappingResult((MappingResultPersistant) args);
+            MappingResultPersistant result = (MappingResultPersistant) args;
+            this.parseMappings(result);
         }
     }
 

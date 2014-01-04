@@ -9,17 +9,16 @@ import org.openide.util.NbBundle;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class OperonDetectionStatsPanel extends javax.swing.JPanel {
-    
+
     private static final long serialVersionUID = 1L;
-    
-    private HashMap<String, Integer> operonStatsMap;
-    
+    private HashMap<String, Object> operonStatsMap;
 
     /**
      * Creates new form OperonDetectionStatsPanel
+     *
      * @param operonStatsMap result of an operon detection
      */
-    public OperonDetectionStatsPanel(HashMap<String, Integer> operonStatsMap) {
+    public OperonDetectionStatsPanel(HashMap<String, Object> operonStatsMap) {
         this.operonStatsMap = operonStatsMap;
         this.initComponents();
         this.initAdditionalComponents();
@@ -87,17 +86,23 @@ public class OperonDetectionStatsPanel extends javax.swing.JPanel {
     private void initAdditionalComponents() {
         operonDetectionStatsTable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{
-                    {ResultPanelOperonDetection.OPERONS_TOTAL, 
-                        String.valueOf(this.operonStatsMap.get(ResultPanelOperonDetection.OPERONS_TOTAL))},
-                    {ResultPanelOperonDetection.OPERONS_WITH_OVERLAPPING_READS, 
-                        String.valueOf(this.operonStatsMap.get(ResultPanelOperonDetection.OPERONS_WITH_OVERLAPPING_READS))},
-                    {ResultPanelOperonDetection.OPERONS_WITH_INTERNAL_READS, 
-                        String.valueOf(this.operonStatsMap.get(ResultPanelOperonDetection.OPERONS_WITH_INTERNAL_READS))}
-                },
+            {ResultPanelOperonDetection.OPERONS_TOTAL,
+                String.valueOf(this.operonStatsMap.get(ResultPanelOperonDetection.OPERONS_TOTAL))},
+            {ResultPanelOperonDetection.OPERONS_WITH_OVERLAPPING_READS,
+                String.valueOf(this.operonStatsMap.get(ResultPanelOperonDetection.OPERONS_WITH_OVERLAPPING_READS))},
+            {ResultPanelOperonDetection.OPERONS_WITH_INTERNAL_READS, String.valueOf(this.operonStatsMap.get(ResultPanelOperonDetection.OPERONS_WITH_INTERNAL_READS))},
+            {ResultPanelTranscriptionStart.MAPPINGS_COUNT,
+                String.valueOf(this.operonStatsMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT))},
+            {ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH, String.valueOf(this.operonStatsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH))},
+            {ResultPanelTranscriptionStart.MAPPINGS_MILLION,
+                String.valueOf(this.operonStatsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MILLION))},
+            {ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD,
+                String.valueOf(this.operonStatsMap.get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD))}
+        },
                 new String[]{
-                    NbBundle.getMessage(OperonDetectionStatsPanel.class, "OperonDetectionStatsPanel.operonDetectionStatsTable.columnModel.title0"),
-                    NbBundle.getMessage(OperonDetectionStatsPanel.class, "OperonDetectionStatsPanel.operonDetectionStatsTable.columnModel.title1")
-                }) {
+            NbBundle.getMessage(OperonDetectionStatsPanel.class, "OperonDetectionStatsPanel.operonDetectionStatsTable.columnModel.title0"),
+            NbBundle.getMessage(OperonDetectionStatsPanel.class, "OperonDetectionStatsPanel.operonDetectionStatsTable.columnModel.title1")
+        }) {
             private static final long serialVersionUID = 1L;
             Class[] types = new Class[]{
                 java.lang.String.class, java.lang.String.class

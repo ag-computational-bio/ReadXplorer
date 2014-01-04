@@ -29,23 +29,22 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 /**
- * This panel is capable of showing a table with detected operons and
- * contains an export button, which exports the data into an excel file.
+ * This panel is capable of showing a table with detected operons and contains
+ * an export button, which exports the data into an excel file.
  *
  * @author -Rolf Hilker-
  */
 public class ResultPanelOperonDetection extends ResultTablePanel {
-    
+
     private static final long serialVersionUID = 1L;
-    
     public static final String OPERONS_TOTAL = "Total number of detected operons";
     public static final String OPERONS_WITH_OVERLAPPING_READS = "Operons with reads overlapping only one feature edge";
     public static final String OPERONS_WITH_INTERNAL_READS = "Operons with internal reads";
-
+    public static final String OPERONS_BACKGROUND_THRESHOLD = "Minimum number of spanning reads (Background threshold)";
     private BoundsInfoManager boundsInfoManager;
     private ReferenceViewer referenceViewer;
     private OperonDetectionResult operonResult;
-    private HashMap<String, Integer> operonDetStats;
+    private HashMap<String, Object> operonDetStats;
     private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
 
     /**
@@ -55,11 +54,10 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
     public ResultPanelOperonDetection() {
         initComponents();
         this.operonDetectionTable.getTableHeader().addMouseListener(tableFilter);
-        this.initStatsMap();        
+        this.initStatsMap();
 
         DefaultListSelectionModel model = (DefaultListSelectionModel) this.operonDetectionTable.getSelectionModel();
         model.addListSelectionListener(new ListSelectionListener() {
-
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 int posColumnIdx = 5;
@@ -68,7 +66,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
             }
         });
     }
-    
+
     /**
      * Initializes the statistics map.
      */
@@ -77,6 +75,11 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
         operonDetStats.put(OPERONS_TOTAL, 0);
         operonDetStats.put(OPERONS_WITH_OVERLAPPING_READS, 0);
         operonDetStats.put(OPERONS_WITH_INTERNAL_READS, 0);
+        operonDetStats.put(ResultPanelTranscriptionStart.MAPPINGS_COUNT, 0.0);
+        operonDetStats.put(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH, 0.0);
+        operonDetStats.put(ResultPanelTranscriptionStart.MAPPINGS_MILLION, 0.0);
+        operonDetStats.put(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD, 0.0);
+
     }
 
     /**
@@ -91,7 +94,6 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         operonDetectionTable = new javax.swing.JTable();
         exportButton = new javax.swing.JButton();
-        parametersLabel = new javax.swing.JLabel();
         statisticsButton = new javax.swing.JButton();
 
         operonDetectionTable.setModel(new javax.swing.table.DefaultTableModel(
@@ -99,14 +101,14 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
 
             },
             new String [] {
-                "Feature 1", "Feature 2", "Track", "Chromosome", "Strand", "Start Feature 1", "Start Feature 2", "Spanning Reads", "Operon String"
+                "Feature 1", "Feature 2", "Track", "Chromosome", "Strand", "Start Feature 1", "Start Feature 2", "Spanning Reads", "Operon String", "Chromosome ID", "Track ID"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class, java.lang.String.class, java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.String.class, java.lang.String.class, java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -127,6 +129,8 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
         operonDetectionTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title8")); // NOI18N
         operonDetectionTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "OperonDetectionResultPanel.operonDetectionTable.columnModel.title6")); // NOI18N
         operonDetectionTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "ResultPanelOperonDetection.operonDetectionTable.columnModel.title10")); // NOI18N
+        operonDetectionTable.getColumnModel().getColumn(9).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "ResultPanelOperonDetection.operonDetectionTable.columnModel.title9_1")); // NOI18N
+        operonDetectionTable.getColumnModel().getColumn(10).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "ResultPanelOperonDetection.operonDetectionTable.columnModel.title10_1")); // NOI18N
 
         exportButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "ResultPanelOperonDetection.exportButton.text")); // NOI18N
         exportButton.addActionListener(new java.awt.event.ActionListener() {
@@ -134,8 +138,6 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
                 exportButtonActionPerformed(evt);
             }
         });
-
-        parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "ResultPanelOperonDetection.parametersLabel.text")); // NOI18N
 
         statisticsButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelOperonDetection.class, "ResultPanelOperonDetection.statisticsButton.text")); // NOI18N
         statisticsButton.addActionListener(new java.awt.event.ActionListener() {
@@ -149,12 +151,11 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(parametersLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 439, Short.MAX_VALUE)
+                .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(statisticsButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(exportButton))
-            .addComponent(jScrollPane1)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 840, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -162,9 +163,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 274, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(parametersLabel)
-                        .addComponent(statisticsButton))
+                    .addComponent(statisticsButton)
                     .addComponent(exportButton)))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -176,25 +175,24 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
     private void statisticsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statisticsButtonActionPerformed
         JOptionPane.showMessageDialog(this, new OperonDetectionStatsPanel(operonDetStats), "Operon Detection Statistics", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_statisticsButtonActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton exportButton;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable operonDetectionTable;
-    private javax.swing.JLabel parametersLabel;
     private javax.swing.JButton statisticsButton;
     // End of variables declaration//GEN-END:variables
 
     /**
-     * Adds the data from this OperonDetectionResult to the data already available
-     * in this result panel. All statistics etc. are also updated.
+     * Adds the data from this OperonDetectionResult to the data already
+     * available in this result panel. All statistics etc. are also updated.
+     *
      * @param newResult the result to add
      */
     @Override
     public void addResult(ResultTrackAnalysis newResult) {
         if (newResult instanceof OperonDetectionResult) {
             OperonDetectionResult operonResultNew = (OperonDetectionResult) newResult;
-            final int nbColumns = 11;
+            final int nbColumns = 13;
             final List<Operon> operons = new ArrayList<>(operonResultNew.getResults());
 
             if (this.operonResult == null) {
@@ -230,6 +228,8 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
                 hasOverlappingReads = false;
                 hasInternalReads = false;
 
+                int chromID = operon.getOperonAdjacencies().get(0).getFeature1().getChromId();
+
                 for (OperonAdjacency opAdj : operon.getOperonAdjacencies()) {
                     annoName1 += opAdj.getFeature1().toString() + "\n";
                     annoName2 += opAdj.getFeature2().toString() + "\n";
@@ -242,7 +242,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
 
                     hasInternalReads = opAdj.getInternalReads() > 0;
                     hasOverlappingReads = opAdj.getReadsFeature1() > 0 || opAdj.getReadsFeature2() > 0;
-                    
+
                 }
                 Object[] rowData = new Object[nbColumns];
                 int i = 0;
@@ -258,6 +258,8 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
 //                rowData[8] = internalReads;
                 rowData[i++] = spanningReads;
                 rowData[i++] = operon.toOperonString();
+                rowData[i++] = chromID;
+                rowData[i++] = operon.getTrackId();
                 if (!annoName1.isEmpty() && !annoName2.isEmpty()) {
                     model.addRow(rowData);
                 }
@@ -268,28 +270,28 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
                 if (hasInternalReads) {
                     ++operonsWithInternal;
                 }
-                
+
             }
 
-            TableRowSorter<TableModel> sorter = new TableRowSorter<>();
-            operonDetectionTable.setRowSorter(sorter);
-            sorter.setModel(model);
-            for (int i = 3; i < 8; ++i) {
-                TableComparatorProvider.setStringComparator(sorter, i);
-            }
+//            TableRowSorter<TableModel> sorter = new TableRowSorter<>();
+//            operonDetectionTable.setRowSorter(sorter);
+//            sorter.setModel(model);
+//            for (int i = 3; i < 8; ++i) {
+//                TableComparatorProvider.setStringComparator(sorter, i);
+//            }
 
-//            parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class,
-//                    "ResultPanelOperonDetection.parametersLabel.text",
-//                    ((ParameterSetWholeTranscriptAnalyses) operonResult.getParameters()).getMinSpanningReads()));
+            operonDetStats.put(OPERONS_TOTAL, (Integer) operonDetStats.get(OPERONS_TOTAL) + operons.size());
+            operonDetStats.put(OPERONS_WITH_OVERLAPPING_READS, (Integer) operonDetStats.get(OPERONS_WITH_OVERLAPPING_READS) + operonsWithOverlapping);
+            operonDetStats.put(OPERONS_WITH_INTERNAL_READS, (Integer) operonDetStats.get(OPERONS_WITH_INTERNAL_READS) + operonsWithInternal);
+            operonDetStats.put(ResultPanelTranscriptionStart.MAPPINGS_COUNT, (Double) operonDetStats.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT) + operonResultNew.getStats().getMc());
+            operonDetStats.put(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH, (Double) operonDetStats.get(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH) + operonResultNew.getStats().getMml());
+            operonDetStats.put(ResultPanelTranscriptionStart.MAPPINGS_MILLION, (Double) operonDetStats.get(ResultPanelTranscriptionStart.MAPPINGS_MILLION) + operonResultNew.getStats().getMm());
+            operonDetStats.put(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD, (Double) operonDetStats.get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD) + operonResultNew.getStats().getBg());
 
-            operonDetStats.put(OPERONS_TOTAL, operonDetStats.get(OPERONS_TOTAL) + operons.size());
-            operonDetStats.put(OPERONS_WITH_OVERLAPPING_READS, operonDetStats.get(OPERONS_WITH_OVERLAPPING_READS) + operonsWithOverlapping);
-            operonDetStats.put(OPERONS_WITH_INTERNAL_READS, operonDetStats.get(OPERONS_WITH_INTERNAL_READS) + operonsWithInternal);
-
-            operonResult.setStatsMap(operonDetStats);
+            operonResult.setStatsAndParametersMap(operonDetStats);
         }
     }
-    
+
     /**
      * @return The number of detected operons
      */
@@ -297,7 +299,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
     public int getResultSize() {
         return this.operonResult.getResults().size();
     }
-    
+
     /**
      * Set the reference viewer needed for updating the currently shown position
      * and extracting the reference sequence.

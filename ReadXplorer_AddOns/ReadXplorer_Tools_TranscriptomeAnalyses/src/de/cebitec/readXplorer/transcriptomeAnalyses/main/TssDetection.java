@@ -68,6 +68,11 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
         int up = parameters.getUpstreamRegion();
         int down = parameters.getDownstreamRegion();
         int leaderlessRestirction = parameters.getLeaderlessLimit();
+        /**
+         * This boolean tells if all internal Tss, which means it is detected in
+         * the region, where a feature is allready annotated. True if all
+         * internal Tss have to be excluded from analysis.
+         */
         boolean isExclusionOfInternalTss = parameters.isExclusionOfInternalTSS();
         Integer distanceForExcludingTss = parameters.getExclusionOfTSSDistance();
         int keepingInternalTssDistance = parameters.getKeepingInternalTssDistance();
@@ -117,7 +122,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                         boolean isPutAntisense = false;
                         int startSubSeq = i - up;
                         int stopSubSeq = i + down;
-                        int nextOffset = 0;
+                        int offsetToNextDownstreamFeature = 0;
                         String startCodon;
                         String stopCodon;
 
@@ -130,11 +135,13 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                         // 4. Offset is > 500bp, which maybe is a TSS for unannotated Transcript which have 
                         // to be blasted
                         // 
+
+                        // Offset is = 0 => distance to start is > 0 
                         if (offset == 0) {
                             dist2start = i - feature.getStart();
                             dist2stop = feature.getStop() - i;
 
-                            // check if leaderless (downstream)
+                            // check if leaderless (downstream direction)
                             if (dist2start < leaderlessRestirction) {
                                 leaderless = true;
                                 isInternal = false;
@@ -158,14 +165,14 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                                 }
 
                                 TranscriptionStart tss = new TranscriptionStart(i, isFwd, forward[chromNo - 1][i], rel_count,
-                                        feature, offset, dist2start, dist2stop, null, nextOffset,
+                                        feature, offset, dist2start, dist2stop, null, offsetToNextDownstreamFeature,
                                         getSubSeq(chrom, isFwd, startSubSeq, stopSubSeq), leaderless, cdsShift,
-                                        startCodon, stopCodon, false, isPutAntisense, this.trackid, chromId); //TODO: check if it is internal
+                                        startCodon, stopCodon, isInternal, isPutAntisense, chromId, this.trackid); //TODO: check if it is internal
 
                                 if (!feature.getType().equals(FeatureType.RRNA) && !feature.getType().equals(FeatureType.TRNA)) {
                                     detectedTSS.add(tss);
                                 }
-                            } else if (dist2start > leaderlessRestirction && isExclusionOfInternalTss == false) { // internal mapping or TSS for nextGene
+                            } else if (dist2start > leaderlessRestirction && isExclusionOfInternalTss == false) { // internal mapping or TSS for next downstream Feature
                                 // here we want to find the next gene because the startsite is inbetween a gene which is not a leaderles gene
                                 int currentFeatureID = feature.getId();
                                 isInternal = true;
@@ -175,7 +182,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                                     j++;
                                     nextDownstreamFeature = allRegionsInHash.get(currentFeatureID + j);
                                 }
-                                nextOffset = nextDownstreamFeature.getStart() - i;
+                                offsetToNextDownstreamFeature = nextDownstreamFeature.getStart() - i;
 
                                 // check antisensness
 
@@ -183,15 +190,29 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                                     isPutAntisense = true;
                                 }
 
-                                if (nextOffset < keepingInternalTssDistance) {
+                                cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), i, dist2start, isFwd, 0.1);
+
+                                if (offsetToNextDownstreamFeature < keepingInternalTssDistance) {
                                     // putative the corresponding gene for TSS
                                     if (nextDownstreamFeature.isFwdStrand()) {
                                         startCodon = getSubSeq(chrom, isFwd, feature.getStart() - 1, feature.getStart() + 2);
                                         stopCodon = getSubSeq(chrom, isFwd, feature.getStop() - 3, feature.getStop());
                                         TranscriptionStart tss = new TranscriptionStart(i, isFwd, forward[chromNo - 1][i], rel_count,
-                                                null, offset, dist2start, dist2stop, nextDownstreamFeature, nextOffset,
+                                                null, offset, dist2start, dist2stop, nextDownstreamFeature, offsetToNextDownstreamFeature,
                                                 getSubSeq(chrom, isFwd, startSubSeq, stopSubSeq), leaderless, cdsShift,
-                                                startCodon, stopCodon, isInternal, isPutAntisense, this.trackid, chromId); //TODO: check if it is internal
+                                                startCodon, stopCodon, isInternal, isPutAntisense, chromId, this.trackid); //TODO: check if it is internal
+                                        if (!nextDownstreamFeature.getType().equals(FeatureType.RRNA) && !nextDownstreamFeature.getType().equals(FeatureType.TRNA)) {
+                                            detectedTSS.add(tss);
+                                        }
+                                    }
+                                } else if (cdsShift) {
+                                    if (nextDownstreamFeature.isFwdStrand()) {
+                                        startCodon = getSubSeq(chrom, isFwd, feature.getStart() - 1, feature.getStart() + 2);
+                                        stopCodon = getSubSeq(chrom, isFwd, feature.getStop() - 3, feature.getStop());
+                                        TranscriptionStart tss = new TranscriptionStart(i, isFwd, forward[chromNo - 1][i], rel_count,
+                                                feature, offset, dist2start, dist2stop, null, offsetToNextDownstreamFeature,
+                                                getSubSeq(chrom, isFwd, startSubSeq, stopSubSeq), leaderless, cdsShift,
+                                                startCodon, stopCodon, isInternal, isPutAntisense, chromId, this.trackid); //TODO: check if it is internal
                                         if (!nextDownstreamFeature.getType().equals(FeatureType.RRNA) && !nextDownstreamFeature.getType().equals(FeatureType.TRNA)) {
                                             detectedTSS.add(tss);
                                         }
@@ -199,19 +220,14 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                                 }
                             }
                         } else {
-
                             // leaderless in upstream direction
                             if (offset < leaderlessRestirction) {
                                 // check antisensness
-
                                 if (reverseCDSs.get(i) != null) {
                                     isPutAntisense = true;
                                 }
-
-                                // check for cdsShift when offset > 0 and distance2Start == 0 and mod 3 == 0
-                                // && !startCodon.equals("TTG") && !startCodon.equals("CTG") && !startCodon.equals("ATG") && !(startCodon.equals("GTG"))
-                                // (dist2start % 3) == 0 checks if in frame
-                                if (offset > 0 && (offset % 3) == 0) {
+                                // check for cdsShift, when offset > and offset+1 mod 3 == 0
+                                if (offset > 0 && ((offset + 1) % 3) == 0) {
                                     String startAtTSS = getSubSeq(chrom, isFwd, i - 1, i + 2);
                                     if (startAtTSS.equals("TTG") || startAtTSS.equals("CTG") || startAtTSS.equals("ATG") || startAtTSS.equals("GTG")) {
                                         cdsShift = true;
@@ -221,21 +237,20 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                                 startCodon = getSubSeq(chrom, isFwd, feature.getStart() - 1, feature.getStart() + 2);
                                 stopCodon = getSubSeq(chrom, isFwd, feature.getStop() - 3, feature.getStop());
                                 TranscriptionStart tss = new TranscriptionStart(i, isFwd, forward[chromNo - 1][i], rel_count, feature,
-                                        offset, dist2start, dist2stop, null, nextOffset, getSubSeq(chrom, isFwd, startSubSeq, stopSubSeq), leaderless,
-                                        cdsShift, startCodon, stopCodon, isInternal, isPutAntisense, this.trackid, chromId);//TODO: check if it is internal
+                                        offset, dist2start, dist2stop, null, offsetToNextDownstreamFeature, getSubSeq(chrom, isFwd, startSubSeq, stopSubSeq), leaderless,
+                                        cdsShift, startCodon, stopCodon, isInternal, isPutAntisense, chromId, this.trackid);//TODO: check if it is internal
                                 if (!feature.getType().equals(FeatureType.RRNA) && !feature.getType().equals(FeatureType.TRNA)) {
                                     detectedTSS.add(tss);
                                 }
                             } else {
                                 if (offset < distanceForExcludingTss) {
                                     // check antisensness
-
                                     if (reverseCDSs.get(i) != null) {
                                         isPutAntisense = true;
                                     }
                                     startCodon = getSubSeq(chrom, isFwd, feature.getStart() - 1, feature.getStart() + 2);
                                     stopCodon = getSubSeq(chrom, isFwd, feature.getStop() - 3, feature.getStop());
-                                    TranscriptionStart tss = new TranscriptionStart(i, isFwd, forward[chromNo - 1][i], rel_count, feature, offset, dist2start, dist2stop, null, nextOffset, getSubSeq(chrom, isFwd, startSubSeq, stopSubSeq), leaderless, cdsShift, startCodon, stopCodon, isInternal, isPutAntisense, this.trackid, chromId);
+                                    TranscriptionStart tss = new TranscriptionStart(i, isFwd, forward[chromNo - 1][i], rel_count, feature, offset, dist2start, dist2stop, null, offsetToNextDownstreamFeature, getSubSeq(chrom, isFwd, startSubSeq, stopSubSeq), leaderless, cdsShift, startCodon, stopCodon, isInternal, isPutAntisense, chromId, this.trackid);
                                     if (!feature.getType().equals(FeatureType.RRNA) && !feature.getType().equals(FeatureType.TRNA)) {
                                         detectedTSS.add(tss);
                                         fwdOffsets.add(new Integer[]{i, i + offset});
@@ -260,7 +275,6 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                             offset++;
                         }
 
-//                        int count = revCov[chromNo][i + k + 1];
                         double rel_count = reverse[chromNo - 1][i] / mm;
 
                         PersistantFeature feature = allRegionsInHash.get(reverseCDSs.get(end + i - offset).get(0));
@@ -284,12 +298,10 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                             // check if leaderless (downstream)
                             if (dist2start < leaderlessRestirction) {
                                 // check antisensness
-
                                 if (forwardCDSs.get(i) != null) {
                                     isPutAntisense = true;
                                 }
                                 leaderless = true;
-//                           
                                 String startCodonRev = getSubSeq(chrom, isFwd, feature.getStop() - 3, feature.getStop());
                                 String stopCodonRev = getSubSeq(chrom, isFwd, feature.getStart() - 1, feature.getStart() + 2);
                                 startCodon = Complement(startCodonRev);
@@ -297,9 +309,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                                 String reversedSeq = new StringBuffer(getSubSeq(chrom, isFwd, startSubSeq, stopSubSeq)).reverse().toString();
                                 String revComplement = Complement(reversedSeq);
 
-                                // check for cdsShift when offset is 0 and distance2Start > 0 and mod 3 == 0
-                                // && !startCodon.equals("TTG") && !startCodon.equals("CTG") && !startCodon.equals("ATG") && !(startCodon.equals("GTG"))
-                                // (dist2start % 3) == 0 checks if in frame
+                                // check for cdsShift when offset is 0 and distance2Start > 0 and dist2Start mod 3 == 0
                                 if (dist2start > 0 && (dist2start % 3) == 0) {
                                     String startAtTSSRev = getSubSeq(chrom, isFwd, i - 3, i);
                                     String complement = Complement(startAtTSSRev);
@@ -308,7 +318,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                                     }
                                 }
 
-                                TranscriptionStart tss = new TranscriptionStart(i, isFwd, reverse[chromNo - 1][i], rel_count, feature, offset, dist2start, dist2stop, null, nextOffset, revComplement, leaderless, cdsShift, startCodon, stopCodon, isInternal, isPutAntisense, this.trackid, chromId);
+                                TranscriptionStart tss = new TranscriptionStart(i, isFwd, reverse[chromNo - 1][i], rel_count, feature, offset, dist2start, dist2stop, null, nextOffset, revComplement, leaderless, cdsShift, startCodon, stopCodon, isInternal, isPutAntisense, chromId, this.trackid);
                                 if (!feature.getType().equals(FeatureType.RRNA) && !feature.getType().equals(FeatureType.TRNA)) {
                                     detectedTSS.add(tss);
                                 }
@@ -329,6 +339,9 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                                 if (forwardCDSs.get(i) != null) {
                                     isPutAntisense = true;
                                 }
+
+                                cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), i, dist2start, isFwd, 0.1);
+
                                 if (nextOffset < keepingInternalTssDistance) {
                                     // puttative nextgene
                                     if (!nextFeature.isFwdStrand()) {
@@ -340,7 +353,22 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                                         String revComplement = Complement(reversedSeq);
                                         TranscriptionStart tss = new TranscriptionStart(i, isFwd, reverse[chromNo - 1][i], rel_count,
                                                 null, offset, dist2start, dist2stop, nextFeature, nextOffset, revComplement, leaderless, cdsShift,
-                                                startCodon, stopCodon, isInternal, isPutAntisense, this.trackid, chromId); //TODO: check if it is internal
+                                                startCodon, stopCodon, isInternal, isPutAntisense, chromId, this.trackid); //TODO: check if it is internal
+                                        if (!nextFeature.getType().equals(FeatureType.RRNA) && !nextFeature.getType().equals(FeatureType.TRNA)) {
+                                            detectedTSS.add(tss);
+                                        }
+                                    }
+                                } else if (cdsShift) {
+                                    if (!nextFeature.isFwdStrand()) {
+                                        String startCodonRev = getSubSeq(chrom, isFwd, feature.getStop() - 3, feature.getStop());
+                                        String stopCodonRev = getSubSeq(chrom, isFwd, feature.getStart() - 1, feature.getStart() + 2);
+                                        startCodon = Complement(startCodonRev);
+                                        stopCodon = Complement(stopCodonRev);
+                                        String reversedSeq = new StringBuffer(getSubSeq(chrom, isFwd, startSubSeq, stopSubSeq)).reverse().toString();
+                                        String revComplement = Complement(reversedSeq);
+                                        TranscriptionStart tss = new TranscriptionStart(i, isFwd, reverse[chromNo - 1][i], rel_count,
+                                                feature, offset, dist2start, dist2stop, null, nextOffset, revComplement, leaderless, cdsShift,
+                                                startCodon, stopCodon, isInternal, isPutAntisense, chromId, this.trackid);
                                         if (!nextFeature.getType().equals(FeatureType.RRNA) && !nextFeature.getType().equals(FeatureType.TRNA)) {
                                             detectedTSS.add(tss);
                                         }
@@ -356,9 +384,6 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                                 }
                                 // Leaderless TSS upstream
                                 leaderless = true;
-//                            if (leaderless && (leaderlessInitSeqDown.equals("GTG") || leaderlessInitSeqDown.equals("CTG") || leaderlessInitSeqDown.equals("TTG"))) {
-//                                cdsShift = true;
-//                            }
                                 String startCodonRev = getSubSeq(chrom, isFwd, feature.getStop() - 3, feature.getStop());
                                 String stopCodonRev = getSubSeq(chrom, isFwd, feature.getStart() - 1, feature.getStart() + 2);
                                 startCodon = Complement(startCodonRev);
@@ -367,9 +392,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                                 String revComplement = Complement(reversedSeq);
 
                                 // check for cdsShift when offset is 0 and distance2Start > 0 and mod 3 == 0
-                                // && !startCodon.equals("TTG") && !startCodon.equals("CTG") && !startCodon.equals("ATG") && !(startCodon.equals("GTG"))
-                                // (dist2start % 3) == 0 checks if in frame
-                                if (dist2start > 0 && (dist2start % 3) == 0) {
+                                if (offset > 0 && ((offset + 1) % 3) == 0) {
                                     String startAtTSSRev = getSubSeq(chrom, isFwd, i - 3, i);
                                     String complement = Complement(startAtTSSRev);
                                     if (complement.equals("TTG") || complement.equals("CTG") || complement.equals("ATG") || complement.equals("GTG")) {
@@ -377,7 +400,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                                     }
                                 }
 
-                                TranscriptionStart tss = new TranscriptionStart(i, isFwd, reverse[chromNo - 1][i], rel_count, feature, offset, dist2start, dist2stop, null, nextOffset, revComplement, leaderless, cdsShift, startCodon, stopCodon, isInternal, isPutAntisense, this.trackid, chromId);
+                                TranscriptionStart tss = new TranscriptionStart(i, isFwd, reverse[chromNo - 1][i], rel_count, feature, offset, dist2start, dist2stop, null, nextOffset, revComplement, leaderless, cdsShift, startCodon, stopCodon, isInternal, isPutAntisense, chromId, this.trackid);
                                 if (!feature.getType().equals(FeatureType.RRNA) && !feature.getType().equals(FeatureType.TRNA)) {
                                     detectedTSS.add(tss);
                                 }
@@ -396,7 +419,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                                     String revComplement = Complement(reversedSeq);
                                     TranscriptionStart tss = new TranscriptionStart(i, isFwd, reverse[chromNo - 1][i], rel_count,
                                             feature, offset, dist2start, dist2stop, null, nextOffset, revComplement, leaderless, cdsShift,
-                                            startCodon, stopCodon, isInternal, isPutAntisense, this.trackid, chromId);
+                                            startCodon, stopCodon, isInternal, isPutAntisense, chromId, this.trackid);
                                     if (!feature.getType().equals(FeatureType.RRNA) && !feature.getType().equals(FeatureType.TRNA)) {
 
                                         revOffsets.add(new Integer[]{i - offset, i});
@@ -412,47 +435,88 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
 
 
 
-//                // running additional Antisense detection
-//                for (int i = 0; i < fwdOffsets.size(); i++) {
-//                    Integer[] offset = fwdOffsets.get(i);
-//                    int j = offset[0];
-//                    int k = offset[1];
-//                    for (; j < k; j++) {
-//                        if (revTss.containsKey(j)) {
-//                            revTss.put(j, true);
-//                        }
-//                    }
-//                }
-//
-//                for (int i = 0; i < revOffsets.size(); i++) {
-//                    Integer[] offset = revOffsets.get(i);
-//                    int j = offset[0];
-//                    int k = offset[1];
-//                    for (; j < k; j++) {
-//                        if (fwdTss.containsKey(j)) {
-//                            fwdTss.put(j, true);
-//                        }
-//                    }
-//                }
+            // running additional Antisense detection
+            for (int i = 0; i < fwdOffsets.size(); i++) {
+                Integer[] offset = fwdOffsets.get(i);
+                int j = offset[0];
+                int k = offset[1];
+                for (; j < k; j++) {
+                    if (revTss.containsKey(j)) {
+                        revTss.put(j, true);
+                    }
+                }
+            }
 
-//            for (TranscriptionStart transcriptionStart : detectedTSS) {
-//                int start = transcriptionStart.getStartPosition();
-//                boolean isFwd = transcriptionStart.isFwdStrand();
-//                if (isFwd) {
-//                    if (fwdTss.containsKey(start)) {
-//                        if (fwdTss.get(start) == true) {
-//                            transcriptionStart.setPutativeAntisense(true);
-//                        }
-//                    }
-//                } else {
-//                    if (revTss.containsKey(start)) {
-//                        if (revTss.get(start) == true) {
-//                            transcriptionStart.setPutativeAntisense(true);
-//                        }
-//                    }
-//                }
-//            }
+            for (int i = 0; i < revOffsets.size(); i++) {
+                Integer[] offset = revOffsets.get(i);
+                int j = offset[0];
+                int k = offset[1];
+                for (; j < k; j++) {
+                    if (fwdTss.containsKey(j)) {
+                        fwdTss.put(j, true);
+                    }
+                }
+            }
+
+            for (TranscriptionStart transcriptionStart : detectedTSS) {
+                int start = transcriptionStart.getStartPosition();
+                boolean isFwd = transcriptionStart.isFwdStrand();
+                if (isFwd) {
+                    if (fwdTss.containsKey(start)) {
+                        if (fwdTss.get(start) == true) {
+                            transcriptionStart.setPutativeAntisense(true);
+                        }
+                    }
+                } else {
+                    if (revTss.containsKey(start)) {
+                        if (revTss.get(start) == true) {
+                            transcriptionStart.setPutativeAntisense(true);
+                        }
+                    }
+                }
+            }
         }
+    }
+
+    /**
+     *
+     * @param chrom PersistantChromosome.
+     * @param featureStart Start position of PersistantFeature.
+     * @param featureStop Stop position of PersistantFeature.
+     * @param tssStart Start position of transcription start site.
+     * @param dist2start Distance from transcription start site to start
+     * position of PersistantFeature.
+     * @param isFwd true if is forward direction.
+     * @param relPercentage
+     * @return true, if putative CDS-Shift occur.
+     */
+    private boolean checkCdsShift(PersistantChromosome chrom, int featureStart, int featureStop, int tssStart, int dist2start, boolean isFwd, double relPercentage) {
+        boolean ret = false;
+        double length = featureStop - featureStart;
+        double partOfFeature = dist2start / length;
+
+        if (partOfFeature <= relPercentage) {
+
+            if (isFwd) {
+                // check for cdsShift when offset is 0 and distance2Start > 0 and mod 3 == 0
+                if ((dist2start % 3) == 0) {
+                    String startAtTSS = getSubSeq(chrom, isFwd, tssStart - 1, tssStart + 2);
+                    if (startAtTSS.equals("TTG") || startAtTSS.equals("CTG") || startAtTSS.equals("ATG") || startAtTSS.equals("GTG")) {
+                        ret = true;
+                    }
+                }
+            } else {
+                // check for cdsShift when offset is 0 and distance2Start > 0 and mod 3 == 0
+                if ((dist2start % 3) == 0) {
+                    String startAtTSSRev = getSubSeq(chrom, isFwd, tssStart - 3, tssStart);
+                    String complement = Complement(startAtTSSRev);
+                    if (complement.equals("TTG") || complement.equals("CTG") || complement.equals("ATG") || complement.equals("GTG")) {
+                        ret = true;
+                    }
+                }
+            }
+        }
+        return ret;
     }
 
     /**
@@ -485,9 +549,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                 compliment = compliment.concat(a);
             }
         }
-
         return compliment;
-
     }
 
     /**

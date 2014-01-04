@@ -15,38 +15,19 @@ import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 
 public final class RbsAnalysisWizardIterator implements WizardDescriptor.Iterator<WizardDescriptor> {
-    
-
-    // Example of invoking this wizard:
-    // @ActionID(category="...", id="...")
-    // @ActionRegistration(displayName="...")
-    // @ActionReference(path="Menu/...")
-    // public static ActionListener run() {
-    //     return new ActionListener() {
-    //         @Override public void actionPerformed(ActionEvent e) {
-    //             WizardDescriptor wiz = new WizardDescriptor(new RbsAnalysisWizardIterator());
-    //             // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()
-    //             // {1} will be replaced by WizardDescriptor.Iterator.name()
-    //             wiz.setTitleFormat(new MessageFormat("{0} ({1})"));
-    //             wiz.setTitle("...dialog title...");
-    //             if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
-    //                 ...do something...
-    //             }
-    //         }
-    //     };
-    // }
+   
     private int index;
     private WizardDescriptor wiz;
     private List<WizardDescriptor.Panel<WizardDescriptor>> allPanels;
     private List<WizardDescriptor.Panel<WizardDescriptor>> currentPanels;
     private String[] currentPanelsIndex;
     private static final String PROP_WIZARD_NAME = "RBS analysis";
-    public static final String PROP_RBS_ANALYSIS_ANALYSIS_ALL_ELEMENTS = "all elements";
-    public static final String PROP_RBS_ANALYSIS_ANALYSIS_ONLY_ANTISENSE = "only putative antisense elements";
-    public static final String PROP_RBS_ANALYSIS_ANALYSIS_ONLY_LEADERLESS = "only leaderless elements";
-    public static final String PROP_RBS_ANALYSIS_ANALYSIS_ONLY_NON_LEADERLESS = "only non leaerless elements";
-    public static final String PROP_RBS_ANALYSIS_ANALYSIS_ONLY_SELECTED = "only for promotor analysis selected elements";
-    public static final String PROP_RBS_ANALYSIS_ANALYSIS_REAL_TSS = "only reals TSS elements";
+//    public static final String PROP_RBS_ANALYSIS_ANALYSIS_ALL_ELEMENTS = "all elements";
+//    public static final String PROP_RBS_ANALYSIS_ANALYSIS_ONLY_ANTISENSE = "only putative antisense elements";
+//    public static final String PROP_RBS_ANALYSIS_ANALYSIS_ONLY_LEADERLESS = "only leaderless elements";
+//    public static final String PROP_RBS_ANALYSIS_ANALYSIS_ONLY_NON_LEADERLESS = "only non leaerless elements";
+//    public static final String PROP_RBS_ANALYSIS_ANALYSIS_ONLY_SELECTED = "only for promotor analysis selected elements";
+//    public static final String PROP_RBS_ANALYSIS_ANALYSIS_REAL_TSS = "only reals TSS elements";
     public static final String PROP_WORKING_DIR = "workingDir";
     public static final String PROP_RBS_ANALYSIS_ANALYSIS_LENGTH_ALL_ELEMENTS = "length for promotor analysis of all elements";
     public static final String PROP_RBS_ANALYSIS_REGION_LENGTH = "region upstream from TLS to analyze";
@@ -69,7 +50,7 @@ public final class RbsAnalysisWizardIterator implements WizardDescriptor.Iterato
         if (allPanels == null) {
             allPanels = new ArrayList<>();
             allPanels.add(new DataSelectionWizardPanel());
-            allPanels.add(new RbsAnalysisWizardPanel(PROP_WIZARD_NAME, this.refViewer, this.tss));
+            allPanels.add(new RbsAnalysisWizardPanel(PROP_WIZARD_NAME));
             String[] steps = new String[allPanels.size()];
             for (int i = 0; i < allPanels.size(); i++) {
                 Component c = allPanels.get(i).getComponent();

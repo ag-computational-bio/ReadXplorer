@@ -13,14 +13,20 @@ import java.util.List;
  * @author jritter
  */
 public class OperonDetection {
-     
-    public OperonDetection() {
+
+    private int trackId;
+
+    public OperonDetection(int trackId) {
+        this.trackId = trackId;
     }
-    
-    
+
+    public int getTrackId() {
+        return trackId;
+    }
+
     /**
      * Creating Operon Data.
-     * 
+     *
      * @param putativeOperonAdjacencies
      * @param trackConnector Trackconnector.
      * @param bg Background Threshold.
@@ -46,7 +52,6 @@ public class OperonDetection {
 
             if (spanningReads > bg) {
                 if (lastAnnoId != feature1.getId() && lastAnnoId != 0) {
-
                     op = new Operon(trackConnector.getTrackID());
                     op.addAllOperonAdjacencies(operonAdjacencies);
                     operons.add(op); //only here the operons are added to final list

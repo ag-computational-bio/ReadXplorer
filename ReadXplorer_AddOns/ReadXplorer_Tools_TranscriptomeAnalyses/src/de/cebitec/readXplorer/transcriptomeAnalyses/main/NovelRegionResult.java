@@ -3,6 +3,7 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelRegion;
+import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.TableType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.TranscriptomeAnalysisWizardIterator;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.SequenceUtils;
@@ -20,6 +21,7 @@ public class NovelRegionResult extends ResultTrackAnalysis<ParameterSetWholeTran
     private ParameterSetFiveEnrichedAnalyses parameters;
     private Statistics stats;
     private Map<String, Object> statsMap;
+    private static final TableType TABLE_TYPE = TableType.NOVEL_REGION_TABLE;
 
     public NovelRegionResult(Statistics stats, Map<Integer, PersistantTrack> trackMap, List<NovelRegion> novelRegions, boolean combineTracks) {
         super(trackMap, 1, combineTracks);
@@ -136,6 +138,11 @@ public class NovelRegionResult extends ResultTrackAnalysis<ParameterSetWholeTran
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD,
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD)));
 
+        
+        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow(""));
+        
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Table Type", TABLE_TYPE.toString()));
+        
         tSSExport.add(statisticsExportData);
 
         return tSSExport;

@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: gral
+OpenIDE-Module-Localizing-Bundle: gral/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0
+

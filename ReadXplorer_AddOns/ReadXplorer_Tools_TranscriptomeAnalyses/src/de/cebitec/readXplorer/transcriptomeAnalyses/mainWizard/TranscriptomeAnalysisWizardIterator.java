@@ -24,9 +24,9 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
     public static final String PROP_RBS_ANALYSIS_BASES_BFORE_I = "numberOfBasesBeforeI";
     public static final String PROP_RBS_ANALYSIS_BASES_AFTER_I = "numberOfBasesAfterI";
     public static final String PROP_RBS_ANALYSIS_WORKINGDIRECTORY_PATH = "pathToWorkinigDir";
-    public static final String PROP_PROMOTOR_ANALYSIS = "promotorAnalysis";
-    public static final String PROP_LEADERLESS_ANALYSIS = "leaderlessAnalysis";
-    public static final String PROP_ANTISENSE_ANALYSIS = "antiseseAnalysis";
+//    public static final String PROP_PROMOTOR_ANALYSIS = "promotorAnalysis";
+//    public static final String PROP_LEADERLESS_ANALYSIS = "leaderlessAnalysis";
+//    public static final String PROP_ANTISENSE_ANALYSIS = "antiseseAnalysis";
     // Whole genome data set analyses
     public static final String PROP_NOVEL_ANALYSIS = "novel";
     public static final String PROP_OPERON_ANALYSIS = "operon";
@@ -59,18 +59,17 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
     private String[] wholeGenomeIndex;
     WizardDescriptor wiz;
     private int index;
-//    private SelectReadClassWizardPanel readClassPanel;
-//    private SelectFeatureTypeWizardPanel featTypePanel;
     private OpenTracksWizardPanel openTracksPanel;
-    private ChangeSupport changeSupport;
     private int referenceId;
 
     public TranscriptomeAnalysisWizardIterator(int referenceId) {
         this.referenceId = referenceId;
-        this.changeSupport = new ChangeSupport(this);
         this.initializePanels();
     }
 
+    /**
+     * Initializes all Wizard Panels.
+     */
     private void initializePanels() {
         if (allPanels == null) {
             allPanels = new ArrayList<>();
@@ -79,8 +78,8 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
             allPanels.add(new FivePrimeEnrichedTracksPanel(PROP_WIZARD_NAME, referenceId)); // 2
             allPanels.add(new AntisenseDetectionParamsPanel(PROP_WIZARD_NAME)); // 3
             allPanels.add(new OperonsDetectionParamsPanel(PROP_WIZARD_NAME)); // 4
-            openTracksPanel = new OpenTracksWizardPanel(PROP_WIZARD_NAME, referenceId);
-            allPanels.add(openTracksPanel); // 5
+            openTracksPanel = new OpenTracksWizardPanel(PROP_WIZARD_NAME, referenceId); // 5
+            allPanels.add(openTracksPanel); 
 
 
             String[] steps = new String[allPanels.size()];
@@ -97,39 +96,29 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
                 }
             }
 
-
-
             initPanels = new ArrayList<>();
             initPanels.add(this.allPanels.get(5));
             initPanels.add(this.allPanels.get(0));
             initPanels.add(this.allPanels.get(1));
-
-            initPanelsIndex = new String[]{steps[5], steps[0], steps[1], "..."};
+            initPanelsIndex = new String[]{steps[5], steps[0], "..."};
 
 
             fivePrimeAnalyses = new ArrayList<>();
             fivePrimeAnalyses.add(this.allPanels.get(5));
             fivePrimeAnalyses.add(this.allPanels.get(0));
             fivePrimeAnalyses.add(this.allPanels.get(2));
-//            fivePrimeAnalyses.add(this.allPanels.get(3));
-
-
             fivePrimeIndex = new String[]{steps[5], steps[0], steps[2], "..."};
 
             wholegenomeAnalyses = new ArrayList<>();
             wholegenomeAnalyses.add(this.allPanels.get(5));
             wholegenomeAnalyses.add(this.allPanels.get(0));
             wholegenomeAnalyses.add(this.allPanels.get(1));
-
-
             wholeGenomeIndex = new String[]{steps[5], steps[0], steps[1], "..."};
 
             fivePrimeSelectedAnalyses = new ArrayList<>();
             fivePrimeSelectedAnalyses.add(this.allPanels.get(5));
             fivePrimeSelectedAnalyses.add(this.allPanels.get(0));
             fivePrimeSelectedAnalyses.add(this.allPanels.get(2));
-
-
 
             wholeGenomeSelectedAnayses = new ArrayList<>();
             wholeGenomeSelectedAnayses.add(this.allPanels.get(5));
@@ -195,16 +184,6 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
             contentData.add(allPanels.get(5).getComponent().getName());
             contentData.add(allPanels.get(0).getComponent().getName());
             contentData.add(allPanels.get(2).getComponent().getName());
-            if ((boolean) wiz.getProperty(PROP_TSS_ANALYSIS) && !fivePrimeSelectedAnalyses.contains(this.allPanels.get(3))) {
-//                fivePrimeSelectedAnalyses.add(this.allPanels.get(3));
-//                contentData.add(allPanels.get(3).getComponent().getName());
-//                fivePrimeSelectedAnalyses.add(this.allPanels.get(6));
-//                contentData.add(allPanels.get(6).getComponent().getName());
-            }
-//            if ((boolean) wiz.getProperty(PROP_ANTISENSE_ANALYSIS) && !fivePrimeSelectedAnalyses.contains(this.allPanels.get(7))) {
-//                fivePrimeSelectedAnalyses.add(this.allPanels.get(7));
-//                contentData.add(allPanels.get(7).getComponent().getName());
-//            }
 
             this.currentPanels = this.fivePrimeSelectedAnalyses;
             if (!contentData.isEmpty()) {
@@ -231,8 +210,6 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
                 wiz.putProperty(WizardDescriptor.PROP_CONTENT_DATA, contentData);
             }
         }
-
-
         index++;
         wiz.putProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, index);
     }
@@ -263,13 +240,6 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
     public void removeChangeListener(ChangeListener l) {
     }
 
-//    /**
-//     * @param usingADBTrack true, if the wizard is running on a track stored
-//     * completely in the DB, false otherwise.
-//     */
-//    public void setUsingDBTrack(boolean containsDBTrack) {
-//        this.readClassPanel.getComponent().setUsingDBTrack(containsDBTrack);
-//    }
     /**
      * @param wiz the wizard, in which this wizard iterator is contained. If it
      * is not set, no properties can be stored, thus it always has to be set.
@@ -285,22 +255,6 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
         return wiz;
     }
 
-//    /**
-//     * @return The dynamically generated property name for the read class
-//     * selection for this wizard. Can be used to obtain the corresponding read
-//     * class parameters.
-//     */
-//    public String getReadClassPropForWiz() {
-//        return this.readClassPanel.getPropReadClassParams();
-//    }
-//
-//    /**
-//     * @return The property string for the selected feature type list for the
-//     * corresponding wizard.
-//     */
-//    public String getPropSelectedFeatTypes() {
-//        return this.featTypePanel.getPropSelectedFeatTypes();
-//    }
     /**
      * @return The list of track selected in this wizard.
      */

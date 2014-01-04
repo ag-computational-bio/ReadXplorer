@@ -1,5 +1,6 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard;
 
+import de.cebitec.readXplorer.transcriptomeAnalyses.verifier.DoubleVerifier;
 import java.util.prefs.Preferences;
 import javax.swing.JPanel;
 import org.openide.util.NbPreferences;
@@ -14,6 +15,8 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
     public WholeTranscriptTracksVisualPanel(String wizardName) {
         this.wizardName = wizardName;
         initComponents();
+        this.fractionNovelRegionTF.setInputVerifier(new DoubleVerifier(this.fractionNovelRegionTF));
+        this.fractionOperonDetectionTF.setInputVerifier(new DoubleVerifier(this.fractionOperonDetectionTF));
         updateCheckBoxes();
     }
 
@@ -58,7 +61,7 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
         this.newRegionsCheckBox.setSelected(pref.getBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_NOVEL_ANALYSIS, false));
         this.fractionNovelRegionTF.setText(pref.get(wizardName + TranscriptomeAnalysisWizardIterator.PROP_FRACTION_NOVELREGION_DETECTION, "0.05"));
         this.minBoundaryNovelRegionTF.setText(pref.get(wizardName + TranscriptomeAnalysisWizardIterator.PROP_MIN_BOUNDRY_LENGTH, "100"));
-        this.fractionOperonDetectionTF.setText(pref.get(wizardName + TranscriptomeAnalysisWizardIterator.PROP_Fraction, "100"));
+        this.fractionOperonDetectionTF.setText(pref.get(wizardName + TranscriptomeAnalysisWizardIterator.PROP_Fraction, "0.05"));
     }
 
     /**

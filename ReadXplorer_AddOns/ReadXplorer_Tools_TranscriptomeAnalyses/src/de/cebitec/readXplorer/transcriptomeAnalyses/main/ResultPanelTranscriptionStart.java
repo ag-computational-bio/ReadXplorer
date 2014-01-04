@@ -1,12 +1,16 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ElementsOfInterest;
 import de.cebitec.readXplorer.view.tableVisualization.tableFilter.TableRightClickDeletion;
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.exporter.excel.ExcelExportFileChooser;
+import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.ChartsGenerationSelectChatTypeWizardPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ChartType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.plots.PlotGenerator;
 import de.cebitec.readXplorer.transcriptomeAnalyses.promotorAnalysis.PromotorAnalysisWizardIterator;
+import de.cebitec.readXplorer.transcriptomeAnalyses.rbsAnalysis.DataSelectionWizardPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.rbsAnalysis.RbsAnalysisWizardIterator;
 import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.readXplorer.util.Observer;
@@ -19,13 +23,16 @@ import de.cebitec.readXplorer.view.tableVisualization.TableComparatorProvider;
 import de.cebitec.readXplorer.view.tableVisualization.TableUtils;
 import de.cebitec.readXplorer.view.tableVisualization.tableFilter.TableRightClickFilter;
 import de.erichseifert.gral.data.DataTable;
+import de.erichseifert.gral.ui.InteractivePanel;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
@@ -70,6 +77,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
     public static final String TSS_NO_PUTATIVE_CDS_SHIFTS = "number of putative cds shifts";
     public static final String TSS_LIMITATION_FOR_DISTANCE_OFUPSTREM_REGION = "Limitation for distance between TSS and TLS";
     public static final String TSS_LIMITATION_FOR_DISTANCE_KEEPING_INTERNAL_TSS = "Limitation for distance between internal TSS and next upstream feature TLS";
+    public static final String BIN_SIZE = "size of bin";
     public static final int UNUSED_STATISTICS_VALUE = -1;
     private BoundsInfoManager boundsInfoManager;
     private ReferenceViewer referenceViewer;
@@ -81,6 +89,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
     private HashMap<Integer, TranscriptionStart> tssInHash;
     private MotifSearchModel model;
     private AppPanelTopComponent appPanelTopComponent;
+    private ElementsOfInterest elements = null;
 
     /**
      * This panel is capable of showing a table with transcription start sites
@@ -99,7 +108,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                 int posColumnIdx = 0;
                 int chromColumnIdx = 1;
                 TableUtils.showPosition(tSSTable, posColumnIdx, chromColumnIdx, boundsInfoManager);
-             }
+            }
         });
     }
 
@@ -304,91 +313,114 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
     }//GEN-LAST:event_tSSTableMouseClicked
 
     private void startChartsOfTssDataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startChartsOfTssDataActionPerformed
-        PlottChoicePanel plotChoice = new PlottChoicePanel();
-
-        NotifyDescriptor nd = new NotifyDescriptor(
-                plotChoice, // instance of your panel
-                "Choose one or more Chart creations", // title of the dialog
-                NotifyDescriptor.OK_CANCEL_OPTION, // it is Yes/No dialog ...
-                NotifyDescriptor.INFORMATION_MESSAGE, // ... of a question type => a question mark icon
-                null, // we have specified YES_NO_OPTION => can be null, options specified by L&F,
-                // otherwise specify options as:
-                //     new Object[] { NotifyDescriptor.YES_OPTION, ... etc. },
-                NotifyDescriptor.OK_CANCEL_OPTION // default option is "Yes"
-                );
-        if (DialogDisplayer.getDefault().notify(nd) == NotifyDescriptor.OK_OPTION) {
-            PlotGenerator gen = new PlotGenerator();
-            //####update tssList! #########################
-            List<TranscriptionStart> tss = this.updateTssResults();
-            //###################################
-
-            if (plotChoice.isTssDistribution()) {
-                DataTable data = new DataTable(Double.class, Double.class);
-                // fill data!
-                // We want to show the distribution of length between TSS to TLS
-                for (TranscriptionStart tSS : tss) {
-                    double x = tSS.getOffset();
-//                    if(tSS.isLeaderless() && x == 0) {
-//                        x = -tSS.getDist2start();
-//                    }
-
-                    double y = tSS.getReadStarts();
-                    data.add(x, y);
-                }
-
-                gen.generateYXPlot(data, "distance between TSS and TLS", "TSS stacksize", "Distribution of TSS distance to TLS");
+        List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<WizardDescriptor.Panel<WizardDescriptor>>();
+        panels.add(new ChartsGenerationSelectChatTypeWizardPanel());
+        panels.add(new DataSelectionWizardPanel());
+        String[] steps = new String[panels.size()];
+        for (int i = 0; i < panels.size(); i++) {
+            Component c = panels.get(i).getComponent();
+            // Default step name to component name of panel.
+            steps[i] = c.getName();
+            if (c instanceof JComponent) { // assume Swing components
+                JComponent jc = (JComponent) c;
+                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, i);
+                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DATA, steps);
+                jc.putClientProperty(WizardDescriptor.PROP_AUTO_WIZARD_STYLE, true);
+                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DISPLAYED, true);
+                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_NUMBERED, true);
             }
-
-            if (plotChoice.isAbsoluteFrequency()) {
-                int bin = plotChoice.getBin();
-                // ermittel den höchsten x wert, teile ihn durch den bin, schaue dann
-                // in welchen bin ein x reinkommt...
-                HashMap<Double, Double> freaquencyOfTSSDistances = new HashMap<>();
-                double smallestValue = 0;
-                double biggestValue = 0;
-                for (TranscriptionStart tSS : tss) {
-                    double x = tSS.getOffset();
-                    if (tSS.isLeaderless() && x == 0) {
-                        x = -tSS.getDist2start();
-                    }
-
-                    if (x < smallestValue) {
-                        smallestValue = x;
-                    }
-
-                    if (x > biggestValue) {
-                        biggestValue = x;
-                    }
-                }
-
-                // Und dann??
-                DataTable data = new DataTable(Double.class, Double.class);
-                // fill data!
-                // We want to show the distribution of length between TSS to TLS
-                for (TranscriptionStart tSS : tss) {
-
-                    double x = tSS.getOffset();
-                    if (tSS.isLeaderless()) {
-                        x = -tSS.getDist2start();
-                    }
-                    if (freaquencyOfTSSDistances.containsKey(x)) {
-                        freaquencyOfTSSDistances.put(x, freaquencyOfTSSDistances.get(x) + 1.0);
-                    } else {
-                        freaquencyOfTSSDistances.put(x, 1.0);
-                    }
-                }
-
-                for (Double key : freaquencyOfTSSDistances.keySet()) {
-                    data.add(key, freaquencyOfTSSDistances.get(key));
-                }
-
-                gen.generateBarPlot(data, "distance between TSS and TLS", "Absolute frequency", "Distribution of TSS distance to TLS");
-            }
-
-            this.tssResult.setResults(tss);
         }
+        WizardDescriptor wiz = new WizardDescriptor(new WizardDescriptor.ArrayIterator<>(panels));
+        // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
+        wiz.setTitleFormat(new MessageFormat("{0}"));
+        wiz.setTitle("...dialog title...");
+        if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
+            final List<TranscriptionStart> currentTss = updateTssResults();
 
 
+            boolean takeAllElements = (boolean) wiz.getProperty(ElementsOfInterest.ALL.toString());
+            boolean takeOnlyLeaderless = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_LEADERLESS.toString());
+            boolean takeOnlyAntisense = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_ANTISENSE.toString());
+            boolean takeOnlyNonLeaderless = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_NONE_LEADERLESS.toString());
+            boolean takeOnlyRealTss = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_REAL_TSS.toString());
+            boolean takeOnlySelectedElements = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_SELECTED.toString());
+
+            boolean isTssDistributionPlot = (boolean) wiz.getProperty(ChartType.DISTRIBUTION_OF_ALL_TSS_OFFSETS_LENGTH.toString());
+            boolean isAbsoluteFrequencyPlot = (boolean) wiz.getProperty(ChartType.ABSOLUTE_FREQUENCY_OF_5_PRIME_UTRs.toString());
+            boolean isBaseDistributionPlot = (boolean) wiz.getProperty(ChartType.BASE_DISTRIBUTION.toString());
+
+            final int lengthRelToTls = (int) wiz.getProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_REGION_LENGTH);
+            final int binSize = (int) wiz.getProperty(BIN_SIZE);
+
+            if (takeAllElements) {
+                elements = ElementsOfInterest.ALL;
+            } else if (takeOnlyLeaderless) {
+                elements = ElementsOfInterest.ONLY_LEADERLESS;
+            } else if (takeOnlyAntisense) {
+                elements = ElementsOfInterest.ONLY_ANTISENSE;
+            } else if (takeOnlyNonLeaderless) {
+                elements = ElementsOfInterest.ONLY_NONE_LEADERLESS;
+            } else if (takeOnlyRealTss) {
+                elements = ElementsOfInterest.ONLY_REAL_TSS;
+            } else if (takeOnlySelectedElements) {
+                elements = ElementsOfInterest.ONLY_SELECTED;
+            }
+
+
+            if (isAbsoluteFrequencyPlot) {
+                appPanelTopComponent = new AppPanelTopComponent();
+                appPanelTopComponent.setLayout(new BorderLayout());
+                appPanelTopComponent.open();
+                appPanelTopComponent.setName("Distribution of TSS distance to TLS");
+                Thread plotGeneration = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        PlotGenerator gen = new PlotGenerator();
+                        List<DataTable> dataList = gen.prepareData(ChartType.ABSOLUTE_FREQUENCY_OF_5_PRIME_UTRs, elements, currentTss, referenceViewer, lengthRelToTls, binSize);
+                        InteractivePanel panel = gen.generateBarPlot(dataList.get(0), "distance between TSS and TLS", "Absolute frequency");
+                        appPanelTopComponent.add(panel, BorderLayout.CENTER);
+                    }
+                });
+                plotGeneration.start();
+            }
+
+            if (isBaseDistributionPlot) {
+                appPanelTopComponent = new AppPanelTopComponent();
+                appPanelTopComponent.setLayout(new BorderLayout());
+                appPanelTopComponent.open();
+                appPanelTopComponent.setName("Distribution of TSS distance to TLS");
+                Thread plotGeneration = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        PlotGenerator gen = new PlotGenerator();
+                        List<DataTable> dataList = gen.prepareData(ChartType.BASE_DISTRIBUTION, elements, currentTss, referenceViewer, lengthRelToTls, binSize);
+                        InteractivePanel panel = gen.generateOverlappedBarPlot(dataList.get(0), dataList.get(1), "bla", "blub");
+                        appPanelTopComponent.add(panel, BorderLayout.CENTER);
+                    }
+                });
+                plotGeneration.start();
+            }
+
+            if (isTssDistributionPlot) {
+                appPanelTopComponent = new AppPanelTopComponent();
+                appPanelTopComponent.setLayout(new BorderLayout());
+                appPanelTopComponent.open();
+                appPanelTopComponent.setName("Distribution of TSS distance to TLS");
+                Thread plotGeneration = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        PlotGenerator gen = new PlotGenerator();
+                        List<DataTable> dataList = gen.prepareData(ChartType.DISTRIBUTION_OF_ALL_TSS_OFFSETS_LENGTH, elements, currentTss, referenceViewer, lengthRelToTls, binSize);
+                        InteractivePanel panel = gen.generateYXPlot(dataList.get(0), "distance between TSS and TLS", "TSS stacksize");
+                        appPanelTopComponent.add(panel, BorderLayout.CENTER);
+                    }
+                });
+                plotGeneration.start();
+
+            }
+
+            this.tssResult.setResults(currentTss);
+        }
     }//GEN-LAST:event_startChartsOfTssDataActionPerformed
 
     private void performDeletionOfAllFPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_performDeletionOfAllFPActionPerformed
@@ -398,7 +430,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         for (int i = 0; i < tSSTable.getRowCount(); i++) {
             Integer posTableAti = (Integer) tSSTable.getValueAt(i, 0);
             TranscriptionStart ts = tssInHash.get(posTableAti);
-            boolean isFalsePositive = (boolean) tSSTable.getValueAt(i, 9);
+            boolean isFalsePositive = (boolean) tSSTable.getValueAt(i, 11);
             if (isFalsePositive) {
                 tssInHash.remove(posTableAti);
                 tableModel.removeRow(i);
@@ -424,12 +456,26 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
         if (!cancelled) {
 
-            boolean takeAllElements = (boolean) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_ALL_ELEMENTS);
-            boolean takeOnlyLeaderless = (boolean) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_ONLY_LEADERLESS);
-            boolean takeOnlyAntisense = (boolean) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_ONLY_ANTISENSE);
-            boolean takeOnlyNonLeaderless = (boolean) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_ONLY_NON_LEADERLESS);
-            boolean takeOnlyRealTss = (boolean) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_REAL_TSS);
-            boolean takeOnlySelectedElements = (boolean) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_ONLY_SELECTED);
+            boolean takeAllElements = (boolean) wiz.getProperty(ElementsOfInterest.ALL.toString());
+            boolean takeOnlyLeaderless = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_LEADERLESS.toString());
+            boolean takeOnlyAntisense = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_ANTISENSE.toString());
+            boolean takeOnlyNonLeaderless = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_NONE_LEADERLESS.toString());
+            boolean takeOnlyRealTss = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_REAL_TSS.toString());
+            boolean takeOnlySelectedElements = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_SELECTED.toString());
+
+            if (takeAllElements) {
+                elements = ElementsOfInterest.ALL;
+            } else if (takeOnlyLeaderless) {
+                elements = ElementsOfInterest.ONLY_LEADERLESS;
+            } else if (takeOnlyAntisense) {
+                elements = ElementsOfInterest.ONLY_ANTISENSE;
+            } else if (takeOnlyNonLeaderless) {
+                elements = ElementsOfInterest.ONLY_NONE_LEADERLESS;
+            } else if (takeOnlyRealTss) {
+                elements = ElementsOfInterest.ONLY_REAL_TSS;
+            } else if (takeOnlySelectedElements) {
+                elements = ElementsOfInterest.ONLY_SELECTED;
+            }
 
             int minus10MotifWidth = (Integer) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_MINUS10_MOTIF_LENGTH);
             int minus35MotifWidth = (Integer) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_MINUS35_MOTIF_LENGTH);
@@ -449,125 +495,21 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
 
             final List<TranscriptionStart> starts = updateTssResults();
-            if (takeAllElements) {
-                appPanelTopComponent = new AppPanelTopComponent();
-                appPanelTopComponent.setLayout(new BorderLayout());
-                appPanelTopComponent.open();
-                appPanelTopComponent.setName("Promotor motif search for all elements in Table");
-                Thread promotorSearch = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        model = new MotifSearchModel(referenceViewer);
-                        model.takeUpstreamRegionsFromAllElementsIntoAccount(starts, lengthRelToTss, false);
-                        model.utrPromotorAnalysis(params);
-                        appPanelTopComponent.add(model.getPromotorMotifSearchPanel(), BorderLayout.CENTER);
-                    }
-                });
-                promotorSearch.start();
-
-            }
-
-            if (takeOnlyAntisense) {
-                appPanelTopComponent = new AppPanelTopComponent();
-                appPanelTopComponent.setLayout(new BorderLayout());
-                appPanelTopComponent.open();
-                appPanelTopComponent.setName("Promotor motif search for all antisense elements in Table");
-                Thread promotorSearch = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        model = new MotifSearchModel(referenceViewer);
-                        model.takeUpstreamRegionsFromAntisenseElementsIntoAccount(starts, lengthRelToTss, false);
-                        model.utrPromotorAnalysis(params);
-                        appPanelTopComponent.add(model.getPromotorMotifSearchPanel(), BorderLayout.CENTER);
-                    }
-                });
-                promotorSearch.start();
-            }
-
-            if (takeOnlyLeaderless) {
-                appPanelTopComponent = new AppPanelTopComponent();
-                appPanelTopComponent.setLayout(new BorderLayout());
-                appPanelTopComponent.open();
-                appPanelTopComponent.setName("Promotor motif search for all leaderless elements in Table");
-                Thread promotorSearch = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        model = new MotifSearchModel(referenceViewer);
-                        model.takeUpstreamRegionsFromLeaderlessElementsIntoAccount(starts, lengthRelToTss, false);
-                        model.utrPromotorAnalysis(params);
-                        appPanelTopComponent.add(model.getPromotorMotifSearchPanel(), BorderLayout.CENTER);
-                    }
-                });
-                promotorSearch.start();
-            }
-
-            if (takeOnlyNonLeaderless) {
-                appPanelTopComponent = new AppPanelTopComponent();
-                appPanelTopComponent.setLayout(new BorderLayout());
-                appPanelTopComponent.open();
-                appPanelTopComponent.setName("Promotor motif search for all non/leaderless elements in Table");
-                Thread promotorSearch = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        model = new MotifSearchModel(referenceViewer);
-                        model.takeUpstreamRegionsFromNonLeaderlessElementsIntoAccount(starts, lengthRelToTss, false);
-                        model.utrPromotorAnalysis(params);
-                        appPanelTopComponent.add(model.getPromotorMotifSearchPanel(), BorderLayout.CENTER);
-                    }
-                });
-                promotorSearch.start();
-            }
-
-            if (takeOnlyRealTss) {
-                appPanelTopComponent = new AppPanelTopComponent();
-                appPanelTopComponent.setLayout(new BorderLayout());
-                appPanelTopComponent.open();
-                appPanelTopComponent.setName("Promotor motif search for all real-TSS elements in Table");
-                Thread promotorSearch = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        model = new MotifSearchModel(referenceViewer);
-                        model.takeUpstreamRegionsFromRealTssElementsIntoAccount(starts, lengthRelToTss, false);
-                        model.utrPromotorAnalysis(params);
-                        appPanelTopComponent.add(model.getPromotorMotifSearchPanel(), BorderLayout.CENTER);
-                    }
-                });
-                promotorSearch.start();
-            }
-
-            if (takeOnlySelectedElements) {
-                appPanelTopComponent = new AppPanelTopComponent();
-                appPanelTopComponent.setLayout(new BorderLayout());
-                appPanelTopComponent.open();
-                appPanelTopComponent.setName("Promotor motif search for all selected upstream-analysis elements in Table");
-                Thread promotorSearch = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        model = new MotifSearchModel(referenceViewer);
-
-                        HashMap<Integer, TranscriptionStart> tmpHash = new HashMap<>();
-                        tmpHash.putAll(tssInHash);
-                        List<TranscriptionStart> tssForAnalysis = new ArrayList<>();
-
-                        for (int i = 0; i < tSSTable.getRowCount(); i++) {
-                            Integer posTableAti = (Integer) tSSTable.getValueAt(i, 0);
-                            boolean isSelected = (boolean) tSSTable.getValueAt(i, 12);
-                            if (tmpHash.containsKey(posTableAti) && !isSelected) {
-                                tmpHash.remove(posTableAti);
-                            }
-                        }
-                        for (Integer key : tmpHash.keySet()) {
-                            TranscriptionStart ts = tmpHash.get(key);
-                            tssForAnalysis.add(ts);
-                        }
-
-                        model.takeUpstreamRegionsFromSelectedElements(tssForAnalysis, lengthRelToTss, false);
-                        model.utrPromotorAnalysis(params);
-                        appPanelTopComponent.add(model.getPromotorMotifSearchPanel(), BorderLayout.CENTER);
-                    }
-                });
-                promotorSearch.start();
-            }
+            appPanelTopComponent = new AppPanelTopComponent();
+            appPanelTopComponent.setLayout(new BorderLayout());
+            appPanelTopComponent.open();
+            String type = elements.toString().toLowerCase();
+            appPanelTopComponent.setName("Promotor motif search for " + type + " elements in Table");
+            Thread promotorSearch = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    model = new MotifSearchModel(referenceViewer);
+                    model.takeUpstreamRegions(elements, starts, lengthRelToTss, false);
+                    MotifSearchPanel promotorMotifSearchPanel = model.utrPromotorAnalysis(params);
+                    appPanelTopComponent.add(promotorMotifSearchPanel, BorderLayout.CENTER);
+                }
+            });
+            promotorSearch.start();
 
             this.tssResult.setResults(starts);
         }
@@ -586,14 +528,26 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
         if (!cancelled) {
 
+            boolean takeAllElements = (boolean) wiz.getProperty(ElementsOfInterest.ALL.toString());
+            boolean takeOnlyLeaderless = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_LEADERLESS.toString());
+            boolean takeOnlyAntisense = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_ANTISENSE.toString());
+            boolean takeOnlyNonLeaderless = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_NONE_LEADERLESS.toString());
+            boolean takeOnlyRealTss = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_REAL_TSS.toString());
+            boolean takeOnlySelectedElements = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_SELECTED.toString());
 
-
-            boolean takeAllElements = (boolean) wiz.getProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_ANALYSIS_ALL_ELEMENTS);
-            boolean takeOnlyLeaderless = (boolean) wiz.getProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_ANALYSIS_ONLY_LEADERLESS);
-            boolean takeOnlyAntisense = (boolean) wiz.getProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_ANALYSIS_ONLY_ANTISENSE);
-            boolean takeOnlyNonLeaderless = (boolean) wiz.getProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_ANALYSIS_ONLY_NON_LEADERLESS);
-            boolean takeOnlyRealTss = (boolean) wiz.getProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_ANALYSIS_REAL_TSS);
-            boolean takeOnlySelectedElements = (boolean) wiz.getProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_ANALYSIS_ONLY_SELECTED);
+            if (takeAllElements) {
+                elements = ElementsOfInterest.ALL;
+            } else if (takeOnlyLeaderless) {
+                elements = ElementsOfInterest.ONLY_LEADERLESS;
+            } else if (takeOnlyAntisense) {
+                elements = ElementsOfInterest.ONLY_ANTISENSE;
+            } else if (takeOnlyNonLeaderless) {
+                elements = ElementsOfInterest.ONLY_NONE_LEADERLESS;
+            } else if (takeOnlyRealTss) {
+                elements = ElementsOfInterest.ONLY_REAL_TSS;
+            } else if (takeOnlySelectedElements) {
+                elements = ElementsOfInterest.ONLY_SELECTED;
+            }
 
             File workingDir = (File) wiz.getProperty(RbsAnalysisWizardIterator.PROP_WORKING_DIR);
             final int lengthRelToTls = (int) wiz.getProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_REGION_LENGTH);
@@ -604,132 +558,28 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
             final RbsAnalysisParameters params = new RbsAnalysisParameters(workingDir, lengthRelToTls, motifWidth, noOfTrying, minSpacer);
 
 
-            if (takeAllElements) {
 
-                appPanelTopComponent = new AppPanelTopComponent();
-                appPanelTopComponent.setLayout(new BorderLayout());
-                appPanelTopComponent.open();
-                appPanelTopComponent.setName("RBS motif search for all elements in Table");
+            appPanelTopComponent = new AppPanelTopComponent();
+            appPanelTopComponent.setLayout(new BorderLayout());
+            appPanelTopComponent.open();
+            String type = elements.toString().toLowerCase();
+            appPanelTopComponent.setName("RBS motif search for " + type + " elements in Table");
 
-                Thread promotorSearch = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
+            Thread promotorSearch = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    model = new MotifSearchModel(referenceViewer);
+                    model.takeUpstreamRegions(elements, currentTss, lengthRelToTls, true);
+                    model.rbsMotifAnalysis(params);
+                    appPanelTopComponent.add(model.getRbsMotifSearchPanel(), BorderLayout.CENTER);
 
-                        model = new MotifSearchModel(referenceViewer);
-                        model.takeUpstreamRegionsFromAllElementsIntoAccount(currentTss, lengthRelToTls, true);
-                        model.rbsMotifAnalysis(params);
-                        appPanelTopComponent.add(model.getRbsMotifSearchPanel(), BorderLayout.CENTER);
+                }
+            });
+            promotorSearch.start();
 
-                    }
-                });
-                promotorSearch.start();
 
-            }
-
-            if (takeOnlyAntisense) {
-                appPanelTopComponent = new AppPanelTopComponent();
-                appPanelTopComponent.setLayout(new BorderLayout());
-                appPanelTopComponent.open();
-                appPanelTopComponent.setName("RBS motif search for all antisense elements in Table");
-                Thread promotorSearch = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        model = new MotifSearchModel(referenceViewer);
-                        model.takeUpstreamRegionsFromAntisenseElementsIntoAccount(currentTss, lengthRelToTls, true);
-                        model.rbsMotifAnalysis(params);
-                        appPanelTopComponent.add(model.getRbsMotifSearchPanel(), BorderLayout.CENTER);
-                    }
-                });
-                promotorSearch.start();
-            }
-
-            if (takeOnlyLeaderless) {
-                appPanelTopComponent = new AppPanelTopComponent();
-                appPanelTopComponent.setLayout(new BorderLayout());
-                appPanelTopComponent.open();
-                appPanelTopComponent.setName("RBS motif search for all leaderless elements in Table");
-                Thread promotorSearch = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        model = new MotifSearchModel(referenceViewer);
-                        model.takeUpstreamRegionsFromLeaderlessElementsIntoAccount(currentTss, lengthRelToTls, true);
-                        model.rbsMotifAnalysis(params);
-                        appPanelTopComponent.add(model.getRbsMotifSearchPanel(), BorderLayout.CENTER);
-                    }
-                });
-                promotorSearch.start();
-
-            }
-
-            if (takeOnlyNonLeaderless) {
-                appPanelTopComponent = new AppPanelTopComponent();
-                appPanelTopComponent.setLayout(new BorderLayout());
-                appPanelTopComponent.open();
-                appPanelTopComponent.setName("RBS motif search for all non-leaderless elements in Table");
-                Thread promotorSearch = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        model = new MotifSearchModel(referenceViewer);
-                        model.takeUpstreamRegionsFromNonLeaderlessElementsIntoAccount(currentTss, lengthRelToTls, true);
-                        model.rbsMotifAnalysis(params);
-                        appPanelTopComponent.add(model.getRbsMotifSearchPanel(), BorderLayout.CENTER);
-                    }
-                });
-                promotorSearch.start();
-            }
-
-            if (takeOnlyRealTss) {
-                appPanelTopComponent = new AppPanelTopComponent();
-                appPanelTopComponent.setLayout(new BorderLayout());
-                appPanelTopComponent.open();
-                appPanelTopComponent.setName("RBS motif search for real TSS elements in Table");
-                Thread promotorSearch = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        model = new MotifSearchModel(referenceViewer);
-                        model.takeUpstreamRegionsFromRealTssElementsIntoAccount(currentTss, lengthRelToTls, true);
-                        model.rbsMotifAnalysis(params);
-                        appPanelTopComponent.add(model.getRbsMotifSearchPanel(), BorderLayout.CENTER);
-                    }
-                });
-                promotorSearch.start();
-            }
-
-            if (takeOnlySelectedElements) {
-
-                appPanelTopComponent = new AppPanelTopComponent();
-                appPanelTopComponent.setLayout(new BorderLayout());
-                appPanelTopComponent.open();
-                appPanelTopComponent.setName("RBS motif search for upstream analysis selected elements in Table");
-                Thread promotorSearch = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-
-                        model = new MotifSearchModel(referenceViewer);
-                        HashMap<Integer, TranscriptionStart> tmpHash = new HashMap<>();
-                        tmpHash.putAll(tssInHash);
-                        List<TranscriptionStart> tssForAnalysis = new ArrayList<>();
-
-                        for (int i = 0; i < tSSTable.getRowCount(); i++) {
-                            Integer posTableAti = (Integer) tSSTable.getValueAt(i, 0);
-                            boolean isSelected = (boolean) tSSTable.getValueAt(i, 12);
-                            if (tmpHash.containsKey(posTableAti) && !isSelected) {
-                                tmpHash.remove(posTableAti);
-                            }
-                        }
-                        for (Integer key : tmpHash.keySet()) {
-                            TranscriptionStart ts = tmpHash.get(key);
-                            tssForAnalysis.add(ts);
-                        }
-                        model.takeUpstreamRegionsFromSelectedElements(tssForAnalysis, lengthRelToTls, false);
-                        model.rbsMotifAnalysis(params);
-                        appPanelTopComponent.add(model.getRbsMotifSearchPanel(), BorderLayout.CENTER);
-                    }
-                });
-                promotorSearch.start();
-            }
+            this.tssResult.setResults(currentTss);
         }
-        this.tssResult.setResults(currentTss);
     }//GEN-LAST:event_performRbsAnalysisActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton exportButton;
@@ -944,6 +794,12 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         for (int i = 0; i < tSSTable.getRowCount(); i++) {
             Integer posTableAti = (Integer) tSSTable.getValueAt(i, 0);
             if (tmpHash.containsKey(posTableAti)) {
+
+                if ((Boolean) tSSTable.getValueAt(i, 14)) {
+                    this.tssInHash.get(posTableAti).setSelected(true);
+                } else {
+                    this.tssInHash.get(posTableAti).setSelected(false);
+                }
                 tmpHash.remove(posTableAti);
             }
         }

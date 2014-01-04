@@ -4,6 +4,7 @@ import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
+import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.TableType;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,6 +20,7 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
     private List<TranscriptionStart> results;
     private Statistics stats;
     private Map<String, Object> statsMap;
+    private static final TableType TABLE_TYPE = TableType.TSS_TABLE;
 
     public TSSDetectionResults(Statistics stats, List<TranscriptionStart> results, Map<Integer, PersistantTrack> trackMap, int refId) {
         super(trackMap, refId, false);
@@ -41,6 +43,7 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
         List<String> dataColumnDescriptions = new ArrayList<>();
 
         dataColumnDescriptions.add("Position");
+        dataColumnDescriptions.add("Strand");
         dataColumnDescriptions.add("Chromosome");
         dataColumnDescriptions.add("Read starts");
         dataColumnDescriptions.add("Rel. count");
@@ -85,13 +88,19 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
             List<Object> tssRow = new ArrayList<>();
 
             tssRow.add(tss.getStartPosition());
+            boolean isFwd = tss.isFwdStrand();
+            if (isFwd) {
+                tssRow.add("Fwd");
+            } else {
+                tssRow.add("Rev");
+            }
             tssRow.add(this.getChromosomeMap().get(tss.getChromId()));
             tssRow.add(tss.getReadStarts());
             tssRow.add(tss.getRelCount());
 
             PersistantFeature detectedGene = tss.getDetectedGene();
             PersistantFeature nextDownstreamGene = tss.getNextGene();
-            
+
             if (detectedGene != null) {
                 tssRow.add(tss.getDetectedGene().toString());
                 tssRow.add(tss.getDetectedGene().getLocus());
@@ -114,13 +123,28 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
                 tssRow.add(detectedGene.isFwdStrand() ? detectedGene.getStart() : detectedGene.getStop());
                 tssRow.add(detectedGene.isFwdStrand() ? detectedGene.getStop() : detectedGene.getStart());
                 tssRow.add(detectedGene.getStop() - detectedGene.getStart());
-                tssRow.add(detectedGene.getFrame());
+
+                int start = detectedGene.getStart();
+                if ((start % 3) == 0) {
+                    tssRow.add(3);
+                } else if (start % 3 == 1) {
+                    tssRow.add(1);
+                } else if (start % 3 == 2) {
+                    tssRow.add(2);
+                }
                 tssRow.add(detectedGene.getProduct());
             } else {
                 tssRow.add(nextDownstreamGene.isFwdStrand() ? nextDownstreamGene.getStart() : nextDownstreamGene.getStop());
                 tssRow.add(nextDownstreamGene.isFwdStrand() ? nextDownstreamGene.getStop() : nextDownstreamGene.getStart());
                 tssRow.add(nextDownstreamGene.getStop() - nextDownstreamGene.getStart());
-                tssRow.add(nextDownstreamGene.getFrame());
+                int start = nextDownstreamGene.getStart();
+                if ((start % 3) == 0) {
+                    tssRow.add(3);
+                } else if (start % 3 == 1) {
+                    tssRow.add(1);
+                } else if (start % 3 == 2) {
+                    tssRow.add(2);
+                }
                 tssRow.add(nextDownstreamGene.getProduct());
             }
 
@@ -145,21 +169,21 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between title and parameters
 
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("Transcription start site detection parameters:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_RATIO, 
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_RATIO,
                 tssParameters.getRatio()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_FRACTION, 
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_FRACTION,
                 tssParameters.getFraction()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_CHOOSEN_UPSTREAM_REGION, 
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_CHOOSEN_UPSTREAM_REGION,
                 tssParameters.getUpstreamRegion()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_CHOOSEN_DOWNSTREAM_REGION, 
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_CHOOSEN_DOWNSTREAM_REGION,
                 tssParameters.getDownstreamRegion()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_EXCLUSION_OF_INTERNAL_TSS, 
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_EXCLUSION_OF_INTERNAL_TSS,
                 tssParameters.isExclusionOfInternalTSS() ? "yes" : "no"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_RANGE_FOR_LEADERLESS_DETECTION, 
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_RANGE_FOR_LEADERLESS_DETECTION,
                 tssParameters.getLeaderlessLimit()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_LIMITATION_FOR_DISTANCE_OFUPSTREM_REGION, 
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_LIMITATION_FOR_DISTANCE_OFUPSTREM_REGION,
                 tssParameters.getExclusionOfTSSDistance()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_LIMITATION_FOR_DISTANCE_KEEPING_INTERNAL_TSS, 
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_LIMITATION_FOR_DISTANCE_KEEPING_INTERNAL_TSS,
                 tssParameters.getKeepingInternalTssDistance()));
 
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between parameters and statistics
@@ -189,7 +213,10 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.MAPPINGS_MILLION)));
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD,
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD)));
-        
+
+        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow(""));
+
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Table Type", TABLE_TYPE.toString()));
         tSSExport.add(statisticsExportData);
 
         return tSSExport;
@@ -206,7 +233,7 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
     public Statistics getStats() {
         return stats;
     }
-    
+
     /**
      * @return The statistics map associated with this analysis
      */
@@ -216,6 +243,7 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
 
     /**
      * Sets the statistics map associated with this analysis.
+     *
      * @param statsMap the statistics map associated with this analysis
      */
     public void setStatsAndParametersMap(Map<String, Object> statsMap) {

@@ -93,8 +93,12 @@ public class FivePrimeEnrichedTracksPanel implements WizardDescriptor.Validating
 
     @Override
     public void validate() throws WizardValidationException {
-//        if () {
-//            throw new WizardValidationException(null, "Please selct at least one of the given analysis types.", null);
-//        }
+        if (component.getFraction() < 0.0 || component.getFraction() > 1.0) {
+            throw new WizardValidationException(null, "Please choose a fraction 0.0 < fraction < 1.0.", null);
+        } else if(component.getRatio() < 0) {
+            throw new WizardValidationException(null, "Please choose a ratio > 0.", null);
+        } else if(component.getKeepingInternalTssDistance() < 0) {
+            throw new WizardValidationException(null, "Please choose a keeping distance rel. to TLS > 0.", null);
+        }
     }
 }

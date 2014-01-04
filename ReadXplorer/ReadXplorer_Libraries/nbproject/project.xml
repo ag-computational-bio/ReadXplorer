@@ -174,13 +174,6 @@
                 <package>de.erichseifert.gral.data.comparators</package>
                 <package>de.erichseifert.gral.data.filters</package>
                 <package>de.erichseifert.gral.data.statistics</package>
-                <package>de.erichseifert.gral.examples</package>
-                <package>de.erichseifert.gral.examples.barplot</package>
-                <package>de.erichseifert.gral.examples.boxplot</package>
-                <package>de.erichseifert.gral.examples.io</package>
-                <package>de.erichseifert.gral.examples.pieplot</package>
-                <package>de.erichseifert.gral.examples.rasterplot</package>
-                <package>de.erichseifert.gral.examples.xyplot</package>
                 <package>de.erichseifert.gral.graphics</package>
                 <package>de.erichseifert.gral.io</package>
                 <package>de.erichseifert.gral.io.data</package>
@@ -193,11 +186,11 @@
                 <package>de.erichseifert.gral.plots.legends</package>
                 <package>de.erichseifert.gral.plots.lines</package>
                 <package>de.erichseifert.gral.plots.points</package>
-                <package>de.erichseifert.gral.plots.settings</package>
                 <package>de.erichseifert.gral.ui</package>
                 <package>de.erichseifert.gral.util</package>
                 <package>de.erichseifert.vectorgraphics2d</package>
                 <package>de.erichseifert.vectorgraphics2d.util</package>
+                <package>gnu.xml.aelfred2</package>
                 <package>javafx.animation</package>
                 <package>javafx.application</package>
                 <package>javafx.beans</package>
@@ -640,6 +633,10 @@
                 <binary-origin>release/modules/ext/mysql-connector-java-5.1.7-bin.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
+                <runtime-relative-path>ext/gral-core-0.10.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/gral-core-0.10.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
                 <runtime-relative-path>ext/batik-swing.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/batik-swing.jar</binary-origin>
             </class-path-extension>
@@ -724,6 +721,10 @@
                 <binary-origin>release/modules/ext/iText-2.1.5.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
+                <runtime-relative-path>ext/VectorGraphics2D-0.9.1.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/VectorGraphics2D-0.9.1.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
                 <runtime-relative-path>ext/servlet.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/servlet.jar</binary-origin>
             </class-path-extension>
@@ -748,10 +749,6 @@
                 <binary-origin>release/modules/ext/jaxrpc.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/VectorGraphics2D-0.9.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/VectorGraphics2D-0.9.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
                 <runtime-relative-path>ext/pdf-transcoder.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/pdf-transcoder.jar</binary-origin>
             </class-path-extension>
@@ -770,10 +767,6 @@
             <class-path-extension>
                 <runtime-relative-path>ext/JRIEngine.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/JRIEngine.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/gral-core-0.9.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/gral-core-0.9.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/jsc.jar</runtime-relative-path>
@@ -796,10 +789,6 @@
                 <binary-origin>release/modules/ext/h2-1.3.170.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/gral-examples-0.9.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/gral-examples-0.9.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
                 <runtime-relative-path>ext/bytecode.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/bytecode.jar</binary-origin>
             </class-path-extension>
@@ -808,12 +797,12 @@
                 <binary-origin>release/modules/ext/gnujaxp.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/japura-1.14.3.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/japura-1.14.3.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
                 <runtime-relative-path>ext/batik-parser.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/batik-parser.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/japura-1.14.3.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/japura-1.14.3.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/junit-4.10.jar</runtime-relative-path>

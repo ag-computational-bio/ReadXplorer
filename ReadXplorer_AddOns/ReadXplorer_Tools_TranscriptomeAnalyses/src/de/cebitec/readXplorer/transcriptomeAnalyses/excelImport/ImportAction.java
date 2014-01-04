@@ -48,13 +48,7 @@ public final class ImportAction implements ActionListener {
                 public void run() {
                     progressHandle.start(30);
                     ExcelImporter importer = new ExcelImporter(progressHandle);
-                    importer.startExcelToTableConverter(fc.getSelectedFile());
-                    progressHandle.progress(11);
-                    if (importer.isTssDataTable()) {
-                        importer.setUpTSSDataStructuresAndTable(refViewer, transcAnalysesTopComp);
-                    } else {
-                        importer.setUpNewRegionStructuresAndTable(refViewer, transcAnalysesTopComp);
-                    }
+                    importer.startExcelToTableConverter(fc.getSelectedFile(), refViewer, transcAnalysesTopComp);
                     progressHandle.progress(30);
 
                     JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successfull!",

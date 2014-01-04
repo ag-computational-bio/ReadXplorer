@@ -1,13 +1,9 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
-import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistant;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.AnalysisStatus;
 import de.cebitec.readXplorer.util.GeneralUtils;
@@ -20,7 +16,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import javax.swing.JOptionPane;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -50,7 +45,6 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
     private TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
     private HashMap<Integer, PersistantTrack> trackMap;
     private ProgressHandle progressHandleParsingFeatures;
-    private List<MappingResultPersistant> mappings;
     /**
      * Key: featureID , Value: PersistantFeature
      */
@@ -137,9 +131,8 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
         final int trackId = dataTypePair.getFirst();
         final String dataType = dataTypePair.getSecond();
 
-        this.stats.parseMappings(this.stats.getMappingResults());
+//        this.stats.parseMappings(this.stats.getMappingResults());
         this.backgroundCutoff = this.stats.calculateBackgroundCutoff(this.parameters.getFraction());
-        this.mappings = this.stats.getMappingResults();
         this.stats.setBg(this.backgroundCutoff);
 
         this.stats.initMappingsStatistics();

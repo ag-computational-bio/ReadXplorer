@@ -12,8 +12,11 @@ import javax.swing.BorderFactory;
  */
 public class NotificationWhenExportingPanel extends javax.swing.JPanel {
 
-    private final String text = "If you want to load this data again in the framework, "
-            + "then note that NO columns can be changed otherwise remains the import denied.";
+    private final String text = "Attention! If you change the COLUMNS in the exported Excel-file, you will\n"
+            + "not be able to reimport your data back to VAMP. We advise you to keep the\n"
+            + "original file and work with a copy of it. Please understand that this\n"
+            + "feature is still in preparation.";
+
     /**
      * Creates new form NotificationWhenExportingPanel
      */

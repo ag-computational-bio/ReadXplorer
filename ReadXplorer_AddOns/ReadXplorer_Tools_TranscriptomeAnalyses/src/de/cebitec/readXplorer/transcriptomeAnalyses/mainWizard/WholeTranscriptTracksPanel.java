@@ -84,10 +84,31 @@ public class WholeTranscriptTracksPanel implements WizardDescriptor.ValidatingPa
         pref.putInt(wizardName + TranscriptomeAnalysisWizardIterator.PROP_MIN_BOUNDRY_LENGTH, component.getMinBoundaryForNovelRegionDetection());
     }
 
+    /**
+     * Validation of the fraction TextFields whether the Fraction is bigger than
+     * 0.0 and smaller than 1 or not.
+     *
+     * @return true if fraction bigger 0.0 && smaller 1.0, false else.
+     */
+    private boolean validateFractionInput() {
+        boolean validate = false;
+        if (component.getFractionForNewRegionDetection() > 0
+                && component.getFractionForOperonDetection() > 0
+                && component.getFractionForNewRegionDetection() < 1.0
+                && component.getFractionForOperonDetection() < 1.0) {
+            validate = true;
+        }
+        return validate;
+    }
+
     @Override
     public void validate() throws WizardValidationException {
         if (!this.component.isRPKM() && !this.component.isOperonDetection() && !this.component.isNewRegions()) {
             throw new WizardValidationException(null, "Please selct at least one of the given analysis types.", null);
+        }
+
+        if (validateFractionInput() == false) {
+            throw new WizardValidationException(null, "Please give a fraction bigger 0.0 and smaller 1.0", null);
         }
     }
 }

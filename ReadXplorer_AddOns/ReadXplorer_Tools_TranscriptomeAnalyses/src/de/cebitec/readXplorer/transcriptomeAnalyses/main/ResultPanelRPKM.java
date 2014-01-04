@@ -60,26 +60,23 @@ public class ResultPanelRPKM extends ResultTablePanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        parametersLabel = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         rpkmTable = new javax.swing.JTable();
         exportButton = new javax.swing.JButton();
-
-        parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.parametersLabel.text")); // NOI18N
 
         rpkmTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Feature", "Feature type", "Track", "Chromosome", "Strand", "Feature Start", "Feature Stop", "Length", "RPKM", "Log-RPKM"
+                "Feature", "Feature type", "Track", "Chromosome", "Strand", "Feature Start", "Feature Stop", "Length", "RPKM", "Log-RPKM", "Chrom. ID", "Track ID"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Long.class, java.lang.Long.class, java.lang.Long.class, java.lang.Double.class, java.lang.Double.class
+                java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Long.class, java.lang.Long.class, java.lang.Long.class, java.lang.Double.class, java.lang.Double.class, java.lang.Integer.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -101,6 +98,8 @@ public class ResultPanelRPKM extends ResultTablePanel {
         rpkmTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title7_1_1")); // NOI18N
         rpkmTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title9_2")); // NOI18N
         rpkmTable.getColumnModel().getColumn(9).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title10_1")); // NOI18N
+        rpkmTable.getColumnModel().getColumn(10).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title10_2")); // NOI18N
+        rpkmTable.getColumnModel().getColumn(11).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title11_1")); // NOI18N
 
         exportButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.exportButton.text")); // NOI18N
         exportButton.addActionListener(new java.awt.event.ActionListener() {
@@ -114,8 +113,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(parametersLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(exportButton))
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1442, Short.MAX_VALUE)
         );
@@ -124,9 +122,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 284, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(parametersLabel)
-                    .addComponent(exportButton)))
+                .addComponent(exportButton))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -136,7 +132,6 @@ public class ResultPanelRPKM extends ResultTablePanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton exportButton;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JLabel parametersLabel;
     private javax.swing.JTable rpkmTable;
     // End of variables declaration//GEN-END:variables
 
@@ -164,7 +159,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
 
         if (newResult instanceof RPKMAnalysisResult) {
             RPKMAnalysisResult rpkmCalcResultNew = (RPKMAnalysisResult) newResult;
-            final int nbColumns = 10;
+            final int nbColumns = 12;
 
             if (this.rpkmCalcResult == null) {
                 this.rpkmCalcResult = rpkmCalcResultNew;
@@ -189,6 +184,9 @@ public class ResultPanelRPKM extends ResultTablePanel {
                 rowData[i++] = feat.getStop() - feat.getStart();
                 rowData[i++] = rpkm.getRPKM();
                 rowData[i++] = rpkm.getLogRpkm();
+                rowData[i++] = feat.getChromId();
+                rowData[i++] = rpkm.getTrackId();
+                
 
                 model.addRow(rowData);
             }
