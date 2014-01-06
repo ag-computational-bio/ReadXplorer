@@ -16,6 +16,7 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.modules.InstalledFileLocator;
 import org.openide.util.NbBundle;
+import org.openide.util.NbBundle.Messages;
 import org.openide.util.NbPreferences;
 
 /**
@@ -74,13 +75,13 @@ public class MappingApi {
      * @return
      * @throws IOException 
      */
+    @Messages({"MSG_MappingApi.mapFastaFile.Start=Map sequencing reads with external mapper"})
     public static String mapFastaFile(SimpleOutput out, String reference, String fasta, String mappingParameters) throws IOException {     
         if (MappingApi.checkMapperConfig()) {
             //remember mapping params for future executions
             setLastMappingParams(mappingParameters);
             
-            ProgressHandle ph = ProgressHandleFactory.createHandle(
-                    NbBundle.getMessage(MappingProcessor.class, "MSG_MappingApi.mapFastaFile.Start", "mapFastaFile"));
+            ProgressHandle ph = ProgressHandleFactory.createHandle(Bundle.MSG_MappingApi_mapFastaFile_Start());
             ph.start();
 
             String basename = de.cebitec.readXplorer.util.FileUtils.getFilePathWithoutExtension(fasta);

@@ -13,6 +13,8 @@ import org.openide.util.NbBundle;
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 public class MappingSelectionCard extends javax.swing.JPanel {
+    private static final long serialVersionUID = 1L;
+    
     private File sourceFile;
     private File referenceFile;
 
@@ -110,22 +112,27 @@ public class MappingSelectionCard extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(sourceFileLabel)
-                        .addContainerGap(562, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(mappingParamLabel)
+                            .addComponent(sourceFileLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 155, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(sourceFileField)
                             .addComponent(referenceFileField))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(openReferenceButton, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(openSourceButton, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(mappingParamField, javax.swing.GroupLayout.DEFAULT_SIZE, 693, Short.MAX_VALUE)
+                            .addComponent(openReferenceButton)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(openSourceButton)
+                                .addContainerGap())))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(sourceFileLabel1)
-                            .addComponent(mappingParamLabel))
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                            .addComponent(mappingParamField)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(sourceFileLabel)
+                                .addGap(0, 602, Short.MAX_VALUE)))
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -152,7 +159,7 @@ public class MappingSelectionCard extends javax.swing.JPanel {
 
     private void openSourceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openSourceButtonActionPerformed
         File file = FileUtils.showFileOpenDialogAndChangePrefs("TrimSelection.Filepath",
-                new FileNameExtensionFilter("FNA File", "fna"),
+                new FileNameExtensionFilter("FNA, FASTQ, FASTA File", "fna", "fastq", "fasta"),
                 sourceFileField, MappingSelectionCard.class, this);
         if (file!=null) {
             sourceFile = file;

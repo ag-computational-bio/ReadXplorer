@@ -65,7 +65,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
         try {
             this.trackConnector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(selectedTrack);
         } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-            JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+            SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
         }
         String handlerTitle = "Creating data structures from feature-information of the reference: " + trackConnector.getAssociatedTrackName();
         this.progressHandleParsingFeatures = ProgressHandleFactory.createHandle(handlerTitle);

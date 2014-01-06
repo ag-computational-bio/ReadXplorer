@@ -24,7 +24,7 @@ public class NovelRegionResult extends ResultTrackAnalysis<ParameterSetWholeTran
     private static final TableType TABLE_TYPE = TableType.NOVEL_REGION_TABLE;
 
     public NovelRegionResult(Statistics stats, Map<Integer, PersistantTrack> trackMap, List<NovelRegion> novelRegions, boolean combineTracks) {
-        super(trackMap, 1, combineTracks);
+        super(trackMap, 1, combineTracks, 2, 0);
         this.results = novelRegions;
         this.stats = stats;
     }

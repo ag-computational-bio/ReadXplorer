@@ -1,6 +1,5 @@
 package de.cebitec.readXplorer.view.dataVisualisation;
 
-import de.cebitec.readXplorer.databackend.dataObjects.ChromosomeObserver;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.AdjustmentPanelListenerI;

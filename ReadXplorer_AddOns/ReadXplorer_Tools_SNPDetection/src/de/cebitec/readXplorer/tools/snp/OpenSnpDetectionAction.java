@@ -157,7 +157,7 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
                 try {
                     connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
                 } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-                    JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The SNP analysis will be cancelled now.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+                    SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
                     continue;
                 }
                 
@@ -170,7 +170,7 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
                 this.createAnalysis(connector, readClassParams);
                 
             } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-                JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The SNP analysis will be cancelled now.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+                SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
             }
         }
     }
@@ -211,7 +211,7 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
 
                 AnalysisSNPs analysisSNPs = trackToAnalysisMap.get(trackId);
                 final SnpDetectionResult result = new SnpDetectionResult(analysisSNPs.getResults(), 
-                        trackMap, referenceId, combineTracks);
+                        trackMap, referenceId, combineTracks, 2, 0);
                 result.setParameters(parametersSNPs);
 
                 SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread

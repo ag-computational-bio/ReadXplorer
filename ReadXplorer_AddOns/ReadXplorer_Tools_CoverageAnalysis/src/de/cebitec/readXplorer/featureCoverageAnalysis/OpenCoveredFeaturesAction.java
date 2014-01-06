@@ -163,7 +163,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
                 try {
                     connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
                 } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-                    JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+                    SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
                     continue;
                 }
 
@@ -176,7 +176,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
                 this.createAnalysis(connector, readClassesParams);  //every track has its own analysis handlers
 
             } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-                JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+                SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
             }
         }
     }
@@ -218,7 +218,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
 
                 AnalysisCoveredFeatures analysisCoveredFeatures = trackToAnalysisMap.get(trackId);
                 final CoveredFeatureResult result = new CoveredFeatureResult(analysisCoveredFeatures.getResults(), 
-                        trackMap, referenceId, combineTracks);
+                        trackMap, referenceId, combineTracks, 1, 0);
                 result.setParameters(parameters);
                 Map<String, Integer> statsMap = new HashMap<>();
                 statsMap.put(ResultPanelCoveredFeatures.FEATURES_TOTAL, analysisCoveredFeatures.getNoGenomeFeatures());

@@ -83,14 +83,14 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
             try {
                 trackConnectors.add(fetcher.getMultiTrackConnector(track));
             } catch (UserCanceledTrackPathUpdateException ex) {
-                JOptionPane.showMessageDialog(null, "The path of one of the selected tracks could not be resolved. The analysis will be canceled now.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+                SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
                 continue;
             }
             trackMap.put(track.getId(), track);
         }
         
         this.analysisResult = new CorrelationResult(this.correlationsList, trackMap, 
-                referenceViewer.getReference().getId(), false);
+                referenceViewer.getReference().getId(), false, -1, -1);
         HashMap<String, Object> params = new HashMap<>();
         params.put("CorrelationCoefficient", cc);
         params.put("intervalLength", intervalLength);

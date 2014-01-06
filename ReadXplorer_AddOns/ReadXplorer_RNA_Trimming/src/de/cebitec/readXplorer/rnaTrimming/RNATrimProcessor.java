@@ -1,11 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.readXplorer.rnaTrimming;
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.readXplorer.databackend.ThreadListener;
 import de.cebitec.readXplorer.mapping.api.MappingApi;
 import de.cebitec.readXplorer.util.SimpleOutput;
 import java.io.BufferedWriter;
@@ -47,7 +42,7 @@ public class RNATrimProcessor  {
     
     
     private Map<String, Integer> computeMappingHistogram(SAMFileReader samBamReader) {
-        MapCounter<String> histogram = new MapCounter<String>();
+        MapCounter<String> histogram = new MapCounter<>();
         SAMRecordIterator samItor = samBamReader.iterator();
         while (samItor.hasNext() && (!this.canceled)) {
             try {
@@ -81,6 +76,7 @@ public class RNATrimProcessor  {
         ProgressHandle ph = ProgressHandleFactory.createHandle(
                 NbBundle.getMessage(RNATrimProcessor.class, "MSG_TrimProcessor.extractUnmapped.Start", sourcePath), 
                 new Cancellable() {
+            @Override
             public boolean cancel() {
                 return handleCancel();
             }
@@ -166,6 +162,7 @@ public class RNATrimProcessor  {
         ProgressHandle ph = ProgressHandleFactory.createHandle(
                 NbBundle.getMessage(RNATrimProcessor.class, "MSG_TrimProcessor.extractOriginalSequencesInSamFile.Start", sampath), 
                 new Cancellable() {
+            @Override
             public boolean cancel() {
                 return handleCancel();
             }
@@ -263,7 +260,7 @@ public class RNATrimProcessor  {
         tc.requestActive();
         final TrimResultPanel resultView = tc.openResultTab(shortFileName);
         this.trimProcessResult = new TrimProcessResult();
-        HashMap<String, Object> params = new HashMap<String, Object>();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("referencePath", referencePath);
         params.put("sourcePath", sourcePath);
         params.put("maximumTrim", maximumTrim);
@@ -279,6 +276,7 @@ public class RNATrimProcessor  {
         
         final ProgressHandle ph = ProgressHandleFactory.createHandle("Trim RNA reads in file '"+sourcePath+"'", new Cancellable() {
 
+            @Override
             public boolean cancel() {
                 return handleCancel();
             }
@@ -296,14 +294,6 @@ public class RNATrimProcessor  {
         // 6. add a tag to the resulting sam file, indicating the source untrimmed sequence
         // 7. add a tag to the resulting sam file, inducating match uniqueness
         Runnable runnable = new Runnable() {
-            private int currentPosition = 1;
-            private int steps;
-            private int currentStep = 0;
-            private boolean wasCanceled = false;
-            
-            private boolean ready = false;
-            
-            private ThreadListener tl; //requires ReadXplorer_BACKEND Module
             
             
             @Override

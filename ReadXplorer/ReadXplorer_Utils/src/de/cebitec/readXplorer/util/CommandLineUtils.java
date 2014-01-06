@@ -1,10 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.readXplorer.util;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 /**
@@ -13,7 +11,7 @@ import java.io.InputStreamReader;
  */
 public class CommandLineUtils {
     
-    private SimpleOutput out;
+    private final SimpleOutput out;
     
     /**
      * If any message should be printed to the console, this method is used.
@@ -31,17 +29,19 @@ public class CommandLineUtils {
     
     /** 
      * run a command line tool and write the output to the console 
+     * @param command
+     * @throws java.io.IOException
      */
     public void runCommandAndWaitUntilEnded(String... command) throws IOException {
         this.showMsg("executing following command: "+GeneralUtils.implode(" ", command));
         ProcessBuilder processBuilder = new ProcessBuilder(command).redirectErrorStream(true);
         Process process = processBuilder.start();
         
-        java.io.InputStream is = process.getInputStream();
-        java.io.BufferedReader reader = new java.io.BufferedReader(new InputStreamReader(is));
+        InputStream is = process.getInputStream();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
         
         // And print each line
-        String s = null;
+        String s;
         while ((s = reader.readLine()) != null) {
             this.showMsg(s);
         }

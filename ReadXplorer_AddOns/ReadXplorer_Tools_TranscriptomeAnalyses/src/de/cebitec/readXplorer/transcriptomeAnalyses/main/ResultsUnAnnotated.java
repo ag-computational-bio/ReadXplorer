@@ -15,7 +15,7 @@ public class ResultsUnAnnotated extends ResultTrackAnalysis<ParameterSetFiveEnri
     private List<NovelRegion> results;
     
     public ResultsUnAnnotated(Map<Integer, PersistantTrack> trackMap, int refId, boolean combineTracks) {
-        super(trackMap, refId, combineTracks);
+        super(trackMap, refId, combineTracks, 0, 0);
     }
 
     

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.readXplorer.rnaTrimming;
 
 import de.cebitec.readXplorer.util.GeneralUtils;
@@ -63,13 +59,13 @@ public class TrimResultPanel extends JPanel implements Observer {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jLabel1 = new javax.swing.JLabel();
+        paramsTitle = new javax.swing.JLabel();
         paramsLabel = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         statisticsFrame = new javax.swing.JPanel();
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(TrimResultPanel.class, "TrimResultPanel.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(paramsTitle, org.openide.util.NbBundle.getMessage(TrimResultPanel.class, "TrimResultPanel.paramsTitle.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(paramsLabel, org.openide.util.NbBundle.getMessage(TrimResultPanel.class, "TrimResultPanel.paramsLabel.text")); // NOI18N
         paramsLabel.setVerticalAlignment(javax.swing.SwingConstants.TOP);
@@ -97,7 +93,7 @@ public class TrimResultPanel extends JPanel implements Observer {
                         .add(statisticsFrame, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 332, Short.MAX_VALUE)
                         .add(14, 14, 14))
                     .add(layout.createSequentialGroup()
-                        .add(jLabel1)
+                        .add(paramsTitle)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                         .add(paramsLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
@@ -109,7 +105,7 @@ public class TrimResultPanel extends JPanel implements Observer {
                     .add(statisticsFrame, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 22, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(paramsTitle, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 22, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(layout.createSequentialGroup()
                         .add(3, 3, 3)
                         .add(paramsLabel, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 47, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
@@ -119,10 +115,10 @@ public class TrimResultPanel extends JPanel implements Observer {
 
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextArea jTextArea1;
     private javax.swing.JLabel paramsLabel;
+    private javax.swing.JLabel paramsTitle;
     private javax.swing.JPanel statisticsFrame;
     // End of variables declaration//GEN-END:variables
 

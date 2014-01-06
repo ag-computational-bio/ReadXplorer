@@ -23,6 +23,8 @@ public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
     private ParameterSetI<T> parameters;
     private Map<String, Integer> statsMap;
     private final boolean combineTracks;
+    private int trackColumn;
+    private int filterColumn;
 
     /**
      * A result of an analysis for a list of tracks. It also fetches and stores 
@@ -32,13 +34,32 @@ public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
      * @param referenceId id of the reference genome, for which this result was generated
      * @param combineTracks <cc>true</cc>, if the tracks in the list are 
      * combined, <cc>false</cc> otherwise
+     * @param trackColumn
+     * @param filterColumn
      */
-    public ResultTrackAnalysis(Map<Integer, PersistantTrack> trackMap, int referenceId, boolean combineTracks) {
+    public ResultTrackAnalysis(Map<Integer, PersistantTrack> trackMap, int referenceId, boolean combineTracks,
+            int trackColumn, int filterColumn) {
         this.trackMap = trackMap;
         this.chromMap = ProjectConnector.getInstance().getRefGenomeConnector(referenceId).getChromosomesForGenome();
         this.trackNameList = PersistantTrack.generateTrackDescriptionList(trackMap.values());
         this.statsMap = new HashMap<>();
         this.combineTracks = combineTracks;
+        this.trackColumn = trackColumn;
+        this.filterColumn = filterColumn;
+    }
+    
+    /**
+     * @return trackColumn
+     */
+    public int getTrackColumn() {
+        return trackColumn;
+    }
+
+    /**
+     * @return filterColumn
+     */
+    public int getFilterColumn() {
+        return filterColumn;
     }
 
     /**
