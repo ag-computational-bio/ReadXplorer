@@ -35,8 +35,9 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
      * @param combineTracks <cc>true</cc>, if the tracks in the list are
      * combined, <cc>false</cc> otherwise
      */
-    public RPKMAnalysisResult(Map<Integer, PersistantTrack> trackMap, List<RPKMvalue> rpkmResults, int referenceId, boolean combineTracks) {
-        super(trackMap, referenceId, combineTracks);
+    public RPKMAnalysisResult(Map<Integer, PersistantTrack> trackMap, List<RPKMvalue> rpkmResults, int referenceId, 
+            boolean combineTracks, int trackColumn, int filterColumn) {
+        super(trackMap, referenceId, combineTracks, trackColumn, filterColumn);
         this.rpkmResults = rpkmResults;
     }
     

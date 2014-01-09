@@ -24,7 +24,7 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetWhole
     private static final TableType TABLE_TYPE = TableType.OPETON_TABLE;
 
     public OperonDetectionResult(StatisticsOnMappingData stats, Map<Integer, PersistantTrack> trackList, List<Operon> detectedOperons, int refId) {//, PersistantTrack currentTrack) {
-        super(trackList, refId, false);
+        super(trackList, refId, false, 2, 1);
         this.detectedOperons = detectedOperons;
         this.stats = stats;
     }

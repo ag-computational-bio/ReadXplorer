@@ -199,7 +199,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                 try {
                     connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
                 } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-                    JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+                    SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
                     continue;
                 }
                 
@@ -212,7 +212,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                 this.createAnalysis(connector, readClassesParams); //every track has its own analysis handlers
                 
             } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-                JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+                SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
             }
 
         }
@@ -296,7 +296,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                             transcriptionStartResultPanel.setReferenceViewer(refViewer);
                         }
 
-                        TssDetectionResult tssResult = new TssDetectionResult(analysisTSS.getResults(), trackMap, referenceId, combineTracks);
+                        TssDetectionResult tssResult = new TssDetectionResult(analysisTSS.getResults(), trackMap, referenceId, combineTracks, 1, 0);
                         tssResult.setParameters(parametersTss);
                         transcriptionStartResultPanel.addResult(tssResult);
 
@@ -316,7 +316,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                                 operonResultPanel.setBoundsInfoManager(refViewer.getBoundsInformationManager());
                             }
                             OperonDetectionResult operonDetectionResult = new OperonDetectionResult(trackMap,
-                                    trackToAnalysisMap.get(trackId).getAnalysisOperon().getResults(), referenceId, combineTracks);
+                                    trackToAnalysisMap.get(trackId).getAnalysisOperon().getResults(), referenceId, combineTracks, 2, 0);
                             operonDetectionResult.setParameters(parametersOperonDet);
                             operonResultPanel.addResult(operonDetectionResult);
 
@@ -334,7 +334,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                                 rpkmResultPanel.setBoundsInfoManager(refViewer.getBoundsInformationManager());
                             }
                             RPKMAnalysisResult rpkmAnalysisResult = new RPKMAnalysisResult(trackMap,
-                                    trackToAnalysisMap.get(trackId).getAnalysisRPKM().getResults(), referenceId, combineTracks);
+                                    trackToAnalysisMap.get(trackId).getAnalysisRPKM().getResults(), referenceId, combineTracks, 1, 0    );
                             rpkmAnalysisResult.setParameters(parametersRPKM);
                             rpkmAnalysisResult.setNoGenomeFeatures(rpkmAnalysis.getNoGenomeFeatures());
                             rpkmResultPanel.addResult(rpkmAnalysisResult);

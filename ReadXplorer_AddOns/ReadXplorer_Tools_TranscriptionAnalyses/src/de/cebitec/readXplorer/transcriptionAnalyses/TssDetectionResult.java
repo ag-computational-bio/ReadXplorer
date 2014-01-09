@@ -35,8 +35,8 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
      * combined, <cc>false</cc> otherwise
      */
     public TssDetectionResult(List<TranscriptionStart> results, Map<Integer, PersistantTrack> trackList, 
-            int referenceId, boolean combineTracks) {
-        super(trackList, referenceId, combineTracks);
+            int referenceId, boolean combineTracks, int trackColumn, int filterColumn) {
+        super(trackList, referenceId, combineTracks, trackColumn, filterColumn);
         this.results = results;
     }
 

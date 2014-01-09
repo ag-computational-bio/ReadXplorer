@@ -29,8 +29,9 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
      * feature detection was carried out
      * @param currentTrack the track on which this analysis result was generated
      */
-    public CoveredFeatureResult(List<CoveredFeature> results, HashMap<Integer, PersistantTrack> trackMap, int referenceId, boolean combineTracks) {
-        super(trackMap, referenceId, combineTracks);
+    public CoveredFeatureResult(List<CoveredFeature> results, HashMap<Integer, PersistantTrack> trackMap, int referenceId, 
+            boolean combineTracks, int trackColumn, int filterColumn) {
+        super(trackMap, referenceId, combineTracks, trackColumn, filterColumn);
         this.results = results;
         
     }

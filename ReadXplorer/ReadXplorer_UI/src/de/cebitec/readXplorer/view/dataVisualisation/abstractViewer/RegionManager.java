@@ -100,8 +100,8 @@ public class RegionManager {
     }
     
     /**
-     * Detects the occurences of the given pattern in the currently shown interval
-     * or the next occurence of the pattern in the genome.
+     * Detects the occurrences of the given pattern in the currently shown interval
+     * or the next occurrence of the pattern in the genome.
      * @param pattern Pattern to search for
      * @return the closest position of the next occurrence of the pattern 
      */
@@ -154,7 +154,7 @@ public class RegionManager {
     
     /**
      * Identifies the currently in this object stored pattern in the genome sequence.
-     * @return position of the next occurence of the pattern from the current position on.
+     * @return position of the next occurrence of the pattern from the current position on.
      */
     public int findPattern() {
         //create the list of component types, that should be removed (only patterns)

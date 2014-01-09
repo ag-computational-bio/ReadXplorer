@@ -1,14 +1,18 @@
 package de.cebitec.readXplorer.view.tableVisualization.tableFilter;
 
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.util.GenerateRowSorter;
+import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import javax.swing.JButton;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
@@ -16,6 +20,9 @@ import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import org.openide.DialogDescriptor;
+import org.openide.DialogDisplayer;
+import org.openide.util.NbBundle;
 
 /**
  * A MouseAdapter, which offers a filter for the columns of a table. An
@@ -23,7 +30,7 @@ import javax.swing.table.JTableHeader;
  * table that should be filtered. Only tables using a model extending
  * DefaultTableModel can be used!
  * @param <E> the table model, which has to extend the DefaultTableModel.
- * @author kstaderm
+ * @author kstaderm, rhilker & Margarita Steinhauer
  */
 public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAdapter {
 
@@ -38,14 +45,18 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
     private JMenuItem numberColumnHigherItem;
     private JMenuItem stringColumnItem;
     private JMenuItem resetItem;
-    private Class<E> classType;
+    private JMenuItem occurrenceFilter;
+    private final Class<E> classType;
+    private Map<Integer, PersistantTrack> trackMap;
 
     /**
      * A MouseAdapter, which offers a filter for the columns of a table. An
      * instance of this class must be added as a listener to the TableHeader of
      * the table that should be filtered. Only tables using a model extending
      * DefaultTableModel can be used!
-     * @param classType the type of the table model, which has to extend the DefaultTableModel.
+     *
+     * @param classType the type of the table model, which has to extend the
+     * DefaultTableModel.
      */
     public TableRightClickFilter(Class<E> classType) {
         this.classType = classType;
@@ -62,9 +73,72 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
     }
 
     /**
-     * Initializes the filter.
+     * Getter for lastTable. needed in FilterOccurrence class.
+     *
+     * @return lastTable
      */
+    public JTable getLastTable() {
+        return lastTable;
+    }
+
+    /**
+     * Getter for classType. needed in FilterOccurrence class.
+     * @return classType
+     */
+    public Class<E> getClassType() {
+        return classType;
+    }
+
+    /**
+     * Initializes the occurrence filter, which filters a table by occurrences
+     * of the same event in different tracks. First an option panel is openend
+     * and then the filtering is carried out for the selected options.
+     */
+    @NbBundle.Messages({
+        "OccurrenceItemTitle=Filter occurrence by...", 
+        "Occurrence_Filter=Occurrence Filter"})
     private void init() {
+        occurrenceFilter = new JMenuItem(Bundle.OccurrenceItemTitle());
+        occurrenceFilter.addActionListener(new ActionListener() {
+            
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                OccurrenceSelectionPanel occurrencePanel = new OccurrenceSelectionPanel();
+                final JButton okButton = new JButton("OK");
+                ActionListener okButtonListener = this.createOkButtonListener(occurrencePanel);
+                DialogDescriptor dialogDescriptor = new DialogDescriptor(occurrencePanel,
+                        Bundle.Occurrence_Filter(), true,
+                        new JButton[]{okButton}, okButton, DialogDescriptor.DEFAULT_ALIGN, null, okButtonListener);
+                dialogDescriptor.setClosingOptions(null);
+                Dialog openRefGenDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
+                openRefGenDialog.setVisible(true);
+            }
+            
+            /**
+             * Action to filter a table by occurrences of the same event in 
+             * different tracks.
+             * @param occurrencePanel the panel, which collected the options for
+             * the filtering process
+             * @return the action to filter a table by occurrences of the same 
+             * event in different tracks.
+             */
+            private ActionListener createOkButtonListener(final OccurrenceSelectionPanel occurrencePanel) {
+                ActionListener listener = new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        // The OccurrenceField only accepts positive numbers
+                        String occurrenceNumberString = occurrencePanel.getOccurrenceField().getText();
+                        Integer occurrenceNumber = Integer.parseInt(occurrenceNumberString); 
+                        FilterOccurrence<E> filter = new FilterOccurrence<>(occurrencePanel.getSelectedButton(), 
+                        occurrenceNumber, TableRightClickFilter.this, 2, 0);
+                        filter.filterTable();
+                    }
+                };
+                return listener;
+            }
+        });
+        popup.add(occurrenceFilter);
+        
         numberColumnLowerItem = new JMenuItem("Remove values smaller than...");
         numberColumnLowerItem.addActionListener(new ActionListener() {
             @Override
@@ -161,7 +235,12 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
         }
     }
 
-    private void setNewTableModel(E newTableModel) {
+    /**
+     * Sets the model of the lastTable. Also sets the original table model, 
+     * if this is the first call of the method.
+     * @param newTableModel the new table model to set
+     */
+    void setNewTableModel(E newTableModel) {
         E tableModel = (E) lastTable.getModel();
         if (originalTableModel == null) {
             TableFilterUtils<E> utils = new TableFilterUtils<>(classType);
@@ -201,4 +280,13 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
         E filteredTableModel = patternFilter.filterTable(tm, column, pattern);
         return filteredTableModel;
     }
+
+    public void setTrackMap(Map<Integer, PersistantTrack> trackMap) {
+        this.trackMap = trackMap;
+}
+    
+    public Map<Integer, PersistantTrack> getTrackMap(){
+        return trackMap;
+    }
+
 }

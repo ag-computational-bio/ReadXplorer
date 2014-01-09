@@ -274,7 +274,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         try {
             tc = fetcher.getMultiTrackConnector(track);
         } catch (UserCanceledTrackPathUpdateException ex) {
-            JOptionPane.showMessageDialog(null, "The path of one of the selected tracks could not be resolved. The analysis will be canceled now.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+            SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
             return null;
         }
 
@@ -322,7 +322,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         try {
             trackCon = fetcher.getMultiTrackConnector(tracks);
         } catch (UserCanceledTrackPathUpdateException ex) {
-            JOptionPane.showMessageDialog(null, "The path of one of the selected tracks could not be resolved. The analysis will be canceled now.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+            SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
             return null; //cannot occur, since both tracks are already open in the thumbnail viewer
         }
         MultipleTrackViewer trackV = new MultipleTrackViewer(boundsManager, b, controller.getCurrentRefGen(), trackCon, false);

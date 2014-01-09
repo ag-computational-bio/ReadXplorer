@@ -23,7 +23,6 @@ public class MappingProcessor  {
     private final static Logger LOG = Logger.getLogger(MappingProcessor.class.getName());
     private RequestProcessor.Task theTask = null;
     private InputOutput io;
-    private String sourcePath;
     
     /**
      * If any message should be printed to the console, this method is used.
@@ -39,7 +38,6 @@ public class MappingProcessor  {
         this.io = IOProvider.getDefault().getIO(NbBundle.getMessage(MappingProcessor.class, "MappingProcessor.output.name"), true);
         this.io.setOutputVisible(true);
         this.io.getOut().println("");
-        this.sourcePath = sourcePath;
         
         CentralLookup.getDefault().add(this);
         try {
@@ -50,17 +48,11 @@ public class MappingProcessor  {
         io.select();
         
         Runnable runnable = new Runnable() {
-            private int currentPosition = 1;
-            private int steps;
-            private int currentStep = 0;
-            private boolean wasCanceled = false;
-            private boolean ready = false;
             
             
             @Override
             public void run() {
                 String sam = null;
-                String extractedSam = null;
                 try {
                     sam = MappingApi.mapFastaFile(new SimpleIO(io), referencePath, sourcePath, mappingParam);
                     showMsg("Extraction ready!");

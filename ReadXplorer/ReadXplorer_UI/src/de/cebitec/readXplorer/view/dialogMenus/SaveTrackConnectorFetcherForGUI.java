@@ -304,6 +304,14 @@ public class SaveTrackConnectorFetcherForGUI {
     }
 
     /**
+     * Shows a JOptionPane with a message saying that the track path selection
+     * failed.
+     */
+    public static void showPathSelectionErrorMsg() {
+        JOptionPane.showMessageDialog(null, "You did not complete the track path selection. Corresponding viewers cannot be opened and analyses are canceled.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    /**
      * Exception which should be thrown if the user cancels the update of a 
      * missing track file path.
      */

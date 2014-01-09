@@ -73,7 +73,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
         try {
             this.trackConnector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(selectedTrack);
         } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-            JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+            SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
         }
 
         String handlerTitle = "Creating data structures from feature-information of the reference: " + trackConnector.getAssociatedTrackName();
@@ -108,7 +108,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
             handler.registerObserver(this.stats);
             handler.startAnalysis();
         } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-            JOptionPane.showMessageDialog(null, "The path of one of the selected tracks could not be resolved. The analysis will be canceled now.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+            SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
             notifyObservers(AnalysisStatus.ERROR);
             this.interrupt();
         }

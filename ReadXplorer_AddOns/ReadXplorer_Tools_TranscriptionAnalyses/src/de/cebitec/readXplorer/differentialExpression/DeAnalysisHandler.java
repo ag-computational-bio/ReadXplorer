@@ -127,7 +127,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
                 handler.registerObserver(collCovData);
                 allHandler.add(handler);
             } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-                JOptionPane.showMessageDialog(null, "The path of one of the selected tracks could not be resolved. The analysis will be canceled now.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+                SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
                 ProcessingLog.getInstance().addProperty("Unresolved track", currentTrack);
                 notifyObservers(AnalysisStatus.ERROR);
                 this.interrupt();

@@ -469,8 +469,8 @@ public class SequenceBar extends JComponent implements HighlightableI {
     }
 
     /**
-     * Detects the occurences of the given pattern in the currently shown
-     * interval or the next occurence of the pattern in the genome.
+     * Detects the occurrences of the given pattern in the currently shown
+     * interval or the next occurrence of the pattern in the genome.
      * @param pattern Pattern to search for
      * @return the next (closest) occurrence of the pattern
      */

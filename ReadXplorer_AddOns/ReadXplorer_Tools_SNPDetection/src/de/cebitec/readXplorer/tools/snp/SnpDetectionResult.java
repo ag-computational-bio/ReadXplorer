@@ -33,8 +33,9 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
      * @param combineTracks <cc>true</cc>, if the tracks in the list are
      * combined, <cc>false</cc> otherwise
      */
-    public SnpDetectionResult(List<SnpI> snpList, Map<Integer, PersistantTrack> trackMap, int referenceId, boolean combineTracks) {
-        super(trackMap, referenceId, combineTracks);
+    public SnpDetectionResult(List<SnpI> snpList, Map<Integer, PersistantTrack> trackMap, int referenceId, boolean combineTracks,
+            int trackColumn, int filterColumn) {
+        super(trackMap, referenceId, combineTracks, trackColumn, filterColumn);
         this.snpList = snpList;
     }
     

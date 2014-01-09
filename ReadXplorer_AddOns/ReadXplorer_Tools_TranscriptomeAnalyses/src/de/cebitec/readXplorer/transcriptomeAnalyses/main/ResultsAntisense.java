@@ -16,7 +16,7 @@ public class ResultsAntisense extends ResultTrackAnalysis<ParameterSetFiveEnrich
     ParameterSetFiveEnrichedAnalyses parameters;
     
     public ResultsAntisense(Map<Integer, PersistantTrack> trackMap, List<Antisense> asResults, int refId, boolean combineTracks) {
-        super(trackMap, refId, combineTracks);
+        super(trackMap, refId, combineTracks, 0, 0);
         this.results = asResults;
     }
 

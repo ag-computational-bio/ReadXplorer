@@ -23,7 +23,7 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
     private static final TableType TABLE_TYPE = TableType.TSS_TABLE;
 
     public TSSDetectionResults(StatisticsOnMappingData stats, List<TranscriptionStart> results, Map<Integer, PersistantTrack> trackMap, int refId) {
-        super(trackMap, refId, false);
+        super(trackMap, refId, false, 22, 0);
         this.results = results;
         this.stats = stats;
         this.statsMap = new HashMap<>();

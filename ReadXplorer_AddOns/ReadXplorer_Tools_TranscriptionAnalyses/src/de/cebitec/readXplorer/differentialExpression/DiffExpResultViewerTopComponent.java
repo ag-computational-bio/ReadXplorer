@@ -118,10 +118,11 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
          * Come up with global concept for position update in all opened references. But after multichromosome
          * support is implemented - it may change some requirements...
          */
+        analysisHandler.getRefGenomeID();
         for (Iterator<ViewController> it = viewControllers.iterator(); it.hasNext();) {
             ViewController tmpVCon = it.next();
             BoundsInfoManager bm = tmpVCon.getBoundsManager(); 
-            if (bm != null) {
+            if (bm != null && analysisHandler.getRefGenomeID() == tmpVCon.getCurrentRefGen().getId()) {
                 int posIdx = 0;
                 int chromIdx = 1;
                 TableUtils.showPosition(topCountsTable, posIdx, chromIdx, bm);

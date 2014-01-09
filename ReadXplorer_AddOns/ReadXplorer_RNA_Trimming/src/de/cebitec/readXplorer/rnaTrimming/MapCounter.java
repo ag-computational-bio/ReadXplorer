@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.readXplorer.rnaTrimming;
 
 import java.util.HashMap;
@@ -11,6 +7,8 @@ import java.util.HashMap;
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 public class MapCounter<T> extends HashMap<T,Integer> {
+    private static final long serialVersionUID = 1L;
+    
     public Integer incrementCount(T key) {
         Integer counter = this.get(key);
         if (counter==null) counter = 0;

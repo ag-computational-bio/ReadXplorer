@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
@@ -145,7 +144,7 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
                 try {
                     connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
                 } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-                    JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+                    SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
                     continue;
                 }
 
@@ -157,7 +156,7 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
                 this.createAnalysis(connector, readClassesParams);
                 
             } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-                JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+                SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
             }
         }
     }

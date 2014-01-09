@@ -37,7 +37,7 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetWholeTra
      * otherwise
      */
     public RPKMAnalysisResult(Map<Integer, PersistantTrack> trackMap, List<RPKMvalue> rpkmResults, int refId) {
-        super(trackMap, refId, false);
+        super(trackMap, refId, false, 2, 0);
         this.rpkmResults = rpkmResults;
         this.stats = stats;
     }

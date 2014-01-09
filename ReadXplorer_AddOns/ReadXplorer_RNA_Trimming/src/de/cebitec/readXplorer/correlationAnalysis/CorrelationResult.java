@@ -31,8 +31,8 @@ public class CorrelationResult extends ResultTrackAnalysis<CorrelationResult> {
      * combined, <cc>false</cc> otherwise
      */
     public CorrelationResult(List<CorrelatedInterval> correlationsList, Map<Integer, PersistantTrack> trackMap, 
-            int referenceId, boolean combineTracks) {
-        super(trackMap, referenceId, combineTracks);
+            int referenceId, boolean combineTracks, int trackColumn, int filterColumn) {
+        super(trackMap, referenceId, combineTracks, trackColumn, filterColumn);
         this.correlationsList = correlationsList;
     }
     

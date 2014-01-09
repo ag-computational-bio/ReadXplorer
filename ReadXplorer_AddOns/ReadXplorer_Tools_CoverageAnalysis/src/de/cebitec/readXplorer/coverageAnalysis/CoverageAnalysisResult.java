@@ -21,7 +21,7 @@ public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCove
 
     public CoverageAnalysisResult(CoverageIntervalContainer results, HashMap<Integer, PersistantTrack> trackMap, 
             int referenceId, boolean combineTracks) {
-        super(trackMap, referenceId, combineTracks);
+        super(trackMap, referenceId, combineTracks, 0, 3);
         this.results = results;
     }
 
