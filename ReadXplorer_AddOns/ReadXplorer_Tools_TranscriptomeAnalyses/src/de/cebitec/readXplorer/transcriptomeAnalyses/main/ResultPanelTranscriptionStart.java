@@ -8,7 +8,7 @@ import de.cebitec.readXplorer.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.ChartsGenerationSelectChatTypeWizardPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ChartType;
-import de.cebitec.readXplorer.transcriptomeAnalyses.plots.PlotGenerator;
+import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.PlotGenerator;
 import de.cebitec.readXplorer.transcriptomeAnalyses.promotorAnalysis.PromotorAnalysisWizardIterator;
 import de.cebitec.readXplorer.transcriptomeAnalyses.rbsAnalysis.DataSelectionWizardPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.rbsAnalysis.RbsAnalysisWizardIterator;
@@ -74,7 +74,8 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
     public static final String TSS_CHOOSEN_DOWNSTREAM_REGION = "Downstream region relative to TSS";
     public static final String TSS_EXCLUSION_OF_INTERNAL_TSS = "Choosen exclusion of all internal TSS";
     public static final String TSS_RANGE_FOR_LEADERLESS_DETECTION = "Range for Leaderless detection";
-    public static final String TSS_NO_PUTATIVE_CDS_SHIFTS = "number of putative cds shifts";
+    public static final String TSS_PERCENTAGE_FOR_CDSSHIFT_ANALYSIS = "Percentage value for CDS-shift analysis";
+    public static final String TSS_NO_PUTATIVE_CDS_SHIFTS = "Number of putative cds-shifts";
     public static final String TSS_LIMITATION_FOR_DISTANCE_OFUPSTREM_REGION = "Limitation for distance between TSS and TLS";
     public static final String TSS_LIMITATION_FOR_DISTANCE_KEEPING_INTERNAL_TSS = "Limitation for distance between internal TSS and next upstream feature TLS";
     public static final String BIN_SIZE = "size of bin";
@@ -90,6 +91,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
     private MotifSearchModel model;
     private AppPanelTopComponent appPanelTopComponent;
     private ElementsOfInterest elements = null;
+    private PlotGenerator gen;
 
     /**
      * This panel is capable of showing a table with transcription start sites
@@ -366,6 +368,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                 elements = ElementsOfInterest.ONLY_SELECTED;
             }
 
+            //  System.out.println(System.getProperty("java.classpath"));
 
             if (isAbsoluteFrequencyPlot) {
                 appPanelTopComponent = new AppPanelTopComponent();
@@ -377,7 +380,9 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                     public void run() {
                         PlotGenerator gen = new PlotGenerator();
                         List<DataTable> dataList = gen.prepareData(ChartType.ABSOLUTE_FREQUENCY_OF_5_PRIME_UTRs, elements, currentTss, referenceViewer, lengthRelToTls, binSize);
-                        InteractivePanel panel = gen.generateBarPlot(dataList.get(0), "distance between TSS and TLS", "Absolute frequency");
+                        ParameterSetFiveEnrichedAnalyses tssParameters = (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters();
+                        double minXvalue = -Double.valueOf(tssParameters.getLeaderlessLimit());
+                        InteractivePanel panel = gen.generateBarPlot(dataList.get(0), "distance between TSS and TLS", "Absolute frequency", minXvalue);
                         appPanelTopComponent.add(panel, BorderLayout.CENTER);
                     }
                 });
@@ -388,13 +393,13 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                 appPanelTopComponent = new AppPanelTopComponent();
                 appPanelTopComponent.setLayout(new BorderLayout());
                 appPanelTopComponent.open();
-                appPanelTopComponent.setName("Distribution of TSS distance to TLS");
+                appPanelTopComponent.setName("Distribution of Bases in relative distance to TLS");
                 Thread plotGeneration = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        PlotGenerator gen = new PlotGenerator();
+                        gen = new PlotGenerator();
                         List<DataTable> dataList = gen.prepareData(ChartType.BASE_DISTRIBUTION, elements, currentTss, referenceViewer, lengthRelToTls, binSize);
-                        InteractivePanel panel = gen.generateOverlappedBarPlot(dataList.get(0), dataList.get(1), "bla", "blub");
+                        InteractivePanel panel = gen.generateOverlappedAreaPlot(dataList.get(0), dataList.get(1), "5'UTR relative to start codon (nt)", "purine/ pyrimidine frequencies");
                         appPanelTopComponent.add(panel, BorderLayout.CENTER);
                     }
                 });
@@ -411,7 +416,9 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                     public void run() {
                         PlotGenerator gen = new PlotGenerator();
                         List<DataTable> dataList = gen.prepareData(ChartType.DISTRIBUTION_OF_ALL_TSS_OFFSETS_LENGTH, elements, currentTss, referenceViewer, lengthRelToTls, binSize);
-                        InteractivePanel panel = gen.generateYXPlot(dataList.get(0), "distance between TSS and TLS", "TSS stacksize");
+                        ParameterSetFiveEnrichedAnalyses tssParameters = (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters();
+                        double minXvalue = -Double.valueOf(tssParameters.getLeaderlessLimit());
+                        InteractivePanel panel = gen.generateYXPlot(dataList.get(0), "distance between TSS and TLS", "TSS stacksize", minXvalue);
                         appPanelTopComponent.add(panel, BorderLayout.CENTER);
                     }
                 });
@@ -550,7 +557,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
             }
 
             File workingDir = (File) wiz.getProperty(RbsAnalysisWizardIterator.PROP_WORKING_DIR);
-            final int lengthRelToTls = (int) wiz.getProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_REGION_LENGTH);
+            final int lengthRelToTls = (int) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS);
             int motifWidth = (int) wiz.getProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_LENGTH_MOTIFWIDTH);
             int noOfTrying = (int) wiz.getProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_NO_TRYING_BIOPROSPECTOR);
             int minSpacer = (int) wiz.getProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_MIN_SPACER);
@@ -757,8 +764,8 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
             statisticsMap.put(MAPPINGS_COUNT, (Double) statisticsMap.get(MAPPINGS_COUNT) + tssResultNew.getStats().getMc());
             statisticsMap.put(MAPPINGS_MEAN_LENGTH, (Double) statisticsMap.get(MAPPINGS_MEAN_LENGTH) + tssResultNew.getStats().getMml());
             statisticsMap.put(MAPPINGS_MILLION, (Double) statisticsMap.get(MAPPINGS_MILLION) + tssResultNew.getStats().getMm());
-            statisticsMap.put(BACKGROUND_THRESHOLD, (Double) statisticsMap.get(BACKGROUND_THRESHOLD) + tssResultNew.getStats().getBg());
-            statisticsMap.put(TSS_NO_PUTATIVE_CDS_SHIFTS, (Double) statisticsMap.get(TSS_NO_PUTATIVE_CDS_SHIFTS) + noPutCdsShifts);
+            statisticsMap.put(BACKGROUND_THRESHOLD, (Double) statisticsMap.get(BACKGROUND_THRESHOLD) + tssResultNew.getStats().getBgThreshold());
+            statisticsMap.put(TSS_NO_PUTATIVE_CDS_SHIFTS, (Integer) statisticsMap.get(TSS_NO_PUTATIVE_CDS_SHIFTS) + noPutCdsShifts);
 
 
             tssResultNew.setStatsAndParametersMap(statisticsMap);

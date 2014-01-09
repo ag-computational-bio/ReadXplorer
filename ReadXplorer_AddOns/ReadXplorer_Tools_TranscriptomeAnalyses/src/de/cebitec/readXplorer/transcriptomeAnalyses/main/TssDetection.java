@@ -62,7 +62,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
      * TSS and detected gene.
      */
     public void runningTSSDetection(HashMap<Integer, List<Integer>> forwardCDSs, HashMap<Integer, List<Integer>> reverseCDSs,
-            HashMap<Integer, PersistantFeature> allRegionsInHash, Statistics stats, ParameterSetFiveEnrichedAnalyses parameters) {
+            HashMap<Integer, PersistantFeature> allRegionsInHash, StatisticsOnMappingData stats, ParameterSetFiveEnrichedAnalyses parameters) {
 
         int ratio = parameters.getRatio();
         int up = parameters.getUpstreamRegion();
@@ -78,10 +78,8 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
         int keepingInternalTssDistance = parameters.getKeepingInternalTssDistance();
         int[][] forward = stats.getForward(); // Array with startsite count information for forward mapping positions.
         int[][] reverse = stats.getReverse(); // Array with startsite count information for reverse mapping positions.
-        int[][] fwdCov = stats.getFwdCoverage(); // Array with coverage counts of mappings in forward direction.
-        int[][] revCov = stats.getRevCoverage(); // Array with coverage counts of mappings in reverse direction.
         double mm = stats.getMm(); // Mappings per Million.
-        double bg = stats.getBg(); // Background cutoff
+        double bg = stats.getBgThreshold(); // Background cutoff
 
         for (PersistantChromosome chrom : refGenome.getChromosomes().values()) {
             int chromId = chrom.getId();
@@ -190,7 +188,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                                     isPutAntisense = true;
                                 }
 
-                                cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), i, dist2start, isFwd, 0.1);
+                                cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), i, dist2start, isFwd, parameters.getCdsShiftPercentage());
 
                                 if (offsetToNextDownstreamFeature < keepingInternalTssDistance) {
                                     // putative the corresponding gene for TSS
@@ -340,7 +338,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                                     isPutAntisense = true;
                                 }
 
-                                cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), i, dist2start, isFwd, 0.1);
+                                cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), i, dist2start, isFwd, parameters.getCdsShiftPercentage());
 
                                 if (nextOffset < keepingInternalTssDistance) {
                                     // puttative nextgene

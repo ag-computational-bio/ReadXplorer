@@ -57,10 +57,6 @@ public class RbsMotifSearchPanel extends javax.swing.JPanel {
         this.jScrollPane3.setEnabled(false);
     }
     
-    public void setUpstreamRegionLength(Integer length) {
-        this.lengthOfUpstreamRegionLabel.setText(length.toString());
-    }
-    
     public void setMotifWidth (Integer width) {
         this.motifWidthLabel.setText(width.toString());
     }
@@ -94,8 +90,6 @@ public class RbsMotifSearchPanel extends javax.swing.JPanel {
         logoPanel = new javax.swing.JPanel();
         infoPanel = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
-        lengthOfUpstreamRegionLabel = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
         lengthOfSequenceForBioProspectorLabel = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         motifWidthLabel = new javax.swing.JLabel();
@@ -141,10 +135,6 @@ public class RbsMotifSearchPanel extends javax.swing.JPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(RbsMotifSearchPanel.class, "RbsMotifSearchPanel.jLabel1.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(lengthOfUpstreamRegionLabel, org.openide.util.NbBundle.getMessage(RbsMotifSearchPanel.class, "RbsMotifSearchPanel.lengthOfUpstreamRegionLabel.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(RbsMotifSearchPanel.class, "RbsMotifSearchPanel.jLabel3.text")); // NOI18N
-
         org.openide.awt.Mnemonics.setLocalizedText(lengthOfSequenceForBioProspectorLabel, org.openide.util.NbBundle.getMessage(RbsMotifSearchPanel.class, "RbsMotifSearchPanel.lengthOfSequenceForBioProspectorLabel.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(RbsMotifSearchPanel.class, "RbsMotifSearchPanel.jLabel5.text")); // NOI18N
@@ -162,28 +152,22 @@ public class RbsMotifSearchPanel extends javax.swing.JPanel {
             .addGroup(infoPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(infoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel3)
                     .addComponent(jLabel1)
                     .addComponent(jLabel5)
                     .addComponent(jLabel2))
-                .addGap(18, 18, 18)
+                .addGap(49, 49, 49)
                 .addGroup(infoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(meanSpacerLabel)
                     .addComponent(motifWidthLabel)
-                    .addComponent(lengthOfSequenceForBioProspectorLabel)
-                    .addComponent(lengthOfUpstreamRegionLabel))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(lengthOfSequenceForBioProspectorLabel))
+                .addContainerGap(28, Short.MAX_VALUE))
         );
         infoPanelLayout.setVerticalGroup(
             infoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(infoPanelLayout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(infoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(lengthOfUpstreamRegionLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(infoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
                     .addComponent(lengthOfSequenceForBioProspectorLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(infoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -193,7 +177,7 @@ public class RbsMotifSearchPanel extends javax.swing.JPanel {
                 .addGroup(infoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(meanSpacerLabel))
-                .addContainerGap(18, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -250,7 +234,6 @@ public class RbsMotifSearchPanel extends javax.swing.JPanel {
     private javax.swing.JPanel infoPanel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -260,7 +243,6 @@ public class RbsMotifSearchPanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JLabel lengthOfSequenceForBioProspectorLabel;
-    private javax.swing.JLabel lengthOfUpstreamRegionLabel;
     private javax.swing.JPanel logoPanel;
     private javax.swing.JLabel meanSpacerLabel;
     private javax.swing.JLabel motifWidthLabel;

@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.cebitec.readXplorer.transcriptomeAnalyses.plots;
+package de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration;
 
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
@@ -10,18 +10,29 @@ import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ChartType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ElementsOfInterest;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import de.erichseifert.gral.data.DataSeries;
+import de.erichseifert.gral.data.DataSource;
 import de.erichseifert.gral.data.DataTable;
 import de.erichseifert.gral.plots.BarPlot;
 import de.erichseifert.gral.plots.XYPlot;
-import de.erichseifert.gral.plots.axes.AxisRenderer;
-import de.erichseifert.gral.plots.axes.LogarithmicRenderer2D;
+import de.erichseifert.gral.plots.areas.AreaRenderer;
+import de.erichseifert.gral.plots.areas.DefaultAreaRenderer2D;
+import de.erichseifert.gral.plots.areas.LineAreaRenderer2D;
+import de.erichseifert.gral.plots.lines.DefaultLineRenderer2D;
+import de.erichseifert.gral.plots.lines.LineRenderer;
+import de.erichseifert.gral.plots.points.DefaultPointRenderer2D;
 import de.erichseifert.gral.plots.points.PointRenderer;
 import de.erichseifert.gral.ui.InteractivePanel;
+import de.erichseifert.gral.util.GraphicsUtils;
 import de.erichseifert.gral.util.Insets2D;
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.LinearGradientPaint;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
 
 /**
  *
@@ -37,9 +48,7 @@ public class PlotGenerator implements Observer {
      * Second corporate color used as signal color
      */
     protected static final Color COLOR2 = new Color(200, 80, 75);
-
-    public PlotGenerator() {
-    }
+    private double smallestColumnValue = 0.0;
 
     public List<DataTable> prepareData(ChartType chartType, ElementsOfInterest elements, List<TranscriptionStart> tss, ReferenceViewer refViewer, int length, int bin) {
 
@@ -64,9 +73,6 @@ public class PlotGenerator implements Observer {
                 if (x < minX) {
                     minX = x;
                 }
-
-
-
                 if (tmpMap.containsKey(x)) {
                     tmpMap.put(x, tmpMap.get(x) + 1.0);
                 } else {
@@ -105,10 +111,11 @@ public class PlotGenerator implements Observer {
             }
             DataTable dataGA = new DataTable(Double.class, Double.class);
             DataTable dataCT = new DataTable(Double.class, Double.class);
-            HashMap<Double, Double[]> map = new HashMap<>();
+            TreeMap<Double, Double[]> map = new TreeMap<>();
             for (double i = -1; i > -(length + 1); i--) {
                 map.put(i, new Double[]{0.0, 0.0});
             }
+
             for (String string : tmpSubstrings) {
                 double relativePosToFeatureStart = -1; // relative position to feature start
                 for (int i = string.length() - 1; i >= 0; i--) {
@@ -123,10 +130,11 @@ public class PlotGenerator implements Observer {
                 }
             }
 
+            int totalNoOfReads = tmpSubstrings.size();
             for (Double relPosToFeatureStart : map.keySet()) {
                 Double[] absoluteOccurenceOnPosition = map.get(relPosToFeatureStart);
-                dataGA.add(relPosToFeatureStart, absoluteOccurenceOnPosition[0]);
-                dataCT.add(relPosToFeatureStart, absoluteOccurenceOnPosition[1]);
+                dataGA.add(relPosToFeatureStart, absoluteOccurenceOnPosition[0] / totalNoOfReads);
+                dataCT.add(relPosToFeatureStart, absoluteOccurenceOnPosition[1] / totalNoOfReads);
             }
 
             dataList.add(dataCT);
@@ -134,6 +142,8 @@ public class PlotGenerator implements Observer {
         }
 
         if (chartType == ChartType.DISTRIBUTION_OF_ALL_TSS_OFFSETS_LENGTH) {
+            
+            // TODO here we need some BITS!
             DataTable data = new DataTable(Double.class, Double.class);
             // We want to show the distribution of length between TSS to TLS
             for (TranscriptionStart tSS : tssForAnalysis) {
@@ -201,78 +211,84 @@ public class PlotGenerator implements Observer {
         return resultList;
     }
 
-    public InteractivePanel generateYXPlot(DataTable data, String xAxisLabel, String yAxisLabel) {
+    public InteractivePanel generateYXPlot(DataTable data, String xAxisLabel, String yAxisLabel, Double minValue) {
         XYPlot plot = new XYPlot(data);
 
         double insetsTop = 20.0,
-                insetsLeft = 100.0,
+                insetsLeft = 80.0,
                 insetsBottom = 60.0,
                 insetsRight = 40.0;
         plot.setInsets(new Insets2D.Double(
                 insetsTop, insetsLeft, insetsBottom, insetsRight));
-//        plot.setAxisRenderer(yAxisLabel, null);
-//        plot.getAxisRenderer(XYPlot.AXIS_X).setSetting(AxisRenderer.LABEL, xAxisLabel);
-//        plot.getAxisRenderer(XYPlot.AXIS_Y).setSetting(AxisRenderer.LABEL, yAxisLabel);
-//        plot.getAxisRenderer(XYPlot.AXIS_X).setSetting(AxisRenderer.INTERSECTION, 0.0);
-//        plot.getAxisRenderer(XYPlot.AXIS_Y).setSetting(AxisRenderer.INTERSECTION, 0.0);
+        plot.getAxisRenderer(XYPlot.AXIS_X).setLabel(xAxisLabel);
+        plot.getAxisRenderer(XYPlot.AXIS_Y).setLabel(yAxisLabel);
+        plot.getAxisRenderer(XYPlot.AXIS_Y).setLabelDistance(2);
+        plot.getAxisRenderer(XYPlot.AXIS_Y).setIntersection(minValue);
 
 
-        Color color = new Color(0.0f, 0.3f, 1.0f);
-//        plot.getPointRenderer(data).setSetting(PointRenderer.COLOR, color);
+        plot.getPointRenderer(data).setColor(COLOR1);
         return new InteractivePanel(plot);
     }
 
-    public InteractivePanel generateBarPlot(DataTable data, String xAxisLabel, String yAxisLabel) {
+    public InteractivePanel generateBarPlot(DataTable data, String xAxisLabel, String yAxisLabel, Double minValue) {
         BarPlot plot = new BarPlot(data);
-//                plot.setBounds(5000, 5000, 500, 500);
-//                LogarithmicRenderer2D rendererX = new LogarithmicRenderer2D();
-//                LogarithmicRenderer2D rendererY = new LogarithmicRenderer2D();
-//                plot.setAxisRenderer(BarPlot.AXIS_X, rendererX);
-//                plot.setAxisRenderer(BarPlot.AXIS_Y, rendererY);
         double insetsTop = 20.0,
-                insetsLeft = 100.0,
+                insetsLeft = 80.0,
                 insetsBottom = 60.0,
                 insetsRight = 40.0;
-//        plot.setInsets(new Insets2D.Double(
-//                insetsTop, insetsLeft, insetsBottom, insetsRight));
-//        plot.getAxisRenderer(BarPlot.AXIS_X).setSetting(LogarithmicRenderer2D.LABEL, xAxisLabel);
-//        plot.getAxisRenderer(BarPlot.AXIS_Y).setSetting(LogarithmicRenderer2D.LABEL, yAxisLabel);
-//        plot.getAxisRenderer(BarPlot.AXIS_X).setSetting(LogarithmicRenderer2D.INTERSECTION, 0.0);
-//        plot.getAxisRenderer(BarPlot.AXIS_Y).setSetting(LogarithmicRenderer2D.INTERSECTION, 0.0);
+        plot.setInsets(new Insets2D.Double(
+                insetsTop, insetsLeft, insetsBottom, insetsRight));
+        plot.getAxisRenderer(XYPlot.AXIS_X).setLabel(xAxisLabel);
+        plot.getAxisRenderer(XYPlot.AXIS_Y).setLabel(yAxisLabel);
+        plot.getAxisRenderer(XYPlot.AXIS_Y).setLabelDistance(2);
+        plot.getAxisRenderer(XYPlot.AXIS_Y).setIntersection(minValue);
+        plot.setBarWidth(0.8);
 
+        // Format bars
+        BarPlot.BarRenderer pointRenderer = (BarPlot.BarRenderer) plot.getPointRenderer(data);
+        pointRenderer.setColor(
+                new LinearGradientPaint(0f, 0f, 0f, 1f,
+                new float[]{0.0f, 1.0f},
+                new Color[]{COLOR1, GraphicsUtils.deriveBrighter(COLOR1)}));
+        pointRenderer.setBorderStroke(new BasicStroke(3f));
+        pointRenderer.setBorderColor(
+                new LinearGradientPaint(0f, 0f, 0f, 1f,
+                new float[]{0.0f, 1.0f},
+                new Color[]{GraphicsUtils.deriveBrighter(COLOR1), COLOR1}));
 
-        Color color = new Color(0.0f, 0.3f, 1.0f);
-        plot.getPointRenderer(data).setColor(COLOR1);
+        pointRenderer.setValueColor(GraphicsUtils.deriveDarker(COLOR1));
+        pointRenderer.setValueFont(Font.decode(null).deriveFont(Font.BOLD));
 
         return new InteractivePanel(plot);
     }
 
-    public InteractivePanel generateOverlappedBarPlot(DataTable dataCT, DataTable dataGA, String xAxisLabel, String yAxisLabel) {
+    /**
+     *
+     * @param dataCT
+     * @param dataGA
+     * @param xAxisLabel
+     * @param yAxisLabel
+     * @return
+     */
+    public InteractivePanel generateOverlappedAreaPlot(DataTable dataCT, DataTable dataGA, String xAxisLabel, String yAxisLabel) {
 
-        BarPlot plot = new BarPlot();
+        // Create data series
+        DataSeries data1 = new DataSeries("CT", dataCT, 0, 1);
+        DataSeries data2 = new DataSeries("GA", dataGA, 0, 1);
 
-        plot.add(dataCT);
-        plot.add(dataGA);
+        // Create new xy-plot
+        XYPlot plot = new XYPlot(data1, data2);
+        plot.setLegendVisible(true);
+        plot.setInsets(new Insets2D.Double(20.0, 20.0, 70.0, 100.0));
+        plot.getAxisRenderer(XYPlot.AXIS_X).setLabel(xAxisLabel);
+        plot.getAxisRenderer(XYPlot.AXIS_Y).setLabel(yAxisLabel);
+        plot.getAxisRenderer(XYPlot.AXIS_Y).setTickLabelsOutside(false);
+        plot.getAxisRenderer(XYPlot.AXIS_Y).setLabelDistance(3);
+        plot.getAxisRenderer(XYPlot.AXIS_X).setTickSpacing(1);
 
-        plot.setInsets(new Insets2D.Double(
-                20.0, 40.0, 60.0, 125.0));
-
-//        plot.setSetting(Plot.LEGEND, true);
-//        plot.getLegend().setSetting(Legend.ORIENTATION, Orientation.HORIZONTAL);
-//        plot.getLegend().setSetting(Legend.ALIGNMENT_X, 1.0);
-//        plot.getLegend().setSetting(Legend.ALIGNMENT_Y, 1.0);
-//                    plot.getLegend().setSetting(BarPlot.BarPlotLegend.LABEL_FORMAT, );
-
-        //            plot.setSetting(Plot.LEGEND_DISTANCE, 2.0);
-        //            plot.setSetting(Plot.LEGEND_LOCATION, Location.SOUTH);
-//        plot.getAxisRenderer(BarPlot.AXIS_X).setSetting(LogarithmicRenderer2D.LABEL, "relative positions to feature start");
-//        plot.getAxisRenderer(BarPlot.AXIS_Y).setSetting(LogarithmicRenderer2D.LABEL, "absolute occurence of bases");
-//        plot.getPointRenderer(dataGA).setSetting(PointRenderer.COLOR, new Color(0, 0, 205, 100)); // blue
-//        plot.getPointRenderer(dataCT).setSetting(PointRenderer.COLOR, new Color(255, 0, 0, 100)); // red
-//        plot.getAxisRenderer(BarPlot.AXIS_X).setSetting(AxisRenderer.INTERSECTION, 0.0);
-//        plot.getAxisRenderer(BarPlot.AXIS_Y).setSetting(AxisRenderer.INTERSECTION, 0.0);
-//        plot.getAxisRenderer(BarPlot.AXIS_Y).setSetting(AxisRenderer.TICK_LABELS_OUTSIDE, false);
-//        plot.getAxisRenderer(BarPlot.AXIS_Y).setSetting(AxisRenderer.LABEL_DISTANCE, 3);
+        // Format data series
+        formatFilledArea(plot, data1, COLOR2);
+        formatFilledArea(plot, data2, COLOR1);
 
         return new InteractivePanel(plot);
 
@@ -311,5 +327,38 @@ public class PlotGenerator implements Observer {
 
         return compliment;
 
+    }
+
+    private static void formatFilledArea(XYPlot plot, DataSource data, Color color) {
+        PointRenderer point = new DefaultPointRenderer2D();
+        point.setColor(color);
+        plot.setPointRenderer(data, point);
+        LineRenderer line = new DefaultLineRenderer2D();
+        line.setColor(color);
+        line.setGap(3.0);
+        line.setGapRounded(true);
+        plot.setLineRenderer(data, line);
+        AreaRenderer area = new DefaultAreaRenderer2D();
+        area.setColor(GraphicsUtils.deriveWithAlpha(color, 64));
+        plot.setAreaRenderer(data, area);
+    }
+
+    private static void formatLineArea(XYPlot plot, DataSource data, Color color) {
+        PointRenderer point = new DefaultPointRenderer2D();
+        point.setColor(color);
+        plot.setPointRenderer(data, point);
+        plot.setLineRenderer(data, null);
+        AreaRenderer area = new LineAreaRenderer2D();
+        area.setGap(3.0);
+        area.setColor(color);
+        plot.setAreaRenderer(data, area);
+    }
+
+    public double getSmallestColumnValue() {
+        return smallestColumnValue;
+    }
+
+    public void setSmallestColumnValue(double smallestColumnValue) {
+        this.smallestColumnValue = smallestColumnValue;
     }
 }

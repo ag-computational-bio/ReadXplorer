@@ -5,7 +5,6 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelRegion;
-import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.util.Observer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +28,7 @@ public class NewRegionDetection implements Observer, AnalysisI<List<NovelRegion>
 
     public void runningNewRegionsDetection(HashMap<Integer, List<Integer>> forwardCDSs,
             HashMap<Integer, List<Integer>> reverseCDSs, HashMap<Integer, PersistantFeature> allRegionsInHash,
-            Statistics stats, ParameterSetWholeTranscriptAnalyses params) {
+            StatisticsOnMappingData stats, ParameterSetWholeTranscriptAnalyses params) {
 
 
         // Key is flag and Value the count of this flag
@@ -40,81 +39,93 @@ public class NewRegionDetection implements Observer, AnalysisI<List<NovelRegion>
         int[][] reverse = stats.getReverse(); // Array with startsite count information for reverse mapping positions.
         int[][] fwdCov = stats.getFwdCoverage(); // Array with coverage counts of mappings in forward direction.
         int[][] revCov = stats.getRevCoverage(); // Array with coverage counts of mappings in reverse direction.
-        double bg = stats.getBg(); // Background cutoff
+        double bg = stats.getBgThreshold(); // Background cutoff
         int minLengthBoundary = params.getMinLengthBoundary();
         for (PersistantChromosome chrom : refGenome.getChromosomes().values()) {
             int chromId = chrom.getId();
             int chromNo = chrom.getChromNumber();
             int chromLength = chrom.getLength();
+            int ratio = 0;
+            boolean isInclusionOfRatio = params.isRatioInclusion();
+            if (isInclusionOfRatio) {
+                ratio = params.getIncreaseRatioValue();
+            }
+
             for (int i = 0; i < chromLength; i++) {
 
-                int fwd_readstarts = forward[chromNo - 1][i];
-                if (fwd_readstarts > bg) { // got through possible forward hits first
-                    int j = 0;
-                    int end = 0;
+                if (((forward[chromNo - 1][i] > bg) || (reverse[chromNo - 1][i] > bg)) && isInclusionOfRatio) { // background cutoff is passed
+                    int f_before = forward[chromNo - 1][i - 1] + 1;
+                    int r_before = reverse[chromNo - 1][i + 1] + 1;
 
-                    // check if the hits can be attributed to a region (up to 700bp downstream)
-                    while (!forwardCDSs.containsKey(i + j - end)) {
-                        if (j > 700) {
-                            break;
-                        }
-                        if ((i + j) > chromLength) {
-                            end = chromLength;
-                        }
-                        j++;
-                    }
-                    if (!forwardCDSs.containsKey(i + j - end)) {
-//	    # if the count crosses the threshold far from a gene
-                        int k = 0;
-//		# search for the drop off
-                        while (fwdCov[chromNo - 1][i + k - end] > bg) {
-                            if ((i + k) > chromLength) {
+                    int f_ratio = (forward[chromNo - 1][i] + 1) / f_before;
+                    int r_ratio = (reverse[chromNo - 1][i] + 1) / r_before;
+
+
+                    if (f_ratio > ratio) { // got through possible forward hits first
+                        int j = 0;
+                        int end = 0;
+
+                        // check if the hits can be attributed to a region (up to 700bp downstream)
+                        while (!forwardCDSs.containsKey(i + j - end)) {
+                            if (j > 700) {
+                                break;
+                            }
+                            if ((i + j) > chromLength) {
                                 end = chromLength;
                             }
-                            k++;
+                            j++;
                         }
-                        int start = i;
-                        int flag = i + k - end;
-                        if (dropdownsFwd.containsKey(flag)) {
-                            dropdownsFwd.put(flag, dropdownsFwd.get(flag) + 1);
-                        } else {
-                            dropdownsFwd.put(flag, 1);
-                        }
+                        if (!forwardCDSs.containsKey(i + j - end)) {
+//	    # if the count crosses the threshold far from a gene
+                            int k = 0;
+//		# search for the drop off
+                            while (fwdCov[chromNo - 1][i + k - end] > bg) {
+                                if ((i + k) > chromLength) {
+                                    end = chromLength;
+                                }
+                                k++;
+                            }
+                            int start = i;
+                            int flag = i + k - end;
+                            if (dropdownsFwd.containsKey(flag)) {
+                                dropdownsFwd.put(flag, dropdownsFwd.get(flag) + 1);
+                            } else {
+                                dropdownsFwd.put(flag, 1);
+                            }
 //                        newRegion = new NovelRegion(true, flag, j, trackID);
 //		new_regs{fwd}{flag}++;
-                        int possibleStop = flag + 1;
+                            int possibleStop = flag + 1;
 //		# and report the likely transcript
-                        String site = "intergenic";
-                        if (reverseCDSs.containsKey(start) || reverseCDSs.containsKey(possibleStop)) {
-                            site = "cis-antisense";
-                        }
+                            String site = "intergenic";
+                            if (reverseCDSs.containsKey(start) || reverseCDSs.containsKey(possibleStop)) {
+                                site = "cis-antisense";
+                            }
 
-                        int lengthOfNewRegion = flag - i;
-                        if (dropdownsFwd.get(flag) == 1 && lengthOfNewRegion >= minLengthBoundary) {
+                            int lengthOfNewRegion = flag - i;
+                            if (dropdownsFwd.get(flag) == 1 && lengthOfNewRegion >= minLengthBoundary) {
 //                            push(@{$new_regs{out}{$start}}, "$pos\t+\t$fwd\t$site") unless ($new_regs{fwd}{$flag} > 1);
-                            newRegion = new NovelRegion(true, start, possibleStop, site, (possibleStop - start), getSubSeq(chrom, true, start, possibleStop), false, false, trackid, chromId);
-                            System.out.println(newRegion.toString());
-                            novelRegions.add(newRegion);
+                                newRegion = new NovelRegion(true, start, possibleStop, site, (possibleStop - start), getSubSeq(chrom, true, start, possibleStop), false, false, trackid, chromId);
+                                System.out.println(newRegion.toString());
+                                novelRegions.add(newRegion);
+                            }
                         }
                     }
-                }
 // #############################################################################
 
-                int rev_readstarts = reverse[chromNo - 1][i];
-                if (rev_readstarts > bg) {
-                    int j = 0;
-                    int end = 0;
-                    while (!reverseCDSs.containsKey(end + i - j)) {
-                        if (j > 700) {
-                            break;
+
+                    if (r_ratio > ratio) {
+                        int j = 0;
+                        int end = 0;
+                        while (!reverseCDSs.containsKey(end + i - j)) {
+                            if (j > 700) {
+                                break;
+                            }
+                            if ((i - j) == 0) {
+                                end = chromLength;
+                            }
+                            j++;
                         }
-                        if ((i - j) == 0) {
-                            end = chromLength;
-                        }
-                        j++;
-                    }
-                    if (!reverseCDSs.containsKey(end + i - j)) {
-                        if (rev_readstarts > bg) {
+                        if (!reverseCDSs.containsKey(end + i - j)) {
                             int k = 0;
                             while (revCov[chromNo - 1][end + i - k] > bg) {
                                 if ((i - k) == 0) {
@@ -145,11 +156,107 @@ public class NewRegionDetection implements Observer, AnalysisI<List<NovelRegion>
                             }
                         }
                     }
+                } else {
+
+                    if (forward[chromNo - 1][i] > bg) { // got through possible forward hits first
+                        int j = 0;
+                        int end = 0;
+
+                        // check if the hits can be attributed to a region (up to 700bp downstream)
+                        while (!forwardCDSs.containsKey(i + j - end)) {
+                            if (j > 700) {
+                                break;
+                            }
+                            if ((i + j) > chromLength) {
+                                end = chromLength;
+                            }
+                            j++;
+                        }
+                        if (!forwardCDSs.containsKey(i + j - end)) {
+//	    # if the count crosses the threshold far from a gene
+                            int k = 0;
+//		# search for the drop off
+                            while (fwdCov[chromNo - 1][i + k - end] > bg) {
+                                if ((i + k) > chromLength) {
+                                    end = chromLength;
+                                }
+                                k++;
+                            }
+                            int start = i;
+                            int flag = i + k - end;
+                            if (dropdownsFwd.containsKey(flag)) {
+                                dropdownsFwd.put(flag, dropdownsFwd.get(flag) + 1);
+                            } else {
+                                dropdownsFwd.put(flag, 1);
+                            }
+//                        newRegion = new NovelRegion(true, flag, j, trackID);
+//		new_regs{fwd}{flag}++;
+                            int possibleStop = flag + 1;
+//		# and report the likely transcript
+                            String site = "intergenic";
+                            if (reverseCDSs.containsKey(start) || reverseCDSs.containsKey(possibleStop)) {
+                                site = "cis-antisense";
+                            }
+
+                            int lengthOfNewRegion = flag - i;
+                            if (dropdownsFwd.get(flag) == 1 && lengthOfNewRegion >= minLengthBoundary) {
+//                            push(@{$new_regs{out}{$start}}, "$pos\t+\t$fwd\t$site") unless ($new_regs{fwd}{$flag} > 1);
+                                newRegion = new NovelRegion(true, start, possibleStop, site, (possibleStop - start), getSubSeq(chrom, true, start, possibleStop), false, false, trackid, chromId);
+                                System.out.println(newRegion.toString());
+                                novelRegions.add(newRegion);
+                            }
+                        }
+                    }
+// #############################################################################
+
+
+                    if (reverse[chromNo - 1][i] > bg) {
+                        int j = 0;
+                        int end = 0;
+                        while (!reverseCDSs.containsKey(end + i - j)) {
+                            if (j > 700) {
+                                break;
+                            }
+                            if ((i - j) == 0) {
+                                end = chromLength;
+                            }
+                            j++;
+                        }
+                        if (!reverseCDSs.containsKey(end + i - j)) {
+                            int k = 0;
+                            while (revCov[chromNo - 1][end + i - k] > bg) {
+                                if ((i - k) == 0) {
+                                    end = chromLength;
+                                }
+                                k++;
+                            }
+                            int start = i + 1;
+                            int flag = end + i - k;
+//                      $new_regs{rev}{flag}++;
+                            if (dropdownsRev.containsKey(flag)) {
+                                dropdownsRev.put(flag, dropdownsRev.get(flag) + 1);
+                            } else {
+                                dropdownsRev.put(flag, 1);
+                            }
+                            int possibleStop = flag + 1;
+                            String site = "intergenic";
+                            if (forwardCDSs.containsKey(start) || forwardCDSs.containsKey(possibleStop)) {
+                                site = "cis-antisense";
+                            }
+                            int lengthOfNewRegion = i - flag;
+                            if (dropdownsRev.get(flag) == 1 && lengthOfNewRegion >= minLengthBoundary) { // unless ($new_regs{rev}{$flag} > 1) {
+//                          push(@{$new_regs{out}{$start}}, "$pos\t-\t$rev\t$site");
+                                String reversedSeq = new StringBuffer(getSubSeq(chrom, false, possibleStop, start)).reverse().toString();
+                                String revComplement = getComplement(reversedSeq);
+                                newRegion = new NovelRegion(false, start, possibleStop, site, (start - possibleStop), revComplement, false, false, trackid, chromId);
+                                novelRegions.add(newRegion);
+                            }
+                        }
+                    }
+
                 }
             }
         }
-        System.out.println(
-                "The genome is running out of length!");
     }
 
     public List<NovelRegion> getNovelRegions() {

@@ -32,15 +32,13 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
     private List<de.cebitec.readXplorer.util.Observer> observer = new ArrayList<>();
     private List<int[]> region2Exclude;
     protected HashMap<Integer, List<Integer>> forwardCDSs, reverseCDSs;
-    private Statistics stats;
+    private StatisticsOnMappingData stats;
     private double backgroundCutoff;
     private ParameterSetFiveEnrichedAnalyses parameters;
     private GenomeFeatureParser featureParser;
     private TssDetection tssDetection;
     private OperonDetection operonDetection;
     private ResultPanelTranscriptionStart transcriptionStartResultPanel;
-    private NovelRegionResultPanel novelRegionResultPanel;
-    private ResultsPanelAntisense antisenseResultPanel;
     private final ReferenceViewer refViewer;
     private TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
     private HashMap<Integer, PersistantTrack> trackMap;
@@ -71,24 +69,21 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
         this.progressHandleParsingFeatures = ProgressHandleFactory.createHandle(handlerTitle);
         this.progressHandleParsingFeatures.start(100);
         this.featureParser = new GenomeFeatureParser(this.trackConnector, this.progressHandleParsingFeatures);
+        this.allRegionsInHash = this.featureParser.getGenomeFeaturesInHash(this.featureParser.getGenomeFeatures());
         this.featureParser.parseFeatureInformation(this.featureParser.getGenomeFeatures());
 
         // Initiation of important structures
         this.region2Exclude = this.featureParser.getRegion2Exclude();
         this.forwardCDSs = this.featureParser.getForwardCDSs();
         this.reverseCDSs = this.featureParser.getReverseCDSs();
-        this.allRegionsInHash = this.featureParser.getAllRegionsInHash();
-        
 
-        // Initiation of important structures
-        this.region2Exclude = this.featureParser.getRegion2Exclude();
-        this.forwardCDSs = this.featureParser.getForwardCDSs();
-        this.reverseCDSs = this.featureParser.getReverseCDSs();
-        this.allRegionsInHash = this.featureParser.getAllRegionsInHash();
+        this.featureParser = null;
+
+        // Finish Progress of parsing genome features
         this.progressHandleParsingFeatures.finish();
 
         // geting Mappings and calculate statistics on mappings.
-        this.stats = new Statistics(trackConnector.getRefGenome(), parameters.getFraction(), this.forwardCDSs, this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
+        this.stats = new StatisticsOnMappingData(trackConnector.getRefGenome(), parameters.getFraction(), this.forwardCDSs, this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
         de.cebitec.readXplorer.databackend.AnalysesHandler handler = new de.cebitec.readXplorer.databackend.AnalysesHandler(trackConnector, this, "Collecting coverage data of track number "
                 + this.selectedTrack.getId(), new ParametersReadClasses(true, false, false, false)); // TODO: ParameterReadClasses noch in den Wizard einbauen und die parameter hier mit übergeben!
         handler.setMappingsNeeded(true);
@@ -131,11 +126,12 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
         final int trackId = dataTypePair.getFirst();
         final String dataType = dataTypePair.getSecond();
 
-//        this.stats.parseMappings(this.stats.getMappingResults());
         this.backgroundCutoff = this.stats.calculateBackgroundCutoff(this.parameters.getFraction());
-        this.stats.setBg(this.backgroundCutoff);
+        this.stats.setBgThreshold(this.backgroundCutoff);
 
         this.stats.initMappingsStatistics();
+
+
         this.tssDetection = new TssDetection(this.trackConnector.getRefGenome(), trackId);
         this.tssDetection.runningTSSDetection(this.forwardCDSs, this.reverseCDSs,
                 this.allRegionsInHash, this.stats, this.parameters);
@@ -145,6 +141,8 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
             transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
             transcriptionStartResultPanel.setReferenceViewer(refViewer);
         }
+
+        this.stats.clearMemory();
 
         TSSDetectionResults tssResult = new TSSDetectionResults(this.stats, this.tssDetection.getResults(), getTrackMap(), refGenomeID);
         tssResult.setParameters(this.parameters);

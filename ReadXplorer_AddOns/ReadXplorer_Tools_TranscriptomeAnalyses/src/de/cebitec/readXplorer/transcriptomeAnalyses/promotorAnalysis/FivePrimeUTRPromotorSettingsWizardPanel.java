@@ -14,6 +14,7 @@ import org.openide.util.NbPreferences;
 public class FivePrimeUTRPromotorSettingsWizardPanel implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     private final String wizardName;
+    private int wholeLengthOfAnalysisRegion;
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
@@ -65,6 +66,7 @@ public class FivePrimeUTRPromotorSettingsWizardPanel implements WizardDescriptor
     @Override
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state
+        this.wholeLengthOfAnalysisRegion = (int) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS);
     }
 
     @Override
@@ -94,5 +96,30 @@ public class FivePrimeUTRPromotorSettingsWizardPanel implements WizardDescriptor
 
     @Override
     public void validate() throws WizardValidationException {
+        if (component.getWorkingDir() == null) {
+            throw new WizardValidationException(null, "Please choose a Directory.", null);
+        } else {
+            if (!component.getWorkingDir().isDirectory()) { // Not a Directory
+                throw new WizardValidationException(null, "Please choose a Directory.", null);
+            }
+        }
+        int fstMinSpacer = component.getSpacer1Length();
+        int sndMinSpacer = component.getSpacer2Length();
+        int lengtOfMinus10Region = component.getPutativeMinusTenLength();
+        int lengthOfMinus35Region = component.getPutativeMinusThirtyFiveLength();
+        int minus10MotifWidth = component.getMinus10MotifWidth();
+        int minus35MotifWidth = component.getMinus35MotifWidth();
+
+        if (this.wholeLengthOfAnalysisRegion < (fstMinSpacer + sndMinSpacer + lengtOfMinus10Region + lengthOfMinus35Region)) {
+            throw new WizardValidationException(null, "Please check your Parameters for promotor analysis.", null);
+        }
+
+        if (lengtOfMinus10Region < minus10MotifWidth) {
+            throw new WizardValidationException(null, "Please check on motif-width for -10 region, beacause it is bigger than the region of interest.", null);
+        }
+
+        if (lengthOfMinus35Region < minus35MotifWidth) {
+            throw new WizardValidationException(null, "Please check on motif-width for -35 region, because it is bigger than the region of interest.", null);
+        }
     }
 }

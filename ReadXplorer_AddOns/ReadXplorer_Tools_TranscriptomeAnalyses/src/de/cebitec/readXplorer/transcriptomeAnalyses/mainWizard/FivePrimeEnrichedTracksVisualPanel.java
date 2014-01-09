@@ -27,7 +27,7 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
     public FivePrimeEnrichedTracksVisualPanel(String wizardName, int referenceID) {
         initComponents();
         setInputVerifier();
-        updateCheckBoxes();
+        updateFields();
         this.wizardName = wizardName;
         this.jScrollPane1.setBorder(BorderFactory.createTitledBorder("TSS-detection"));
         this.descriptionTextArea.setEditable(false);
@@ -37,7 +37,6 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
             this.referenceLength += persistantChromosome.getLength();
             this.nbOfFeatures += refGenConnector.getFeaturesForClosedInterval(0, persistantChromosome.getLength(), persistantChromosome.getId()).size();
         }
-        
     }
     
     private void setInputVerifier() {
@@ -95,6 +94,10 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
     public Integer getLeaderlessDistance() {
         return Integer.valueOf(this.leaderlessDistanveTF.getText());
     }
+    
+    public Double getPercentageForCdsShiftAnalysis() {
+        return Double.valueOf(this.percentageTF.getText());
+    }
 
     /**
      * Updates the checkboxes for the read classes with the globally stored
@@ -109,6 +112,7 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
         ratioTF.setText(pref.get(wizardName + TranscriptomeAnalysisWizardIterator.PROP_RATIO, "5"));
         excludeTSSDistanceTF.setText(pref.get(wizardName + TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_TSS_DISTANCE, "500"));
         keepingDistanceForInternalTssTF.setText(pref.get(wizardName + TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_TSS_DISTANCE, "100"));
+        percentageTF.setText(pref.get(wizardName + TranscriptomeAnalysisWizardIterator.PROP_PERCENTAGE_FOR_CDS_ANALYSIS, "0.1"));
     }
 
     /**
@@ -138,10 +142,14 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
         excludeTSSDistanceTF = new javax.swing.JTextField();
         keepInternalLabel = new javax.swing.JLabel();
         keepingDistanceForInternalTssTF = new javax.swing.JTextField();
-        jSeparator1 = new javax.swing.JSeparator();
+        separator1 = new javax.swing.JSeparator();
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         leaderlessDistanveTF = new javax.swing.JTextField();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        percentageTF = new javax.swing.JTextField();
+        jSeparator1 = new javax.swing.JSeparator();
 
         descriptionTextArea.setColumns(20);
         descriptionTextArea.setRows(5);
@@ -206,13 +214,24 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
 
         leaderlessDistanveTF.setText(org.openide.util.NbBundle.getMessage(FivePrimeEnrichedTracksVisualPanel.class, "FivePrimeEnrichedTracksVisualPanel.leaderlessDistanveTF.text")); // NOI18N
 
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel8, org.openide.util.NbBundle.getMessage(FivePrimeEnrichedTracksVisualPanel.class, "FivePrimeEnrichedTracksVisualPanel.jLabel8.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel11, org.openide.util.NbBundle.getMessage(FivePrimeEnrichedTracksVisualPanel.class, "FivePrimeEnrichedTracksVisualPanel.jLabel11.text")); // NOI18N
+
+        percentageTF.setText(org.openide.util.NbBundle.getMessage(FivePrimeEnrichedTracksVisualPanel.class, "FivePrimeEnrichedTracksVisualPanel.percentageTF.text")); // NOI18N
+        percentageTF.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                percentageTFActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout settingsPanelLayout = new javax.swing.GroupLayout(settingsPanel);
         settingsPanel.setLayout(settingsPanelLayout);
         settingsPanelLayout.setHorizontalGroup(
             settingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(settingsPanelLayout.createSequentialGroup()
                 .addGroup(settingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(separator1, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(settingsPanelLayout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(settingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -251,15 +270,19 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
                                     .addGroup(settingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                         .addComponent(keepingDistanceForInternalTssTF)
                                         .addComponent(excludeTSSDistanceTF, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE))))
-                            .addComponent(jLabel9))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                            .addComponent(jLabel9)
+                            .addComponent(jLabel8)
+                            .addGroup(settingsPanelLayout.createSequentialGroup()
+                                .addGroup(settingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGap(18, 18, 18)
+                                .addGroup(settingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                    .addComponent(percentageTF)
+                                    .addComponent(leaderlessDistanveTF, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE))))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(jSeparator1))
                 .addContainerGap())
-            .addGroup(settingsPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel10)
-                .addGap(18, 18, 18)
-                .addComponent(leaderlessDistanveTF, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         settingsPanelLayout.setVerticalGroup(
             settingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -288,14 +311,22 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
                     .addComponent(keepInternalLabel)
                     .addComponent(keepingDistanceForInternalTssTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(separator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel9)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(settingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel10)
                     .addComponent(leaderlessDistanveTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(23, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel8)
+                .addGap(18, 18, 18)
+                .addGroup(settingsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel11)
+                    .addComponent(percentageTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -306,7 +337,7 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(settingsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 549, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addGap(0, 0, Short.MAX_VALUE))))
@@ -356,6 +387,11 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
             }
         }
     }//GEN-LAST:event_fractionTFKeyReleased
+
+    private void percentageTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_percentageTFActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_percentageTFActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField UpstreamTF;
     private javax.swing.JTextArea descriptionTextArea;
@@ -365,20 +401,24 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
     private javax.swing.JTextField fractionTF;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JLabel keepInternalLabel;
     private javax.swing.JTextField keepingDistanceForInternalTssTF;
     private javax.swing.JTextField leaderlessDistanveTF;
+    private javax.swing.JTextField percentageTF;
     private javax.swing.JTextField ratioTF;
     private javax.swing.JLabel resultLabel;
+    private javax.swing.JSeparator separator1;
     private javax.swing.JPanel settingsPanel;
     // End of variables declaration//GEN-END:variables
 }

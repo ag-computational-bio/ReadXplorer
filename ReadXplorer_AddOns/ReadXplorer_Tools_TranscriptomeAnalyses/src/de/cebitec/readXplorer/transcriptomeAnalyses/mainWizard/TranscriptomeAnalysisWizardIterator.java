@@ -46,6 +46,9 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
     public static final String PROP_NORMAL_RPKM_ANALYSIS = "normalRPKMs";
     public static final String PROP_KEEPINTERNAL_DISTANCE = "keepingInternalDistance";
     public static final String PROP_PUTATIVE_UNANNOTATED = "putative unannotated";
+    public static final String PROP_PERCENTAGE_FOR_CDS_ANALYSIS = "percentage for cds-shift analysis";
+    public static final String PROP_RAIO_NOVELREGION_DETECTION = "increase ratio value for novel region detection";
+    public static final String PROP_INCLUDE_RATIOVALUE_IN_NOVEL_REGION_DETECTION = "inclusion of ratio value for novel region detection";
     // Wizard descriptors
     private List<WizardDescriptor.Panel<WizardDescriptor>> allPanels;
     private List<WizardDescriptor.Panel<WizardDescriptor>> initPanels;

@@ -21,7 +21,7 @@ import de.cebitec.readXplorer.transcriptomeAnalyses.main.RPKMAnalysisResult;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.ResultPanelOperonDetection;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.ResultPanelRPKM;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.ResultPanelTranscriptionStart;
-import de.cebitec.readXplorer.transcriptomeAnalyses.main.Statistics;
+import de.cebitec.readXplorer.transcriptomeAnalyses.main.StatisticsOnMappingData;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.TSSDetectionResults;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.TranscriptomeAnalysesTopComponentTopComponent;
 import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.TranscriptomeAnalysisWizardIterator;
@@ -170,10 +170,14 @@ public class ExcelImporter {
         tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.TSS_RANGE_FOR_LEADERLESS_DETECTION);
         int rangeForLeaderlessDetection = Integer.valueOf(tmp);
 
+        tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.TSS_PERCENTAGE_FOR_CDSSHIFT_ANALYSIS);
+        replaced = tmp.replaceAll(",", ".");
+        double cdsPercentageValue = Double.valueOf(replaced);
+
         ParameterSetFiveEnrichedAnalyses params = new ParameterSetFiveEnrichedAnalyses(
                 fraction, ratio, upstream, downstream, isInternalExclusion,
-                rangeForKeepingTSS, rangeForLeaderlessDetection, keepingInternalRange);
-        Statistics stats = new Statistics(refConnector.getRefGenome(), mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
+                rangeForKeepingTSS, rangeForLeaderlessDetection, keepingInternalRange, cdsPercentageValue);
+        StatisticsOnMappingData stats = new StatisticsOnMappingData(refConnector.getRefGenome(), mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
 
 
         TSSDetectionResults tssResult = new TSSDetectionResults(stats, null, trackMap, genomeId);
@@ -383,8 +387,8 @@ public class ExcelImporter {
         replaced = tmp.replaceAll(",", ".");
         double fraction = Double.valueOf(replaced);
 
-        ParameterSetWholeTranscriptAnalyses params = new ParameterSetWholeTranscriptAnalyses(true, false, true, false, fraction, 0);
-        Statistics stats = new Statistics(refConnector.getRefGenome(), mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
+        ParameterSetWholeTranscriptAnalyses params = new ParameterSetWholeTranscriptAnalyses(true, false, true, false, fraction, 0, false, 0);
+        StatisticsOnMappingData stats = new StatisticsOnMappingData(refConnector.getRefGenome(), mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
 
 
 
@@ -478,9 +482,18 @@ public class ExcelImporter {
         tmp = (String) secondSheetMap.get(NovelRegionResultPanel.NOVELREGION_DETECTION_MIN_LENGTH);
         int minBoundary = Integer.valueOf(tmp);
 
+        tmp = (String) secondSheetMap.get(TranscriptomeAnalysisWizardIterator.PROP_INCLUDE_RATIOVALUE_IN_NOVEL_REGION_DETECTION);
+        boolean includeRatioValue = false;
+        if (tmp.equals("true")) {
+            includeRatioValue = true;
+        }
 
-        ParameterSetWholeTranscriptAnalyses params = new ParameterSetWholeTranscriptAnalyses(true, false, true, false, fraction, minBoundary);
-        Statistics stats = new Statistics(refConnector.getRefGenome(), mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
+        tmp = (String) secondSheetMap.get(TranscriptomeAnalysisWizardIterator.PROP_RAIO_NOVELREGION_DETECTION);
+        int ratio = Integer.valueOf(tmp);
+
+
+        ParameterSetWholeTranscriptAnalyses params = new ParameterSetWholeTranscriptAnalyses(true, false, true, false, fraction, minBoundary, includeRatioValue, ratio);
+        StatisticsOnMappingData stats = new StatisticsOnMappingData(refConnector.getRefGenome(), mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
 
 
         NovelRegionResult novelRegionResults = new NovelRegionResult(stats, trackMap, null, false);

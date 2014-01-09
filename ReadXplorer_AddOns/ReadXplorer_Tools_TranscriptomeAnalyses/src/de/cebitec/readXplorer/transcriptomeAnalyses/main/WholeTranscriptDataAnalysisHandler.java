@@ -3,11 +3,8 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 import de.cebitec.readXplorer.databackend.AnalysesHandler;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.AnalysisStatus;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
-import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistant;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
@@ -23,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import javax.swing.JOptionPane;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -42,7 +38,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
     private List<de.cebitec.readXplorer.util.Observer> observer = new ArrayList<>();
     private List<int[]> region2Exclude;
     protected HashMap<Integer, List<Integer>> forwardCDSs, reverseCDSs;
-    private Statistics stats;
+    private StatisticsOnMappingData stats;
     private double backgroundCutoff;
     private ParameterSetWholeTranscriptAnalyses parameters;
     private GenomeFeatureParser featureParser;
@@ -84,15 +80,15 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
         this.progressHandle = ProgressHandleFactory.createHandle(handlerTitle);
         this.progressHandle.start(120);
         this.featureParser = new GenomeFeatureParser(this.trackConnector, progressHandle);
+        this.allRegionsInHash = this.featureParser.getGenomeFeaturesInHash(this.featureParser.getGenomeFeatures());
         this.featureParser.parseFeatureInformation(this.featureParser.getGenomeFeatures());
 
         this.region2Exclude = this.featureParser.getRegion2Exclude();
         this.forwardCDSs = this.featureParser.getForwardCDSs();
         this.reverseCDSs = this.featureParser.getReverseCDSs();
-        this.allRegionsInHash = this.featureParser.getAllRegionsInHash();
         if (parameters.isPerformNovelRegionDetection()) {
             this.progressHandle.progress("Loading additional feature information ... ", 105);
-            featureParser.generateAllFeatureStrandInformation();
+            featureParser.generateAllFeatureStrandInformation(this.featureParser.getGenomeFeatures());
             this.progressHandle.progress(120);
             this.progressHandle.finish();
         } else {
@@ -103,7 +99,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
         // geting Mappings and calculate statistics on mappings.
         try {
             trackConnector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(this.selectedTrack);
-            this.stats = new Statistics(refViewer.getReference(), this.fraction, this.forwardCDSs,
+            this.stats = new StatisticsOnMappingData(refViewer.getReference(), this.fraction, this.forwardCDSs,
                     this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
             AnalysesHandler handler = new AnalysesHandler(trackConnector, this, "Collecting coverage data of track number "
                     + this.selectedTrack.getId(), new ParametersReadClasses(true, false, false, false)); // TODO: ParameterReadClasses noch in den Wizard einbauen und die parameter hier mit übergeben!
@@ -154,10 +150,8 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
     public void showData(Object data) {
         Pair<Integer, String> dataTypePair = (Pair<Integer, String>) data;
         final int trackId = dataTypePair.getFirst();
-//        this.mappingResults = this.stats.getMappingResults();
-//        this.stats.parseMappings(this.mappingResults);
         this.backgroundCutoff = this.stats.calculateBackgroundCutoff(this.parameters.getFraction());
-        this.stats.setBg(this.backgroundCutoff);
+        this.stats.setBgThreshold(this.backgroundCutoff);
 
 
         this.stats.initMappingsStatistics();
@@ -182,11 +176,6 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
         if (parameters.isPerformNovelRegionDetection()) {
             newRegionDetection = new NewRegionDetection(trackConnector.getRefGenome(), trackId);
 
-            /* TODO: call this method once for each chromosome and generate a list of forwardCDSs and reverseCDSs
-             * (one for each chromosome) like this: List<HashMap<Integer, List<Integer>>> forwardCDSs
-             */
-            int chromNo = 0; //TODO: correctly set these values
-            int chromLength = 0;
             newRegionDetection.runningNewRegionsDetection(featureParser.getAllFwdFeatures(), featureParser.getAllRevFeatures(), allRegionsInHash,
                     this.stats, this.parameters);
             String trackNames;
@@ -213,8 +202,8 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
              */
             List<Operon> fwdOperons, revOperons;
             operonDetection = new OperonDetection(trackId);
-            fwdOperons = operonDetection.concatOperonAdjacenciesToOperons(stats.getPutativeOperonAdjacenciesFWD(), this.trackConnector, stats.getBg());
-            revOperons = operonDetection.concatOperonAdjacenciesToOperons(stats.getPutativeOperonAdjacenciesREV(), this.trackConnector, this.stats.getBg());
+            fwdOperons = operonDetection.concatOperonAdjacenciesToOperons(stats.getPutativeOperonAdjacenciesFWD(), this.trackConnector, stats.getBgThreshold());
+            revOperons = operonDetection.concatOperonAdjacenciesToOperons(stats.getPutativeOperonAdjacenciesREV(), this.trackConnector, this.stats.getBgThreshold());
             List<Operon> detectedOperons = new ArrayList<>(fwdOperons);
             detectedOperons.addAll(revOperons);
             String trackNames;

@@ -18,11 +18,11 @@ import java.util.Map;
 public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnrichedAnalyses> {
 
     private List<TranscriptionStart> results;
-    private Statistics stats;
+    private StatisticsOnMappingData stats;
     private Map<String, Object> statsMap;
     private static final TableType TABLE_TYPE = TableType.TSS_TABLE;
 
-    public TSSDetectionResults(Statistics stats, List<TranscriptionStart> results, Map<Integer, PersistantTrack> trackMap, int refId) {
+    public TSSDetectionResults(StatisticsOnMappingData stats, List<TranscriptionStart> results, Map<Integer, PersistantTrack> trackMap, int refId) {
         super(trackMap, refId, false);
         this.results = results;
         this.stats = stats;
@@ -185,6 +185,8 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
                 tssParameters.getExclusionOfTSSDistance()));
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_LIMITATION_FOR_DISTANCE_KEEPING_INTERNAL_TSS,
                 tssParameters.getKeepingInternalTssDistance()));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_PERCENTAGE_FOR_CDSSHIFT_ANALYSIS,
+                tssParameters.getCdsShiftPercentage()));
 
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between parameters and statistics
 
@@ -230,7 +232,7 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
         this.results = results;
     }
 
-    public Statistics getStats() {
+    public StatisticsOnMappingData getStats() {
         return stats;
     }
 

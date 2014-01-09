@@ -286,7 +286,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
             operonDetStats.put(ResultPanelTranscriptionStart.MAPPINGS_COUNT, (Double) operonDetStats.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT) + operonResultNew.getStats().getMc());
             operonDetStats.put(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH, (Double) operonDetStats.get(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH) + operonResultNew.getStats().getMml());
             operonDetStats.put(ResultPanelTranscriptionStart.MAPPINGS_MILLION, (Double) operonDetStats.get(ResultPanelTranscriptionStart.MAPPINGS_MILLION) + operonResultNew.getStats().getMm());
-            operonDetStats.put(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD, (Double) operonDetStats.get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD) + operonResultNew.getStats().getBg());
+            operonDetStats.put(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD, (Double) operonDetStats.get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD) + operonResultNew.getStats().getBgThreshold());
 
             operonResult.setStatsAndParametersMap(operonDetStats);
         }

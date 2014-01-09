@@ -22,7 +22,7 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetWholeTra
 
     private List<RPKMvalue> rpkmResults;
     private int noGenomeFeatures;
-    private Statistics stats;
+    private StatisticsOnMappingData stats;
     private static final TableType TABLE_TYPE = TableType.RPKM_TABLE;
 
     /**
@@ -154,11 +154,11 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetWholeTra
         return this.noGenomeFeatures;
     }
 
-    public Statistics getStats() {
+    public StatisticsOnMappingData getStats() {
         return stats;
     }
 
-    public void setStats(Statistics stats) {
+    public void setStats(StatisticsOnMappingData stats) {
         this.stats = stats;
     }
 }

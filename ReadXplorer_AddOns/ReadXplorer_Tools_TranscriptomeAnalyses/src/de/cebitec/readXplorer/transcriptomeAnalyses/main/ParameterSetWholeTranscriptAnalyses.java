@@ -8,17 +8,43 @@ import de.cebitec.readXplorer.databackend.ParameterSetI;
  */
 public class ParameterSetWholeTranscriptAnalyses implements ParameterSetI<ParameterSetWholeTranscriptAnalyses> {
 
-    private boolean performWholeTrascriptomeAnalyses, performOperonDetection, performNovelRegionDetection, performRPKMs;
+    private boolean performWholeTrascriptomeAnalyses, performOperonDetection, performNovelRegionDetection, performRPKMs, ratioInclusion;
     private double fraction, fractionForNewRegionDetection;
-    private int minLengthBoundary;
+    private int minLengthBoundary, increaseRatioValue;
 
-    public ParameterSetWholeTranscriptAnalyses(boolean performWholeTrascriptomeAnalyses, boolean performOperonDetection, boolean performNovelRegionDetection, boolean rPKMs, double fraction, int minBoundary) {
+    public ParameterSetWholeTranscriptAnalyses(boolean performWholeTrascriptomeAnalyses, boolean performOperonDetection, boolean performNovelRegionDetection, boolean rPKMs, double fraction, int minBoundary, boolean ratioInclusion, int increaseRatioValue) {
         this.performWholeTrascriptomeAnalyses = performWholeTrascriptomeAnalyses;
         this.performOperonDetection = performOperonDetection;
         this.performNovelRegionDetection = performNovelRegionDetection;
         this.performRPKMs = rPKMs;
         this.fraction = fraction;
         this.minLengthBoundary = minBoundary;
+        this.increaseRatioValue = increaseRatioValue;
+        this.ratioInclusion = ratioInclusion;
+    }
+
+    public boolean isRatioInclusion() {
+        return ratioInclusion;
+    }
+
+    public void setRatioInclusion(boolean ratioInclusion) {
+        this.ratioInclusion = ratioInclusion;
+    }
+
+    public boolean isPerformRPKMs() {
+        return performRPKMs;
+    }
+
+    public void setPerformRPKMs(boolean performRPKMs) {
+        this.performRPKMs = performRPKMs;
+    }
+
+    public int getIncreaseRatioValue() {
+        return increaseRatioValue;
+    }
+
+    public void setIncreaseRatioValue(int increaseRatioValue) {
+        this.increaseRatioValue = increaseRatioValue;
     }
 
     public boolean isPerformWholeTrascriptomeAnalyses() {

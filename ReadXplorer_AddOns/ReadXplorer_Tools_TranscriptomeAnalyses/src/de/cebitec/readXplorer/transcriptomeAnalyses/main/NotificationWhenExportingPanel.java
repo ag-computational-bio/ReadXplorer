@@ -12,18 +12,13 @@ import javax.swing.BorderFactory;
  */
 public class NotificationWhenExportingPanel extends javax.swing.JPanel {
 
-    private final String text = "Attention! If you change the COLUMNS in the exported Excel-file, you will\n"
-            + "not be able to reimport your data back to VAMP. We advise you to keep the\n"
-            + "original file and work with a copy of it. Please understand that this\n"
-            + "feature is still in preparation.";
-
     /**
      * Creates new form NotificationWhenExportingPanel
      */
     public NotificationWhenExportingPanel() {
         initComponents();
-        this.notificationTP.setBorder(BorderFactory.createRaisedBevelBorder());
-        this.notificationTP.setText(this.text);
+        this.notificationTA.setBorder(BorderFactory.createRaisedBevelBorder());
+        this.notificationTA.setEditable(false);
     }
 
     /**
@@ -35,10 +30,13 @@ public class NotificationWhenExportingPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        notificationTP = new javax.swing.JTextPane();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        notificationTA = new javax.swing.JTextArea();
 
-        jScrollPane1.setViewportView(notificationTP);
+        notificationTA.setColumns(20);
+        notificationTA.setRows(5);
+        notificationTA.setText(org.openide.util.NbBundle.getMessage(NotificationWhenExportingPanel.class, "NotificationWhenExportingPanel.notificationTA.text")); // NOI18N
+        jScrollPane2.setViewportView(notificationTA);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -46,19 +44,19 @@ public class NotificationWhenExportingPanel extends javax.swing.JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 300, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextPane notificationTP;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTextArea notificationTA;
     // End of variables declaration//GEN-END:variables
 }

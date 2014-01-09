@@ -35,10 +35,12 @@ public class GenomeFeatureParser {
     private PersistantReference refGenome;
 
     /**
-     * Constructor for Genome-feature parser. Produces different needed data
-     * structures for further analyses.
+     * Genome-feature parser, parses the needed information from all Features in
+     * a Genome. Produces different needed data structures for further analyses.
      *
-     * @param trackConnector
+     * @param trackConnector TrackConnector.
+     * @param progressHandle current ProgressHandle, shows the progress for the
+     * running analysis.
      */
     public GenomeFeatureParser(TrackConnector trackConnector, ProgressHandle progressHandle) {
         this.progressHandle = progressHandle;
@@ -57,7 +59,7 @@ public class GenomeFeatureParser {
             this.region2Exclude.add(new int[chrom.getLength()]);
             this.referenceLength += chrom.getLength();
         }
-        this.allRegionsInHash = getGenomeFeaturesInHash(this.genomeFeatures);
+//        this.allRegionsInHash = getGenomeFeaturesInHash(this.genomeFeatures);
     }
 
     /**
@@ -239,11 +241,9 @@ public class GenomeFeatureParser {
      * @param genomeFeatures List of Persistant Features.
      * @return a HashMap<FeatureID, Feature> with all genome features.
      */
-    private HashMap<Integer, PersistantFeature> getGenomeFeaturesInHash(List<PersistantFeature> genomeFeatures) {
+    public HashMap<Integer, PersistantFeature> getGenomeFeaturesInHash(List<PersistantFeature> genomeFeatures) {
         this.progressHandle.progress("Hashing of Features", 10);
         HashMap<Integer, PersistantFeature> regions = new HashMap<>();
-        this.allFwdFeatures = new HashMap<>();
-        this.allRevFeatures = new HashMap<>();
 
         for (PersistantFeature gf : genomeFeatures) {
             regions.put(gf.getId(), gf);
@@ -252,7 +252,11 @@ public class GenomeFeatureParser {
         return regions;
     }
 
-    public void generateAllFeatureStrandInformation() {
+    /**
+     * Running trough all features in genome and divided by direction in which
+     * strand the features are located and creates two hash structures.
+     */
+    public void generateAllFeatureStrandInformation(List<PersistantFeature> genomeFeatures) {
         this.allFwdFeatures = new HashMap<>();
         this.allRevFeatures = new HashMap<>();
 
@@ -306,6 +310,13 @@ public class GenomeFeatureParser {
         this.allFwdFeatures = allFwdFeatures;
     }
 
+    /**
+     * Get the hash structure filled with all reverse feature elements.
+     *
+     * @return HashMap<StartPosition, List<FeatureID>> which contains start
+     * position as the KEY and a list filled with features ids, that starts at
+     * this position.
+     */
     public HashMap<Integer, List<Integer>> getAllRevFeatures() {
         return allRevFeatures;
     }
@@ -315,7 +326,7 @@ public class GenomeFeatureParser {
     }
 
     /**
-     * Returns the whole length of all Chromosomes together.
+     * Returns the whole length of all Chromosomes lenght summed up.
      *
      * @return Reference length.
      */

@@ -8,7 +8,7 @@ import de.cebitec.readXplorer.databackend.ParameterSetI;
  */
 public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<ParameterSetFiveEnrichedAnalyses> {
 
-    private Double fraction;
+    private Double fraction, cdsShiftPercentage;
     private Integer ratio;
     private Integer upstreamRegion, downstreamRegion;
     private Integer leaderlessLimit, exclusionOfTSSDistance, keepingInternalTssDistance;
@@ -23,8 +23,8 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
      * @param fraction
      */
     public ParameterSetFiveEnrichedAnalyses(Double fraction, Integer ratio, Integer upstream, Integer downstream,
-            boolean excludeInternalTSS, Integer distanceForExcludionOfTss, 
-            Integer leaderlessLimit, int keepInternalDistance) {
+            boolean excludeInternalTSS, Integer distanceForExcludionOfTss,
+            Integer leaderlessLimit, int keepInternalDistance, double cdsShiftPercentage) {
         this.fraction = fraction;
         this.upstreamRegion = upstream;
         this.downstreamRegion = downstream;
@@ -33,8 +33,15 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
         this.exclusionOfInternalTSS = excludeInternalTSS;
         this.exclusionOfTSSDistance = distanceForExcludionOfTss;
         this.keepingInternalTssDistance = keepInternalDistance;
-            
+        this.cdsShiftPercentage = cdsShiftPercentage;
+    }
 
+    public Double getCdsShiftPercentage() {
+        return cdsShiftPercentage;
+    }
+
+    public void setCdsShiftPercentage(Double cdsShiftPercentage) {
+        this.cdsShiftPercentage = cdsShiftPercentage;
     }
 
     public double getFraction() {
@@ -72,6 +79,4 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
     public Integer getKeepingInternalTssDistance() {
         return keepingInternalTssDistance;
     }
-
-
 }

@@ -19,17 +19,17 @@ import java.util.Map;
 public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetWholeTranscriptAnalyses> {
 
     private final List<Operon> detectedOperons;
-    private final Statistics stats;
+    private final StatisticsOnMappingData stats;
     private HashMap<String, Object> operonStatsMap;
     private static final TableType TABLE_TYPE = TableType.OPETON_TABLE;
 
-    public OperonDetectionResult(Statistics stats, Map<Integer, PersistantTrack> trackList, List<Operon> detectedOperons, int refId) {//, PersistantTrack currentTrack) {
+    public OperonDetectionResult(StatisticsOnMappingData stats, Map<Integer, PersistantTrack> trackList, List<Operon> detectedOperons, int refId) {//, PersistantTrack currentTrack) {
         super(trackList, refId, false);
         this.detectedOperons = detectedOperons;
         this.stats = stats;
     }
 
-    public Statistics getStats() {
+    public StatisticsOnMappingData getStats() {
         return stats;
     }
 

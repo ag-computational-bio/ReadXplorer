@@ -4,16 +4,15 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.rbsAnalysis;
 
-import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
-import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import java.util.List;
+import de.cebitec.readXplorer.transcriptomeAnalyses.promotorAnalysis.PromotorAnalysisWizardIterator;
 import java.util.prefs.Preferences;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
+import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbPreferences;
 
-public class RbsAnalysisWizardPanel implements WizardDescriptor.Panel<WizardDescriptor> {
+public class RbsAnalysisWizardPanel implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     /**
      * The visual component that displays this panel. If you need to access the
@@ -21,6 +20,7 @@ public class RbsAnalysisWizardPanel implements WizardDescriptor.Panel<WizardDesc
      */
     private RbsAnalysisVisualPanel component;
     private String wizardName;
+    private int wholeLengthOfAnalysisRegion;
 
     public RbsAnalysisWizardPanel(String wizardName) {
         this.wizardName = wizardName;
@@ -67,12 +67,12 @@ public class RbsAnalysisWizardPanel implements WizardDescriptor.Panel<WizardDesc
     @Override
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state
+        this.wholeLengthOfAnalysisRegion = (int) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS);
     }
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
-        wiz.putProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_REGION_LENGTH, component.getRegionLengthForMotifAnalysis());
         wiz.putProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_LENGTH_MOTIFWIDTH, component.getExpectedMotifWidth());
         wiz.putProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_NO_TRYING_BIOPROSPECTOR, component.getNoOfTrying());
         wiz.putProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_MIN_SPACER, component.getMinSpacer());
@@ -82,8 +82,27 @@ public class RbsAnalysisWizardPanel implements WizardDescriptor.Panel<WizardDesc
 
     private void storePrefs() {
         Preferences pref = NbPreferences.forModule(Object.class);
-        pref.put(wizardName + RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_REGION_LENGTH, component.getRegionLengthForMotifAnalysis().toString());
         pref.put(wizardName + RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_LENGTH_MOTIFWIDTH, component.getExpectedMotifWidth().toString());
         pref.put(wizardName + RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_MIN_SPACER, component.getMinSpacer().toString());
+    }
+
+    @Override
+    public void validate() throws WizardValidationException {
+        if (component.getWorkingDir() == null) {
+            throw new WizardValidationException(null, "Please choose a Directory.", null);
+        } else {
+            if (!component.getWorkingDir().isDirectory()) { // Not a Directory
+                throw new WizardValidationException(null, "Please choose a Directory.", null);
+            }
+        }
+        int fstMinSpacer = component.getMinSpacer();
+        int rbsMotifWidth = component.getExpectedMotifWidth();
+
+        if (this.wholeLengthOfAnalysisRegion < (fstMinSpacer + rbsMotifWidth)) {
+            throw new WizardValidationException(null, "Please check your Parameters for RBS analysis.", null);
+        }
+        if ((this.wholeLengthOfAnalysisRegion - fstMinSpacer) < rbsMotifWidth) {
+            throw new WizardValidationException(null, "Please check on expected RBS motif-width for, beacause it is bigger than the region of interest.", null);
+        }
     }
 }

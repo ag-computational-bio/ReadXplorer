@@ -95,6 +95,7 @@ public class TssDetectionStatsPanel extends javax.swing.JPanel {
             {ResultPanelTranscriptionStart.TSS_LEADERLESS, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_LEADERLESS))},
             {ResultPanelTranscriptionStart.TSS_INTERNAL, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_INTERNAL))},
             {ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE))},
+            {ResultPanelTranscriptionStart.TSS_NO_PUTATIVE_CDS_SHIFTS, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_NO_PUTATIVE_CDS_SHIFTS))},
             {ResultPanelTranscriptionStart.MAPPINGS_COUNT, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT))},
             {ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH))},
             {ResultPanelTranscriptionStart.MAPPINGS_MILLION, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MILLION))},

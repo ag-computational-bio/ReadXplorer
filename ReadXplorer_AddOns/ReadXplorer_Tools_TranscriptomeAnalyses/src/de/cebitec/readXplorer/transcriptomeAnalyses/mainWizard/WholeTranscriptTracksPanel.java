@@ -71,9 +71,18 @@ public class WholeTranscriptTracksPanel implements WizardDescriptor.ValidatingPa
         wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_Fraction, (double) component.getFractionForOperonDetection());
         wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_FRACTION_NOVELREGION_DETECTION, (double) component.getFractionForNewRegionDetection());
         wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_MIN_BOUNDRY_LENGTH, (int) component.getMinBoundaryForNovelRegionDetection());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_INCLUDE_RATIOVALUE_IN_NOVEL_REGION_DETECTION, (boolean) component.isInclusionOfRatioValueSelected());
+
+        if (component.isInclusionOfRatioValueSelected()) {
+            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_RAIO_NOVELREGION_DETECTION, (int) component.getIncreaseRatioValue());
+        }
+
         storePrefs();
     }
 
+    /**
+     * Stores the entries that are made during use.
+     */
     private void storePrefs() {
         Preferences pref = NbPreferences.forModule(Object.class);
         pref.putBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_RPKM_ANALYSIS, component.isRPKM());
@@ -82,6 +91,10 @@ public class WholeTranscriptTracksPanel implements WizardDescriptor.ValidatingPa
         pref.putDouble(wizardName + TranscriptomeAnalysisWizardIterator.PROP_Fraction, component.getFractionForOperonDetection());
         pref.putDouble(wizardName + TranscriptomeAnalysisWizardIterator.PROP_FRACTION_NOVELREGION_DETECTION, component.getFractionForNewRegionDetection());
         pref.putInt(wizardName + TranscriptomeAnalysisWizardIterator.PROP_MIN_BOUNDRY_LENGTH, component.getMinBoundaryForNovelRegionDetection());
+        pref.putBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_INCLUDE_RATIOVALUE_IN_NOVEL_REGION_DETECTION, component.isInclusionOfRatioValueSelected());
+        if (component.isInclusionOfRatioValueSelected()) {
+            pref.putInt(TranscriptomeAnalysisWizardIterator.PROP_RAIO_NOVELREGION_DETECTION, component.getIncreaseRatioValue());
+        }
     }
 
     /**

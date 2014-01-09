@@ -1,6 +1,7 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard;
 
 import de.cebitec.readXplorer.transcriptomeAnalyses.verifier.DoubleVerifier;
+import de.cebitec.readXplorer.transcriptomeAnalyses.verifier.IntegerVerifier;
 import java.util.prefs.Preferences;
 import javax.swing.JPanel;
 import org.openide.util.NbPreferences;
@@ -17,7 +18,9 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
         initComponents();
         this.fractionNovelRegionTF.setInputVerifier(new DoubleVerifier(this.fractionNovelRegionTF));
         this.fractionOperonDetectionTF.setInputVerifier(new DoubleVerifier(this.fractionOperonDetectionTF));
-        updateCheckBoxes();
+        this.increaseRatioValueTF.setInputVerifier(new IntegerVerifier(this.increaseRatioValueTF));
+        this.increaseRatioValueTF.setEnabled(false);
+        updateCheckFields();
     }
 
     @Override
@@ -49,12 +52,20 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
         return Integer.valueOf(this.minBoundaryNovelRegionTF.getText());
     }
 
+    public boolean isInclusionOfRatioValueSelected() {
+        return this.includeRatioValueCB.isSelected();
+    }
+
+    public Integer getIncreaseRatioValue() {
+        return Integer.valueOf(this.increaseRatioValueTF.getText());
+    }
+
     /**
      * Updates the checkboxes for the read classes with the globally stored
      * settings for this wizard. If no settings were stored, the default
      * configuration is chosen.
      */
-    private void updateCheckBoxes() {
+    private void updateCheckFields() {
         Preferences pref = NbPreferences.forModule(Object.class);
         this.rpkmCheckBox.setSelected(pref.getBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_NORMAL_RPKM_ANALYSIS, false));
         this.operonsCheckBox.setSelected(pref.getBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_OPERON_ANALYSIS, false));
@@ -62,6 +73,7 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
         this.fractionNovelRegionTF.setText(pref.get(wizardName + TranscriptomeAnalysisWizardIterator.PROP_FRACTION_NOVELREGION_DETECTION, "0.05"));
         this.minBoundaryNovelRegionTF.setText(pref.get(wizardName + TranscriptomeAnalysisWizardIterator.PROP_MIN_BOUNDRY_LENGTH, "100"));
         this.fractionOperonDetectionTF.setText(pref.get(wizardName + TranscriptomeAnalysisWizardIterator.PROP_Fraction, "0.05"));
+        this.increaseRatioValueTF.setText(pref.get(wizardName + TranscriptomeAnalysisWizardIterator.PROP_RAIO_NOVELREGION_DETECTION, "5"));
     }
 
     /**
@@ -77,6 +89,9 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
         minBoundaryNovelRegionTF = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
+        includeRatioValueCB = new javax.swing.JCheckBox();
+        increaseRatioValueTF = new javax.swing.JTextField();
+        jSeparator4 = new javax.swing.JSeparator();
         operonDetectionParamsPanel = new javax.swing.JPanel();
         fractionOperonDetectionTF = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
@@ -94,22 +109,39 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(WholeTranscriptTracksVisualPanel.class, "WholeTranscriptTracksVisualPanel.jLabel5.text")); // NOI18N
 
+        org.openide.awt.Mnemonics.setLocalizedText(includeRatioValueCB, org.openide.util.NbBundle.getMessage(WholeTranscriptTracksVisualPanel.class, "WholeTranscriptTracksVisualPanel.includeRatioValueCB.text")); // NOI18N
+        includeRatioValueCB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                includeRatioValueCBActionPerformed(evt);
+            }
+        });
+
+        increaseRatioValueTF.setText(org.openide.util.NbBundle.getMessage(WholeTranscriptTracksVisualPanel.class, "WholeTranscriptTracksVisualPanel.increaseRatioValueTF.text")); // NOI18N
+
         javax.swing.GroupLayout newRegionParamsPanelLayout = new javax.swing.GroupLayout(newRegionParamsPanel);
         newRegionParamsPanel.setLayout(newRegionParamsPanelLayout);
         newRegionParamsPanelLayout.setHorizontalGroup(
             newRegionParamsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(newRegionParamsPanelLayout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(newRegionParamsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(newRegionParamsPanelLayout.createSequentialGroup()
-                        .addComponent(jLabel5)
-                        .addGap(108, 108, 108)
-                        .addComponent(minBoundaryNovelRegionTF, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(newRegionParamsPanelLayout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(18, 18, 18)
-                        .addComponent(fractionNovelRegionTF, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addContainerGap()
+                        .addGroup(newRegionParamsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(newRegionParamsPanelLayout.createSequentialGroup()
+                                .addGroup(newRegionParamsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel1)
+                                    .addComponent(jLabel5))
+                                .addGap(18, 18, 18)
+                                .addGroup(newRegionParamsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(minBoundaryNovelRegionTF, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(fractionNovelRegionTF, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(newRegionParamsPanelLayout.createSequentialGroup()
+                                .addComponent(includeRatioValueCB)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(increaseRatioValueTF, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                    .addComponent(jSeparator4))
+                .addContainerGap())
         );
         newRegionParamsPanelLayout.setVerticalGroup(
             newRegionParamsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -122,7 +154,13 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
                 .addGroup(newRegionParamsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(minBoundaryNovelRegionTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSeparator4, javax.swing.GroupLayout.DEFAULT_SIZE, 11, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(newRegionParamsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(increaseRatioValueTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(includeRatioValueCB))
+                .addGap(1, 1, 1))
         );
 
         fractionOperonDetectionTF.setText(org.openide.util.NbBundle.getMessage(WholeTranscriptTracksVisualPanel.class, "WholeTranscriptTracksVisualPanel.fractionOperonDetectionTF.text")); // NOI18N
@@ -165,19 +203,19 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(rpkmCheckBox)
+                            .addComponent(newRegionsCheckBox)
+                            .addComponent(operonsCheckBox))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(newRegionsCheckBox)
-                                    .addComponent(operonsCheckBox))
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(operonDetectionParamsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGap(46, 46, 46)
-                                        .addComponent(newRegionParamsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                        .addGap(0, 13, Short.MAX_VALUE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(operonDetectionParamsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(28, 28, 28)
+                                .addComponent(newRegionParamsPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addContainerGap())))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(rpkmCheckBox)
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jSeparator2)
@@ -187,14 +225,14 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(newRegionParamsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(35, 35, 35)
-                        .addComponent(newRegionsCheckBox)))
-                .addGap(18, 18, 18)
+                        .addComponent(newRegionParamsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(newRegionsCheckBox)
+                        .addGap(55, 55, 55)))
                 .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -208,14 +246,24 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void includeRatioValueCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_includeRatioValueCBActionPerformed
+        if (includeRatioValueCB.isSelected()) {
+            increaseRatioValueTF.setEnabled(true);
+        } else {
+            increaseRatioValueTF.setEnabled(false);
+        }
+    }//GEN-LAST:event_includeRatioValueCBActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField fractionNovelRegionTF;
     private javax.swing.JTextField fractionOperonDetectionTF;
+    private javax.swing.JCheckBox includeRatioValueCB;
+    private javax.swing.JTextField increaseRatioValueTF;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JSeparator jSeparator4;
     private javax.swing.JTextField minBoundaryNovelRegionTF;
     private javax.swing.JPanel newRegionParamsPanel;
     private javax.swing.JCheckBox newRegionsCheckBox;

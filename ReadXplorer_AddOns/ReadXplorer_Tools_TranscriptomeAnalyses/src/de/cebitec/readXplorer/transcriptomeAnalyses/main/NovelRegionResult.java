@@ -19,11 +19,11 @@ public class NovelRegionResult extends ResultTrackAnalysis<ParameterSetWholeTran
 
     private List<NovelRegion> results;
     private ParameterSetFiveEnrichedAnalyses parameters;
-    private Statistics stats;
+    private StatisticsOnMappingData stats;
     private Map<String, Object> statsMap;
     private static final TableType TABLE_TYPE = TableType.NOVEL_REGION_TABLE;
 
-    public NovelRegionResult(Statistics stats, Map<Integer, PersistantTrack> trackMap, List<NovelRegion> novelRegions, boolean combineTracks) {
+    public NovelRegionResult(StatisticsOnMappingData stats, Map<Integer, PersistantTrack> trackMap, List<NovelRegion> novelRegions, boolean combineTracks) {
         super(trackMap, 1, combineTracks);
         this.results = novelRegions;
         this.stats = stats;
@@ -115,6 +115,10 @@ public class NovelRegionResult extends ResultTrackAnalysis<ParameterSetWholeTran
                 novelRegionParameters.getMinLengthBoundary()));
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(TranscriptomeAnalysisWizardIterator.PROP_FRACTION_NOVELREGION_DETECTION,
                 novelRegionParameters.getFraction()));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(TranscriptomeAnalysisWizardIterator.PROP_INCLUDE_RATIOVALUE_IN_NOVEL_REGION_DETECTION,
+                novelRegionParameters.isRatioInclusion()));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(TranscriptomeAnalysisWizardIterator.PROP_RAIO_NOVELREGION_DETECTION,
+                novelRegionParameters.getIncreaseRatioValue()));
 
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between parameters and statistics
 
@@ -138,11 +142,11 @@ public class NovelRegionResult extends ResultTrackAnalysis<ParameterSetWholeTran
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD,
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD)));
 
-        
+
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow(""));
-        
+
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Table Type", TABLE_TYPE.toString()));
-        
+
         tSSExport.add(statisticsExportData);
 
         return tSSExport;
@@ -152,7 +156,7 @@ public class NovelRegionResult extends ResultTrackAnalysis<ParameterSetWholeTran
         this.results = results;
     }
 
-    public Statistics getStats() {
+    public StatisticsOnMappingData getStats() {
         return stats;
     }
 

@@ -25,13 +25,13 @@ public class RPKMValuesCalculation {
      * Key: featureID , Value: PersistantFeature
      */
     private HashMap<Integer, PersistantFeature> allRegionsInHash;
-    private Statistics stats;
+    private StatisticsOnMappingData stats;
     private final int[][] forwardStarts, reverseStarts;
     private final int[][] forwardCoverage, reverseCoverage;
     private final double mm, mc;
     private int trackId;
 
-    public RPKMValuesCalculation(HashMap<Integer, PersistantFeature> persFeatures, Statistics stats, int trackId) {
+    public RPKMValuesCalculation(HashMap<Integer, PersistantFeature> persFeatures, StatisticsOnMappingData stats, int trackId) {
         this.allRegionsInHash = persFeatures;
         this.rpkmValues = new ArrayList<>();
         this.stats = stats;

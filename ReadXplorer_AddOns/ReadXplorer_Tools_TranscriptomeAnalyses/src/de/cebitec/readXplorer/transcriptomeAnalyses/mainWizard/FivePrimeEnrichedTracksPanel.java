@@ -76,6 +76,7 @@ public class FivePrimeEnrichedTracksPanel implements WizardDescriptor.Validating
         wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_TSS_DISTANCE, component.getExcludeTssDistance());
         wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_KEEPINTERNAL_DISTANCE, component.getKeepingInternalTssDistance());
         wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_LIMIT, component.getLeaderlessDistance());
+        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_PERCENTAGE_FOR_CDS_ANALYSIS, component.getPercentageForCdsShiftAnalysis());
         storePrefs();
     }
 
@@ -89,6 +90,7 @@ public class FivePrimeEnrichedTracksPanel implements WizardDescriptor.Validating
         pref.putInt(wizardName+TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_TSS_DISTANCE, component.getExcludeTssDistance());
         pref.putInt(wizardName+TranscriptomeAnalysisWizardIterator.PROP_KEEPINTERNAL_DISTANCE, component.getKeepingInternalTssDistance());
         pref.put(wizardName+TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_LIMIT, component.getLeaderlessDistance().toString());
+        pref.put(wizardName+TranscriptomeAnalysisWizardIterator.PROP_PERCENTAGE_FOR_CDS_ANALYSIS, component.getPercentageForCdsShiftAnalysis().toString());
     }
 
     @Override
@@ -99,6 +101,8 @@ public class FivePrimeEnrichedTracksPanel implements WizardDescriptor.Validating
             throw new WizardValidationException(null, "Please choose a ratio > 0.", null);
         } else if(component.getKeepingInternalTssDistance() < 0) {
             throw new WizardValidationException(null, "Please choose a keeping distance rel. to TLS > 0.", null);
+        } else if (component.getPercentageForCdsShiftAnalysis() < 0.0 || component.getPercentageForCdsShiftAnalysis() > 1.0){
+            throw new WizardValidationException(null, "Please check your CDS-shift parameter.", null);
         }
     }
 }

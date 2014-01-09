@@ -18,18 +18,18 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+              <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="BaseDistributionCB" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
-                      <Component id="rangeTF" max="32767" attributes="0"/>
+                      <Component id="rangeTF" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="tssDistanceDistributionCB" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="absoluteFrequencyCB" min="-2" max="-2" attributes="0"/>
+                      <Component id="tssDistanceDistributionCB" min="-2" max="-2" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="binTF" min="-2" pref="30" max="-2" attributes="0"/>
                   </Group>
+                  <Component id="absoluteFrequencyCB" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -44,12 +44,12 @@
                   <Component id="rangeTF" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="tssDistanceDistributionCB" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="absoluteFrequencyCB" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="tssDistanceDistributionCB" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="binTF" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Component id="absoluteFrequencyCB" min="-2" max="-2" attributes="0"/>
               <EmptySpace pref="185" max="32767" attributes="0"/>
           </Group>
       </Group>
