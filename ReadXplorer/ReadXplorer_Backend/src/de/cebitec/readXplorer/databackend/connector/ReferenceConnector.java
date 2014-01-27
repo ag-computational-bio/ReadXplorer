@@ -34,6 +34,7 @@ public class ReferenceConnector {
     /**
      * The reference genome connector is responsible for the connection to a
      * reference genome.
+     *
      * @param refGenID id of the associated reference genome
      */
     ReferenceConnector(int refGenID) {
@@ -98,17 +99,17 @@ public class ReferenceConnector {
         } catch (SQLException ex) {
             Logger.getLogger(ReferenceConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return chromosomes;
     }
-    
+
     /**
      * @param chromId the id of the chromosome to fetch
      * @return One chromosome of this reference without its sequence.
      */
     public PersistantChromosome getChromosomeForGenome(int chromId) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Loading chromosome for reference with id  \"{0}\" from database", refGenID);
-        
+
         PersistantChromosome chrom = null;
         try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_CHROMOSOME)) {
             fetch.setLong(1, chromId);
@@ -132,8 +133,8 @@ public class ReferenceConnector {
 
     /**
      *
-     * @param chromId id of the chromosome to retrieve from this 
-     * reference genome.
+     * @param chromId id of the chromosome to retrieve from this reference
+     * genome.
      * @return Fetches the needed chromosome sequence of the reference.
      */
     public String getChromSequence(int chromId) {
@@ -163,6 +164,7 @@ public class ReferenceConnector {
     /**
      * Fetches all features which at least partly overlap a given region of the
      * reference.
+     *
      * @param from start position of the region of interest
      * @param to end position of the region of interest
      * @param featureType type of features to retrieve from the db. Either
@@ -216,6 +218,7 @@ public class ReferenceConnector {
     /**
      * Fetches all features which at least partly overlap a given region of the
      * reference.
+     *
      * @param from start position of the region of interest
      * @param to end position of the region of interest
      * @param usedFeatures list of features used to retrieve from the db.
@@ -234,6 +237,7 @@ public class ReferenceConnector {
     /**
      * Fetches all features which are completely located within a given region
      * of the reference.
+     *
      * @param left start position of the region of interest
      * @param right end position of the region of interest
      * @param chromId chromosome id of the features of interest
@@ -302,6 +306,7 @@ public class ReferenceConnector {
     /**
      * Calculates and returns the names of all tracks belonging to this
      * reference hashed to their track id.
+     *
      * @return the names of all tracks of this reference hashed to their track
      * id.
      */
@@ -316,8 +321,9 @@ public class ReferenceConnector {
     }
 
     /**
-     * Checks if this reference genome has at least one feature of any of the 
+     * Checks if this reference genome has at least one feature of any of the
      * given types.
+     *
      * @param typeList the feature type list to check
      * @return true, if this reference genome has at least one feature of the
      * given type, false otherwise
@@ -333,29 +339,38 @@ public class ReferenceConnector {
     }
 
     /**
-     * Checks if this reference genome has at least one feature of the given type.
+     * Checks if this reference genome has at least one feature of the given
+     * type.
+     *
      * @param type the feature type to check
      * @return true, if this reference genome has at least one feature of the
      * given type, false otherwise
      */
     public boolean hasFeatures(FeatureType type) {
-        try {
-            PreparedStatement fetch;
-            if (type == FeatureType.ANY) {//TODO: update check feature method for chromosomes!!
-                fetch = con.prepareStatement(SQLStatements.CHECK_IF_FEATURES_EXIST);
-                fetch.setLong(1, refGenID);
-            } else {
-                fetch = con.prepareStatement(SQLStatements.CHECK_IF_FEATURES_OF_TYPE_EXIST);
-                fetch.setLong(1, refGenID);
-                fetch.setLong(2, type.getTypeInt());
+        Map<Integer, PersistantChromosome> chromosomesForGenome = getChromosomesForGenome();
+        for (PersistantChromosome chromosome : chromosomesForGenome.values()) {
+            int currentID = chromosome.getId();
+            try {
+                PreparedStatement fetch;
+                if (type == FeatureType.ANY) {
+                    fetch = con.prepareStatement(SQLStatements.CHECK_IF_FEATURES_EXIST);
+                    fetch.setLong(1, currentID);
+                } else {
+                    fetch = con.prepareStatement(SQLStatements.CHECK_IF_FEATURES_OF_TYPE_EXIST);
+                    fetch.setLong(1, currentID);
+                    fetch.setLong(2, type.getTypeInt());
+                }
+                ResultSet rs = fetch.executeQuery();
+                if(rs.next()){
+                    //If at least one entry exists we can exit early.
+                    return true;
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(ReferenceConnector.class.getName()).log(Level.SEVERE, null, ex);
+                return false;
             }
-
-            ResultSet rs = fetch.executeQuery();
-            return rs.next();
-
-        } catch (SQLException ex) {
-            Logger.getLogger(ReferenceConnector.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
         }
+        //Tried all chromosomes, no entry found
+        return false;
     }
 }
