@@ -33,8 +33,8 @@ public final class CommonsMappingParser {
      * current record, but there is at least one record, that has an insertion
      * at that position), 7 (=) = sequene match, 8 (X) = sequence mismatch.
      */
-    //option H-hard clipped not necessary, because it does not count into the alignment
-    public static final String cigarRegex = "[MIDNSPX=]+";
+    //option H-hard clipped not needed later, because it does not count into the alignment, but if not splitted, a number format exception is triggered
+    public static final String cigarRegex = "[MIDNSPXH=]+";
     
     private CommonsMappingParser(){
         

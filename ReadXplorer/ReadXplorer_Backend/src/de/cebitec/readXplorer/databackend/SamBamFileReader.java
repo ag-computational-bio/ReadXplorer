@@ -1,6 +1,16 @@
 package de.cebitec.readXplorer.databackend;
 
-import de.cebitec.readXplorer.databackend.dataObjects.*;
+import de.cebitec.readXplorer.databackend.dataObjects.ChromosomeObserver;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistant;
+import de.cebitec.readXplorer.databackend.dataObjects.IndexBamNotificationPanel;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantCoverage;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantDiff;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantDiffAndGapResult;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReadPairGroup;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReferenceGap;
 import de.cebitec.readXplorer.parser.mappings.CommonsMappingParser;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Observer;
@@ -108,7 +118,6 @@ public class SamBamFileReader implements Observable {
     /**
      * Retrieves the mappings from the given interval from the sam or bam file
      * set for this data reader and the reference sequence with the given name.
-     * @param refGenome reference genome used in the bam file
      * @param request the request to carry out
      * @param needDiffs true, if the diffs need to be fetched from the file as
      * well

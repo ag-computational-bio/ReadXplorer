@@ -169,7 +169,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
             RPKMAnalysisResult rpkmAnalysisResult = new RPKMAnalysisResult(trackMap, rpkmCalculation.getRpkmValues(), refGenomeID);
             rpkmResultPanel.addResult(rpkmAnalysisResult);
             trackNames = GeneralUtils.generateConcatenatedString(rpkmAnalysisResult.getTrackNameList(), 120);
-            String panelName = "RPKM and read count values for " + trackNames + " (" + rpkmResultPanel.getResultSize() + " hits)";
+            String panelName = "RPKM and read count values for " + trackNames + " (" + rpkmResultPanel.getDataSize() + " hits)";
             transcAnalysesTopComp.openAnalysisTab(panelName, rpkmResultPanel);
         }
 
@@ -190,7 +190,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
             novelRegionResult.addResult(newRegionResult);
 
             trackNames = GeneralUtils.generateConcatenatedString(newRegionResult.getTrackNameList(), 120);
-            String panelName = "Novel region detection results" + trackNames + " (" + novelRegionResult.getResultSize() + " hits)";
+            String panelName = "Novel region detection results" + trackNames + " (" + novelRegionResult.getDataSize() + " hits)";
             transcAnalysesTopComp.openAnalysisTab(panelName, novelRegionResult);
         }
 
@@ -218,7 +218,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
             operonResultPanel.addResult(operonDetectionResult);
             
             trackNames = GeneralUtils.generateConcatenatedString(operonDetectionResult.getTrackNameList(), 120);
-            String panelName = "Operon detection results " + trackNames + " (" + operonResultPanel.getResultSize() + " hits)";
+            String panelName = "Operon detection results " + trackNames + " (" + operonResultPanel.getDataSize() + " hits)";
             transcAnalysesTopComp.openAnalysisTab(panelName, operonResultPanel);
         }
 

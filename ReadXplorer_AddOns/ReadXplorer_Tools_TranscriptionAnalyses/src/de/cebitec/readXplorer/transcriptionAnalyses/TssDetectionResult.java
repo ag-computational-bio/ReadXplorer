@@ -73,6 +73,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         
         dataColumnDescriptions.add("Position");
         dataColumnDescriptions.add("Track");
+        dataColumnDescriptions.add("Chromosome");
         dataColumnDescriptions.add("Strand");
         dataColumnDescriptions.add("No Read Starts");
         dataColumnDescriptions.add("Coverage Increase");
@@ -116,6 +117,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
             
             tssRow.add(tss.getPos());
             tssRow.add(this.getTrackEntry(tss.getTrackId(), true));
+            tssRow.add(this.getChromosomeMap().get(tss.getChromId()));
             tssRow.add(tss.isFwdStrand() ? SequenceUtils.STRAND_FWD_STRING : SequenceUtils.STRAND_REV_STRING);
             tssRow.add(tss.getReadStartsAtPos());
             tssRow.add(tss.getCoverageIncrease());

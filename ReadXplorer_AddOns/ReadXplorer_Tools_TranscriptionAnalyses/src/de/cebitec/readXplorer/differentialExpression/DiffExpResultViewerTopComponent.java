@@ -113,11 +113,6 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
     private void showPosition() {
         Collection<ViewController> viewControllers =
                 (Collection<ViewController>) CentralLookup.getDefault().lookupAll(ViewController.class);
-        /*
-         * TODO: can lead to error, if references have different length and pos is out of bounds in one.
-         * Come up with global concept for position update in all opened references. But after multichromosome
-         * support is implemented - it may change some requirements...
-         */
         analysisHandler.getRefGenomeID();
         for (Iterator<ViewController> it = viewControllers.iterator(); it.hasNext();) {
             ViewController tmpVCon = it.next();

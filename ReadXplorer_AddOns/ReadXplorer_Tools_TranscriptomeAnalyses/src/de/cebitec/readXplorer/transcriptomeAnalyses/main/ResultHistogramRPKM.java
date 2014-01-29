@@ -1,7 +1,7 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.RPKMvalue;
-import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
+import de.cebitec.readXplorer.view.TopComponentExtended;
 import java.awt.BorderLayout;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
@@ -27,7 +27,7 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements Component
     private static final long serialVersionUID = 1L;
 
     private JFXPanel fxPanel;
-    private AppPanelTopComponent appPanelTopComponent; //TODO: Create new TopComp for this histogram
+    private TopComponentExtended appPanelTopComponent;
     private JPanel mainPanel;
     private List<RPKMvalue> rpkmValues;
     private BarChart<String, Number> barChart;
@@ -40,7 +40,7 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements Component
      */
     public ResultHistogramRPKM(List<RPKMvalue> rpkmValues) {
         this.rpkmValues = rpkmValues;
-        this.appPanelTopComponent = new AppPanelTopComponent();
+        this.appPanelTopComponent = new TopComponentExtended();
         this.appPanelTopComponent.setLayout(new BorderLayout());
         initSwingComponents();
         initFxComponents();

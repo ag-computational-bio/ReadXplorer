@@ -1,6 +1,6 @@
 package de.cebitec.readXplorer.rnaTrimming;
 
-import de.cebitec.readXplorer.correlationAnalysis.*;
+import de.cebitec.readXplorer.correlationAnalysis.CorrelationResultTopComponent;
 import de.cebitec.readXplorer.util.TabWithCloseX;
 import de.cebitec.readXplorer.view.TopComponentExtended;
 import java.awt.event.ContainerEvent;
@@ -9,8 +9,8 @@ import java.util.logging.Logger;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
-import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
+import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
 /**
@@ -40,6 +40,7 @@ public final class TrimResultTopComponent extends TopComponentExtended {
     
     private static TrimResultTopComponent instance;
     private static final String PREFERRED_ID = "TrimResultTopComponent";
+    private static final long serialVersionUID = 1L;
     
     
     public TrimResultTopComponent() {
@@ -101,7 +102,7 @@ public final class TrimResultTopComponent extends TopComponentExtended {
     }
 
     /**
-     * Obtain the SNP_DetectionTopComponent instance. Never call {@link #getDefault} directly!
+     * Obtain the TrimResultTopComponent instance. Never call {@link #getDefault} directly!
      */
     public static synchronized TrimResultTopComponent findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);

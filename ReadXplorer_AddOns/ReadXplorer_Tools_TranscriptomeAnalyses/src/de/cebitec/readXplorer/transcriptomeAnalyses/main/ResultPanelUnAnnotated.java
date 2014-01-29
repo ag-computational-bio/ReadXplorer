@@ -193,7 +193,7 @@ public class ResultPanelUnAnnotated extends ResultTablePanel {
     }
 
     @Override
-    public int getResultSize() {
+    public int getDataSize() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

@@ -28,7 +28,7 @@ public class ConverterSetupCard extends FileSelectionPanel {
     private ConverterI[] availableParsers = new ConverterI[]{new JokToBamConverter()};
     private ConverterI currentConverter;
     private String refChromName;
-    private int referenceLength;
+    private int chromLength;
     private boolean canConvert;
     private PersistantChromosome selectedChrom;
     
@@ -47,7 +47,7 @@ public class ConverterSetupCard extends FileSelectionPanel {
     private void initAdditionalData() {
         this.converterComboBox.setSelectedIndex(0);
         this.currentConverter = availableParsers[0];
-        this.referenceLength = -1;
+        this.chromLength = -1;
         this.selectConverter();
     }
 
@@ -313,15 +313,15 @@ public class ConverterSetupCard extends FileSelectionPanel {
         String wholeInput = value.concat(input);
         if (input.equals("\b")) {
             if (GeneralUtils.isValidPositiveNumberInput(value)) {
-                this.referenceLength = Integer.valueOf(value);
+                this.chromLength = Integer.valueOf(value);
             } else {
-                this.referenceLength = -1;
+                this.chromLength = -1;
             }
         } else if (GeneralUtils.isValidPositiveNumberInput(wholeInput)) {
-            this.referenceLength = Integer.valueOf(wholeInput);
+            this.chromLength = Integer.valueOf(wholeInput);
         } else {
             JOptionPane.showMessageDialog(this, "Please enter a numerical reference length larger than 0!", "Invalid Length", JOptionPane.ERROR_MESSAGE);
-            this.referenceLength = -1;
+            this.chromLength = -1;
         }
         this.isRequiredInfoSet();
 
@@ -407,13 +407,8 @@ public class ConverterSetupCard extends FileSelectionPanel {
      * conversion can be started or not.
      */
     public void isRequiredInfoSet() {
-        if (!getMappingFiles().isEmpty() && currentConverter != null && 
-                (refChromName != null && !refChromName.isEmpty() && referenceLength >= 0 || 
-                refCheckBox.isSelected())) {
-            canConvert = true;
-        } else {
-            canConvert = false;
-        }
+        canConvert = !getMappingFiles().isEmpty() && currentConverter != null && 
+                (refChromName != null && !refChromName.isEmpty() && chromLength >= 0 || refCheckBox.isSelected());
         firePropertyChange(ConverterAction.PROP_CAN_CONVERT, null, canConvert);
     }
 
@@ -425,10 +420,10 @@ public class ConverterSetupCard extends FileSelectionPanel {
      * @return The length of the reference sequence.
      */
     public int getChromosomeLength() {
-        if (this.refCheckBox.isSelected()) {
+        if (this.refCheckBox.isSelected() && selectedChrom != null) {
             return selectedChrom.getLength();
         } else {
-            return referenceLength;
+            return chromLength;
         }
     }
 
@@ -437,7 +432,7 @@ public class ConverterSetupCard extends FileSelectionPanel {
      * identifier for all mappings.
      */
     public String getRefChromosomeName() {
-        if (this.refCheckBox.isSelected()) {
+        if (this.refCheckBox.isSelected() && selectedChrom != null) {
             return selectedChrom.getName();
         } else {
             return refChromName;

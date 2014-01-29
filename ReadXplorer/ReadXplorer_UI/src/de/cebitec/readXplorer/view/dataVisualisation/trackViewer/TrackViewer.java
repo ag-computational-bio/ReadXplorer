@@ -15,7 +15,12 @@ import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.BasePanel;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
@@ -737,7 +742,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     public void close() {
         super.close();
         ProjectConnector.getInstance().removeTrackConnector(trackCon.getTrackID());
-        trackCon = null;
+        trackCon = null; //TODO: close does not work correctly always!
     }
 
     /**

@@ -302,7 +302,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
 
                         if (finishedCovAnalyses >= tracks.size() || combineTracks) {
                             trackNames = GeneralUtils.generateConcatenatedString(tssResult.getTrackNameList(), 120);
-                            String panelName = "Detected TSSs for " + trackNames + " (" + transcriptionStartResultPanel.getResultSize() + " hits)";
+                            String panelName = "Detected TSSs for " + trackNames + " (" + transcriptionStartResultPanel.getDataSize() + " hits)";
                             transcAnalysesTopComp.openAnalysisTab(panelName, transcriptionStartResultPanel);
                         }
                     }
@@ -322,7 +322,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
 
                             if (finishedMappingAnalyses >= tracks.size() || combineTracks) {
                                 trackNames = GeneralUtils.generateConcatenatedString(operonDetectionResult.getTrackNameList(), 120);
-                                String panelName = "Detected operons for " + trackNames + " (" + operonResultPanel.getResultSize() + " hits)";
+                                String panelName = "Detected operons for " + trackNames + " (" + operonResultPanel.getDataSize() + " hits)";
                                 transcAnalysesTopComp.openAnalysisTab(panelName, operonResultPanel);
                             }
                         }
@@ -341,7 +341,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
 
                             if (finishedMappingAnalyses >= tracks.size() || combineTracks) {
                                 trackNames = GeneralUtils.generateConcatenatedString(rpkmAnalysisResult.getTrackNameList(), 120);
-                                String panelName = "RPKM and read count values for " + trackNames + " (" + rpkmResultPanel.getResultSize() + " hits)";
+                                String panelName = "RPKM and read count values for " + trackNames + " (" + rpkmResultPanel.getDataSize() + " hits)";
                                 transcAnalysesTopComp.openAnalysisTab(panelName, rpkmResultPanel);
                             }
                         }

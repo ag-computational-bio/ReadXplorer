@@ -6,6 +6,7 @@ import de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler.Tool;
 import de.cebitec.readXplorer.util.FeatureType;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
@@ -92,7 +93,7 @@ public class GeneralSettingsWizardPanel implements WizardDescriptor.ValidatingPa
             usedFeatures = new ArrayList<>();
             usedFeatures.add(FeatureType.ANY);
         }
-        wiz.putProperty("featureType", usedFeatures);
+        wiz.putProperty("featureType", new HashSet<>(usedFeatures));
     }
 
     @Override

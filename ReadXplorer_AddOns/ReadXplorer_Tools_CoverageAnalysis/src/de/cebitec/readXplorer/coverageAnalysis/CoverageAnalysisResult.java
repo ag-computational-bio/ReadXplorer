@@ -51,11 +51,11 @@ public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCove
         List<List<String>> dataColumnDescriptions = new ArrayList<>();
         List<String> resultDescriptions = new ArrayList<>();
 
+        resultDescriptions.add("Start");
+        resultDescriptions.add("Stop");
         resultDescriptions.add("Track");
         resultDescriptions.add("Chromosome");
         resultDescriptions.add("Strand");
-        resultDescriptions.add("Start");
-        resultDescriptions.add("Stop");
         resultDescriptions.add("Length");
         resultDescriptions.add("Mean Coverage");
 
@@ -121,11 +121,11 @@ public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCove
     private void fillTableRow(List<CoverageInterval> coverageList, List<List<Object>> coveredFeaturesResultList) {
         for (CoverageInterval interval : coverageList) {
             List<Object> coveredIntervalRow = new ArrayList<>();
+            coveredIntervalRow.add(interval.isFwdStrand() ? interval.getStart() : interval.getStop());
+            coveredIntervalRow.add(interval.isFwdStrand() ? interval.getStop() : interval.getStart());
             coveredIntervalRow.add(this.getTrackEntry(interval.getTrackId(), true));
             coveredIntervalRow.add(this.getChromosomeMap().get(interval.getChromId()));
             coveredIntervalRow.add(interval.getStrandString());
-            coveredIntervalRow.add(interval.isFwdStrand() ? interval.getStart() : interval.getStop());
-            coveredIntervalRow.add(interval.isFwdStrand() ? interval.getStop() : interval.getStart());
             coveredIntervalRow.add(interval.getLength());
             coveredIntervalRow.add(interval.getMeanCoverage());
 

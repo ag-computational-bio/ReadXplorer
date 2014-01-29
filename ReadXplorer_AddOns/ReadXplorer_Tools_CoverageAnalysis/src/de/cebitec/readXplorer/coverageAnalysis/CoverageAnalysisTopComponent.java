@@ -1,16 +1,13 @@
 package de.cebitec.readXplorer.coverageAnalysis;
 
-import de.cebitec.readXplorer.util.TabWithCloseX;
 import de.cebitec.readXplorer.view.TopComponentExtended;
-import java.awt.event.ContainerEvent;
-import java.awt.event.ContainerListener;
+import de.cebitec.readXplorer.view.TopComponentHelper;
 import javax.swing.JPanel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
-import org.openide.windows.WindowManager;
 
 /**
  * TopComponent of the coverage analysis. It displays all results of all carried 
@@ -37,7 +34,6 @@ import org.openide.windows.WindowManager;
 })
 public final class CoverageAnalysisTopComponent extends TopComponentExtended {
 
-    public static final String PREFERRED_ID = "CoverageAnalysisTopComponent";
     private static final long serialVersionUID = 1L;
 
     /**
@@ -49,20 +45,7 @@ public final class CoverageAnalysisTopComponent extends TopComponentExtended {
         setName(Bundle.CTL_CoverageAnalysisTopComponent());
         setToolTipText(Bundle.HINT_CoverageAnalysisTopComponent());
         putClientProperty(TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE);
-        
-        // add listener to close TopComponent when no tabs are shown
-        this.coverageAnalysisTabbedPanel.addContainerListener(new ContainerListener() {
-            @Override
-            public void componentAdded(ContainerEvent e) {
-            }
-
-            @Override
-            public void componentRemoved(ContainerEvent e) {
-                if (coverageAnalysisTabbedPanel.getTabCount() == 0) {
-                    WindowManager.getDefault().findTopComponent(PREFERRED_ID).close();
-                }
-            }
-        });
+        TopComponentHelper.setupContainerListener(coverageAnalysisTabbedPanel, preferredID());
     }
 
     /**
@@ -120,11 +103,7 @@ public final class CoverageAnalysisTopComponent extends TopComponentExtended {
      * @param resultPanel the panel to place in the new tab
      */
     public void openAnalysisTab(String panelName, JPanel resultPanel) {
-        this.coverageAnalysisTabbedPanel.add(panelName, resultPanel);
-        this.coverageAnalysisTabbedPanel.setTabComponentAt(this.coverageAnalysisTabbedPanel.getTabCount()
-                - 1, new TabWithCloseX(this.coverageAnalysisTabbedPanel));
-        this.coverageAnalysisTabbedPanel.setSelectedIndex(this.coverageAnalysisTabbedPanel.getTabCount() 
-                - 1);
+        TopComponentHelper.openTableTab(coverageAnalysisTabbedPanel, panelName, resultPanel);
     }    
     
      /**

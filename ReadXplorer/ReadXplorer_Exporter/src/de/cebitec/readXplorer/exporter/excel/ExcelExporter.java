@@ -83,6 +83,8 @@ public class ExcelExporter {
      * @throws WriteException
      * @throws OutOfMemoryError  
      */
+    @NbBundle.Messages({"ExcelExporter.SuccessMsg=Excel exporter stored data successfully: ", 
+        "ExcelExporter.SuccessHeader=Information Message"})
     public File writeFile(File file) throws FileNotFoundException, IOException, WriteException, OutOfMemoryError {
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting to write Excel file...{0}", file.getAbsolutePath());
@@ -121,9 +123,8 @@ public class ExcelExporter {
         workbook.write();
         workbook.close();
 
-        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), NbBundle.getMessage(
-                ExcelExporter.class, "ExcelExporter.SuccessMsg") + sheetNames.get(0),
-                NbBundle.getMessage(ExcelExporter.class, "ExcelExporter.SuccessHeader"), JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), Bundle.ExcelExporter_SuccessMsg() + sheetNames.get(0),
+                Bundle.ExcelExporter_SuccessHeader(), JOptionPane.INFORMATION_MESSAGE);
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished writing Excel file!");
 

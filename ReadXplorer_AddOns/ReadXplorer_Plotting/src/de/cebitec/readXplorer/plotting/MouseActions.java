@@ -52,8 +52,7 @@ public class MouseActions implements ChartMouseListener {
     private void showPosition(PersistantFeature feature) {
         if (feature != null) {
             int pos = feature.getStart();
-            Collection<ViewController> viewControllers;
-            viewControllers = (Collection<ViewController>) CentralLookup.getDefault().lookupAll(ViewController.class);
+            Collection<ViewController> viewControllers = (Collection<ViewController>) CentralLookup.getDefault().lookupAll(ViewController.class);
             for (Iterator<ViewController> it = viewControllers.iterator(); it.hasNext();) {
                 ViewController tmpVCon = it.next();
                 BoundsInfoManager bm = tmpVCon.getBoundsManager();

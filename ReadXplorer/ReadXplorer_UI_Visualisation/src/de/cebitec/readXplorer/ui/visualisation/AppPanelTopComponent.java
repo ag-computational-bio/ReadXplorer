@@ -7,7 +7,6 @@ import de.cebitec.readXplorer.api.cookies.OpenTrackCookie;
 import de.cebitec.readXplorer.controller.ViewController;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readXplorer.view.TopComponentExtended;
-import de.cebitec.readXplorer.view.TopComponentHelper;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.MultipleTrackViewer;
@@ -17,7 +16,6 @@ import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -39,7 +37,6 @@ import javax.swing.JScrollPane;
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.apache.batik.svggen.SVGGraphics2DIOException;
-import org.biojava.utils.xml.AppBeanRunner;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
@@ -337,6 +334,7 @@ public final class AppPanelTopComponent extends TopComponentExtended implements 
         BasePanel bp = (BasePanel) trackPanel;
         TrackViewer tv = (TrackViewer) bp.getViewer();
         content.remove(tv);
+        trackViewerList.remove(tv);
 
         // if this was the last trackPanel close the track statistics window
         if (getLookup().lookupAll(TrackViewer.class).isEmpty()) {

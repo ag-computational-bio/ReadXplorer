@@ -1,7 +1,7 @@
 package de.cebitec.readXplorer.view.analysis;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.readXplorer.view.tableVisualization.TablePanel;
 
 /**
  * This panel is a basic result panel for showing a PersistantResult.
@@ -10,9 +10,8 @@ import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
  * 
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public abstract class ResultTablePanel extends javax.swing.JPanel {
+public abstract class ResultTablePanel extends TablePanel {
     private static final long serialVersionUID = 1L;
-    private BoundsInfoManager bim;
 
     /**
      * This panel is a result panel for showing a PersistantResult. It shall be
@@ -23,34 +22,11 @@ public abstract class ResultTablePanel extends javax.swing.JPanel {
     }
     
     /**
-     * Set the bounds info manager needed for updating the currently shown
-     * position. 
-     * @param boundsInformationManager the bounds info manager belonging to this
-     * analysis result
-     */
-    public void setBoundsInfoManager(BoundsInfoManager boundsInformationManager) {
-        this.bim = boundsInformationManager;
-    }
-    
-    /**
-     * @return The bounds info manager needed for updating the currently shown
-     * position. 
-     */
-    protected BoundsInfoManager getBoundsInfoManager() {
-        return this.bim;
-    }
-    
-    /**
      * Adds the data from the given Result object to the data already
      * available in this result panel. All statistics etc. are also updated.
      * @param newResult the new result to add
      */
     public abstract void addResult(final ResultTrackAnalysis newResult);
-    
-    /**
-     * @return The size of the result contained in this panel.
-     */
-    public abstract int getResultSize();
 
     /**
      * This method is called from within the constructor to initialize the form.

@@ -63,9 +63,7 @@
                 <package>de.cebitec.readXplorer.parser.output</package>
                 <package>de.cebitec.readXplorer.parser.reference</package>
                 <package>de.cebitec.readXplorer.parser.reference.Filter</package>
-                <package>de.cebitec.readXplorer.parser.reference.embl.biojava</package>
-                <package>de.cebitec.readXplorer.parser.reference.fasta</package>
-                <package>de.cebitec.readXplorer.parser.reference.genbank.biojava</package>
+                <package>de.cebitec.readXplorer.parser.tables</package>
             </public-packages>
         </data>
     </configuration>

@@ -62,17 +62,14 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
         
         for (PersistantChromosome chrom : refConnector.getChromosomesForGenome().values()) {
             int chromLength = chrom.getLength();
-            List<PersistantFeature> chromFeatures = refConnector.getFeaturesForClosedInterval(0, chromLength, chrom.getId());
-            PersistantFeature.Utils.addParentFeatures(chromFeatures);
+            List<PersistantFeature> chromFeatures = refConnector.getFeaturesForRegionInclParents(0, chromLength, parametersRPKM.getSelFeatureTypes(), chrom.getId());
 
 //        this.featureCountMap = this.fillInFeatureTypes();
 
             for (PersistantFeature feature : chromFeatures) {
                 this.featureReadCount.put(feature.getId(), new RPKMvalue(feature, 0, 0, trackConnector.getTrackID()));
-                if (parametersRPKM.getSelFeatureTypes().contains(feature.getType())) {
-                    this.genomeFeatures.add(feature);
+                this.genomeFeatures.add(feature);
 //                featureCountMap.put(feature.getType(), featureCountMap.get(feature.getType()) + 1);
-                }
             }
             this.noSelectedFeatures = this.genomeFeatures.size();
         }
@@ -122,7 +119,7 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
                     PersistantMapping mapping = mappings.get(j);
 
                     //mappings identified within a feature
-                    if (mapping.getStop() > featStart && feature.isFwdStrand() == mapping.isFwdStrand()
+                    if (mapping.getStop() > featStart && feature.isFwdStrand() == mapping.isFwdStrand() //TODO: set as parameter from diff expr.
                             && mapping.getStart() < featStop) {
 
                         if (fstFittingMapping) {
@@ -236,7 +233,11 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
                 PersistantFeature subFeature = (PersistantFeature) node;
                 if (subFeature.getType() == type) {
                     geneExonLength += subFeature.getStop() - subFeature.getStart();
-                    noFeatureReads += featureReadCount.get(subFeature.getId()).getReadCount();
+                    try {
+                        noFeatureReads += featureReadCount.get(subFeature.getId()).getReadCount();
+                    } catch (NullPointerException e) {
+                        //continue
+                    }
                 }
             }
         });

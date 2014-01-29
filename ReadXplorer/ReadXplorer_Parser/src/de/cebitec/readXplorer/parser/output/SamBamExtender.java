@@ -148,8 +148,11 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
                     }
 
                     samBamFileWriter.addAlignment(record);
-                } catch (NumberFormatException | RuntimeEOFException e) {
-                    this.notifyObservers("Last record in file is incomplete! Ignoring last record.");
+                } catch (NumberFormatException e) {
+                    this.notifyObservers("Or last incomplete record is ignored.");
+                    Exceptions.printStackTrace(e);
+                } catch (RuntimeEOFException e) {
+                    this.notifyObservers("Last record in file is incomplete! Ignoring last record."); 
                 } catch (SAMFormatException e) {
                     if (!e.getMessage().contains("MAPQ should be 0")) {
                         this.notifyObservers(e.getMessage());

@@ -25,8 +25,13 @@ public class TopComponentExtended  extends TopComponent {
         super(lookup);
     }
     
+    @Override
+    public int getPersistenceType() {
+        return TopComponent.PERSISTENCE_ALWAYS;
+    }
+    
     /**
-     * /@return The name of this extended TopComponent.
+     * @return The name of this extended TopComponent.
      */
     @Override
     public String toString() {

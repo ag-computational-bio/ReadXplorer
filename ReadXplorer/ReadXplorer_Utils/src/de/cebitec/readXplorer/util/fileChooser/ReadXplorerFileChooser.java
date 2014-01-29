@@ -20,6 +20,7 @@ import org.openide.util.NbPreferences;
  * @author Rolf Hilker
  */
 public abstract class ReadXplorerFileChooser  extends JFileChooser {
+    private static final long serialVersionUID = 1L;
 
     protected Object data;
     private String[] fileExtensions;

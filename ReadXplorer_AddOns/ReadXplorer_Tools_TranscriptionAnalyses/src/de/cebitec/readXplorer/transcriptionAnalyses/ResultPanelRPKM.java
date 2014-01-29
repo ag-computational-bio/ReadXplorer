@@ -9,6 +9,7 @@ import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.RPKMvalue;
+import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.readXplorer.util.UneditableTableModel;
 import de.cebitec.readXplorer.view.analysis.ResultTablePanel;
 import de.cebitec.readXplorer.view.tableVisualization.TableUtils;
@@ -41,6 +42,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
     private PersistantFeature feature;
     private boolean statistics = false;
     private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
+    private ReferenceFeatureTopComp refComp;
     
     /**
      * Panel showing a result of an analysis filtering for features with a min
@@ -51,6 +53,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
         this.rpkmTable.getTableHeader().addMouseListener(tableFilter);
         this.filterStatisticsMap = new HashMap<>();
         this.filterStatisticsMap.put(RETURNED_FEATURES, 0);
+        this.refComp = ReferenceFeatureTopComp.findInstance();
         
         DefaultListSelectionModel model = (DefaultListSelectionModel) this.rpkmTable.getSelectionModel();
         model.addListSelectionListener(new ListSelectionListener() {
@@ -60,6 +63,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
                 int posIdx = 0;
                 int chromIdx = 3;
                 TableUtils.showPosition(rpkmTable, posIdx, chromIdx, getBoundsInfoManager());
+                refComp.showTableFeature(rpkmTable, 0);
             }
         });
     }
@@ -248,7 +252,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
      * @return the number of features filtered during the associated analysis
      */
     @Override
-    public int getResultSize() {
+    public int getDataSize() {
         return this.rpkmCalcResult.getResults().size();
     }
 }

@@ -1,13 +1,24 @@
 package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
 
 import de.cebitec.readXplorer.databackend.dataObjects.ChromosomeObserver;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.SequenceUtils;
-import de.cebitec.readXplorer.view.dataVisualisation.*;
+import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfo;
+import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.readXplorer.view.dataVisualisation.GenomeGapManager;
+import de.cebitec.readXplorer.view.dataVisualisation.HighlightAreaListener;
+import de.cebitec.readXplorer.view.dataVisualisation.HighlightableI;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.readXplorer.view.dialogMenus.MenuItemFactory;
-import java.awt.*;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -190,6 +201,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
             int logright = bounds.getLogRight();
             String currentChromSeq = refGen.getChromSequence(refGen.getActiveChromId(), chromObserver);
             refGen.getChromosome(refGen.getActiveChromId()).removeObserver(chromObserver);
+            
             for (int i = logleft; i <= logright; i++) {
                 this.drawChar(g, i, currentChromSeq);
                 this.drawCharReverse(g, i, currentChromSeq);
@@ -327,11 +339,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
      * Adjust the width that is used for marking bases to the current size
      */
     private void adjustMarkingInterval() {
-        if (parentViewer.isInMaxZoomLevel()) {
-            printSeq = true;
-        } else {
-            printSeq = false;
-        }
+        printSeq = parentViewer.isInMaxZoomLevel();
 
         // asume 50 px for label and leave a gap of 30 px to next label
         int labelWidth = 50;
@@ -373,7 +381,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
         if (this.parentViewer instanceof ReferenceViewer) {
             ReferenceViewer refViewer = (ReferenceViewer) this.parentViewer;
             if (refViewer.getCurrentlySelectedFeature() != null) {
-                frameCurrFeature = (byte) refViewer.determineFrame(refViewer.getCurrentlySelectedFeature().getPersistantFeature());
+                frameCurrFeature = (byte) PersistantFeature.Utils.determineFrame(refViewer.getCurrentlySelectedFeature().getPersistantFeature());
             }
         }
         return frameCurrFeature;

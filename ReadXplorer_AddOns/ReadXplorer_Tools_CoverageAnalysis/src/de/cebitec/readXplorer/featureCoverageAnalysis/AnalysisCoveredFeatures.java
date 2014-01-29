@@ -62,22 +62,14 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
     private void initDatastructures() {
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackConnector.getRefGenome().getId());
         for (PersistantChromosome chrom : refConnector.getChromosomesForGenome().values()) {
-            int chromLength = chrom.getLength();
-            this.genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(0, chromLength, chrom.getId()));
-            List<Integer> removeList = new ArrayList<>();
+            this.genomeFeatures.addAll(refConnector.getFeaturesForRegionInclParents(0, chrom.getLength(), 
+                    analysisParams.getSelFeatureTypes(), chrom.getId()));
+        }
 
-            PersistantFeature feature;
-            for (int i = 0; i < this.genomeFeatures.size(); ++i) {
-                feature = this.genomeFeatures.get(i);
-                if (analysisParams.getSelFeatureTypes().contains(feature.getType())) {
-                    this.coveredFeatureCount.put(feature.getId(), new CoveredFeature(feature, trackConnector.getTrackID()));
-                } else {
-                    removeList.add(i);
-                }
-            }
-            for (int i = removeList.size() - 1; i >= 0; --i) {
-                this.genomeFeatures.remove((int) removeList.get(i));
-            }
+        PersistantFeature feature;
+        for (int i = 0; i < this.genomeFeatures.size(); ++i) {
+            feature = this.genomeFeatures.get(i);
+            this.coveredFeatureCount.put(feature.getId(), new CoveredFeature(feature, trackConnector.getTrackID()));
         }
     }
     

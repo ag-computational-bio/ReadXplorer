@@ -37,7 +37,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
-import javax.swing.*;
+import javax.swing.AbstractButton;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 /**
  * Factory used to initialize all different kinds of base panels.
@@ -375,7 +382,7 @@ public class BasePanelFactory {
     private JCheckBox getCheckBox(FeatureType type, AbstractViewer viewer) {
         JCheckBox checker = new JCheckBox(type.getTypeString());
         //special cases are handled here
-        if (type != FeatureType.UNDEFINED) {
+        if (type != FeatureType.UNDEFINED && type != FeatureType.SOURCE) {
             checker.setSelected(true);
         } else {
             checker.setSelected(false);
@@ -445,10 +452,11 @@ public class BasePanelFactory {
         legend1.add(this.getLegendEntry(ColorProperties.EXON, FeatureType.EXON, viewer));
         legend1.add(this.getLegendEntry(ColorProperties.REPEAT_UNIT, FeatureType.REPEAT_UNIT, viewer));
         legend1.add(this.getLegendEntry(ColorProperties.MRNA, FeatureType.MRNA, viewer));
-        legend2.add(this.getLegendEntry(ColorProperties.MI_RNA, FeatureType.MIRNA, viewer));
+        legend1.add(this.getLegendEntry(ColorProperties.MI_RNA, FeatureType.MIRNA, viewer));
         legend2.add(this.getLegendEntry(ColorProperties.RRNA, FeatureType.RRNA, viewer));
         legend2.add(this.getLegendEntry(ColorProperties.TRNA, FeatureType.TRNA, viewer));
         legend2.add(this.getLegendEntry(ColorProperties.MISC_RNA, FeatureType.MISC_RNA, viewer));
+        legend2.add(this.getLegendEntry(ColorProperties.SOURCE, FeatureType.SOURCE, viewer));
         legend2.add(this.getLegendEntry(ColorProperties.UNDEF_FEATURE, FeatureType.UNDEFINED, viewer));
 
         legend.add(legend1, BorderLayout.WEST);

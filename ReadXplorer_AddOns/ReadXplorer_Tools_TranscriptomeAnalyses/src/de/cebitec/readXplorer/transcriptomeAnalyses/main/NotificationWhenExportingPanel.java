@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import javax.swing.BorderFactory;
@@ -11,6 +7,7 @@ import javax.swing.BorderFactory;
  * @author jritter
  */
 public class NotificationWhenExportingPanel extends javax.swing.JPanel {
+    private static final long serialVersionUID = 1L;
 
     /**
      * Creates new form NotificationWhenExportingPanel

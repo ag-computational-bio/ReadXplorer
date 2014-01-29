@@ -13,7 +13,11 @@ import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
 /**
- * Top component which displays something.
+ * Top component which displays navigation panels for the reference. It includes
+ * a searchable list of all features, a "Jump to position" dialog and a dialog
+ * for filtering regular expressions within the reference.
+ * 
+ * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.readXplorer.ui.visualisation.reference//ReferenceNavigator//EN", autostore = false)
 public final class ReferenceNavigatorTopComp extends TopComponentExtended implements LookupListener{
@@ -26,6 +30,11 @@ public final class ReferenceNavigatorTopComp extends TopComponentExtended implem
 //    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
     private static final String PREFERRED_ID = "ReferenceNavigatorTopComp";
 
+    /**
+     * Top component which displays navigation panels for the reference. It
+     * includes a searchable list of all features, a "Jump to position" dialog
+     * and a dialog for filtering regular expressions within the reference.
+     */
     public ReferenceNavigatorTopComp() {
         initComponents();
         setName(NbBundle.getMessage(ReferenceNavigatorTopComp.class, "CTL_ReferenceNavigatorTopComp"));
@@ -37,9 +46,11 @@ public final class ReferenceNavigatorTopComp extends TopComponentExtended implem
 
     }
 
+    /**
+     * @param viewer The reference viewer, for which the data shall be shown.
+     */
     public void setRefViewer(ReferenceViewer viewer){
         jumpPanel.setViewer(viewer);
-        jumpPanel.setBoundsInfoManager(viewer.getBoundsInformationManager());
     }
 
     /** This method is called from within the constructor to

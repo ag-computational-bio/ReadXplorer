@@ -182,7 +182,7 @@ public class ResultsPanelAntisense extends ResultTablePanel {
     }
 
     @Override
-    public int getResultSize() {
+    public int getDataSize() {
         return this.results.getResults().size();
     }
 

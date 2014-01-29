@@ -170,11 +170,11 @@ public class SnpTranslatorTest {
         snps.add(snp19);
         snps.add(snp20);        
                 
-        Set<FeatureType> featureTypes = new HashSet<>();
-        featureTypes.add(FeatureType.CDS);
-        featureTypes.add(FeatureType.EXON);
-        featureTypes.add(FeatureType.MIRNA);
-        SnpTranslator snpTranslator = new SnpTranslator(featuresFound, new PersistantChromosome(1, 1, 1, "genome", 1), featureTypes);
+//        Set<FeatureType> featureTypes = new HashSet<>();
+//        featureTypes.add(FeatureType.CDS);
+//        featureTypes.add(FeatureType.EXON);
+//        featureTypes.add(FeatureType.MIRNA);
+        SnpTranslator snpTranslator = new SnpTranslator(featuresFound, new PersistantChromosome(1, 1, 1, "genome", 1));
         for (Snp snp : snps){
             snpTranslator.checkForFeature(snp);
         }

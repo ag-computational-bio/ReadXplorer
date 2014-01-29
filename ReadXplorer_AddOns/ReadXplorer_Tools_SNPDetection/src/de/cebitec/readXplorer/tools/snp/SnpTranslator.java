@@ -16,7 +16,6 @@ import de.cebitec.readXplorer.util.polyTree.Node;
 import de.cebitec.readXplorer.util.polyTree.NodeVisitor;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.prefs.Preferences;
 import org.openide.util.NbPreferences;
 
@@ -42,7 +41,6 @@ public class SnpTranslator {
     private GeneticCode code;
     private int index;
     private int subPos; //summed up bases in subfeatures up to the snp position regarding the strand of the feature
-    private final Set<FeatureType> selectedFeatureTypes;
     private boolean posDirectAtLeftChromBorder;
     private boolean posAtLeftChromBorder;
     private boolean posAtRightChromBorder;
@@ -63,14 +61,11 @@ public class SnpTranslator {
      * - The current feature has subfeatures and the snp is located in such a subfeature.
      * - The snp is located in a subfeature at a border, but this is not the last subfeature
      * (depending on the strand) and the triplet can be completed from the neighboring subfeature.
-     * @param genomicFeatures all features of the reference genome
+     * @param genomicFeatures all features of the reference genome of the desired feature types
      * @param refSeq the reference sequence
-     * @param selectedFeatureTypes The set of selected feature types to include in the translation
      */
-    public SnpTranslator(List<PersistantFeature> genomicFeatures, PersistantChromosome chromosome, Set<FeatureType> selectedFeatureTypes) {
-        this.selectedFeatureTypes = selectedFeatureTypes;
-        PersistantFeature.Utils.addParentFeatures(genomicFeatures);
-        this.genomicFeatures = PersistantFeature.filterFeatureTypes(genomicFeatures, this.selectedFeatureTypes);
+    public SnpTranslator(List<PersistantFeature> genomicFeatures, PersistantChromosome chromosome) {
+        this.genomicFeatures = genomicFeatures;
         ChromosomeObserver chromObserver = new ChromosomeObserver();
         this.refSeq = chromosome.getSequence(chromObserver);
         this.refLength = refSeq.length();

@@ -8,12 +8,17 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.SequenceUtils;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -221,15 +226,52 @@ public class ReferenceConnector {
      *
      * @param from start position of the region of interest
      * @param to end position of the region of interest
-     * @param usedFeatures list of features used to retrieve from the db.
+     * @param featureTypes list of features used to retrieve from the db.
      * @param chromId chromosome id of the features of interest
      * @return the list of all features found in the interval of interest
      */
-    public List<PersistantFeature> getFeaturesForRegion(int from, int to, List<FeatureType> usedFeatures, int chromId) {
+    public List<PersistantFeature> getFeaturesForRegion(int from, int to, Set<FeatureType> featureTypes, int chromId) {
         List<PersistantFeature> features = new ArrayList<>();
-        for (Iterator<FeatureType> it = usedFeatures.iterator(); it.hasNext();) {
-            FeatureType featureType = it.next();
+        for (FeatureType featureType : featureTypes) {
             features.addAll(getFeaturesForRegion(from, to, featureType, chromId));
+        }
+        return features;
+    }
+    
+    /**
+     * Fetches all features which at least partly overlap a given region of the
+     * reference including all parent-children relationships between the 
+     * features.
+     * @param from start position of the region of interest
+     * @param to end position of the region of interest
+     * @param featureType type of features to retrieve from the db. Either
+     * FeatureType.ANY or a specified type
+     * @param chromId chromosome id of the features of interest
+     * @return the list of all features found in the interval of interest 
+     * including their parent and children relationships
+     */
+    public List<PersistantFeature> getFeaturesForRegionInclParents(int from, int to, FeatureType featureType, int chromId) {
+        List<PersistantFeature> features = this.getFeaturesForRegion(from, to, FeatureType.ANY, chromId);
+        PersistantFeature.Utils.addParentFeatures(features);
+        features = PersistantFeature.Utils.filterFeatureTypes(features, featureType);
+        return features;
+    }
+    
+    /**
+     * Fetches all features which at least partly overlap a given region of the
+     * reference including all parent-children relationships between the 
+     * features.
+     * @param from start position of the region of interest
+     * @param to end position of the region of interest
+     * @param featureTypes list of features used to retrieve from the db.
+     * @param chromId chromosome id of the features of interest
+     * @return the list of all features found in the interval of interest 
+     * including their parent and children relationships
+     */
+    public List<PersistantFeature> getFeaturesForRegionInclParents(int from, int to, Set<FeatureType> featureTypes, int chromId) {
+        List<PersistantFeature> features = new ArrayList<>();
+        for (FeatureType featureType : featureTypes) {
+            features.addAll(this.getFeaturesForRegionInclParents(from, to, featureType, chromId));
         }
         return features;
     }

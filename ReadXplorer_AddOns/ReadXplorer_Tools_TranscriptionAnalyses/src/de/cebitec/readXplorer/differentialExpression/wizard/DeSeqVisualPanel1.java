@@ -51,6 +51,7 @@ public final class DeSeqVisualPanel1 extends JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
 
+        twoConditionsRB.setSelected(true);
         org.openide.awt.Mnemonics.setLocalizedText(twoConditionsRB, org.openide.util.NbBundle.getMessage(DeSeqVisualPanel1.class, "DeSeqVisualPanel1.twoConditionsRB.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(moreConditionsRB, org.openide.util.NbBundle.getMessage(DeSeqVisualPanel1.class, "DeSeqVisualPanel1.moreConditionsRB.text")); // NOI18N
@@ -76,7 +77,7 @@ public final class DeSeqVisualPanel1 extends JPanel {
                     .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(twoConditionsRB)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 98, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 88, Short.MAX_VALUE)
                         .addComponent(moreConditionsRB)))
                 .addContainerGap())
         );

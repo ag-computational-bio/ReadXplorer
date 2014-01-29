@@ -615,7 +615,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
      * @return The number of detected TSS
      */
     @Override
-    public int getResultSize() {
+    public int getDataSize() {
         return this.tssResult.getResults().size();
     }
 

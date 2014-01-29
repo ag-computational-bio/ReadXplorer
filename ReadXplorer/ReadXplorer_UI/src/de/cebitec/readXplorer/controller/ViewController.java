@@ -12,7 +12,11 @@ import de.cebitec.readXplorer.view.dataVisualisation.basePanel.BasePanelFactory;
 import de.cebitec.readXplorer.view.dialogMenus.OpenRefGenPanel;
 import de.cebitec.readXplorer.view.dialogMenus.OpenTracksVisualPanel;
 import java.awt.Dialog;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.openide.DialogDescriptor;
@@ -27,7 +31,7 @@ import org.openide.util.Utilities;
  *
  * @author ddoppmeier
  */
-public class ViewController implements de.cebitec.readXplorer.view.dataVisualisation.MousePositionListener {
+public class ViewController implements MousePositionListener {
 
     private List<MousePositionListener> mousePosListener;
     private BoundsInfoManager boundsManager;

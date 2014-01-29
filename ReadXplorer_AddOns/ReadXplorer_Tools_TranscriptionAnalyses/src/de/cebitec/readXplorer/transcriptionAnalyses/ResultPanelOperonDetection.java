@@ -296,7 +296,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
      * @return The number of detected operons
      */
     @Override
-    public int getResultSize() {
+    public int getDataSize() {
         return this.operonResult.getResults().size();
     }
 }

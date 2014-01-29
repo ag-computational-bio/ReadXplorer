@@ -1,6 +1,5 @@
 package de.cebitec.readXplorer.correlationAnalysis;
 
-import de.cebitec.readXplorer.correlationAnalysis.Bundle;
 import de.cebitec.readXplorer.util.TabWithCloseX;
 import de.cebitec.readXplorer.view.TopComponentExtended;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
@@ -101,7 +100,7 @@ public final class CorrelationResultTopComponent extends TopComponentExtended {
     }
 
     /**
-     * Obtain the SNP_DetectionTopComponent instance. Never call {@link #getDefault} directly!
+     * Obtain the Correlation analysis top component instance. Never call {@link #getDefault} directly!
      */
     public static synchronized CorrelationResultTopComponent findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);

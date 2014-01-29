@@ -4,7 +4,10 @@ import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Observer;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -147,5 +150,18 @@ public class PersistantChromosome implements Observable {
         hash = 19 * hash + Objects.hashCode(this.name);
         hash = 19 * hash + this.chromLength;
         return hash;
+    }
+    
+    /**
+     * Creates a mapping of the chromosome names to the chromosome.
+     * @param chroms chromosome list to transform into the chromosome name map
+     * @return The mapping of chromosome name to chromosome
+     */
+    public static Map<String, PersistantChromosome> getChromNameMap(Collection<PersistantChromosome> chroms) {
+        Map<String, PersistantChromosome> chromMap = new HashMap<>();
+        for (PersistantChromosome chrom : chroms) {
+            chromMap.put(chrom.getName(), chrom);
+        }
+        return chromMap;
     }
 }

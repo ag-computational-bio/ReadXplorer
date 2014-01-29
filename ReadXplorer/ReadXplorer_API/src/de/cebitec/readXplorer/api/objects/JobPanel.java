@@ -20,6 +20,8 @@ import javax.swing.event.ListSelectionListener;
  */
 public abstract class JobPanel extends JPanel implements NewJobDialogI {
     
+    private static final long serialVersionUID = 1L;
+    
     /**
      * @return <cc>true</cc>, if all required information is set, <cc>false</cc> 
      * otherwise.

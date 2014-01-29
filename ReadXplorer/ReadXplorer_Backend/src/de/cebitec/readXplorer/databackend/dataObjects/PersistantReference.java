@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.openide.util.Exceptions;
 
 /**
  * A persistant reference containing an id, name, description & timestamp of a 
@@ -151,7 +150,7 @@ public class PersistantReference implements Observable {
 
     @Override
     public String toString(){
-        return name + " " + description;
+        return this.getName();
     }
     
     /* 

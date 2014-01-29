@@ -149,7 +149,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
         transcriptionStartResultPanel.addResult(tssResult);
 
         trackNames = GeneralUtils.generateConcatenatedString(tssResult.getTrackNameList(), 120);
-        String panelName = "Detected TSSs for " + trackNames + " (" + transcriptionStartResultPanel.getResultSize() + " hits)";
+        String panelName = "Detected TSSs for " + trackNames + " (" + transcriptionStartResultPanel.getDataSize() + " hits)";
         transcAnalysesTopComp.openAnalysisTab(panelName, transcriptionStartResultPanel);
 
         notifyObservers(AnalysisStatus.FINISHED);

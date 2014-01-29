@@ -106,7 +106,7 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
                             .addComponent(transcriptionStartBox)
                             .addComponent(rpkmValuesBox)
                             .addComponent(operonDetectionBox))
-                        .addGap(0, 29, Short.MAX_VALUE))
+                        .addGap(0, 179, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(21, 21, 21)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

@@ -27,11 +27,17 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
+ * Abstract analysis handler for the differential gene expression. Takes care of
+ * collecting all count data from each single AnalysisHandler of each track,
+ * starting the processing by the chosen tool and displaying the results after
+ * the calculations.
+ *
  * @author kstaderm
  */
 public abstract class DeAnalysisHandler extends Thread implements Observable, DataVisualisationI {
@@ -44,7 +50,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
     private List<ResultDeAnalysis> results;
     private List<de.cebitec.readXplorer.util.Observer> observerList = new ArrayList<>();
     private File saveFile = null;
-    private List<FeatureType> selectedFeatures;
+    private Set<FeatureType> selectedFeatureTypes;
     private Map<Integer, Map<PersistantFeature, Integer>> allCountData = new HashMap<>();
     private int resultsReceivedBack = 0;
     private int startOffset;
@@ -83,14 +89,32 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         RUNNING, FINISHED, ERROR;
     }
 
+    /**
+     * Abstract analysis handler for the differential gene expression. Takes 
+     * care of collecting all count data from each single AnalysisHandler of
+     * each track, starting the processing by the chosen tool and displaying
+     * the results after the calculations.
+     * @param selectedTracks list of selected tracks for the analysis
+     * @param refGenomeID id of the selected reference genome
+     * @param saveFile file, in which some data for this analysis can be stored
+     * @param selectedFeatureTypes list of selected feature types to keep in the
+     * list of analyzed genomic features
+     * @param startOffset offset in bases left of each feature start
+     * @param stopOffset offset in bases right of each feature stop 
+     * @param readClassParams Parameter set of the selected read classes for 
+     * this analysis
+     * @param regardReadOrientation <cc>true</cc>, if the read orientation of
+     * all reads shall be taken into account, <cc>false</cc>, if reads on both
+     * strands are counted for the expression values of genomic features.
+     */
     public DeAnalysisHandler(List<PersistantTrack> selectedTracks, int refGenomeID,
-            File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset,
+            File saveFile, Set<FeatureType> selectedFeatureTypes, int startOffset, int stopOffset,
             ParametersReadClasses readClassParams, boolean regardReadOrientation) {
         ProcessingLog.getInstance().resetLog();
         this.selectedTracks = selectedTracks;
         this.refGenomeID = refGenomeID;
         this.saveFile = saveFile;
-        this.selectedFeatures = selectedFeatures;
+        this.selectedFeatureTypes = selectedFeatureTypes;
         this.startOffset = startOffset;
         this.stopOffset = stopOffset;
         this.readClassParams = readClassParams;
@@ -109,9 +133,9 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         genomeAnnos = new ArrayList<>();
         
         for (PersistantChromosome chrom : referenceConnector.getRefGenome().getChromosomes().values()) {
-            genomeAnnos.addAll(referenceConnector.getFeaturesForRegion(1, chrom.getLength(), selectedFeatures, chrom.getId()));
+            genomeAnnos.addAll(referenceConnector.getFeaturesForRegionInclParents(1, chrom.getLength(), selectedFeatureTypes, chrom.getId()));     
         }
-        
+                
         for (Iterator<PersistantTrack> it = selectedTracks.iterator(); it.hasNext();) {
             
             PersistantTrack currentTrack = it.next();

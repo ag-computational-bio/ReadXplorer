@@ -1,9 +1,14 @@
 package de.cebitec.readXplorer.view;
 
+import de.cebitec.readXplorer.util.TabWithCloseX;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
@@ -68,6 +73,44 @@ public class TopComponentHelper {
         Set<TopComponent> topComps = WindowManager.getDefault().getRegistry().getOpened();
         TopComponent[] topCompArray = new TopComponent[topComps.size()];
         return topComps.toArray(topCompArray);
+    }
+    
+    /**
+     * Sets up a container listener, which assures that the TopComponent with
+     * the given preferredId is closed when no tabs are shown.
+     * @param tabs the JTabbedPane containing the tabs
+     * @param preferredId the id of the corresponding TopCopmonent
+     */
+    public static void setupContainerListener(final JTabbedPane tabs, final String preferredId) {
+
+        // add listener to close TopComponent when no tabs are shown
+        tabs.addContainerListener(new ContainerListener() {
+            @Override
+            public void componentAdded(ContainerEvent e) {
+            }
+
+            @Override
+            public void componentRemoved(ContainerEvent e) {
+                if (tabs.getTabCount() == 0) {
+                    TopComponent topComp = WindowManager.getDefault().findTopComponent(preferredId);
+                    if (topComp != null) {
+                        topComp.close();
+                    }
+                }
+            }
+        });
+    }
+    
+    /**
+     * This method needs to be called in order to open a new tab for a table.
+     * @param tabs JTabbedPane containing the tabs
+     * @param panelName name of the panel to open
+     * @param tablePanel the panel to display in the new tab
+     */
+    public static void openTableTab(JTabbedPane tabs, String panelName, JPanel tablePanel) {
+        tabs.addTab(panelName, tablePanel);
+        tabs.setTabComponentAt(tabs.getTabCount() - 1, new TabWithCloseX(tabs));
+        tabs.setSelectedIndex(tabs.getTabCount() - 1);
     }
     
 }

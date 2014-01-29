@@ -34,6 +34,9 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
      * generated
      * @param combineTracks <cc>true</cc>, if the tracks in the list are
      * combined, <cc>false</cc> otherwise
+     * @param trackColumn column in which the track is stored
+     * @param filterColumn column which shall be used for filtering the results
+     * among results of other tracks (e.g. the feature column for RPKM analysis)
      */
     public RPKMAnalysisResult(Map<Integer, PersistantTrack> trackMap, List<RPKMvalue> rpkmResults, int referenceId, 
             boolean combineTracks, int trackColumn, int filterColumn) {
@@ -65,6 +68,7 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
         dataColumnDescriptions.add("Feature");
         dataColumnDescriptions.add("Feature Type");
         dataColumnDescriptions.add("Track");
+        dataColumnDescriptions.add("Chromosome");
         dataColumnDescriptions.add("Start");
         dataColumnDescriptions.add("Stop");
         dataColumnDescriptions.add("Length");
@@ -96,6 +100,7 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
             rpkmRow.add(feat);
             rpkmRow.add(feat.getType());
             rpkmRow.add(this.getTrackEntry(rpkmValue.getTrackId(), true));
+            rpkmRow.add(this.getChromosomeMap().get(feat.getChromId()));
             rpkmRow.add(feat.isFwdStrand() ? feat.getStart() : feat.getStop());
             rpkmRow.add(feat.isFwdStrand() ? feat.getStop() : feat.getStart());
             rpkmRow.add(feat.getStop() - feat.getStart());

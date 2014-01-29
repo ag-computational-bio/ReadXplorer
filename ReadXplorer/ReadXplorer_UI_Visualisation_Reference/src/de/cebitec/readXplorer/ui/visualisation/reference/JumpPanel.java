@@ -18,7 +18,8 @@ import de.cebitec.readXplorer.view.dialogMenus.JTextFieldPasteable;
 import de.cebitec.readXplorer.view.dialogMenus.StandardMenuEvent;
 import de.cebitec.readXplorer.view.tableVisualization.TableUtils;
 import java.awt.Dimension;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -55,6 +56,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
     private FeatureTableObserver featTableObserver;
     private ChromComboObserver chromObserver;
     private ChromosomeListener chromListener;
+    private ReferenceFeatureTopComp refComp;
 
     
     /** Creates new Panel for navigating in the currently viewed chromosome 
@@ -88,11 +90,13 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
         });        
 
         //Listener for TableSelect-Events
+        this.refComp = ReferenceFeatureTopComp.findInstance();
         featureTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 TableUtils.showFeaturePosition(featureTable, 0, boundsManager);
+                refComp.showTableFeature(featureTable, 0);
             }
         });
 
@@ -456,7 +460,9 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
 
     /**
      * Set the viewer including the reference genome, for which the 
-     * navigation is currently available in this panel.
+     * navigation is currently available in this panel. Also updates the bounds
+     * information manager to the current viewers manager and removes the old 
+     * table feature observer for the last reference genome.
      * @param viewer The viewer to navigate
      */
     public void setViewer(AbstractViewer viewer) {
@@ -464,6 +470,7 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
         this.updateFeatTableObserver(this.refGenome, viewer, firstCall);
         this.viewer = viewer;
         this.refGenome = viewer.getReference();
+        this.boundsManager = viewer.getBoundsInformationManager();
         refGenCon = ProjectConnector.getInstance().getRefGenomeConnector(refGenome.getId());
         
         if (refGenome.getNoChromosomes() > 1) {
@@ -568,11 +575,6 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
             return;
         }
         ((TableRowSorter<TableModel>) featureTable.getRowSorter()).setRowFilter(rf);
-    }
-
-    public void setBoundsInfoManager(BoundsInfoManager boundsManager) {
-        this.boundsManager = boundsManager;
-
     }
 
     @Override

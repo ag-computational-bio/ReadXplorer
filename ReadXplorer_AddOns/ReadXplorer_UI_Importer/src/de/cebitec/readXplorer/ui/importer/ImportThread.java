@@ -72,7 +72,14 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         this.referenceJobs = refJobs;
         this.readPairJobs = readPairJobs;
         this.ph = ProgressHandleFactory.createHandle(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.progress.name"));
-        this.workunits = refJobs.size() + 2 * trackJobs.size() + 3 * readPairJobs.size();
+        
+        this.workunits = refJobs.size();
+        for (TrackJob trackJob : trackJobs) {
+            workunits += trackJob.isAlreadyImported() ? 1 : 2; //one or two steps are needed
+        }
+        for (ReadPairJobContainer readPairJob : readPairJobs) {
+            workunits += readPairJob.getTrackJob1().isAlreadyImported() ? 1 : 3; //one or three steps are needed
+        }
     }
 
     private ParsedReference parseRefJob(ReferenceJob refGenJob) throws ParsingException, OutOfMemoryError {

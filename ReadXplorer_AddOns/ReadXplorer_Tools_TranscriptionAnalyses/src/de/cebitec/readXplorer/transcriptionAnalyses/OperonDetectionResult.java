@@ -1,6 +1,7 @@
 package de.cebitec.readXplorer.transcriptionAnalyses;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.Operon;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.OperonAdjacency;
@@ -15,7 +16,7 @@ import java.util.Map;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetOperonDet> {
-    
+    //sdfsdf
     private final List<Operon> detectedOperons;
 
     public OperonDetectionResult(Map<Integer, PersistantTrack> trackList, List<Operon> detectedOperons, 
@@ -36,6 +37,7 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetOpero
         dataColumnDescriptions.add("Feature 1");
         dataColumnDescriptions.add("Feature 2");
         dataColumnDescriptions.add("Track");
+        dataColumnDescriptions.add("Chromosome");
         dataColumnDescriptions.add("Strand");
         dataColumnDescriptions.add("Start Anno 1");
         dataColumnDescriptions.add("Start Anno 2");
@@ -61,9 +63,10 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetOpero
         List<List<Object>> operonResults = new ArrayList<>();
 
         for (Operon operon : this.detectedOperons) {
+            PersistantFeature feat1 = operon.getOperonAdjacencies().get(0).getFeature1();
             String annoName1 = "";
             String annoName2 = "";
-            String strand = (operon.getOperonAdjacencies().get(0).getFeature1().isFwdStrandString()) + "\n";
+            String strand = feat1.isFwdStrandString() + "\n";
             String startAnno1 = "";
             String startAnno2 = "";
             String readsAnno1 = "";
@@ -86,6 +89,7 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetOpero
             operonsRow.add(annoName1);
             operonsRow.add(annoName2);
             operonsRow.add(this.getTrackEntry(operon.getTrackId(), true));
+            operonsRow.add(this.getChromosomeMap().get(feat1.getChromId()));
             operonsRow.add(strand);
             operonsRow.add(startAnno1);
             operonsRow.add(startAnno2);

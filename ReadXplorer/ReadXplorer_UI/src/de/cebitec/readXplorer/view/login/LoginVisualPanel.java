@@ -144,7 +144,7 @@ public final class LoginVisualPanel extends JPanel {
         passwordField = new javax.swing.JPasswordField();
         urlField = new javax.swing.JTextField();
         dbTypeLabel = new javax.swing.JLabel();
-        dbTypeBox = new javax.swing.JComboBox();
+        dbTypeBox = new javax.swing.JComboBox<>();
         saveDataCheckBox = new javax.swing.JCheckBox();
         dbChooseButton = new javax.swing.JButton();
 
@@ -164,7 +164,7 @@ public final class LoginVisualPanel extends JPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(dbTypeLabel, org.openide.util.NbBundle.getMessage(LoginVisualPanel.class, "LoginVisualPanel.dbTypeLabel.text")); // NOI18N
 
-        dbTypeBox.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "h2", "MySQL" }));
+        dbTypeBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "h2", "MySQL" }));
         dbTypeBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 dbTypeBoxActionPerformed(evt);
@@ -202,12 +202,12 @@ public final class LoginVisualPanel extends JPanel {
                             .addComponent(urlLabel))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(passwordField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
-                            .addComponent(userField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
-                            .addComponent(dbTypeBox, 0, 297, Short.MAX_VALUE)
-                            .addComponent(urlField, javax.swing.GroupLayout.DEFAULT_SIZE, 297, Short.MAX_VALUE)
+                            .addComponent(passwordField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 418, Short.MAX_VALUE)
+                            .addComponent(userField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 418, Short.MAX_VALUE)
+                            .addComponent(dbTypeBox, 0, 418, Short.MAX_VALUE)
+                            .addComponent(urlField, javax.swing.GroupLayout.DEFAULT_SIZE, 418, Short.MAX_VALUE)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(databaseField, javax.swing.GroupLayout.DEFAULT_SIZE, 222, Short.MAX_VALUE)
+                                .addComponent(databaseField, javax.swing.GroupLayout.DEFAULT_SIZE, 295, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(dbChooseButton)))))
                 .addContainerGap())
@@ -312,7 +312,7 @@ public final class LoginVisualPanel extends JPanel {
     private javax.swing.JTextField databaseField;
     private javax.swing.JLabel databaseLabel;
     private javax.swing.JButton dbChooseButton;
-    private javax.swing.JComboBox dbTypeBox;
+    private javax.swing.JComboBox<String> dbTypeBox;
     private javax.swing.JLabel dbTypeLabel;
     private javax.swing.JPasswordField passwordField;
     private javax.swing.JLabel passwordLabel;

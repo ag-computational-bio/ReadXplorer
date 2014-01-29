@@ -476,10 +476,13 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                         break;
                     }
 
-                } else if (start >= maxStartPos) {
+                } else if (start >= tssPos) {
                     if (fstFittingFeature) {
-                        this.lastFeatureIdxGenStartsRev = i;
+                        this.lastFeatureIdxGenStartsRev = i; //TODO: features should be sorted by stop pos for rev strand
+                        fstFittingFeature = false;
                     }
+                } 
+                if (start >= maxStartPos && feature.getStart() > maxStartPos) {
                     break;
                 }
             }

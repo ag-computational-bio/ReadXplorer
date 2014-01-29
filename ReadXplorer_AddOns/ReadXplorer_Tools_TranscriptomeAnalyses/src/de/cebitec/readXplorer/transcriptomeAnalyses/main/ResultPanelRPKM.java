@@ -201,7 +201,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
      * @return the number of features filtered during the associated analysis
      */
     @Override
-    public int getResultSize() {
+    public int getDataSize() {
         return this.rpkmCalcResult.getResults().size();
     }
 }

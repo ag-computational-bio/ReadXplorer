@@ -611,6 +611,16 @@
                 <package>org.rosuda.JRI</package>
                 <package>org.rosuda.REngine</package>
                 <package>org.rosuda.REngine.JRI</package>
+                <package>org.supercsv.cellprocessor</package>
+                <package>org.supercsv.cellprocessor.constraint</package>
+                <package>org.supercsv.cellprocessor.ift</package>
+                <package>org.supercsv.comment</package>
+                <package>org.supercsv.encoder</package>
+                <package>org.supercsv.exception</package>
+                <package>org.supercsv.io</package>
+                <package>org.supercsv.prefs</package>
+                <package>org.supercsv.quote</package>
+                <package>org.supercsv.util</package>
             </public-packages>
             <class-path-extension>
                 <runtime-relative-path>ext/batik-transcoder.jar</runtime-relative-path>
@@ -651,6 +661,10 @@
             <class-path-extension>
                 <runtime-relative-path>ext/JRI.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/JRI.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/super-csv-2.1.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/super-csv-2.1.0.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/batik-xml.jar</runtime-relative-path>

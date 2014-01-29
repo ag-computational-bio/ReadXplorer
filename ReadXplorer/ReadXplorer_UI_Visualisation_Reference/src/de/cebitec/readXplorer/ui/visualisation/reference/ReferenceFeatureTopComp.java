@@ -186,7 +186,7 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended implemen
                     .addComponent(startField, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(stopField, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(ecNumField)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 212, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1)
                     .addComponent(strandText, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(typeText, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
@@ -420,7 +420,7 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended implemen
    }
     
     /**
-     * Displays the feature associated wit the currently selected table row in
+     * Displays the feature associated with the currently selected table row in
      * this feature window.
      * @param table the table whose selected feature shall be shown
      * @param featureColumnIndex the index of the feature column in the table

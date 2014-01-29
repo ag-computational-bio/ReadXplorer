@@ -401,7 +401,7 @@ public class NovelRegionResultPanel extends ResultTablePanel {
     }
 
     @Override
-    public int getResultSize() {
+    public int getDataSize() {
         return this.novelRegionResults.getResults().size();
     }
 

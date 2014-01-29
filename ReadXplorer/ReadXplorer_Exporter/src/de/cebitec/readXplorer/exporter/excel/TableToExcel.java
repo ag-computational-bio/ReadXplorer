@@ -7,7 +7,9 @@ import java.util.Vector;
 import javax.swing.table.DefaultTableModel;
 
 /**
- *
+ * Converts a DefaultTableModel in a suitable format for export. The instance of
+ * this class can be handed over to the ExcelExportFileChooser.
+ * 
  * @author kstaderm
  */
 public class TableToExcel implements ExcelExportDataI {

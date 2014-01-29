@@ -4,7 +4,10 @@ import de.cebitec.readXplorer.databackend.dataObjects.ChromosomeObserver;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.FeatureType;
-import de.cebitec.readXplorer.view.dataVisualisation.*;
+import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfo;
+import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.readXplorer.view.dataVisualisation.LogicalBoundsListener;
+import de.cebitec.readXplorer.view.dataVisualisation.MousePositionListener;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.readXplorer.view.dialogMenus.MenuItemFactory;
 import java.awt.Color;
@@ -24,7 +27,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollBar;
+import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 import org.openide.util.Exceptions;
 
 /**

@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
@@ -102,6 +101,9 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
      * @param trackIds the list of track ids for which the snp detection has to
      * be carried out
      */
+    @Messages({ "TTL_SNPWizardTitle=SNP Detection Parameter Wizard",
+                "TITLE_SNPDetectionTopComp=SNP Detection Window", 
+                "HINT_SNPDetectionTopComp=This is a SNP Detection window"})
     private void runWizardAndSnpDetection() {
         
         @SuppressWarnings("unchecked")
@@ -118,7 +120,7 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
         
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
         wiz.setTitleFormat(new MessageFormat("{0}"));
-        wiz.setTitle(NbBundle.getMessage(OpenSnpDetectionAction.class, "TTL_SNPWizardTitle"));
+        wiz.setTitle(Bundle.TTL_SNPWizardTitle());
         
         //action to perform after successfully finishing the wizard
         boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
@@ -132,6 +134,8 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
             }
 
             this.snpDetectionTopComp = (SNP_DetectionTopComponent) WindowManager.getDefault().findTopComponent("SNP_DetectionTopComponent");
+            this.snpDetectionTopComp.setName(Bundle.TITLE_SNPDetectionTopComp());
+            this.snpDetectionTopComp.setToolTipText(Bundle.HINT_SNP_DetectionTopComp());
             this.snpDetectionTopComp.open();
             this.startSNPDetection(wiz);
         }
@@ -228,7 +232,7 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
 
                             //get track name(s) for tab descriptions
                             String trackNames = GeneralUtils.generateConcatenatedString(result.getTrackNameList(), 120);
-                            String panelName = "SNP Detection for " + trackNames + " (" + snpDetectionResultPanel.getResultSize() + " hits)";
+                            String panelName = "SNP Detection for " + trackNames + " (" + snpDetectionResultPanel.getDataSize() + " hits)";
                             snpDetectionTopComp.openDetectionTab(panelName, snpDetectionResultPanel);
                         }
                     }

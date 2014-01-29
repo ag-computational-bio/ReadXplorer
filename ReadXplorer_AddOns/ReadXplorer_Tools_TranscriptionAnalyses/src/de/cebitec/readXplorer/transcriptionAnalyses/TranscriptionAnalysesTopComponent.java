@@ -1,18 +1,13 @@
 package de.cebitec.readXplorer.transcriptionAnalyses;
 
-import de.cebitec.readXplorer.transcriptionAnalyses.Bundle;
-import de.cebitec.readXplorer.util.TabWithCloseX;
 import de.cebitec.readXplorer.view.TopComponentExtended;
-import java.awt.event.ContainerEvent;
-import java.awt.event.ContainerListener;
+import de.cebitec.readXplorer.view.TopComponentHelper;
 import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
-import org.openide.windows.WindowManager;
 
 /**
  * TopComponent for displaying all gui elements belonging to the transcription
@@ -41,7 +36,6 @@ preferredID = "TranscriptionAnalysesTopComponent")
 public final class TranscriptionAnalysesTopComponent extends TopComponentExtended {
     
     private static final long serialVersionUID = 1L;
-    public static final String PREFERRED_ID = "TranscriptionAnalysesTopComponent";
 
     /**
      * TopComponent for displaying all gui elements belonging to the
@@ -52,21 +46,7 @@ public final class TranscriptionAnalysesTopComponent extends TopComponentExtende
         setName(Bundle.CTL_TranscriptionAnalysesTopComponent());
         setToolTipText(Bundle.HINT_TranscriptionAnalysesTopComponent());
         putClientProperty(TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE);
-
-        // add listener to close TopComponent when no tabs are shown
-        this.analysesTabbedPane.addContainerListener(new ContainerListener() {
-            @Override
-            public void componentAdded(ContainerEvent e) {
-            }
-
-            @Override
-            public void componentRemoved(ContainerEvent e) {
-                if (analysesTabbedPane.getTabCount() == 0) {
-                    WindowManager.getDefault().findTopComponent(PREFERRED_ID).close();
-                }
-            }
-        });
-
+        TopComponentHelper.setupContainerListener(analysesTabbedPane, preferredID());
     }
 
     /**
@@ -101,7 +81,7 @@ public final class TranscriptionAnalysesTopComponent extends TopComponentExtende
 
     @Override
     public void componentClosed() {
-        // TODO add custom code on component closing
+        this.analysesTabbedPane.removeAll();
     }
 
     void writeProperties(java.util.Properties p) {
@@ -116,11 +96,6 @@ public final class TranscriptionAnalysesTopComponent extends TopComponentExtende
         // TODO read your settings according to their version
     }
     
-    @Override
-    protected String preferredID() {
-        return PREFERRED_ID;
-    }
-    
     /**
      * This method needs to be called in order to open a new tab for
      * transcription analyses. Make sure to call {@link setAnalysisContext()} 
@@ -128,16 +103,8 @@ public final class TranscriptionAnalysesTopComponent extends TopComponentExtende
      * @param panelName title of the new tab to create
      * @param resultPanel the panel to place in the new tab 
      */
-    public void openAnalysisTab(final String panelName, final JPanel resultPanel) { //TranscriptionAnalysesPanel transAnalysisPanel, 
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                analysesTabbedPane.add(panelName, resultPanel);
-                analysesTabbedPane.setTabComponentAt(analysesTabbedPane.getTabCount() - 1, new TabWithCloseX(analysesTabbedPane));
-                analysesTabbedPane.setSelectedIndex(analysesTabbedPane.getTabCount() - 1);
-            }
-        });
+    public void openAnalysisTab(final String panelName, final JPanel resultPanel) {
+        TopComponentHelper.openTableTab(analysesTabbedPane, panelName, resultPanel);
     }
     
     /**

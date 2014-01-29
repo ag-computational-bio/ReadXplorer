@@ -14,6 +14,7 @@ import de.cebitec.readXplorer.util.FeatureType;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import org.openide.util.Exceptions;
 
 /**
@@ -43,7 +44,7 @@ public class ExpressTestAnalysisHandler extends DeAnalysisHandler implements Exp
 
     public ExpressTestAnalysisHandler(List<PersistantTrack> selectedTracks,
             int[] groupA, int[] groupB, Integer refGenomeID, boolean workingWithoutReplicates,
-            File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset, 
+            File saveFile, Set<FeatureType> selectedFeatures, int startOffset, int stopOffset, 
             ParametersReadClasses readClassParams, boolean regardReadOrientation, List<Integer> normalizationFeatures) {
         super(selectedTracks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams, regardReadOrientation);
         expressTestAnalysisData = new ExpressTestAnalysisData(selectedTracks.size(),

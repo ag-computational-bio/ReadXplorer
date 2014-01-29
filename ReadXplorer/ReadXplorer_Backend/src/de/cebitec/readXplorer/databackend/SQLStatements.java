@@ -198,8 +198,8 @@ public class SQLStatements {
     
     
     /**
-     * @param seqPairId sequence pair id to set for current track
-     * @param trackId track id to set the sequence pair id for
+     * @param readPairId read pair id to set for current track
+     * @param trackId track id to set the read pair id for
      */
     public static final String INSERT_TRACK_SEQ_PAIR_ID =
             "UPDATE " + FieldNames.TABLE_TRACK
@@ -1334,7 +1334,7 @@ public class SQLStatements {
             + "(C." + FieldNames.COVERAGE_ZERO_FW_MULT + " + " + FieldNames.COVERAGE_ZERO_RV_MULT + " ) !=0 and " + FieldNames.COVERAGE_TRACK + "= ?";
     
     /**
-     * @param trackId track id of one track of a sequence pair
+     * @param trackId track id of one track of a read pair
      */
     public static String FETCH_READ_PAIR_TO_TRACK_ID =
             "SELECT "
@@ -1345,9 +1345,8 @@ public class SQLStatements {
             + FieldNames.TRACK_ID + " = ? ";
     
     /**
-     * Fetches second track id for sequence pair tracks.
-     *
-     * @param seqPairId sequence pair id
+     * Fetches second track id for read pair tracks.
+     * @param seqPairId read pair id
      * @param trackId track id of one of the two tracks of the pair
      */
     public static String FETCH_TRACK_ID_TO_READ_PAIR_ID =

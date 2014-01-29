@@ -1,16 +1,16 @@
 package de.cebitec.readXplorer.ui.dataAdministration.actions;
 
-import de.cebitec.readXplorer.ui.dataAdministration.DataAdminWizardSelectionPanel;
-import de.cebitec.readXplorer.ui.dataAdministration.DataAdminWizardOverviewPanel;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readXplorer.api.cookies.LoginCookie;
 import de.cebitec.readXplorer.parser.ReferenceJob;
 import de.cebitec.readXplorer.parser.TrackJob;
+import de.cebitec.readXplorer.ui.dataAdministration.DataAdminWizardOverviewPanel;
+import de.cebitec.readXplorer.ui.dataAdministration.DataAdminWizardSelectionPanel;
 import de.cebitec.readXplorer.ui.dataAdministration.DeletionThread;
 import java.awt.Component;
 import java.awt.Dialog;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.MessageFormat;
 import java.util.List;
 import javax.swing.JComponent;
@@ -18,9 +18,26 @@ import javax.swing.SwingWorker;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.WizardDescriptor;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionReferences;
+import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
+@ActionID(
+        category = "File",
+        id = "de.cebitec.readXplorer.ui.dataAdministration.actions.DataAdminWizardAction"
+)
+@ActionRegistration(
+        iconBase = "de/cebitec/readXplorer/ui/dataAdministration/manage.png",
+        displayName = "#CTL_DataAdminWizardAction"
+)
+@ActionReferences({
+    @ActionReference(path = "Menu/File", position = 1462),
+    @ActionReference(path = "Toolbars/Management", position = 401)
+})
+@NbBundle.Messages("CTL_DataAdminWizardAction=Manage data")
 public final class DataAdminWizardAction implements ActionListener {
 
     private final LoginCookie context;

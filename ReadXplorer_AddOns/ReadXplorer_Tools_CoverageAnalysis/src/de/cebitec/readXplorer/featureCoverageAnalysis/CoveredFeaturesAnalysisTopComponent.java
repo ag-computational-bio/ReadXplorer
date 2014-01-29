@@ -1,16 +1,13 @@
 package de.cebitec.readXplorer.featureCoverageAnalysis;
 
-import de.cebitec.readXplorer.util.TabWithCloseX;
 import de.cebitec.readXplorer.view.TopComponentExtended;
-import java.awt.event.ContainerEvent;
-import java.awt.event.ContainerListener;
+import de.cebitec.readXplorer.view.TopComponentHelper;
 import javax.swing.JPanel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
-import org.openide.windows.WindowManager;
 
 /**
  * TopComponent for displaying all gui elements belonging to the feature coverage 
@@ -38,7 +35,6 @@ preferredID = "FeatureCoverageAnalysisTopComponent")
 })
 public final class CoveredFeaturesAnalysisTopComponent extends TopComponentExtended {
     
-    public static final String PREFERRED_ID = "FeatureCoverageAnalysisTopComponent";
     private static final long serialVersionUID = 1L;
 
     /**
@@ -51,22 +47,7 @@ public final class CoveredFeaturesAnalysisTopComponent extends TopComponentExten
         setToolTipText(Bundle.HINT_CoveredFeaturesAnalysisTopComponent());
         putClientProperty(TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE);
         
-        // add listener to close TopComponent when no tabs are shown
-        this.coveredFeaturesTabbedPane.addContainerListener(new ContainerListener() {
-            @Override
-            public void componentAdded(ContainerEvent e) {
-            }
-
-            @Override
-            public void componentRemoved(ContainerEvent e) {
-                if (coveredFeaturesTabbedPane.getTabCount() == 0) {
-                    TopComponent topComp = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
-                    if (topComp != null) {
-                        topComp.close();
-                    }
-                }
-            }
-        });
+        TopComponentHelper.setupContainerListener(coveredFeaturesTabbedPane, preferredID());
 
     }
 
@@ -125,9 +106,7 @@ public final class CoveredFeaturesAnalysisTopComponent extends TopComponentExten
      * @param resultPanel the panel to place in the new tab
      */
     public void openAnalysisTab(String panelName, JPanel resultPanel) {
-        this.coveredFeaturesTabbedPane.add(panelName, resultPanel);
-        this.coveredFeaturesTabbedPane.setTabComponentAt(this.coveredFeaturesTabbedPane.getTabCount() - 1, new TabWithCloseX(this.coveredFeaturesTabbedPane));
-        this.coveredFeaturesTabbedPane.setSelectedIndex(this.coveredFeaturesTabbedPane.getTabCount() - 1);
+        TopComponentHelper.openTableTab(coveredFeaturesTabbedPane, panelName, resultPanel);
     }
     
     /**

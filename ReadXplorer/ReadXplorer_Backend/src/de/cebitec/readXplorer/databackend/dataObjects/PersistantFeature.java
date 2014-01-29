@@ -7,6 +7,7 @@ import de.cebitec.readXplorer.util.polyTree.Node;
 import de.cebitec.readXplorer.util.polyTree.Polytree;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -271,6 +272,22 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
     public static class Utils {
 
         /**
+         * @param feature feature whose frame has to be determined
+         * @return 1, 2, 3, -1, -2, -3 depending on the reading frame of the
+         * feature
+         */
+        public static int determineFrame(PersistantFeature feature) {
+            int frame;
+
+            if (feature.isFwdStrand()) { // forward strand
+                frame = (feature.getStart() - 1) % 3 + 1;
+            } else { // reverse strand. start <= stop ALWAYS! so use stop for reverse strand
+                frame = (feature.getStop() - 1) % 3 - 3;
+            }
+            return frame;
+        }
+        
+        /**
          * Utility method for creating a mapping of features to their id.
          * @param features List of features for which the mapping should be
          * created
@@ -280,6 +297,20 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
             Map<Integer, PersistantFeature> featureMap = new HashMap<>();
             for (PersistantFeature feature : features) {
                 featureMap.put(feature.getId(), feature); //ids are unique
+            }
+            return featureMap;
+        }
+
+        /**
+         * Utility method for creating a mapping of features to their locus.
+         * @param features List of features for which the mapping should be
+         * created
+         * @return The map of feature locus to the corresponding feature
+         */
+        public static Map<String, PersistantFeature> getFeatureLocusMap(List<PersistantFeature> features) {
+            Map<String, PersistantFeature> featureMap = new HashMap<>();
+            for (PersistantFeature feature : features) {
+                featureMap.put(feature.getLocus(), feature); //not necessarily unique, but should be found at the same position
             }
             return featureMap;
         }
@@ -377,25 +408,41 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
                 }
             }
         }
-    }
-    
-    /**
-     * Creates a new array list of the genomic features, which are among the
-     * allowed feature types. All features, whose feature type is not in the
-     * <cc>selectedFeatureTypes</cc> list is dismissed.
-     * @param featuresToFilter the list of features to filter
-     * @param selectedFeatureTypes the set of feature types, which shall be
-     * contained in the returned list of features
-     * @return the filtered list of features. Only features of a type from the 
-     *  <cc>selectedFeatureTypes</cc> are returned
-     */
-    public static List<PersistantFeature> filterFeatureTypes(List<PersistantFeature> featuresToFilter, Set<FeatureType> selectedFeatureTypes) {
-        List<PersistantFeature> newFeatures = new ArrayList<>();
-        for (PersistantFeature feature : featuresToFilter) {
-            if (selectedFeatureTypes.contains(feature.getType())) {
-                newFeatures.add(feature);
+
+        /**
+         * Creates a new array list of the genomic features, which are among the
+         * allowed feature types. All features, whose feature type is not in the
+         * <cc>selectedFeatureTypes</cc> list is dismissed.
+         * @param featuresToFilter the list of features to filter
+         * @param selectedFeatureTypes the set of feature types, which shall be
+         * contained in the returned list of features
+         * @return the filtered list of features. Only features of a type from
+         * the <cc>selectedFeatureTypes</cc> are returned
+         */
+        public static List<PersistantFeature> filterFeatureTypes(List<PersistantFeature> featuresToFilter, Set<FeatureType> selectedFeatureTypes) {
+            List<PersistantFeature> newFeatures = new ArrayList<>();
+            for (PersistantFeature feature : featuresToFilter) {
+                if (selectedFeatureTypes.contains(feature.getType())) {
+                    newFeatures.add(feature);
+                }
             }
+            return newFeatures;
         }
-        return newFeatures;
+
+        /**
+         * Creates a new array list of the genomic features, which are of the
+         * allowed feature type. All features, whose feature type is different 
+         * than the <cc>selectedFeatureType</cc> is dismissed.
+         * @param featuresToFilter the list of features to filter
+         * @param selectedFeatureType the feature type, which shall be contained 
+         * in the returned list of features
+         * @return the filtered list of features. Only features of the type from
+         * the <cc>selectedFeatureType</cc> are returned
+         */
+        public static List<PersistantFeature> filterFeatureTypes(List<PersistantFeature> featuresToFilter, FeatureType selectedFeatureType) {
+            Set<FeatureType> featureTypeSet = new HashSet<>();
+            featureTypeSet.add(selectedFeatureType);
+            return Utils.filterFeatureTypes(featuresToFilter, featureTypeSet);
+        }
     }
 }

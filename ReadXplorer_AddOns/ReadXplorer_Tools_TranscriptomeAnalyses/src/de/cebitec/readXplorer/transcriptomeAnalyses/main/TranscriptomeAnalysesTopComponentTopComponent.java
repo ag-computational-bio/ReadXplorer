@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.util.TabWithCloseX;
@@ -12,22 +8,22 @@ import javax.swing.SwingUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
-import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
+import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
 /**
  * Top component which displays something.
  */
 @ConvertAsProperties(
-        dtd = "-//de.cebitec.vamp.transcriptomeAnalyses//TranscriptomeAnalysesTopComponent//EN",
+        dtd = "-//de.cebitec.readXplorer.transcriptomeAnalyses//TranscriptomeAnalysesTopComponent//EN",
         autostore = false)
 @TopComponent.Description(
         preferredID = "TranscriptomeAnalysesTopComponentTopComponent",
         //iconBase="SET/PATH/TO/ICON/HERE", 
         persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @TopComponent.Registration(mode = "output", openAtStartup = false)
-@ActionID(category = "Window", id = "de.cebitec.vamp.transcriptomeAnalyses.TranscriptomeAnalysesTopComponentTopComponent")
+@ActionID(category = "Window", id = "de.cebitec.readXplorer.transcriptomeAnalyses.TranscriptomeAnalysesTopComponentTopComponent")
 @ActionReference(path = "Menu/Window" /*, position = 333 */)
 @TopComponent.OpenActionRegistration(
         displayName = "#CTL_TranscriptomeAnalysesTopComponentAction",

@@ -7,6 +7,7 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.util.FeatureType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
@@ -57,7 +58,7 @@ public class ExpressTestWizardPanelNormalization implements WizardDescriptor.Val
     @Override
     public void readSettings(WizardDescriptor wiz) {
         int id = (int) wiz.getProperty("genomeID");
-        List<FeatureType> usedFeatures = (List<FeatureType>) wiz.getProperty("featureType");
+        Set<FeatureType> usedFeatures = (Set<FeatureType>) wiz.getProperty("featureType");
         ReferenceConnector referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(id);
         List<PersistantFeature> allRefFeatures = new ArrayList<>();
         for (PersistantChromosome chrom : referenceConnector.getChromosomesForGenome().values()) {

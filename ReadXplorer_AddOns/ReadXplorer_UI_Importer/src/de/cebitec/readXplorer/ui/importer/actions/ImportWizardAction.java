@@ -2,30 +2,52 @@ package de.cebitec.readXplorer.ui.importer.actions;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readXplorer.api.cookies.LoginCookie;
+import de.cebitec.readXplorer.parser.ReadPairJobContainer;
 import de.cebitec.readXplorer.parser.ReferenceJob;
 import de.cebitec.readXplorer.parser.TrackJob;
 import de.cebitec.readXplorer.ui.importer.ImportThread;
-import de.cebitec.readXplorer.ui.importer.ImportWizardSetupPanel;
 import de.cebitec.readXplorer.ui.importer.ImportWizardOverviewPanel;
-import de.cebitec.readXplorer.parser.ReadPairJobContainer;
-import java.awt.Component;
+import de.cebitec.readXplorer.ui.importer.ImportWizardSetupPanel;
+import de.cebitec.readXplorer.util.VisualisationUtils;
 import java.awt.Dialog;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JComponent;
 import javax.swing.SwingWorker;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.WizardDescriptor;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
+import org.openide.awt.ActionReferences;
+import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
+/**
+ * Action for importing data into ReadXplorer.
+ * 
+ * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ */
+@ActionID(
+        category = "File",
+        id = "de.cebitec.readXplorer.ui.importer.actions.ImportWizardAction"
+)
+@ActionRegistration(
+        iconBase = "de/cebitec/readXplorer/ui/importer/import.png",
+        displayName = "#CTL_ImportWizardAction"
+)
+@ActionReferences({
+    @ActionReference(path = "Menu/File", position = 1450, separatorAfter = 1475),
+    @ActionReference(path = "Toolbars/Management", position = 400)
+})
+@NbBundle.Messages("CTL_ImportWizardAction=Import data")
 public final class ImportWizardAction implements ActionListener {
 
     private final LoginCookie context;
-    private WizardDescriptor.Panel<WizardDescriptor>[] panels;
+    private List<WizardDescriptor.Panel<WizardDescriptor>> panels;
 
     public static final String PROP_CAN_IMPORT = "canImport";
     public static final String PROP_REFJOBLIST = "referenceJob";
@@ -35,70 +57,48 @@ public final class ImportWizardAction implements ActionListener {
     public static final String PROP_READPAIRDEVIATION = "readPairDeviation";
     public static final String PROP_POSITIONTABLELIST = "positionTableList";
 
+    /**
+     * Creates an action for importing data into ReadXplorer.
+     * @param context Only available, if already logged into a database
+     */
     public ImportWizardAction(LoginCookie context) {
         this.context = context;
     }
 
     @Override
     @SuppressWarnings("unchecked")
+    @NbBundle.Messages("TTL_ImportWizardTitle=ReadXplorer Import")
     public void actionPerformed(ActionEvent ev) {
         if (CentralLookup.getDefault().lookup(SwingWorker.class) != null){
             NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ImportWizardAction.class, "MSG_BackgroundActivity"), NotifyDescriptor.WARNING_MESSAGE);
             DialogDisplayer.getDefault().notify(nd);
             return;
         }
-        WizardDescriptor wizardDescriptor = new WizardDescriptor(getPanels());
+        
+        if (panels == null) {
+            panels = new ArrayList<>();
+            panels.add(new ImportWizardSetupPanel());
+            panels.add(new ImportWizardOverviewPanel());
+        }
+        WizardDescriptor wizardDescriptor = new WizardDescriptor(new WizardDescriptor.ArrayIterator<>(VisualisationUtils.getWizardPanels(panels)));
         // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()
         wizardDescriptor.setTitleFormat(new MessageFormat("{0}"));
-        wizardDescriptor.setTitle(NbBundle.getMessage(ImportWizardAction.class, "TTL_ImportWizardTitle"));
+        wizardDescriptor.setTitle(Bundle.TTL_ImportWizardTitle());
         Dialog dialog = DialogDisplayer.getDefault().createDialog(wizardDescriptor);
         dialog.setVisible(true);
         dialog.toFront();
+        
         boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
         if (!cancelled) {
-            // do something
+            // get paramters
             List<ReferenceJob> refJobs = (List<ReferenceJob>) wizardDescriptor.getProperty(PROP_REFJOBLIST);
             List<TrackJob> trackJobs = (List<TrackJob>) wizardDescriptor.getProperty(PROP_TRACKJOBLIST);
-             //since sequence pair jobs have their own parser it can be distinguished later
+             //since read pair jobs have their own parser it can be distinguished later
             List<ReadPairJobContainer> readPairJobs = (List<ReadPairJobContainer>) wizardDescriptor.getProperty(PROP_READPAIRJOBLIST);
 
             ImportThread i = new ImportThread(refJobs, trackJobs, readPairJobs);
             RequestProcessor rp = new RequestProcessor("Import Threads", 2);
             rp.post(i);
         }
-    }
-
-    /**
-     * Initialize panels representing individual wizard's steps and sets
-     * various properties for them influencing wizard appearance.
-     */
-    @SuppressWarnings("unchecked")
-    private WizardDescriptor.Panel<WizardDescriptor>[] getPanels() {
-        if (panels == null) {
-            panels = new WizardDescriptor.Panel[]{
-                        new ImportWizardSetupPanel(),
-                        new ImportWizardOverviewPanel(),
-                    };
-            String[] steps = new String[panels.length];
-            for (int i = 0; i < panels.length; i++) {
-                Component c = panels[i].getComponent();
-                // Default step name to component name of panel.
-                steps[i] = c.getName();
-                if (c instanceof JComponent) { // assume Swing components
-                    JComponent jc = (JComponent) c;
-                    // Sets step number of a component
-                    jc.putClientProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, new Integer(i));
-                    // Sets steps names for a panel
-                    jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DATA, steps);
-                    // Turn on subtitle creation on each step
-                    jc.putClientProperty(WizardDescriptor.PROP_AUTO_WIZARD_STYLE, Boolean.TRUE);
-                    // Show steps on the left side with the image on the background
-                    jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DISPLAYED, Boolean.TRUE);
-                    // Turn on numbering of all steps
-                    jc.putClientProperty(WizardDescriptor.PROP_CONTENT_NUMBERED, Boolean.TRUE);
-                }
-            }
-        }
-        return panels;
     }
 }

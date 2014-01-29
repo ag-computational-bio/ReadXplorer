@@ -34,7 +34,7 @@ public class ReferenceViewer extends AbstractViewer {
     private static int height = 250;
     private static int FRAMEHEIGHT = 20;
     private Map<FeatureType, Integer> featureStats;
-    private JFeature currentlySelectedFeature;
+    private JFeature selectedFeature;
     private int labelMargin;
     private ReferenceConnector refGenConnector;
     private ArrayList<JFeature> features;
@@ -58,33 +58,39 @@ public class ReferenceViewer extends AbstractViewer {
         this.refGenConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenome.getId());
         this.featureStats = new EnumMap<>(FeatureType.class);
         this.getExcludedFeatureTypes().add(FeatureType.UNDEFINED);
+        this.getExcludedFeatureTypes().add(FeatureType.SOURCE);
         this.showSequenceBar(true, true);
         this.labelMargin = 3;
         this.setViewerSize();
     }
            
-
+    /**
+     * Sets the selected feature in this viewer. Only one feature can be 
+     * selected at a time.
+     * @param feature The feature, which shall be selected
+     */
     public void setSelectedFeature(JFeature feature){
         
-        firePropertyChange(PROP_FEATURE_SELECTED, currentlySelectedFeature, feature);
+        firePropertyChange(PROP_FEATURE_SELECTED, selectedFeature, feature);
 
         // if the currently selected feature is clicked again, de-select it
-        if (currentlySelectedFeature == feature){
-            currentlySelectedFeature.setSelected(false);
-            currentlySelectedFeature = null;
+        if (selectedFeature == feature){
+            selectedFeature.setSelected(false);
+            selectedFeature = null;
         } else {
 
             // if there was a feature selected before, de-select it
-            if (currentlySelectedFeature != null){
-                currentlySelectedFeature.setSelected(false);
+            if (selectedFeature != null){
+                selectedFeature.setSelected(false);
             }
 
-            currentlySelectedFeature = feature;
-            currentlySelectedFeature.setSelected(true);
+            selectedFeature = feature;
+            selectedFeature.setSelected(true);
         }
 
         //only recalculate if reading frame was switched
-        if (currentlySelectedFeature == null || this.getSequenceBar().getFrameCurrFeature() != this.determineFrame(currentlySelectedFeature.getPersistantFeature())){
+        if (selectedFeature == null || this.getSequenceBar().getFrameCurrFeature() != 
+                PersistantFeature.Utils.determineFrame(selectedFeature.getPersistantFeature())){
             this.getSequenceBar().findCodons(); //update codons for current selection
         }
     }
@@ -137,7 +143,7 @@ public class ReferenceViewer extends AbstractViewer {
         int frame = 0;
         for (Polytree featTree : featureTrees) { //this means if two roots are on different frames, 
             for (Node root : featTree.getRoots()) { //all children are painted on the frame of the last root node
-                frame = this.determineFrame((PersistantFeature) root); 
+                frame = PersistantFeature.Utils.determineFrame((PersistantFeature) root); 
             }
             PaintNodeVisitor paintVisitor = new PaintNodeVisitor(frame);
             featTree.bottomUp(paintVisitor);
@@ -200,8 +206,8 @@ public class ReferenceViewer extends AbstractViewer {
             int yFrom = yCoord - (jFeature.getHeight() / 2);
             jFeature.setBounds((int) phyStart, yFrom, jFeature.getSize().width, jFeature.getHeight());
 
-            if (currentlySelectedFeature != null) {
-                if (feature.getId() == currentlySelectedFeature.getPersistantFeature().getId()) {
+            if (selectedFeature != null) {
+                if (feature.getId() == selectedFeature.getPersistantFeature().getId()) {
                     setSelectedFeature(jFeature);
                 }
             }
@@ -222,21 +228,6 @@ public class ReferenceViewer extends AbstractViewer {
             result -= offset;
         }
         return result;
-    }
-
-    /**
-     * @param feature feature whose frame has to be determined
-     * @return 1, 2, 3, -1, -2, -3 depending on the reading frame of the feature
-     */
-    public int determineFrame(PersistantFeature feature) {
-        int frame;
-
-        if (feature.isFwdStrand()) { // forward strand
-            frame = (feature.getStart() - 1) % 3 + 1;
-        } else { // reverse strand. start <= stop ALWAYS! so use stop for reverse strand
-            frame = (feature.getStop() - 1) % 3 - 3;
-        }
-        return frame;
     }
 
     @Override
@@ -316,7 +307,7 @@ public class ReferenceViewer extends AbstractViewer {
      * @return The currently selected feature by the user.
      */
     public JFeature getCurrentlySelectedFeature() {
-        return this.currentlySelectedFeature;
+        return this.selectedFeature;
     }
     
     /**
