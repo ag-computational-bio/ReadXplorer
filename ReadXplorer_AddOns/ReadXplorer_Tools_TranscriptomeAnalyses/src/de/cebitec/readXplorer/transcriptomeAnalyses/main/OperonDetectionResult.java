@@ -4,7 +4,7 @@ import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.OperonAdjacency;
-import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.TableType;
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,10 +18,10 @@ import java.util.Map;
  */
 public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetWholeTranscriptAnalyses> {
 
-    private final List<Operon> detectedOperons;
+    private List<Operon> detectedOperons;
     private final StatisticsOnMappingData stats;
     private HashMap<String, Object> operonStatsMap;
-    private static final TableType TABLE_TYPE = TableType.OPETON_TABLE;
+    private static final TableType TABLE_TYPE = TableType.OPERON_TABLE;
 
     public OperonDetectionResult(StatisticsOnMappingData stats, Map<Integer, PersistantTrack> trackList, List<Operon> detectedOperons, int refId) {//, PersistantTrack currentTrack) {
         super(trackList, refId, false, 2, 1);
@@ -45,11 +45,16 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetWhole
         return detectedOperons;
     }
 
+    public void setResults(List<Operon> results) {
+        this.detectedOperons = results;
+    }
+
     @Override
     public List<List<String>> dataColumnDescriptions() {
         List<List<String>> allSheetDescriptions = new ArrayList<>();
         List<String> dataColumnDescriptions = new ArrayList<>();
 
+        dataColumnDescriptions.add("Putative Operon Transcript Begin");
         dataColumnDescriptions.add("Feature 1");
         dataColumnDescriptions.add("Feature 2");
         dataColumnDescriptions.add("Track");
@@ -57,6 +62,8 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetWhole
         dataColumnDescriptions.add("Strand");
         dataColumnDescriptions.add("Start Anno 1");
         dataColumnDescriptions.add("Start Anno 2");
+        dataColumnDescriptions.add("Upstream Analysis");
+        dataColumnDescriptions.add("Finished");
 //        dataColumnDescriptions.add("Reads Overlap Stop 1");
 //        dataColumnDescriptions.add("Reads Overlap Start 2");
 //        dataColumnDescriptions.add("Internal Reads");
@@ -84,7 +91,7 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetWhole
         for (Operon operon : this.detectedOperons) {
             String annoName1 = "";
             String annoName2 = "";
-            String strand = (operon.getOperonAdjacencies().get(0).getFeature1().isFwdStrandString()) + "\n";
+            String strand = (operon.getOperonAdjacencies().get(0).getFeature1().isFwdStrandString());
             String startAnno1 = "";
             String startAnno2 = "";
 //            String readsAnno1 = "";
@@ -105,6 +112,9 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetWhole
 
             }
             List<Object> operonsRow = new ArrayList<>();
+            operonsRow.add(operon.getOperonAdjacencies().get(0).getFeature1().isFwdStrand()
+                    ? operon.getOperonAdjacencies().get(0).getFeature1().getStart()
+                    : operon.getOperonAdjacencies().get(0).getFeature1().getStop());
             operonsRow.add(annoName1);
             operonsRow.add(annoName2);
             operonsRow.add(this.getTrackEntry(operon.getTrackId(), true));
@@ -112,6 +122,8 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetWhole
             operonsRow.add(strand);
             operonsRow.add(startAnno1);
             operonsRow.add(startAnno2);
+            operonsRow.add(operon.isForUpstreamAnalysisMarked());
+            operonsRow.add(operon.isConsidered());
 //            operonsRow.add(readsAnno1);
 //            operonsRow.add(readsAnno2);
 //            operonsRow.add(internalReads);
@@ -156,9 +168,9 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetWhole
                 this.getOperonStatsMap().get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD)));
 
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow(""));
-        
+
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Table Type", TABLE_TYPE.toString()));
-        
+
         exportData.add(statisticsExportData);
 
         return exportData;

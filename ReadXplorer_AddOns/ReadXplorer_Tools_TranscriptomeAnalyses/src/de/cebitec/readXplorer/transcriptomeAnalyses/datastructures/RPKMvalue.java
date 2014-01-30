@@ -2,7 +2,6 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.datastructures;
 
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.TrackChromResultEntry;
-import de.cebitec.readXplorer.databackend.dataObjects.TrackResultEntry;
 
 /**
  * Data storage for RPKM and read count values of a reference feature.
@@ -10,14 +9,14 @@ import de.cebitec.readXplorer.databackend.dataObjects.TrackResultEntry;
  * @author Martin Tötsches, Rolf Hilker
  */
 public class RPKMvalue extends TrackChromResultEntry {
-    
+
     private PersistantFeature feature;
     private int readCount, coverage;
     private double rpkm, logRpkm, coverageRpkm, coverageLogRpkm;
-    
-    
+
     /**
      * Data storage for RPKM and read count values of a reference feature.
+     *
      * @param feature feature for which the values shall be stored
      * @param rpkm the RPKM value for this feature
      * @param readCount the raw read count for this feature
@@ -29,17 +28,17 @@ public class RPKMvalue extends TrackChromResultEntry {
         this.rpkm = rpkm;
         this.readCount = readCount;
     }
-    
+
     /**
      * Data storage for RPKM and read count values of a reference feature.
-     * 
+     *
      * @param feature PersistantFeature for which the RPKM values are.
      * @param rpkm Reads per kilobase of exon per million mapped reads.
      * @param logRpkm
      * @param coverageRpkm
      * @param trackId Track id.
      */
-    public RPKMvalue(PersistantFeature feature, double rpkm, double logRpkm, double coverageRpkm, double coverageLogRpkm, 
+    public RPKMvalue(PersistantFeature feature, double rpkm, double logRpkm, double coverageRpkm, double coverageLogRpkm,
             int readstarts, int coverage, int trackId, int chromId) {
         super(trackId, chromId);
         this.feature = feature;
@@ -51,7 +50,6 @@ public class RPKMvalue extends TrackChromResultEntry {
         this.readCount = readstarts;
     }
 
-   
     /**
      * @return the RPKM value for this feature.
      */
@@ -125,6 +123,4 @@ public class RPKMvalue extends TrackChromResultEntry {
     public void setCoverage(int coverage) {
         this.coverage = coverage;
     }
-    
-    
 }

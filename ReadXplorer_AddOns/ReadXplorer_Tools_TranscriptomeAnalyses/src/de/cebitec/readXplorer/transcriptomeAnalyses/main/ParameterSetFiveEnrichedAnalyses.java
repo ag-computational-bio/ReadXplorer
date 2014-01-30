@@ -8,26 +8,27 @@ import de.cebitec.readXplorer.databackend.ParameterSetI;
  */
 public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<ParameterSetFiveEnrichedAnalyses> {
 
-    private Double fraction, cdsShiftPercentage;
+    private Double fraction;
+    private Integer cdsShiftPercentage;
     private Integer ratio;
-    private Integer upstreamRegion, downstreamRegion;
     private Integer leaderlessLimit, exclusionOfTSSDistance, keepingInternalTssDistance;
     private boolean exclusionOfInternalTSS;
 
     /**
      * Data storage for all parameters associated with a transcription analysis.
-     *
-     * @param performTSSAnalysis
-     * @param performLeaderlessAnalysis
-     * @param performAntisenseAnalysis
+     * 
      * @param fraction
+     * @param ratio
+     * @param excludeInternalTSS
+     * @param distanceForExcludionOfTss
+     * @param leaderlessLimit
+     * @param keepInternalDistance
+     * @param cdsShiftPercentage 
      */
-    public ParameterSetFiveEnrichedAnalyses(Double fraction, Integer ratio, Integer upstream, Integer downstream,
+    public ParameterSetFiveEnrichedAnalyses(Double fraction, Integer ratio,
             boolean excludeInternalTSS, Integer distanceForExcludionOfTss,
-            Integer leaderlessLimit, int keepInternalDistance, double cdsShiftPercentage) {
+            Integer leaderlessLimit, int keepInternalDistance, int cdsShiftPercentage) {
         this.fraction = fraction;
-        this.upstreamRegion = upstream;
-        this.downstreamRegion = downstream;
         this.ratio = ratio;
         this.leaderlessLimit = leaderlessLimit;
         this.exclusionOfInternalTSS = excludeInternalTSS;
@@ -36,11 +37,11 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
         this.cdsShiftPercentage = cdsShiftPercentage;
     }
 
-    public Double getCdsShiftPercentage() {
+    public Integer getCdsShiftPercentage() {
         return cdsShiftPercentage;
     }
 
-    public void setCdsShiftPercentage(Double cdsShiftPercentage) {
+    public void setCdsShiftPercentage(int cdsShiftPercentage) {
         this.cdsShiftPercentage = cdsShiftPercentage;
     }
 
@@ -51,15 +52,7 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
     public void setFraction(double fraction) {
         this.fraction = fraction;
     }
-
-    public int getUpstreamRegion() {
-        return upstreamRegion;
-    }
-
-    public int getDownstreamRegion() {
-        return downstreamRegion;
-    }
-
+    
     public Integer getRatio() {
         return ratio;
     }

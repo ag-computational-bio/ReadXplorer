@@ -4,7 +4,7 @@ import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.RPKMvalue;
-import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.TableType;
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import java.util.ArrayList;
 import java.util.List;

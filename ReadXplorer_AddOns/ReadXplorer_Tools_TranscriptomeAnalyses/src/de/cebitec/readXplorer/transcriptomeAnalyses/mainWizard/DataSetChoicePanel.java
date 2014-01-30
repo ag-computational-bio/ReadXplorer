@@ -1,12 +1,14 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard;
 
-import java.util.prefs.Preferences;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
-import org.openide.util.NbPreferences;
 
+/**
+ * 
+ * @author jritter
+ */
 public class DataSetChoicePanel implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     /**
@@ -14,13 +16,10 @@ public class DataSetChoicePanel implements WizardDescriptor.ValidatingPanel<Wiza
      * component from this class, just use getComponent().
      */
     private DataSetChoiceVisualPanel component;
-    private final String wizardName;
 
-    public DataSetChoicePanel(String wizardName) {
-        this.wizardName = wizardName;
+    public DataSetChoicePanel() {
     }
-    
-    
+
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
@@ -28,7 +27,7 @@ public class DataSetChoicePanel implements WizardDescriptor.ValidatingPanel<Wiza
     @Override
     public DataSetChoiceVisualPanel getComponent() {
         if (component == null) {
-            component = new DataSetChoiceVisualPanel(wizardName);
+            component = new DataSetChoiceVisualPanel();
         }
         return component;
     }
@@ -45,7 +44,6 @@ public class DataSetChoicePanel implements WizardDescriptor.ValidatingPanel<Wiza
     public boolean isValid() {
         return true;
     }
-
 
     @Override
     public void addChangeListener(ChangeListener l) {
@@ -65,19 +63,8 @@ public class DataSetChoicePanel implements WizardDescriptor.ValidatingPanel<Wiza
         // use wiz.putProperty to remember current panel state
         wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_FIVEPRIME_DATASET, this.component.isFiveEnrichedTrack());
         wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_WHOLEGENOME_DATASET, this.component.isWholeGenomeTrack());
-        storePrefs();
     }
 
-    /**
-     * Stores the selected read classes for this specific wizard for later use,
-     * also after restarting the software.
-     * @param readClassParams The parameters to store
-     */
-    private void storePrefs() {
-        Preferences pref = NbPreferences.forModule(Object.class);
-        pref.putBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_WHOLEGENOME_DATASET, this.component.isWholeGenomeTrack());
-        pref.putBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_FIVEPRIME_DATASET, this.component.isFiveEnrichedTrack());
-    }
 
     @Override
     public void validate() throws WizardValidationException {

@@ -70,8 +70,6 @@ public class FivePrimeEnrichedTracksPanel implements WizardDescriptor.Validating
         // use wiz.putProperty to remember current panel state
         wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_Fraction, component.getFraction());
         wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_RATIO, component.getRatio());
-        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_UPSTREAM, component.getUpstrteam());
-        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_DOWNSTREAM, component.getDownstream());
         wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_INTERNAL_TSS, component.isExcludeInternalTSS());
         wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_TSS_DISTANCE, component.getExcludeTssDistance());
         wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_KEEPINTERNAL_DISTANCE, component.getKeepingInternalTssDistance());
@@ -83,8 +81,6 @@ public class FivePrimeEnrichedTracksPanel implements WizardDescriptor.Validating
     private void storePrefs() {
         Preferences pref = NbPreferences.forModule(Object.class);
         pref.put(wizardName+TranscriptomeAnalysisWizardIterator.PROP_Fraction, component.getFraction().toString());
-        pref.put(wizardName+TranscriptomeAnalysisWizardIterator.PROP_UPSTREAM, component.getUpstrteam().toString());
-        pref.put(wizardName+TranscriptomeAnalysisWizardIterator.PROP_DOWNSTREAM, component.getDownstream().toString());
         pref.put(wizardName+TranscriptomeAnalysisWizardIterator.PROP_RATIO, component.getRatio().toString());
         pref.putBoolean(wizardName+TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_INTERNAL_TSS, component.isExcludeInternalTSS());
         pref.putInt(wizardName+TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_TSS_DISTANCE, component.getExcludeTssDistance());
@@ -101,7 +97,7 @@ public class FivePrimeEnrichedTracksPanel implements WizardDescriptor.Validating
             throw new WizardValidationException(null, "Please choose a ratio > 0.", null);
         } else if(component.getKeepingInternalTssDistance() < 0) {
             throw new WizardValidationException(null, "Please choose a keeping distance rel. to TLS > 0.", null);
-        } else if (component.getPercentageForCdsShiftAnalysis() < 0.0 || component.getPercentageForCdsShiftAnalysis() > 1.0){
+        } else if (component.getPercentageForCdsShiftAnalysis() < 0 || component.getPercentageForCdsShiftAnalysis() > 100){
             throw new WizardValidationException(null, "Please check your CDS-shift parameter.", null);
         }
     }

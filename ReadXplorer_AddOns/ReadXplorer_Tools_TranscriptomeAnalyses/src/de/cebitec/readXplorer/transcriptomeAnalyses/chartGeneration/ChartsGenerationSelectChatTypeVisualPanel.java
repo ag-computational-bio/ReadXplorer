@@ -28,16 +28,8 @@ public final class ChartsGenerationSelectChatTypeVisualPanel extends JPanel {
         return this.BaseDistributionCB.isSelected();
     }
 
-    public boolean isTssDistribution() {
-        return this.tssDistanceDistributionCB.isSelected();
-    }
-
     public boolean isAbsoluteFrequency() {
         return this.absoluteFrequencyCB.isSelected();
-    }
-
-    public int getBin() {
-        return Integer.valueOf(this.binTF.getText());
     }
 
     /**
@@ -49,25 +41,18 @@ public final class ChartsGenerationSelectChatTypeVisualPanel extends JPanel {
     private void initComponents() {
 
         BaseDistributionCB = new javax.swing.JCheckBox();
-        tssDistanceDistributionCB = new javax.swing.JCheckBox();
         absoluteFrequencyCB = new javax.swing.JCheckBox();
         rangeTF = new javax.swing.JTextField();
-        binTF = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JSeparator();
 
         org.openide.awt.Mnemonics.setLocalizedText(BaseDistributionCB, org.openide.util.NbBundle.getMessage(ChartsGenerationSelectChatTypeVisualPanel.class, "ChartsGenerationSelectChatTypeVisualPanel.BaseDistributionCB.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(tssDistanceDistributionCB, org.openide.util.NbBundle.getMessage(ChartsGenerationSelectChatTypeVisualPanel.class, "ChartsGenerationSelectChatTypeVisualPanel.tssDistanceDistributionCB.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(absoluteFrequencyCB, org.openide.util.NbBundle.getMessage(ChartsGenerationSelectChatTypeVisualPanel.class, "ChartsGenerationSelectChatTypeVisualPanel.absoluteFrequencyCB.text")); // NOI18N
 
         rangeTF.setText(org.openide.util.NbBundle.getMessage(ChartsGenerationSelectChatTypeVisualPanel.class, "ChartsGenerationSelectChatTypeVisualPanel.rangeTF.text")); // NOI18N
 
-        binTF.setText(org.openide.util.NbBundle.getMessage(ChartsGenerationSelectChatTypeVisualPanel.class, "ChartsGenerationSelectChatTypeVisualPanel.binTF.text")); // NOI18N
-        binTF.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                binTFActionPerformed(evt);
-            }
-        });
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(ChartsGenerationSelectChatTypeVisualPanel.class, "ChartsGenerationSelectChatTypeVisualPanel.jLabel1.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -76,43 +61,41 @@ public final class ChartsGenerationSelectChatTypeVisualPanel extends JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jSeparator1)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(BaseDistributionCB)
-                        .addGap(18, 18, 18)
-                        .addComponent(rangeTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(tssDistanceDistributionCB)
-                        .addGap(18, 18, 18)
-                        .addComponent(binTF, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(absoluteFrequencyCB))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(21, 21, 21)
+                                .addComponent(jLabel1)
+                                .addGap(18, 18, 18)
+                                .addComponent(rangeTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(BaseDistributionCB)
+                            .addComponent(absoluteFrequencyCB))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(BaseDistributionCB)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(BaseDistributionCB)
+                    .addComponent(jLabel1)
                     .addComponent(rangeTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tssDistanceDistributionCB)
-                    .addComponent(binTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(13, 13, 13)
                 .addComponent(absoluteFrequencyCB)
-                .addContainerGap(185, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-
-    private void binTFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_binTFActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_binTFActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox BaseDistributionCB;
     private javax.swing.JCheckBox absoluteFrequencyCB;
-    private javax.swing.JTextField binTF;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTextField rangeTF;
-    private javax.swing.JCheckBox tssDistanceDistributionCB;
     // End of variables declaration//GEN-END:variables
 }

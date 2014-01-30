@@ -4,11 +4,13 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport;
 
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelRegion;
+import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelTranscript;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
+import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.OperonAdjacency;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
+import de.cebitec.readXplorer.util.FeatureType;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,7 +18,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.TreeMap;
 import org.openide.util.Exceptions;
 
 /**
@@ -26,137 +31,106 @@ import org.openide.util.Exceptions;
 public class SequinTableFormatExporter extends Thread {
 
     private File outputLocation;
-    private List<Object> inputList;
+    private ArrayList<TranscriptionStart> tssInputList;
+    private ArrayList<Operon> operonInputList;
+    private ArrayList<NovelTranscript> novelRegionInputList;
     private TableType tableType;
-    private PersistantReference refGenome;
-    private String tableName;
+    private final String featureName;
 
-    public SequinTableFormatExporter(File outputFile, List<Object> inputList, TableType tableType, PersistantReference refGenome, String tableName) {
+    public SequinTableFormatExporter(File outputFile, ArrayList<TranscriptionStart> tssInputList, ArrayList<Operon> operonInputList, ArrayList<NovelTranscript> novelRegionInputList, TableType tableType, String featureName) {
         this.outputLocation = outputFile;
-        this.inputList = inputList;
+        this.tssInputList = tssInputList;
+        this.operonInputList = operonInputList;
+        this.novelRegionInputList = novelRegionInputList;
         this.tableType = tableType;
-        this.refGenome = refGenome;
-        this.tableName = tableName;
+        this.featureName = featureName;
     }
 
     @Override
     public void run() {
-        createSequinTableFormattedFile(outputLocation, inputList, tableType, refGenome, tableName);
+        createSequinTableFormattedFile(outputLocation, tssInputList, operonInputList, novelRegionInputList, tableType, featureName);
     }
 
     /**
      *
      * @param outputFile
-     * @param list
+     * @param tssList
+     * @param operonList
+     * @param novelRegionList
      * @param tableType
-     * @param refGenome
-     * @param tableName
+     * @param featureName
      */
-    public void createSequinTableFormattedFile(File outputFile, List<Object> list, TableType tableType, PersistantReference refGenome, String tableName) {
+    public void createSequinTableFormattedFile(File outputFile, ArrayList<TranscriptionStart> tssList, ArrayList<Operon> operonList, ArrayList<NovelTranscript> novelRegionList, TableType tableType, String featureNames) {
+
         try {
             Writer writer = new BufferedWriter(new OutputStreamWriter(
                     new FileOutputStream(outputFile)));
+            writer.write(">Feature " + featureName + "\n");
+            TranscriptionStart tss = null;
 
+            if (tssList != null && !tssList.isEmpty() && tableType.equals(TableType.TSS_TABLE)) {
+                ArrayList<ExportFeature> featuresToExport = (ArrayList<ExportFeature>) prepareTssForExport(tssList);
 
-            if (list != null && !list.isEmpty()) {
-                if (tableType.equals(TableType.TSS_TABLE)) {
-
-                    TranscriptionStart tss = null;
-                    writer.write(createFirstSequinTableEntry(refGenome.getName(), tableName));
-//                    writer.write(createSequinTableEntry(refGenome, MIN_PRIORITY, FeatureKey.SOURCE))
-                    for (Object object : list) {
-                        tss = (TranscriptionStart) object;
-                        PersistantFeature feature = tss.getAssignedFeature();
-
-                        // GENE
-                        writer.write(createSequinTableEntry(tss.getStartPosition(), feature.getStop(), FeatureKey.GENE));
-                        writer.write(generateSecondLine(Qualifier.GENE, feature.toString()));
-                        writer.write(generateSecondLine(Qualifier.STRAIN, feature.toString()));
-                        if (feature.hasLocus()) {
-                            writer.write(generateSecondLine(Qualifier.LOCUS_TAG, feature.getLocus()));
-                        }
-                        // CDS
-                        writer.write(createSequinTableEntry(feature.getStart(), feature.getStop(), FeatureKey.CDS));
-                        writer.write(generateSecondLine(Qualifier.PRODUCT, feature.getProduct()));
-                        writer.write(generateSecondLine(Qualifier.CODON_START, "" + feature.getFrame())); // Frame?
-                        writer.write(generateSecondLine(Qualifier.EC_NUMBER, feature.getEcNumber()));
-                        if (feature.hasLocus()) {
-                            writer.write(generateSecondLine(Qualifier.LOCUS_TAG, feature.getLocus()));
-                        }
-                        // mRNA
-                        writer.write(createSequinTableEntry(tss.getStartPosition(), feature.getStop(), FeatureKey.MRNA));
-                        writer.write(generateSecondLine(Qualifier.GENE, feature.toString()));
-                        writer.write(generateSecondLine(Qualifier.PRODUCT, feature.getProduct()));
-
-                        // PROMOTOR
-                        writer.write(createSequinTableEntry(tss.getStartPosition() - tss.getSequence().length(), tss.getStartPosition(), FeatureKey.PROMOTOR));
-
-                        // RBS 
-//                        writer.write(createSequinTableEntry(tss.getRbsStart, tss.getRbsStop, FeatureKey.RBS));
-//                        writer.write(generateSecondLine(Qualifier.GENE, feature.toString()));
-//
-//                        // 5'-UTR
-//                        writer.write(createSequinTableEntry(tss.getStartPosition(), feature.getStart(), FeatureKey.FiveUTR));
-//                        writer.write(generateSecondLine(Qualifier.GENE, feature.toString()));
-//                        // -10 signal
-//                        writer.write(createSequinTableEntry(tss.getMinusTenSignalStart, feature.getMinusTenSignalStop, FeatureKey.MINUS_TEN_SIGNAL));
-//                        writer.write(generateSecondLine(Qualifier.GENE, feature.toString()));
-//
-//                        // -35 signal
-//                        writer.write(createSequinTableEntry(tss.getMinus35SignalStart, feature.getMinus35SignalStop, FeatureKey.MINUS_THIRTYFIVE_SIGNAL));
-//                        writer.write(generateSecondLine(Qualifier.GENE, feature.toString()));
-                    }
-                } else if (tableType.equals(TableType.NOVEL_REGION_TABLE)) {
-                    NovelRegion novel = null;
-                    writer.write(createFirstSequinTableEntry(refGenome.getName(), tableName));
-                    for (Object object : list) {
-                        novel = (NovelRegion) object;
+                for (ExportFeature feat : featuresToExport) {
+                    exportTSS(feat, writer);
+                }
+            }
+            if (novelRegionList != null && !novelRegionList.isEmpty()) {
+                if (tableType.equals(TableType.NOVEL_REGION_TABLE)) {
+                    NovelTranscript novel = null;
+                    boolean isFwd;
+                    for (Object object : novelRegionList) {
+                        novel = (NovelTranscript) object;
+                        isFwd = novel.isFWD();
 
                         // NC-RNA
-                        writer.write(createSequinTableEntry(novel.getPos(), novel.getDropOffPos(), FeatureKey.NC_RNA));
+                        writer.write(createSequinTableEntry(novel.getStartPosition(), novel.getDropOffPos(), FeatureKey.NC_RNA));
                         if (novel.getSite().equals("cis-antisense")) {
                             writer.write(generateSecondLine(Qualifier.NC_RNA, "antisense_RNA"));
                         } else {
                             writer.write(generateSecondLine(Qualifier.NC_RNA, "other"));
                         }
                     }
-                } else if (tableType.equals(TableType.OPETON_TABLE)) {
+                }
+            }
+            if (operonList != null && !operonList.isEmpty()) {
+                if (tableType.equals(TableType.OPERON_TABLE)) {
                     Operon operon = null;
-                    writer.write(createFirstSequinTableEntry(refGenome.getName(), tableName));
-                    for (Object object : list) {
+                    boolean isFwd;
+                    for (Object object : operonList) {
                         operon = (Operon) object;
+                        isFwd = operon.isFwd();
 
                         int start = operon.getOperonAdjacencies().get(0).getFeature1().getStart();
                         int stop = operon.getOperonAdjacencies().get(operon.getOperonAdjacencies().size() - 1).getFeature2().getStop();
                         writer.write(createSequinTableEntry(start, stop, FeatureKey.OPERON));
                         writer.write(generateSecondLine(Qualifier.OPERON, operon.toOperonString()));
+
+                        for (Iterator<OperonAdjacency> it = operon.getOperonAdjacencies().iterator(); it.hasNext();) {
+                            OperonAdjacency operonAdjacency = it.next();
+
+                            if (it.hasNext()) {
+                                writer.write(generateSecondLine(Qualifier.LOCUS_TAG, operonAdjacency.getFeature1().getLocus()));
+
+                            } else {
+                                writer.write(generateSecondLine(Qualifier.LOCUS_TAG, operonAdjacency.getFeature2().getLocus()));
+                            }
+                        }
+
+                        writer.write(createSequinTableEntry(start, stop, FeatureKey.MRNA));
+                        writer.write(generateSecondLine(Qualifier.OPERON, operon.getOperonAdjacencies().get(0).getFeature1().getLocus()));
                     }
                 }
             }
 
+
+            writer.close();
         } catch (FileNotFoundException ex) {
             Exceptions.printStackTrace(ex);
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
 
-    }
-
-    /**
-     * The first line of the table contains the following basic information.
-     *
-     * >Feature SeqId table_name
-     *
-     * @param seqID
-     * @return
-     */
-    private String createFirstSequinTableEntry(String seqID, String tableName) {
-        String firstSequinTableEntry = "";
-
-//        !!!!!!!!
-//        !!TODO!!
-//        !!!!!!!!
-        return firstSequinTableEntry;
     }
 
     /**
@@ -167,21 +141,208 @@ public class SequinTableFormatExporter extends Thread {
      * 1: Start location of feature Column 2: Stop location of feature Column 3:
      * Feature key Line2: Column 4: Qualifier key Column 5: Qualifier value
      *
-     * @return
+     * @return a tab separated String containing the start and stop location of
+     * the feature.
      */
     private String createSequinTableEntry(int startLocation, int stopLocation, FeatureKey featureKey) {
         String sequinTableEntry = "";
-
-
-
+        if (featureKey == FeatureKey.FiveUTR) {
+            sequinTableEntry += startLocation + "\t" + stopLocation + "\t" + "5'UTR\n";
+        } else if (featureKey == FeatureKey.MINUS_TEN_SIGNAL) {
+            sequinTableEntry += startLocation + "\t" + stopLocation + "\t" + "-10_signal\n";
+        } else if (featureKey == FeatureKey.MINUS_THIRTYFIVE_SIGNAL) {
+            sequinTableEntry += startLocation + "\t" + stopLocation + "\t" + "-35_signal\n";
+        } else if (featureKey == FeatureKey.CDS) {
+            sequinTableEntry += startLocation + "\t" + stopLocation + "\t"
+                    + "CDS" + "\n";
+        } else if (featureKey == FeatureKey.MRNA) {
+            sequinTableEntry += startLocation + "\t" + stopLocation + "\t"
+                    + "mRNA" + "\n";
+        } else if (featureKey == FeatureKey.RBS) {
+            sequinTableEntry += startLocation + "\t" + stopLocation + "\t"
+                    + "RBS" + "\n";
+        } else {
+            sequinTableEntry += startLocation + "\t" + stopLocation + "\t"
+                    + featureKey.toString().toLowerCase() + "\n";
+        }
         return sequinTableEntry;
     }
 
+    /**
+     * Generates the second line of an feature entry.
+     *
+     * @param qualifierKey
+     * @param qualifierValue
+     * @return
+     */
     private String generateSecondLine(Qualifier qualifierKey, String qualifierValue) {
         String sequinTableEntry = "";
-
-
-
+        if (qualifierKey == Qualifier.EC_NUMBER) {
+            sequinTableEntry = "\t\t\t"
+                    + "EC_number"
+                    + "\t" + qualifierValue.toString() + "\n";
+        } else if (qualifierKey == Qualifier.NC_RNA) {
+            sequinTableEntry = "\t\t\t"
+                    + "ncRNA"
+                    + "\t" + qualifierValue.toString() + "\n";
+        } else if (qualifierKey == Qualifier.PCR_CONTITIONS) {
+            sequinTableEntry = "\t\t\t"
+                    + "PCR_conditions"
+                    + "\t" + qualifierValue.toString() + "\n";
+        } else if (qualifierKey == Qualifier.PCR_PRIMERS) {
+            sequinTableEntry = "\t\t\t"
+                    + "PCR_primers"
+                    + "\t" + qualifierValue.toString() + "\n";
+        } else {
+            sequinTableEntry = "\t\t\t"
+                    + qualifierKey.toString().toLowerCase()
+                    + "\t" + qualifierValue.toString() + "\n";
+        }
         return sequinTableEntry;
+    }
+
+    private void exportTSS(ExportFeature exportFeat, Writer writer) throws IOException {
+        PersistantFeature feature = exportFeat.getFeature();
+        boolean isFwd = feature.isFwdStrand();
+        int geneStart;
+
+        if (feature.getType() == FeatureType.CDS || feature.getType() == FeatureType.GENE) {
+            // GENE
+            geneStart = exportFeat.getGeneStart();
+            writer.write(createSequinTableEntry(geneStart, feature.getStop(), FeatureKey.GENE));
+
+            if (feature.hasLocus()) {
+                writer.write(generateSecondLine(Qualifier.LOCUS_TAG, feature.getLocus()));
+            }
+            if (feature.hasFeatureName() && !feature.getFeatureName().equals("")) {
+                writer.write(generateSecondLine(Qualifier.STANDARD_NAME, feature.getFeatureName()));
+            }
+            if (!feature.getProduct().equals("")) {
+                writer.write(generateSecondLine(Qualifier.PRODUCT, feature.getProduct()));
+            }
+//            // CDS
+//            writer.write(createSequinTableEntry(isFwd, feature.getStart(), feature.getStop(), FeatureKey.CDS));
+//            writer.write(generateSecondLine(Qualifier.PRODUCT, feature.getProduct()));
+//            writer.write(generateSecondLine(Qualifier.CODON_START, "" + feature.getFrame())); // Frame
+//            if (!feature.getEcNumber().equals("")) {
+//                writer.write(generateSecondLine(Qualifier.EC_NUMBER, feature.getEcNumber()));
+//            }
+//            if (feature.hasLocus()) {
+//                writer.write(generateSecondLine(Qualifier.LOCUS_TAG, feature.getLocus()));
+//            }
+
+
+            for (Integer start : exportFeat.getTssPositions()) {
+                // mRNA
+                if (isFwd) {
+                    writer.write(createSequinTableEntry(start, feature.getStop(), FeatureKey.MRNA));
+                } else {
+                    writer.write(createSequinTableEntry(start, feature.getStart(), FeatureKey.MRNA));
+                }
+                if (feature.hasLocus()) {
+                    writer.write(generateSecondLine(Qualifier.LOCUS_TAG, feature.getLocus()));
+                }
+                if (!feature.getProduct().equals("")) {
+                    writer.write(generateSecondLine(Qualifier.PRODUCT, feature.getProduct()));
+                }
+
+                // 5'-UTR
+                if (isFwd) {
+                    writer.write(createSequinTableEntry(start, feature.getStart(), FeatureKey.FiveUTR));
+                } else {
+                    writer.write(createSequinTableEntry(start, feature.getStop(), FeatureKey.FiveUTR));
+                }
+                if (feature.hasLocus()) {
+                    writer.write(generateSecondLine(Qualifier.LOCUS_TAG, feature.getLocus()));
+                }
+
+                if (exportFeat.getRbsAssignments().get(start)) {
+                    // RBS 
+                    if (isFwd) {
+                        int startMotif = exportFeat.getFeature().getStart() - exportFeat.getRbsSequenceLength() + exportFeat.getRbsPosistions().get(start);
+                        int stopMotif = startMotif + exportFeat.getRbsMotifWidth();
+                        writer.write(createSequinTableEntry(startMotif, stopMotif, FeatureKey.RBS));
+                    } else {
+                        int startMotif = exportFeat.getFeature().getStop() + exportFeat.getRbsSequenceLength() - exportFeat.getRbsPosistions().get(start);
+                        int stopMotif = startMotif - exportFeat.getRbsMotifWidth();
+                        writer.write(createSequinTableEntry(startMotif, stopMotif, FeatureKey.RBS));
+                    }
+                    writer.write(generateSecondLine(Qualifier.LOCUS_TAG, feature.getLocus()));
+                }
+
+                if (exportFeat.getPromotorAssignments().get(start)) {
+                    //PROMOTOR
+                    if (isFwd) {
+                        if (exportFeat.getMinus35Positions().containsKey(start)) {
+                            writer.write(createSequinTableEntry(start - exportFeat.getPromotorSequenceLength() + exportFeat.getMinus35Positions().get(start), start, FeatureKey.PROMOTER));
+                            writer.write(generateSecondLine(Qualifier.LOCUS_TAG, feature.getLocus()));
+                        } else if (exportFeat.minus10Positions.containsKey(start)) {
+                            writer.write(createSequinTableEntry(start - exportFeat.getPromotorSequenceLength() + exportFeat.getMinus10Positions().get(start), start, FeatureKey.PROMOTER));
+                            writer.write(generateSecondLine(Qualifier.LOCUS_TAG, feature.getLocus()));
+                        }
+                    } else {
+                        if (exportFeat.getMinus35Positions().containsKey(start)) {
+                            writer.write(createSequinTableEntry(start + exportFeat.getPromotorSequenceLength() - exportFeat.getMinus35Positions().get(start), start, FeatureKey.PROMOTER));
+                            writer.write(generateSecondLine(Qualifier.LOCUS_TAG, feature.getLocus()));
+                        } else if (exportFeat.minus10Positions.containsKey(start)) {
+                            writer.write(createSequinTableEntry(start + exportFeat.getPromotorSequenceLength() - exportFeat.getMinus10Positions().get(start), start, FeatureKey.PROMOTER));
+                            writer.write(generateSecondLine(Qualifier.LOCUS_TAG, feature.getLocus()));
+                        }
+                    }
+
+
+                    // -10 signal
+                    if (isFwd) {
+                        int startMotif = start - exportFeat.getPromotorSequenceLength() + exportFeat.getMinus10Positions().get(start);
+                        int stopMotif = startMotif + (exportFeat.getMinus10MotifWidth()-1);
+                        writer.write(createSequinTableEntry(startMotif, stopMotif, FeatureKey.MINUS_TEN_SIGNAL));
+                    } else {
+                        int startMotif = start + exportFeat.getPromotorSequenceLength() - exportFeat.getMinus10Positions().get(start);
+                        int stopMotif = startMotif - (exportFeat.getMinus10MotifWidth()-1);
+                        writer.write(createSequinTableEntry(startMotif, stopMotif, FeatureKey.MINUS_TEN_SIGNAL));
+                    }
+
+                    // -35 signal
+                    if (isFwd) {
+                        int startMotif = start - exportFeat.getPromotorSequenceLength() + exportFeat.getMinus35Positions().get(start);
+                        int stopMotif = startMotif + (exportFeat.getMinus35MotifWidth()-1);
+                        writer.write(createSequinTableEntry(startMotif, stopMotif, FeatureKey.MINUS_THIRTYFIVE_SIGNAL));
+                    } else {
+                        int startMotif = start + exportFeat.getPromotorSequenceLength() - exportFeat.getMinus35Positions().get(start);
+                        int stopMotif = startMotif - (exportFeat.getMinus35MotifWidth()-1);
+                        writer.write(createSequinTableEntry(startMotif, stopMotif, FeatureKey.MINUS_THIRTYFIVE_SIGNAL));
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * This method clusters information of all transcription start sites, which
+     * assigned to the same CDS into a ExportFeature. This featuer continains
+     * all export information.
+     *
+     * @param tss List of TranscriptionStart instances.
+     * @return List of ExportFeature instances.
+     */
+    private List<ExportFeature> prepareTssForExport(List<TranscriptionStart> tss) {
+        List<ExportFeature> features = new ArrayList<>();
+        TreeMap<String, ExportFeature> uniqueFeatures = new TreeMap<>();
+        ExportFeature feat;
+        for (TranscriptionStart ts : tss) {
+            if (uniqueFeatures.containsKey(ts.getAssignedFeature().getLocus())) {
+                feat = uniqueFeatures.get(ts.getAssignedFeature().getLocus());
+                feat.setValues(ts.getStartPosition(), ts.getStartRbsMotif(), ts.getStartMinus10Motif(), ts.getStartMinus35Motif(), ts.hasPromotorFeaturesAssigned(), ts.hasRbsFeatureAssigned(), ts.getPromotorSequenceLength(), ts.getRbsSequenceLength());
+                uniqueFeatures.put(ts.getAssignedFeature().getLocus(), feat);
+            } else {
+                feat = new ExportFeature(ts.getAssignedFeature(), ts.getMinus10MotifWidth(), ts.getMinus35MotifWidth(), ts.getRbsMotifWidth());
+                feat.setValues(ts.getStartPosition(), ts.getStartRbsMotif(), ts.getStartMinus10Motif(), ts.getStartMinus35Motif(), ts.hasPromotorFeaturesAssigned(), ts.hasRbsFeatureAssigned(), ts.getPromotorSequenceLength(), ts.getRbsSequenceLength());
+                uniqueFeatures.put(ts.getAssignedFeature().getLocus(), feat);
+            }
+        }
+
+        features.addAll(uniqueFeatures.values());
+
+        return features;
     }
 }

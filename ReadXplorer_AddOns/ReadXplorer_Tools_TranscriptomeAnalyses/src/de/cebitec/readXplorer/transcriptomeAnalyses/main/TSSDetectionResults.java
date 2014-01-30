@@ -4,8 +4,9 @@ import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
-import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.TableType;
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
 import de.cebitec.readXplorer.util.GeneralUtils;
+import de.cebitec.readXplorer.util.Observer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,8 +21,16 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
     private List<TranscriptionStart> results;
     private StatisticsOnMappingData stats;
     private Map<String, Object> statsMap;
+    private List<String> promotorRegions;
     private static final TableType TABLE_TYPE = TableType.TSS_TABLE;
 
+    /**
+     * 
+     * @param stats
+     * @param results
+     * @param trackMap
+     * @param refId 
+     */
     public TSSDetectionResults(StatisticsOnMappingData stats, List<TranscriptionStart> results, Map<Integer, PersistantTrack> trackMap, int refId) {
         super(trackMap, refId, false, 22, 0);
         this.results = results;
@@ -45,6 +54,7 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
         dataColumnDescriptions.add("Position");
         dataColumnDescriptions.add("Strand");
         dataColumnDescriptions.add("Chromosome");
+        dataColumnDescriptions.add("Comment");
         dataColumnDescriptions.add("Read starts");
         dataColumnDescriptions.add("Rel. count");
         dataColumnDescriptions.add("Feature name");
@@ -57,6 +67,8 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
         dataColumnDescriptions.add("Putative CDS-Shift");
         dataColumnDescriptions.add("Internal TSS");
         dataColumnDescriptions.add("Putative antisense");
+        dataColumnDescriptions.add("Selected for Upstream Region Analysis");
+        dataColumnDescriptions.add("Finished");
         dataColumnDescriptions.add("Gene start");
         dataColumnDescriptions.add("Gene stop");
         dataColumnDescriptions.add("Gene length in bp");
@@ -95,6 +107,11 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
                 tssRow.add("Rev");
             }
             tssRow.add(this.getChromosomeMap().get(tss.getChromId()));
+            if (tss.getComment() != null) {
+                tssRow.add(tss.getComment());
+            } else {
+                tssRow.add("-");
+            }
             tssRow.add(tss.getReadStarts());
             tssRow.add(tss.getRelCount());
 
@@ -105,21 +122,28 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
                 tssRow.add(tss.getDetectedGene().toString());
                 tssRow.add(tss.getDetectedGene().getLocus());
                 tssRow.add(tss.getOffset());
-            } else {
+            } else if(nextDownstreamGene != null) {
                 tssRow.add(tss.getNextGene().toString());
                 tssRow.add(tss.getNextGene().getLocus());
                 tssRow.add(tss.getNextOffset());
+            } else {
+                tssRow.add("-");
+                tssRow.add("-");
+                tssRow.add("-");
             }
-            tssRow.add(tss.getDist2start());
-            tssRow.add(tss.getDist2stop());
-            tssRow.add(tss.getSequence());
+            tssRow.add("-");
+            tssRow.add("-");
+            String promotorSequence = promotorRegions.get(i);
+            tssRow.add(promotorSequence);
             tssRow.add(tss.isLeaderless());
             tssRow.add(tss.isCdsShift());
             tssRow.add(tss.isInternalTSS());
             tssRow.add(tss.isPutativeAntisense());
+            tssRow.add(tss.isSelected());
+            tssRow.add(tss.isConsideredTSS());
 
             // additionally informations about detected gene
-            if (tss.getDetectedGene() != null) {
+            if (detectedGene != null) {
                 tssRow.add(detectedGene.isFwdStrand() ? detectedGene.getStart() : detectedGene.getStop());
                 tssRow.add(detectedGene.isFwdStrand() ? detectedGene.getStop() : detectedGene.getStart());
                 tssRow.add(detectedGene.getStop() - detectedGene.getStart());
@@ -133,7 +157,7 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
                     tssRow.add(2);
                 }
                 tssRow.add(detectedGene.getProduct());
-            } else {
+            } else if (nextDownstreamGene != null) {
                 tssRow.add(nextDownstreamGene.isFwdStrand() ? nextDownstreamGene.getStart() : nextDownstreamGene.getStop());
                 tssRow.add(nextDownstreamGene.isFwdStrand() ? nextDownstreamGene.getStop() : nextDownstreamGene.getStart());
                 tssRow.add(nextDownstreamGene.getStop() - nextDownstreamGene.getStart());
@@ -146,6 +170,12 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
                     tssRow.add(2);
                 }
                 tssRow.add(nextDownstreamGene.getProduct());
+            } else {
+                 tssRow.add("-");
+                tssRow.add("-");
+                tssRow.add("-");
+                tssRow.add("-");
+                tssRow.add("-");
             }
 
             tssRow.add(tss.getDetectedFeatStart());
@@ -173,10 +203,6 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
                 tssParameters.getRatio()));
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_FRACTION,
                 tssParameters.getFraction()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_CHOOSEN_UPSTREAM_REGION,
-                tssParameters.getUpstreamRegion()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_CHOOSEN_DOWNSTREAM_REGION,
-                tssParameters.getDownstreamRegion()));
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_EXCLUSION_OF_INTERNAL_TSS,
                 tssParameters.isExclusionOfInternalTSS() ? "yes" : "no"));
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_RANGE_FOR_LEADERLESS_DETECTION,
@@ -250,5 +276,21 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
      */
     public void setStatsAndParametersMap(Map<String, Object> statsMap) {
         this.statsMap = statsMap;
+    }
+
+    /**
+     * @return Promotor regions of the detected TSS
+     */
+    public List<String> getPromotorRegions() {
+        return promotorRegions;
+    }
+
+    /**
+     * Sets the promotor regions of the detected TSS
+     *
+     * @param promotorRegions Promotor regions of the detected TSS
+     */
+    public void setPromotorRegions(List<String> promotorRegions) {
+        this.promotorRegions = promotorRegions;
     }
 }

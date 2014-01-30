@@ -1153,7 +1153,7 @@ PRECURSER_RNA,
 //
 //Molecule scope        DNA
 
-        PROMOTOR,
+        PROMOTER,
 
 //Feature Key           protein_bind
 //

@@ -64,4 +64,8 @@ public class OperonDetection {
 
         return operons;
     }
+    
+    public void detectPutativeTranscriptionStart(List<Operon> operons, int[] fwdCoverage, int[] revCoverage, double threshold) {
+        
+    }
 }

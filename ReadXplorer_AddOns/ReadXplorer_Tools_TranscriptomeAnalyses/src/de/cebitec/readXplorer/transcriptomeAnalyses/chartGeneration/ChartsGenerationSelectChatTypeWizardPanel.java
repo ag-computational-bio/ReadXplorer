@@ -6,7 +6,7 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration;
 
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ChartType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.ResultPanelTranscriptionStart;
-import de.cebitec.readXplorer.transcriptomeAnalyses.rbsAnalysis.RbsAnalysisWizardIterator;
+import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.RbsAnalysisWizardIterator;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
@@ -67,8 +67,6 @@ public class ChartsGenerationSelectChatTypeWizardPanel implements WizardDescript
         // use wiz.putProperty to remember current panel state
         wiz.putProperty(ChartType.ABSOLUTE_FREQUENCY_OF_5_PRIME_UTRs.toString(), component.isAbsoluteFrequency());
         wiz.putProperty(ChartType.BASE_DISTRIBUTION.toString(), component.isBaseDistribution());
-        wiz.putProperty(ChartType.DISTRIBUTION_OF_ALL_TSS_OFFSETS_LENGTH.toString(), component.isTssDistribution());
         wiz.putProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_REGION_LENGTH, component.getRange());
-        wiz.putProperty(ResultPanelTranscriptionStart.BIN_SIZE, component.getBin());
     }
 }

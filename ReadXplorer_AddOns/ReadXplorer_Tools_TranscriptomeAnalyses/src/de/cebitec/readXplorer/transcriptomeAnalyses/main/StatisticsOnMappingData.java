@@ -139,7 +139,7 @@ public class StatisticsOnMappingData implements Observer {
             int start = mapping.getStart();
             int stop = mapping.getStop();
 
-            boolean directionFWD = mapping.isFwdStrand();
+            boolean isFwd = mapping.isFwdStrand();
 
             // count only non t/rRNA mappingResults
             if (region2Exclude.get(chromNo - 1)[start] == 0) {
@@ -152,7 +152,7 @@ public class StatisticsOnMappingData implements Observer {
 
             //	# sum up the total coverage at each positions
             //	# (this is needed for extending genes later)
-            if (directionFWD) {
+            if (isFwd) {
                 fwdReadStarts[chromNo - 1][start]++;
                 for (int i = start; i < stop; i++) {// map {$_++} @{$coverage{fwd}}[$sstart..$sstop];
                     fwdCoverage[chromNo - 1][i]++;
@@ -234,7 +234,7 @@ public class StatisticsOnMappingData implements Observer {
      * 
      * @return 
      */
-    public int[][] getForward() {
+    public int[][] getForwardReadStarts() {
         return fwdReadStarts;
     }
 
@@ -242,7 +242,7 @@ public class StatisticsOnMappingData implements Observer {
      * 
      * @return 
      */
-    public int[][] getReverse() {
+    public int[][] getReverseReadStarts() {
         return revReadStarts;
     }
 
@@ -256,7 +256,7 @@ public class StatisticsOnMappingData implements Observer {
 
     /**
      * 
-     * @return 
+     * @return
      */
     public int[][] getRevCoverage() {
         return revCoverage;
@@ -326,6 +326,9 @@ public class StatisticsOnMappingData implements Observer {
         this.bgThreshold = bg;
     }
     
+    /**
+     * 
+     */
     public void clearMemory() {
         this.allRegionsInHash = null;
         this.forwardCDSs = null;

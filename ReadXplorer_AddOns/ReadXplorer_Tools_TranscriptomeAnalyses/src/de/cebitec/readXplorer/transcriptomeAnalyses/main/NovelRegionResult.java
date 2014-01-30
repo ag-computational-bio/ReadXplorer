@@ -2,8 +2,8 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
-import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelRegion;
-import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.TableType;
+import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelTranscript;
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.TranscriptomeAnalysisWizardIterator;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.SequenceUtils;
@@ -17,19 +17,19 @@ import java.util.Map;
  */
 public class NovelRegionResult extends ResultTrackAnalysis<ParameterSetWholeTranscriptAnalyses> {
 
-    private List<NovelRegion> results;
+    private List<NovelTranscript> results;
     private ParameterSetFiveEnrichedAnalyses parameters;
     private StatisticsOnMappingData stats;
     private Map<String, Object> statsMap;
     private static final TableType TABLE_TYPE = TableType.NOVEL_REGION_TABLE;
 
-    public NovelRegionResult(StatisticsOnMappingData stats, Map<Integer, PersistantTrack> trackMap, List<NovelRegion> novelRegions, boolean combineTracks) {
+    public NovelRegionResult(StatisticsOnMappingData stats, Map<Integer, PersistantTrack> trackMap, List<NovelTranscript> novelRegions, boolean combineTracks) {
         super(trackMap, 1, combineTracks, 2, 0);
         this.results = novelRegions;
         this.stats = stats;
     }
 
-    public List<NovelRegion> getResults() {
+    public List<NovelTranscript> getResults() {
         return this.results;
     }
 
@@ -52,6 +52,7 @@ public class NovelRegionResult extends ResultTrackAnalysis<ParameterSetWholeTran
         dataColumnDescriptions.add("Chromosome");
         dataColumnDescriptions.add("FALSE POSITIVE");
         dataColumnDescriptions.add("Selected for BLAST");
+        dataColumnDescriptions.add("Finished");
         dataColumnDescriptions.add("Site");
         dataColumnDescriptions.add("Coverage dropoff");
         dataColumnDescriptions.add("Length in bp");
@@ -76,17 +77,18 @@ public class NovelRegionResult extends ResultTrackAnalysis<ParameterSetWholeTran
         List<List<Object>> tSSResults = new ArrayList<>();
 
         for (int i = 0; i < results.size(); ++i) {
-            NovelRegion novelRegion = results.get(i);
+            NovelTranscript novelRegion = results.get(i);
             List<Object> novelRegionRow = new ArrayList<>();
 
-            novelRegionRow.add(novelRegion.getPos());
-            novelRegionRow.add(novelRegion.isFwdStrand() ? SequenceUtils.STRAND_FWD_STRING : SequenceUtils.STRAND_REV_STRING);
+            novelRegionRow.add(novelRegion.getStartPosition());
+            novelRegionRow.add(novelRegion.isFWD() ? SequenceUtils.STRAND_FWD_STRING : SequenceUtils.STRAND_REV_STRING);
 
             novelRegionRow.add(this.getTrackMap().get(novelRegion.getTrackId()));
             novelRegionRow.add(this.getChromosomeMap().get(novelRegion.getChromId()));
 
             novelRegionRow.add(novelRegion.isFalsePositive());
             novelRegionRow.add(novelRegion.isSelected());
+            novelRegionRow.add(novelRegion.isConsidered());
             novelRegionRow.add(novelRegion.getSite());
             novelRegionRow.add(novelRegion.getDropOffPos());
             novelRegionRow.add(novelRegion.getLength());
@@ -152,7 +154,7 @@ public class NovelRegionResult extends ResultTrackAnalysis<ParameterSetWholeTran
         return tSSExport;
     }
 
-    public void setResults(List<NovelRegion> results) {
+    public void setResults(List<NovelTranscript> results) {
         this.results = results;
     }
 
