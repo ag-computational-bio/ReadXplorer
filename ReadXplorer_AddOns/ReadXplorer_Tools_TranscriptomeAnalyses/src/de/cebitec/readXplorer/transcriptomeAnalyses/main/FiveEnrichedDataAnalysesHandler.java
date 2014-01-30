@@ -16,11 +16,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import javax.swing.JOptionPane;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 
 /**
+ * This class starts all analysis to be performed on a 5'-enriched dataset.
  *
  * @author jritter
  */
@@ -37,7 +37,6 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
     private ParameterSetFiveEnrichedAnalyses parameters;
     private GenomeFeatureParser featureParser;
     private TssDetection tssDetection;
-    private OperonDetection operonDetection;
     private ResultPanelTranscriptionStart transcriptionStartResultPanel;
     private final ReferenceViewer refViewer;
     private TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
@@ -48,8 +47,19 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
      */
     private HashMap<Integer, PersistantFeature> allRegionsInHash;
 
+    /**
+     * Constructor for FiveEnrichedDataAnalysesHandler.
+     *
+     * @param selectedTrack PersistantTrack the analysis is based on.
+     * @param parameterset ParameterSetFiveEnrichedAnalyses stores all
+     * paramaters for 5'-enriched based datasets analysis.
+     * @param refViewer ReferenceViewer
+     * @param transcAnalysesTopComp
+     * TranscriptomeAnalysesTopComponentTopComponent output widow for computed
+     * results.
+     * @param trackMap contains all PersistantTracks used for this analysis-run.
+     */
     public FiveEnrichedDataAnalysesHandler(PersistantTrack selectedTrack, ParameterSetFiveEnrichedAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, HashMap<Integer, PersistantTrack> trackMap) {
-
         this.selectedTrack = selectedTrack;
         this.refGenomeID = refViewer.getReference().getId();
         this.parameters = parameterset;
@@ -58,6 +68,9 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
         this.trackMap = trackMap;
     }
 
+    /**
+     * Starts the analysis.
+     */
     private void startAnalysis() {
 
         try {
@@ -82,7 +95,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
         // Finish Progress of parsing genome features
         this.progressHandleParsingFeatures.finish();
 
-        // geting Mappings and calculate statistics on mappings.
+        // geting Mappings and calculate statistics on them.
         this.stats = new StatisticsOnMappingData(trackConnector.getRefGenome(), parameters.getFraction(), this.forwardCDSs, this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
         de.cebitec.readXplorer.databackend.AnalysesHandler handler = new de.cebitec.readXplorer.databackend.AnalysesHandler(trackConnector, this, "Collecting coverage data of track number "
                 + this.selectedTrack.getId(), new ParametersReadClasses(true, false, false, false)); // TODO: ParameterReadClasses noch in den Wizard einbauen und die parameter hier mit übergeben!
@@ -124,7 +137,6 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
     public void showData(Object data) {
         Pair<Integer, String> dataTypePair = (Pair<Integer, String>) data;
         final int trackId = dataTypePair.getFirst();
-        final String dataType = dataTypePair.getSecond();
 
         this.backgroundCutoff = this.stats.calculateBackgroundCutoff(this.parameters.getFraction());
         this.stats.setBgThreshold(this.backgroundCutoff);
@@ -137,45 +149,41 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
                 this.allRegionsInHash, this.stats, this.parameters);
 
         String trackNames;
-        if (transcriptionStartResultPanel == null) {
-            transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
-            transcriptionStartResultPanel.setReferenceViewer(refViewer);
+        if (this.transcriptionStartResultPanel == null) {
+            this.transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
+            this.transcriptionStartResultPanel.setReferenceViewer(this.refViewer);
         }
 
         this.stats.clearMemory();
+        this.clearMemory();
 
-        TSSDetectionResults tssResult = new TSSDetectionResults(this.stats, this.tssDetection.getResults(), getTrackMap(), refGenomeID);
+        TSSDetectionResults tssResult = new TSSDetectionResults(this.stats, this.tssDetection.getResults(), getTrackMap(), this.refGenomeID);
         tssResult.setParameters(this.parameters);
-        transcriptionStartResultPanel.addResult(tssResult);
+        this.transcriptionStartResultPanel.addResult(tssResult);
 
         trackNames = GeneralUtils.generateConcatenatedString(tssResult.getTrackNameList(), 120);
         String panelName = "Detected TSSs for " + trackNames + " (" + transcriptionStartResultPanel.getDataSize() + " hits)";
-        transcAnalysesTopComp.openAnalysisTab(panelName, transcriptionStartResultPanel);
+        this.transcAnalysesTopComp.openAnalysisTab(panelName, this.transcriptionStartResultPanel);
 
         notifyObservers(AnalysisStatus.FINISHED);
     }
 
-    public HashMap<Integer, List<Integer>> getForwardCDSs() {
-        return forwardCDSs;
-    }
-
-    public HashMap<Integer, List<Integer>> getReverseCDSs() {
-        return reverseCDSs;
-    }
-
-    public List<int[]> getRegion2Exclude() {
-        return region2Exclude;
-    }
-
-    public TssDetection getTssDetection() {
-        return tssDetection;
-    }
-
-    public OperonDetection getOperonDetection() {
-        return operonDetection;
-    }
-
+    /**
+     * Getter for the trackMap.
+     *
+     * @return HashMap<Integer, PersistantTrack> containing all PersistantTracks
+     * used for this analysis-run.
+     */
     public HashMap<Integer, PersistantTrack> getTrackMap() {
         return trackMap;
+    }
+
+    /**
+     * Clear the flash memory.
+     */
+    private void clearMemory() {
+        this.allRegionsInHash = null;
+        this.forwardCDSs = null;
+        this.reverseCDSs = null;
     }
 }

@@ -20,12 +20,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import javax.swing.JOptionPane;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Exceptions;
 
 /**
+ * This class starts all analysis to be performed on a whole transcript dataset.
  *
  * @author jritter
  */
@@ -44,8 +44,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
     private GenomeFeatureParser featureParser;
     private RPKMValuesCalculation rpkmCalculation;
     private OperonDetection operonDetection;
-    private NewRegionDetection newRegionDetection;
-    private ResultPanelTranscriptionStart transcriptionStartResultPanel;
+    private NovelTranscriptDetection newRegionDetection;
     private final ReferenceViewer refViewer;
     private TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
     private HashMap<Integer, PersistantTrack> trackMap;
@@ -58,6 +57,18 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
     private NovelRegionResultPanel novelRegionResult;
     private ResultPanelOperonDetection operonResultPanel;
 
+    /**
+     * Constructor for WholeTranscriptDataAnalysisHandler.
+     *
+     * @param selectedTrack PersistantTrack the analysis is based on.
+     * @param parameterset ParameterSetWholeTranscriptAnalyses stores all
+     * paramaters for whole transcript dataset analysis.
+     * @param refViewer ReferenceViewer
+     * @param transcAnalysesTopComp
+     * TranscriptomeAnalysesTopComponentTopComponent output widow for computed
+     * results.
+     * @param trackMap contains all PersistantTracks used for this analysis-run.
+     */
     public WholeTranscriptDataAnalysisHandler(PersistantTrack selectedTrack, ParameterSetWholeTranscriptAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, HashMap<Integer, PersistantTrack> trackMap) {
         this.selectedTrack = selectedTrack;
         this.refGenomeID = refViewer.getReference().getId();
@@ -68,6 +79,11 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
         this.trackMap = trackMap;
     }
 
+    /**
+     * Starts the analysis.
+     *
+     * @throws FileNotFoundException
+     */
     private void startAnalysis() throws FileNotFoundException {
 
         try {
@@ -81,17 +97,20 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
         this.progressHandle.start(120);
         this.featureParser = new GenomeFeatureParser(this.trackConnector, progressHandle);
         this.allRegionsInHash = this.featureParser.getGenomeFeaturesInHash(this.featureParser.getGenomeFeatures());
-        this.featureParser.parseFeatureInformation(this.featureParser.getGenomeFeatures());
 
-        this.region2Exclude = this.featureParser.getRegion2Exclude();
-        this.forwardCDSs = this.featureParser.getForwardCDSs();
-        this.reverseCDSs = this.featureParser.getReverseCDSs();
         if (parameters.isPerformNovelRegionDetection()) {
             this.progressHandle.progress("Loading additional feature information ... ", 105);
             featureParser.generateAllFeatureStrandInformation(this.featureParser.getGenomeFeatures());
+            this.region2Exclude = this.featureParser.getRegion2Exclude();
+            this.forwardCDSs = this.featureParser.getForwardCDSs();
+            this.reverseCDSs = this.featureParser.getReverseCDSs();
             this.progressHandle.progress(120);
             this.progressHandle.finish();
         } else {
+            this.featureParser.parseFeatureInformation(this.featureParser.getGenomeFeatures());
+            this.region2Exclude = this.featureParser.getRegion2Exclude();
+            this.forwardCDSs = this.featureParser.getForwardCDSs();
+            this.reverseCDSs = this.featureParser.getReverseCDSs();
             this.progressHandle.progress(120);
             this.progressHandle.finish();
         }
@@ -174,7 +193,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
         }
 
         if (parameters.isPerformNovelRegionDetection()) {
-            newRegionDetection = new NewRegionDetection(trackConnector.getRefGenome(), trackId);
+            newRegionDetection = new NovelTranscriptDetection(trackConnector.getRefGenome(), trackId);
 
             newRegionDetection.runningNewRegionsDetection(featureParser.getAllFwdFeatures(), featureParser.getAllRevFeatures(), allRegionsInHash,
                     this.stats, this.parameters);
@@ -210,18 +229,31 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
 
             if (operonResultPanel == null) {
                 operonResultPanel = new ResultPanelOperonDetection();
-                operonResultPanel.setBoundsInfoManager(refViewer.getBoundsInformationManager());
+                operonResultPanel.setReferenceViewer(refViewer);
             }
 
             OperonDetectionResult operonDetectionResult = new OperonDetectionResult(this.stats, this.trackMap, detectedOperons, refGenomeID);
             operonDetectionResult.setParameters(this.parameters);
             operonResultPanel.addResult(operonDetectionResult);
-            
+
             trackNames = GeneralUtils.generateConcatenatedString(operonDetectionResult.getTrackNameList(), 120);
             String panelName = "Operon detection results " + trackNames + " (" + operonResultPanel.getDataSize() + " hits)";
             transcAnalysesTopComp.openAnalysisTab(panelName, operonResultPanel);
         }
 
+        this.stats.clearMemory();
+        this.clearMemory();
+
+
         notifyObservers(AnalysisStatus.FINISHED);
+    }
+
+    /**
+     * Clear flash memory.
+     */
+    private void clearMemory() {
+        this.allRegionsInHash = null;
+        this.forwardCDSs = null;
+        this.reverseCDSs = null;
     }
 }

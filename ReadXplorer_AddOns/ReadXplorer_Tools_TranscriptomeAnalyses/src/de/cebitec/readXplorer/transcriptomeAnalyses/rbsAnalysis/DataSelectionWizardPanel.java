@@ -4,18 +4,26 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.rbsAnalysis;
 
+import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.RbsAnalysisWizardIterator;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ElementsOfInterest;
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.PurposeEnum;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
+import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 
-public class DataSelectionWizardPanel implements WizardDescriptor.Panel<WizardDescriptor> {
+public class DataSelectionWizardPanel implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
     private DataSelectionVisualPanel component;
+    private PurposeEnum purpose;
+
+    public DataSelectionWizardPanel(PurposeEnum purpose) {
+        this.purpose = purpose;
+    }
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -24,7 +32,7 @@ public class DataSelectionWizardPanel implements WizardDescriptor.Panel<WizardDe
     @Override
     public DataSelectionVisualPanel getComponent() {
         if (component == null) {
-            component = new DataSelectionVisualPanel();
+            component = new DataSelectionVisualPanel(this.purpose);
         }
         return component;
     }
@@ -71,5 +79,18 @@ public class DataSelectionWizardPanel implements WizardDescriptor.Panel<WizardDe
         wiz.putProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_ANALYSIS_LENGTH_ALL_ELEMENTS, component.getLengthRelativeToTss());
         wiz.putProperty(ElementsOfInterest.ONLY_SELECTED.toString(), component.isOnlySelected());
 
+    }
+
+    @Override
+    public void validate() throws WizardValidationException {
+
+        if (this.component.isAllElements() == false
+                && this.component.isOnlyAntisenseElements() == false
+                && this.component.isOnlyLeaderlessElements() == false
+                && this.component.isOnlyNonLeaderlessElements() == false
+                && this.component.isOnlyRealTSS() == false
+                && this.component.isOnlySelected() == false) {
+            throw new WizardValidationException(null, "Plese select one of the possible Element types!", null);
+        }
     }
 }

@@ -149,7 +149,7 @@ public class GenomeFeatureParser {
             // tRNA and rRNA regions are entered into the "mask array"
             if (type.equals(FeatureType.RRNA) || type.equals(FeatureType.TRNA)) {
                 maskingRegions(type, isFwd, start, stop, feature.getChromId());
-            } else {
+            } else if (!type.equals(FeatureType.SOURCE)) {
                 // store the regions in arrays of arrays (allows for overlapping regions)
                 if (isFwd) {
                     createCDSsStrandInformation(this.forwardCDSs, id, start, stop, isFwd);

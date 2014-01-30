@@ -387,6 +387,8 @@
                 <package>org.apache.commons.discovery.resource.classes</package>
                 <package>org.apache.commons.discovery.resource.names</package>
                 <package>org.apache.commons.discovery.tools</package>
+                <package>org.apache.commons.io</package>
+                <package>org.apache.commons.io.output</package>
                 <package>org.apache.commons.lang3</package>
                 <package>org.apache.commons.lang3.builder</package>
                 <package>org.apache.commons.lang3.concurrent</package>
@@ -811,12 +813,12 @@
                 <binary-origin>release/modules/ext/gnujaxp.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/batik-parser.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/batik-parser.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
                 <runtime-relative-path>ext/japura-1.14.3.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/japura-1.14.3.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-parser.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-parser.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/junit-4.10.jar</runtime-relative-path>

@@ -1,11 +1,14 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.exporter.excel.ExcelExportFileChooser;
-import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelRegion;
+import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelTranscript;
+import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.SequinTableFormatExporter;
+import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.SequinTableSettingsWizardPanel;
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.util.UneditableTableModel;
+import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readXplorer.view.analysis.ResultTablePanel;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
@@ -13,6 +16,7 @@ import de.cebitec.readXplorer.view.tableVisualization.TableComparatorProvider;
 import de.cebitec.readXplorer.view.tableVisualization.TableUtils;
 import de.cebitec.readXplorer.view.tableVisualization.tableFilter.TableRightClickDeletion;
 import de.cebitec.readXplorer.view.tableVisualization.tableFilter.TableRightClickFilter;
+import java.awt.Component;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -20,22 +24,24 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.DefaultListSelectionModel;
-import javax.swing.JFileChooser;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.filechooser.FileFilter;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
+import org.openide.WizardDescriptor;
 import org.openide.util.Exceptions;
 
 /**
@@ -50,13 +56,15 @@ public class NovelRegionResultPanel extends ResultTablePanel {
     private HashMap<String, Object> statisticsMap;
     private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
     private TableRightClickDeletion<DefaultTableModel> rowDeletion = new TableRightClickDeletion();
-    private HashMap<Integer, NovelRegion> nrInHash;
+    private HashMap<Integer, NovelTranscript> nrInHash;
+    public final TableType tableType = TableType.NOVEL_REGION_TABLE;
     public static final String NOVELREGION_DETECTION_MIN_LENGTH = "Minimum length of new region";
     public static final String NOVELREGION_DETECTION_NO_OF_FEATURES = "Number of detected regions";
     public static final String NOVELREGION_DETECTION_NO_OF_REV_FEATURES = "Number of reverse features";
     public static final String NOVELREGION_DETECTION_NO_OF_FWD_FEATURES = "Number of forward features";
     public static final String NOVELREGION_DETECTION_NO_OF_CISANTISENSE = "Number of cis-antisense features";
     public static final String NOVELREGION_DETECTION_NO_OF_TRANSGENIC = "Number of transgenic features";
+    private ProgressHandle progresshandle;
 
     /**
      * Creates new form NovelRegionResultPanel
@@ -111,20 +119,21 @@ public class NovelRegionResultPanel extends ResultTablePanel {
         jButton3 = new javax.swing.JButton();
         jButton4 = new javax.swing.JButton();
         statisticsButton = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
 
         novelRegionTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Putative Start", "Strand", "Track", "Chromosome", "FALSE POSITIVE", "Selection for Blast", "Site", "Dropoff Position", "Length", "Sequence", "Chrom. ID", "Track ID"
+                "Putative Start", "Strand", "Track", "Chromosome", "FALSE POSITIVE", "Selection for Blast", "Finished", "Site", "Dropoff Position", "Length", "Sequence", "Chrom. ID", "Track ID"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, true, true, false, false, false, true, false, false
+                false, false, false, false, true, true, true, false, false, false, true, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -142,12 +151,13 @@ public class NovelRegionResultPanel extends ResultTablePanel {
         novelRegionTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title10")); // NOI18N
         novelRegionTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title3_1_1")); // NOI18N
         novelRegionTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title7")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title2_1_1")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title5")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title6")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(9).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title8")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(10).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title11")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(11).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title4_1")); // NOI18N
+        novelRegionTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title12")); // NOI18N
+        novelRegionTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title2_1_1")); // NOI18N
+        novelRegionTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title5")); // NOI18N
+        novelRegionTable.getColumnModel().getColumn(9).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title6")); // NOI18N
+        novelRegionTable.getColumnModel().getColumn(10).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title8")); // NOI18N
+        novelRegionTable.getColumnModel().getColumn(11).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title11")); // NOI18N
+        novelRegionTable.getColumnModel().getColumn(12).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title4_1")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.jButton1.text_1")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -184,14 +194,23 @@ public class NovelRegionResultPanel extends ResultTablePanel {
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(jButton2, org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.jButton2.text")); // NOI18N
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 495, Short.MAX_VALUE)
+            .addComponent(jScrollPane1)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(statisticsButton)
+                .addGap(18, 18, 18)
+                .addComponent(jButton2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jButton4)
                 .addGap(18, 18, 18)
@@ -212,12 +231,13 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                     .addComponent(removeAllFalsePosButton)
                     .addComponent(jButton3)
                     .addComponent(jButton4)
-                    .addComponent(statisticsButton)))
+                    .addComponent(statisticsButton)
+                    .addComponent(jButton2)))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        List<NovelRegion> tss = this.updateNovelRegionResults();
+        List<NovelTranscript> tss = this.updateNovelRegionResults();
         novelRegionResults.setResults(tss);
 
         NotificationWhenExportingPanel notification = new NotificationWhenExportingPanel();
@@ -241,11 +261,11 @@ public class NovelRegionResultPanel extends ResultTablePanel {
 
     private void removeAllFalsePosButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeAllFalsePosButtonActionPerformed
         // delete all false positive detected novel regions from table and novelregion array
-        List<NovelRegion> novelRegions = this.updateNovelRegionResults();
+        List<NovelTranscript> novelRegions = this.updateNovelRegionResults();
         DefaultTableModel tableModel = (DefaultTableModel) novelRegionTable.getModel();
         for (int i = 0; i < novelRegionTable.getRowCount(); i++) {
             Integer posTableAti = (Integer) novelRegionTable.getValueAt(i, 0);
-            NovelRegion nr = nrInHash.get(posTableAti);
+            NovelTranscript nr = nrInHash.get(posTableAti);
             boolean isFalsePositive = (boolean) novelRegionTable.getValueAt(i, 2);
             if (isFalsePositive) {
                 nrInHash.remove(posTableAti);
@@ -259,58 +279,150 @@ public class NovelRegionResultPanel extends ResultTablePanel {
     }//GEN-LAST:event_removeAllFalsePosButtonActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        FileFilter filter = new FileNameExtensionFilter("FASTA file", "fna", "faa", "ffn", "FASTA");
-        JFileChooser fc = new JFileChooser();
-        fc.addChoosableFileFilter(filter);
-        int retrival = fc.showSaveDialog(this);
-        if (retrival == JFileChooser.APPROVE_OPTION) {
 
-            List<String> sequences = new ArrayList<>();
-            List<NovelRegion> novelRegions = this.updateNovelRegionResults();
-            for (int i = 0; i < novelRegionTable.getRowCount(); i++) {
-                Integer posTableAti = (Integer) novelRegionTable.getValueAt(i, 0);
-                NovelRegion nr = nrInHash.get(posTableAti);
-                if (nr.isFWD()) {
-                    sequences.add("Start\t" + nr.getPos() + "\tLength\t" + nr.getLength() + "\tDirection\tfwd");
-                } else {
-                    sequences.add("Start\t" + nr.getPos() + "\tLength\t" + nr.getLength() + "\tDirection\trev");
+        this.progresshandle = ProgressHandleFactory.createHandle("Export to Fasta!");
+        ReadXplorerFileChooser fileChooser = new ReadXplorerFileChooser(new String[]{"fna", "faa", "ffn"}, "FASTA file") {
+            @Override
+            public void save(String fileLocation) {
+                progresshandle.start(5);
+                List<String> sequences = new ArrayList<>();
+                List<NovelTranscript> novelRegions = updateNovelRegionResults();
+                progresshandle.progress(1);
+                for (int i = 0; i < novelRegionTable.getRowCount(); i++) {
+                    Integer posTableAti = (Integer) novelRegionTable.getValueAt(i, 0);
+                    NovelTranscript nr = nrInHash.get(posTableAti);
+                    if (nr.isFWD()) {
+                        sequences.add("Start\t" + nr.getStartPosition() + "\tLength\t" + nr.getLength() + "\tDirection\tfwd");
+                    } else {
+                        sequences.add("Start\t" + nr.getStartPosition() + "\tLength\t" + nr.getLength() + "\tDirection\trev");
+                    }
+                    sequences.add(nr.getSequence());
+                    writeFastaFileForBlast(fileLocation, sequences);
                 }
-                sequences.add(nr.getSequence());
-                writeFastaFileForBlast(fc.getSelectedFile(), sequences);
+                progresshandle.progress(2);
+                novelRegionResults.setResults(novelRegions);
+                progresshandle.progress(3);
             }
-            novelRegionResults.setResults(novelRegions);
-        }
+
+            @Override
+            public void open(String fileLocation) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        };
+
+        fileChooser.openFileChooser(ReadXplorerFileChooser.SAVE_DIALOG);
+        progresshandle.progress(5);
+
+        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successfull!",
+                "Export was successfull!", JOptionPane.INFORMATION_MESSAGE);
+        progresshandle.finish();
+
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        FileFilter filter = new FileNameExtensionFilter("FASTA file", "fna", "faa", "ffn", "FASTA");
-        JFileChooser fc = new JFileChooser();
-        fc.addChoosableFileFilter(filter);
-        int retrival = fc.showSaveDialog(this);
-        if (retrival == JFileChooser.APPROVE_OPTION) {
 
-            List<String> sequences = new ArrayList<>();
-            List<NovelRegion> novelRegions = this.updateNovelRegionResults();
-            for (int i = 0; i < novelRegionTable.getRowCount(); i++) {
-                Integer posTableAti = (Integer) novelRegionTable.getValueAt(i, 0);
-                NovelRegion nr = nrInHash.get(posTableAti);
-                boolean isSelected = (boolean) novelRegionTable.getValueAt(i, 3);
-                if (isSelected) {
-                    if (nr.isFWD()) {
-                        sequences.add("Start\t" + nr.getPos() + "\tLength\t" + nr.getLength() + "\tDirection\tfwd");
-                    } else {
-                        sequences.add("Start\t" + nr.getPos() + "\tLength\t" + nr.getLength() + "\tDirection\trev");
+        this.progresshandle = ProgressHandleFactory.createHandle("Export to Fasta!");
+        ReadXplorerFileChooser fileChooser = new ReadXplorerFileChooser(new String[]{"fna", "faa", "ffn"}, "FASTA file") {
+            @Override
+            public void save(String fileLocation) {
+                progresshandle.start(5);
+                List<String> sequences = new ArrayList<>();
+                List<NovelTranscript> novelRegions = updateNovelRegionResults();
+                progresshandle.progress(1);
+                for (int i = 0; i < novelRegionTable.getRowCount(); i++) {
+                    Integer posTableAti = (Integer) novelRegionTable.getValueAt(i, 0);
+                    NovelTranscript nr = nrInHash.get(posTableAti);
+                    boolean isSelected = (boolean) novelRegionTable.getValueAt(i, 3);
+                    if (isSelected) {
+                        if (nr.isFWD()) {
+                            sequences.add("Start\t" + nr.getStartPosition() + "\tLength\t" + nr.getLength() + "\tDirection\tfwd");
+                        } else {
+                            sequences.add("Start\t" + nr.getStartPosition() + "\tLength\t" + nr.getLength() + "\tDirection\trev");
+                        }
+                        sequences.add(nr.getSequence());
+                        writeFastaFileForBlast(fileLocation, sequences);
                     }
-                    sequences.add(nr.getSequence());
-                    writeFastaFileForBlast(fc.getSelectedFile(), sequences);
                 }
+                progresshandle.progress(2);
+                novelRegionResults.setResults(novelRegions);
+                progresshandle.progress(3);
+
             }
 
-            novelRegionResults.setResults(novelRegions);
-        }
+            @Override
+            public void open(String fileLocation) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        };
+
+        fileChooser.openFileChooser(ReadXplorerFileChooser.SAVE_DIALOG);
+        progresshandle.progress(5);
+
+        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successfull!",
+                "Export was successfull!", JOptionPane.INFORMATION_MESSAGE);
+        progresshandle.finish();
     }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        final String wizardName = "Sequin Feature Table Export";
+        List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
+        panels.add(new SequinTableSettingsWizardPanel(wizardName));
+//        DataSelectionWizardPanel selection = new DataSelectionWizardPanel();
+//        selection.getComponent().disableTF();
+//        panels.add(selection);
+        String[] steps = new String[panels.size()];
+        for (int i = 0; i < panels.size(); i++) {
+            Component c = panels.get(i).getComponent();
+            // Default step name to component name of panel.
+            steps[i] = c.getName();
+            if (c instanceof JComponent) { // assume Swing components
+                JComponent jc = (JComponent) c;
+                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, i);
+                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DATA, steps);
+                jc.putClientProperty(WizardDescriptor.PROP_AUTO_WIZARD_STYLE, true);
+                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DISPLAYED, true);
+                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_NUMBERED, true);
+            }
+        }
+        WizardDescriptor wiz = new WizardDescriptor(new WizardDescriptor.ArrayIterator<>(panels));
+        // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
+        wiz.setTitleFormat(new MessageFormat("{0}"));
+        wiz.setTitle("Sequin Feature Table Export");
+        if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
+
+//            final ArrayList<Operon> tss = (ArrayList<Operon>) this.updateTssResults();
+//            operonResult.setResults(tss);
+            final String featureName = (String) wiz.getProperty(SequinTableSettingsWizardPanel.SEQUIN_EXPORT_FEATURE_NAME);
+            this.progresshandle = ProgressHandleFactory.createHandle("Export of feature table!");
+            ReadXplorerFileChooser fileChooser = new ReadXplorerFileChooser(new String[]{"tbl"}, "Table files for Sequin export") {
+                @Override
+                public void save(String fileLocation) {
+                    progresshandle.start(5);
+                    progresshandle.progress(1);
+                    SequinTableFormatExporter exporter = new SequinTableFormatExporter(new File(fileLocation), null, null, (ArrayList<NovelTranscript>) novelRegionResults.getResults(), tableType, featureName); //To change body of generated methods, choose Tools | Templates.
+                    progresshandle.progress(2);
+                    exporter.start();
+                    progresshandle.progress(3);
+                }
+
+                @Override
+                public void open(String fileLocation) {
+                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                }
+            };
+
+            fileChooser.openFileChooser(ReadXplorerFileChooser.SAVE_DIALOG);
+            progresshandle.progress(4);
+            progresshandle.progress(5);
+
+            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successfull!",
+                    "Export was successfull!", JOptionPane.INFORMATION_MESSAGE);
+            progresshandle.finish();
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JScrollPane jScrollPane1;
@@ -323,7 +435,7 @@ public class NovelRegionResultPanel extends ResultTablePanel {
     public void addResult(ResultTrackAnalysis newResult) {
         if (newResult instanceof NovelRegionResult) {
             final NovelRegionResult novelRegResults = (NovelRegionResult) newResult;
-            final List<NovelRegion> novelReggions = new ArrayList<>(novelRegResults.getResults());
+            final List<NovelTranscript> novelReggions = new ArrayList<>(novelRegResults.getResults());
             this.nrInHash = new HashMap<>();
 
             if (novelRegionResults == null) {
@@ -332,7 +444,7 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                 novelRegionResults.getResults().addAll(novelRegResults.getResults());
             }
 
-            final int nbColumns = 12;
+            final int nbColumns = 13;
             int noFwdFeatures = 0;
             int noRevFeatures = 0;
             int noCisAntisense = 0;
@@ -341,11 +453,10 @@ public class NovelRegionResultPanel extends ResultTablePanel {
             final DefaultTableModel model = (DefaultTableModel) this.novelRegionTable.getModel();
 
             String strand;
-            PersistantFeature feature;
 
-            for (NovelRegion nr : novelReggions) {
+            for (NovelTranscript nr : novelReggions) {
 
-                if (nr.isFwdStrand()) {
+                if (nr.isFWD()) {
                     strand = SequenceUtils.STRAND_FWD_STRING;
                     ++noFwdFeatures;
                 } else {
@@ -354,7 +465,7 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                 }
 
                 final Object[] rowData = new Object[nbColumns];
-                int position = nr.getPos();
+                int position = nr.getStartPosition();
                 this.nrInHash.put(position, nr);
                 int i = 0;
                 rowData[i++] = position;
@@ -363,6 +474,7 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                 rowData[i++] = novelRegResults.getChromosomeMap().get(nr.getChromId());
                 rowData[i++] = false;
                 rowData[i++] = false;
+                rowData[i++] = nr.isConsidered();
                 rowData[i++] = nr.getSite();
                 rowData[i++] = nr.getDropOffPos();
                 rowData[i++] = nr.getLength();
@@ -417,31 +529,38 @@ public class NovelRegionResultPanel extends ResultTablePanel {
         this.referenceViewer = referenceViewer;
     }
 
-    private List<NovelRegion> updateNovelRegionResults() {
-        List<NovelRegion> novelRegions = novelRegionResults.getResults();
-        HashMap<Integer, NovelRegion> tmpHash = new HashMap<>();
+    private List<NovelTranscript> updateNovelRegionResults() {
+        List<NovelTranscript> novelRegions = novelRegionResults.getResults();
+        HashMap<Integer, NovelTranscript> tmpHash = new HashMap<>();
         tmpHash.putAll(this.nrInHash);
 
         for (int i = 0; i < novelRegionTable.getRowCount(); i++) {
             Integer posTableAti = (Integer) novelRegionTable.getValueAt(i, 0);
             if (tmpHash.containsKey(posTableAti)) {
+
+                if ((Boolean) novelRegionTable.getValueAt(i, 6)) {
+                    this.nrInHash.get(posTableAti).setIsConsidered(true);
+                } else {
+                    this.nrInHash.get(posTableAti).setIsConsidered(false);
+                }
+
                 tmpHash.remove(posTableAti);
             }
         }
         for (Integer key : tmpHash.keySet()) {
-            NovelRegion nr = tmpHash.get(key);
+            NovelTranscript nr = tmpHash.get(key);
             nrInHash.remove(key);
             novelRegions.remove(nr);
         }
         return novelRegions;
     }
 
-    private void writeFastaFileForBlast(File outFile, List<String> seqsOfInterest) {
+    private void writeFastaFileForBlast(String fileLocation, List<String> seqsOfInterest) {
         Writer writer = null;
         int cnt = 1;
         try {
             writer = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(outFile)));
+                    new FileOutputStream(fileLocation)));
             for (String sequence : seqsOfInterest) {
                 if (cnt == 1) {
                     writer.write(">" + sequence + "\n");

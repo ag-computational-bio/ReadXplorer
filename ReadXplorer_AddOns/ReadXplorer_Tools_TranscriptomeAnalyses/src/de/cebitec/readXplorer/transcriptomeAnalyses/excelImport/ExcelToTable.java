@@ -4,6 +4,7 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.excelImport;
 
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,6 +41,25 @@ public class ExcelToTable implements ExcelImportDataI {
     public ExcelToTable(File file, ProgressHandle handle) throws IOException {
         this.columnNames = new ArrayList<>();
         fetchSheetTableAndParameters(file, handle);
+    }
+    
+    public boolean validateImportFile(File importFile, TableType typeOfTable) {
+        boolean validate = false;
+        
+        if(typeOfTable == TableType.TSS_TABLE) {
+            // check 
+        }
+        if(typeOfTable == TableType.OPERON_TABLE) {
+            
+        }
+        if(typeOfTable == TableType.NOVEL_REGION_TABLE) {
+            
+        }
+        if(typeOfTable == TableType.RPKM_TABLE) {
+            
+        }
+        
+        return validate;
     }
 
     /**

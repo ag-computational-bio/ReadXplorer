@@ -35,8 +35,8 @@ public class RPKMValuesCalculation {
         this.allRegionsInHash = persFeatures;
         this.rpkmValues = new ArrayList<>();
         this.stats = stats;
-        this.forwardStarts = this.stats.getForward();
-        this.reverseStarts = this.stats.getReverse();
+        this.forwardStarts = this.stats.getForwardReadStarts();
+        this.reverseStarts = this.stats.getReverseReadStarts();
         this.forwardCoverage = this.stats.getFwdCoverage();
         this.reverseCoverage = this.stats.getRevCoverage();
         this.mm = this.stats.getMm();

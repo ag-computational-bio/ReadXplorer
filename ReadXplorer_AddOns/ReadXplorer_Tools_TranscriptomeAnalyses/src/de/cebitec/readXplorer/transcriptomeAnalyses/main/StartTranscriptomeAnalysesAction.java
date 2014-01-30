@@ -108,16 +108,14 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
             if (performFivePrimeAnalyses) {
                 int ratio = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_RATIO);
                 this.fraction = (double) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_Fraction);
-                int upstream = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_UPSTREAM);
-                int downstream = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_DOWNSTREAM);
                 boolean excludeInternalTss = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_INTERNAL_TSS);
                 int excludeTSSDistance = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_TSS_DISTANCE);
                 int leaderlessDistance = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_LIMIT);
                 int keepingInternalTssDistance = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_KEEPINTERNAL_DISTANCE);
-                double cdsShiftPercentage = (double) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_PERCENTAGE_FOR_CDS_ANALYSIS);
+                int cdsShiftPercentage = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_PERCENTAGE_FOR_CDS_ANALYSIS);
 
-                ParameterSetFiveEnrichedAnalyses parameterSetFiveprime = new ParameterSetFiveEnrichedAnalyses(this.fraction, ratio, upstream,
-                        downstream, excludeInternalTss, excludeTSSDistance, leaderlessDistance, keepingInternalTssDistance, cdsShiftPercentage);
+                ParameterSetFiveEnrichedAnalyses parameterSetFiveprime = new ParameterSetFiveEnrichedAnalyses(this.fraction, ratio,
+                        excludeInternalTss, excludeTSSDistance, leaderlessDistance, keepingInternalTssDistance, cdsShiftPercentage);
 
                 // start five prime transcripts analyses handler
                 this.fifePrimeAnalysesHandler = new FiveEnrichedDataAnalysesHandler(

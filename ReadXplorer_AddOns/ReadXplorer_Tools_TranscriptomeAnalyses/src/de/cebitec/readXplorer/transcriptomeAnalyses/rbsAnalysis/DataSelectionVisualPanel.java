@@ -4,27 +4,36 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.rbsAnalysis;
 
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.PurposeEnum;
 import javax.swing.JPanel;
 
 public final class DataSelectionVisualPanel extends JPanel {
 
+    
     /**
      * Creates new form DataSelectionVisualPanel
      */
-    public DataSelectionVisualPanel() {
+    public DataSelectionVisualPanel(PurposeEnum purpose) {
         initComponents();
         this.buttonSelectionGroup.add(onlyLeaderlessElementsCB);
         this.buttonSelectionGroup.add(onlyNonLeaderlessElementsCB);
         this.buttonSelectionGroup.add(onlyPutAntisenseElementsCB);
         this.buttonSelectionGroup.add(onlyRealTssCB);
         this.buttonSelectionGroup.add(onlySelectedCB);
-
-//        this.lengthRelativeToTSS.setEnabled(false);
+        
+        if(purpose == PurposeEnum.CHARTS || purpose == PurposeEnum.SEQUIN_EXPORT) {
+            this.disableTF();
+            this.lengthLabel.setEnabled(false);
+        } 
     }
 
     @Override
     public String getName() {
-        return "Data type selection";
+        return "Data selection";
+    }
+    
+    public void disableTF() {
+        this.lengthRelativeToTSS.setEnabled(false);
     }
 
     public boolean isAllElements() {
@@ -72,7 +81,7 @@ public final class DataSelectionVisualPanel extends JPanel {
         jLabel2 = new javax.swing.JLabel();
         onlyRealTssCB = new javax.swing.JCheckBox();
         lengthRelativeToTSS = new javax.swing.JTextField();
-        jLabel3 = new javax.swing.JLabel();
+        lengthLabel = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
         onlySelectedCB = new javax.swing.JCheckBox();
 
@@ -97,7 +106,7 @@ public final class DataSelectionVisualPanel extends JPanel {
 
         lengthRelativeToTSS.setText(org.openide.util.NbBundle.getMessage(DataSelectionVisualPanel.class, "DataSelectionVisualPanel.lengthRelativeToTSS.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(DataSelectionVisualPanel.class, "DataSelectionVisualPanel.jLabel3.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(lengthLabel, org.openide.util.NbBundle.getMessage(DataSelectionVisualPanel.class, "DataSelectionVisualPanel.lengthLabel.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(onlySelectedCB, org.openide.util.NbBundle.getMessage(DataSelectionVisualPanel.class, "DataSelectionVisualPanel.onlySelectedCB.text")); // NOI18N
 
@@ -111,7 +120,7 @@ public final class DataSelectionVisualPanel extends JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(allElementsCB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(18, 18, 18)
-                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lengthLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lengthRelativeToTSS, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(13, 13, 13))
@@ -140,7 +149,7 @@ public final class DataSelectionVisualPanel extends JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(allElementsCB)
                     .addComponent(lengthRelativeToTSS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel3))
+                    .addComponent(lengthLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -183,8 +192,8 @@ public final class DataSelectionVisualPanel extends JPanel {
     private javax.swing.ButtonGroup buttonSelectionGroup;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JLabel lengthLabel;
     private javax.swing.JTextField lengthRelativeToTSS;
     private javax.swing.JCheckBox onlyLeaderlessElementsCB;
     private javax.swing.JCheckBox onlyNonLeaderlessElementsCB;

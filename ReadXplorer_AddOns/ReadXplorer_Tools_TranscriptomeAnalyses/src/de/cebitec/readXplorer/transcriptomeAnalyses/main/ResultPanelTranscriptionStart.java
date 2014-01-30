@@ -1,21 +1,34 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
+import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.PromotorSearchParameters;
+import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.RbsAnalysisParameters;
+import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.MotifSearchPanel;
+import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.MotifSearchModel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ElementsOfInterest;
 import de.cebitec.readXplorer.view.tableVisualization.tableFilter.TableRightClickDeletion;
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
+import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
+import de.cebitec.readXplorer.databackend.dataObjects.ChromosomeObserver;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.ChartsGenerationSelectChatTypeWizardPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ChartType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.PlotGenerator;
-import de.cebitec.readXplorer.transcriptomeAnalyses.promotorAnalysis.PromotorAnalysisWizardIterator;
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.PurposeEnum;
+import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.SequinTableFormatExporter;
+import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.SequinTableSettingsWizardPanel;
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
+import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.MultiPurposeTopComponent;
+import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.PromotorAnalysisWizardIterator;
 import de.cebitec.readXplorer.transcriptomeAnalyses.rbsAnalysis.DataSelectionWizardPanel;
-import de.cebitec.readXplorer.transcriptomeAnalyses.rbsAnalysis.RbsAnalysisWizardIterator;
-import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
+import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.RbsAnalysisWizardIterator;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.util.UneditableTableModel;
+import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readXplorer.view.analysis.ResultTablePanel;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
@@ -40,6 +53,8 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.WizardDescriptor;
@@ -70,8 +85,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
     public static final String TSS_PUTATIVE_ANTISENSE = "Putative antisense";
     public static final String TSS_FRACTION = "Choosen fraction";
     public static final String TSS_RATIO = "Choosen ratio";
-    public static final String TSS_CHOOSEN_UPSTREAM_REGION = "Upstream region relativ to TSS";
-    public static final String TSS_CHOOSEN_DOWNSTREAM_REGION = "Downstream region relative to TSS";
     public static final String TSS_EXCLUSION_OF_INTERNAL_TSS = "Choosen exclusion of all internal TSS";
     public static final String TSS_RANGE_FOR_LEADERLESS_DETECTION = "Range for Leaderless detection";
     public static final String TSS_PERCENTAGE_FOR_CDSSHIFT_ANALYSIS = "Percentage value for CDS-shift analysis";
@@ -79,6 +92,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
     public static final String TSS_LIMITATION_FOR_DISTANCE_OFUPSTREM_REGION = "Limitation for distance between TSS and TLS";
     public static final String TSS_LIMITATION_FOR_DISTANCE_KEEPING_INTERNAL_TSS = "Limitation for distance between internal TSS and next upstream feature TLS";
     public static final String BIN_SIZE = "size of bin";
+    public final TableType tableType = TableType.TSS_TABLE;
     public static final int UNUSED_STATISTICS_VALUE = -1;
     private BoundsInfoManager boundsInfoManager;
     private ReferenceViewer referenceViewer;
@@ -89,9 +103,11 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
     private List<String> promotorList;
     private HashMap<Integer, TranscriptionStart> tssInHash;
     private MotifSearchModel model;
-    private AppPanelTopComponent appPanelTopComponent;
+    private MultiPurposeTopComponent topComponent;
     private ElementsOfInterest elements = null;
     private PlotGenerator gen;
+    private ProgressHandle progresshandle;
+    private List<String> promotorRegions;
 
     /**
      * This panel is capable of showing a table with transcription start sites
@@ -134,7 +150,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         statisticsMap.put(MAPPINGS_MEAN_LENGTH, 0.0);
         statisticsMap.put(MAPPINGS_MILLION, 0.0);
         statisticsMap.put(BACKGROUND_THRESHOLD, 0.0);
-        statisticsMap.put(TSS_NO_PUTATIVE_CDS_SHIFTS, 0.0);
+        statisticsMap.put(TSS_NO_PUTATIVE_CDS_SHIFTS, 0);
     }
 
     /**
@@ -154,20 +170,21 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         performPromotorAnalysis = new javax.swing.JButton();
         performRbsAnalysis = new javax.swing.JButton();
         performDeletionOfAllFP = new javax.swing.JButton();
+        sequinTableExporter = new javax.swing.JButton();
 
         tSSTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Position", "Chromosome", "Direction", "Read starts", "Rel. count", "Gene name", "Gene locus", "offset", "Sequence", "Leaderless", "CDS-Shift", "False positive", "Internal TSS", "Putative Antisense", "Upstream analysis", "Gene start", "Gene stop", "Gene length", "Gene Frame", "Gene product", "Start codon", "Stop codon", "Chrom ID", "Track ID"
+                "Position", "Chromosome", "Comments", "Direction", "Read starts", "Rel. count", "Gene name", "Gene locus", "offset", "Leaderless", "CDS-Shift", "False positive", "Internal TSS", "Putative Antisense", "Upstream region analysis", "Finished", "Gene start", "Gene stop", "Gene length", "Gene Frame", "Gene product", "Start codon", "Stop codon", "Chrom ID", "Track ID"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Double.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
+                java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Double.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false
+                false, false, true, false, false, false, false, false, false, true, true, true, true, true, true, true, false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -186,28 +203,29 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         tssScrollPane.setViewportView(tSSTable);
         tSSTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title0_1")); // NOI18N
         tSSTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title22_2")); // NOI18N
-        tSSTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title11_1")); // NOI18N
-        tSSTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title1_1")); // NOI18N
-        tSSTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title2_1")); // NOI18N
-        tSSTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title14_1")); // NOI18N
-        tSSTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title18_1_1")); // NOI18N
-        tSSTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title15_1")); // NOI18N
-        tSSTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title20_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title24_2")); // NOI18N
+        tSSTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title11_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title1_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title2_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title14_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title18_1_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title15_1")); // NOI18N
         tSSTable.getColumnModel().getColumn(9).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title21_1")); // NOI18N
         tSSTable.getColumnModel().getColumn(10).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title21_2")); // NOI18N
         tSSTable.getColumnModel().getColumn(11).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title6_1_1")); // NOI18N
         tSSTable.getColumnModel().getColumn(12).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title18_2_1")); // NOI18N
         tSSTable.getColumnModel().getColumn(13).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title19_1")); // NOI18N
         tSSTable.getColumnModel().getColumn(14).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title20_2")); // NOI18N
-        tSSTable.getColumnModel().getColumn(15).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title22_1")); // NOI18N
-        tSSTable.getColumnModel().getColumn(16).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title23_1")); // NOI18N
-        tSSTable.getColumnModel().getColumn(17).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title24_1")); // NOI18N
-        tSSTable.getColumnModel().getColumn(18).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title25_1")); // NOI18N
-        tSSTable.getColumnModel().getColumn(19).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title26_1")); // NOI18N
-        tSSTable.getColumnModel().getColumn(20).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title27_1")); // NOI18N
-        tSSTable.getColumnModel().getColumn(21).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title28_1")); // NOI18N
-        tSSTable.getColumnModel().getColumn(22).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title23_2")); // NOI18N
-        tSSTable.getColumnModel().getColumn(23).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title29_1_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(15).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title23_3")); // NOI18N
+        tSSTable.getColumnModel().getColumn(16).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title22_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(17).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title23_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(18).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title24_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(19).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title25_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(20).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title26_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(21).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title27_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(22).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title28_1")); // NOI18N
+        tSSTable.getColumnModel().getColumn(23).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title23_2")); // NOI18N
+        tSSTable.getColumnModel().getColumn(24).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.tSSTable.columnModel.title29_1_1")); // NOI18N
 
         exportButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.exportButton.text_1")); // NOI18N
         exportButton.addActionListener(new java.awt.event.ActionListener() {
@@ -251,6 +269,13 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
             }
         });
 
+        sequinTableExporter.setText(org.openide.util.NbBundle.getMessage(ResultPanelTranscriptionStart.class, "ResultPanelTranscriptionStart.sequinTableExporter.text")); // NOI18N
+        sequinTableExporter.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sequinTableExporterActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -264,9 +289,11 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                 .addComponent(startChartsOfTssData)
                 .addGap(18, 18, 18)
                 .addComponent(statisticsButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 274, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addComponent(performDeletionOfAllFP)
-                .addGap(426, 426, 426)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 427, Short.MAX_VALUE)
+                .addComponent(sequinTableExporter)
+                .addGap(18, 18, 18)
                 .addComponent(exportButton)
                 .addContainerGap())
         );
@@ -281,7 +308,8 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                     .addComponent(performDeletionOfAllFP)
                     .addComponent(startChartsOfTssData)
                     .addComponent(statisticsButton)
-                    .addComponent(exportButton))
+                    .addComponent(exportButton)
+                    .addComponent(sequinTableExporter))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -290,6 +318,9 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
         List<TranscriptionStart> tss = this.updateTssResults();
         tssResult.setResults(tss);
+
+        processResultForExport();
+        tssResult.setPromotorRegions(promotorRegions);
 
         NotificationWhenExportingPanel notification = new NotificationWhenExportingPanel();
         NotifyDescriptor nd = new NotifyDescriptor(
@@ -315,9 +346,9 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
     }//GEN-LAST:event_tSSTableMouseClicked
 
     private void startChartsOfTssDataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startChartsOfTssDataActionPerformed
-        List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<WizardDescriptor.Panel<WizardDescriptor>>();
+        List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
         panels.add(new ChartsGenerationSelectChatTypeWizardPanel());
-        panels.add(new DataSelectionWizardPanel());
+        panels.add(new DataSelectionWizardPanel(PurposeEnum.CHARTS));
         String[] steps = new String[panels.size()];
         for (int i = 0; i < panels.size(); i++) {
             Component c = panels.get(i).getComponent();
@@ -347,7 +378,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
             boolean takeOnlyRealTss = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_REAL_TSS.toString());
             boolean takeOnlySelectedElements = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_SELECTED.toString());
 
-            boolean isTssDistributionPlot = (boolean) wiz.getProperty(ChartType.DISTRIBUTION_OF_ALL_TSS_OFFSETS_LENGTH.toString());
             boolean isAbsoluteFrequencyPlot = (boolean) wiz.getProperty(ChartType.ABSOLUTE_FREQUENCY_OF_5_PRIME_UTRs.toString());
             boolean isBaseDistributionPlot = (boolean) wiz.getProperty(ChartType.BASE_DISTRIBUTION.toString());
 
@@ -368,13 +398,12 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                 elements = ElementsOfInterest.ONLY_SELECTED;
             }
 
-            //  System.out.println(System.getProperty("java.classpath"));
-
             if (isAbsoluteFrequencyPlot) {
-                appPanelTopComponent = new AppPanelTopComponent();
-                appPanelTopComponent.setLayout(new BorderLayout());
-                appPanelTopComponent.open();
-                appPanelTopComponent.setName("Distribution of TSS distance to TLS");
+//                appPanelTopComponent = new AppPanelTopComponent();
+                topComponent = new MultiPurposeTopComponent(PurposeEnum.CHARTS);
+                topComponent.setLayout(new BorderLayout());
+                topComponent.open();
+                topComponent.setName("Distribution of 5′-UTR lengths");
                 Thread plotGeneration = new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -382,48 +411,28 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                         List<DataTable> dataList = gen.prepareData(ChartType.ABSOLUTE_FREQUENCY_OF_5_PRIME_UTRs, elements, currentTss, referenceViewer, lengthRelToTls, binSize);
                         ParameterSetFiveEnrichedAnalyses tssParameters = (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters();
                         double minXvalue = -Double.valueOf(tssParameters.getLeaderlessLimit());
-                        InteractivePanel panel = gen.generateBarPlot(dataList.get(0), "distance between TSS and TLS", "Absolute frequency", minXvalue);
-                        appPanelTopComponent.add(panel, BorderLayout.CENTER);
+                        InteractivePanel panel = gen.generateBarPlot(dataList.get(0), "5′-UTR lenght (distance between TSS and TLS)", "Absolute frequency", minXvalue);
+                        topComponent.add(panel, BorderLayout.CENTER);
                     }
                 });
                 plotGeneration.start();
             }
 
             if (isBaseDistributionPlot) {
-                appPanelTopComponent = new AppPanelTopComponent();
-                appPanelTopComponent.setLayout(new BorderLayout());
-                appPanelTopComponent.open();
-                appPanelTopComponent.setName("Distribution of Bases in relative distance to TLS");
+                topComponent = new MultiPurposeTopComponent(PurposeEnum.CHARTS);
+                topComponent.setLayout(new BorderLayout());
+                topComponent.open();
+                topComponent.setName("GA content distribution");
                 Thread plotGeneration = new Thread(new Runnable() {
                     @Override
                     public void run() {
                         gen = new PlotGenerator();
                         List<DataTable> dataList = gen.prepareData(ChartType.BASE_DISTRIBUTION, elements, currentTss, referenceViewer, lengthRelToTls, binSize);
-                        InteractivePanel panel = gen.generateOverlappedAreaPlot(dataList.get(0), dataList.get(1), "5'UTR relative to start codon (nt)", "purine/ pyrimidine frequencies");
-                        appPanelTopComponent.add(panel, BorderLayout.CENTER);
+                        InteractivePanel panel = gen.generateOverlappedAreaPlot(dataList.get(0), dataList.get(1), "upstream position relative to start codon (nt)", "purine/pyrimidine distribution (relative abbundance)");
+                        topComponent.add(panel, BorderLayout.CENTER);
                     }
                 });
                 plotGeneration.start();
-            }
-
-            if (isTssDistributionPlot) {
-                appPanelTopComponent = new AppPanelTopComponent();
-                appPanelTopComponent.setLayout(new BorderLayout());
-                appPanelTopComponent.open();
-                appPanelTopComponent.setName("Distribution of TSS distance to TLS");
-                Thread plotGeneration = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        PlotGenerator gen = new PlotGenerator();
-                        List<DataTable> dataList = gen.prepareData(ChartType.DISTRIBUTION_OF_ALL_TSS_OFFSETS_LENGTH, elements, currentTss, referenceViewer, lengthRelToTls, binSize);
-                        ParameterSetFiveEnrichedAnalyses tssParameters = (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters();
-                        double minXvalue = -Double.valueOf(tssParameters.getLeaderlessLimit());
-                        InteractivePanel panel = gen.generateYXPlot(dataList.get(0), "distance between TSS and TLS", "TSS stacksize", minXvalue);
-                        appPanelTopComponent.add(panel, BorderLayout.CENTER);
-                    }
-                });
-                plotGeneration.start();
-
             }
 
             this.tssResult.setResults(currentTss);
@@ -434,18 +443,26 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         // delete all false positive TSS from table and TSS array
         List<TranscriptionStart> tss = this.updateTssResults();
         DefaultTableModel tableModel = (DefaultTableModel) tSSTable.getModel();
-        for (int i = 0; i < tSSTable.getRowCount(); i++) {
+        List<Integer> valuesToRemove = new ArrayList<>();
+        int columnNo = tSSTable.getRowCount();
+        for (int i = 0; i < columnNo; i++) {
             Integer posTableAti = (Integer) tSSTable.getValueAt(i, 0);
             TranscriptionStart ts = tssInHash.get(posTableAti);
-            boolean isFalsePositive = (boolean) tSSTable.getValueAt(i, 11);
+            boolean isFalsePositive = (boolean) tSSTable.getValueAt(i, 10);
             if (isFalsePositive) {
                 tssInHash.remove(posTableAti);
-                tableModel.removeRow(i);
+                valuesToRemove.add(i);
                 tss.remove(ts);
             }
         }
 
+        for (int i = valuesToRemove.size() - 1; i >= 0; i--) {
+            Integer x = valuesToRemove.get(i);
+            tableModel.removeRow(x);
+        }
+
         tSSTable.setModel(tableModel);
+        tSSTable.updateUI();
         tssResult.setResults(tss);
 
     }//GEN-LAST:event_performDeletionOfAllFPActionPerformed
@@ -471,17 +488,17 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
             boolean takeOnlySelectedElements = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_SELECTED.toString());
 
             if (takeAllElements) {
-                elements = ElementsOfInterest.ALL;
+                this.elements = ElementsOfInterest.ALL;
             } else if (takeOnlyLeaderless) {
-                elements = ElementsOfInterest.ONLY_LEADERLESS;
+                this.elements = ElementsOfInterest.ONLY_LEADERLESS;
             } else if (takeOnlyAntisense) {
-                elements = ElementsOfInterest.ONLY_ANTISENSE;
+                this.elements = ElementsOfInterest.ONLY_ANTISENSE;
             } else if (takeOnlyNonLeaderless) {
-                elements = ElementsOfInterest.ONLY_NONE_LEADERLESS;
+                this.elements = ElementsOfInterest.ONLY_NONE_LEADERLESS;
             } else if (takeOnlyRealTss) {
-                elements = ElementsOfInterest.ONLY_REAL_TSS;
+                this.elements = ElementsOfInterest.ONLY_REAL_TSS;
             } else if (takeOnlySelectedElements) {
-                elements = ElementsOfInterest.ONLY_SELECTED;
+                this.elements = ElementsOfInterest.ONLY_SELECTED;
             }
 
             int minus10MotifWidth = (Integer) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_MINUS10_MOTIF_LENGTH);
@@ -491,29 +508,30 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
             int minSpacer2 = (Integer) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER2_LENGTH);
             int seqWidthMinus10 = (Integer) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_PUTATIVE_10_REGION);
             int seqWidthMinus35 = (Integer) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_PUTATIVE_35_REGION);
+            int alternativeSpacer = (Integer) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_ALTERNATIVE_SPACER);
             final int lengthRelToTss = (Integer) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS);
-
-            File workingDir = (File) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_WORKING_DIR);
 
             final PromotorSearchParameters params = new PromotorSearchParameters(
                     minus10MotifWidth, minus35MotifWidth,
-                    noOfTimes, minSpacer1, minSpacer2,
-                    seqWidthMinus10, seqWidthMinus35, lengthRelToTss, workingDir);
+                    noOfTimes, minSpacer1, minSpacer2, alternativeSpacer,
+                    seqWidthMinus10, seqWidthMinus35, lengthRelToTss);
 
 
             final List<TranscriptionStart> starts = updateTssResults();
-            appPanelTopComponent = new AppPanelTopComponent();
-            appPanelTopComponent.setLayout(new BorderLayout());
-            appPanelTopComponent.open();
+            this.topComponent = new MultiPurposeTopComponent(PurposeEnum.MOTIF_SEARCH);
+            this.topComponent.setLayout(new BorderLayout());
+            this.topComponent.open();
             String type = elements.toString().toLowerCase();
-            appPanelTopComponent.setName("Promotor motif search for " + type + " elements in Table");
+            this.topComponent.setName("Promotor motif search for " + type + " elements in Table");
             Thread promotorSearch = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     model = new MotifSearchModel(referenceViewer);
                     model.takeUpstreamRegions(elements, starts, lengthRelToTss, false);
-                    MotifSearchPanel promotorMotifSearchPanel = model.utrPromotorAnalysis(params);
-                    appPanelTopComponent.add(promotorMotifSearchPanel, BorderLayout.CENTER);
+                    MotifSearchPanel promotorMotifSearchPanel = model.utrPromotorAnalysis(params, starts, null);
+                    promotorMotifSearchPanel.updateUI();
+                    topComponent.add(promotorMotifSearchPanel, BorderLayout.CENTER);
+                    topComponent.updateUI();
                 }
             });
             promotorSearch.start();
@@ -524,7 +542,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
     private void performRbsAnalysisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_performRbsAnalysisActionPerformed
         final List<TranscriptionStart> currentTss = updateTssResults();
-        RbsAnalysisWizardIterator wizard = new RbsAnalysisWizardIterator(this.referenceViewer, currentTss);
+        RbsAnalysisWizardIterator wizard = new RbsAnalysisWizardIterator();
         WizardDescriptor wiz = new WizardDescriptor(wizard);
         wizard.setWiz(wiz);
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
@@ -556,43 +574,154 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                 elements = ElementsOfInterest.ONLY_SELECTED;
             }
 
-            File workingDir = (File) wiz.getProperty(RbsAnalysisWizardIterator.PROP_WORKING_DIR);
+//            File workingDir = (File) wiz.getProperty(RbsAnalysisWizardIterator.PROP_WORKING_DIR);
+
             final int lengthRelToTls = (int) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS);
             int motifWidth = (int) wiz.getProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_LENGTH_MOTIFWIDTH);
             int noOfTrying = (int) wiz.getProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_NO_TRYING_BIOPROSPECTOR);
             int minSpacer = (int) wiz.getProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_MIN_SPACER);
 
-            final RbsAnalysisParameters params = new RbsAnalysisParameters(workingDir, lengthRelToTls, motifWidth, noOfTrying, minSpacer);
+//            final RbsAnalysisParameters params = new RbsAnalysisParameters(workingDir, lengthRelToTls, motifWidth, noOfTrying, minSpacer);
+            final RbsAnalysisParameters params = new RbsAnalysisParameters(lengthRelToTls, motifWidth, noOfTrying, minSpacer);
 
-
-
-            appPanelTopComponent = new AppPanelTopComponent();
-            appPanelTopComponent.setLayout(new BorderLayout());
-            appPanelTopComponent.open();
+//            appPanelTopComponent = new AppPanelTopComponent();
+            topComponent = new MultiPurposeTopComponent(PurposeEnum.MOTIF_SEARCH);
+            topComponent.setLayout(new BorderLayout());
+            topComponent.open();
             String type = elements.toString().toLowerCase();
-            appPanelTopComponent.setName("RBS motif search for " + type + " elements in Table");
+            topComponent.setName("RBS motif search for " + type + " elements in Table");
 
             Thread promotorSearch = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     model = new MotifSearchModel(referenceViewer);
                     model.takeUpstreamRegions(elements, currentTss, lengthRelToTls, true);
-                    model.rbsMotifAnalysis(params);
-                    appPanelTopComponent.add(model.getRbsMotifSearchPanel(), BorderLayout.CENTER);
-
+                    model.rbsMotifAnalysis(params, currentTss, null);
+                    topComponent.add(model.getRbsMotifSearchPanel(), BorderLayout.CENTER);
                 }
             });
             promotorSearch.start();
-
-
             this.tssResult.setResults(currentTss);
         }
     }//GEN-LAST:event_performRbsAnalysisActionPerformed
+
+    private void sequinTableExporterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sequinTableExporterActionPerformed
+
+        final String wizardName = "Sequin Feature Table Export";
+        List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
+        panels.add(new SequinTableSettingsWizardPanel(wizardName));
+        DataSelectionWizardPanel selection = new DataSelectionWizardPanel(PurposeEnum.SEQUIN_EXPORT);
+        selection.getComponent().disableTF();
+        panels.add(selection);
+        String[] steps = new String[panels.size()];
+        for (int i = 0; i < panels.size(); i++) {
+            Component c = panels.get(i).getComponent();
+            // Default step name to component name of panel.
+            steps[i] = c.getName();
+            if (c instanceof JComponent) { // assume Swing components
+                JComponent jc = (JComponent) c;
+                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, i);
+                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DATA, steps);
+                jc.putClientProperty(WizardDescriptor.PROP_AUTO_WIZARD_STYLE, true);
+                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DISPLAYED, true);
+                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_NUMBERED, true);
+            }
+        }
+        WizardDescriptor wiz = new WizardDescriptor(new WizardDescriptor.ArrayIterator<>(panels));
+        // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
+        wiz.setTitleFormat(new MessageFormat("{0}"));
+        wiz.setTitle("...dialog title...");
+        if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
+
+            progresshandle = ProgressHandleFactory.createHandle("Export of feature table");
+            final ArrayList<TranscriptionStart> tss = (ArrayList<TranscriptionStart>) this.updateTssResults();
+            tssResult.setResults(tss);
+
+
+            final String featureName = (String) wiz.getProperty(SequinTableSettingsWizardPanel.SEQUIN_EXPORT_FEATURE_NAME);
+            boolean takeAllElements = (boolean) wiz.getProperty(ElementsOfInterest.ALL.toString());
+            boolean takeOnlyLeaderless = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_LEADERLESS.toString());
+            boolean takeOnlyAntisense = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_ANTISENSE.toString());
+            boolean takeOnlyNonLeaderless = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_NONE_LEADERLESS.toString());
+            boolean takeOnlyRealTss = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_REAL_TSS.toString());
+            boolean takeOnlySelectedElements = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_SELECTED.toString());
+
+            final List<TranscriptionStart> filteredTssList = new ArrayList<>();
+            if (takeAllElements) {
+                elements = ElementsOfInterest.ALL;
+                filteredTssList.addAll(tss);
+            } else if (takeOnlyLeaderless) {
+                elements = ElementsOfInterest.ONLY_LEADERLESS;
+                for (TranscriptionStart ts : tss) {
+                    if (ts.isLeaderless()) {
+                        filteredTssList.add(ts);
+                    }
+                }
+            } else if (takeOnlyAntisense) {
+                elements = ElementsOfInterest.ONLY_ANTISENSE;
+                for (TranscriptionStart ts : tss) {
+                    if (ts.isPutativeAntisense()) {
+                        filteredTssList.add(ts);
+                    }
+                }
+            } else if (takeOnlyNonLeaderless) {
+                elements = ElementsOfInterest.ONLY_NONE_LEADERLESS;
+                for (TranscriptionStart ts : tss) {
+                    if (!ts.isLeaderless()) {
+                        filteredTssList.add(ts);
+                    }
+                }
+            } else if (takeOnlyRealTss) {
+                elements = ElementsOfInterest.ONLY_REAL_TSS;
+                for (TranscriptionStart ts : tss) {
+                    if (!ts.isLeaderless() && !ts.isInternalTSS() && !ts.isPutativeAntisense()) {
+                        filteredTssList.add(ts);
+                    }
+                }
+            } else if (takeOnlySelectedElements) {
+                elements = ElementsOfInterest.ONLY_SELECTED;
+                for (TranscriptionStart ts : tss) {
+                    if (ts.isSelected()) {
+                        filteredTssList.add(ts);
+                    }
+                }
+            }
+
+
+
+
+            ReadXplorerFileChooser fileChooser = new ReadXplorerFileChooser(new String[]{"tbl"}, "Table files for Sequin export") {
+                @Override
+                public void save(String fileLocation) {
+                    progresshandle.start(5);
+                    SequinTableFormatExporter exporter = new SequinTableFormatExporter(new File(fileLocation), (ArrayList<TranscriptionStart>) filteredTssList, null, null, tableType, featureName); //To change body of generated methods, choose Tools | Templates.
+                    progresshandle.progress(1);
+                    exporter.start();
+                    progresshandle.progress(2);
+                }
+
+                @Override
+                public void open(String fileLocation) {
+                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                }
+            };
+
+
+            fileChooser.openFileChooser(ReadXplorerFileChooser.SAVE_DIALOG);
+            progresshandle.progress(3);
+            progresshandle.progress(5);
+
+            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successfull!",
+                    "Export was successfull!", JOptionPane.INFORMATION_MESSAGE);
+            progresshandle.finish();
+        }
+    }//GEN-LAST:event_sequinTableExporterActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton exportButton;
     private javax.swing.JButton performDeletionOfAllFP;
     private javax.swing.JButton performPromotorAnalysis;
     private javax.swing.JButton performRbsAnalysis;
+    private javax.swing.JButton sequinTableExporter;
     private javax.swing.JButton startChartsOfTssData;
     private javax.swing.JButton statisticsButton;
     private javax.swing.JTable tSSTable;
@@ -634,6 +763,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
             final int nbColumns = 25;
 
+            // statistic values
             int noCorrectStarts = 0;
             int noFwdFeatures = 0;
             int noRevFeatures = 0;
@@ -641,13 +771,14 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
             int noInternalTSS = 0;
             int noPutativeAntisense = 0;
             int noPutCdsShifts = 0;
+            int noTssUnannotated = 0;
 
 
             final DefaultTableModel model = (DefaultTableModel) tSSTable.getModel();
 
             String strand;
             PersistantFeature feature;
-            PersistantFeature nextGene;
+            PersistantFeature nextDownstreamFeature;
 
             for (TranscriptionStart tSS : tsss) {
 
@@ -668,54 +799,79 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                 this.tssInHash.put(position, tSS);
 
                 int i = 0;
+                // 0
                 rowData[i++] = position;
+                // 1
                 rowData[i++] = newResult.getChromosomeMap().get(tSS.getChromId());
+                // 2
+                rowData[i++] = tSS.getComment();
+                // 3
                 rowData[i++] = strand;
+                // 4
                 rowData[i++] = tSS.getReadStarts();
+                // 5
                 rowData[i++] = tSS.getRelCount();
 
                 feature = tSS.getDetectedGene();
-                nextGene = tSS.getNextGene();
+                nextDownstreamFeature = tSS.getNextGene();
 
                 if (feature != null) {
+                    // 6
                     rowData[i++] = feature.toString();
+                    // 7
                     rowData[i++] = feature.getLocus();
+                    // 8
                     rowData[i++] = tSS.getOffset();
                     ++noCorrectStarts;
-                } else {
-                    rowData[i++] = nextGene.toString();
-                    rowData[i++] = nextGene.getLocus();
+                } else if (nextDownstreamFeature != null) {
+                    rowData[i++] = nextDownstreamFeature.toString();
+                    rowData[i++] = nextDownstreamFeature.getLocus();
                     rowData[i++] = tSS.getNextOffset();
+                } 
+                else {
+                    rowData[i++] = "-";
+                    rowData[i++] = "-";
+                    rowData[i++] = "-";
+                    noTssUnannotated++;
                 }
 
-                rowData[i++] = tSS.getSequence();
-
+                // 9
                 rowData[i++] = leaderless;
 
+                // 10
                 boolean cdsShift = tSS.isCdsShift();
                 rowData[i++] = cdsShift;
                 if (cdsShift) {
                     noPutCdsShifts++;
                 }
 
+                // 11
                 rowData[i++] = false;
+
+                // 12
                 rowData[i++] = tSS.isInternalTSS();
                 if (tSS.isInternalTSS()) {
                     noInternalTSS++;
                 }
 
+                // 13
                 rowData[i++] = tSS.isPutativeAntisense();
                 if (tSS.isPutativeAntisense()) {
                     noPutativeAntisense++;
                 }
 
-                rowData[i++] = false;
+                // 14
+                rowData[i++] = tSS.isSelected();
+
+                // 15
+                rowData[i++] = tSS.isConsideredTSS();
+
                 // additionally informations about detected gene
                 if (feature != null) {
                     rowData[i++] = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
                     rowData[i++] = feature.isFwdStrand() ? feature.getStop() : feature.getStart();
                     rowData[i++] = feature.getStop() - feature.getStart();
-                    int start = feature.getStart();
+                    int start = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
                     if ((start % 3) == 0) {
                         rowData[i++] = 3;
                     } else if (start % 3 == 1) {
@@ -724,19 +880,26 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                         rowData[i++] = 2;
                     }
                     rowData[i++] = feature.getProduct();
-                } else {
-                    rowData[i++] = nextGene.isFwdStrand() ? nextGene.getStart() : nextGene.getStop();
-                    rowData[i++] = nextGene.isFwdStrand() ? nextGene.getStop() : nextGene.getStart();
-                    rowData[i++] = nextGene.getStop() - nextGene.getStart();
-                    int start = nextGene.getStart();
+                } else if (nextDownstreamFeature != null) {
+                    rowData[i++] = nextDownstreamFeature.isFwdStrand() ? nextDownstreamFeature.getStart() : nextDownstreamFeature.getStop();
+                    rowData[i++] = nextDownstreamFeature.isFwdStrand() ? nextDownstreamFeature.getStop() : nextDownstreamFeature.getStart();
+                    rowData[i++] = nextDownstreamFeature.getStop() - nextDownstreamFeature.getStart();
+                    int start = nextDownstreamFeature.isFwdStrand() ? nextDownstreamFeature.getStart() : nextDownstreamFeature.getStop();
                     if ((start % 3) == 0) {
-                        rowData[i++] = 2;
+                        rowData[i++] = 3;
                     } else if (start % 3 == 1) {
                         rowData[i++] = 1;
                     } else if (start % 3 == 2) {
-                        rowData[i++] = 3;
+                        rowData[i++] = 2;
                     }
-                    rowData[i++] = nextGene.getProduct();
+                    rowData[i++] = nextDownstreamFeature.getProduct();
+                } 
+                else {
+                    rowData[i++] = "-";
+                    rowData[i++] = "-";
+                    rowData[i++] = "-";
+                    rowData[i++] = "-";
+                    rowData[i++] = "-";
                 }
 
                 rowData[i++] = tSS.getDetectedFeatStart();
@@ -802,11 +965,25 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
             Integer posTableAti = (Integer) tSSTable.getValueAt(i, 0);
             if (tmpHash.containsKey(posTableAti)) {
 
-                if ((Boolean) tSSTable.getValueAt(i, 14)) {
+                if ((Boolean) tSSTable.getValueAt(i, 13)) {
                     this.tssInHash.get(posTableAti).setSelected(true);
                 } else {
                     this.tssInHash.get(posTableAti).setSelected(false);
                 }
+                if ((Boolean) tSSTable.getValueAt(i, 9)) {
+                    this.tssInHash.get(posTableAti).setCdsShift(true);
+                } else {
+                    this.tssInHash.get(posTableAti).setCdsShift(false);
+                }
+
+                if ((Boolean) tSSTable.getValueAt(i, 14)) {
+                    this.tssInHash.get(posTableAti).setIsconsideredTSS(true);
+                } else {
+                    this.tssInHash.get(posTableAti).setIsconsideredTSS(false);
+                }
+
+                this.tssInHash.get(posTableAti).setComment((String) tSSTable.getValueAt(i, 2));
+
                 tmpHash.remove(posTableAti);
             }
         }
@@ -820,6 +997,45 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
     @Override
     public void update(Object args) {
+//        if(args instanceof List<Object>) {
+//            List<Object> list = (List<Object>) args;
+//            
+//        }
+//        
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    /**
+     * Prepares the result for output. Any special operations are carried out
+     * here. In this case generating the promotor region for each TSS.
+     */
+    private void processResultForExport() {
+        //Generating promotor regions for the TSS
+        this.promotorRegions = new ArrayList<>();
+
+        //get reference sequence for promotor regions
+        PersistantReference ref = this.referenceViewer.getReference();
+        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(ref.getId());
+        ChromosomeObserver chromObserver = new ChromosomeObserver();
+        String chromSeq = refConnector.getRefGenome().getActiveChromSequence(chromObserver);
+        String promotor;
+
+        //get the promotor region for each TSS
+        int promotorStart;
+        int chromLength = chromSeq.length();
+        for (TranscriptionStart tSS : this.tssResult.getResults()) {
+            if (tSS.isFwdStrand()) {
+                promotorStart = tSS.getStartPosition() - 70;
+                promotorStart = promotorStart < 0 ? 0 : promotorStart;
+                promotor = chromSeq.substring(promotorStart, tSS.getStartPosition());
+            } else {
+                promotorStart = tSS.getStartPosition() + 70;
+                promotorStart = promotorStart > chromLength ? chromLength : promotorStart;
+                promotor = SequenceUtils.getReverseComplement(chromSeq.substring(tSS.getStartPosition(), promotorStart));
+            }
+            this.promotorRegions.add(promotor);
+        }
+        tssResult.setPromotorRegions(promotorRegions);
+        refConnector.getRefGenome().getActiveChromosome().removeObserver(chromObserver);
     }
 }

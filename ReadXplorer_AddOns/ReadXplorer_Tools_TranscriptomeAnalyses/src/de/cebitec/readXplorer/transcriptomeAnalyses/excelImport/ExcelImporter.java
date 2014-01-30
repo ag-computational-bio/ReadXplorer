@@ -6,12 +6,12 @@ import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
-import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelRegion;
+import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelTranscript;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.OperonAdjacency;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.RPKMvalue;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
-import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.TableType;
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.NovelRegionResult;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.NovelRegionResultPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.OperonDetectionResult;
@@ -77,7 +77,7 @@ public class ExcelImporter {
             setUpNewRegionStructuresAndTable(refViewer, transcAnalysesTopComp);
         } else if (secondSheetMap.get(TABLE_TYPE).equals(TableType.RPKM_TABLE.toString())) {
             setUpRpkmStructuresAndTable(transcAnalysesTopComp);
-        } else if (secondSheetMap.get(TABLE_TYPE).equals(TableType.OPETON_TABLE.toString())) {
+        } else if (secondSheetMap.get(TABLE_TYPE).equals(TableType.OPERON_TABLE.toString())) {
             setUpOperonStructuresAndTable(refViewer, transcAnalysesTopComp);
         }
     }
@@ -147,12 +147,6 @@ public class ExcelImporter {
         tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.TSS_RATIO);
         int ratio = Integer.valueOf(tmp);
 
-        tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.TSS_CHOOSEN_DOWNSTREAM_REGION);
-        int downstream = Integer.valueOf(tmp);
-
-        tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.TSS_CHOOSEN_UPSTREAM_REGION);
-        int upstream = Integer.valueOf(tmp);
-
         tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.TSS_EXCLUSION_OF_INTERNAL_TSS);
         boolean isInternalExclusion;
         if (tmp.equals("no")) {
@@ -172,10 +166,10 @@ public class ExcelImporter {
 
         tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.TSS_PERCENTAGE_FOR_CDSSHIFT_ANALYSIS);
         replaced = tmp.replaceAll(",", ".");
-        double cdsPercentageValue = Double.valueOf(replaced);
+        int cdsPercentageValue = Integer.valueOf(replaced);
 
         ParameterSetFiveEnrichedAnalyses params = new ParameterSetFiveEnrichedAnalyses(
-                fraction, ratio, upstream, downstream, isInternalExclusion,
+                fraction, ratio, isInternalExclusion,
                 rangeForKeepingTSS, rangeForLeaderlessDetection, keepingInternalRange, cdsPercentageValue);
         StatisticsOnMappingData stats = new StatisticsOnMappingData(refConnector.getRefGenome(), mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
 
@@ -185,9 +179,10 @@ public class ExcelImporter {
         List<TranscriptionStart> tss = new ArrayList<>();
         TranscriptionStart ts = null;
         progressHandle.progress("Initialize table ... ", 20);
+
         for (int row = 1; row < model.getRowCount(); row++) {
 
-            String internalTSS = (String) model.getValueAt(row, 12);
+            String internalTSS = (String) model.getValueAt(row, 14);
             boolean isInternalTSS;
 
             if (internalTSS.equals("false")) {
@@ -198,13 +193,16 @@ public class ExcelImporter {
 
             PersistantFeature detectedGene = null;
             PersistantFeature downstreamNextGene = null;
-            String locus = (String) model.getValueAt(row, 6);
+            String locus = (String) model.getValueAt(row, 7);
 
-            if (isInternalTSS) {
-                downstreamNextGene = featureMap.get(locus);
-            } else {
-                detectedGene = featureMap.get(locus);
+            if (featureMap.containsKey(locus)) {
+                if (isInternalTSS) {
+                    downstreamNextGene = featureMap.get(locus);
+                } else {
+                    detectedGene = featureMap.get(locus);
+                }
             }
+
             boolean isFwd;
             String strand = (String) model.getValueAt(row, 1);
             if (strand.equals("Fwd")) {
@@ -216,23 +214,52 @@ public class ExcelImporter {
             String position = (String) model.getValueAt(row, 0);
             int tssPosition = Integer.valueOf(position);
 
-            String readStartsString = (String) model.getValueAt(row, 3);
-            int readStarts = Integer.valueOf(readStartsString);
 
-            String relCountsString = (String) model.getValueAt(row, 4);
-            replaced = relCountsString.replaceAll(",", ".");
-            double relCount = Double.valueOf(replaced);
+            String comment = (String) model.getValueAt(row, 3);
 
-            String offsetString = (String) model.getValueAt(row, 7);
-            int offset = Integer.valueOf(offsetString);
+            int readStarts;
+            String readStartsString = (String) model.getValueAt(row, 4);
+            if (readStartsString.equals("-") || readStartsString.isEmpty()) {
+                readStarts = 0;
+            } else {
+                readStarts = Integer.valueOf(readStartsString);
+            }
 
-            String dist2StartString = (String) model.getValueAt(row, 8);
-            int dist2Start = Integer.valueOf(dist2StartString);
+            double relCount;
+            String relCountsString = (String) model.getValueAt(row, 5);
+            if (relCountsString.equals("-")|| readStartsString.isEmpty()) {
+                relCount = 0.0;
+            } else {
+                replaced = relCountsString.replaceAll(",", ".");
+                relCount = Double.valueOf(replaced);
+            }
 
-            String dist2StopString = (String) model.getValueAt(row, 9);
-            int dist2Stop = Integer.valueOf(dist2StopString);
 
-            String leaderlessBool = (String) model.getValueAt(row, 11);
+            String offsetString = (String) model.getValueAt(row, 8);
+            int offset;
+            if (offsetString.equals("-")|| readStartsString.isEmpty()) {
+                offset = 0;
+            } else {
+                offset = Integer.valueOf(offsetString);
+            }
+
+            int dist2Start;
+            String dist2StartString = (String) model.getValueAt(row, 9);
+            if (dist2StartString.equals("-")|| readStartsString.isEmpty()) {
+                dist2Start = 0;
+            } else {
+                dist2Start = Integer.valueOf(dist2StartString);
+            }
+
+            int dist2Stop;
+            String dist2StopString = (String) model.getValueAt(row, 10);
+            if (dist2StopString.equals("-")|| readStartsString.isEmpty()) {
+                dist2Stop = 0;
+            } else {
+                dist2Stop = Integer.valueOf(dist2StopString);
+            }
+
+            String leaderlessBool = (String) model.getValueAt(row, 12);
             boolean isLeaderless;
             if (leaderlessBool.equals("false")) {
                 isLeaderless = false;
@@ -240,7 +267,7 @@ public class ExcelImporter {
                 isLeaderless = true;
             }
 
-            String cdsShiftBool = (String) model.getValueAt(row, 12);
+            String cdsShiftBool = (String) model.getValueAt(row, 13);
             boolean isCdsShift;
             if (cdsShiftBool.equals("false")) {
                 isCdsShift = false;
@@ -250,28 +277,45 @@ public class ExcelImporter {
 
 
 
-            String antisenseBool = (String) model.getValueAt(row, 13);
+            String antisenseBool = (String) model.getValueAt(row, 15);
             boolean isPutAntisense;
             if (antisenseBool.equals("false")) {
                 isPutAntisense = false;
             } else {
                 isPutAntisense = true;
             }
+            String selectedForUpstreamAnalysis = (String) model.getValueAt(row, 16);
+            boolean isSelected;
+            if (selectedForUpstreamAnalysis.equals("false")) {
+                isSelected = false;
+            } else {
+                isSelected = true;
+            }
+
+            String isConsideredString = (String) model.getValueAt(row, 17);
+            boolean isConsidered;
+            if (isConsideredString.equals("false")) {
+                isConsidered = false;
+            } else {
+                isConsidered = true;
+            }
 
             ts = new TranscriptionStart(tssPosition,
                     isFwd, readStarts, relCount,
                     detectedGene, offset,
                     dist2Start, dist2Stop,
-                    downstreamNextGene, offset,
-                    (String) model.getValueAt(row, 10), isLeaderless, isCdsShift,
-                    (String) model.getValueAt(row, 19), (String) model.getValueAt(row, 20),
+                    downstreamNextGene, offset, isLeaderless, isCdsShift,
+                    (String) model.getValueAt(row, 21), (String) model.getValueAt(row, 22),
                     isInternalTSS, isPutAntisense, chromId, refID);
+            ts.setComment(comment);
+            ts.setSelected(isSelected);
+            ts.setIsconsideredTSS(isConsidered);
             tss.add(ts);
         }
         progressHandle.progress(27);
         tssResult.setResults(tss);
         tssResultsPanel.addResult(tssResult);
-        transcAnalysesTopComp.openAnalysisTab("TSS-Detection for: " + refConnector.getAssociatedTrackNames().get(track.getId()), tssResultsPanel);
+        transcAnalysesTopComp.openAnalysisTab("TSS-Detection for: " + refConnector.getAssociatedTrackNames().get(track.getId()) + " (Hits: " + tss.size() + ")", tssResultsPanel);
     }
 
     public void setUpRpkmStructuresAndTable(TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp) {
@@ -336,6 +380,7 @@ public class ExcelImporter {
 
     public void setUpOperonStructuresAndTable(ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp) {
         ResultPanelOperonDetection resultPanel = new ResultPanelOperonDetection();
+//        resultPanel.setBoundsInfoManager(refViewer.getBoundsInformationManager());
         resultPanel.setReferenceViewer(refViewer);
 
 
@@ -387,6 +432,8 @@ public class ExcelImporter {
         replaced = tmp.replaceAll(",", ".");
         double fraction = Double.valueOf(replaced);
 
+
+
         ParameterSetWholeTranscriptAnalyses params = new ParameterSetWholeTranscriptAnalyses(true, false, true, false, fraction, 0, false, 0);
         StatisticsOnMappingData stats = new StatisticsOnMappingData(refConnector.getRefGenome(), mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
 
@@ -400,12 +447,14 @@ public class ExcelImporter {
             adjacencies = new ArrayList<>();
             operon = new Operon(trackID);
             // getAll Adjacencies, put them in operon.
-//          
-            String firstFeatures = (String) model.getValueAt(row, 0);
+            int transcriptStart = Integer.parseInt((String) model.getValueAt(row, 0));
+            operon.setStartPositionOfTranscript(transcriptStart);
+
+            String firstFeatures = (String) model.getValueAt(row, 1);
             String[] splitedFeatures = firstFeatures.split("\n");
             String secondFeatures = (String) model.getValueAt(row, 1);
             String[] splitedSecFeatures = secondFeatures.split("\n");
-            String spanningReadCount = (String) model.getValueAt(row, 7);
+            String spanningReadCount = (String) model.getValueAt(row, 10);
             String[] splitedSpanningReadCounts = spanningReadCount.split("\n");
 
             for (int i = 0; i < splitedFeatures.length; i++) {
@@ -417,7 +466,35 @@ public class ExcelImporter {
                 adjacencies.add(adj);
             }
 
+            boolean isFwd;
+            String direction = (String) model.getValueAt(row, 5);
+            String withoutNewLine = direction.substring(0, direction.length() - 1);
+            if (withoutNewLine.equals("Fwd")) {
+                isFwd = true;
+            } else {
+                isFwd = false;
+            }
+
+            boolean isUpstreamAnalysisMarked;
+            String upstreamAnalysis = (String) model.getValueAt(row, 8);
+            if (upstreamAnalysis.equals("false")) {
+                isUpstreamAnalysisMarked = false;
+            } else {
+                isUpstreamAnalysisMarked = true;
+            }
+
+            boolean isConsidered;
+            String consideration = (String) model.getValueAt(row, 9);
+            if (consideration.equals("false")) {
+                isConsidered = false;
+            } else {
+                isConsidered = true;
+            }
+
             operon.addAllOperonAdjacencies(adjacencies);
+            operon.setIsConsidered(isConsidered);
+            operon.setFwd(isFwd);
+            operon.setForUpstreamAnalysisMarked(isUpstreamAnalysisMarked);
             operons.add(operon);
         }
         progressHandle.progress(27);
@@ -498,8 +575,8 @@ public class ExcelImporter {
 
         NovelRegionResult novelRegionResults = new NovelRegionResult(stats, trackMap, null, false);
         novelRegionResults.setParameters(params);
-        List<NovelRegion> novelRegions = new ArrayList<>();
-        NovelRegion novelRegion = null;
+        List<NovelTranscript> novelRegions = new ArrayList<>();
+        NovelTranscript novelRegion = null;
         progressHandle.progress("Initialize table ... ", 20);
         for (int row = 1; row < model.getRowCount(); row++) {
 
@@ -530,16 +607,25 @@ public class ExcelImporter {
                 isSelectedForBlast = true;
             }
 
+            boolean isFinished;
+            String finishedSring = (String) model.getValueAt(row, 6);
+            if (finishedSring.equals("false")) {
+                isFinished = false;
+            } else {
+                isFinished = true;
+            }
+
             int dropOff;
-            String dropOffString = (String) model.getValueAt(row, 7);
+            String dropOffString = (String) model.getValueAt(row, 8);
             dropOff = Integer.valueOf(dropOffString);
 
             int length;
-            String lengthString = (String) model.getValueAt(row, 8);
+            String lengthString = (String) model.getValueAt(row, 9);
             length = Integer.valueOf(lengthString);
 
-            novelRegion = new NovelRegion(isFwd, novelRegStartPos, dropOff, (String) model.getValueAt(row, 6),
-                    length, (String) model.getValueAt(row, 9), isFP, isSelectedForBlast, refID, chromId);
+            novelRegion = new NovelTranscript(isFwd, novelRegStartPos, dropOff, (String) model.getValueAt(row, 7),
+                    length, (String) model.getValueAt(row, 10), isFP, isSelectedForBlast, refID, chromId);
+            novelRegion.setIsConsidered(isFinished);
             novelRegions.add(novelRegion);
         }
         progressHandle.progress(27);

@@ -11,6 +11,8 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport;
  * @author jritter
  */
 public enum Qualifier {
+    
+    NONE,
 
 //Qualifier       name of qualifier; qualifier requires a value if followed by an equal 
 //                sign
@@ -1360,5 +1362,5 @@ public enum Qualifier {
     //                varieties, i.e., products of artificial selection;
     //                varieties other than plant and fungal variatas should be            
     //                annotated via /note, e.g. /note="breed:Cukorova"
-    VARIETY,
+    VARIETY, PUBMED,
 }
