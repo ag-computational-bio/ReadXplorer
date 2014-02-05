@@ -50,7 +50,7 @@ public class PlotGenerator implements Observer {
     protected static final Color COLOR2 = new Color(200, 80, 75);
     private double smallestColumnValue = 0.0;
 
-    public List<DataTable> prepareData(ChartType chartType, ElementsOfInterest elements, List<TranscriptionStart> tss, ReferenceViewer refViewer, int length, int bin) {
+    public List<DataTable> prepareData(ChartType chartType, ElementsOfInterest elements, List<TranscriptionStart> tss, ReferenceViewer refViewer, int length) {
 
         List<DataTable> dataList = new ArrayList<>();
         List<TranscriptionStart> tssForAnalysis = getTssOfInterest(elements, tss);

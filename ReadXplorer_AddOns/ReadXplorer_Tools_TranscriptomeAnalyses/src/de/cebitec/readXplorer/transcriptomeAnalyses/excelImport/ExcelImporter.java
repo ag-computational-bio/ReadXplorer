@@ -305,7 +305,7 @@ public class ExcelImporter {
                     detectedGene, offset,
                     dist2Start, dist2Stop,
                     downstreamNextGene, offset, isLeaderless, isCdsShift,
-                    (String) model.getValueAt(row, 21), (String) model.getValueAt(row, 22),
+                    (String) model.getValueAt(row, 23), (String) model.getValueAt(row, 24),
                     isInternalTSS, isPutAntisense, chromId, refID);
             ts.setComment(comment);
             ts.setSelected(isSelected);

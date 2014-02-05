@@ -66,8 +66,10 @@ public class TssDetectionStatsPanel extends javax.swing.JPanel {
             }
         });
         tssDetectionStatsScrollpane.setViewportView(tssDetectionStatsTable);
-        tssDetectionStatsTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(TssDetectionStatsPanel.class, "TssDetectionStatsPanel.tssDetectionStatsTable.columnModel.title0_1")); // NOI18N
-        tssDetectionStatsTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(TssDetectionStatsPanel.class, "TssDetectionStatsPanel.tssDetectionStatsTable.columnModel.title1_1")); // NOI18N
+        if (tssDetectionStatsTable.getColumnModel().getColumnCount() > 0) {
+            tssDetectionStatsTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(TssDetectionStatsPanel.class, "TssDetectionStatsPanel.tssDetectionStatsTable.columnModel.title0_1")); // NOI18N
+            tssDetectionStatsTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(TssDetectionStatsPanel.class, "TssDetectionStatsPanel.tssDetectionStatsTable.columnModel.title1_1")); // NOI18N
+        }
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -88,6 +90,7 @@ public class TssDetectionStatsPanel extends javax.swing.JPanel {
     private void initAdditionalComponents() {
         tssDetectionStatsTable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{
+            {"TSS Statistics", ""},
             {ResultPanelTranscriptionStart.TSS_TOTAL, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_TOTAL))},
             {ResultPanelTranscriptionStart.TSS_CORRECT, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_CORRECT))},
             {ResultPanelTranscriptionStart.TSS_FWD, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_FWD))},
@@ -96,6 +99,7 @@ public class TssDetectionStatsPanel extends javax.swing.JPanel {
             {ResultPanelTranscriptionStart.TSS_INTERNAL, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_INTERNAL))},
             {ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE))},
             {ResultPanelTranscriptionStart.TSS_NO_PUTATIVE_CDS_SHIFTS, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_NO_PUTATIVE_CDS_SHIFTS))},
+            {"Mapping statistics", ""},
             {ResultPanelTranscriptionStart.MAPPINGS_COUNT, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT))},
             {ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH))},
             {ResultPanelTranscriptionStart.MAPPINGS_MILLION, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MILLION))},

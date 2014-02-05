@@ -362,7 +362,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
                     motifSearch = new MotifSearchModel(referenceViewer);
                     motifSearch.takeSubRegionsForOperonAnalysis(filteredForSelected, lengthRelToTls, true);
                     motifSearch.rbsMotifAnalysis(params, null, updateOperonResults());
-                    appPanelTopComponent.add(motifSearch.getRbsMotifSearchPanel(), BorderLayout.CENTER);
+//                    appPanelTopComponent.add(motifSearch.getRbsMotifSearchPanel(), BorderLayout.CENTER);
                 }
             });
             rbsMotifSearchThread.start();
@@ -429,8 +429,8 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
                 public void run() {
                     motifSearch = new MotifSearchModel(referenceViewer);
                     motifSearch.takeSubRegionsForOperonAnalysis(filteredForSelected, lengthRelToTss, false);
-                    MotifSearchPanel panel = motifSearch.utrPromotorAnalysis(params, null, updateOperonResults());
-                    appPanelTopComponent.add(panel, BorderLayout.CENTER);
+//                    MotifSearchPanel panel = motifSearch.utrPromotorAnalysis(params, null, updateOperonResults());
+//                    appPanelTopComponent.add(panel, BorderLayout.CENTER);
                 }
             });
             rbsMotifSearchThread.start();

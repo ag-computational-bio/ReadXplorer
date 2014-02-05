@@ -31,6 +31,7 @@ public class TranscriptionStart extends TrackChromResultEntry {
     private int minus10MotifWidth, minus35MotifWidth, rbsMotifWidth;
     private boolean hasRbsFeatureAssigned, hasPromtorFeaturesAssigned;
     private boolean isConsideredTSS;
+    private boolean isIntergenicAntisense;
     /**
      * A comment the user can set in the table during the analysis.
      */
@@ -139,6 +140,16 @@ public class TranscriptionStart extends TrackChromResultEntry {
     public boolean isPutativeAntisense() {
         return putativeAntisense;
     }
+
+    public boolean isIntergenicAntisense() {
+        return isIntergenicAntisense;
+    }
+
+    public void setIntergenicAntisense(boolean isIntergenicAntisense) {
+        this.isIntergenicAntisense = isIntergenicAntisense;
+    }
+    
+    
 
     /**
      * Set whether this TSS is in antisense location or not.

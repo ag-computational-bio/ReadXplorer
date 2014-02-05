@@ -4,9 +4,16 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch;
 
+import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
+import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
+import de.cebitec.readXplorer.util.Observable;
+import de.cebitec.readXplorer.util.Observer;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeMap;
 import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -19,10 +26,16 @@ import org.netbeans.api.progress.ProgressHandleFactory;
  *
  * @author jritter
  */
-public class RbsMotifSearchPanel extends javax.swing.JPanel {
+public class RbsMotifSearchPanel extends javax.swing.JPanel implements Observable {
 
     private ProgressHandle progressHandle;
     private File bioProspInput, bioProspOut, sequenceLogo;
+    private List<Observer> observerList;
+    TreeMap<String, Integer> rbsStarts;
+    TreeMap<String, Integer> rbsShifts;
+    RbsAnalysisParameters params;
+    List<Operon> operons;
+    List<String> upstreamRegions;
 
     /**
      * Creates new form RbsMotifSearchPanel
@@ -45,6 +58,7 @@ public class RbsMotifSearchPanel extends javax.swing.JPanel {
         this.regionOfIntrestTP.setEditable(false);
         this.regionOfIntrestTP.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         this.infoPanel.setBorder(BorderFactory.createTitledBorder("Info panel"));
+        this.observerList = new ArrayList<>();
     }
 
     public void setLogo(JLabel logo) {
@@ -301,6 +315,7 @@ public class RbsMotifSearchPanel extends javax.swing.JPanel {
         int returnVal = fileChooser.showSaveDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             progressHandle.start(4);
+            this.notifyObservers(this);
             progressHandle.progress(1);
             File input = getBioProspInput();
             input.renameTo(new File(fileChooser.getSelectedFile().getAbsolutePath() + "\\intputSequencesForBioProspector.fna"));
@@ -339,4 +354,63 @@ public class RbsMotifSearchPanel extends javax.swing.JPanel {
     private javax.swing.JTextPane regionOfIntrestTP;
     private javax.swing.JTextPane regionsToAnalyseTP;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void registerObserver(Observer observer) {
+        this.observerList.add(observer);
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+        this.observerList.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers(Object data) {
+        for (Observer observer : observerList) {
+            observer.update(data);
+        }
+    }
+
+    public TreeMap<String, Integer> getRbsStarts() {
+        return rbsStarts;
+    }
+
+    public void setRbsStarts(TreeMap<String, Integer> rbsStarts) {
+        this.rbsStarts = rbsStarts;
+    }
+
+    public TreeMap<String, Integer> getRbsShifts() {
+        return rbsShifts;
+    }
+
+    public void setRbsShifts(TreeMap<String, Integer> rbsShifts) {
+        this.rbsShifts = rbsShifts;
+    }
+
+    public RbsAnalysisParameters getParams() {
+        return params;
+    }
+
+    public void setParams(RbsAnalysisParameters params) {
+        this.params = params;
+    }
+
+    public List<Operon> getOperons() {
+        return operons;
+    }
+
+    public void setOperons(List<Operon> operons) {
+        this.operons = operons;
+    }
+
+    public List<String> getUpstreamRegions() {
+        return upstreamRegions;
+    }
+
+    public void setUpstreamRegions(List<String> upstreamRegions) {
+        this.upstreamRegions = upstreamRegions;
+    }
+    
+    
 }

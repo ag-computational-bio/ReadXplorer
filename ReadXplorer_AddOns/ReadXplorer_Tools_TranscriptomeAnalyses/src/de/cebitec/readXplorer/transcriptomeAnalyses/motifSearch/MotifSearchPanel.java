@@ -1,8 +1,16 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch;
 
+import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
+import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.PurposeEnum;
+import de.cebitec.readXplorer.util.Observable;
+import de.cebitec.readXplorer.util.Observer;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeMap;
 import javax.swing.BorderFactory;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -15,7 +23,7 @@ import org.netbeans.api.progress.ProgressHandleFactory;
  *
  * @author jritter
  */
-public class MotifSearchPanel extends javax.swing.JPanel {
+public class MotifSearchPanel extends javax.swing.JPanel implements Observable {
 
     public static final String CURRENT_DIR = "currentDirectory";
     private File minus10Input;
@@ -24,6 +32,13 @@ public class MotifSearchPanel extends javax.swing.JPanel {
     private File bioProspOutMinus35;
     private File logoMinus10, logoMinus35;
     private ProgressHandle progressHandle;
+    private List<Observer> observerList;
+    List<String> upstreamRegions;
+    TreeMap<String, Integer> minus10Starts;
+    TreeMap<String, Integer> minus35Starts;
+    TreeMap<String, Integer> minus10Shifts;
+    TreeMap<String, Integer> minus35Shifts;
+    PromotorSearchParameters params;
 
     /**
      * Creates new form MotifSearchPanel
@@ -37,6 +52,7 @@ public class MotifSearchPanel extends javax.swing.JPanel {
      * Some additional settings on components like setting borders.
      */
     private void additionalInits() {
+        this.observerList = new ArrayList<>();
         promotorsPanel.setBorder(BorderFactory.createTitledBorder("Promotor region in Fasta format"));
         promotorsInFastaTextPane.setEditable(true);
         promotorsInFastaTextPane.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
@@ -360,6 +376,7 @@ public class MotifSearchPanel extends javax.swing.JPanel {
         int returnVal = fileChooser.showSaveDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             progressHandle.start(4);
+            this.notifyObservers(PurposeEnum.PROMOTER_ANALYSIS);
             progressHandle.progress(1);
             File inputMinus10 = getMinus10Input();
             File inputMinus35 = getMinus35Input();
@@ -439,4 +456,70 @@ public class MotifSearchPanel extends javax.swing.JPanel {
     public void setContributionMinus35Label(String text) {
         this.noSegmentsOfSeqsContributionToMotif35.setText(text);
     }
+
+    @Override
+    public void registerObserver(Observer observer) {
+        this.observerList.add(observer);
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+        this.observerList.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers(Object data) {
+        for (Observer observer : observerList) {
+            observer.update(data);
+        }
+    }
+
+    public List<String> getUpstreamRegions() {
+        return upstreamRegions;
+    }
+
+    public void setUpstreamRegions(List<String> upstreamRegions) {
+        this.upstreamRegions = upstreamRegions;
+    }
+
+    public TreeMap<String, Integer> getMinus10Starts() {
+        return minus10Starts;
+    }
+
+    public void setMinus10Starts(TreeMap<String, Integer> minus10Starts) {
+        this.minus10Starts = minus10Starts;
+    }
+
+    public TreeMap<String, Integer> getMinus35Starts() {
+        return minus35Starts;
+    }
+
+    public void setMinus35Starts(TreeMap<String, Integer> minus35Starts) {
+        this.minus35Starts = minus35Starts;
+    }
+
+    public TreeMap<String, Integer> getMinus10Shifts() {
+        return minus10Shifts;
+    }
+
+    public void setMinus10Shifts(TreeMap<String, Integer> minus10Shifts) {
+        this.minus10Shifts = minus10Shifts;
+    }
+
+    public TreeMap<String, Integer> getMinus35Shifts() {
+        return minus35Shifts;
+    }
+
+    public void setMinus35Shifts(TreeMap<String, Integer> minus35Shifts) {
+        this.minus35Shifts = minus35Shifts;
+    }
+
+    public PromotorSearchParameters getParams() {
+        return params;
+    }
+
+    public void setParams(PromotorSearchParameters params) {
+        this.params = params;
+    }
+
 }

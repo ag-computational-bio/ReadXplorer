@@ -88,12 +88,14 @@ public class NovelRegionDetectionStatsPanel extends javax.swing.JPanel {
     private void initAdditionalComponents() {
         tssDetectionStatsTable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{
+                    {"Novel Transcript Statistics", ""},
             {NovelRegionResultPanel.NOVELREGION_DETECTION_MIN_LENGTH, String.valueOf(this.tssStatisticsMap.get(NovelRegionResultPanel.NOVELREGION_DETECTION_MIN_LENGTH))},
             {NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_FEATURES, String.valueOf(this.tssStatisticsMap.get(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_FEATURES))},
             {NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_REV_FEATURES, String.valueOf(this.tssStatisticsMap.get(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_REV_FEATURES))},
             {NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_FWD_FEATURES, String.valueOf(this.tssStatisticsMap.get(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_FWD_FEATURES))},
             {NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_CISANTISENSE, String.valueOf(this.tssStatisticsMap.get(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_CISANTISENSE))},
             {NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_TRANSGENIC, String.valueOf(this.tssStatisticsMap.get(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_TRANSGENIC))},
+            {"Mapping Statistics", ""},
             {ResultPanelTranscriptionStart.MAPPINGS_COUNT, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT))},
             {ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH))},
             {ResultPanelTranscriptionStart.MAPPINGS_MILLION, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MILLION))},

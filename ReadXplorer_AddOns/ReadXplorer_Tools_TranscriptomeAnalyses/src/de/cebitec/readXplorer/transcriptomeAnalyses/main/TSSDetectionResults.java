@@ -233,6 +233,11 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE)));
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_NO_PUTATIVE_CDS_SHIFTS,
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.TSS_NO_PUTATIVE_CDS_SHIFTS)));
+        
+        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between parameters and statistics
+
+        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("Mapping statistics:"));
+        
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.MAPPINGS_COUNT,
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.MAPPINGS_COUNT)));
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH,

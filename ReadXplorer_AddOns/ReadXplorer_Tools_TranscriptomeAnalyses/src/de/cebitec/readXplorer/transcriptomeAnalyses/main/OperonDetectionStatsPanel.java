@@ -86,11 +86,13 @@ public class OperonDetectionStatsPanel extends javax.swing.JPanel {
     private void initAdditionalComponents() {
         operonDetectionStatsTable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{
+                    {"Operon Statistics", ""},
             {ResultPanelOperonDetection.OPERONS_TOTAL,
                 String.valueOf(this.operonStatsMap.get(ResultPanelOperonDetection.OPERONS_TOTAL))},
             {ResultPanelOperonDetection.OPERONS_WITH_OVERLAPPING_READS,
                 String.valueOf(this.operonStatsMap.get(ResultPanelOperonDetection.OPERONS_WITH_OVERLAPPING_READS))},
             {ResultPanelOperonDetection.OPERONS_WITH_INTERNAL_READS, String.valueOf(this.operonStatsMap.get(ResultPanelOperonDetection.OPERONS_WITH_INTERNAL_READS))},
+            {"Mapping Statistics", ""},
             {ResultPanelTranscriptionStart.MAPPINGS_COUNT,
                 String.valueOf(this.operonStatsMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT))},
             {ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH, String.valueOf(this.operonStatsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH))},

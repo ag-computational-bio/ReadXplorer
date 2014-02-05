@@ -46,20 +46,35 @@ import org.openide.util.Exceptions;
  */
 public class MotifSearchModel implements Observer {
 
-    private RbsMotifSearchPanel rbsMotifSearchPanel;
+//    private RbsMotifSearchPanel rbsMotifSearchPanel;
     private TreeMap<String, String> upstreamRegionsInHash;
     private TreeMap<String, Integer> contributedSequencesWithShift;
     private File logoMinus10, logoMinus35, logoRbs;
-    private HashMap<Integer, PersistantChromosome> chromosomes;
+    private final HashMap<Integer, PersistantChromosome> chromosomes;
     private List<String> upstreamRegions;
     private float meanMinus10SpacerToTSS, meanMinus35SpacerToMinus10;
     private float meanSpacerLengthOfRBSMotif;
     private final ProgressHandle progressHandlePromotorAnalysis, progressHandleRbsAnalysis;
-    private String handlerTitlePromotorAnalysis, handlerTitleRBSAnalysis;
+    private final String handlerTitlePromotorAnalysis, handlerTitleRBSAnalysis;
     private List<String> minus10AnalysisStrings, minus35AnalysisStrings;
     private float contributingCitesForMinus10Motif, contributingCitesForMinus35Motif, contributingCitesForRbsMotif;
     private int alternativeSpacer;
     private TreeMap<String, Integer> minus10MotifStarts, minus35MotifStarts, rbsStarts;
+    private File rbsBioProspectorInput;
+    private File rbsBioProsFirstHit;
+    JTextPane regionsRelToTLSTextPane;
+    JTextPane regionsForMotifSearch;
+    JLabel rbsLogoLabel;
+    File minus10Input;
+    File minus35Input;
+    File bioProspOutMinus10;
+    File bioProspOutMinus35;
+    JTextPane regionOfIntrestMinus10, regionOfIntrestMinus35;
+    TreeMap<String, Integer> idsToMinus10Shifts;
+    TreeMap<String, Integer> idsToMinus35Shifts;
+    StyledDocument coloredPromotorRegions;
+    JLabel minus10logoLabel;
+    JLabel minus35LogoLabel;
 
     /**
      *
@@ -79,20 +94,18 @@ public class MotifSearchModel implements Observer {
      *
      * @param params instance of PromotorSearchParameters.
      */
-    public MotifSearchPanel utrPromotorAnalysis(PromotorSearchParameters params, List<TranscriptionStart> starts, List<Operon> operons) {
+//    public MotifSearchPanel utrPromotorAnalysis(PromotorSearchParameters params, List<TranscriptionStart> starts, List<Operon> operons) {
+    public void utrPromotorAnalysis(PromotorSearchParameters params, List<TranscriptionStart> starts, List<Operon> operons) {
 
         this.alternativeSpacer = params.getAlternativeSpacer();
         minus10MotifStarts = new TreeMap<>();
         minus35MotifStarts = new TreeMap<>();
-        MotifSearchPanel promotorMotifSearchPanel = new MotifSearchPanel();
-        promotorMotifSearchPanel.setMinus35MotifWidth(params.getMinus35MotifWidth());
-        promotorMotifSearchPanel.setMinus10MotifWidth(params.getMinusTenMotifWidth());
         this.minus10AnalysisStrings = new ArrayList<>();
         this.minus35AnalysisStrings = new ArrayList<>();
         this.progressHandlePromotorAnalysis.progress("processing promotor analysis ...", 20);
 
-        JTextPane regionOfIntrestMinus10 = new JTextPane();
-        JTextPane regionOfIntrestMinus35 = new JTextPane();
+        regionOfIntrestMinus10 = new JTextPane();
+        regionOfIntrestMinus35 = new JTextPane();
 
         Path workingDirPath = null;
         Path bioProspectorOutMinus10Path = null;
@@ -110,26 +123,21 @@ public class MotifSearchModel implements Observer {
         }
 
         File workingDir = workingDirPath.toFile();
-        File minus10Input = minus10InputPath.toFile();
-        File minus35Input = minus35InputPath.toFile();
-        File bioProspOutMinus10 = bioProspectorOutMinus10Path.toFile();
-        File bioProspOutMinus35 = bioProspectorOutMinus35Path.toFile();
-
-        promotorMotifSearchPanel.setMinus10Input(minus10Input);
-        promotorMotifSearchPanel.setMinus35Input(minus35Input);
-        promotorMotifSearchPanel.setBioProspOutMinus10(bioProspOutMinus10);
-        promotorMotifSearchPanel.setBioProspOutMinus35(bioProspOutMinus35);
+        minus10Input = minus10InputPath.toFile();
+        minus35Input = minus35InputPath.toFile();
+        bioProspOutMinus10 = bioProspectorOutMinus10Path.toFile();
+        bioProspOutMinus35 = bioProspectorOutMinus35Path.toFile();
 
         // 1. write all upstream subregions for -10 analysis
-        File minusTenFile = writeSubRegionFor5UTRInFile(
-                workingDir, minus10Input, this.upstreamRegions,
+        writeSubRegionFor5UTRInFile(
+                minus10Input, this.upstreamRegions,
                 params.getMinSpacer1(), params.getSequenceWidthToAnalyzeMinus10(),
                 params.getMinSpacer2(), params.getSequenceWidthToAnalyzeMinus35(),
                 null);
 
         // BioProspector search for -10 motif
         String posixPath = "/cygdrive/c";
-        String sub = minusTenFile.getAbsolutePath().toString().substring(2);
+        String sub = minus10Input.getAbsolutePath().toString().substring(2);
         posixPath += sub.replaceAll("\\\\", "/");
 
         try {
@@ -143,23 +151,20 @@ public class MotifSearchModel implements Observer {
 
         this.progressHandlePromotorAnalysis.progress("Starting promotor analysis ...", 40);
 
-//        List<List<Object>> alignmentshiftsOFMinusTenArray = new ArrayList<>();
-//        alignmentshiftsOFMinusTenArray.addAll(this.bioProspectorOutArray);
-        TreeMap<String, Integer> idsToMinus10Shifts = new TreeMap<>();
+        idsToMinus10Shifts = new TreeMap<>();
         idsToMinus10Shifts.putAll(this.contributedSequencesWithShift);
 
         // 4. All sequences, which did not contain a motif in the first run for-10 motif serch
         // will be descard in the next step of the analysis of the -35 motif search
-
-        File minusThirtyFiveFile = writeSubRegionFor5UTRInFile(
-                workingDir, minus35Input, this.upstreamRegions,
+        writeSubRegionFor5UTRInFile(
+                minus35Input, this.upstreamRegions,
                 params.getMinSpacer1(), params.getSequenceWidthToAnalyzeMinus10(),
                 params.getMinSpacer2(), params.getSequenceWidthToAnalyzeMinus35(),
                 idsToMinus10Shifts);
 //                alignmentshiftsOFMinusTenArray, regionOfIntrestMinus10, regionOfIntrestMinus35);
 
         posixPath = "/cygdrive/c";
-        sub = minusThirtyFiveFile.getAbsolutePath().toString().substring(2);
+        sub = minus35Input.getAbsolutePath().toString().substring(2);
         posixPath += sub.replaceAll("\\\\", "/");
 
         try {
@@ -175,9 +180,8 @@ public class MotifSearchModel implements Observer {
 
         progressHandlePromotorAnalysis.progress("Starting promotor analysis ...", 60);
 
-        TreeMap<String, Integer> idsToMinus35Shifts = new TreeMap<>();
+        idsToMinus35Shifts = new TreeMap<>();
         idsToMinus35Shifts.putAll(this.contributedSequencesWithShift);
-
 
         int motifWidth10 = params.getMinusTenMotifWidth();
         int motifWidth35 = params.getMinus35MotifWidth();
@@ -222,58 +226,37 @@ public class MotifSearchModel implements Observer {
             }
         }
 
-        promotorMotifSearchPanel.setStyledDocumentToRegionOfIntrestMinusTen(regionOfIntrestMinus10.getStyledDocument());
-        promotorMotifSearchPanel.setStyledDocumentToRegionOfIntrestMinus35(regionOfIntrestMinus35.getStyledDocument());
-
         calcMotifStartsAndMeanSpacerLength(this.upstreamRegions, idsToMinus10Shifts, idsToMinus35Shifts, params);
         setMotifSearchResults(starts, operons, this.minus10MotifStarts, this.minus35MotifStarts, params);
 
         progressHandlePromotorAnalysis.progress("Starting promotor analysis ...", 70);
 
         // Color -35 and -10 motifs in the pane with the whole urt region rel. to TSS
-        StyledDocument coloredPromotorRegions = colorPromotorMotifRegions(this.upstreamRegions, this.minus10MotifStarts, this.minus35MotifStarts, params);
-
-        promotorMotifSearchPanel.setStyledDocToPromotorsFastaPane(coloredPromotorRegions);
-
-        promotorMotifSearchPanel.setContributionMinus10Label("Number of segments contributes to the motif: "
-                + (int) this.contributingCitesForMinus10Motif + "/" + this.upstreamRegions.size() / 2);
-        promotorMotifSearchPanel.setContributionMinus35Label("Number of segments contributes to the motif: "
-                + (int) this.contributingCitesForMinus35Motif + "/" + this.upstreamRegions.size() / 2);
+        coloredPromotorRegions = colorPromotorMotifRegions(this.upstreamRegions, this.minus10MotifStarts, this.minus35MotifStarts, params);
 
         progressHandlePromotorAnalysis.progress("Starting promotor analysis ...", 80);
         // generating Sequence Logos and adding them into Tabbedpane
         int logoStart10 = Math.round(this.meanMinus10SpacerToTSS + params.getMinusTenMotifWidth());
-        String roundedMean = String.format("%.1f", this.meanMinus10SpacerToTSS);
-        promotorMotifSearchPanel.setMinSpacer1LengthToLabel(roundedMean);
 
         this.logoMinus10 = makeSeqLogo(2.0, bioProspOutMinus10, workingDir.getAbsolutePath() + "\\minusTenLogo",
                 "PNG", 8.0, -logoStart10, 15, true, true);
 
-        promotorMotifSearchPanel.setLogoMinus10(new File(this.logoMinus10.getAbsolutePath() + ".png"));
-        JLabel logoLabel1 = new JLabel();
+        minus10logoLabel = new JLabel();
         Icon icon1 = new ImageIcon(this.logoMinus10.getAbsolutePath() + ".png");
-        logoLabel1.setIcon(icon1);
-        promotorMotifSearchPanel.setMinus10LogoToPanel(logoLabel1);
-
+        minus10logoLabel.setIcon(icon1);
 
         int logoStart35 = Math.round(this.meanMinus35SpacerToMinus10 + params.getMinus35MotifWidth() + logoStart10);
-        roundedMean = String.format("%.1f", this.meanMinus35SpacerToMinus10);
-        promotorMotifSearchPanel.setMinSpacer2LengthToLabel(roundedMean);
         progressHandlePromotorAnalysis.progress("Starting promotor analysis ...", 90);
 
         this.logoMinus35 = makeSeqLogo(2.0, bioProspOutMinus35, workingDir.getAbsolutePath() + "\\minus35Logo",
                 "PNG", 8.0, -logoStart35, 15, true, true);
 
-
-        promotorMotifSearchPanel.setLogoMinus35(new File(this.logoMinus35.getAbsolutePath() + ".png"));
-        JLabel logoLabel2 = new JLabel();
+        minus35LogoLabel = new JLabel();
         Icon icon2 = new ImageIcon(this.logoMinus35.getAbsolutePath() + ".png");
-        logoLabel2.setIcon(icon2);
-        promotorMotifSearchPanel.setMinus35LogoToPanel(logoLabel2);
+        minus35LogoLabel.setIcon(icon2);
 
         progressHandlePromotorAnalysis.progress("Starting promotor analysis ...", 100);
         progressHandlePromotorAnalysis.finish();
-        return promotorMotifSearchPanel;
     }
 
     /**
@@ -299,25 +282,17 @@ public class MotifSearchModel implements Observer {
         }
 
         File parentDir = workingDir.toFile();
-        File rbsBioProspectorInput = rbsBioProspectorInputPath.toFile();
-        File rbsBioProsFirstHit = rbsBioProsFirstHitPath.toFile();
+        rbsBioProspectorInput = rbsBioProspectorInputPath.toFile();
+        rbsBioProsFirstHit = rbsBioProsFirstHitPath.toFile();
 
-
-
-        System.out.println("WOrkingDir: " + parentDir.getAbsolutePath());
-        System.out.println("rbsProspectorInput: " + rbsBioProspectorInput.getAbsolutePath());
-        System.out.println("BestHit: " + rbsBioProsFirstHit.getAbsolutePath());
-
-        this.rbsMotifSearchPanel = new RbsMotifSearchPanel();
-
-
-        rbsMotifSearchPanel.setBioProspInput(rbsBioProspectorInput);
-        rbsMotifSearchPanel.setBioProspOut(rbsBioProsFirstHit);
+//        this.rbsMotifSearchPanel = new RbsMotifSearchPanel();
+//        rbsMotifSearchPanel.setBioProspInput(rbsBioProspectorInput);
+//        rbsMotifSearchPanel.setBioProspOut(rbsBioProsFirstHit);
         this.rbsStarts = new TreeMap<>();
 
         // Make a text pane, set its font and color, then add it to the frame
-        JTextPane regionsRelToTLSTextPane = new JTextPane();
-        JTextPane regionsForMotifSearch = new JTextPane();
+        regionsRelToTLSTextPane = new JTextPane();
+        regionsForMotifSearch = new JTextPane();
 
         writeSeqaForRbsAnalysisInFile(rbsBioProspectorInput, rbsParams);
         progressHandleRbsAnalysis.progress("processing rbs analysis ...", 60);
@@ -353,31 +328,30 @@ public class MotifSearchModel implements Observer {
 
         progressHandleRbsAnalysis.progress("processing rbs analysis ...", 80);
         try {
-            meanSpacerLengthOfRBSMotif = calculateMotifStartsAndMeanSpacerInRbsAnalysis(this.upstreamRegions, regionsRelToTLSTextPane, this.contributedSequencesWithShift, rbsParams, starts, operons);
+            meanSpacerLengthOfRBSMotif = calculateMotifStartsAndMeanSpacerInRbsAnalysis(this.upstreamRegions, this.regionsRelToTLSTextPane, this.contributedSequencesWithShift, rbsParams, starts, operons);
         } catch (BadLocationException ex) {
             Exceptions.printStackTrace(ex);
         }
 
-        this.rbsMotifSearchPanel.setContributedSequencesToMotif("" + this.contributingCitesForRbsMotif + "/" + upstreamRegions.size() / 2);
-        this.rbsMotifSearchPanel.setRegionsToAnalyzeToPane(regionsRelToTLSTextPane.getStyledDocument());
-        this.rbsMotifSearchPanel.setRegionOfIntrestToPane(regionsForMotifSearch.getStyledDocument());
-
+//        this.rbsMotifSearchPanel.setContributedSequencesToMotif("" + this.contributingCitesForRbsMotif + "/" + upstreamRegions.size() / 2);
+//        this.rbsMotifSearchPanel.setRegionsToAnalyzeToPane(regionsRelToTLSTextPane.getStyledDocument());
+//        this.rbsMotifSearchPanel.setRegionOfIntrestToPane(regionsForMotifSearch.getStyledDocument());
         // generating Sequence Logos and adding them into Tabbedpane
         int logoStart = Math.round(this.meanSpacerLengthOfRBSMotif);
         logoStart += rbsParams.getMotifWidth();
-        String roundedMean = String.format("%.1f", this.meanSpacerLengthOfRBSMotif);
-
-        this.rbsMotifSearchPanel.setRegionLengthForBioProspector(rbsParams.getSeqLengthToAnalyze());
-        this.rbsMotifSearchPanel.setMotifWidth(rbsParams.getMotifWidth());
-        this.rbsMotifSearchPanel.setMeanSpacerLength(roundedMean);
+//        String roundedMean = String.format("%.1f", this.meanSpacerLengthOfRBSMotif);
+//
+//        this.rbsMotifSearchPanel.setRegionLengthForBioProspector(rbsParams.getSeqLengthToAnalyze());
+//        this.rbsMotifSearchPanel.setMotifWidth(rbsParams.getMotifWidth());
+//        this.rbsMotifSearchPanel.setMeanSpacerLength(roundedMean);
 
         this.logoRbs = makeSeqLogo(2.0, rbsBioProsFirstHit, parentDir.getAbsolutePath() + "\\RBSLogo",
                 "PNG", 8.0, -logoStart, 15, true, true);
-        rbsMotifSearchPanel.setSequenceLogo(new File(this.logoRbs.getAbsolutePath() + ".png"));
-        JLabel logoLabel = new JLabel();
+//        rbsMotifSearchPanel.setSequenceLogo(new File(this.logoRbs.getAbsolutePath() + ".png"));
+        rbsLogoLabel = new JLabel();
         Icon icon = new ImageIcon(this.logoRbs.getAbsolutePath() + ".png");
-        logoLabel.setIcon(icon);
-        this.rbsMotifSearchPanel.setLogo(logoLabel);
+        rbsLogoLabel.setIcon(icon);
+//        this.rbsMotifSearchPanel.setLogo(rbsLogoLabel);
         progressHandleRbsAnalysis.progress("processing rbs analysis ...", 100);
         progressHandleRbsAnalysis.finish();
     }
@@ -477,9 +451,9 @@ public class MotifSearchModel implements Observer {
      * @return the output file containing all subregions needet for motif search
      * as input.
      */
-    private File writeSubRegionFor5UTRInFile(File workDir, File outFile,
-            List<String> seqs, int spacer, int seqLengthForMotifSearch,
-            int spacer2, int seqLengthForMotifSearch2, TreeMap<String, Integer> alignmentShifts) {
+    private void writeSubRegionFor5UTRInFile(File outFile, List<String> seqs,
+            int spacer, int seqLengthForMotifSearch, int spacer2,
+            int seqLengthForMotifSearch2, TreeMap<String, Integer> alignmentShifts) {
 
         Writer writer = null;
         int cnt = 1;
@@ -501,11 +475,8 @@ public class MotifSearchModel implements Observer {
                         if (alignmentShifts.containsKey(header)) {
                             shift = alignmentShifts.get(header);
                         }
-
                         writer.append(string);
-//                        minus35TP.getStyledDocument().insertString(minus35TP.getStyledDocument().getLength(), string, null);
                     } else {
-//                        minus10TP.getStyledDocument().insertString(minus10TP.getStyledDocument().getLength(), string, null);
                         writer.append(string);
                     }
                     cnt = 0;
@@ -525,8 +496,6 @@ public class MotifSearchModel implements Observer {
                             writer.append(substring + "\n");
                         }
                         minus35AnalysisStrings.add(substring + "\n");
-//                        minus35TP.getStyledDocument().insertString(minus35TP.getStyledDocument().getLength(), substring + "\n", null);
-//                        colorSubstringsInStyledDocument(minus35TP, font, shift - 1, cnt, Color.blue);
                     } else {
                         int stringLength = string.length();
                         int offset = stringLength - (spacer + 1) - seqLengthForMotifSearch;
@@ -534,8 +503,6 @@ public class MotifSearchModel implements Observer {
                         substring = string.substring(offset, end);
                         writer.append(substring + "\n");
                         minus10AnalysisStrings.add(substring + "\n");
-//                        minus10TP.getStyledDocument().insertString(minus10TP.getStyledDocument().getLength(), substring + "\n", null);
-//                        colorSubstringsInStyledDocument(minus10TP, font, shift - 1, cnt, Color.blue);
                     }
                     cnt = 1;
                 }
@@ -549,7 +516,7 @@ public class MotifSearchModel implements Observer {
             } catch (Exception ex) {
             }
         }
-        return outFile;
+//        return outFile;
     }
 
     /**
@@ -574,8 +541,6 @@ public class MotifSearchModel implements Observer {
         int minSpacer = params.getMinSpacer();
         int motifWidth = params.getMotifWidth();
         int sequenceOfInterestLength = params.getSeqLengthToAnalyze();
-
-
 
         String header = "";
         for (String string : upstreamRegions) {
@@ -604,7 +569,7 @@ public class MotifSearchModel implements Observer {
                 }
             }
         }
-        storeRbsAnalysisResults(this.rbsStarts, tss, rbsShifts, params, operons);
+//        storeRbsAnalysisResults(this.rbsStarts, tss, rbsShifts, params, operons);
         return sumOfMinsSpacer / contributingCitesForRbsMotif;
     }
 
@@ -1137,37 +1102,12 @@ public class MotifSearchModel implements Observer {
     }
 
     /**
-     * Getter for RbsMotifSearchPanel.
-     *
-     * @return an instance of RbsMotifSearchPanel.
-     */
-    public RbsMotifSearchPanel getRbsMotifSearchPanel() {
-        return rbsMotifSearchPanel;
-    }
-
-    /**
-     * Setter for RbsMotifSearchPanel.
-     *
-     * @param rbsMotifSearchPanel an instance of RbsMotifSearchPanel.
-     */
-    public void setRbsMotifSearchPanel(RbsMotifSearchPanel rbsMotifSearchPanel) {
-        this.rbsMotifSearchPanel = rbsMotifSearchPanel;
-    }
-
-    @Override
-    public void update(Object args) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    /**
      *
      * @param rbsBioProspectorInput
      * @param regionsForMotifSearch
      * @param rbsParams
      */
     private void writeBioProspInputFromRbsAalysis(File rbsBioProspectorInput, StyledDocument regionsForMotifSearch, RbsAnalysisParameters rbsParams) {
-        this.rbsMotifSearchPanel = new RbsMotifSearchPanel();
-
         Writer writer = null;
         try {
             writer = new BufferedWriter(new OutputStreamWriter(
@@ -1381,31 +1321,47 @@ public class MotifSearchModel implements Observer {
 
     }
 
-    private void storeRbsAnalysisResults(TreeMap<String, Integer> rbsStarts, List<TranscriptionStart> tss, TreeMap<String, Integer> rbsShifts, RbsAnalysisParameters params, List<Operon> operons) {
+    /**
+     *
+     * @param upstreamRegions
+     * @param minus10Starts
+     * @param minus35Starts
+     * @param minus10Shifts
+     * @param minus35Shifts
+     * @param params
+     * @param tss
+     * @param operons
+     */
+    public void storePromoterAnalysisResults(List<String> upstreamRegions, TreeMap<String, Integer> minus10Starts, TreeMap<String, Integer> minus35Starts, TreeMap<String, Integer> minus10Shifts, TreeMap<String, Integer> minus35Shifts, PromotorSearchParameters params, List<TranscriptionStart> tss, List<Operon> operons) {
         if (tss != null) {
-            HashMap<String, TranscriptionStart> startsInTreeMap = new HashMap<>();
+            HashMap<String, TranscriptionStart> tssInTreeMap = new HashMap<>();
             for (TranscriptionStart ts : tss) {
                 if (ts.getAdditionalIdentyfier() != null) {
-                    startsInTreeMap.put(ts.getAdditionalIdentyfier(), ts);
+                    tssInTreeMap.put(ts.getAdditionalIdentyfier(), ts);
+                    // reset
+                    ts.setPromotorFeaturesAssigned(false);
                 }
             }
 
-            for (int i = 0; i < this.upstreamRegions.size(); i++) {
-                String str = this.upstreamRegions.get(i);
+            for (int i = 0; i < upstreamRegions.size(); i++) {
+                String str = upstreamRegions.get(i);
                 String locus;
                 if (str.startsWith(">")) {
                     locus = str.substring(1, str.length() - 1);
-                    if (startsInTreeMap.containsKey(locus.toString())) {
-                        TranscriptionStart start = startsInTreeMap.get(locus);
-                        if (rbsShifts.containsKey(locus)) {
-                            start.setRbsFeatureAssigned(true);
-                            start.setStartRbsMotif(rbsStarts.get(locus));
-                            start.setRbsMotifWidth(params.getMotifWidth());
+                    if (tssInTreeMap.containsKey(locus.toString())) {
+                        TranscriptionStart start = tssInTreeMap.get(locus);
+                        if (minus10Shifts.containsKey(locus)) {
+                            start.setPromotorFeaturesAssigned(true);
+                            start.setStartMinus10Motif(minus10Starts.get(locus));
+                            start.setMinus10MotifWidth(params.getMinusTenMotifWidth());
                         }
-                        startsInTreeMap.put(locus, start);
+                        if (minus35Shifts.containsKey(locus)) {
+                            start.setPromotorFeaturesAssigned(true);
+                            start.setStartMinus10Motif(minus35Starts.get(locus));
+                            start.setMinus10MotifWidth(params.getMinus35MotifWidth());
+                        }
+                        tssInTreeMap.put(locus, start);
                     }
-                } else {
-                    continue;
                 }
             }
         } else if (operons != null) {
@@ -1413,11 +1369,84 @@ public class MotifSearchModel implements Observer {
             for (Operon op : operons) {
                 if (op.getAdditionalLocus() != null) {
                     operonsInTreeMap.put(op.getAdditionalLocus(), op);
+                    // reset
+                    op.setHasPromtorFeaturesAssigned(false);
                 }
             }
 
-            for (int i = 0; i < this.upstreamRegions.size(); i++) {
-                String str = this.upstreamRegions.get(i);
+            for (int i = 0; i < upstreamRegions.size(); i++) {
+                String str = upstreamRegions.get(i);
+                String locus;
+                if (str.startsWith(">")) {
+                    locus = str.substring(1, str.length() - 1);
+                    if (operonsInTreeMap.containsKey(locus.toString())) {
+                        Operon op = operonsInTreeMap.get(locus);
+                        if (minus10Shifts.containsKey(locus)) {
+                            op.setHasPromtorFeaturesAssigned(true);
+                            op.setStartMinus10Motif(minus10Starts.get(locus));
+                            op.setMinus10MotifWidth(params.getMinusTenMotifWidth());
+                        }
+
+                        if (minus35Shifts.containsKey(locus)) {
+                            op.setHasPromtorFeaturesAssigned(true);
+                            op.setStartMinus10Motif(minus35Starts.get(locus));
+                            op.setMinus10MotifWidth(params.getMinus35MotifWidth());
+                        }
+                        operonsInTreeMap.put(locus, op);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     *
+     * @param upstreamRegions
+     * @param rbsStarts
+     * @param rbsShifts
+     * @param params
+     * @param tss
+     * @param operons
+     */
+    public void storeRbsAnalysisResults(List<String> upstreamRegions, TreeMap<String, Integer> rbsStarts, TreeMap<String, Integer> rbsShifts, RbsAnalysisParameters params, List<TranscriptionStart> tss, List<Operon> operons) {
+        if (tss != null) {
+            HashMap<String, TranscriptionStart> tssInTreeMap = new HashMap<>();
+            for (TranscriptionStart ts : tss) {
+                if (ts.getAdditionalIdentyfier() != null) {
+                    tssInTreeMap.put(ts.getAdditionalIdentyfier(), ts);
+                    // reset
+                    ts.setRbsFeatureAssigned(false);
+                }
+            }
+
+            for (int i = 0; i < upstreamRegions.size(); i++) {
+                String str = upstreamRegions.get(i);
+                String locus;
+                if (str.startsWith(">")) {
+                    locus = str.substring(1, str.length() - 1);
+                    if (tssInTreeMap.containsKey(locus.toString())) {
+                        TranscriptionStart start = tssInTreeMap.get(locus);
+                        if (rbsShifts.containsKey(locus)) {
+                            start.setRbsFeatureAssigned(true);
+                            start.setStartRbsMotif(rbsStarts.get(locus));
+                            start.setRbsMotifWidth(params.getMotifWidth());
+                        }
+                        tssInTreeMap.put(locus, start);
+                    }
+                }
+            }
+        } else if (operons != null) {
+            HashMap<String, Operon> operonsInTreeMap = new HashMap<>();
+            for (Operon op : operons) {
+                if (op.getAdditionalLocus() != null) {
+                    operonsInTreeMap.put(op.getAdditionalLocus(), op);
+                    // reset
+                    op.setRbsFeatureAssigned(false);
+                }
+            }
+
+            for (int i = 0; i < upstreamRegions.size(); i++) {
+                String str = upstreamRegions.get(i);
                 String locus;
                 if (str.startsWith(">")) {
                     locus = str.substring(1, str.length() - 1);
@@ -1430,10 +1459,286 @@ public class MotifSearchModel implements Observer {
                         }
                         operonsInTreeMap.put(locus, op);
                     }
-                } else {
-                    continue;
                 }
             }
         }
     }
+
+    @Override
+    public void update(Object args) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    public TreeMap<String, Integer> getContributedSequencesWithShift() {
+        return contributedSequencesWithShift;
+    }
+
+    public void setContributedSequencesWithShift(TreeMap<String, Integer> contributedSequencesWithShift) {
+        this.contributedSequencesWithShift = contributedSequencesWithShift;
+    }
+
+    public File getLogoMinus10() {
+        return logoMinus10;
+    }
+
+    public JLabel getMinus35LogoLabel() {
+        return minus35LogoLabel;
+    }
+
+    public void setMinus35LogoLabel(JLabel minus35LogoLabel) {
+        this.minus35LogoLabel = minus35LogoLabel;
+    }
+
+    public void setLogoMinus10(File logoMinus10) {
+        this.logoMinus10 = logoMinus10;
+    }
+
+    public File getLogoMinus35() {
+        return logoMinus35;
+    }
+
+    public void setLogoMinus35(File logoMinus35) {
+        this.logoMinus35 = logoMinus35;
+    }
+
+    public JLabel getMinus10logoLabel() {
+        return minus10logoLabel;
+    }
+
+    public void setMinus10logoLabel(JLabel minus10logoLabel) {
+        this.minus10logoLabel = minus10logoLabel;
+    }
+
+    public File getLogoRbs() {
+        return logoRbs;
+    }
+
+    public void setLogoRbs(File logoRbs) {
+        this.logoRbs = logoRbs;
+    }
+
+    public List<String> getUpstreamRegions() {
+        return upstreamRegions;
+    }
+
+    public void setUpstreamRegions(List<String> upstreamRegions) {
+        this.upstreamRegions = upstreamRegions;
+    }
+
+    public List<String> getMinus10AnalysisStrings() {
+        return minus10AnalysisStrings;
+    }
+
+    public void setMinus10AnalysisStrings(List<String> minus10AnalysisStrings) {
+        this.minus10AnalysisStrings = minus10AnalysisStrings;
+    }
+
+    public List<String> getMinus35AnalysisStrings() {
+        return minus35AnalysisStrings;
+    }
+
+    public void setMinus35AnalysisStrings(List<String> minus35AnalysisStrings) {
+        this.minus35AnalysisStrings = minus35AnalysisStrings;
+    }
+
+    public float getContributingCitesForMinus10Motif() {
+        return contributingCitesForMinus10Motif;
+    }
+
+    public void setContributingCitesForMinus10Motif(float contributingCitesForMinus10Motif) {
+        this.contributingCitesForMinus10Motif = contributingCitesForMinus10Motif;
+    }
+
+    public float getContributingCitesForMinus35Motif() {
+        return contributingCitesForMinus35Motif;
+    }
+
+    public void setContributingCitesForMinus35Motif(float contributingCitesForMinus35Motif) {
+        this.contributingCitesForMinus35Motif = contributingCitesForMinus35Motif;
+    }
+
+    public float getContributingCitesForRbsMotif() {
+        return contributingCitesForRbsMotif;
+    }
+
+    public void setContributingCitesForRbsMotif(float contributingCitesForRbsMotif) {
+        this.contributingCitesForRbsMotif = contributingCitesForRbsMotif;
+    }
+
+    public int getAlternativeSpacer() {
+        return alternativeSpacer;
+    }
+
+    public void setAlternativeSpacer(int alternativeSpacer) {
+        this.alternativeSpacer = alternativeSpacer;
+    }
+
+    public TreeMap<String, Integer> getMinus10MotifStarts() {
+        return minus10MotifStarts;
+    }
+
+    public void setMinus10MotifStarts(TreeMap<String, Integer> minus10MotifStarts) {
+        this.minus10MotifStarts = minus10MotifStarts;
+    }
+
+    public TreeMap<String, Integer> getMinus35MotifStarts() {
+        return minus35MotifStarts;
+    }
+
+    public void setMinus35MotifStarts(TreeMap<String, Integer> minus35MotifStarts) {
+        this.minus35MotifStarts = minus35MotifStarts;
+    }
+
+    public TreeMap<String, Integer> getRbsStarts() {
+        return rbsStarts;
+    }
+
+    public void setRbsStarts(TreeMap<String, Integer> rbsStarts) {
+        this.rbsStarts = rbsStarts;
+    }
+
+    public File getRbsBioProspectorInput() {
+        return rbsBioProspectorInput;
+    }
+
+    public void setRbsBioProspectorInput(File rbsBioProspectorInput) {
+        this.rbsBioProspectorInput = rbsBioProspectorInput;
+    }
+
+    public File getRbsBioProsFirstHit() {
+        return rbsBioProsFirstHit;
+    }
+
+    public void setRbsBioProsFirstHit(File rbsBioProsFirstHit) {
+        this.rbsBioProsFirstHit = rbsBioProsFirstHit;
+    }
+
+    public TreeMap<String, String> getUpstreamRegionsInHash() {
+        return upstreamRegionsInHash;
+    }
+
+    public void setUpstreamRegionsInHash(TreeMap<String, String> upstreamRegionsInHash) {
+        this.upstreamRegionsInHash = upstreamRegionsInHash;
+    }
+
+    public float getMeanMinus10SpacerToTSS() {
+        return meanMinus10SpacerToTSS;
+    }
+
+    public void setMeanMinus10SpacerToTSS(float meanMinus10SpacerToTSS) {
+        this.meanMinus10SpacerToTSS = meanMinus10SpacerToTSS;
+    }
+
+    public float getMeanMinus35SpacerToMinus10() {
+        return meanMinus35SpacerToMinus10;
+    }
+
+    public void setMeanMinus35SpacerToMinus10(float meanMinus35SpacerToMinus10) {
+        this.meanMinus35SpacerToMinus10 = meanMinus35SpacerToMinus10;
+    }
+
+    public float getMeanSpacerLengthOfRBSMotif() {
+        return meanSpacerLengthOfRBSMotif;
+    }
+
+    public void setMeanSpacerLengthOfRBSMotif(float meanSpacerLengthOfRBSMotif) {
+        this.meanSpacerLengthOfRBSMotif = meanSpacerLengthOfRBSMotif;
+    }
+
+    public JTextPane getRegionsRelToTLSTextPane() {
+        return regionsRelToTLSTextPane;
+    }
+
+    public void setRegionsRelToTLSTextPane(JTextPane regionsRelToTLSTextPane) {
+        this.regionsRelToTLSTextPane = regionsRelToTLSTextPane;
+    }
+
+    public JTextPane getRegionsForMotifSearch() {
+        return regionsForMotifSearch;
+    }
+
+    public void setRegionsForMotifSearch(JTextPane regionsForMotifSearch) {
+        this.regionsForMotifSearch = regionsForMotifSearch;
+    }
+
+    public JLabel getRbsLogoLabel() {
+        return rbsLogoLabel;
+    }
+
+    public void setRbsLogoLabel(JLabel rbsLogoLabel) {
+        this.rbsLogoLabel = rbsLogoLabel;
+    }
+
+    public File getMinus10Input() {
+        return minus10Input;
+    }
+
+    public void setMinus10Input(File minus10Input) {
+        this.minus10Input = minus10Input;
+    }
+
+    public File getMinus35Input() {
+        return minus35Input;
+    }
+
+    public void setMinus35Input(File minus35Input) {
+        this.minus35Input = minus35Input;
+    }
+
+    public File getBioProspOutMinus10() {
+        return bioProspOutMinus10;
+    }
+
+    public void setBioProspOutMinus10(File bioProspOutMinus10) {
+        this.bioProspOutMinus10 = bioProspOutMinus10;
+    }
+
+    public File getBioProspOutMinus35() {
+        return bioProspOutMinus35;
+    }
+
+    public void setBioProspOutMinus35(File bioProspOutMinus35) {
+        this.bioProspOutMinus35 = bioProspOutMinus35;
+    }
+
+    public JTextPane getRegionOfIntrestMinus10() {
+        return regionOfIntrestMinus10;
+    }
+
+    public void setRegionOfIntrestMinus10(JTextPane regionOfIntrestMinus10) {
+        this.regionOfIntrestMinus10 = regionOfIntrestMinus10;
+    }
+
+    public JTextPane getRegionOfIntrestMinus35() {
+        return regionOfIntrestMinus35;
+    }
+
+    public void setRegionOfIntrestMinus35(JTextPane regionOfIntrestMinus35) {
+        this.regionOfIntrestMinus35 = regionOfIntrestMinus35;
+    }
+
+    public TreeMap<String, Integer> getIdsToMinus10Shifts() {
+        return idsToMinus10Shifts;
+    }
+
+    public void setIdsToMinus10Shifts(TreeMap<String, Integer> idsToMinus10Shifts) {
+        this.idsToMinus10Shifts = idsToMinus10Shifts;
+    }
+
+    public TreeMap<String, Integer> getIdsToMinus35Shifts() {
+        return idsToMinus35Shifts;
+    }
+
+    public void setIdsToMinus35Shifts(TreeMap<String, Integer> idsToMinus35Shifts) {
+        this.idsToMinus35Shifts = idsToMinus35Shifts;
+    }
+
+    public StyledDocument getColoredPromotorRegions() {
+        return coloredPromotorRegions;
+    }
+
+    public void setColoredPromotorRegions(StyledDocument coloredPromotorRegions) {
+        this.coloredPromotorRegions = coloredPromotorRegions;
+    }
+
 }
