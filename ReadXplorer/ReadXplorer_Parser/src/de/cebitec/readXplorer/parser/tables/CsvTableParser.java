@@ -104,21 +104,23 @@ public class CsvTableParser implements TableParserI {
                 final String[] header = listReader.getHeader(true);
                 tableData.add(Arrays.asList(header));
                 
-                CellProcessor[] processors;
+                CellProcessor[] generalProcessors;
                 if (tableModel.equals(TableType.COVERAGE_ANALYSIS.getName())
                         || tableModel.equals(TableType.POS_TABLE.getName())
                         || tableModel.equals(TableType.SNP_DETECTION.getName())
                         || tableModel.equals(TableType.TSS_DETECTION.getName())
                         ) {
-                    processors = POS_TABLE_PROCESSOR;
+                    generalProcessors = POS_TABLE_PROCESSOR;
                 } else {
-                    processors = DEFAULT_TABLE_PROCESSOR;
+                    generalProcessors = DEFAULT_TABLE_PROCESSOR;
                 }
                 
                 int length;
                 List<Object> rowData;
+                CellProcessor[] processors;
                 while (listReader.read() != null) {
                     if ((length = listReader.length()) > 0) {
+                        processors = generalProcessors.clone();
                         processors = ArrayUtils.addAll(processors, new CellProcessor[length - processors.length]);
                         rowData = listReader.executeProcessors(processors);
                         tableData.add(rowData);

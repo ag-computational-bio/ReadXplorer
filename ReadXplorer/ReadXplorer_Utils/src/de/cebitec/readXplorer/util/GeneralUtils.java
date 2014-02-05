@@ -228,6 +228,37 @@ public class GeneralUtils {
     }
     
     /**
+     * Converts a given number into a number of the given classType. If this is
+     * not possible, it throws a ClassCastException
+     * @param <T>
+     * @param classType the type to convert the number into
+     * @param number the number to convert
+     * @return The converted number
+     */
+    public static <T extends Number> T convertNumber(Class<T> classType, Number number) throws ClassCastException {
+        T convertedValue = null;
+        if (classType.equals(Integer.class)) {
+            convertedValue = classType.cast(number.intValue());
+        } else if (classType.equals(Double.class)) {
+            convertedValue = classType.cast(number.doubleValue());
+        } else if (classType.equals(Long.class)) {
+            convertedValue = classType.cast(number.longValue());
+        } else if (classType.equals(Float.class)) {
+            convertedValue = classType.cast(number.floatValue());
+        } else if (classType.equals(Short.class)) {
+            convertedValue = classType.cast(number.shortValue());
+        } else if (classType.equals(Byte.class)) {
+            convertedValue = classType.cast(number.byteValue());
+        }
+        
+        if (convertedValue == null) {
+            throw new ClassCastException("Cannot cast the given number into the given format.");
+        }
+        
+        return convertedValue;
+    }
+    
+    /**
      * format a number to show it to the user
      * @param number
      * @return a good readable string representation of the given number

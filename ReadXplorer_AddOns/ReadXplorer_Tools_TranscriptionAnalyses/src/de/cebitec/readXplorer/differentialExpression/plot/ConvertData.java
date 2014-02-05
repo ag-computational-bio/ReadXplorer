@@ -6,6 +6,7 @@ import static de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler.To
 import static de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler.Tool.DeSeq;
 import static de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler.Tool.ExpressTest;
 import de.cebitec.readXplorer.differentialExpression.ResultDeAnalysis;
+import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Pair;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -80,13 +81,13 @@ public class ConvertData {
             Double X = 0d;
             for (int i = 0; i < sampleA.length; i++) {
                 int index = sampleA[i] + BAY_SEQ_OFFSET;
-                X += (Double) row.get(index);
+                X += GeneralUtils.convertNumber(Double.class, (Number) row.get(index));
             }
             X /= sampleA.length;
             Double Y = 0d;
             for (int i = 0; i < sampleB.length; i++) {
                 int index = sampleB[i] + BAY_SEQ_OFFSET;
-                Y += (Double) row.get(index);
+                Y += GeneralUtils.convertNumber(Double.class, (Number) row.get(index));
             }
             Y /= sampleB.length;
             Pair<Double, Double> values = new Pair<>(X, Y);

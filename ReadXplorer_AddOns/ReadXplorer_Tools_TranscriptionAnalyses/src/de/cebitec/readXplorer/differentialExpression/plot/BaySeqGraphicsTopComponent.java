@@ -514,7 +514,8 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended imple
     @Override
     public void itemStateChanged(ItemEvent e) {
         BaySeqAnalysisHandler.Plot item = (BaySeqAnalysisHandler.Plot) e.getItem();
-        if (item == BaySeqAnalysisHandler.Plot.MACD) {
+        if (    item == BaySeqAnalysisHandler.Plot.Priors || 
+                item == BaySeqAnalysisHandler.Plot.MACD) {
             samplesAList.setEnabled(false);
             samplesALabel.setEnabled(false);
             samplesBList.setEnabled(false);
@@ -527,14 +528,6 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended imple
             samplesALabel.setEnabled(true);
             samplesBList.setEnabled(true);
             samplesBLabel.setEnabled(true);
-            groupComboBox.setEnabled(true);
-            iSymbol.setVisible(false);
-        }
-        if (item == BaySeqAnalysisHandler.Plot.Priors) {
-            samplesAList.setEnabled(false);
-            samplesALabel.setEnabled(false);
-            samplesBList.setEnabled(false);
-            samplesBLabel.setEnabled(false);
             groupComboBox.setEnabled(true);
             iSymbol.setVisible(false);
         }
