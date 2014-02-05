@@ -5,7 +5,6 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch;
 
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
-import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Observer;
 import java.awt.BorderLayout;
@@ -29,7 +28,7 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 public class RbsMotifSearchPanel extends javax.swing.JPanel implements Observable {
 
     private ProgressHandle progressHandle;
-    private File bioProspInput, bioProspOut, sequenceLogo;
+    private File bioProspInput, bioProspOut, sequenceLogo, info;
     private List<Observer> observerList;
     TreeMap<String, Integer> rbsStarts;
     TreeMap<String, Integer> rbsShifts;
@@ -323,6 +322,8 @@ public class RbsMotifSearchPanel extends javax.swing.JPanel implements Observabl
             output.renameTo(new File(fileChooser.getSelectedFile().getAbsolutePath() + "\\bestOutputFromBioProspector.fna"));
             File logo = getSequenceLogo();
             logo.renameTo(new File(fileChooser.getSelectedFile().getAbsolutePath() + "\\rbsLogo.png"));
+            File info = getInfo();
+            info.renameTo(new File(fileChooser.getSelectedFile().getAbsoluteFile()+ "\\info.txt"));
             progressHandle.progress(2);
         }
         progressHandle.progress(3);
@@ -411,6 +412,13 @@ public class RbsMotifSearchPanel extends javax.swing.JPanel implements Observabl
     public void setUpstreamRegions(List<String> upstreamRegions) {
         this.upstreamRegions = upstreamRegions;
     }
-    
-    
+
+    public File getInfo() {
+        return info;
+    }
+
+    public void setInfo(File info) {
+        this.info = info;
+    }
+
 }

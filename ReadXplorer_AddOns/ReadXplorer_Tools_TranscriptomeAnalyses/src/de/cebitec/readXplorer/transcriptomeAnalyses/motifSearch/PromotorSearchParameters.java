@@ -6,7 +6,7 @@ import de.cebitec.readXplorer.databackend.ParameterSetI;
  *
  * @author jritter
  */
-public class PromotorSearchParameters implements ParameterSetI<PromotorSearchParameters> {
+public class PromotorSearchParameters implements ParameterSetI<Object> {
 
     private int minusTenMotifWidth, minus35MotifWidth;
     private int minSpacer1, minSpacer2, alternativeSpacer, sequenceWidthToAnalyzeMinus10, sequenceWidthToAnalyzeMinus35;

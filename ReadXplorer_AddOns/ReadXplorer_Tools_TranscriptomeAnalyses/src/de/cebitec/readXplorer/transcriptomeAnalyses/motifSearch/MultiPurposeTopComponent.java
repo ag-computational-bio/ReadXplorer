@@ -38,13 +38,14 @@ public class MultiPurposeTopComponent extends TopComponentExtended {
             if (this.getComponent(0) instanceof MotifSearchPanel) {
                 System.out.println("====MotifSearch-Promotor=====");
                 MotifSearchPanel msPanel = (MotifSearchPanel) this.getComponent(0);
-                File parent =  msPanel.getBioProspOutMinus10().getParentFile();
+                File parent = msPanel.getBioProspOutMinus10().getParentFile();
                 msPanel.getBioProspOutMinus10().delete();
                 msPanel.getBioProspOutMinus35().delete();
                 msPanel.getLogoMinus10().delete();
                 msPanel.getLogoMinus35().delete();
                 msPanel.getMinus10Input().delete();
                 msPanel.getMinus35Input().delete();
+                msPanel.getInfo().delete();
                 parent.delete();
             }
 
@@ -55,6 +56,7 @@ public class MultiPurposeTopComponent extends TopComponentExtended {
                 rbsPanel.getBioProspInput().delete();
                 rbsPanel.getBioProspOut().delete();
                 rbsPanel.getSequenceLogo().delete();
+                rbsPanel.getInfo().delete();
                 parent.delete();
             }
         }

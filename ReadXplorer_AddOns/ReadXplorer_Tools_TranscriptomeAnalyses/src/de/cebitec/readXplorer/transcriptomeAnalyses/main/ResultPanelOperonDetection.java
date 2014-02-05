@@ -8,26 +8,19 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.PromotorSearchParameters;
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.exporter.excel.ExcelExportFileChooser;
-import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.ChartsGenerationSelectChatTypeWizardPanel;
-import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.PlotGenerator;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.OperonAdjacency;
-import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
-import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ChartType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ElementsOfInterest;
 import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.SequinTableFormatExporter;
 import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.SequinTableSettingsWizardPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.FivePrimeUTRPromotorSettingsWizardPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.MotifSearchModel;
-import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.MotifSearchPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.PromotorAnalysisWizardIterator;
 import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.RbsAnalysisParameters;
 import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.RbsAnalysisWizardIterator;
 import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.RbsAnalysisWizardPanel;
-import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.SequenceLengthSelectionForMotifAnalysis;
 import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.SequenceLengthSelectionWizardPanel;
-import de.cebitec.readXplorer.transcriptomeAnalyses.rbsAnalysis.DataSelectionWizardPanel;
 import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.readXplorer.util.LineWrapCellRenderer;
 import de.cebitec.readXplorer.util.SequenceUtils;
@@ -39,8 +32,6 @@ import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceVi
 import de.cebitec.readXplorer.view.tableVisualization.TableComparatorProvider;
 import de.cebitec.readXplorer.view.tableVisualization.TableUtils;
 import de.cebitec.readXplorer.view.tableVisualization.tableFilter.TableRightClickFilter;
-import de.erichseifert.gral.data.DataTable;
-import de.erichseifert.gral.ui.InteractivePanel;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.io.File;
@@ -61,7 +52,6 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
-import org.openide.util.NbBundle;
 
 /**
  * This panel is capable of showing a table with detected operons and contains

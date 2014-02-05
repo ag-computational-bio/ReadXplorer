@@ -249,7 +249,7 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                 // otherwise specify options as:
                 //     new Object[] { NotifyDescriptor.YES_OPTION, ... etc. },
                 NotifyDescriptor.OK_CANCEL_OPTION // default option is "Yes"
-                );
+        );
         if (DialogDisplayer.getDefault().notify(nd) == NotifyDescriptor.OK_OPTION) {
             ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", this.novelRegionResults);
         }
@@ -476,6 +476,11 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                 rowData[i++] = false;
                 rowData[i++] = nr.isConsidered();
                 rowData[i++] = nr.getSite();
+                if (nr.getSite().equals("cis-antisense")) {
+                    ++noCisAntisense;
+                } else {
+                    ++noTransgene;
+                }
                 rowData[i++] = nr.getDropOffPos();
                 rowData[i++] = nr.getLength();
                 rowData[i++] = nr.getSequence();
@@ -499,9 +504,9 @@ public class NovelRegionResultPanel extends ResultTablePanel {
             statisticsMap.put(NOVELREGION_DETECTION_NO_OF_CISANTISENSE, (Integer) statisticsMap.get(NOVELREGION_DETECTION_NO_OF_CISANTISENSE) + noCisAntisense);
             statisticsMap.put(NOVELREGION_DETECTION_NO_OF_TRANSGENIC, (Integer) statisticsMap.get(NOVELREGION_DETECTION_NO_OF_TRANSGENIC) + noTransgene);
             statisticsMap.put(ResultPanelTranscriptionStart.MAPPINGS_COUNT, (Double) statisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT) + novelRegResults.getStats().getMc());
-            statisticsMap.put(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH, (Double) statisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH) + novelRegResults.getStats().getMc());
-            statisticsMap.put(ResultPanelTranscriptionStart.MAPPINGS_MILLION, (Double) statisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MILLION) + novelRegResults.getStats().getMc());
-            statisticsMap.put(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD, (Double) statisticsMap.get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD) + novelRegResults.getStats().getMc());
+            statisticsMap.put(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH, (Double) statisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH) + novelRegResults.getStats().getMml());
+            statisticsMap.put(ResultPanelTranscriptionStart.MAPPINGS_MILLION, (Double) statisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MILLION) + novelRegResults.getStats().getMm());
+            statisticsMap.put(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD, (Double) statisticsMap.get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD) + novelRegResults.getStats().getBgThreshold());
 
             novelRegResults.setStatsAndParametersMap(statisticsMap);
 
