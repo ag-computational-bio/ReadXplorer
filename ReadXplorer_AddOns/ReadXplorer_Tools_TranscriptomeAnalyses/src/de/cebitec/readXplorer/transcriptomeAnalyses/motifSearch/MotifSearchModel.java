@@ -1,5 +1,6 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch;
 
+import de.cebitec.readXplorer.databackend.ParameterSetI;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
@@ -60,21 +61,17 @@ public class MotifSearchModel implements Observer {
     private float contributingCitesForMinus10Motif, contributingCitesForMinus35Motif, contributingCitesForRbsMotif;
     private int alternativeSpacer;
     private TreeMap<String, Integer> minus10MotifStarts, minus35MotifStarts, rbsStarts;
-    private File rbsBioProspectorInput;
-    private File rbsBioProsFirstHit;
-    JTextPane regionsRelToTLSTextPane;
-    JTextPane regionsForMotifSearch;
-    JLabel rbsLogoLabel;
-    File minus10Input;
-    File minus35Input;
-    File bioProspOutMinus10;
-    File bioProspOutMinus35;
-    JTextPane regionOfIntrestMinus10, regionOfIntrestMinus35;
-    TreeMap<String, Integer> idsToMinus10Shifts;
-    TreeMap<String, Integer> idsToMinus35Shifts;
-    StyledDocument coloredPromotorRegions;
-    JLabel minus10logoLabel;
-    JLabel minus35LogoLabel;
+    private File rbsBioProspectorInput, rbsBioProsFirstHit;
+    private JTextPane regionsRelToTLSTextPane;
+    private JTextPane regionsForMotifSearch;
+    private JLabel rbsLogoLabel;
+    private File minus10Input, minus35Input, bioProspOutMinus10, bioProspOutMinus35, info;
+    private JTextPane regionOfIntrestMinus10, regionOfIntrestMinus35;
+    private TreeMap<String, Integer> idsToMinus10Shifts;
+    private TreeMap<String, Integer> idsToMinus35Shifts;
+    private StyledDocument coloredPromotorRegions;
+    private JLabel minus10logoLabel;
+    private JLabel minus35LogoLabel;
 
     /**
      *
@@ -94,7 +91,6 @@ public class MotifSearchModel implements Observer {
      *
      * @param params instance of PromotorSearchParameters.
      */
-//    public MotifSearchPanel utrPromotorAnalysis(PromotorSearchParameters params, List<TranscriptionStart> starts, List<Operon> operons) {
     public void utrPromotorAnalysis(PromotorSearchParameters params, List<TranscriptionStart> starts, List<Operon> operons) {
 
         this.alternativeSpacer = params.getAlternativeSpacer();
@@ -112,12 +108,14 @@ public class MotifSearchModel implements Observer {
         Path bioProspectorOutMinus35Path = null;
         Path minus10InputPath = null;
         Path minus35InputPath = null;
+        Path infoFilePath = null;
         try {
             workingDirPath = Files.createTempDirectory("promotorAnalysis_");
             bioProspectorOutMinus10Path = Files.createTempFile(workingDirPath, "promotorAnalysis_", "bioProspectorOutMinus10.fna");
             bioProspectorOutMinus35Path = Files.createTempFile(workingDirPath, "promotorAnalysis_", "bioProspectorOutMinus35.fna");
             minus10InputPath = Files.createTempFile(workingDirPath, "promotorAnalysis_", "inputBioProspectorMinus10.fna");
             minus35InputPath = Files.createTempFile(workingDirPath, "promotorAnalysis_", "inputBioProspectorMinus35.fna");
+            infoFilePath = Files.createTempFile(workingDirPath, "promotorAnalysis_", "info.txt");
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -127,6 +125,7 @@ public class MotifSearchModel implements Observer {
         minus35Input = minus35InputPath.toFile();
         bioProspOutMinus10 = bioProspectorOutMinus10Path.toFile();
         bioProspOutMinus35 = bioProspectorOutMinus35Path.toFile();
+        info = infoFilePath.toFile();
 
         // 1. write all upstream subregions for -10 analysis
         writeSubRegionFor5UTRInFile(
@@ -255,6 +254,7 @@ public class MotifSearchModel implements Observer {
         Icon icon2 = new ImageIcon(this.logoMinus35.getAbsolutePath() + ".png");
         minus35LogoLabel.setIcon(icon2);
 
+        writeInfoFile(info, false, meanMinus10SpacerToTSS, meanMinus35SpacerToMinus10, (int) contributingCitesForMinus10Motif, (int) contributingCitesForMinus35Motif, upstreamRegions.size(), params);
         progressHandlePromotorAnalysis.progress("Starting promotor analysis ...", 100);
         progressHandlePromotorAnalysis.finish();
     }
@@ -274,9 +274,11 @@ public class MotifSearchModel implements Observer {
         }
         Path rbsBioProspectorInputPath = null;
         Path rbsBioProsFirstHitPath = null;
+        Path infoFilePath = null;
         try {
             rbsBioProspectorInputPath = Files.createTempFile(workingDir, "rbsAnalysis_", "SequencesOfIntrest.fna");
             rbsBioProsFirstHitPath = Files.createTempFile(workingDir, "rbsAnalysis_", "BioProspectorBestHit.fna");
+            infoFilePath = Files.createTempFile(workingDir, "rbsAnalysis_", "info.txt");
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -284,10 +286,8 @@ public class MotifSearchModel implements Observer {
         File parentDir = workingDir.toFile();
         rbsBioProspectorInput = rbsBioProspectorInputPath.toFile();
         rbsBioProsFirstHit = rbsBioProsFirstHitPath.toFile();
+        info = infoFilePath.toFile();
 
-//        this.rbsMotifSearchPanel = new RbsMotifSearchPanel();
-//        rbsMotifSearchPanel.setBioProspInput(rbsBioProspectorInput);
-//        rbsMotifSearchPanel.setBioProspOut(rbsBioProsFirstHit);
         this.rbsStarts = new TreeMap<>();
 
         // Make a text pane, set its font and color, then add it to the frame
@@ -333,25 +333,17 @@ public class MotifSearchModel implements Observer {
             Exceptions.printStackTrace(ex);
         }
 
-//        this.rbsMotifSearchPanel.setContributedSequencesToMotif("" + this.contributingCitesForRbsMotif + "/" + upstreamRegions.size() / 2);
-//        this.rbsMotifSearchPanel.setRegionsToAnalyzeToPane(regionsRelToTLSTextPane.getStyledDocument());
-//        this.rbsMotifSearchPanel.setRegionOfIntrestToPane(regionsForMotifSearch.getStyledDocument());
         // generating Sequence Logos and adding them into Tabbedpane
         int logoStart = Math.round(this.meanSpacerLengthOfRBSMotif);
         logoStart += rbsParams.getMotifWidth();
-//        String roundedMean = String.format("%.1f", this.meanSpacerLengthOfRBSMotif);
-//
-//        this.rbsMotifSearchPanel.setRegionLengthForBioProspector(rbsParams.getSeqLengthToAnalyze());
-//        this.rbsMotifSearchPanel.setMotifWidth(rbsParams.getMotifWidth());
-//        this.rbsMotifSearchPanel.setMeanSpacerLength(roundedMean);
 
         this.logoRbs = makeSeqLogo(2.0, rbsBioProsFirstHit, parentDir.getAbsolutePath() + "\\RBSLogo",
                 "PNG", 8.0, -logoStart, 15, true, true);
-//        rbsMotifSearchPanel.setSequenceLogo(new File(this.logoRbs.getAbsolutePath() + ".png"));
         rbsLogoLabel = new JLabel();
         Icon icon = new ImageIcon(this.logoRbs.getAbsolutePath() + ".png");
         rbsLogoLabel.setIcon(icon);
-//        this.rbsMotifSearchPanel.setLogo(rbsLogoLabel);
+
+        writeInfoFile(info, true, meanSpacerLengthOfRBSMotif, 0, (int) contributingCitesForRbsMotif, 0, upstreamRegions.size(), rbsParams);
         progressHandleRbsAnalysis.progress("processing rbs analysis ...", 100);
         progressHandleRbsAnalysis.finish();
     }
@@ -1739,6 +1731,56 @@ public class MotifSearchModel implements Observer {
 
     public void setColoredPromotorRegions(StyledDocument coloredPromotorRegions) {
         this.coloredPromotorRegions = coloredPromotorRegions;
+    }
+
+    private void writeInfoFile(File file, boolean isRbs, float meanSpacer1, float meanspacer2, int contributedSegmentsToFstMotif, int contributedSegmentsToSndMotif, int noOfSequences, ParameterSetI<Object> params) {
+        PromotorSearchParameters promotorParams = null;
+        RbsAnalysisParameters rbsParams = null;
+        if (isRbs) {
+            rbsParams = (RbsAnalysisParameters) params;
+        } else {
+            promotorParams = (PromotorSearchParameters) params;
+        }
+
+        Writer writer = null;
+        try {
+            writer = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(file.getAbsolutePath()), "utf-8"));
+
+            if (isRbs) {
+                writer.write("Infos to RBS analysis\n");
+                writer.write("Length of upstream regions relative to TLS taken for analysis: " + rbsParams.getSeqLengthToAnalyze() + "\n");
+                writer.write("Min. Spacer: " + rbsParams.getMinSpacer() + "\n");
+                writer.write("Motif width: " + rbsParams.getMotifWidth() + "\n");
+                writer.write("Mean spacer width relative to TLS: " + meanSpacer1 + "\n");
+                writer.write("Number of contributed Segments to Motif: " + contributedSegmentsToFstMotif + "/" + noOfSequences + "\n");
+            } else {
+                writer.write("Infos to Promotor analysis\n");
+                writer.write("Length of upstream regions relative to TLS taken for analysis: " + promotorParams.getLengthOfPromotorRegion() + "\n");
+                writer.write("Min. spacer 1: " + promotorParams.getMinSpacer1() + "\n");
+                writer.write("Mean spacer 1: " + meanSpacer1 + "\n");
+                writer.write("Min. spacer 2: " + promotorParams.getMinSpacer2() + "\n");
+                writer.write("Mean spacer 2: " + meanspacer2 + "\n");
+                writer.write("-10 motif width: " + promotorParams.getMinusTenMotifWidth() + "\n");
+                writer.write("-35 motif width: " + promotorParams.getMinus35MotifWidth() + "\n");
+                writer.write("Number of contributed Segments to -10 Motif: " + contributedSegmentsToFstMotif + "/" + noOfSequences + "\n");
+                writer.write("Number of contributed Segments to -35 Motif: " + contributedSegmentsToSndMotif + "/" + noOfSequences + "\n");
+            }
+            writer.close();
+
+        } catch (UnsupportedEncodingException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }
+
+    public File getInfo() {
+        return info;
+    }
+
+    public void setInfo(File info) {
+        this.info = info;
     }
 
 }

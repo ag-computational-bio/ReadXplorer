@@ -584,6 +584,8 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                     promotorMotifSearchPanel.setLogoMinus35(new File(model.getLogoMinus35().getAbsolutePath() + ".png"));
                     promotorMotifSearchPanel.setMinus35LogoToPanel(model.getMinus35LogoLabel());
 
+                    promotorMotifSearchPanel.setInfo(model.getInfo());
+
                     topComponent.add(promotorMotifSearchPanel, BorderLayout.CENTER);
                     topComponent.updateUI();
                 }
@@ -666,6 +668,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                     rbsMotifSearchPanel.setMeanSpacerLength(roundedMean);
                     rbsMotifSearchPanel.setSequenceLogo(new File(model.getLogoRbs().getAbsolutePath() + ".png"));
                     rbsMotifSearchPanel.setLogo(model.getRbsLogoLabel());
+                    rbsMotifSearchPanel.setInfo(model.getInfo());
 
                     topComponent.add(rbsMotifSearchPanel, BorderLayout.CENTER);
                 }

@@ -1,7 +1,5 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch;
 
-import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
-import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.PurposeEnum;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Observer;
@@ -30,7 +28,7 @@ public class MotifSearchPanel extends javax.swing.JPanel implements Observable {
     private File minus35Input;
     private File bioProspOutMinus10;
     private File bioProspOutMinus35;
-    private File logoMinus10, logoMinus35;
+    private File logoMinus10, logoMinus35, info;
     private ProgressHandle progressHandle;
     private List<Observer> observerList;
     List<String> upstreamRegions;
@@ -390,6 +388,8 @@ public class MotifSearchPanel extends javax.swing.JPanel implements Observable {
             File logoMinus35 = getLogoMinus35();
             logoMinus10.renameTo(new File(fileChooser.getSelectedFile().getAbsolutePath() + "\\sequenceLogoMinus10.png"));
             logoMinus35.renameTo(new File(fileChooser.getSelectedFile().getAbsolutePath() + "\\sequenceLogoMinus35.png"));
+            File info = getInfo();
+            info.renameTo(new File(fileChooser.getSelectedFile().getAbsoluteFile() + "\\info.txt"));
             progressHandle.progress(2);
         }
         progressHandle.progress(3);
@@ -520,6 +520,14 @@ public class MotifSearchPanel extends javax.swing.JPanel implements Observable {
 
     public void setParams(PromotorSearchParameters params) {
         this.params = params;
+    }
+
+    public File getInfo() {
+        return info;
+    }
+
+    public void setInfo(File info) {
+        this.info = info;
     }
 
 }
