@@ -3,10 +3,10 @@ package de.cebitec.readXplorer.tools.snp;
 import de.cebitec.common.sequencetools.geneticcode.AminoAcidProperties;
 import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
 import de.cebitec.common.sequencetools.geneticcode.GeneticCodeFactory;
-import de.cebitec.readXplorer.databackend.dataObjects.ChromosomeObserver;
 import de.cebitec.readXplorer.databackend.dataObjects.CodonSnp;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.Snp;
 import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.Properties;
@@ -35,8 +35,8 @@ public class SnpTranslator {
 
     
     private final Preferences pref;
-    private final String refSeq;
-    private int refLength;
+    private final PersistantChromosome chromosome;
+    private long refLength;
     private List<PersistantFeature> genomicFeatures;
     private GeneticCode code;
     private int index;
@@ -52,6 +52,7 @@ public class SnpTranslator {
     private PersistantFeature subfeatBefore; //only set if pos is at borders
     private PersistantFeature subfeatAfter;
     private boolean subFeatureFound;
+    private final PersistantReference reference;
 
     /**
      * Generates all translations possible for a given snp for the given genomic features
@@ -62,13 +63,14 @@ public class SnpTranslator {
      * - The snp is located in a subfeature at a border, but this is not the last subfeature
      * (depending on the strand) and the triplet can be completed from the neighboring subfeature.
      * @param genomicFeatures all features of the reference genome of the desired feature types
-     * @param refSeq the reference sequence
+     * @param chromosome the chromosome for the current analysis
+     * @param reference the reference sequence for the current analysis
      */
-    public SnpTranslator(List<PersistantFeature> genomicFeatures, PersistantChromosome chromosome) {
+    public SnpTranslator(List<PersistantFeature> genomicFeatures, PersistantChromosome chromosome, PersistantReference reference) {
         this.genomicFeatures = genomicFeatures;
-        ChromosomeObserver chromObserver = new ChromosomeObserver();
-        this.refSeq = chromosome.getSequence(chromObserver);
-        this.refLength = refSeq.length();
+        this.chromosome = chromosome;
+        this.reference = reference;
+        this.refLength = chromosome.getLength();
         index = 0;
         this.pref = NbPreferences.forModule(Object.class);
         GeneticCodeFactory genCodeFactory = GeneticCodeFactory.getDefault();
@@ -201,13 +203,13 @@ public class SnpTranslator {
                     }
 
                     if (!posAtRightChromBorder && (fwdStrand && mod == 1 || !fwdStrand && mod == 0)) { //left base of triplet, get pos to pos+2
-                        tripletRef = refSeq.substring(pos - 1, pos + 2);
+                        tripletRef = reference.getChromSequence(chromosome.getId(), pos, pos + 2);
                         tripletSnp = snp.getBase().toLowerCase().concat(tripletRef.substring(1));
                     } else if (mod == 2 && !posDirectAtLeftChromBorder && !posDirectAtRightChromBorder) { //middle base of triplet, get pos-1, pos and pos+1
-                        tripletRef = refSeq.substring(pos - 2, pos + 1);
+                        tripletRef = reference.getChromSequence(chromosome.getId(), pos - 1, pos + 1);
                         tripletSnp = tripletRef.charAt(0) + snp.getBase().toLowerCase() + tripletRef.charAt(2);
                     } else if (!posAtLeftChromBorder && (fwdStrand && mod == 0 || !fwdStrand && mod == 1)) { //right base of triplet, get pos-2 to pos
-                        tripletRef = refSeq.substring(pos - 3, pos);
+                        tripletRef = reference.getChromSequence(chromosome.getId(), pos - 2, pos);
                         tripletSnp = tripletRef.substring(0, 2).concat(snp.getBase().toLowerCase());
                     }
                 } else { //snp is located in a subfeature (exon) and at a border of a subfeature
@@ -220,26 +222,26 @@ public class SnpTranslator {
 
                         if (posAtRightSubBorder) {
                             if (posDirectAtRightSubBorder) { //get only last base from current subfeature and two from next subfeature
-                                tripletRef = refSeq.substring(pos - 1, pos) + refSeq.substring(subfeatAfter.getStart() - 1, subfeatAfter.getStart() + 1);
+                                tripletRef = reference.getChromSequence(chromosome.getId(), pos, pos) + reference.getChromSequence(chromosome.getId(), subfeatAfter.getStart(), subfeatAfter.getStart() + 1);
                             } else { //get last two bases from current subfeature and first base of next subfeature
-                                tripletRef = refSeq.substring(pos - 1, pos + 1) + refSeq.substring(subfeatAfter.getStart() - 1, subfeatAfter.getStart());
+                                tripletRef = reference.getChromSequence(chromosome.getId(), pos, pos + 1) + reference.getChromSequence(chromosome.getId(), subfeatAfter.getStart(), subfeatAfter.getStart());
                             }
                         } else {
-                            tripletRef = refSeq.substring(pos - 1, pos + 2);
+                            tripletRef = reference.getChromSequence(chromosome.getId(), pos - 1, pos + 2);
                         }
                         tripletSnp = snp.getBase().toLowerCase().concat(tripletRef.substring(1));
 
                     } else if (mod == 2 && !posDirectAtLeftChromBorder && !posDirectAtRightChromBorder) { //middle base of triplet, get pos-1, pos and pos+1
 
                         if (posDirectAtLeftSubBorder) { //get one base from left subfeature and one from right subfeature, adding last base later
-                            tripletRef = refSeq.substring(subfeatBefore.getStop() - 1, subfeatBefore.getStop()) + refSeq.substring(pos - 1, pos);
+                            tripletRef = reference.getChromSequence(chromosome.getId(), subfeatBefore.getStop(), subfeatBefore.getStop()) + reference.getChromSequence(chromosome.getId(), pos, pos);
                         } else {
-                            tripletRef = refSeq.substring(pos - 2, pos);
+                            tripletRef = reference.getChromSequence(chromosome.getId(), pos - 1, pos);
                         }
                         if (posDirectAtRightSubBorder) {
-                            tripletRef += refSeq.substring(subfeatAfter.getStart() - 1, subfeatAfter.getStart());
+                            tripletRef += reference.getChromSequence(chromosome.getId(), subfeatAfter.getStart(), subfeatAfter.getStart());
                         } else {
-                            tripletRef += refSeq.substring(pos, pos + 1);
+                            tripletRef += reference.getChromSequence(chromosome.getId(), pos + 1, pos + 1);
                         }
                         tripletSnp = tripletRef.charAt(0) + snp.getBase().toLowerCase() + tripletRef.charAt(2);
 
@@ -247,12 +249,12 @@ public class SnpTranslator {
 
                         if (posAtLeftSubBorder) {
                             if (posDirectAtLeftSubBorder) { //get both left bases from other subfeature
-                                tripletRef = refSeq.substring(subfeatBefore.getStop() - 2, subfeatBefore.getStop()) + refSeq.substring(pos - 1, pos);
+                                tripletRef = reference.getChromSequence(chromosome.getId(), subfeatBefore.getStop() - 1, subfeatBefore.getStop()) + reference.getChromSequence(chromosome.getId(), pos, pos);
                             } else { //get last base from feature before
-                                tripletRef = refSeq.substring(subfeatBefore.getStop() - 1, subfeatBefore.getStop()) + refSeq.substring(pos - 2, pos);
+                                tripletRef = reference.getChromSequence(chromosome.getId(), subfeatBefore.getStop(), subfeatBefore.getStop()) + reference.getChromSequence(chromosome.getId(), pos - 1, pos);
                             }
                         } else {
-                            tripletRef = refSeq.substring(pos - 3, pos);
+                            tripletRef = reference.getChromSequence(chromosome.getId(), pos - 2, pos);
                         }
                         tripletSnp = tripletRef.substring(0, 2).concat(snp.getBase().toLowerCase());
                     }
@@ -283,7 +285,7 @@ public class SnpTranslator {
 
                 codonSnpList.add(new CodonSnp(tripletRef, tripletSnp, aminoRef, aminoSnp, type, feature));
             } catch (NullPointerException e) {
-                continue; //ignore translations with N's or gaps
+                //nothing to do, ignore translations with N's or gaps
             }
         }
         return codonSnpList;

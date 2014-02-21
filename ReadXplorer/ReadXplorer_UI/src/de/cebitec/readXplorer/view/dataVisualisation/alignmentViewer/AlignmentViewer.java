@@ -42,7 +42,6 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
     private float percentSandBPerCovUnit;
     private int oldLogLeft;
     private int oldLogRight;
-    boolean mappingsLoading = false;
     MappingResultPersistant mappingResult;
     HashMap<Integer, Integer> completeCoverage;
 
@@ -119,7 +118,6 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
         if (logLeft != this.oldLogLeft || logRight != this.oldLogRight || this.isNewDataRequestNeeded()) {
             
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
-            this.mappingsLoading = true;
             this.trackConnector.addMappingRequest(new IntervalRequest(from, to, this.getReference().getActiveChromId(), this, true));
             this.oldLogLeft = logLeft;
             this.oldLogRight = logRight;
@@ -154,7 +152,6 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
             this.layout = new Layout(mappingResult.getRequest().getFrom(), mappingResult.getRequest().getTo(), mappingResult.getMappings(), getExcludedFeatureTypes());
 
             this.removeAll();
-            this.addBlocks(layout);
 
             if (this.hasLegend()) {
                 this.add(this.getLegendLabel());
@@ -170,9 +167,9 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
             }
 
             getSequenceBar().setGenomeGapManager(layout.getGenomeGapManager());
+            this.addBlocks(layout);
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             
-            this.mappingsLoading = false;
             this.repaint();
     }
 

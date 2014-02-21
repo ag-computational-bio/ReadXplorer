@@ -8,6 +8,7 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.SequenceUtils;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -68,8 +69,9 @@ public class ReferenceConnector {
                 String name = rs.getString(FieldNames.REF_GEN_NAME);
                 String description = rs.getString(FieldNames.REF_GEN_DESCRIPTION);
                 Timestamp time = rs.getTimestamp(FieldNames.REF_GEN_TIMESTAMP);
+                File fastaFile = new File(rs.getString(FieldNames.REF_GEN_FASTA_FILE));
 
-                reference = new PersistantReference(refGenID, name, description, time);
+                reference = new PersistantReference(refGenID, name, description, time, fastaFile);
             }
             rs.close();
 
@@ -134,36 +136,6 @@ public class ReferenceConnector {
         }
 
         return chrom;
-    }
-
-    /**
-     *
-     * @param chromId id of the chromosome to retrieve from this reference
-     * genome.
-     * @return Fetches the needed chromosome sequence of the reference.
-     */
-    public String getChromSequence(int chromId) {
-        String sequence = "";
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Loading chromosome sequence with id  \"{0}\" from database", chromId);
-        try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_CHROM_SEQ)) {
-            fetch.setLong(1, chromId);
-
-            ResultSet rs = fetch.executeQuery();
-            if (rs.next()) {
-                sequence = rs.getString(FieldNames.CHROM_SEQUENCE);
-            }
-            rs.close();
-
-        } catch (SQLException ex) {
-            Logger.getLogger(ReferenceConnector.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (Exception e) {
-            //dirty fix for a bug in h2 database stating "lob not found"
-            Logger.getLogger(ReferenceConnector.class.getName()).log(Level.INFO,
-                    "Cound not read reference sequence from dabase (this probably a concurrency issue), ignoring ..  ",
-                    e);
-        }
-
-        return sequence;
     }
 
     /**

@@ -297,11 +297,11 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
             ReferenceConnector refGenCon = ProjectConnector.getInstance().getRefGenomeConnector(this.reference.getId());
             
             ParameterSetSNPs snpAnalysisParams = (ParameterSetSNPs) snpData.getParameters();
-            for (PersistantChromosome chrom : refGenCon.getChromosomesForGenome().values()) {
+            for (PersistantChromosome chrom : reference.getChromosomes().values()) {
                 List<PersistantFeature> featuresSorted = refGenCon.getFeaturesForRegionInclParents(0, chrom.getLength(), 
                         snpAnalysisParams.getSelFeatureTypes(), chrom.getId());
 
-                SnpTranslator snpTranslator = new SnpTranslator(featuresSorted, chrom);
+                SnpTranslator snpTranslator = new SnpTranslator(featuresSorted, chrom, reference);
 
                 Snp snp;
                 Object[] rowData;

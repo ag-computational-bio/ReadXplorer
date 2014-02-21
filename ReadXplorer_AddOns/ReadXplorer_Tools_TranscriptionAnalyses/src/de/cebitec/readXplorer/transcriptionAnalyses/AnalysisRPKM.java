@@ -62,6 +62,7 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
         
         for (PersistantChromosome chrom : refConnector.getChromosomesForGenome().values()) {
             int chromLength = chrom.getLength();
+//            this.modifySelFeatureTypes();
             List<PersistantFeature> chromFeatures = refConnector.getFeaturesForRegionInclParents(0, chromLength, parametersRPKM.getSelFeatureTypes(), chrom.getId());
 
 //        this.featureCountMap = this.fillInFeatureTypes();
@@ -261,5 +262,11 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
      */
     public int getNoGenomeFeatures() {
         return this.noSelectedFeatures;
+    }
+
+    private void modifySelFeatureTypes() {
+        if (parametersRPKM.getSelFeatureTypes().contains(FeatureType.GENE)) {
+            parametersRPKM.getSelFeatureTypes().add(FeatureType.EXON);
+        }
     }
 }

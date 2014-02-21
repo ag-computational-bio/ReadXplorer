@@ -7,6 +7,7 @@ import de.cebitec.readXplorer.parser.common.ParsedTrack;
 import de.cebitec.readXplorer.util.Benchmark;
 import de.cebitec.readXplorer.util.DiscreteCountingDistribution;
 import de.cebitec.readXplorer.util.ErrorLimit;
+import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.MessageSenderI;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Observer;
@@ -14,6 +15,7 @@ import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.StatsContainer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -93,6 +95,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
         Integer mappingCount;
         ErrorLimit errorLimit = new ErrorLimit();
         Set<String> readNameSet = new HashSet<>();
+//        HashMap<String, Object> readNameSet = new HashMap<>();
         
 //        String[] nameArray;
 //        String shortReadName;
@@ -127,6 +130,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
 //                        shortReadName = nameArray[0] + "/" + nameArray[1].split("/")[1];
 //                        readNameSet.add(shortReadName);
                         if (statsContainer.getStatsMap().get(StatsContainer.NO_READS) <= 0) {
+//                            GeneralUtils.splitReadNameAndAddToMap(readNameSet, readName, 0, GeneralUtils.NameStyle.STYLE_STANDARD);
                             readNameSet.add(readName);
                         }
                         

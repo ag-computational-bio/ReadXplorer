@@ -664,7 +664,6 @@ public final class CommonsMappingParser {
      * sam record. Use this method, if the number of differences is already
      * known. No data is added to reads, which do not occur in the 
      * classification map.
-     * @param readName the complete read name
      * @param record the sam record to update
      * @param differences the number of differences the record has to the
      * reference

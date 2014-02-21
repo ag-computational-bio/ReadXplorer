@@ -19,7 +19,7 @@ public class Layer implements LayerI{
         this.absStart = absStart;
         this.absStop = absStop;
         this.gapManager = gapManager;
-        blocks = new ArrayList<BlockI>();
+        blocks = new ArrayList<>();
     }
 
     @Override
@@ -32,23 +32,23 @@ public class Layer implements LayerI{
 
         StringBuilder sb = new StringBuilder();
         int from = absStart;
-        for(BlockI b : blocks){
-            int to = b.getAbsStart()-1;
+        for (BlockI b : blocks) {
+            int to = b.getAbsStart() - 1;
             this.fillWithGaps(from, to, sb);
             sb.append(b.toString());
-            from =  b.getAbsStop()+1;
+            from = b.getAbsStop() + 1;
         }
-        if(from <  absStop){
+        if (from < absStop) {
 
             this.fillWithGaps(from, absStop, sb);
         }
         return sb.toString();
     }
 
-    private void fillWithGaps(int from, int to, StringBuilder sb){
-        for(int i = from; i<= to; i++){
-            if(gapManager.hasGapAt(i)){
-                for(int x = 0; x< gapManager.getNumOfGapsAt(i); x++){
+    private void fillWithGaps(int from, int to, StringBuilder sb) {
+        for (int i = from; i <= to; i++) {
+            if (gapManager.hasGapAt(i)) {
+                for (int x = 0; x < gapManager.getNumOfGapsAt(i); x++) {
                     sb.append("-");
                 }
                 sb.append(".");

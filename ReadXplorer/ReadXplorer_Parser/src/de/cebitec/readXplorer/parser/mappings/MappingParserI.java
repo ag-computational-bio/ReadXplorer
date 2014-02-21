@@ -10,20 +10,19 @@ import java.util.Map;
 /**
  * Interface to be implemented for all mapping parsers.
  *
- * @author ddoppmeier
+ * @author ddoppmeier, Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
  */
 public interface MappingParserI extends ParserI, Observable, PreprocessorI {
 
-    //public ParsedMappingContainer parseInput(TrackJob trackJob, HashMap<String, Integer> readnameToSequenceID, String sequenceString) throws ParsingException;
     /**
      * Parses the input determined by the track job.
      * @param trackJob the track job to parse
-     * @param chromSeqMap the map of chromosome names to chromosome sequences
+     * @param chromLengthMap the map of chromosome names to chromosome length
      * @return the parsed data object
      * @throws ParsingException
      * @throws OutOfMemoryError 
      */
-    public Object parseInput(TrackJob trackJob, Map<String, String> chromSeqMap) throws ParsingException, OutOfMemoryError;
+    public Object parseInput(TrackJob trackJob, Map<String, Integer> chromLengthMap) throws ParsingException, OutOfMemoryError;
     
     /**
      * Converts some data for the given track job and the given reference.

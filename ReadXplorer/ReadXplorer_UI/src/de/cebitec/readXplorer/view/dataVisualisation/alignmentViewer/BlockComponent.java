@@ -129,11 +129,14 @@ public class BlockComponent extends JComponent {
 
     }
 
+    /**
+     * @return The reference sequence 
+     */
     public String getSequence() {
         int start = ((PersistantMapping) block.getPersistantObject()).getStart();
         int stop = ((PersistantMapping) block.getPersistantObject()).getStop();
         //string first pos is zero
-        String readSequence = parentViewer.getReference().getActiveChromSequence(parentViewer.getChromosomeObserver()).substring(start-1, stop);
+        String readSequence = parentViewer.getReference().getActiveChromSequence(start - 1, stop);
         return readSequence;
     }
 
@@ -194,7 +197,7 @@ public class BlockComponent extends JComponent {
                 key = "Reference insertions";
                 printLabel = false;
             }
-            StringBuilder tmp = new StringBuilder();
+            StringBuilder tmp = new StringBuilder(10);
             for (PersistantReferenceGap g : mapping.getGenomeGapsAtPosition(pos)) {
                 tmp.append(g.getBase()).append(", ");
             }

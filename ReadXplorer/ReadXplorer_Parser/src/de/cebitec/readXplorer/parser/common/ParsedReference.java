@@ -1,11 +1,10 @@
 package de.cebitec.readXplorer.parser.common;
 
 import de.cebitec.readXplorer.parser.reference.Filter.FeatureFilter;
+import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Data holder for a parsed reference sequence. Besides that it knows whether
@@ -25,6 +24,7 @@ public class ParsedReference {
     private FeatureFilter filter;
     private Timestamp timestamp;
     private int id;
+    private File fastaFile;
 
     /**
      * Data holder for a parsed reference sequence. Besides that it knows
@@ -110,7 +110,7 @@ public class ParsedReference {
      */
     public void setName(String name) {
         this.name = name;
-        }
+    }
 
     /**
      * Adds a chromosome to the list of chromosomes for this reference.
@@ -118,12 +118,27 @@ public class ParsedReference {
      */
     public void addChromosome(ParsedChromosome parsedChrom) {
         chromosomes.add(parsedChrom);
-            }
+    }
 
     /**
      * @return The list of chromosomes for this reference.
      */
     public List<ParsedChromosome> getChromosomes() {
         return chromosomes;
-            }
-        }
+    }
+
+    /**
+     * Sets the reference fasta file containing the sequence.
+     * @param fastaFile The fasta file of the reference containing the sequence.
+     */
+    public void setFastaFile(File fastaFile) {
+        this.fastaFile = fastaFile;
+    }
+    
+    /**
+     * @return The fasta file of the reference containing the sequence.
+     */
+    public File getFastaFile() {
+        return this.fastaFile;
+    }
+}

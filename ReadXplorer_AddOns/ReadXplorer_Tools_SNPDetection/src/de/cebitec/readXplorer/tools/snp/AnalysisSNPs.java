@@ -1,8 +1,8 @@
 package de.cebitec.readXplorer.tools.snp;
 
 import de.cebitec.readXplorer.api.objects.AnalysisI;
+import de.cebitec.readXplorer.databackend.IntervalRequest;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.ChromosomeObserver;
 import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistant;
 import de.cebitec.readXplorer.databackend.dataObjects.GapCount;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantCoverage;
@@ -165,7 +165,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
         int relativeGapPos;
         for (PersistantReferenceGap gap : gaps) {
             if (gap.getPosition() >= coverage.getLeftBound() && gap.getPosition() < coverage.getRightBound()) {
-                relativeGapPos = gap.getPosition() - coverage.getLeftBound(); //+1 because sequence starts at 1 not 0
+                relativeGapPos = gap.getPosition() - coverage.getLeftBound();
                 if (gapCounts[relativeGapPos] == null) {
                     gapCounts[relativeGapPos] = new GapCount();
                 }
@@ -173,8 +173,8 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
             }
         }
         
-        ChromosomeObserver chromObserver = new ChromosomeObserver();
-        String refSeq = trackConnector.getRefGenome().getChromSequence(covAndDiffs.getRequest().getChromId(), chromObserver);
+        IntervalRequest request = covAndDiffs.getRequest();
+        String refSubSeq = trackConnector.getRefGenome().getChromSequence(request.getChromId(), request.getFrom(), request.getTo());
         int absPos;
         int[] baseCounts;
         char refBase;
@@ -217,7 +217,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
 
 
                     if (frequency >= analysisParams.getMinPercentage()) {
-                        refBase = refSeq.charAt(absPos - 1);
+                        refBase = refSubSeq.charAt(i); //TODO:SEQ: Test if base is correct base
                         refBaseIdx = getBaseInt(refBase);
                         //determine SNP type, can still be match, if match coverage is largest
                         baseCounts[refBaseIdx] = cov - diffCount;
@@ -313,8 +313,6 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
         } catch (RuntimeIOException e) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Could not read data from track file: {0}", trackConnector.getTrackPath());
         }
-        
-        trackConnector.getRefGenome().getChromosome(covAndDiffs.getRequest().getChromId()).removeObserver(chromObserver);
     }
 
 //    private int getNeighboringCov(int absPos, PersistantCoverage coverage) {

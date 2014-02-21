@@ -67,6 +67,7 @@ public final class LoginVisualPanel extends JPanel {
             hostname = null;
             database = databaseField.getText();
             if (database.endsWith(".h2.db")) { database = database.replace(".h2.db", ""); }
+            if (database.endsWith(".h2")) { database = database.replace(".h2", ""); }
             user = null;
             password = null;
         }

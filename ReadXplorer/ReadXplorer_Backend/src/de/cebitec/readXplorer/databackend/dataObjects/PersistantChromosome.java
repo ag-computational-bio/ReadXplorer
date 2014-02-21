@@ -1,12 +1,7 @@
 package de.cebitec.readXplorer.databackend.dataObjects;
 
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.util.Observable;
-import de.cebitec.readXplorer.util.Observer;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -15,15 +10,13 @@ import java.util.Objects;
  * 
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class PersistantChromosome implements Observable {
+public class PersistantChromosome {
 
     private int id;
     private final int chromNumber;
     private int refGenID;
-    private String sequence;
     private int chromLength;
     private final String name;
-    private List<Observer> observers;
 
     /**
      * Data holder for a chromosome. 
@@ -38,10 +31,7 @@ public class PersistantChromosome implements Observable {
         this.chromNumber = chromNumber;
         this.refGenID = refGenID;
         this.name = name;
-        this.sequence = "";
         this.chromLength = chromLength;
-        this.observers = new ArrayList<>();
-
     }
 
     /**
@@ -71,20 +61,6 @@ public class PersistantChromosome implements Observable {
     public String getName() {
         return this.name;
     }
-    
-    /**
-     * @param observer The observer of the chromosome. It is added to the
-     * chromosome and should remain in the observer list, as long, as the
-     * observer needs the sequence of the chromosome.
-     * @return The chromosome sequence.
-     */
-    public String getSequence(Observer observer) {
-        this.registerObserver(observer);
-        if (this.sequence.isEmpty()) {
-            this.sequence = ProjectConnector.getInstance().getRefGenomeConnector(refGenID).getChromSequence(id);
-        }
-        return sequence;
-    }
 
     /**
      * @return the length of the chromosome sequence
@@ -99,28 +75,6 @@ public class PersistantChromosome implements Observable {
     @Override
     public String toString() {
         return this.name;
-    }
-    
-    @Override
-    public void registerObserver(Observer observer) {
-        if (!this.observers.contains(observer)) {
-            this.observers.add(observer);
-        }
-    }
-
-    @Override
-    public void removeObserver(Observer observer) {
-        this.observers.remove(observer);
-        if (this.observers.isEmpty()) {
-            this.sequence = "";
-        }
-    }
-
-    @Override
-    public void notifyObservers(Object data) {
-        for (Observer observer : this.observers) {
-            observer.update(data);
-        }
     }
     
     /**

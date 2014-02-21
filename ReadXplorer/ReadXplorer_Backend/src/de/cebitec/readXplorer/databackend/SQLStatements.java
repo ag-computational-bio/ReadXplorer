@@ -142,10 +142,10 @@ public class SQLStatements {
             + FieldNames.REF_GEN_ID + ", "
             + FieldNames.REF_GEN_NAME + ","
             + FieldNames.REF_GEN_DESCRIPTION + ","
-   //         + FieldNames.REF_GEN_SEQUENCE + ", "
-            + FieldNames.REF_GEN_TIMESTAMP + " "
+            + FieldNames.REF_GEN_TIMESTAMP + ","
+            + FieldNames.REF_GEN_FASTA_FILE + " "
             + ") "
-            + "VALUES (?,?,?,?)";
+            + "VALUES (?,?,?,?,?)";
     
     
         public final static String INSERT_CHROMOSOME =
@@ -155,10 +155,9 @@ public class SQLStatements {
             + FieldNames.CHROM_NUMBER + ", "
             + FieldNames.CHROM_REFERENCE_ID + ", "
             + FieldNames.CHROM_NAME + ", "
-            + FieldNames.CHROM_LENGTH + ", "
-            + FieldNames.CHROM_SEQUENCE + " "
+            + FieldNames.CHROM_LENGTH + " "
             + ") "
-            + "VALUES (?,?,?,?,?,?)";
+            + "VALUES (?,?,?,?,?)";
     
     
     public final static String INSERT_FEATURE =
@@ -443,7 +442,8 @@ public class SQLStatements {
                 + "R." + FieldNames.REF_GEN_ID + ", "
                 + "R." + FieldNames.REF_GEN_NAME + ", "
                 + "R." + FieldNames.REF_GEN_DESCRIPTION + ", "
-                + "R." + FieldNames.REF_GEN_TIMESTAMP
+                + "R." + FieldNames.REF_GEN_TIMESTAMP + ", "
+                + "R." + FieldNames.REF_GEN_FASTA_FILE + " "
             + " FROM "
                 + FieldNames.TABLE_REFERENCE + " AS R ";
     
@@ -475,14 +475,14 @@ public class SQLStatements {
             + " WHERE "
                 + FieldNames.CHROM_ID + " = ? ";
     
-    /** Fetch the chromosome sequence for a given chromosome id. */
-    public static final String FETCH_CHROM_SEQ =
+    /** Fetch the reference sequence file for a given reference id. */
+    public static final String FETCH_REF_FILE =
             "SELECT "
-                + FieldNames.CHROM_SEQUENCE
+                + FieldNames.REF_GEN_FASTA_FILE
             + " FROM "
-                + FieldNames.TABLE_CHROMOSOME
+                + FieldNames.TABLE_REFERENCE
             + " WHERE "
-                + FieldNames.CHROM_ID + " = ?";
+                + FieldNames.REF_GEN_ID + " = ?";
     
     /** Fetch the number of chromosomes for a reference. */
     public static String FETCH_NUMBER_CHROMS_FOR_REF =
@@ -496,12 +496,12 @@ public class SQLStatements {
     /**
      * Updates the reference genome sequence.
      */
-    public static final String UPDATE_CHROM_SEQ =
-            "UPDATE " + FieldNames.TABLE_CHROMOSOME
+    public static final String UPDATE_REF_FILE =
+            "UPDATE " + FieldNames.TABLE_REFERENCE
             + " SET "
-            + FieldNames.CHROM_SEQUENCE + " = ? "
+            + FieldNames.REF_GEN_FASTA_FILE + " = ? "
             + " WHERE "
-            + FieldNames.CHROM_ID + " = ? ";
+            + FieldNames.REF_GEN_ID + " = ? ";
     
     
     public static final String UPDATE_FEATURE_TABLE =
@@ -516,6 +516,7 @@ public class SQLStatements {
      * @deprecated for newer DB Versions, since the sequences are stored in the
      * chromosome table!
      */
+    @Deprecated
     public static final String FETCH_REF_SEQ =
             " SELECT "
             + FieldNames.REF_GEN_SEQUENCE + ", "
@@ -544,7 +545,8 @@ public class SQLStatements {
             + "R." + FieldNames.REF_GEN_ID + ", "
             + "R." + FieldNames.REF_GEN_NAME + ", "
             + "R." + FieldNames.REF_GEN_DESCRIPTION + ", "
-            + "R." + FieldNames.REF_GEN_TIMESTAMP
+            + "R." + FieldNames.REF_GEN_TIMESTAMP + ", "
+            + "R." + FieldNames.REF_GEN_FASTA_FILE + " "
             + " FROM "
             + FieldNames.TABLE_REFERENCE + " AS R"
             + " WHERE "
@@ -1212,7 +1214,7 @@ public class SQLStatements {
             + "COUNT(DISTINCT S." + FieldNames.SEQ_PAIR_ID + ") as NUM "
             + "FROM "
             + FieldNames.TABLE_SEQ_PAIR_PIVOT + " as S "
-            + "WHERE " + //TODO:mappingid holen & track abgleichen...
+            + "WHERE " + 
             "S." + FieldNames.MAPPING_TRACK + " = ?";    
     
     public static final String FETCH_STATS_FOR_TRACK = 

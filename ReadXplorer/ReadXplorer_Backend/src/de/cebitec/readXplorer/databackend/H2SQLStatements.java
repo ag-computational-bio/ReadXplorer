@@ -46,7 +46,8 @@ public class H2SQLStatements {
             + FieldNames.REF_GEN_ID + " BIGINT PRIMARY KEY, "
             + FieldNames.REF_GEN_NAME + " VARCHAR(200) NOT NULL, "
             + FieldNames.REF_GEN_DESCRIPTION + " VARCHAR(200) NOT NULL,"
-            + FieldNames.REF_GEN_TIMESTAMP + " DATETIME NOT NULL"
+            + FieldNames.REF_GEN_TIMESTAMP + " DATETIME NOT NULL,"
+            + FieldNames.REF_GEN_FASTA_FILE + " VARCHAR(600) NOT NULL"
             + ") ";
     
     
@@ -57,8 +58,7 @@ public class H2SQLStatements {
             + FieldNames.CHROM_NUMBER + " BIGINT UNSIGNED NOT NULL, "             
             + FieldNames.CHROM_REFERENCE_ID + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.CHROM_NAME + " VARCHAR(200) NOT NULL, "
-            + FieldNames.CHROM_LENGTH + " BIGINT UNSIGNED NOT NULL, " 
-            + FieldNames.CHROM_SEQUENCE + " CLOB NOT NULL, " 
+            + FieldNames.CHROM_LENGTH + " BIGINT UNSIGNED NOT NULL "
             + ") ";
     
     
@@ -181,7 +181,7 @@ public class H2SQLStatements {
             + FieldNames.TRACK_READ_PAIR_ID + " BIGINT UNSIGNED, " //only for paired sequences
             + FieldNames.TRACK_DESCRIPTION + " VARCHAR (200) NOT NULL, "
             + FieldNames.TRACK_TIMESTAMP + " DATETIME NOT NULL,  "
-            + FieldNames.TRACK_PATH + " VARCHAR(400) "
+            + FieldNames.TRACK_PATH + " VARCHAR(600) "
             + ") ";
     
     

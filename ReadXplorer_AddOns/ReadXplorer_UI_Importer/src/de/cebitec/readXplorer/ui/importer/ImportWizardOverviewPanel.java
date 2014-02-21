@@ -1,7 +1,7 @@
 package de.cebitec.readXplorer.ui.importer;
 
-import de.cebitec.readXplorer.parser.ReferenceJob;
 import de.cebitec.readXplorer.parser.ReadPairJobContainer;
+import de.cebitec.readXplorer.parser.ReferenceJob;
 import de.cebitec.readXplorer.parser.TrackJob;
 import de.cebitec.readXplorer.ui.importer.actions.ImportWizardAction;
 import java.awt.Component;
@@ -61,9 +61,9 @@ public class ImportWizardOverviewPanel implements WizardDescriptor.Panel<WizardD
         // load jobs to be imported
         List<ReferenceJob> refJobs = (List<ReferenceJob>) settings.getProperty(ImportWizardAction.PROP_REFJOBLIST);
         List<TrackJob> trackJobs = (List<TrackJob>) settings.getProperty(ImportWizardAction.PROP_TRACKJOBLIST);
-        List<ReadPairJobContainer> seqPairJobs = (List<ReadPairJobContainer>) settings.getProperty(ImportWizardAction.PROP_READPAIRJOBLIST);
+        List<ReadPairJobContainer> readPairJobs = (List<ReadPairJobContainer>) settings.getProperty(ImportWizardAction.PROP_READPAIRJOBLIST);
         
-        importOverviewCard.showOverview(refJobs, trackJobs, seqPairJobs);
+        importOverviewCard.showOverview(refJobs, trackJobs, readPairJobs);
     }
 
     @Override

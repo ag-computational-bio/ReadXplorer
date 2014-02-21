@@ -8,6 +8,7 @@ import de.cebitec.readXplorer.parser.common.ParsingException;
 import de.cebitec.readXplorer.parser.reference.Filter.FeatureFilter;
 import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.Observer;
+import de.cebitec.readXplorer.util.SequenceUtils;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -21,6 +22,7 @@ import org.biojava.bio.BioException;
 import org.biojava.bio.program.gff.GFFDocumentHandler;
 import org.biojava.bio.program.gff.GFFParser;
 import org.biojava.bio.program.gff.GFFRecord;
+import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.utils.ParserException;
   
 
@@ -31,16 +33,15 @@ import org.biojava.utils.ParserException;
  *
  * @author marie-theres, @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
  */
-public class BioJavaGff2Parser extends FastaReferenceParser {
+public class BioJavaGff2Parser implements ReferenceParserI {
     
      // File extension used by Filechooser to choose files to be parsed by this parser
-    private static final String[] fileExtension = new String[]{"gff", "gff2"};
+    private static final String[] fileExtension = new String[]{"gff", "GFF", "gff2", "GFF2", "gtf", "GTF"};
     // name of this parser for use in ComboBoxes
-    private static final String parserName = "GFF2 file";
-    private static final String fileDescription = "GFF2 file";
+    private static final String parserName = "GFF2/GTF file";
+    private static final String fileDescription = parserName;
     
     private List<Observer> observers = new ArrayList<>();
-    private String errorMsg;
 
     /**
      * Parses the sequence from a fasta file contained in the ReferenceJob and
@@ -53,7 +54,8 @@ public class BioJavaGff2Parser extends FastaReferenceParser {
     @Override
     public ParsedReference parseReference(final ReferenceJob referenceJob, FeatureFilter filter) throws ParsingException {
         
-        final ParsedReference refGenome = super.parseReference(referenceJob, filter);
+        FastaReferenceParser fastaParser = new FastaReferenceParser();
+        final ParsedReference refGenome = fastaParser.parseReference(referenceJob, filter);
         refGenome.setFeatureFilter(filter);
         final Map<String, ParsedChromosome> chromMap = CommonsRefParser.generateStringMap(refGenome.getChromosomes());
 
@@ -100,11 +102,7 @@ public class BioJavaGff2Parser extends FastaReferenceParser {
                         parsedType = gffr.getFeature();
                         start = gffr.getStart();
                         stop = gffr.getEnd();
-                        strand = gffr.getStrand().getValue();
-                        if (strand != -1 && strand != 1) {
-                            sendErrorMsg("Strand of this feature is not valid: " + strand + " in feature with start: " + gffr.getStart());
-                            return;
-                        }
+                        strand = gffr.getStrand().equals(StrandedFeature.POSITIVE) ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV;
                         //phase can be used for translation within incomplete annotated genes. a given phase shows where to start in such a case
 //                        int phase = gffr.getPhase(); //0, 1, 2 or -1, if not used
 //                        if (phase >= 0 && phase <= 2) {
@@ -181,7 +179,7 @@ public class BioJavaGff2Parser extends FastaReferenceParser {
                         
                         FeatureType type = FeatureType.getFeatureType(parsedType);
                         if (type == FeatureType.UNDEFINED) {
-                            sendErrorMsg(referenceJob.getFile().getName()
+                            notifyObservers(referenceJob.getFile().getName()
                                     + ": Using unknown feature type for " + parsedType);
                         }
                         
@@ -231,15 +229,5 @@ public class BioJavaGff2Parser extends FastaReferenceParser {
         for (Observer observer : this.observers) {
             observer.update(data);
         }
-    }
-
-    /**
-     * Method setting and sending the error msg to all observers.
-     *
-     * @param errorMsg the error msg to send
-     */
-    private void sendErrorMsg(final String errorMsg) {
-        this.errorMsg = errorMsg;
-        this.notifyObservers(this.errorMsg);
     }
 }

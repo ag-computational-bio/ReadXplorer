@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -230,7 +231,7 @@ public class GeneralUtils {
     /**
      * Converts a given number into a number of the given classType. If this is
      * not possible, it throws a ClassCastException
-     * @param <T>
+     * @param <T> one of the classes derived from Number
      * @param classType the type to convert the number into
      * @param number the number to convert
      * @return The converted number
@@ -305,5 +306,98 @@ public class GeneralUtils {
     public static String escapeHtml(String s) {
         return StringEscapeUtils.escapeHtml3(s);
     }
+    
+    /**
+     * Enumeration of read name styles.
+     */
+    public static enum NameStyle {
+        /** Style useable for all reads. */
+        STYLE_STANDARD, 
+        /** Style useable for Illumina reads. */
+        STYLE_ILLUMINA;
+    }
+    
+    /**
+     * Splits the given readname by the given style.
+     * @param readName The readname to split
+     * @param specialStyle The style to use for splitting
+     * @return The splitted read name array
+     */
+    public static String[] splitReadName(String readName, NameStyle specialStyle) {
+        String[] nameArray;
+        if (specialStyle == NameStyle.STYLE_ILLUMINA) {
+            nameArray = readName.split(":|#");
+        } else {
+            int length = readName.length() / 5 + 1;
+            nameArray = new String[length];
+            int index = 0;
+            int end;
+            for (int i = 0; i < length; i++) {
+                index = i * 5;
+                end = index + 5;
+                if (end < readName.length()) {
+                    nameArray[i] = readName.substring(index, end);
+                } else {
+                    nameArray[i] = readName.substring(index, readName.length());
+                }
+            }
+        }
+        
+        return nameArray;
+    }
+    
+//    /**
+//     * For a given map of strings to other maps or objects, this method 
+//     * recursively adds or creates a mapping of the input array to the value to
+//     * store. The depth of the HashMaps is dependent on the elements in the input
+//     * array. The value to store is stored in the deepest level (leaf), which is
+//     * hashed to the last element of the input array.<br>E.g. the read name arrays:<br>
+//     * {HWI-ST486_0090, 5, 1101, 17454, 23711, ACTTGA/1}<br>
+//     * {HWI-ST486_0090, 5, 1101, 17454, 23712, ACTTGA/1}<br>
+//     * is transformed into a mapping of:<br>
+//     * {HWI-ST486_0090{5, {1101, {17454, {23711, {ACTTGA/1, valueToStore}, {23712, {ACTTGA/1, valueToStore}}}}}}}<br>
+//     * This method helps to significantly reduce the memory footprint for a huge amount of partially identical Strings.
+//     * @param map The map (in)to which the new input shall be associated/integrated
+//     * @param input The input array of Strings to integrate in the map
+//     * @param valueToStore The value to store for the last element of the input 
+//     * array
+//     * @return The updated map
+//     */
+//    public static HashMap<String, Object> generateStringMap(HashMap<String, Object> map, String[] input, Object valueToStore) {
+//        if (input.length > 1) {
+//            String key = input[0];
+//            String[] next = new String[input.length - 1];
+//            System.arraycopy(input, 1, next, 0, input.length - 1);
+//            if (!map.containsKey(key)) {
+//                map.put(key, GeneralUtils.generateStringMap(new HashMap<String, Object>(), next, valueToStore));
+//            } else {
+//                Object value = map.get(key);
+//                if (value instanceof HashMap) {
+//                    @SuppressWarnings("unchecked")
+//                    HashMap<String, Object> subMap = (HashMap<String, Object>) value;
+//                    GeneralUtils.generateStringMap(subMap, next, valueToStore);
+//                } else {
+//                    
+//                }
+//            }
+//        } else if (input.length == 1) {
+//            map.put(input[0], valueToStore);
+//        }
+//        return map;
+//    }
+//    
+//    /**
+//     * Convenience method for first splitting a read name and then storing it 
+//     * and the given valueToStore in the given map.
+//     * @param map The map (in)to which the new input shall be associated/integrated
+//     * @param readName The readname to split and store
+//     * @param valueToStore The value to store for the last element of the
+//     * splitted read name array
+//     * @param style The style to use for splitting
+//     */
+//    public static void splitReadNameAndAddToMap(HashMap<String, Object> map, String readName, Object valueToStore, NameStyle style) {
+//        String[] splittedName = GeneralUtils.splitReadName(readName, style);
+//        GeneralUtils.generateStringMap(map, splittedName, valueToStore);
+//    }
     
 }

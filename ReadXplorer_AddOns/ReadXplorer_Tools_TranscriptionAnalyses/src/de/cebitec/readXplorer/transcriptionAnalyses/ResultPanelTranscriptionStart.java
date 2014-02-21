@@ -6,9 +6,6 @@
 package de.cebitec.readXplorer.transcriptionAnalyses;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.ChromosomeObserver;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.exporter.excel.ExcelExportFileChooser;
@@ -355,27 +352,23 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
         
         //get reference sequence for promotor regions
         PersistantReference ref = this.referenceViewer.getReference();
-        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(ref.getId());
-        ChromosomeObserver chromObserver = new ChromosomeObserver();
-        String chromSeq = refConnector.getRefGenome().getActiveChromSequence(chromObserver);
         String promotor;
         
         //get the promotor region for each TSS
         int promotorStart;
-        int chromLength = chromSeq.length();
+        int chromLength = ref.getActiveChromosome().getLength();
         for (TranscriptionStart tSS : this.tssResult.getResults()) {
             if (tSS.isFwdStrand()) {
                 promotorStart = tSS.getPos() - 70;
                 promotorStart = promotorStart < 0 ? 0 : promotorStart;
-                promotor = chromSeq.substring(promotorStart, tSS.getPos());
+                promotor = ref.getActiveChromSequence(promotorStart, tSS.getPos());
             } else {
                 promotorStart = tSS.getPos() + 70;
                 promotorStart = promotorStart > chromLength ? chromLength : promotorStart;
-                promotor = SequenceUtils.getReverseComplement(chromSeq.substring(tSS.getPos(), promotorStart));
+                promotor = SequenceUtils.getReverseComplement(ref.getActiveChromSequence(tSS.getPos(), promotorStart));
             }
             this.promotorRegions.add(promotor);
         }
         tssResult.setPromotorRegions(promotorRegions);
-        refConnector.getRefGenome().getActiveChromosome().removeObserver(chromObserver);
     }
 }

@@ -1,24 +1,30 @@
 package de.cebitec.readXplorer.parser.reference;
 
+import de.cebitec.common.parser.fasta.FastaIndexEntry;
+import de.cebitec.common.parser.fasta.FastaIndexReader;
 import de.cebitec.readXplorer.parser.ReferenceJob;
 import de.cebitec.readXplorer.parser.common.ParsedChromosome;
 import de.cebitec.readXplorer.parser.common.ParsedReference;
 import de.cebitec.readXplorer.parser.common.ParsingException;
 import de.cebitec.readXplorer.parser.reference.Filter.FeatureFilter;
+import de.cebitec.readXplorer.util.FastaUtils;
 import de.cebitec.readXplorer.util.Observer;
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
- * The FastaReferenceParser can parse the reference genome from a fasta file.
- * Attention: there will be no features in this file just the sequence
+ * The FastaReferenceParser can parse a reference genome from a fasta file.
+ * This means, the sequence dictonary is checked for multiple sequences,
+ * corresponding chromosomes are created and the fasta file is indexed, if that
+ * is not already the case. Later, the data has to be directly fetched from the
+ * now indexed fasta file.
+ * Attention: there will be no features in this file just the sequence.
  *
- * @author jstraube, rhilker
+ * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
  */
 public class FastaReferenceParser implements ReferenceParserI {
 
@@ -28,10 +34,31 @@ public class FastaReferenceParser implements ReferenceParserI {
     private ArrayList<Observer> observers = new ArrayList<>();
     private String errorMsg;
 
-    /*
-     * parses the containing sequences to one long sequence
-     * @return returns the object parsedReference with the name, describtion
-     * and the sequence from the reference genome
+    /**
+     * The FastaReferenceParser can parse a reference genome from a fasta file.
+     * This means, the sequence dictonary is checked for multiple sequences,
+     * corresponding chromosomes are created and the fasta file is indexed, if
+     * that is not already the case. Later, the data has to be directly fetched
+     * from the now indexed fasta file. Attention: there will be no features in
+     * this file just the sequence.
+     */
+    public FastaReferenceParser() {
+    }
+
+    
+    /**
+     * Parses a reference genome from a fasta file.\n This means, the sequence
+     * dictonary is checked for multiple sequences, corresponding chromosomes
+     * are created and the fasta file is indexed, if that is not already the
+     * case. Later, the data has to be directly fetched from the now indexed
+     * fasta file. Attention: there will be no features in this file just the
+     * sequence.
+     * @param referenceJob the reference job, for which the data shall be parsed
+     * @param filter the feature filter to use for this reference. Not needed
+     * for fasta, since it does not have features.
+     * @return returns the object parsedReference with the name, description
+     * and chromosomes for the reference genome
+     * @throws de.cebitec.readXplorer.parser.common.ParsingException
      */
     @Override
     public ParsedReference parseReference(ReferenceJob referenceJob, FeatureFilter filter) throws ParsingException {
@@ -43,41 +70,20 @@ public class FastaReferenceParser implements ReferenceParserI {
             refGenome.setDescription(referenceJob.getDescription());
             refGenome.setName(referenceJob.getName());
             refGenome.setTimestamp(referenceJob.getTimestamp());
+            refGenome.setFastaFile(referenceJob.getFile());
             
-            BufferedReader in = new BufferedReader(new FileReader(referenceJob.getFile()));
-            StringBuilder chromBuilder = new StringBuilder(1000);
-            String line;
-            boolean parseData = false; //only start parsing after first ">"
-            String chromName = "";
-            Pattern seqNameSplitter = Pattern.compile("\\s"); //split string on any whitespace character
-
-            while ((line = in.readLine()) != null) {
-                if (parseData && !line.startsWith(">")) {
-                    chromBuilder.append(line);
-                } else if (line.startsWith(">")) {
-                    if (chromCounter > 0) {
-                        this.createChromosome(chromName, chromBuilder, refGenome);
-                        chromBuilder = new StringBuilder(1000);
-                    }
-                    ++chromCounter;
-                    parseData = true;
-                    Matcher matcher = seqNameSplitter.matcher(line);
-                    
-                    if (matcher.find()) {
-                        chromName = line.substring(1, matcher.end() - 1);
-                    } else {
-                        chromName = line.substring(1);
-                    }
-                }
+            FastaUtils fastaUtils = new FastaUtils();
+            fastaUtils.indexFasta(referenceJob.getFile(), this.observers);
+            
+            FastaIndexReader reader = new FastaIndexReader();
+            File indexFile = new File(referenceJob.getFile().toString() + ".fai");
+            List<FastaIndexEntry> entries = reader.read(indexFile.toPath());
+            for (FastaIndexEntry entry : entries) {
+                this.createChromosome(entry.getSequenceId(), entry.getSequenceLength(), refGenome);
             }
 
-            if (chromCounter > 0) {
-                this.createChromosome(chromName, chromBuilder, refGenome);
-            }
-            
-            in.close();
 
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             this.sendErrorMsg(ex.getMessage());
         }
 
@@ -87,17 +93,12 @@ public class FastaReferenceParser implements ReferenceParserI {
     }
 
     /**
-     * Creates a chromosomes from a chromosome string builder and adds it to the
-     * given reference.
+     * Creates a chromosome for a given name and adds it to the given reference.
      * @param chromName name of the chromosome
-     * @param chromBuilder the builder holding the chromosome sequence.
      * @param reference reference genome to which the chromosome shall be added
      */
-    private void createChromosome(String chromName, StringBuilder chromBuilder, ParsedReference reference) {
-        ParsedChromosome chrom = new ParsedChromosome();
-        chrom.setHasSubFeatures(false);
-        chrom.setName(chromName);
-        chrom.setSequence(chromBuilder.toString());
+    private void createChromosome(String chromName, long chromLength, ParsedReference reference) {
+        ParsedChromosome chrom = new ParsedChromosome(chromName, chromLength, false);
         reference.addChromosome(chrom);
     }
 

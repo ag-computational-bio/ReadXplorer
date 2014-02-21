@@ -27,7 +27,7 @@ import javax.swing.JOptionPane;
 import org.openide.util.NbBundle;
 
 /**
- * Panel allowing for input of two sequence pair mapping files.
+ * Panel allowing for input of two read pair mapping files.
  * 
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
@@ -39,11 +39,11 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel implement
     private final JokToBamDirectParser jokToBamDirectParser;
     private final SamBamDirectParser samBamDirectParser;
     private MappingParserI[] parsers;
-    private int distance; //distance of the sequences in a sequence pair in bp
+    private int distance; //distance of the sequences in a read pair in bp
     private short deviation; //deviation allowed from that distance in %
     private byte orientation; //0 = fr, 1 = rf, 2 = ff/rr
 
-    /** Panel allowing for input of two sequence pair mapping files. */
+    /** Panel allowing for input of two read pair mapping files. */
     public NewReadPairTracksDialogPanel() {
         this.refGenJobs = getReferenceJobs();
         // choose the default parser. first entry is shown in combobox by default
@@ -239,24 +239,23 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel implement
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(2, 2, 2)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(distanceLabel)
+                                    .addComponent(jLabel2))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(layout.createSequentialGroup()
-                                        .addComponent(distanceLabel)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(distanceField, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel2)
+                                        .addComponent(distanceField, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGap(18, 18, 18)
-                                        .addComponent(orientation1Button)))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(layout.createSequentialGroup()
                                         .addComponent(deviationLabel)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(deviationField, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addGroup(layout.createSequentialGroup()
+                                        .addComponent(orientation1Button)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(orientation2Button)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(orientation3Button))))))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(orientation3Button)))
+                                .addGap(0, 0, Short.MAX_VALUE))))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(37, 37, 37)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -264,13 +263,10 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel implement
                             .addComponent(multiTrackListLabel))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(multipleImportCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(alreadyImportedBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(refGenBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(multipleImportCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(alreadyImportedBox)
-                                    .addComponent(multiTrackScrollPane))
-                                .addGap(0, 0, Short.MAX_VALUE)))))
+                            .addComponent(multiTrackScrollPane))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -419,7 +415,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel implement
 
     
     /**
-     * Opens a file chooser for selecting a sequence pair mapping file.
+     * Opens a file chooser for selecting a read pair mapping file.
      * @param isFstFile true, if this is the first file, false if it is the second.
      */
     private void openFileChooser(final boolean isFstFile) {
@@ -521,7 +517,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel implement
     // End of variables declaration//GEN-END:variables
 
     /**
-     * @return true, if all required info for this sequence pair track job dialog is set,
+     * @return true, if all required info for this read pair track job dialog is set,
      * false otherwise.
      */
     @Override
@@ -604,7 +600,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel implement
 
     
     /**
-     * @return Distance of the sequences in a sequence pair in bp (from start1 to stop2)
+     * @return Distance of the sequences in a read pair in bp (from start1 to stop2)
      */
     public int getDistance(){
         return this.distance;
@@ -634,7 +630,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel implement
     }
     
     /**
-     * sets the average distance of the sequence pairs.
+     * sets the average distance of the read pairs.
      */
     private void setDistance(){
         try {
@@ -645,7 +641,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel implement
     }
     
     /**
-     * Sets the maximum deviation a sequence pair can have in percent of the sequence
+     * Sets the maximum deviation a read pair can have in percent of the sequence
      * pair distance.
      */
     private void setDeviation(){
@@ -658,7 +654,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel implement
     }
 
     /**
-     * @param orientString the orientation of the sequence pairs: "fr", "rf",
+     * @param orientString the orientation of the read pairs: "fr", "rf",
      * "ff/rr".
      */
     private void setOrientation(String orientString) {

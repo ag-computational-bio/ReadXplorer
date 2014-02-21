@@ -37,12 +37,12 @@ public class SamBamDirectReadPairStatsParser extends SamBamDirectReadPairClassif
      * track. This parser is mainly used for track, which have already been
      * imported into another ReadXplorer DB and are now reimported.
      * @param readPairJobContainer container with both track jobs of this pair
-     * @param chromSeqMap mapping of chromosome names to their sequence
+     * @param chromLengthMap mapping of chromosome names to their length
      * @param classificationMap the classification map of the track - not needed
      * in this parser until now
      */
-    public SamBamDirectReadPairStatsParser(ReadPairJobContainer readPairJobContainer, Map<String,String> chromSeqMap, Map<String, ParsedClassification> classificationMap) {
-        super(readPairJobContainer, chromSeqMap, classificationMap);
+    public SamBamDirectReadPairStatsParser(ReadPairJobContainer readPairJobContainer, Map<String, Integer> chromLengthMap, Map<String, ParsedClassification> classificationMap) {
+        super(readPairJobContainer, chromLengthMap, classificationMap);
         this.trackJob = readPairJobContainer.getTrackJob1();
         this.dist = readPairJobContainer.getDistance();
         int maxDist = this.calculateMinAndMaxDist(dist, readPairJobContainer.getDeviation());

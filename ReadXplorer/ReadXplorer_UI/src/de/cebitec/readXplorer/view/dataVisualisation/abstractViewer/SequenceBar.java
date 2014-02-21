@@ -1,6 +1,5 @@
 package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
 
-import de.cebitec.readXplorer.databackend.dataObjects.ChromosomeObserver;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.util.ColorProperties;
@@ -58,7 +57,6 @@ public class SequenceBar extends JComponent implements HighlightableI {
     private HighlightAreaListener highlightListener;
     private RegionManager regionManager;
     private byte frameCurrFeature;
-    private ChromosomeObserver chromObserver;
 
     /**
      * A sequence bar is used to display the sequence of a reference genome
@@ -81,7 +79,6 @@ public class SequenceBar extends JComponent implements HighlightableI {
         this.initMouseListener(); //this order has to be obeyed, otherwise the highlight listener
         this.initHighlightListener(); //will not be shown in the highlighted area!
         this.regionManager = new RegionManager(this, parentViewer, refGen, highlightListener);
-        this.chromObserver = new ChromosomeObserver();
     }
 
     /**
@@ -199,8 +196,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
                 logleft = 1;
             }
             int logright = bounds.getLogRight();
-            String currentChromSeq = refGen.getChromSequence(refGen.getActiveChromId(), chromObserver);
-            refGen.getChromosome(refGen.getActiveChromId()).removeObserver(chromObserver);
+            String currentChromSeq = refGen.getActiveChromSequence(logleft, logright);
             
             for (int i = logleft; i <= logright; i++) {
                 this.drawChar(g, i, currentChromSeq);
@@ -219,7 +215,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
     private void drawChar(Graphics2D g, int pos, String chromSeq) {
         // pos depents on slider value and cannot be smaller 1
         // since counting in strings starts with 0, we have to substract 1
-        int basePosition = pos - 1;
+        int basePosition = pos - parentViewer.getBoundsInfo().getLogLeft();
 
         PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos(pos);
         double physX = bounds.getPhyMiddle();
@@ -250,7 +246,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
     private void drawCharReverse(Graphics2D g, int pos, String chromSeq) {
         // logX depents on slider value and cannot be smaller 1
         // since counting in strings starts with 0, we have to substract 1
-        int basePosition = pos - 1;
+        int basePosition = pos - parentViewer.getBoundsInfo().getLogLeft();
 
         PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos(pos);
         double physX = bounds.getPhyMiddle();
@@ -521,22 +517,18 @@ public class SequenceBar extends JComponent implements HighlightableI {
      * Paints the background of each base with a base specific color.
      * Before calling this method make sure to call "removeAll" on this sequence
      * bar! Otherwise the colors accumulate.
-     * @param logX
+     * @param basePosition Position of the current base in the genome
      */
-    public void paintBaseBackgroundColor(int logX) {
-        int basePosition = 0;
-        if (logX > 0) {
-            basePosition = logX - 1;
-        }
-        PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos(logX);
+    public void paintBaseBackgroundColor(int basePosition) {
+        if (basePosition < 1) { basePosition = 1; }
+        PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos(basePosition);
         if (bounds != null) {
             double physX = bounds.getPhyMiddle();
-            if (gapManager != null && gapManager.hasGapAt(logX)) {
-                int numOfGaps = gapManager.getNumOfGapsAt(logX);
+            if (gapManager != null && gapManager.hasGapAt(basePosition)) {
+                int numOfGaps = gapManager.getNumOfGapsAt(basePosition);
                 physX += numOfGaps * bounds.getPhysWidth();
             }
-            String base = refGen.getChromSequence(refGen.getActiveChromId(), chromObserver).substring(basePosition, basePosition + 1);
-            refGen.getChromosome(refGen.getActiveChromId()).removeObserver(chromObserver);
+            String base = refGen.getActiveChromSequence(basePosition, basePosition);
             
             if (base != null && metrics != null) {
                 int offset = metrics.stringWidth(base) / 2;

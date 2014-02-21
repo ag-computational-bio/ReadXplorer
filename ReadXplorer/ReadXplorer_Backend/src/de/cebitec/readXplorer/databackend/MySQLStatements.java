@@ -13,11 +13,12 @@ public class MySQLStatements {
     public final static String SETUP_REFERENCE_GENOME =
             "CREATE TABLE IF NOT EXISTS "+FieldNames.TABLE_REFERENCE+" " +
             "(" +
-            FieldNames.REF_GEN_ID+" BIGINT PRIMARY KEY, " +
-            FieldNames.REF_GEN_NAME+" VARCHAR(200) NOT NULL, " +
-            FieldNames.REF_GEN_DESCRIPTION+" VARCHAR(200) NOT NULL," +
+            FieldNames.REF_GEN_ID + " BIGINT PRIMARY KEY, " +
+            FieldNames.REF_GEN_NAME + " VARCHAR(200) NOT NULL, " +
+            FieldNames.REF_GEN_DESCRIPTION + " VARCHAR(200) NOT NULL," +
       //      FieldNames.REF_GEN_SEQUENCE+" LONGTEXT NOT NULL, " +
-            FieldNames.REF_GEN_TIMESTAMP+" DATETIME NOT NULL" +
+            FieldNames.REF_GEN_TIMESTAMP + " DATETIME NOT NULL," +
+            FieldNames.REF_GEN_FASTA_FILE + " VARCHAR(600) NOT NULL" +
             ") ";
 
     
@@ -28,8 +29,7 @@ public class MySQLStatements {
             + FieldNames.CHROM_NUMBER + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.CHROM_REFERENCE_ID + " BIGINT UNSIGNED NOT NULL, "
             + FieldNames.CHROM_NAME + " VARCHAR(200) NOT NULL, "
-            + FieldNames.CHROM_LENGTH + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.CHROM_SEQUENCE + " LONGTEXT NOT NULL, "
+            + FieldNames.CHROM_LENGTH + " BIGINT UNSIGNED NOT NULL "
             + "INDEX (" + FieldNames.CHROM_REFERENCE_ID + ") "
             + ") ";
 

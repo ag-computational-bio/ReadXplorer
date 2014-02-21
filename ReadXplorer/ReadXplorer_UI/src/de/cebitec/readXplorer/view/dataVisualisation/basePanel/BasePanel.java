@@ -19,7 +19,7 @@ import javax.swing.JSlider;
 /**
  * A BasePanel serves as basis for other visual components.
  *
- * @author ddoppmei
+ * @author ddoppmei, rhilker
  */
 public class BasePanel extends JPanel implements MousePositionListener {
 
@@ -128,7 +128,7 @@ public class BasePanel extends JPanel implements MousePositionListener {
       
         this.currentMousePosListeners.add(viewer);
         this.centerScrollpane = new JScrollPane(this.viewer);
-        this.centerScrollpane.setPreferredSize(new Dimension(490, 400));
+        this.centerScrollpane.setPreferredSize(new Dimension(490, 200));
         this.centerScrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         
         this.centerPanel.add(this.centerScrollpane, BorderLayout.CENTER);
