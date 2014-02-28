@@ -154,7 +154,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
             topCountsTable.setRowSorter(trs);
             if (usedTool == ExpressTest) {
                 List<RowSorter.SortKey> sortKeys = new ArrayList<>();
-                sortKeys.add(new RowSorter.SortKey(7, SortOrder.DESCENDING));
+                sortKeys.add(new RowSorter.SortKey(8, SortOrder.DESCENDING));
                 trs.setSortKeys(sortKeys);
                 trs.sort();
             }
@@ -366,7 +366,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
             topCountsTable.setRowSorter(trs);
             if (usedTool == ExpressTest) {
                 List<RowSorter.SortKey> sortKeys = new ArrayList<>();
-                sortKeys.add(new RowSorter.SortKey(7, SortOrder.DESCENDING));
+                sortKeys.add(new RowSorter.SortKey(8, SortOrder.DESCENDING));
                 trs.setSortKeys(sortKeys);
                 trs.sort();
             }

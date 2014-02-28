@@ -335,12 +335,6 @@ public class ExpressTest implements ExpressTestI {
         if (meanB == 0) {
             meanB = 1d;
         }
-        if(varA == 0){
-            varA = 1d;
-        }
-        if(varB == 0){
-            varB = 1d;
-        }
         confidence = -(Math.log10((((varA / meanA) + (varB / meanB)) / 2)));
         return confidence;
     }
