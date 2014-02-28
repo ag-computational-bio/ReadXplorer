@@ -279,7 +279,7 @@ public class NovelTranscriptDetection implements Observer, AnalysisI<List<NovelT
 
         String seq = "";
         if (start > 0 && stop < chrom.getLength()) {
-            seq = chrom.getSequence(this).substring(start, stop);
+            seq = refGenome.getChromSequence(chrom.getId(), start, stop);
         }
         if (isFwd) {
             return seq;

@@ -44,15 +44,4 @@
             </file>
         </folder>
     </folder>
-    <folder name="Windows2">
-        <folder name="Components">
-            <file name="DetailedViewerTopComponent.settings" url="DetailedViewerTopComponentSettings.xml"/>
-        </folder>
-        <folder name="Modes">
-            <file name="detailedViewer.wsmode" url="detailedViewer.wsmode"/>
-            <folder name="detailedViewer">
-                <file name="DetailedViewerTopComponent.wstcref" url="DetailedViewerTopComponentWstcref.xml"/>
-            </folder>
-        </folder>
-    </folder>
 </filesystem>

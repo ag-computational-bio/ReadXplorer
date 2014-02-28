@@ -6,6 +6,7 @@ import de.cebitec.readXplorer.parser.common.DiffAndGapResult;
 import de.cebitec.readXplorer.parser.common.DirectAccessDataContainer;
 import de.cebitec.readXplorer.parser.common.ParsedClassification;
 import de.cebitec.readXplorer.parser.common.ParsingException;
+import de.cebitec.readXplorer.parser.common.RefSeqFetcher;
 import de.cebitec.readXplorer.util.Benchmark;
 import de.cebitec.readXplorer.util.ErrorLimit;
 import de.cebitec.readXplorer.util.MessageSenderI;
@@ -38,6 +39,7 @@ public class SamBamDirectParser implements MappingParserI, Observer, MessageSend
     private List<Observer> observers;
     private StatsContainer statsContainer;
     ErrorLimit errorLimit;
+    private RefSeqFetcher refSeqFetcher;
 
     /**
      * Sam/Bam parser for the data needed for a direct file access track. This
@@ -98,7 +100,7 @@ public class SamBamDirectParser implements MappingParserI, Observer, MessageSend
      * First calls the preprocessing method, which currently does nothing and 
      * then parses the input determined by the track job.
      * @param trackJob the track job to parse
-     * @param chromSeqMap the map of chromosome names to chromosome sequence
+     * @param chromLengthMap the map of chromosome names to chromosome sequence
      * @return a direct access data container constisting of:
      * a classification map: The key is the readname and each name
      * links to a pair consisting of the number of occurrences of the read name
@@ -109,18 +111,19 @@ public class SamBamDirectParser implements MappingParserI, Observer, MessageSend
      * @throws OutOfMemoryError
      */
     @Override
-    public DirectAccessDataContainer parseInput(TrackJob trackJob, Map<String, String> chromSeqMap) throws ParsingException, OutOfMemoryError {
-
-        boolean success = (boolean) this.preprocessData(trackJob);
+    public DirectAccessDataContainer parseInput(TrackJob trackJob, Map<String, Integer> chromLengthMap) throws ParsingException, OutOfMemoryError {
         
+        //mapping of read name to number of occurences of the read and the lowest mismatch count
+        Map<String, ParsedClassification> classificationMap = new HashMap<>();
+        
+        this.refSeqFetcher = new RefSeqFetcher(trackJob.getRefGen().getFile(), this);
+        boolean success = (boolean) this.preprocessData(trackJob);
+
         String fileName = trackJob.getFile().getName();
         long startTime = System.currentTimeMillis();
         this.notifyObservers(NbBundle.getMessage(SamBamDirectParser.class, "Parser.Parsing.Start", fileName));
 
         int lineno = 0;
-
-        //mapping of read name to number of occurences of the read and the lowest mismatch count
-        Map<String, ParsedClassification> classificationMap = new HashMap<>();
 
         String refSeq;
         int start;
@@ -144,18 +147,18 @@ public class SamBamDirectParser implements MappingParserI, Observer, MessageSend
                     ++lineno;
 
                     record = samItor.next();
-                    if (!record.getReadUnmappedFlag() && chromSeqMap.containsKey(record.getReferenceName())) {
+                    if (!record.getReadUnmappedFlag() && chromLengthMap.containsKey(record.getReferenceName())) {
 
                         cigar = record.getCigarString();
                         readSeq = record.getReadString();
                         start = record.getAlignmentStart();
                         stop = record.getAlignmentEnd();
 
-                        if (!CommonsMappingParser.checkReadSam(this, readSeq, chromSeqMap.get(record.getReferenceName()).length(), cigar, start, stop, fileName, lineno)) {
+                        if (!CommonsMappingParser.checkReadSam(this, readSeq, chromLengthMap.get(record.getReferenceName()), cigar, start, stop, fileName, lineno)) {
                             continue; //continue, and ignore read, if it contains inconsistent information
                         }
-                        
-                        refSeq = chromSeqMap.get(record.getReferenceName()).substring(start - 1, stop);
+
+                        refSeq = refSeqFetcher.getSubSequence(record.getReferenceName(), start, stop);
 
                         /*
                          * The cigar values are as follows: 0 (M) = alignment match
@@ -177,8 +180,7 @@ public class SamBamDirectParser implements MappingParserI, Observer, MessageSend
                         classificationData.addReadStart(start);
                         classificationData.updateMinMismatches(mismatches);
 
-                        //saruman starts genome at 0 other algorithms like bwa start genome at 1
-
+                            //saruman starts genome at 0 other algorithms like bwa start genome at 1
                     } else { // else read is unmapped or belongs to another reference
                         this.sendMsgIfAllowed(NbBundle.getMessage(SamBamDirectParser.class,
                                 "Parser.Parsing.CorruptData", lineno, record.getReadName()));
@@ -187,12 +189,12 @@ public class SamBamDirectParser implements MappingParserI, Observer, MessageSend
                     if (!e.getMessage().contains("MAPQ should be 0")) {
                         this.sendMsgIfAllowed(NbBundle.getMessage(SamBamDirectParser.class,
                                 "Parser.Parsing.CorruptData", lineno, e.toString()));
-                    } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
+                    } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored
                 }
 
             }
             if (errorLimit.getSkippedCount() > 0) {
-                     this.notifyObservers( "... " + errorLimit.getSkippedCount() + " more errors occured");
+                this.notifyObservers("... " + errorLimit.getSkippedCount() + " more errors occured");
             }
 
             samItor.close();

@@ -317,7 +317,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
         int start = (int) ((PersistantReadPair) block.getPersistantObject()).getStart();
         int stop = (int) ((PersistantReadPair) block.getPersistantObject()).getStop();
         //string first pos is zero
-        String readSequence = parentViewer.getReference().getActiveChromSequence(parentViewer.getChromosomeObserver()).substring(start - 1, stop);
+        String readSequence = parentViewer.getReference().getActiveChromSequence(start - 1, stop);
         j.setText(readSequence);
         j.selectAll();
         j.copy();

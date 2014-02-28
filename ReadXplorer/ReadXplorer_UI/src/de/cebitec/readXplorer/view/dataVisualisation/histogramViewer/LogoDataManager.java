@@ -4,7 +4,6 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantDiff;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReferenceGap;
 import de.cebitec.readXplorer.view.dataVisualisation.GenomeGapManager;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -179,8 +178,7 @@ public class LogoDataManager {
      * @param gapManager the genome gap manager for the given gaps
      */
     public void addGaps(Collection<PersistantReferenceGap> gaps, GenomeGapManager gapManager) {
-        for (Iterator<PersistantReferenceGap> it = gaps.iterator(); it.hasNext();) {
-            PersistantReferenceGap gap = it.next();
+        for (PersistantReferenceGap gap : gaps) {
             int origPos = gap.getPosition();
             
             if (origPos > this.absStart && origPos < this.stop) {

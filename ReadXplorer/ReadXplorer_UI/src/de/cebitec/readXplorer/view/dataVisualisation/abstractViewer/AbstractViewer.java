@@ -1,6 +1,5 @@
 package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
 
-import de.cebitec.readXplorer.databackend.dataObjects.ChromosomeObserver;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.FeatureType;
@@ -90,7 +89,6 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     private JScrollBar scrollBar; /* Scrollbar, which should adapt, when component is repainted. */
     private boolean centerScrollBar = false;
     private BufferedImage loadingIndicator;
-    private ChromosomeObserver chromObserver;
     private boolean newDataRequestNeeded = false;
 
     public AbstractViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference reference) {
@@ -104,7 +102,6 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
             Exceptions.printStackTrace(ex);
         }
         
-        this.chromObserver = new ChromosomeObserver();
         this.excludedFeatureTypes = new ArrayList<>();
         this.setLayout(null);
         this.setBackground(AbstractViewer.backgroundColor);
@@ -531,11 +528,11 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     }
 
     /**
-     * Assign new logical bounds to this panel, meaning the range from the genome
-     * that should be displayed. In case the abstract viewer was handed over a scrollbar
-     * the value of the scrollbar is adjusted to the middle.
-     * @param bounds Information about the interval that should be displayed
-     * and the current position
+     * Assign new logical bounds to this panel, meaning the range from the
+     * sequence that should be displayed. In case the abstract viewer was handed
+     * over a scrollbar the value of the scrollbar is adjusted to the middle.
+     * @param bounds Information about the interval that should be displayed and
+     * the current position
      */
     @Override
     public void updateLogicalBounds(BoundsInfo bounds) {
@@ -856,14 +853,6 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      */
     public BufferedImage getLoadingIndicator() {
         return loadingIndicator;
-    }
-    
-    /**
-     * @return The chromosome observer of this viewer. It shall be used
-     * to querry data from the reference genome.
-     */
-    public ChromosomeObserver getChromosomeObserver() {
-        return this.chromObserver;
     }
 
     /**

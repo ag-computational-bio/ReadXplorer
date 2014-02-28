@@ -153,13 +153,17 @@ public class PersistantCoverage implements Serializable {
         return finished;
     }
 
+    /**
+     * @param left left bound of the interval to check
+     * @param right right bound of the interval to check
+     * @return <cc>true</cc>, if this coverage object covers the given interval,
+     * <cc>false</cc> otherwise
+     */
     public boolean coversBounds(int left, int right) {
         if (this.leftBound == 0 && this.rightBound == 0) {
             return false;
-        } else if (leftBound <= left && right <= rightBound) {
-            return true;
         } else {
-            return false;
+            return leftBound <= left && right <= rightBound;
         }
     }
 
@@ -331,8 +335,8 @@ public class PersistantCoverage implements Serializable {
 
 
     /**
-     * Get the best match forward coverage with duplicates.
-     * @param logPos position whose coverage is needed
+     * @param logPos absolute position on the chromosome, whose coverage is needed
+     * @return the best match forward coverage with duplicates.
      */
     public int getBestMatchFwdMult(int logPos) {
         this.internalPos = logPos - this.leftBound;
@@ -344,8 +348,8 @@ public class PersistantCoverage implements Serializable {
     }
 
     /**
-     * Get the best match forward coverage WITHOUT duplicates.
-     * @param logPos position whose coverage is needed
+     * @param logPos absolute position on the chromosome, whose coverage is needed
+     * @return the best match forward coverage WITHOUT duplicates.
      */
     public int getBestMatchFwdNum(int logPos) {
         this.internalPos = logPos - this.leftBound;
@@ -357,8 +361,8 @@ public class PersistantCoverage implements Serializable {
     }
 
     /**
-     * Get the best match reverse coverage with duplicates.
-     * @param logPos position whose coverage is needed
+     * @param logPos absolute position on the chromosome, whose coverage is needed
+     * @return the best match reverse coverage with duplicates.
      */
     public int getBestMatchRevMult(int logPos) {
         this.internalPos = logPos - this.leftBound;
@@ -370,8 +374,8 @@ public class PersistantCoverage implements Serializable {
     }
 
     /**
-     * Get the best match reverse coverage WITHOUT duplicates.
-     * @param logPos position whose coverage is needed
+     * @param logPos absolute position on the chromosome, whose coverage is needed
+     * @return the best match reverse coverage WITHOUT duplicates.
      */
     public int getBestMatchRevNum(int logPos) {
         this.internalPos = logPos - this.leftBound;
@@ -383,8 +387,8 @@ public class PersistantCoverage implements Serializable {
     }
 
     /**
-     * Get the common match forward coverage with duplicates.
-     * @param logPos position whose coverage is needed
+     * @param logPos absolute position on the chromosome, whose coverage is needed
+     * @return the common match forward coverage with duplicates.
      */
     public int getCommonFwdMult(int logPos) {
         this.internalPos = logPos - this.leftBound;
@@ -396,8 +400,8 @@ public class PersistantCoverage implements Serializable {
     }
 
     /**
-     * Get the common match forward coverage WITHOUT duplicates.
-     * @param logPos position whose coverage is needed
+     * @param logPos absolute position on the chromosome, whose coverage is needed
+     * @return the common match forward coverage WITHOUT duplicates.
      */
     public int getCommonFwdNum(int logPos) {
         this.internalPos = logPos - this.leftBound;
@@ -409,8 +413,8 @@ public class PersistantCoverage implements Serializable {
     }
 
     /**
-     * Get the common match reverse coverage with duplicates.
-     * @param logPos position whose coverage is needed
+     * @param logPos absolute position on the chromosome, whose coverage is needed
+     * @return the common match reverse coverage with duplicates.
      */
     public int getCommonRevMult(int logPos) {
         this.internalPos = logPos - this.leftBound;
@@ -422,8 +426,8 @@ public class PersistantCoverage implements Serializable {
     }
 
     /**
-     * Get the common match reverse coverage WITHOUT duplicates.
-     * @param logPos position whose coverage is needed
+     * @param logPos absolute position on the chromosome, whose coverage is needed
+     * @return the common match reverse coverage WITHOUT duplicates.
      */
     public int getCommonRevNum(int logPos) {
         this.internalPos = logPos - this.leftBound;
@@ -435,9 +439,9 @@ public class PersistantCoverage implements Serializable {
     }
 
     /**
-     * Get the perfect match forward coverage with duplicates. If the position is not
-     * covered 0 is returned.
-     * @param logPos position whose coverage is needed
+     * @param logPos absolute position on the chromosome, whose coverage is needed
+     * @return the perfect match forward coverage with duplicates. If the
+     * position is not covered 0 is returned.
      */
     public int getPerfectFwdMult(int logPos) {
         this.internalPos = logPos - this.leftBound;
@@ -449,8 +453,8 @@ public class PersistantCoverage implements Serializable {
     }
 
     /**
-     * Get the perfect match forward coverage WITHOUT duplicates.
-     * @param logPos position whose coverage is needed
+     * @param logPos absolute position on the chromosome, whose coverage is needed
+     * @return the perfect match forward coverage WITHOUT duplicates.
      */
     public int getPerfectFwdNum(int logPos) {
         this.internalPos = logPos - this.leftBound;
@@ -462,8 +466,8 @@ public class PersistantCoverage implements Serializable {
     }
 
     /**
-     * Get the perfect match reverse coverage with duplicates.
-     * @param logPos position whose coverage is needed
+     * @param logPos absolute position on the chromosome, whose coverage is needed
+     * @return the perfect match reverse coverage with duplicates.
      */
     public int getPerfectRevMult(int logPos) {
         this.internalPos = logPos - this.leftBound;
@@ -475,8 +479,8 @@ public class PersistantCoverage implements Serializable {
     }
 
     /**
-     * Get the perfect match reverse coverage WITHOUT duplicates.
-     * @param logPos position whose coverage is needed
+     * @param logPos absolute position on the chromosome, whose coverage is needed
+     * @return the perfect match reverse coverage WITHOUT duplicates.
      */
     public int getPerfectRevNum(int logPos) {
         this.internalPos = logPos - this.leftBound;
@@ -488,10 +492,11 @@ public class PersistantCoverage implements Serializable {
     }
 
     /**
-     * Get the common match forward coverage with duplicates for track 1 in a
-     * two track analysis case.
-     * @param logPos position whose coverage is needed
+     * @param logPos absolute position on the chromosome, whose coverage is needed
+     * @return the common match forward coverage with duplicates for track 1 in
+     * a two track analysis case.
      */
+
     public int getCommonFwdMultTrack1(int logPos) {
         this.internalPos = logPos - this.leftBound;
         if (this.internalPos < this.commonFwdMultCovTrack1.length && this.internalPos >= 0) {
@@ -502,9 +507,9 @@ public class PersistantCoverage implements Serializable {
     }
 
     /**
-     * Get the common match reverse coverage with duplicates for track 1 in a
-     * two track analysis case.
-     * @param logPos position whose coverage is needed
+     * @param logPos absolute position on the chromosome, whose coverage is needed
+     * @return the common match reverse coverage with duplicates for track 1 in
+     * a two track analysis case.
      */
     public int getCommonRevMultTrack1(int logPos) {
         this.internalPos = logPos - this.leftBound;
@@ -516,9 +521,9 @@ public class PersistantCoverage implements Serializable {
     }
 
     /**
-     * Get the common match forward coverage with duplicates for track 2 in a
-     * two track analysis case.
-     * @param logPos position whose coverage is needed
+     * @param logPos absolute position on the chromosome, whose coverage is needed
+     * @return the common match forward coverage with duplicates for track 2 in
+     * a two track analysis case.
      */
     public int getCommonFwdMultTrack2(int logPos) {
         this.internalPos = logPos - this.leftBound;
@@ -530,9 +535,9 @@ public class PersistantCoverage implements Serializable {
     }
 
     /**
-     * Get the common match reverse coverage with duplicates for track 2 in a
-     * two track analysis case.
-     * @param logPos position whose coverage is needed
+     * @param logPos absolute position on the chromosome, whose coverage is needed
+     * @return the common match reverse coverage with duplicates for track 2 in
+     * a two track analysis case.
      */
     public int getCommonRevMultTrack2(int logPos) {
         this.internalPos = logPos - this.leftBound;
@@ -676,11 +681,7 @@ public class PersistantCoverage implements Serializable {
      * and false otherwise
      */
     public boolean isInBounds(int posToCheck) {
-        if (posToCheck < leftBound || posToCheck > rightBound && this.internalPos >= 0) {
-            return false;
-        } else {
-            return true;
-        }
+        return !(posToCheck < leftBound || posToCheck > rightBound && this.internalPos >= 0);
     }
 
     /**

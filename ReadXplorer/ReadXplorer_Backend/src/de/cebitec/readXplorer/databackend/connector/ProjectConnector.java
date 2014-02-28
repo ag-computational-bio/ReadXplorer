@@ -1,5 +1,6 @@
 package de.cebitec.readXplorer.databackend.connector;
 
+import de.cebitec.common.parser.fasta.FastaLineWriter;
 import de.cebitec.readXplorer.databackend.FieldNames;
 import de.cebitec.readXplorer.databackend.GenericSQLQueries;
 import de.cebitec.readXplorer.databackend.H2SQLStatements;
@@ -15,10 +16,12 @@ import de.cebitec.readXplorer.parser.common.ParsedFeature;
 import de.cebitec.readXplorer.parser.common.ParsedReference;
 import de.cebitec.readXplorer.parser.common.ParsedTrack;
 import de.cebitec.readXplorer.util.DiscreteCountingDistribution;
-import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.StatsContainer;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -35,6 +38,8 @@ import java.util.Map;
 import java.util.Observable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import org.h2.jdbc.JdbcSQLException;
 import org.openide.util.Exceptions;
 
@@ -44,7 +49,7 @@ import org.openide.util.Exceptions;
  *
  * @author ddoppmeier, rhilker
  */
-public class ProjectConnector extends Observable implements Observer {
+public class ProjectConnector extends Observable {
 
     private static ProjectConnector dbConnector;
     private static final int DB_VERSION_NO = 2;
@@ -77,6 +82,7 @@ public class ProjectConnector extends Observable implements Observer {
     private int containerCount = 0;
     private DiscreteCountingDistribution readLengthDistribution;
     private DiscreteCountingDistribution readPairLengthDistribution;
+    private String projectLocation;
     
     /**
      * Responsible for the connection between user interface and data base.
@@ -155,6 +161,7 @@ public class ProjectConnector extends Observable implements Observer {
      */
     public void connect(String adapter, String projectLocation, String hostname, String user, String password) throws SQLException, JdbcSQLException {
         this.adapter = adapter;
+        this.projectLocation = projectLocation;
         if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
             this.url = "jdbc:" + adapter + "://" + hostname + "/" + projectLocation;
             this.user = user;
@@ -615,6 +622,7 @@ public class ProjectConnector extends Observable implements Observer {
             insertGenome.setString(2, reference.getName());
             insertGenome.setString(3, reference.getDescription());
             insertGenome.setTimestamp(4, reference.getTimestamp());
+            insertGenome.setString(5, reference.getFastaFile().toString());
             insertGenome.execute();
 
             List<ParsedChromosome> chromosomes = reference.getChromosomes();
@@ -650,8 +658,7 @@ public class ProjectConnector extends Observable implements Observer {
             insertChromosome.setLong(2, chromNumber);
             insertChromosome.setLong(3, refID);
             insertChromosome.setString(4, chromosome.getName());
-            insertChromosome.setInt(5, chromosome.getSequence().length());
-            insertChromosome.setString(6, chromosome.getSequence());
+            insertChromosome.setLong(5, chromosome.getChromLength());
             insertChromosome.execute();
                 
             con.commit();
@@ -1212,14 +1219,15 @@ public class ProjectConnector extends Observable implements Observer {
         List<PersistantReference> refGens = new ArrayList<>();
 
         try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_GENOMES)) {
-
+            
             ResultSet rs = fetch.executeQuery();
             while (rs.next()) {
                 int id = rs.getInt(FieldNames.REF_GEN_ID);
                 String description = rs.getString(FieldNames.REF_GEN_DESCRIPTION);
                 String name = rs.getString(FieldNames.REF_GEN_NAME);
                 Timestamp timestamp = rs.getTimestamp(FieldNames.REF_GEN_TIMESTAMP);
-                refGens.add(new PersistantReference(id, name, description, timestamp));
+                File fastaFile = new File(rs.getString(FieldNames.REF_GEN_FASTA_FILE));
+                refGens.add(new PersistantReference(id, name, description, timestamp, fastaFile));
             }
             rs.close();
 
@@ -1521,12 +1529,6 @@ public class ProjectConnector extends Observable implements Observer {
                 this.createChromsFromRefs();
             }
             
-            //update DB = switch all references to upper case
-            if (dbVersion < 1) {
-                updateNeeded = true;
-                this.chromsToUpperCase();
-            }
-            
             if (updateNeeded) {
                 if (dbVersion == 0) {
                     PreparedStatement setDBVersion = con.prepareStatement(SQLStatements.INSERT_DB_VERSION_NO);
@@ -1563,9 +1565,18 @@ public class ProjectConnector extends Observable implements Observer {
 
                     String refSeq = rs.getString(FieldNames.REF_GEN_SEQUENCE);
                     String chromName = rs.getString(FieldNames.REF_GEN_NAME);
+                    
+                    String pathString = new File(projectLocation).getParent().concat(ref.getName().concat(".fasta"));
+                    Path fastaPath = new File(pathString).toPath();
+                    try (FastaLineWriter fastaWriter = FastaLineWriter.fileWriter(fastaPath)) {
+                        fastaWriter.writeHeader(ref.getName());
+                        fastaWriter.appendSequence(refSeq);
+                    } catch (IOException ex) {
+                        JOptionPane.showMessageDialog(new JPanel(), "Reference fasta file cannot be written to disk! Change the permissions in the DB folder!",
+                                "Reference fasta cannot be written to DB folder", JOptionPane.ERROR_MESSAGE);
+                    }
 
                     ParsedChromosome newChrom = new ParsedChromosome();
-                    newChrom.setSequence(refSeq);
                     newChrom.setName(chromName);
 
                     this.storeChromosome(newChrom, 1, ref.getId());
@@ -1597,31 +1608,5 @@ public class ProjectConnector extends Observable implements Observer {
         //Drop old ref seq column for this DB
         this.runSqlStatement(GenericSQLQueries.genRemoveColumnString(
                 FieldNames.TABLE_REFERENCE, FieldNames.REF_GEN_SEQUENCE));
-    }
-
-    /**
-     * Transforms all reference sequences to upper case and stores the new
-     * sequences in the db.
-     */
-    private void chromsToUpperCase() {
-        List<PersistantReference> refList = this.getGenomes();
-        for (PersistantReference ref : refList) {
-            for (PersistantChromosome chrom : ref.getChromosomes().values()) {
-                String chromSeq = chrom.getSequence(this).toUpperCase();
-
-                try (PreparedStatement updateRefGenome = con.prepareStatement(SQLStatements.UPDATE_CHROM_SEQ)) {
-                    updateRefGenome.setString(1, chromSeq);
-                    updateRefGenome.setInt(2, chrom.getId());
-                    updateRefGenome.executeUpdate();
-                } catch (SQLException ex) {
-                    Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
-        }
-    }
-
-    @Override
-    public void update(Object args) {
-        //nothing to do, we just want to inform the chromosome, that we are observing it
     }
 }

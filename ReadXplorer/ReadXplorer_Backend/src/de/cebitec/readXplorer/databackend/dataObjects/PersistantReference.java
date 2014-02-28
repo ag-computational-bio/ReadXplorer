@@ -1,13 +1,21 @@
 package de.cebitec.readXplorer.databackend.dataObjects;
 
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readXplorer.util.FastaUtils;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Observer;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import net.sf.picard.PicardException;
+import net.sf.picard.reference.IndexedFastaSequenceFile;
 
 /**
  * A persistant reference containing an id, name, description & timestamp of a 
@@ -27,6 +35,8 @@ public class PersistantReference implements Observable {
     private Timestamp timestamp;
     private int noChromosomes;
     private List<Observer> observers;
+    private final File fastaFile;
+    private IndexedFastaSequenceFile seqFile;
 
     /**
      * Data holder for a reference genome containing an id, name, description &
@@ -36,9 +46,10 @@ public class PersistantReference implements Observable {
      * @param name The name of the reference.
      * @param description The additional description of the reference.
      * @param timestamp The insertion timestamp of the reference.
+     * @param fastaFile Fasta file containing the reference sequences
      */
-    public PersistantReference(int id, String name, String description, Timestamp timestamp) {
-        this(id, -1, name, description, timestamp);
+    public PersistantReference(int id, String name, String description, Timestamp timestamp, File fastaFile) {
+        this(id, -1, name, description, timestamp, fastaFile);
     }
     
     /**
@@ -50,15 +61,35 @@ public class PersistantReference implements Observable {
      * @param name The name of the reference.
      * @param description The additional description of the reference.
      * @param timestamp The insertion timestamp of the reference.
+     * @param fastaFile Fasta file containing the reference sequences
      */
-    public PersistantReference(int id, int activeChromId, String name, String description, Timestamp timestamp) {
+    public PersistantReference(int id, int activeChromId, String name, String description, Timestamp timestamp, File fastaFile) {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.fastaFile = fastaFile;
         this.chromosomes = ProjectConnector.getInstance().getRefGenomeConnector(id).getChromosomesForGenome();
         this.noChromosomes = this.chromosomes.size();
         this.timestamp = timestamp;
         this.observers = new ArrayList<>();
+        this.checkRef(activeChromId);
+    }
+    
+    /**
+     * Checks if everything is fine with the reference sequence file. 
+     * Appropriate messages are shown, if something is wrong.
+     * @param activeChromId id of the currently active chromosome (>= 0)
+     */
+    private void checkRef(int activeChromId) {
+        FastaUtils fastaUtils = new FastaUtils();
+        try { //check for index and recreate it with notificaiton, if necessary
+            IndexedFastaSequenceFile indexedFasta = new IndexedFastaSequenceFile(fastaFile);
+        } catch (FileNotFoundException e) {
+            fastaUtils.recreateMissingIndex(fastaFile);
+        } catch (PicardException e) {
+            String msg = "The following reference fasta file is missing! Please restore it in order to use this DB:\n" + fastaFile.getAbsolutePath();
+            JOptionPane.showMessageDialog(new JPanel(), msg, "Fasta missing error", JOptionPane.ERROR_MESSAGE);
+        }
         if (activeChromId < 0) {
             Iterator<PersistantChromosome> chromIt = chromosomes.values().iterator();
             if (chromIt.hasNext()) {
@@ -67,7 +98,16 @@ public class PersistantReference implements Observable {
         } else {
             this.activeChromID = activeChromId;
         }
-
+        this.seqFile = fastaUtils.getIndexedFasta(fastaFile);
+        try {
+            this.getChromSequence(activeChromID, 1, 1);
+        } catch (PicardException e) {
+            if (e.getMessage().contains("Unable to find entry for contig")) {
+                String msg = "The fasta file \n" + fastaFile.getAbsolutePath() + 
+                        "\ndoes not contain the expected sequence:\n" + e.getMessage();
+                JOptionPane.showMessageDialog(new JPanel(), msg, "Sequence missing error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
 
     /**
@@ -108,23 +148,24 @@ public class PersistantReference implements Observable {
 
     /**
      * @param chromId the chromosome id of interest
-     * @param observer The observer of the chromosome. It is added to the
-     * chromosome and should remain in the observer list, as long, as the
-     * observer needs the sequence of the chromosome.
-     * @return The chromosome sequence for the given chromosome id.
+     * @param start Start position of the desired sequence
+     * @param stop Stop position of the desired sequence
+     * @return The wanted part of the chromosome sequence for the given 
+     * chromosome id.
      */
-    public String getChromSequence(int chromId, Observer observer) {
-        return this.chromosomes.get(chromId).getSequence(observer);
+    public String getChromSequence(int chromId, int start, int stop) {
+        String refSubSeq = new String(seqFile.getSubsequenceAt(chromosomes.get(chromId).getName(), start, stop).getBases(), Charset.forName("UTF-8"));
+        return refSubSeq.toUpperCase();
     }
     
     /**
-     * @param observer The observer of the chromosome. It is added to the
-     * chromosome and should remain in the observer list, as long, as the
-     * observer needs the sequence of the chromosome.
-     * @return The chromosome sequence for the given chromosome id.
+     * @param start Start position of the desired sequence
+     * @param stop Stop position of the desired sequence
+     * @return The wanted part of the active chromosome sequence for the given
+     * chromosome id.
      */
-    public String getActiveChromSequence(Observer observer) {
-        return this.chromosomes.get(this.getActiveChromId()).getSequence(observer);
+    public String getActiveChromSequence(int start, int stop) {
+        return this.getChromSequence(this.activeChromID, start, stop);
     }
 
     /**
@@ -148,6 +189,16 @@ public class PersistantReference implements Observable {
         return timestamp;
     }
 
+    /**
+     * @return Fasta file containing the reference sequences.
+     */
+    public File getFastaFile() {
+        return fastaFile;
+    }
+
+    /**
+     * @return The name of the reference.
+     */
     @Override
     public String toString(){
         return this.getName();

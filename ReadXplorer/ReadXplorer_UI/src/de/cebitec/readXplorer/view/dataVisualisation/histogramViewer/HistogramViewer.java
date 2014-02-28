@@ -4,7 +4,11 @@ import de.cebitec.readXplorer.databackend.IntervalRequest;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.databackend.ThreadListener;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.*;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistant;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantCoverage;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantDiff;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReferenceGap;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.Properties; 
@@ -20,7 +24,11 @@ import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 //import org.openide.util.NbBundle;
@@ -38,7 +46,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
     private static final long serialVersionUID = 234765253;
     private static final int MININTERVALLENGTH = 3000;
 //    private InputOutput io;
-    private static int height = 500;
+    private static int height = 200;
     private TrackConnector trackConnector;
     private PersistantReference refGen;
     private GenomeGapManager gapManager;
@@ -59,6 +67,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
     private int maxCoverage;
     private List<Integer> scaleValues;
     private double pxPerCoverageUnit;
+    private String refSubSeq;
 
     @Override
     public void notifySkipped() {
@@ -102,7 +111,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         // do not update if this windows is inactive
         if (this.isActive() && dataLoaded) {
             int relPos = logPos;
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder(100);
             sb.append("<html>");
             sb.append("<b>Position</b>: ").append(logPos);
 
@@ -241,11 +250,11 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
 
                 @Override
                 public void run() {
-                    if (!coverageLoaded && result.getCoverage().getRightBound() != 0 && result.getRequest().getFrom() <= lowerBound && result.getRequest().getTo() >= upperBound) {
+                    if (!coverageLoaded && result.getCoverage().getRightBound() != 0 && result.getRequest().getTotalFrom() <= lowerBound && result.getRequest().getTotalTo() >= upperBound) {
                         cov = result.getCoverage();
                         coverageLoaded = true;
                     }
-                    if (result.getRequest().isDiffsAndGapsNeeded() && !diffsLoaded && result.getRequest().getFrom() <= lowerBound && result.getRequest().getTo() >= upperBound) {
+                    if (result.getRequest().isDiffsAndGapsNeeded() && !diffsLoaded && result.getRequest().getTotalFrom() <= lowerBound && result.getRequest().getTotalTo() >= upperBound) {
                         diffs = result.getDiffs();
                         gaps = result.getGaps();
                         Collections.sort(diffs);
@@ -266,6 +275,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
      */
     private synchronized void setupData() {
         gapManager = new GenomeGapManager(lowerBound, upperBound);
+        refSubSeq = refGen.getActiveChromSequence(lowerBound, upperBound);
 
         this.fillGapManager();
         this.getSequenceBar().setGenomeGapManager(gapManager);
@@ -435,7 +445,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         double value;
         Color c;
         int y = (isForwardStrand ? getPaintingAreaInfo().getForwardLow() : getPaintingAreaInfo().getReverseLow());
-        char base = refGen.getActiveChromSequence(this.getChromosomeObserver()).charAt(absPos - 1);
+        char base = refSubSeq.charAt(absPos - lowerBound);
         PhysicalBaseBounds bounds = getPhysBoundariesForLogPos(absPos);
         
         value = logoData.getNumOfMatchesAt(relPos, isForwardStrand);
@@ -587,7 +597,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
 
         // store diff information from the reference genome in logo data
         PersistantDiff d;
-        int position; //TODO: runs over all diffs for 25000 pos = can be 600.000 = improve performance!
+        int position;
         for (Iterator<PersistantDiff> it = diffs.iterator(); it.hasNext();) {
             d = it.next();
             position = d.getPosition();

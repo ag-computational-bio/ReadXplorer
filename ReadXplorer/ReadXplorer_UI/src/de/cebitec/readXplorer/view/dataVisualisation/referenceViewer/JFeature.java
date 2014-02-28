@@ -254,7 +254,7 @@ public class JFeature extends JComponent {
                     MenuItemFactory menuItemFactory = new MenuItemFactory();
 
                     //add copy option
-                    String selFeatureSequence = viewer.getReference().getActiveChromSequence(viewer.getChromosomeObserver()).substring(feature.getStart() - 1, feature.getStop());
+                    String selFeatureSequence = viewer.getReference().getActiveChromSequence(feature.getStart(), feature.getStop());
                     popUp.add(menuItemFactory.getCopyItem(selFeatureSequence));
                     //add copy translated feature sequence option
                     popUp.add(menuItemFactory.getCopyTranslatedItem(selFeatureSequence));

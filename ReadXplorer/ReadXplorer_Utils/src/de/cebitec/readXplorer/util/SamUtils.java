@@ -3,7 +3,15 @@ package de.cebitec.readXplorer.util;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import net.sf.samtools.*;
+import net.sf.samtools.BAMIndexer;
+import net.sf.samtools.SAMException;
+import net.sf.samtools.SAMFileHeader;
+import net.sf.samtools.SAMFileReader;
+import net.sf.samtools.SAMFileWriter;
+import net.sf.samtools.SAMFileWriterFactory;
+import net.sf.samtools.SAMFormatException;
+import net.sf.samtools.SAMRecord;
+import net.sf.samtools.SAMRecordIterator;
 import net.sf.samtools.util.RuntimeEOFException;
 
 /*
@@ -31,9 +39,9 @@ import net.sf.samtools.util.RuntimeEOFException;
  */
 
 /**
- * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
- * 
  * Contains some utils for sam and bam files.
+ * 
+ * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class SamUtils implements Observable {
     
@@ -45,6 +53,9 @@ public class SamUtils implements Observable {
     
     private List<Observer> observers;
 
+    /**
+     * Contains some utils for sam and bam files.
+     */
     public SamUtils() {
         this.observers = new ArrayList<>();
     }

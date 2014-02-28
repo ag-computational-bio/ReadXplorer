@@ -1,34 +1,30 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
-import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.PromotorSearchParameters;
-import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.RbsAnalysisParameters;
-import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.MotifSearchPanel;
-import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.MotifSearchModel;
-import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ElementsOfInterest;
-import de.cebitec.readXplorer.view.tableVisualization.tableFilter.TableRightClickDeletion;
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.ChromosomeObserver;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.ChartsGenerationSelectChatTypeWizardPanel;
+import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.PlotGenerator;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ChartType;
-import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.PlotGenerator;
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ElementsOfInterest;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.FilterType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.PurposeEnum;
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.SequinTableFormatExporter;
 import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.SequinTableSettingsWizardPanel;
-import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.filterWizard.FilterTSS;
 import de.cebitec.readXplorer.transcriptomeAnalyses.filterWizard.FilterWizardPanel;
+import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.MotifSearchModel;
+import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.MotifSearchPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.MultiPurposeTopComponent;
 import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.PromotorAnalysisWizardIterator;
-import de.cebitec.readXplorer.transcriptomeAnalyses.rbsAnalysis.DataSelectionWizardPanel;
+import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.PromotorSearchParameters;
+import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.RbsAnalysisParameters;
 import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.RbsAnalysisWizardIterator;
 import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.RbsMotifSearchPanel;
+import de.cebitec.readXplorer.transcriptomeAnalyses.rbsAnalysis.DataSelectionWizardPanel;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.SequenceUtils;
@@ -39,6 +35,7 @@ import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.readXplorer.view.tableVisualization.TableComparatorProvider;
 import de.cebitec.readXplorer.view.tableVisualization.TableUtils;
+import de.cebitec.readXplorer.view.tableVisualization.tableFilter.TableRightClickDeletion;
 import de.cebitec.readXplorer.view.tableVisualization.tableFilter.TableRightClickFilter;
 import de.erichseifert.gral.data.DataTable;
 import de.erichseifert.gral.ui.InteractivePanel;
@@ -106,7 +103,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
     private TSSDetectionResults tssResult;
     private HashMap<String, Object> statisticsMap;
     private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
-    private TableRightClickDeletion<DefaultTableModel> rowDeletion = new TableRightClickDeletion();
+    private TableRightClickDeletion<DefaultTableModel> rowDeletion = new TableRightClickDeletion<>();
     private List<String> promotorList;
     private HashMap<Integer, TranscriptionStart> tssInHash;
     private MotifSearchModel model;
@@ -128,8 +125,8 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         this.tSSTable.addMouseListener(rowDeletion);
         this.initStatsMap();
 
-        DefaultListSelectionModel model = (DefaultListSelectionModel) this.tSSTable.getSelectionModel();
-        model.addListSelectionListener(new ListSelectionListener() {
+        DefaultListSelectionModel tssTableModel = (DefaultListSelectionModel) this.tSSTable.getSelectionModel();
+        tssTableModel.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 int posColumnIdx = 0;
@@ -784,7 +781,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // Let's filter the table in sub-table
-        List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<WizardDescriptor.Panel<WizardDescriptor>>();
+        List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
         panels.add(new FilterWizardPanel("Filtration"));
         String[] steps = new String[panels.size()];
         for (int i = 0; i < panels.size(); i++) {
@@ -908,7 +905,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
             int noPutCdsShifts = 0;
             int noTssUnannotated = 0;
 
-            final DefaultTableModel model = (DefaultTableModel) tSSTable.getModel();
+            final DefaultTableModel tssTableModel = (DefaultTableModel) tSSTable.getModel();
 
             String strand;
             PersistantFeature feature;
@@ -1042,7 +1039,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                 SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
                     @Override
                     public void run() {
-                        model.addRow(rowData);
+                        tssTableModel.addRow(rowData);
                     }
                 });
             }
@@ -1066,7 +1063,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
             TableRowSorter<TableModel> sorter = new TableRowSorter<>();
             tSSTable.setRowSorter(sorter);
-            sorter.setModel(model);
+            sorter.setModel(tssTableModel);
             TableComparatorProvider.setPersistantTrackComparator(sorter, 1);
 
         }
@@ -1159,27 +1156,23 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
         //get reference sequence for promotor regions
         PersistantReference ref = this.referenceViewer.getReference();
-        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(ref.getId());
-        ChromosomeObserver chromObserver = new ChromosomeObserver();
-        String chromSeq = refConnector.getRefGenome().getActiveChromSequence(chromObserver);
         String promotor;
 
         //get the promotor region for each TSS
         int promotorStart;
-        int chromLength = chromSeq.length();
+        int chromLength = ref.getActiveChromosome().getLength();
         for (TranscriptionStart tSS : this.tssResult.getResults()) {
             if (tSS.isFwdStrand()) {
                 promotorStart = tSS.getStartPosition() - 70;
                 promotorStart = promotorStart < 0 ? 0 : promotorStart;
-                promotor = chromSeq.substring(promotorStart, tSS.getStartPosition());
+                promotor = ref.getActiveChromSequence(promotorStart, tSS.getStartPosition());
             } else {
                 promotorStart = tSS.getStartPosition() + 70;
                 promotorStart = promotorStart > chromLength ? chromLength : promotorStart;
-                promotor = SequenceUtils.getReverseComplement(chromSeq.substring(tSS.getStartPosition(), promotorStart));
+                promotor = SequenceUtils.getReverseComplement(ref.getActiveChromSequence(tSS.getStartPosition(), promotorStart));
             }
             this.promotorRegions.add(promotor);
         }
         tssResult.setPromotorRegions(promotorRegions);
-        refConnector.getRefGenome().getActiveChromosome().removeObserver(chromObserver);
     }
 }

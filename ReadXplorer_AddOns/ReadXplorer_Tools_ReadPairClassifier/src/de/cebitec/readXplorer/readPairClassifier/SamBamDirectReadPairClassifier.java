@@ -5,6 +5,7 @@ import de.cebitec.readXplorer.parser.TrackJob;
 import de.cebitec.readXplorer.parser.common.ParsedClassification;
 import de.cebitec.readXplorer.parser.common.ParsedReadPairContainer;
 import de.cebitec.readXplorer.parser.common.ParsingException;
+import de.cebitec.readXplorer.parser.common.RefSeqFetcher;
 import de.cebitec.readXplorer.parser.mappings.CommonsMappingParser;
 import de.cebitec.readXplorer.parser.mappings.ReadPairClassifierI;
 import de.cebitec.readXplorer.parser.output.SamBamSorter;
@@ -20,9 +21,12 @@ import de.cebitec.readXplorer.util.SamUtils;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.util.StatsContainer;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sf.samtools.SAMFileHeader;
@@ -31,6 +35,7 @@ import net.sf.samtools.SAMFileWriter;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
 import org.openide.util.NbBundle;
+import org.openide.util.lookup.ServiceProvider;
 
 /**
  * Sam/Bam read pair classifier for a direct file access track. This means
@@ -43,6 +48,7 @@ import org.openide.util.NbBundle;
  *
  * @author Rolf Hilker
  */
+@ServiceProvider(service = ReadPairClassifierI.class)
 public class SamBamDirectReadPairClassifier implements ReadPairClassifierI, Observer, Observable {
 
     private ArrayList<Observer> observers;
@@ -53,11 +59,22 @@ public class SamBamDirectReadPairClassifier implements ReadPairClassifierI, Obse
     private short orienation; //orientation of the reads: 0 = fr, 1 = rf, 2 = ff/rr
     private SAMFileWriter samBamFileWriter;
     private Map<String,ParsedClassification> classificationMap; 
-    private final Map<String, String> chromSeqMap;
+    private final Map<String, Integer> chromLengthMap;
     private boolean deleteSortedFile;
     
     private StatsContainer statsContainer;
     private DiscreteCountingDistribution readPairSizeDistribution;
+    private RefSeqFetcher refSeqFetcher;
+    
+    /**
+     * Empty constructor, because nothing to do yet. But don't forget to set
+     * data before calling classifyReadPairs().
+     */
+    public SamBamDirectReadPairClassifier() {
+        //set data later
+        this.observers = new ArrayList<>();
+        this.chromLengthMap = new HashMap<>();
+    }
     
     /**
      * Sam/Bam read pair classifier for a direct file access track. This
@@ -68,11 +85,11 @@ public class SamBamDirectReadPairClassifier implements ReadPairClassifierI, Obse
      * classification. Note for multichromosomal mappings: The classification 
      * works, no matter on which chromosome the reads were mapped!
      * @param readPairJobContainer the read pair job container to classify
-     * @param chromSeqMap the mapping of chromosome name to chromosome sequence
+     * @param chromLengthMap the mapping of chromosome name to chromosome sequence
      * @param classificationMap the ordinary classification map of the reads. It
      *      is needed for the extension of the sam/bam file
      */
-    public SamBamDirectReadPairClassifier(ReadPairJobContainer readPairJobContainer, Map<String, String> chromSeqMap, 
+    public SamBamDirectReadPairClassifier(ReadPairJobContainer readPairJobContainer, Map<String, Integer> chromLengthMap, 
             Map<String,ParsedClassification> classificationMap) {
         this.observers = new ArrayList<>();
         this.trackJob = readPairJobContainer.getTrackJob1();
@@ -80,7 +97,7 @@ public class SamBamDirectReadPairClassifier implements ReadPairClassifierI, Obse
         this.calculateMinAndMaxDist(dist, readPairJobContainer.getDeviation());
         this.orienation = readPairJobContainer.getOrientation();
         this.classificationMap = classificationMap;
-        this.chromSeqMap = chromSeqMap;
+        this.chromLengthMap = chromLengthMap;
         this.readPairSizeDistribution = new DiscreteCountingDistribution(maxDist * 3);
         readPairSizeDistribution.setType(Properties.READ_PAIR_SIZE_DISTRIBUTION);
     }
@@ -111,32 +128,33 @@ public class SamBamDirectReadPairClassifier implements ReadPairClassifierI, Obse
      */
     @Override
     public ParsedReadPairContainer classifyReadPairs() throws ParsingException, OutOfMemoryError {
-        
+
+        this.refSeqFetcher = new RefSeqFetcher(trackJob.getRefGen().getFile(), this);
         this.preprocessData(trackJob);
         File oldWorkFile = trackJob.getFile();
-        
+
         try {
             long start = System.currentTimeMillis();
             this.notifyObservers(NbBundle.getMessage(SamBamDirectReadPairClassifier.class, "Classifier.Classification.Start"));
-            
+
             List<SAMRecord> currentRecords1 = new ArrayList<>();
-            List<SAMRecord> currentRecords2 = new ArrayList<>();       
-            
+            List<SAMRecord> currentRecords2 = new ArrayList<>();
+
             int lineno = 0;
             SAMFileReader samBamReader = new SAMFileReader(trackJob.getFile());
             samBamReader.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
             SAMRecordIterator samItor = samBamReader.iterator();
-            
+
             SAMFileHeader header = samBamReader.getFileHeader();
             header.setSortOrder(SAMFileHeader.SortOrder.coordinate);
-            
+
             Pair<SAMFileWriter, File> writerAndFile = SamUtils.createSamBamWriter(
                     trackJob.getFile(), header, false, SamUtils.EXTENDED_STRING);
-            
+
             this.samBamFileWriter = writerAndFile.getFirst();
-            
+
             File outputFile = writerAndFile.getSecond();
-            
+
             SAMRecord record;
             String lastReadName = "";
             String readNameFull; //read name with pair tag
@@ -147,18 +165,18 @@ public class SamBamDirectReadPairClassifier implements ReadPairClassifierI, Obse
                 ++lineno;
                 //separate all mappings of same pair by read pair tag and hand it over to classification then
                 record = samItor.next();
-                if (!record.getReadUnmappedFlag() && chromSeqMap.containsKey(record.getReferenceName())) {
+                if (!record.getReadUnmappedFlag() && chromLengthMap.containsKey(record.getReferenceName())) {
                     readNameFull = record.getReadName();
                     pairTag = CommonsMappingParser.getReadPairTag(record);
                     readName = CommonsMappingParser.getReadNameWithoutPairTag(readNameFull);
-                    
+
                     if (!readName.equals(lastReadName)) { //meaning: next pair, because sorted by read name
                         // classify read pair, because all mappings for this pair are currently stored in list
                         this.performClassification(currentRecords1, currentRecords2, readPairId);
                         currentRecords1.clear();
                         currentRecords2.clear();
                         ++readPairId;
-                        
+
                     }
                     if (pairTag == Properties.EXT_A1) {
                         record.setReadPairedFlag(true);
@@ -174,39 +192,40 @@ public class SamBamDirectReadPairClassifier implements ReadPairClassifierI, Obse
                     lastReadName = readName;
                 }
             }
-            
+
             if (!currentRecords1.isEmpty() || !currentRecords2.isEmpty()) {
                 this.performClassification(currentRecords1, currentRecords2, readPairId);
             }
-            
+
             samItor.close();
             this.samBamFileWriter.close();
             samBamReader.close();
-            
+
             samBamReader = new SAMFileReader(outputFile);
             samBamReader.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
             File indexFile = new File(outputFile.getAbsolutePath() + Properties.BAM_INDEX_EXT);
             SamUtils utils = new SamUtils();
             utils.createIndex(samBamReader, indexFile);
             samBamReader.close();
-            
+
             long finish = System.currentTimeMillis();
             String msg = NbBundle.getMessage(SamBamDirectReadPairClassifier.class, "Classifier.Classification.Finish");
             this.notifyObservers(Benchmark.calculateDuration(start, finish, msg));
-            
+
             //delete the sorted/preprocessed file
-            if (deleteSortedFile) { GeneralUtils.deleteOldWorkFile(oldWorkFile); }
-            
+            if (deleteSortedFile) {
+                GeneralUtils.deleteOldWorkFile(oldWorkFile);
+            }
+
             trackJob.setFile(outputFile);
-            
+
             this.statsContainer.setReadPairDistribution(this.readPairSizeDistribution);
-            
-        } catch (Exception e) {
+
+        } catch (MissingResourceException | IOException e) {
             this.notifyObservers(NbBundle.getMessage(SamBamDirectReadPairClassifier.class, "Classifier.Error", e.getMessage()));
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, e.getMessage());
         }
-        
-        
+
         return new ParsedReadPairContainer();
     }
 
@@ -231,6 +250,8 @@ public class SamBamDirectReadPairClassifier implements ReadPairClassifierI, Obse
         ParsedClassification class2;
         int diffs1;
         int diffs2;
+        String refSubSeq1;
+        String refSubSeq2;
 
         int largestSmallerDist = Integer.MIN_VALUE;
         int largestPotSmallerDist = Integer.MIN_VALUE;
@@ -325,10 +346,11 @@ public class SamBamDirectReadPairClassifier implements ReadPairClassifierI, Obse
                         stop1 = recordA.getAlignmentEnd();
                         totalReadName = CommonsMappingParser.elongatePairedReadName(recordA);
                         class1 = this.classificationMap.get(totalReadName);
+                        refSubSeq1 = refSeqFetcher.getSubSequence(recordA.getReferenceName(), start1, stop1);
                         diffs1 = CommonsMappingParser.countDiffsAndGaps(
                                 recordA.getCigarString(),
                                 recordA.getReadString(),
-                                this.chromSeqMap.get(recordA.getReferenceName()).substring(start1 - 1, stop1),
+                                refSubSeq1,
                                 recordA.getReadNegativeStrandFlag());
 
                         for (SAMRecord recordB : currentRecords2) {
@@ -341,10 +363,11 @@ public class SamBamDirectReadPairClassifier implements ReadPairClassifierI, Obse
                                     direction2 = recordB.getReadNegativeStrandFlag() ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD;
                                     totalReadName = CommonsMappingParser.elongatePairedReadName(recordB);
                                     class2 = this.classificationMap.get(totalReadName);
+                                    refSubSeq2 = refSeqFetcher.getSubSequence(recordB.getReferenceName(), start2, stop2);
                                     diffs2 = CommonsMappingParser.countDiffsAndGaps(
                                             recordB.getCigarString(),
                                             recordB.getReadString(),
-                                            this.chromSeqMap.get(recordB.getReferenceName()).substring(start2 - 1, stop2),
+                                            refSubSeq2,
                                             recordB.getReadNegativeStrandFlag());
 
 
@@ -648,11 +671,12 @@ public class SamBamDirectReadPairClassifier implements ReadPairClassifierI, Obse
      * Use this method, if the number of differences is not already known.
      * @param record the sam record to update
      */
-    private void addClassificationData(SAMRecord record) {
+    private void addClassificationData(SAMRecord record) { //TODO: avoid recalculating diffs and gaps!!!
+        String refSubSeq = refSeqFetcher.getSubSequence(record.getReferenceName(), record.getAlignmentStart(), record.getAlignmentEnd());
         int differences = CommonsMappingParser.countDiffsAndGaps(
                 record.getCigarString(), 
                 record.getReadString(), 
-                this.chromSeqMap.get(record.getReferenceName()).substring(record.getAlignmentStart() - 1, record.getAlignmentEnd()),
+                refSubSeq,
                 record.getReadNegativeStrandFlag());
         CommonsMappingParser.addClassificationData(record, differences, classificationMap);
     }

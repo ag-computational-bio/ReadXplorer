@@ -2,6 +2,7 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch;
 
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ElementsOfInterest;
@@ -50,7 +51,7 @@ public class MotifSearchModel implements Observer {
     private TreeMap<String, String> upstreamRegionsInHash;
     private TreeMap<String, Integer> contributedSequencesWithShift;
     private File logoMinus10, logoMinus35, logoRbs;
-    private final HashMap<Integer, PersistantChromosome> chromosomes;
+    private final PersistantReference ref;
     private List<String> upstreamRegions;
     private float meanMinus10SpacerToTSS, meanMinus35SpacerToMinus10;
     private float meanSpacerLengthOfRBSMotif;
@@ -81,7 +82,7 @@ public class MotifSearchModel implements Observer {
      * @param refViewer
      */
     public MotifSearchModel(ReferenceViewer refViewer) {
-        this.chromosomes = (HashMap<Integer, PersistantChromosome>) refViewer.getReference().getChromosomes();
+        this.ref = refViewer.getReference();
         this.handlerTitlePromotorAnalysis = "Processing promotor analysis";
         this.handlerTitleRBSAnalysis = "Processing rbs analysis";
         this.progressHandlePromotorAnalysis = ProgressHandleFactory.createHandle(handlerTitlePromotorAnalysis);
@@ -841,24 +842,24 @@ public class MotifSearchModel implements Observer {
                     if (tss.isFwdStrand()) {
                         if (tss.isLeaderless()) {
                             tssStart = tss.getStartPosition();
-                            substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart - (length + 1), tssStart - 1);
+                            substr = this.ref.getChromSequence(tss.getChromId(), tssStart - length, tssStart);
                             upstreamRegions.add(substr + "\n");
                             this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                         } else {
                             featureStart = currentFeature.getStart();
-                            substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart - (length + 1), featureStart - 1);
+                            substr = this.ref.getChromSequence(tss.getChromId(), featureStart - length, featureStart);
                             upstreamRegions.add(substr + "\n");
                             this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                         }
                     } else {
                         if (tss.isLeaderless()) {
                             tssStart = tss.getStartPosition();
-                            substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart + 1, tssStart + (length + 1));
+                            substr = this.ref.getChromSequence(tss.getChromId(), tssStart, tssStart + length);
                             upstreamRegions.add(substr + "\n");
                             this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                         } else {
                             featureStart = currentFeature.getStop();
-                            substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart + 1, featureStart + (length + 1));
+                            substr = this.ref.getChromSequence(tss.getChromId(), featureStart, featureStart + length);
                             upstreamRegions.add(substr + "\n");
                             this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                         }
@@ -869,11 +870,11 @@ public class MotifSearchModel implements Observer {
                     tssStart = tss.getStartPosition();
                     this.upstreamRegions.add(">" + newLocus + "\n");
                     if (tss.isFwdStrand()) {
-                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart - (length + 1), tssStart - 1);
+                        substr = this.ref.getChromSequence(tss.getChromId(), tssStart - length, tssStart);
                         upstreamRegions.add(substr + "\n");
                         this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                     } else {
-                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart + 1, tssStart + (length + 1));
+                        substr = this.ref.getChromSequence(tss.getChromId(), tssStart, tssStart + length);
                         upstreamRegions.add(substr + "\n");
                         this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                     }
@@ -892,12 +893,12 @@ public class MotifSearchModel implements Observer {
                         this.upstreamRegions.add(">" + newLocus + "\n");
                         if (tss.isFwdStrand()) {
                             featureStart = currentFeature.getStart();
-                            substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart - (length + 1), featureStart - 1);
+                            substr = this.ref.getChromSequence(tss.getChromId(), featureStart - length, featureStart);
                             upstreamRegions.add(substr + "\n");
                             this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                         } else {
                             featureStart = currentFeature.getStop();
-                            substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart + 1, featureStart + (length + 1));
+                            substr = this.ref.getChromSequence(tss.getChromId(), featureStart, featureStart + length);
                             upstreamRegions.add(substr + "\n");
                             this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                         }
@@ -911,11 +912,11 @@ public class MotifSearchModel implements Observer {
                         tssStart = tss.getStartPosition();
                         this.upstreamRegions.add(">" + newLocus + "\n");
                         if (tss.isFwdStrand()) {
-                            substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart - (length + 1), tssStart - 1);
+                            substr = this.ref.getChromSequence(tss.getChromId(), tssStart - length, tssStart);
                             upstreamRegions.add(substr + "\n");
                             this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                         } else {
-                            substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart + 1, tssStart + (length + 1));
+                            substr = this.ref.getChromSequence(tss.getChromId(), tssStart, tssStart + length);
                             upstreamRegions.add(substr + "\n");
                             this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                         }
@@ -940,11 +941,11 @@ public class MotifSearchModel implements Observer {
                     }
                     this.upstreamRegions.add(">" + newLocus + "\n");
                     if (tss.isFwdStrand()) {
-                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart - (length + 1), tssStart - 1);
+                        substr = this.ref.getChromSequence(tss.getChromId(), tssStart - length, tssStart);
                         upstreamRegions.add(substr + "\n");
                         this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                     } else {
-                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart + 1, tssStart + (length + 1));
+                        substr = this.ref.getChromSequence(tss.getChromId(), tssStart, tssStart + length);
                         upstreamRegions.add(substr + "\n");
                         this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                     }
@@ -965,12 +966,12 @@ public class MotifSearchModel implements Observer {
                         this.upstreamRegions.add(">" + newLocus + "\n");
                         if (tss.isFwdStrand()) {
                             featureStart = currentFeature.getStart();
-                            substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart - (length + 1), featureStart - 1);
+                            substr = this.ref.getChromSequence(tss.getChromId(), featureStart - length, featureStart);
                             upstreamRegions.add(substr + "\n");
                             this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                         } else {
                             featureStart = currentFeature.getStop();
-                            substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart + 1, featureStart + (length + 1));
+                            substr = this.ref.getChromSequence(tss.getChromId(), featureStart, featureStart + length);
                             upstreamRegions.add(substr + "\n");
                             this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                         }
@@ -984,11 +985,11 @@ public class MotifSearchModel implements Observer {
                         tssStart = tss.getStartPosition();
                         this.upstreamRegions.add(">" + newLocus + "\n");
                         if (tss.isFwdStrand()) {
-                            substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart - (length + 1), tssStart - 1);
+                            substr = this.ref.getChromSequence(tss.getChromId(), tssStart - length, tssStart);
                             upstreamRegions.add(substr + "\n");
                             this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                         } else {
-                            substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart + 1, tssStart + (length + 1));
+                            substr = this.ref.getChromSequence(tss.getChromId(), tssStart, tssStart + length);
                             upstreamRegions.add(substr + "\n");
                             this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                         }
@@ -1010,12 +1011,12 @@ public class MotifSearchModel implements Observer {
                         this.upstreamRegions.add(">" + newLocus + "\n");
                         if (tss.isFwdStrand()) {
                             featureStart = currentFeature.getStart();
-                            substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart - (length + 1), featureStart - 1);
+                            substr = this.ref.getChromSequence(tss.getChromId(), featureStart - length, featureStart);
                             upstreamRegions.add(substr + "\n");
                             this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                         } else {
                             featureStart = currentFeature.getStop();
-                            substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart + 1, featureStart + (length + 1));
+                            substr = this.ref.getChromSequence(tss.getChromId(), featureStart, featureStart + length);
                             upstreamRegions.add(substr + "\n");
                             this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                         }
@@ -1029,11 +1030,11 @@ public class MotifSearchModel implements Observer {
                         tssStart = tss.getStartPosition();
                         this.upstreamRegions.add(">" + newLocus + "\n");
                         if (tss.isFwdStrand()) {
-                            substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart - (length + 1), tssStart - 1);
+                            substr = this.ref.getChromSequence(tss.getChromId(), tssStart - length, tssStart);
                             upstreamRegions.add(substr + "\n");
                             this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                         } else {
-                            substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart + 1, tssStart + (length + 1));
+                            substr = this.ref.getChromSequence(tss.getChromId(), tssStart, tssStart + length);
                             upstreamRegions.add(substr + "\n");
                             this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                         }
@@ -1055,11 +1056,11 @@ public class MotifSearchModel implements Observer {
                         tss.setAdditionalIdentyfier(newLocus);
                         this.upstreamRegions.add(">" + newLocus + "\n");
                         if (tss.isFwdStrand()) {
-                            substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart - (length + 1), tssStart - 1);
+                            substr = this.ref.getChromSequence(tss.getChromId(), tssStart - length, tssStart);
                             upstreamRegions.add(substr + "\n");
                             this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                         } else {
-                            substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart + 1, tssStart + (length + 1));
+                            substr = this.ref.getChromSequence(tss.getChromId(), tssStart, tssStart + length);
                             upstreamRegions.add(substr + "\n");
                             this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                         }
@@ -1069,12 +1070,12 @@ public class MotifSearchModel implements Observer {
                         this.upstreamRegions.add(">" + newLocus + "\n");
                         if (tss.isFwdStrand()) {
                             featureStart = currentFeature.getStart();
-                            substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart - (length + 1), featureStart - 1);
+                            substr = this.ref.getChromSequence(tss.getChromId(), featureStart - length, featureStart);
                             upstreamRegions.add(substr + "\n");
                             this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                         } else {
                             featureStart = currentFeature.getStop();
-                            substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart + 1, featureStart + (length + 1));
+                            substr = this.ref.getChromSequence(tss.getChromId(), featureStart, featureStart + length);
                             upstreamRegions.add(substr + "\n");
                             this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                         }
@@ -1085,12 +1086,12 @@ public class MotifSearchModel implements Observer {
                     this.upstreamRegions.add(">" + newLocus + "\n");
                     System.out.println(">" + currentFeature.getLocus());
                     if (tss.isFwdStrand()) {
-                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart - (length + 1), tssStart - 1);
+                        substr = this.ref.getChromSequence(tss.getChromId(), tssStart - length, tssStart);
                         upstreamRegions.add(substr + "\n");
                         this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                         System.out.println(substr);
                     } else {
-                        substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart + 1, tssStart + (length + 1));
+                        substr = this.ref.getChromSequence(tss.getChromId(), tssStart, tssStart + length);
                         upstreamRegions.add(substr + "\n");
                         this.upstreamRegionsInHash.put(newLocus, substr + "\n");
                         System.out.println(substr);
@@ -1188,12 +1189,12 @@ public class MotifSearchModel implements Observer {
                 this.upstreamRegions.add(">" + uniqueLocus + "\n");
                 if (operon.isFwd()) {
                     featureStart = leadingFeature.getStart();
-                    substr = this.chromosomes.get(leadingFeature.getChromId()).getSequence(this).substring(featureStart - (length + 1), featureStart - 1);
+                    substr = this.ref.getChromSequence(leadingFeature.getChromId(), featureStart - length, featureStart);
                     upstreamRegions.add(substr + "\n");
                     this.upstreamRegionsInHash.put(uniqueLocus, substr + "\n");
                 } else {
                     featureStart = leadingFeature.getStop();
-                    substr = this.chromosomes.get(leadingFeature.getChromId()).getSequence(this).substring(featureStart + 1, featureStart + (length + 1));
+                    substr = this.ref.getChromSequence(leadingFeature.getChromId(), featureStart, featureStart + length);
                     upstreamRegions.add(substr + "\n");
                     this.upstreamRegionsInHash.put(uniqueLocus, substr + "\n");
                 }
@@ -1203,11 +1204,11 @@ public class MotifSearchModel implements Observer {
                 int transkriptStart = operon.getStartPositionOfTranscript();
                 this.upstreamRegions.add(">" + uniqueLocus + "\n");
                 if (operon.isFwd()) {
-                    substr = this.chromosomes.get(leadingFeature.getChromId()).getSequence(this).substring(transkriptStart - (length + 1), transkriptStart - 1);
+                    substr = this.ref.getChromSequence(leadingFeature.getChromId(), transkriptStart - length, transkriptStart);
                     upstreamRegions.add(substr + "\n");
                     this.upstreamRegionsInHash.put(uniqueLocus, substr + "\n");
                 } else {
-                    substr = this.chromosomes.get(leadingFeature.getChromId()).getSequence(this).substring(transkriptStart + 1, transkriptStart + (length + 1));
+                    substr = this.ref.getChromSequence(leadingFeature.getChromId(), transkriptStart, transkriptStart + length);
                     upstreamRegions.add(substr + "\n");
                     this.upstreamRegionsInHash.put(uniqueLocus, substr + "\n");
                 }

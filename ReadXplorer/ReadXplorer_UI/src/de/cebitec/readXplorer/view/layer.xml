@@ -58,11 +58,12 @@
     </folder>
     <folder name="Toolbars">
         <folder name="File_hidden"/>
-        <folder name="Clipboard_hidden"/>
+        <folder name="Memory">
+            <file name="org-netbeans-modules-profiler-actions-SelfSamplerAction.shadow_hidden"/>
+        </folder>
         <folder name="UndoRedo_hidden"/>
-        <folder name="Memory_hidden"/>
         <folder name="Tools">
-            <attr name="position" intvalue="300"/>
+            <attr name="position" intvalue="3000"/>
         </folder>
     </folder>
 </filesystem>

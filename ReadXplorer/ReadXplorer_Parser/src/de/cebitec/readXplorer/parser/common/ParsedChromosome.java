@@ -17,24 +17,35 @@ public class ParsedChromosome {
     private List<ParsedFeature> features;
     private List<ParsedFeature> finalFeatures;
     private Map<String, Integer> featureIdMap;
-    private String sequence;
     private FeatureFilter filter;
     private int id;
     private int featId;
     private String name;
     private boolean hasSubFeatures;
+    private long chromLength;
 
+    /**
+     * Data holder for a chromosome.
+     * @param name Name of the chromosome
+     * @param chromLength
+     * @param hasSubfeatures <tt>true</tt>, if it has subfeatures,
+     * <tt>false</tt>, if it already relies on parent ids.
+     */
+    public ParsedChromosome(String name, long chromLength, boolean hasSubfeatures) {
+        this.features = new ArrayList<>();
+        this.finalFeatures = new ArrayList<>();
+        this.featureIdMap = new HashMap<>();
+        this.filter = new FeatureFilter();
+        this.hasSubFeatures = hasSubfeatures;
+        this.name = name;
+        this.chromLength = chromLength;
+    }
+    
     /**
      * Data holder for a chromosome.
      */
     public ParsedChromosome() {
-
-        features = new ArrayList<>();
-        finalFeatures = new ArrayList<>();
-        featureIdMap = new HashMap<>();
-        filter = new FeatureFilter();
-        hasSubFeatures = true;
-        name = "";
+        this("", 0, true);
     }
 
     /**
@@ -53,30 +64,6 @@ public class ParsedChromosome {
     }
 
     /**
-     * @return The upper case sequence string of this chromosome.
-     */
-    public String getSequence() {
-        return sequence;
-    }
-
-    /**
-     * Sets the chromosome sequence and transforms it to upper case. Thus, a
-     * chromosome sequence will be only available as upper case in the whole
-     * software.
-     * @param sequence The sequence string of this chromosome.
-     */
-    public void setSequence(String sequence) {
-        this.sequence = sequence.toUpperCase();
-    }
-
-    /**
-     * @return The length of the sequence string of this chromosome.
-     */
-    public int getLength() {
-        return sequence.length();
-    }
-
-    /**
      * @return The name of this chromosome.
      */
     public String getName() {
@@ -88,6 +75,20 @@ public class ParsedChromosome {
      */
     public void setName(String name) {
         this.name = name;
+    }
+
+    /**
+     * @return Length of the chromosome.
+     */
+    public long getChromLength() {
+        return chromLength;
+    }
+
+    /**
+     * @param chromLength Length of the chromosome.
+     */
+    public void setChromLength(long chromLength) {
+        this.chromLength = chromLength;
     }
     
     /**

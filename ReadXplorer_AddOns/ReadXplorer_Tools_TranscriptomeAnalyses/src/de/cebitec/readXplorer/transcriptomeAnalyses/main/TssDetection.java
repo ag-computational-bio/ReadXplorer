@@ -598,7 +598,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
 
         String seq = "";
         if (start > 0 && stop < chrom.getLength()) {
-            seq = chrom.getSequence(this).substring(start, stop);
+            seq = refGenome.getChromSequence(chrom.getId(), start, stop);
         }
         if (isFwd) {
             return seq;
@@ -623,9 +623,8 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
     }
 
     private String getStatisticsOnTssDetection() {
-        String result = null;
-
-        result = "Gesamtanzahl von TSS:\t" + this.totalCntOfTss
+        String result = 
+                "Gesamtanzahl von TSS:\t" + this.totalCntOfTss
                 + "\nAnzahl der reversen TSS:\t" + this.cntOfReverseTss
                 + "\nAnzahl der forward TSS:\t" + this.cntOfFwdTss
                 + "\nAnzahl der normalen TSS:\t" + this.cntOfNormalTSS

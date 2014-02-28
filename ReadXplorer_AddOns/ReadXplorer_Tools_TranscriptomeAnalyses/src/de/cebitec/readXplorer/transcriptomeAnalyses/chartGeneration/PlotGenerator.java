@@ -1,14 +1,9 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ChartType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ElementsOfInterest;
-import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.erichseifert.gral.data.DataSeries;
 import de.erichseifert.gral.data.DataSource;
@@ -38,7 +33,7 @@ import java.util.TreeMap;
  *
  * @author jritter
  */
-public class PlotGenerator implements Observer {
+public class PlotGenerator {
 
     /**
      * First corporate color used for normal coloring.
@@ -89,7 +84,7 @@ public class PlotGenerator implements Observer {
         }
 
         if (chartType == ChartType.BASE_DISTRIBUTION) {
-            HashMap<Integer, PersistantChromosome> chromosomes = (HashMap<Integer, PersistantChromosome>) refViewer.getReference().getChromosomes();
+            PersistantReference ref = refViewer.getReference();
             StringBuffer buffer;
             List<String> tmpSubstrings = new ArrayList<>();
             String substr;
@@ -99,10 +94,10 @@ public class PlotGenerator implements Observer {
                 int featureStart = tSS.getAssignedFeature().getStart();
                 int featureStop = tSS.getAssignedFeature().getStop();
                 if (tSS.isFwdStrand()) {
-                    substr = chromosomes.get(chromID).getSequence(this).substring(featureStart - 1 - length, featureStart - 1);
+                    substr = ref.getChromSequence(chromID, featureStart - length, featureStart);
                     tmpSubstrings.add(substr);
                 } else {
-                    substr = chromosomes.get(chromID).getSequence(this).substring(featureStop + 1, featureStop + 1 + length);
+                    substr = ref.getChromSequence(chromID, featureStop, featureStop + length);
                     buffer = new StringBuffer(substr);
                     String reversedSubstr = buffer.reverse().toString();
                     String complement = Complement(reversedSubstr);
@@ -159,11 +154,6 @@ public class PlotGenerator implements Observer {
             dataList.add(data);
         }
         return dataList;
-    }
-
-    @Override
-    public void update(Object args) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     private List<TranscriptionStart> getTssOfInterest(ElementsOfInterest elements, List<TranscriptionStart> tss) {

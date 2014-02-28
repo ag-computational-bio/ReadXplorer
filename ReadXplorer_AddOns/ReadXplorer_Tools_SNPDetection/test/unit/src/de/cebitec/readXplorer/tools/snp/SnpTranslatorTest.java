@@ -3,17 +3,17 @@ package de.cebitec.readXplorer.tools.snp;
 import de.cebitec.readXplorer.databackend.dataObjects.CodonSnp;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantSubFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.Snp;
 import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.SequenceComparison;
+import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import org.junit.After;
 import org.junit.AfterClass;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -174,7 +174,9 @@ public class SnpTranslatorTest {
 //        featureTypes.add(FeatureType.CDS);
 //        featureTypes.add(FeatureType.EXON);
 //        featureTypes.add(FeatureType.MIRNA);
-        SnpTranslator snpTranslator = new SnpTranslator(featuresFound, new PersistantChromosome(1, 1, 1, "genome", 1));
+        SnpTranslator snpTranslator = new SnpTranslator(featuresFound, 
+                new PersistantChromosome(1, 1, 1, "genome", 1), 
+                new PersistantReference(1, "test", "test", null, new File("")));
         for (Snp snp : snps){
             snpTranslator.checkForFeature(snp);
         }

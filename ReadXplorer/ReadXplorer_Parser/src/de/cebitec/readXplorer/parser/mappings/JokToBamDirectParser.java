@@ -53,13 +53,13 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
     
     
     @Override
-    public Object parseInput(TrackJob trackJob, Map<String, String> chromSeqMap) throws ParsingException, OutOfMemoryError {
+    public Object parseInput(TrackJob trackJob, Map<String, Integer> chromLengthMap) throws ParsingException, OutOfMemoryError {
         
         this.preprocessData(trackJob);
         
         //parse the newly converted bam file
         bamParser.registerObserver(this);
-        DirectAccessDataContainer trackData = bamParser.parseInput(trackJob, chromSeqMap);
+        DirectAccessDataContainer trackData = bamParser.parseInput(trackJob, chromLengthMap);
         bamParser.removeObserver(this);
         
         return trackData;

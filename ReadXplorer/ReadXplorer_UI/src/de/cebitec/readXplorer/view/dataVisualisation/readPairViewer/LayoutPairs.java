@@ -40,10 +40,10 @@ public class LayoutPairs implements LayoutI {
         this.absStop = absStop;
         this.reverseLayers = new ArrayList<>();
         this.reverseBlockContainer = new BlockContainer();
+        this.exclusionList = exclusionList;
 
         this.createBlocks(readPairs);
         this.layoutBlocks(this.reverseLayers, this.reverseBlockContainer);
-        this.exclusionList = exclusionList;
     }
 
     /**
@@ -64,7 +64,7 @@ public class LayoutPairs implements LayoutI {
             //handle pairs
             while (pairIt.hasNext()) {
                 PersistantReadPair pair = pairIt.next();
-                containsVisibleMapping = inExclusionList(pair.getVisibleMapping()) || inExclusionList(pair.getVisibleMapping2());
+                containsVisibleMapping = !inExclusionList(pair.getVisibleMapping()) || !inExclusionList(pair.getVisibleMapping2());
 
                 if (containsVisibleMapping) {
                     // get start position
@@ -164,19 +164,14 @@ public class LayoutPairs implements LayoutI {
     /**
      * Returns true if the type of the current mapping is in the exclusion list.
      * This means it should not be displayed.
-     *
      * @param m the mapping to test, if it should be displayed
      * @return true, if the mapping should be excluded from being displayed,
      * false otherwise
      */
     private boolean inExclusionList(PersistantMapping m) {
-        if ((m.getDifferences() == 0 && this.exclusionList.contains(FeatureType.PERFECT_COVERAGE))
+        return (m.getDifferences() == 0 && this.exclusionList.contains(FeatureType.PERFECT_COVERAGE))
                 || (m.getDifferences() > 0 && m.isBestMatch() && this.exclusionList.contains(FeatureType.BEST_MATCH_COVERAGE))
                 || (!m.isUnique() && this.exclusionList.contains(FeatureType.MULTIPLE_MAPPED_READ))
-                || (m.getDifferences() > 0 && !m.isBestMatch() && this.exclusionList.contains(FeatureType.COMMON_COVERAGE))) {
-            return true;
-        } else {
-            return false;
-        }
+                || (m.getDifferences() > 0 && !m.isBestMatch() && this.exclusionList.contains(FeatureType.COMMON_COVERAGE));
     }
 }

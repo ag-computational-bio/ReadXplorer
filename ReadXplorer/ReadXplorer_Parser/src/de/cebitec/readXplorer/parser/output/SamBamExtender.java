@@ -4,14 +4,26 @@ import de.cebitec.readXplorer.parser.TrackJob;
 import de.cebitec.readXplorer.parser.common.ParsedClassification;
 import de.cebitec.readXplorer.parser.common.ParserI;
 import de.cebitec.readXplorer.parser.common.ParsingException;
+import de.cebitec.readXplorer.parser.common.RefSeqFetcher;
 import de.cebitec.readXplorer.parser.mappings.CommonsMappingParser;
-import de.cebitec.readXplorer.util.*;
+import de.cebitec.readXplorer.util.ErrorLimit;
+import de.cebitec.readXplorer.util.MessageSenderI;
+import de.cebitec.readXplorer.util.Observable;
+import de.cebitec.readXplorer.util.Observer;
+import de.cebitec.readXplorer.util.Pair;
+import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readXplorer.util.SamUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import net.sf.samtools.*;
+import net.sf.samtools.SAMFileHeader;
+import net.sf.samtools.SAMFileReader;
+import net.sf.samtools.SAMFileWriter;
+import net.sf.samtools.SAMFormatException;
+import net.sf.samtools.SAMRecord;
+import net.sf.samtools.SAMRecordIterator;
 import net.sf.samtools.util.RuntimeEOFException;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
@@ -31,8 +43,9 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
     private static String[] fileExtension = new String[]{"bam", "BAM", "Bam", "sam", "SAM", "Sam"};
     private static String fileDescription = "SAM/BAM Input, extended SAM/BAM Output";
     private List<Observer> observers;
-    private Map<String, String> chromSeqMap;
+    private Map<String, Integer> chromLengthMap;
     private ErrorLimit errorLimit;
+    private RefSeqFetcher refSeqFetcher;
 
     /**
      * Extends a SAM/BAM file !!sorted by read sequence!! with ReadXplorer
@@ -58,16 +71,16 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
     }
 
     /**
-     * A SamBamExtender needs exactly two arguments:
+     * @param data A SamBamExtender needs exactly two arguments:
      * - trackJob the track job including a sam or bam file for
      * extension with more data.
-     * - chromSeqMap mapping of chromosome names to their chromosome sequences
+     * - chromLengthMap mapping of chromosome names to their length
      */
     @Override
     @SuppressWarnings("unchecked")
     public void setDataToConvert(Object... data) {
         this.observers = new ArrayList<>();
-        this.chromSeqMap = new HashMap<>();
+        this.chromLengthMap = new HashMap<>();
         boolean works = true;
         if (data.length >= 2) {
             if (data[0] instanceof TrackJob) {
@@ -75,8 +88,8 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
             } else {
                 works = false;
             }
-            if (this.chromSeqMap.getClass().equals(data[1].getClass())) {
-                this.chromSeqMap = (Map<String, String>) data[1];
+            if (this.chromLengthMap.getClass().equals(data[1].getClass())) {
+                this.chromLengthMap = (Map<String, Integer>) data[1];
             } else {
                 works = false;
             }
@@ -101,6 +114,7 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
         SAMFileWriter samBamFileWriter;
 
         try (SAMFileReader samBamReader = new SAMFileReader(fileToExtend)) {
+            this.refSeqFetcher = new RefSeqFetcher(trackJob.getRefGen().getFile(), this);
 
             samBamReader.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
             SAMRecordIterator samBamItor = samBamReader.iterator();
@@ -128,18 +142,18 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
 
                 try {
                     record = samBamItor.next();
-                    if (!record.getReadUnmappedFlag() && chromSeqMap.containsKey(record.getReferenceName())) {
+                    if (!record.getReadUnmappedFlag() && chromLengthMap.containsKey(record.getReferenceName())) {
                         cigar = record.getCigarString();
                         readSeq = record.getReadString();
                         start = record.getAlignmentStart();
                         stop = record.getAlignmentEnd();
 
-                        if (!CommonsMappingParser.checkReadSam(this, readSeq, chromSeqMap.get(record.getReferenceName()).length(), 
+                        if (!CommonsMappingParser.checkReadSam(this, readSeq, chromLengthMap.get(record.getReferenceName()), 
                                 cigar, start, stop, fileToExtend.getName(), lineno)) {
                             continue; //continue, and ignore read, if it contains inconsistent information
                         }
                         
-                        refSeq = chromSeqMap.get(record.getReferenceName()).substring(start - 1, stop);
+                        refSeq = refSeqFetcher.getSubSequence(record.getReferenceName(), start, stop);
                         
                         //count differences to reference
                         differences = CommonsMappingParser.countDiffsAndGaps(cigar, readSeq, refSeq, record.getReadNegativeStrandFlag());
@@ -157,6 +171,8 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
                     if (!e.getMessage().contains("MAPQ should be 0")) {
                         this.notifyObservers(e.getMessage());
                     } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
+                } catch (AssertionError e) {
+                    this.notifyObservers(e.getMessage());
                 } catch (Exception e) {
                     this.notifyObservers(e.getMessage());
                     Exceptions.printStackTrace(e);

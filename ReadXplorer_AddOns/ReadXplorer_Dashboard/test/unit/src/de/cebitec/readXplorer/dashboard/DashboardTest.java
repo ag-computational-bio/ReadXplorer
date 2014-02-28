@@ -4,12 +4,12 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,7 +17,10 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import org.junit.After;
 import org.junit.AfterClass;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -49,9 +52,9 @@ public class DashboardTest {
     
     @Test
     public void testEquals() {
-        PersistantReference r1 = new PersistantReference(1, "", "", new Timestamp(111111111));
-        PersistantReference r2 = new PersistantReference(1, "", "", new Timestamp(111111111));
-        PersistantReference r3 = new PersistantReference(2, "", "", new Timestamp(111111111));
+        PersistantReference r1 = new PersistantReference(1, "", "", new Timestamp(111111111), new File(""));
+        PersistantReference r2 = new PersistantReference(1, "", "", new Timestamp(111111111), new File(""));
+        PersistantReference r3 = new PersistantReference(2, "", "", new Timestamp(111111111), new File(""));
         assertTrue(r1.equals(r2));
         assertFalse(r1.equals(r3));
         
@@ -73,9 +76,9 @@ public class DashboardTest {
     
     @Test
     public void testMap2() {
-        Hashtable<PersistantReference, List<PersistantTrack>> tracks_by_reference = new Hashtable<>();
-        PersistantReference r1 = new PersistantReference(1, "", "", new Timestamp(111111111));
-        PersistantReference r2 = new PersistantReference(1, "", "", new Timestamp(111111111));
+        HashMap<PersistantReference, List<PersistantTrack>> tracks_by_reference = new HashMap<>();
+        PersistantReference r1 = new PersistantReference(1, "", "", new Timestamp(111111111), new File(""));
+        PersistantReference r2 = new PersistantReference(1, "", "", new Timestamp(111111111), new File(""));
         List<PersistantTrack> list = new ArrayList<>();
         tracks_by_reference.put(r1, list);
         assertNotNull(tracks_by_reference.get(r2));

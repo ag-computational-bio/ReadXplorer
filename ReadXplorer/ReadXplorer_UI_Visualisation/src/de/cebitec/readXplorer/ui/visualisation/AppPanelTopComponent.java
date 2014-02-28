@@ -12,16 +12,9 @@ import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceVi
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.MultipleTrackViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -31,61 +24,66 @@ import java.util.Iterator;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JFileChooser;
+import static javax.swing.Action.NAME;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import org.apache.batik.dom.GenericDOMImplementation;
-import org.apache.batik.svggen.SVGGraphics2D;
-import org.apache.batik.svggen.SVGGraphics2DIOException;
 import org.netbeans.api.settings.ConvertAsProperties;
-import org.openide.util.Exceptions;
+import org.openide.awt.ActionID;
+import org.openide.awt.ActionReference;
 import org.openide.util.Lookup;
-import org.openide.util.NbBundle;
+import org.openide.util.NbBundle.Messages;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
-import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Document;
 
 /**
- * Top component which displays the main work area of ReadXplorer, which contains the
- * reference and track viewers.
+ * Top component which displays something.
  */
-@ConvertAsProperties(dtd = "-//de.cebitec.readXplorer.view//AppPanel//EN", autostore = false)
+@ConvertAsProperties(
+        dtd = "-//de.cebitec.readXplorer.ui.visualisation//AppPanel//EN",
+        autostore = false
+)
+@TopComponent.Description(
+        preferredID = "AppPanelTopComponent",
+        //iconBase="SET/PATH/TO/ICON/HERE", 
+        persistenceType = TopComponent.PERSISTENCE_ALWAYS
+)
+@TopComponent.Registration(mode = "editor", openAtStartup = false)
+@ActionID(category = "Window", id = "de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent")
+@ActionReference(path = "Menu/Window" /*, position = 333 */)
+@TopComponent.OpenActionRegistration(
+        displayName = "#CTL_AppPanelAction",
+        preferredID = "AppPanelTopComponent"
+)
+@Messages({
+    "CTL_AppPanelAction=AppPanel",
+    "CTL_AppPanelTopComponent=AppPanel Window",
+    "HINT_AppPanelTopComponent=This is a AppPanel window"
+})
 public final class AppPanelTopComponent extends TopComponentExtended implements ApplicationFrameI {
-
-    private static AppPanelTopComponent instance;
-    /**
-     * path to the icon used by the component and its open action
-     */
-//    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
-    private static final String PREFERRED_ID = "AppPanelTopComponent";
     private static final long serialVersionUID = 1L;
+    private static final String PREFERRED_ID = "AppPanelTopComponent";
+    
+    private static AppPanelTopComponent instance;
     private InstanceContent content = new InstanceContent();
     private Lookup localLookup;
     private ReferenceViewer referenceViewer;
     private ArrayList<TrackViewer> trackViewerList;
     private JScrollPane trackScrollPane;
     private JPanel tracksPanel;
-
-    /**
-     * Top component which displays the main work area of ReadXplorer, which contains
-     * the reference and track viewers.
-     */
+    
     public AppPanelTopComponent() {
         initComponents();
-        Snapshot.setVisible(false);
-        setName(NbBundle.getMessage(AppPanelTopComponent.class, "CTL_AppPanelTopComponent"));
-        setToolTipText(NbBundle.getMessage(AppPanelTopComponent.class, "HINT_AppPanelTopComponent"));
-//        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
+        setName(Bundle.CTL_AppPanelTopComponent());
+        setToolTipText(Bundle.HINT_AppPanelTopComponent());
         localLookup = new AbstractLookup(content);
         associateLookup(localLookup);
         this.trackViewerList = new ArrayList<>();
         this.tracksPanel = new JPanel();
         this.tracksPanel.setLayout(new javax.swing.BoxLayout(tracksPanel, javax.swing.BoxLayout.PAGE_AXIS));
     }
-
+    
     /**
      * Removes all cookies which are contained in TopComponent.getLookup().
      */
@@ -106,54 +104,24 @@ public final class AppPanelTopComponent extends TopComponentExtended implements 
     private void initComponents() {
 
         visualPanel = new javax.swing.JPanel();
-        Snapshot = new javax.swing.JButton();
 
         visualPanel.setLayout(new javax.swing.BoxLayout(visualPanel, javax.swing.BoxLayout.PAGE_AXIS));
-
-        org.openide.awt.Mnemonics.setLocalizedText(Snapshot, org.openide.util.NbBundle.getMessage(AppPanelTopComponent.class, "AppPanelTopComponent.Snapshot.text")); // NOI18N
-        Snapshot.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                SnapshotActionPerformed(evt);
-            }
-        });
-        visualPanel.add(Snapshot);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(visualPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 846, Short.MAX_VALUE)
+            .addComponent(visualPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(visualPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 546, Short.MAX_VALUE)
+            .addComponent(visualPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void SnapshotActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SnapshotActionPerformed
-        this.Snapshot.setVisible(false); 
-        DOMImplementation domImpl = GenericDOMImplementation.getDOMImplementation();
-        String svgNS = "http://www.w3.org/2000/svg";
-        Document document = domImpl.createDocument(svgNS, "svg", null);
-        SVGGraphics2D svgGenerator = new SVGGraphics2D(document);
-        this.paint(svgGenerator);
-        try {
-            JFileChooser chooser = new JFileChooser();
-            chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-            chooser.showSaveDialog(null);
-            OutputStream file = new FileOutputStream(chooser.getSelectedFile());
-            Writer out = new OutputStreamWriter(file, "UTF-8");
-            svgGenerator.stream(out, false);
-        } catch (UnsupportedEncodingException | SVGGraphics2DIOException | FileNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-        this.Snapshot.setVisible(true);
-    }//GEN-LAST:event_SnapshotActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton Snapshot;
     private javax.swing.JPanel visualPanel;
     // End of variables declaration//GEN-END:variables
-
     @Override
     public int getPersistenceType() {
         return TopComponent.PERSISTENCE_NEVER;
@@ -246,7 +214,6 @@ public final class AppPanelTopComponent extends TopComponentExtended implements 
     @Override
     public void showRefGenPanel(JPanel refGenPanel) {
         visualPanel.add(refGenPanel);
-        visualPanel.updateUI();
 
         WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComp").open();
         WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComp").open();
@@ -289,7 +256,6 @@ public final class AppPanelTopComponent extends TopComponentExtended implements 
 
         // add the trackPanel
         tracksPanel.add(trackPanel);
-        visualPanel.updateUI();
         this.referenceViewer.increaseTrackCount();
 
         // search for opened tracks, if there are none open the track statistics window
@@ -328,7 +294,6 @@ public final class AppPanelTopComponent extends TopComponentExtended implements 
     @Override
     public void closeTrackPanel(JPanel trackPanel) {
         tracksPanel.remove(trackPanel);
-        visualPanel.updateUI();
 
         // remove the panel's TrackViewer from lookup
         BasePanel bp = (BasePanel) trackPanel;
@@ -342,22 +307,22 @@ public final class AppPanelTopComponent extends TopComponentExtended implements 
         }
     }
 
-    /**
-     * Checks all components recursively for a JPanel and returns the first one
-     * found. If there is no JPanel among the components, null is returned.
-     * @param comps component array to check for a JPanel
-     * @return The first identified JPanel or null, if there is no JPanel
-     */
-    private Component getJPanel(Component[] comps) {
-        for (Component comp : comps) {
-            if (comp instanceof JPanel) {
-                return (JPanel) comp;
-            } else if (comp instanceof Container) {
-                return this.getJPanel(((Container) comp).getComponents());
-            }
-        }
-        return null;
-    }
+//    /**
+//     * Checks all components recursively for a JPanel and returns the first one
+//     * found. If there is no JPanel among the components, null is returned.
+//     * @param comps component array to check for a JPanel
+//     * @return The first identified JPanel or null, if there is no JPanel
+//     */
+//    private Component getJPanel(Component[] comps) {
+//        for (Component comp : comps) {
+//            if (comp instanceof JPanel) {
+//                return (JPanel) comp;
+//            } else if (comp instanceof Container) {
+//                return this.getJPanel(((Container) comp).getComponents());
+//            }
+//        }
+//        return null;
+//    }
 
     /*
      * Overriding these two methods ensures that only displayed components are updated
@@ -381,6 +346,7 @@ public final class AppPanelTopComponent extends TopComponentExtended implements 
 
     /**
      * Updates the status of all track viewers belonging to this top component.
+     *
      * @param isActive true, if track viewers should be active, false, if not.
      */
     private void changeActiveTrackStatus(boolean isActive) {

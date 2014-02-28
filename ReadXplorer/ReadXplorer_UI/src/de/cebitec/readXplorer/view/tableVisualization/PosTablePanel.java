@@ -3,6 +3,7 @@ package de.cebitec.readXplorer.view.tableVisualization;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.parser.tables.TableType;
 import de.cebitec.readXplorer.util.UneditableTableModel;
+import de.cebitec.readXplorer.view.tableVisualization.tableFilter.TableRightClickFilter;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -18,6 +19,7 @@ public class PosTablePanel extends TablePanel {
     private final UneditableTableModel tableData;
     private PersistantReference reference;
     private TableType tableType;
+    private TableRightClickFilter<UneditableTableModel> filterListener = new TableRightClickFilter<>(UneditableTableModel.class);
 
     /**
      * Creates a new position table panel. A position table starts with a column
@@ -28,6 +30,7 @@ public class PosTablePanel extends TablePanel {
         this.tableData = tableData;
         this.initComponents();
         this.initAdditionalComponents();
+        this.dataTable.getTableHeader().addMouseListener(filterListener);
     }
 
     /**

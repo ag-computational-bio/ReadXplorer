@@ -16,7 +16,10 @@ import de.cebitec.readXplorer.view.dialogMenus.ImportTrackBasePanel;
 import java.awt.Component;
 import java.io.File;
 import java.util.List;
-import javax.swing.*;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
 import org.openide.util.NbBundle;
 
 /**
@@ -32,12 +35,6 @@ public class NewTrackDialogPanel extends ImportTrackBasePanel implements NewJobD
     private final JokToBamDirectParser jokToBamDirectParser;
     private final SamBamDirectParser samBamDirectParser;
     private MappingParserI[] parsers;
-    
-    private int stepSize = 0;
-    private static final int maxVal = 1000000000;
-    private static final int minVal = 10000;
-    private static final int step = 1000;
-    private static final int defaultVal = 300000;
 
     /** 
      * Panel displaying the options for importing new tracks into ReadXplorer. 
@@ -204,7 +201,7 @@ public class NewTrackDialogPanel extends ImportTrackBasePanel implements NewJobD
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(multipleImportCheckBox)
                                     .addComponent(alreadyImportedBox))
-                                .addGap(0, 77, Short.MAX_VALUE)))))
+                                .addGap(0, 0, Short.MAX_VALUE)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(

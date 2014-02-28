@@ -1,16 +1,22 @@
 package de.cebitec.readXplorer.parser.reference;
 
+import de.cebitec.common.parser.ConverterI;
+import de.cebitec.common.parser.embl.parsers.EmblSequenceToFastaConverterParser;
+import de.cebitec.common.parser.genbank.parsers.GenbankSequenceToFastaConverterParser;
 import de.cebitec.readXplorer.parser.ReferenceJob;
 import de.cebitec.readXplorer.parser.common.ParsedChromosome;
 import de.cebitec.readXplorer.parser.common.ParsedFeature;
 import de.cebitec.readXplorer.parser.common.ParsedReference;
 import de.cebitec.readXplorer.parser.common.ParsingException;
 import de.cebitec.readXplorer.parser.reference.Filter.FeatureFilter;
+import de.cebitec.readXplorer.util.FastaUtils;
 import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,13 +31,13 @@ import javax.swing.JPanel;
 import org.biojava.bio.BioException;
 import org.biojava.bio.seq.DNATools;
 import org.biojava.bio.seq.Feature;
+import org.biojava.bio.seq.StrandedFeature;
 import org.biojava.bio.seq.io.SymbolTokenization;
 import org.biojava.bio.symbol.Location;
 import org.biojavax.Namespace;
 import org.biojavax.Note;
 import org.biojavax.RichObjectFactory;
 import org.biojavax.bio.seq.RichFeature;
-import org.biojavax.bio.seq.RichLocation;
 import org.biojavax.bio.seq.RichSequence;
 import org.biojavax.bio.seq.io.EMBLFormat;
 import org.biojavax.bio.seq.io.GenbankFormat;
@@ -47,17 +53,13 @@ import org.biojavax.bio.seq.io.RichStreamReader;
  */
 public class BioJavaParser implements ReferenceParserI {
 
-    /**
-     * Use this for initializing an embl parser.
-     */
+    /** Use this for initializing an embl parser. */
     public static final int EMBL = 1;
-    /**
-     * Use this for initializing a genbank parser.
-     */
+    /** Use this for initializing a genbank parser. */
     public static final int GENBANK = 2;
     // File extension used by Filechooser to choose files to be parsed by this parser
-    private static final String[] fileExtensionEmbl = new String[]{"embl"};
-    private static final String[] fileExtensionGbk = new String[]{"gbk", "gb", "genbank"};
+    private static final String[] fileExtensionEmbl = new String[]{"embl", "EMBL"};
+    private static final String[] fileExtensionGbk = new String[]{"gbk", "gb", "genbank", "GBK", "GB", "GENBANK"};
     // name of this parser for use in ComboBoxes
     private static final String parserNameEmbl = "EMBL file";
     private static final String parserNameGbk = "GenBank file";
@@ -68,7 +70,6 @@ public class BioJavaParser implements ReferenceParserI {
     private String fileDescription;
     private final RichSequenceFormat seqFormat;
     private ArrayList<Observer> observers = new ArrayList<>();
-    private String errorMsg;
 
     /**
      * A biojava parser can be initialized to parse embl or genbank files and
@@ -84,7 +85,7 @@ public class BioJavaParser implements ReferenceParserI {
             this.parserName = parserNameEmbl;
             this.fileDescription = fileDescriptionEmbl;
             this.seqFormat = new EMBLFormat();
-
+            
         } else { //for your info: if (type == BioJavaParser.GENBANK){
             this.fileExtension = fileExtensionGbk;
             this.parserName = parserNameGbk;
@@ -100,7 +101,7 @@ public class BioJavaParser implements ReferenceParserI {
 
         ParsedReference refGenome = new ParsedReference();
         refGenome.setFeatureFilter(filter);
-        //at first store all eonxs in one data structure and add them to the ref genome at the end
+        //at first store all exons in one data structure and add them to the ref genome at the end
         Map<FeatureType, List<ParsedFeature>> featMap = new HashMap<>();
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start reading file  \"{0}\"", refGenJob.getFile());
@@ -140,14 +141,34 @@ public class BioJavaParser implements ReferenceParserI {
             String[] posArray;
             ParsedFeature currentFeature;
             ParsedChromosome chrom;
+            
+            //Convert Genbank and EMBL to indexed fasta
+            this.notifyObservers("Converting " + refGenJob.getFile() + " into indexed fasta...");
+            Path fastaPath = new File(refGenJob.getFile().getAbsolutePath() + ".fasta").toPath();
+            ConverterI seqConverter;
+            if (seqFormat instanceof EMBLFormat) {
+                seqConverter = EmblSequenceToFastaConverterParser.fileConverter(refGenJob.getFile().toPath(), fastaPath);
+            } else {
+                seqConverter = GenbankSequenceToFastaConverterParser.fileConverter(refGenJob.getFile().toPath(), fastaPath);
+            }
+            seqConverter.convert();
+            seqConverter.close();
+            this.notifyObservers("Creating fasta index " + refGenJob.getFile() + ".fai...");
+            FastaUtils fastaUtils = new FastaUtils();
+            File file = fastaPath.toFile();
+            fastaUtils.indexFasta(file, this.observers);
+            refGenome.setFastaFile(file);
+            this.notifyObservers("Finished creating fasta index.");
+            this.notifyObservers("Finished conversion into indexed fasta.");
 
+            //Store features in DB
             while (seqIter.hasNext()) {
                 try {
                     chrom = new ParsedChromosome();
                     seq = seqIter.nextRichSequence();
                     chrom.setName(seq.getName());
-                    chrom.setSequence(seq.seqString());
-
+                    chrom.setChromLength(seq.length());
+                    
                     // iterate through all features
                     featIt = seq.getFeatureSet().iterator();
                     while (featIt.hasNext()) {
@@ -166,14 +187,14 @@ public class BioJavaParser implements ReferenceParserI {
                         start = location.getMin();
                         stop = location.getMax();
                         if (start >= stop) {
-                            this.sendErrorMsg("Start bigger than stop in " + refGenJob.getFile().getAbsolutePath()
+                            this.notifyObservers("Start bigger than stop in " + refGenJob.getFile().getAbsolutePath()
                                     + ". Found start: " + start + ", stop: " + stop + ". Feature ignored.");
                             continue;
                         }
                         try {
-                            strand = this.determineStrand(feature, refGenJob);
+                            strand = feature.getStrand().equals(StrandedFeature.POSITIVE) ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV;
                         } catch (IllegalStateException e) {
-                            this.sendErrorMsg(e.getMessage());
+                            this.notifyObservers(e.getMessage());
                             continue;
                         }
 
@@ -205,7 +226,7 @@ public class BioJavaParser implements ReferenceParserI {
                          */
                         FeatureType type = FeatureType.getFeatureType(parsedType);
                         if (type == FeatureType.UNDEFINED) {
-                            this.sendErrorMsg(refGenJob.getFile().getName()
+                            this.notifyObservers(refGenJob.getFile().getName()
                                     + ": Using unknown feature type for " + parsedType);
                         }
 
@@ -230,12 +251,11 @@ public class BioJavaParser implements ReferenceParserI {
 //                            subFeatures.add(new ParsedFeature(type, subStart, subStop, strand,
 //                                    locusTag, product, ecNumber, geneName, new ArrayList<ParsedFeature>(), null));
 //                        }
-
                         if (location.toString().contains("join")) {
                             subFeatureIter = location.blockIterator();
                             while (subFeatureIter.hasNext()) {
 
-                                pos = subFeatureIter.next().toString();
+                                pos = subFeatureIter.next().toString(); //TODO: check if handling here is correct
                                 //array always contains at least 2 entries
                                 posArray = pos.split("\\..");
                                 subStart = Integer.parseInt(posArray[0]);
@@ -259,12 +279,12 @@ public class BioJavaParser implements ReferenceParserI {
                     refGenome.addChromosome(chrom);
 
                 } catch (BioException | NoSuchElementException e) {
-                    JOptionPane.showMessageDialog(new JPanel(), "One of the imported chromosomes does not contain any sequence data!",
+                    JOptionPane.showMessageDialog(new JPanel(), "One of the imported chromosomes does not contain any sequence data or is in corrupted format!",
                             "Chromosome Parsing Error", JOptionPane.ERROR_MESSAGE);
-                    continue;
+                    break; //Sadly the iterator does not continue with next element, but ends up in infinite loop otherwise
+                }
             }
-            }
-
+            
         } catch (Exception ex) {
             throw new ParsingException(ex);
         }
@@ -364,31 +384,6 @@ public class BioJavaParser implements ReferenceParserI {
         return mergedList;
     }
 
-    /**
-     * Determines the strand of a feature.
-     *
-     * @param feature the feature whose strand is needed
-     * @param refGenJob the reference genome job this feature belongs to
-     * @return SequenceUtils.STRAND_REV (-1), SequenceUtils.STRAND_FWD (1) or 0,
-     * if the strand cannot be determined
-     */
-    private int determineStrand(RichFeature feature, ReferenceJob refGenJob) throws IllegalStateException {
-        String strandString = RichLocation.Tools.enrich(feature.getLocation()).getStrand().toString();
-        int strand = 0;
-        switch (strandString) {
-            case "-":
-                strand = SequenceUtils.STRAND_REV;
-                break;
-            case "+":
-                strand = SequenceUtils.STRAND_FWD;
-                break;
-            default:
-                throw new IllegalStateException(refGenJob.getFile().getAbsolutePath()
-                        + ": Unknown strand found: " + strandString + ". Feature ignored.");
-        }
-        return strand;
-    }
-
     @Override
     public String getName() {
         return parserName;
@@ -417,17 +412,7 @@ public class BioJavaParser implements ReferenceParserI {
     @Override
     public void notifyObservers(Object data) {
         for (Observer observer : this.observers) {
-            observer.update(this.errorMsg);
+            observer.update(data);
         }
-    }
-
-    /**
-     * Method setting and sending the error msg to all observers.
-     *
-     * @param errorMsg the error msg to send
-     */
-    private void sendErrorMsg(final String errorMsg) {
-        this.errorMsg = errorMsg;
-        this.notifyObservers(null);
     }
 }

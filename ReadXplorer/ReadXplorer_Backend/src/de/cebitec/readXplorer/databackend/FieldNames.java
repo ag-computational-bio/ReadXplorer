@@ -14,21 +14,21 @@ public class FieldNames {
 
     // names for various database tables
     public static final String TABLE_PROJECT_FOLDER = "PROJECT_FOLDER";
-    public final static String TABLE_REFERENCE = "REFERENCE";
-    public final static String TABLE_CHROMOSOME = "CHROMOSOME";
-    public final static String TABLE_DIFF = "DIFF";
-    public final static String TABLE_COVERAGE = "COVERAGE";
-    public final static String TABLE_FEATURES = "FEATURE";
-    public final static String TABLE_MAPPING = "MAPPING";
-    public final static String TABLE_TRACK = "TRACK";
+    public static final String TABLE_REFERENCE = "REFERENCE";
+    public static final String TABLE_CHROMOSOME = "CHROMOSOME";
+    public static final String TABLE_DIFF = "DIFF";
+    public static final String TABLE_COVERAGE = "COVERAGE";
+    public static final String TABLE_FEATURES = "FEATURE";
+    public static final String TABLE_MAPPING = "MAPPING";
+    public static final String TABLE_TRACK = "TRACK";
     public static final String TABLE_SEQ_PAIRS = "SEQ_PAIRS";
     public static final String TABLE_SEQ_PAIR_PIVOT = "SEQ_PAIR_PIVOT";
     public static final String TABLE_SEQ_PAIR_REPLICATES = "SEQ_PAIR_REPLICATES";
-    public final static String TABLE_POSITIONS = "POSITIONS";
-    public final static String TABLE_STATISTICS = "STATISTICS";  
-    public final static String TABLE_COUNT_DISTRIBUTION = "COUNT_DISTRIBUTION";
-    public final static String TABLE_OBJECTCACHE = "OBJECT_CACHE"; 
-    public final static String TABLE_DB_VERSION = "DB_VERSION"; 
+    public static final String TABLE_POSITIONS = "POSITIONS";
+    public static final String TABLE_STATISTICS = "STATISTICS";  
+    public static final String TABLE_COUNT_DISTRIBUTION = "COUNT_DISTRIBUTION";
+    public static final String TABLE_OBJECTCACHE = "OBJECT_CACHE"; 
+    public static final String TABLE_DB_VERSION = "DB_VERSION"; 
     
     
     ////////////////////////  tables fields  //////////////////////////////// 
@@ -37,83 +37,83 @@ public class FieldNames {
 //    public static final String PROJECT_FOLDER_PATH = "PATH";
     
     // position table fields
-    public final static String POSITIONS_SNP_ID = "ID";
-    public final static String POSITIONS_TRACK_ID = "TRACK_ID";
-    public final static String POSITIONS_POSITION = "POSITION";
-    public final static String POSITIONS_BASE = "BASE";
-    public final static String POSITIONS_REFERENCE_BASE = "REFERENCE_BASE";
-    public final static String POSITIONS_A = "A";
-    public final static String POSITIONS_C = "C";
-    public final static String POSITIONS_G = "G";
-    public final static String POSITIONS_T = "T";
-    public final static String POSITIONS_N = "N";
-    public final static String POSITIONS_GAP = "_";
-    public final static String POSITIONS_COVERAGE = "COVERAGE";
-    public final static String POSITIONS_FREQUENCY = "FREQUENCY";
-    public final static String POSITIONS_TYPE = "TYPE";
+    public static final String POSITIONS_SNP_ID = "ID";
+    public static final String POSITIONS_TRACK_ID = "TRACK_ID";
+    public static final String POSITIONS_POSITION = "POSITION";
+    public static final String POSITIONS_BASE = "BASE";
+    public static final String POSITIONS_REFERENCE_BASE = "REFERENCE_BASE";
+    public static final String POSITIONS_A = "A";
+    public static final String POSITIONS_C = "C";
+    public static final String POSITIONS_G = "G";
+    public static final String POSITIONS_T = "T";
+    public static final String POSITIONS_N = "N";
+    public static final String POSITIONS_GAP = "_";
+    public static final String POSITIONS_COVERAGE = "COVERAGE";
+    public static final String POSITIONS_FREQUENCY = "FREQUENCY";
+    public static final String POSITIONS_TYPE = "TYPE";
     
     // reference genome table fields
-    public final static String REF_GEN_ID ="ID";
-    public final static String REF_GEN_NAME = "NAME";
-    public final static String REF_GEN_DESCRIPTION = "DESCRIPTION";
-    public final static String REF_GEN_SEQUENCE = "SEQUENCE"; //still needed for old DBs...
-    public final static String REF_GEN_TIMESTAMP = "CREATIONTIME";
+    public static final String REF_GEN_ID ="ID";
+    public static final String REF_GEN_NAME = "NAME";
+    public static final String REF_GEN_DESCRIPTION = "DESCRIPTION";
+    public static final String REF_GEN_SEQUENCE = "SEQUENCE"; //still needed for old DBs...
+    public static final String REF_GEN_TIMESTAMP = "CREATIONTIME";
+    public static final String REF_GEN_FASTA_FILE = "FASTAFILE";
 
     // chromosome table fields
-    public final static String CHROM_ID = "ID";
-    public final static String CHROM_NUMBER = "NUMBER";
-    public final static String CHROM_REFERENCE_ID = "REFERENCE_ID";
-    public final static String CHROM_NAME = "NAME";
-    public final static String CHROM_LENGTH = "LENGTH";
-    public final static String CHROM_SEQUENCE = "SEQUENCE";
+    public static final String CHROM_ID = "ID";
+    public static final String CHROM_NUMBER = "NUMBER";
+    public static final String CHROM_REFERENCE_ID = "REFERENCE_ID";
+    public static final String CHROM_NAME = "NAME";
+    public static final String CHROM_LENGTH = "LENGTH";
 
     // diff table fields
-    public final static String DIFF_ID = "ID";
-    public final static String DIFF_MAPPING_ID = "MAPPING_ID";
-    public final static String DIFF_POSITION = "POSITION";
-    public final static String DIFF_BASE = "BASE";
-    public final static String DIFF_TYPE = "TYPE";
-    public final static String DIFF_GAP_ORDER = "GAP_ORDER";
-    public final static String DIFF_SNP_ID = "SNP_ID";
+    public static final String DIFF_ID = "ID";
+    public static final String DIFF_MAPPING_ID = "MAPPING_ID";
+    public static final String DIFF_POSITION = "POSITION";
+    public static final String DIFF_BASE = "BASE";
+    public static final String DIFF_TYPE = "TYPE";
+    public static final String DIFF_GAP_ORDER = "GAP_ORDER";
+    public static final String DIFF_SNP_ID = "SNP_ID";
 
     
     // objectcache table fields
-    public final static String OBJECTCACHE_ID = "ID";
-    public final static String OBJECTCACHE_FAMILY = "FAMILY";
-    public final static String OBJECTCACHE_KEY = "KEY";
-    public final static String OBJECTCACHE_DATA = "DATA";
+    public static final String OBJECTCACHE_ID = "ID";
+    public static final String OBJECTCACHE_FAMILY = "FAMILY";
+    public static final String OBJECTCACHE_KEY = "KEY";
+    public static final String OBJECTCACHE_DATA = "DATA";
     
     // coverage table fields
-    public final static String COVERAGE_ID = "ID";
-    public final static String COVERAGE_TRACK = "TRACK_ID";
-    public final static String COVERAGE_POSITION = "POSITION";
-    public final static String COVERAGE_BM_FW_MULT =    "BEST_MATCH_FORWARD_REDUNDANT";
-    public final static String COVERAGE_BM_FW_NUM =     "BEST_MATCH_FORWARD_NON_REDUNDANT"; //NON_REDUNDANT is what you want!
-    public final static String COVERAGE_BM_RV_MULT =    "BEST_MATCH_REVERSE_REDUNDANT"; //check if this is needed anyway
-    public final static String COVERAGE_BM_RV_NUM =     "BEST_MATCH_REVERSE_NON_REDUNDANT";
-    public final static String COVERAGE_ZERO_FW_MULT =  "PERFECT_MATCH_FORWARD_REDUNDANT";
-    public final static String COVERAGE_ZERO_FW_NUM =   "PERFECT_MATCH_FORWARD_NON_REDUNDANT";
-    public final static String COVERAGE_ZERO_RV_MULT =  "PERFECT_MATCH_REVERSE_REDUNDANT";
-    public final static String COVERAGE_ZERO_RV_NUM =   "PERFECT_MATCH_REVERSE_NON_REDUNDANT";
-    public final static String COVERAGE_N_FW_MULT =     "COMPLETE_FORWARD_REDUNDANT";
-    public final static String COVERAGE_N_FW_NUM =      "COMPLETE_FORWARD_NON_REDUNDANT";
-    public final static String COVERAGE_N_RV_MULT =     "COMPLETE_REVERSE_REDUNDANT";
-    public final static String COVERAGE_N_RV_NUM =      "COMPLETE_REVERSE_NON_REDUNDANT";
+    public static final String COVERAGE_ID = "ID";
+    public static final String COVERAGE_TRACK = "TRACK_ID";
+    public static final String COVERAGE_POSITION = "POSITION";
+    public static final String COVERAGE_BM_FW_MULT =    "BEST_MATCH_FORWARD_REDUNDANT";
+    public static final String COVERAGE_BM_FW_NUM =     "BEST_MATCH_FORWARD_NON_REDUNDANT"; //NON_REDUNDANT is what you want!
+    public static final String COVERAGE_BM_RV_MULT =    "BEST_MATCH_REVERSE_REDUNDANT"; //check if this is needed anyway
+    public static final String COVERAGE_BM_RV_NUM =     "BEST_MATCH_REVERSE_NON_REDUNDANT";
+    public static final String COVERAGE_ZERO_FW_MULT =  "PERFECT_MATCH_FORWARD_REDUNDANT";
+    public static final String COVERAGE_ZERO_FW_NUM =   "PERFECT_MATCH_FORWARD_NON_REDUNDANT";
+    public static final String COVERAGE_ZERO_RV_MULT =  "PERFECT_MATCH_REVERSE_REDUNDANT";
+    public static final String COVERAGE_ZERO_RV_NUM =   "PERFECT_MATCH_REVERSE_NON_REDUNDANT";
+    public static final String COVERAGE_N_FW_MULT =     "COMPLETE_FORWARD_REDUNDANT";
+    public static final String COVERAGE_N_FW_NUM =      "COMPLETE_FORWARD_NON_REDUNDANT";
+    public static final String COVERAGE_N_RV_MULT =     "COMPLETE_REVERSE_REDUNDANT";
+    public static final String COVERAGE_N_RV_NUM =      "COMPLETE_REVERSE_NON_REDUNDANT";
 
-    public final static String COVERAGE_N_FW_MULT_TRACK_1 =     "COMPLETE_FORWARD_REDUNDANT_TRACK_1";
-    public final static String COVERAGE_N_FW_NUM_TRACK_1 =      "COMPLETE_FORWARD_NON_REDUNDANT_TRACK_1";
-    public final static String COVERAGE_N_RV_MULT_TRACK_1 =     "COMPLETE_REVERSE_REDUNDANT_TRACK_1";
-    public final static String COVERAGE_N_RV_NUM_TRACK_1 =      "COMPLETE_REVERSE_NON_REDUNDANT_TRACK_1";
+    public static final String COVERAGE_N_FW_MULT_TRACK_1 =     "COMPLETE_FORWARD_REDUNDANT_TRACK_1";
+    public static final String COVERAGE_N_FW_NUM_TRACK_1 =      "COMPLETE_FORWARD_NON_REDUNDANT_TRACK_1";
+    public static final String COVERAGE_N_RV_MULT_TRACK_1 =     "COMPLETE_REVERSE_REDUNDANT_TRACK_1";
+    public static final String COVERAGE_N_RV_NUM_TRACK_1 =      "COMPLETE_REVERSE_NON_REDUNDANT_TRACK_1";
 
-    public final static String COVERAGE_N_FW_MULT_TRACK_2 =     "COMPLETE_FORWARD_REDUNDANT_TRACK_2";
-    public final static String COVERAGE_N_FW_NUM_TRACK_2 =      "COMPLETE_FORWARD_NON_REDUNDANT_TRACK_2";
-    public final static String COVERAGE_N_RV_MULT_TRACK_2 =     "COMPLETE_REVERSE_REDUNDANT_TRACK_2";
-    public final static String COVERAGE_N_RV_NUM_TRACK_2 =      "COMPLETE_REVERSE_NON_REDUNDANT_TRACK_2";
-    public final static String COVERAGE_N_MULT =                "COMPLETE_REDUNDANT_TRACK";
-    public final static String COVERAGE_N_FW_MULT_TRACK_DIFF =     "COMPLETE_FORWARD_REDUNDANT_TRACK_DIFF";
-    public final static String COVERAGE_N_FW_NUM_TRACK_DIFF =      "COMPLETE_FORWARD_NON_REDUNDANT_DIFF";
-    public final static String COVERAGE_N_RV_MULT_TRACK_DIFF =     "COMPLETE_REVERSE_REDUNDANT__DIFF";
-    public final static String COVERAGE_N_RV_NUM_TRACK_DIFF=      "COMPLETE_REVERSE_NON_REDUNDANT_DIFF";
+    public static final String COVERAGE_N_FW_MULT_TRACK_2 =     "COMPLETE_FORWARD_REDUNDANT_TRACK_2";
+    public static final String COVERAGE_N_FW_NUM_TRACK_2 =      "COMPLETE_FORWARD_NON_REDUNDANT_TRACK_2";
+    public static final String COVERAGE_N_RV_MULT_TRACK_2 =     "COMPLETE_REVERSE_REDUNDANT_TRACK_2";
+    public static final String COVERAGE_N_RV_NUM_TRACK_2 =      "COMPLETE_REVERSE_NON_REDUNDANT_TRACK_2";
+    public static final String COVERAGE_N_MULT =                "COMPLETE_REDUNDANT_TRACK";
+    public static final String COVERAGE_N_FW_MULT_TRACK_DIFF =     "COMPLETE_FORWARD_REDUNDANT_TRACK_DIFF";
+    public static final String COVERAGE_N_FW_NUM_TRACK_DIFF =      "COMPLETE_FORWARD_NON_REDUNDANT_DIFF";
+    public static final String COVERAGE_N_RV_MULT_TRACK_DIFF =     "COMPLETE_REVERSE_REDUNDANT__DIFF";
+    public static final String COVERAGE_N_RV_NUM_TRACK_DIFF=      "COMPLETE_REVERSE_NON_REDUNDANT_DIFF";
 
 
     //all feature table fields
@@ -133,23 +133,23 @@ public class FieldNames {
 
     
     // mapping table fields
-    public final static String MAPPING_ID = "ID";
-    public final static String MAPPING_SEQUENCE_ID = "SEQUENCE_ID";
-    public final static String MAPPING_START = "START";
-    public final static String MAPPING_STOP = "STOP";
-    public final static String MAPPING_NUM_OF_ERRORS = "NUM_OF_ERRORS";
-    public final static String MAPPING_IS_BEST_MAPPING = "IS_BEST_MAPPING";
-    public final static String MAPPING_DIRECTION = "DIRECTION";
-    public final static String MAPPING_NUM_OF_REPLICATES = "NUM_OF_REPLICATES";
-    public final static String MAPPING_TRACK = "TRACK_ID";
+    public static final String MAPPING_ID = "ID";
+    public static final String MAPPING_SEQUENCE_ID = "SEQUENCE_ID";
+    public static final String MAPPING_START = "START";
+    public static final String MAPPING_STOP = "STOP";
+    public static final String MAPPING_NUM_OF_ERRORS = "NUM_OF_ERRORS";
+    public static final String MAPPING_IS_BEST_MAPPING = "IS_BEST_MAPPING";
+    public static final String MAPPING_DIRECTION = "DIRECTION";
+    public static final String MAPPING_NUM_OF_REPLICATES = "NUM_OF_REPLICATES";
+    public static final String MAPPING_TRACK = "TRACK_ID";
 
     // track table fields
-    public final static String TRACK_ID = "ID";
-    public final static String TRACK_REFERENCE_ID = "REFERENCE_ID";
+    public static final String TRACK_ID = "ID";
+    public static final String TRACK_REFERENCE_ID = "REFERENCE_ID";
     public static final String TRACK_READ_PAIR_ID = "SEQUENCE_PAIR_ID";
-    public final static String TRACK_DESCRIPTION = "DESCRIPTION";
-    public final static String TRACK_TIMESTAMP = "CREATIONTIME";
-    public final static String TRACK_PATH = "PATH";
+    public static final String TRACK_DESCRIPTION = "DESCRIPTION";
+    public static final String TRACK_TIMESTAMP = "CREATIONTIME";
+    public static final String TRACK_PATH = "PATH";
     
     //paired data table fields (mate pairs and paired end data)
     public static final String SEQ_PAIR_ID = "ID";
@@ -159,7 +159,7 @@ public class FieldNames {
     public static final String SEQ_PAIR_TYPE = "TYPE";
     
     // paired data replicates table fields
-    public final static String SEQ_PAIR_REPLICATE_PAIR_ID = "PAIR_ID";
+    public static final String SEQ_PAIR_REPLICATE_PAIR_ID = "PAIR_ID";
     public static final String SEQ_PAIR_NUM_OF_REPLICATES = "NUM_OF_REPLICATES";
     
     //paired data to mapping connection table

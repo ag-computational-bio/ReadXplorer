@@ -3,7 +3,6 @@ package de.cebitec.readXplorer.ui.importer;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.StorageException;
-import de.cebitec.readXplorer.databackend.dataObjects.ChromosomeObserver;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.parser.ReadPairJobContainer;
 import de.cebitec.readXplorer.parser.ReferenceJob;
@@ -57,7 +56,6 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
     private int workunits;
     private boolean noErrors = true;
     private Map<String, Integer> chromLengthMap;
-    private Map<String, String> chromSeqMap;
 
     /**
      * THE thread in ReadXplorer for handling the import of data.
@@ -165,17 +163,12 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
      * @param trackJob The track job for which the chromosome sequences and
      * lengths are needed.
      */
-    private void setChromMaps(TrackJob trackJob) {
-        chromSeqMap = new HashMap<>();
+    private void setChromLengthMap(TrackJob trackJob) {
         chromLengthMap = new HashMap<>();
         int id = trackJob.getRefGen().getID();
         Map<Integer, PersistantChromosome> chromIdMap = ProjectConnector.getInstance().getRefGenomeConnector(id).getRefGenome().getChromosomes();
-        ChromosomeObserver chromObserver = new ChromosomeObserver();
         for (PersistantChromosome chrom : chromIdMap.values()) {
-            String seq = chrom.getSequence(chromObserver);
-            chromLengthMap.put(chrom.getName(), seq.length());
-            chromSeqMap.put(chrom.getName(), seq);
-            chrom.removeObserver(chromObserver); //tells the chromosome, that the sequence is not needed anymore
+            chromLengthMap.put(chrom.getName(), chrom.getLength());
         }
     }
     
@@ -188,10 +181,10 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
             
             for (Iterator<TrackJob> it = tracksJobs.iterator(); it.hasNext();) {
                 TrackJob trackJob = it.next();
-                ph.progress(workunits++);
-                                
-                    this.parseDirectAccessTrack(trackJob);
 
+                this.parseDirectAccessTrack(trackJob);
+
+                ph.progress(workunits++);
                 it.remove();
             }
         }
@@ -209,7 +202,6 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
             for (Iterator<ReadPairJobContainer> it = readPairJobs.iterator(); it.hasNext();) {
                 start = System.currentTimeMillis();
                 ReadPairJobContainer readPairJobContainer = it.next();
-                ph.progress(workunits++);
 
                 int distance = readPairJobContainer.getDistance();
                 if (distance > 0) {
@@ -237,7 +229,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                         TrackJob trackJob1 = readPairJobContainer.getTrackJob1();
                         TrackJob trackJob2 = readPairJobContainer.getTrackJob2();
                         Map<String, ParsedClassification> classificationMap;
-                        this.setChromMaps(trackJob1);
+                        this.setChromLengthMap(trackJob1);
                         File inputFile1 = trackJob1.getFile();
                         inputFile1.setReadOnly(); //prevents changes or deletion of original file!
                         boolean success;
@@ -293,7 +285,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                                 mappingParser.registerObserver(this);
                                 //parser also deletes combined file or other writable input file
                                 mappingParser.setStatsContainer(statsContainer);
-                                Object parsingResult = mappingParser.parseInput(trackJob1, chromSeqMap);
+                                Object parsingResult = mappingParser.parseInput(trackJob1, chromLengthMap);
                                 mappingParser.removeObserver(this);
                                 if (lastWorkFile != trackJob1.getFile()) { //either combined or write protected orig file
                                     GeneralUtils.deleteOldWorkFile(lastWorkFile); //only delete, if file was changed during parsing
@@ -311,7 +303,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 
                                 //extension for both classification and read pair info
                                 SamBamDirectReadPairClassifier samBamDirectReadPairClassifier = new SamBamDirectReadPairClassifier(
-                                        readPairJobContainer, chromSeqMap, classificationMap);
+                                        readPairJobContainer, chromLengthMap, classificationMap);
                                 samBamDirectReadPairClassifier.registerObserver(this);
                                 samBamDirectReadPairClassifier.setStatsContainer(statsContainer);
                                 samBamDirectReadPairClassifier.classifyReadPairs();
@@ -332,7 +324,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                         } else { //else case with 2 already imported tracks is prohibited
                             //we have to calculate the stats
                             ph.progress(workunits++);
-                            SamBamDirectReadPairStatsParser statsParser = new SamBamDirectReadPairStatsParser(readPairJobContainer, chromSeqMap, null);
+                            SamBamDirectReadPairStatsParser statsParser = new SamBamDirectReadPairStatsParser(readPairJobContainer, chromLengthMap, null);
                             statsParser.setStatsContainer(statsContainer);
                             try {
                                 statsParser.registerObserver(this);
@@ -370,6 +362,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                     this.noErrors = false;
                 }
 
+                ph.progress(workunits++);
                 it.remove();
             }
         }
@@ -392,7 +385,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
          * create statistics (advantage: is already sorted by coordinate & classification in file)
          */   
 
-        this.setChromMaps(trackJob);
+        this.setChromLengthMap(trackJob);
         boolean success;
         
         //only extend, if data is not already stored in it
@@ -407,7 +400,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 
                 //generate classification data in file sorted by read sequence
                 mappingParser.registerObserver(this);
-                Object parsingResult = mappingParser.parseInput(trackJob, chromSeqMap);
+                Object parsingResult = mappingParser.parseInput(trackJob, chromLengthMap);
                 mappingParser.removeObserver(this);
                 ph.progress(workunits++);
                 if (parsingResult instanceof DirectAccessDataContainer) {
@@ -415,7 +408,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                     Map<String, ParsedClassification> classificationMap = dataContainer.getClassificationMap(); 
 
                     //write new file with classification information
-                    success = success ? this.extendSamBamFile(classificationMap, trackJob, chromSeqMap) : success;
+                    success = success ? this.extendSamBamFile(classificationMap, trackJob, chromLengthMap) : success;
                     noErrors = noErrors ? success : noErrors;
                     if (success) { GeneralUtils.deleteOldWorkFile(lastWorkFile); }
                 } else {
@@ -473,8 +466,8 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
          
         this.showMsg("Your current JVM config allows up to "+GeneralUtils.formatNumber(rt.maxMemory())+" bytes of memory to be allocated.");
         this.showMsg("Currently the plattform is using "+GeneralUtils.formatNumber(rt.totalMemory() - rt.freeMemory())+" bytes of memory.");
-        this.showMsg("Please be aware of that you might need to change the -J-Xmx value of your JVM to process large imports successfully.");
-        this.showMsg("The value can be configured in the ../readXplorer/etc/readXplorer.conf file of this application."); 
+        this.showMsg("Please be aware of that you might need to change the -J-d64 and -J-Xmx value of your JVM to process large imports successfully.");
+        this.showMsg("The value can be configured in the ../readXplorer/etc/readXplorer.conf file in the application folder."); 
         this.showMsg("");
         
         this.processTrackJobs();
@@ -545,10 +538,10 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
      * Extends a sam or bam file with ReadXplorers classification data.
      * @param classificationMap the classification map of classification data
      * @param trackJob the track job containing the file to extend
-     * @param chromSeqMap the mapping of chromosome names to chromosome sequences
+     * @param chromLengthMap the mapping of chromosome names to chromosome length
      * @return true, if the extension was successful, false otherwise
      */
-    private boolean extendSamBamFile(Map<String, ParsedClassification> classificationMap, TrackJob trackJob, Map<String, String> chromSeqMap) {
+    private boolean extendSamBamFile(Map<String, ParsedClassification> classificationMap, TrackJob trackJob, Map<String, Integer> chromLengthMap) {
         boolean success;
         try {
             io.getOut().println(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.start.extension", trackJob.getFile().getName()));
@@ -556,7 +549,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
             
             //sorts file again by genome coordinate (position) & stores classification data
             SamBamExtender bamExtender = new SamBamExtender(classificationMap);
-            bamExtender.setDataToConvert(trackJob, chromSeqMap);
+            bamExtender.setDataToConvert(trackJob, chromLengthMap);
             bamExtender.registerObserver(this);
             success = bamExtender.convert();
             

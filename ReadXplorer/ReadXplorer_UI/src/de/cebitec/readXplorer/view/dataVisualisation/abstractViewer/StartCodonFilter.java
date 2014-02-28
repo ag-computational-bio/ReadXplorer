@@ -2,7 +2,6 @@ package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
 
 import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
 import de.cebitec.common.sequencetools.geneticcode.GeneticCodeFactory;
-import de.cebitec.readXplorer.databackend.dataObjects.ChromosomeObserver;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.util.CodonUtilities;
 import de.cebitec.readXplorer.util.Properties;
@@ -24,6 +23,7 @@ import org.openide.util.NbPreferences;
 public class StartCodonFilter implements RegionFilterI {
 
     public static final int INIT = 10;
+    private static final int INTERVAL_SIZE = 3000000;
     private Preferences pref;
     
     private List<Region> regions;
@@ -38,7 +38,6 @@ public class StartCodonFilter implements RegionFilterI {
     private int frameCurrFeature;
     private int nbGeneticCodes;
     private GeneticCodeFactory genCodeFactory;
-    private ChromosomeObserver chromObserver;
 
     /**
      * Filters for start and stop codons in two ways: First for all available start 
@@ -49,7 +48,6 @@ public class StartCodonFilter implements RegionFilterI {
      * @param refGen the reference in which to search
      */
     public StartCodonFilter(int absStart, int absStop, PersistantReference refGen) {
-        this.chromObserver = new ChromosomeObserver();
         this.pref = NbPreferences.forModule(Object.class);
         this.regions = new ArrayList<>();
         this.absStart = absStart;
@@ -76,37 +74,42 @@ public class StartCodonFilter implements RegionFilterI {
             int offset = 3;
             int start = absStart - offset;
             int stop = absStop + 2;
-            String chromSeq = refGen.getActiveChromSequence(chromObserver);
-            int genomeLength = chromSeq.length();
+            int genomeLength = this.refGen.getActiveChromosome().getLength();
 
             if (stop > 0) {
-                if (start < 0) {
+                if (start <= 0) {
                     offset -= Math.abs(start);
-                    start = 0;
+                    start = 1;
                 }
                 if (stop > genomeLength) {
                     stop = genomeLength;
                 }
-
-                sequence = chromSeq.substring(start, stop);
-                boolean isFeatureSelected = this.frameCurrFeature != INIT;
-
-                int index = 0;
-                for (int i = 0; i < this.selectedStarts.size(); ++i) {
-                    if (this.selectedStarts.get(i)) {
-                        this.matchPattern(sequence, this.startCodons[index++], true, offset, isFeatureSelected, Properties.START);
-                        this.matchPattern(sequence, this.startCodons[index++], false, offset, isFeatureSelected, Properties.START);
+                for (int i = start; i <= stop; i++) {
+                    if (i + INTERVAL_SIZE <= stop) {
+                        this.sequence = refGen.getActiveChromSequence(i, i + INTERVAL_SIZE);
                     } else {
-                        index += 2;
+                        this.sequence = refGen.getActiveChromSequence(i, stop);
                     }
-                }
-                index = 0;
-                for (int i = 0; i < this.selectedStops.size(); ++i) {
-                    if (this.selectedStops.get(i)) {
-                        this.matchPattern(sequence, this.stopCodons[index++], true, offset, isFeatureSelected, Properties.STOP);
-                        this.matchPattern(sequence, this.stopCodons[index++], false, offset, isFeatureSelected, Properties.STOP);
-                    } else {
-                        index += 2;
+                    i += INTERVAL_SIZE;
+                    boolean isFeatureSelected = this.frameCurrFeature != INIT;
+
+                    int index = 0;
+                    for (int j = 0; j < this.selectedStarts.size(); ++j) {
+                        if (this.selectedStarts.get(j)) {
+                            this.matchPattern(sequence, this.startCodons[index++], true, offset, isFeatureSelected, Properties.START);
+                            this.matchPattern(sequence, this.startCodons[index++], false, offset, isFeatureSelected, Properties.START);
+                        } else {
+                            index += 2;
+                        }
+                    }
+                    index = 0;
+                    for (int j = 0; j < this.selectedStops.size(); ++j) {
+                        if (this.selectedStops.get(j)) {
+                            this.matchPattern(sequence, this.stopCodons[index++], true, offset, isFeatureSelected, Properties.STOP);
+                            this.matchPattern(sequence, this.stopCodons[index++], false, offset, isFeatureSelected, Properties.STOP);
+                        } else {
+                            index += 2;
+                        }
                     }
                 }
             }
@@ -129,14 +132,14 @@ public class StartCodonFilter implements RegionFilterI {
     private void matchPattern(String sequence, Pattern p, boolean isForwardStrand, int offset, boolean restricted,
             int type){
         // match forward
-        final boolean codonFwdStrand = this.frameCurrFeature > 0 ? true : false;
+        final boolean codonFwdStrand = this.frameCurrFeature > 0;
         if (!restricted || restricted && codonFwdStrand == isForwardStrand){
             Matcher m = p.matcher(sequence);
             while (m.find()) {
                 int from = m.start();
                 int to = m.end() - 1;
-                final int start = absStart - offset + from + 1; // +1 because in matcher each pos is 
-                final int stop = absStart - offset + to + 1; //shifted by -1 (index starts with 0)
+                final int start = absStart - offset + from; // +1 because in matcher each pos is 
+                final int stop = absStart - offset + to; //shifted by -1 (index starts with 0)
                 if (restricted) {
                     /*
                      * Works because e.g. for positions 1-3 & 6-4: 
@@ -252,13 +255,13 @@ public class StartCodonFilter implements RegionFilterI {
         } else {
             startCodonsNew = CodonUtilities.parseCustomCodons(codeIndex, pref.get(Properties.CUSTOM_GENETIC_CODES, "1"));
         }
-        this.startCodons = new Pattern[startCodonsNew.length*2];
-        this.stopCodons = new Pattern[stopCodonsNew.length*2];
+        this.startCodons = new Pattern[startCodonsNew.length * 2];
+        this.stopCodons = new Pattern[stopCodonsNew.length * 2];
         this.selectedStarts = new ArrayList<>();
         this.selectedStops = new ArrayList<>();
         int index = 0;
         String codon;
-        for (int i=0; i<startCodonsNew.length; ++i){
+        for (int i = 0; i < startCodonsNew.length; ++i) {
             codon = startCodonsNew[i];
             this.startCodons[index++] = Pattern.compile(codon);
             this.startCodons[index++] = Pattern.compile(SequenceUtils.complementDNA(SequenceUtils.reverseString(codon)));

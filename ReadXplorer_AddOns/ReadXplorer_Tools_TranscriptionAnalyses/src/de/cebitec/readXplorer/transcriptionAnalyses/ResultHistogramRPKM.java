@@ -1,7 +1,6 @@
 package de.cebitec.readXplorer.transcriptionAnalyses;
 
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.RPKMvalue;
-import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.view.TopComponentExtended;
 import java.awt.BorderLayout;

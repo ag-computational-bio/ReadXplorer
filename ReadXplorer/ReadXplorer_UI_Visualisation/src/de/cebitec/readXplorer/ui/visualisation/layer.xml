@@ -122,11 +122,7 @@
             <file name="de-cebitec-readXplorer-ui-visualisation-actions-CloseTrackAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readXplorer-ui-visualisation-actions-CloseTrackAction.instance"/>
                 <attr name="position" intvalue="387"/>
-            </file><!--
-            <file name="de-cebitec-readXplorer-ui-visualisation-actions-OpenRefGenDialogAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readXplorer-ui-visualisation-actions-OpenRefGenDialogAction.instance"/>
-                <attr name="position" intvalue="300"/>
-            </file>-->
+            </file>
             <file name="de-cebitec-readXplorer-ui-visualisation-actions-OpenRefGenViewerAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readXplorer-ui-visualisation-actions-OpenRefGenViewerAction.instance"/>
                 <attr name="position" intvalue="301"/>
@@ -135,16 +131,6 @@
                 <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readXplorer-ui-visualisation-actions-OpenTrackAction.instance"/>
                 <attr name="position" intvalue="375"/>
             </file>
-        </folder>
-    </folder>
-    <folder name="Windows2">
-        <folder name="Components">
-            <file name="AppPanelTopComponent.settings" url="AppPanelTopComponentSettings.xml"/>
-        </folder>
-        <folder name="Modes">
-            <folder name="editor">
-                <file name="AppPanelTopComponent.wstcref" url="AppPanelTopComponentWstcref.xml"/>
-            </folder>
         </folder>
     </folder>
 </filesystem>

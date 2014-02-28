@@ -4,8 +4,12 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.util.Properties;
 import java.io.File;
-import org.junit.*;
-import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  *
@@ -55,7 +59,7 @@ public class SamBamFileReaderTest {
     @Test
     public void testGetCoverageFromBam() {
         System.out.println("getCoverageFromBam");
-        PersistantReference refGenome = new PersistantReference(1, "PAO1", "PAO1", null);
+        PersistantReference refGenome = new PersistantReference(1, "PAO1", "PAO1", null, new File(""));
         int from = 10000;
         int to = 21100;
         boolean diffsAndGapsNeeded = false;
