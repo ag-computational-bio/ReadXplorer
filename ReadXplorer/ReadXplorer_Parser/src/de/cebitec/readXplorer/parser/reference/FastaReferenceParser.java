@@ -72,8 +72,10 @@ public class FastaReferenceParser implements ReferenceParserI {
             refGenome.setTimestamp(referenceJob.getTimestamp());
             refGenome.setFastaFile(referenceJob.getFile());
             
+            this.notifyObservers("Creating fasta index " + referenceJob.getFile() + ".fai...");
             FastaUtils fastaUtils = new FastaUtils();
             fastaUtils.indexFasta(referenceJob.getFile(), this.observers);
+            this.notifyObservers("Finished creating fasta index.");
             
             FastaIndexReader reader = new FastaIndexReader();
             File indexFile = new File(referenceJob.getFile().toString() + ".fai");
@@ -84,7 +86,7 @@ public class FastaReferenceParser implements ReferenceParserI {
 
 
         } catch (IOException ex) {
-            this.sendErrorMsg(ex.getMessage());
+            this.notifyObservers(ex.getMessage());
         }
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished reading file  \"{0}" + "\"" + "genome with: {1} chromosomes", new Object[]{referenceJob.getFile(), chromCounter});
@@ -133,16 +135,7 @@ public class FastaReferenceParser implements ReferenceParserI {
     @Override
     public void notifyObservers(Object data) {
         for (Observer observer : this.observers) {
-            observer.update(this.errorMsg);
+            observer.update(data);
         }
-    }
-
-    /**
-     * Method setting and sending the error msg to all observers.
-     * @param errorMsg the error msg to send
-     */
-    private void sendErrorMsg(final String errorMsg) {
-        this.errorMsg = errorMsg;
-        this.notifyObservers(null);
     }
 }

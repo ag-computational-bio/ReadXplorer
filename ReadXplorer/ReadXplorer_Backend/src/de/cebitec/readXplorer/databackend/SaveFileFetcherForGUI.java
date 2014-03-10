@@ -1,17 +1,17 @@
-package de.cebitec.readXplorer.view.dialogMenus;
+package de.cebitec.readXplorer.databackend;
 
-import de.cebitec.readXplorer.databackend.SamBamFileReader;
 import de.cebitec.readXplorer.databackend.connector.MultiTrackConnector;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.StorageException;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
-import static de.cebitec.readXplorer.view.dialogMenus.Bundle.*;
-import de.cebitec.readXplorer.view.login.LoginProperties;
+import de.cebitec.readXplorer.util.FastaUtils;
 import java.awt.Dialog;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -19,6 +19,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import net.sf.picard.PicardException;
+import net.sf.picard.reference.IndexedFastaSequenceFile;
 import net.sf.samtools.util.RuntimeIOException;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
@@ -33,12 +36,12 @@ import org.openide.util.NbPreferences;
 @Messages({ "TITLE_FileReset=Reset track file path",
             "MSG_FileReset=If you do not reset the track file location, it cannot be opened",
             "MSG_FileReset_StorageError=An error occured during storage of the new file path. Please try again" })
-public class SaveTrackConnectorFetcherForGUI {
+public class SaveFileFetcherForGUI {
 
     /**
      * A class for GUI Components to safely fetch a TrackConnector.
      */
-    public SaveTrackConnectorFetcherForGUI() {
+    public SaveFileFetcherForGUI() {
     }
 
     /**
@@ -144,8 +147,7 @@ public class SaveTrackConnectorFetcherForGUI {
         String basePath = prefs.get("ResetTrack.Filepath", ".");
         newTrack = this.checkFileExists(basePath, oldTrackFile, track, connector);
         if (newTrack == null) {
-            prefs = Preferences.userNodeForPackage(LoginProperties.class);
-            basePath = new File(prefs.get(LoginProperties.LOGIN_DATABASE_H2, ".")).getParentFile().getAbsolutePath();
+            basePath = new File(connector.getDBLocation()).getParentFile().getAbsolutePath();
             newTrack = this.checkFileExists(basePath, oldTrackFile, track, connector);
         }
         if (newTrack == null) {
@@ -175,7 +177,7 @@ public class SaveTrackConnectorFetcherForGUI {
                 try {
                     connector.resetTrackPath(newTrack);
                 } catch (StorageException ex) {
-                    JOptionPane.showMessageDialog(null, MSG_FileReset_StorageError(), TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, Bundle.MSG_FileReset_StorageError(), Bundle.TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE);
                 }
             } catch (RuntimeIOException e) {
                 //nothing to do, we return a null track
@@ -195,10 +197,10 @@ public class SaveTrackConnectorFetcherForGUI {
      *
      * @author rhilker, kstaderm
      */
-    @Messages({"MSG_WrongFileChosen=You did not choose a \"bam\" file, please select a bam file to proceed."})
+    @Messages({"MSG_WrongTrackFileChosen=You did not choose a \"bam\" file, please select a bam file to proceed."})
     private PersistantTrack openResetFilePathDialog(PersistantTrack track, ProjectConnector connector) {
         PersistantTrack newTrack = null;
-        ResetTrackFilePanel resetPanel = new ResetTrackFilePanel(track.getFilePath());
+        ResetFilePanel resetPanel = new ResetFilePanel(track.getFilePath());
         DialogDescriptor dialogDescriptor = new DialogDescriptor(resetPanel, "Reset File Path");
         Dialog resetFileDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
         resetFileDialog.setVisible(true);
@@ -215,18 +217,18 @@ public class SaveTrackConnectorFetcherForGUI {
                         try {
                             TrackConnector trackConnector = connector.getTrackConnector(newTrack);
                         } catch (FileNotFoundException ex) {
-                            JOptionPane.showMessageDialog(null, MSG_FileReset(), TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE);
+                            JOptionPane.showMessageDialog(null, Bundle.MSG_FileReset(), Bundle.TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE);
                         }
                     } catch (StorageException ex) {
-                        JOptionPane.showMessageDialog(null, MSG_FileReset_StorageError(), TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(null, Bundle.MSG_FileReset_StorageError(), Bundle.TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE);
                     }
                 } else if (!selectedFile.getName().endsWith(".bam")) {
-                    JOptionPane.showMessageDialog(null, MSG_WrongFileChosen(), TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, Bundle.MSG_WrongTrackFileChosen(), Bundle.TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE);
                     this.openResetFilePathDialog(track, connector);
                 }
             }
         } else {
-            JOptionPane.showMessageDialog(null, MSG_FileReset(), TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null, Bundle.MSG_FileReset(), Bundle.TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE);
         }
         return newTrack;
     }
@@ -309,6 +311,125 @@ public class SaveTrackConnectorFetcherForGUI {
      */
     public static void showPathSelectionErrorMsg() {
         JOptionPane.showMessageDialog(null, "You did not complete the track path selection. Corresponding viewers cannot be opened and analyses are canceled.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+    }
+    
+    /**
+     * Checks if the fasta file belonging to a reference exists and if not, it
+     * tries to get a new path from the user. Missing fasta indices are
+     * automatically recreated.
+     * @param ref The reference whose fasta path has to be resetted
+     * @return The indexed fasta file
+     * @throws UserCanceledTrackPathUpdateException
+     */
+    @Messages({"# {0} - fasta path", "MSG_FastaMissing=The following reference fasta file is missing! Please restore it in order to use this DB:\n {0}",
+                "TITLE_FastaMissing=Fasta missing error"})
+    public IndexedFastaSequenceFile checkRefFile(PersistantReference ref) throws UserCanceledTrackPathUpdateException {
+        File fastaFile = ref.getFastaFile();
+        IndexedFastaSequenceFile indexedRefFile;
+        FastaUtils fastaUtils = new FastaUtils(); //TODO: observers are empty, add observers!
+        if (fastaFile.exists()) {
+            try { //check for index and recreate it with notificaiton, if necessary
+                new IndexedFastaSequenceFile(fastaFile);
+            } catch (FileNotFoundException e) {
+                fastaUtils.recreateMissingIndex(fastaFile);
+            } catch (PicardException e) { //should not occur, since we test existence of fasta before
+                JOptionPane.showMessageDialog(new JPanel(), Bundle.MSG_FastaMissing(fastaFile.getAbsolutePath()), Bundle.TITLE_FastaMissing(), JOptionPane.ERROR_MESSAGE);
+            }
+            indexedRefFile = fastaUtils.getIndexedFasta(fastaFile);
+        } else {
+            indexedRefFile = this.resetRefFile(ref);
+        }
+        if (indexedRefFile == null) {
+            //If the new path is not set by the user throw exception notifying about this
+            throw new UserCanceledTrackPathUpdateException();
+        }
+        return indexedRefFile;
+    }
+    
+    /**
+     * In case a reference fasta file is missing and needs to be replaced, this
+     * method offers a dialog to replace the old file with a new one in the
+     * correct file format.
+     * @param ref The reference whose fasta path has to be resetted
+     * @return the new file or null, if it did not work
+     *
+     * @author rhilker
+     */
+    @Messages({"MSG_WrongRefFileChosen=You did not choose a \"fasta\" file, please select a fasta file to proceed."})
+    private IndexedFastaSequenceFile resetRefFile(PersistantReference ref) {
+        IndexedFastaSequenceFile newFastaFile = null;
+        ProjectConnector connector = ProjectConnector.getInstance();
+        List<String> fileEndings = new ArrayList<>();
+        fileEndings.add(".fasta");
+        fileEndings.add(".fa");
+        fileEndings.add(".fna");
+        fileEndings.add(".ffn");
+        
+        File newFile = this.openResetFilePathDialog(ref.getFastaFile(), fileEndings);
+        
+        if (newFile != null) {
+            try {
+                try {
+                    newFastaFile = new IndexedFastaSequenceFile(newFile);
+                } catch (FileNotFoundException ex) { //we know the file exists, so only the index can be missing
+                    FastaUtils fastaUtils = new FastaUtils();  //TODO: observers are empty, add observers!
+                    fastaUtils.recreateMissingIndex(newFile);
+                }
+                connector.resetRefPath(newFile, ref);
+            } catch (StorageException ex) {
+                JOptionPane.showMessageDialog(null, Bundle.MSG_FileReset_StorageError(), Bundle.TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, Bundle.MSG_FileReset(), Bundle.TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE);
+        }
+        return newFastaFile;
+    }
+    
+    /**
+     * In case a file is missing and needs to be replaced, this method offers a
+     * dialog to replace the old file with a new one in the correct file format.
+     * @param oldFile Old file, whose path has to be resetted
+     * @param fileEndings List of file endings to check
+     * @return the new file or null, if it did not work
+     *
+     * @author rhilker
+     */
+    @Messages({"# {0} - file formats", "MSG_WrongFileChosen=You did not choose a \"{0}\" file, please select a fasta file to proceed."})
+    private File openResetFilePathDialog(File oldFile, List<String> fileEndings) {
+        File newFile = null;
+        ResetFilePanel resetPanel = new ResetFilePanel(oldFile.getAbsolutePath());
+        DialogDescriptor dialogDescriptor = new DialogDescriptor(resetPanel, "Reset File Path");
+        Dialog resetFileDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
+        resetFileDialog.setVisible(true);
+
+        if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && resetPanel.getNewFileLocation() != null) {
+            newFile = new File(resetPanel.getNewFileLocation());
+
+            boolean correctEnding = false;
+            for (String fileEnding : fileEndings) {
+                if (newFile.getName().endsWith(fileEnding)) {
+                    correctEnding = newFile.getName().endsWith(fileEnding);
+                    break;
+                }
+            }
+
+            if (newFile.exists() && newFile.isFile() && correctEnding) {
+                return newFile;
+
+            } else if (!correctEnding) {
+                String msg;
+                if (fileEndings.size() > 1) {
+                    msg = Bundle.MSG_WrongFileChosen(fileEndings.get(0));
+                } else {
+                    msg = Bundle.MSG_WrongFileChosen("correct");
+                }
+                JOptionPane.showMessageDialog(null, msg, Bundle.TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE);
+                newFile = this.openResetFilePathDialog(oldFile, fileEndings);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, Bundle.MSG_FileReset(), Bundle.TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE);
+        }
+        return newFile;
     }
 
     /**

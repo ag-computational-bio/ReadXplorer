@@ -94,6 +94,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer, Mess
     private boolean convertJokToBam() throws ParsingException {
         boolean success = true;
         long startTime = System.currentTimeMillis();
+        long finish;
         for (File currentFile : jokFiles) {
             String fileName = currentFile.getName();
             int noReads = 0;
@@ -209,8 +210,9 @@ public class JokToBamConverter implements ConverterI, Observable, Observer, Mess
                         }
 
                         // Reads with an error already skip this part because of "continue" statements
-                        if (++noReads % 1000000 == 0) {
-                            this.notifyObservers(noReads + " reads converted...");
+                        if (++noReads % 500000 == 0) {
+                            finish = System.currentTimeMillis();
+                            this.notifyObservers(Benchmark.calculateDuration(startTime, finish, lineno + " reads converted..."));
                         }
                         counter++;
                     }
@@ -223,7 +225,8 @@ public class JokToBamConverter implements ConverterI, Observable, Observer, Mess
                     success = samUtils.createIndex(samFileReader, new File(outputFile + Properties.BAM_INDEX_EXT));
                 }
 
-                long finish = System.currentTimeMillis();
+                this.notifyObservers("Converting track...");
+                finish = System.currentTimeMillis();
                 msg = NbBundle.getMessage(JokToBamConverter.class, "Converter.Convert.Finished", outFileName);
                 this.notifyObservers(Benchmark.calculateDuration(startTime, finish, msg));
 

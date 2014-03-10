@@ -33,7 +33,6 @@
                                       <Component id="fileLabel" min="-2" max="-2" attributes="0"/>
                                       <Component id="refComboLabel" min="-2" max="-2" attributes="0"/>
                                       <Component id="refSelectionLabel" min="-2" max="-2" attributes="0"/>
-                                      <Component id="multipleFileLabel" min="-2" max="-2" attributes="0"/>
                                       <Component id="multiTrackListLabel" min="-2" max="-2" attributes="0"/>
                                   </Group>
                               </Group>
@@ -55,10 +54,7 @@
                           <Component id="referenceLengthField" alignment="1" max="32767" attributes="0"/>
                           <Component id="refComboBox" max="32767" attributes="0"/>
                           <Group type="102" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="multipleFileCheckBox" min="-2" max="-2" attributes="0"/>
-                                  <Component id="refCheckBox" min="-2" max="-2" attributes="0"/>
-                              </Group>
+                              <Component id="refCheckBox" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
                           <Component id="chromComboBox" alignment="1" max="32767" attributes="0"/>
@@ -90,12 +86,7 @@
                   <Component id="refCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="refSelectionLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="multipleFileCheckBox" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="multipleFileLabel" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="refComboBox" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="refComboLabel" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -119,7 +110,7 @@
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" attributes="0">
                       <Component id="multiTrackListLabel" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="0" pref="93" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="96" max="32767" attributes="0"/>
                   </Group>
                   <Component id="multiTrackScrollPane" pref="0" max="32767" attributes="0"/>
               </Group>
@@ -252,23 +243,6 @@
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="de/cebitec/vamp/ui/converter/Bundle.properties" key="ConverterSetupCard.refSelectionLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JCheckBox" name="multipleFileCheckBox">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/ui/converter/Bundle.properties" key="ConverterSetupCard.multipleFileCheckBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="multipleFileCheckBoxActionPerformed"/>
-      </Events>
-    </Component>
-    <Component class="javax.swing.JLabel" name="multipleFileLabel">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/ui/converter/Bundle.properties" key="ConverterSetupCard.multipleFileLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>

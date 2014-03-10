@@ -26,7 +26,7 @@ import de.cebitec.readXplorer.transcriptomeAnalyses.main.TSSDetectionResults;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.TranscriptomeAnalysesTopComponentTopComponent;
 import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.TranscriptomeAnalysisWizardIterator;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.readXplorer.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
+import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -99,9 +99,9 @@ public class ExcelImporter {
         PersistantTrack track = ProjectConnector.getInstance().getTrack(refID);
         TrackConnector connector = null;
         try {
-            connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
-        } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-            SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
+            connector = (new SaveFileFetcherForGUI()).getTrackConnector(track);
+        } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+            SaveFileFetcherForGUI.showPathSelectionErrorMsg();
         }
 
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(connector.getRefGenome().getId());
@@ -330,9 +330,9 @@ public class ExcelImporter {
         trackMap.put(track.getId(), track);
         TrackConnector connector = null;
         try {
-            connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
-        } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-            SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
+            connector = (new SaveFileFetcherForGUI()).getTrackConnector(track);
+        } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+            SaveFileFetcherForGUI.showPathSelectionErrorMsg();
         }
 
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(connector.getRefGenome().getId());
@@ -393,8 +393,8 @@ public class ExcelImporter {
         trackMap.put(track.getId(), track);
         TrackConnector connector = null;
         try {
-            connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
-        } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+            connector = (new SaveFileFetcherForGUI()).getTrackConnector(track);
+        } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
             JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
         }
 
@@ -517,9 +517,9 @@ public class ExcelImporter {
         trackMap.put(track.getId(), track);
         TrackConnector connector = null;
         try {
-            connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
-        } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-            SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
+            connector = (new SaveFileFetcherForGUI()).getTrackConnector(track);
+        } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+            SaveFileFetcherForGUI.showPathSelectionErrorMsg();
         }
 
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(connector.getRefGenome().getId());

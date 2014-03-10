@@ -111,7 +111,6 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
         File fileToExtend = trackJob.getFile();
 
         File outputFile;
-        SAMFileWriter samBamFileWriter;
 
         try (SAMFileReader samBamReader = new SAMFileReader(fileToExtend)) {
             this.refSeqFetcher = new RefSeqFetcher(trackJob.getRefGen().getFile(), this);
@@ -124,7 +123,7 @@ public class SamBamExtender implements ConverterI, ParserI, Observable, Observer
             Pair<SAMFileWriter, File> writerAndFile = SamUtils.createSamBamWriter(
                     fileToExtend, header, false, SamUtils.EXTENDED_STRING);
             
-            samBamFileWriter = writerAndFile.getFirst();
+            SAMFileWriter samBamFileWriter = writerAndFile.getFirst();
             outputFile = writerAndFile.getSecond();
             trackJob.setFile(outputFile);
 

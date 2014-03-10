@@ -11,7 +11,7 @@ import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.readXplorer.view.dialogMenus.OpenTracksVisualPanel;
 import de.cebitec.readXplorer.view.dialogMenus.OpenTracksWizardPanel;
-import de.cebitec.readXplorer.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
+import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.view.dialogMenus.SelectFeatureTypeWizardPanel;
 import de.cebitec.readXplorer.view.dialogMenus.SelectReadClassWizardPanel;
 import java.awt.event.ActionEvent;
@@ -161,9 +161,9 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
         if (!combineTracks) {
             for (PersistantTrack track : this.tracks) {
                 try {
-                    connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
-                } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-                    SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
+                    connector = (new SaveFileFetcherForGUI()).getTrackConnector(track);
+                } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+                    SaveFileFetcherForGUI.showPathSelectionErrorMsg();
                     continue;
                 }
 
@@ -172,11 +172,11 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
             }
         } else {
             try {
-                connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(tracks, combineTracks);
+                connector = (new SaveFileFetcherForGUI()).getTrackConnector(tracks, combineTracks);
                 this.createAnalysis(connector, readClassesParams);  //every track has its own analysis handlers
 
-            } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-                SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
+            } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+                SaveFileFetcherForGUI.showPathSelectionErrorMsg();
             }
         }
     }

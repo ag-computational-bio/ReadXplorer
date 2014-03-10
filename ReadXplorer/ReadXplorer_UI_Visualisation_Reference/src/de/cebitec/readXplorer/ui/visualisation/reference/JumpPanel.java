@@ -295,7 +295,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
         featureGroundPanel.setLayout(featureGroundPanelLayout);
         featureGroundPanelLayout.setHorizontalGroup(
             featureGroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(filterProperties, 0, 174, Short.MAX_VALUE)
+            .addComponent(filterProperties, 0, 229, Short.MAX_VALUE)
             .addComponent(tableScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .addGroup(featureGroundPanelLayout.createSequentialGroup()
                 .addGroup(featureGroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -305,15 +305,13 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
                         .addComponent(chromComboBox, 0, 1, Short.MAX_VALUE))
                     .addGroup(featureGroundPanelLayout.createSequentialGroup()
                         .addContainerGap()
+                        .addGroup(featureGroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jumpButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(searchPatternButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(featureGroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(featureGroundPanelLayout.createSequentialGroup()
-                                .addComponent(jumpButton, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jumpTextfield))
-                            .addGroup(featureGroundPanelLayout.createSequentialGroup()
-                                .addComponent(searchPatternButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(searchPatternField)))))
+                            .addComponent(jumpTextfield)
+                            .addComponent(searchPatternField))))
                 .addContainerGap())
         );
         featureGroundPanelLayout.setVerticalGroup(

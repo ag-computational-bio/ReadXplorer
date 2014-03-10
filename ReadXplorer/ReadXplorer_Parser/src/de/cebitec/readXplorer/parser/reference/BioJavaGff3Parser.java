@@ -55,7 +55,14 @@ public class BioJavaGff3Parser implements ReferenceParserI {
     public ParsedReference parseReference(final ReferenceJob referenceJob, FeatureFilter filter) throws ParsingException {
         
         FastaReferenceParser fastaParser = new FastaReferenceParser();
+        for (Observer observer : this.observers) {
+            fastaParser.registerObserver(observer);
+        }
         final ParsedReference refGenome = fastaParser.parseReference(referenceJob, filter);
+        for (Observer observer : this.observers) {
+            fastaParser.removeObserver(observer);
+        }
+        
         refGenome.setFeatureFilter(filter);
         final Map<String, ParsedChromosome> chromMap = CommonsRefParser.generateStringMap(refGenome.getChromosomes());
 

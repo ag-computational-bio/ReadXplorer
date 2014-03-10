@@ -9,8 +9,8 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.readXplorer.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
-import de.cebitec.readXplorer.view.dialogMenus.SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException;
+import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
+import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -78,12 +78,12 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
 
         this.trackConnectors = new ArrayList<>();
         HashMap<Integer, PersistantTrack> trackMap = new HashMap<>();
-        SaveTrackConnectorFetcherForGUI fetcher = new SaveTrackConnectorFetcherForGUI();
+        SaveFileFetcherForGUI fetcher = new SaveFileFetcherForGUI();
         for (PersistantTrack track : tracks) {
             try {
                 trackConnectors.add(fetcher.getMultiTrackConnector(track));
             } catch (UserCanceledTrackPathUpdateException ex) {
-                SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
+                SaveFileFetcherForGUI.showPathSelectionErrorMsg();
                 continue;
             }
             trackMap.put(track.getId(), track);

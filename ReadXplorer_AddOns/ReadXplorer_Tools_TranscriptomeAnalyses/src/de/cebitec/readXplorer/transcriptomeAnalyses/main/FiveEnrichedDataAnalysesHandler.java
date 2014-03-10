@@ -11,7 +11,7 @@ import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.readXplorer.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
+import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -74,9 +74,9 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
     private void startAnalysis() {
 
         try {
-            this.trackConnector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(selectedTrack);
-        } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-            SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
+            this.trackConnector = (new SaveFileFetcherForGUI()).getTrackConnector(selectedTrack);
+        } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+            SaveFileFetcherForGUI.showPathSelectionErrorMsg();
         }
         String handlerTitle = "Creating data structures from feature-information of the reference: " + trackConnector.getAssociatedTrackName();
         this.progressHandleParsingFeatures = ProgressHandleFactory.createHandle(handlerTitle);

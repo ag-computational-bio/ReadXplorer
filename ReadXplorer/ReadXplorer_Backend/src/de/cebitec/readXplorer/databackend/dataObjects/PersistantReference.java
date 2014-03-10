@@ -1,11 +1,10 @@
 package de.cebitec.readXplorer.databackend.dataObjects;
 
+import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.util.FastaUtils;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Observer;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -35,7 +34,7 @@ public class PersistantReference implements Observable {
     private Timestamp timestamp;
     private int noChromosomes;
     private List<Observer> observers;
-    private final File fastaFile;
+    private File fastaFile;
     private IndexedFastaSequenceFile seqFile;
 
     /**
@@ -81,32 +80,29 @@ public class PersistantReference implements Observable {
      * @param activeChromId id of the currently active chromosome (>= 0)
      */
     private void checkRef(int activeChromId) {
-        FastaUtils fastaUtils = new FastaUtils();
-        try { //check for index and recreate it with notificaiton, if necessary
-            IndexedFastaSequenceFile indexedFasta = new IndexedFastaSequenceFile(fastaFile);
-        } catch (FileNotFoundException e) {
-            fastaUtils.recreateMissingIndex(fastaFile);
-        } catch (PicardException e) {
-            String msg = "The following reference fasta file is missing! Please restore it in order to use this DB:\n" + fastaFile.getAbsolutePath();
-            JOptionPane.showMessageDialog(new JPanel(), msg, "Fasta missing error", JOptionPane.ERROR_MESSAGE);
-        }
-        if (activeChromId < 0) {
-            Iterator<PersistantChromosome> chromIt = chromosomes.values().iterator();
-            if (chromIt.hasNext()) {
-                activeChromID = chromIt.next().getId();
-            }
-        } else {
-            this.activeChromID = activeChromId;
-        }
-        this.seqFile = fastaUtils.getIndexedFasta(fastaFile);
+        SaveFileFetcherForGUI fileFetcher = new SaveFileFetcherForGUI();
         try {
-            this.getChromSequence(activeChromID, 1, 1);
-        } catch (PicardException e) {
-            if (e.getMessage().contains("Unable to find entry for contig")) {
-                String msg = "The fasta file \n" + fastaFile.getAbsolutePath() + 
-                        "\ndoes not contain the expected sequence:\n" + e.getMessage();
-                JOptionPane.showMessageDialog(new JPanel(), msg, "Sequence missing error", JOptionPane.ERROR_MESSAGE);
+            this.seqFile = fileFetcher.checkRefFile(this);
+            if (activeChromId < 0) {
+                Iterator<PersistantChromosome> chromIt = chromosomes.values().iterator();
+                if (chromIt.hasNext()) {
+                    activeChromID = chromIt.next().getId();
+                }
+            } else {
+                this.activeChromID = activeChromId;
             }
+            try {
+                this.getChromSequence(activeChromID, 1, 1);
+            } catch (PicardException | NullPointerException e) {
+                if (e.getMessage() != null && e.getMessage().contains("Unable to find entry for contig")) {
+                    String msg = "The fasta file \n" + fastaFile.getAbsolutePath()
+                            + "\ndoes not contain the expected sequence:\n" + e.getMessage();
+                    JOptionPane.showMessageDialog(new JPanel(), msg, "Sequence missing error", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+            String msg = "If the missing fasta file is not replaced, the reference cannot be shown and analyses for this reference cannot be run.";
+            JOptionPane.showMessageDialog(new JPanel(), msg, "Sequence missing error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -292,6 +288,15 @@ public class PersistantReference implements Observable {
             wholeGenomeLength += chrom.getLength();
         }
         return wholeGenomeLength;
+    }
+
+    /**
+     * USe this method only, if the path to the fasta file, beloning to this
+     * reference has to be replaced.
+     * @param newFastaFile The new fasta file
+     */
+    public void resetFastaPath(File newFastaFile) {
+        this.fastaFile = newFastaFile;
     }
 
 }

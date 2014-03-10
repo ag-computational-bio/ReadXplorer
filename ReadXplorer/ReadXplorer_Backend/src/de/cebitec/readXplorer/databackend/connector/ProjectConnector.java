@@ -82,7 +82,7 @@ public class ProjectConnector extends Observable {
     private int containerCount = 0;
     private DiscreteCountingDistribution readLengthDistribution;
     private DiscreteCountingDistribution readPairLengthDistribution;
-    private String projectLocation;
+    private String dbLocation;
     
     /**
      * Responsible for the connection between user interface and data base.
@@ -161,7 +161,7 @@ public class ProjectConnector extends Observable {
      */
     public void connect(String adapter, String projectLocation, String hostname, String user, String password) throws SQLException, JdbcSQLException {
         this.adapter = adapter;
-        this.projectLocation = projectLocation;
+        this.dbLocation = projectLocation;
         if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
             this.url = "jdbc:" + adapter + "://" + hostname + "/" + projectLocation;
             this.user = user;
@@ -1472,8 +1472,7 @@ public class ProjectConnector extends Observable {
     }
 
     /**
-     * Resets the file path of a direct access track.
-     *
+     * Resets the file path of a direct access reference.
      * @param track track whose file path has to be resetted.
      * @throws StorageException
      */
@@ -1501,6 +1500,39 @@ public class ProjectConnector extends Observable {
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Track \"{0}\" has been updated successfully", track.getDescription());
     }
+    
+    /**
+     * Resets the fasta file path of a direct access reference.
+     * @param fastaFile fasta file to reset for the current reference.
+     * @param ref The reference genome, whose file shall be updated
+     * @throws StorageException
+     */
+    public void resetRefPath(File fastaFile, PersistantReference ref) throws StorageException {
+
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Preparing statements for storing track data");
+
+        if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
+            this.lockReferenceDomainTables();
+            this.disableReferenceIndices();
+        }
+
+        try (PreparedStatement resetRefPath = con.prepareStatement(SQLStatements.RESET_REF_PATH)) {
+            resetRefPath.setString(1, fastaFile.getAbsolutePath());
+            resetRefPath.setLong(2, ref.getId());
+            resetRefPath.execute();
+            ref.resetFastaPath(fastaFile);
+        } catch (SQLException ex) {
+            this.rollbackOnError(this.getClass().getName(), ex);
+        }
+
+        if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
+            this.enableReferenceIndices();
+            this.unlockTables();
+        }
+
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Reference file for \"{0}\" has been updated successfully", ref.getName());
+    }
+    
 
     private void notifyObserversAbout(final String message) {
         this.setChanged();
@@ -1566,7 +1598,7 @@ public class ProjectConnector extends Observable {
                     String refSeq = rs.getString(FieldNames.REF_GEN_SEQUENCE);
                     String chromName = rs.getString(FieldNames.REF_GEN_NAME);
                     
-                    String pathString = new File(projectLocation).getParent().concat(ref.getName().concat(".fasta"));
+                    String pathString = new File(dbLocation).getParent().concat(ref.getName().concat(".fasta"));
                     Path fastaPath = new File(pathString).toPath();
                     try (FastaLineWriter fastaWriter = FastaLineWriter.fileWriter(fastaPath)) {
                         fastaWriter.writeHeader(ref.getName());
@@ -1608,5 +1640,12 @@ public class ProjectConnector extends Observable {
         //Drop old ref seq column for this DB
         this.runSqlStatement(GenericSQLQueries.genRemoveColumnString(
                 FieldNames.TABLE_REFERENCE, FieldNames.REF_GEN_SEQUENCE));
+    }
+    
+    /**
+     * @return The location of the database
+     */
+    public String getDBLocation() {
+        return this.dbLocation;
     }
 }

@@ -16,7 +16,7 @@
   <Layout>
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" alignment="0" attributes="0">
+          <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
@@ -37,6 +37,11 @@
                   <Component id="unannotatedTranscriptsBox" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="transcriptionStartAutomaticBox" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="additionalOptionPanel" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Component id="maxLeaderlessDistanceField" min="-2" pref="57" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="transcriptExtensionLabel1" min="-2" max="-2" attributes="0"/>
+                  </Group>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -66,6 +71,11 @@
                   <Component id="transcriptExtensionField" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="transcriptExtensionLabel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
+              <EmptySpace min="-2" pref="27" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="maxLeaderlessDistanceField" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="transcriptExtensionLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
@@ -75,7 +85,7 @@
     <Component class="javax.swing.JCheckBox" name="transcriptionStartAutomaticBox">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.transcriptionStartAutomaticBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.transcriptionStartAutomaticBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <Events>
@@ -85,28 +95,28 @@
     <Component class="javax.swing.JTextField" name="minTotalIncreaseField">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.minTotalIncreaseField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.minTotalIncreaseField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="minTotalIncreaseLabel">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.minTotalIncreaseLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.minTotalIncreaseLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="minPercentIncreaseField">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.minPercentIncreaseField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.minPercentIncreaseField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="minPercentIncreaseLabel">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.minPercentIncreaseLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.minPercentIncreaseLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
@@ -165,21 +175,21 @@
         <Component class="javax.swing.JTextField" name="maxInitialCountField">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.maxInitialCountField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.maxInitialCountField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="maxInitialCountLabel">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.maxInitialCountLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.maxInitialCountLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="minLowCovCountField">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.minLowCovCountField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.minLowCovCountField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>
@@ -189,14 +199,14 @@
         <Component class="javax.swing.JLabel" name="minLowCovCountLabel">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.minLowCovCountLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.minLowCovCountLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
         </Component>
         <Component class="javax.swing.JLabel" name="addRestrictionLabel">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.addRestrictionLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.addRestrictionLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
         </Component>
@@ -206,7 +216,7 @@
       <Properties>
         <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.unannotatedTranscriptsBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.unannotatedTranscriptsBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <Events>
@@ -216,14 +226,31 @@
     <Component class="javax.swing.JTextField" name="transcriptExtensionField">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.transcriptExtensionField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.transcriptExtensionField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="transcriptExtensionLabel">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.transcriptExtensionLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.transcriptExtensionLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="maxLeaderlessDistanceField">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.maxLeaderlessDistanceField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="transcriptExtensionLabel1">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.transcriptExtensionLabel1.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+        <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/readXplorer/transcriptionAnalyses/wizard/Bundle.properties" key="TransAnalysesTSSVisualPanel.transcriptExtensionLabel1.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>

@@ -84,9 +84,11 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         dataColumnDescriptions.add("Next Upstream Feature");
         dataColumnDescriptions.add("Next Upstream Feature Start");
         dataColumnDescriptions.add("Next Upstream Feature Stop");
+        dataColumnDescriptions.add("Distance Upstream Feature");
         dataColumnDescriptions.add("Next Downstream Feature");
         dataColumnDescriptions.add("Next Downstream Feature Start");
         dataColumnDescriptions.add("Next Downstream Feature Stop");
+        dataColumnDescriptions.add("Distance Downstream Feature");
         dataColumnDescriptions.add("Novel Transcript");
         dataColumnDescriptions.add("Transcript Stop");
         dataColumnDescriptions.add("70bp Upstream of Start");
@@ -111,6 +113,8 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         List<List<List<Object>>> tSSExport = new ArrayList<>();
         List<List<Object>> tSSResults = new ArrayList<>();
         
+        PersistantFeature feature;
+        
         for (int i = 0; i < results.size(); ++i) {      
             TranscriptionStart tss = results.get(i);
             List<Object> tssRow = new ArrayList<>();
@@ -124,9 +128,9 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
             tssRow.add(tss.getPercentIncrease());
             
             DetectedFeatures detFeatures = tss.getDetFeatures();
-            this.addFeatureRows(detFeatures.getCorrectStartFeature(), tssRow);
-            this.addFeatureRows(detFeatures.getUpstreamFeature(), tssRow);
-            this.addFeatureRows(detFeatures.getDownstreamFeature(), tssRow);
+            this.addFeatureRows(detFeatures.getCorrectStartFeature(), tssRow, tss, false);
+            this.addFeatureRows(detFeatures.getUpstreamFeature(), tssRow, tss, true);
+            this.addFeatureRows(detFeatures.getDownstreamFeature(), tssRow, tss, true);
             
             if (tss instanceof TransStartUnannotated) {
                 TransStartUnannotated unannoStart = (TransStartUnannotated) tss;
@@ -180,6 +184,8 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
                 getStatsMap().get(ResultPanelTranscriptionStart.TSS_UPSTREAM)));
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_DOWNSTREAM, 
                 getStatsMap().get(ResultPanelTranscriptionStart.TSS_DOWNSTREAM)));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_LEADERLESS, 
+                getStatsMap().get(ResultPanelTranscriptionStart.TSS_LEADERLESS)));
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_FWD, 
                 getStatsMap().get(ResultPanelTranscriptionStart.TSS_FWD)));
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_REV, 
@@ -210,16 +216,23 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
      * @param feature the feature to add. In case it is null the row receives 
      * "-" entries.
      * @param tssRow the row to which the data should be added
+     * @param tss The TSS fo which the data shall be added
+     * @param addDistance true, if the distance from the feature start to the
+     * current TSS shall be printed, too
      */
-    private void addFeatureRows(PersistantFeature feature, List<Object> tssRow) {
+    private void addFeatureRows(PersistantFeature feature, List<Object> tssRow, TranscriptionStart tss, boolean addDistance) {
         if (feature != null) {
             tssRow.add(feature.toString());
             tssRow.add(feature.isFwdStrand() ? feature.getStart() : feature.getStop());
             tssRow.add(feature.isFwdStrand() ? feature.getStop() : feature.getStart());
+            if (addDistance) {
+                tssRow.add(Math.abs(tss.getPos() - (tss.isFwdStrand() ? feature.getStart() : feature.getStop())));
+            }
         } else {
             tssRow.add("-");
             tssRow.add("-");
             tssRow.add("-");
+            if (addDistance) { tssRow.add(""); }
         }
     }
     

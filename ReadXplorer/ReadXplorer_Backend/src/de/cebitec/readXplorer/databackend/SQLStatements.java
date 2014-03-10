@@ -196,6 +196,12 @@ public class SQLStatements {
             + "WHERE " + FieldNames.TRACK_ID + " = ?;";
     
     
+    public static final String RESET_REF_PATH = 
+            "UPDATE " + FieldNames.TABLE_REFERENCE
+            + " SET " + FieldNames.REF_GEN_FASTA_FILE + " = ? "
+            + "WHERE " + FieldNames.REF_GEN_ID + " = ?;";
+    
+    
     /**
      * @param readPairId read pair id to set for current track
      * @param trackId track id to set the read pair id for

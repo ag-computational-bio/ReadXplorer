@@ -20,15 +20,15 @@ public class Benchmark {
      * @return the message concatenated with the time difference between both 
      * time points separated by hours, minutes, seconds and milliseconds
      */
-    public static String calculateDuration(long startTime, long finishTime, String message){
-        
+    public static String calculateDuration(long startTime, long finishTime, String message) {
+
         long diff = finishTime - startTime;
 
         int hours = 0;
         int minutes = 0;
         int seconds = 0;
         int millis;
-        
+
         if (diff > 3600000) { //milliseconds per hour
             hours = (int) (diff / 3600000);
             diff -= (hours * 3600000);

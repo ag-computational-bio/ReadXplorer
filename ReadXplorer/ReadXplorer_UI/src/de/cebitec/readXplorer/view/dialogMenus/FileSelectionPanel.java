@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -48,7 +47,7 @@ public class FileSelectionPanel extends JPanel {
     }
     
     /**
-     * @return true, if multiple files arre imported at once, false otherwise
+     * @return true, if multiple files can be imported at once, false otherwise
      */
     public boolean useMultipleImport() {
         return useMultipleImport;
@@ -56,8 +55,7 @@ public class FileSelectionPanel extends JPanel {
 
     /**
      * Sets if mutliple tracks should be imported at once
-     *
-     * @param useMultipleImport true, if multiple files arre imported at once,
+     * @param useMultipleImport true, if multiple files can be imported at once,
      * false otherwise
      */
     protected void setUseMultipleImport(boolean useMultipleImport) {
@@ -85,7 +83,6 @@ public class FileSelectionPanel extends JPanel {
 
     /**
      * Sets the mapping files for multiple track import at once.
-     *
      * @param mappingFiles The list of mapping files to import at once
      */
     protected void setMappingFiles(List<File> mappingFiles) {
@@ -94,7 +91,6 @@ public class FileSelectionPanel extends JPanel {
 
     /**
      * Adds a single mapping file to the list.
-     *
      * @param mappingFile The mapping file to add to the list
      */
     protected void addMappingFile(File mappingFile) {
@@ -120,8 +116,8 @@ public class FileSelectionPanel extends JPanel {
     
     /**
      * Updates the gui for multiple or single file handling.
-     * @param multipleFileCheckBox the checkbox defining whether multiple file
-     * handling is enabled
+     * @param multiFileImportEnabled true, if multiple files can be imported at
+     * once, false otherwise
      * @param multiTrackScrollPane scrollpane to display multiple files
      * @param multiTrackList list which actually displays the multiple files on
      * the scrollpane
@@ -130,9 +126,9 @@ public class FileSelectionPanel extends JPanel {
      * @param fileTextField text field displaying either the file path for
      * single files or the count of files to handle for multiple file handling
      */
-    public void updateGuiForMultipleFiles(JCheckBox multipleFileCheckBox, JScrollPane multiTrackScrollPane, JList<String> multiTrackList,
+    public void updateGuiForMultipleFiles(boolean multiFileImportEnabled, JScrollPane multiTrackScrollPane, JList<String> multiTrackList,
             JLabel multiTrackListLabel, JTextField fileTextField) {
-        this.setUseMultipleImport(multipleFileCheckBox.isSelected());
+        this.setUseMultipleImport(multiFileImportEnabled);
         if (this.useMultipleImport()) {
             multiTrackScrollPane.setVisible(true);
             multiTrackList.setVisible(true);
@@ -141,6 +137,7 @@ public class FileSelectionPanel extends JPanel {
             DefaultListModel<String> model = new DefaultListModel<>();
             fillMultipleImportTable(model, getMappingFiles(), "Mapping file list:");
             multiTrackList.setModel(model);
+            this.setSize(this.getPreferredSize());
         } else {
             multiTrackScrollPane.setVisible(false);
             multiTrackList.setVisible(false);

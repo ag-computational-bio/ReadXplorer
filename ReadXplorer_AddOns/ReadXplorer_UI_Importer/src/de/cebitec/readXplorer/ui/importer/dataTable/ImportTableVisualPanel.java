@@ -7,9 +7,9 @@ import de.cebitec.readXplorer.parser.common.ParserI;
 import de.cebitec.readXplorer.parser.tables.CsvPreferenceForUsers;
 import de.cebitec.readXplorer.parser.tables.CsvTableParser;
 import de.cebitec.readXplorer.parser.tables.TableType;
-import de.cebitec.readXplorer.parser.tables.TableParserI;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
+import java.io.File;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ScrollPaneConstants;
 import org.openide.util.NbBundle;
@@ -166,6 +166,7 @@ public final class ImportTableVisualPanel extends JobPanel {
             
             @Override
             public void open(String fileLocation) {
+                File[] files = this.getSelectedFiles();
                 ImportTableVisualPanel.this.fileLocation = fileLocation;
             }
         };

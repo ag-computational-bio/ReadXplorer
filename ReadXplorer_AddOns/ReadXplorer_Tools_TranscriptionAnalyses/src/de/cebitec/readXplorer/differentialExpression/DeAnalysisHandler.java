@@ -17,7 +17,7 @@ import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
-import de.cebitec.readXplorer.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
+import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -140,7 +140,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
             
             PersistantTrack currentTrack = it.next();
             try {
-                TrackConnector tc = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(currentTrack);
+                TrackConnector tc = (new SaveFileFetcherForGUI()).getTrackConnector(currentTrack);
 
                 CollectCoverageData collCovData = new CollectCoverageData(genomeAnnos, startOffset, stopOffset, regardReadOrientation);
                 collectCoverageDataInstances.put(currentTrack.getId(), collCovData);
@@ -150,8 +150,8 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
                 handler.setDesiredData(Properties.REDUCED_MAPPINGS);
                 handler.registerObserver(collCovData);
                 allHandler.add(handler);
-            } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-                SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
+            } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+                SaveFileFetcherForGUI.showPathSelectionErrorMsg();
                 ProcessingLog.getInstance().addProperty("Unresolved track", currentTrack);
                 notifyObservers(AnalysisStatus.ERROR);
                 this.interrupt();

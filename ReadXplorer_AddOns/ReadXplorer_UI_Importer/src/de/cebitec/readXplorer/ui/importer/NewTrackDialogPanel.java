@@ -20,7 +20,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JList;
-import org.openide.util.NbBundle;
 
 /**
  * Panel displaying the options for importing new tracks into ReadXplorer.
@@ -108,10 +107,11 @@ public class NewTrackDialogPanel extends ImportTrackBasePanel implements NewJobD
         nameField = new javax.swing.JTextField();
         mappingTypeCombo = new javax.swing.JComboBox<>(parsers);
         alreadyImportedBox = new javax.swing.JCheckBox();
-        multipleImportCheckBox = new javax.swing.JCheckBox();
         multiTrackScrollPane = new javax.swing.JScrollPane();
         multiTrackList = new javax.swing.JList<>();
         multiTrackListLabel = new javax.swing.JLabel();
+
+        setMinimumSize(new java.awt.Dimension(484, 300));
 
         mappingTypeLabel.setText(org.openide.util.NbBundle.getMessage(NewTrackDialogPanel.class, "NewTrackDialogPanel.mappingTypeLabel.text")); // NOI18N
 
@@ -154,13 +154,6 @@ public class NewTrackDialogPanel extends ImportTrackBasePanel implements NewJobD
             }
         });
 
-        multipleImportCheckBox.setText(org.openide.util.NbBundle.getMessage(NewTrackDialogPanel.class, "NewTrackDialogPanel.multipleImportCheckBox.text")); // NOI18N
-        multipleImportCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                multipleImportCheckBoxActionPerformed(evt);
-            }
-        });
-
         multiTrackScrollPane.setViewportView(multiTrackList);
 
         multiTrackListLabel.setText(org.openide.util.NbBundle.getMessage(NewTrackDialogPanel.class, "NewTrackDialogPanel.multiTrackListLabel.text")); // NOI18N
@@ -173,35 +166,34 @@ public class NewTrackDialogPanel extends ImportTrackBasePanel implements NewJobD
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(16, 16, 16)
-                        .addComponent(multiTrackListLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(multiTrackScrollPane))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(refGenLabel)
-                            .addComponent(mappingTypeLabel))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(refGenBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(mappingTypeCombo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(34, 34, 34)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(mappingFileLabel)
-                            .addComponent(nameLabel))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(refGenLabel)
+                                .addComponent(mappingTypeLabel))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(21, 21, 21)
+                                .addComponent(mappingFileLabel)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(mappingFileField)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(chooseButton, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(nameField, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(mappingTypeCombo, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(refGenBox, javax.swing.GroupLayout.Alignment.TRAILING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(multipleImportCheckBox)
-                                    .addComponent(alreadyImportedBox))
-                                .addGap(0, 0, Short.MAX_VALUE)))))
+                                .addGap(16, 16, 16)
+                                .addComponent(multiTrackListLabel))
+                            .addComponent(nameLabel, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(alreadyImportedBox)
+                                .addGap(0, 163, Short.MAX_VALUE))
+                            .addComponent(multiTrackScrollPane)
+                            .addComponent(nameField))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -227,13 +219,12 @@ public class NewTrackDialogPanel extends ImportTrackBasePanel implements NewJobD
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(alreadyImportedBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(multipleImportCheckBox)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(multiTrackScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(multiTrackListLabel)
-                        .addContainerGap(127, Short.MAX_VALUE))
-                    .addComponent(multiTrackScrollPane)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -251,6 +242,7 @@ public class NewTrackDialogPanel extends ImportTrackBasePanel implements NewJobD
             public void open(String fileLocation) {
 
                 // file chosen
+                updateGuiForMultipleFiles(this.getSelectedFiles().length > 1, multiTrackScrollPane, multiTrackList, multiTrackListLabel, mappingFileField);
                 if (useMultipleImport()) {
                     File[] files = this.getSelectedFiles();
                     getMappingFiles().clear();
@@ -274,7 +266,7 @@ public class NewTrackDialogPanel extends ImportTrackBasePanel implements NewJobD
         };
         
         fc.setDirectoryProperty("NewTrack.Filepath");
-        fc.setMultiSelectionEnabled(this.useMultipleImport());
+        fc.setMultiSelectionEnabled(true);
         fc.openFileChooser(ReadXplorerFileChooser.OPEN_DIALOG);
 }//GEN-LAST:event_chooseButtonActionPerformed
     
@@ -296,17 +288,6 @@ public class NewTrackDialogPanel extends ImportTrackBasePanel implements NewJobD
         }
     }//GEN-LAST:event_mappingTypeComboActionPerformed
 
-    private void multipleImportCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multipleImportCheckBoxActionPerformed
-        this.updateGuiForMultipleFiles(multipleImportCheckBox, multiTrackScrollPane, multiTrackList, multiTrackListLabel, mappingFileField);
-        if (this.useMultipleImport()) {
-            nameField.setEnabled(false);
-            nameField.setText(NbBundle.getMessage(NewTrackDialogPanel.class, "MultipleImportTrackNameMsg"));
-        } else {
-            this.nameField.setEnabled(true);
-            this.nameField.setText("");
-        }
-    }//GEN-LAST:event_multipleImportCheckBoxActionPerformed
-
     private void alreadyImportedBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alreadyImportedBoxActionPerformed
         this.setIsAlreadyImported(this.alreadyImportedBox.isSelected());
     }//GEN-LAST:event_alreadyImportedBoxActionPerformed
@@ -321,7 +302,6 @@ public class NewTrackDialogPanel extends ImportTrackBasePanel implements NewJobD
     private javax.swing.JList<String> multiTrackList;
     private javax.swing.JLabel multiTrackListLabel;
     private javax.swing.JScrollPane multiTrackScrollPane;
-    private javax.swing.JCheckBox multipleImportCheckBox;
     private javax.swing.JTextField nameField;
     private javax.swing.JLabel nameLabel;
     private javax.swing.JComboBox<ReferenceJob> refGenBox;

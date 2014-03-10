@@ -14,7 +14,7 @@ import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.readXplorer.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
+import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -87,9 +87,9 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
     private void startAnalysis() throws FileNotFoundException {
 
         try {
-            this.trackConnector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(selectedTrack);
-        } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-            SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
+            this.trackConnector = (new SaveFileFetcherForGUI()).getTrackConnector(selectedTrack);
+        } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+            SaveFileFetcherForGUI.showPathSelectionErrorMsg();
         }
 
         String handlerTitle = "Creating data structures from feature-information of the reference: " + trackConnector.getAssociatedTrackName();
@@ -117,7 +117,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
 
         // geting Mappings and calculate statistics on mappings.
         try {
-            trackConnector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(this.selectedTrack);
+            trackConnector = (new SaveFileFetcherForGUI()).getTrackConnector(this.selectedTrack);
             this.stats = new StatisticsOnMappingData(refViewer.getReference(), this.fraction, this.forwardCDSs,
                     this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
             AnalysesHandler handler = new AnalysesHandler(trackConnector, this, "Collecting coverage data of track number "
@@ -126,8 +126,8 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
             handler.setDesiredData(Properties.REDUCED_MAPPINGS);
             handler.registerObserver(this.stats);
             handler.startAnalysis();
-        } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-            SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
+        } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+            SaveFileFetcherForGUI.showPathSelectionErrorMsg();
             notifyObservers(AnalysisStatus.ERROR);
             this.interrupt();
         }

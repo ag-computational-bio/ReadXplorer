@@ -10,6 +10,7 @@ import de.cebitec.readXplorer.util.Benchmark;
 import de.cebitec.readXplorer.util.DiscreteCountingDistribution;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.ReadPairType;
+import de.cebitec.readXplorer.util.StatsContainer;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -42,7 +43,7 @@ public class SamBamDirectReadPairStatsParser extends SamBamDirectReadPairClassif
      * in this parser until now
      */
     public SamBamDirectReadPairStatsParser(ReadPairJobContainer readPairJobContainer, Map<String, Integer> chromLengthMap, Map<String, ParsedClassification> classificationMap) {
-        super(readPairJobContainer, chromLengthMap, classificationMap);
+        super(readPairJobContainer, chromLengthMap);
         this.trackJob = readPairJobContainer.getTrackJob1();
         this.dist = readPairJobContainer.getDistance();
         int maxDist = this.calculateMinAndMaxDist(dist, readPairJobContainer.getDeviation());
@@ -61,6 +62,8 @@ public class SamBamDirectReadPairStatsParser extends SamBamDirectReadPairClassif
 
         try (SAMFileReader samBamReader = new SAMFileReader(trackJob.getFile())) {
             long start = System.currentTimeMillis();
+            long finish;
+            int lineNo = 0;
             this.notifyObservers(NbBundle.getMessage(SamBamDirectReadPairClassifier.class, "ReadPairStatsParser.Start"));
 
             samBamReader.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
@@ -74,6 +77,7 @@ public class SamBamDirectReadPairStatsParser extends SamBamDirectReadPairClassif
             ReadPairType pairClass;
             int insertSize;
             while (samItor.hasNext()) {
+                ++lineNo;
                 //separate all mappings of same pair by read pair tag and hand it over to classification then
                 record = samItor.next();
                 if (!record.getReadUnmappedFlag() && record.getReferenceName().equals(refName)) {
@@ -85,7 +89,7 @@ public class SamBamDirectReadPairStatsParser extends SamBamDirectReadPairClassif
                         if (classobj != null) {
                             if (classobj instanceof Integer && ((int) classobj) >= -128 && ((int) classobj) <= 128) {
                                 pairClass = ReadPairType.getReadPairType(Integer.valueOf(classobj.toString()));
-                                this.getStatsContainer().incReadPairStats(pairClass, 1);
+                                this.statsContainer.incReadPairStats(pairClass, 1);
                                 insertSize = Math.abs(record.getInferredInsertSize());
                                 if (insertSize != 0) { // 0 = unpaired/not available
                                     this.readPairSizeDistribution.increaseDistribution(insertSize);
@@ -93,7 +97,7 @@ public class SamBamDirectReadPairStatsParser extends SamBamDirectReadPairClassif
                             }
                             
                         } else {
-                            this.getStatsContainer().incReadPairStats(ReadPairType.UNPAIRED_PAIR, 1);
+                            this.statsContainer.incReadPairStats(ReadPairType.UNPAIRED_PAIR, 1);
                         }
                         
                     } else if (pairTag == Properties.EXT_A2) {
@@ -102,22 +106,27 @@ public class SamBamDirectReadPairStatsParser extends SamBamDirectReadPairClassif
                         if (classobj != null && classobj instanceof Integer) {
                             pairClass = ReadPairType.getReadPairType(Integer.valueOf(classobj.toString()));
                             if (pairClass == ReadPairType.UNPAIRED_PAIR) {
-                                this.getStatsContainer().incReadPairStats(pairClass, 1);
+                                this.statsContainer.incReadPairStats(pairClass, 1);
                             } //else we have already counted read 1 of the pair
                         } else {
-                            this.getStatsContainer().incReadPairStats(ReadPairType.UNPAIRED_PAIR, 1);
+                            this.statsContainer.incReadPairStats(ReadPairType.UNPAIRED_PAIR, 1);
                         }
                     }
+                }
+                
+                if (lineNo % 500000 == 0) {
+                    finish = System.currentTimeMillis();
+                    this.notifyObservers(Benchmark.calculateDuration(start, finish, lineNo + " mappings processed in "));
                 }
             }
 
             samItor.close();
 
-            long finish = System.currentTimeMillis();
+            finish = System.currentTimeMillis();
             String msg = NbBundle.getMessage(SamBamDirectReadPairClassifier.class, "ReadPairStatsParser.Finish");
             this.notifyObservers(Benchmark.calculateDuration(start, finish, msg));
 
-            this.getStatsContainer().setReadPairDistribution(this.readPairSizeDistribution);
+            this.statsContainer.setReadPairDistribution(this.readPairSizeDistribution);
 
         } catch (Exception e) {
             this.notifyObservers(NbBundle.getMessage(SamBamDirectReadPairClassifier.class, "ReadPairStatsParser.Error", e.getMessage()));
@@ -125,6 +134,15 @@ public class SamBamDirectReadPairStatsParser extends SamBamDirectReadPairClassif
         }
 
         return new ParsedReadPairContainer();
+    }
+    
+    /**
+     * Sets the stats container to keep track of statistics for this track.
+     * @param statsContainer The stats container to add
+     */
+    @Override
+    public void setStatsContainer(StatsContainer statsContainer) {
+        this.statsContainer = statsContainer;
     }
 
 }

@@ -107,7 +107,7 @@ public class MappingThread extends RequestThread {
                 track = tracks.get(i);
                 if (!track.isDbUsed()) {
                     SamBamFileReader externalDataReader = new SamBamFileReader(new File(track.getFilePath()), track.getId(), refGenome);
-                    Collection<PersistantMapping> intermedRes = externalDataReader.getMappingsFromBam(request, true);
+                    Collection<PersistantMapping> intermedRes = externalDataReader.getMappingsFromBam(request);
                     externalDataReader.close();
                     mappingList.addAll(intermedRes);
                 }

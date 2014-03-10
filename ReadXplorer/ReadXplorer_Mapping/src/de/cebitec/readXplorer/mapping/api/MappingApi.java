@@ -1,10 +1,5 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.readXplorer.mapping.api;
 
-import de.cebitec.readXplorer.mapping.MappingProcessor;
 import de.cebitec.readXplorer.util.CommandLineUtils;
 import de.cebitec.readXplorer.util.FileUtils;
 import de.cebitec.readXplorer.util.Properties;
@@ -15,7 +10,6 @@ import javax.swing.JOptionPane;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.modules.InstalledFileLocator;
-import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.NbPreferences;
 

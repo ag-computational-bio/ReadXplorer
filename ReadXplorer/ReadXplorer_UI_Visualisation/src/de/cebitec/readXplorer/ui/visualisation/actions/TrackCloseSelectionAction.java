@@ -30,14 +30,14 @@ public class TrackCloseSelectionAction extends AbstractAction implements Dynamic
     public JComponent[] getMenuPresenters() {
         AppPanelTopComponent context = null;
         TopComponent tc = WindowManager.getDefault().getRegistry().getActivated();
-        if(tc instanceof AppPanelTopComponent){
-                context = (AppPanelTopComponent) tc;
-            }
+        if (tc instanceof AppPanelTopComponent) {
+            context = (AppPanelTopComponent) tc;
+        }
 
         List<Action> actions = context != null ? context.allTrackCloseActions() : new ArrayList<Action>();
         JMenu menu = new JMenu("Close specific tracks");
         for (Action a : actions) {
-            menu.add (new JMenuItem(a));
+            menu.add(new JMenuItem(a));
         }
         return new JComponent[] { menu };
     }

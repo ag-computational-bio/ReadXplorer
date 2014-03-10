@@ -18,6 +18,7 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
     private int maxLowCovInitCount;
     private int minLowCovIncrease;
     private int minTranscriptExtensionCov;
+    private int maxLeaderlessDistance;
     private ParametersReadClasses readClassParams;
 
     
@@ -30,11 +31,12 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
      * @param minPercentIncrease
      * @param maxLowCovInitCount
      * @param minLowCovIncrease
+     * @param maxLeaderlessDistance
      * @param minTranscriptExtensionCov 
      */
     ParameterSetTSS(boolean performTSSAnalysis, boolean autoTssParamEstimation, boolean performUnannotatedTranscriptDet, 
             int minNoReadStarts, int minPercentIncrease, int maxLowCovInitCount, int minLowCovIncrease, 
-            int minTranscriptExtensionCov, ParametersReadClasses readClassParams) {
+            int minTranscriptExtensionCov, int maxLeaderlessDistance, ParametersReadClasses readClassParams) {
         this.performTSSAnalysis = performTSSAnalysis;
         this.autoTssParamEstimation = autoTssParamEstimation;
         this.performUnannotatedTranscriptDet = performUnannotatedTranscriptDet;
@@ -43,6 +45,7 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
         this.maxLowCovInitCount = maxLowCovInitCount;
         this.minLowCovIncrease = minLowCovIncrease;
         this.minTranscriptExtensionCov = minTranscriptExtensionCov;
+        this.maxLeaderlessDistance = maxLeaderlessDistance;
         this.readClassParams = readClassParams;
         
     }
@@ -77,6 +80,10 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
 
     public int getMinTranscriptExtensionCov() {
         return minTranscriptExtensionCov;
+    }
+
+    public int getMaxLeaderlessDistance() {
+        return this.maxLeaderlessDistance;
     }
 
     public ParametersReadClasses getReadClassParams() {
@@ -114,6 +121,10 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
     public void setMinTranscriptExtensionCov(int minTranscriptExtensionCov) {
         this.minTranscriptExtensionCov = minTranscriptExtensionCov;
     }  
+
+    public void setMaxLeaderlessDistance(int maxLeaderlessDistance) {
+        this.maxLeaderlessDistance = maxLeaderlessDistance;
+    }
 
     public void setReadClassParams(ParametersReadClasses readClassParams) {
         this.readClassParams = readClassParams;

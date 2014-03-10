@@ -13,6 +13,7 @@ import de.cebitec.readXplorer.parser.common.ParsedReference;
 import de.cebitec.readXplorer.parser.common.ParsedTrack;
 import de.cebitec.readXplorer.parser.common.ParsingException;
 import de.cebitec.readXplorer.parser.mappings.MappingParserI;
+import de.cebitec.readXplorer.parser.mappings.SamBamDirectParser;
 import de.cebitec.readXplorer.parser.mappings.SamBamStatsParser;
 import de.cebitec.readXplorer.parser.output.SamBamCombiner;
 import de.cebitec.readXplorer.parser.output.SamBamExtender;
@@ -280,30 +281,9 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                                     inputFile2.setWritable(true);
                                 }
 
-                                //generate classification data in sorted file
-                                MappingParserI mappingParser = trackJob1.getParser();
-                                mappingParser.registerObserver(this);
-                                //parser also deletes combined file or other writable input file
-                                mappingParser.setStatsContainer(statsContainer);
-                                Object parsingResult = mappingParser.parseInput(trackJob1, chromLengthMap);
-                                mappingParser.removeObserver(this);
-                                if (lastWorkFile != trackJob1.getFile()) { //either combined or write protected orig file
-                                    GeneralUtils.deleteOldWorkFile(lastWorkFile); //only delete, if file was changed during parsing
-                                    lastWorkFile = trackJob1.getFile();
-                                }
-                                ph.progress(workunits++);
-                                if (parsingResult instanceof DirectAccessDataContainer) {
-                                    DirectAccessDataContainer dataContainer = (DirectAccessDataContainer) parsingResult;
-                                    classificationMap = dataContainer.getClassificationMap();
-                                } else {
-                                    this.showMsg("Parsing of " + trackJob1.getName() + "failed! The parsing result was of an unexpected type: " + parsingResult.getClass());
-                                    this.noErrors = false;
-                                    continue;
-                                }
-
                                 //extension for both classification and read pair info
                                 SamBamDirectReadPairClassifier samBamDirectReadPairClassifier = new SamBamDirectReadPairClassifier(
-                                        readPairJobContainer, chromLengthMap, classificationMap);
+                                        readPairJobContainer, chromLengthMap);
                                 samBamDirectReadPairClassifier.registerObserver(this);
                                 samBamDirectReadPairClassifier.setStatsContainer(statsContainer);
                                 samBamDirectReadPairClassifier.classifyReadPairs();
@@ -387,6 +367,8 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 
         this.setChromLengthMap(trackJob);
         boolean success;
+        StatsContainer statsContainer = new StatsContainer();
+        statsContainer.prepareForTrack();
         
         //only extend, if data is not already stored in it
         if (!trackJob.isAlreadyImported()) {
@@ -400,20 +382,12 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 
                 //generate classification data in file sorted by read sequence
                 mappingParser.registerObserver(this);
-                Object parsingResult = mappingParser.parseInput(trackJob, chromLengthMap);
+                mappingParser.setStatsContainer(statsContainer);
+                mappingParser.parseInput(trackJob, chromLengthMap);
                 mappingParser.removeObserver(this);
                 ph.progress(workunits++);
-                if (parsingResult instanceof DirectAccessDataContainer) {
-                    DirectAccessDataContainer dataContainer = (DirectAccessDataContainer) parsingResult;
-                    Map<String, ParsedClassification> classificationMap = dataContainer.getClassificationMap(); 
-
-                    //write new file with classification information
-                    success = success ? this.extendSamBamFile(classificationMap, trackJob, chromLengthMap) : success;
-                    noErrors = noErrors ? success : noErrors;
-                    if (success) { GeneralUtils.deleteOldWorkFile(lastWorkFile); }
-                } else {
-                    this.showMsg("Parsing of " + trackJob.getName() + "failed! The parsing result was of an unexpected type: " + parsingResult.getClass());
-                }
+                noErrors = noErrors ? success : noErrors;
+                if (success) { GeneralUtils.deleteOldWorkFile(lastWorkFile); } //only when we reach this line without exceptions and conversion was successful
 
             } catch (OutOfMemoryError ex) {
                 this.showMsg("Out of memory error during parsing of direct access track: " + ex.getMessage());
@@ -429,11 +403,8 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
             mappingParser.removeObserver(this);
         }
 
-        //generate position table and statistics data for track
         //file needs to be sorted by coordinate for efficient calculation
         SamBamStatsParser statsParser = new SamBamStatsParser();
-        StatsContainer statsContainer = new StatsContainer();
-        statsContainer.prepareForTrack();
         statsParser.setStatsContainer(statsContainer);
         statsParser.registerObserver(this);
         ParsedTrack track = statsParser.createTrackStats(trackJob, chromLengthMap);
@@ -466,7 +437,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
          
         this.showMsg("Your current JVM config allows up to "+GeneralUtils.formatNumber(rt.maxMemory())+" bytes of memory to be allocated.");
         this.showMsg("Currently the plattform is using "+GeneralUtils.formatNumber(rt.totalMemory() - rt.freeMemory())+" bytes of memory.");
-        this.showMsg("Please be aware of that you might need to change the -J-d64 and -J-Xmx value of your JVM to process large imports successfully.");
+        this.showMsg("Please be aware that you might need to change the -J-d64 and -J-Xmx value of your JVM to process large imports successfully.");
         this.showMsg("The value can be configured in the ../readXplorer/etc/readXplorer.conf file in the application folder."); 
         this.showMsg("");
         
@@ -493,7 +464,12 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 
     @Override
     public void update(Object data) {
-         this.showMsg(data.toString());            
+        if (data.toString().contains("processed") || data.toString().contains("converted") || data.toString().contains("indexed")) {
+            this.ph.progress(data.toString());
+        } else {
+            this.showMsg(data.toString());
+            this.ph.progress("");
+        }
     }
 
     /**

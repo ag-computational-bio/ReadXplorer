@@ -7,7 +7,6 @@ import de.cebitec.readXplorer.parser.common.ParsedTrack;
 import de.cebitec.readXplorer.util.Benchmark;
 import de.cebitec.readXplorer.util.DiscreteCountingDistribution;
 import de.cebitec.readXplorer.util.ErrorLimit;
-import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.MessageSenderI;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Observer;
@@ -15,7 +14,6 @@ import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.StatsContainer;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +66,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
     public ParsedTrack createTrackStats(TrackJob trackJob, Map<String, Integer> chromLengthMap) {
         
         long startTime = System.currentTimeMillis();
+        long finish;
         String fileName = trackJob.getFile().getName();
         this.notifyObservers(NbBundle.getMessage(SamBamStatsParser.class, "StatsParser.Start", fileName));
 
@@ -94,7 +93,6 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
         Integer classification;
         Integer mappingCount;
         ErrorLimit errorLimit = new ErrorLimit();
-        Set<String> readNameSet = new HashSet<>();
 //        HashMap<String, Object> readNameSet = new HashMap<>();
         
 //        String[] nameArray;
@@ -122,18 +120,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
                             continue; //continue, and ignore read, if it contains inconsistent information
                         }
 
-                        //statistics calculations: count no reads and distinct sequences ////////////
-                        //illumina read hack to reduce memory footprint
-//                        nameArray = readName.split(":");
-//                        shortReadName = nameArray[2] + nameArray[3] + nameArray[4];
-//                        nameArray = shortReadName.split("#");
-//                        shortReadName = nameArray[0] + "/" + nameArray[1].split("/")[1];
-//                        readNameSet.add(shortReadName);
-                        if (statsContainer.getStatsMap().get(StatsContainer.NO_READS) <= 0) {
-//                            GeneralUtils.splitReadNameAndAddToMap(readNameSet, readName, 0, GeneralUtils.NameStyle.STYLE_STANDARD);
-                            readNameSet.add(readName);
-                        }
-                        
+                        //statistics calculations: count no mappings in classifications and distinct sequences ////////////
                         mappingCount = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
                         if (mappingCount != null) {
                             mapCount = mappingCount;
@@ -202,14 +189,16 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
                     }
                 } catch (Exception e) {
                     //skip error messages, if too many occur to prevent bug in the output panel
-                    if (!e.getMessage().contains("MAPQ should be 0")) {
+                    if (e.getMessage() == null || !e.getMessage().contains("MAPQ should be 0")) {
                         //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
                         this.sendMsgIfAllowed(NbBundle.getMessage(SamBamStatsParser.class,
                                 "Parser.Parsing.CorruptData", lineno, e.toString()));
+                        Exceptions.printStackTrace(e);
                     }
                 }
                 if ((lineno % 500000) == 0)  {//output process info only on every XX line
-                    this.notifyObservers(lineno + " mappings processed ...");
+                    finish = System.currentTimeMillis();
+                    this.notifyObservers(Benchmark.calculateDuration(startTime, finish, lineno + " mappings processed in "));
                 }
             }
             if (errorLimit.getSkippedCount() > 0) {
@@ -229,14 +218,12 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
         coverageContainer.setCoveredPerfectPositions(this.getCoveredBases(coveredPerfectIntervals));
 
         ParsedTrack track = new ParsedTrack(trackJob, new ParsedMappingContainer(), coverageContainer);
-        statsContainer.increaseValue(StatsContainer.NO_READS, readNameSet.size());
         statsContainer.setReadLengthDistribution(readLengthDistribution);
         track.setStatsContainer(statsContainer);
 //        this.notifyObservers(track);
         this.coverageContainer = new CoverageContainer();
-        readNameSet.clear();
         
-        long finish = System.currentTimeMillis();
+        finish = System.currentTimeMillis();
         String msg = NbBundle.getMessage(SamBamStatsParser.class, "StatsParser.Finished", fileName);
         this.notifyObservers(Benchmark.calculateDuration(startTime, finish, msg));
         

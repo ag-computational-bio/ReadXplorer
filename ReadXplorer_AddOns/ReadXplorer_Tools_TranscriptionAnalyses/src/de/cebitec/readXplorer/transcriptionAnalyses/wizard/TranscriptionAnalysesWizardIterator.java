@@ -53,6 +53,7 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
     public static final String PROP_MAX_LOW_COV_INIT_COUNT = "maxLowCovInitialCount";
     public static final String PROP_MIN_LOW_COV_INC = "minLowCovIncrease";
     public static final String PROP_MIN_TRANSCRIPT_EXTENSION_COV = "minTranscriptExtensionCov";
+    public static final String PROP_MAX_LEADERLESS_DISTANCE = "maxLeaderlessDistance";
     public static final String PROP_MIN_NUMBER_READS = "minNumberReads";
     public static final String PROP_MAX_NUMBER_READS = "maxNumberReads";
     public static final String PROP_MIN_SPANNING_READS = "minNumberSpanningReads";

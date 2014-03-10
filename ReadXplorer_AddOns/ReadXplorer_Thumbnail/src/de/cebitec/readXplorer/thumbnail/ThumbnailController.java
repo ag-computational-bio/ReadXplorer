@@ -23,8 +23,8 @@ import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.CoverageInfoLab
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.CoverageZoomSlider;
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.MultipleTrackViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.TrackViewer;
-import de.cebitec.readXplorer.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
-import de.cebitec.readXplorer.view.dialogMenus.SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException;
+import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
+import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException;
 import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.Dimension;
@@ -269,11 +269,11 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
 
         // create track viewer
         MultiTrackConnector tc;
-        SaveTrackConnectorFetcherForGUI fetcher = new SaveTrackConnectorFetcherForGUI();
+        SaveFileFetcherForGUI fetcher = new SaveFileFetcherForGUI();
         try {
             tc = fetcher.getMultiTrackConnector(track);
         } catch (UserCanceledTrackPathUpdateException ex) {
-            SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
+            SaveFileFetcherForGUI.showPathSelectionErrorMsg();
             return null;
         }
 
@@ -317,11 +317,11 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
 
         // get double track connector
         MultiTrackConnector trackCon;
-        SaveTrackConnectorFetcherForGUI fetcher = new SaveTrackConnectorFetcherForGUI();
+        SaveFileFetcherForGUI fetcher = new SaveFileFetcherForGUI();
         try {
             trackCon = fetcher.getMultiTrackConnector(tracks);
         } catch (UserCanceledTrackPathUpdateException ex) {
-            SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
+            SaveFileFetcherForGUI.showPathSelectionErrorMsg();
             return null; //cannot occur, since both tracks are already open in the thumbnail viewer
         }
         MultipleTrackViewer trackV = new MultipleTrackViewer(boundsManager, b, controller.getCurrentRefGen(), trackCon, false);

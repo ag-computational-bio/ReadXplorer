@@ -79,9 +79,8 @@
                           <Component id="refGenLabel" min="-2" max="-2" attributes="0"/>
                           <Component id="multiTrackListLabel" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="multipleImportCheckBox" max="32767" attributes="0"/>
                           <Component id="alreadyImportedBox" max="32767" attributes="0"/>
                           <Component id="refGenBox" alignment="0" max="32767" attributes="1"/>
                           <Component id="multiTrackScrollPane" alignment="0" max="32767" attributes="0"/>
@@ -139,15 +138,13 @@
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="alreadyImportedBox" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="multipleImportCheckBox" min="-2" max="-2" attributes="0"/>
-              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="multiTrackScrollPane" pref="141" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
                       <Component id="multiTrackListLabel" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="0" pref="96" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
-                  <Component id="multiTrackScrollPane" pref="0" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -364,16 +361,6 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="alreadyImportedBoxActionPerformed"/>
-      </Events>
-    </Component>
-    <Component class="javax.swing.JCheckBox" name="multipleImportCheckBox">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readXplorer/ui/importer/Bundle.properties" key="NewReadPairTracksDialogPanel.multipleImportCheckBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="multipleImportCheckBoxActionPerformed"/>
       </Events>
     </Component>
     <Container class="javax.swing.JScrollPane" name="multiTrackScrollPane">

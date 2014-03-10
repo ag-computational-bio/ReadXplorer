@@ -90,7 +90,6 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel implement
         orientation3Button = new javax.swing.JRadioButton();
         orientation2Button = new javax.swing.JRadioButton();
         alreadyImportedBox = new javax.swing.JCheckBox();
-        multipleImportCheckBox = new javax.swing.JCheckBox();
         multiTrackScrollPane = new javax.swing.JScrollPane();
         multiTrackList = new javax.swing.JList<>();
         multiTrackListLabel = new javax.swing.JLabel();
@@ -199,13 +198,6 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel implement
             }
         });
 
-        multipleImportCheckBox.setText(org.openide.util.NbBundle.getMessage(NewReadPairTracksDialogPanel.class, "NewReadPairTracksDialogPanel.multipleImportCheckBox.text")); // NOI18N
-        multipleImportCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                multipleImportCheckBoxActionPerformed(evt);
-            }
-        });
-
         multiTrackScrollPane.setViewportView(multiTrackList);
 
         multiTrackListLabel.setText(org.openide.util.NbBundle.getMessage(NewReadPairTracksDialogPanel.class, "NewReadPairTracksDialogPanel.multiTrackListLabel.text")); // NOI18N
@@ -263,7 +255,6 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel implement
                             .addComponent(multiTrackListLabel))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(multipleImportCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(alreadyImportedBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(refGenBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(multiTrackScrollPane))))
@@ -309,14 +300,12 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel implement
                     .addComponent(refGenLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(alreadyImportedBox)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(multipleImportCheckBox)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(multiTrackScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(multiTrackListLabel)
-                        .addGap(0, 96, Short.MAX_VALUE))
-                    .addComponent(multiTrackScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -393,26 +382,6 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel implement
         }
     }//GEN-LAST:event_alreadyImportedBoxActionPerformed
 
-    private void multipleImportCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_multipleImportCheckBoxActionPerformed
-        this.updateGuiForMultipleFiles(multipleImportCheckBox, multiTrackScrollPane, multiTrackList, multiTrackListLabel, mappingFile1Field);
-        if (this.useMultipleImport()) {
-            this.nameField.setEnabled(false);
-            this.nameField.setText(NbBundle.getMessage(NewReadPairTracksDialogPanel.class, "MultipleImportTrackNameMsg"));
-            DefaultListModel<String> model = new DefaultListModel<>();
-            this.fillMultipleImportTable(model, getMappingFiles(), "Mapping file 1 list:");
-            if (!this.isAlreadyImported()) {
-                this.fillMultipleImportTable(model, mappingFiles2, "Mapping file 2 list:");
-            }
-            this.mappingFile2Field.setText(mappingFiles2.size() + " tracks to import");
-            multiTrackList.setModel(model);
-        } else {
-            this.nameField.setEnabled(true);
-            this.nameField.setText("");
-            this.mappingFiles2.clear();
-            this.mappingFile2Field.setText("");
-        }
-    }//GEN-LAST:event_multipleImportCheckBoxActionPerformed
-
     
     /**
      * Opens a file chooser for selecting a read pair mapping file.
@@ -431,6 +400,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel implement
             public void open(String fileLocation) {
                 
                 // file chosen
+                updateGuiForMultipleFiles(this.getSelectedFiles().length > 1, multiTrackScrollPane, multiTrackList, multiTrackListLabel, mappingFile1Field);
                 if (useMultipleImport()) {
                     File[] files = this.getSelectedFiles();
                     if (isFstFile) {
@@ -482,7 +452,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel implement
         };
         
         fc.setDirectoryProperty("NewSeqPairTrack.Filepath");
-        fc.setMultiSelectionEnabled(this.useMultipleImport());
+        fc.setMultiSelectionEnabled(true);
         fc.openFileChooser(ReadXplorerFileChooser.OPEN_DIALOG);
     }    
     
@@ -504,7 +474,6 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel implement
     private javax.swing.JList<String> multiTrackList;
     private javax.swing.JLabel multiTrackListLabel;
     private javax.swing.JScrollPane multiTrackScrollPane;
-    private javax.swing.JCheckBox multipleImportCheckBox;
     private javax.swing.JTextField nameField;
     private javax.swing.JLabel nameLabel;
     private javax.swing.JRadioButton orientation1Button;

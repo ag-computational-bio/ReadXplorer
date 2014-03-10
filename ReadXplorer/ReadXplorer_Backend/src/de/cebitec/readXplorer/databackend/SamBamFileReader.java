@@ -1,7 +1,6 @@
 package de.cebitec.readXplorer.databackend;
 
 import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistant;
-import de.cebitec.readXplorer.util.IndexFileNotificationPanel;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantDiff;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantDiffAndGapResult;
@@ -10,6 +9,7 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantReadPairGroup;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReferenceGap;
 import de.cebitec.readXplorer.parser.mappings.CommonsMappingParser;
+import de.cebitec.readXplorer.util.IndexFileNotificationPanel;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Properties;
@@ -115,11 +115,9 @@ public class SamBamFileReader implements Observable {
      * Retrieves the mappings from the given interval from the sam or bam file
      * set for this data reader and the reference sequence with the given name.
      * @param request the request to carry out
-     * @param needDiffs true, if the diffs need to be fetched from the file as
-     * well
      * @return the mappings for the given interval
      */
-    public Collection<PersistantMapping> getMappingsFromBam(IntervalRequest request, boolean needDiffs) {
+    public Collection<PersistantMapping> getMappingsFromBam(IntervalRequest request) {
 
         Collection<PersistantMapping> mappings = new ArrayList<>();
         
@@ -151,27 +149,30 @@ public class SamBamFileReader implements Observable {
                     classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
                     numMappingsForRead = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
 
-                    //find check alignment via cigar string and add diffs to mapping
-                    cigar = record.getCigarString();
-                    if (cigar.contains("M")) {
-                        refSubSeq = reference.getChromSequence(request.getChromId(), start, stop);
-                    } else {
-                        refSubSeq = null;
-                    }
-
-                    //only add mappings, which are valid according to the read classification paramters
+                    //only add mappings, which are valid according to the read classification parameters
                     if (this.isIncludedMapping(classification, numMappingsForRead, request)) {
 
                         mapping = this.getMappingForValues(classification, numMappingsForRead, numReplicates, id++, start, stop, isFwdStrand);
 
-                        this.createDiffsAndGaps(record.getCigarString(), start, isFwdStrand, numReplicates,
-                                record.getReadString(), refSubSeq, mapping);
+                        if (request.isDiffsAndGapsNeeded() && classification != Properties.PERFECT_COVERAGE) {
 
+                            //find check alignment via cigar string and add diffs to mapping
+                            cigar = record.getCigarString();
+                            if (cigar.contains("M")) { //TODO: check if this check is faster or the version in other methods here
+                                refSubSeq = reference.getChromSequence(request.getChromId(), start, stop);
+                            } else {
+                                refSubSeq = null;
+                            }
+                            this.createDiffsAndGaps(record.getCigarString(), start, isFwdStrand, numReplicates,
+                                    record.getReadString(), refSubSeq, mapping);
+                        }
+                        
+                        //stuff for trimmed reads
                         Object originalSequence = record.getAttribute("os");
                         if ((originalSequence != null) && (originalSequence instanceof String)) {
-                        String ors = (String) originalSequence;
-                        ors = ors.replace("@", record.getReadString());
-                        mapping.setOriginalSequence(ors);
+                            String ors = (String) originalSequence;
+                            ors = ors.replace("@", record.getReadString());
+                            mapping.setOriginalSequence(ors);
                         }
                         Object trimmedFromLeft = record.getIntegerAttribute("tl");
                         if ((trimmedFromLeft != null) && (trimmedFromLeft instanceof Integer)) {
@@ -309,15 +310,6 @@ public class SamBamFileReader implements Observable {
                         mateStart = record.getMateAlignmentStart();
                         bothVisible = mateStart > from && mateStart < to;
 
-
-                        //check alignment via cigar string and add diffs to mapping
-                        cigar = record.getCigarString();
-                        if (cigar.contains("M")) {
-                            refSubSeq = reference.getChromSequence(request.getChromId(), startPos, stop);
-                        } else {
-                            refSubSeq = null;
-                        }
-
                         mapping = this.getMappingForValues(classification, numMappingsForRead, numReplicates, id++, startPos, stop, isFwdStrand);
                         if (pairId != null && pairType != null) { //since both data fields are always written together
 //                // add new readPair if not exists
@@ -337,6 +329,14 @@ public class SamBamFileReader implements Observable {
                         }
 
                         if (request.isDiffsAndGapsNeeded() && classification != Properties.PERFECT_COVERAGE) {
+
+                            //check alignment via cigar string and add diffs to mapping
+                            cigar = record.getCigarString();
+                            if (cigar.contains("M")) {
+                                refSubSeq = reference.getChromSequence(request.getChromId(), startPos, stop);
+                            } else {
+                                refSubSeq = null;
+                            }
                             this.createDiffsAndGaps(record.getCigarString(), startPos, isFwdStrand, numReplicates,
                                     record.getReadString(), refSubSeq, mapping);
                         }
@@ -421,7 +421,7 @@ public class SamBamFileReader implements Observable {
                         classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
                         startPos = isFwdStrand ? record.getAlignmentStart() : record.getAlignmentEnd();
                         
-                        this.increaseCoverage(request, numMappingsForRead, classification, 
+                        this.increaseCoverage(request, classification, 
                                 trackNeeded, isFwdStrand, startPos, startPos, coverage);
                     }
                 }
@@ -490,13 +490,13 @@ public class SamBamFileReader implements Observable {
                         startPos = record.getAlignmentStart();
                         stop = record.getAlignmentEnd();
                         
-                        this.increaseCoverage(request, numMappingsForRead, classification, 
+                        this.increaseCoverage(request, classification, 
                                 trackNeeded, isFwdStrand, startPos, stop, coverage);
                         if (isFwdStrand) {
-                            this.increaseCoverage(request, numMappingsForRead, classification, 
+                            this.increaseCoverage(request, classification, 
                                     trackNeeded, isFwdStrand, startPos, startPos, readStarts);
                         } else {
-                            this.increaseCoverage(request, numMappingsForRead, classification,
+                            this.increaseCoverage(request, classification,
                                     trackNeeded, isFwdStrand, stop, stop, readStarts);
                         }
 
@@ -574,7 +574,7 @@ public class SamBamFileReader implements Observable {
                         startPos = record.getAlignmentStart();
                         stop = record.getAlignmentEnd();
                         
-                        this.increaseCoverage(request, numMappingsForRead, classification, trackNeeded, 
+                        this.increaseCoverage(request, classification, trackNeeded, 
                                 isFwdStrand, startPos, stop, coverage);
 
                         if (request.isDiffsAndGapsNeeded() && classification != Properties.PERFECT_COVERAGE && 
@@ -612,71 +612,67 @@ public class SamBamFileReader implements Observable {
      * @param startPos
      * @param stopPos 
      */
-    private void increaseCoverage(IntervalRequest request, Integer numMappingsForRead, Integer classification, 
+    private void increaseCoverage(IntervalRequest request, Integer classification, 
             byte trackNeeded, boolean isFwdStrand, int startPos, int stopPos, PersistantCoverage coverage) {
         
         List<int[]> coverageArrays = new ArrayList<>();
         
-        if (!request.getReadClassParams().isOnlyUniqueReads()
-                || request.getReadClassParams().isOnlyUniqueReads() && numMappingsForRead != null && numMappingsForRead == 1) {
+        if (trackNeeded == 0) {
+            //only the arrays, which are allowed to be updated are added to the coverage array list
 
-            if (trackNeeded == 0) {
-                //only the arrays, which are allowed to be updated are added to the coverage array list
+            if (classification != null) {
+                if (classification == Properties.PERFECT_COVERAGE) {
 
-                if (classification != null) {
-                    if (classification == Properties.PERFECT_COVERAGE) {
-
-                        if (isFwdStrand) {
-                            if (request.getReadClassParams().isPerfectMatchUsed()) {
-                                coverageArrays.add(coverage.getPerfectFwdMult());
-                            }
-                            if (request.getReadClassParams().isBestMatchUsed()) {
-                                coverageArrays.add(coverage.getBestMatchFwdMult());
-                            }
-                        } else {
-                            if (request.getReadClassParams().isPerfectMatchUsed()) {
-                                coverageArrays.add(coverage.getPerfectRevMult());
-                            }
-                            if (request.getReadClassParams().isBestMatchUsed()) {
-                                coverageArrays.add(coverage.getBestMatchRevMult());
-                            }
+                    if (isFwdStrand) {
+                        if (request.getReadClassParams().isPerfectMatchUsed()) {
+                            coverageArrays.add(coverage.getPerfectFwdMult());
                         }
-                    }
-
-                    if ((classification == Properties.BEST_MATCH_COVERAGE)
-                            && request.getReadClassParams().isBestMatchUsed()) {
-
-                        if (isFwdStrand) {
+                        if (request.getReadClassParams().isBestMatchUsed()) {
                             coverageArrays.add(coverage.getBestMatchFwdMult());
-                        } else {
+                        }
+                    } else {
+                        if (request.getReadClassParams().isPerfectMatchUsed()) {
+                            coverageArrays.add(coverage.getPerfectRevMult());
+                        }
+                        if (request.getReadClassParams().isBestMatchUsed()) {
                             coverageArrays.add(coverage.getBestMatchRevMult());
                         }
                     }
                 }
 
-                if (request.getReadClassParams().isCommonMatchUsed()) {
+                if ((classification == Properties.BEST_MATCH_COVERAGE)
+                        && request.getReadClassParams().isBestMatchUsed()) {
+
                     if (isFwdStrand) {
-                        coverageArrays.add(coverage.getCommonFwdMult());
+                        coverageArrays.add(coverage.getBestMatchFwdMult());
                     } else {
-                        coverageArrays.add(coverage.getCommonRevMult());
+                        coverageArrays.add(coverage.getBestMatchRevMult());
                     }
                 }
+            }
 
-            } else if (trackNeeded == PersistantCoverage.TRACK1) {
+            if (request.getReadClassParams().isCommonMatchUsed()) {
                 if (isFwdStrand) {
-                    coverageArrays.add(coverage.getCommonFwdMultCovTrack1());
+                    coverageArrays.add(coverage.getCommonFwdMult());
                 } else {
-                    coverageArrays.add(coverage.getCommonRevMultCovTrack1());
-                }
-            } else if (trackNeeded == PersistantCoverage.TRACK2) {
-                if (isFwdStrand) {
-                    coverageArrays.add(coverage.getCommonFwdMultCovTrack2());
-                } else {
-                    coverageArrays.add(coverage.getCommonRevMultCovTrack2());
+                    coverageArrays.add(coverage.getCommonRevMult());
                 }
             }
-            this.increaseCoverage(startPos, stopPos, request.getTotalFrom(), request.getTotalTo(), coverageArrays);
+
+        } else if (trackNeeded == PersistantCoverage.TRACK1) {
+            if (isFwdStrand) {
+                coverageArrays.add(coverage.getCommonFwdMultCovTrack1());
+            } else {
+                coverageArrays.add(coverage.getCommonRevMultCovTrack1());
+            }
+        } else if (trackNeeded == PersistantCoverage.TRACK2) {
+            if (isFwdStrand) {
+                coverageArrays.add(coverage.getCommonFwdMultCovTrack2());
+            } else {
+                coverageArrays.add(coverage.getCommonRevMultCovTrack2());
+            }
         }
+        this.increaseCoverage(startPos, stopPos, request.getTotalFrom(), request.getTotalTo(), coverageArrays);
     }
     
     /**

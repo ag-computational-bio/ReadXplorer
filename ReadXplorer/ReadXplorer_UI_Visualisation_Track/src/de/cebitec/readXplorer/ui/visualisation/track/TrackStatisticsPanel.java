@@ -449,7 +449,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 }
                 singletonMappingsAbsLabel.setText(String.valueOf(numUniqueMappings));
 
-                int numUniqueSequences = statsMap.get(StatsContainer.NO_UNIQUE_SEQS);
+                int numUniqueSequences = statsMap.get(StatsContainer.NO_UNIQUE_SEQS); //NOT CALCULATED CURRENTLY
                 if (numUniqueSequences == -1) {
                     numUniqueSequences = trackCon.getNumOfUniqueSequencesCalculate();
                     recalculated = true;

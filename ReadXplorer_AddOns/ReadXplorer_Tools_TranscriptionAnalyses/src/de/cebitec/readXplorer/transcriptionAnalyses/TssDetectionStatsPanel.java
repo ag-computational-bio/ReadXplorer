@@ -37,23 +37,24 @@ public class TssDetectionStatsPanel extends javax.swing.JPanel {
 
         tssDetectionStatsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null},
-                {null},
-                {null},
-                {null},
-                {null},
-                {null},
-                {null}
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null},
+                {null, null}
             },
             new String [] {
-                ""
+                "Bla", "Blubb"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.String.class
+                java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false
+                false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -65,7 +66,10 @@ public class TssDetectionStatsPanel extends javax.swing.JPanel {
             }
         });
         tssDetectionStatsScrollpane.setViewportView(tssDetectionStatsTable);
-        tssDetectionStatsTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(TssDetectionStatsPanel.class, "TssDetectionStatsPanel.tssDetectionStatsTable.columnModel.title0")); // NOI18N
+        if (tssDetectionStatsTable.getColumnModel().getColumnCount() > 0) {
+            tssDetectionStatsTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(TssDetectionStatsPanel.class, "TssDetectionStatsPanel.tssDetectionStatsTable.columnModel.title0_1")); // NOI18N
+            tssDetectionStatsTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(TssDetectionStatsPanel.class, "TssDetectionStatsPanel.tssDetectionStatsTable.columnModel.title1")); // NOI18N
+        }
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -75,7 +79,7 @@ public class TssDetectionStatsPanel extends javax.swing.JPanel {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(tssDetectionStatsScrollpane, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(tssDetectionStatsScrollpane, javax.swing.GroupLayout.PREFERRED_SIZE, 178, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -93,12 +97,13 @@ public class TssDetectionStatsPanel extends javax.swing.JPanel {
                 {ResultPanelTranscriptionStart.TSS_CORRECT, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_CORRECT))},
                 {ResultPanelTranscriptionStart.TSS_UPSTREAM, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_UPSTREAM))},
                 {ResultPanelTranscriptionStart.TSS_DOWNSTREAM, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_DOWNSTREAM))},
+                {ResultPanelTranscriptionStart.TSS_LEADERLESS, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_LEADERLESS))},
                 {ResultPanelTranscriptionStart.TSS_FWD, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_FWD))},
                 {ResultPanelTranscriptionStart.TSS_REV, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_REV))},
                 {ResultPanelTranscriptionStart.TSS_NOVEL, unannotatedTransValue}
             },
             new String [] {
-                NbBundle.getMessage(TssDetectionStatsPanel.class, "TssDetectionStatsPanel.tssDetectionStatsTable.columnModel.title0"), 
+                NbBundle.getMessage(TssDetectionStatsPanel.class, "TssDetectionStatsPanel.tssDetectionStatsTable.columnModel.title0_1"), 
                 NbBundle.getMessage(TssDetectionStatsPanel.class, "TssDetectionStatsPanel.tssDetectionStatsTable.columnModel.title1")
                 
             }

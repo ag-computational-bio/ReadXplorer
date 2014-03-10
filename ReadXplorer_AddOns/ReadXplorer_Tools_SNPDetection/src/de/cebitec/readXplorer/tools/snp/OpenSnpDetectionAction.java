@@ -2,6 +2,7 @@ package de.cebitec.readXplorer.tools.snp;
 
 import de.cebitec.readXplorer.databackend.AnalysesHandler;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
+import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
@@ -11,7 +12,6 @@ import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.readXplorer.view.dialogMenus.OpenTracksWizardPanel;
-import de.cebitec.readXplorer.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
 import de.cebitec.readXplorer.view.dialogMenus.SelectFeatureTypeWizardPanel;
 import de.cebitec.readXplorer.view.dialogMenus.SelectReadClassWizardPanel;
 import java.awt.event.ActionEvent;
@@ -159,9 +159,9 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
         if (!combineTracks) {
             for (PersistantTrack track : tracks) {
                 try {
-                    connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
-                } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-                    SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
+                    connector = (new SaveFileFetcherForGUI()).getTrackConnector(track);
+                } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+                    SaveFileFetcherForGUI.showPathSelectionErrorMsg();
                     continue;
                 }
                 
@@ -170,11 +170,11 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
             }
         } else {
             try {
-                connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(tracks, combineTracks);
+                connector = (new SaveFileFetcherForGUI()).getTrackConnector(tracks, combineTracks);
                 this.createAnalysis(connector, readClassParams);
                 
-            } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-                SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
+            } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+                SaveFileFetcherForGUI.showPathSelectionErrorMsg();
             }
         }
     }

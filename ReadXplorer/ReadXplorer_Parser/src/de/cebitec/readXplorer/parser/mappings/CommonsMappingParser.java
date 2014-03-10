@@ -4,15 +4,20 @@ import de.cebitec.readXplorer.parser.common.DiffAndGapResult;
 import de.cebitec.readXplorer.parser.common.ParsedClassification;
 import de.cebitec.readXplorer.parser.common.ParsedDiff;
 import de.cebitec.readXplorer.parser.common.ParsedReferenceGap;
+import de.cebitec.readXplorer.parser.common.RefSeqFetcher;
 import de.cebitec.readXplorer.util.MessageSenderI;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.SequenceUtils;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import net.sf.samtools.BAMFileWriter;
+import net.sf.samtools.SAMFileHeader;
+import net.sf.samtools.SAMFileWriter;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMTag;
 import org.openide.util.NbBundle;
@@ -659,6 +664,7 @@ public final class CommonsMappingParser {
         }
         return isMapped;
     }
+    
     /**
      * Adds the classification data (type and number of mapped positions) to the
      * sam record. Use this method, if the number of differences is already
@@ -704,6 +710,90 @@ public final class CommonsMappingParser {
         } else {
             //currently no data is added to reads with errors, since they are not contained in the classification map
         }
+    }
+    
+    /**
+     * Adds the classification data (type and number of mapped positions) to the
+     * sam records. Use this method, if the number of differences is already
+     * known.
+     * @param recordToDiffMap map of sam records to their number of mismatches
+     * to update with classification data
+     * @param classification the classification for the current list of records
+     * @throws AssertionError
+     */
+    public static void addClassificationData(Map<SAMRecord, Integer> recordToDiffMap,
+            ParsedClassification classification) throws AssertionError {
+
+        for (Map.Entry<SAMRecord, Integer> entry : recordToDiffMap.entrySet()) {
+            SAMRecord record = entry.getKey();
+            Integer differences = entry.getValue();
+            int lowestDiffRate = classification.getMinMismatches();
+            int nextMappingPos = classification.getNextMappingStart(record.getAlignmentStart());
+            
+            if (nextMappingPos > 0) {
+                record.setAttribute(SAMTag.CP.name(), nextMappingPos);
+                record.setAttribute(SAMTag.CC.name(), "=");
+            }
+            if (differences == 0) { //perfect mapping
+                record.setAttribute(Properties.TAG_READ_CLASS, (int) Properties.PERFECT_COVERAGE);
+
+            } else if (differences == lowestDiffRate) { //best match mapping
+                record.setAttribute(Properties.TAG_READ_CLASS, (int) Properties.BEST_MATCH_COVERAGE);
+
+            } else if (differences > lowestDiffRate) { //common mapping
+                record.setAttribute(Properties.TAG_READ_CLASS, (int) Properties.COMPLETE_COVERAGE);
+
+            } else { //meaning: differences < lowestDiffRate
+                throw new AssertionError("Cannot contain less than the lowest diff rate number of errors!");
+            }
+            record.setAttribute(Properties.TAG_MAP_COUNT, classification.getNumberOccurrences());
+        }
+    }
+    
+    public static void writeSamRecord(Map<SAMRecord, Integer> diffMap, ParsedClassification classificationData, 
+            SAMFileWriter samBamWriter) {
+        
+        //store data and clear data structure, if new read name is reached - file needs to be sorted by read name
+        CommonsMappingParser.addClassificationData(diffMap, classificationData);
+        for (SAMRecord rec : diffMap.keySet()) {
+            samBamWriter.addAlignment(rec);
+        }
+
+        //reset data structures for next read name
+        diffMap.clear();
+    }
+    
+    public static boolean classifyRead(SAMRecord record, MessageSenderI messageSender, Map<String, Integer> chromLengthMap, File file, int lineno,
+            RefSeqFetcher refSeqFetcher, Map<SAMRecord, Integer> diffMap, ParsedClassification classificationData) {
+        String cigar = record.getCigarString();
+        String readSeq = record.getReadString();
+        int start = record.getAlignmentStart();
+        int stop = record.getAlignmentEnd();
+
+        boolean isConsistent = CommonsMappingParser.checkReadSam(messageSender, readSeq, chromLengthMap.get(record.getReferenceName()), 
+                cigar, start, stop, file.getName(), lineno);
+//            ++noSkippedReads;
+//            continue; //continue, and ignore read, if it contains inconsistent information
+
+        if (isConsistent) {
+            /*
+             * The cigar values are as follows: 0 (M) = alignment match
+             * (both, match or mismatch), 1 (I) = insertion, 2 (D) =
+             * deletion, 3 (N) = skipped, 4 (S) = soft clipped, 5 (H) =
+             * hard clipped, 6 (P) = padding, 7 (=) = sequene match, 8
+             * (X) = sequence mismatch. H not needed, because these
+             * bases are not present in the read sequence!
+             */
+            //count differences to reference
+            String refSeq = refSeqFetcher.getSubSequence(record.getReferenceName(), start, stop);
+            boolean isRevStrand = record.getReadNegativeStrandFlag();
+            DiffAndGapResult diffGapResult = CommonsMappingParser.createDiffsAndGaps(cigar, readSeq, refSeq, isRevStrand, start);
+            int mismatches = diffGapResult.getDifferences();
+            diffMap.put(record, mismatches);
+            classificationData.addReadStart(start);
+            classificationData.updateMinMismatches(mismatches);
+        }
+        return isConsistent;
     }
     
 //    /**

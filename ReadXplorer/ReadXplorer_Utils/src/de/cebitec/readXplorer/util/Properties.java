@@ -77,9 +77,9 @@ public class Properties {
     public static final String TAG_READ_CLASS = "Yc";
     /** 'Yt' = Tag for number of positions a sequence maps to in a reference. */
     public static final String TAG_MAP_COUNT = "Yt";
-    /** 'Yi' = Tag for the sequence pair id. */
+    /** 'Yi' = Tag for the read pair id. */
     public static final String TAG_READ_PAIR_ID = "Yi";
-    /** 'Ys' = Tag for the sequence pair type. */
+    /** 'Ys' = Tag for the read pair type. */
     public static final String TAG_READ_PAIR_TYPE = "Ys";
     
     //Supported sequence pair extensions.

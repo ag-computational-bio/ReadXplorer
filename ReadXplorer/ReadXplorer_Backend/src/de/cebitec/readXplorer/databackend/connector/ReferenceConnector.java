@@ -40,7 +40,6 @@ public class ReferenceConnector {
     /**
      * The reference genome connector is responsible for the connection to a
      * reference genome.
-     *
      * @param refGenID id of the associated reference genome
      */
     ReferenceConnector(int refGenID) {

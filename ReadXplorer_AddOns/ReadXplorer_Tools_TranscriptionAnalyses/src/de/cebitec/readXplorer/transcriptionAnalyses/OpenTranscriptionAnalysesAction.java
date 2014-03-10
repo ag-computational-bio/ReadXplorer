@@ -11,7 +11,7 @@ import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.readXplorer.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
+import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
@@ -76,6 +76,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
     private int minLowCovIncrease = 0;
     private boolean performUnannotatedTranscriptDet = false;
     private int minTranscriptExtensionCov = 0;
+    private int maxLeaderlessDistance = 0;
     private int minNumberReads = 0;
     private int maxNumberReads = 0;
     private boolean autoOperonParamEstimation = false;
@@ -174,6 +175,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
             minLowCovIncrease = (int) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_MIN_LOW_COV_INC);
             performUnannotatedTranscriptDet = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_UNANNOTATED_TRANSCRIPT_DET);
             minTranscriptExtensionCov = (int) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_MIN_TRANSCRIPT_EXTENSION_COV);
+            maxLeaderlessDistance = (int) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_MAX_LEADERLESS_DISTANCE);
         }
         if (performOperonAnalysis) {
             autoOperonParamEstimation = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_AUTO_OPERON_PARAMS);
@@ -187,7 +189,8 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
         }
         //create parameter set for each analysis
         parametersTss = new ParameterSetTSS(performTSSAnalysis, autoTssParamEstimation, performUnannotatedTranscriptDet,
-                minTotalIncrease, minPercentIncrease, maxLowCovInitCount, minLowCovIncrease, minTranscriptExtensionCov, readClassesParams);
+                minTotalIncrease, minPercentIncrease, maxLowCovInitCount, minLowCovIncrease, minTranscriptExtensionCov, 
+                maxLeaderlessDistance, readClassesParams);
         parametersOperonDet = new ParameterSetOperonDet(performOperonAnalysis, minSpanningReads, autoOperonParamEstimation, selOperonFeatureTypes);
         parametersRPKM = new ParameterSetRPKM(performRPKMAnalysis, minNumberReads, maxNumberReads, selRPKMFeatureTypes);
 
@@ -197,9 +200,9 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
             for (PersistantTrack track : this.tracks) {
 
                 try {
-                    connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
-                } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-                    SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
+                    connector = (new SaveFileFetcherForGUI()).getTrackConnector(track);
+                } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+                    SaveFileFetcherForGUI.showPathSelectionErrorMsg();
                     continue;
                 }
                 
@@ -208,11 +211,11 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
             }
         } else {
             try {
-                connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(tracks, combineTracks);
+                connector = (new SaveFileFetcherForGUI()).getTrackConnector(tracks, combineTracks);
                 this.createAnalysis(connector, readClassesParams); //every track has its own analysis handlers
                 
-            } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
-                SaveTrackConnectorFetcherForGUI.showPathSelectionErrorMsg();
+            } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+                SaveFileFetcherForGUI.showPathSelectionErrorMsg();
             }
 
         }
@@ -249,12 +252,14 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
 
             mappingAnalysisHandler.registerObserver(analysisOperon);
             mappingAnalysisHandler.setMappingsNeeded(true);
+            mappingAnalysisHandler.setDesiredData(Properties.REDUCED_MAPPINGS);
         }
         if (parametersRPKM.isPerformRPKMAnalysis()) {
             analysisRPKM = new AnalysisRPKM(connector, parametersRPKM);
 
             mappingAnalysisHandler.registerObserver(analysisRPKM);
             mappingAnalysisHandler.setMappingsNeeded(true);
+            mappingAnalysisHandler.setDesiredData(Properties.REDUCED_MAPPINGS);
         }
 
         trackToAnalysisMap.put(connector.getTrackID(), new AnalysisContainer(analysisTSS, analysisOperon, analysisRPKM));

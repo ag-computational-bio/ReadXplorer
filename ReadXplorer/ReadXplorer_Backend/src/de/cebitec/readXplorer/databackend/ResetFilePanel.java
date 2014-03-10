@@ -1,27 +1,28 @@
-package de.cebitec.readXplorer.view.dialogMenus;
+package de.cebitec.readXplorer.databackend;
 
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
+import org.openide.util.NbBundle;
 
 /**
  * Panel for resetting the file path of a direct access mapping file (track).
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class ResetTrackFilePanel extends javax.swing.JPanel {
+public class ResetFilePanel extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
 
     private String newFileLocation;
     private String filePath;
   
     /**
-     * Panel for resetting the file path of a direct access mapping file
-     * (track).
-     * @param filePath the old path of the track, which is not valid anymore
+     * Panel for resetting the file path of a direct access file.
+     * @param filePath the old path of the file, which is not valid anymore
      */
-    public ResetTrackFilePanel(String filePath) {
+    @NbBundle.Messages({"# {0} - file path", "ResetFilePanel.resetPane.text=File not found:\n{0}\nPlease correct the file path:"})
+    public ResetFilePanel(String filePath) {
         this.filePath = filePath;
         initComponents();
-        this.resetPane.setText(org.openide.util.NbBundle.getMessage(ResetTrackFilePanel.class, "ResetTrackFilePanel.resetPane.text", this.filePath));
+        this.resetPane.setText(Bundle.ResetFilePanel_resetPane_text(this.filePath));
     }
 
     /**
@@ -38,9 +39,9 @@ public class ResetTrackFilePanel extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         resetPane = new javax.swing.JTextPane();
 
-        resetField.setText(org.openide.util.NbBundle.getMessage(ResetTrackFilePanel.class, "ResetTrackFilePanel.resetField.text")); // NOI18N
+        resetField.setText(org.openide.util.NbBundle.getMessage(ResetFilePanel.class, "ResetFilePanel.resetField.text")); // NOI18N
 
-        resetButton.setText(org.openide.util.NbBundle.getMessage(ResetTrackFilePanel.class, "ResetTrackFilePanel.resetButton.text")); // NOI18N
+        resetButton.setText(org.openide.util.NbBundle.getMessage(ResetFilePanel.class, "ResetFilePanel.resetButton.text")); // NOI18N
         resetButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 resetButtonActionPerformed(evt);
@@ -52,6 +53,7 @@ public class ResetTrackFilePanel extends javax.swing.JPanel {
         resetPane.setEditable(false);
         resetPane.setBackground(new java.awt.Color(240, 240, 240));
         resetPane.setBorder(null);
+        resetPane.setText(org.openide.util.NbBundle.getMessage(ResetFilePanel.class, "ResetFilePanel.resetPane.text")); // NOI18N
         jScrollPane1.setViewportView(resetPane);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -63,7 +65,7 @@ public class ResetTrackFilePanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(resetField, javax.swing.GroupLayout.DEFAULT_SIZE, 278, Short.MAX_VALUE)
+                        .addComponent(resetField)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(resetButton, javax.swing.GroupLayout.PREFERRED_SIZE, 69, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())

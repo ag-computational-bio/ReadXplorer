@@ -145,7 +145,7 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
 
     @Override
     public void setStatsContainer(StatsContainer statsContainer) {
-        //do nothing right now
+        this.bamParser.setStatsContainer(statsContainer);
     }
     
 }

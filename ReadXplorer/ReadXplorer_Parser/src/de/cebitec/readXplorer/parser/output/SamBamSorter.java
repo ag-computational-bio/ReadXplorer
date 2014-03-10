@@ -45,10 +45,16 @@ public class SamBamSorter implements Observable {
      * status messages
      * @return true, if the sorting was successful, false otherwise
      */
+    @NbBundle.Messages({
+        "MSG_SamBamSorter.sort.Start=Start sorting file by {0}...", 
+        "MSG_SamBamSorter.sort.Finish=Finished sorting file by {0}. ", 
+        "MSG_SamBamSorter.sort.Failed=Failed sorting file {0}, therefore the file cannot be imported."})
     public boolean sortSamBam(TrackJob trackJob, SAMFileHeader.SortOrder sortOrder, String sortOrderMsg) {
         boolean success = true;
-        this.notifyObservers(NbBundle.getMessage(SamBamSorter.class, "MSG_SamBamSorter.sort.Start", sortOrderMsg));
+        this.notifyObservers(Bundle.MSG_SamBamSorter_sort_Start(sortOrderMsg));
         long start = System.currentTimeMillis();
+        long finish;
+        int lineno = 0;
         String msg;
         Pair<SAMFileWriter, File> writerAndFile = null;
 
@@ -56,24 +62,32 @@ public class SamBamSorter implements Observable {
             SAMRecordIterator samItor = samBamReader.iterator();
             SAMFileHeader header = samBamReader.getFileHeader();
             samBamReader.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
-            header.setSortOrder(sortOrder);
-            writerAndFile = SamUtils.createSamBamWriter(trackJob.getFile(), header, false, sortOrderMsg);
-            SAMFileWriter writer = writerAndFile.getFirst();
-            while (samItor.hasNext()) {
-                try {
-                    writer.addAlignment(samItor.next());
-                } catch (SAMFormatException e) {
-                    if (!e.getMessage().contains("MAPQ should be 0")) {
-                        this.notifyObservers(e.getMessage());
-                    } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
+            if (header.getSortOrder() != SAMFileHeader.SortOrder.queryname) {
+                header.setSortOrder(sortOrder);
+                writerAndFile = SamUtils.createSamBamWriter(trackJob.getFile(), header, false, sortOrderMsg);
+                SAMFileWriter writer = writerAndFile.getFirst();
+                while (samItor.hasNext()) {
+                    try {
+                        writer.addAlignment(samItor.next());
+                        if (++lineno % 500000 == 0) {
+                            finish = System.currentTimeMillis();
+                            this.notifyObservers(Benchmark.calculateDuration(start, finish, lineno + " mappings processed in "));
+                        }
+                    } catch (SAMFormatException e) {
+                        if (!e.getMessage().contains("MAPQ should be 0")) {
+                            this.notifyObservers(e.getMessage());
+                        } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
+                    }
                 }
+                this.notifyObservers("Writing sorted bam file... ");
+                samItor.close();
+                writer.close();
+
+                trackJob.setFile(writerAndFile.getSecond());
             }
-            samItor.close();
-            writer.close();
-
-            trackJob.setFile(writerAndFile.getSecond());
-
-            msg = NbBundle.getMessage(SamBamSorter.class, "MSG_SamBamSorter.sort.Finish", sortOrderMsg);
+            
+            msg = Bundle.MSG_SamBamSorter_sort_Finish(sortOrderMsg);
+        
         } catch (Exception e) {
             if (writerAndFile != null) {
                 trackJob.setFile(writerAndFile.getSecond());
@@ -82,9 +96,9 @@ public class SamBamSorter implements Observable {
             }
             success = false;
             this.notifyObservers(e.getMessage());
-            msg = NbBundle.getMessage(SamBamSorter.class, "MSG_SamBamSorter.sort.Failed", trackJob.getFile());
+            msg = Bundle.MSG_SamBamSorter_sort_Failed(trackJob.getFile());
         }
-        long finish = System.currentTimeMillis();
+        finish = System.currentTimeMillis();
         this.notifyObservers(Benchmark.calculateDuration(start, finish, msg));
         return success;
     }

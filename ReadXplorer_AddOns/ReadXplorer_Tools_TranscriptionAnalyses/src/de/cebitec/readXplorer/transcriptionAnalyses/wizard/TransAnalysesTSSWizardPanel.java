@@ -47,6 +47,7 @@ public class TransAnalysesTSSWizardPanel extends ChangeListeningWizardPanel {
             wiz.putProperty(TranscriptionAnalysesWizardIterator.PROP_MIN_LOW_COV_INC, this.component.getMinLowCovIncrease());
             wiz.putProperty(TranscriptionAnalysesWizardIterator.PROP_UNANNOTATED_TRANSCRIPT_DET, this.component.getDetectUnannotatedTranscripts());
             wiz.putProperty(TranscriptionAnalysesWizardIterator.PROP_MIN_TRANSCRIPT_EXTENSION_COV, this.component.getMinTranscriptExtensionCov());
+            wiz.putProperty(TranscriptionAnalysesWizardIterator.PROP_MAX_LEADERLESS_DISTANCE, this.component.getMaxLeaderlessDistance());
         }
     }
 }

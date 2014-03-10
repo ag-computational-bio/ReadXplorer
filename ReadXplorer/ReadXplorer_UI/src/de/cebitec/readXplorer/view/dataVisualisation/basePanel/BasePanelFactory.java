@@ -24,7 +24,7 @@ import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.TrackOptionsPan
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.TrackViewer;
 import de.cebitec.readXplorer.view.dialogMenus.ChromosomeVisualizationHelper;
 import de.cebitec.readXplorer.view.dialogMenus.ChromosomeVisualizationHelper.ChromosomeListener;
-import de.cebitec.readXplorer.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
+import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -117,8 +117,8 @@ public class BasePanelFactory {
         // create track viewer
         TrackConnector tc;
         try {
-            tc = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
-        } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+            tc = (new SaveFileFetcherForGUI()).getTrackConnector(track);
+        } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
             JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
             return null;
         }
@@ -179,8 +179,8 @@ public class BasePanelFactory {
             // get double track connector           
             TrackConnector trackCon;
             try {
-                trackCon = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(tracks, combineTracks);
-            } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+                trackCon = (new SaveFileFetcherForGUI()).getTrackConnector(tracks, combineTracks);
+            } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
                 JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
                 return null;
             }
