@@ -2,7 +2,6 @@ package de.cebitec.readXplorer.parser.mappings;
 
 import de.cebitec.readXplorer.parser.TrackJob;
 import de.cebitec.readXplorer.parser.common.CoverageContainer;
-import de.cebitec.readXplorer.parser.common.DiffAndGapResult;
 import de.cebitec.readXplorer.parser.common.DirectAccessDataContainer;
 import de.cebitec.readXplorer.parser.common.ParsedClassification;
 import de.cebitec.readXplorer.parser.common.ParsingException;
@@ -215,7 +214,7 @@ public class SamBamDirectParser implements MappingParserI, Observer, MessageSend
             ++noReads;
             
             if (errorLimit.getSkippedCount() > 0) {
-                this.notifyObservers("... " + errorLimit.getSkippedCount() + " more errors occured");
+                this.notifyObservers("... " + errorLimit.getSkippedCount() + " more errors occurred");
             }
 
             this.notifyObservers("Writing extended bam file...");

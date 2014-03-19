@@ -202,7 +202,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
                 }
             }
             if (errorLimit.getSkippedCount() > 0) {
-                this.notifyObservers( "... " + (errorLimit.getSkippedCount()) + " more errors occured");
+                this.notifyObservers( "... " + (errorLimit.getSkippedCount()) + " more errors occurred");
             }
             samItor.close();
 

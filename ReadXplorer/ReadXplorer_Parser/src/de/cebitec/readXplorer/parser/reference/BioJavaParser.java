@@ -9,8 +9,10 @@ import de.cebitec.readXplorer.parser.common.ParsedFeature;
 import de.cebitec.readXplorer.parser.common.ParsedReference;
 import de.cebitec.readXplorer.parser.common.ParsingException;
 import de.cebitec.readXplorer.parser.reference.Filter.FeatureFilter;
+import de.cebitec.readXplorer.util.ErrorLimit;
 import de.cebitec.readXplorer.util.FastaUtils;
 import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.MessageSenderI;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import java.io.BufferedReader;
@@ -51,7 +53,7 @@ import org.biojavax.bio.seq.io.RichStreamReader;
  *
  * @author ddopmeier, rhilker
  */
-public class BioJavaParser implements ReferenceParserI {
+public class BioJavaParser implements ReferenceParserI, MessageSenderI {
 
     /** Use this for initializing an embl parser. */
     public static final int EMBL = 1;
@@ -70,6 +72,7 @@ public class BioJavaParser implements ReferenceParserI {
     private String fileDescription;
     private final RichSequenceFormat seqFormat;
     private ArrayList<Observer> observers = new ArrayList<>();
+    private ErrorLimit errorLimit;
 
     /**
      * A biojava parser can be initialized to parse embl or genbank files and
@@ -92,7 +95,8 @@ public class BioJavaParser implements ReferenceParserI {
             this.fileDescription = fileDescriptionGbk;
             this.seqFormat = new GenbankFormat();
         }
-
+        
+        this.errorLimit = new ErrorLimit(100);
     }
 
     @Override
@@ -135,10 +139,9 @@ public class BioJavaParser implements ReferenceParserI {
             String name;
             String value;
             Iterator<Location> subFeatureIter;
+            Location subLocation;
             int subStart;
             int subStop;
-            String pos;
-            String[] posArray;
             ParsedFeature currentFeature;
             ParsedChromosome chrom;
             
@@ -187,14 +190,14 @@ public class BioJavaParser implements ReferenceParserI {
                         start = location.getMin();
                         stop = location.getMax();
                         if (start >= stop) {
-                            this.notifyObservers("Start bigger than stop in " + refGenJob.getFile().getAbsolutePath()
+                            this.sendMsgIfAllowed("Start bigger than stop in " + refGenJob.getFile().getAbsolutePath()
                                     + ". Found start: " + start + ", stop: " + stop + ". Feature ignored.");
                             continue;
                         }
                         try {
                             strand = feature.getStrand().equals(StrandedFeature.POSITIVE) ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV;
                         } catch (IllegalStateException e) {
-                            this.notifyObservers(e.getMessage());
+                            this.sendMsgIfAllowed(e.getMessage());
                             continue;
                         }
 
@@ -216,7 +219,12 @@ public class BioJavaParser implements ReferenceParserI {
                             } else if (name.equalsIgnoreCase("EC_number")) {
                                 ecNumber = value;
                             } else if (name.equalsIgnoreCase("gene")) {
-                                geneName = value;
+                                if (value.length() > 20) {
+                                    geneName = value.substring(0, 20);
+                                    this.sendMsgIfAllowed("Gene name too long, only keeping first 20 characters: " + geneName);
+                                } else {
+                                    geneName = value;
+                                }
                             }
                         }
 
@@ -226,7 +234,7 @@ public class BioJavaParser implements ReferenceParserI {
                          */
                         FeatureType type = FeatureType.getFeatureType(parsedType);
                         if (type == FeatureType.UNDEFINED) {
-                            this.notifyObservers(refGenJob.getFile().getName()
+                            this.sendMsgIfAllowed(refGenJob.getFile().getName()
                                     + ": Using unknown feature type for " + parsedType);
                         }
 
@@ -255,11 +263,10 @@ public class BioJavaParser implements ReferenceParserI {
                             subFeatureIter = location.blockIterator();
                             while (subFeatureIter.hasNext()) {
 
-                                pos = subFeatureIter.next().toString(); //TODO: check if handling here is correct
+                                subLocation = subFeatureIter.next(); //TODO: check if handling here is correct
                                 //array always contains at least 2 entries
-                                posArray = pos.split("\\..");
-                                subStart = Integer.parseInt(posArray[0]);
-                                subStop = Integer.parseInt(posArray[1]);
+                                subStart = subLocation.getMin();
+                                subStop = subLocation.getMax();
                                 subFeatures.add(new ParsedFeature(type, subStart, subStop, strand,
                                         locusTag, product, ecNumber, geneName, new ArrayList<ParsedFeature>(), null));
                             }
@@ -273,7 +280,7 @@ public class BioJavaParser implements ReferenceParserI {
                         featMap.get(type).add(currentFeature);
 
                     }
-                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "File successfully read");
+                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Sequence successfully read");
 
                     chrom.addAllFeatures(this.createFeatureHierarchy(featMap));
                     refGenome.addChromosome(chrom);
@@ -287,6 +294,10 @@ public class BioJavaParser implements ReferenceParserI {
             
         } catch (Exception ex) {
             throw new ParsingException(ex);
+        }
+        
+        if (errorLimit.getSkippedCount() > 0) {
+            this.notifyObservers("... " + errorLimit.getSkippedCount() + " more errors occurred");
         }
 
         return refGenome;
@@ -413,6 +424,18 @@ public class BioJavaParser implements ReferenceParserI {
     public void notifyObservers(Object data) {
         for (Observer observer : this.observers) {
             observer.update(data);
+        }
+    }    
+    
+    /**
+     * Sends the given msg to all observers, if the error limit is not already
+     * reached for this parser.
+     * @param msg The message to send
+     */
+    @Override
+    public void sendMsgIfAllowed(String msg) {
+        if (this.errorLimit.allowOutput()) {
+            this.notifyObservers(msg);
         }
     }
 }
