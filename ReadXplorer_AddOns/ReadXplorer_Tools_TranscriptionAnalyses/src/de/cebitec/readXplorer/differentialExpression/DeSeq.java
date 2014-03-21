@@ -39,7 +39,6 @@ public class DeSeq {
             IllegalStateException, UnknownGnuRException {
         gnuR = GnuR.SecureGnuRInitiliser.getGnuRinstance(key);
         gnuR.clearGnuR();
-        int numberOfSubDesigns;
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: GNU R is processing data.", currentTimestamp);
         gnuR.loadPackage("DESeq");
@@ -87,10 +86,8 @@ public class DeSeq {
 
                 //Now we need to hand over the experimental design behind the data.
                 concatenate = new StringBuilder();
-                numberOfSubDesigns = 0;
                 //First all sub designs are assigned to an individual variable.
                 while (analysisData.hasNextSubDesign()) {
-                    numberOfSubDesigns++;
                     DeSeqAnalysisData.ReturnTupel subDesign = analysisData.getNextSubDesign();
                     gnuR.assign(subDesign.getKey(), subDesign.getValue());
                     concatenate.append(subDesign.getKey()).append(",");

@@ -61,7 +61,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
 
     public static enum Tool {
 
-        ExpressTest("Express Test"), DeSeq("DESeq"), BaySeq("baySeq");
+        ExpressTest("Express Test"), DeSeq("DESeq"), BaySeq("baySeq"), ExportCountTable("Export only count table");
 
         private Tool(String stringRep) {
             this.stringRep = stringRep;
@@ -77,8 +77,9 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
             if (GnuR.SecureGnuRInitiliser.isGnuRSetUpCorrect() && GnuR.SecureGnuRInitiliser.isGnuRInstanceFree()) {
                 return Tool.values();
             } else {
-                Tool[] ret = new Tool[1];
+                Tool[] ret = new Tool[2];
                 ret[0] = ExpressTest;
+                ret[1] = ExportCountTable;
                 return ret;
             }
         }

@@ -153,7 +153,7 @@ public final class ExpressTestVisualPanelNormalization extends JPanel {
                             .addComponent(searchField)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(searchLable)
-                                .addGap(0, 243, Short.MAX_VALUE)))
+                                .addGap(0, 0, Short.MAX_VALUE)))
                         .addGap(224, 224, 224))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

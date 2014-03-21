@@ -9,7 +9,7 @@ import javax.swing.JPanel;
 
 public final class ChooseVisualPanel extends JPanel {
 
-    private ComboBoxModel cbm = new DefaultComboBoxModel(DeAnalysisHandler.Tool.usableTools());
+    private final ComboBoxModel cbm = new DefaultComboBoxModel(DeAnalysisHandler.Tool.usableTools());
 
     /**
      * Creates new form ChooseVisualPanel
@@ -17,10 +17,10 @@ public final class ChooseVisualPanel extends JPanel {
     public ChooseVisualPanel() {
         initComponents();
         if (!GnuR.SecureGnuRInitiliser.isGnuRSetUpCorrect()) {
-            jriErrorText.setText("GNU R is not installed.\nOnly the ExpressTest can be used as long as no GNU R is installed.");
+            jriErrorText.setText("GNU R is not installed.\nOnly the ExpressTest and the count table export can be used\nas long as no GNU R is installed.");
         } else {
             if (!GnuR.SecureGnuRInitiliser.isGnuRInstanceFree()) {
-                jriErrorText.setText("GNU R instance is already in use.\nOnly the ExpressTest can be used as long as an other GNU R based test is opened.");
+                jriErrorText.setText("GNU R instance is already in use.\nOnly the ExpressTest and the count table export can be used\nas long as an other GNU R based test is opened.");
             }
         }
     }
@@ -56,7 +56,7 @@ public final class ChooseVisualPanel extends JPanel {
         jTextArea1.setFont(jTextArea1.getFont());
         jTextArea1.setLineWrap(true);
         jTextArea1.setRows(5);
-        jTextArea1.setText(org.openide.util.NbBundle.getMessage(ChooseVisualPanel.class, "ChooseVisualPanel.jTextArea1.text")); // NOI18N
+        jTextArea1.setText(org.openide.util.NbBundle.getMessage(ChooseVisualPanel.class, "ChooseVisualPanel.jTextArea1.text_1")); // NOI18N
         jTextArea1.setWrapStyleWord(true);
         jTextArea1.setBorder(null);
         jScrollPane1.setViewportView(jTextArea1);
@@ -76,7 +76,7 @@ public final class ChooseVisualPanel extends JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 344, Short.MAX_VALUE)
                     .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(

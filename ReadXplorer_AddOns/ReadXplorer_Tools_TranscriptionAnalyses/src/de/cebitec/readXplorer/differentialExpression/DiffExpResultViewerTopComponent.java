@@ -58,8 +58,8 @@ import org.openide.windows.TopComponent;
 @TopComponent.Registration(mode = "bottomSlidingSide", openAtStartup = false)
 @ActionID(category = "Window", id = "de.cebitec.readXplorer.differentialExpression.DiffExpResultViewerTopComponent")
 @ActionReference(path = "Menu/Window" /*
-         * , position = 333
-         */)
+ * , position = 333
+ */)
 @TopComponent.OpenActionRegistration(displayName = "#CTL_DiffExpResultViewerAction",
         preferredID = "DiffExpResultViewerTopComponent")
 @Messages({
@@ -107,16 +107,16 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
     }
 
     /**
-     * Updates the position in all available bounds info managers to the 
+     * Updates the position in all available bounds info managers to the
      * reference position of the currently selected genomic feature.
      */
     private void showPosition() {
-        Collection<ViewController> viewControllers =
-                (Collection<ViewController>) CentralLookup.getDefault().lookupAll(ViewController.class);
+        Collection<ViewController> viewControllers
+                = (Collection<ViewController>) CentralLookup.getDefault().lookupAll(ViewController.class);
         analysisHandler.getRefGenomeID();
         for (Iterator<ViewController> it = viewControllers.iterator(); it.hasNext();) {
             ViewController tmpVCon = it.next();
-            BoundsInfoManager bm = tmpVCon.getBoundsManager(); 
+            BoundsInfoManager bm = tmpVCon.getBoundsManager();
             if (bm != null && analysisHandler.getRefGenomeID() == tmpVCon.getCurrentRefGen().getId()) {
                 int posIdx = 0;
                 int chromIdx = 1;
@@ -138,9 +138,14 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
                 ResultDeAnalysis currentResult = it.next();
                 Vector colNames = new Vector(currentResult.getColnames());
                 Vector<Vector> tableContents;
-                colNames.remove(0);
-                colNames.add(0, "Feature");
-                tableContents = currentResult.getTableContents();
+                if (usedTool == DeAnalysisHandler.Tool.ExportCountTable) {
+                    colNames.add(0, "Feature");
+                    tableContents = currentResult.getTableContentsContainingRowNames();
+                } else {
+                    colNames.remove(0);
+                    colNames.add(0, "Feature");
+                    tableContents = currentResult.getTableContents();
+                }
 
                 DefaultTableModel tmpTableModel = new UneditableTableModel(tableContents, colNames);
                 descriptions.add(currentResult.getDescription());

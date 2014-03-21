@@ -7,6 +7,7 @@ import de.cebitec.readXplorer.differentialExpression.BaySeqAnalysisHandler;
 import de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler;
 import de.cebitec.readXplorer.differentialExpression.DeSeqAnalysisHandler;
 import de.cebitec.readXplorer.differentialExpression.DiffExpResultViewerTopComponent;
+import de.cebitec.readXplorer.differentialExpression.ExportOnlyAnalysisHandler;
 import de.cebitec.readXplorer.differentialExpression.ExpressTestAnalysisHandler;
 import de.cebitec.readXplorer.differentialExpression.GnuR;
 import de.cebitec.readXplorer.differentialExpression.Group;
@@ -49,11 +50,13 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
     private List<WizardDescriptor.Panel<WizardDescriptor>> deSeqTwoCondsPanels;
     private List<WizardDescriptor.Panel<WizardDescriptor>> deSeqMoreCondsPanels;
     private List<WizardDescriptor.Panel<WizardDescriptor>> expressTestPanels;
+    private List<WizardDescriptor.Panel<WizardDescriptor>> exportOnlyPanels;
     private String[] deSeqIndex;
     private String[] baySeqIndex;
     private String[] deSeqTwoCondsIndex;
     private String[] deSeqMoreCondsIndex;
     private String[] expressTestIndex;
+    private String[] exportOnlyIndex;
     private String[] initialSteps;
     private DeAnalysisHandler.Tool tool;
     private WizardDescriptor wiz;
@@ -61,54 +64,51 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
 
     /**
      * Action, which is performed, when this wizard shall be opened.
-     * @param e 
+     *
+     * @param e
      */
     @Override
     @SuppressWarnings("unchecked")
     public void actionPerformed(ActionEvent e) {
-            initializePanels();
-            wiz = new WizardDescriptor(this);
-            // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()
-            // {1} will be replaced by WizardDescriptor.Iterator.name()
-            wiz.setTitleFormat(new MessageFormat("{0} ({1})"));
-            wiz.setTitle("Differential Gene Expression Analysis");
-            if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
-                ParametersReadClasses readClassParams = (ParametersReadClasses) wiz.getProperty(this.readClassPanel.getPropReadClassParams());
-                List<Group> createdGroups = (List<Group>) wiz.getProperty("createdGroups");
-                List<PersistantTrack> selectedTracks = (List<PersistantTrack>) wiz.getProperty("tracks");
-                Integer genomeID = (Integer) wiz.getProperty("genomeID");
-                int[] replicateStructure = (int[]) wiz.getProperty("replicateStructure");
-                File saveFile = (File) wiz.getProperty("saveFile");
-                Map<String, String[]> design = (Map<String, String[]>) wiz.getProperty("design");
-                Set<FeatureType> featureTypes = (Set<FeatureType>) wiz.getProperty("featureType");
-                Integer startOffset = (Integer) wiz.getProperty("startOffset");
-                Integer stopOffset = (Integer) wiz.getProperty("stopOffset");
-                boolean regardReadOrientation = (boolean) wiz.getProperty("regardReadOrientation");
-                DeAnalysisHandler handler = null;
+        initializePanels();
+        wiz = new WizardDescriptor(this);
+        // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()
+        // {1} will be replaced by WizardDescriptor.Iterator.name()
+        wiz.setTitleFormat(new MessageFormat("{0} ({1})"));
+        wiz.setTitle("Differential Gene Expression Analysis");
+        if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
+            ParametersReadClasses readClassParams = (ParametersReadClasses) wiz.getProperty(this.readClassPanel.getPropReadClassParams());
+            List<Group> createdGroups = (List<Group>) wiz.getProperty("createdGroups");
+            List<PersistantTrack> selectedTracks = (List<PersistantTrack>) wiz.getProperty("tracks");
+            Integer genomeID = (Integer) wiz.getProperty("genomeID");
+            int[] replicateStructure = (int[]) wiz.getProperty("replicateStructure");
+            File saveFile = (File) wiz.getProperty("saveFile");
+            Map<String, String[]> design = (Map<String, String[]>) wiz.getProperty("design");
+            Set<FeatureType> featureTypes = (Set<FeatureType>) wiz.getProperty("featureType");
+            Integer startOffset = (Integer) wiz.getProperty("startOffset");
+            Integer stopOffset = (Integer) wiz.getProperty("stopOffset");
+            boolean regardReadOrientation = (boolean) wiz.getProperty("regardReadOrientation");
+            DeAnalysisHandler handler = null;
 
-                if (tool == DeAnalysisHandler.Tool.BaySeq) {
-                    UUID key = GnuR.SecureGnuRInitiliser.reserveGnuRinstance();
-                    handler = new BaySeqAnalysisHandler(selectedTracks, createdGroups, genomeID,
-                            replicateStructure, saveFile, featureTypes, startOffset, stopOffset, readClassParams, regardReadOrientation, key);
-                } else
+            if (tool == DeAnalysisHandler.Tool.BaySeq) {
+                UUID key = GnuR.SecureGnuRInitiliser.reserveGnuRinstance();
+                handler = new BaySeqAnalysisHandler(selectedTracks, createdGroups, genomeID,
+                        replicateStructure, saveFile, featureTypes, startOffset, stopOffset, readClassParams, regardReadOrientation, key);
+            } else if (tool == DeAnalysisHandler.Tool.DeSeq) {
+                UUID key = GnuR.SecureGnuRInitiliser.reserveGnuRinstance();
+                boolean moreThanTwoConditions = (boolean) wiz.getProperty("moreThanTwoConditions");
+                boolean workingWithoutReplicates = (boolean) wiz.getProperty("workingWithoutReplicates");
 
-                if (tool == DeAnalysisHandler.Tool.DeSeq) {
-                    UUID key = GnuR.SecureGnuRInitiliser.reserveGnuRinstance();
-                    boolean moreThanTwoConditions = (boolean) wiz.getProperty("moreThanTwoConditions");
-                    boolean workingWithoutReplicates = (boolean) wiz.getProperty("workingWithoutReplicates");
-
-                    List<String> fittingGroupOne = null;
-                    List<String> fittingGroupTwo = null;
-                    if (moreThanTwoConditions) {
-                        fittingGroupOne = (List<String>) wiz.getProperty("fittingGroupOne");
-                        fittingGroupTwo = (List<String>) wiz.getProperty("fittingGroupTwo");
-                    }
-                    handler = new DeSeqAnalysisHandler(selectedTracks, design, moreThanTwoConditions, fittingGroupOne, 
-                            fittingGroupTwo, genomeID, workingWithoutReplicates,
-                            saveFile, featureTypes, startOffset, stopOffset, readClassParams, regardReadOrientation, key);
-                } else {
-
-                //if (tool == DeAnalysisHandler.Tool.ExpressTest) {
+                List<String> fittingGroupOne = null;
+                List<String> fittingGroupTwo = null;
+                if (moreThanTwoConditions) {
+                    fittingGroupOne = (List<String>) wiz.getProperty("fittingGroupOne");
+                    fittingGroupTwo = (List<String>) wiz.getProperty("fittingGroupTwo");
+                }
+                handler = new DeSeqAnalysisHandler(selectedTracks, design, moreThanTwoConditions, fittingGroupOne,
+                        fittingGroupTwo, genomeID, workingWithoutReplicates,
+                        saveFile, featureTypes, startOffset, stopOffset, readClassParams, regardReadOrientation, key);
+            } else if (tool == DeAnalysisHandler.Tool.ExpressTest) {
                     List<Integer> groupAList = (List<Integer>) wiz.getProperty("groupA");
                     boolean workingWithoutReplicates = (boolean) wiz.getProperty("workingWithoutReplicates");
                     int[] groupA = new int[groupAList.size()];
@@ -131,15 +131,17 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                     handler = new ExpressTestAnalysisHandler(selectedTracks, groupA, groupB, genomeID,
                             workingWithoutReplicates, saveFile, featureTypes, startOffset, stopOffset,
                             readClassParams, regardReadOrientation, normalizationFeatures);
+                } else if (tool == DeAnalysisHandler.Tool.ExportCountTable) {
+                    handler = new ExportOnlyAnalysisHandler(selectedTracks, genomeID, saveFile, featureTypes, startOffset, stopOffset, readClassParams, regardReadOrientation);               
                 }
-
-                DiffExpResultViewerTopComponent diffExpResultViewerTopComponent = new DiffExpResultViewerTopComponent(handler, tool);
-                diffExpResultViewerTopComponent.open();
-                diffExpResultViewerTopComponent.requestActive();
-                handler.registerObserver(diffExpResultViewerTopComponent);
-                ProcessingLog.getInstance().setProperties(wiz.getProperties());
-                handler.start();
-            }
+            
+            DiffExpResultViewerTopComponent diffExpResultViewerTopComponent = new DiffExpResultViewerTopComponent(handler, tool);
+            diffExpResultViewerTopComponent.open();
+            diffExpResultViewerTopComponent.requestActive();
+            handler.registerObserver(diffExpResultViewerTopComponent);
+            ProcessingLog.getInstance().setProperties(wiz.getProperties());
+            handler.start();
+        }
     }
 
     private void initializePanels() {
@@ -216,6 +218,13 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
             expressTestPanels.add(allPanels.get(11));
             expressTestIndex = new String[]{steps[0], steps[2], steps[7], steps[8], steps[9], steps[10], steps[11]};
 
+            exportOnlyPanels = new ArrayList<>();
+            exportOnlyPanels.add(allPanels.get(0));
+            exportOnlyPanels.add(allPanels.get(2));
+            exportOnlyPanels.add(allPanels.get(8));
+            exportOnlyPanels.add(allPanels.get(10));
+            exportOnlyIndex = new String[]{steps[0], steps[2], steps[8], steps[10]};
+
             currentPanels = baySeqPanels;
         }
     }
@@ -256,10 +265,13 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                 currentPanels = baySeqPanels;
                 contentData = baySeqIndex;
             }
-
             if (tool == DeAnalysisHandler.Tool.ExpressTest) {
                 currentPanels = expressTestPanels;
                 contentData = expressTestIndex;
+            }
+            if (tool == DeAnalysisHandler.Tool.ExportCountTable) {
+                currentPanels = exportOnlyPanels;
+                contentData = exportOnlyIndex;
             }
 
             if (contentData != null) {
