@@ -29,7 +29,7 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.util.NbPreferences;
 
 /**
- * A class for GUI Components to safely fetch a TrackConnector.
+ * A class for GUI Components to safely fetching files within ReadXplorer.
  *
  * @author kstaderm, rhilker
  */
@@ -39,7 +39,7 @@ import org.openide.util.NbPreferences;
 public class SaveFileFetcherForGUI {
 
     /**
-     * A class for GUI Components to safely fetch a TrackConnector.
+     * A class for GUI Components to safely fetching files within ReadXplorer.
      */
     public SaveFileFetcherForGUI() {
     }
@@ -359,14 +359,21 @@ public class SaveFileFetcherForGUI {
     private IndexedFastaSequenceFile resetRefFile(PersistantReference ref) {
         IndexedFastaSequenceFile newFastaFile = null;
         ProjectConnector connector = ProjectConnector.getInstance();
-        List<String> fileEndings = new ArrayList<>();
-        fileEndings.add(".fasta");
-        fileEndings.add(".fa");
-        fileEndings.add(".fna");
-        fileEndings.add(".ffn");
         
-        File newFile = this.openResetFilePathDialog(ref.getFastaFile(), fileEndings);
+        File newFile = new File(connector.getDBLocation()).getParentFile();
+        newFile = new File(newFile.getAbsolutePath() + "/" + ref.getFastaFile().getName());
         
+        if (!newFile.exists()) {
+
+            List<String> fileEndings = new ArrayList<>();
+            fileEndings.add(".fasta");
+            fileEndings.add(".fa");
+            fileEndings.add(".fna");
+            fileEndings.add(".ffn");
+
+            newFile = this.openResetFilePathDialog(ref.getFastaFile(), fileEndings);
+        }
+
         if (newFile != null) {
             try {
                 try {
@@ -382,6 +389,7 @@ public class SaveFileFetcherForGUI {
         } else {
             JOptionPane.showMessageDialog(null, Bundle.MSG_FileReset(), Bundle.TITLE_FileReset(), JOptionPane.INFORMATION_MESSAGE);
         }
+        
         return newFastaFile;
     }
     
