@@ -189,7 +189,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                         parsedType = feature.getType();
                         start = location.getMin();
                         stop = location.getMax();
-                        if (start >= stop) {
+                        if (start > stop) {
                             this.sendMsgIfAllowed("Start bigger than stop in " + refGenJob.getFile().getAbsolutePath()
                                     + ". Found start: " + start + ", stop: " + stop + ". Feature ignored.");
                             continue;

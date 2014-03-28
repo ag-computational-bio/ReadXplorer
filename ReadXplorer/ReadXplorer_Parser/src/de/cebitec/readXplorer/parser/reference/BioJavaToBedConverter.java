@@ -148,7 +148,7 @@ package de.cebitec.readXplorer.parser.reference;
 //                        parsedType = annotation.getType();
 //                        start = location.getMin();
 //                        stop = location.getMax();
-//                        if (start >= stop) {
+//                        if (start > stop) {
 //                            this.sendErrorMsg("Start bigger than stop in " + referenceJob.getFile().getAbsolutePath() 
 //                                    + ". Found start: " + start + ", stop: " + stop + ". Feature ignored.");
 //                            continue;

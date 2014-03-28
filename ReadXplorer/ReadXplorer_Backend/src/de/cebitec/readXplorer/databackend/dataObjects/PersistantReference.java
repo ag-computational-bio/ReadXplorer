@@ -63,6 +63,22 @@ public class PersistantReference implements Observable {
      * @param fastaFile Fasta file containing the reference sequences
      */
     public PersistantReference(int id, int activeChromId, String name, String description, Timestamp timestamp, File fastaFile) {
+        this(id, -1, name, description, timestamp, fastaFile, true);
+    }
+    
+    /**
+     * Data holder for a reference genome containing an id, name, description &
+     * timestamp of a reference genome. It also garants access to the active and
+     * all other chromosomes of the reference.
+     * @param id The database id of the reference.
+     * @param activeChromId id of the currently active chromosome (>= 0)
+     * @param name The name of the reference.
+     * @param description The additional description of the reference.
+     * @param timestamp The insertion timestamp of the reference.
+     * @param fastaFile Fasta file containing the reference sequences
+     * @param checkFile true, if the reference file shall be checked for validitiy, false otherwise
+     */
+    public PersistantReference(int id, int activeChromId, String name, String description, Timestamp timestamp, File fastaFile, boolean checkFile) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -71,7 +87,9 @@ public class PersistantReference implements Observable {
         this.noChromosomes = this.chromosomes.size();
         this.timestamp = timestamp;
         this.observers = new ArrayList<>();
-        this.checkRef(activeChromId);
+        if (checkFile) {
+            this.checkRef(activeChromId);
+        }
     }
     
     /**

@@ -95,26 +95,13 @@ public class SQLStatements {
     * Only needed as long as older databases are floating around and did not
     * already drop this table which was replaced by STATISTICS.
     */
-    public static final String DROP_TABLE_STATICS = "DROP TABLE IF EXISTS STATICS";
-    
-    /**
-     * Only needed as long as older databases are floating around and did not
-     * already drop this table which is not necessary anymore.
-     */
-    public static String DROP_TABLE_SUBFEATURES = "DROP TABLE IF EXISTS SUBFEATURES";
-
-    /**
-     * Only needed as long as older databases are floating around and did not
-     * already drop this table which is not necessary anymore.
-     */
-    public static String DROP_TABLE_COVERAGE_DISTRIBUTION = "DROP TABLE IF EXISTS COVERAGE_DISTRIBUTION";
-
+    public static final String DROP_TABLE = "DROP TABLE IF EXISTS ";
+         
     /** 
      * Only needed as long as older databases are floating around and did not
      * already drop this index which is not necessary anymore. 
      */
-    public static String DROP_INDEX_INDEXPOS = "DROP INDEX IF EXISTS INDEXPOS";
-         
+    public static String DROP_INDEX = "DROP INDEX IF EXISTS ";
          
     //////////////////  statements for data insertion  ////////////////////////
     
@@ -350,12 +337,6 @@ public class SQLStatements {
             + FieldNames.TABLE_COUNT_DISTRIBUTION
             + " WHERE "
             + FieldNames.COUNT_DISTRIBUTION_TRACK_ID + " = ? ";
-            
-    public static String DELETE_POS_TABLE_FROM_TRACK =
-            "DELETE FROM "
-            + FieldNames.TABLE_POSITIONS 
-            + " WHERE "
-            + FieldNames.POSITIONS_TRACK_ID + " = ? ";
             
     
     public final static String DELETE_SEQUENCE_PAIRS = //TODO: test delete seqpairs
@@ -1513,6 +1494,24 @@ public class SQLStatements {
             + FieldNames.TABLE_FEATURES
             + " ALTER COLUMN "
             + FieldNames.FEATURE_PARENT_IDS
+            + " SET NOT NULL";
+    
+    
+        public static String INIT_FASTAFILE =
+            "UPDATE "
+            + FieldNames.TABLE_REFERENCE
+            + " SET "
+            + FieldNames.REF_GEN_FASTA_FILE
+            + " = default "
+            + " WHERE "
+            + FieldNames.REF_GEN_FASTA_FILE + " IS NULL ";
+    
+    
+        public static final String NOT_NULL_FASTAFILE =
+            "ALTER TABLE "
+            + FieldNames.TABLE_REFERENCE
+            + " ALTER COLUMN "
+            + FieldNames.REF_GEN_FASTA_FILE
             + " SET NOT NULL";
     
     

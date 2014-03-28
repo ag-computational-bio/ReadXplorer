@@ -1,6 +1,7 @@
 package de.cebitec.readXplorer.view.dataVisualisation.basePanel;
 
 import de.cebitec.readXplorer.controller.ViewController;
+import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
@@ -24,7 +25,6 @@ import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.TrackOptionsPan
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.TrackViewer;
 import de.cebitec.readXplorer.view.dialogMenus.ChromosomeVisualizationHelper;
 import de.cebitec.readXplorer.view.dialogMenus.ChromosomeVisualizationHelper.ChromosomeListener;
-import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;

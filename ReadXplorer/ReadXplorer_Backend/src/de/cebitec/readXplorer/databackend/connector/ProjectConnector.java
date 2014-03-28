@@ -16,6 +16,7 @@ import de.cebitec.readXplorer.parser.common.ParsedFeature;
 import de.cebitec.readXplorer.parser.common.ParsedReference;
 import de.cebitec.readXplorer.parser.common.ParsedTrack;
 import de.cebitec.readXplorer.util.DiscreteCountingDistribution;
+import de.cebitec.readXplorer.util.FastaUtils;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.StatsContainer;
 import java.io.File;
@@ -235,9 +236,6 @@ public class ProjectConnector extends Observable {
             con.prepareStatement(H2SQLStatements.SETUP_CHROMOSOME).executeUpdate();
             con.prepareStatement(H2SQLStatements.INDEX_CHROMOSOME).executeUpdate();
             
-            con.prepareStatement(H2SQLStatements.SETUP_POSITIONS).executeUpdate();
-            con.prepareStatement(H2SQLStatements.INDEX_POSITIONS).executeUpdate();
-            
             con.prepareStatement(H2SQLStatements.SETUP_DIFFS).executeUpdate();
             con.prepareStatement(H2SQLStatements.INDEX_DIFF).executeUpdate();
             
@@ -342,9 +340,10 @@ public class ProjectConnector extends Observable {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Checking DB structure...");
 
         //remove statics table (replaced by STATISTICS table)
-        this.runSqlStatement(SQLStatements.DROP_TABLE_STATICS);
-        this.runSqlStatement(SQLStatements.DROP_TABLE_SUBFEATURES);
-        this.runSqlStatement(SQLStatements.DROP_TABLE_COVERAGE_DISTRIBUTION);
+        this.runSqlStatement(SQLStatements.DROP_TABLE + "STATICS");
+        this.runSqlStatement(SQLStatements.DROP_TABLE + "SUBFEATURES");
+        this.runSqlStatement(SQLStatements.DROP_TABLE + "COVERAGE_DISTRIBUTION");
+        this.runSqlStatement(SQLStatements.DROP_TABLE + "POSITIONS");
 
         //stats table
         this.runSqlStatement(GenericSQLQueries.genAddColumnString(FieldNames.TABLE_STATISTICS, 
@@ -439,7 +438,7 @@ public class ProjectConnector extends Observable {
                 FieldNames.TABLE_FEATURES, "PARENT_ID"));
                 
         //Drop unneeded indexes
-        this.runSqlStatement(SQLStatements.DROP_INDEX_INDEXPOS);
+        this.runSqlStatement(SQLStatements.DROP_INDEX + "INDEXPOS");
         
         this.checkDBVersion();
         
@@ -1226,7 +1225,9 @@ public class ProjectConnector extends Observable {
                 String description = rs.getString(FieldNames.REF_GEN_DESCRIPTION);
                 String name = rs.getString(FieldNames.REF_GEN_NAME);
                 Timestamp timestamp = rs.getTimestamp(FieldNames.REF_GEN_TIMESTAMP);
-                File fastaFile = new File(rs.getString(FieldNames.REF_GEN_FASTA_FILE));
+                String fileName = rs.getString(FieldNames.REF_GEN_FASTA_FILE); //special handling for backwards compatibility with old DBs
+                fileName = fileName == null ? "" : fileName;
+                File fastaFile = new File(fileName);
                 refGens.add(new PersistantReference(id, name, description, timestamp, fastaFile));
             }
             rs.close();
@@ -1352,7 +1353,6 @@ public class ProjectConnector extends Observable {
              PreparedStatement deleteCoverage = con.prepareStatement(SQLStatements.DELETE_COVERAGE_FROM_TRACK);
              PreparedStatement deleteStatistics = con.prepareStatement(SQLStatements.DELETE_STATISTIC_FROM_TRACK);
              PreparedStatement deleteCountDistributions = con.prepareStatement(SQLStatements.DELETE_COUNT_DISTRIBUTIONS_FROM_TRACK);
-             PreparedStatement deletePosTable = con.prepareStatement(SQLStatements.DELETE_POS_TABLE_FROM_TRACK);
              PreparedStatement deleteTrack = con.prepareStatement(SQLStatements.DELETE_TRACK);) {
             
             con.setAutoCommit(false);
@@ -1386,7 +1386,6 @@ public class ProjectConnector extends Observable {
             }
             
             deleteStatistics.setInt(1, trackID);
-            deletePosTable.setInt(1, trackID);
             deleteCountDistributions.setInt(1, trackID);
             deleteTrack.setInt(1, trackID);
             
@@ -1394,8 +1393,6 @@ public class ProjectConnector extends Observable {
             deleteStatistics.execute();
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Count Distributions...");
             deleteCountDistributions.execute();
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Position Table...");
-            deletePosTable.execute();
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Track...");
             deleteTrack.execute();
             
@@ -1555,8 +1552,11 @@ public class ProjectConnector extends Observable {
                 dbVersion = rs.getInt(FieldNames.DB_VERSION_DB_VERSION_NO);
             } 
             
+            ResultSet fileColumn = con.getMetaData().getColumns(con.getCatalog(), "PUBLIC", FieldNames.TABLE_REFERENCE, FieldNames.REF_GEN_FASTA_FILE);
+            boolean columnFastafileMissing = !fileColumn.next();
+            
             //move references to chromosome table
-            if (dbVersion < 2) {
+            if (dbVersion < 2 || columnFastafileMissing) {
                 updateNeeded = true;
                 this.createChromsFromRefs();
             }
@@ -1587,36 +1587,57 @@ public class ProjectConnector extends Observable {
      * reference table.
      * This method is intended for DBs < version 2.
      */
-    private void createChromsFromRefs() {
-        List<PersistantReference> refList = this.getGenomes();
+    private void createChromsFromRefs() throws SQLException {
+        //Add column fastafile to reference table
+        this.runSqlStatement(GenericSQLQueries.genAddColumnString(FieldNames.TABLE_REFERENCE, FieldNames.REF_GEN_FASTA_FILE, "VARCHAR(600)"));
+        //add column chromosome id to features
+        this.runSqlStatement(GenericSQLQueries.genAddColumnString(FieldNames.TABLE_FEATURES, FieldNames.FEATURE_CHROMOSOME_ID, BIGINT_UNSIGNED));
+        
+        List<PersistantReference> refList = this.getGenomesDbUpgrade();
+        
+        
         for (PersistantReference ref : refList) {
-            try (@SuppressWarnings("deprecation") PreparedStatement fetchRefSeq = con.prepareStatement(SQLStatements.FETCH_REF_SEQ)) {
+            try (PreparedStatement fetchRefSeq = con.prepareStatement(SQLStatements.FETCH_REF_SEQ);) {
+                
                 fetchRefSeq.setInt(1, ref.getId());
                 ResultSet rs = fetchRefSeq.executeQuery();
                 if (rs.next()) {
 
                     String refSeq = rs.getString(FieldNames.REF_GEN_SEQUENCE);
                     String chromName = rs.getString(FieldNames.REF_GEN_NAME);
-                    
-                    String pathString = new File(dbLocation).getParent().concat(ref.getName().concat(".fasta"));
+
+                    String preparedRefName = ref.getName().replace(':', '-').
+                            replace('/', '-').
+                            replace('\\', '-').
+                            replace('*', '-').
+                            replace('?', '-').
+                            replace('|', '-').
+                            replace('<', '-').
+                            replace('>', '-').
+                            replace('"', '_').
+                            replace(" ", "_");
+                    String pathString = new File(dbLocation).getParent().concat("\\" + preparedRefName.concat(".fasta"));
                     Path fastaPath = new File(pathString).toPath();
                     try (FastaLineWriter fastaWriter = FastaLineWriter.fileWriter(fastaPath)) {
                         fastaWriter.writeHeader(ref.getName());
                         fastaWriter.appendSequence(refSeq);
+                        PreparedStatement updateRefFile = con.prepareStatement(SQLStatements.UPDATE_REF_FILE);
+                        updateRefFile.setString(1, pathString);
+                        updateRefFile.setInt(2, ref.getId());
+                        updateRefFile.execute();
+                        FastaUtils fastaUtils = new FastaUtils();
+                        fastaUtils.getIndexedFasta(fastaPath.toFile());
                     } catch (IOException ex) {
                         JOptionPane.showMessageDialog(new JPanel(), "Reference fasta file cannot be written to disk! Change the permissions in the DB folder!",
                                 "Reference fasta cannot be written to DB folder", JOptionPane.ERROR_MESSAGE);
+                        throw new SQLException("Cannot update reference table, since fasta file is missing. Please retry after changing the permissions in the DB folder!");
                     }
 
                     ParsedChromosome newChrom = new ParsedChromosome();
                     newChrom.setName(chromName);
+                    newChrom.setChromLength(refSeq.length());
 
                     this.storeChromosome(newChrom, 1, ref.getId());
-
-
-                    //add column chromosome id to features
-                    this.runSqlStatement(GenericSQLQueries.genAddColumnString(FieldNames.TABLE_FEATURES,
-                            FieldNames.FEATURE_CHROMOSOME_ID, BIGINT_UNSIGNED));
 
                     //Update chromosome ids of the features for this reference
                     //Since there is exactly one chrom for the current genome, we can query it as follows:
@@ -1627,19 +1648,53 @@ public class ProjectConnector extends Observable {
                     updateFeatureTable.setInt(2, ref.getId());
                     updateFeatureTable.executeUpdate();
                 }
-            } catch (SQLException ex) {
-                Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 
-        //after setting all chromosome ids of the features, now we can delete the REFGEN_ID
+        //set default value for references without file and set column not null
+        this.runSqlStatement(SQLStatements.INIT_FASTAFILE);
+        this.runSqlStatement(SQLStatements.NOT_NULL_FASTAFILE);
+
+        //after setting all chromosome ids of the features, now we can delete the REFERENCE_ID
         this.runSqlStatement(SQLStatements.NOT_NULL_CHROMOSOME_ID);
-        //Drop old REFGEN_ID column
+        //Drop old REFERENCE_ID column
         this.runSqlStatement(GenericSQLQueries.genRemoveColumnString(
-                FieldNames.TABLE_FEATURES, "REFGEN_ID"));
+                FieldNames.TABLE_FEATURES, FieldNames.FEATURE_REFGEN_ID));
         //Drop old ref seq column for this DB
         this.runSqlStatement(GenericSQLQueries.genRemoveColumnString(
                 FieldNames.TABLE_REFERENCE, FieldNames.REF_GEN_SEQUENCE));
+    }
+    
+    /**
+     * @return All references stored in the db with their associated data. All
+     * references are re-queried from the DB and returned in new, independent
+     * objects each time the method is called. No check of fasta files is performed
+     * @throws OutOfMemoryError 
+     */
+    public List<PersistantReference> getGenomesDbUpgrade() throws OutOfMemoryError {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Reading reference genome data from database");
+        List<PersistantReference> refGens = new ArrayList<>();
+
+        try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_GENOMES)) {
+            
+            ResultSet rs = fetch.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt(FieldNames.REF_GEN_ID);
+                String description = rs.getString(FieldNames.REF_GEN_DESCRIPTION);
+                String name = rs.getString(FieldNames.REF_GEN_NAME);
+                Timestamp timestamp = rs.getTimestamp(FieldNames.REF_GEN_TIMESTAMP);
+                String fileName = rs.getString(FieldNames.REF_GEN_FASTA_FILE); //special handling for backwards compatibility with old DBs
+                fileName = fileName == null ? "" : fileName;
+                File fastaFile = new File(fileName);
+                refGens.add(new PersistantReference(id, 1, name, description, timestamp, fastaFile, false));
+            }
+            rs.close();
+
+        } catch (SQLException e) {
+            Logger.getLogger(ProjectConnector.class.getName()).log(Level.SEVERE, null, e);
+        }
+
+        return refGens;
     }
     
     /**
