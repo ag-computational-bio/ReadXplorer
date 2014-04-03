@@ -27,14 +27,12 @@ public class ExpressTest implements ExpressTestI {
     private Map<Double[], Double> meanCache;
     private List<Integer> normalizationFeatures;
     private boolean useHousekeepingGenesForNormalization = false;
-    private final Map<Integer, PersistantChromosome> chromMap;
 
-    public ExpressTest(int referenceId) {
+    public ExpressTest() {
         this.meanCache = new HashMap<>();
         this.observers = new LinkedList<>();
-        this.colNames = new Vector(Arrays.asList(new String[]{"Region", "Chromosome", "Start",
+        this.colNames = new Vector(Arrays.asList(new String[]{"Region", "Start",
             "Stop", "MeanA", "VarA", "MeanB", "VarB", "RatioAB", "RatioBA", "Confidence"}));
-        this.chromMap = ProjectConnector.getInstance().getRefGenomeConnector(referenceId).getChromosomesForGenome();
     }
 
     @Override
@@ -135,8 +133,6 @@ public class ExpressTest implements ExpressTestI {
 
                 currentResult.add(regionNames[i]);
                 currentResultNormalized.add(regionNames[i]);
-                currentResult.add(chromMap.get(regionNames[i].getChromId()));
-                currentResultNormalized.add(chromMap.get(regionNames[i].getChromId()));
                 currentResult.add(start[i]);
                 currentResultNormalized.add(start[i]);
                 currentResult.add(stop[i]);

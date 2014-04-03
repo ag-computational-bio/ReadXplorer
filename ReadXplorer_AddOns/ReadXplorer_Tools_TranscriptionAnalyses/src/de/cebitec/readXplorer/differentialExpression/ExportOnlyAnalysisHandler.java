@@ -57,7 +57,7 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
         Vector colNames = new Vector(Arrays.asList(trackDescriptions));
         Vector rowNames = new Vector(regionNamesList);
 
-        results.add(new ResultDeAnalysis(getRefGenomeID(), tableContents, colNames, rowNames, "Count Data Table"));
+        results.add(new ResultDeAnalysis(tableContents, colNames, rowNames, "Count Data Table"));
         return results;
     }
 

@@ -5,6 +5,7 @@ import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.differentialExpression.BaySeqAnalysisHandler;
 import de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler;
+import de.cebitec.readXplorer.differentialExpression.DeSeq2AnalysisHandler;
 import de.cebitec.readXplorer.differentialExpression.DeSeqAnalysisHandler;
 import de.cebitec.readXplorer.differentialExpression.DiffExpResultViewerTopComponent;
 import de.cebitec.readXplorer.differentialExpression.ExportOnlyAnalysisHandler;
@@ -94,7 +95,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                 UUID key = GnuR.SecureGnuRInitiliser.reserveGnuRinstance();
                 handler = new BaySeqAnalysisHandler(selectedTracks, createdGroups, genomeID,
                         replicateStructure, saveFile, featureTypes, startOffset, stopOffset, readClassParams, regardReadOrientation, key);
-            } else if (tool == DeAnalysisHandler.Tool.DeSeq) {
+            } else if (tool == DeAnalysisHandler.Tool.DeSeq || tool == DeAnalysisHandler.Tool.DeSeq2) {
                 UUID key = GnuR.SecureGnuRInitiliser.reserveGnuRinstance();
                 boolean moreThanTwoConditions = (boolean) wiz.getProperty("moreThanTwoConditions");
                 boolean workingWithoutReplicates = (boolean) wiz.getProperty("workingWithoutReplicates");
@@ -105,36 +106,42 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                     fittingGroupOne = (List<String>) wiz.getProperty("fittingGroupOne");
                     fittingGroupTwo = (List<String>) wiz.getProperty("fittingGroupTwo");
                 }
-                handler = new DeSeqAnalysisHandler(selectedTracks, design, moreThanTwoConditions, fittingGroupOne,
-                        fittingGroupTwo, genomeID, workingWithoutReplicates,
-                        saveFile, featureTypes, startOffset, stopOffset, readClassParams, regardReadOrientation, key);
-            } else if (tool == DeAnalysisHandler.Tool.ExpressTest) {
-                    List<Integer> groupAList = (List<Integer>) wiz.getProperty("groupA");
-                    boolean workingWithoutReplicates = (boolean) wiz.getProperty("workingWithoutReplicates");
-                    int[] groupA = new int[groupAList.size()];
-                    for (int i = 0; i < groupA.length; i++) {
-                        groupA[i] = groupAList.get(i);
-                    }
-
-                    List<Integer> groupBList = (List<Integer>) wiz.getProperty("groupB");
-                    int[] groupB = new int[groupBList.size()];
-                    for (int i = 0; i < groupB.length; i++) {
-                        groupB[i] = groupBList.get(i);
-                    }
-
-                    boolean useHouseKeepingGenesToNormalize = (boolean) wiz.getProperty("useHouseKeepingGenesToNormalize");
-                    List<Integer> normalizationFeatures = null;
-                    if (useHouseKeepingGenesToNormalize) {
-                        normalizationFeatures = (List<Integer>) wiz.getProperty("normalizationFeatures");
-                    }
-
-                    handler = new ExpressTestAnalysisHandler(selectedTracks, groupA, groupB, genomeID,
-                            workingWithoutReplicates, saveFile, featureTypes, startOffset, stopOffset,
-                            readClassParams, regardReadOrientation, normalizationFeatures);
-                } else if (tool == DeAnalysisHandler.Tool.ExportCountTable) {
-                    handler = new ExportOnlyAnalysisHandler(selectedTracks, genomeID, saveFile, featureTypes, startOffset, stopOffset, readClassParams, regardReadOrientation);               
+                if (tool == DeAnalysisHandler.Tool.DeSeq) {
+                    handler = new DeSeqAnalysisHandler(selectedTracks, design, moreThanTwoConditions, fittingGroupOne,
+                            fittingGroupTwo, genomeID, workingWithoutReplicates,
+                            saveFile, featureTypes, startOffset, stopOffset, readClassParams, regardReadOrientation, key);
+                } else {
+                    handler = new DeSeq2AnalysisHandler(selectedTracks, design, moreThanTwoConditions, fittingGroupOne,
+                            fittingGroupTwo, genomeID, workingWithoutReplicates,
+                            saveFile, featureTypes, startOffset, stopOffset, readClassParams, regardReadOrientation, key);
                 }
-            
+            } else if (tool == DeAnalysisHandler.Tool.ExpressTest) {
+                List<Integer> groupAList = (List<Integer>) wiz.getProperty("groupA");
+                boolean workingWithoutReplicates = (boolean) wiz.getProperty("workingWithoutReplicates");
+                int[] groupA = new int[groupAList.size()];
+                for (int i = 0; i < groupA.length; i++) {
+                    groupA[i] = groupAList.get(i);
+                }
+
+                List<Integer> groupBList = (List<Integer>) wiz.getProperty("groupB");
+                int[] groupB = new int[groupBList.size()];
+                for (int i = 0; i < groupB.length; i++) {
+                    groupB[i] = groupBList.get(i);
+                }
+
+                boolean useHouseKeepingGenesToNormalize = (boolean) wiz.getProperty("useHouseKeepingGenesToNormalize");
+                List<Integer> normalizationFeatures = null;
+                if (useHouseKeepingGenesToNormalize) {
+                    normalizationFeatures = (List<Integer>) wiz.getProperty("normalizationFeatures");
+                }
+
+                handler = new ExpressTestAnalysisHandler(selectedTracks, groupA, groupB, genomeID,
+                        workingWithoutReplicates, saveFile, featureTypes, startOffset, stopOffset,
+                        readClassParams, regardReadOrientation, normalizationFeatures);
+            } else if (tool == DeAnalysisHandler.Tool.ExportCountTable) {
+                handler = new ExportOnlyAnalysisHandler(selectedTracks, genomeID, saveFile, featureTypes, startOffset, stopOffset, readClassParams, regardReadOrientation);
+            }
+
             DiffExpResultViewerTopComponent diffExpResultViewerTopComponent = new DiffExpResultViewerTopComponent(handler, tool);
             diffExpResultViewerTopComponent.open();
             diffExpResultViewerTopComponent.requestActive();
@@ -257,7 +264,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
         if (index == 0) {
             String[] contentData = null;
             tool = (DeAnalysisHandler.Tool) wiz.getProperty("tool");
-            if (tool == DeAnalysisHandler.Tool.DeSeq) {
+            if (tool == DeAnalysisHandler.Tool.DeSeq || tool == DeAnalysisHandler.Tool.DeSeq2) {
                 currentPanels = deSeqTwoCondsPanels;
                 contentData = deSeqIndex;
             }

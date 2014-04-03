@@ -11,11 +11,11 @@ public class BaySeqAnalysisData extends DeAnalysisData {
     /**
      * The groups which should be taken into account by the analysis step.
      */
-    private List<Group> groups;
+    private final List<Group> groups;
     /**
      * The replicate structure of the selected tracks.
      */
-    private int[] replicateStructure;
+    private final int[] replicateStructure;
 
     public BaySeqAnalysisData(int capacity, List<Group> groups, int[] replicateStructure) {
         super(capacity);

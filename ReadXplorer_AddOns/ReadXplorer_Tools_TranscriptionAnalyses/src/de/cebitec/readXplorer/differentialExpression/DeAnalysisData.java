@@ -28,7 +28,7 @@ public class DeAnalysisData {
      * secound Integer array holds the count data for the selected track with
      * the secound lowest id an so on.
      */
-    private Queue<Integer[]> countData;
+    private final Queue<Integer[]> countData;
     /**
      * The tracks selected by the user to perform the analysis on.
      */
@@ -37,7 +37,7 @@ public class DeAnalysisData {
      * Track Descriptions. Each description just appears one time.
      */
     private String[] trackDescriptions;
-
+    
     /**
      * Creates a new instance of the DeAnalysisData class.
      *
@@ -84,11 +84,7 @@ public class DeAnalysisData {
      * it is empty.
      */
     public boolean hasCountData() {
-        if (countData.isEmpty()) {
-            return false;
-        } else {
-            return true;
-        }
+        return !countData.isEmpty();
     }
 
     /**

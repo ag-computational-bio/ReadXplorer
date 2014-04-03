@@ -73,14 +73,14 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
     private static final long serialVersionUID = 1L;
     private TableModel tm;
     private ComboBoxModel<Object> cbm;
-    private ArrayList<DefaultTableModel> tableModels = new ArrayList<>();
+    private final ArrayList<DefaultTableModel> tableModels = new ArrayList<>();
     private TopComponent graphicsTopComponent;
     private ExpressTestGraphicsTopComponent ptc;
     private TopComponent LogTopComponent;
     private DeAnalysisHandler analysisHandler;
     private DeAnalysisHandler.Tool usedTool;
-    private ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Differential Gene Expression Analysis");
-    private TableRightClickFilter<UneditableTableModel> rktm = new TableRightClickFilter<>(UneditableTableModel.class);
+    private final ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Differential Gene Expression Analysis");
+    private final TableRightClickFilter<UneditableTableModel> rktm = new TableRightClickFilter<>(UneditableTableModel.class);
     private ReferenceFeatureTopComp refComp;
 
     public DiffExpResultViewerTopComponent() {
@@ -138,13 +138,19 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
                 ResultDeAnalysis currentResult = it.next();
                 Vector colNames = new Vector(currentResult.getColnames());
                 Vector<Vector> tableContents;
-                if (usedTool == DeAnalysisHandler.Tool.ExportCountTable) {
-                    colNames.add(0, "Feature");
-                    tableContents = currentResult.getTableContentsContainingRowNames();
-                } else {
-                    colNames.remove(0);
-                    colNames.add(0, "Feature");
-                    tableContents = currentResult.getTableContents();
+                switch (usedTool) {
+                    case ExportCountTable:
+                        colNames.add(0, "Feature");
+                        tableContents = currentResult.getTableContentsContainingRowNames();
+                        break;
+                    case DeSeq2:
+                        colNames.add(0, "Feature");
+                        tableContents = currentResult.getTableContentsContainingRowNames();
+                        break;
+                    default:
+                        colNames.remove(0);
+                        colNames.add(0, "Feature");
+                        tableContents = currentResult.getTableContents();
                 }
 
                 DefaultTableModel tmpTableModel = new UneditableTableModel(tableContents, colNames);

@@ -19,10 +19,10 @@ import java.util.UUID;
  */
 public class BaySeqAnalysisHandler extends DeAnalysisHandler {
 
-    private List<Group> groups;
+    private final List<Group> groups;
     private BaySeq baySeq;
-    private BaySeqAnalysisData baySeqAnalysisData;
-    private UUID key;
+    private final BaySeqAnalysisData baySeqAnalysisData;
+    private final UUID key;
 
     public static enum Plot {
 
@@ -44,7 +44,7 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
     public BaySeqAnalysisHandler(List<PersistantTrack> selectedTracks, List<Group> groups, Integer refGenomeID, int[] replicateStructure,
             File saveFile, Set<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams, boolean regardReadOrientation, UUID key) {
         super(selectedTracks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams, regardReadOrientation);
-        baySeq = new BaySeq(this.getRefGenomeID());
+        baySeq = new BaySeq();
         baySeqAnalysisData = new BaySeqAnalysisData(getSelectedTracks().size(), groups, replicateStructure);
         this.groups=groups;
         this.key = key;

@@ -27,10 +27,8 @@ import org.rosuda.JRI.RVector;
 public class DeSeq {
 
     private GnuR gnuR;
-    private final int referenceId;
 
-    public DeSeq(int referenceId) {
-        this.referenceId = referenceId;
+    public DeSeq() {
     }
 
     public List<ResultDeAnalysis> process(DeSeqAnalysisData analysisData,
@@ -194,7 +192,7 @@ public class DeSeq {
                 RVector tableContents1 = currentResult1.asVector();
                 REXP colNames1 = gnuR.eval("colnames(res0)");
                 REXP rowNames1 = gnuR.eval("rownames(res0)");
-                results.add(new ResultDeAnalysis(referenceId, tableContents1, colNames1, rowNames1, "Fitting Group One", analysisData));
+                results.add(new ResultDeAnalysis(tableContents1, colNames1, rowNames1, "Fitting Group One", analysisData));
 
                 gnuR.eval("tmp1 <- data.frame(fit0,pvalsGLM,padjGLM)");
                 gnuR.eval("res1 <- data.frame(rownames(tmp1),tmp1)");
@@ -202,7 +200,7 @@ public class DeSeq {
                 RVector tableContents0 = currentResult0.asVector();
                 REXP colNames0 = gnuR.eval("colnames(res1)");
                 REXP rowNames0 = gnuR.eval("rownames(res1)");
-                results.add(new ResultDeAnalysis(referenceId, tableContents0, colNames0, rowNames0, "Fitting Group Two", analysisData));
+                results.add(new ResultDeAnalysis(tableContents0, colNames0, rowNames0, "Fitting Group Two", analysisData));
 
             } else {
                 //Significant results sorted by the most significantly differentially expressed genes
@@ -211,7 +209,7 @@ public class DeSeq {
                 RVector rvec = result.asVector();
                 REXP colNames = gnuR.eval("colnames(res0)");
                 REXP rowNames = gnuR.eval("rownames(res0)");
-                results.add(new ResultDeAnalysis(referenceId, rvec, colNames, rowNames,
+                results.add(new ResultDeAnalysis(rvec, colNames, rowNames,
                         "Significant results sorted by the most significantly differentially expressed genes", analysisData));
 
                 //Significant results sorted by the most strongly down regulated genes
@@ -220,7 +218,7 @@ public class DeSeq {
                 rvec = result.asVector();
                 colNames = gnuR.eval("colnames(res1)");
                 rowNames = gnuR.eval("rownames(res1)");
-                results.add(new ResultDeAnalysis(referenceId, rvec, colNames, rowNames,
+                results.add(new ResultDeAnalysis(rvec, colNames, rowNames,
                         "Significant results sorted by the most strongly down regulated genes", analysisData));
 
                 //Significant results sorted by the most strongly up regulated genes
@@ -229,7 +227,7 @@ public class DeSeq {
                 rvec = result.asVector();
                 colNames = gnuR.eval("colnames(res2)");
                 rowNames = gnuR.eval("rownames(res2)");
-                results.add(new ResultDeAnalysis(referenceId, rvec, colNames, rowNames,
+                results.add(new ResultDeAnalysis(rvec, colNames, rowNames,
                         "Significant results sorted by the most strongly up regulated genes", analysisData));
             }
             if (saveFile != null) {

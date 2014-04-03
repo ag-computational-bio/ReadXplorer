@@ -57,7 +57,7 @@ public class ExpressTestAnalysisHandler extends DeAnalysisHandler implements Exp
         prepareFeatures(expressTestAnalysisData);
         prepareCountData(expressTestAnalysisData, getAllCountData());
 
-        ExpressTestI st = new ExpressTest(this.getRefGenomeID());
+        ExpressTestI st = new ExpressTest();
 
 
         st.addObserver(this);
@@ -107,8 +107,8 @@ public class ExpressTestAnalysisHandler extends DeAnalysisHandler implements Exp
     public void update(ExpressTestI origin, ExpressTestStatus status) {
         if (status == ExpressTestStatus.FINISHED) {
             ArrayList<ResultDeAnalysis> tmpRes = new ArrayList<>();
-            tmpRes.add(new ResultDeAnalysis(this.getRefGenomeID(), origin.getResults(), origin.getColumnNames(), origin.getRowNames(), "result"));
-            tmpRes.add(new ResultDeAnalysis(this.getRefGenomeID(), origin.getResultsNormalized(), origin.getColumnNames(), origin.getRowNames(), "normalized result"));
+            tmpRes.add(new ResultDeAnalysis(origin.getResults(), origin.getColumnNames(), origin.getRowNames(), "result"));
+            tmpRes.add(new ResultDeAnalysis(origin.getResultsNormalized(), origin.getColumnNames(), origin.getRowNames(), "normalized result"));
             results = new ArrayList<>();
             results.addAll(tmpRes);
         }

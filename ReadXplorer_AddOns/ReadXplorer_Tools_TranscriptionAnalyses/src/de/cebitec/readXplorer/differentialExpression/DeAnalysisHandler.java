@@ -44,29 +44,29 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
 
     private ReferenceConnector referenceConnector;
     private List<PersistantFeature> genomeAnnos;
-    private List<PersistantTrack> selectedTracks;
+    private final List<PersistantTrack> selectedTracks;
     private Map<Integer, CollectCoverageData> collectCoverageDataInstances;
-    private int refGenomeID;
+    private final int refGenomeID;
     private List<ResultDeAnalysis> results;
-    private List<de.cebitec.readXplorer.util.Observer> observerList = new ArrayList<>();
+    private final List<de.cebitec.readXplorer.util.Observer> observerList = new ArrayList<>();
     private File saveFile = null;
-    private Set<FeatureType> selectedFeatureTypes;
-    private Map<Integer, Map<PersistantFeature, Integer>> allCountData = new HashMap<>();
+    private final Set<FeatureType> selectedFeatureTypes;
+    private final Map<Integer, Map<PersistantFeature, Integer>> allCountData = new HashMap<>();
     private int resultsReceivedBack = 0;
-    private int startOffset;
-    private int stopOffset;
-    private boolean regardReadOrientation;
+    private final int startOffset;
+    private final int stopOffset;
+    private final boolean regardReadOrientation;
     public static boolean TESTING_MODE = false;
     private final ParametersReadClasses readClassParams;
 
     public static enum Tool {
 
-        ExpressTest("Express Test"), DeSeq("DESeq"), BaySeq("baySeq"), ExportCountTable("Export only count table");
+        ExpressTest("Express Test"), DeSeq("DESeq"), DeSeq2("DESeq2"), BaySeq("baySeq"), ExportCountTable("Export only count table");
 
         private Tool(String stringRep) {
             this.stringRep = stringRep;
         }
-        private String stringRep;
+        private final String stringRep;
 
         @Override
         public String toString() {
@@ -91,18 +91,19 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
     }
 
     /**
-     * Abstract analysis handler for the differential gene expression. Takes 
+     * Abstract analysis handler for the differential gene expression. Takes
      * care of collecting all count data from each single AnalysisHandler of
-     * each track, starting the processing by the chosen tool and displaying
-     * the results after the calculations.
+     * each track, starting the processing by the chosen tool and displaying the
+     * results after the calculations.
+     *
      * @param selectedTracks list of selected tracks for the analysis
      * @param refGenomeID id of the selected reference genome
      * @param saveFile file, in which some data for this analysis can be stored
      * @param selectedFeatureTypes list of selected feature types to keep in the
      * list of analyzed genomic features
      * @param startOffset offset in bases left of each feature start
-     * @param stopOffset offset in bases right of each feature stop 
-     * @param readClassParams Parameter set of the selected read classes for 
+     * @param stopOffset offset in bases right of each feature stop
+     * @param readClassParams Parameter set of the selected read classes for
      * this analysis
      * @param regardReadOrientation <cc>true</cc>, if the read orientation of
      * all reads shall be taken into account, <cc>false</cc>, if reads on both
@@ -132,13 +133,13 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenomeID);
         List<AnalysesHandler> allHandler = new ArrayList<>();
         genomeAnnos = new ArrayList<>();
-        
+
         for (PersistantChromosome chrom : referenceConnector.getRefGenome().getChromosomes().values()) {
-            genomeAnnos.addAll(referenceConnector.getFeaturesForRegionInclParents(1, chrom.getLength(), selectedFeatureTypes, chrom.getId()));     
+            genomeAnnos.addAll(referenceConnector.getFeaturesForRegionInclParents(1, chrom.getLength(), selectedFeatureTypes, chrom.getId()));
         }
-                
+
         for (Iterator<PersistantTrack> it = selectedTracks.iterator(); it.hasNext();) {
-            
+
             PersistantTrack currentTrack = it.next();
             try {
                 TrackConnector tc = (new SaveFileFetcherForGUI()).getTrackConnector(currentTrack);
@@ -159,7 +160,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
                 return;
             }
         }
-        
+
         for (Iterator<AnalysesHandler> it = allHandler.iterator(); it.hasNext();) {
             AnalysesHandler handler = it.next();
             handler.startAnalysis();
@@ -229,6 +230,13 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         return results;
     }
 
+    /**
+     * @return Id of the reference, for which the analysis is carried out.
+     */
+    public int getRefGenomeID() {
+        return refGenomeID;
+    }
+
     public Map<Integer, CollectCoverageData> getCollectCoverageDataInstances() {
         return collectCoverageDataInstances;
     }
@@ -289,11 +297,4 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
             notifyObservers(AnalysisStatus.FINISHED);
         }
     }
-
-    /**
-     * @return Id of the reference, for which the analysis is carried out.
-     */
-    public int getRefGenomeID() {
-        return refGenomeID;
-    }    
 }

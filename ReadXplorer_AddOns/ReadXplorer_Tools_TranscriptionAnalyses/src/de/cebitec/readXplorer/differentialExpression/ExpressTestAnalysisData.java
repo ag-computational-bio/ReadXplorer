@@ -1,6 +1,5 @@
 package de.cebitec.readXplorer.differentialExpression;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import java.util.List;
 
 /**
@@ -9,10 +8,10 @@ import java.util.List;
  */
 public class ExpressTestAnalysisData extends DeAnalysisData {
 
-    private int[] groupA;
-    private int[] groupB;
-    private boolean workingWithoutReplicates;
-    private List<Integer> normalizationFeatures;
+    private final int[] groupA;
+    private final int[] groupB;
+    private final boolean workingWithoutReplicates;
+    private final List<Integer> normalizationFeatures;
 
     public ExpressTestAnalysisData(int capacity, int[] groupA, int[] groupB, 
             boolean workingWithoutReplicates, List<Integer> normalizationFeatures) {

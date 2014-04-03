@@ -13,12 +13,12 @@ import java.util.Set;
  */
 public class DeSeqAnalysisData extends DeAnalysisData{
 
-    private Map<String, String[]> design;
-    private Iterator<String> designIterator;
-    private List<String> fittingGroupOne;
-    private List<String> fittingGroupTwo;
+    private final Map<String, String[]> design;
+    private final Iterator<String> designIterator;
+    private final List<String> fittingGroupOne;
+    private final List<String> fittingGroupTwo;
     private Set<String> levels;
-    private boolean moreThanTwoConditions;
+    private final boolean moreThanTwoConditions;
     /**
      * Is the analysis performed with or without Replicates. If there are not at
      * least two tracks belonging to the same conditions this variable is true.
@@ -78,8 +78,8 @@ public class DeSeqAnalysisData extends DeAnalysisData{
 
     public static class ReturnTupel {
 
-        private String key;
-        private String[] value;
+        private final String key;
+        private final String[] value;
 
         public ReturnTupel(String key, String[] value) {
             this.key = key;
