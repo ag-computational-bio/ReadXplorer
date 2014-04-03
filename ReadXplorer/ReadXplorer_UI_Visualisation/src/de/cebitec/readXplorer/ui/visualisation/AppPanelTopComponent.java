@@ -7,11 +7,13 @@ import de.cebitec.readXplorer.api.cookies.OpenTrackCookie;
 import de.cebitec.readXplorer.controller.ViewController;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readXplorer.view.TopComponentExtended;
+import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.MultipleTrackViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -24,7 +26,6 @@ import java.util.Iterator;
 import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import static javax.swing.Action.NAME;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -38,7 +39,10 @@ import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
 /**
- * Top component which displays something.
+ * Top component which displays the main work area of ReadXplorer, which contains the
+ * reference and track viewers.
+ * 
+ * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 @ConvertAsProperties(
         dtd = "-//de.cebitec.readXplorer.ui.visualisation//AppPanel//EN",
@@ -62,28 +66,40 @@ import org.openide.windows.WindowManager;
     "HINT_AppPanelTopComponent=This is a AppPanel window"
 })
 public final class AppPanelTopComponent extends TopComponentExtended implements ApplicationFrameI {
-    private static final long serialVersionUID = 1L;
+    /**
+     * path to the icon used by the component and its open action
+     */
+//    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
     private static final String PREFERRED_ID = "AppPanelTopComponent";
-    
+    private static final long serialVersionUID = 1L;
     private static AppPanelTopComponent instance;
     private InstanceContent content = new InstanceContent();
     private Lookup localLookup;
     private ReferenceViewer referenceViewer;
     private ArrayList<TrackViewer> trackViewerList;
     private JScrollPane trackScrollPane;
+    private JScrollPane basePanelScrollPane;
     private JPanel tracksPanel;
-    
+    private JPanel basePanelPanel;
+
+    /**
+     * Top component which displays the main work area of ReadXplorer, which contains
+     * the reference and track viewers.
+     */
     public AppPanelTopComponent() {
         initComponents();
         setName(Bundle.CTL_AppPanelTopComponent());
         setToolTipText(Bundle.HINT_AppPanelTopComponent());
+//        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
         localLookup = new AbstractLookup(content);
         associateLookup(localLookup);
         this.trackViewerList = new ArrayList<>();
         this.tracksPanel = new JPanel();
         this.tracksPanel.setLayout(new javax.swing.BoxLayout(tracksPanel, javax.swing.BoxLayout.PAGE_AXIS));
+        this.basePanelPanel = new JPanel();
+        this.basePanelPanel.setLayout(new javax.swing.BoxLayout(basePanelPanel, javax.swing.BoxLayout.PAGE_AXIS));
     }
-    
+
     /**
      * Removes all cookies which are contained in TopComponent.getLookup().
      */
@@ -111,17 +127,18 @@ public final class AppPanelTopComponent extends TopComponentExtended implements 
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(visualPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(visualPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 378, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(visualPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(visualPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 208, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+// Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel visualPanel;
     // End of variables declaration//GEN-END:variables
+
     @Override
     public int getPersistenceType() {
         return TopComponent.PERSISTENCE_NEVER;
@@ -214,6 +231,7 @@ public final class AppPanelTopComponent extends TopComponentExtended implements 
     @Override
     public void showRefGenPanel(JPanel refGenPanel) {
         visualPanel.add(refGenPanel);
+        visualPanel.updateUI();
 
         WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComp").open();
         WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComp").open();
@@ -251,11 +269,13 @@ public final class AppPanelTopComponent extends TopComponentExtended implements 
     public void showTrackPanel(final JPanel trackPanel) {
         if (this.trackScrollPane == null) {
             this.trackScrollPane = new JScrollPane(this.tracksPanel);
+            trackScrollPane.setPreferredSize(new Dimension (trackScrollPane.getWidth(), 230));
             this.visualPanel.add(this.trackScrollPane);
         }
 
         // add the trackPanel
         tracksPanel.add(trackPanel);
+        visualPanel.updateUI();
         this.referenceViewer.increaseTrackCount();
 
         // search for opened tracks, if there are none open the track statistics window
@@ -294,6 +314,7 @@ public final class AppPanelTopComponent extends TopComponentExtended implements 
     @Override
     public void closeTrackPanel(JPanel trackPanel) {
         tracksPanel.remove(trackPanel);
+        visualPanel.updateUI();
 
         // remove the panel's TrackViewer from lookup
         BasePanel bp = (BasePanel) trackPanel;
@@ -305,6 +326,39 @@ public final class AppPanelTopComponent extends TopComponentExtended implements 
         if (getLookup().lookupAll(TrackViewer.class).isEmpty()) {
             WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").close();
         }
+    }
+    
+    
+    public void showBasePanel(final BasePanel basePanel) {
+        if (this.basePanelScrollPane == null) {
+            this.basePanelScrollPane = new JScrollPane(this.basePanelPanel);
+            basePanelScrollPane.setPreferredSize(new Dimension(basePanelScrollPane.getWidth(), 50));
+            this.visualPanel.add(this.basePanelScrollPane);
+        }
+
+        // add the basePanelPanel
+        basePanelPanel.add(basePanel);
+
+        // put the panel's Viewer in lookup so it can be accessed
+        AbstractViewer viewer = (AbstractViewer) basePanel.getViewer();
+        this.content.add(viewer);
+
+        //maybe use this later
+//        CloseTrackCookie closeViewerCookie = new CloseTrackCookie() {
+//            @Override
+//            public boolean close() {
+//                getLookup().lookup(ViewController.class).closeTrackPanel(basePanel);
+//                content.remove(this);
+//                return true;
+//            }
+//
+//            @Override
+//            public String getName() {
+//                return basePanel.getName();
+//            }
+//        };
+//
+//        content.add(closeViewerCookie);
     }
 
 //    /**
@@ -346,7 +400,6 @@ public final class AppPanelTopComponent extends TopComponentExtended implements 
 
     /**
      * Updates the status of all track viewers belonging to this top component.
-     *
      * @param isActive true, if track viewers should be active, false, if not.
      */
     private void changeActiveTrackStatus(boolean isActive) {

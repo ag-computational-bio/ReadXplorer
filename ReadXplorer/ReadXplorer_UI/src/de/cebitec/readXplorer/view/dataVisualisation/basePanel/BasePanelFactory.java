@@ -68,6 +68,20 @@ public class BasePanelFactory {
         this.boundsManager = boundsManager;
         this.viewController = viewController;
     }
+    
+    public BasePanel getGenericBasePanel(boolean hasScrollbar, boolean hasSlider, boolean hasTitle,
+            String title) {
+        BasePanel b = new BasePanel(boundsManager, viewController);
+        viewController.addMousePositionListener(b);
+
+        // add panels to basepanel
+        int maxSliderValue = 500;
+        b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(hasScrollbar, hasSlider, maxSliderValue));
+        if (hasTitle) {
+            b.setTitlePanel(this.getTitlePanel(title));
+        }
+        return b;
+    }
 
     /**
      * Creates a base panel for reference sequences (genomes).
@@ -382,7 +396,7 @@ public class BasePanelFactory {
     private JCheckBox getCheckBox(FeatureType type, AbstractViewer viewer) {
         JCheckBox checker = new JCheckBox(type.getTypeString());
         //special cases are handled here
-        if (type != FeatureType.UNDEFINED && type != FeatureType.SOURCE) {
+        if (type != FeatureType.UNDEFINED) {
             checker.setSelected(true);
         } else {
             checker.setSelected(false);
@@ -452,11 +466,10 @@ public class BasePanelFactory {
         legend1.add(this.getLegendEntry(ColorProperties.EXON, FeatureType.EXON, viewer));
         legend1.add(this.getLegendEntry(ColorProperties.REPEAT_UNIT, FeatureType.REPEAT_UNIT, viewer));
         legend1.add(this.getLegendEntry(ColorProperties.MRNA, FeatureType.MRNA, viewer));
-        legend1.add(this.getLegendEntry(ColorProperties.MI_RNA, FeatureType.MIRNA, viewer));
+        legend2.add(this.getLegendEntry(ColorProperties.MI_RNA, FeatureType.MIRNA, viewer));
         legend2.add(this.getLegendEntry(ColorProperties.RRNA, FeatureType.RRNA, viewer));
         legend2.add(this.getLegendEntry(ColorProperties.TRNA, FeatureType.TRNA, viewer));
         legend2.add(this.getLegendEntry(ColorProperties.MISC_RNA, FeatureType.MISC_RNA, viewer));
-        legend2.add(this.getLegendEntry(ColorProperties.SOURCE, FeatureType.SOURCE, viewer));
         legend2.add(this.getLegendEntry(ColorProperties.UNDEF_FEATURE, FeatureType.UNDEFINED, viewer));
 
         legend.add(legend1, BorderLayout.WEST);

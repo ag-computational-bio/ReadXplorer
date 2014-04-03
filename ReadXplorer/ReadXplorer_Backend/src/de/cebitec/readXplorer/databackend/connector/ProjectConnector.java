@@ -1213,7 +1213,7 @@ public class ProjectConnector extends Observable {
      * objects each time the method is called.
      * @throws OutOfMemoryError 
      */
-    public List<PersistantReference> getGenomes() throws OutOfMemoryError {
+    public List<PersistantReference> getGenomes() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Reading reference genome data from database");
         List<PersistantReference> refGens = new ArrayList<>();
 
@@ -1237,6 +1237,16 @@ public class ProjectConnector extends Observable {
         }
 
         return refGens;
+    }
+    /**
+     * Get an array of available genomes from the database. Alternative method
+     * for getGenomes().
+     * @return Array of genomes
+     */
+    public PersistantReference[] getGenomesAsArray() {
+        List<PersistantReference> references = this.getGenomes();
+        PersistantReference[] refArray = new PersistantReference[references.size()];
+        return references.toArray(refArray);
     }
 
     /**

@@ -7,8 +7,6 @@ package de.cebitec.readXplorer.view.dialogMenus;
 
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.util.VisualisationUtils;
-import java.util.List;
 
 /**
  * Panel for selecting and opening reference genomes.
@@ -24,23 +22,6 @@ public class OpenRefGenPanel extends javax.swing.JPanel {
         initComponents();
     }
 
-    /**
-     * Get a list of available genomes from the database.
-     * @return Array of genomes WITHOUT actual sequence
-     */
-    private PersistantReference[] fillList() {
-        PersistantReference[] genArray = new PersistantReference[0];
-        try {
-            List<PersistantReference> gens = ProjectConnector.getInstance().getGenomes();
-            genArray = new PersistantReference[gens.size()];
-            genArray = gens.toArray(genArray);
-        } catch (OutOfMemoryError e) {
-            VisualisationUtils.displayOutOfMemoryError(this);
-        }
-
-        return genArray;
-    }
-
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -51,7 +32,7 @@ public class OpenRefGenPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        refGenList = new javax.swing.JList<>(this.fillList());
+        refGenList = new javax.swing.JList<>(ProjectConnector.getInstance().getGenomesAsArray());
 
         setLayout(new java.awt.BorderLayout());
 

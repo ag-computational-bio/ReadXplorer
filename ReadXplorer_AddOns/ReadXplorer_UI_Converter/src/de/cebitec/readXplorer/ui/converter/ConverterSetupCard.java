@@ -10,13 +10,14 @@ import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readXplorer.view.dialogMenus.FileSelectionPanel;
 import java.io.File;
 import java.util.Collection;
-import java.util.List;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import org.openide.util.NbBundle;
 
 /**
+ * Visual wizard panel for selection of files to convert and selection of a 
+ * converter.
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
@@ -33,7 +34,8 @@ public class ConverterSetupCard extends FileSelectionPanel {
     private PersistantChromosome selectedChrom;
     
     /**
-     * Creates new form ConverterSetupCard
+     * Visual wizard panel for selection of files to convert and selection of a
+     * converter.
      */
     public ConverterSetupCard() {
         initComponents();
@@ -71,7 +73,7 @@ public class ConverterSetupCard extends FileSelectionPanel {
         referenceNameField = new javax.swing.JTextField();
         referenceLengthField = new javax.swing.JTextField();
         referenceLengthLabel = new javax.swing.JLabel();
-        refComboBox = new javax.swing.JComboBox<>(this.getDbReferences());
+        refComboBox = new javax.swing.JComboBox<>(ProjectConnector.getInstance().getGenomesAsArray());
         refComboLabel = new javax.swing.JLabel();
         refCheckBox = new javax.swing.JCheckBox();
         refSelectionLabel = new javax.swing.JLabel();
@@ -345,20 +347,6 @@ public class ConverterSetupCard extends FileSelectionPanel {
     private javax.swing.JTextField referenceNameField;
     private javax.swing.JLabel referenceNameLabel;
     // End of variables declaration//GEN-END:variables
-    
-    /**
-     * @return Querries and returns all reference sequences stored in the current
-     * DB.
-     */
-    private PersistantReference[] getDbReferences() {
-        ProjectConnector connector = ProjectConnector.getInstance();
-        PersistantReference[] refs = new PersistantReference[0];
-        if (connector.isConnected()) {
-            List<PersistantReference> references = connector.getGenomes();
-            refs = references.toArray(refs);
-        }
-        return refs;
-    }
     
     
     /**

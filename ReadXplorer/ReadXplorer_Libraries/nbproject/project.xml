@@ -359,6 +359,7 @@
                 <package>net.sf.picard.filter</package>
                 <package>net.sf.picard.illumina</package>
                 <package>net.sf.picard.illumina.parser</package>
+                <package>net.sf.picard.illumina.parser.fakers</package>
                 <package>net.sf.picard.illumina.parser.readers</package>
                 <package>net.sf.picard.io</package>
                 <package>net.sf.picard.liftover</package>
@@ -773,9 +774,15 @@
                 <package>org.broad.tribble.index</package>
                 <package>org.broad.tribble.index.interval</package>
                 <package>org.broad.tribble.index.linear</package>
+                <package>org.broad.tribble.index.tabix</package>
                 <package>org.broad.tribble.readers</package>
                 <package>org.broad.tribble.util</package>
                 <package>org.broad.tribble.util.popgen</package>
+                <package>org.broadinstitute.variant.bcf2</package>
+                <package>org.broadinstitute.variant.utils</package>
+                <package>org.broadinstitute.variant.variantcontext</package>
+                <package>org.broadinstitute.variant.variantcontext.writer</package>
+                <package>org.broadinstitute.variant.vcf</package>
                 <package>org.gjt.mm.mysql</package>
                 <package>org.h2</package>
                 <package>org.h2.api</package>
@@ -993,6 +1000,18 @@
                 <binary-origin>release/modules/ext/wsdl4j-1.5.1.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
+                <runtime-relative-path>ext/sam-1.110.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/sam-1.110.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/variant-1.110.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/variant-1.110.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/tribble-1.110.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/tribble-1.110.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
                 <runtime-relative-path>ext/JRI.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/JRI.jar</binary-origin>
             </class-path-extension>
@@ -1007,6 +1026,10 @@
             <class-path-extension>
                 <runtime-relative-path>ext/jfreechart-1.0.15.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/jfreechart-1.0.15.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/picard-1.110.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/picard-1.110.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/biojava-core-1.8.1.jar</runtime-relative-path>
@@ -1077,20 +1100,12 @@
                 <binary-origin>release/modules/ext/servlet.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/picard-1.107.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/picard-1.107.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
                 <runtime-relative-path>ext/commons-lang3-3.1.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/commons-lang3-3.1.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/batik-anim.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/batik-anim.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/tribble-1.107.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/tribble-1.107.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/batik-css.jar</runtime-relative-path>
@@ -1135,10 +1150,6 @@
             <class-path-extension>
                 <runtime-relative-path>ext/JRIEngine.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/JRIEngine.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/sam-1.107.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/sam-1.107.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/jsc.jar</runtime-relative-path>

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
@@ -16,22 +12,33 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+/**
+ * Panel to first select a reference and then some tracks associated with this
+ * reference for an analysis.
+ * 
+ * @author kstadermann
+ */
 public final class SelectTrackVisualPanel extends JPanel implements ListSelectionListener {
+    private static final long serialVersionUID = 1L;
 
-    private List<PersistantReference> references;
+    private PersistantReference[] references;
     private int selectedIndex = -1;
     private PersistantReference selectedRef;
     private DefaultListModel<PersistantTrack> trackListModel = new DefaultListModel<>();
 
     /**
-     * Creates new form SelectTrackVisualPanel
+     * Panel to first select a reference and then some tracks associated with
+     * this reference for an analysis.
      */
     public SelectTrackVisualPanel() {
         ProjectConnector con = ProjectConnector.getInstance();
-        references = con.getGenomes();
+        references = con.getGenomesAsArray();
         initComponents();
     }
 
+    /**
+     * @return The name is: "Select tracks".
+     */
     @Override
     public String getName() {
         return "Select tracks";
@@ -46,11 +53,11 @@ public final class SelectTrackVisualPanel extends JPanel implements ListSelectio
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        referenceList = new javax.swing.JList(references.toArray());
+        referenceList = new javax.swing.JList<>(references);
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        trackList = new javax.swing.JList(trackListModel);
+        trackList = new javax.swing.JList<>(trackListModel);
 
         referenceList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         referenceList.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
@@ -76,7 +83,7 @@ public final class SelectTrackVisualPanel extends JPanel implements ListSelectio
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel2))
-                        .addGap(0, 9, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(jScrollPane2))
                 .addContainerGap())
         );
@@ -99,15 +106,15 @@ public final class SelectTrackVisualPanel extends JPanel implements ListSelectio
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JList referenceList;
-    private javax.swing.JList trackList;
+    private javax.swing.JList<PersistantReference> referenceList;
+    private javax.swing.JList<PersistantTrack> trackList;
     // End of variables declaration//GEN-END:variables
 
     @Override
     public void valueChanged(ListSelectionEvent e) {
         if (selectedIndex != referenceList.getSelectedIndex() && !e.getValueIsAdjusting()) {
             selectedIndex = referenceList.getSelectedIndex();
-            selectedRef = references.get(selectedIndex);
+            selectedRef = references[selectedIndex];
             ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector(selectedRef.getId());
             List<PersistantTrack> tracks = refCon.getAssociatedTracks();
             trackListModel.clear();
@@ -122,10 +129,17 @@ public final class SelectTrackVisualPanel extends JPanel implements ListSelectio
         return selectedRef.getId();
     }
 
+    /**
+     * @return The list of selected tracks for the single selected reference.
+     */
     public List<PersistantTrack> getSelectedTracks() {
         return trackList.getSelectedValuesList();
     }
 
+    /**
+     * @return Checks whether the selection of tracks is valid. true, if it is
+     * valid, false otherwise.
+     */
     public boolean selectionFinished() {
         if (trackList.isSelectionEmpty()) {
             return false;
