@@ -2,7 +2,7 @@ package de.cebitec.readXplorer.coverageAnalysis;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
-import de.cebitec.readXplorer.exporter.excel.ExcelExportDataI;
+import de.cebitec.readXplorer.exporter.tables.ExportDataI;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +15,7 @@ import java.util.List;
  *
  * @author Tobias Zimmermann, Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
  */
-public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCoverageAnalysis> implements ExcelExportDataI {
+public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCoverageAnalysis> implements ExportDataI {
 
     private CoverageIntervalContainer results;
 

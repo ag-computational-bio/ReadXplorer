@@ -8,7 +8,7 @@ package de.cebitec.readXplorer.transcriptionAnalyses;
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.exporter.excel.ExcelExportFileChooser;
+import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.DetectedFeatures;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.TransStartUnannotated;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.TranscriptionStart;
@@ -30,7 +30,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-import static de.cebitec.readXplorer.transcriptionAnalyses.Bundle.*;
 import org.openide.util.NbBundle;
 
 /**
@@ -196,7 +195,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
         
         this.processResultForExport();
         
-        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", tssResult); 
+        TableExportFileChooser fileChooser = new TableExportFileChooser(TableExportFileChooser.getTableFileExtensions(), tssResult); 
     }//GEN-LAST:event_exportButtonActionPerformed
 
     private void statisticsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statisticsButtonActionPerformed

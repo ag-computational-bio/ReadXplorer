@@ -3,7 +3,7 @@ package de.cebitec.readXplorer.featureCoverageAnalysis;
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
-import de.cebitec.readXplorer.exporter.excel.ExcelExportDataI;
+import de.cebitec.readXplorer.exporter.tables.ExportDataI;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,7 +16,7 @@ import java.util.List;
  * 
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCoveredFeatures> implements ExcelExportDataI {
+public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCoveredFeatures> implements ExportDataI {
     
     private List<CoveredFeature> results;
 

@@ -1,4 +1,4 @@
-package de.cebitec.readXplorer.exporter.excel;
+package de.cebitec.readXplorer.exporter.tables;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -28,7 +28,7 @@ import org.openide.util.NbBundle;
  *
  * @author -Rolf Hilker-
  */
-public class ExcelExporter {
+public class ExcelExporter implements TableExporterI {
     
 
     private ProgressHandle progressHandle;
@@ -42,8 +42,8 @@ public class ExcelExporter {
     /**
      * General excel exporter. It supports even multiple sheets in one document.
      * All 3 data fields have to be set in order to start a successful export.
-     * @param progressHandle the progress handle which should display the progress
-     *      of the ExcelExporter
+     * @param progressHandle the progress handle which should display the
+     * progress of the ExcelExporter
      */
     public ExcelExporter(ProgressHandle progressHandle) {
         this.progressHandle = progressHandle;
@@ -51,9 +51,10 @@ public class ExcelExporter {
     } 
     
     /**
-     * @param dataSheetNames the sheet name list the sheets which should be 
+     * @param dataSheetNames the sheet name listf for the sheets which should be
      * exported to the excel file. Must be set!
      */
+    @Override
     public void setSheetNames(List<String> dataSheetNames) {
         this.sheetNames = dataSheetNames;
     } 
@@ -62,6 +63,7 @@ public class ExcelExporter {
      * @param headers the header list for the tables which should be exported to
      * the excel file. Must be set!
      */
+    @Override
     public void setHeaders(List<List<String>> headers) {
         this.headers = headers;
     }
@@ -70,6 +72,7 @@ public class ExcelExporter {
      * @param exportData The list of data which should be exported to excel.
      * Must be set!
      */
+    @Override
     public void setExportData(List<List<List<Object>>> exportData) {
         this.exportData = exportData;
     }
@@ -85,6 +88,7 @@ public class ExcelExporter {
      */
     @NbBundle.Messages({"ExcelExporterSuccessMsg=Excel exporter stored data successfully: ", 
         "ExcelExporterSuccessHeader=Information Message"})
+    @Override
     public File writeFile(File file) throws FileNotFoundException, IOException, WriteException, OutOfMemoryError {
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting to write Excel file...{0}", file.getAbsolutePath());
@@ -168,7 +172,7 @@ public class ExcelExporter {
                 }
             }
             if (dataLeft) { break; }
-            if (this.rowNumberGlobal++ % 10 == 0) {
+            if (this.rowNumberGlobal++ % 100 == 0) {
                 this.progressHandle.progress("Storing line", this.rowNumberGlobal);
             }
             ++row;
@@ -252,9 +256,9 @@ public class ExcelExporter {
     }
     
     /**
-     * @return true, if the complete export process can be started by calling
-     *      {@link writeFile()}.
+     * {@inheritDoc}
      */
+    @Override
     public boolean readyToExport() {
         return this.exportData != null && !this.exportData.isEmpty() 
                 && this.headers != null && !this.headers.isEmpty()

@@ -48,7 +48,7 @@ public class FastaUtils implements Observable {
      * errors.
      */
     public void indexFasta(File fastaFileToIndex, List<Observer> observers) {
-        for (Observer observer : this.observers) {
+        for (Observer observer : observers) {
             this.registerObserver(observer);
         }
         
@@ -61,7 +61,7 @@ public class FastaUtils implements Observable {
                 FastaIndexWriter idxWriter = new FastaIndexWriter();
                 Path indexFile = Paths.get(fastaFileToIndex.getAbsolutePath() + ".fai");
                 idxWriter.writeIndex(indexFile, sequences);
-            } catch (IOException e) {
+            } catch (IOException | IllegalStateException e) {
                 this.notifyObservers(e.getMessage());
             }
         } catch (PicardException e) {
@@ -69,7 +69,7 @@ public class FastaUtils implements Observable {
             JOptionPane.showMessageDialog(new JPanel(), msg, "Fasta missing error", JOptionPane.ERROR_MESSAGE);
         }
 
-        for (Observer observer : this.observers) {
+        for (Observer observer : observers) {
             this.removeObserver(observer);
         }
     }

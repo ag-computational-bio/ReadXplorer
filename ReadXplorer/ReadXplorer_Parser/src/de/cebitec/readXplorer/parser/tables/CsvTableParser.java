@@ -24,7 +24,7 @@ import org.supercsv.prefs.CsvPreference;
  *  
  * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
  */
-public class CsvTableParser implements TableParserI {
+public class CsvTableParser implements CsvParserI {
 
     private static String name = "CSV Table Parser";
     private static String[] fileExtension = new String[]{"csv", "CSV"};

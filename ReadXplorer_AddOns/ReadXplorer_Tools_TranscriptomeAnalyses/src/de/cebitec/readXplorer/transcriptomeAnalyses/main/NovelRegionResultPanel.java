@@ -1,11 +1,11 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.exporter.excel.ExcelExportFileChooser;
+import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelTranscript;
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.SequinTableFormatExporter;
 import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.SequinTableSettingsWizardPanel;
-import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.util.UneditableTableModel;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
@@ -251,7 +251,7 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                 NotifyDescriptor.OK_CANCEL_OPTION // default option is "Yes"
                 );
         if (DialogDisplayer.getDefault().notify(nd) == NotifyDescriptor.OK_OPTION) {
-            ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", this.novelRegionResults);
+            TableExportFileChooser fileChooser = new TableExportFileChooser(TableExportFileChooser.getTableFileExtensions(), this.novelRegionResults);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 

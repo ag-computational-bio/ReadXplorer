@@ -1,4 +1,4 @@
-package de.cebitec.readXplorer.exporter.excel;
+package de.cebitec.readXplorer.exporter.tables;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -12,7 +12,7 @@ import javax.swing.table.DefaultTableModel;
  * 
  * @author kstaderm
  */
-public class TableToExcel implements ExcelExportDataI {
+public class TableToExcel implements ExportDataI {
 
     private String tableName;
     private List<String> columnName;

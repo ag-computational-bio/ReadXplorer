@@ -9,6 +9,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
@@ -48,7 +49,7 @@ public abstract class ReadXplorerFileChooser  extends JFileChooser {
         this.data = data;
         this.fileExtensions = fileExtensions;
         this.fileDescription = fileDescription;
-        if (fileExtensions[0] != null && !fileExtensions[0].isEmpty()) {
+        if (fileExtensions != null && !fileExtensions[0].isEmpty()) {
             this.setFileFilter(new FileNameExtensionFilter(fileDescription, fileExtensions));
         }
         this.pref = NbPreferences.forModule(Object.class);
@@ -102,10 +103,7 @@ public abstract class ReadXplorerFileChooser  extends JFileChooser {
             this.open(fileLocation);
         } else
         if (option == ReadXplorerFileChooser.SAVE_DIALOG) {
-            if (!fileExtensions[0].isEmpty() && !fileLocation.endsWith(".".concat(fileExtensions[0]))
-                    && !fileLocation.endsWith(".".concat(fileExtensions[0].toUpperCase()))) {
-                fileLocation = fileLocation.concat(".".concat(fileExtensions[0]));
-            }
+            fileLocation = ReadXplorerFileChooser.getSelectedFileWithExtension(this).getAbsolutePath();
             boolean done = this.checkFileExists(fileLocation, this);
             if (!done) {
                 this.save(fileLocation);
@@ -168,5 +166,37 @@ public abstract class ReadXplorerFileChooser  extends JFileChooser {
      */
     public void setDirectory(String directory) {
         this.currentDirectory = directory;
+    }
+    
+    /**
+     * Returns the selected file from a JFileChooser, including the extension
+     * from the file filter.
+     * @param chooser the chooser whose file is needed with its extension
+     * @return The file including its extension.
+     */
+    public static File getSelectedFileWithExtension(JFileChooser chooser) {
+        File file = chooser.getSelectedFile();
+        if (chooser.getFileFilter() instanceof FileNameExtensionFilter) {
+            String[] extensions = ((FileNameExtensionFilter) chooser.getFileFilter()).getExtensions();
+            for (String extension : extensions) { // check if it already has a valid extension
+                if (file.getName().endsWith('.' + extension)) {
+                    return file;
+                }
+            }
+            // if not, append the first extension from the selected filter
+            file = new File(file.getAbsolutePath() + '.' + extensions[0]);
+        } else { //if no appropriate filter is currently selected, the first extensions of the first appropriate extension filter is appended to the file name
+            FileFilter[] filters = chooser.getChoosableFileFilters();
+            if (filters.length > 0) {
+                for (FileFilter filter : filters) {
+                    if (filter instanceof FileNameExtensionFilter) {
+                        FileNameExtensionFilter extensionFilter = (FileNameExtensionFilter) filter;
+                        file = new File(file.getAbsolutePath() + '.' + extensionFilter.getExtensions()[0]);
+                        break;
+                    }
+                }
+            }
+        }
+        return file;
     }
 }

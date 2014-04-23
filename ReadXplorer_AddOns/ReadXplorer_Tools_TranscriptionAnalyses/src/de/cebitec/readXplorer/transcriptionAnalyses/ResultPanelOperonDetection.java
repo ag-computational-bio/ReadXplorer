@@ -7,7 +7,7 @@ package de.cebitec.readXplorer.transcriptionAnalyses;
  */
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.exporter.excel.ExcelExportFileChooser;
+import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.Operon;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.OperonAdjacency;
 import de.cebitec.readXplorer.util.LineWrapCellRenderer;
@@ -170,7 +170,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
-        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", operonResult);
+        TableExportFileChooser fileChooser = new TableExportFileChooser(TableExportFileChooser.getTableFileExtensions(), operonResult);
     }//GEN-LAST:event_exportButtonActionPerformed
 
     private void statisticsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statisticsButtonActionPerformed

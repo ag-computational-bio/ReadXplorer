@@ -15,7 +15,7 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.Snp;
 import de.cebitec.readXplorer.databackend.dataObjects.SnpI;
-import de.cebitec.readXplorer.exporter.excel.ExcelExportFileChooser;
+import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.util.LineWrapCellRenderer;
 import de.cebitec.readXplorer.util.SequenceComparison;
 import de.cebitec.readXplorer.util.UneditableTableModel;
@@ -218,7 +218,7 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
-        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", completeSnpData);
+        TableExportFileChooser fileChooser = new TableExportFileChooser(TableExportFileChooser.getTableFileExtensions(), completeSnpData);
 }//GEN-LAST:event_exportButtonActionPerformed
 
     private void alignmentButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alignmentButtonActionPerformed

@@ -12,8 +12,8 @@ import static de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler.To
 import de.cebitec.readXplorer.differentialExpression.plot.BaySeqGraphicsTopComponent;
 import de.cebitec.readXplorer.differentialExpression.plot.DeSeqGraphicsTopComponent;
 import de.cebitec.readXplorer.differentialExpression.plot.ExpressTestGraphicsTopComponent;
-import de.cebitec.readXplorer.exporter.excel.ExcelExportFileChooser;
-import de.cebitec.readXplorer.exporter.excel.TableToExcel;
+import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
+import de.cebitec.readXplorer.exporter.tables.TableToExcel;
 import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.readXplorer.util.GenerateRowSorter;
 import de.cebitec.readXplorer.util.Observer;
@@ -293,8 +293,8 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
     }//GEN-LAST:event_createGraphicsButtonActionPerformed
 
     private void saveTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTableButtonActionPerformed
-        ExcelExportFileChooser fc = new ExcelExportFileChooser(new String[]{"xls"},
-                "xls", new TableToExcel(resultComboBox.getSelectedItem().toString(), (UneditableTableModel) topCountsTable.getModel()));
+        TableExportFileChooser fileChooser = new TableExportFileChooser(TableExportFileChooser.getTableFileExtensions(), 
+                new TableToExcel(resultComboBox.getSelectedItem().toString(), (UneditableTableModel) topCountsTable.getModel()));
     }//GEN-LAST:event_saveTableButtonActionPerformed
 
     private void showLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showLogButtonActionPerformed

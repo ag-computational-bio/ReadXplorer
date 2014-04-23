@@ -1,6 +1,6 @@
 package de.cebitec.readXplorer.coverageAnalysis;
 
-import de.cebitec.readXplorer.exporter.excel.ExcelExportFileChooser;
+import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.util.UneditableTableModel;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.tableVisualization.TableUtils;
@@ -149,7 +149,7 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
-        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", this.coverageAnalysisResult);
+        TableExportFileChooser fileChooser = new TableExportFileChooser(TableExportFileChooser.getTableFileExtensions(), this.coverageAnalysisResult);
     }//GEN-LAST:event_exportButtonActionPerformed
 
     private void statisticsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statisticsButtonActionPerformed

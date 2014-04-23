@@ -6,6 +6,7 @@ import de.cebitec.readXplorer.controller.ViewController;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.parser.common.ParsingException;
 import de.cebitec.readXplorer.parser.tables.CsvTableParser;
+import de.cebitec.readXplorer.parser.tables.TableParserI;
 import de.cebitec.readXplorer.parser.tables.TableType;
 import de.cebitec.readXplorer.ui.importer.dataTable.ImportTableWizardPanel;
 import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
@@ -74,11 +75,14 @@ public final class ImportTableWizardAction implements ActionListener {
             final PersistantReference ref = (PersistantReference) wiz.getProperty(ImportTableWizardPanel.PROP_SELECTED_REF);
             final boolean autoDelimiter = (boolean) wiz.getProperty(ImportTableWizardPanel.PROP_AUTO_DELEMITER);
             final CsvPreference csvPref = (CsvPreference) wiz.getProperty(ImportTableWizardPanel.PROP_SEL_PREF);
+            final TableParserI parser = (TableParserI) wiz.getProperty(ImportTableWizardPanel.PROP_SEL_PARSER);
             
-            CsvTableParser parser = new CsvTableParser();
-            parser.setAutoDelimiter(autoDelimiter);
-            parser.setCsvPref(csvPref);
-            parser.setTableModel(tableType.getName());
+            if (parser instanceof CsvTableParser) {
+                CsvTableParser csvParser = (CsvTableParser) parser;
+                csvParser.setAutoDelimiter(autoDelimiter);
+                csvParser.setCsvPref(csvPref);
+                csvParser.setTableModel(tableType.getName());
+            }
             
             //parse file in readable format for a table
             final File tableFile = new File(fileLocation);

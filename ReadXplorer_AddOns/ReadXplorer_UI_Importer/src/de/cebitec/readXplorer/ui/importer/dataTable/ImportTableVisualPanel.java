@@ -3,10 +3,11 @@ package de.cebitec.readXplorer.ui.importer.dataTable;
 import de.cebitec.readXplorer.api.objects.JobPanel;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.parser.common.ParserI;
 import de.cebitec.readXplorer.parser.tables.CsvPreferenceForUsers;
 import de.cebitec.readXplorer.parser.tables.CsvTableParser;
+import de.cebitec.readXplorer.parser.tables.TableParserI;
 import de.cebitec.readXplorer.parser.tables.TableType;
+import de.cebitec.readXplorer.parser.tables.XlsTableParser;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
 import java.io.File;
@@ -26,6 +27,7 @@ public final class ImportTableVisualPanel extends JobPanel {
     private static final long serialVersionUID = 1L;
     
     private String fileLocation;
+    private final TableParserI[] availableParsers = {new CsvTableParser(), new XlsTableParser()};
 
     /**
      * Creates a panel for displaying the selection of different table parsers
@@ -52,7 +54,7 @@ public final class ImportTableVisualPanel extends JobPanel {
 
         descriptionScrollPane = new javax.swing.JScrollPane();
         descriptionTextArea = new javax.swing.JTextArea();
-        tableComboBox = new javax.swing.JComboBox<>(new javax.swing.DefaultComboBoxModel<>(TableType.values()));
+        tableComboBox = new javax.swing.JComboBox<>(new javax.swing.DefaultComboBoxModel<>(de.cebitec.readXplorer.parser.tables.TableType.values()));
         fileTextField = new javax.swing.JTextField();
         fileButton = new javax.swing.JButton();
         PersistantReference[] refArray = new PersistantReference[0];
@@ -63,6 +65,8 @@ public final class ImportTableVisualPanel extends JobPanel {
         refLabel = new javax.swing.JLabel();
         delimiterCheckBox = new javax.swing.JCheckBox();
         csvPrefComboBox = new javax.swing.JComboBox<>(CsvPreferenceForUsers.values());
+        parserLabel = new javax.swing.JLabel();
+        parserComboBox = new javax.swing.JComboBox<>(availableParsers);
 
         descriptionTextArea.setEditable(false);
         descriptionTextArea.setColumns(20);
@@ -103,6 +107,15 @@ public final class ImportTableVisualPanel extends JobPanel {
 
         csvPrefComboBox.setVisible(!this.delimiterCheckBox.isSelected());
 
+        org.openide.awt.Mnemonics.setLocalizedText(parserLabel, org.openide.util.NbBundle.getMessage(ImportTableVisualPanel.class, "ImportTableVisualPanel.parserLabel.text")); // NOI18N
+
+        tableComboBox.setSelectedIndex(0);
+        parserComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                parserComboBoxActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -112,19 +125,25 @@ public final class ImportTableVisualPanel extends JobPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(csvPrefComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(descriptionScrollPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
-                    .addComponent(tableComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(refComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(fileTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(fileButton))
-                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(tableLabel)
                             .addComponent(refLabel)
                             .addComponent(fileLabel)
                             .addComponent(delimiterCheckBox))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(parserLabel)
+                            .addComponent(tableLabel))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(tableComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(parserComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(fileTextField, javax.swing.GroupLayout.DEFAULT_SIZE, 305, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(fileButton)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -132,21 +151,25 @@ public final class ImportTableVisualPanel extends JobPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(descriptionScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(tableLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tableComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(parserLabel)
+                    .addComponent(parserComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tableLabel)
+                    .addComponent(tableComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(refLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(refComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(fileLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(fileTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(fileButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(delimiterCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(csvPrefComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -155,7 +178,7 @@ public final class ImportTableVisualPanel extends JobPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void fileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileButtonActionPerformed
-        ParserI currentParser = new CsvTableParser();
+        TableParserI currentParser = (TableParserI) parserComboBox.getSelectedItem();
         ReadXplorerFileChooser chooser = new ReadXplorerFileChooser(currentParser.getFileExtensions(), currentParser.getInputFileDescription()) {
             private static final long serialVersionUID = 1L;
             
@@ -179,6 +202,14 @@ public final class ImportTableVisualPanel extends JobPanel {
         this.csvPrefComboBox.setVisible(!delimiterCheckBox.isSelected());
     }//GEN-LAST:event_delimiterCheckBoxActionPerformed
 
+    private void parserComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_parserComboBoxActionPerformed
+        this.fileLocation = "";
+        this.fileTextField.setText(org.openide.util.NbBundle.getMessage(ImportTableVisualPanel.class, "ImportTableVisualPanel.fileTextField.text"));
+        boolean isCsvParser = (this.parserComboBox.getSelectedItem() instanceof CsvTableParser);
+        this.csvPrefComboBox.setVisible(isCsvParser && !this.delimiterCheckBox.isSelected());
+        this.delimiterCheckBox.setVisible(isCsvParser);
+    }//GEN-LAST:event_parserComboBoxActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<CsvPreferenceForUsers> csvPrefComboBox;
     private javax.swing.JCheckBox delimiterCheckBox;
@@ -187,9 +218,11 @@ public final class ImportTableVisualPanel extends JobPanel {
     private javax.swing.JButton fileButton;
     private javax.swing.JLabel fileLabel;
     private javax.swing.JTextField fileTextField;
+    private javax.swing.JComboBox<TableParserI> parserComboBox;
+    private javax.swing.JLabel parserLabel;
     private javax.swing.JComboBox<PersistantReference> refComboBox;
     private javax.swing.JLabel refLabel;
-    private javax.swing.JComboBox<TableType> tableComboBox;
+    private javax.swing.JComboBox<de.cebitec.readXplorer.parser.tables.TableType> tableComboBox;
     private javax.swing.JLabel tableLabel;
     // End of variables declaration//GEN-END:variables
 
@@ -202,9 +235,9 @@ public final class ImportTableVisualPanel extends JobPanel {
     }
 
     /**
-     * @return The parser selected in this panel.
+     * @return The table type selected in this panel.
      */
-    public TableType getSelectedParser() {
+    public TableType getSelectedTableType() {
         return (TableType) this.tableComboBox.getSelectedItem();
     }
 
@@ -235,6 +268,13 @@ public final class ImportTableVisualPanel extends JobPanel {
      */
     public boolean isAutodetectDelimiter() {
         return this.delimiterCheckBox.isSelected();
+    }
+
+    /**
+     * @return The selected table parser to use.
+     */
+    public TableParserI getParser() {
+        return (TableParserI) this.parserComboBox.getSelectedItem();
     }
     
 }

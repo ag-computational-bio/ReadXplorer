@@ -3,7 +3,7 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.exporter.excel.ExcelExportFileChooser;
+import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.ChartsGenerationSelectChatTypeWizardPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.PlotGenerator;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
@@ -352,7 +352,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                 NotifyDescriptor.OK_CANCEL_OPTION // default option is "Yes"
         );
         if (DialogDisplayer.getDefault().notify(nd) == NotifyDescriptor.OK_OPTION) {
-            ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", this.tssResult);
+            TableExportFileChooser fileChooser = new TableExportFileChooser(TableExportFileChooser.getTableFileExtensions(), this.tssResult);
         }
     }//GEN-LAST:event_exportButtonActionPerformed
 

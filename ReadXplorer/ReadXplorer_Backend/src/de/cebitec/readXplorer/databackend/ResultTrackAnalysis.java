@@ -3,7 +3,7 @@ package de.cebitec.readXplorer.databackend;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
-import de.cebitec.readXplorer.exporter.excel.ExcelExportDataI;
+import de.cebitec.readXplorer.exporter.tables.ExportDataI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.Map;
  * 
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
+public abstract class ResultTrackAnalysis<T> implements ExportDataI {
     
     private Map<Integer, PersistantTrack> trackMap;
     private Map<Integer, PersistantChromosome> chromMap;

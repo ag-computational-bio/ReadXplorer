@@ -4,10 +4,9 @@
  */
 package de.cebitec.readXplorer.correlationAnalysis;
 
-import de.cebitec.readXplorer.exporter.excel.ExcelExportFileChooser;
+import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
-import java.util.Map.Entry;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JPanel;
 import javax.swing.event.ListSelectionEvent;
@@ -142,7 +141,7 @@ public class CorrelationResultPanel extends JPanel {
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
         if (this.getAnalysisResult()!=null) {
-            new ExcelExportFileChooser(new String[]{"xls"}, "xls", this.getAnalysisResult());
+            TableExportFileChooser fileChooser = new TableExportFileChooser(TableExportFileChooser.getTableFileExtensions(), this.getAnalysisResult());
         }
     }//GEN-LAST:event_exportButtonActionPerformed
 

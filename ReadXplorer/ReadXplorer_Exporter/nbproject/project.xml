@@ -67,8 +67,7 @@
                 </test-type>
             </test-dependencies>
             <public-packages>
-                <package>de.cebitec.readXplorer.exporter</package>
-                <package>de.cebitec.readXplorer.exporter.excel</package>
+                <package>de.cebitec.readXplorer.exporter.tables</package>
             </public-packages>
         </data>
     </configuration>

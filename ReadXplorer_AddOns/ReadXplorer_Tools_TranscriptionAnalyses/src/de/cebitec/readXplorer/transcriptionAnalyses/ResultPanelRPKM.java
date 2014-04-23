@@ -7,7 +7,7 @@ package de.cebitec.readXplorer.transcriptionAnalyses;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.exporter.excel.ExcelExportFileChooser;
+import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.RPKMvalue;
 import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.readXplorer.util.UneditableTableModel;
@@ -180,7 +180,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
     }//GEN-LAST:event_histogramButtonActionPerformed
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
-        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", rpkmCalcResult);
+        TableExportFileChooser fileChooser = new TableExportFileChooser(TableExportFileChooser.getTableFileExtensions(), rpkmCalcResult);
     }//GEN-LAST:event_exportButtonActionPerformed
 
     private void statisticsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statisticsButtonActionPerformed
