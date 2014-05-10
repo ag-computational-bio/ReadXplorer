@@ -2,6 +2,7 @@ package de.cebitec.readXplorer.transcriptionAnalyses;
 
 import de.cebitec.readXplorer.databackend.ParameterSetI;
 import de.cebitec.readXplorer.databackend.ParametersFeatureTypes;
+import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.util.FeatureType;
 import java.util.Set;
 
@@ -16,6 +17,7 @@ public class ParameterSetRPKM extends ParametersFeatureTypes implements Paramete
     private boolean performRPKMAnalysis;
     private int minReadCount;
     private int maxReadCount;
+    private final ParametersReadClasses readClassParams;
     
     /**
      * Data storage for all parameters associated with an RPKM and read count
@@ -24,13 +26,15 @@ public class ParameterSetRPKM extends ParametersFeatureTypes implements Paramete
      * @param minReadCount minimum read count of a feature to return it in the result
      * @param maxReadCount maximum read count of a feature to return it in the result
      * @param selFeatureTypes the set of selected feature types
+     * @param readClassParams
      */
-    public ParameterSetRPKM(boolean performRPKMAnalysis, int minReadCount, int maxReadCount, Set<FeatureType> selFeatureTypes) {
+    public ParameterSetRPKM(boolean performRPKMAnalysis, int minReadCount, int maxReadCount, Set<FeatureType> selFeatureTypes, ParametersReadClasses readClassParams) {
         
         super(selFeatureTypes);
         this.performRPKMAnalysis = performRPKMAnalysis;
         this.minReadCount = minReadCount;
         this.maxReadCount = maxReadCount;
+        this.readClassParams = readClassParams;
     }
 
     /**
@@ -67,4 +71,9 @@ public class ParameterSetRPKM extends ParametersFeatureTypes implements Paramete
     public void setMaxReadCount(int maxRPKM) {
         this.maxReadCount = maxRPKM;
     }    
+
+    public ParametersReadClasses getReadClassParams() {
+        return readClassParams;
+    }
+    
 }

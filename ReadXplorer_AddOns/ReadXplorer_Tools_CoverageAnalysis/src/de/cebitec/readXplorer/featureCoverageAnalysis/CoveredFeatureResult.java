@@ -71,6 +71,9 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
         resultDescriptions.add("Length");
         resultDescriptions.add("Covered Percent");
         resultDescriptions.add("Covered Bases Count");
+        resultDescriptions.add("Locus");
+        resultDescriptions.add("EC-Number");
+        resultDescriptions.add("Product");
 
         dataColumnDescriptions.add(resultDescriptions);
 
@@ -101,6 +104,9 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
             coveredFeatureRow.add(feature.getStop() - feature.getStart());
             coveredFeatureRow.add(coveredFeature.getPercentCovered());
             coveredFeatureRow.add(coveredFeature.getNoCoveredBases());
+            coveredFeatureRow.add(feature.getLocus());
+            coveredFeatureRow.add(feature.getEcNumber());
+            coveredFeatureRow.add(feature.getProduct());
 
             coveredFeaturesResultList.add(coveredFeatureRow);
         }
@@ -114,24 +120,25 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
         String coveredString = parameters.isGetCoveredFeatures() ? "Covered" : "Uncovered";
         
         List<List<Object>> statisticsExportData = new ArrayList<>();
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(coveredString + " feature detection statistics for tracks:", 
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(coveredString + " feature detection statistics for tracks:", 
                 GeneralUtils.generateConcatenatedString(this.getTrackNameList(), 0)));
         
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between title and parameters
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between title and parameters
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow(coveredString + " feature detection parameters:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Minimum covered percent:", parameters.getMinCoveredPercent()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Minimum counted coverage:", parameters.getMinCoverageCount()));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(coveredString + " feature detection parameters:"));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Minimum covered percent:", parameters.getMinCoveredPercent()));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Minimum counted coverage:", parameters.getMinCoverageCount()));
         String whateverStrand = parameters.isWhateverStrand() ? "no" : "yes";
         String uncoveredFeatures = parameters.isGetCoveredFeatures() ? "no" : "yes";
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Only count read on feature strand:", whateverStrand));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Detect uncovered instead of covered features:", uncoveredFeatures));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Only count read on feature strand:", whateverStrand));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Detect uncovered instead of covered features:", uncoveredFeatures));
+        parameters.getReadClassParams().addReadClassParamsToStats(statisticsExportData);
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between parameters and statistics
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between parameters and statistics
         
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow(coveredString + " feature statistics:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelCoveredFeatures.FEATURES_COVERED, coveredFeaturesResultList.size()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(coveredString + " feature statistics:"));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelCoveredFeatures.FEATURES_COVERED, coveredFeaturesResultList.size()));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(
                 ResultPanelCoveredFeatures.FEATURES_TOTAL, this.getStatsMap().get(ResultPanelCoveredFeatures.FEATURES_TOTAL)));
 
         coveredFeaturesExport.add(statisticsExportData);

@@ -214,8 +214,8 @@ public class SequinTableFormatExporter extends Thread {
             if (feature.hasLocus()) {
                 writer.write(generateSecondLine(Qualifier.LOCUS_TAG, feature.getLocus()));
             }
-            if (feature.hasFeatureName() && !feature.getFeatureName().equals("")) {
-                writer.write(generateSecondLine(Qualifier.STANDARD_NAME, feature.getFeatureName()));
+            if (feature.hasFeatureName() && !feature.getName().equals("")) {
+                writer.write(generateSecondLine(Qualifier.STANDARD_NAME, feature.getName()));
             }
             if (!feature.getProduct().equals("")) {
                 writer.write(generateSecondLine(Qualifier.PRODUCT, feature.getProduct()));

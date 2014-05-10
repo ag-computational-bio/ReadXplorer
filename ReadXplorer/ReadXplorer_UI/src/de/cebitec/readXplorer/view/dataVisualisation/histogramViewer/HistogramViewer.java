@@ -10,7 +10,6 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantDiff;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReferenceGap;
 import de.cebitec.readXplorer.util.ColorProperties;
-import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.Properties; 
 import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
@@ -221,7 +220,6 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         int totalFrom = lowerBound - MININTERVALLENGTH;
         int totalTo = upperBound + MININTERVALLENGTH;
         if (cov != null && cov.coversBounds(lowerBound, upperBound) && !this.isNewDataRequestNeeded()) {
-            this.setNewDataRequestNeeded(false);
             this.coverageLoaded = true;
             //we need to load the diffs seperately for tracks completely stored in the db
             this.diffsLoaded = trackConnector.addDiffRequest(new IntervalRequest(from, to, totalFrom, totalTo, refGen.getActiveChromId(), this, true, Properties.DIFFS, Properties.NORMAL));
@@ -232,13 +230,9 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
             this.coverageLoaded = false;
             this.diffsLoaded = false;
-            boolean perfectCovWanted = !this.getExcludedFeatureTypes().contains(FeatureType.PERFECT_COVERAGE);
-            boolean bestMatchCovWanted = !this.getExcludedFeatureTypes().contains(FeatureType.BEST_MATCH_COVERAGE);
-            boolean commonCovWanted = !this.getExcludedFeatureTypes().contains(FeatureType.COMMON_COVERAGE);
-            boolean multipleMappedReadsWanted = this.getExcludedFeatureTypes().contains(FeatureType.MULTIPLE_MAPPED_READ);
-            ParametersReadClasses readClassParams = new ParametersReadClasses(perfectCovWanted, bestMatchCovWanted, commonCovWanted, multipleMappedReadsWanted);
+            ParametersReadClasses readClassParams = this.getReadClassParams();
             trackConnector.addCoverageRequest(new IntervalRequest(from, to, totalFrom, totalTo, refGen.getActiveChromId(), this, true, readClassParams));
-            trackConnector.addDiffRequest(new IntervalRequest(from, to, totalFrom, totalTo, refGen.getActiveChromId(), this, true, Properties.DIFFS, Properties.NORMAL));
+            trackConnector.addDiffRequest(new IntervalRequest(from, to, totalFrom, totalTo, refGen.getActiveChromId(), this, true, Properties.DIFFS, Properties.NORMAL, readClassParams));
         }
     }
 

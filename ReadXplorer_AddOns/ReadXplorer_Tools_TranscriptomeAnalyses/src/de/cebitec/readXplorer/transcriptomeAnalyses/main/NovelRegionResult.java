@@ -106,48 +106,48 @@ public class NovelRegionResult extends ResultTrackAnalysis<ParameterSetWholeTran
         ParameterSetWholeTranscriptAnalyses novelRegionParameters = (ParameterSetWholeTranscriptAnalyses) this.getParameters();
         List<List<Object>> statisticsExportData = new ArrayList<>();
 
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(
                 "Novel Region detection statistics for tracks:",
                 GeneralUtils.generateConcatenatedString(this.getTrackNameList(), 0)));
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between title and parameters
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between title and parameters
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("Novel Region detection parameters:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(NovelRegionResultPanel.NOVELREGION_DETECTION_MIN_LENGTH,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Novel Region detection parameters:"));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(NovelRegionResultPanel.NOVELREGION_DETECTION_MIN_LENGTH,
                 novelRegionParameters.getMinLengthBoundary()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(TranscriptomeAnalysisWizardIterator.PROP_FRACTION_NOVELREGION_DETECTION,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(TranscriptomeAnalysisWizardIterator.PROP_FRACTION_NOVELREGION_DETECTION,
                 novelRegionParameters.getFraction()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(TranscriptomeAnalysisWizardIterator.PROP_INCLUDE_RATIOVALUE_IN_NOVEL_REGION_DETECTION,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(TranscriptomeAnalysisWizardIterator.PROP_INCLUDE_RATIOVALUE_IN_NOVEL_REGION_DETECTION,
                 novelRegionParameters.isRatioInclusion()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(TranscriptomeAnalysisWizardIterator.PROP_RAIO_NOVELREGION_DETECTION,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(TranscriptomeAnalysisWizardIterator.PROP_RAIO_NOVELREGION_DETECTION,
                 novelRegionParameters.getIncreaseRatioValue()));
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between parameters and statistics
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between parameters and statistics
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("Novel Region statistics:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_FEATURES,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Novel Region statistics:"));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_FEATURES,
                 getStatsAndParametersMap().get(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_FEATURES)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_REV_FEATURES,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_REV_FEATURES,
                 getStatsAndParametersMap().get(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_REV_FEATURES)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_FWD_FEATURES,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_FWD_FEATURES,
                 getStatsAndParametersMap().get(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_FWD_FEATURES)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_CISANTISENSE,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_CISANTISENSE,
                 getStatsAndParametersMap().get(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_CISANTISENSE)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_TRANSGENIC,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_TRANSGENIC,
                 getStatsAndParametersMap().get(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_TRANSGENIC)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.MAPPINGS_COUNT,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.MAPPINGS_COUNT,
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.MAPPINGS_COUNT)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH,
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.MAPPINGS_MILLION,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.MAPPINGS_MILLION,
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.MAPPINGS_MILLION)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD,
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD)));
 
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow(""));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(""));
 
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Table Type", TABLE_TYPE.toString()));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Table Type", TABLE_TYPE.toString()));
 
         tSSExport.add(statisticsExportData);
 

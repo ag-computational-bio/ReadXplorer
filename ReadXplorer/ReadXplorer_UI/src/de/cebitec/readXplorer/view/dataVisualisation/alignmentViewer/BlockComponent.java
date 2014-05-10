@@ -1,5 +1,6 @@
 package de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer;
 
+import de.cebitec.readXplorer.databackend.SamBamFileReader;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantDiff;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
@@ -87,7 +88,7 @@ public class BlockComponent extends JComponent {
                         popUp.add(menuItemFactory.getRNAFoldItem(rnaFolderControl, mappingSequence, this.getHeader()));
                     }
 
-                    popUp.show((JComponent) e.getComponent(), e.getX(), e.getY());
+                    popUp.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
             
@@ -152,6 +153,9 @@ public class BlockComponent extends JComponent {
         sb.append(createTableRow("Replicates", String.valueOf(mapping.getNbReplicates())));
 //        this.appendReadnames(mapping, sb); //no readnames are stored anymore: RUN domain excluded
         sb.append(createTableRow("Mismatches", String.valueOf(mapping.getDifferences())));
+        int mappingQual = mapping.getMappingQuality() == -1 ? SamBamFileReader.DEFAULT_MAP_QUAL : mapping.getMappingQuality();
+        sb.append(createTableRow("Mapping quality (Phred)", String.valueOf(mappingQual)));
+        sb.append(createTableRow("Base qualities (Phred)", this.generateBaseQualString(mapping.getBaseQualities())));
         this.appendDiffs(mapping, sb);
         this.appendGaps(mapping, sb);
         
@@ -175,6 +179,30 @@ public class BlockComponent extends JComponent {
         sb.append("</html>");
 
         return sb.toString();
+    }
+
+    /**
+     * @param baseQualities The array of phred scaled base qualities to convert
+     * @return A String representation of the phred scaled base qualities in 
+     * the array.
+     */
+    private String generateBaseQualString(byte[] baseQualities) {
+        String baseQualString = "[";
+        int aThird = baseQualities.length / 4;
+        int current = aThird;
+        for (int i = 0; i < baseQualities.length; i++) {
+            baseQualString += baseQualities[i] + ",";
+            if (i > current) {
+                baseQualString += "<br>";
+                current += aThird;
+            }
+        }
+        if (baseQualString.endsWith(",")) {
+            baseQualString = baseQualString.substring(0, baseQualString.length() - 1) + "]";
+        } else if (baseQualString.endsWith("<br>")) {
+            baseQualString = baseQualString.substring(0, baseQualString.length() - 5) + "]";
+        }
+        return baseQualString;
     }
 
     private void appendDiffs(PersistantMapping mapping, StringBuilder sb) {

@@ -1,5 +1,6 @@
 package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
 
+import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.FeatureType;
@@ -82,6 +83,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     private JPanel chromSelectionPanel;
     private boolean hasChromSelection;
     private List<FeatureType> excludedFeatureTypes;
+    private byte minMappingQuality = 0;
     private boolean pAInfoIsAvailable = false;
     public static final String PROP_MOUSEPOSITION_CHANGED = "mousePos changed";
     public static final String PROP_MOUSEOVER_REQUESTED = "mouseOver requested";
@@ -346,7 +348,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
                     popUp.add(menuItemFactory.getCopyPositionItem(currentLogMousePos));
                     //add center current position option
                     popUp.add(menuItemFactory.getJumpToPosItem(boundsManager, getCurrentMousePos()));
-                    popUp.show((JComponent) e.getComponent(), e.getX(), e.getY());
+                    popUp.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
 
@@ -793,6 +795,35 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
     public List<FeatureType> getExcludedFeatureTypes() {
         return this.excludedFeatureTypes;
+    }
+    
+    /**
+     * @return The minimum mapping quality for data queries. If at least one
+     * mapping does not contain a mapping quality, this filter is not used!
+     */
+    public byte getMinMappingQuality() {
+        return this.minMappingQuality;
+    }
+    
+    /**
+     * @param minMappingQuality Sets this value as the minimum mapping quality 
+     * to use for data queries. If at least one mapping does not contain a
+     * mapping quality, this filter is not used!
+     */
+    public void setMinMappingQuality(byte minMappingQuality) {
+        this.minMappingQuality = minMappingQuality;
+    }
+    
+    /**
+     * @return Queries the excluded feature type list for the read class 
+     * parameter selection and converts them to a ParametersReadClasses object.
+     */
+    public ParametersReadClasses getReadClassParams() {
+        boolean perfectCovWanted = !this.getExcludedFeatureTypes().contains(FeatureType.PERFECT_COVERAGE);
+        boolean bestMatchCovWanted = !this.getExcludedFeatureTypes().contains(FeatureType.BEST_MATCH_COVERAGE);
+        boolean commonCovWanted = !this.getExcludedFeatureTypes().contains(FeatureType.COMMON_COVERAGE);
+        boolean multipleMappedReadsWanted = this.getExcludedFeatureTypes().contains(FeatureType.MULTIPLE_MAPPED_READ);
+        return new ParametersReadClasses(perfectCovWanted, bestMatchCovWanted, commonCovWanted, multipleMappedReadsWanted, this.getMinMappingQuality());
     }
 
     public boolean isMouseOverPaintingRequested() {

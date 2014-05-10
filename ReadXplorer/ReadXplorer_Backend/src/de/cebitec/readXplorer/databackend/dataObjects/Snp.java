@@ -26,6 +26,8 @@ public class Snp extends TrackChromResultEntry implements SnpI {
     List<CodonSnp> codons;
     private SequenceComparison effect;
     private int gapOrderIndex;
+    private int averageBaseQual;
+    private int averageMappingQual;
 
     /**
      * A SNP. The data structure for storing a basic SNP.
@@ -44,11 +46,14 @@ public class Snp extends TrackChromResultEntry implements SnpI {
      * @param frequency
      * @param type type can be among S = substitution, I = insertion, D = deletion, M = match according to
      *  Snp.SUB, Snp.INS, Snp.DEL, Snp.MATCH
+     * @param averageBaseQual
+     * @param averageMappingQual
      */
     public Snp(int position, int trackId, int chromId, char base, char refBase, int aRate, int cRate, 
                     int gRate, int tRate, int nRate, int gapRate, int coverage,
-                    int frequency, SequenceComparison type) {
-        this(position, trackId, chromId, base, refBase, aRate, cRate, gRate, tRate, nRate, gapRate, coverage, frequency, type, 0);
+                    int frequency, SequenceComparison type, int averageBaseQual, int averageMappingQual) {
+        this(position, trackId, chromId, base, refBase, aRate, cRate, gRate, tRate, nRate, 
+                gapRate, coverage, frequency, type, 0, averageBaseQual, averageMappingQual);
     }
 
     /**
@@ -69,10 +74,12 @@ public class Snp extends TrackChromResultEntry implements SnpI {
      * @param type type can be among S = substitution, I = insertion, D = deletion, M = match according to
      *  Snp.SUB, Snp.INS, Snp.DEL, Snp.MATCH
      * @param gapOrderIndex 
+     * @param averageBaseQual 
+     * @param averageMappingQual 
      */
     public Snp(int position, int trackId, int chromId, char base, char refBase, int aRate, int cRate,
-            int gRate, int tRate, int nRate, int gapRate, int coverage,
-            int frequency, SequenceComparison type, int gapOrderIndex) {
+            int gRate, int tRate, int nRate, int gapRate, int coverage, int frequency, 
+            SequenceComparison type, int gapOrderIndex, int averageBaseQual, int averageMappingQual) {
         super(trackId, chromId);
         
         this.position = position;
@@ -89,6 +96,8 @@ public class Snp extends TrackChromResultEntry implements SnpI {
         this.type = type;
         this.codons = new ArrayList<>();
         this.gapOrderIndex = gapOrderIndex;
+        this.averageBaseQual = averageBaseQual;
+        this.averageMappingQual = averageMappingQual;
     }
 
     
@@ -204,6 +213,22 @@ public class Snp extends TrackChromResultEntry implements SnpI {
         this.gapOrderIndex = gapOrderIndex;
     }
 
+    /**
+     * @return Average phred scaled base quality among all mappings or -1 if 
+     * unknown.
+     */
+    public int getAverageBaseQual() {
+        return averageBaseQual;
+    }
+
+    /**
+     * @return Average phred scaled mapping quality among all mappings or -1 if 
+     * unknown.
+     */
+    public int getAverageMappingQual() {
+        return averageMappingQual;
+    }
+    
     @Override
     public String toString(){
         return "position: "+position+"\ttrack: "+this.getTrackId()+"\tchromosome: "+this.getChromId()+"\trefBase: "+refBase
@@ -213,7 +238,7 @@ public class Snp extends TrackChromResultEntry implements SnpI {
 
     @Override
     public int compareTo(SnpI other) {
-        int value = 0;
+        int value;
         if (this.getPosition() < other.getPosition()) {
             value = -1;
         } else if (this.getPosition() > other.getPosition()) {

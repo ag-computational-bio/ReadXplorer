@@ -165,6 +165,7 @@
             <public-packages>
                 <package>de.cebitec.readXplorer.ui.importer</package>
                 <package>de.cebitec.readXplorer.ui.importer.actions</package>
+                <package>de.cebitec.readXplorer.ui.importer.dataTable</package>
             </public-packages>
         </data>
     </configuration>

@@ -92,6 +92,15 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         dataColumnDescriptions.add("Novel Transcript");
         dataColumnDescriptions.add("Transcript Stop");
         dataColumnDescriptions.add("70bp Upstream of Start");
+        dataColumnDescriptions.add("Correct Start Locus");
+        dataColumnDescriptions.add("Correct Start EC-Number");
+        dataColumnDescriptions.add("Correct Start Product");
+        dataColumnDescriptions.add("Next Upstream Locus");
+        dataColumnDescriptions.add("Next Upstream EC-Number");
+        dataColumnDescriptions.add("Next Upstream Product");
+        dataColumnDescriptions.add("Next Downstream Locus");
+        dataColumnDescriptions.add("Next Downstream EC-Number");
+        dataColumnDescriptions.add("Next Downstream Product");
         
         allSheetDescriptions.add(dataColumnDescriptions);
 
@@ -153,48 +162,49 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         ParameterSetTSS tssParameters = (ParameterSetTSS) this.getParameters();
         List<List<Object>> statisticsExportData = new ArrayList<>();
 
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(
                 "Transcription start site detection statistics for tracks:", 
                 GeneralUtils.generateConcatenatedString(this.getTrackNameList(), 0)));
         
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between title and parameters
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between title and parameters
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("Transcription start site detection parameters:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Minimum number of read starts:", 
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Transcription start site detection parameters:"));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Minimum number of read starts:", 
                 tssParameters.getMinNoReadStarts()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Minimum percent of coverage increase:", 
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Minimum percent of coverage increase:", 
                 tssParameters.getMinPercentIncrease()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Maximum low coverage read start count:", 
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Maximum low coverage read start count:", 
                 tssParameters.getMaxLowCovReadStarts()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Minimum low coverage read starts:", 
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Minimum low coverage read starts:", 
                 tssParameters.getMinLowCovReadStarts()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Detect novel transcripts?", 
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Detect novel transcripts?", 
                 tssParameters.isPerformUnannotatedTranscriptDet() ? "yes" : "no"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Minimum transcript extension coverage:", 
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Minimum transcript extension coverage:", 
                 tssParameters.getMinTranscriptExtensionCov()));
+        tssParameters.getReadClassParams().addReadClassParamsToStats(statisticsExportData);
         
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between parameters and statistics
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between parameters and statistics
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("Transcription start site statistics:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_TOTAL, 
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Transcription start site statistics:"));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_TOTAL, 
                 getStatsMap().get(ResultPanelTranscriptionStart.TSS_TOTAL)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_CORRECT, 
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_CORRECT, 
                 getStatsMap().get(ResultPanelTranscriptionStart.TSS_CORRECT)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_UPSTREAM, 
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_UPSTREAM, 
                 getStatsMap().get(ResultPanelTranscriptionStart.TSS_UPSTREAM)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_DOWNSTREAM, 
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_DOWNSTREAM, 
                 getStatsMap().get(ResultPanelTranscriptionStart.TSS_DOWNSTREAM)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_LEADERLESS, 
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_LEADERLESS, 
                 getStatsMap().get(ResultPanelTranscriptionStart.TSS_LEADERLESS)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_FWD, 
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_FWD, 
                 getStatsMap().get(ResultPanelTranscriptionStart.TSS_FWD)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_REV, 
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_REV, 
                 getStatsMap().get(ResultPanelTranscriptionStart.TSS_REV)));
         
         int noUnannotatedTrans = this.getStatsMap().get(ResultPanelTranscriptionStart.TSS_NOVEL);
         String unannotatedTransValue = noUnannotatedTrans
                 == ResultPanelTranscriptionStart.UNUSED_STATISTICS_VALUE ? "-" : String.valueOf(noUnannotatedTrans);
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_NOVEL, 
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_NOVEL, 
                 unannotatedTransValue));
 
         tSSExport.add(statisticsExportData);
@@ -223,6 +233,9 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
     private void addFeatureRows(PersistantFeature feature, List<Object> tssRow, TranscriptionStart tss, boolean addDistance) {
         if (feature != null) {
             tssRow.add(feature.toString());
+            tssRow.add(feature.getLocus());
+            tssRow.add(feature.getEcNumber());
+            tssRow.add(feature.getProduct());
             tssRow.add(feature.isFwdStrand() ? feature.getStart() : feature.getStop());
             tssRow.add(feature.isFwdStrand() ? feature.getStop() : feature.getStart());
             if (addDistance) {

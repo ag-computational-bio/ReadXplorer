@@ -3,62 +3,33 @@ package de.cebitec.readXplorer.databackend.dataObjects;
 import java.io.Serializable;
 
 /**
- * Depicts a difference in a mapping to the reference genome. Therefore, it contains
- * base, position, number of replicates and strand information.
- * 
- * @author ddoppmei
+ * Depicts a comparable difference in a mapping to the reference genome.
+ * Therefore, it contains base, position, number of replicates and strand
+ * information.
+ *
+ * @author ddoppmeier, Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
  */
-public class PersistantDiff implements Comparable<PersistantDiff>, Serializable {
+public class PersistantDiff extends PersistantBasicDiff implements Comparable<PersistantDiff>, Serializable {
     
     private static final long serialVersionUID = 1L;
 
-    private char base;
-    private int position;
-    private boolean isForwardStrand;
-    private int count;
-
     /**
-     * Depicts a difference in a mapping to the reference genome. Therefore, it
-     * contains base, position, number of replicates and strand information.
-     * @param position
-     * @param base the base already converted to the correct strand and upper case
-     * @param isForwardStrand
-     * @param count  
+     * Depicts a comparable difference in a mapping to the reference genome.
+     * Therefore, it contains base, position, number of replicates, strand
+     * information, base quality and mapping quality value.
+     * @param position position of the diff in the reference
+     * @param base the base already converted to the correct strand and upper
+     * case
+     * @param isForwardStrand <cc>true</cc> if the diff was on the fwd strand,
+     * <cc>false</cc> otherwise
+     * @param count number of replicates of the diff
+     * @param baseQuality The phred base quality value for the diff base in the
+     * read.
+     * @param mappingQuality The phred mapping quality value of the read from
+     * which the diff originated
      */
-    public PersistantDiff(int position, char base, boolean isForwardStrand, int count) {
-        this.position = position;
-        this.base = base;
-        this.isForwardStrand = isForwardStrand;
-        this.count = count;
-    }
-
-    /**
-     * @return The associated base of the diff, already converted to the correct 
-     * strand and upper case.
-     */
-    public char getBase() {
-        return base;
-    }
-
-    /**
-     * @return the absolute position of the diff in genome coordinates.
-     */
-    public int getPosition() {
-        return position;
-    }
-
-    /**
-     * @return number of replicate mappings in which this diff occurs.
-     */
-    public int getCount() {
-        return count;
-    }
-
-    /**
-     * @return true, if this diff is on the forward strand
-     */
-    public boolean isForwardStrand() {
-        return isForwardStrand;
+    public PersistantDiff(int position, char base, boolean isForwardStrand, int count, byte baseQuality, Byte mappingQuality) {
+        super(position, base, isForwardStrand, count, baseQuality, mappingQuality);
     }
 
     /**

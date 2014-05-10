@@ -61,7 +61,8 @@ public abstract class RequestThread extends Thread {
         return  lastParams.isPerfectMatchUsed() == params.isPerfectMatchUsed() &&
                 lastParams.isBestMatchUsed()    == params.isBestMatchUsed()    &&
                 lastParams.isCommonMatchUsed()  == params.isCommonMatchUsed()  &&
-                lastParams.isOnlyUniqueReads()  == params.isOnlyUniqueReads();
+                lastParams.isOnlyUniqueReads()  == params.isOnlyUniqueReads()  &&
+                lastParams.getMinMappingQual()  == params.getMinMappingQual();
     }
 
     /**

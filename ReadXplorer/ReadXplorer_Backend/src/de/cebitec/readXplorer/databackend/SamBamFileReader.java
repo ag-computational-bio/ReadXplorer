@@ -42,7 +42,14 @@ import org.openide.DialogDisplayer;
  */
 public class SamBamFileReader implements Observable {
 
-    public static final String cigarRegex = "[MIDNSPX=]+";
+    /** 0 = Default mapping quality value, if it is unknown. */
+    public static final int UNKNOWN_MAP_QUAL = 0;
+    /** 255 = Default mapping quality value according to SAM spec, if it was not calculated. */
+    public static final int DEFAULT_MAP_QUAL = 255;
+    /** -1 = Replacement of 255 from SAM spec. Enables us to use byte. */
+    public static final int UNKNOWN_CALCULATED_MAP_QUAL = -1;
+    
+    public static final String cigarRegex = "[MIDNSPXH=]+";
     private final File dataFile;
     private final int trackId;
     private final PersistantReference reference;
@@ -136,6 +143,7 @@ public class SamBamFileReader implements Observable {
             Integer numMappingsForRead;
             PersistantMapping mapping;
             int numReplicates = 1;
+            int mappingQuality;
 
             while (samRecordIterator.hasNext()) {
                 record = samRecordIterator.next();
@@ -148,11 +156,13 @@ public class SamBamFileReader implements Observable {
                     isFwdStrand = !record.getReadNegativeStrandFlag();
                     classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
                     numMappingsForRead = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
+                    mappingQuality = record.getMappingQuality();
 
                     //only add mappings, which are valid according to the read classification parameters
-                    if (this.isIncludedMapping(classification, numMappingsForRead, request)) {
+                    if (this.isIncludedMapping(classification, numMappingsForRead, mappingQuality, request)) {
 
-                        mapping = this.getMappingForValues(classification, numMappingsForRead, numReplicates, id++, start, stop, isFwdStrand);
+                        mapping = this.getMappingForValues(classification, numMappingsForRead, numReplicates, id++, 
+                                start, stop, isFwdStrand, mappingQuality, record.getBaseQualities());
 
                         if (request.isDiffsAndGapsNeeded() && classification != Properties.PERFECT_COVERAGE) {
 
@@ -163,8 +173,7 @@ public class SamBamFileReader implements Observable {
                             } else {
                                 refSubSeq = null;
                             }
-                            this.createDiffsAndGaps(record.getCigarString(), start, isFwdStrand, numReplicates,
-                                    record.getReadString(), refSubSeq, mapping);
+                            this.createDiffsAndGaps(record, numReplicates, refSubSeq, mapping);
                         }
                         
                         //stuff for trimmed reads
@@ -223,15 +232,17 @@ public class SamBamFileReader implements Observable {
             Integer numMappingsForRead;
             boolean isFwdStrand;
             PersistantMapping mapping;
+            int mappingQuality;
 
             while (samRecordIterator.hasNext()) {
                 record = samRecordIterator.next();
                 if (!record.getReadUnmappedFlag()) {
                     classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
                     numMappingsForRead = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
+                    mappingQuality = record.getMappingQuality();
 
                     //only add mappings, which are valid according to the read classification paramters
-                    if (this.isIncludedMapping(classification, numMappingsForRead, request)) {
+                    if (this.isIncludedMapping(classification, numMappingsForRead, mappingQuality, request)) {
 
                         start = record.getAlignmentStart();
                         stop = record.getAlignmentEnd();
@@ -290,6 +301,7 @@ public class SamBamFileReader implements Observable {
             PersistantMapping mate;
             PersistantReadPairGroup newGroup;
             int numReplicates = 1;
+            int mappingQuality;
 
             while (samRecordIterator.hasNext()) {
                 record = samRecordIterator.next();
@@ -297,8 +309,9 @@ public class SamBamFileReader implements Observable {
                 if (!record.getReadUnmappedFlag()) {
                     classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
                     numMappingsForRead = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
+                    mappingQuality = record.getMappingQuality();
 
-                    if (this.isIncludedMapping(classification, numMappingsForRead, request)) {
+                    if (this.isIncludedMapping(classification, numMappingsForRead, mappingQuality, request)) {
 
                         startPos = record.getAlignmentStart();
                         stop = record.getAlignmentEnd();
@@ -310,7 +323,8 @@ public class SamBamFileReader implements Observable {
                         mateStart = record.getMateAlignmentStart();
                         bothVisible = mateStart > from && mateStart < to;
 
-                        mapping = this.getMappingForValues(classification, numMappingsForRead, numReplicates, id++, startPos, stop, isFwdStrand);
+                        mapping = this.getMappingForValues(classification, numMappingsForRead, numReplicates, id++, 
+                                startPos, stop, isFwdStrand, mappingQuality, record.getBaseQualities());
                         if (pairId != null && pairType != null) { //since both data fields are always written together
 //                // add new readPair if not exists
                             readPairId = (long) pairId;
@@ -321,9 +335,9 @@ public class SamBamFileReader implements Observable {
                                 readPairs.put(readPairId, newGroup);
                             } //TODO: check where ids are needed
                             try {
-                                mate = this.getMappingForValues(-1, -1, numReplicates, -1, mateStart, -1, !record.getMateNegativeStrandFlag());
+                                mate = this.getMappingForValues(-1, -1, numReplicates, -1, mateStart, -1, !record.getMateNegativeStrandFlag(), new Byte("0"), new byte[0]);
                             } catch (IllegalStateException e) {
-                                mate = this.getMappingForValues(-1, -1, numReplicates, -1, mateStart, -1, true);
+                                mate = this.getMappingForValues(-1, -1, numReplicates, -1, mateStart, -1, true, new Byte("0"), new byte[0]);
                             } //TODO: get mate data from querried records later
                             readPairs.get(readPairId).addPersistantDirectAccessMapping(mapping, mate, readPairType, bothVisible);
                         }
@@ -337,8 +351,7 @@ public class SamBamFileReader implements Observable {
                             } else {
                                 refSubSeq = null;
                             }
-                            this.createDiffsAndGaps(record.getCigarString(), startPos, isFwdStrand, numReplicates,
-                                    record.getReadString(), refSubSeq, mapping);
+                            this.createDiffsAndGaps(record, numReplicates, refSubSeq, mapping);
                         }
                     }
                 }
@@ -368,11 +381,12 @@ public class SamBamFileReader implements Observable {
      * not null. Otherwise isBestMapping is currently always true.
      */
     private PersistantMapping getMappingForValues(Integer classification, Integer numMappingsForRead, int numReplicates, int id, 
-            int startPos, int stop, boolean isFwdStrand) {
+            int startPos, int stop, boolean isFwdStrand, int mappingQuality, byte[] baseQualities) {
         int mappingsForRead = numMappingsForRead != null ? numMappingsForRead : -1;
-        boolean isBestMapping = classification != null && (classification == (int) Properties.PERFECT_COVERAGE
-                                || (classification == (int) Properties.BEST_MATCH_COVERAGE));
-        return new PersistantMapping(id, startPos, stop, trackId, isFwdStrand, numReplicates, 0, 0, isBestMapping, mappingsForRead);
+        boolean isBestMapping = classification != null && (classification == Properties.PERFECT_COVERAGE
+                                || (classification == Properties.BEST_MATCH_COVERAGE));
+        return new PersistantMapping(id, startPos, stop, trackId, isFwdStrand, numReplicates, 0, 0, 
+                isBestMapping, mappingQuality, baseQualities, mappingsForRead);
     }
     
     /**
@@ -408,17 +422,18 @@ public class SamBamFileReader implements Observable {
             Integer classification;
             Integer numMappingsForRead;
             int startPos; //in the genome, to get the index: -1
+            int mappingQuality;
             while (samRecordIterator.hasNext()) {
                 record = samRecordIterator.next();
 
                 if (!record.getReadUnmappedFlag()) {
+                    classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
                     numMappingsForRead = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
+                    mappingQuality = record.getMappingQuality();
 
-                    if (!request.getReadClassParams().isOnlyUniqueReads()
-                            || request.getReadClassParams().isOnlyUniqueReads() && numMappingsForRead != null && numMappingsForRead == 1) {
+                    if (this.isIncludedMapping(classification, numMappingsForRead, mappingQuality, request)) {
                         
                         isFwdStrand = !record.getReadNegativeStrandFlag();
-                        classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
                         startPos = isFwdStrand ? record.getAlignmentStart() : record.getAlignmentEnd();
                         
                         this.increaseCoverage(request, classification, 
@@ -476,17 +491,18 @@ public class SamBamFileReader implements Observable {
             Integer numMappingsForRead;
             int startPos; //in the genome, to get the index: -1
             int stop;
+            int mappingQuality;
             while (samRecordIterator.hasNext()) {
                 record = samRecordIterator.next();
 
                 if (!record.getReadUnmappedFlag()) {
+                    classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
                     numMappingsForRead = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
+                    mappingQuality = record.getMappingQuality();
 
-                    if (!request.getReadClassParams().isOnlyUniqueReads()
-                            || request.getReadClassParams().isOnlyUniqueReads() && numMappingsForRead != null && numMappingsForRead == 1) {
+                    if (this.isIncludedMapping(classification, numMappingsForRead, mappingQuality, request)) {
 
                         isFwdStrand = !record.getReadNegativeStrandFlag();
-                        classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
                         startPos = record.getAlignmentStart();
                         stop = record.getAlignmentEnd();
                         
@@ -502,8 +518,7 @@ public class SamBamFileReader implements Observable {
 
                         if (request.isDiffsAndGapsNeeded() && classification != Properties.PERFECT_COVERAGE
                                 && request.getReadClassParams().isClassificationAllowed(classification)) {
-                            diffsAndGaps = this.createDiffsAndGaps(record.getCigarString(),
-                                    startPos, isFwdStrand, 1, record.getReadString(),
+                            diffsAndGaps = this.createDiffsAndGaps(record, 1,
                                     reference.getChromSequence(request.getChromId(), startPos, stop), null);
                             diffs.addAll(diffsAndGaps.getDiffs());
                             gaps.addAll(diffsAndGaps.getGaps());
@@ -560,17 +575,18 @@ public class SamBamFileReader implements Observable {
             Integer numMappingsForRead;
             int startPos; //in the genome, to get the index: -1
             int stop;
+            int mappingQuality;
             while (samRecordIterator.hasNext()) {
                 record = samRecordIterator.next();
                 
                 if (!record.getReadUnmappedFlag()) {
+                    classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
                     numMappingsForRead = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
+                    mappingQuality = record.getMappingQuality();
 
-                    if (!request.getReadClassParams().isOnlyUniqueReads()
-                            || request.getReadClassParams().isOnlyUniqueReads() && numMappingsForRead != null && numMappingsForRead == 1) {
+                    if (this.isIncludedMapping(classification, numMappingsForRead, mappingQuality, request)) {
 
                         isFwdStrand = !record.getReadNegativeStrandFlag();
-                        classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
                         startPos = record.getAlignmentStart();
                         stop = record.getAlignmentEnd();
                         
@@ -579,8 +595,7 @@ public class SamBamFileReader implements Observable {
 
                         if (request.isDiffsAndGapsNeeded() && classification != Properties.PERFECT_COVERAGE && 
                                 request.getReadClassParams().isClassificationAllowed(classification)) {
-                            diffsAndGaps = this.createDiffsAndGaps(record.getCigarString(),
-                                    startPos, isFwdStrand, 1, record.getReadString(),
+                            diffsAndGaps = this.createDiffsAndGaps(record, 1,
                                     reference.getChromSequence(request.getChromId(), startPos, stop), null);
                             diffs.addAll(diffsAndGaps.getDiffs());
                             gaps.addAll(diffsAndGaps.getGaps());
@@ -718,13 +733,19 @@ public class SamBamFileReader implements Observable {
      * PersistantDiffAndGapResult contains all the diff and gap data.
      * @return PersistantDiffAndGapResult containing all the diffs and gaps
      */
-    private PersistantDiffAndGapResult createDiffsAndGaps(String cigar, int start, boolean isFwdStrand, int nbReplicates,
-            String readSeq, String refSeq, PersistantMapping mapping) throws NumberFormatException {
+    private PersistantDiffAndGapResult createDiffsAndGaps(SAMRecord record, int nbReplicates,
+            String refSeq, PersistantMapping mapping) throws NumberFormatException {
 
         Map<Integer, Integer> gapOrderIndex = new HashMap<>();
         List<PersistantDiff> diffs = new ArrayList<>();
         List<PersistantReferenceGap> gaps = new ArrayList<>();
         int differences = 0;
+        String cigar = record.getCigarString();
+        String readSeq = record.getReadString();
+        boolean isFwdStrand = !record.getReadNegativeStrandFlag();
+        int start = record.getAlignmentStart();
+        byte[] baseQualities = record.getBaseQualities();
+        Byte mappingQuality = (byte) (record.getMappingQuality() >= DEFAULT_MAP_QUAL ? UNKNOWN_CALCULATED_MAP_QUAL : record.getMappingQuality());
         String[] num = cigar.split(cigarRegex);
         String[] charCigar = cigar.split("\\d+");
         String op;//operation
@@ -734,82 +755,94 @@ public class SamBamFileReader implements Observable {
         int currentCount;
         int refPos = 0;
         int readPos = 0;
+        byte baseQuality;
         
         for (int i = 1; i < charCigar.length; ++i) {
             op = charCigar[i];
             currentCount = Integer.valueOf(num[i - 1]);
-            
-            if (op.equals("M")) { //check, count and add diffs for deviating Ms
-                bases = readSeq.substring(readPos, readPos + currentCount).toUpperCase();
-                refBases = refSeq.substring(refPos, refPos + currentCount);
-                for (int j = 0; j < bases.length(); ++j) {
-                    base = bases.charAt(j);
-                    if (base != refBases.charAt(j)) {
-                        ++differences;
+            switch (op) {
+                case "M":
+                    //check, count and add diffs for deviating Ms
+                    bases = readSeq.substring(readPos, readPos + currentCount).toUpperCase();
+                    refBases = refSeq.substring(refPos, refPos + currentCount);
+                    for (int j = 0; j < bases.length(); ++j) {
+                        base = bases.charAt(j);
+                        if (base != refBases.charAt(j)) {
+                            ++differences;
+                            if (!isFwdStrand) {
+                                base = SequenceUtils.getDnaComplement(base);
+                            }
+                            baseQuality = baseQualities.length == 0 ? -1 : baseQualities[j];
+                            PersistantDiff d = new PersistantDiff(refPos + j + start, base, isFwdStrand, nbReplicates, baseQuality, mappingQuality);
+                            this.addDiff(mapping, diffs, d);
+                        }
+                    }   refPos += currentCount;
+                readPos += currentCount;
+                    break;
+                case "=":
+                    //only increase position for matches
+                    refPos += currentCount;
+                    readPos += currentCount;
+                    break;
+                case "X":
+                    //count and create diffs for mismatches
+                    differences += currentCount;
+                    for (int j = 0; j < currentCount; ++j) {
+                        base = Character.toUpperCase(readSeq.charAt(readPos + j));
                         if (!isFwdStrand) {
                             base = SequenceUtils.getDnaComplement(base);
                         }
-                        PersistantDiff d = new PersistantDiff(refPos + j + start, base, isFwdStrand, nbReplicates);
+                        baseQuality = baseQualities.length == 0 ? -1 : baseQualities[j];
+                        PersistantDiff d = new PersistantDiff(refPos + j + start, base, isFwdStrand, nbReplicates, baseQuality, mappingQuality);
                         this.addDiff(mapping, diffs, d);
-                    }
-                }
-                refPos += currentCount;
+                        
+                    }   refPos += currentCount;
                 readPos += currentCount;
-
-            } else if (op.equals("=")) { //only increase position for matches
-                refPos += currentCount;
-                readPos += currentCount;
-               
-            } else if (op.equals("X")) { //count and create diffs for mismatches
-                differences += currentCount;
-                for (int j = 0; j < currentCount; ++j) {
-                    base = Character.toUpperCase(readSeq.charAt(readPos + j));
-                    if (!isFwdStrand) {
-                        base = SequenceUtils.getDnaComplement(base);
-                    }
-                    PersistantDiff d = new PersistantDiff(refPos + j + start, base, isFwdStrand, nbReplicates);
-                    this.addDiff(mapping, diffs, d);
-                    
-                }
-                refPos += currentCount;
-                readPos += currentCount;
-
-            } else if (op.equals("D")) { // count and add diff gaps for deletions in reference
-                differences += currentCount;
-                for (int j = 0; j < currentCount; ++j) {
-                    PersistantDiff d = new PersistantDiff(refPos + j + start, '_', isFwdStrand, nbReplicates);
-                    this.addDiff(mapping, diffs, d);
-                }
-                refPos += currentCount;
+                    break;
+                case "D":
+                    // count and add diff gaps for deletions in reference
+                    differences += currentCount;
+                    for (int j = 0; j < currentCount; ++j) {
+                        baseQuality = baseQualities.length == 0 ? -1 : baseQualities[j];
+                        PersistantDiff d = new PersistantDiff(refPos + j + start, '_', isFwdStrand, nbReplicates, baseQuality, mappingQuality);
+                        this.addDiff(mapping, diffs, d);
+                    }   refPos += currentCount;
                 // readPos remains the same
-            
-            } else if (op.equals("I")) { // count and add reference gaps for insertions
-                differences += currentCount;
-                for (int j = 0; j < currentCount; ++j) {
-                    base = Character.toUpperCase(readSeq.charAt(readPos + j));
-                    if (!isFwdStrand) {
-                        base = SequenceUtils.getDnaComplement(base);
-                    }
-                    PersistantReferenceGap gap = new PersistantReferenceGap(refPos + start, base, 
-                            CommonsMappingParser.getOrderForGap(refPos + start, gapOrderIndex), isFwdStrand, nbReplicates);
-                    if (mapping != null) {
-                        mapping.addGenomeGap(gap);
-                    } else {
-                        gaps.add(gap);
-        }
-                }
-                //refPos remains the same
-                readPos += currentCount;
-
-            } else if (op.equals("N") || op.equals("P")) { //increase ref position for padded and skipped reference bases
-                refPos += currentCount;
-                //readPos remains the same
-
-            } else if (op.equals("S")) { //increase read position for soft clipped bases which are present in the read
-                //refPos remains the same
-                readPos += currentCount;
+                    break;
+                case "I":
+                    // count and add reference gaps for insertions
+                    differences += currentCount;
+                    for (int j = 0; j < currentCount; ++j) {
+                        base = Character.toUpperCase(readSeq.charAt(readPos + j));
+                        if (!isFwdStrand) {
+                            base = SequenceUtils.getDnaComplement(base);
+                        }
+                        baseQuality = baseQualities.length == 0 ? -1 : baseQualities[j];
+                        PersistantReferenceGap gap = new PersistantReferenceGap(refPos + start, base,
+                                CommonsMappingParser.getOrderForGap(refPos + start, gapOrderIndex), 
+                                isFwdStrand, nbReplicates, baseQuality, mappingQuality);
+                        if (mapping != null) {
+                            mapping.addGenomeGap(gap);
+                        } else {
+                            gaps.add(gap);
+                        }
+                    }   //refPos remains the same
+                    readPos += currentCount;
+                    break;
+                case "N": //fallthrough, treatment is equal to "P"
+                case "P":
+                    //increase ref position for padded and skipped reference bases
+                    refPos += currentCount;
+                    //readPos remains the same
+                    break;
+                case "S":
+                    //increase read position for soft clipped bases which are present in the read
+                    //refPos remains the same
+                    readPos += currentCount;
+                    break;
+                case "H": //just do nothing since the position is not in the reference and not in the read!
+                    break;
             }
-            //H = hard clipping does not contribute to differences
         }
 
         if (mapping != null) {
@@ -865,10 +898,13 @@ public class SamBamFileReader implements Observable {
      * @return true, if the mapping can be included in further steps, false
      * otherwise
      */
-    private boolean isIncludedMapping(Integer classification, Integer numMappingsForRead, IntervalRequest request) {
+    private boolean isIncludedMapping(Integer classification, Integer numMappingsForRead, int mappingQuality, IntervalRequest request) {
         return (!request.getReadClassParams().isOnlyUniqueReads()
               || request.getReadClassParams().isOnlyUniqueReads() && numMappingsForRead != null && numMappingsForRead == 1)
-                && 
+                &&
+                    (mappingQuality == UNKNOWN_MAP_QUAL
+                  || mappingQuality > request.getReadClassParams().getMinMappingQual())
+                &&
                 ((classification != null
                     && ((classification == Properties.PERFECT_COVERAGE
                         && request.getReadClassParams().isPerfectMatchUsed())

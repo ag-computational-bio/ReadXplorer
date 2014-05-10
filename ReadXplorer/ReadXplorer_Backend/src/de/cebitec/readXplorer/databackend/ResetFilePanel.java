@@ -13,6 +13,7 @@ public class ResetFilePanel extends javax.swing.JPanel {
 
     private String newFileLocation;
     private String filePath;
+    private String[] fileExtension;
   
     /**
      * Panel for resetting the file path of a direct access file.
@@ -21,6 +22,8 @@ public class ResetFilePanel extends javax.swing.JPanel {
     @NbBundle.Messages({"# {0} - file path", "ResetFilePanel.resetPane.text=File not found:\n{0}\nPlease correct the file path:"})
     public ResetFilePanel(String filePath) {
         this.filePath = filePath;
+        String[] split = this.filePath.split("\\.");
+        this.fileExtension = new String[] { split[split.length - 1] };
         initComponents();
         this.resetPane.setText(Bundle.ResetFilePanel_resetPane_text(this.filePath));
     }
@@ -83,7 +86,7 @@ public class ResetFilePanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
-        ReadXplorerFileChooser fc = new ReadXplorerFileChooser(new String[1], "") {
+        ReadXplorerFileChooser fc = new ReadXplorerFileChooser(fileExtension, "") {
             private static final long serialVersionUID = 1L;
 
             @Override

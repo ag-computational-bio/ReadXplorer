@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +88,50 @@ public class GeneralUtils {
     public static boolean isValidNumberInput(String input) {
         try {
             return Integer.parseInt(input) >= 0;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }    
+    
+    /**
+     * Checks if the input string is a valid position number between 1 and the
+     * given maximum position.
+     * @param input input string to check
+     * @param max maximum position value for the input
+     * @return <code>true</code> if it is a valid input string,
+     * <code>false</code> otherwise
+     */
+    public static boolean isValidPositionInput(String input, int max) {
+        return GeneralUtils.isValidRangeInput(input, 1, max);
+    }
+    
+    /**
+     * Checks if the input string is a valid number in the range of the given
+     * interval.
+     * @param input input string to check
+     * @param min minimum position value for the input
+     * @param max maximum position value for the input
+     * @return <code>true</code> if it is a valid input string,
+     * <code>false</code> otherwise
+     */
+    public static boolean isValidRangeInput(String input, int min, int max) {
+        try {
+            int tmp = Integer.parseInt(input);
+            return tmp >= min && tmp <= max;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+    
+    /**
+     * Checks if the input string is a valid byte larger than or equal to 0.
+     * @param text input string to check
+     * @return <code>true</code> if it is a valid input string,
+     * <code>false</code> otherwise
+     */
+    public static boolean isValidByteInput(String text) {
+        try {
+            return Byte.parseByte(text) >= 0;
         } catch (NumberFormatException e) {
             return false;
         }
@@ -330,7 +373,7 @@ public class GeneralUtils {
         } else {
             int length = readName.length() / 5 + 1;
             nameArray = new String[length];
-            int index = 0;
+            int index;
             int end;
             for (int i = 0; i < length; i++) {
                 index = i * 5;
@@ -399,5 +442,8 @@ public class GeneralUtils {
 //        String[] splittedName = GeneralUtils.splitReadName(readName, style);
 //        GeneralUtils.generateStringMap(map, splittedName, valueToStore);
 //    }
+
+    private GeneralUtils() {
+    }
     
 }

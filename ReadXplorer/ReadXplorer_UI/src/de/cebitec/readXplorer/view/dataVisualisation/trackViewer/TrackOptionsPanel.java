@@ -2,16 +2,25 @@ package de.cebitec.readXplorer.view.dataVisualisation.trackViewer;
 
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.util.ColorProperties;
-import java.awt.*;
+import de.cebitec.readXplorer.view.dataVisualisation.basePanel.LegendAndOptionsProvider;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.*;
+import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
+import javax.swing.JFormattedTextField;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSpinner;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.text.NumberFormatter;
+import javax.swing.text.DefaultFormatter;
 
 /**
  * Panel containing the display options for a track viewer like
@@ -75,8 +84,12 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
         headerPanel.setPreferredSize(new Dimension(headerPanel.getPreferredSize().width, headerPanel.getPreferredSize().height + 2));
         this.add(headerPanel);
         
-        JPanel generalPanel = new JPanel();
-        generalPanel.setLayout(new BorderLayout());
+        JPanel qualityPanel = new JPanel(new BorderLayout());
+        qualityPanel.setBackground(ColorProperties.LEGEND_BACKGROUND);
+        LegendAndOptionsProvider.createMappingQualityFilter(trackViewer, qualityPanel);
+        this.add(qualityPanel);
+        
+        JPanel generalPanel = new JPanel(new BorderLayout());
         generalPanel.setBackground(ColorProperties.LEGEND_BACKGROUND);
         final JCheckBox scaleBox = new JCheckBox("Automatic scaling enabled");
         scaleBox.setBackground(ColorProperties.LEGEND_BACKGROUND);
@@ -127,7 +140,7 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
         JPanel trackPanel = new JPanel();
         trackPanel.setLayout(new BoxLayout(trackPanel, BoxLayout.X_AXIS));
 
-        JPanel placeholder = this.createPlaceholder();
+        JPanel placeholder = LegendAndOptionsProvider.createPlaceholder();
         final JLabel nameLabel = new JLabel("Track: " + name);
         nameLabel.setBackground(ColorProperties.LEGEND_BACKGROUND);
         nameLabel.setFont(new Font("Arial", Font.PLAIN, 11));
@@ -170,7 +183,7 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
         
         JSpinner.NumberEditor editor = (JSpinner.NumberEditor) scaleFactorSpinner.getEditor();
         final JFormattedTextField txt = editor.getTextField();
-        ((NumberFormatter) txt.getFormatter()).setAllowsInvalid(false);
+        ((DefaultFormatter) txt.getFormatter()).setAllowsInvalid(false);
         DecimalFormat format = editor.getFormat();
         format.setMinimumFractionDigits(1);
 
@@ -240,25 +253,14 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
      * @return a new normalization settins object.
      */
     private NormalizationSettings setNewNormalizationSettings() {
-        List<Boolean> bools = new ArrayList<Boolean>();
-        List<Double> factors = new ArrayList<Double>();
-        List<Boolean> hasNorm = new ArrayList<Boolean>();
+        List<Boolean> bools = new ArrayList<>();
+        List<Double> factors = new ArrayList<>();
+        List<Boolean> hasNorm = new ArrayList<>();
         for (int i = 0; i < trackViewer.getTrackCon().getTrackIds().size(); ++i) {
             bools.add(i, false);
             factors.add(i, 1.0);
             hasNorm.add(i, false);
         }
         return new NormalizationSettings(trackViewer.getTrackCon().getTrackIds(), bools, factors, hasNorm);
-    }
-
-    /**
-     * @return A placeholder with width 3 and height 20.
-     */
-    private JPanel createPlaceholder() {
-        JPanel placeholder = new JPanel();
-        placeholder.setBackground(ColorProperties.LEGEND_BACKGROUND);
-        placeholder.setMinimumSize(new Dimension(3, 20));
-        placeholder.setPreferredSize(new Dimension(3, 20));
-        return placeholder;
     }
 }

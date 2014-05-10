@@ -28,7 +28,7 @@ public class FeatureTableModel extends AbstractTableModel {
             counter++;
             this.data[counter][0] = feature;
             this.data[counter][1] = feature.getType();
-            this.data[counter][2] = feature.getFeatureName();
+            this.data[counter][2] = feature.getName();
             this.data[counter][3] = feature.getProduct();
             this.data[counter][4] = feature.getEcNumber();
         }

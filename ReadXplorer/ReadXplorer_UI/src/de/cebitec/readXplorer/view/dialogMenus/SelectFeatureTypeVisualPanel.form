@@ -65,7 +65,7 @@
     <Component class="javax.swing.JLabel" name="featTypeLabel">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/view/dialogMenus/Bundle.properties" key="SelectFeatureTypeVisualPanel.featTypeLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readXplorer/view/dialogMenus/Bundle.properties" key="SelectFeatureTypeVisualPanel.featTypeLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>

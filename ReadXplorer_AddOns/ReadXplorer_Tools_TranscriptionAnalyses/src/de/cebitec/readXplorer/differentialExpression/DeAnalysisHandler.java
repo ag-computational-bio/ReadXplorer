@@ -75,11 +75,9 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
 
         public static Tool[] usableTools() {
             if (GnuR.SecureGnuRInitiliser.isGnuRSetUpCorrect() && GnuR.SecureGnuRInitiliser.isGnuRInstanceFree()) {
-                return Tool.values();
+                return new Tool[]{ ExpressTest, DeSeq, BaySeq, ExportCountTable }; //Tool.values();
             } else {
-                Tool[] ret = new Tool[2];
-                ret[0] = ExpressTest;
-                ret[1] = ExportCountTable;
+                Tool[] ret = new Tool[]{ ExpressTest, ExportCountTable };
                 return ret;
             }
         }

@@ -231,6 +231,7 @@ public class MappingThread extends RequestThread {
                 fetch.setLong(6, from);
                 fetch.setLong(7, to);
 
+                final Byte mappingQuality = -1; //we only want one shared object
                 ResultSet rs = fetch.executeQuery();
                 while (rs.next()) {
                     // mapping data
@@ -267,10 +268,10 @@ public class MappingThread extends RequestThread {
                         if (baseString != null) {
                             char base = baseString.charAt(0);
                             if (type == 1) {
-                                PersistantDiff d = new PersistantDiff(position, base, isForwardStrand, count);
+                                PersistantDiff d = new PersistantDiff(position, base, isForwardStrand, count, Byte.valueOf("-1"), mappingQuality);
                                 mappings.get(m.getId()).addDiff(d);
                             } else if (type == 0) {
-                                PersistantReferenceGap g = new PersistantReferenceGap(position, base, gapOrder, isForwardStrand, count);
+                                PersistantReferenceGap g = new PersistantReferenceGap(position, base, gapOrder, isForwardStrand, count, Byte.valueOf("-1"), mappingQuality);
                                 mappings.get(m.getId()).addGenomeGap(g);
                             } else {
                                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown type for diff in database {0}", type);

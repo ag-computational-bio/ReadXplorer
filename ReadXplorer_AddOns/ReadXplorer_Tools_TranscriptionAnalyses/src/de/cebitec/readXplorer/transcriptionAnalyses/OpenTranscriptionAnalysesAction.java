@@ -2,6 +2,7 @@ package de.cebitec.readXplorer.transcriptionAnalyses;
 
 import de.cebitec.readXplorer.databackend.AnalysesHandler;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
+import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
@@ -11,7 +12,6 @@ import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
@@ -164,7 +164,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
         performOperonAnalysis = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_OPERON_ANALYSIS);
         performRPKMAnalysis = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_RPKM_ANALYSIS);
         
-        ParametersReadClasses readClassesParams = (ParametersReadClasses) wiz.getProperty(readClassPropString);
+        ParametersReadClasses readClassParams = (ParametersReadClasses) wiz.getProperty(readClassPropString);
         this.combineTracks = (boolean) wiz.getProperty(combineTracksPropString);
 
         if (performTSSAnalysis) { //set values depending on the selected analysis functions (avoiding null pointers)
@@ -190,9 +190,9 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
         //create parameter set for each analysis
         parametersTss = new ParameterSetTSS(performTSSAnalysis, autoTssParamEstimation, performUnannotatedTranscriptDet,
                 minTotalIncrease, minPercentIncrease, maxLowCovInitCount, minLowCovIncrease, minTranscriptExtensionCov, 
-                maxLeaderlessDistance, readClassesParams);
-        parametersOperonDet = new ParameterSetOperonDet(performOperonAnalysis, minSpanningReads, autoOperonParamEstimation, selOperonFeatureTypes);
-        parametersRPKM = new ParameterSetRPKM(performRPKMAnalysis, minNumberReads, maxNumberReads, selRPKMFeatureTypes);
+                maxLeaderlessDistance, readClassParams);
+        parametersOperonDet = new ParameterSetOperonDet(performOperonAnalysis, minSpanningReads, autoOperonParamEstimation, selOperonFeatureTypes, readClassParams);
+        parametersRPKM = new ParameterSetRPKM(performRPKMAnalysis, minNumberReads, maxNumberReads, selRPKMFeatureTypes, readClassParams);
 
 
         TrackConnector connector;
@@ -207,12 +207,12 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                 }
                 
                 //every track has its own analysis handlers
-                this.createAnalysis(connector, readClassesParams);
+                this.createAnalysis(connector, readClassParams);
             }
         } else {
             try {
                 connector = (new SaveFileFetcherForGUI()).getTrackConnector(tracks, combineTracks);
-                this.createAnalysis(connector, readClassesParams); //every track has its own analysis handlers
+                this.createAnalysis(connector, readClassParams); //every track has its own analysis handlers
                 
             } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();

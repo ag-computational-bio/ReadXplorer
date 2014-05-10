@@ -1,17 +1,14 @@
 package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
 
-import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
-import de.cebitec.common.sequencetools.geneticcode.GeneticCodeFactory;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.util.CodonUtilities;
+import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.openide.util.NbPreferences;
 
 /**
  * Filters for start and stop codons in two ways: First for all
@@ -24,7 +21,6 @@ public class StartCodonFilter implements RegionFilterI {
 
     public static final int INIT = 10;
     private static final int INTERVAL_SIZE = 3000000;
-    private Preferences pref;
     
     private List<Region> regions;
     private int absStart;
@@ -36,8 +32,6 @@ public class StartCodonFilter implements RegionFilterI {
     private Pattern[] startCodons;
     private Pattern[] stopCodons;
     private int frameCurrFeature;
-    private int nbGeneticCodes;
-    private GeneticCodeFactory genCodeFactory;
 
     /**
      * Filters for start and stop codons in two ways: First for all available start 
@@ -48,13 +42,10 @@ public class StartCodonFilter implements RegionFilterI {
      * @param refGen the reference in which to search
      */
     public StartCodonFilter(int absStart, int absStop, PersistantReference refGen) {
-        this.pref = NbPreferences.forModule(Object.class);
         this.regions = new ArrayList<>();
         this.absStart = absStart;
         this.absStop = absStop;
         this.refGen = refGen;
-        this.genCodeFactory = GeneticCodeFactory.getDefault();
-        this.nbGeneticCodes = genCodeFactory.getGeneticCodes().size();
 
         this.resetCodons();
 
@@ -78,7 +69,7 @@ public class StartCodonFilter implements RegionFilterI {
 
             if (stop > 0) {
                 if (start <= 0) {
-                    offset -= Math.abs(start);
+                    offset -= Math.abs(start) + 1;
                     start = 1;
                 }
                 if (stop > genomeLength) {
@@ -245,16 +236,10 @@ public class StartCodonFilter implements RegionFilterI {
      * Resets the set of start and stop codons according to the currently selected genetic code.
      */
     public final void resetCodons() {
-        String[] startCodonsNew = new String[0];
-        String[] stopCodonsNew = new String[0];
-        int codeIndex = Integer.valueOf(pref.get(Properties.GENETIC_CODE_INDEX, "0"));
-        if (codeIndex < nbGeneticCodes) {
-            GeneticCode code = genCodeFactory.getGeneticCodeById(Integer.valueOf(pref.get(Properties.SEL_GENETIC_CODE, "1")));
-            startCodonsNew = code.getStartCodons().toArray(startCodonsNew);
-            stopCodonsNew = code.getStopCodons().toArray(stopCodonsNew);
-        } else {
-            startCodonsNew = CodonUtilities.parseCustomCodons(codeIndex, pref.get(Properties.CUSTOM_GENETIC_CODES, "1"));
-        }
+        Pair<String[], String[]> geneticCode = CodonUtilities.getGeneticCodeArrays();
+        String[] startCodonsNew = geneticCode.getFirst();
+        String[] stopCodonsNew = geneticCode.getSecond();
+        
         this.startCodons = new Pattern[startCodonsNew.length * 2];
         this.stopCodons = new Pattern[stopCodonsNew.length * 2];
         this.selectedStarts = new ArrayList<>();

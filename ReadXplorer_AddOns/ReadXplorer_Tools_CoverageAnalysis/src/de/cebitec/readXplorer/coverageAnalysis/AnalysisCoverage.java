@@ -82,13 +82,13 @@ public class AnalysisCoverage implements Observer, AnalysisI<CoverageIntervalCon
         PersistantCoverage coverage = coverageResult.getCoverage();
 
         //since read classes are inclusive, we simply check which array to use, starting with the larges read class
-        if (this.parameters.getReadClassesParams().isCommonMatchUsed()) {
+        if (this.parameters.getReadClassParams().isCommonMatchUsed()) {
             coverageArraySumOrFwd = coverage.getCommonFwdMult();
             coverageArrayRev = coverage.getCommonRevMult();
-        } else if (this.parameters.getReadClassesParams().isBestMatchUsed()) {
+        } else if (this.parameters.getReadClassParams().isBestMatchUsed()) {
             coverageArraySumOrFwd = coverage.getBestMatchFwdMult();
             coverageArrayRev = coverage.getBestMatchRevMult();
-        } else if (this.parameters.getReadClassesParams().isPerfectMatchUsed()) {
+        } else if (this.parameters.getReadClassParams().isPerfectMatchUsed()) {
             coverageArraySumOrFwd = coverage.getPerfectFwdMult();
             coverageArrayRev = coverage.getPerfectRevMult();
         }

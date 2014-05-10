@@ -17,6 +17,7 @@ public class SelectReadClassWizardPanel extends ChangeListeningWizardPanel {
     public static final String PROP_BEST_MATCH_SELECTED = "BestMatchSelected";
     public static final String PROP_COMMON_MATCH_SELECTED = "CommonMatchSelected";
     public static final String PROP_UNIQUE_SELECTED = "UniqueSelected";
+    public static final String PROP_MIN_MAPPING_QUAL = "minMapQual";
     
     private static final String PROP_READ_CLASS_PARAMS = "ReadClassParams";
     /**
@@ -34,7 +35,7 @@ public class SelectReadClassWizardPanel extends ChangeListeningWizardPanel {
      * identifier.
      */
     public SelectReadClassWizardPanel(String wizardName) {
-        super("Please select at least one read class to continue!");
+        super("Please select at least one read class to continue and enter a value between 0 and 127 as mapping quality!");
         this.wizardName = wizardName;
     }
 
@@ -53,11 +54,7 @@ public class SelectReadClassWizardPanel extends ChangeListeningWizardPanel {
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         if (isValid()) {
-            ParametersReadClasses readClassParams = new ParametersReadClasses(
-                    this.component.isPerfectSelected(), 
-                    this.component.isBestMatchSelected(), 
-                    this.component.isCommonMatchSelected(), 
-                    this.component.isUniqueSelected());
+            ParametersReadClasses readClassParams = this.component.getReadClassParams();
             wiz.putProperty(getPropReadClassParams(), readClassParams);
             this.storePrefs(readClassParams);
         }
@@ -73,11 +70,13 @@ public class SelectReadClassWizardPanel extends ChangeListeningWizardPanel {
         String isBestMatchSelected = readClassParams.isBestMatchUsed() ? "1" : "0";
         String isCommonMatchSelected = readClassParams.isCommonMatchUsed() ? "1" : "0";
         String isUniqueSelected = readClassParams.isOnlyUniqueReads() ? "1" : "0";
+        String minMappingQuality = String.valueOf(readClassParams.getMinMappingQual());
         Preferences pref = NbPreferences.forModule(Object.class);
         pref.put(wizardName + PROP_PERFECT_SELECTED, isPerfectSelected);
         pref.put(wizardName + PROP_BEST_MATCH_SELECTED, isBestMatchSelected);
         pref.put(wizardName + PROP_COMMON_MATCH_SELECTED, isCommonMatchSelected);
         pref.put(wizardName + PROP_UNIQUE_SELECTED, isUniqueSelected);
+        pref.put(wizardName + PROP_MIN_MAPPING_QUAL, minMappingQuality);
     }
     
     /**

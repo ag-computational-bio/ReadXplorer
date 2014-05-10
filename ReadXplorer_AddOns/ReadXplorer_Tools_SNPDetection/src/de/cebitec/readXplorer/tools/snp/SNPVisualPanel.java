@@ -3,11 +3,11 @@ package de.cebitec.readXplorer.tools.snp;
 import de.cebitec.readXplorer.api.objects.JobPanel;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
+import java.util.prefs.Preferences;
 import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import org.openide.util.NbPreferences;
 
 /**
  * Panel displaying all options for a SNP detection.
@@ -19,7 +19,9 @@ public final class SNPVisualPanel extends JobPanel {
     private static final long serialVersionUID = 1L;
     private Object minPercentage = 90;
     private int minMismatchBases = 15;
-    private boolean useMainBase = true;
+    private byte minBaseQuality = 0;
+    private byte minAverageBaseQual = 0;
+    private byte minAverageMappingQual = 0;
 
     /**
      * Panel displaying all options for a SNP detection.
@@ -28,24 +30,12 @@ public final class SNPVisualPanel extends JobPanel {
         initComponents();
         
         this.absNumText.getDocument().addDocumentListener(this.createDocumentListener());
+        this.minBaseQualityField.getDocument().addDocumentListener(this.createDocumentListener());
+        this.minAvrgBaseQualField.getDocument().addDocumentListener(this.createDocumentListener());
+        this.minAvrgMappingQualField.getDocument().addDocumentListener(this.createDocumentListener());
         
-        ((DefaultEditor) percentSpinner.getEditor()).getTextField().getDocument().addDocumentListener(new DocumentListener() {
-
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                isRequiredInfoSet();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                isRequiredInfoSet();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-//                isRequiredInfoSet();
-            }
-        });
+        ((DefaultEditor) percentSpinner.getEditor()).getTextField().getDocument().addDocumentListener(this.createDocumentListener());
+        this.loadLastParameterSelection();
     }
 
     @Override
@@ -65,16 +55,24 @@ public final class SNPVisualPanel extends JobPanel {
         jTextArea1 = new javax.swing.JTextArea();
         jLabel2 = new javax.swing.JLabel();
         percentSpinner = new javax.swing.JSpinner(new SpinnerNumberModel());
-        jPanel1 = new javax.swing.JPanel();
+        mismatchOptionsPanel = new javax.swing.JPanel();
         absNumText = new javax.swing.JTextField();
         useMainBaseBox = new javax.swing.JCheckBox();
         jLabel3 = new javax.swing.JLabel();
+        qualityOptionsPanel = new javax.swing.JPanel();
+        minBaseQualityField = new javax.swing.JTextField();
+        minAvrgBaseQualField = new javax.swing.JTextField();
+        minAvrgMappingQualField = new javax.swing.JTextField();
+        minBaseQualityLabel = new javax.swing.JLabel();
+        minAvrgBaseQualLabel = new javax.swing.JLabel();
+        minAvrgMappingQualLabel = new javax.swing.JLabel();
+        qualFilterCheckBox = new javax.swing.JCheckBox();
 
         jTextArea1.setEditable(false);
         jTextArea1.setColumns(20);
         jTextArea1.setLineWrap(true);
         jTextArea1.setRows(5);
-        jTextArea1.setText(org.openide.util.NbBundle.getMessage(SNPVisualPanel.class, "SNPVisualPanel.jTextArea1.text")); // NOI18N
+        jTextArea1.setText(org.openide.util.NbBundle.getMessage(SNPVisualPanel.class, "SNPVisualPanel.jTextArea1.text_1")); // NOI18N
         jTextArea1.setWrapStyleWord(true);
         jScrollPane1.setViewportView(jTextArea1);
 
@@ -87,7 +85,7 @@ public final class SNPVisualPanel extends JobPanel {
             }
         });
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+        mismatchOptionsPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         absNumText.setFont(new java.awt.Font("Dialog", 1, 12)); // NOI18N
         absNumText.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
@@ -103,30 +101,88 @@ public final class SNPVisualPanel extends JobPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(SNPVisualPanel.class, "SNPVisualPanel.jLabel3.text")); // NOI18N
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        javax.swing.GroupLayout mismatchOptionsPanelLayout = new javax.swing.GroupLayout(mismatchOptionsPanel);
+        mismatchOptionsPanel.setLayout(mismatchOptionsPanelLayout);
+        mismatchOptionsPanelLayout.setHorizontalGroup(
+            mismatchOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(mismatchOptionsPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGroup(mismatchOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(mismatchOptionsPanelLayout.createSequentialGroup()
                         .addComponent(jLabel3)
-                        .addGap(18, 18, 18)
-                        .addComponent(absNumText, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(useMainBaseBox, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(absNumText, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(useMainBaseBox))
                 .addContainerGap())
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        mismatchOptionsPanelLayout.setVerticalGroup(
+            mismatchOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(mismatchOptionsPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(mismatchOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(absNumText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(useMainBaseBox)
                 .addContainerGap())
+        );
+
+        qualityOptionsPanel.setBorder(javax.swing.BorderFactory.createEtchedBorder());
+
+        minBaseQualityField.setText(org.openide.util.NbBundle.getMessage(SNPVisualPanel.class, "SNPVisualPanel.minBaseQualityField.text")); // NOI18N
+
+        minAvrgBaseQualField.setText(org.openide.util.NbBundle.getMessage(SNPVisualPanel.class, "SNPVisualPanel.minAvrgBaseQualField.text")); // NOI18N
+
+        minAvrgMappingQualField.setText(org.openide.util.NbBundle.getMessage(SNPVisualPanel.class, "SNPVisualPanel.minAvrgMappingQualField.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(minBaseQualityLabel, org.openide.util.NbBundle.getMessage(SNPVisualPanel.class, "SNPVisualPanel.minBaseQualityLabel.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(minAvrgBaseQualLabel, org.openide.util.NbBundle.getMessage(SNPVisualPanel.class, "SNPVisualPanel.minAvrgBaseQualLabel.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(minAvrgMappingQualLabel, org.openide.util.NbBundle.getMessage(SNPVisualPanel.class, "SNPVisualPanel.minAvrgMappingQualLabel.text")); // NOI18N
+
+        qualFilterCheckBox.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(qualFilterCheckBox, org.openide.util.NbBundle.getMessage(SNPVisualPanel.class, "SNPVisualPanel.qualFilterCheckBox.text")); // NOI18N
+
+        javax.swing.GroupLayout qualityOptionsPanelLayout = new javax.swing.GroupLayout(qualityOptionsPanel);
+        qualityOptionsPanel.setLayout(qualityOptionsPanelLayout);
+        qualityOptionsPanelLayout.setHorizontalGroup(
+            qualityOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+            .addGroup(qualityOptionsPanelLayout.createSequentialGroup()
+                .addContainerGap(44, Short.MAX_VALUE)
+                .addGroup(qualityOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(minBaseQualityLabel, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(minAvrgBaseQualLabel, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(minAvrgMappingQualLabel, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(qualityOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(minBaseQualityField, javax.swing.GroupLayout.DEFAULT_SIZE, 68, Short.MAX_VALUE)
+                    .addComponent(minAvrgBaseQualField)
+                    .addComponent(minAvrgMappingQualField))
+                .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, qualityOptionsPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(qualFilterCheckBox)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        qualityOptionsPanelLayout.setVerticalGroup(
+            qualityOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, qualityOptionsPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(qualFilterCheckBox)
+                .addGap(1, 1, 1)
+                .addGroup(qualityOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(minBaseQualityField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(minBaseQualityLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(qualityOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(minAvrgBaseQualField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(minAvrgBaseQualLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(qualityOptionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(minAvrgMappingQualField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(minAvrgMappingQualLabel))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -138,13 +194,15 @@ public final class SNPVisualPanel extends JobPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 76, Short.MAX_VALUE)
+                        .addGap(0, 235, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(jLabel2)
-                                .addGap(18, 18, 18)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(percentSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(qualityOptionsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(mismatchOptionsPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -152,12 +210,14 @@ public final class SNPVisualPanel extends JobPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(37, 37, 37)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(percentSpinner, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
-                .addGap(18, 18, 18)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(mismatchOptionsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(qualityOptionsPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -176,10 +236,18 @@ public final class SNPVisualPanel extends JobPanel {
     private javax.swing.JTextField absNumText;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JTextField minAvrgBaseQualField;
+    private javax.swing.JLabel minAvrgBaseQualLabel;
+    private javax.swing.JTextField minAvrgMappingQualField;
+    private javax.swing.JLabel minAvrgMappingQualLabel;
+    private javax.swing.JTextField minBaseQualityField;
+    private javax.swing.JLabel minBaseQualityLabel;
+    private javax.swing.JPanel mismatchOptionsPanel;
     private javax.swing.JSpinner percentSpinner;
+    private javax.swing.JCheckBox qualFilterCheckBox;
+    private javax.swing.JPanel qualityOptionsPanel;
     private javax.swing.JCheckBox useMainBaseBox;
     // End of variables declaration//GEN-END:variables
 
@@ -204,7 +272,27 @@ public final class SNPVisualPanel extends JobPanel {
      * the current position.
      */
     public boolean isUseMainBase() {
-        return this.useMainBase;
+        return this.useMainBaseBox.isSelected();
+    }
+
+    /**
+     * @return <cc>true</cc>, if the quality filter options should be enabled. 
+     * <cc>false</cc>, if the quality options should not have any effect.
+     */
+    public boolean isUseQualFilter() {
+        return this.qualFilterCheckBox.isSelected();
+    }
+
+    byte getMinBaseQuality() {
+        return minBaseQuality;
+    }
+
+    byte getMinAverageBaseQual() {
+        return minAverageBaseQual;
+    }
+
+    byte getMinAverageMappingQual() {
+        return minAverageMappingQual;
     }
     
     /**
@@ -218,17 +306,41 @@ public final class SNPVisualPanel extends JobPanel {
         } else {
             isValidated = false;
         }
+        if (GeneralUtils.isValidByteInput(minBaseQualityField.getText())
+                && GeneralUtils.isValidByteInput(minAvrgBaseQualField.getText())
+                && GeneralUtils.isValidByteInput(minAvrgMappingQualField.getText())
+                ) {
+            this.minBaseQuality = Byte.parseByte(minBaseQualityField.getText());
+            this.minAverageBaseQual = Byte.parseByte(minAvrgBaseQualField.getText());
+            this.minAverageMappingQual = Byte.parseByte(minAvrgMappingQualField.getText());
+        } else {
+            isValidated = false;
+        }
         JTextField spinnerField = ((DefaultEditor) percentSpinner.getEditor()).getTextField();
-        String newString = spinnerField.getText();
-        if (GeneralUtils.isValidPercentage(newString)) {
+        if (GeneralUtils.isValidPercentage(spinnerField.getText())) {
             this.minPercentage = this.percentSpinner.getValue();
         } else {
             isValidated = false;
         }
-        this.useMainBase = this.useMainBaseBox.isSelected();
         
         firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated);
         return isValidated;
+    }
+
+    /**
+     * Updates the parameters for this panel with the globally stored
+     * settings for this wizard panel. If no settings were stored, the default
+     * configuration is chosen.
+     */
+    private void loadLastParameterSelection() {
+        Preferences pref = NbPreferences.forModule(Object.class);
+        ((DefaultEditor) percentSpinner.getEditor()).getTextField().setText(pref.get(SNPWizardPanel.PROP_MIN_PERCENT, "90"));
+        absNumText.setText(pref.get(SNPWizardPanel.PROP_MIN_VARYING_BASES, "15"));
+        useMainBaseBox.setSelected(pref.get(SNPWizardPanel.PROP_USE_MAIN_BASE, "1").equals("1"));
+        qualFilterCheckBox.setSelected(pref.get(SNPWizardPanel.PROP_SEL_QUAL_FILTER, "1").equals("1"));
+        minBaseQualityField.setText(pref.get(SNPWizardPanel.PROP_MIN_BASE_QUAL, "20"));
+        minAvrgBaseQualField.setText(pref.get(SNPWizardPanel.PROP_MIN_AVERAGE_BASE_QUAL, "20"));
+        minAvrgMappingQualField.setText(pref.get(SNPWizardPanel.PROP_MIN_AVERAGE_MAP_QUAL, "20"));        
     }
     
 }

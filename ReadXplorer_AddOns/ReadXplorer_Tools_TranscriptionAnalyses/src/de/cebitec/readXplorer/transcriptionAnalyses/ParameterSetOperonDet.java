@@ -2,6 +2,7 @@ package de.cebitec.readXplorer.transcriptionAnalyses;
 
 import de.cebitec.readXplorer.databackend.ParameterSetI;
 import de.cebitec.readXplorer.databackend.ParametersFeatureTypes;
+import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.util.FeatureType;
 import java.util.Set;
 
@@ -15,6 +16,7 @@ public class ParameterSetOperonDet extends ParametersFeatureTypes implements Par
     private boolean performOperonAnalysis;
     private int minSpanningReads;
     private boolean autoOperonParamEstimation;
+    private final ParametersReadClasses readClassParams;
 
     /**
      * Data storage for all parameters associated with an operon detection.
@@ -24,13 +26,15 @@ public class ParameterSetOperonDet extends ParametersFeatureTypes implements Par
      * @param autoOperonParamEstimation true, if the automatic parameter estimation should
      * be switched on for the operon detection
      * @param selFeatureTypes the set of selected feature types
+     * @param readClassParams
      */
     public ParameterSetOperonDet(boolean performOperonAnalysis, int minSpanningReads, 
-            boolean autoOperonParamEstimation, Set<FeatureType> selFeatureTypes) {
+            boolean autoOperonParamEstimation, Set<FeatureType> selFeatureTypes, ParametersReadClasses readClassParams) {
         super(selFeatureTypes);
         this.performOperonAnalysis = performOperonAnalysis;
         this.minSpanningReads = minSpanningReads;
         this.autoOperonParamEstimation = autoOperonParamEstimation;
+        this.readClassParams = readClassParams;
     }
 
     /**
@@ -77,6 +81,10 @@ public class ParameterSetOperonDet extends ParametersFeatureTypes implements Par
      */
     public void setAutoOperonParamEstimation(boolean autoOperonParamEstimation) {
         this.autoOperonParamEstimation = autoOperonParamEstimation;
+    }
+
+    public ParametersReadClasses getReadClassParams() {
+        return readClassParams;
     }
     
 }

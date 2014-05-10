@@ -185,6 +185,11 @@ public class RegionManager {
         return this.patternFilter.findNextOccurrence();
     }
 
+    /**
+     * Sets a list of cds regions and replaces the list stored in this variable
+     * until now.
+     * @param cdsRegions the cdsRegions to set
+     */
     public void setCdsRegions(List<Region> cdsRegions) {
         if (this.cdsRegions.containsAll(cdsRegions)) {
             this.cdsRegions.removeAll(cdsRegions);

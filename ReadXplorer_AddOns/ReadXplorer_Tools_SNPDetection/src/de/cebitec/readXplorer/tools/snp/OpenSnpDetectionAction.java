@@ -150,11 +150,15 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
         int minVaryingBases = (int) wiz.getProperty(SNPWizardPanel.PROP_MIN_VARYING_BASES);
         int minPercentage = (int) wiz.getProperty(SNPWizardPanel.PROP_MIN_PERCENT);
         boolean useMainBase = (boolean) wiz.getProperty(SNPWizardPanel.PROP_USE_MAIN_BASE);
+        byte minBaseQuality = (byte) wiz.getProperty(SNPWizardPanel.PROP_MIN_BASE_QUAL);
+        byte minAverageBaseQual = (byte) wiz.getProperty(SNPWizardPanel.PROP_MIN_AVERAGE_BASE_QUAL);
+        byte minAverageMapQual = (byte) wiz.getProperty(SNPWizardPanel.PROP_MIN_AVERAGE_MAP_QUAL);
         this.selFeatureTypes = (Set<FeatureType>) wiz.getProperty(featureTypePanel.getPropSelectedFeatTypes());
         ParametersReadClasses readClassParams = (ParametersReadClasses) wiz.getProperty(readClassWizPanel.getPropReadClassParams());
         this.combineTracks = (boolean) wiz.getProperty(openTracksPanel.getPropCombineTracks());
         
-        this.parametersSNPs = new ParameterSetSNPs(minVaryingBases, minPercentage, useMainBase, selFeatureTypes, readClassParams);
+        this.parametersSNPs = new ParameterSetSNPs(minVaryingBases, minPercentage, useMainBase, selFeatureTypes, 
+                readClassParams, minBaseQuality, minAverageBaseQual, minAverageMapQual);
         TrackConnector connector;
         if (!combineTracks) {
             for (PersistantTrack track : tracks) {

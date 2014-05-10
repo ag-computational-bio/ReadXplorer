@@ -23,6 +23,8 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
     private int differences;
     private int sequenceID;
     private boolean isBestMatch;
+    private int mappingQuality;
+    private byte[] baseQualities;
     private int numMappingsForRead;
     private String originalSequence = null;
 
@@ -37,10 +39,14 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
      * @param mismatches
      * @param sequenceID
      * @param isBestMapping 
+     * @param mappingQuality phred mapping quality (if available it is > 0 or -1
+     * for 255), otherwise 0
+     * @param baseQualities phred score array of base qualities, (if available
+     * it is > 0 or -1 for 255), otherwise 0
      * @param numMappingsForRead number of mappings for the read of this mapping
      */
-    public PersistantMapping(int id, int start, int stop, int trackId, boolean isFwdStrand, 
-            int numReplicates, int mismatches, int sequenceID, boolean isBestMapping, int numMappingsForRead){
+    public PersistantMapping(int id, int start, int stop, int trackId, boolean isFwdStrand, int numReplicates, 
+            int mismatches, int sequenceID, boolean isBestMapping, int mappingQuality, byte[] baseQualities, int numMappingsForRead) {
         this.id = id;
         this.start = start;
         this.stop = stop;
@@ -52,6 +58,8 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
         this.differences = mismatches;
         this.sequenceID = sequenceID;
         this.isBestMatch = isBestMapping;
+        this.mappingQuality = mappingQuality;
+        this.baseQualities = baseQualities;
         this.numMappingsForRead = numMappingsForRead;
     }
     
@@ -68,9 +76,9 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
      * @param sequenceID
      * @param isBestMapping 
      */
-    public PersistantMapping(int id, int start, int stop, int trackId, boolean isFwdStrand, 
-            int numReplicates, int mismatches, int sequenceID, boolean isBestMapping) {
-        this(id, start, stop, trackId, isFwdStrand, numReplicates, mismatches, sequenceID, isBestMapping, -1);
+    public PersistantMapping(int id, int start, int stop, int trackId, boolean isFwdStrand, int numReplicates, 
+            int mismatches, int sequenceID, boolean isBestMapping) {
+        this(id, start, stop, trackId, isFwdStrand, numReplicates, mismatches, sequenceID, isBestMapping, 0, new byte[0], -1);
     }
     
     /*
@@ -309,6 +317,22 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
      */
     public int getNumMappingsForRead() {
         return this.numMappingsForRead;
+    }
+
+    /**
+     * @return phred score array of base qualities, (if available it is > 0 or
+     * -1 for 255), otherwise 0
+     */
+    public byte[] getBaseQualities() {
+        return baseQualities;
+    }
+
+    /**
+     * @return phred mapping quality (if available it is > 0 or -1 for 255),
+     * otherwise 0
+     */
+    public int getMappingQuality() {
+        return mappingQuality;
     }
    
 

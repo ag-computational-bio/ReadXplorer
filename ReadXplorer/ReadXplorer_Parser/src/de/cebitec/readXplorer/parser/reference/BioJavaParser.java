@@ -1,6 +1,6 @@
 package de.cebitec.readXplorer.parser.reference;
 
-import de.cebitec.common.parser.ConverterI;
+import de.cebitec.common.parser.Converter;
 import de.cebitec.common.parser.embl.parsers.EmblSequenceToFastaConverterParser;
 import de.cebitec.common.parser.genbank.parsers.GenbankSequenceToFastaConverterParser;
 import de.cebitec.readXplorer.parser.ReferenceJob;
@@ -109,9 +109,8 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
         Map<FeatureType, List<ParsedFeature>> featMap = new HashMap<>();
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start reading file  \"{0}\"", refGenJob.getFile());
-        try {
+        try (BufferedReader in = new BufferedReader(new FileReader(refGenJob.getFile()))) {
 
-            BufferedReader in = new BufferedReader(new FileReader(refGenJob.getFile()));
             Namespace ns = RichObjectFactory.getDefaultNamespace();
             SymbolTokenization dna = DNATools.getDNA().getTokenization("token");
             RichSequenceBuilderFactory factory = RichSequenceBuilderFactory.THRESHOLD;
@@ -148,7 +147,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
             //Convert Genbank and EMBL to indexed fasta
             this.notifyObservers("Converting " + refGenJob.getFile() + " into indexed fasta...");
             Path fastaPath = new File(refGenJob.getFile().getAbsolutePath() + ".fasta").toPath();
-            ConverterI seqConverter;
+            Converter seqConverter;
             if (seqFormat instanceof EMBLFormat) {
                 seqConverter = EmblSequenceToFastaConverterParser.fileConverter(refGenJob.getFile().toPath(), fastaPath);
             } else {
@@ -187,13 +186,6 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                         location = feature.getLocation();
 
                         parsedType = feature.getType();
-                        start = location.getMin();
-                        stop = location.getMax();
-                        if (start > stop) {
-                            this.sendMsgIfAllowed("Start bigger than stop in " + refGenJob.getFile().getAbsolutePath()
-                                    + ". Found start: " + start + ", stop: " + stop + ". Feature ignored.");
-                            continue;
-                        }
                         try {
                             strand = feature.getStrand().equals(StrandedFeature.POSITIVE) ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV;
                         } catch (IllegalStateException e) {
@@ -259,6 +251,10 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
 //                            subFeatures.add(new ParsedFeature(type, subStart, subStop, strand,
 //                                    locusTag, product, ecNumber, geneName, new ArrayList<ParsedFeature>(), null));
 //                        }
+                        start = location.getMin();
+                        stop = location.getMax();
+                        boolean featAcrossBorder = false;
+                        int index = 0;
                         if (location.toString().contains("join")) {
                             subFeatureIter = location.blockIterator();
                             while (subFeatureIter.hasNext()) {
@@ -269,16 +265,26 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                                 subStop = subLocation.getMax();
                                 subFeatures.add(new ParsedFeature(type, subStart, subStop, strand,
                                         locusTag, product, ecNumber, geneName, new ArrayList<ParsedFeature>(), null));
+                                featAcrossBorder = subStart == 1 && index > 0; //feature across circular chrom start, separate in two features
+                                ++index;
                             }
                         }
 
                         //TODO: filter unknown features, if a known feature exists with same locus! best to do not here
-                        currentFeature = new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber, geneName, subFeatures, null);
-                        if (!featMap.containsKey(type)) {
-                            featMap.put(type, new ArrayList<ParsedFeature>());
+                        if (featAcrossBorder) { //feature across circular chrom start, add each subfeature separately
+                            for (ParsedFeature subFeature : subFeatures) {
+                                if (!featMap.containsKey(type)) {
+                                    featMap.put(type, new ArrayList<ParsedFeature>());
+                                }
+                                featMap.get(type).add(subFeature);
+                            }
+                        } else {
+                            currentFeature = new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber, geneName, subFeatures, null);
+                            if (!featMap.containsKey(type)) {
+                                featMap.put(type, new ArrayList<ParsedFeature>());
+                            }
+                            featMap.get(type).add(currentFeature);
                         }
-                        featMap.get(type).add(currentFeature);
-
                     }
                     Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Sequence successfully read");
 
@@ -288,7 +294,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                 } catch (BioException | NoSuchElementException e) {
                     JOptionPane.showMessageDialog(new JPanel(), "One of the imported chromosomes does not contain any sequence data or is in corrupted format!",
                             "Chromosome Parsing Error", JOptionPane.ERROR_MESSAGE);
-                    break; //Sadly the iterator does not continue with next element, but ends up in infinite loop otherwise
+                    throw new ParsingException(e);
                 }
             }
             

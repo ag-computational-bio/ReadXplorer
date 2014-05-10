@@ -7,6 +7,9 @@ package de.cebitec.readXplorer.util;
  */
 public class Properties {
 
+    private Properties() {
+    }
+    
     // different adapter types for a project and or database
     public static final String ADAPTER_MYSQL = "mysql";
     public static final String ADAPTER_H2 = "h2";
@@ -15,6 +18,7 @@ public class Properties {
     // properties mainly for genetic codes
     public static final String SEL_GENETIC_CODE = "selectedGeneticCode";
     public static final String STANDARD = "Standard";
+    /** 1 = Index of the standard genetic code. */
     public static final String STANDARD_CODE_INDEX = "1";
     public static final String GENETIC_CODE_INDEX = "geneticCodeIndex";
     public static final String CUSTOM_GENETIC_CODES = "customGeneticCode";

@@ -98,7 +98,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
         // geting Mappings and calculate statistics on them.
         this.stats = new StatisticsOnMappingData(trackConnector.getRefGenome(), parameters.getFraction(), this.forwardCDSs, this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
         de.cebitec.readXplorer.databackend.AnalysesHandler handler = new de.cebitec.readXplorer.databackend.AnalysesHandler(trackConnector, this, "Collecting coverage data of track number "
-                + this.selectedTrack.getId(), new ParametersReadClasses(true, false, false, false)); // TODO: ParameterReadClasses noch in den Wizard einbauen und die parameter hier mit übergeben!
+                + this.selectedTrack.getId(), new ParametersReadClasses(true, false, false, false, new Byte("0"))); // TODO: ParameterReadClasses noch in den Wizard einbauen und die parameter hier mit übergeben!
         handler.setMappingsNeeded(true);
         handler.setDesiredData(Properties.REDUCED_MAPPINGS);
         handler.registerObserver(this.stats);

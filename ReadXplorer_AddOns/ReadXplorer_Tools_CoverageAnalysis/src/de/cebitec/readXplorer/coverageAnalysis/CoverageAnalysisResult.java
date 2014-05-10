@@ -86,25 +86,26 @@ public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCove
          String coveredString = parameters.isDetectCoveredIntervals() ? "Covered" : "Uncovered";
 
         List<List<Object>> statisticsExportData = new ArrayList<>();
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(coveredString + " interval analysis statistics for tracks:",
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(coveredString + " interval analysis statistics for tracks:",
                 GeneralUtils.generateConcatenatedString(this.getTrackNameList(), 0)));
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between title and parameters
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between title and parameters
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow(coveredString + " interval analysis detection parameters:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Minimum counted coverage:", parameters.getMinCoverageCount()));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(coveredString + " interval analysis detection parameters:"));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Minimum counted coverage:", parameters.getMinCoverageCount()));
 
         String coverageCount = parameters.isSumCoverageOfBothStrands() ? "sum coverage of both strands" : "treat each strand separately";
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Count coverage for:", coverageCount));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Count coverage for:", coverageCount));
+        parameters.getReadClassParams().addReadClassParamsToStats(statisticsExportData);
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between parameters and statistics
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between parameters and statistics
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow(coveredString + " interval analysis statistics:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(coveredString + " interval analysis statistics:"));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(
                 ResultPanelCoverageAnalysis.NUMBER_INTERVALS, getStatsMap().get(ResultPanelCoverageAnalysis.NUMBER_INTERVALS)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(
                 ResultPanelCoverageAnalysis.MEAN_INTERVAL_LENGTH, getStatsMap().get(ResultPanelCoverageAnalysis.MEAN_INTERVAL_LENGTH)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(
                 ResultPanelCoverageAnalysis.MEAN_INTERVAL_COVERAGE, getStatsMap().get(ResultPanelCoverageAnalysis.MEAN_INTERVAL_COVERAGE)));
 
 

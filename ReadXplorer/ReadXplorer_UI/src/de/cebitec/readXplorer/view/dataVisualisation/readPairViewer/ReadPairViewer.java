@@ -134,7 +134,7 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
         //TODO: add unique filter to read pair viewer
         this.mappingsLoading = true;
         ParametersReadClasses readClassParams = new ParametersReadClasses(!excludedFeatureTypes.contains(FeatureType.PERFECT_PAIR),
-                !excludedFeatureTypes.contains(FeatureType.DISTORTED_PAIR), !excludedFeatureTypes.contains(FeatureType.SINGLE_MAPPING), false);
+                !excludedFeatureTypes.contains(FeatureType.DISTORTED_PAIR), !excludedFeatureTypes.contains(FeatureType.SINGLE_MAPPING), false, new Byte("0"));
         trackConnector.addMappingRequest(new IntervalRequest(from, to, from - 1000, to + 1000, this.getRefGen().getActiveChromId(), this, false, 
                 Properties.READ_PAIRS, Byte.valueOf("0"), readClassParams));
         this.oldLogLeft = from;

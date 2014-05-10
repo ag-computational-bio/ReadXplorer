@@ -184,7 +184,7 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
      */
     private boolean checkCanIncreaseBothStrands(PersistantCoverage coverage, int j) {
         boolean canIncrease = false;
-        ParametersReadClasses readClassParams = analysisParams.getReadClassesParams();
+        ParametersReadClasses readClassParams = analysisParams.getReadClassParams();
         if (readClassParams.isCommonMatchUsed() &&
             coverage.getCommonFwdMult(j) + coverage.getCommonRevMult(j) >= analysisParams.getMinCoverageCount()) {
                 canIncrease = true;
@@ -206,7 +206,7 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
      */
     private boolean checkCanIncreaseOneStrand(PersistantCoverage coverage, int j, boolean isFwdStrand) {
         boolean canIncrease = false;
-        ParametersReadClasses readClassParams = analysisParams.getReadClassesParams();
+        ParametersReadClasses readClassParams = analysisParams.getReadClassParams();
         if (readClassParams.isCommonMatchUsed() &&
             (isFwdStrand && coverage.getCommonFwdMult(j) >= analysisParams.getMinCoverageCount()
                 || !isFwdStrand && coverage.getCommonRevMult(j) >= analysisParams.getMinCoverageCount())) {

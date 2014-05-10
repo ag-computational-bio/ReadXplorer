@@ -1,8 +1,8 @@
 package de.cebitec.readXplorer.view.dataVisualisation;
 
-import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
-import de.cebitec.common.sequencetools.geneticcode.GeneticCodeFactory;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.util.CodonUtilities;
+import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.JRegion;
@@ -20,7 +20,6 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import org.openide.util.Lookup;
-import org.openide.util.NbPreferences;
 
 /**
  * Listener for highlighting areas on a sequence bar. Note that classes with a
@@ -305,7 +304,7 @@ public class HighlightAreaListener extends MouseAdapter {
                 }
             }
             
-            popUp.show((JComponent) e.getComponent(), xPos, e.getY());
+            popUp.show(e.getComponent(), xPos, e.getY());
         }
     }
 
@@ -343,14 +342,11 @@ public class HighlightAreaListener extends MouseAdapter {
      * @return 
      */
     private Region findNextStopPos(int start, PersistantReference reference) {
-        
-        GeneticCodeFactory genCodeFactory = GeneticCodeFactory.getDefault();
-        GeneticCode code = genCodeFactory.getGeneticCodeById(Integer.valueOf(NbPreferences.forModule(Object.class).get(Properties.SEL_GENETIC_CODE, "1")));
-        List<String> stopCodons = code.getStopCodons();
+        Pair<String[], String[]> geneticCode = CodonUtilities.getGeneticCodeArrays();
+        String[] stopCodons = geneticCode.getSecond();
         List<Integer> results = new ArrayList<>();
         
-        int searchStart = isFwdStrand ? start + 3 : start - 3;
-        PatternFilter patternFilter = new PatternFilter(searchStart, reference.getActiveChromLength(), reference);
+        PatternFilter patternFilter = new PatternFilter(start, reference.getActiveChromLength(), reference);
         for (String stop : stopCodons) {
             patternFilter.setPattern(stop.toUpperCase());
             int stopPos = patternFilter.findNextOccurrenceOnStrand(isFwdStrand);

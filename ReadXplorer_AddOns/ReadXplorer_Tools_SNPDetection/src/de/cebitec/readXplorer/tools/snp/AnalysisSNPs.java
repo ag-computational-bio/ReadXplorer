@@ -2,6 +2,7 @@ package de.cebitec.readXplorer.tools.snp;
 
 import de.cebitec.readXplorer.api.objects.AnalysisI;
 import de.cebitec.readXplorer.databackend.IntervalRequest;
+import de.cebitec.readXplorer.databackend.SamBamFileReader;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistant;
 import de.cebitec.readXplorer.databackend.dataObjects.GapCount;
@@ -36,10 +37,21 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
     private TrackConnector trackConnector;
     private ParameterSetSNPs analysisParams;
     private List<SnpI> snps;
+    private boolean hasBaseQualities = true;
+    private boolean hasMappingQualities = true;
     
     
 //    private int count = 0;
-    private static final int NO_FIELDS = 6;
+    /** 6 = Number of supported bases: A,C,G,T,N,_. */
+    private static final int NO_BASES = 6;
+    /** 3 = Three values are needed: the count, the base  quality and the mapping quality. */
+    private static final int NO_VALUES = 3;
+    /** 0 = index for the count of a diff in all mappings at that position. */
+    private static final int COUNT_IDX = 0;
+    /** 1 = index for the average base quality of a diff base in all mappings for that position. */
+    private static final int BASE_QUAL_IDX = 1;
+    /** 2 = index for the average mapping quality of a diff base in all mappings for that position. */
+    private static final int MAP_QUAL_IDX = 2;
 
     /**
      * Carries out the logic behind the SNP and DIP detection.
@@ -73,6 +85,23 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
     @Override
     public List<SnpI> getResults() {
         return this.snps;
+    }
+
+    /**
+     * @return <cc>true</cc> if all mappings have base qualities, <cc>false</cc>
+     * if at least one mapping does not have base qualities.
+     */
+    public boolean isHasBaseQualities() {
+        return hasBaseQualities;
+    }
+
+    /**
+     * @return <cc>true</cc> if all mappings have mapping qualities including
+     * 255, <cc>false</cc> if at least one mapping does not have a mapping
+     * quality.
+     */
+    public boolean isHasMappingQualities() {
+        return hasMappingQualities;
     }
     
     /**
@@ -148,35 +177,57 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
         List<PersistantReferenceGap> gaps = covAndDiffs.getGaps();
         
         
-        //in both arrays the first index is the relative position. The second index is the base index
-        int[][] baseArray = new int[coverage.getRightBound() - coverage.getLeftBound() + 1][NO_FIELDS]; //+1 because sequence starts at 1 not 0
+        //in base array the first index is the relative position. The second aindex is the base index, the third contains count (0) and average base quality (1)
+        int[][][] baseArray = new int[coverage.getRightBound() - coverage.getLeftBound() + 1][NO_BASES][NO_VALUES]; //+1 because sequence starts at 1 not 0
         GapCount[] gapCounts = new GapCount[coverage.getRightBound() - coverage.getLeftBound() + 1]; //right bound is excluded in PersistantCoverage
         
         char base;
         int maxBaseIdx;
+        int pos;
         for (PersistantDiff diff : diffs) {
-            if (diff.getPosition() >= coverage.getLeftBound() && diff.getPosition() < coverage.getRightBound()) {
+            if (diff.getPosition() >= coverage.getLeftBound() && diff.getPosition() < coverage.getRightBound() && 
+                    (diff.getBaseQuality() > analysisParams.getMinBaseQuality() || diff.getBaseQuality() == -1)) {
                 base = diff.isForwardStrand() ? diff.getBase() : SequenceUtils.getDnaComplement(diff.getBase());
                 maxBaseIdx = this.getBaseInt(base);
-                baseArray[diff.getPosition() - coverage.getLeftBound()][maxBaseIdx] += diff.getCount(); //+1 because sequence starts at 1 not 0
+                pos = diff.getPosition() - coverage.getLeftBound();
+                baseArray[pos][maxBaseIdx][COUNT_IDX] += diff.getCount(); //+1 because sequence starts at 1 not 0
+                if (diff.getBaseQuality() > -1) {
+                    baseArray[pos][maxBaseIdx][BASE_QUAL_IDX] += diff.getBaseQuality(); //can be -1 if unknown
+                } else {
+                    hasBaseQualities = false;
+                }
+                if (    diff.getMappingQuality() != SamBamFileReader.UNKNOWN_MAP_QUAL
+                     || diff.getMappingQuality() != SamBamFileReader.UNKNOWN_CALCULATED_MAP_QUAL) {
+                        baseArray[pos][maxBaseIdx][MAP_QUAL_IDX] += diff.getMappingQuality();
+                } else {
+                    hasMappingQualities = false; //TODO: check before analysis for a track, if it supports base and mapping qualities - could lead to errors when stored in DB or takes a while
+                }
             }
         }
         
         int relativeGapPos;
         for (PersistantReferenceGap gap : gaps) {
-            if (gap.getPosition() >= coverage.getLeftBound() && gap.getPosition() < coverage.getRightBound()) {
+            if (gap.getPosition() >= coverage.getLeftBound() && gap.getPosition() < coverage.getRightBound() &&
+                    (gap.getBaseQuality() == -1 || gap.getBaseQuality() > analysisParams.getMinBaseQuality())) {
                 relativeGapPos = gap.getPosition() - coverage.getLeftBound();
                 if (gapCounts[relativeGapPos] == null) {
                     gapCounts[relativeGapPos] = new GapCount();
                 }
                 gapCounts[relativeGapPos].incCountFor(gap);
+                if (gap.getBaseQuality() <= -1) {
+                    hasBaseQualities = false;
+                }
+                if (   gap.getMappingQuality() == SamBamFileReader.UNKNOWN_MAP_QUAL
+                    || gap.getMappingQuality() == SamBamFileReader.UNKNOWN_CALCULATED_MAP_QUAL) {
+                    hasMappingQualities = false;
+                }
             }
         }
         
         IntervalRequest request = covAndDiffs.getRequest();
         String refSubSeq = trackConnector.getRefGenome().getChromSequence(request.getChromId(), request.getFrom(), request.getTo());
         int absPos;
-        int[] baseCounts;
+        int[][] baseCounts;
         char refBase;
         int maxCount;
         int refBaseIdx;
@@ -185,6 +236,8 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
         int cov;
         int frequency;
         SequenceComparison snpType;
+        int averageBaseQual;
+        int averageMappingQual;
         try {
 
             for (int i = 0; i < baseArray.length; ++i) {
@@ -197,58 +250,69 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                 maxCount = 0;
                 maxBaseIdx = 0;
                 for (int j = 0; j <= BASE_GAP; j++) {
-                    if (maxCount < baseCounts[j]) {
-                        maxCount = baseCounts[j];
+                    if (maxCount < baseCounts[j][COUNT_IDX]) {
+                        maxCount = baseCounts[j][COUNT_IDX];
                         maxBaseIdx = j;
                     }
                     //because only contains diffs, no matches
-                    diffCount += baseCounts[j];
-                    largestBaseCount = largestBaseCount < baseCounts[j] ? baseCounts[j] : largestBaseCount;
+                    diffCount += baseCounts[j][COUNT_IDX];
+                    largestBaseCount = largestBaseCount < baseCounts[j][COUNT_IDX] ? baseCounts[j][COUNT_IDX] : largestBaseCount;
                 }
 
                 if (maxCount > 0 && !analysisParams.isUseMainBase() && diffCount >= analysisParams.getMinMismatchingBases()
-                        || analysisParams.isUseMainBase() && largestBaseCount >= analysisParams.getMinMismatchingBases()) {
-                    cov = coverage.getBestMatchFwdMult(absPos) + coverage.getBestMatchRevMult(absPos);
-                    if (cov == 0) {
-                        ++cov;
-                        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found uncovered position in diffs: {0}", absPos);
-                    }
-                    frequency = (diffCount * 100) / cov;
-
-
-                    if (frequency >= analysisParams.getMinPercentage()) {
-                        refBase = refSubSeq.charAt(i); //TODO:SEQ: Test if base is correct base
-                        refBaseIdx = getBaseInt(refBase);
-                        //determine SNP type, can still be match, if match coverage is largest
-                        baseCounts[refBaseIdx] = cov - diffCount;
-                        if (maxBaseIdx == refBaseIdx) {
-                            continue;//snpType = SequenceComparison.MATCH; base = refBase;
-                        } else {
-                            snpType = this.getType(maxBaseIdx);
-                            base = this.getBase(maxBaseIdx);
+                        || analysisParams.isUseMainBase()    && largestBaseCount >= analysisParams.getMinMismatchingBases()
+                        ) {
+                    
+                    averageBaseQual = baseCounts[maxBaseIdx][BASE_QUAL_IDX] / maxCount;
+                    averageMappingQual = baseCounts[maxBaseIdx][MAP_QUAL_IDX] / maxCount;
+                    
+                    if (  (!this.hasBaseQualities    || averageBaseQual    >= analysisParams.getMinAverageBaseQual())
+                       && (!this.hasMappingQualities || averageMappingQual >= analysisParams.getMinAverageMappingQual())
+                            ) {
+                        
+                        cov = coverage.getBestMatchFwdMult(absPos) + coverage.getBestMatchRevMult(absPos);
+                        if (cov == 0) {
+                            ++cov;
+                            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found uncovered position in diffs: {0}", absPos);
                         }
+                        frequency = (diffCount * 100) / cov;
 
-                        this.snps.add(new Snp(
-                                absPos,
-                                trackConnector.getTrackID(),
-                                covAndDiffs.getRequest().getChromId(),
-                                base,
-                                refBase,
-                                baseCounts[BASE_A],
-                                baseCounts[BASE_C],
-                                baseCounts[BASE_G],
-                                baseCounts[BASE_T],
-                                baseCounts[BASE_N],
-                                baseCounts[BASE_GAP],
-                                cov,
-                                frequency,
-                                snpType));
+                        if (frequency >= analysisParams.getMinPercentage()) {
+                            refBase = refSubSeq.charAt(i); //TODO:SEQ: Test if base is correct base
+                            refBaseIdx = getBaseInt(refBase);
+                            //determine SNP type, can still be match, if match coverage is largest
+                            baseCounts[refBaseIdx][COUNT_IDX] = cov - diffCount;
+                            if (maxBaseIdx == refBaseIdx) {
+                                continue;//snpType = SequenceComparison.MATCH; base = refBase;
+                            } else {
+                                snpType = this.getType(maxBaseIdx);
+                                base = this.getBase(maxBaseIdx);
+                            }
+
+                            this.snps.add(new Snp(
+                                    absPos,
+                                    trackConnector.getTrackID(),
+                                    covAndDiffs.getRequest().getChromId(),
+                                    base,
+                                    refBase,
+                                    baseCounts[BASE_A][COUNT_IDX],
+                                    baseCounts[BASE_C][COUNT_IDX],
+                                    baseCounts[BASE_G][COUNT_IDX],
+                                    baseCounts[BASE_T][COUNT_IDX],
+                                    baseCounts[BASE_N][COUNT_IDX],
+                                    baseCounts[BASE_GAP][COUNT_IDX],
+                                    cov,
+                                    frequency,
+                                    snpType,
+                                    averageBaseQual,
+                                    averageMappingQual));
+                        }
                     }
                 }
             }
 
-            List<int[]> gapOrderList;
-            int[] gapCountArray;
+            List<int[][]> gapOrderList;
+            int[][] gapCountArray;
 
             for (int i = 0; i < gapCounts.length; ++i) {
                 if (gapCounts[i] != null) {
@@ -264,44 +328,55 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                         maxCount = 0;
                         maxBaseIdx = 0;
                         for (int k = 0; k < BASE_GAP; k++) { //here we only have bases including 'N'
-                            if (maxCount < gapCountArray[k]) {
-                                maxCount = gapCountArray[k];
+                            if (maxCount < gapCountArray[k][COUNT_IDX]) {
+                                maxCount = gapCountArray[k][COUNT_IDX];
                                 maxBaseIdx = k;
                             }
                             //because only contains gaps counts, no matches
-                            diffCount += gapCountArray[k];
-                            largestBaseCount = largestBaseCount < gapCountArray[k] ? gapCountArray[k] : largestBaseCount;
+                            diffCount += gapCountArray[k][COUNT_IDX];
+                            largestBaseCount = largestBaseCount < gapCountArray[k][COUNT_IDX] ? gapCountArray[k][COUNT_IDX] : largestBaseCount;
                         }
 
                         if (!analysisParams.isUseMainBase() && diffCount >= analysisParams.getMinMismatchingBases()
-                                || analysisParams.isUseMainBase() && largestBaseCount >= analysisParams.getMinMismatchingBases()) {
+                                || analysisParams.isUseMainBase() && largestBaseCount >= analysisParams.getMinMismatchingBases()
+                        ) {
 
-                            cov = coverage.getBestMatchFwdMult(absPos) + coverage.getBestMatchRevMult(absPos);
-                            if (cov == 0) {
-                                ++cov;
-                                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found uncovered position in gaps: {0}", absPos);
-                            }
-                            frequency = (diffCount * 100) / cov;
+                            averageBaseQual = gapCountArray[maxBaseIdx][BASE_QUAL_IDX] / maxCount;
+                            averageMappingQual = gapCountArray[maxBaseIdx][MAP_QUAL_IDX] / maxCount;
 
-                            if (frequency >= analysisParams.getMinPercentage()) {
-                                base = this.getBase(maxBaseIdx);
+                            if (   (!this.hasBaseQualities    || averageBaseQual    >= analysisParams.getMinAverageBaseQual())
+                                && (!this.hasMappingQualities || averageMappingQual >= analysisParams.getMinAverageMappingQual())
+                            ) {
 
-                                this.snps.add(new Snp(
-                                        absPos,
-                                        trackConnector.getTrackID(),
-                                        covAndDiffs.getRequest().getChromId(),
-                                        base,
-                                        '_',
-                                        gapCountArray[BASE_A],
-                                        gapCountArray[BASE_C],
-                                        gapCountArray[BASE_G],
-                                        gapCountArray[BASE_T],
-                                        gapCountArray[BASE_N],
-                                        0,
-                                        cov,
-                                        frequency,
-                                        SequenceComparison.INSERTION,
-                                        j));
+                                cov = coverage.getBestMatchFwdMult(absPos) + coverage.getBestMatchRevMult(absPos);
+                                if (cov == 0) {
+                                    ++cov;
+                                    Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found uncovered position in gaps: {0}", absPos);
+                                }
+                                frequency = (diffCount * 100) / cov;
+
+                                if (frequency >= analysisParams.getMinPercentage()) {
+                                    base = this.getBase(maxBaseIdx);
+
+                                    this.snps.add(new Snp(
+                                            absPos,
+                                            trackConnector.getTrackID(),
+                                            covAndDiffs.getRequest().getChromId(),
+                                            base,
+                                            '_',
+                                            gapCountArray[BASE_A][COUNT_IDX],
+                                            gapCountArray[BASE_C][COUNT_IDX],
+                                            gapCountArray[BASE_G][COUNT_IDX],
+                                            gapCountArray[BASE_T][COUNT_IDX],
+                                            gapCountArray[BASE_N][COUNT_IDX],
+                                            0,
+                                            cov,
+                                            frequency,
+                                            SequenceComparison.INSERTION,
+                                            j,
+                                            averageBaseQual,
+                                            averageMappingQual));
+                                }
                             }
                         }
                     }

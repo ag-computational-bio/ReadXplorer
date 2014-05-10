@@ -1,10 +1,9 @@
 package de.cebitec.readXplorer.view.dialogMenus;
 
 import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
-import de.cebitec.common.sequencetools.geneticcode.GeneticCodeFactory;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.parser.output.OutputParser;
-import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readXplorer.util.CodonUtilities;
 import de.cebitec.readXplorer.util.fileChooser.FastaFileChooser;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.Region;
@@ -19,13 +18,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.List;
-import java.util.prefs.Preferences;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.text.JTextComponent;
 import org.openide.util.NbBundle;
-import org.openide.util.NbPreferences;
 
 /**
  * Factory for different JMenuItems with predefined functionality.
@@ -36,16 +33,12 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
 
     private static final long serialVersionUID = 1L;
     
-    private Preferences pref;
     private final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-    private final GeneticCodeFactory genCodeFactory;
     
     /**
      * Creates a Factory for different JMenuItems with predefined functionality.
      */
     public MenuItemFactory() {
-        this.pref = NbPreferences.forModule(Object.class);
-        this.genCodeFactory = GeneticCodeFactory.getDefault();
     }
     
     /**
@@ -97,7 +90,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
             @Override
             public void actionPerformed(ActionEvent e) {
                 
-                 GeneticCode code = genCodeFactory.getGeneticCodeById(Integer.valueOf(pref.get(Properties.SEL_GENETIC_CODE, "1")));
+                 GeneticCode code = CodonUtilities.getGeneticCode();
                  String translatedSequence = code.getTranslationForString(dnaSeqToTranslateAndCopy);
                  clipboard.setContents(new StringSelection(translatedSequence), MenuItemFactory.this);
             }
@@ -131,7 +124,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
      * reference feature in fasta format.
      */
     public JMenuItem getStoreTranslatedFeatureFastaItem(final String dnaSeqToTranslateAndStore,final String refName, final PersistantFeature feature){
-         GeneticCode code = genCodeFactory.getGeneticCodeById(Integer.valueOf(pref.get(Properties.SEL_GENETIC_CODE, "1")));
+         GeneticCode code = CodonUtilities.getGeneticCode();
          String translatedSequence = code.getTranslationForString(dnaSeqToTranslateAndStore);
          String title = NbBundle.getMessage(MenuItemFactory.class, "MenuItem.StoreTranslatedFasta");
            
@@ -149,7 +142,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
      * @return The JMenuItem  for storing a translated sequence in fasta format
      */
     public JMenuItem getStoreTranslatedFastaItem(final String dnaSeqToTranslateAndStore, final String refName, final int seqStart, final int seqStop){
-        GeneticCode code = genCodeFactory.getGeneticCodeById(Integer.valueOf(pref.get(Properties.SEL_GENETIC_CODE, "1")));
+        GeneticCode code = CodonUtilities.getGeneticCode();
         String translatedSequence = code.getTranslationForString(dnaSeqToTranslateAndStore);
         String title = NbBundle.getMessage(MenuItemFactory.class, "MenuItem.StoreTranslatedFasta");
 

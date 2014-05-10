@@ -121,7 +121,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
             this.stats = new StatisticsOnMappingData(refViewer.getReference(), this.fraction, this.forwardCDSs,
                     this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
             AnalysesHandler handler = new AnalysesHandler(trackConnector, this, "Collecting coverage data of track number "
-                    + this.selectedTrack.getId(), new ParametersReadClasses(true, false, false, false)); // TODO: ParameterReadClasses noch in den Wizard einbauen und die parameter hier mit übergeben!
+                    + this.selectedTrack.getId(), new ParametersReadClasses(true, false, false, false, new Byte("0"))); // TODO: ParameterReadClasses noch in den Wizard einbauen und die parameter hier mit übergeben!
             handler.setMappingsNeeded(true);
             handler.setDesiredData(Properties.REDUCED_MAPPINGS);
             handler.registerObserver(this.stats);

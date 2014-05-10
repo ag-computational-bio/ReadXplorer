@@ -23,7 +23,7 @@ import org.openide.windows.WindowManager;
  */
 public class Installer extends ModuleInstall {
     
-    public static final String ReadXplorer_VERSION = "1.9.1";
+    public static final String ReadXplorer_VERSION = "1.9.2";
     private static final long serialVersionUID = 1L;
 //    private static final Logger logger = Logger.getLogger(Installer.class.getName(), Installer.class.getPackage().getName() + ".Log");
 

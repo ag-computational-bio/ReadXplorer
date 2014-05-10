@@ -1,15 +1,23 @@
 package de.cebitec.readXplorer.view.dataVisualisation.readPairViewer;
 
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReadPairGroup;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReadPair;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReadPairGroup;
 import de.cebitec.readXplorer.util.ReadPairType;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.*;
+import javax.swing.AbstractListModel;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
@@ -49,61 +57,66 @@ public class ReadPairPopup extends JPopupMenu {
         this.initDataAndComponents();
     }
     
+    @NbBundle.Messages({"ReadPairDetails=Read Pair Details",
+                        "ReadPair=Read Pair",
+                        "Type=Type:",
+                        "Replicates=Replicates:",
+                        "Distance=Distance:"})
     private void initDataAndComponents() {
-        PersistantReadPairGroup seqPairData = this.getSeqPairInfo(); //TODO: get infos from elswhere
+        PersistantReadPairGroup readPairData = this.getReadPairInfo(); //TODO: get infos from elswhere
         
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
-        TitledBorder title = BorderFactory.createTitledBorder(NbBundle.getMessage(ReadPairPopup.class, "SeqPairDetails"));
+        TitledBorder title = BorderFactory.createTitledBorder(Bundle.ReadPairDetails());
         title.setTitleJustification(TitledBorder.CENTER);
         contentPanel.setBorder(title);
         JScrollPane contentScrollpane = new JScrollPane(contentPanel);
         this.add(contentScrollpane);
 
-        //handle sequence pair data
-        List<PersistantReadPair> seqPairs = seqPairData.getReadPairs();
-        List<PersistantMapping> singleMappings = seqPairData.getSingleMappings();
-        PersistantReadPair seqPair;
+        //handle read pair data
+        List<PersistantReadPair> readPairs = readPairData.getReadPairs();
+        List<PersistantMapping> singleMappings = readPairData.getSingleMappings();
+        PersistantReadPair readPair;
         PersistantMapping mapping;
-        JPanel seqPairMappingInfoPanel = null;
+        JPanel readPairMappingInfoPanel = null;
 
-        for (int i = 0; i < seqPairs.size(); ++i) {
+        for (int i = 0; i < readPairs.size(); ++i) {
             JPanel seqPairInfoPanel = new JPanel();
-            seqPairMappingInfoPanel = new JPanel();
-            seqPairMappingInfoPanel.setLayout(new BoxLayout(seqPairMappingInfoPanel, BoxLayout.Y_AXIS));
-            seqPairMappingInfoPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
+            readPairMappingInfoPanel = new JPanel();
+            readPairMappingInfoPanel.setLayout(new BoxLayout(readPairMappingInfoPanel, BoxLayout.Y_AXIS));
+            readPairMappingInfoPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
             contentPanel.add(seqPairInfoPanel);
-            contentPanel.add(seqPairMappingInfoPanel);
+            contentPanel.add(readPairMappingInfoPanel);
             
-            seqPair = seqPairs.get(i);
-            ReadPairType type = seqPair.getReadPairType();
+            readPair = readPairs.get(i);
+            ReadPairType type = readPair.getReadPairType();
             String hex = Integer.toHexString(PersistantReadPair.determineReadPairColor(type).getRGB());
             hex = hex.substring(2, hex.length());
             
-            long distance = Math.abs(seqPair.getStop()-seqPair.getStart());
-            JLabel seqPairLabel = new JLabel("<html>".concat(NbBundle.getMessage(BlockComponentPair.class, "SeqPair")).
+            long distance = Math.abs(readPair.getStop() - readPair.getStart());
+            JLabel readPairLabel = new JLabel("<html>".concat(Bundle.ReadPair()).
                     concat(" ").concat(String.valueOf(i + 1)).concat("<br>").
-                    concat(NbBundle.getMessage(BlockComponentPair.class, "Type")).
+                    concat(Bundle.Type()).
                     concat("</b> <font bgcolor=").concat(hex).concat("> ").
                     concat(type.getTypeString()).concat("</font><br> ").
-                    concat(NbBundle.getMessage(BlockComponentPair.class, "Replicates")).
-                    concat(" ").concat(String.valueOf(seqPair.getSeqPairReplicates())).concat("<br> ").
-                    concat(NbBundle.getMessage(BlockComponentPair.class, "Distance")).
+                    concat(Bundle.Replicates()).
+                    concat(" ").concat(String.valueOf(readPair.getReadPairReplicates())).concat("<br> ").
+                    concat(Bundle.Distance()).
                     concat(" ").concat(String.valueOf(distance)).concat("</html>"));
-            seqPairInfoPanel.add(seqPairLabel);
+            seqPairInfoPanel.add(readPairLabel);
 
             //handle mappings of pair
-            mapping = seqPair.getVisibleMapping();
+            mapping = readPair.getVisibleMapping();
             String mapping1Description = this.getPairMappingString("Mapping1", mapping);
             String mapping2Description = null;
-            if (seqPair.hasVisibleMapping2()) {
-                mapping = seqPair.getVisibleMapping2();
+            if (readPair.hasVisibleMapping2()) {
+                mapping = readPair.getVisibleMapping2();
                 mapping2Description = this.getPairMappingString("Mapping2", mapping);
             }
 
             //create JList with content for all paired mappings of the pair
             final JList<Object> contentList = new javax.swing.JList<>();
-            seqPairMappingInfoPanel.add(contentList);
+            readPairMappingInfoPanel.add(contentList);
             contentList.setModel(new MappingListModel());
             contentList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
             
@@ -142,7 +155,7 @@ public class ReadPairPopup extends JPopupMenu {
         //create JList with content for all single mappings of the pair
         if (!singleMappingList.isEmpty()) {
             
-            if (seqPairMappingInfoPanel != null){
+            if (readPairMappingInfoPanel != null){
                 JPanel placeholder = new JPanel();
                 placeholder.setPreferredSize(new Dimension(6, 6));
                 contentPanel.add(placeholder);
@@ -174,9 +187,9 @@ public class ReadPairPopup extends JPopupMenu {
                 }
             });
             
-            if (seqPairMappingInfoPanel != null){
-                seqPairMappingInfoPanel.setPreferredSize(new Dimension(
-                        mappingInfoPanel.getPreferredSize().width, seqPairMappingInfoPanel.getPreferredSize().height));
+            if (readPairMappingInfoPanel != null){
+                readPairMappingInfoPanel.setPreferredSize(new Dimension(
+                        mappingInfoPanel.getPreferredSize().width, readPairMappingInfoPanel.getPreferredSize().height));
             }
         }
         
@@ -203,7 +216,7 @@ public class ReadPairPopup extends JPopupMenu {
      * to show in the popup. If the parent viewer ist not a ReadPairViewer
      * <code>null</code> is returned.
      */
-    private PersistantReadPairGroup getSeqPairInfo() {
+    private PersistantReadPairGroup getReadPairInfo() {
         PersistantReadPairGroup seqPairGroup = null;
         if (parentViewer instanceof ReadPairViewer){
             ReadPairViewer viewer = (ReadPairViewer) this.parentViewer;

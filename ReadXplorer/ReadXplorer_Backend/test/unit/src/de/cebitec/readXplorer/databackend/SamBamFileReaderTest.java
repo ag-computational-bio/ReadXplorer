@@ -42,15 +42,16 @@ public class SamBamFileReaderTest {
     @Test
     public void testGetMappingsFromBam() {
 //        System.out.println("getMappingsFromBam");
-//        PersistantReference refGenome = null;
-//        int from = 0;
-//        int to = 0;
-//        SamBamFileReader instance = null;
-//        Collection expResult = null;
-//        Collection result = instance.getMappingsFromBam(refGenome, from, to);
-//        assertEquals(expResult, result);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
+//        PersistantReference refGenome = new PersistantReference(1, "PAO1", "PAO1", null, new File(""));
+//        PersistantChromosome chrom = new PersistantChromosome(0, 1, 1, "gi|292657124|ref|NC_013968.1|", 7000000);
+//        int from = 2000;
+//        int to = 3000;
+//        boolean diffsAndGapsNeeded = true;
+//        byte trackNeeded = 0;
+//        ParametersReadClasses parametersReadClasses = new ParametersReadClasses(true, true, false, false, new Byte("30"));
+//        IntervalRequest request = new IntervalRequest(from, to, from, to, 1, null, diffsAndGapsNeeded, Properties.NORMAL, trackNeeded, parametersReadClasses);
+//        SamBamFileReader samBamFileReader = new SamBamFileReader(new File(), 1, refGenome);
+
     }
 
     /**

@@ -52,7 +52,7 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="filterProperties" alignment="0" min="0" pref="229" max="32767" attributes="1"/>
+              <Component id="filterProperties" alignment="0" min="0" pref="174" max="32767" attributes="1"/>
               <Component id="tableScrollPane" alignment="0" pref="0" max="32767" attributes="1"/>
               <Group type="102" attributes="0">
                   <Group type="103" groupAlignment="0" attributes="0">

@@ -5,7 +5,7 @@ import de.cebitec.readXplorer.util.ReadPairType;
 import java.awt.Color;
 
 /**
- * Creates a new persistant sequence pair. If both mappings of the pair are
+ * Creates a new persistant read pair. If both mappings of the pair are
  * visible the second mapping has to be added separately.
  * TODO: persistant objects vereinheitlichen, wo möglich
  * 
@@ -13,52 +13,52 @@ import java.awt.Color;
  */
 public class PersistantReadPair implements PersistantObject {
 
-    private long seqPairID;
+    private long readPairID;
     private long mapping2Id;
-    private ReadPairType seqPairType;
-    private int seqPairReplicates;
+    private ReadPairType readPairType;
+    private int readPairReplicates;
     private PersistantMapping visibleMapping;
     private PersistantMapping visiblemapping2;
     
     
     /**
-     * Creates a new persistant sequence pair. If both mappings of the pair are
+     * Creates a new persistant read pair. If both mappings of the pair are
      * visible the second mapping has to be added separately.
-     * @param seqPairID id of the pair, will identify all mappings belonging to this pair id
+     * @param readPairID id of the pair, will identify all mappings belonging to this pair id
      * @param mapping1ID id of mapping 1 of this pair
      * @param mapping2ID id of mapping 2 of this pair
-     * @param seqPairType type of the sequence pair (@see SeqPairClassifier constants with values: 0-6)
-     * @param seqPairReplicates number of replicates of this pair
+     * @param readPairType type of the read pair (@see ReadPairClassifier constants with values: 0-6)
+     * @param readPairReplicates number of replicates of this pair
      * @param visibleMapping currently visible mapping of the pair
      */
-    public PersistantReadPair(long seqPairID, long mapping1ID, long mapping2ID, ReadPairType seqPairType, 
-            int seqPairReplicates, PersistantMapping visibleMapping) {
-        this.seqPairID = seqPairID;
+    public PersistantReadPair(long readPairID, long mapping1ID, long mapping2ID, ReadPairType readPairType, 
+            int readPairReplicates, PersistantMapping visibleMapping) {
+        this.readPairID = readPairID;
         this.mapping2Id = mapping1ID == visibleMapping.getId() ? mapping2ID : mapping1ID;
-        this.seqPairType = seqPairType;
-        this.seqPairReplicates = seqPairReplicates == 0 ? 1 : seqPairReplicates;
+        this.readPairType = readPairType;
+        this.readPairReplicates = readPairReplicates == 0 ? 1 : readPairReplicates;
         this.visibleMapping = visibleMapping;
     }
     
     /**
-     * Creates a new persistant sequence pair. If both mappings of the pair are
+     * Creates a new persistant read pair. If both mappings of the pair are
      * visible the second mapping has to be added separately.
-     * @param seqPairID id of the pair, will identify all mappings belonging to
+     * @param readPairID id of the pair, will identify all mappings belonging to
      * this pair id
      * @param mapping1ID id of mapping 1 of this pair
      * @param mapping2ID id of mapping 2 of this pair
-     * @param seqPairType type of the sequence pair (
-     * @see SeqPairClassifier constants with values: 0-6)
-     * @param seqPairReplicates number of replicates of this pair
+     * @param readPairType type of the read pair (
+     * @see ReadPairClassifier constants with values: 0-6)
+     * @param readPairReplicates number of replicates of this pair
      * @param visibleMapping currently visible mapping of the pair
      * @param mate the mate of the visibleMapping = other read of the pair 
      */
-    public PersistantReadPair(long seqPairID, long mapping1ID, long mapping2ID, ReadPairType seqPairType,
-            int seqPairReplicates, PersistantMapping visibleMapping, PersistantMapping mate) {
-        this.seqPairID = seqPairID;
+    public PersistantReadPair(long readPairID, long mapping1ID, long mapping2ID, ReadPairType readPairType,
+            int readPairReplicates, PersistantMapping visibleMapping, PersistantMapping mate) {
+        this.readPairID = readPairID;
         this.mapping2Id = mapping1ID == visibleMapping.getId() ? mapping2ID : mapping1ID;
-        this.seqPairType = seqPairType;
-        this.seqPairReplicates = seqPairReplicates == 0 ? 1 : seqPairReplicates;
+        this.readPairType = readPairType;
+        this.readPairReplicates = readPairReplicates == 0 ? 1 : readPairReplicates;
         this.visibleMapping = visibleMapping;
         this.visiblemapping2 = mate;
     }
@@ -73,27 +73,27 @@ public class PersistantReadPair implements PersistantObject {
 
     @Override
     public long getId() {
-        return seqPairID;
+        return readPairID;
     }
 
-    public void setSeqPairID(long seqPairID) {
-        this.seqPairID = seqPairID;
+    public void setReadPairID(long readPairID) {
+        this.readPairID = readPairID;
     }
 
-    public int getSeqPairReplicates() {
-        return seqPairReplicates;
+    public int getReadPairReplicates() {
+        return readPairReplicates;
     }
 
-    public void setSeqPairReplicates(int seqPairReplicates) {
-        this.seqPairReplicates = seqPairReplicates;
+    public void setReadPairReplicates(int readPairReplicates) {
+        this.readPairReplicates = readPairReplicates;
     }
 
     public ReadPairType getReadPairType() {
-        return seqPairType;
+        return readPairType;
     }
 
-    public void setSeqPairType(ReadPairType seqPairType) {
-        this.seqPairType = seqPairType;
+    public void setReadPairType(ReadPairType readPairType) {
+        this.readPairType = readPairType;
     }
 
     public PersistantMapping getVisibleMapping() {
@@ -149,7 +149,7 @@ public class PersistantReadPair implements PersistantObject {
     }
 
     /**
-     * @return true, if this sequence pair already has a second visible mapping, false otherwise
+     * @return true, if this read pair already has a second visible mapping, false otherwise
      */
     public boolean hasVisibleMapping2() {
         return this.visiblemapping2 != null;

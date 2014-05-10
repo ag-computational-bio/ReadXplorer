@@ -123,28 +123,28 @@ public class SnpTranslatorTest {
         featuresFound.add(feat5);
         featuresFound.add(feat6);
         featuresFound.add(feat7);           //A, C, G, T, N, Gap, cov, freq
-        Snp snp1 = new Snp(1, 1, 1, 'A', 'T', 20, 0, 0, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp2 = new Snp(2, 1, 1, 'G', 'T', 0, 0, 30, 5, 0, 0, 35, 83, SequenceComparison.SUBSTITUTION);
-        Snp snp3 = new Snp(3, 1, 1, 'C', 'T', 0, 20, 0, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp4 = new Snp(10, 1, 1, 'T', 'A', 0, 0, 0, 25, 0, 0, 25, 100, SequenceComparison.SUBSTITUTION);
-        Snp snp5 = new Snp(11, 1, 1, 'A', 'C', 20, 5, 0, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp6 = new Snp(500, 1, 1, 'A', 'G', 20, 0, 0, 0, 0, 0, 20, 100, SequenceComparison.SUBSTITUTION); //right base of triplet, test for suspended snp
-        Snp snp7 = new Snp(501, 1, 1, 'A', 'C', 20, 5, 0, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp8 = new Snp(620, 1, 1, 'A', 'C', 20, 5, 0, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp8b = new Snp(630, 1, 1, 'C', 'T', 0, 20, 0, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp8c = new Snp(751, 1, 1, 'C', 'T', 0, 20, 0, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp9 = new Snp(1000, 1, 1, 'A', 'T', 20, 0, 5, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp10 = new Snp(1001, 1, 1, 'T', 'G', 0, 0, 5, 15, 0, 0, 20, 75, SequenceComparison.SUBSTITUTION);
-        Snp snp11 = new Snp(1002, 1, 1, 'T', 'A', 5, 0, 0, 15, 0, 0, 25, 75, SequenceComparison.SUBSTITUTION); //to high coverage
-        Snp snp12 = new Snp(1003, 1, 1, 'G', 'A', 5, 0, 20, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp13 = new Snp(1098, 1, 1, 'A', 'T', 20, 0, 0, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp14 = new Snp(1099, 1, 1, 'G', 'A', 5, 0, 20, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp15 = new Snp(1100, 1, 1, 'A', 'C', 20, 5, 0, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp16 = new Snp(1101, 1, 1, 'T', 'A', 0, 0, 0, 25, 0, 0, 25, 100, SequenceComparison.SUBSTITUTION);
-        Snp snp17 = new Snp(11127, 1, 1, 'T', 'A', 5, 0, 0, 20, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION);
-        Snp snp18 = new Snp(11128, 1, 1, 'N', 'T', 0, 0, 0, 5, 20, 0, 25, 80, SequenceComparison.SUBSTITUTION); //contains an N
-        Snp snp19 = new Snp(11129, 1, 1, 'G', 'C', 0, 0, 20, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION); 
-        Snp snp20 = new Snp(11130, 1, 1, '_', 'G', 20, 0, 5, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION); //contains a _
+        Snp snp1 = new Snp(1, 1, 1, 'A', 'T', 20, 0, 0, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION, 37, 37);
+        Snp snp2 = new Snp(2, 1, 1, 'G', 'T', 0, 0, 30, 5, 0, 0, 35, 83, SequenceComparison.SUBSTITUTION, 37, 37);
+        Snp snp3 = new Snp(3, 1, 1, 'C', 'T', 0, 20, 0, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION, 37, 37);
+        Snp snp4 = new Snp(10, 1, 1, 'T', 'A', 0, 0, 0, 25, 0, 0, 25, 100, SequenceComparison.SUBSTITUTION, 37, 37);
+        Snp snp5 = new Snp(11, 1, 1, 'A', 'C', 20, 5, 0, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION, 37, 37);
+        Snp snp6 = new Snp(500, 1, 1, 'A', 'G', 20, 0, 0, 0, 0, 0, 20, 100, SequenceComparison.SUBSTITUTION, 37, 37); //right base of triplet, test for suspended snp
+        Snp snp7 = new Snp(501, 1, 1, 'A', 'C', 20, 5, 0, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION, 37, 37);
+        Snp snp8 = new Snp(620, 1, 1, 'A', 'C', 20, 5, 0, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION, 37, 37);
+        Snp snp8b = new Snp(630, 1, 1, 'C', 'T', 0, 20, 0, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION, 37, 37);
+        Snp snp8c = new Snp(751, 1, 1, 'C', 'T', 0, 20, 0, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION, 37, 37);
+        Snp snp9 = new Snp(1000, 1, 1, 'A', 'T', 20, 0, 5, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION, 37, 37);
+        Snp snp10 = new Snp(1001, 1, 1, 'T', 'G', 0, 0, 5, 15, 0, 0, 20, 75, SequenceComparison.SUBSTITUTION, 37, 37);
+        Snp snp11 = new Snp(1002, 1, 1, 'T', 'A', 5, 0, 0, 15, 0, 0, 25, 75, SequenceComparison.SUBSTITUTION, 37, 37); //to high coverage
+        Snp snp12 = new Snp(1003, 1, 1, 'G', 'A', 5, 0, 20, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION, 37, 37);
+        Snp snp13 = new Snp(1098, 1, 1, 'A', 'T', 20, 0, 0, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION, 37, 37);
+        Snp snp14 = new Snp(1099, 1, 1, 'G', 'A', 5, 0, 20, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION, 37, 37);
+        Snp snp15 = new Snp(1100, 1, 1, 'A', 'C', 20, 5, 0, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION, 37, 37);
+        Snp snp16 = new Snp(1101, 1, 1, 'T', 'A', 0, 0, 0, 25, 0, 0, 25, 100, SequenceComparison.SUBSTITUTION, 37, 37);
+        Snp snp17 = new Snp(11127, 1, 1, 'T', 'A', 5, 0, 0, 20, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION, 37, 37);
+        Snp snp18 = new Snp(11128, 1, 1, 'N', 'T', 0, 0, 0, 5, 20, 0, 25, 80, SequenceComparison.SUBSTITUTION, 37, 37); //contains an N
+        Snp snp19 = new Snp(11129, 1, 1, 'G', 'C', 0, 0, 20, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION, 37, 37); 
+        Snp snp20 = new Snp(11130, 1, 1, '_', 'G', 20, 0, 5, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION, 37, 37); //contains a _
         
         List<Snp> snps = new ArrayList<>();
         snps.add(snp1);

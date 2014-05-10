@@ -118,7 +118,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
         if (logLeft != this.oldLogLeft || logRight != this.oldLogRight || this.isNewDataRequestNeeded()) {
             
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
-            this.trackConnector.addMappingRequest(new IntervalRequest(from, to, this.getReference().getActiveChromId(), this, true));
+            this.trackConnector.addMappingRequest(new IntervalRequest(from, to, this.getReference().getActiveChromId(), this, true, this.getReadClassParams()));
             this.oldLogLeft = logLeft;
             this.oldLogRight = logRight;
         } else { //needed when e.g. mapping classes are deselected

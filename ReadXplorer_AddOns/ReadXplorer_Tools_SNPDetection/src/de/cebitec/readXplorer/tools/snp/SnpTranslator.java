@@ -2,22 +2,19 @@ package de.cebitec.readXplorer.tools.snp;
 
 import de.cebitec.common.sequencetools.geneticcode.AminoAcidProperties;
 import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
-import de.cebitec.common.sequencetools.geneticcode.GeneticCodeFactory;
 import de.cebitec.readXplorer.databackend.dataObjects.CodonSnp;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.Snp;
+import de.cebitec.readXplorer.util.CodonUtilities;
 import de.cebitec.readXplorer.util.FeatureType;
-import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.SequenceComparison;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.util.polyTree.Node;
 import de.cebitec.readXplorer.util.polyTree.NodeVisitor;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.prefs.Preferences;
-import org.openide.util.NbPreferences;
 
 /**
  * Generates all translations possible for a given snp for the given genomic
@@ -33,13 +30,11 @@ import org.openide.util.NbPreferences;
  */
 public class SnpTranslator {
 
-    
-    private final Preferences pref;
     private final PersistantChromosome chromosome;
     private long refLength;
     private List<PersistantFeature> genomicFeatures;
     private GeneticCode code;
-    private int index;
+    private int featIdx;
     private int subPos; //summed up bases in subfeatures up to the snp position regarding the strand of the feature
     private boolean posDirectAtLeftChromBorder;
     private boolean posAtLeftChromBorder;
@@ -71,11 +66,8 @@ public class SnpTranslator {
         this.chromosome = chromosome;
         this.reference = reference;
         this.refLength = chromosome.getLength();
-        index = 0;
-        this.pref = NbPreferences.forModule(Object.class);
-        GeneticCodeFactory genCodeFactory = GeneticCodeFactory.getDefault();
-        code = genCodeFactory.getGeneticCodeById(Integer.valueOf(
-                pref.get(Properties.SEL_GENETIC_CODE, Properties.STANDARD_CODE_INDEX)));
+        featIdx = 0;
+        code = CodonUtilities.getGeneticCode();
     }
     
     /**
@@ -86,17 +78,17 @@ public class SnpTranslator {
 
         //find feature/s which cover current snp position
         List<PersistantFeature> featuresFound = new ArrayList<>();
-        int stopIndex = index;
+        int stopIndex = featIdx;
         boolean fstFoundFeat = true;
 
-        while (index < this.genomicFeatures.size()) {
+        while (featIdx < this.genomicFeatures.size()) {
             
-            PersistantFeature feature = this.genomicFeatures.get(index++);
+            PersistantFeature feature = this.genomicFeatures.get(featIdx++);
             if (feature.getStart() <= position && feature.getStop() >= position) {
                 //found hit, also try next index
                 featuresFound.add(feature);
                 if (fstFoundFeat) {
-                    stopIndex = index - 1;
+                    stopIndex = featIdx - 1;
                     fstFoundFeat = false;
                 }
             } else if (feature.getStop() < position) {
@@ -105,7 +97,7 @@ public class SnpTranslator {
                 break; //stop
             }
         }
-        index = stopIndex < 0 ? 0 : stopIndex; //to always ensure not to forget about the last visited features
+        featIdx = stopIndex < 0 ? 0 : stopIndex; //to always ensure not to forget about the last visited features
         
         return featuresFound;
 
@@ -284,7 +276,8 @@ public class SnpTranslator {
                 }
 
                 codonSnpList.add(new CodonSnp(tripletRef, tripletSnp, aminoRef, aminoSnp, type, feature));
-            } catch (NullPointerException e) {
+            } catch (NullPointerException | AssertionError e) {
+                codonSnpList.add(new CodonSnp(tripletRef, tripletSnp, '-', '-', SequenceComparison.UNKNOWN, feature));
                 //nothing to do, ignore translations with N's or gaps
             }
         }

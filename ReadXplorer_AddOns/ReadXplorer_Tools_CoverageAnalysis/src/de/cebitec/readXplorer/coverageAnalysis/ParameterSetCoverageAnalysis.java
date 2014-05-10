@@ -49,7 +49,7 @@ public class ParameterSetCoverageAnalysis implements ParameterSetI<ParameterSetC
      * @return the read classes, which shall be taken into account for this 
      * analysis
      */
-    public ParametersReadClasses getReadClassesParams() {
+    public ParametersReadClasses getReadClassParams() {
         return readClassesParams;
     }
 

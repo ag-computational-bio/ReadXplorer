@@ -119,7 +119,7 @@ public class ParameterSetCoveredFeatures extends ParametersFeatureTypes implemen
      * @return The parameter set for the used read classes for this analysis
      * instance.
      */
-    public ParametersReadClasses getReadClassesParams() {
+    public ParametersReadClasses getReadClassParams() {
         return readClassesParams;
     }
 }

@@ -120,20 +120,20 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetWholeTra
         ParameterSetWholeTranscriptAnalyses rpkmCalculationParameters = (ParameterSetWholeTranscriptAnalyses) this.getParameters();
         List<List<Object>> statisticsExportData = new ArrayList<>();
 
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("RPKM and raw read count calculation for tracks:",
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("RPKM and raw read count calculation for tracks:",
                 GeneralUtils.generateConcatenatedString(this.getTrackNameList(), 0)));
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between title and parameters
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between title and parameters
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("RPKM and read count calculation parameters:"));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("RPKM and read count calculation parameters:"));
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between parameters and statistics
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between parameters and statistics
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("RPKM and read count calculation statistics:"));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("RPKM and read count calculation statistics:"));
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow(""));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(""));
         
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Table Type", TABLE_TYPE.toString()));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Table Type", TABLE_TYPE.toString()));
         
         exportData.add(statisticsExportData);
 

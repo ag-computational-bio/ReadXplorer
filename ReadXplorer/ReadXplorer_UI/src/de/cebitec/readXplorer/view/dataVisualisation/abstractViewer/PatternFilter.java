@@ -73,8 +73,8 @@ public class PatternFilter implements RegionFilterI {
     }
 
     /**
-     * Identifies next (closest) occurrence from either forward or reverse strand of a pattern 
-     * in the current reference genome.
+     * Identifies next (closest) occurrence from either forward or reverse
+     * strand of a pattern in the current reference genome.
      * @return the position of the next occurrence of the pattern
      */
     public int findNextOccurrence() {
@@ -139,61 +139,96 @@ public class PatternFilter implements RegionFilterI {
     }
     
     /**
-     * Identifies next (closest) occurrence from either forward or reverse strand of a pattern 
-     * in the current reference genome.
-     * @param isFwdStrand true, if the next occurrence on the fwd strand is needed
-     * @return the position of the next occurrence of the pattern
+     * Identifies the end position of the next (closest) occurrence from either
+     * forward or reverse strand of a pattern in the current reference genome in
+     * the correct reading frame.
+     * @param isFwdStrand true, if the next occurrence on the fwd strand is 
+     * needed, false if the next occurrence on the rev strand is needed
+     * @return the end position of the next occurrence of the pattern
      */
     public int findNextOccurrenceOnStrand(boolean isFwdStrand) {
-
-        int refLength = this.refGen.getActiveChromosome().getLength();
-        int from = -1;
-        int start = this.absStart;
-        if (!(this.pattern == null) && !this.pattern.toString().isEmpty()) {
-            String seq;
-            
-            boolean isCorrectFrame = false;
-            //at first search from current position till end of sequence on selected strand
-            if (isFwdStrand) { //start with the stop pos of current codon
-                while (++start < refLength && !isCorrectFrame) { //++, because otherwise we start at last start pos
-                    for (int i = start; i <= refLength; i++) {
-                        if (i + INTERVAL_SIZE <= refLength) {
-                            seq = refGen.getActiveChromSequence(i, i + INTERVAL_SIZE);
-                        } else {
-                            seq = refGen.getActiveChromSequence(i, refLength);
-                        }
-                        i += INTERVAL_SIZE;
-                        from = this.matchNextOccurrence(seq, this.pattern); // because we don't want index, but pos in genome
-                        start += from;
-                        isCorrectFrame = ((start) % 3 == this.absStart % 3);
-                    }
-                }
-                ++start; //because we had fst pos of stop, then +2 and when exiting while loop -1. by +1 we move to last pos of stop
-            } else { //reverse complement dna and start with the stop pos of current codon
-                for (int i = 1; i <= absStart; i++) {
-                    if (i + INTERVAL_SIZE <= refLength) { //sequence we start with
-                        seq = refGen.getActiveChromSequence(i, i + INTERVAL_SIZE);
-                    } else {
-                        seq = refGen.getActiveChromSequence(i, absStart);
-                    }
-                    i += INTERVAL_SIZE;
-                    String seqRev = SequenceUtils.getReverseComplement(seq);
-                    int nextStart = 0;
-                    int fromRev = 0;
-                    while (nextStart < this.absStart && fromRev != -1 && !isCorrectFrame) {
-                        seqRev = seqRev.substring(nextStart, seqRev.length());
-                        fromRev = this.matchNextOccurrence(seqRev, this.pattern);
-                        //reverse the position again to determine the pos in the total genome seq
-                        from = seqRev.length() - fromRev;
-                        isCorrectFrame = (from - this.absStart) % 3 == 0;
-                        nextStart = fromRev + 1;
-                    }
-                    start = from - 2;
-                }
-            }
-            return start; 
+        int start = -1;
+        if (this.pattern != null && !this.pattern.toString().isEmpty()) {
+            if (isFwdStrand) { 
+                start = this.findNextOnFwdStrand();
+            } else { 
+                start = this.findNextOnRevStrand();
+            } 
         }
-        return from;
+        return start;
+    }
+    
+    /**
+     * @return Identifies the next occurrence of pattern "p" in the given
+     * "sequence" on the fwd strand starting in the desired reading frame and
+     * returns its end position.
+     */
+    private int findNextOnFwdStrand() {
+        boolean isCorrectFrame = false;
+        String seq;
+        int refLength = this.refGen.getActiveChromosome().getLength();
+        int patternLength = this.pattern.toString().length();
+        int start = this.absStart + patternLength; //start with the stop+1 pos of current codon
+        int from;
+        int end;
+        while (start < refLength && !isCorrectFrame) {
+            if (start + INTERVAL_SIZE <= refLength) {
+                end = start + INTERVAL_SIZE;
+            } else {
+                end = refLength;
+            }
+            seq = refGen.getActiveChromSequence(start, end); //TODO: first check whole seq object for fitting hits
+            from = this.matchNextOccurrence(seq, this.pattern);
+            if (from != -1) {
+                start += from;
+                isCorrectFrame = (start % 3 == this.absStart % 3);
+                if (isCorrectFrame) {
+                    break;
+                }
+            } else {
+                start += INTERVAL_SIZE - patternLength;
+            }
+            ++start; //we want to continue at the first possible hit position
+        }
+        start = start >= refLength && !isCorrectFrame ? -1 : start + patternLength - 1; //set to -1 if no hit in correct frame was found
+        return start;
+    }
+    
+    /**
+     * @return Identifies the next occurrence of pattern "p" in the given
+     * "sequence" on the rev strand starting in the desired reading frame and
+     * returns its end position.
+     */
+    private int findNextOnRevStrand() {
+        boolean isCorrectFrame = false;
+        String seq;
+        String seqRev;
+        int patternLength = this.pattern.toString().length();
+        int start = this.absStart - patternLength;
+        int from;
+        int end;
+        while (start > 0 && !isCorrectFrame) {
+            if (start - INTERVAL_SIZE > 0) { //sequence we start with
+                end = start - INTERVAL_SIZE;
+            } else {
+                end = 1;
+            } //reverse complement dna and start with the stop pos of current codon
+            seq = refGen.getActiveChromSequence(end, start);
+            seqRev = SequenceUtils.getReverseComplement(seq);
+            from = this.matchNextOccurrence(seqRev, this.pattern);
+            if (from != -1) {
+                start -= from;
+                isCorrectFrame = (start % 3 == this.absStart % 3);
+                if (isCorrectFrame) {
+                    break;
+                }
+            } else {
+                start -= INTERVAL_SIZE + patternLength;
+            }
+            --start;
+        }
+        start = start <= 0 && !isCorrectFrame ? -1 : start - patternLength + 1; //set to -1 if no hit in correct frame was found
+        return start;
     }
 
     /**
@@ -230,6 +265,8 @@ public class PatternFilter implements RegionFilterI {
      * returns its position.
      * @param sequence the sequence to analyse
      * @param p pattern to search for
+     * @return The position of the next occurrence of pattern "p" in the given 
+     * "sequence". -1 if the pattern cannot be found.
      */
     private int matchNextOccurrence(String sequence, Pattern p) {
 

@@ -8,13 +8,14 @@ import java.util.List;
 import java.util.prefs.Preferences;
 import javax.swing.AbstractListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.ToolTipManager;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.openide.util.NbPreferences;
 
 /**
- * Panel for choosing the genetic code to use. Meaning which start and stop codons
- * should be used.
+ * Panel for choosing the genetic code to use. Meaning which start and stop
+ * codons should be used.
  * 
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
@@ -27,7 +28,7 @@ final class GeneticCodePanel extends javax.swing.JPanel {
 
     GeneticCodePanel(GeneticCodeOptionsPanelController controller) {
         GeneticCodeFactory genCodeFactory = GeneticCodeFactory.getDefault();
-        genCodes = genCodeFactory.getGeneticCodes();
+        this.genCodes = genCodeFactory.getGeneticCodes();
         this.controller = controller;
         this.pref = NbPreferences.forModule(Object.class);
         this.initComponents();
@@ -58,6 +59,8 @@ final class GeneticCodePanel extends javax.swing.JPanel {
 
         customCodonField.setText(org.openide.util.NbBundle.getMessage(GeneticCodePanel.class, "GeneticCodePanel.customCodonField.text")); // NOI18N
         customCodonField.setToolTipText(org.openide.util.NbBundle.getMessage(GeneticCodePanel.class, "GeneticCodePanel.customCodonField.toolTipText")); // NOI18N
+        //ensure the tooltips are shown for 20 seconds to be able to read the data
+        ToolTipManager.sharedInstance().setDismissDelay(20000);
 
         org.openide.awt.Mnemonics.setLocalizedText(addButton, org.openide.util.NbBundle.getMessage(GeneticCodePanel.class, "GeneticCodePanel.addButton.text")); // NOI18N
         addButton.addActionListener(new java.awt.event.ActionListener() {
@@ -83,7 +86,7 @@ final class GeneticCodePanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(geneticCodeScrolPane, javax.swing.GroupLayout.DEFAULT_SIZE, 489, Short.MAX_VALUE)
+                    .addComponent(geneticCodeScrolPane)
                     .addComponent(chooseCodeLabel)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(customCodonLabel)
@@ -204,7 +207,6 @@ final class GeneticCodePanel extends javax.swing.JPanel {
         this.geneticCodeList.setModel(new GeneticCodeListModel(geneticCodesData));
         
         //get custom codes and add to table
-        //TODO: add stop codons, too
         String storedCustomCodes = this.pref.get(Properties.CUSTOM_GENETIC_CODES, "");
         while (storedCustomCodes.contains("\n")){
             this.addGeneticCodeToTable(storedCustomCodes.substring(0, storedCustomCodes.indexOf('\n')));
@@ -219,15 +221,17 @@ final class GeneticCodePanel extends javax.swing.JPanel {
     /**
      * Adds a custom genetic code taken from the customCodonField to both,
      * the gui list and the custom genetic codes storage.
-     * Input format: "(codon1, codon2, codon3, ...) - codeName" 
+     * <br>Input format: "(startcodon1, startcodon2, startcodon3, ...; stopcodon1, 
+     * stopcodon2, ...) - codeName" 
      */
     private void addCodonsToList() {
         String newGeneticCode = this.customCodonField.getText();
-        if (!(newGeneticCode = this.checkInput(newGeneticCode)).equals("false")){
+        newGeneticCode = this.checkInput(newGeneticCode);
+        if (!(newGeneticCode).equals("false")) {
             //store in custom genetic codes storage
             String storedCustomCodes = this.pref.get(Properties.CUSTOM_GENETIC_CODES, "");
-            if (storedCustomCodes.length() > 0){
-                this.pref.put(Properties.CUSTOM_GENETIC_CODES, storedCustomCodes+"\n"+newGeneticCode);
+            if (storedCustomCodes.length() > 0) {
+                this.pref.put(Properties.CUSTOM_GENETIC_CODES, storedCustomCodes + "\n" + newGeneticCode);
             } else {
                 this.pref.put(Properties.CUSTOM_GENETIC_CODES, newGeneticCode);
             }
@@ -248,30 +252,35 @@ final class GeneticCodePanel extends javax.swing.JPanel {
      */
     private String checkInput(String codonString) {
         String uppercaseCodons = "(";
-        if (codonString.startsWith("(") && codonString.indexOf(')') > -1){
+        if (codonString.startsWith("(") && codonString.indexOf(')') > -1) {
             String codonPart = codonString.substring(1, codonString.indexOf(')'));
-            if (codonPart.length() == 0){
+            if (codonPart.length() == 0) {
                 return "false";
             }
-            String[] splitted = codonPart.split(",");
-            String codon;
-            for (int i = 0; i < splitted.length; ++i) {
-                codon = splitted[i].toUpperCase().trim();
-                uppercaseCodons = uppercaseCodons.concat(codon).concat(", ");
-                while (codon.length() > 0) {
-                    if (codon.startsWith("A") || codon.startsWith("G") || codon.startsWith("C")
-                            || codon.startsWith("T")) {
-                        codon = codon.substring(1);
-                    } else {
-                        return "false";
+            String[] startAndStops = codonPart.split(";");
+            if (startAndStops.length <= 2) {
+                for (String codons : startAndStops) {
+                    String[] splitted = codons.split(",");
+                    String codon;
+                    for (int i = 0; i < splitted.length; ++i) {
+                        codon = splitted[i].toUpperCase().trim();
+                        uppercaseCodons = uppercaseCodons.concat(codon).concat(", ");
+                        while (codon.length() > 0) {
+                            if (codon.startsWith("A") || codon.startsWith("G") || codon.startsWith("C")
+                                    || codon.startsWith("T")) {
+                                codon = codon.substring(1);
+                            } else {
+                                return "false";
+                            }
+                        }
                     }
+                    uppercaseCodons = uppercaseCodons.substring(0, uppercaseCodons.length() - 2).concat("; ");
                 }
+                return uppercaseCodons.substring(0, uppercaseCodons.length() - 2).
+                        concat(codonString.substring(codonString.indexOf(')'), codonString.length()));
             }
-            return uppercaseCodons.substring(0, uppercaseCodons.length()-2).
-                    concat(codonString.substring(codonString.indexOf(')'), codonString.length()));
-        } else {
-            return "false";
         }
+        return "false";
     }
 
     /**
@@ -299,33 +308,33 @@ final class GeneticCodePanel extends javax.swing.JPanel {
         int lineBreakIndex;
         
         //remove from storage
-        if ( (codeIndex = this.geneticCodeList.getSelectedIndex()) >= (index = genCodes.size()) ){
-            
-            if (codeIndex == Integer.valueOf(this.pref.get(Properties.GENETIC_CODE_INDEX, "0"))){ 
+        if ( (codeIndex = this.geneticCodeList.getSelectedIndex()) >= (index = genCodes.size())) {
+
+            if (codeIndex == Integer.valueOf(this.pref.get(Properties.GENETIC_CODE_INDEX, "0"))) {
                 //reset genetic code to standard
                 this.pref.put(Properties.SEL_GENETIC_CODE, String.valueOf(genCodes.get(0).getId()));
                 this.pref.put(Properties.GENETIC_CODE_INDEX, "0");
             }
-            
+
             while (index++ < codeIndex) {
                 lineBreakIndex = customCodes.indexOf('\n');
-                endIndex += lineBreakIndex+1;
+                endIndex += lineBreakIndex + 1;
                 customCodes = customCodes.substring(lineBreakIndex + 1, customCodes.length());
             }
-            if (customCodes.indexOf('\n') > -1){
+            if (customCodes.indexOf('\n') > -1) {
                 customCodes = customCodes.substring(customCodes.indexOf('\n'));
             } else {
                 customCodes = "";
             }
-            if (endIndex == 0){
+            if (endIndex == 0) {
                 ++endIndex;
             }
-            this.pref.put(Properties.CUSTOM_GENETIC_CODES, origCustomCodes.substring(0, endIndex-1) + customCodes);
+            this.pref.put(Properties.CUSTOM_GENETIC_CODES, origCustomCodes.substring(0, endIndex - 1) + customCodes);
 
             //remove from table model
             ((GeneticCodeListModel) this.geneticCodeList.getModel()).removeElement(codeIndex);
             this.geneticCodeList.setSelectedIndex(0);
-        }        
+        }  
     }
     
     /**

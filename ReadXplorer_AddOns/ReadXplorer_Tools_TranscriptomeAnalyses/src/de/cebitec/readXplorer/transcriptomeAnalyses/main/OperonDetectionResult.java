@@ -140,36 +140,36 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetWhole
         ParameterSetWholeTranscriptAnalyses operonDetectionParameters = (ParameterSetWholeTranscriptAnalyses) this.getParameters();
         List<List<Object>> statisticsExportData = new ArrayList<>();
 
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Operon detection statistics for tracks:",
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Operon detection statistics for tracks:",
                 GeneralUtils.generateConcatenatedString(this.getTrackNameList(), 0)));
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between title and parameters
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between title and parameters
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("Operon detection parameters:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelOperonDetection.OPERONS_BACKGROUND_THRESHOLD,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Operon detection parameters:"));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelOperonDetection.OPERONS_BACKGROUND_THRESHOLD,
                 this.getOperonStatsMap().get(ResultPanelOperonDetection.OPERONS_BACKGROUND_THRESHOLD)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Fraction for Background threshold calculation:",
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Fraction for Background threshold calculation:",
                 operonDetectionParameters.getFraction()));
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between parameters and statistics
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between parameters and statistics
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("Operon detection statistics:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelOperonDetection.OPERONS_TOTAL,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Operon detection statistics:"));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelOperonDetection.OPERONS_TOTAL,
                 this.getOperonStatsMap().get(ResultPanelOperonDetection.OPERONS_TOTAL)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelOperonDetection.OPERONS_WITH_OVERLAPPING_READS,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelOperonDetection.OPERONS_WITH_OVERLAPPING_READS,
                 this.getOperonStatsMap().get(ResultPanelOperonDetection.OPERONS_WITH_OVERLAPPING_READS)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.MAPPINGS_COUNT,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.MAPPINGS_COUNT,
                 this.getOperonStatsMap().get(ResultPanelTranscriptionStart.MAPPINGS_COUNT)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH,
                 this.getOperonStatsMap().get(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.MAPPINGS_MILLION,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.MAPPINGS_MILLION,
                 this.getOperonStatsMap().get(ResultPanelTranscriptionStart.MAPPINGS_MILLION)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD,
                 this.getOperonStatsMap().get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD)));
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow(""));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(""));
 
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Table Type", TABLE_TYPE.toString()));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Table Type", TABLE_TYPE.toString()));
 
         exportData.add(statisticsExportData);
 

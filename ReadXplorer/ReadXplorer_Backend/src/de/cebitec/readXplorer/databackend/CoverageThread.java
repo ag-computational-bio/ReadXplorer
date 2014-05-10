@@ -563,6 +563,7 @@ public class CoverageThread extends RequestThread {
                 fetch.setInt(2, to);
                 fetch.setLong(3, trackID);
 
+                final Byte mappingQuality = -1; //we only want one shared object
                 ResultSet rs = fetch.executeQuery();
                 while (rs.next()) {
                     int position = rs.getInt(FieldNames.DIFF_POSITION);
@@ -573,10 +574,10 @@ public class CoverageThread extends RequestThread {
                     int count = rs.getInt(FieldNames.MAPPING_NUM_OF_REPLICATES);
 
                     if (type == 1) { //1 = diffs
-                        diffs.add(new PersistantDiff(position, base, isForwardStrand, count));
+                        diffs.add(new PersistantDiff(position, base, isForwardStrand, count, Byte.valueOf("-1"), mappingQuality));
                     } else { //0 = gaps
                         int order = rs.getInt(FieldNames.DIFF_GAP_ORDER);
-                        gaps.add(new PersistantReferenceGap(position, base, order, isForwardStrand, count));
+                        gaps.add(new PersistantReferenceGap(position, base, order, isForwardStrand, count, Byte.valueOf("-1"), mappingQuality));
                     }
                 }
 

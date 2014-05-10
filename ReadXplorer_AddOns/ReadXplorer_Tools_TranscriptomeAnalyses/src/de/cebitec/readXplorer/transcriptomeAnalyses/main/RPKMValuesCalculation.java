@@ -65,12 +65,12 @@ public class RPKMValuesCalculation {
             int chromNo = chromosomes.get(chromId).getChromNumber();
             RPKMvalue rpkm = null;
             if (isFwd) {
-                System.out.println("Feature fwd: " + feature.getFeatureName());
+                System.out.println("Feature fwd: " + feature.getName());
                 rpkm = this.calculateStatistics(chromNo, chromId, start, stop, forwardStarts, forwardCoverage, this.mm, this.mc);
                 rpkm.setFeature(feature);
                 rpkmValues.add(rpkm);
             } else {
-                System.out.println("Feature rev: " + feature.getFeatureName());
+                System.out.println("Feature rev: " + feature.getName());
                 rpkm = this.calculateStatistics(chromNo, chromId, start, stop, reverseStarts, reverseCoverage, this.mm, this.mc);
                 rpkm.setFeature(feature);
                 rpkmValues.add(rpkm);

@@ -16,6 +16,9 @@ class ParameterSetSNPs extends ParametersFeatureTypes implements ParameterSetI<P
     private int minPercentage;
     private final boolean useMainBase;
     private ParametersReadClasses readClassParams;
+    private final byte minBaseQuality;
+    private final byte minAverageBaseQual;
+    private final int minAverageMappingQual;
 
     /**
      * Data storage for all parameters associated with a SNP and DIP detection.
@@ -29,13 +32,20 @@ class ParameterSetSNPs extends ParametersFeatureTypes implements ParameterSetI<P
      * snp translation.
      * @param readClassParams only include mappings in the analysis, which 
      * belong to the selected mapping classes.
+     * @param minBaseQuality Minimum phred scaled base quality or -1 if unknown.
+     * @param minAverageBaseQual Minimum average phred scaled base quality or -1 if unknown.
+     * @param minAverageMappingQual Minimum average phred scaled mapping quality or -1 if unknown.
      */
-    public ParameterSetSNPs(int minMismatchBases, int minPercentage, boolean useMainBase, Set<FeatureType> selFeatureTypes, ParametersReadClasses readClassParams) {
+    public ParameterSetSNPs(int minMismatchBases, int minPercentage, boolean useMainBase, Set<FeatureType> selFeatureTypes, ParametersReadClasses readClassParams,
+            byte minBaseQuality, byte minAverageBaseQual, int minAverageMappingQual) {
         super(selFeatureTypes);
         this.minMismatchBases = minMismatchBases;
         this.minPercentage = minPercentage;
         this.useMainBase = useMainBase;
         this.readClassParams = readClassParams;
+        this.minBaseQuality = minBaseQuality;
+        this.minAverageBaseQual = minAverageBaseQual;
+        this.minAverageMappingQual = minAverageMappingQual;
     }
 
     /**
@@ -78,8 +88,29 @@ class ParameterSetSNPs extends ParametersFeatureTypes implements ParameterSetI<P
      * minVaryingBases count corresponds to the overall mismatch count at the
      * current position.
      */
-    boolean isUseMainBase() {
+    public boolean isUseMainBase() {
         return this.useMainBase;
+    }
+
+    /**
+     * @return Minimum phred scaled base quality or -1 if unknown.
+     */
+    public byte getMinBaseQuality() {
+       return this.minBaseQuality; 
+    }
+
+    /**
+     * @return Minimum average phred scaled base quality or -1 if unknown.
+     */
+    public int getMinAverageBaseQual() {
+        return this.minAverageBaseQual;
+    }
+
+    /**
+     * @return Minimum average phred scaled mapping quality or 255 if unknown.
+     */
+    public int getMinAverageMappingQual() {
+        return this.minAverageMappingQual;
     }
     
 }

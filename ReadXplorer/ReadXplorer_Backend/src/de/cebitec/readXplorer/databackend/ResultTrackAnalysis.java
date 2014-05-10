@@ -5,6 +5,7 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.exporter.tables.ExportDataI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -225,25 +226,12 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
     
     /**
      * Creates a table row (= object list) with two elemets.
-     * @param fstEntry first entry of the table row
-     * @param scndEntry second entry of the table row
+     * @param content  entries to add to the table row
      * @return the new table row (= object list)
      */
-    public static List<Object> createTwoElementTableRow(Object fstEntry, Object scndEntry) {
+    public static List<Object> createTableRow(Object... content) {
         List<Object> row = new ArrayList<>();
-        row.add(fstEntry);
-        row.add(scndEntry);
-        return row;
-    }
-    
-    /**
-     * Creates a table row (= object list) with only one element.
-     * @param entry the entry of the table row
-     * @return the new table row (= object list)
-     */
-    public static List<Object> createSingleElementTableRow(Object entry) {
-        List<Object> row = new ArrayList<>();
-        row.add(entry);
+        row.addAll(Arrays.asList(content));
         return row;
     }
     

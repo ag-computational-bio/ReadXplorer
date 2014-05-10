@@ -41,9 +41,9 @@ public class AnalysisCoverageTest {
     @Test
     public void testUpdate() {
         
-        ParametersReadClasses readClassParamsCommon = new ParametersReadClasses(true, true, true, false);
-        ParametersReadClasses readClassParamsBM = new ParametersReadClasses(true, true, false, false);
-        ParametersReadClasses readClassParamsPerfect = new ParametersReadClasses(true, false, false, false);
+        ParametersReadClasses readClassParamsCommon = new ParametersReadClasses(true, true, true, false, new Byte("0"));
+        ParametersReadClasses readClassParamsBM = new ParametersReadClasses(true, true, false, false, new Byte("0"));
+        ParametersReadClasses readClassParamsPerfect = new ParametersReadClasses(true, false, false, false, new Byte("0"));
         
         ParameterSetCoverageAnalysis sumCoverageParamsCommon = new ParameterSetCoverageAnalysis(5, true, true, readClassParamsCommon);
         ParameterSetCoverageAnalysis sumCoverageParamsBM = new ParameterSetCoverageAnalysis(5, true, false, readClassParamsBM);

@@ -6,6 +6,7 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
@@ -353,7 +354,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
 }//GEN-LAST:event_jumpTextfieldKeyTyped
 
     private void jumpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jumpButtonActionPerformed
-        if (isValidNumberInput(this.jumpTextfield.getText())) {
+        if (GeneralUtils.isValidPositionInput(this.jumpTextfield.getText(), refGenome.getActiveChromLength())) {
             this.jumpPosition = Integer.parseInt(this.jumpTextfield.getText().trim());
             this.boundsManager.navigatorBarUpdated(this.jumpPosition);
         } else {
@@ -416,24 +417,6 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     private void chromCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chromCheckBoxActionPerformed
         this.fillFeatureList();
     }//GEN-LAST:event_chromCheckBoxActionPerformed
-
-    /**
-     * Cecks if the input string is a valid number in the range of the reference genome.
-     * @param s input string to check
-     * @return <code>true</code> if it is a valid input string, <code>false</code> otherwise
-     */
-    private boolean isValidNumberInput(String s) {
-        try {
-            int tmp = Integer.parseInt(s);
-            if (tmp >= 1 && tmp <= refGenome.getActiveChromLength()) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
-            return false;
-        }
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;

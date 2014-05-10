@@ -68,11 +68,10 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
         this.snpTable.getTableHeader().addMouseListener(tableFilter);
         
         //ensures number of lines will adapt to number of translations (features) for each snp
-        LineWrapCellRenderer cellRenderer = new LineWrapCellRenderer();
-        this.snpTable.getColumnModel().getColumn(14).setCellRenderer(cellRenderer);
-        this.snpTable.getColumnModel().getColumn(15).setCellRenderer(cellRenderer);
-        this.snpTable.getColumnModel().getColumn(16).setCellRenderer(cellRenderer);
-        this.snpTable.getColumnModel().getColumn(17).setCellRenderer(cellRenderer);
+        LineWrapCellRenderer lineWrapRenderer = new LineWrapCellRenderer();
+        for (int i = 15; i <= 20; i++) { //these columns might contain multiple entries
+            this.snpTable.getColumnModel().getColumn(i).setCellRenderer(lineWrapRenderer);
+        }
         
         DefaultListSelectionModel model = (DefaultListSelectionModel) snpTable.getSelectionModel();
         model.addListSelectionListener(new ListSelectionListener() {
@@ -109,14 +108,14 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
 
             },
             new String [] {
-                "Pos", "Gap", "Track", "Chromosome", "Base", "Ref", "A", "C", "G", "T", "N", "_", "Ref Cov", "Freq", "Type", "AA Ref", "AA SNP", "Codon Ref", "Codon SNP", "Effect on AA", "Feature"
+                "Pos", "Gap", "Track", "Chromosome", "Base", "Ref", "A", "C", "G", "T", "N", "_", "Ref Cov", "Freq", "Type", "AA Ref", "AA SNP", "Codon Ref", "Codon SNP", "Effect on AA", "Feature", "Av Base Qual", "Av Mapping Qual"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.Integer.class, java.lang.Integer.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -152,6 +151,8 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
             snpTable.getColumnModel().getColumn(18).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title18_1")); // NOI18N
             snpTable.getColumnModel().getColumn(19).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title15_1")); // NOI18N
             snpTable.getColumnModel().getColumn(20).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title16_1")); // NOI18N
+            snpTable.getColumnModel().getColumn(21).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title21")); // NOI18N
+            snpTable.getColumnModel().getColumn(22).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title22")); // NOI18N
         }
 
         exportButton.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.exportButton.text")); // NOI18N
@@ -198,8 +199,7 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(alignmentButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(exportButton)
-                .addContainerGap())
+                .addComponent(exportButton))
             .addComponent(jScrollPane1)
         );
         layout.setVerticalGroup(
@@ -288,7 +288,8 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
             int noInsertions = snpStatsMap.get(SNPS_INSERTIONS);
             int noDeletions = snpStatsMap.get(SNPS_DELETIONS);
 
-            final int snpDataSize = 21;
+            final String intergenic = "Intergenic";
+            final int snpDataSize = 23;
             List<SnpI> snps = snpData.getSnpList();
             Collections.sort(snps);
             DefaultTableModel model = (DefaultTableModel) snpTable.getModel();
@@ -356,9 +357,17 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
                             for (CodonSnp codon : codons) {
 
                                 aminoAcid = codon.getAminoRef();
-                                aminosRef += aminoAcid + " (" + AminoAcidProperties.getPropertyForAA(aminoAcid) + ")\n";
+                                if (aminoAcid != '-') {
+                                    aminosRef += aminoAcid + " (" + AminoAcidProperties.getPropertyForAA(aminoAcid) + ")\n";
+                                } else {
+                                    aminosRef += aminoAcid + "\n";
+                                }
                                 aminoAcid = codon.getAminoSnp();
-                                aminosSnp += aminoAcid + " (" + AminoAcidProperties.getPropertyForAA(aminoAcid) + ")\n";
+                                if (aminoAcid != '-') {
+                                    aminosSnp += aminoAcid + " (" + AminoAcidProperties.getPropertyForAA(aminoAcid) + ")\n";
+                                } else {
+                                    aminosSnp += aminoAcid + "\n";
+                                }
                                 codonsRef += codon.getTripletRef() + "\n";
                                 codonsSnp += codon.getTripletSnp() + "\n";
                                 effect += codon.getEffect().getType() + "\n";
@@ -366,8 +375,8 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
                             }
 
                             if (codons.isEmpty()) {
-                                aminosRef = "No gene";
-                                aminosSnp = "No gene";
+                                aminosRef = intergenic;
+                                aminosSnp = intergenic;
                                 codonsRef = "-";
                                 codonsSnp = "-";
                                 effect = "-";
@@ -421,8 +430,8 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
                                 rowData[i++] = ids;
 
                             } else { //intergenic
-                                rowData[i++] = "No gene";
-                                rowData[i++] = "No gene";
+                                rowData[i++] = intergenic;
+                                rowData[i++] = intergenic;
                                 rowData[i++] = "-";
                                 rowData[i++] = "-";
                                 rowData[i++] = "-";
@@ -435,6 +444,8 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
                                 }
                             }
                         }
+                        rowData[i++] = snp.getAverageBaseQual();
+                        rowData[i++] = snp.getAverageMappingQual();
 
                         model.addRow(rowData);
                     }

@@ -182,7 +182,7 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
     /**
      * @return the gene name. Caution: may be null!
      */
-    public String getFeatureName() {
+    public String getName() {
         return this.featureName;
     }
     

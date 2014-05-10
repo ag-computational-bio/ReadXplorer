@@ -1,8 +1,7 @@
 package de.cebitec.readXplorer.ui.visualisation.reference;
 
-import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
-import de.cebitec.common.sequencetools.geneticcode.GeneticCodeFactory;
 import de.cebitec.readXplorer.util.CodonUtilities;
+import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.awt.BorderLayout;
@@ -26,16 +25,9 @@ public class CodonSelector extends javax.swing.JPanel {
 
     private ReferenceViewer viewer;
     private Preferences pref;
-    
-    private int nbGeneticCodes;
-    private final GeneticCodeFactory genCodeFactory;
-    
-
+      
     /** Creates new form CodonSelector */
-    public CodonSelector() {
-        this.genCodeFactory = GeneticCodeFactory.getDefault();
-        this.nbGeneticCodes = genCodeFactory.getGeneticCodes().size();
-        
+    public CodonSelector() {        
         this.initComponents();
         this.initListener();
         this.createPanels();
@@ -119,17 +111,10 @@ public class CodonSelector extends javax.swing.JPanel {
         this.removeAll();
         this.setLayout(new BorderLayout());
         
-        String[] startCodons = new String[0];
-        String[] stopCodons = new String[0];
-        int codeIndex = Integer.valueOf(pref.get(Properties.GENETIC_CODE_INDEX, "0"));
-        if (codeIndex < nbGeneticCodes) {
-            GeneticCode code = genCodeFactory.getGeneticCodeById(Integer.valueOf(pref.get(Properties.SEL_GENETIC_CODE, "1")));
-            startCodons = code.getStartCodons().toArray(startCodons);
-            stopCodons = code.getStopCodons().toArray(stopCodons);
-        } else {
-            startCodons = CodonUtilities.parseCustomCodons(codeIndex, pref.get(Properties.CUSTOM_GENETIC_CODES, "1"));
-        }
-        
+        Pair<String[], String[]> geneticCode = CodonUtilities.getGeneticCodeArrays();
+        String[] startCodons = geneticCode.getFirst();
+        String[] stopCodons = geneticCode.getSecond();
+                
         CodonFamilyPanel startPanel = new CodonFamilyPanel("Starts:", startCodons);
         CodonFamilyPanel stopPanel = new CodonFamilyPanel("Stops:", stopCodons);
         this.add(startPanel, BorderLayout.NORTH);

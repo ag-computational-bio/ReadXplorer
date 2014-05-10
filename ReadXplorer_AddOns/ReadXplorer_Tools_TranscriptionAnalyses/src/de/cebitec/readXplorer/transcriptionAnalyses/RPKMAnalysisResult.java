@@ -66,6 +66,9 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
         List<String> dataColumnDescriptions = new ArrayList<>();
 
         dataColumnDescriptions.add("Feature");
+        dataColumnDescriptions.add("Locus");
+        dataColumnDescriptions.add("EC-Number");
+        dataColumnDescriptions.add("Product");
         dataColumnDescriptions.add("Feature Type");
         dataColumnDescriptions.add("Track");
         dataColumnDescriptions.add("Chromosome");
@@ -98,6 +101,9 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
 
             feat = rpkmValue.getFeature();
             rpkmRow.add(feat);
+            rpkmRow.add(feat.getLocus());
+            rpkmRow.add(feat.getEcNumber());
+            rpkmRow.add(feat.getProduct());
             rpkmRow.add(feat.getType());
             rpkmRow.add(this.getTrackEntry(rpkmValue.getTrackId(), true));
             rpkmRow.add(this.getChromosomeMap().get(feat.getChromId()));
@@ -117,23 +123,24 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
         ParameterSetRPKM rpkmCalculationParameters = (ParameterSetRPKM) this.getParameters();
         List<List<Object>> statisticsExportData = new ArrayList<>();
 
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("RPKM and raw read count calculation for tracks:", 
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("RPKM and raw read count calculation for tracks:", 
                 GeneralUtils.generateConcatenatedString(this.getTrackNameList(), 0)));
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between title and parameters
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between title and parameters
         
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("RPKM and read count calculation parameters:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Min read count value of a feature to be shown in the results:", 
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("RPKM and read count calculation parameters:"));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Min read count value of a feature to be shown in the results:", 
                 rpkmCalculationParameters.getMinReadCount()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Max read count value of a feature to be shown in the results:", 
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Max read count value of a feature to be shown in the results:", 
                 rpkmCalculationParameters.getMaxReadCount()));
+        rpkmCalculationParameters.getReadClassParams().addReadClassParamsToStats(statisticsExportData);
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between parameters and statistics
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between parameters and statistics
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("RPKM and read count calculation statistics:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelRPKM.RETURNED_FEATURES,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("RPKM and read count calculation statistics:"));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelRPKM.RETURNED_FEATURES,
                 this.getStatsMap().get(ResultPanelRPKM.RETURNED_FEATURES)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelRPKM.FEATURES_TOTAL, 
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelRPKM.FEATURES_TOTAL, 
                 this.getStatsMap().get(ResultPanelRPKM.FEATURES_TOTAL)));
 
         exportData.add(statisticsExportData);

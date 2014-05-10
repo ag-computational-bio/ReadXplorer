@@ -71,14 +71,14 @@ public class CorrelationResult extends ResultTrackAnalysis<CorrelationResult> {
         //create statistics sheet
         List<List<Object>> statisticsExportData = new ArrayList<>();
         
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Correlation analysis for tracks:", 
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Correlation analysis for tracks:", 
                 GeneralUtils.generateConcatenatedString(this.getTrackNameList(), 0)));
         
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between title and parameters
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between title and parameters
         
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("Analysis parameters:"));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Analysis parameters:"));
         for(Entry<String, Object> entry : this.params.entrySet()) {
-            statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(entry.getKey()+":", entry.getValue()));
+            statisticsExportData.add(ResultTrackAnalysis.createTableRow(entry.getKey()+":", entry.getValue()));
         }
         allData.add(statisticsExportData);
         

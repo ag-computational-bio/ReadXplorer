@@ -2,7 +2,6 @@ package de.cebitec.readXplorer.view.dataVisualisation.trackViewer;
 
 import de.cebitec.readXplorer.controller.TrackCacher;
 import de.cebitec.readXplorer.databackend.IntervalRequest;
-import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.databackend.ThreadListener;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
@@ -10,7 +9,6 @@ import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersi
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.util.ColorProperties;
-import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
@@ -423,21 +421,16 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             totalFrom -= MININTERVALLENGTH;
             totalTo += MININTERVALLENGTH;
         }
-        boolean perfectCovWanted = !this.getExcludedFeatureTypes().contains(FeatureType.PERFECT_COVERAGE);
-        boolean bestMatchCovWanted = !this.getExcludedFeatureTypes().contains(FeatureType.BEST_MATCH_COVERAGE);
-        boolean commonCovWanted = !this.getExcludedFeatureTypes().contains(FeatureType.COMMON_COVERAGE);
-        boolean onlyUniqueReadsWanted = this.getExcludedFeatureTypes().contains(FeatureType.MULTIPLE_MAPPED_READ);
         trackCon.addCoverageRequest(new IntervalRequest(
                 getBoundsInfo().getLogLeft(), 
                 getBoundsInfo().getLogRight(), 
                 totalFrom ,
                 totalTo , 
-                this.getReference().getActiveChromId(),
-                this, false, new ParametersReadClasses(perfectCovWanted, bestMatchCovWanted, commonCovWanted, onlyUniqueReadsWanted)));
+                this.getReference().getActiveChromId(), this, false, this.getReadClassParams()));
     }
 
     @Override
-    public synchronized void receiveData(Object coverageData){
+    public synchronized void receiveData(Object coverageData) {
         if (coverageData instanceof CoverageAndDiffResultPersistant) {
             CoverageAndDiffResultPersistant covResult = (CoverageAndDiffResultPersistant) coverageData;
             this.cov = covResult.getCoverage();
@@ -456,7 +449,6 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             this.repaint();
             this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         }
-        
     }
 
     @Override

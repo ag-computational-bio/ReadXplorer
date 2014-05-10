@@ -377,7 +377,7 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended implemen
             this.productText.setText(feat.getProduct());
             this.productText.setToolTipText(feat.getProduct());
             this.locusField.setText(feat.getLocus());
-            this.geneField.setText(feat.getFeatureName());
+            this.geneField.setText(feat.getName());
             this.typeText.setText(feat.getType().getTypeString());
             this.parentList.setListData(parentVect);
             this.subfeatureList.setListData(childrenVect);
