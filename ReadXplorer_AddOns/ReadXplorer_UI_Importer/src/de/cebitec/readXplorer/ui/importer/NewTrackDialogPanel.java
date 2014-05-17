@@ -1,7 +1,18 @@
-/*
- * NewTrackDialogPanel.java
+/* 
+ * Copyright (C) 2014 Rolf Hilker
  *
- * Created on 13.01.2011, 15:18:28
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cebitec.readXplorer.ui.importer;
 
@@ -10,7 +21,7 @@ import de.cebitec.readXplorer.parser.ReferenceJob;
 import de.cebitec.readXplorer.parser.common.ParserI;
 import de.cebitec.readXplorer.parser.mappings.JokToBamDirectParser;
 import de.cebitec.readXplorer.parser.mappings.MappingParserI;
-import de.cebitec.readXplorer.parser.mappings.SamBamDirectParser;
+import de.cebitec.readXplorer.parser.mappings.SamBamParser;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readXplorer.view.dialogMenus.ImportTrackBasePanel;
 import java.awt.Component;
@@ -32,7 +43,7 @@ public class NewTrackDialogPanel extends ImportTrackBasePanel implements NewJobD
     private ReferenceJob[] refGenJobs;
     
     private final JokToBamDirectParser jokToBamDirectParser;
-    private final SamBamDirectParser samBamDirectParser;
+    private final SamBamParser samBamDirectParser;
     private MappingParserI[] parsers;
 
     /** 
@@ -41,7 +52,7 @@ public class NewTrackDialogPanel extends ImportTrackBasePanel implements NewJobD
     public NewTrackDialogPanel() {
         this.refGenJobs = this.getReferenceJobs();
         this.jokToBamDirectParser = new JokToBamDirectParser();
-        this.samBamDirectParser = new SamBamDirectParser();
+        this.samBamDirectParser = new SamBamParser();
         this.parsers = new MappingParserI[] { this.samBamDirectParser, jokToBamDirectParser };
         // choose the default parser. first entry is shown in combobox by default
         this.setCurrentParser(this.parsers[0]);
@@ -278,7 +289,7 @@ public class NewTrackDialogPanel extends ImportTrackBasePanel implements NewJobD
             this.getMappingFiles().clear();
             this.mappingFileField.setText("");
             this.nameField.setText("");
-            if (newparser instanceof SamBamDirectParser) {
+            if (newparser instanceof SamBamParser) {
                 this.alreadyImportedBox.setEnabled(true);
             } else {
                 this.alreadyImportedBox.setEnabled(false);

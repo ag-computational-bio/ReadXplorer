@@ -1,3 +1,19 @@
+/* 
+ * Copyright (C) 2014 Rolf Hilker
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
 
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
@@ -5,6 +21,7 @@ import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfo;
 import de.cebitec.readXplorer.view.dataVisualisation.HighlightAreaListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
@@ -12,10 +29,10 @@ import java.util.prefs.Preferences;
 import org.openide.util.NbPreferences;
 
 /**
- * @author Rolf Hilker
- * 
  * Manages the detection and highlighting of regions in a sequence bar.
  * It currently supports start and stop codons and exact sequence region highlighting.
+ * 
+ * @author Rolf Hilker
  */
 public class RegionManager {
     
@@ -132,9 +149,7 @@ public class RegionManager {
      */
     public void findCodons() {
         //create the list of component types, that should be removed (only patterns)
-        List<Byte> typeList = new ArrayList<>();
-        typeList.add(Properties.START);
-        typeList.add(Properties.STOP);
+        List<Byte> typeList = Arrays.asList(Properties.START, Properties.STOP);
         this.regionVisualizer.removeAll(typeList);
         this.highlightListener.clearSpecialRegions();
         this.codonFilter.setInterval(this.parentViewer.getBoundsInfo().getLogLeft(), this.parentViewer.getBoundsInfo().getLogRight());

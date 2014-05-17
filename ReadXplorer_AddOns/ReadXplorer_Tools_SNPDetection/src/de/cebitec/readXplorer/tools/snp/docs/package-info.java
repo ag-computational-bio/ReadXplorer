@@ -1,10 +1,18 @@
-/**
- * The snp detection module allows to detect snps among all opened/selected tracks for
- * a single reference genome. It contains the dialog windows for creating a snp detection
- * request, then the request uses the snp detection logic from the de.cebitec.readXplorer.backend package,
- * and it also contains the result windows, showing the snps in a table.
- * An excel exporter for the data is also included.
- * 
+/* 
+ * Copyright (C) 2014 Rolf Hilker
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 @HelpSetRegistration(helpSet = "snp-hs.xml", position = 3559)
 package de.cebitec.readXplorer.tools.snp.docs;

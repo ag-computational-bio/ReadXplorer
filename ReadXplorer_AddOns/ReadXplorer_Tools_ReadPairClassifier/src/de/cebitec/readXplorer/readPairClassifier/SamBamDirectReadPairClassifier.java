@@ -1,3 +1,19 @@
+/* 
+ * Copyright (C) 2014 Rolf Hilker
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package de.cebitec.readXplorer.readPairClassifier;
 
 import de.cebitec.readXplorer.parser.ReadPairJobContainer;
@@ -8,7 +24,7 @@ import de.cebitec.readXplorer.parser.common.ParsingException;
 import de.cebitec.readXplorer.parser.common.RefSeqFetcher;
 import de.cebitec.readXplorer.parser.mappings.CommonsMappingParser;
 import de.cebitec.readXplorer.parser.mappings.ReadPairClassifierI;
-import de.cebitec.readXplorer.parser.mappings.SamBamDirectParser;
+import de.cebitec.readXplorer.parser.mappings.SamBamParser;
 import de.cebitec.readXplorer.parser.output.SamBamSorter;
 import de.cebitec.readXplorer.util.Benchmark;
 import de.cebitec.readXplorer.util.DiscreteCountingDistribution;
@@ -215,12 +231,12 @@ public class SamBamDirectReadPairClassifier implements ReadPairClassifierI, Obse
 
                         lastReadName = readName;
                     } else { // else read is unmapped or belongs to another reference
-                        this.sendMsgIfAllowed(NbBundle.getMessage(SamBamDirectParser.class,
+                        this.sendMsgIfAllowed(NbBundle.getMessage(SamBamParser.class,
                                 "Parser.Parsing.CorruptData", lineno, record.getReadName()));
                     }
                 } catch (SAMFormatException e) {
                     if (!e.getMessage().contains("MAPQ should be 0")) {
-                        this.sendMsgIfAllowed(NbBundle.getMessage(SamBamDirectParser.class,
+                        this.sendMsgIfAllowed(NbBundle.getMessage(SamBamParser.class,
                                 "Parser.Parsing.CorruptData", lineno, e.toString()));
                     } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored
                 }
@@ -680,7 +696,7 @@ public class SamBamDirectReadPairClassifier implements ReadPairClassifierI, Obse
     
     /**
      * Sends the given msg to all observers, if the error limit is not already
-     * reached for this instance of SamBamDirectParser.
+ reached for this instance of SamBamParser.
      * @param msg The message to send
      */
     @Override

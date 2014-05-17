@@ -1,15 +1,28 @@
+/* 
+ * Copyright (C) 2014 Rolf Hilker
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package de.cebitec.readXplorer.parser.common;
 
-import de.cebitec.readXplorer.parser.common.ParsedReferenceGap;
-import de.cebitec.readXplorer.parser.common.CoverageContainer;
-import de.cebitec.readXplorer.parser.common.ParsedDiff;
-import de.cebitec.readXplorer.parser.common.ParsedMapping;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
-import static org.junit.Assert.*;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -60,11 +73,6 @@ public class CoverageContainerTest {
         System.out.println("clearCoverageContainerUpTo");
         int clearPos = 9;
         CoverageContainer covContainer = new CoverageContainer();
-        List<ParsedDiff> diffs1 = new ArrayList<ParsedDiff>();
-        List<ParsedDiff> diffs2 = new ArrayList<ParsedDiff>();
-        List<ParsedDiff> diffs3 = new ArrayList<ParsedDiff>();
-        List<ParsedDiff> diffs4 = new ArrayList<ParsedDiff>();
-        List<ParsedDiff> diffs5 = new ArrayList<ParsedDiff>();
         
         long diff1 = 3;
         long diff2 = 7;
@@ -72,12 +80,11 @@ public class CoverageContainerTest {
         long diff4 = 30;
         long diff5 = 9;
         long diff6 = 10;
-        diffs1.add(new ParsedDiff(diff1, 'a'));
-        diffs1.add(new ParsedDiff(diff6, 'a'));
-        diffs2.add(new ParsedDiff(diff2, 'a'));
-        diffs3.add(new ParsedDiff(diff3, 'a'));
-        diffs4.add(new ParsedDiff(diff4, 'a'));
-        diffs5.add(new ParsedDiff(diff5, 'a'));
+        List<ParsedDiff> diffs1 = Arrays.asList(new ParsedDiff(diff1, 'a'), new ParsedDiff(diff6, 'a'));
+        List<ParsedDiff> diffs2 = Arrays.asList(new ParsedDiff(diff2, 'a'));
+        List<ParsedDiff> diffs3 = Arrays.asList(new ParsedDiff(diff3, 'a'));
+        List<ParsedDiff> diffs4 = Arrays.asList(new ParsedDiff(diff4, 'a'));
+        List<ParsedDiff> diffs5 = Arrays.asList(new ParsedDiff(diff5, 'a'));
         
         ParsedMapping mapping1 = new ParsedMapping(1, 10, Byte.valueOf("1"), diffs1, new ArrayList<ParsedReferenceGap>(), 2);
         ParsedMapping mapping2 = new ParsedMapping(2, 11, Byte.valueOf("-1"), diffs2, new ArrayList<ParsedReferenceGap>(), 1);

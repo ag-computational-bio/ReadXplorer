@@ -195,9 +195,7 @@
                     </test-dependency>
                 </test-type>
             </test-dependencies>
-            <public-packages>
-                <package>de.cebitec.readXplorer.transcriptionAnalyses</package>
-            </public-packages>
+            <public-packages/>
         </data>
     </configuration>
 </project>

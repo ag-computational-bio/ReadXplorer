@@ -1,3 +1,19 @@
+/* 
+ * Copyright (C) 2014 Rolf Hilker
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package de.cebitec.readXplorer.parser.mappings;
 
 import de.cebitec.readXplorer.parser.TrackJob;
@@ -24,7 +40,7 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
     private static String name = "Jok to Bam Direct Access Parser";
     private static String[] fileExtension = new String[]{"out", "Jok", "jok", "JOK"};
     private static String fileDescription = "Jok Read Mappings converted to BAM";
-    private SamBamDirectParser bamParser;
+    private SamBamParser bamParser;
     private List<Observer> observers;
     private boolean alreadyConverted = false;
 
@@ -35,7 +51,7 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
      */
     public JokToBamDirectParser() {
         this.observers = new ArrayList<>();
-        this.bamParser = new SamBamDirectParser();
+        this.bamParser = new SamBamParser();
     }
 
     /**
