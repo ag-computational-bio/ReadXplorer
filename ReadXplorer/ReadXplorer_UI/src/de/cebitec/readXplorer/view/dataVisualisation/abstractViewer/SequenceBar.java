@@ -279,7 +279,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
             physX += numOfGaps * bounds.getPhysWidth();
         }
         String base = chromSeq.substring(basePosition, basePosition + 1);
-        String revBase = SequenceUtils.complementDNA(base);
+        String revBase = SequenceUtils.getDnaComplement(base);
         int offset = metrics.stringWidth(revBase) / 2;
         g.drawString(revBase,
                 (float) physX - offset,
@@ -551,7 +551,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
                 BaseBackground b = new BaseBackground(12, 12, base);
                 b.setBounds((int) physX - offset, baseLineY - 18, b.getSize().width, b.getSize().height);
                 this.add(b);
-                BaseBackground brev = new BaseBackground(12, 12, SequenceUtils.complementDNA(base));
+                BaseBackground brev = new BaseBackground(12, 12, SequenceUtils.getDnaComplement(base));
                 brev.setBounds((int) physX - offset, baseLineY + 2, b.getSize().width, b.getSize().height);
                 this.add(brev);
             }

@@ -47,7 +47,7 @@ import org.openide.util.Lookup;
 public class ReferenceViewer extends AbstractViewer {
 
     private final static long serialVersionUID = 7964236;
-    private static int height = 250;
+    private static int height = 230;
     private static int FRAMEHEIGHT = 20;
     private Map<FeatureType, Integer> featureStats;
     private JFeature selectedFeature;

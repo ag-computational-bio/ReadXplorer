@@ -35,7 +35,7 @@ import org.openide.util.NbPreferences;
  * 
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-final class GeneticCodePanel extends javax.swing.JPanel {
+final class GeneticCodePanel extends OptionsPanel {
     private static final long serialVersionUID = 1L;
 
     private final GeneticCodeOptionsPanelController controller;
@@ -63,7 +63,7 @@ final class GeneticCodePanel extends javax.swing.JPanel {
 
         chooseCodeLabel = new javax.swing.JLabel();
         geneticCodeScrolPane = new javax.swing.JScrollPane();
-        geneticCodeList = new javax.swing.JList();
+        geneticCodeList = new javax.swing.JList<>();
         customCodonField = new javax.swing.JTextField();
         addButton = new javax.swing.JButton();
         customCodonLabel = new javax.swing.JLabel();
@@ -138,6 +138,7 @@ final class GeneticCodePanel extends javax.swing.JPanel {
         this.removeCodonsFromList();
     }//GEN-LAST:event_removeButtonActionPerformed
 
+    @Override
     public void load() {
         this.geneticCodeList.setSelectedIndex(Integer.valueOf(this.pref.get(Properties.GENETIC_CODE_INDEX, "0")));
     }
@@ -145,6 +146,7 @@ final class GeneticCodePanel extends javax.swing.JPanel {
     /**
      * Store modified settings
      */
+    @Override
     public void store() {
         if (geneticCodeList.getSelectedIndex() < genCodes.size()) {
         // remember selected indices in geneticCodeList have to be conform with GeneticCodesToPropParser order!
@@ -163,17 +165,13 @@ final class GeneticCodePanel extends javax.swing.JPanel {
             }
         }
     }
-
-    public boolean valid() {
-        // checks whether form is consistent and complete
-        return true;
-    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addButton;
     private javax.swing.JLabel chooseCodeLabel;
     private javax.swing.JTextField customCodonField;
     private javax.swing.JLabel customCodonLabel;
-    private javax.swing.JList geneticCodeList;
+    private javax.swing.JList<Object> geneticCodeList;
     private javax.swing.JScrollPane geneticCodeScrolPane;
     private javax.swing.JButton removeButton;
     // End of variables declaration//GEN-END:variables
@@ -204,7 +202,7 @@ final class GeneticCodePanel extends javax.swing.JPanel {
         this.geneticCodeList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         
-        final ArrayList<String> geneticCodesData = new ArrayList<>();
+        final List<String> geneticCodesData = new ArrayList<>();
         
         //get standard codes and add to tableD
         String codonsConcat;
@@ -352,17 +350,17 @@ final class GeneticCodePanel extends javax.swing.JPanel {
             this.geneticCodeList.setSelectedIndex(0);
         }  
     }
-    
+
     /**
      * Internal class representing the table model for start codons.
      * Implements all methods needed for handling some geneticCodesData.
      */
-    private class GeneticCodeListModel extends AbstractListModel {
+    private class GeneticCodeListModel extends AbstractListModel<Object> {
         private static final long serialVersionUID = 1L;
         
-        private ArrayList<String> geneticCodesDataModel;
+        private List<String> geneticCodesDataModel;
         
-        public GeneticCodeListModel(ArrayList<String> geneticCodesData){
+        public GeneticCodeListModel(List<String> geneticCodesData){
             this.geneticCodesDataModel = geneticCodesData;
         }
 

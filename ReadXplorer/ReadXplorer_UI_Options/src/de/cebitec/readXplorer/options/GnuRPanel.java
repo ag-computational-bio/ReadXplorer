@@ -42,11 +42,11 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
-import org.openide.LifecycleManager;
 import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
 
-final class GnuRPanel extends javax.swing.JPanel implements Observer {
+final class GnuRPanel extends OptionsPanel implements Observer {
+    private static final long serialVersionUID = 1L;
 
     private final GnuROptionsPanelController controller;
     private Preferences pref;
@@ -561,17 +561,16 @@ final class GnuRPanel extends javax.swing.JPanel implements Observer {
         }
     }//GEN-LAST:event_sourceFileTextFieldMouseReleased
 
+    @Override
     void load() {
         cranMirror.setText(pref.get(Properties.CRAN_MIRROR, DEFAULT_CRAN_MIRROR));
     }
 
+    @Override
     void store() {
         pref.put(Properties.CRAN_MIRROR, cranMirror.getText());
     }
 
-    boolean valid() {
-        return true;
-    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField cranMirror;
     private javax.swing.JButton installButton;

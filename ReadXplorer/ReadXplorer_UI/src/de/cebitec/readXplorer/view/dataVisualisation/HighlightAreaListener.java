@@ -33,7 +33,6 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 import org.openide.util.Lookup;
 
@@ -195,7 +194,7 @@ public class HighlightAreaListener extends MouseAdapter {
                 popUp.add(menuItemFactory.getRNAFoldItem(rnaFolderControl, selSequence, header));
             }
 
-            popUp.show((JComponent) e.getComponent(), e.getX(), e.getY());
+            popUp.show(e.getComponent(), e.getX(), e.getY());
         }
     }
 
@@ -351,11 +350,10 @@ public class HighlightAreaListener extends MouseAdapter {
     }
 
     /**
-     * 
-     * @param start the first position in the correct reading frame, on which stop codons
-     *      should be detected.
+     * @param start the first position in the correct reading frame, on which
+     * stop codons should be detected.
      * @param reference
-     * @return 
+     * @return The next stop position in the reference from the given start
      */
     private Region findNextStopPos(int start, PersistantReference reference) {
         Pair<String[], String[]> geneticCode = CodonUtilities.getGeneticCodeArrays();

@@ -20,19 +20,26 @@ import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readXplorer.api.ApplicationFrameI;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManagerFactory;
 import de.cebitec.readXplorer.view.dataVisualisation.MousePositionListener;
+import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.BasePanelFactory;
+import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.TrackViewer;
 import de.cebitec.readXplorer.view.dialogMenus.OpenRefGenPanel;
 import de.cebitec.readXplorer.view.dialogMenus.OpenTracksVisualPanel;
+import java.awt.Component;
 import java.awt.Dialog;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.openide.DialogDescriptor;
@@ -142,13 +149,37 @@ public class ViewController implements MousePositionListener {
     public void openTracksOnCurrentGenome(Collection<PersistantTrack> tracks) {
         for (PersistantTrack track : tracks) {
             // create basepanel
-            BasePanel trackPanel = basePanelFac.getTrackBasePanel(track, currentRefGen);
+            final BasePanel trackPanel = basePanelFac.getTrackBasePanel(track, currentRefGen);
             if (trackPanel != null) {
                 currentTracks.add(trackPanel);
                 trackToPanel.put(track, trackPanel);
 
                 // show the panel and the track
                 getApp().showTrackPanel(trackPanel);
+                
+                trackPanel.addPrefListener(new PreferenceChangeListener() {
+
+                    @Override
+                    public void preferenceChange(final PreferenceChangeEvent evt) {
+                        AbstractViewer viewer = trackPanel.getViewer();
+                        if (evt.getKey().equals(Properties.VIEWER_HEIGHT)) {
+
+                            int height = Integer.parseInt(evt.getNewValue());
+                            trackPanel.setSize(trackPanel.getSize().width, height);
+                            trackPanel.setPreferredSize(new Dimension(trackPanel.getPreferredSize().width, height));
+                            trackPanel.setMaximumSize(new Dimension(trackPanel.getMaximumSize().width, height));
+                            Component comp = (Component) getApp();
+                            comp.paintAll(comp.getGraphics());
+                            viewer.updatePhysicalBounds();
+                            viewer.setNewDataRequestNeeded(true);
+                            viewer.boundsChangedHook();
+                        } else if (evt.getKey().equals(Properties.VIEWER_AUTO_SCALING)) {
+                            if (viewer instanceof TrackViewer) {
+                                ((TrackViewer) viewer).setAutomaticScaling(evt.getNewValue().equals("true"));
+                            }
+                        }
+                    }
+                });
             }
         }
     }
@@ -219,18 +250,16 @@ public class ViewController implements MousePositionListener {
 
     /**
      * Replacement for <code>closeTrack</code> so the application does not need
-     * to know <code>PersistantTrack</code> or <code>BasePanel</code>
-     *
-     * @param track
+     * to know <code>PersistantTrack</code> or <code>BasePanel</code>.
+     * @param trackPanel The base panel to close
      */
-    public void closeTrackPanel(JPanel track) {
-        BasePanel trackPanel = (BasePanel) track;
+    public void closeTrackPanel(JPanel trackPanel) {
+        BasePanel trackBasePanel = (BasePanel) trackPanel;
         currentTracks.clear();
-        getApp().closeTrackPanel(trackPanel);
-        trackPanel.close();
-        mousePosListener.remove(trackPanel);
-
-        trackToPanel.values().remove((BasePanel) track);
+        getApp().closeTrackPanel(trackBasePanel);
+        trackBasePanel.close();
+        mousePosListener.remove(trackBasePanel);
+        trackToPanel.values().remove(trackBasePanel);
     }
 
     public void openTrack2(BasePanel tp) {

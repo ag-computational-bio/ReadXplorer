@@ -343,7 +343,7 @@ public class SamBamFileReader implements Observable {
                                 startPos, stop, isFwdStrand, mappingQuality, record.getBaseQualities());
                         if (pairId != null && pairType != null) { //since both data fields are always written together
 //                // add new readPair if not exists
-                            readPairId = (long) pairId;
+                            readPairId = pairId;
                             readPairType = ReadPairType.getReadPairType(pairType);
                             if (!readPairs.containsKey(readPairId)) {
                                 newGroup = new PersistantReadPairGroup();

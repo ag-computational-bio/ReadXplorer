@@ -126,5 +126,16 @@ public class Properties {
     
     /** '-1' For reference features, which do not have a parent. */
     public static final String NO_PARENT_STRING = "-1";
-    public static String MAPPER_PARAMS = "MAPPER_PARAMS";
+    public static final String MAPPER_PARAMS = "MAPPER_PARAMS";
+    
+    /** Property for the height of data viewers. */
+    public static final String VIEWER_HEIGHT = "VIEWER_HEIGHT";
+    /** Small viewer height = "120" pixels. */
+    public static final int SMALL_HEIGHT = 120;
+    /** Medium viewer height = "200" pixels. */
+    public static final int DEFAULT_HEIGHT = 200;
+    /** Large viewer height = "250" pixels. */
+    public static final int MAX_HEIGHT = 250;
+    /** Property for auto scaling of viewers. */
+    public static final String VIEWER_AUTO_SCALING = "AUTO_SCALING";
 }

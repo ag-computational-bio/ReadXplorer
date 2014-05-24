@@ -34,7 +34,6 @@ import de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer.AlignmentVi
 import de.cebitec.readXplorer.view.dataVisualisation.histogramViewer.HistogramViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.readPairViewer.ReadPairViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.CoverageInfoLabel;
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.CoverageZoomSlider;
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.MultipleTrackViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.TrackOptionsPanel;
@@ -140,7 +139,7 @@ public class BasePanelFactory {
      */
     public BasePanel getTrackBasePanel(PersistantTrack track, PersistantReference refGen) {
 
-        BasePanel basePanel = new BasePanel(boundsManager, viewController);
+        final BasePanel basePanel = new BasePanel(boundsManager, viewController);
         basePanel.setName(track.getDescription());
         viewController.addMousePositionListener(basePanel);
 
@@ -153,7 +152,7 @@ public class BasePanelFactory {
             return null;
         }
         if (tc != null) {
-            TrackViewer trackV = new TrackViewer(boundsManager, basePanel, refGen, tc, false);
+            final TrackViewer trackV = new TrackViewer(boundsManager, basePanel, refGen, tc, false);
             trackV.setName(track.getDescription());
 
             // create and set up legend
@@ -171,15 +170,15 @@ public class BasePanelFactory {
             optionsLabel.registerObserver(legendLabel);
 
             // create info label
-            CoverageInfoLabel cil = new CoverageInfoLabel();
-            trackV.setTrackInfoPanel(cil);
+//            CoverageInfoLabel cil = new CoverageInfoLabel();
+//            trackV.setTrackInfoPanel(cil);
 
             // create zoom slider
             CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
 
             // add panels to basepanel
             int maxSliderValue = 500;
-            basePanel.setTopInfoPanel(cil);
+//            basePanel.setTopInfoPanel(cil); //coverage info panel, which we don't show anymore
             basePanel.setViewer(trackV, slider);
             basePanel.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true, maxSliderValue));
             basePanel.setTitlePanel(this.getTitlePanel(track.getDescription()));
@@ -236,18 +235,18 @@ public class BasePanelFactory {
             legendLabel.registerObserver(optionsLabel);
             optionsLabel.registerObserver(legendLabel);
 
-            // create info panel
-            CoverageInfoLabel cil = new CoverageInfoLabel();
-            cil.setCombineTracks(combineTracks);
-            cil.renameFields();
-            trackV.setTrackInfoPanel(cil);
+//            // create info panel
+//            CoverageInfoLabel cil = new CoverageInfoLabel();
+//            cil.setCombineTracks(combineTracks);
+//            cil.renameFields();
+//            trackV.setTrackInfoPanel(cil);
 
             // create zoom slider
             CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
 
             // add panels to basepanel
             int maxSliderValue = 500;
-            basePanel.setTopInfoPanel(cil);
+//            basePanel.setTopInfoPanel(cil);
             basePanel.setViewer(trackV, slider);
             basePanel.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true, maxSliderValue));
 

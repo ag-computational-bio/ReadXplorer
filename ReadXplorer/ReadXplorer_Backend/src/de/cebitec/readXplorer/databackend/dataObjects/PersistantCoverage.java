@@ -172,8 +172,8 @@ public class PersistantCoverage implements Serializable {
     /**
      * @param left left bound of the interval to check
      * @param right right bound of the interval to check
-     * @return <cc>true</cc>, if this coverage object covers the given interval,
-     * <cc>false</cc> otherwise
+     * @return <code>true</code>, if this coverage object covers the given interval,
+     * <code>false</code> otherwise
      */
     public boolean coversBounds(int left, int right) {
         if (this.leftBound == 0 && this.rightBound == 0) {

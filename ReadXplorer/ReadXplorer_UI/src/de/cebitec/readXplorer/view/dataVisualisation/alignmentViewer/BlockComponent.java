@@ -326,7 +326,7 @@ public class BlockComponent extends JComponent {
 
     /**
      * Determines the color, brithness and saturation of a block.
-     * @return 
+     * @return The color of the block.
      */
     private Color determineBlockColor() {
         PersistantMapping m = ((PersistantMapping) block.getPersistantObject());

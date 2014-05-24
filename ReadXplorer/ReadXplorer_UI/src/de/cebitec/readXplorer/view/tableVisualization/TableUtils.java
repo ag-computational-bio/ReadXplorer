@@ -184,7 +184,7 @@ public class TableUtils {
      * contain the table rows.
      * @param dataToTransform The list of data to be transformed into a table
      * model ready for display.
-     * @return 
+     * @return The table model filled with the given dataToTransform.
      */
     public static UneditableTableModel transformDataToTableModel(List<List<?>> dataToTransform) {
         UneditableTableModel newModel = null;

@@ -34,6 +34,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class FileUtils {
     
+    private FileUtils() {
+    }
+    
     /**
      * extract the whole path part without extension  
      * @param file the file 
@@ -51,10 +54,10 @@ public class FileUtils {
     public static String getFilePathWithoutExtension(String filePath) {
         String[] nameParts = filePath.split("\\.");
         String newFileName = nameParts[0];
-        for(int i=1; i<(nameParts.length-1); i++) {
+        for (int i = 1; i < (nameParts.length - 1); i++) {
             newFileName += "." + nameParts[i];
         }
-        
+
         return newFileName;
     } 
     
@@ -62,18 +65,18 @@ public class FileUtils {
      * count lines in a file 
      * equivalent of wc -l in unix
      * @param file
-     * @return number of lines
+     * @return number of lines or 0 if an error occured during reading
      */
     public static int countLinesInFile(File file) {
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-            int lines = 0;
-            while (reader.readLine() != null) lines++;
-            reader.close();
-            return lines;
-        } catch(Exception e) {
-            return 0;
+        int lines = 0;
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            while (reader.readLine() != null) {
+                lines++;
+            }
+        } catch (Exception e) {
+            lines = 0;
         }
+        return lines;
     }
     
     public static int countLinesInFile(String filepath) {
@@ -95,7 +98,7 @@ public class FileUtils {
         fc.setFileFilter(fileNameExtensionFilter);
         Preferences prefs2 = Preferences.userNodeForPackage(forClass);
         String path = prefs2.get(prefName, null);
-        if(path!=null){
+        if (path != null) {
             fc.setCurrentDirectory(new File(path));
         }
         int result = fc.showOpenDialog(parent);

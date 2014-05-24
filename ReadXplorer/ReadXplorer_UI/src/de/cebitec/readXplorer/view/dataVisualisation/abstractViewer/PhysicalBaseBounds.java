@@ -29,6 +29,12 @@ public class PhysicalBaseBounds {
     private double physWidth;
     private double phyMiddle;
 
+    /**
+     * Storage for the physical bounds of the base window. Contains the left 
+     * and right bounds, width and middle position.
+     * @param leftPhysBound the left physical boundary (pixel)
+     * @param rightPhysBound the right physical boundary (pixel) (pixel)
+     */
     public PhysicalBaseBounds(double leftPhysBound, double rightPhysBound){
         this.leftPhysBound = leftPhysBound;
         this.rightPhysBound = rightPhysBound;
@@ -37,32 +43,28 @@ public class PhysicalBaseBounds {
     }
 
     /**
-     * Returns the left physical bound.
-     * @return
+     * @return the left physical boundary (pixel)
      */
     public double getLeftPhysBound() {
         return leftPhysBound;
     }
 
     /**
-     * Returns the right physical bound.
-     * @return
+     * @return the right physical boundary (pixel)
      */
     public double getRightPhysBound() {
         return rightPhysBound;
     }
 
     /**
-     * Returns the physical width.
-     * @return
+     * @return the physical width.
      */
     public double getPhysWidth() {
         return physWidth;
     }
 
     /**
-     * Returns the physical center value.
-     * @return
+     * @return the physical center value.
      */
     public double getPhyMiddle() {
         return phyMiddle;

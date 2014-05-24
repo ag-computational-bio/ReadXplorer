@@ -18,6 +18,7 @@ package de.cebitec.readXplorer.view.dataVisualisation.trackViewer;
 
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.util.ColorProperties;
+import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.LegendAndOptionsProvider;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -27,6 +28,9 @@ import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
+import java.util.prefs.Preferences;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JFormattedTextField;
@@ -37,6 +41,7 @@ import javax.swing.SpinnerNumberModel;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.text.DefaultFormatter;
+import org.openide.util.NbPreferences;
 
 /**
  * Panel containing the display options for a track viewer like
@@ -48,6 +53,7 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
 
     private TrackViewer trackViewer;
+    private Preferences pref = NbPreferences.forModule(Object.class);
 
     /**
      * Creates a new Panel containing the display options for a track viewer like
@@ -87,30 +93,47 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
 
     
     /**
-     * Initializes in fact all components of the panel.
+     * Initializes all components of the panel.
      */
     private void initOtherComponents() {
         
-        final JLabel header = new JLabel("General:");
-        header.setBackground(ColorProperties.LEGEND_BACKGROUND);
-        header.setFont(new Font("Arial", Font.BOLD, 11));
-        final JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(ColorProperties.LEGEND_BACKGROUND);
+        this.createHeader();
+        this.createQualityFilter();
+        this.createScalingOption();
+        this.createNormalizationOption();
+
+        this.updateUI();
+    }
+
+    /**
+     * Sets the header of the panel.
+     */
+    private void createHeader() {
+        JLabel header = this.createLabel("General:");
+        final JPanel headerPanel = this.createStandardPanel();
         headerPanel.add(header, BorderLayout.CENTER);
         headerPanel.setPreferredSize(new Dimension(headerPanel.getPreferredSize().width, headerPanel.getPreferredSize().height + 2));
         this.add(headerPanel);
-        
-        JPanel qualityPanel = new JPanel(new BorderLayout());
-        qualityPanel.setBackground(ColorProperties.LEGEND_BACKGROUND);
+    }
+
+    /**
+     * Creates the quality filter.
+     */
+    private void createQualityFilter() {
+        JPanel qualityPanel = this.createStandardPanel();
         LegendAndOptionsProvider.createMappingQualityFilter(trackViewer, qualityPanel);
         this.add(qualityPanel);
-        
-        JPanel generalPanel = new JPanel(new BorderLayout());
-        generalPanel.setBackground(ColorProperties.LEGEND_BACKGROUND);
+    }
+
+    /**
+     * Creates a check box for automatic scaling of the coverage.
+     */
+    private void createScalingOption() {
+        JPanel generalPanel = this.createStandardPanel();
         final JCheckBox scaleBox = new JCheckBox("Automatic scaling enabled");
         scaleBox.setBackground(ColorProperties.LEGEND_BACKGROUND);
-        scaleBox.setSelected(false);
-        
+        scaleBox.setSelected(pref.getBoolean(Properties.VIEWER_AUTO_SCALING, false));
+
         //automatic scaling enabled event
         scaleBox.addActionListener(new ActionListener() {
 
@@ -120,15 +143,26 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
                 trackViewer.setAutomaticScaling(scaleBox.isSelected());
             }
         });
+        //preference change listener for updating the check box
+        pref.addPreferenceChangeListener(new PreferenceChangeListener() {
+
+            @Override
+            public void preferenceChange(PreferenceChangeEvent evt) {
+                if (evt.getKey().equals(Properties.VIEWER_AUTO_SCALING)) {
+                    scaleBox.setSelected(evt.getNewValue().equals("true"));
+                }
+            }
+        });
         generalPanel.add(scaleBox, BorderLayout.WEST);
         this.add(generalPanel);
-        
-        // normalization options
-        final JLabel header2 = new JLabel("Normalization:");
-        header2.setBackground(ColorProperties.LEGEND_BACKGROUND);
-        header2.setFont(new Font("Arial", Font.BOLD, 11));
-        final JPanel headerPanel2 = new JPanel(new BorderLayout());
-        headerPanel2.setBackground(ColorProperties.LEGEND_BACKGROUND);
+    }
+
+    /**
+     * Creates the normalization options.
+     */
+    private void createNormalizationOption() {
+        JLabel header2 = this.createLabel("Normalization");
+        final JPanel headerPanel2 = this.createStandardPanel();
         headerPanel2.add(header2, BorderLayout.CENTER);
         headerPanel2.setPreferredSize(new Dimension(headerPanel2.getPreferredSize().width, headerPanel2.getPreferredSize().height + 2));
         this.add(headerPanel2);
@@ -141,10 +175,8 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
         } else if (trackViewer.isTwoTracks()) {
             this.createNormalizationEntry("All tracks: ", 0);
         } else {
-            this.createNormalizationEntry(trackViewer.getTrackCon().getAssociatedTrackName(), 0);
+            this.createNormalizationEntry("", 0);
         }
-
-        this.updateUI();
     }
     
     /**
@@ -156,16 +188,9 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
         JPanel trackPanel = new JPanel();
         trackPanel.setLayout(new BoxLayout(trackPanel, BoxLayout.X_AXIS));
 
-        JPanel placeholder = LegendAndOptionsProvider.createPlaceholder();
-        final JLabel nameLabel = new JLabel("Track: " + name);
-        nameLabel.setBackground(ColorProperties.LEGEND_BACKGROUND);
-        nameLabel.setFont(new Font("Arial", Font.PLAIN, 11));
-        
-        final JPanel labelPanel = new JPanel(new BorderLayout());
-        labelPanel.setBackground(ColorProperties.LEGEND_BACKGROUND);
-        labelPanel.add(placeholder, BorderLayout.WEST);
-        labelPanel.add(nameLabel, BorderLayout.CENTER);
-        labelPanel.setPreferredSize(new Dimension(labelPanel.getPreferredSize().width, labelPanel.getPreferredSize().height + 2));
+        if (!name.isEmpty()) {
+            this.createNormalizationLabel(trackPanel, name);
+        }
 
         final JCheckBox log = new JCheckBox("Log2");
         log.setBackground(ColorProperties.LEGEND_BACKGROUND);
@@ -257,11 +282,26 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
             }
         });
 
-        trackPanel.add(labelPanel);
         trackPanel.add(log);
         trackPanel.add(factor);
         trackPanel.add(scaleFactorSpinner);
         this.add(trackPanel);
+    }
+
+    /**
+     * Creates and adds a label with a name to a track option panel.
+     * @param trackPanel the track option panel to which the label shall be added
+     * @param name the name of the tracks to add to the panel
+     */
+    private void createNormalizationLabel(JPanel trackPanel, String name) {
+        JPanel placeholder = LegendAndOptionsProvider.createPlaceholder();
+        JLabel nameLabel = this.createLabel("Track: " + name);
+
+        final JPanel labelPanel = this.createStandardPanel();
+        labelPanel.add(placeholder, BorderLayout.WEST);
+        labelPanel.add(nameLabel, BorderLayout.CENTER);
+        labelPanel.setPreferredSize(new Dimension(labelPanel.getPreferredSize().width, labelPanel.getPreferredSize().height + 2));
+        trackPanel.add(labelPanel);
     }
 
     /**
@@ -279,4 +319,28 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
         }
         return new NormalizationSettings(trackViewer.getTrackCon().getTrackIds(), bools, factors, hasNorm);
     }
+    
+    /**
+     * @param text Text to place on the label.
+     * @return A label with ColorProperties.LEGEND_BACKGROUND background color
+     * and font Arial in 11 with the given text.
+     */
+    private JLabel createLabel(String text) {
+        final JLabel label = new JLabel(text);
+        label.setBackground(ColorProperties.LEGEND_BACKGROUND);
+        label.setFont(new Font("Arial", Font.BOLD, 11));
+        return label;
+    }
+    
+    /**
+     * @return A JPanel with ColorProperties.LEGEND_BACKGROUND background color
+     * and a standard border layout.
+     */
+    private JPanel createStandardPanel() {
+        final JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(ColorProperties.LEGEND_BACKGROUND);
+        return panel;
+    }
+
+
 }

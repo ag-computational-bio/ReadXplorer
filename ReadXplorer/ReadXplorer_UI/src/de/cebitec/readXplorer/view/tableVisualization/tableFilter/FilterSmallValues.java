@@ -28,13 +28,14 @@ public class FilterSmallValues implements FilterValuesI {
 
     /**
      * Filters values which are smaller than a given cutoff from the given 
-     * column of the table.
-     * @param tableModel the table whose content shall be filtered
-     * @param column the column, which shall be filtered
-     * @param filterValue the minimum double value in the given column to keep 
+     * column of the table. The filtered table model is updated and only 
+     * contains rows whose values in the selected column exceed the given 
+     * double filterValue.
+     * @param filteredTableModel the table whose content shall be filtered
+     * @param row the row, which shall be filtered
+     * @param cutoff the minimum double value in the given column to keep 
      * the current row in the table
-     * @return the filtered table model only containing rows whose values in 
-     * the selected column exceed the given double filterValue
+     * @param currentEntryValue filter value associated with the given row
      */
     @Override
     public void filterTable(DefaultTableModel filteredTableModel, Vector row, double cutoff, double currentEntryValue) {

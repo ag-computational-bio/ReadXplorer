@@ -22,7 +22,8 @@ import java.awt.event.KeyListener;
 import java.util.prefs.Preferences;
 import org.openide.util.NbPreferences;
 
-final class ObjectCachePanel extends javax.swing.JPanel {
+final class ObjectCachePanel extends OptionsPanel {
+    private static final long serialVersionUID = 1L;
     
     private final ObjectCachePanelController controller;
     private Preferences pref;
@@ -117,18 +118,16 @@ final class ObjectCachePanel extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_useCacheCheckBoxActionPerformed
 
+    @Override
     void load() {
         cacheCheckBox.setSelected(pref.getBoolean(Properties.OBJECTCACHE_AUTOSTART, true));
         useCacheCheckBox.setSelected(pref.getBoolean(Properties.OBJECTCACHE_ACTIVE, true));
     }
     
+    @Override
     void store() {
         pref.putBoolean(Properties.OBJECTCACHE_AUTOSTART, cacheCheckBox.isSelected());
         pref.putBoolean(Properties.OBJECTCACHE_ACTIVE, useCacheCheckBox.isSelected());
-    }
-    
-    boolean valid() {
-        return true;
     }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox cacheCheckBox;

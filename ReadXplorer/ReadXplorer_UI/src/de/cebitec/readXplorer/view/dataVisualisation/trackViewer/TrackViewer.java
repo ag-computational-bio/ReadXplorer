@@ -25,13 +25,14 @@ import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersi
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.util.ColorProperties;
+import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.BasePanel;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -58,6 +59,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     private static final long serialVersionUID = 572406471;
     private static final int MININTERVALLENGTH = 25000;
     
+    private final Preferences pref = NbPreferences.forModule(Object.class);
     private NormalizationSettings normSetting = null;
     private TrackConnector trackCon;
     private List<Integer> trackIDs ;
@@ -68,13 +70,12 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     private int id2 ;
     private boolean colorChanges;
     private boolean hasNormalizationFactor = false;
-    private boolean automaticScaling = false;
+    private boolean automaticScaling = pref.getBoolean(Properties.VIEWER_AUTO_SCALING, false);
     private boolean useMinimalIntervalLength = true;
     
     private JSlider verticalSlider = null;
  
-    private static int height = 230;
-    private CoverageInfoI trackInfo;
+//    private CoverageInfoI trackInfo;
     private double scaleFactor;
     private int scaleLineStep;
     private int labelMargin;
@@ -123,7 +124,6 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         nRv = new GeneralPath();
        
          
-        final Preferences pref = NbPreferences.forModule(Object.class);
         this.setColors(pref);
 
         pref.addPreferenceChangeListener(new PreferenceChangeListener() {
@@ -134,12 +134,16 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
                 repaint();
             }
         });
-        this.setViewerSize();
         
+        this.setSizes();
         TrackCacher tc = new TrackCacher(trackCon, refGen.getActiveChromLength());
           
     }
 
+    /**
+     * Updates the colors of the coverage in this viewer.
+     * @param pref The preference object containing the new colors
+     */
     private void setColors(Preferences pref) {
         boolean uniformColouration = pref.getBoolean("uniformDesired", false);
         if (uniformColouration) {
@@ -352,7 +356,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     }
     
     /**
-     * Normalizes the value handed over to the method according to the normalization
+     * Normalizes the value handed over to the method acodeording to the normalization
      * method choosen for the given track.
      * @param trackID the track id this value belongs to
      * @param value the value that should be normalized
@@ -374,7 +378,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      */
     private GeneralPath getCoveragePath(boolean isForwardStrand, byte covType) {
         GeneralPath covPath = new GeneralPath();
-        int orientation = (isForwardStrand ? -1 : 1);
+        int orientation = (isForwardStrand ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD);
 
         PaintingAreaInfo info = getPaintingAreaInfo();
         int low = (orientation < 0 ? info.getForwardLow() : info.getReverseLow());
@@ -451,7 +455,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             CoverageAndDiffResultPersistant covResult = (CoverageAndDiffResultPersistant) coverageData;
             this.cov = covResult.getCoverage();
             this.cov.setHighestCoverage(0);
-            this.trackInfo.setCoverage(this.cov);
+//            this.trackInfo.setCoverage(this.cov);
 
             if (this.cov.isTwoTracks() && !this.combineTracks) {
                 this.createCoveragePathsDiffOfTwoTracks();
@@ -475,7 +479,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         } else {
             // coverage already loaded
             
-            this.trackInfo.setCoverage(this.cov);
+//            this.trackInfo.setCoverage(this.cov);
             
             if (cov.isTwoTracks()) {
                 this.createCoveragePathsDiffOfTwoTracks();
@@ -539,11 +543,17 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         zRv = this.getCoveragePath(false, PersistantCoverage.DIFF);
     }
 
+    /**
+     * @return The maximal height for this viewer.
+     */
     @Override
     public int getMaximalHeight() {
-        return height;
+        return pref.getInt(Properties.VIEWER_HEIGHT, Properties.DEFAULT_HEIGHT);
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void changeToolTipText(int logPos) {
         if (covLoaded && twoTracks && !hasNormalizationFactor && !combineTracks) {
@@ -727,9 +737,9 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         return "<tr><td align=\"right\">" + label + ":</td><td align=\"left\">" + String.valueOf(scaleFacVal) + " (" + String.valueOf((int) value) + ")" + "</td></tr>";
     }
 
-    public void setTrackInfoPanel(CoverageInfoI info) {
-        this.trackInfo = info;
-    }
+//    public void setTrackInfoPanel(CoverageInfoI info) {
+//        this.trackInfo = info;
+//    }
 
     /**
      * @param coverage the coverage for a certain position
@@ -755,7 +765,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
 
     /**
      * Method to be called when the vertical zoom level of this track viewer was
-     * changed, thus the coverage paths have to be recalculated according to the 
+     * changed, thus the coverage paths have to be recalculated acodeording to the 
      * new zoom level. A scaleFactor of 1 means a 1:1 translation of coverage to 
      * pixels. A value smaller than 1 is adjusted to 1.
      * @param value the new vertical zoom slider value
@@ -795,6 +805,8 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
 
         if (visibleCoverage <= 10) {
             this.scaleLineStep = 1;
+        } else if (visibleCoverage <= 50) {
+            this.scaleLineStep = 10;
         } else if (visibleCoverage <= 100) {
             this.scaleLineStep = 20;
         } else if (visibleCoverage <= 200) {
@@ -930,14 +942,6 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     }
 
     /**
-     * Sets the initial size of the track viewer.
-     */
-    private void setViewerSize() {
-        this.setPreferredSize(new Dimension(1, height));
-        this.revalidate();
-    }
-
-    /**
      * @return true, if this is a double track viewer, which combines the selected
      * tracks into a single coverage wave.
      */
@@ -997,9 +1001,10 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     }
 
     /**
-     * @param automaticScaling Set true, if the coverage slider should automatically 
-     * adapt to the coverage shown (the complete coverage in the interval always is 
-     * visible). False, if the slider value should only be changed manually by the user.
+     * @param automaticScaling Set <code>true</code>, if the coverage slider
+     * should automatically adapt to the coverage shown (the complete coverage
+     * in the interval always is visible). <code>false</code>, if the slider
+     * value should only be changed manually by the user.
      */
     public void setAutomaticScaling(boolean automaticScaling) {
         this.automaticScaling = automaticScaling;
@@ -1012,8 +1017,8 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     }
 
     /**
-     * @return <cc>true</cc> if the queried interval length should be extended
-     * to the <cc>MININTERVALLENGTH</cc>, <cc>false</cc> if the original 
+     * @return <code>true</code> if the queried interval length should be extended
+     * to the <code>MININTERVALLENGTH</code>, <code>false</code> if the original 
      * bounds should be used for the coverage queries.
      */
     public boolean isUseMinimalIntervalLength() {
@@ -1021,13 +1026,13 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     }
 
     /**
-     * @param useMinimalIntervalLength <cc>true</cc> if the queried interval
-     * length should be extended to the <cc>MININTERVALLENGTH</cc>,
-     * <cc>false</cc> if the original bounds should be used for the coverage 
+     * @param useMinimalIntervalLength <code>true</code> if the queried interval
+     * length should be extended to the <code>MININTERVALLENGTH</code>,
+     * <code>false</code> if the original bounds should be used for the coverage 
      * queries.
      */
     public void setUseMinimalIntervalLength(boolean useMinimalIntervalLength) {
         this.useMinimalIntervalLength = useMinimalIntervalLength;
     }
-
+    
 }

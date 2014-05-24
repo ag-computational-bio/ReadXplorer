@@ -285,7 +285,7 @@ public final class AppPanelTopComponent extends TopComponentExtended implements 
     public void showTrackPanel(final JPanel trackPanel) {
         if (this.trackScrollPane == null) {
             this.trackScrollPane = new JScrollPane(this.tracksPanel);
-            trackScrollPane.setPreferredSize(new Dimension (trackScrollPane.getWidth(), 230));
+            trackScrollPane.setPreferredSize(new Dimension (trackScrollPane.getWidth(), 100));
             this.visualPanel.add(this.trackScrollPane);
         }
 
@@ -356,7 +356,7 @@ public final class AppPanelTopComponent extends TopComponentExtended implements 
         basePanelPanel.add(basePanel);
 
         // put the panel's Viewer in lookup so it can be accessed
-        AbstractViewer viewer = (AbstractViewer) basePanel.getViewer();
+        AbstractViewer viewer = basePanel.getViewer();
         this.content.add(viewer);
 
         //maybe use this later

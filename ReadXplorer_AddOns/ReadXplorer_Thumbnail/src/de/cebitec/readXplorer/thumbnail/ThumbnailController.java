@@ -18,6 +18,8 @@ package de.cebitec.readXplorer.thumbnail;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readXplorer.controller.ViewController;
+import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
+import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException;
 import de.cebitec.readXplorer.databackend.connector.MultiTrackConnector;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
@@ -35,13 +37,12 @@ import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.IThumbnailView;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.CoverageInfoLabel;
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.CoverageZoomSlider;
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.MultipleTrackViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.TrackViewer;
-import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
-import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -59,6 +60,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JSlider;
 import javax.swing.JTable;
 import org.netbeans.api.visual.action.ActionFactory;
 import org.netbeans.api.visual.action.ResizeProvider.ControlPoint;
@@ -299,8 +301,8 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         trackV.setIsPanModeOn(false);
         trackV.setCanZoom(false);
 
-        CoverageInfoLabel cil = new CoverageInfoLabel();
-        trackV.setTrackInfoPanel(cil);
+//        CoverageInfoLabel cil = new CoverageInfoLabel();
+//        trackV.setTrackInfoPanel(cil);
 
         //own ComponentListener for TrackViewer
         trackV.addComponentListener(new TrackViewerCompListener(currentFeature, trackV));
@@ -348,16 +350,16 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         //eigener ComponentListener für TrackV
         trackV.addComponentListener(new TrackViewerCompListener(feature, trackV));
 
-        // create info panel
-        CoverageInfoLabel cil = new CoverageInfoLabel();
-        cil.renameFields();
-        trackV.setTrackInfoPanel(cil);
+//        // create info panel
+//        CoverageInfoLabel cil = new CoverageInfoLabel();
+//        cil.renameFields();
+//        trackV.setTrackInfoPanel(cil);
 
         // create zoom slider and set its value based on other slider's values for this Feature
         CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
         BasePanel p = featureToTrackpanelList.get(feature).get(0);
         try {
-            int sValue = ((CoverageZoomSlider) ((JPanel) p.getComponent(0)).getComponent(1)).getValue();
+            int sValue = ((JSlider) ((Container) p.getComponent(0)).getComponent(1)).getValue();
             slider.setValue(sValue);
         } catch (ClassCastException e) {
             Logger.getLogger(ThumbnailController.class.getName()).log(
@@ -452,7 +454,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
                                 for (BasePanel p : featureToTrackpanelList.get(feat)) {
                                     trackPanelToTrack.remove(p);
                                     //Stop CoverageThread
-                                    ((MultiTrackConnector) ((TrackViewer) p.getViewer()).getTrackCon()).getCoverageThread().stop();
+                                    ((TrackViewer) p.getViewer()).getTrackCon().getCoverageThread().stop();
                                 }
                                 featureToTrackpanelList.remove(feat);
                                 featureToLayoutWidget.remove(feat);
@@ -703,7 +705,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
 
         void startCompare(ActionEvent e) {
             try {
-                BasePanel secondTrackBP = (BasePanel) ((JPanel) ((JCheckBox) e.getSource()).getParent()).getParent();
+                BasePanel secondTrackBP = (BasePanel) ((Component) e.getSource()).getParent().getParent();
                 ArrayList<PersistantTrack> trackList = new ArrayList<>();
                 trackList.add(trackPanelToTrack.get(firstTrackPanelToCompare));
                 trackList.add(trackPanelToTrack.get(secondTrackBP));
@@ -717,7 +719,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         @Override
         public void actionPerformed(final ActionEvent e) {
             //Get Source of Event i.e. BasePanel
-            BasePanel bp = (BasePanel) ((JPanel) ((JCheckBox) e.getSource()).getParent()).getParent();
+            BasePanel bp = (BasePanel) ((Component) e.getSource()).getParent().getParent();
             if (bp != null) {
                 updateCurrentFeature(bp);
                 JCheckBox src = (JCheckBox) e.getSource();

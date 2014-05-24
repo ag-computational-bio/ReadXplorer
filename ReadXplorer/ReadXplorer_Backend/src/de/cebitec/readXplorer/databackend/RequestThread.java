@@ -96,15 +96,10 @@ public abstract class RequestThread extends Thread {
         int currentMiddle = calcCenterMiddle(request);
         
         // rounding error somewhere....
-        if (currentMiddle - 1 <= latestMiddle && latestMiddle <= currentMiddle + 1
+        return currentMiddle - 1 <= latestMiddle && latestMiddle <= currentMiddle + 1
                 || request.getDesiredData() != latestRequest.getDesiredData()
                 || request.getSender() != latestRequest.getSender()
-                || request.getChromId() != latestRequest.getChromId()
-                ) {
-            return true;
-        } else {
-            return false;
-        }
+                || request.getChromId() != latestRequest.getChromId();
     }
 
     /**

@@ -46,12 +46,7 @@ public class ErrorLimit {
     //skip error messages, if too many occur to prevent bug in the output panel
     public boolean allowOutput() {
         this.setErrorCount(this.getErrorCount() + 1);
-        if (getErrorCount() <= getMaxErrorCount()) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return getErrorCount() <= getMaxErrorCount();
     }
 
     /**
@@ -87,7 +82,7 @@ public class ErrorLimit {
      */
     public long getSkippedCount() {
         long n = this.errorCount - this.maxErrorCount;
-        if (n<0) n=0;
+        if (n < 0) { n = 0; }
         return n;
     }
     

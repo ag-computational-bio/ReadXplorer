@@ -51,7 +51,10 @@ public class CodonUtilities {
         String codons = customCodonString.substring(startIndex, customCodonString.indexOf(')'));
         String[] startsAndStops = codons.split(";");
         String[] starts = splitCodons(startsAndStops[0]);
-        String[] stops = splitCodons(startsAndStops[1]);
+        String[] stops = {};
+        if (startsAndStops.length > 1) {
+            stops = splitCodons(startsAndStops[1]);
+        }
         return new Pair<>(starts, stops);
     }
     
@@ -112,8 +115,10 @@ public class CodonUtilities {
      * @return An array of genetic codons.
      */
     private static String[] splitCodons(String codonString) {
-        String[] codonArray;
-        codonArray = codonString.split(",");
+        String[] codonArray = codonString.split(",");
+        if (codonArray.length == 1 && codonArray[0].isEmpty()) {
+            codonArray = new String[0];
+        }
         for (int i = 0; i < codonArray.length; ++i) {
             codonArray[i] = codonArray[i].toUpperCase().trim(); //to assure correct format
         }

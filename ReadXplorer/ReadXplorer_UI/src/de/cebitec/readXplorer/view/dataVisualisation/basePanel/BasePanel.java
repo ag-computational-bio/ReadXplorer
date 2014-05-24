@@ -27,10 +27,13 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.prefs.PreferenceChangeListener;
+import java.util.prefs.Preferences;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import org.openide.util.NbPreferences;
 
 /**
  * A BasePanel serves as basis for other visual components.
@@ -51,6 +54,8 @@ public class BasePanel extends JPanel implements MousePositionListener {
     private AdjustmentPanel adjustmentPanelHorizontal;
     private Component topPanel;
     private JScrollPane centerScrollpane;
+    private final Preferences pref = NbPreferences.forModule(Object.class);
+    private List<PreferenceChangeListener> listeners = new ArrayList<>();
 
     public BasePanel(BoundsInfoManager boundsManager, MousePositionListener viewController){
         super();
@@ -62,17 +67,26 @@ public class BasePanel extends JPanel implements MousePositionListener {
         this.currentMousePosListeners = new ArrayList<>();
     }
 
+    /**
+     * Method to call when this base panel is closed.
+     */
     public void close(){
         this.shutdownViewer();
         this.shutdownInfoPanelAndAdjustmentPanel();
+        for (PreferenceChangeListener listener : listeners) {
+            this.pref.removePreferenceChangeListener(listener);
+        }
         this.remove(centerPanel);
         this.centerPanel = null;
         this.viewController = null;
         this.updateUI();
     }
 
-    private void shutdownViewer(){
-        if(this.viewer != null){
+    /**
+     * Method shutting down the viewer contained in this base panel.
+     */
+    private void shutdownViewer() {
+        if (this.viewer != null) {
             this.boundsManager.removeBoundListener(viewer);
             this.currentMousePosListeners.remove(viewer);
             this.centerPanel.remove(viewer);
@@ -81,20 +95,23 @@ public class BasePanel extends JPanel implements MousePositionListener {
         }
     }
 
-    private void shutdownInfoPanelAndAdjustmentPanel(){
-        if(adjustmentPanelHorizontal != null){
+    /**
+     * Method shutting down the info and adjustment panels of this base panel.
+     */
+    private void shutdownInfoPanelAndAdjustmentPanel() {
+        if (adjustmentPanelHorizontal != null) {
             centerPanel.remove(adjustmentPanelHorizontal);
             adjustmentPanelHorizontal = null;
         }
 
-        if(rightPanel != null){
+        if (rightPanel != null) {
             rightPanel.close();
             this.remove(rightPanel);
             currentMousePosListeners.remove(rightPanel);
             rightPanel = null;
         }
 
-        if(leftPanel != null){
+        if (leftPanel != null) {
             leftPanel.close();
             this.remove(leftPanel);
             currentMousePosListeners.remove(leftPanel);
@@ -102,6 +119,11 @@ public class BasePanel extends JPanel implements MousePositionListener {
         }
     }
 
+    /**
+     * Set an AbstractViewer with a vertical zoom slider into this base panel.
+     * @param viewer The viewer to display in this base panel
+     * @param verticalZoom the vertical zoom slider for the viewer
+     */
     public void setViewer(AbstractViewer viewer, JSlider verticalZoom){
         this.viewer = viewer;
         verticalZoom.setOrientation(JSlider.VERTICAL);
@@ -117,6 +139,10 @@ public class BasePanel extends JPanel implements MousePositionListener {
         this.updateSize();
     }
 
+    /**
+     * Set an AbstractViewer without a vertical zoom slider into this base panel.
+     * @param viewer The viewer to display in this base panel
+     */
     public void setViewer(AbstractViewer viewer){
         this.viewer = viewer;
         this.boundsManager.addBoundsListener(viewer);
@@ -127,6 +153,10 @@ public class BasePanel extends JPanel implements MousePositionListener {
         this.updateSize();
     }
 
+    /**
+     * Sets the horizontal adjustment panel for this base panel.
+     * @param adjustmentPanel The horizontal scroll panel
+     */
     public void setHorizontalAdjustmentPanel(AdjustmentPanel adjustmentPanel){
         this.adjustmentPanelHorizontal = adjustmentPanel;
         centerPanel.add(adjustmentPanel, BorderLayout.NORTH);
@@ -237,12 +267,34 @@ public class BasePanel extends JPanel implements MousePositionListener {
         }
     }
 
+    /**
+     * @return The AbstractViewer displayed by this base panel.
+     */
     public AbstractViewer getViewer(){
         return viewer;
     }
 
     private void updateSize(){
-        this.setMaximumSize(new Dimension(Integer.MAX_VALUE, this.getPreferredSize().height));
+        this.setMaximumSize(new Dimension(Integer.MAX_VALUE, this.viewer.getPreferredSize().height));
+    }
+    
+    /**
+     * Add a <code>PreferenceChangeListener</code> to this 
+     * <code>BasePanel</code>'s preferences.
+     * @param listener The listener to add
+     */
+    public void addPrefListener(PreferenceChangeListener listener) {
+        this.listeners.add(listener);
+        this.pref.addPreferenceChangeListener(listener);
+    }
+    
+    /**
+     * Remove a <code>PreferenceChangeListener</code> from this
+     * <code>BasePanel</code>'s preferences.
+     * @param listener The listener to remove
+     */
+    public void removePrefListener(PreferenceChangeListener listener) {
+        this.pref.removePreferenceChangeListener(listener);
     }
 
 }

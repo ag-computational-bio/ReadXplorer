@@ -311,6 +311,6 @@ public class PatternFilter implements RegionFilterI {
      */
     public final void setPattern(String pattern) {
         this.pattern = Pattern.compile(pattern);
-//        this.patternRev = Pattern.compile(SequenceUtils.complementDNA(SequenceUtils.reverseString(pattern)));
+//        this.patternRev = Pattern.compile(SequenceUtils.getDnaComplement(SequenceUtils.reverseString(pattern)));
     }
 }

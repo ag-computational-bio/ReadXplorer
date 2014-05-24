@@ -265,14 +265,14 @@ public class StartCodonFilter implements RegionFilterI {
         for (int i = 0; i < startCodonsNew.length; ++i) {
             codon = startCodonsNew[i];
             this.startCodons[index++] = Pattern.compile(codon);
-            this.startCodons[index++] = Pattern.compile(SequenceUtils.complementDNA(SequenceUtils.reverseString(codon)));
+            this.startCodons[index++] = Pattern.compile(SequenceUtils.getDnaComplement(SequenceUtils.reverseString(codon)));
             this.selectedStarts.add(false);
         }
         index = 0;
         for (int i = 0; i < stopCodonsNew.length; ++i) {
             codon = stopCodonsNew[i];
             this.stopCodons[index++] = Pattern.compile(codon);
-            this.stopCodons[index++] = Pattern.compile(SequenceUtils.complementDNA(SequenceUtils.reverseString(codon)));
+            this.stopCodons[index++] = Pattern.compile(SequenceUtils.getDnaComplement(SequenceUtils.reverseString(codon)));
             this.selectedStops.add(false);
         }
     }   

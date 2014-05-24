@@ -42,8 +42,8 @@ public class StopWatch {
         long secs = TimeUnit.MILLISECONDS.toSeconds(millis);
         long millis_carryover = millis - TimeUnit.SECONDS.toMillis(secs);
         String s = "";
-        if (secs>0) s = String.format("%d s ", secs);
-        s = s + String.format("%d ms", millis_carryover);
+        if (secs>0) { s = String.format("%d s ", secs); }
+        s += String.format("%d ms", millis_carryover);
         return s;
     }
     

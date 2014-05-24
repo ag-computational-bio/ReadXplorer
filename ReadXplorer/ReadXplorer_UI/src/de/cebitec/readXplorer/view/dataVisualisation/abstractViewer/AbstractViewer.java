@@ -60,7 +60,7 @@ import org.openide.util.Exceptions;
  * methods for these values. Tooltips in this viewer are initially shown for 
  * 20 seconds.
  * 
- * @author ddoppmeier, rhilker
+ * @author ddoppmeier, rhilker <rhilker at mikrobio.med.uni-giessen.de>
  */
 public abstract class AbstractViewer extends JPanel implements LogicalBoundsListener, MousePositionListener {
 
@@ -132,9 +132,6 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         inDrawingMode = true;
         isActive = true;
 
-        // sets min, max and preferred size
-        this.setSizes();
-
         // init physical bounds
         horizontalMargin = 40;
         verticalMargin = 10;
@@ -153,12 +150,19 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
     }
 
-    private void setSizes() {
+    /**
+     * Sets the minimum, maximum and preferred size of this viewer based on the
+     * subclass implementation of <code>getMaximalHeight()</code>.
+     */
+    public void setSizes() {
         setMinimumSize(new Dimension(Integer.MIN_VALUE, getMaximalHeight()));
         setMaximumSize(new Dimension(Integer.MAX_VALUE, getMaximalHeight()));
         setPreferredSize(new Dimension(getPreferredSize().width, getMaximalHeight()));
     }
 
+    /**
+     * Carries out the stuff to do when the abstract viewer is closed.
+     */
     public void close() {
         boundsManager.removeBoundListener(this);
     }
@@ -234,9 +238,6 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         }
         // this.updatePhysicalBounds();
     }
-    /*
-     * check this error occures!
-     */
 
     private void adjustPaintingAreaInfo() {
         if (this.getHeight() > 0 && this.getWidth() > 0) {
@@ -417,25 +418,30 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     }
 
     /**
-     * @return <cc>true</cc> if this viewer is allowed to zoom via the mouse
-     * wheel, <cc>false</cc> otherwise.
+     * @return <code>true</code> if this viewer is allowed to zoom via the mouse
+     * wheel, <code>false</code> otherwise.
      */
     public boolean isCanZoom() {
         return canZoom;
     }
 
     /**
-     * @param canZoom <cc>true</cc> if this viewer is allowed to zoom via the 
-     * mouse wheel, <cc>false</cc> otherwise.
+     * @param canZoom <code>true</code> if this viewer is allowed to zoom via
+     * the mouse wheel, <code>false</code> otherwise.
      */
     public void setCanZoom(boolean canZoom) {
         this.canZoom = canZoom;
     }
 
+    /**
+     * Updates the tool tip text for the given logPos = reference position.
+     * @param logPos The reference position for which the tool tip shall be 
+     * shown
+     */
     public abstract void changeToolTipText(int logPos);
 
     /**
-     * Compute the space that is currently assigned for one base of the genome
+     * Compute the space that is currently assigned for one base of the genome.
      */
     private void calcBaseWidth() {
         if (pAInfoIsAvailable) {
@@ -455,11 +461,12 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     }
 
     /**
-     * Compute the horizontal position (pixel) for a logical position (base in genome).
-     * If a base has more space than one pixel, this method returns the leftmost pixel,
-     * meaning the beginning of the available interval for displaying this base
+     * Compute the horizontal position (pixel) for a logical position (base in
+     * genome). If a base has more space than one pixel, this method returns the
+     * leftmost pixel, meaning the beginning of the available interval for
+     * displaying this base.
      * @param logPos a position in the genome
-     * @return horizontal position for requested base position
+     * @return horizontal position for requested base position.
      */
     protected double transformToPhysicalCoord(int logPos) {
         double tmp = (logPos - bounds.getLogLeft()) * correlationFactor + horizontalMargin;

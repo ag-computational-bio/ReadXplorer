@@ -18,7 +18,6 @@ package de.cebitec.readXplorer.view.dialogMenus.screenshot;
 
 import de.cebitec.readXplorer.util.ScreenshotUtils;
 import de.cebitec.readXplorer.util.VisualisationUtils;
-import static de.cebitec.readXplorer.view.dialogMenus.screenshot.Bundle.*;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -73,7 +72,7 @@ public final class OpenScreenshotWizardAction implements ActionListener {
         WizardDescriptor wiz = new WizardDescriptor(new WizardDescriptor.ArrayIterator<>(VisualisationUtils.getWizardPanels(panels)));
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
         wiz.setTitleFormat(new MessageFormat("{0}"));
-        wiz.setTitle(ScreenshotWizardTitle());
+        wiz.setTitle(Bundle.ScreenshotWizardTitle());
         if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
             TopComponent comp = (TopComponent) wiz.getProperty(ScreenshotWizardPanel.PROP_SELECTED_TOP_COMP);
             Rectangle oldBounds = comp.getBounds();

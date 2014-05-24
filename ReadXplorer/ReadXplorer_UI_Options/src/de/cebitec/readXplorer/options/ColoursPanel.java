@@ -23,7 +23,7 @@ import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
 import org.openide.util.NbPreferences;
 
-final class ColoursPanel extends javax.swing.JPanel {
+final class ColoursPanel extends OptionsPanel {
 
     private static final long serialVersionUID = 1L;
     private final ColoursOptionsPanelController controller;
@@ -210,10 +210,6 @@ final class ColoursPanel extends javax.swing.JPanel {
         NbPreferences.forModule(Object.class).put("perfectMatchColour", Integer.toString(perfectMatchButton.getBackground().getRGB()));
         NbPreferences.forModule(Object.class).put("uniformColour", Integer.toString(uniformColButton.getBackground().getRGB()));
         NbPreferences.forModule(Object.class).putBoolean("uniformDesired", uniformColorationCheckBox.isSelected());
-    }
-
-    boolean valid() {
-        return true;
     }
 
     private void displayColorChooserForButton(javax.swing.JButton button){

@@ -21,6 +21,7 @@ package de.cebitec.readXplorer.api.objects;
  * the given methods.
  * 
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
+ * @param <T> Object type of the result of this analysis.
  */
 public interface AnalysisI<T> {    
     

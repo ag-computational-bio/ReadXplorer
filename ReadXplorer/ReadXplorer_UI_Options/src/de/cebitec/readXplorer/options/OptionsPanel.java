@@ -16,30 +16,32 @@
  */
 package de.cebitec.readXplorer.options;
 
-import org.netbeans.spi.options.OptionsPanelController;
+import javax.swing.JPanel;
 
 /**
- * Controller for genetic code options.
- * 
+ * An interface for option panels to load and store data.
+ *
  * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
  */
-@OptionsPanelController.TopLevelRegistration(categoryName = "#OptionsCategory_Name_GeneticCode",
-iconBase = "de/cebitec/readXplorer/options/geneticCode.png",
-keywords = "#OptionsCategory_Keywords_GeneticCode",
-keywordsCategory = "GeneticCode",
-position = 905)
-public final class GeneticCodeOptionsPanelController extends ChangeListeningOptionsPanelController {
-
-    private GeneticCodePanel panel;
-
+public abstract class OptionsPanel extends JPanel {
+    private static final long serialVersionUID = 1L;
+    
     /**
-     * {@inheritDoc}
+     * Loads some data.
      */
-    @Override
-    protected OptionsPanel getPanel() {
-        if (panel == null) {
-            panel = new GeneticCodePanel(this);
-        }
-        return panel;
+    abstract void load();
+    
+    /**
+     * Stores some data.
+     */
+    abstract void store();
+    
+    /**
+     * @return true, if the object is valid, false otherwise.
+     */
+    public boolean valid() {
+        // checks whether form is consistent and complete
+        return true;
     }
+    
 }
