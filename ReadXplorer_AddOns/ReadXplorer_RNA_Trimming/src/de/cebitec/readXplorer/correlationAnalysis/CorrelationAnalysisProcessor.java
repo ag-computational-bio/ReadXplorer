@@ -92,7 +92,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         this.correlationsList = new ArrayList<>();
 
         this.trackConnectors = new ArrayList<>();
-        HashMap<Integer, PersistantTrack> trackMap = new HashMap<>();
+        Map<Integer, PersistantTrack> trackMap = new HashMap<>();
         SaveFileFetcherForGUI fetcher = new SaveFileFetcherForGUI();
         for (PersistantTrack track : tracks) {
             try {
@@ -106,7 +106,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         
         this.analysisResult = new CorrelationResult(this.correlationsList, trackMap, 
                 referenceViewer.getReference().getId(), false, -1, -1);
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put("CorrelationCoefficient", cc);
         params.put("intervalLength", intervalLength);
         params.put("minCorrelation", minCorrelation);

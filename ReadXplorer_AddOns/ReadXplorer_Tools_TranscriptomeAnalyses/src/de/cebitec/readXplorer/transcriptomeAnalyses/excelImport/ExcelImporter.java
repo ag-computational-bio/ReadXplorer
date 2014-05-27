@@ -118,7 +118,7 @@ public class ExcelImporter {
             featureMap.put(persistantFeature.getLocus(), persistantFeature);
         }
 
-        HashMap<Integer, PersistantTrack> trackMap = new HashMap<>();
+        Map<Integer, PersistantTrack> trackMap = new HashMap<>();
         trackMap.put(track.getId(), track);
 
         progressHandle.progress("Load Statistics from file ... ", 15);
@@ -326,7 +326,7 @@ public class ExcelImporter {
         String chromID = (String) model.getValueAt(1, model.getColumnCount() - 2);
         int chromId = Integer.valueOf(chromID);
         PersistantTrack track = ProjectConnector.getInstance().getTrack(trackID);
-        HashMap<Integer, PersistantTrack> trackMap = new HashMap<>();
+        Map<Integer, PersistantTrack> trackMap = new HashMap<>();
         trackMap.put(track.getId(), track);
         TrackConnector connector = null;
         try {
@@ -389,7 +389,7 @@ public class ExcelImporter {
         String chromID = (String) model.getValueAt(1, model.getColumnCount() - 2);
         int chromId = Integer.valueOf(chromID);
         PersistantTrack track = ProjectConnector.getInstance().getTrack(trackID);
-        HashMap<Integer, PersistantTrack> trackMap = new HashMap<>();
+        Map<Integer, PersistantTrack> trackMap = new HashMap<>();
         trackMap.put(track.getId(), track);
         TrackConnector connector = null;
         try {
@@ -513,7 +513,7 @@ public class ExcelImporter {
         String chromID = (String) model.getValueAt(1, model.getColumnCount() - 2);
         int chromId = Integer.valueOf(chromID);
         PersistantTrack track = ProjectConnector.getInstance().getTrack(refID);
-        HashMap<Integer, PersistantTrack> trackMap = new HashMap<>();
+        Map<Integer, PersistantTrack> trackMap = new HashMap<>();
         trackMap.put(track.getId(), track);
         TrackConnector connector = null;
         try {

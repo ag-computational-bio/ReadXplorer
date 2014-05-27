@@ -22,8 +22,8 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.exporter.tables.ExportDataI;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Container for all data belonging to a covered feature detection result. Also
@@ -45,7 +45,7 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
      * feature detection was carried out
      * @param currentTrack the track on which this analysis result was generated
      */
-    public CoveredFeatureResult(List<CoveredFeature> results, HashMap<Integer, PersistantTrack> trackMap, int referenceId, 
+    public CoveredFeatureResult(List<CoveredFeature> results, Map<Integer, PersistantTrack> trackMap, int referenceId, 
             boolean combineTracks, int trackColumn, int filterColumn) {
         super(trackMap, referenceId, combineTracks, trackColumn, filterColumn);
         this.results = results;

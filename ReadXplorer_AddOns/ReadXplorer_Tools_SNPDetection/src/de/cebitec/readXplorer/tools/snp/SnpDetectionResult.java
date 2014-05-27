@@ -46,8 +46,8 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
      * @param trackMap hashmap of track ids to the tracks used in the analysis
      * @param referenceId id of the reference genome, for which this result was
      * generated
-     * @param combineTracks <cc>true</cc>, if the tracks in the list are
-     * combined, <cc>false</cc> otherwise
+     * @param combineTracks <code>true</code>, if the tracks in the list are
+     * combined, <code>false</code> otherwise
      */
     public SnpDetectionResult(List<SnpI> snpList, Map<Integer, PersistantTrack> trackMap, int referenceId, boolean combineTracks,
             int trackColumn, int filterColumn) {
