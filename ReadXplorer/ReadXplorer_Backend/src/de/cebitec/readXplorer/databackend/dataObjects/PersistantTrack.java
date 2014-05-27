@@ -122,14 +122,6 @@ public class PersistantTrack {
     }
     
     /**
-     * @return True, if this track is stored within the database, false, if it is
-     * stored for direct file access.
-     */
-    public boolean isDbUsed() {
-        return this.path.isEmpty();
-    }
-
-    /**
      * @return Returns the description of this track
      */
     @Override
@@ -150,8 +142,7 @@ public class PersistantTrack {
     
     
     /**
-     * Checks if the given track is equal to this one.
-     * @param o object to compare to this one
+     * {@inheritDoc }
      */
     @Override
     public boolean equals(Object o) {
@@ -182,22 +173,6 @@ public class PersistantTrack {
             trackNameList.add(track.getDescription());
         }
         return trackNameList;
-    }
-    
-    /**
-     * Checks if any of the tracks in the list is a track completely stored in
-     * the DB.
-     * @param tracks the list of tracks to check
-     * @return true, if there is at least one track completely stored in the DB,
-     * false otherwise
-     */
-    public static boolean checkForDBTrack(List<PersistantTrack> tracks) {
-        for (PersistantTrack track : tracks) {
-            if (track.isDbUsed()) {
-                return true;
-            }
-        }
-        return false;
     }
 
 }

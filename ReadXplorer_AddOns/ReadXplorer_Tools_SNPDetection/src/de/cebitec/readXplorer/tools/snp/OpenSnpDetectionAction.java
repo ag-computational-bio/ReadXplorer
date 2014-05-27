@@ -19,6 +19,7 @@ package de.cebitec.readXplorer.tools.snp;
 import de.cebitec.readXplorer.databackend.AnalysesHandler;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
+import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
@@ -143,11 +144,8 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
         List<PersistantTrack> selectedTracks = openTracksPanel.getComponent().getSelectedTracks();
         if (!cancelled && !selectedTracks.isEmpty()) {
             this.tracks = new ArrayList<>();
-            this.trackMap = new HashMap<>();
+            this.trackMap = ProjectConnector.getTrackMap(tracks);
             this.tracks = selectedTracks;
-            for (PersistantTrack track : this.tracks) {
-                this.trackMap.put(track.getId(), track);
-            }
 
             this.snpDetectionTopComp = (SNP_DetectionTopComponent) WindowManager.getDefault().findTopComponent("SNP_DetectionTopComponent");
             this.snpDetectionTopComp.setName(Bundle.TITLE_SNPDetectionTopComp());

@@ -49,8 +49,8 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
      * their respective chromosomes id.
      * @param trackMap the map of track ids to the tracks for which the analysis was carried out
      * @param referenceId id of the reference genome, for which this result was generated
-     * @param combineTracks <cc>true</cc>, if the tracks in the list are 
-     * combined, <cc>false</cc> otherwise
+     * @param combineTracks <code>true</code>, if the tracks in the list are 
+     * combined, <code>false</code> otherwise
      * @param trackColumn
      * @param filterColumn
      */
@@ -80,8 +80,8 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
     }
 
     /**
-     * @return <cc>true</cc>, if the tracks in the list are combined,
-     * <cc>false</cc> otherwise
+     * @return <code>true</code>, if the tracks in the list are combined,
+     * <code>false</code> otherwise
      */
     public boolean isCombineTracks() {
         return combineTracks;
@@ -90,8 +90,8 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
     /**
      * Concatenates all track names either in full length or each name trimmed 
      * to 20 characters.
-     * @param fullLength <cc>true</cc>, if the track names shall appear in full 
-     * length, <cc>false</cc> otherwise
+     * @param fullLength <code>true</code>, if the track names shall appear in full 
+     * length, <code>false</code> otherwise
      * @return The concatenated String containing all track names.
      */
     private String getCombinedTrackNames(boolean fullLength) {

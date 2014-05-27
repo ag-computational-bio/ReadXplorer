@@ -17,6 +17,7 @@
 package de.cebitec.readXplorer.ui.dataAdministration;
 
 import de.cebitec.readXplorer.parser.TrackJob;
+import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.event.TableModelEvent;
@@ -40,7 +41,7 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener{
     /** Creates new form MappingView */
     public TrackView() {
         initComponents();
-        jobs = new ArrayList<TrackJob>();
+        jobs = new ArrayList<>();
     }
 
     public void setTrackJobs(List<TrackJob> trackJobs){
@@ -54,10 +55,10 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener{
     }
 
     public List<TrackJob> getJobs2Del(){
-        jobs2del = new ArrayList<TrackJob>();
+        jobs2del = new ArrayList<>();
 
-        for (int row = 0; row <= jobTable.getRowCount()-1; row++) {
-            if ((Boolean) jobTable.getValueAt(row, 0)){
+        for (int row = 0; row <= jobTable.getRowCount() - 1; row++) {
+            if ((Boolean) jobTable.getValueAt(row, 0)) {
                 jobs2del.add(jobs.get(row));
             }
         }
@@ -72,14 +73,14 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener{
     }
 
     private void checkColumnSelection() {
-        List<Boolean> selection = new ArrayList<Boolean>();
+        List<Boolean> selection = new ArrayList<>();
 
-        for (int row = 0; row <= jobTable.getRowCount()-1; row++) {
+        for (int row = 0; row <= jobTable.getRowCount() - 1; row++) {
             selection.add((Boolean) jobTable.getValueAt(row, 0));
         }
 
-        hasCheckedJobs = selection.contains(Boolean.TRUE) ? Boolean.TRUE : Boolean.FALSE;
-        firePropertyChange(SelectionCard.PROP_HAS_CHECKED_JOBS, null, hasCheckedJobs);
+        hasCheckedJobs = selection.contains(Boolean.TRUE);
+        firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, hasCheckedJobs);
     }
 
     /** This method is called from within the constructor to

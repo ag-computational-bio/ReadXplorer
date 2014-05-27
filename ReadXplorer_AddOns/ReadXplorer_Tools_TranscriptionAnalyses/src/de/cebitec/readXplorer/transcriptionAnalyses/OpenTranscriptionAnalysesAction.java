@@ -19,6 +19,7 @@ package de.cebitec.readXplorer.transcriptionAnalyses;
 import de.cebitec.readXplorer.databackend.AnalysesHandler;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
+import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
@@ -151,10 +152,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
         List<PersistantTrack> selectedTracks = transWizardIterator.getSelectedTracks();
         if (!cancelled && !selectedTracks.isEmpty()) {
             this.tracks = selectedTracks;
-            this.trackMap = new HashMap<>();
-            for (PersistantTrack track : this.tracks) {
-                this.trackMap.put(track.getId(), track);
-            }
+            this.trackMap = ProjectConnector.getTrackMap(tracks);
 
             this.transcAnalysesTopComp.open();
             this.startTransciptionAnalyses(wiz);

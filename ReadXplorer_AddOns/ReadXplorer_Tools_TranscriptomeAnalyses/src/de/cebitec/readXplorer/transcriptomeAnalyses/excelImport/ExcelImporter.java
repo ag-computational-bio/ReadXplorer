@@ -1,5 +1,6 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.excelImport;
 
+import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
@@ -26,7 +27,6 @@ import de.cebitec.readXplorer.transcriptomeAnalyses.main.TSSDetectionResults;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.TranscriptomeAnalysesTopComponentTopComponent;
 import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.TranscriptomeAnalysisWizardIterator;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;

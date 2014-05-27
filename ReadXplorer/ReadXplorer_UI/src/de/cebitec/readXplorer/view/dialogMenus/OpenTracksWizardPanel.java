@@ -63,9 +63,6 @@ public class OpenTracksWizardPanel extends ChangeListeningWizardPanel {
             List<PersistantTrack> tracks = this.component.getSelectedTracks();
             wiz.putProperty(getPropSelectedTracks(), tracks);
             wiz.putProperty(getPropCombineTracks(), this.component.isCombineTracks());
-            if (this.readClassVisualPanel != null) {
-                this.readClassVisualPanel.setUsingDBTrack(PersistantTrack.checkForDBTrack(tracks));
-            }
         }
     }
 

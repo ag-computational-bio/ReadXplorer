@@ -27,11 +27,11 @@ import java.util.List;
  */
 public class MultiTrackConnector extends TrackConnector {
 
-    MultiTrackConnector(PersistantTrack track, String adapter) throws FileNotFoundException {
-        super(track, adapter);
+    MultiTrackConnector(PersistantTrack track) throws FileNotFoundException {
+        super(track);
     }
 
-    MultiTrackConnector(List<PersistantTrack> tracks, String adapter) throws FileNotFoundException {
-        super(9999, tracks, adapter, false);
+    MultiTrackConnector(List<PersistantTrack> tracks) throws FileNotFoundException {
+        super(9999, tracks, false);
     }
 }

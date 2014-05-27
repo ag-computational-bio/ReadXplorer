@@ -17,20 +17,15 @@
 package de.cebitec.readXplorer.databackend;
 
 import de.cebitec.readXplorer.api.objects.JobI;
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.util.Benchmark;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
-import de.cebitec.readXplorer.util.StatsContainer;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -133,66 +128,20 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
         } else if (this.mappingsNeeded) {
 
             int stepSize = 150000;
+            for (PersistantChromosome chrom : chroms.values()) {
 
-            if (trackConnector.isDbUsed()) {
-                //calculate which mappings are needed from the db
-                int numUnneededMappings = 0;
-                List<PersistantTrack> tracksAll = ProjectConnector.getInstance().getTracks();
-                for (PersistantTrack track : tracksAll) {
-                    TrackConnector connector;
-                    try {
-                        connector = ProjectConnector.getInstance().getTrackConnector(track);
-                    } catch (FileNotFoundException ex) {
-                        //This can only happen is SamBam files are used but in this
-                        //case we are in DbUsed mode. This means this Exception will
-                        //never be thrown.
-                        return;
-                    }
-                    if (track.getId() < trackConnector.getTrackID()) {
-                        numUnneededMappings += connector.getTrackStats().getStatsMap().get(StatsContainer.NO_UNIQ_MAPPINGS);
-                    } else {
-                        break;
-                    }
-                }
-                int numInterestingMappings = numUnneededMappings + trackConnector.getTrackStats().getStatsMap().get(StatsContainer.NO_UNIQ_MAPPINGS);
-                int from = numUnneededMappings;
-                int to = numInterestingMappings - numUnneededMappings > stepSize
-                        ? numUnneededMappings + stepSize : numInterestingMappings;
-                desiredData = Properties.MAPPINGS_DB_BY_ID;
-
-                int additionalRequest = numInterestingMappings % stepSize == 0 ? 0 : 1;
-                this.nbMappingRequests = (numInterestingMappings - numUnneededMappings) / stepSize + additionalRequest;
-
-                this.nbRequests += this.nbMappingRequests;
-                this.progressHandle.switchToDeterminate(this.nbRequests);
-                this.progressHandle.progress("Request " + (nbCarriedOutRequests + 1) + " of " + nbRequests, nbCarriedOutRequests);
-                int chromId = trackConnector.getRefGenome().getActiveChromId();
-
-                while (to < numInterestingMappings) {
-                    trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, chromId, this, false, desiredData, readClassParams));
+                int chromLength = chrom.getLength();
+                int from = 1;
+                int to = this.calcRightBoundary(chromLength, stepSize, MAPPING_QUERRIES_FINISHED);
+                while (to < chromLength) {
+                    trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, chrom.getId(), this, false, desiredData, readClassParams));
                     from = to + 1;
                     to += stepSize;
                 }
 
                 //calc last interval until genomeSize
-                to = numInterestingMappings;
-                trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, chromId, this, false, desiredData, readClassParams));
-            } else {
-                for (PersistantChromosome chrom : chroms.values()) {
-
-                    int chromLength = chrom.getLength();
-                    int from = 1;
-                    int to = this.calcRightBoundary(chromLength, stepSize, MAPPING_QUERRIES_FINISHED);
-                    while (to < chromLength) {
-                        trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, chrom.getId(), this, false, desiredData, readClassParams));
-                        from = to + 1;
-                        to += stepSize;
-                    }
-
-                    //calc last interval until genomeSize
-                    to = chromLength;
-                    trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, chrom.getId(), this, false, desiredData, readClassParams));
-                }
+                to = chromLength;
+                trackConnector.addMappingAnalysisRequest(new IntervalRequest(from, to, chrom.getId(), this, false, desiredData, readClassParams));
             }
         } else {
             this.progressHandle.finish();

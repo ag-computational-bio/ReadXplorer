@@ -26,7 +26,12 @@ import de.cebitec.readXplorer.util.SamUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import net.sf.samtools.*;
+import net.sf.samtools.SAMFileHeader;
+import net.sf.samtools.SAMFileReader;
+import net.sf.samtools.SAMFileWriter;
+import net.sf.samtools.SAMFormatException;
+import net.sf.samtools.SAMRecord;
+import net.sf.samtools.SAMRecordIterator;
 import net.sf.samtools.util.RuntimeEOFException;
 import org.openide.util.NbBundle;
 
@@ -70,6 +75,7 @@ public class SamBamCombiner implements CombinerI {
      * pairs) in one file. The first trackjob contains the new file name
      * afterwards, while the second trackjob contains an empty file name to
      * prevent reuse of it after the combination.
+     * @throws de.cebitec.readXplorer.parser.common.ParsingException
      * @throws OutOfMemoryError 
      */
     @Override

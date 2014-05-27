@@ -18,6 +18,8 @@ package de.cebitec.readXplorer.coverageAnalysis;
 
 import de.cebitec.readXplorer.databackend.AnalysesHandler;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
+import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
+import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
@@ -25,7 +27,6 @@ import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.readXplorer.view.dialogMenus.OpenTracksWizardPanel;
-import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.view.dialogMenus.SelectReadClassWizardPanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -75,7 +76,7 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
     private SelectReadClassWizardPanel readClassWizPanel;
     private OpenTracksWizardPanel openTracksPanel;
     private CoverageAnalysisTopComponent coveredAnnoAnalysisTopComp;
-    private HashMap<Integer, PersistantTrack> trackMap;
+    private Map<Integer, PersistantTrack> trackMap;
     private int finishedCovAnalyses = 0;
     private ResultPanelCoverageAnalysis coverageAnalysisResultPanel;
 
@@ -124,13 +125,10 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
         List<PersistantTrack> selectedTracks = openTracksPanel.getComponent().getSelectedTracks();
         if (!cancelled && !selectedTracks.isEmpty()) {
             this.tracks = selectedTracks;
-            this.trackMap = new HashMap<>();
+            this.trackMap = ProjectConnector.getTrackMap(tracks);
             this.trackToAnalysisMap = new HashMap<>();
             this.finishedCovAnalyses = 0;
             this.coverageAnalysisResultPanel = null;
-            for (PersistantTrack track : this.tracks) {
-                this.trackMap.put(track.getId(), track);
-            }
 
             if (this.coveredAnnoAnalysisTopComp == null) {
                 this.coveredAnnoAnalysisTopComp = (CoverageAnalysisTopComponent) WindowManager.getDefault().findTopComponent("CoverageAnalysisTopComponent");

@@ -16,7 +16,6 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.trackViewer;
 
-import de.cebitec.readXplorer.controller.TrackCacher;
 import de.cebitec.readXplorer.databackend.IntervalRequest;
 import de.cebitec.readXplorer.databackend.ThreadListener;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
@@ -135,9 +134,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             }
         });
         
-        this.setSizes();
-        TrackCacher tc = new TrackCacher(trackCon, refGen.getActiveChromLength());
-          
+        this.setSizes();          
     }
 
     /**

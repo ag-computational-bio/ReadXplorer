@@ -17,6 +17,7 @@
 package de.cebitec.readXplorer.ui.dataAdministration;
 
 import de.cebitec.readXplorer.parser.ReferenceJob;
+import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.event.TableModelEvent;
@@ -30,7 +31,7 @@ import org.openide.util.NbBundle;
  *
  * @author ddoppmeier
  */
-public class ReferenceView extends javax.swing.JPanel implements TableModelListener{
+public class ReferenceView extends javax.swing.JPanel implements TableModelListener {
 
     private static final long serialVersionUID = 72465263;
     private List<ReferenceJob> jobs;
@@ -40,7 +41,7 @@ public class ReferenceView extends javax.swing.JPanel implements TableModelListe
     /** Creates new form RefGenView */
     public ReferenceView() {
         initComponents();
-        jobs = new ArrayList<ReferenceJob>();
+        jobs = new ArrayList<>();
     }
 
     public void setReferenceJobs(List<ReferenceJob> refJobs){
@@ -54,10 +55,10 @@ public class ReferenceView extends javax.swing.JPanel implements TableModelListe
     }
 
     public List<ReferenceJob> getJobs2del(){
-        jobs2del = new ArrayList<ReferenceJob>();
+        jobs2del = new ArrayList<>();
 
-        for (int row = 0; row <= jobTable.getRowCount()-1; row++) {
-            if ((Boolean) jobTable.getValueAt(row, 0)){
+        for (int row = 0; row <= jobTable.getRowCount() - 1; row++) {
+            if ((Boolean) jobTable.getValueAt(row, 0)) {
                 jobs2del.add(jobs.get(row));
             }
         }
@@ -72,14 +73,14 @@ public class ReferenceView extends javax.swing.JPanel implements TableModelListe
     }
 
     private void checkColumnSelection() {
-        List<Boolean> selection = new ArrayList<Boolean>();
+        List<Boolean> selection = new ArrayList<>();
 
-        for (int row = 0; row <= jobTable.getRowCount()-1; row++) {
+        for (int row = 0; row <= jobTable.getRowCount() - 1; row++) {
             selection.add((Boolean) jobTable.getValueAt(row, 0));
         }
 
-        hasCheckedJobs = selection.contains(Boolean.TRUE) ? Boolean.TRUE : Boolean.FALSE;
-        firePropertyChange(SelectionCard.PROP_HAS_CHECKED_JOBS, null, hasCheckedJobs);
+        hasCheckedJobs = selection.contains(Boolean.TRUE);
+        firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, hasCheckedJobs);
     }
 
     void deselectRefGen(ReferenceJob refGen) {

@@ -26,7 +26,6 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantDiff;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReferenceGap;
 import de.cebitec.readXplorer.util.ColorProperties;
-import de.cebitec.readXplorer.util.Properties; 
 import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.GenomeGapManager;
@@ -237,8 +236,6 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         int totalTo = upperBound + MININTERVALLENGTH;
         if (cov != null && cov.coversBounds(lowerBound, upperBound) && !this.isNewDataRequestNeeded()) {
             this.coverageLoaded = true;
-            //we need to load the diffs seperately for tracks completely stored in the db
-            this.diffsLoaded = trackConnector.addDiffRequest(new IntervalRequest(from, to, totalFrom, totalTo, refGen.getActiveChromId(), this, true, Properties.DIFFS, Properties.NORMAL));
             if (this.diffsLoaded) {
                 this.setupData();
             }
@@ -248,7 +245,6 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
             this.diffsLoaded = false;
             ParametersReadClasses readClassParams = this.getReadClassParams();
             trackConnector.addCoverageRequest(new IntervalRequest(from, to, totalFrom, totalTo, refGen.getActiveChromId(), this, true, readClassParams));
-            trackConnector.addDiffRequest(new IntervalRequest(from, to, totalFrom, totalTo, refGen.getActiveChromId(), this, true, Properties.DIFFS, Properties.NORMAL, readClassParams));
         }
     }
 

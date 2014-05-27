@@ -18,6 +18,8 @@ package de.cebitec.readXplorer.api.objects;
 
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.event.DocumentEvent;
@@ -39,7 +41,7 @@ public abstract class JobPanel extends JPanel implements NewJobDialogI {
     private static final long serialVersionUID = 1L;
     
     /**
-     * @return <cc>true</cc>, if all required information is set, <cc>false</cc> 
+     * @return <code>true</code>, if all required information is set, <code>false</code> 
      * otherwise.
      */
     @Override
@@ -82,7 +84,6 @@ public abstract class JobPanel extends JPanel implements NewJobDialogI {
     }
     
     /**
-     * 
      * @param table the table to which this listener is added to determine row
      * and column of the MouseEvent
      * @param column the column to which this listener listens
@@ -98,6 +99,19 @@ public abstract class JobPanel extends JPanel implements NewJobDialogI {
                 if (row >= 0 && col == column) {
                     isRequiredInfoSet();
                 }
+            }
+        };
+    }
+    
+    /**
+     * @return A PropertyChangeListener calling {@link isRequiredInfoSet()}.
+     */
+    public PropertyChangeListener createPropertyChangeListener() {
+        return new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                isRequiredInfoSet();
             }
         };
     }

@@ -19,15 +19,16 @@ package de.cebitec.readXplorer.view.login;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readXplorer.api.cookies.LoginCookie;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readXplorer.view.dialogMenus.LoadingDialog;
-import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -50,7 +51,7 @@ import org.openide.windows.WindowManager;
 public final class LoginWizardAction implements ActionListener {
 
     private static final long serialVersionUID = 1L;
-    private WizardDescriptor.Panel<WizardDescriptor>[] panels;
+    private List<WizardDescriptor.Panel<WizardDescriptor>> panels;
     private LoadingDialog loading;
     private LoginWizardPanel loginPanel;
 
@@ -64,20 +65,25 @@ public final class LoginWizardAction implements ActionListener {
             LogoutAction logoutAction = new LogoutAction(cl.lookup(LoginCookie.class));
             logoutAction.actionPerformed(new ActionEvent(this, 1, "close"));
         }
-
-        final WizardDescriptor wizardDescriptor = new WizardDescriptor(getPanels());
+        
+        if (panels == null) {
+            this.loginPanel = new LoginWizardPanel();
+            panels = new ArrayList<>();
+            panels.add(loginPanel);
+        }
+        WizardDescriptor wiz = new WizardDescriptor(new WizardDescriptor.ArrayIterator<>(VisualisationUtils.getWizardPanels(panels)));
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
-        wizardDescriptor.setTitleFormat(new MessageFormat("{0}"));
-        wizardDescriptor.setTitle(NbBundle.getMessage(LoginWizardAction.class, "TTL_LoginWizardAction"));
-        Dialog dialog = DialogDisplayer.getDefault().createDialog(wizardDescriptor);
+        wiz.setTitleFormat(new MessageFormat("{0}"));
+        wiz.setTitle(NbBundle.getMessage(LoginWizardAction.class, "TTL_LoginWizardAction"));
+        Dialog dialog = DialogDisplayer.getDefault().createDialog(wiz);
         dialog.setVisible(true);
         dialog.toFront();
-        boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
+        boolean cancelled = wiz.getValue() != WizardDescriptor.FINISH_OPTION;
         if (!cancelled) {
             try {
                 this.loading = new LoadingDialog(WindowManager.getDefault().getMainWindow());
 
-                final Map<String, Object> loginProps = wizardDescriptor.getProperties();
+                final Map<String, Object> loginProps = wiz.getProperties();
                 //add database path to main window title
                 JFrame mainFrame = (JFrame) WindowManager.getDefault().getMainWindow();
                 mainFrame.setTitle(mainFrame.getTitle() + " - " + (String) loginProps.get(LoginWizardPanel.PROP_DATABASE));
@@ -112,42 +118,6 @@ public final class LoginWizardAction implements ActionListener {
                         Bundle.LoginWizardAction_ErrorHeader(), JOptionPane.ERROR_MESSAGE);
             }
         }
-    }
-
-    /**
-     * Initialize panels representing individual wizard's steps and sets various
-     * properties for them influencing wizard appearance.
-     */
-    @SuppressWarnings("unchecked")
-    private WizardDescriptor.Panel<WizardDescriptor>[] getPanels() {
-        if (this.loginPanel == null) {
-            this.loginPanel = new LoginWizardPanel();
-        }
-        if (panels == null) {
-            panels = new WizardDescriptor.Panel[]{ this.loginPanel };
-            String[] steps = new String[panels.length];
-            for (int i = 0; i < panels.length; i++) {
-                Component c = panels[i].getComponent();
-                // Default step name to component name of panel. Mainly useful
-                // for getting the name of the target chooser to appear in the
-                // list of steps.
-                steps[i] = c.getName();
-                if (c instanceof JComponent) { // assume Swing components
-                    JComponent jc = (JComponent) c;
-                    // Sets step number of a component
-                    jc.putClientProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, new Integer(i));
-                    // Sets steps names for a panel
-                    jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DATA, steps);
-                    // Turn on subtitle creation on each step
-                    jc.putClientProperty(WizardDescriptor.PROP_AUTO_WIZARD_STYLE, Boolean.TRUE);
-                    // Show steps on the left side with the image on the background
-                    jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DISPLAYED, Boolean.FALSE);
-                    // Turn on numbering of all steps
-                    jc.putClientProperty(WizardDescriptor.PROP_CONTENT_NUMBERED, Boolean.TRUE);
-                }
-            }
-        }
-        return panels;
     }
 
     /**

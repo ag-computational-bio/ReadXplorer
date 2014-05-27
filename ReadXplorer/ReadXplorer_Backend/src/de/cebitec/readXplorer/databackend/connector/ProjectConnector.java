@@ -116,7 +116,6 @@ public class ProjectConnector extends Observable {
      * Clears all track an reference connector lists of this ProjectConnector.
      */
     private void cleanUp() {
-        Iterator<Integer> trackConIt = trackConnectors.keySet().iterator();
         trackConnectors.clear();
         refConnectors.clear();
     }
@@ -252,39 +251,12 @@ public class ProjectConnector extends Observable {
             con.prepareStatement(H2SQLStatements.SETUP_CHROMOSOME).executeUpdate();
             con.prepareStatement(H2SQLStatements.INDEX_CHROMOSOME).executeUpdate();
             
-            con.prepareStatement(H2SQLStatements.SETUP_DIFFS).executeUpdate();
-            con.prepareStatement(H2SQLStatements.INDEX_DIFF).executeUpdate();
-            
-            con.prepareStatement(H2SQLStatements.SETUP_COVERAGE).executeUpdate();
-            con.prepareStatement(H2SQLStatements.INDEX_COVERAGE).executeUpdate();
-            
-            //create reversed coverage index (speedup by factor of 3 with many tracks in one database)
-            con.prepareStatement(H2SQLStatements.INDEX_COVERAGE_RV).executeUpdate();
-            
             con.prepareStatement(H2SQLStatements.SETUP_FEATURES).executeUpdate();
             con.prepareStatement(H2SQLStatements.INDEX_FEATURES).executeUpdate();
             
-            con.prepareStatement(H2SQLStatements.SETUP_MAPPINGS).executeUpdate();
-//            con.prepareStatement(H2SQLStatements.INDEX_MAPPINGS).executeUpdate();
-            con.prepareStatement(H2SQLStatements.INDEX_MAPPING_START).executeUpdate();
-            con.prepareStatement(H2SQLStatements.INDEX_MAPPING_STOP).executeUpdate();
-            con.prepareStatement(H2SQLStatements.INDEX_MAPPING_SEQ_ID).executeUpdate();
-            
             con.prepareStatement(H2SQLStatements.SETUP_TRACKS).execute();
             con.prepareStatement(H2SQLStatements.INDEX_TRACK_REFID).executeUpdate();
-            con.prepareStatement(H2SQLStatements.INDEX_TRACK_SEQ_PAIR_ID).executeUpdate();
-            
-            con.prepareStatement(H2SQLStatements.SETUP_SEQ_PAIRS).execute();
-            con.prepareStatement(H2SQLStatements.INDEX_SEQ_PAIR_PAIR_ID).executeUpdate();
-            con.prepareStatement(H2SQLStatements.INDEX_SEQ_PAIR_MAPPING1_ID).executeUpdate();
-            con.prepareStatement(H2SQLStatements.INDEX_SEQ_PAIR_MAPPING2_ID).executeUpdate();
-            
-            con.prepareStatement(H2SQLStatements.SETUP_SEQ_PAIR_REPLICATES).execute();
-            con.prepareStatement(H2SQLStatements.INDEX_SEQ_PAIR_REPLICATES).executeUpdate();
-            
-            con.prepareStatement(H2SQLStatements.SETUP_SEQ_PAIR_PIVOT).execute();
-            con.prepareStatement(H2SQLStatements.INDEX_SEQ_PAIR_PIVOT_MID).executeUpdate();
-            con.prepareStatement(H2SQLStatements.INDEX_SEQ_PAIR_PIVOT_SID).executeUpdate();
+            con.prepareStatement(H2SQLStatements.INDEX_TRACK_READ_PAIR_ID).executeUpdate();
             
             con.prepareStatement(SQLStatements.SETUP_STATISTICS).executeUpdate();
             
@@ -321,15 +293,8 @@ public class ProjectConnector extends Observable {
             //create tables if not exist yet
 //            con.prepareStatement(SQLStatements.SETUP_PROJECT_FOLDER).executeUpdate();
             con.prepareStatement(MySQLStatements.SETUP_REFERENCE_GENOME).executeUpdate();
-            con.prepareStatement(MySQLStatements.SETUP_POSITIONS).executeUpdate();
-            con.prepareStatement(MySQLStatements.SETUP_DIFFS).executeUpdate();
-            con.prepareStatement(MySQLStatements.SETUP_COVERAGE).executeUpdate();
             con.prepareStatement(MySQLStatements.SETUP_FEATURES).executeUpdate();
-            con.prepareStatement(MySQLStatements.SETUP_MAPPINGS).executeUpdate();
             con.prepareStatement(MySQLStatements.SETUP_TRACKS).execute();
-            con.prepareStatement(MySQLStatements.SETUP_SEQ_PAIRS).execute();
-            con.prepareStatement(MySQLStatements.SETUP_SEQ_PAIR_REPLICATES).execute();
-            con.prepareStatement(MySQLStatements.SETUP_SEQ_PAIR_PIVOT).execute();
             con.prepareStatement(SQLStatements.SETUP_STATISTICS).execute();
             con.prepareStatement(MySQLStatements.SETUP_COUNT_DISTRIBUTION).executeUpdate();
             con.prepareStatement(MySQLStatements.SETUP_CHROMOSOME).executeUpdate();
@@ -780,9 +745,9 @@ public class ProjectConnector extends Observable {
     public void storeTrackStatistics(ParsedTrack track) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track statistics data...");
 
-        int coveragePerf;
-        int coverageBM;
-        int coverageComplete;
+        int coveragePerf = 0;
+        int coverageBM = 0;
+        int coverageComplete = 0;
         int trackID = track.getID();
         StatsContainer statsContainer = track.getStatsContainer();
         Map<String, Integer> statsMap = statsContainer.getStatsMap();
@@ -806,24 +771,15 @@ public class ProjectConnector extends Observable {
             CoverageContainer cov = track.getCoverageContainer();
             if (cov.getCoveredPerfectPositions() > 0) {
                 coveragePerf = cov.getCoveredPerfectPositions();
-            } else {
-                coveragePerf = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_OF_PERFECT_POSITIONS_FOR_TRACK,
-                        SQLStatements.GET_NUM, con, trackID);
-            }
+            } 
 
             if (cov.getCoveredBestMatchPositions() > 0) {
                 coverageBM = cov.getCoveredBestMatchPositions();
-            } else {
-                coverageBM = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_BM_COVERAGE_OF_GENOME_CALCULATE,
-                        SQLStatements.GET_NUM, con, trackID);
-            }
+            } 
 
             if (cov.getCoveredCommonMatchPositions() > 0) {
                 coverageComplete = cov.getCoveredCommonMatchPositions();
-            } else {
-                coverageComplete = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_COVERED_POSITIONS,
-                        SQLStatements.GET_NUM, con, trackID);
-            }
+            } 
 
             //calculate average read length
             int averageReadLength = this.containerCount > 0 ? this.averageReadLengthPart / this.containerCount : 0;
@@ -956,8 +912,7 @@ public class ProjectConnector extends Observable {
     }
 
     /**
-     * Sets the sequence pair id for both tracks belonging to one sequence pair.
-     *
+     * Sets the read pair id for both tracks belonging to one read pair.
      * @param track1Id track id of first track of the pair
      * @param track2Id track id of second track of the pair
      */
@@ -965,9 +920,9 @@ public class ProjectConnector extends Observable {
 
         try {
             //not 0, because 0 is the value when a track is not a sequence pair track!
-            int readPairId = (int) GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_TRACK_SEQUENCE_PAIR_ID, con);
+            int readPairId = (int) GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_TRACK_READ_PAIR_ID, con);
 
-            try (PreparedStatement setReadPairIds = con.prepareStatement(SQLStatements.INSERT_TRACK_SEQ_PAIR_ID)) {
+            try (PreparedStatement setReadPairIds = con.prepareStatement(SQLStatements.INSERT_TRACK_READ_PAIR_ID)) {
                 setReadPairIds.setInt(1, readPairId);
                 setReadPairIds.setLong(2, track1Id);
                 setReadPairIds.execute();
@@ -990,13 +945,6 @@ public class ProjectConnector extends Observable {
     }
 
     /**
-     * Locks all tables involved when adding seq pair data in mysql fashion.
-     */
-    private void lockReadPairDomainTables() {
-        this.lockDomainTables(MySQLStatements.LOCK_TABLE_SEQUENCE_PAIRS_DOMAIN, "seq pair");
-    }
-
-    /**
      * Locks all tables declared by the lock sql statement.
      * @param lockStatement sql statement to lock some tables
      * @param domainName name of the domain to lock for logging
@@ -1013,19 +961,13 @@ public class ProjectConnector extends Observable {
 
     private void disableTrackDomainIndices() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "started disabling track data domain indices");
-        this.disableDomainIndices(MySQLStatements.DISABLE_COVERAGE_INDICES, null);
         this.disableDomainIndices(MySQLStatements.DISABLE_TRACK_INDICES, null);
-        this.disableDomainIndices(MySQLStatements.DISABLE_MAPPING_INDICES, null);
-        this.disableDomainIndices(MySQLStatements.DISABLE_DIFF_INDICES, null);
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "finished disabling track data domain indices");
     }
 
     private void enableTrackDomainIndices() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "started enabling track data domain indices");
-        this.enableDomainIndices(MySQLStatements.ENABLE_COVERAGE_INDICES, null);
         this.enableDomainIndices(MySQLStatements.ENABLE_TRACK_INDICES, null);
-        this.enableDomainIndices(MySQLStatements.ENABLE_MAPPING_INDICES, null);
-        this.enableDomainIndices(MySQLStatements.ENABLE_DIFF_INDICES, null);
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "finished enabling track data domain indices");
     }
 
@@ -1069,14 +1011,6 @@ public class ProjectConnector extends Observable {
         }
     }
 
-    private void disableReadPairDomainIndices() {
-        this.disableDomainIndices(MySQLStatements.DISABLE_SEQUENCE_PAIR_INDICES, "seq pair");
-    }
-
-    private void enableReadPairDomainIndices() {
-        this.enableDomainIndices(MySQLStatements.ENABLE_SEQUENCE_PAIR_INDICES, "seq pair");
-    }
-
     /**
      * @param refGenID the reference id
      * @return The reference genome connector for the given reference id
@@ -1095,7 +1029,7 @@ public class ProjectConnector extends Observable {
         // only return new object, if no suitable connector was created before
         int trackID = track.getId();
         if (!trackConnectors.containsKey(trackID)) {
-            trackConnectors.put(trackID, new TrackConnector(track, adapter));
+            trackConnectors.put(trackID, new TrackConnector(track));
         }
         return trackConnectors.get(trackID);
     }
@@ -1108,7 +1042,7 @@ public class ProjectConnector extends Observable {
             id += track.getId();
         }
         // only return new object, if no suitable connector was created before
-        trackConnectors.put(id, new TrackConnector(id, tracks, adapter, combineTracks));
+        trackConnectors.put(id, new TrackConnector(id, tracks, combineTracks));
         return trackConnectors.get(id);
     }
     
@@ -1117,7 +1051,7 @@ public class ProjectConnector extends Observable {
         // only return new object, if no suitable connector was created before
         int trackID = track.getId();
         if (!multiTrackConnectors.containsKey(trackID)) { //old solution, which does not work anymore
-            multiTrackConnectors.put(trackID, new MultiTrackConnector(track, adapter));
+            multiTrackConnectors.put(trackID, new MultiTrackConnector(track));
         }
         return multiTrackConnectors.get(trackID);
     }
@@ -1130,7 +1064,7 @@ public class ProjectConnector extends Observable {
             id += track.getId();
         }
         // only return new object, if no suitable connector was created before
-        multiTrackConnectors.put(id, new MultiTrackConnector(tracks, adapter));
+        multiTrackConnectors.put(id, new MultiTrackConnector(tracks));
         return multiTrackConnectors.get(id);
     }
     
@@ -1371,46 +1305,12 @@ public class ProjectConnector extends Observable {
      */
     public void deleteTrack(int trackID) throws StorageException {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting deletion of track with id \"{0}\"", trackID);
-        try (PreparedStatement deleteDiffs = con.prepareStatement(SQLStatements.DELETE_DIFFS_FROM_TRACK);
-             PreparedStatement deleteReadPairPivot = con.prepareStatement(SQLStatements.DELETE_SEQUENCE_PAIR_PIVOT);
-             PreparedStatement deleteReadPairReplicates = con.prepareStatement(SQLStatements.DELETE_SEQUENCE_PAIR_REPLICATE);
-             PreparedStatement deleteReadPairs = con.prepareStatement(SQLStatements.DELETE_SEQUENCE_PAIRS);
-             PreparedStatement deleteMappings = con.prepareStatement(SQLStatements.DELETE_MAPPINGS_FROM_TRACK);
-             PreparedStatement deleteCoverage = con.prepareStatement(SQLStatements.DELETE_COVERAGE_FROM_TRACK);
-             PreparedStatement deleteStatistics = con.prepareStatement(SQLStatements.DELETE_STATISTIC_FROM_TRACK);
+        try (PreparedStatement deleteStatistics = con.prepareStatement(SQLStatements.DELETE_STATISTIC_FROM_TRACK);
              PreparedStatement deleteCountDistributions = con.prepareStatement(SQLStatements.DELETE_COUNT_DISTRIBUTIONS_FROM_TRACK);
              PreparedStatement deleteTrack = con.prepareStatement(SQLStatements.DELETE_TRACK);) {
             
             con.setAutoCommit(false);
-            boolean isDBused = this.getTrack(trackID).isDbUsed();
-            int readPairTrack = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_READ_PAIR_TO_TRACK_ID, SQLStatements.GET_NUM, con, trackID);
-            if (isDBused) {
-                if (readPairTrack > 0) {
-                    deleteReadPairPivot.setLong(1, trackID);
-                    deleteReadPairReplicates.setLong(1, trackID);
-                    deleteReadPairs.setLong(1, trackID);
-
-                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Seq Pair Pivot data...");
-                    deleteReadPairPivot.execute();
-                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Seq Pair Replicate data...");
-                    deleteReadPairReplicates.execute();
-                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Seq Pair Main data...");
-                    deleteReadPairs.execute();
-
-                    con.commit();
-                }
-                deleteDiffs.setLong(1, trackID);
-                deleteMappings.setInt(1, trackID);
-                deleteCoverage.setInt(1, trackID);
-
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Diffs...");
-                deleteDiffs.execute();
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Mappings...");
-                deleteMappings.execute();
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Coverage...");
-                deleteCoverage.execute();
-            }
-            
+                       
             deleteStatistics.setInt(1, trackID);
             deleteCountDistributions.setInt(1, trackID);
             deleteTrack.setInt(1, trackID);
@@ -1728,5 +1628,18 @@ public class ProjectConnector extends Observable {
      */
     public String getDBLocation() {
         return this.dbLocation;
+    }
+    
+    /**
+     * @param tracks The list of tracks to convert to a map
+     * @return Converts the given track list into a map of tracks to their track
+     * id.
+     */
+    public static Map<Integer, PersistantTrack> getTrackMap(List<PersistantTrack> tracks) {
+        Map<Integer, PersistantTrack> trackMap = new HashMap<>();
+        for (PersistantTrack track : tracks) {
+            trackMap.put(track.getId(), track);
+        }
+        return trackMap;
     }
 }

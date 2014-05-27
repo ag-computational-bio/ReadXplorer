@@ -21,8 +21,8 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.exporter.tables.ExportDataI;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Container for all data belonging to a coverage analysis result. Also converts
@@ -35,7 +35,7 @@ public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCove
 
     private CoverageIntervalContainer results;
 
-    public CoverageAnalysisResult(CoverageIntervalContainer results, HashMap<Integer, PersistantTrack> trackMap, 
+    public CoverageAnalysisResult(CoverageIntervalContainer results, Map<Integer, PersistantTrack> trackMap, 
             int referenceId, boolean combineTracks) {
         super(trackMap, referenceId, combineTracks, 0, 3);
         this.results = results;

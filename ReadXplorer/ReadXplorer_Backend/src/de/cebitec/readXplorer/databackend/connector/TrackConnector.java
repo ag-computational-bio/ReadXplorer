@@ -27,13 +27,9 @@ import de.cebitec.readXplorer.databackend.MappingThreadAnalyses;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.databackend.SQLStatements;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReadPairGroup;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.util.DiscreteCountingDistribution;
-import de.cebitec.readXplorer.util.ReadPairType;
-import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.util.StatsContainer;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -55,9 +51,7 @@ public class TrackConnector {
 
     private List<PersistantTrack> associatedTracks;
     private int trackID;
-    private String adapter;
     private CoverageThread coverageThread;
-    private CoverageThread diffThread;
     private MappingThread mappingThread;
     private CoverageThreadAnalyses coverageThreadAnalyses;
     private MappingThreadAnalyses mappingThreadAnalyses; 
@@ -68,30 +62,28 @@ public class TrackConnector {
     /**
      * A track connector for a single track. It handles all data requests for this track.
      * @param track the track for which this connector is created
-     * @param adapter the database adapter type (mysql or h2)
      * @throws FileNotFoundException  
      */
-    protected TrackConnector(PersistantTrack track, String adapter) throws FileNotFoundException {
+    protected TrackConnector(PersistantTrack track) throws FileNotFoundException {
         this.associatedTracks = new ArrayList<>();
         this.associatedTracks.add(track);
-        this.initTrackConnector(track.getId(), false, adapter);
+        this.initTrackConnector(track.getId(), false);
     }
 
     /**
      * A track connector for a list of tracks. It handles all data requests for these tracks.
      * @param id id of the track
      * @param tracks the list of tracks for which this connector is created
-     * @param adapter the database adapter type (mysql or h2)
      * @param combineTracks true, if the data of these tracks is to be combined, false if 
      *      it should be kept separated
      * @throws FileNotFoundException  
      */
-    protected TrackConnector(int id, List<PersistantTrack> tracks, String adapter, boolean combineTracks) throws FileNotFoundException {
+    protected TrackConnector(int id, List<PersistantTrack> tracks, boolean combineTracks) throws FileNotFoundException {
         if (tracks.size() > 2 && !combineTracks) {
             throw new UnsupportedOperationException("More than two tracks not supported yet.");
         }
         this.associatedTracks = tracks;
-        this.initTrackConnector(id, combineTracks, adapter);
+        this.initTrackConnector(id, combineTracks);
     }
     
     /**
@@ -99,17 +91,15 @@ public class TrackConnector {
      * @param trackId the track id to use
      * @param combineTracks true, if the data of these tracks is to be combined,
      * false if it should be kept separated
-     * @param adapter the database adapter type (mysql or h2)
      */
-    private void initTrackConnector(int trackId, boolean combineTracks, String adapter) throws FileNotFoundException {
+    private void initTrackConnector(int trackId, boolean combineTracks) throws FileNotFoundException {
         for (PersistantTrack track : associatedTracks) {
-            if (!new File(track.getFilePath()).exists() && !track.isDbUsed()) {
+            if (!new File(track.getFilePath()).exists()) {
                 throw new FileNotFoundException(track.getFilePath());
             }
         }
         
         this.trackID = trackId;
-        this.adapter = adapter;
         this.con = ProjectConnector.getInstance().getConnection();
 
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(
@@ -136,12 +126,10 @@ public class TrackConnector {
      */
     private void startDataThreads(boolean combineTracks) {
         this.coverageThread = new CoverageThread(this.associatedTracks, combineTracks);
-        this.diffThread = new CoverageThread(this.associatedTracks, combineTracks);
         this.coverageThreadAnalyses = new CoverageThreadAnalyses(this.associatedTracks, combineTracks);
         this.mappingThread = new MappingThread(this.associatedTracks);
         this.mappingThreadAnalyses = new MappingThreadAnalyses(this.associatedTracks);
         this.coverageThread.start();
-        this.diffThread.start();
         this.coverageThreadAnalyses.start();
         this.mappingThread.start();
         this.mappingThreadAnalyses.start();
@@ -174,21 +162,6 @@ public class TrackConnector {
     public void addCoverageAnalysisRequest(IntervalRequest request) {
         coverageThreadAnalyses.addRequest(request);
         //Currently we can only catch the diffs for one track, but not, if this is a multiple track connector
-    }
-    
-    /**
-     * Handles a diff request. This means the request is carried out by the TrackConnector
-     * if the track is stored in the db and afterwards the diff result is handed 
-     * over to the receiver.
-     * @param request the diff request including the receiving object
-     * @return request unneeded: true, if this is a direct access track, false, if the request had to be carried out
-     */
-    public boolean addDiffRequest(IntervalRequest request) {
-        if (request.isDiffsAndGapsNeeded() && this.associatedTracks.get(0).isDbUsed()) {
-            this.diffThread.addRequest(request);
-            return false;
-        }
-        return true;
     }
     
     /**
@@ -277,154 +250,6 @@ public class TrackConnector {
         return statsContainer;
     }
     
-    
-    public int getNumOfReadsCalculate() {
-        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_READS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
-    }
-
-
-    public int getNumOfUniqueSequencesCalculate() {
-        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_UNIQUE_SEQUENCES_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
-    }
-
-
-    public int getNumOfUniqueBmMappingsCalculate() {
-        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_BM_MAPPINGS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
-    }
-
-
-    public int getNumOfMappingsCalculate() {
-        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_MAPPINGS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
-    }
-
-
-    public int getNumOfUniqueMappingsCalculate() {
-        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_SINGLETON_MAPPINGS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
-    }
-
-
-    public int getNumOfPerfectUniqueMappingsCalculate() {
-        return GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_PERFECT_MAPPINGS_FOR_TRACK_CALCULATE, SQLStatements.GET_NUM, con, trackID);
-    }
-
-    
-    public double getPercentRefGenPerfectCoveredCalculate() {
-        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_OF_PERFECT_POSITIONS_FOR_TRACK, SQLStatements.GET_NUM, con, trackID);
-        return absValue / refGenome.getActiveChromLength() * 100;
-
-    }
-
-    
-    public double getPercentRefGenBmCoveredCalculate() {
-        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_BM_COVERAGE_OF_GENOME_CALCULATE, SQLStatements.GET_NUM, con, trackID);
-        return absValue / refGenome.getActiveChromLength() * 100;
-    }
-
-
-    public double getPercentRefGenNErrorCoveredCalculate() {
-        double absValue = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_COVERED_POSITIONS, SQLStatements.GET_NUM, con, trackID);
-        return absValue / refGenome.getActiveChromLength() * 100;
-    }
-
-//    public void setStatistics(int numMappings, int numUniqueMappings, int numUniqueSeq,
-//            int numPerfectMappings, int numBestMatchMappings, double coveragePerf, double coverageBM,
-//            double coverageComplete, int numReads) {
-//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track statistics");
-//        
-//        try (PreparedStatement insertStatistics = con.prepareStatement(SQLStatements.INSERT_STATISTICS);
-//             PreparedStatement updateStatistics = con.prepareStatement(SQLStatements.UPDATE_STATISTICS)) {
-//            
-//            int hasTrack = GenericSQLQueries.getIntegerFromDB(SQLStatements.CHECK_FOR_TRACK_IN_STATS_CALCULATE, SQLStatements.GET_NUM, con, trackID);
-//            if (hasTrack == 0) {
-//                
-//                int id = (int) GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_STATISTICS_ID, con);
-//                id++;
-//                int covPerf = (int) (coveragePerf / 100 * refSeqLength);
-//                int covBM = (int) (coverageBM / 100 * refSeqLength);
-//                int covComplete = (int) (coverageComplete / 100 * refSeqLength);
-//                
-//                //calculate average read length
-////                int averageReadLength = GenericSQLQueries.getIntegerFromDB(SQLStatements.FETCH_NUM_AVERAGE_READ_LENGTH, SQLStatements.GET_NUM, con, trackID);
-//                
-//                // store track in table
-//                insertStatistics.setLong(1, id);
-//                insertStatistics.setLong(2, trackID);
-//                insertStatistics.setInt(3, numMappings);
-//                insertStatistics.setInt(4, numPerfectMappings);
-//                insertStatistics.setInt(5, numBestMatchMappings);
-//                insertStatistics.setInt(6, numUniqueMappings);
-//                insertStatistics.setInt(7, covPerf);
-//                insertStatistics.setInt(8, covBM);
-//                insertStatistics.setInt(9, covComplete);
-//                insertStatistics.setInt(10, numUniqueSeq);
-//                insertStatistics.setInt(11, numReads);
-//                insertStatistics.execute();
-//            } else {
-//                int id = (int) GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_STATISTICS_ID, con);
-//                id++;
-//                int covPerf = (int) (coveragePerf / 100 * refSeqLength);
-//                int covBM = (int) (coverageBM / 100 * refSeqLength);
-//                int covComplete = (int) (coverageComplete / 100 * refSeqLength);
-//                // store track in table
-//                updateStatistics.setInt(1, numMappings);
-//                updateStatistics.setInt(2, numPerfectMappings);
-//                updateStatistics.setInt(3, numBestMatchMappings);
-//                updateStatistics.setInt(4, numUniqueMappings);
-//                updateStatistics.setInt(5, covPerf);
-//                updateStatistics.setInt(6, covBM);
-//                updateStatistics.setInt(7, covComplete);
-//                updateStatistics.setInt(8, numUniqueSeq);
-//                updateStatistics.setInt(9, numReads);
-//                updateStatistics.setLong(10, trackID);
-//                updateStatistics.executeUpdate();
-//            }
-//
-//        } catch (SQLException ex) {
-//            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
-//        }
-//
-//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track statistics");
-//    }
-
-//    /**
-//     * Store the sequence pair statistics for a sequence pair data set.
-//     * @param numReadPairs
-//     * @param numPerfectReadPairs
-//     * @param numUniqueReadPairs
-//     * @param numUniquePerfectReadPairs
-//     * @param numSingleMappings 
-//     */
-//    public void addReadPairStatistics(int numReadPairs, int numPerfectReadPairs, int numUniqueReadPairs,
-//            int numUniquePerfectReadPairs, int numSingleMappings) {
-//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing sequence pair statistics");
-//        
-//        try (PreparedStatement addReadPairStats = con.prepareStatement(SQLStatements.INSERT_READPAIR_STATISTICS);
-//             PreparedStatement latestID = con.prepareStatement(SQLStatements.GET_LATEST_STATISTICS_ID)) {
-//            
-//            // get latest id for track
-//            long id = 0;
-//            ResultSet rs = latestID.executeQuery();
-//            if (rs.next()) {
-//                id = rs.getLong("LATEST_ID");
-//            }
-//            id++;
-//                
-//            addReadPairStats.setLong(1, id);
-//            addReadPairStats.setInt(2, numReadPairs);
-//            addReadPairStats.setInt(3, numPerfectReadPairs);
-//            addReadPairStats.setInt(4, numUniqueReadPairs);
-//            addReadPairStats.setInt(5, numUniquePerfectReadPairs);
-//            addReadPairStats.setInt(6, numSingleMappings);
-//            addReadPairStats.execute();
-//
-//        } catch (SQLException ex) {
-//            ProjectConnector.getInstance().rollbackOnError(this.getClass().getName(), ex);
-//        }
-//
-//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing sequence pair statistics");
-//
-//    }
-
     public int getTrackID() {
         return trackID;
     }    
@@ -448,44 +273,6 @@ public class TrackConnector {
             trackIds.add(track.getId());
         }
         return trackIds;
-    }
-
-
-    /*
-     * pruefe coverage links und rechts des Diffs -> soll nicht abfallen,
-     * stetige Readabdeckung TODO: try to incorporate continuous coverage as
-     * optional in snp detection
-     */
-    private boolean isCoverageContinuous(int position, double coverage) {
-        boolean isContinous = true;
-        try {
-            //Die Coverage der naechsten 5 Basen links und rechts des SNPs wird verglichen
-            int refSeqLength = this.refGenome.getActiveChromLength();
-            int fromPos = ((position - 5) < 0) ? 0 : (position - 5);
-            int toPos = ((position + 5) > refSeqLength) ? refSeqLength : (position + 5);
-            PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COVERAGE_FOR_INTERVAL_OF_TRACK);
-            fetch.setLong(3, trackID);
-            fetch.setLong(1, fromPos);
-            fetch.setLong(2, toPos);
-
-            ResultSet rs = fetch.executeQuery();
-
-
-            while (rs.next()) {
-                int covPosition = rs.getInt(FieldNames.COVERAGE_POSITION);
-                int forwardCov = rs.getInt(FieldNames.COVERAGE_BM_FW_MULT);
-                int reverseCov = rs.getInt(FieldNames.COVERAGE_BM_RV_MULT);
-                int neighbourCov = forwardCov + reverseCov;
-                double deviation = (Math.abs(neighbourCov - coverage)) / coverage;
-                if (deviation >= 0.5) {
-                    isContinous = false;
-                }
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return isContinous;
     }
 
     /**
@@ -559,104 +346,6 @@ public class TrackConnector {
     }
 
     /**
-     * Returns all mappings belonging to a sequence pair
-     *
-     * @param seqPairId sequence id to search for
-     * @return all data belonging to this sequence pair id (all mappings and
-     * pair replicates)
-     */
-    public PersistantReadPairGroup getMappingsForReadPairId(long seqPairId) {
-
-        PersistantReadPairGroup readPairData = new PersistantReadPairGroup();
-        readPairData.setReadPairId(seqPairId);
-        try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_FOR_SEQ_PAIR_ID);
-             PreparedStatement fetch2 = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_FOR_SEQ_PAIR_ID2);
-             PreparedStatement fetchSingleReads = con.prepareStatement(SQLStatements.FETCH_SINGLE_MAPPINGS_FOR_SEQ_PAIR_ID);) {
-
-            //sequence pair processing
-            fetch.setLong(1, seqPairId);
-            fetch2.setLong(1, seqPairId);
-
-            ResultSet rs = fetch.executeQuery();
-            while (rs.next()) {
-
-                // mapping data
-                long mappingId = rs.getLong(FieldNames.MAPPING_ID);
-                int start = rs.getInt(FieldNames.MAPPING_START);
-                int stop = rs.getInt(FieldNames.MAPPING_STOP);
-                byte direction = rs.getByte(FieldNames.MAPPING_DIRECTION);
-                boolean isFwdStrand = direction == SequenceUtils.STRAND_FWD;
-                int count = rs.getInt("MAPPING_REPLICATES");
-                int errors = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
-                int bestMapping = rs.getInt(FieldNames.MAPPING_IS_BEST_MAPPING);
-                boolean isBestMapping = bestMapping == 1;
-                long mapping1Id = rs.getLong(FieldNames.SEQ_PAIR_MAPPING1_ID);
-                long mapping2Id = rs.getLong(FieldNames.SEQ_PAIR_MAPPING2_ID);
-                ReadPairType readPairType = ReadPairType.getReadPairType(rs.getByte(FieldNames.SEQ_PAIR_TYPE));
-                int readPairReplicates = rs.getInt(FieldNames.SEQ_PAIR_NUM_OF_REPLICATES);
-                
-                PersistantMapping mapping = new PersistantMapping((int) mappingId, start, stop, -1, isFwdStrand, count, errors, -1, isBestMapping);
-                readPairData.addPersistantMapping(mapping, readPairType, mapping1Id, mapping2Id, readPairReplicates);
-
-            }
-
-            ResultSet rs2 = fetch2.executeQuery();
-            while (rs2.next()) {
-
-                // mapping data
-                long mappingId = rs2.getLong(FieldNames.MAPPING_ID);
-                int start = rs2.getInt(FieldNames.MAPPING_START);
-                int stop = rs2.getInt(FieldNames.MAPPING_STOP);
-                byte direction = rs2.getByte(FieldNames.MAPPING_DIRECTION);
-                boolean isFwdStrand = direction == SequenceUtils.STRAND_FWD;
-                int count = rs2.getInt("MAPPING_REPLICATES");
-                int errors = rs2.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
-                int bestMapping = rs2.getInt(FieldNames.MAPPING_IS_BEST_MAPPING);
-                boolean isBestMapping = bestMapping == 1;
-                long mapping1Id = rs2.getLong(FieldNames.SEQ_PAIR_MAPPING1_ID);
-                long mapping2Id = rs2.getLong(FieldNames.SEQ_PAIR_MAPPING2_ID);
-                ReadPairType readPairType = ReadPairType.getReadPairType(rs2.getByte(FieldNames.SEQ_PAIR_TYPE));
-                int readPairReplicates = rs2.getInt(FieldNames.SEQ_PAIR_NUM_OF_REPLICATES);
-                
-                rs2.close();
-
-                PersistantMapping mapping = new PersistantMapping((int) mappingId, start, stop, -1, isFwdStrand, count, errors, -1, isBestMapping);
-                readPairData.addPersistantMapping(mapping, readPairType, mapping1Id, mapping2Id, readPairReplicates);
-
-            }
-
-            //single mapping processing
-            fetchSingleReads.setLong(1, seqPairId);
-
-            rs = fetchSingleReads.executeQuery();
-            while (rs.next()) {
-
-                // mapping data
-                int start = rs.getInt(FieldNames.MAPPING_START);
-                int stop = rs.getInt(FieldNames.MAPPING_STOP);
-                byte direction = rs.getByte(FieldNames.MAPPING_DIRECTION);
-                boolean isFwdStrand = direction == SequenceUtils.STRAND_FWD;
-                int count = rs.getInt(FieldNames.MAPPING_NUM_OF_REPLICATES);
-                int errors = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
-                int bestMapping = rs.getInt(FieldNames.MAPPING_IS_BEST_MAPPING);
-                boolean isBestMapping = bestMapping == 1;
-                long mapping1Id = rs.getLong(FieldNames.SEQ_PAIR_PIVOT_MAPPING_ID);
-                PersistantMapping mapping = new PersistantMapping((int) mapping1Id, start, stop, -1, isFwdStrand, count, errors, -1, isBestMapping);
-
-                readPairData.addPersistantMapping(mapping, ReadPairType.UNPAIRED_PAIR, -1, -1, -1);
-
-            }
-            rs.close();
-
-        } catch (SQLException ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return readPairData;
-
-    }
-
-    /**
      * Fetches a {@link DiscreteCountingDistribution} for this track.
      * @param type the type of distribution either
      * Properties.READ_START_DISTRIBUTION or
@@ -685,14 +374,6 @@ public class TrackConnector {
         }
 
         return countDistribution;
-    }
-    
-    /**
-     * @return true, if this track's data is completely stored in the db, false
-     * if this is a direct access track
-     */
-    public boolean isDbUsed() {
-        return this.associatedTracks.get(0).isDbUsed();
     }
 
     /**

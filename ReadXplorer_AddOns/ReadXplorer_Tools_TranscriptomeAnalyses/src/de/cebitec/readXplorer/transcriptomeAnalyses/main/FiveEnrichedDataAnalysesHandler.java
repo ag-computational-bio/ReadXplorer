@@ -1,6 +1,7 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
+import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
@@ -11,11 +12,11 @@ import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 
@@ -40,7 +41,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
     private ResultPanelTranscriptionStart transcriptionStartResultPanel;
     private final ReferenceViewer refViewer;
     private TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
-    private HashMap<Integer, PersistantTrack> trackMap;
+    private Map<Integer, PersistantTrack> trackMap;
     private ProgressHandle progressHandleParsingFeatures;
     /**
      * Key: featureID , Value: PersistantFeature
@@ -59,7 +60,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
      * results.
      * @param trackMap contains all PersistantTracks used for this analysis-run.
      */
-    public FiveEnrichedDataAnalysesHandler(PersistantTrack selectedTrack, ParameterSetFiveEnrichedAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, HashMap<Integer, PersistantTrack> trackMap) {
+    public FiveEnrichedDataAnalysesHandler(PersistantTrack selectedTrack, ParameterSetFiveEnrichedAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, Map<Integer, PersistantTrack> trackMap) {
         this.selectedTrack = selectedTrack;
         this.refGenomeID = refViewer.getReference().getId();
         this.parameters = parameterset;
@@ -174,7 +175,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
      * @return HashMap<Integer, PersistantTrack> containing all PersistantTracks
      * used for this analysis-run.
      */
-    public HashMap<Integer, PersistantTrack> getTrackMap() {
+    public Map<Integer, PersistantTrack> getTrackMap() {
         return trackMap;
     }
 

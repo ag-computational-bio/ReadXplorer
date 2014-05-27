@@ -38,25 +38,6 @@ import org.openide.util.ChangeSupport;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public final class TranscriptionAnalysesWizardIterator implements WizardDescriptor.Iterator<WizardDescriptor> {
-
-    // Example of invoking this wizard:
-    // @ActionID(category="...", id="...")
-    // @ActionRegistration(displayName="...")
-    // @ActionReference(path="Menu/...")
-    // public static ActionListener run() {
-    //     return new ActionListener() {
-    //         @Override public void actionPerformed(ActionEvent e) {
-    //             WizardDescriptor wiz = new WizardDescriptor(new TranscriptionAnalysesWizardIterator());
-    //             // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()
-    //             // {1} will be replaced by WizardDescriptor.Iterator.name()
-    //             wiz.setTitleFormat(new MessageFormat("{0} ({1})"));
-    //             wiz.setTitle("...dialog title...");
-    //             if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
-    //                 ...do something...
-    //             }
-    //         }
-    //     };
-    // }
     
     public static final String PROP_TSS_ANALYSIS = "tssAnalysis";
     public static final String PROP_OPERON_ANALYSIS = "Operon";
@@ -277,14 +258,6 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
         } else if (currentPanels.contains(analysisPanel)) {
             currentPanels.remove(analysisPanel);
         }
-    }
-
-    /**
-     * @param usingADBTrack true, if the wizard is run on a track stored
-     * completely in the DB, false otherwise.
-     */
-    public void setUsingDBTrack(boolean containsDBTrack) {
-        this.readClassPanel.getComponent().setUsingDBTrack(containsDBTrack);
     }
     
     /**

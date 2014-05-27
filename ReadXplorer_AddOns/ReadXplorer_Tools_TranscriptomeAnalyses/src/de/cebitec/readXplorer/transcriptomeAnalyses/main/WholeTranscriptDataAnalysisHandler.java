@@ -1,25 +1,26 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.AnalysesHandler;
-import de.cebitec.readXplorer.transcriptomeAnalyses.enums.AnalysisStatus;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
+import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.AnalysisStatus;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Exceptions;
@@ -47,7 +48,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
     private NovelTranscriptDetection newRegionDetection;
     private final ReferenceViewer refViewer;
     private TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
-    private HashMap<Integer, PersistantTrack> trackMap;
+    private Map<Integer, PersistantTrack> trackMap;
     private ProgressHandle progressHandle;
     /**
      * Key: featureID , Value: PersistantFeature
@@ -69,7 +70,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
      * results.
      * @param trackMap contains all PersistantTracks used for this analysis-run.
      */
-    public WholeTranscriptDataAnalysisHandler(PersistantTrack selectedTrack, ParameterSetWholeTranscriptAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, HashMap<Integer, PersistantTrack> trackMap) {
+    public WholeTranscriptDataAnalysisHandler(PersistantTrack selectedTrack, ParameterSetWholeTranscriptAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, Map<Integer, PersistantTrack> trackMap) {
         this.selectedTrack = selectedTrack;
         this.refGenomeID = refViewer.getReference().getId();
         this.fraction = parameterset.getFraction();

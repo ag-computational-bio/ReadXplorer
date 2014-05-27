@@ -1,13 +1,14 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
+import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.TranscriptomeAnalysisWizardIterator;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.JOptionPane;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
@@ -30,7 +31,7 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
 
     private final ReferenceViewer refViewer;
     private List<PersistantTrack> tracks;
-    private HashMap<Integer, PersistantTrack> trackMap;
+    private Map<Integer, PersistantTrack> trackMap;
 //    private String readClassPropString;
 //    private String selFeatureTypesPropString;
     private int referenceId;
@@ -78,10 +79,7 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
         List<PersistantTrack> selectedTracks = transWizardIterator.getSelectedTracks();
         if (!cancelled && !selectedTracks.isEmpty()) {
             this.tracks = selectedTracks;
-            this.trackMap = new HashMap<>();
-            for (PersistantTrack track : this.tracks) {
-                this.trackMap.put(track.getId(), track);
-            }
+            this.trackMap = ProjectConnector.getTrackMap(tracks);
 
             this.transcAnalysesTopComp.open();
             this.startTranscriptomeAnalyses(wiz);

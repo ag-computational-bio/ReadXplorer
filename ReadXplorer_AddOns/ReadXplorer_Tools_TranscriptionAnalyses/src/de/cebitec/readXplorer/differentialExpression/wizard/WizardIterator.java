@@ -345,19 +345,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
     @Override
     public void removeChangeListener(ChangeListener l) {
     }
-    // If something changes dynamically (besides moving between allPanels), e.g.
-    // the number of allPanels changes in response to user input, then use
-    // ChangeSupport to implement add/removeChangeListener and call fireChange
-    // when needed
-
-    /**
-     * @param usingADBTrack true, if the wizard is run on a track stored
-     * completely in the DB, false otherwise.
-     */
-    public void setUsingDBTrack(boolean containsDBTrack) {
-        this.readClassPanel.getComponent().setUsingDBTrack(containsDBTrack);
-    }
-
+   
     /**
      * @return The dynamically generated property name for the read class
      * selection for this wizard. Can be used to obtain the corresponding read

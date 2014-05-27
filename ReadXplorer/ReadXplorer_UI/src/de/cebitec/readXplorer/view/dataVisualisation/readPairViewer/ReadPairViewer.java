@@ -20,7 +20,6 @@ import de.cebitec.readXplorer.databackend.IntervalRequest;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.databackend.ThreadListener;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReadPairGroup;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.ReadPairResultPersistant;
 import de.cebitec.readXplorer.util.Benchmark;
@@ -317,24 +316,6 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
         final int spacer = 120;
         this.setPreferredSize(new Dimension(this.getWidth(), newHeight + spacer));
         this.revalidate();
-    }
-    
-    /**
-     * returns all information belonging to the given read pair id. This
-     * comprises all pair replicates and all single mappings associated with this id.
-     * @param readPairId the id to receive all data for
-     * @return The PersistantReadPairGroup holding all information regarding this read pair id
-     */
-    protected PersistantReadPairGroup getReadPairInfoFromDB(long readPairId){
-        return this.trackConnector.getMappingsForReadPairId(readPairId);
-    }
-    
-    /**
-     * @return true, if this viewer shows data completely stored in the DB,
-     * false if the direct access is used
-     */
-    public boolean isDbViewer() {
-        return this.trackConnector.isDbUsed();
     }
 
     @Override

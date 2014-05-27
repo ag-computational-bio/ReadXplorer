@@ -279,8 +279,8 @@ public final class ImportTableVisualPanel extends JobPanel {
     }
     
     /**
-     * @return <cc>true</cc>, if the delimiter shall be detected automatically,
-     * <cc>false</cc>, if the delimiter was selected by the user.
+     * @return <code>true</code>, if the delimiter shall be detected automatically,
+     * <code>false</code>, if the delimiter was selected by the user.
      */
     public boolean isAutodetectDelimiter() {
         return this.delimiterCheckBox.isSelected();

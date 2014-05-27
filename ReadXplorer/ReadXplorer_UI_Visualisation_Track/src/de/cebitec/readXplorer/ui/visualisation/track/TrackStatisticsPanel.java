@@ -19,8 +19,6 @@ package de.cebitec.readXplorer.ui.visualisation.track;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.util.StatsContainer;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 /**
@@ -452,22 +450,21 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
 
                 int numOfMappings = statsMap.get(StatsContainer.NO_COMMON_MAPPINGS);
                 if (numOfMappings == -1) {
-                    numOfMappings = trackCon.getNumOfMappingsCalculate();
-                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Updating statistic information");
+                    
                     recalculated = true;
                 }
                 numMappingsAbsLabel.setText(String.valueOf(numOfMappings));
 
                 int numUniqueMappings = statsMap.get(StatsContainer.NO_UNIQ_MAPPINGS);
                 if (numUniqueMappings == -1) {
-                    numUniqueMappings = trackCon.getNumOfUniqueMappingsCalculate();
+                    
                     recalculated = true;
                 }
                 singletonMappingsAbsLabel.setText(String.valueOf(numUniqueMappings));
 
                 int numUniqueSequences = statsMap.get(StatsContainer.NO_UNIQUE_SEQS); //NOT CALCULATED CURRENTLY
                 if (numUniqueSequences == -1) {
-                    numUniqueSequences = trackCon.getNumOfUniqueSequencesCalculate();
+                    
                     recalculated = true;
                 }
                 uniqueSequencesAbsLabel.setVisible(false);
@@ -485,33 +482,33 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
 
                 int numOfPerfectMappings = statsMap.get(StatsContainer.NO_PERFECT_MAPPINGS);
                 if (numOfPerfectMappings == -1) {
-                    numOfPerfectMappings = trackCon.getNumOfPerfectUniqueMappingsCalculate();
+                    
                     recalculated = true;
                 }
                 perfectMappingsAbsLabel.setText(String.valueOf(numOfPerfectMappings));
 
                 int numOfBestMatchMappings = statsMap.get(StatsContainer.NO_BESTMATCH_MAPPINGS);
                 if (numOfBestMatchMappings == -1) {
-                    numOfBestMatchMappings = trackCon.getNumOfUniqueBmMappingsCalculate();
+                    
                     recalculated = true;
                 }
                 bestMatchMappingsAbsLabel.setText(String.valueOf(numOfBestMatchMappings));
 
                 double percentagePerfectCovered = (double) statsMap.get(StatsContainer.COVERAGE_PERFECT_GENOME) / chromLength * 100;
                 if (percentagePerfectCovered == -1) {
-                    percentagePerfectCovered = trackCon.getPercentRefGenPerfectCoveredCalculate();
+                    
                     recalculated = true;
                 }
 
                 double percentageBMCovered = (double) statsMap.get(StatsContainer.COVERAGE_BM_GENOME) / chromLength * 100;
                 if (percentageBMCovered == -1) {
-                    percentageBMCovered = trackCon.getPercentRefGenBmCoveredCalculate();
+                    
                     recalculated = true;
                 }
 
                 double percentageNErrorCovered = (double) statsMap.get(StatsContainer.COVERAGE_COMPLETE_GENOME) / chromLength * 100;;
                 if (percentageNErrorCovered == -1) {
-                    percentageNErrorCovered = trackCon.getPercentRefGenNErrorCoveredCalculate();
+                    
                     recalculated = true;
                 }
 

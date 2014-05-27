@@ -237,18 +237,6 @@ public class SelectReadClassVisualPanel extends JobPanel {
     public String getName() {
         return "Read Classification Selection";
     }
-    
-    /**
-     * @param usingADBTrack true, if the wizard is run on a track stored 
-     * completely in the DB, false otherwise.
-     */
-    public void setUsingDBTrack(boolean usingADBTrack) {
-        this.usingADBTrack = usingADBTrack;
-        if (this.usingADBTrack) {
-            this.checkBoxUnique.setSelected(!usingADBTrack);
-            this.checkBoxUnique.setEnabled(!usingADBTrack);
-        }
-    }
 
     /**
      * Updates the checkboxes for the read classes with the globally stored

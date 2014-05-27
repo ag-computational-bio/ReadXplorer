@@ -18,6 +18,8 @@ package de.cebitec.readXplorer.featureCoverageAnalysis;
 
 import de.cebitec.readXplorer.databackend.AnalysesHandler;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
+import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
+import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
@@ -27,7 +29,6 @@ import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.readXplorer.view.dialogMenus.OpenTracksVisualPanel;
 import de.cebitec.readXplorer.view.dialogMenus.OpenTracksWizardPanel;
-import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.view.dialogMenus.SelectFeatureTypeWizardPanel;
 import de.cebitec.readXplorer.view.dialogMenus.SelectReadClassWizardPanel;
 import java.awt.event.ActionEvent;
@@ -80,7 +81,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
     private ResultPanelCoveredFeatures coveredFeaturesResultPanel;
     ParameterSetCoveredFeatures parameters;
     private boolean combineTracks;
-    private HashMap<Integer, PersistantTrack> trackMap;
+    private Map<Integer, PersistantTrack> trackMap;
     private OpenTracksWizardPanel openTracksWizPanel;
     private SelectReadClassWizardPanel readClassWizPanel;
     private SelectFeatureTypeWizardPanel featTypeWizPanel; 
@@ -133,13 +134,10 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
             OpenTracksVisualPanel tracksVisPanel = openTracksWizPanel.getComponent();
             if (!tracksVisPanel.getAllMarkedNodes().isEmpty()) {
                 this.tracks = tracksVisPanel.getSelectedTracks();
-                this.trackMap = new HashMap<>();
+                this.trackMap = ProjectConnector.getTrackMap(tracks);
                 this.trackToAnalysisMap = new HashMap<>();
                 this.finishedCovAnalyses = 0;
                 this.coveredFeaturesResultPanel = null;
-                for (PersistantTrack track : this.tracks) {
-                    this.trackMap.put(track.getId(), track);
-                }
 
                 if (this.coveredAnnoAnalysisTopComp == null) {
                     this.coveredAnnoAnalysisTopComp = (CoveredFeaturesAnalysisTopComponent) WindowManager.getDefault().findTopComponent("CoveredFeaturesAnalysisTopComponent");

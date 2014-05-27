@@ -16,8 +16,10 @@
  */
 package de.cebitec.readXplorer.ui.dataAdministration;
 
+import de.cebitec.readXplorer.api.objects.JobPanel;
 import de.cebitec.readXplorer.parser.ReferenceJob;
 import de.cebitec.readXplorer.parser.TrackJob;
+import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
@@ -25,19 +27,17 @@ import org.openide.util.NbBundle;
 
 /**
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
-public class SelectionCard extends javax.swing.JPanel {
+public class SelectionCard extends JobPanel {
     
     private static final long serialVersionUID = 1L;
-
-    public static final String PROP_HAS_CHECKED_JOBS = "hasCheckedJobs";
 
     /** Creates new form DataAdminPanel */
     public SelectionCard() {
         initComponents();
-        refGenView.addPropertyChangeListener(PROP_HAS_CHECKED_JOBS, getHasCheckedJobsListener());
-        mappingView.addPropertyChangeListener(PROP_HAS_CHECKED_JOBS, getHasCheckedJobsListener());
+        refGenView.addPropertyChangeListener(this.createPropertyChangeListener());
+        mappingView.addPropertyChangeListener(this.createPropertyChangeListener());
         mappingView.addPropertyChangeListener(TrackView.PROP_DESELECT, new PropertyChangeListener() {
 
             @Override
@@ -58,21 +58,6 @@ public class SelectionCard extends javax.swing.JPanel {
 
     public List<TrackJob> getTrack2DelJobs(){
         return mappingView.getJobs2Del();
-    }
-
-    private PropertyChangeListener getHasCheckedJobsListener(){
-        return new PropertyChangeListener() {
-
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (refGenView.getJobs2del().isEmpty() && mappingView.getJobs2Del().isEmpty()){
-                    firePropertyChange(evt.getPropertyName(), null, Boolean.FALSE);
-                }
-                else{
-                    firePropertyChange(evt.getPropertyName(), null, Boolean.TRUE);
-                }
-            }
-        };
     }
 
     @Override
@@ -104,7 +89,7 @@ public class SelectionCard extends javax.swing.JPanel {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 322, Short.MAX_VALUE)
+            .addComponent(jTabbedPane1)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -115,4 +100,10 @@ public class SelectionCard extends javax.swing.JPanel {
     private de.cebitec.readXplorer.ui.dataAdministration.ReferenceView refGenView;
     // End of variables declaration//GEN-END:variables
 
+    @Override
+    public boolean isRequiredInfoSet() {
+        boolean isValidated = !refGenView.getJobs2del().isEmpty() || !mappingView.getJobs2Del().isEmpty();
+        firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated);
+        return isValidated;
+    }
 }
