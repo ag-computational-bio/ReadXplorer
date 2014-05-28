@@ -41,7 +41,7 @@ public class DeSeqAnalysisData extends DeAnalysisData{
      * DeSeq is then called with a special option allowing it to work without
      * replicates. Be careful: The results may be unreliable.
      */
-    private boolean workingWithoutReplicates;
+    private final boolean workingWithoutReplicates;
 
     public DeSeqAnalysisData(int capacity, Map<String, String[]> design, 
             boolean moreThanTwoConditions, List<String> fittingGroupOne, 

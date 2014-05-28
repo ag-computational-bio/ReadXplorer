@@ -150,7 +150,8 @@ public class LogoDataManager {
             case 'G': row = G; break;
             case 'T': row = T; break;
             case 'N': row = N; break;
-            case '_': row = READGAP; break; 
+            case '_': row = READGAP; break;
+            case '.': return; //It's a split read an we are in the split region, so do nothing.
             default:
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown base {0}", base);
         }
