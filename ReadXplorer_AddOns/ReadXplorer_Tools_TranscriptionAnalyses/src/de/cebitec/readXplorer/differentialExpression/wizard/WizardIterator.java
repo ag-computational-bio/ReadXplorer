@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Kai Bernd Stadermann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -66,12 +66,14 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
     private List<WizardDescriptor.Panel<WizardDescriptor>> baySeqPanels;
     private List<WizardDescriptor.Panel<WizardDescriptor>> deSeqTwoCondsPanels;
     private List<WizardDescriptor.Panel<WizardDescriptor>> deSeqMoreCondsPanels;
+    private List<WizardDescriptor.Panel<WizardDescriptor>> deSeq2Panels;
     private List<WizardDescriptor.Panel<WizardDescriptor>> expressTestPanels;
     private List<WizardDescriptor.Panel<WizardDescriptor>> exportOnlyPanels;
     private String[] deSeqIndex;
     private String[] baySeqIndex;
     private String[] deSeqTwoCondsIndex;
     private String[] deSeqMoreCondsIndex;
+    private String[] deSeq2Index;
     private String[] expressTestIndex;
     private String[] exportOnlyIndex;
     private String[] initialSteps;
@@ -111,7 +113,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                 UUID key = GnuR.SecureGnuRInitiliser.reserveGnuRinstance();
                 handler = new BaySeqAnalysisHandler(selectedTracks, createdGroups, genomeID,
                         replicateStructure, saveFile, featureTypes, startOffset, stopOffset, readClassParams, regardReadOrientation, key);
-            } else if (tool == DeAnalysisHandler.Tool.DeSeq || tool == DeAnalysisHandler.Tool.DeSeq2) {
+            } else if (tool == DeAnalysisHandler.Tool.DeSeq) {
                 UUID key = GnuR.SecureGnuRInitiliser.reserveGnuRinstance();
                 boolean moreThanTwoConditions = (boolean) wiz.getProperty("moreThanTwoConditions");
                 boolean workingWithoutReplicates = (boolean) wiz.getProperty("workingWithoutReplicates");
@@ -122,15 +124,16 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                     fittingGroupOne = (List<String>) wiz.getProperty("fittingGroupOne");
                     fittingGroupTwo = (List<String>) wiz.getProperty("fittingGroupTwo");
                 }
-                if (tool == DeAnalysisHandler.Tool.DeSeq) {
-                    handler = new DeSeqAnalysisHandler(selectedTracks, design, moreThanTwoConditions, fittingGroupOne,
-                            fittingGroupTwo, genomeID, workingWithoutReplicates,
-                            saveFile, featureTypes, startOffset, stopOffset, readClassParams, regardReadOrientation, key);
-                } else {
-                    handler = new DeSeq2AnalysisHandler(selectedTracks, design, moreThanTwoConditions, fittingGroupOne,
-                            fittingGroupTwo, genomeID, workingWithoutReplicates,
-                            saveFile, featureTypes, startOffset, stopOffset, readClassParams, regardReadOrientation, key);
-                }
+                handler = new DeSeqAnalysisHandler(selectedTracks, design, moreThanTwoConditions, fittingGroupOne,
+                        fittingGroupTwo, genomeID, workingWithoutReplicates,
+                        saveFile, featureTypes, startOffset, stopOffset, readClassParams, regardReadOrientation, key);
+            } else if (tool == DeAnalysisHandler.Tool.DeSeq2) {
+                UUID key = GnuR.SecureGnuRInitiliser.reserveGnuRinstance();
+                boolean workingWithoutReplicates = (boolean) wiz.getProperty("workingWithoutReplicates");
+                
+                handler = new DeSeq2AnalysisHandler(selectedTracks, design, null,
+                        null, genomeID, workingWithoutReplicates,
+                        saveFile, featureTypes, startOffset, stopOffset, readClassParams, regardReadOrientation, key);
             } else if (tool == DeAnalysisHandler.Tool.ExpressTest) {
                 List<Integer> groupAList = (List<Integer>) wiz.getProperty("groupA");
                 boolean workingWithoutReplicates = (boolean) wiz.getProperty("workingWithoutReplicates");
@@ -231,6 +234,15 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
             deSeqMoreCondsPanels.add(allPanels.get(11));
             deSeqMoreCondsIndex = new String[]{steps[0], steps[1], steps[2], steps[5], steps[6], steps[8], steps[10], steps[11]};
 
+            deSeq2Panels = new ArrayList<>();
+            deSeq2Panels.add(allPanels.get(0));
+            deSeq2Panels.add(allPanels.get(2));
+            deSeq2Panels.add(allPanels.get(7));
+            deSeq2Panels.add(allPanels.get(8));
+            deSeq2Panels.add(allPanels.get(10));
+            deSeq2Panels.add(allPanels.get(11));
+            deSeq2Index = new String[]{steps[0], steps[2], steps[7], steps[8], steps[10], steps[11]};
+
             expressTestPanels = new ArrayList<>();
             expressTestPanels.add(allPanels.get(0));
             expressTestPanels.add(allPanels.get(2));
@@ -280,9 +292,13 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
         if (index == 0) {
             String[] contentData = null;
             tool = (DeAnalysisHandler.Tool) wiz.getProperty("tool");
-            if (tool == DeAnalysisHandler.Tool.DeSeq || tool == DeAnalysisHandler.Tool.DeSeq2) {
+            if (tool == DeAnalysisHandler.Tool.DeSeq) {
                 currentPanels = deSeqTwoCondsPanels;
                 contentData = deSeqIndex;
+            }
+            if (tool == DeAnalysisHandler.Tool.DeSeq2) {
+                currentPanels = deSeq2Panels;
+                contentData = deSeq2Index;
             }
             if (tool == DeAnalysisHandler.Tool.BaySeq) {
                 currentPanels = baySeqPanels;
@@ -345,7 +361,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
     @Override
     public void removeChangeListener(ChangeListener l) {
     }
-   
+
     /**
      * @return The dynamically generated property name for the read class
      * selection for this wizard. Can be used to obtain the corresponding read

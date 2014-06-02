@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Kai Bernd Stadermann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ import java.util.UUID;
  */
 public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
 
-    private DeSeq2 deSeq;
+    private DeSeq2 deSeq2;
     private final DeSeqAnalysisData deSeqAnalysisData;
     private final UUID key;
 
@@ -65,14 +65,14 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
         }
     }
 
-    public DeSeq2AnalysisHandler(List<PersistantTrack> selectedTracks, Map<String, String[]> design, boolean moreThanTwoConditions,
+    public DeSeq2AnalysisHandler(List<PersistantTrack> selectedTracks, Map<String, String[]> design, 
             List<String> fittingGroupOne, List<String> fittingGroupTwo, Integer refGenomeID, boolean workingWithoutReplicates,
             File saveFile, Set<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams, boolean regardReadOrientation, UUID key) {
         super(selectedTracks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams, regardReadOrientation);
-        deSeq = new DeSeq2(this.getRefGenomeID());
+        deSeq2 = new DeSeq2(this.getRefGenomeID());
         this.key = key;
         deSeqAnalysisData = new DeSeqAnalysisData(selectedTracks.size(),
-                design, moreThanTwoConditions, fittingGroupOne, fittingGroupTwo, 
+                design, false, fittingGroupOne, fittingGroupTwo, 
                 workingWithoutReplicates);
     }
 
@@ -81,7 +81,7 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
         List<ResultDeAnalysis> results;
         prepareFeatures(deSeqAnalysisData);
         prepareCountData(deSeqAnalysisData, getAllCountData());
-        results = deSeq.process(deSeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile(), key);
+        results = deSeq2.process(deSeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile(), key);
         return results;
 
     }
@@ -92,21 +92,21 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
 
     @Override
     public void endAnalysis() {
-        deSeq.shutdown(key);
-        deSeq = null;
+        deSeq2.shutdown(key);
+        deSeq2 = null;
     }
 
     public File plot(Plot plot) throws IOException, IllegalStateException, PackageNotLoadableException {
         File file = File.createTempFile("ReadXplorer_Plot_", ".svg");
         file.deleteOnExit();
         if (plot == Plot.DE) {
-            deSeq.plotDE(file);
+            deSeq2.plotDE(file);
         }
         if (plot == Plot.DispEsts) {
-            deSeq.plotDispEsts(file);
+            deSeq2.plotDispEsts(file);
         }
         if (plot == Plot.HIST) {
-            deSeq.plotHist(file);
+            deSeq2.plotHist(file);
         }
         return file;
     }

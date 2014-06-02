@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Kai Bernd Stadermann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,22 +35,36 @@ public class CollectCoverageData implements Observer {
     /**
      * The whole set of features for the current genome.
      */
-    private List<PersistantFeature> genomeFeatures;
+    private final List<PersistantFeature> genomeFeatures;
     /**
      * The storage holding the collected coverage data, also named count data.
      * The Key value of this HashMap is the ID of the feature. The value value
      * represents the corresponding number of counted coverage data.
      */
-    private Map<PersistantFeature, Integer> countData = new HashMap<>();
+    private final Map<PersistantFeature, Integer> countData = new HashMap<>();
     /**
-     * Adjusts how many bases downstream from the start position of an feature a
-     * mapping should still be considered a hit. The feature in the database are
-     * manly CDS positions. So it is normal that a lot of mappings will start in
+     * Adjusts how many bases downstream from the start position of a feature a
+     * mapping should still be considered a hit. The features in the database are
+     * sometimes CDS positions. So it is normal that a lot of mappings will start in
      * an are downstream of the start position of the feature.
      */
-    private int startOffset;
-    private int stopOffset;
-    private boolean regardReadOrientation;
+    private final int startOffset;
+    /**
+     * Adjusts how many bases upstream from the stop position of a feature a
+     * mapping should still be considered a hit. The features in the database are
+     * sometimes CDS positions. So it is normales that some mappings are not
+     * located exactly indside the feature positions.
+     */
+    private final int stopOffset;
+    /**
+     * States if the mapping orientation is taken into account. If strand specific
+     * RNA-Seq was used it makes senses to only count the mappings on the same
+     * strand as the corresponding feature. However, not strand specific RNA-Seq
+     * is also used frequently. If this is the case, the reads will map on
+     * forward and reverse strand just by chance. In this case the orientation
+     * of a mapping should not be taken into account.
+     */
+    private final boolean regardReadOrientation;
 
     /**
      * Constructor of the class.
@@ -73,7 +87,7 @@ public class CollectCoverageData implements Observer {
      *
      * @param mappings the mappings
      */
-    private void updateReadCountForFeatures(MappingResultPersistant result) {
+    protected void updateReadCountForFeatures(MappingResultPersistant result) {
         List<PersistantMapping> mappings = result.getMappings();
         Collections.sort(mappings);
         int lastMappingIdx = 0;
@@ -83,7 +97,7 @@ public class CollectCoverageData implements Observer {
         for (int i = 0; i < this.genomeFeatures.size(); ++i) {
             feature = this.genomeFeatures.get(i);
             if (feature.getChromId() == result.getRequest().getChromId()) {
-                
+
                 int featStart = feature.getStart() - startOffset;
                 int featStop = feature.getStop() + stopOffset;
                 fstFittingMapping = true;

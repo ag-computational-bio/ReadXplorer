@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Kai Bernd Stadermann
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,6 @@
  */
 package de.cebitec.readXplorer.differentialExpression.expressTest;
 
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.differentialExpression.ProcessingLog;
 import java.util.Arrays;
