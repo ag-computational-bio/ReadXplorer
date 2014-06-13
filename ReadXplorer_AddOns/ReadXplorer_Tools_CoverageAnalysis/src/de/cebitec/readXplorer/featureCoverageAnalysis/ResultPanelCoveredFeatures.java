@@ -237,11 +237,11 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
         sorter.setModel(model);
 
         ParameterSetCoveredFeatures parameters = ((ParameterSetCoveredFeatures) coveredFeaturesResult.getParameters());
-        String whateverStrand = parameters.isWhateverStrand() ? "no" : "yes";
+        String strandOption = parameters.getReadClassParams().getStrandOptionString();
         String coveredFeatures = parameters.isGetCoveredFeatures() ? "no" : "yes";
         parametersLabel.setText(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class,
                 "ResultPanelCoveredFeatures.parametersLabel.text", parameters.getMinCoveredPercent(),
-                parameters.getMinCoverageCount(), whateverStrand, coveredFeatures));
+                parameters.getMinCoverageCount(), strandOption, coveredFeatures));
     }
     
     /**

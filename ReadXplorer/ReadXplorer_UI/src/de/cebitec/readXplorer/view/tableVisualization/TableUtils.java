@@ -104,7 +104,7 @@ public class TableUtils {
      * @param bim the bounds information manager which should be updated
      * @param reference The reference belonging to this data table. NOTE: It is
      * only needed, if the chromosome column does not contain the chromosome,
-     * but only its name! Otherwise the reference can be <cc>NULL</cc>
+     * but only its name! Otherwise the reference can be <code>null</code>
      */
     public static void showPosition(JTable table, int posColumnIndex, int chromColumnIdx, 
             BoundsInfoManager bim, PersistantReference reference) {

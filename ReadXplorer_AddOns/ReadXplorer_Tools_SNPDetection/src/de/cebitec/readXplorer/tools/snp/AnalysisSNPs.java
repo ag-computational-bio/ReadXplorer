@@ -286,7 +286,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                        && (!this.hasMappingQualities || averageMappingQual >= analysisParams.getMinAverageMappingQual())
                             ) {
                         
-                        cov = coverage.getBestMatchFwdMult(absPos) + coverage.getBestMatchRevMult(absPos);
+                        cov = coverage.getBestMatchFwd(absPos) + coverage.getBestMatchRev(absPos);
                         if (cov == 0) {
                             ++cov;
                             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found uncovered position in diffs: {0}", absPos);
@@ -364,7 +364,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                                 && (!this.hasMappingQualities || averageMappingQual >= analysisParams.getMinAverageMappingQual())
                             ) {
 
-                                cov = coverage.getBestMatchFwdMult(absPos) + coverage.getBestMatchRevMult(absPos);
+                                cov = coverage.getBestMatchFwd(absPos) + coverage.getBestMatchRev(absPos);
                                 if (cov == 0) {
                                     ++cov;
                                     Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found uncovered position in gaps: {0}", absPos);
@@ -410,12 +410,12 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
 //        int cov1 = 0;
 //        int cov2 = 0;
 //        
-//        cov1 = coverage.getBestMatchFwdMult(absPos) + coverage.getBestMatchRevMult(absPos);
+//        cov1 = coverage.getBestMatchFwd(absPos) + coverage.getBestMatchRev(absPos);
 //        if (cov1 == 0) {
 //            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found uncovered position in gaps: {0}", absPos);
 //        }
 //
-//        cov2 = coverage.getBestMatchFwdMult(absPos + 1) + coverage.getBestMatchRevMult(absPos + 1);
+//        cov2 = coverage.getBestMatchFwd(absPos + 1) + coverage.getBestMatchRev(absPos + 1);
 //
 //        int cov = (cov1 + cov2) / 2;
 //        return cov == 0 ? 1 : cov;

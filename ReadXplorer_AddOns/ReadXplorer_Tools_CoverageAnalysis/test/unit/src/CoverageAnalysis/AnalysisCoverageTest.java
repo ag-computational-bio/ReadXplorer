@@ -114,36 +114,36 @@ public class AnalysisCoverageTest {
             int[] commonArrayFwd4 = this.generateArray(covValues4, size);
             int[] commonArrayRev4 = this.generateArray(covValues4, size);
             
-            coverage.setPerfectFwdMult(perfArrayFwd);
-            coverage.setPerfectRevMult(perfArrayRev);
-            coverage.setBestMatchFwdMult(bmArrayFwd);
-            coverage.setBestMatchRevMult(bmArrayRev);
-            coverage.setCommonFwdMult(commonArrayFwd);
-            coverage.setCommonRevMult(commonArrayRev);
+            coverage.setPerfectFwd(perfArrayFwd);
+            coverage.setPerfectRev(perfArrayRev);
+            coverage.setBestMatchFwd(bmArrayFwd);
+            coverage.setBestMatchRev(bmArrayRev);
+            coverage.setCommonFwd(commonArrayFwd);
+            coverage.setCommonRev(commonArrayRev);
             CoverageAndDiffResultPersistant coverageResult = new CoverageAndDiffResultPersistant(coverage, null, null, null);
             
-            coverage2.setPerfectFwdMult(perfArrayFwd2);
-            coverage2.setPerfectRevMult(perfArrayRev2);
-            coverage2.setBestMatchFwdMult(bmArrayFwd2);
-            coverage2.setBestMatchRevMult(bmArrayRev2);
-            coverage2.setCommonFwdMult(commonArrayFwd2);
-            coverage2.setCommonRevMult(commonArrayRev2);
+            coverage2.setPerfectFwd(perfArrayFwd2);
+            coverage2.setPerfectRev(perfArrayRev2);
+            coverage2.setBestMatchFwd(bmArrayFwd2);
+            coverage2.setBestMatchRev(bmArrayRev2);
+            coverage2.setCommonFwd(commonArrayFwd2);
+            coverage2.setCommonRev(commonArrayRev2);
             CoverageAndDiffResultPersistant coverageResult2 = new CoverageAndDiffResultPersistant(coverage2, null, null, null);
             
-            coverage3.setPerfectFwdMult(perfArrayFwd3);
-            coverage3.setPerfectRevMult(perfArrayRev3);
-            coverage3.setBestMatchFwdMult(bmArrayFwd3);
-            coverage3.setBestMatchRevMult(bmArrayRev3);
-            coverage3.setCommonFwdMult(commonArrayFwd3);
-            coverage3.setCommonRevMult(commonArrayRev3);
+            coverage3.setPerfectFwd(perfArrayFwd3);
+            coverage3.setPerfectRev(perfArrayRev3);
+            coverage3.setBestMatchFwd(bmArrayFwd3);
+            coverage3.setBestMatchRev(bmArrayRev3);
+            coverage3.setCommonFwd(commonArrayFwd3);
+            coverage3.setCommonRev(commonArrayRev3);
             CoverageAndDiffResultPersistant coverageResult3 = new CoverageAndDiffResultPersistant(coverage3, null, null, null);
             
-            coverage4.setPerfectFwdMult(perfArrayFwd4);
-            coverage4.setPerfectRevMult(perfArrayRev4);
-            coverage4.setBestMatchFwdMult(bmArrayFwd4);
-            coverage4.setBestMatchRevMult(bmArrayRev4);
-            coverage4.setCommonFwdMult(commonArrayFwd4);
-            coverage4.setCommonRevMult(commonArrayRev4);
+            coverage4.setPerfectFwd(perfArrayFwd4);
+            coverage4.setPerfectRev(perfArrayRev4);
+            coverage4.setBestMatchFwd(bmArrayFwd4);
+            coverage4.setBestMatchRev(bmArrayRev4);
+            coverage4.setCommonFwd(commonArrayFwd4);
+            coverage4.setCommonRev(commonArrayRev4);
             CoverageAndDiffResultPersistant coverageResult4 = new CoverageAndDiffResultPersistant(coverage4, null, null, null);
             
             //standard order

@@ -56,7 +56,7 @@ import org.openide.util.Exceptions;
  * It provides methods to compute the physical position (meaning pixel) for any
  * logical position (base position in genome) and otherwise. Depending on it's
  * own size and settings in the ViewerController AbstractViewer knows, which
- * interval from the genome should currently be diplayed and provides getter
+ * interval from the genome should currently be displayed and provides getter
  * methods for these values. Tooltips in this viewer are initially shown for 
  * 20 seconds.
  * 
@@ -109,6 +109,18 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     private BufferedImage loadingIndicator;
     private boolean newDataRequestNeeded = false;
 
+    /**
+     * AbstractViewer ist a superclass for displaying genome related
+     * information. It provides methods to compute the physical position
+     * (meaning pixel) for any logical position (base position in genome) and
+     * otherwise. Depending on it's own size and settings in the
+     * ViewerController AbstractViewer knows, which interval from the genome
+     * should currently be displayed and provides getter methods for these
+     * values. Tooltips in this viewer are initially shown for 20 seconds.
+     * @param boundsManager The reference bounds manager of this viewer
+     * @param basePanel the base panel to paint data on
+     * @param reference the associated reference genome
+     */
     public AbstractViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference reference) {
         super();
         
@@ -229,6 +241,13 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         this.chromSelectionPanel = chromSelectionPanel;
     }
 
+    /**
+     * Enables showing or hiding the sequence bar.
+     * @param showSeqBar true, if the sequence bar shall be visible, false 
+     * otherwise
+     * @param centerSeqBar true, if the sequence bar shall be centered, false
+     * if it shall be shown at the top
+     */
     public void showSequenceBar(boolean showSeqBar, boolean centerSeqBar) {
         if (showSeqBar) {
             this.seqBar = new SequenceBar(this);
@@ -239,6 +258,10 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         // this.updatePhysicalBounds();
     }
 
+    /**
+     * Updates the painting area info of this viewer according to the available
+     * heigth and width.
+     */
     private void adjustPaintingAreaInfo() {
         if (this.getHeight() > 0 && this.getWidth() > 0) {
             pAInfoIsAvailable = true;
@@ -284,8 +307,14 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         return this.seqBar;
     }
 
+    /**
+     * @return The maximal height of this viewer.
+     */
     protected abstract int getMaximalHeight();
 
+    /**
+     * Initializes all listeners of this viewer.
+     */
     private void initComponents() {
         this.addComponentListener(new ComponentAdapter() {
 
@@ -491,7 +520,6 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     protected int transformToLogicalCoord(int physPos) {
         //       Logger.getLogger(this.getClass().getName()).log(Level.INFO, "boundsLeft "+ bounds.getLogLeft()+"right"+ bounds.getLogRight());
         return (int) (((double) physPos - horizontalMargin) / correlationFactor + bounds.getLogLeft());
-
     }
 
     /**
@@ -584,6 +612,9 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         }
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void setCurrentMousePosition(int newPos) {
         oldLogMousePos = currentLogMousePos;
@@ -601,7 +632,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     }
 
     /**
-     * Repaints the component.
+     * Repaints the mouse position rectangle.
      * @param oldPos the old mouse position
      * @param newPos the new mouse position
      */
@@ -628,8 +659,8 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     }
 
     /**
-     * Paints the rectangle marking the mouse position. It covers the whole height
-     * of the viewer.
+     * Paints the rectangle marking the mouse position. It covers the whole
+     * height of the viewer.
      * @param g the grapics object to paint in
      */
     private void drawMouseCursor(Graphics g) {
@@ -642,6 +673,11 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         }
     }
 
+    /**
+     * Paints the grey rectangle behind the current center position of the 
+     * viewer.
+     * @param g The graphics to paint on
+     */
     private void paintCurrentCenterPosition(Graphics g) {
         PhysicalBaseBounds coords = getPhysBoundariesForLogPos(getBoundsInfo().getCurrentLogPos());
         PaintingAreaInfo info = this.getPaintingAreaInfo();
@@ -655,6 +691,9 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         return (int) (mouseArea.getPhysWidth() >= 3 ? mouseArea.getPhysWidth() : 3);
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
@@ -668,6 +707,9 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         }
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void setMouseOverPaintingRequested(boolean requested) {
         // repaint whole viewer if mouse curser was painted before, but none is not wanted
@@ -716,10 +758,17 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         return pAInfoIsAvailable;
     }
 
+    /**
+     * @return The painting area info for this viewer. It contains useful info
+     * about heights, widths and left and right end positions.
+     */
     public PaintingAreaInfo getPaintingAreaInfo() {
         return paintingAreaInfo;
     }
 
+    /**
+     * @return The hovered reference positions.
+     */
     public int getCurrentMousePos() {
         return currentLogMousePos;
     }

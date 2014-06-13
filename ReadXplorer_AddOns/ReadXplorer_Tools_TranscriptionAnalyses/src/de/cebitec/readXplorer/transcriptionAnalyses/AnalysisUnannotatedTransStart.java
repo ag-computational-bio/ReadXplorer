@@ -71,12 +71,12 @@ public class AnalysisUnannotatedTransStart extends AnalysisTranscriptionStart {
                 features.getUpstreamFeature() == null) {
             
             if (tss.isFwdStrand()) {
-                while (currentCoverage.getBestMatchFwdMult(currentPos) > this.getParametersTSS().getMinTranscriptExtensionCov()) {
+                while (currentCoverage.getBestMatchFwd(currentPos) > this.getParametersTSS().getMinTranscriptExtensionCov()) {
                     ++currentPos;
                 }
                 --currentPos;
             } else {
-                while (currentCoverage.getBestMatchRevMult(currentPos) > this.getParametersTSS().getMinTranscriptExtensionCov()) { // TODO: && currentPos < referenceLength > 0
+                while (currentCoverage.getBestMatchRev(currentPos) > this.getParametersTSS().getMinTranscriptExtensionCov()) { // TODO: && currentPos < referenceLength > 0
                     --currentPos;
                 }
                 ++currentPos;

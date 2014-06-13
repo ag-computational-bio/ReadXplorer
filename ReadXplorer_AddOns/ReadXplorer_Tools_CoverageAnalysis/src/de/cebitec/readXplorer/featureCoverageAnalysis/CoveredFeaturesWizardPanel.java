@@ -30,7 +30,6 @@ public class CoveredFeaturesWizardPanel extends ChangeListeningWizardPanel {
     public static final String PROP_GET_COVERED_FEATURES = "getCoveredFeatures";
     public static final String PROP_MIN_COVERED_PERCENT = "minCoveredPercent";
     public static final String PROP_MIN_COVERAGE_COUNT = "minCoverageCount";
-    public static final String PROP_WHATEVER_STRAND = "whateverStrand";
 
     /**
      * The visual component that displays this panel. If you need to access the
@@ -66,7 +65,6 @@ public class CoveredFeaturesWizardPanel extends ChangeListeningWizardPanel {
             wiz.putProperty(CoveredFeaturesWizardPanel.PROP_GET_COVERED_FEATURES, this.component.getGetCoveredFeatures());
             wiz.putProperty(CoveredFeaturesWizardPanel.PROP_MIN_COVERED_PERCENT, this.component.getMinCoveredPercent());
             wiz.putProperty(CoveredFeaturesWizardPanel.PROP_MIN_COVERAGE_COUNT, this.component.getMinCoverageCount());
-            wiz.putProperty(CoveredFeaturesWizardPanel.PROP_WHATEVER_STRAND, this.component.getIsWhateverStrand());
         }
     }
 }

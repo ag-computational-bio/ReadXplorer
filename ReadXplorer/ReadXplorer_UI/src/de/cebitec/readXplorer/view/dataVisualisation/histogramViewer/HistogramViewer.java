@@ -138,12 +138,12 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
                 }
             }
 
-            int complete = cov.getCommonFwdMult(logPos);
+            int complete = cov.getCommonFwd(logPos);
             if (complete != 0) {
                 appendStatsTable(sb, complete, relPos, true, "Forward strand", false);
             }
 
-            complete = cov.getCommonRevMult(logPos);
+            complete = cov.getCommonRev(logPos);
             if (complete != 0) {
                 appendStatsTable(sb, complete, relPos, false, "Reverse strand", false);
             }
@@ -152,10 +152,10 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
                 int tmp = logPos + gapManager.getNumOfGapsSmaller(logPos);
                 for (int i = 0; i < gapManager.getNumOfGapsAt(logPos); ++i) {
                     sb.append("<tr><td align=\"left\"><b>Gap position ").append(logPos).append("_").append(i+1).append("</b></td></tr>");
-                    complete = cov.getCommonFwdMult(logPos);
+                    complete = cov.getCommonFwd(logPos);
                     appendStatsTable(sb, complete, tmp, true, "Genome gaps forward", true);
 
-                    complete = cov.getCommonFwdMult(logPos);
+                    complete = cov.getCommonFwd(logPos);
                     appendStatsTable(sb, complete, tmp, false, "Genome gaps reverse", true);
                     ++tmp;
                 }
@@ -596,8 +596,8 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         int relPos;
         for (int i = lowerBound; i <= upperBound; i++) {
             relPos = i + gapManager.getNumOfGapsAt(i) + gapManager.getNumOfGapsSmaller(i);
-            logoData.setCoverageAt(relPos, cov.getCommonFwdMult(i), true);
-            logoData.setCoverageAt(relPos, cov.getCommonRevMult(i), false);
+            logoData.setCoverageAt(relPos, cov.getCommonFwd(i), true);
+            logoData.setCoverageAt(relPos, cov.getCommonRev(i), false);
 
         }
 

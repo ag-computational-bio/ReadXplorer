@@ -146,8 +146,8 @@ public class OpenTracksVisualPanel extends JobPanel implements ExplorerManager.P
     }
     
     /**
-     * @return <cc>true</cc>, if the all selected tracks shall be combined,
-     * <cc>false</cc> otherwise.
+     * @return <code>true</code>, if the all selected tracks shall be combined,
+     * <code>false</code> otherwise.
      */
     public boolean isCombineTracks() {
         return this.combineTracksBox.isSelected();
@@ -210,7 +210,7 @@ public class OpenTracksVisualPanel extends JobPanel implements ExplorerManager.P
         Node[] selectedNodes = explorerManager.getSelectedNodes();
         for (int i = 0; i < selectedNodes.length; ++i) {
             if (selectedNodes[i] instanceof TrackNode) {
-                StandardItem item = ((TrackNode) selectedNodes[i]).getData();
+                StandardItem item = ((StandardNode) selectedNodes[i]).getData();
                 if (item instanceof TrackItem) {
                     TrackItem trackItem = (TrackItem) item;
                     if (!selectedTracks.contains(trackItem.getTrack())) {

@@ -65,7 +65,7 @@ public class PatternFilter implements RegionFilterI {
             int stop = this.absStop + offset - 1;
 
             if (start <= 0 ) {
-                offset -= Math.abs(start);
+                offset -= Math.abs(start) + 1;
                 start = 1;
             }
             if (stop > this.refGen.getActiveChromLength()) {

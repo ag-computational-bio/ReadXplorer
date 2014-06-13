@@ -716,8 +716,8 @@ public class ProjectConnector extends Observable {
      * track job.
      * @param track the track job containing the track information to store
      */
-    public void storeDirectAccessTrack(ParsedTrack track) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing direct access track data...");       
+    public void storeBamTrack(ParsedTrack track) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing bam track data...");       
         
         try (PreparedStatement insertTrack = con.prepareStatement(SQLStatements.INSERT_TRACK)) {
             insertTrack.setLong(1, track.getID());
@@ -734,7 +734,7 @@ public class ProjectConnector extends Observable {
         // notify observers about the change of the database
         this.notifyObserversAbout("storeTrack");
         
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing direct access track data");        
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing bam track data");        
     }
 
 

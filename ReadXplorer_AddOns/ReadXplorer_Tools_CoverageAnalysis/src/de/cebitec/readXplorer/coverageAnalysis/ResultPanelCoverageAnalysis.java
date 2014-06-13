@@ -65,8 +65,8 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
         model.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                int posColumnIdx = 3;
-                int chromColumnIdx = 1;
+                int posColumnIdx = 0;
+                int chromColumnIdx = 3;
                 TableUtils.showPosition(coverageAnalysisTable, posColumnIdx, chromColumnIdx, bim);
             }
         });

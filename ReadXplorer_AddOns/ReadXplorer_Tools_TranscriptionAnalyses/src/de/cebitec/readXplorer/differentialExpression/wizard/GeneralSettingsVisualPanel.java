@@ -17,12 +17,11 @@
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
 import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import java.io.File;
 import java.util.List;
-import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 /**
  * Panel displaying general options for the differential expression wizard, such
@@ -54,20 +53,7 @@ public final class GeneralSettingsVisualPanel extends JPanel {
     }
 
     public boolean verifyInput() {
-        return (verifyComponentInteger(startOffset) && verifyComponentInteger(stopOffset));
-    }
-
-    private boolean verifyComponentInteger(JComponent input) {
-        String text = ((JTextField) input).getText();
-        try {
-            Integer value = Integer.parseInt(text);
-            if (value < 0) {
-                return false;
-            }
-        } catch (NumberFormatException ex) {
-            return false;
-        }
-        return true;
+        return GeneralUtils.isValidNumberInput(startOffset.getText()) && GeneralUtils.isValidNumberInput(stopOffset.getText());
     }
 
     public Integer getStartOffset() {
@@ -95,10 +81,6 @@ public final class GeneralSettingsVisualPanel extends JPanel {
         return saveBoxChecked;
     }
 
-    public boolean regaredReadOrientation() {
-        return readOrientationBox.isSelected();
-    }
-
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -117,7 +99,6 @@ public final class GeneralSettingsVisualPanel extends JPanel {
         fileChooserButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         usedAnnotationsList = new javax.swing.JList<>(FeatureType.SELECTABLE_FEATURE_TYPES);
-        readOrientationBox = new javax.swing.JCheckBox();
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(GeneralSettingsVisualPanel.class, "GeneralSettingsVisualPanel.jLabel1.text")); // NOI18N
 
@@ -149,9 +130,6 @@ public final class GeneralSettingsVisualPanel extends JPanel {
 
         jScrollPane1.setViewportView(usedAnnotationsList);
 
-        readOrientationBox.setSelected(true);
-        org.openide.awt.Mnemonics.setLocalizedText(readOrientationBox, org.openide.util.NbBundle.getMessage(GeneralSettingsVisualPanel.class, "GeneralSettingsVisualPanel.readOrientationBox.text")); // NOI18N
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -167,17 +145,15 @@ public final class GeneralSettingsVisualPanel extends JPanel {
                         .addComponent(fileNameField)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(fileChooserButton))
-                    .addComponent(saveCheckBox, javax.swing.GroupLayout.PREFERRED_SIZE, 353, Short.MAX_VALUE)
+                    .addComponent(saveCheckBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(startOffset, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(stopOffset, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(readOrientationBox)
-                            .addComponent(jLabel3))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addComponent(jLabel3)
+                        .addGap(0, 277, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -195,9 +171,7 @@ public final class GeneralSettingsVisualPanel extends JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(startOffset, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(stopOffset, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 6, Short.MAX_VALUE)
-                .addComponent(readOrientationBox)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 29, Short.MAX_VALUE)
                 .addComponent(saveCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -235,7 +209,6 @@ public final class GeneralSettingsVisualPanel extends JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JCheckBox readOrientationBox;
     private javax.swing.JCheckBox saveCheckBox;
     private javax.swing.JTextField startOffset;
     private javax.swing.JTextField stopOffset;

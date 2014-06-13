@@ -262,55 +262,94 @@ public class ViewController implements MousePositionListener {
         trackToPanel.values().remove(trackBasePanel);
     }
 
+    /**
+     * Open a double track viewer which already has two selected tracks.
+     * @param tp the double track viewer base panel
+     */
     public void openTrack2(BasePanel tp) {
         getApp().showTrackPanel(tp);
         currentTracks.add(tp);
     }
 
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void setCurrentMousePosition(int logPos) {
-        for(MousePositionListener c : mousePosListener){
+        for (MousePositionListener c : mousePosListener) {
             c.setCurrentMousePosition(logPos);
         }
     }
     
+    /**
+     * {@inheritDoc }
+     */
     @Override
     public void setMouseOverPaintingRequested(boolean requested) {
-        for(MousePositionListener c : mousePosListener){
+        for (MousePositionListener c : mousePosListener) {
             c.setMouseOverPaintingRequested(requested);
         }
     }
 
+    /**
+     * @return The bounds manager associated to this view controller.
+     */
     public BoundsInfoManager getBoundsManager() {
         return boundsManager;
     }
 
+    /**
+     * @return The reference genome associated with this view controller.
+     */
     public PersistantReference getCurrentRefGen() {
         return currentRefGen;
     }
 
-    public boolean hasRefGen(){
+    /**
+     * @return true, if this view controller already has a reference, false 
+     * otherwise.
+     */
+    public boolean hasRefGen() {
         return currentRefGen != null;
     }
 
-    public String getDisplayName(){
+    /**
+     * @return A displayable name of this reference.
+     */
+    public String getDisplayName() {
         return currentRefGen.getName() + ": " + currentRefGen.getDescription();
     }
 
-    public void addMousePositionListener(MousePositionListener listener){
+    /**
+     * Adds a mouse position listener to this view controller.
+     * @param listener the listener to add
+     */
+    public void addMousePositionListener(MousePositionListener listener) {
         mousePosListener.add(listener);
     }
 
-    public void removeMousePositionListener(MousePositionListener listener){
-        if(mousePosListener.contains(listener)){
+    /**
+     * Removes a mouse position listener from this view controller.
+     * @param listener the listener to add
+     */
+    public void removeMousePositionListener(MousePositionListener listener) {
+        if (mousePosListener.contains(listener)) {
             mousePosListener.remove(listener);
         }
     }
 
-    private ApplicationFrameI getApp(){
+    /**
+     * @return The {@link ApplicationFrameI} associated with this view 
+     * controller.
+     */
+    private ApplicationFrameI getApp() {
         return app;
     }
 
+    /**
+     * @return The {@link BasePanelFactory} associated with this view 
+     * controller. This factory generates all viewers.
+     */
     public BasePanelFactory getBasePanelFac() {
         return basePanelFac;
     }

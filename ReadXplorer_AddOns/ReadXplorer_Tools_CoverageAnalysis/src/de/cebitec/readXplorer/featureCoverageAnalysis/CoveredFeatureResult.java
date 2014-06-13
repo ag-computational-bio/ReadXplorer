@@ -144,9 +144,7 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
         statisticsExportData.add(ResultTrackAnalysis.createTableRow(coveredString + " feature detection parameters:"));
         statisticsExportData.add(ResultTrackAnalysis.createTableRow("Minimum covered percent:", parameters.getMinCoveredPercent()));
         statisticsExportData.add(ResultTrackAnalysis.createTableRow("Minimum counted coverage:", parameters.getMinCoverageCount()));
-        String whateverStrand = parameters.isWhateverStrand() ? "no" : "yes";
         String uncoveredFeatures = parameters.isGetCoveredFeatures() ? "no" : "yes";
-        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Only count read on feature strand:", whateverStrand));
         statisticsExportData.add(ResultTrackAnalysis.createTableRow("Detect uncovered instead of covered features:", uncoveredFeatures));
         parameters.getReadClassParams().addReadClassParamsToStats(statisticsExportData);
 

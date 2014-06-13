@@ -155,13 +155,13 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     
     
     private int getFwdCoverageAt(CoverageAndDiffResultPersistant coverageResult, int position) {
-        return coverageResult.getCoverage().getCommonFwdMult(position)
-                + coverageResult.getCoverage().getPerfectFwdMult(position);
+        return coverageResult.getCoverage().getCommonFwd(position)
+                + coverageResult.getCoverage().getPerfectFwd(position);
     }
     
     private int getRevCoverageAt(CoverageAndDiffResultPersistant coverageResult, int position) {
-        return coverageResult.getCoverage().getCommonRevMult(position)
-                + coverageResult.getCoverage().getPerfectRevMult(position);
+        return coverageResult.getCoverage().getCommonRev(position)
+                + coverageResult.getCoverage().getPerfectRev(position);
     }
     
     private int getCoverageAt(CoverageAndDiffResultPersistant coverageResult, int position, StrandDirection direction) {

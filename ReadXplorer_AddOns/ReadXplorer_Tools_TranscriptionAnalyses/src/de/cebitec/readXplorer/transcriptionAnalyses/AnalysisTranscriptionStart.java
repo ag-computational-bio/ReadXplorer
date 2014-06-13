@@ -61,6 +61,10 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
 
     private TrackConnector trackConnector;
     private final ParameterSetTSS parametersTSS;
+    private boolean isStrandBothOption;
+    private boolean isBothFwdDirection;
+    private boolean isFeatureStrand;
+    private boolean isFeatureStrandAnalysis;
     protected List<TranscriptionStart> detectedStarts;
     private DiscreteCountingDistribution readStartDistribution;
     private DiscreteCountingDistribution covIncPercentDistribution;
@@ -191,10 +195,73 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         int chromLength = chromosomes.get(chromId).getLength();
         List<PersistantFeature> chromFeatures = refConnector.getFeaturesForClosedInterval(0, chromLength, chromId);
         this.currentCoverage = coverage;
+        isStrandBothOption = parametersTSS.getReadClassParams().isStrandBothOption();
+        isBothFwdDirection = parametersTSS.getReadClassParams().isStrandBothFwdOption();
+        isFeatureStrand = parametersTSS.getReadClassParams().isStrandFeatureOption();
+        isFeatureStrandAnalysis = isFeatureStrand || isStrandBothOption && isBothFwdDirection;
         
         int leftBound = coverage.getLeftBound();
         int fixedLeftBound = leftBound <= 0 ? 0 : leftBound - 1;
         int rightBound = coverage.getRightBound();
+        
+        coverage.setLeftBound(fixedLeftBound); //add left coverage value from last request (or 0) to left
+        readStarts.setLeftBound(fixedLeftBound); //of all coverage arrays.
+        coverage.setPerfectFwd(this.fixLeftCoverageBound(coverage.getPerfectFwd(), perfectCovLastFwdPos));
+        coverage.setPerfectRev(this.fixLeftCoverageBound(coverage.getPerfectRev(), perfectCovLastRevPos));
+        coverage.setBestMatchFwd(this.fixLeftCoverageBound(coverage.getBestMatchFwd(), bmCovLastFwdPos));
+        coverage.setBestMatchRev(this.fixLeftCoverageBound(coverage.getBestMatchRev(), bmCovLastRevPos));
+        coverage.setCommonFwd(this.fixLeftCoverageBound(coverage.getCommonFwd(), commonCovLastFwdPos));
+        coverage.setCommonRev(this.fixLeftCoverageBound(coverage.getCommonRev(), commonCovLastRevPos));
+        readStarts.setPerfectFwd(this.fixLeftCoverageBound(readStarts.getPerfectFwd(), 0)); //for read starts the left pos is not important
+        readStarts.setPerfectRev(this.fixLeftCoverageBound(readStarts.getPerfectRev(), perfectReadStartsLastRevPos)); //on fwd strand
+        readStarts.setBestMatchFwd(this.fixLeftCoverageBound(readStarts.getBestMatchFwd(), 0));
+        readStarts.setBestMatchRev(this.fixLeftCoverageBound(readStarts.getBestMatchRev(), bmReadStartsLastRevPos));
+        readStarts.setCommonFwd(this.fixLeftCoverageBound(readStarts.getCommonFwd(), 0));
+        readStarts.setCommonRev(this.fixLeftCoverageBound(readStarts.getCommonRev(), commonReadStartsLastRevPos));
+
+        for (int i = fixedLeftBound; i < rightBound; ++i) {
+            
+            if (parametersTSS.getReadClassParams().isCommonMatchUsed()) {
+                this.gatherDataAndDetect(chromId, chromLength, chromFeatures, coverage.getCommonFwd(), 
+                        coverage.getCommonRev(), readStarts.getCommonFwd(), readStarts.getCommonRev(), i);
+            
+            } else if (parametersTSS.getReadClassParams().isBestMatchUsed()) {
+                this.gatherDataAndDetect(chromId, chromLength, chromFeatures, coverage.getBestMatchFwd(), 
+                        coverage.getBestMatchRev(), readStarts.getBestMatchFwd(), readStarts.getBestMatchRev(), i);
+            
+            } else {//if (parametersTSS.getReadClassParams().isPerfectMatchUsed()) {
+                this.gatherDataAndDetect(chromId, chromLength, chromFeatures, coverage.getPerfectFwd(), 
+                        coverage.getPerfectFwd(), readStarts.getPerfectFwd(), readStarts.getPerfectRev(), i);
+            }
+        }
+
+        perfectCovLastFwdPos = coverage.getPerfectFwd(rightBound);
+        perfectCovLastRevPos = coverage.getPerfectRev(rightBound);
+        bmCovLastFwdPos = coverage.getBestMatchFwd(rightBound);
+        bmCovLastRevPos = coverage.getBestMatchRev(rightBound);
+        commonCovLastFwdPos = coverage.getCommonFwd(rightBound);
+        commonCovLastRevPos = coverage.getCommonRev(rightBound);
+        perfectReadStartsLastRevPos = readStarts.getPerfectRev(rightBound);
+        bmReadStartsLastRevPos = readStarts.getBestMatchRev(rightBound);
+        commonReadStartsLastRevPos = readStarts.getCommonRev(rightBound);
+    }
+    
+    /**
+     * Gathers the necessary data from a given set of coverage arrays. 
+     * Afterwards, the TSS detection is performed.
+     * @param chromId the chromosome to analyze
+     * @param chromLength the length of this chromosome
+     * @param chromFeatures all features of the chromosome
+     * @param covArrayFwd the fwd coverage array of the selected mapping class
+     * @param covArrayRev the rev coverage array of the selected mapping class
+     * @param readStartArrayFwd the fwd read start array of the selected mapping 
+     * class
+     * @param readStartArrayRev the rev read start array of the selected mapping 
+     * class
+     * @param pos the currently investigated position
+     */
+    private void gatherDataAndDetect(int chromId, int chromLength, List<PersistantFeature> chromFeatures, 
+            int[] covArrayFwd, int[] covArrayRev, int[] readStartArrayFwd, int[] readStartArrayRev, int pos) {
         int fwdCov1;
         int revCov1;
         int fwdCov2;
@@ -205,106 +272,64 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         int readStartsRev;
         int percentIncFwd;
         int percentIncRev;
+        int readStartIntermd;
         
-        coverage.setLeftBound(fixedLeftBound); //add left coverage value from last request (or 0) to left
-        readStarts.setLeftBound(fixedLeftBound); //of all coverage arrays.
-        coverage.setPerfectFwdMult(this.fixLeftCoverageBound(coverage.getPerfectFwdMult(), perfectCovLastFwdPos));
-        coverage.setPerfectRevMult(this.fixLeftCoverageBound(coverage.getPerfectRevMult(), perfectCovLastRevPos));
-        coverage.setBestMatchFwdMult(this.fixLeftCoverageBound(coverage.getBestMatchFwdMult(), bmCovLastFwdPos));
-        coverage.setBestMatchRevMult(this.fixLeftCoverageBound(coverage.getBestMatchRevMult(), bmCovLastRevPos));
-        coverage.setCommonFwdMult(this.fixLeftCoverageBound(coverage.getCommonFwdMult(), commonCovLastFwdPos));
-        coverage.setCommonRevMult(this.fixLeftCoverageBound(coverage.getCommonRevMult(), commonCovLastRevPos));
-        readStarts.setPerfectFwdMult(this.fixLeftCoverageBound(readStarts.getPerfectFwdMult(), 0)); //for read starts the left pos is not important
-        readStarts.setPerfectRevMult(this.fixLeftCoverageBound(readStarts.getPerfectRevMult(), perfectReadStartsLastRevPos)); //on fwd strand
-        readStarts.setBestMatchFwdMult(this.fixLeftCoverageBound(readStarts.getBestMatchFwdMult(), 0));
-        readStarts.setBestMatchRevMult(this.fixLeftCoverageBound(readStarts.getBestMatchRevMult(), bmReadStartsLastRevPos));
-        readStarts.setCommonFwdMult(this.fixLeftCoverageBound(readStarts.getCommonFwdMult(), 0));
-        readStarts.setCommonRevMult(this.fixLeftCoverageBound(readStarts.getCommonRevMult(), commonReadStartsLastRevPos));
-        
-        if (this.calcCoverageDistributions) { //this way code is duplicated, but if clause only evaluated once
-            for (int i = fixedLeftBound; i < rightBound; ++i) {
-                if (parametersTSS.getReadClassParams().isCommonMatchUsed()) {
-                    fwdCov1 = coverage.getCommonFwdMult(i);
-                    revCov1 = coverage.getCommonRevMult(i);
-                    fwdCov2 = coverage.getCommonFwdMult(i + 1);
-                    revCov2 = coverage.getCommonRevMult(i + 1);
-                    readStartsFwd = readStarts.getCommonFwdMult(i + 1);
-                    readStartsRev = readStarts.getCommonRevMult(i);
-                } else if (parametersTSS.getReadClassParams().isBestMatchUsed()) {
-                    fwdCov1 = coverage.getBestMatchFwdMult(i);
-                    revCov1 = coverage.getBestMatchRevMult(i);
-                    fwdCov2 = coverage.getBestMatchFwdMult(i + 1);
-                    revCov2 = coverage.getBestMatchRevMult(i + 1);  
-                    readStartsFwd = readStarts.getBestMatchFwdMult(i + 1);
-                    readStartsRev = readStarts.getBestMatchRevMult(i);
-                } else {//if (parametersTSS.getReadClassParams().isPerfectMatchUsed()) {
-                    fwdCov1 = coverage.getPerfectFwdMult(i);
-                    revCov1 = coverage.getPerfectRevMult(i);
-                    fwdCov2 = coverage.getPerfectFwdMult(i + 1);
-                    revCov2 = coverage.getPerfectRevMult(i + 1);
-                    readStartsFwd = readStarts.getPerfectFwdMult(i + 1);
-                    readStartsRev = readStarts.getPerfectRevMult(i);
-                }
-                increaseFwd = fwdCov2 - fwdCov1;
-                increaseRev = revCov1 - revCov2;
-                
-                percentIncFwd = GeneralUtils.calculatePercentageIncrease(fwdCov1, fwdCov2);
-                percentIncRev = GeneralUtils.calculatePercentageIncrease(revCov2, revCov1);
-                
-                this.readStartDistribution.increaseDistribution(readStartsFwd);
-                this.readStartDistribution.increaseDistribution(readStartsRev);
-                this.covIncPercentDistribution.increaseDistribution(percentIncFwd);
-                this.covIncPercentDistribution.increaseDistribution(percentIncRev);
-                
-                this.detectStart(i, chromId, chromLength, chromFeatures, readStartsFwd, readStartsRev, increaseFwd, increaseRev, percentIncFwd, percentIncRev);
-            }
+        fwdCov1 = covArrayFwd[pos];
+        revCov1 = covArrayRev[pos];
+        fwdCov2 = covArrayFwd[pos + 1];
+        revCov2 = covArrayRev[pos + 1];
+        if (!isFeatureStrand && !isStrandBothOption) {
+            readStartsFwd = readStartArrayFwd[pos];
+            readStartsRev = readStartArrayRev[pos + 1];
         } else {
-            for (int i = fixedLeftBound; i < rightBound; ++i) {
-                if (parametersTSS.getReadClassParams().isCommonMatchUsed()) {
-                    fwdCov1 = coverage.getCommonFwdMult(i);
-                    revCov1 = coverage.getCommonRevMult(i);
-                    fwdCov2 = coverage.getCommonFwdMult(i + 1);
-                    revCov2 = coverage.getCommonRevMult(i + 1);
-                    readStartsFwd = readStarts.getCommonFwdMult(i + 1);
-                    readStartsRev = readStarts.getCommonRevMult(i);
-                } else if (parametersTSS.getReadClassParams().isBestMatchUsed()) {
-                    fwdCov1 = coverage.getBestMatchFwdMult(i);
-                    revCov1 = coverage.getBestMatchRevMult(i);
-                    fwdCov2 = coverage.getBestMatchFwdMult(i + 1);
-                    revCov2 = coverage.getBestMatchRevMult(i + 1);
-                    readStartsFwd = readStarts.getBestMatchFwdMult(i + 1);
-                    readStartsRev = readStarts.getBestMatchRevMult(i);
-                } else {//if (parametersTSS.getReadClassParams().isPerfectMatchUsed()) {
-                    fwdCov1 = coverage.getPerfectFwdMult(i);
-                    revCov1 = coverage.getPerfectRevMult(i);
-                    fwdCov2 = coverage.getPerfectFwdMult(i + 1);
-                    revCov2 = coverage.getPerfectRevMult(i + 1);
-                    readStartsFwd = readStarts.getPerfectFwdMult(i + 1);
-                    readStartsRev = readStarts.getPerfectRevMult(i);
+            readStartsFwd = readStartArrayFwd[pos + 1];
+            readStartsRev = readStartArrayRev[pos];
+        }
+        
+        if (isStrandBothOption) {
+                if (isBothFwdDirection) {
+                    increaseFwd = fwdCov2 - fwdCov1 + revCov2 - revCov1;
+                    increaseRev = 0;
+                    percentIncFwd = GeneralUtils.calculatePercentageIncrease(fwdCov1 + revCov1, fwdCov2 + revCov2);
+                    percentIncRev = GeneralUtils.calculatePercentageIncrease(0, 0);
+                } else {
+                    increaseFwd = 0;
+                    increaseRev = revCov1 - revCov2 + fwdCov1 - fwdCov2;
+                    percentIncFwd = GeneralUtils.calculatePercentageIncrease(0, 0);
+                    percentIncRev = GeneralUtils.calculatePercentageIncrease(revCov2 + fwdCov2, revCov1 + fwdCov1);
                 }
-                increaseFwd = fwdCov2 - fwdCov1;
-                increaseRev = revCov1 - revCov2;
-                
-                percentIncFwd = GeneralUtils.calculatePercentageIncrease(fwdCov1, fwdCov2);
-                percentIncRev = GeneralUtils.calculatePercentageIncrease(revCov2, revCov1);
-                
-                this.detectStart(i, chromId, chromLength, chromFeatures, readStartsFwd, readStartsRev, increaseFwd, increaseRev, percentIncFwd, percentIncRev);
+            } else {
+                //default increases for correctly stranded libraries
+                if (isFeatureStrand) {
+                    increaseFwd = fwdCov2 - fwdCov1;
+                    increaseRev = revCov1 - revCov2;
+                    percentIncFwd = GeneralUtils.calculatePercentageIncrease(fwdCov1, fwdCov2);
+                    percentIncRev = GeneralUtils.calculatePercentageIncrease(revCov2, revCov1);
+
+                //extra increases for invertedly stranded libraries
+                } else {
+                    increaseRev = fwdCov1 - fwdCov2;
+                    increaseFwd = revCov2 - revCov1;
+                    percentIncRev = GeneralUtils.calculatePercentageIncrease(fwdCov2, fwdCov1);
+                    percentIncFwd = GeneralUtils.calculatePercentageIncrease(revCov1, revCov2);
+                    readStartIntermd = readStartsFwd;
+                    readStartsFwd = readStartsRev;
+                    readStartsRev = readStartIntermd;
+                }
             }
+        
+        if (this.calcCoverageDistributions) {
+            this.readStartDistribution.increaseDistribution(readStartsFwd);
+            this.readStartDistribution.increaseDistribution(readStartsRev);
+            this.covIncPercentDistribution.increaseDistribution(percentIncFwd);
+            this.covIncPercentDistribution.increaseDistribution(percentIncRev);
         }
 
-        perfectCovLastFwdPos = coverage.getPerfectFwdMult(rightBound);
-        perfectCovLastRevPos = coverage.getPerfectRevMult(rightBound);
-        bmCovLastFwdPos = coverage.getBestMatchFwdMult(rightBound);
-        bmCovLastRevPos = coverage.getBestMatchRevMult(rightBound);
-        commonCovLastFwdPos = coverage.getCommonFwdMult(rightBound);
-        commonCovLastRevPos = coverage.getCommonRevMult(rightBound);
-        perfectReadStartsLastRevPos = readStarts.getPerfectRevMult(rightBound);
-        bmReadStartsLastRevPos = readStarts.getBestMatchRevMult(rightBound);
-        commonReadStartsLastRevPos = readStarts.getCommonRevMult(rightBound);
+        this.detectStart(pos, chromId, chromLength, chromFeatures, readStartsFwd, readStartsRev, increaseFwd, increaseRev, percentIncFwd, percentIncRev);
     }
     
     /**
-     * Method for analysing the coverage of one pair of neighboring positions and
+     * Method for analyzing the coverage of one pair of neighboring positions and
      * detecting a transcription start site, if the parameters are satisfied.
      * @param coverage the PersistantCoverage container
      * @param pos the position defining the pair to analyse: pos and (pos + 1)
@@ -319,10 +344,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      */
     private void detectStart(int pos, int chromId, int chromLength, List<PersistantFeature> chromFeatures, int readStartsFwd, 
                     int readStartsRev, int increaseFwd, int increaseRev, int percentIncreaseFwd, int percentIncreaseRev) {
-
-        if (pos == 1190041 && chromId == 3) {
-            System.out.println("e");
-        }
+        
         
         if ( ((readStartsFwd <= parametersTSS.getMaxLowCovReadStarts() && readStartsFwd >= parametersTSS.getMinLowCovReadStarts())
             || readStartsFwd >  parametersTSS.getMaxLowCovReadStarts() && readStartsFwd >= parametersTSS.getMinNoReadStarts())
@@ -535,9 +557,6 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                 int noReadStartsTSS = tss.getReadStartsAtPos();
                 
                 if (noReadStartsLastStart < noReadStartsTSS) {
-                    if (this.detectedStarts.get(this.detectedStarts.size() - 1).getPos() == 1190041) {
-                        System.out.println("e");
-                    }
                     this.detectedStarts.remove(index);
                     this.addDetectStart(tss);
                 }
@@ -652,9 +671,6 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
             tss = this.detectedStarts.get(i);
             if (tss.getReadStartsAtPos() < parametersTSS.getMinNoReadStarts()
                     || tss.getPercentIncrease() < parametersTSS.getMinPercentIncrease()) {
-                if (tss.getPos() == 1190041) {
-                    System.out.println("e");
-                }
                 this.detectedStarts.remove(tss);
             }
         }
@@ -679,9 +695,6 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         List<TranscriptionStart> copiedDetectedStarts = new ArrayList<>(this.detectedStarts);
         for (TranscriptionStart tss : this.detectedStarts) {
             
-            if (tss.getPos() == 1190041) {
-                System.out.println("e");
-            }
             if ((   tss.getReadStartsAtPos() < parametersTSS.getMinNoReadStarts() ||
                     tss.getPercentIncrease() < parametersTSS.getMinPercentIncrease()) 
 //                    && tss.getReadStartsAtPos() > parametersTSS.getMaxLowCovReadStarts()

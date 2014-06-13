@@ -21,7 +21,6 @@ import de.cebitec.readXplorer.util.StatsContainer;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Contains all data (description, mappings and coverageContainer) belonging
@@ -34,7 +33,6 @@ public class ParsedTrack {
     private TrackJob trackJob;
     private HashMap<String, Integer> readNameToSeqIDMap1;
     private HashMap<String, Integer> readNameToSeqIDMap2;
-    private ParsedMappingContainer mappings;
     private CoverageContainer coverageContainer;
     private boolean isFirstTrack;
     private int batchPos; /** Stop position of the current batch in the ref. genome. */
@@ -44,22 +42,13 @@ public class ParsedTrack {
      * Contains all data (description, mappings and coverageContainer) belonging
      * to a track, which can be stored into a database now.
      * @param trackJob the track job for which the track is created
-     * @param mappings mappings of the track
      * @param coverageContainer coverage container of the track
      */
-    public ParsedTrack(TrackJob trackJob, ParsedMappingContainer mappings, CoverageContainer coverageContainer){
+    public ParsedTrack(TrackJob trackJob, CoverageContainer coverageContainer){
         this.trackJob = trackJob;
         this.readNameToSeqIDMap1 = new HashMap<>();
         this.readNameToSeqIDMap2 = new HashMap<>();
-        this.mappings = mappings;
         this.coverageContainer = coverageContainer;
-    }
-
-    /**
-     * @return true, if this track is stored in the db completely, false otherwise
-     */
-    public boolean isDbUsed() {
-        return trackJob.isDbUsed();
     }
 
     /**
@@ -67,14 +56,6 @@ public class ParsedTrack {
      */
     public CoverageContainer getCoverageContainer(){
         return this.coverageContainer;
-    }
-
-    /**
-     * @return the container of all mappings of this track (if they were stored,
-     * if not, the container is just empty)
-     */
-    public ParsedMappingContainer getParsedMappingContainer() {
-        return this.mappings;
     }
 
     /**
@@ -159,11 +140,10 @@ public class ParsedTrack {
     }
     
     /**
-     * Clears the mappings, coverage container and ReadnameToseqIDMap.
+     * Clears the coverage container and ReadnameToseqIDMap.
      * All other information persists!
      */
     public void clear(){
-        this.mappings.clear();
         this.readNameToSeqIDMap1.clear();
         this.coverageContainer.clearCoverageContainer();
     }
@@ -198,24 +178,15 @@ public class ParsedTrack {
     }
 
     /**
-     * @return The statistics container for this track
+     * @return The statistics container for this track. If it it currently null
+     * a brand new StatsContainer is created and prepared for a standard track.
      */
     public StatsContainer getStatsContainer() {
         if (statsContainer == null) {
             this.statsContainer = new StatsContainer();
             this.statsContainer.prepareForTrack();
-            if (mappings.getMappingInfos() != null) {
-                Map<Integer,Integer> mappingInfos = mappings.getMappingInfos();
-                statsContainer.increaseValue(StatsContainer.NO_COMMON_MAPPINGS, mappingInfos.get(1));
-                statsContainer.increaseValue(StatsContainer.NO_PERFECT_MAPPINGS, mappingInfos.get(2));
-                statsContainer.increaseValue(StatsContainer.NO_BESTMATCH_MAPPINGS, mappingInfos.get(3));
-                statsContainer.increaseValue(StatsContainer.NO_READS, mappingInfos.get(6));
-                statsContainer.increaseValue(StatsContainer.NO_UNIQUE_SEQS, mappingInfos.get(5));
-                statsContainer.increaseValue(StatsContainer.NO_UNIQ_MAPPINGS, mappingInfos.get(4));
-            }
         }
         return statsContainer;
     }
     
-
 }

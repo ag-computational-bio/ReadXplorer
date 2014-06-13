@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -68,10 +68,15 @@ public class Properties {
     public static final byte MAPPINGS_DB_BY_ID = 6;
     /** Value for mappings without diffs (7). */
     public static final byte MAPPINGS_WO_DIFFS = 7;
-    /** kasterm: Value for all reduced mappings*/
+    /** kasterm: Value for all reduced mappings (8). */
     public static final byte REDUCED_MAPPINGS  = 8;
-    /** Value for obtaining read starts instead of coverage. */
+    /** Value for obtaining read starts instead of coverage (9). */
     public static byte READ_STARTS = 9;
+    /** Value for viewing all mappings as if they came from the fwd. strand 
+     * (10). This should only be used in combination with {@link STRAND_BOTH}
+     to infer, if all mappings shall be treated as if the came from the fwd. or
+     the rev. strand ()*/
+    public static byte STRAND_FWD_ANALYSIS = 10;
     
     /** Value for read start distribution = 5. */
     public static final byte READ_START_DISTRIBUTION = 5;
@@ -102,7 +107,11 @@ public class Properties {
     /** 'Ys' = Tag for the read pair type. */
     public static final String TAG_READ_PAIR_TYPE = "Ys";
     
-    //Supported sequence pair extensions.
+    //Supported read pair extensions.
+    /** / = separator used for read pair tags before Casava 1.8 format. */
+    public static final char EXT_SEPARATOR = '/';
+    /** 0 = For reads not having a pair tag. */
+    public static final char EXT_UNDEFINED = '0';
     /** 1 = Supported extension of read 1. */
     public static final char EXT_A1 = '1';
     /** 2 = Supported extension of read 2. */
@@ -111,6 +120,10 @@ public class Properties {
     public static final char EXT_B1 = 'f';
     /** r = Supported extension of read 2. */
     public static final char EXT_B2 = 'r';
+    /** 1 = Supported extension of read 1 as String. */
+    public static final String EXT_A1_STRING = String.valueOf(EXT_A1);
+    /** 2 = Supported extension of read 2 as String. */
+    public static final String EXT_A2_STRING = String.valueOf(EXT_A2);
     
     /** The CRAN Mirror used by Gnu R to load missing packages */
     public static final String CRAN_MIRROR = "CRAN_MIRROR";
@@ -138,4 +151,21 @@ public class Properties {
     public static final int MAX_HEIGHT = 250;
     /** Property for auto scaling of viewers. */
     public static final String VIEWER_AUTO_SCALING = "AUTO_SCALING";
+    
+    /** 0 = Combine data of both strands option.*/
+    public static final byte STRAND_BOTH = 0;
+    /** 3 = Combine data of both strands option and treat them as if they were originating from fwd strand. */
+    public static final byte STRAND_BOTH_FWD = 3;
+    /** 4 = Combine data of both strands option and treat them as if they were originating from rev strand. */
+    public static final byte STRAND_BOTH_REV = 4;
+    /** 1 = Feature/analysis strand option.*/
+    public static final byte STRAND_FEATURE = 1;
+    /** 2 = Opposite strand option.*/
+    public static final byte STRAND_OPPOSITE = 2;
+    /** 0 = Combine data of both strands option string.*/
+    public static final String STRAND_BOTH_STRING = String.valueOf(STRAND_BOTH);
+    /** 1 = Feature/analysis strand option string.*/
+    public static final String STRAND_FEATURE_STRING = String.valueOf(STRAND_FEATURE);
+    /** 2 = Opposite strand option string.*/
+    public static final String STRAND_OPPOSITE_STRING = String.valueOf(STRAND_OPPOSITE);
 }

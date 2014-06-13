@@ -20,6 +20,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import net.sf.samtools.BAMIndexer;
+import net.sf.samtools.Cigar;
+import net.sf.samtools.CigarElement;
 import net.sf.samtools.SAMException;
 import net.sf.samtools.SAMFileHeader;
 import net.sf.samtools.SAMFileReader;
@@ -238,5 +240,50 @@ public class SamUtils implements Observable {
                 return false;
             }
         }
+    }
+    
+    /**
+     * Returns blocks of the read sequence that have been aligned directly to the
+     * reference sequence. Note that clipped portions of the read and inserted and
+     * deleted bases (vs. the reference) are not represented in the alignment blocks.
+     * @param cigar
+     * @param refStartPos
+     * @return 
+     */
+    public List<SamAlignmentBlock> getAlignmentBlocks(Cigar cigar, int refStartPos) {
+        
+        final List<SamAlignmentBlock> alignmentBlocks = new ArrayList<>();
+        int start = refStartPos;
+        int stop = refStartPos - 1;
+        boolean fstElement = true;
+
+        for (final CigarElement e : cigar.getCigarElements()) {
+            switch (e.getOperator()) {
+                case H : break; //ignore hard clipped bases
+                case P : break; //ignore padded bases
+                case S : break; //soft clipped read bases
+                case D : stop += e.getLength(); break; //dels
+                case I : break; //insertions
+                case N : 
+                    if (!fstElement) {
+                        alignmentBlocks.add(new SamAlignmentBlock(start, stop));
+                    }
+                    stop += e.getLength(); 
+                    start = stop + 1;
+                    break;  //skipped reference bases are excluded
+                case M : 
+                case EQ :
+                case X :
+                    stop += e.getLength();
+                    fstElement = false;
+                    break;
+                default : throw new IllegalStateException("Case statement encountered unknown cigar op: " + e.getOperator());
+            }
+        }
+        if (start < stop) {
+            alignmentBlocks.add(new SamAlignmentBlock(start, stop));
+        }
+
+        return alignmentBlocks;
     }
 }

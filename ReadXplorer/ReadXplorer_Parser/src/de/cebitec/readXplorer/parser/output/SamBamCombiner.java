@@ -18,6 +18,7 @@ package de.cebitec.readXplorer.parser.output;
 
 import de.cebitec.readXplorer.parser.TrackJob;
 import de.cebitec.readXplorer.parser.common.ParsingException;
+import de.cebitec.readXplorer.parser.mappings.CommonsMappingParser;
 import de.cebitec.readXplorer.util.Benchmark;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Pair;
@@ -111,13 +112,13 @@ public class SamBamCombiner implements CombinerI {
             trackJob1.setFile(outputFile);
             trackJob2.setFile(new File("")); //clean file to make sure, it is not used anymore
 
-            this.readAndWrite(samBamItor, samBamFileWriter);
+            this.readAndWrite(samBamItor, samBamFileWriter, true);
             samBamItor.close();
             samBamReader.close();
 
             samBamReader = new SAMFileReader(file2);
             samBamItor = samBamReader.iterator();
-            this.readAndWrite(samBamItor, samBamFileWriter);
+            this.readAndWrite(samBamItor, samBamFileWriter, false);
             samBamItor.close();
             samBamReader.close();
             samBamFileWriter.close();
@@ -145,12 +146,18 @@ public class SamBamCombiner implements CombinerI {
      * cannot be processed.
      * @param samBamItor the iterator to read sam records from
      * @param samBamFileWriter the writer to write to
+     * @param isFstFile true, if this is the file containing read1, false if
+     * this is the file containing read2 of the pairs
      */
-    private void readAndWrite(SAMRecordIterator samBamItor, SAMFileWriter samBamFileWriter) {
+    private void readAndWrite(SAMRecordIterator samBamItor, SAMFileWriter samBamFileWriter, boolean isFstFile) {
+        long startTime = System.currentTimeMillis();
+        long finish;
+        int noReads = 0;
         SAMRecord record = new SAMRecord(null);
         while (samBamItor.hasNext()) {
             try {
                 record = samBamItor.next();
+                CommonsMappingParser.checkOrAddPairTag(record, isFstFile);
                 samBamFileWriter.addAlignment(record);
             } catch (RuntimeEOFException e) {
                 this.notifyObservers("Read could not be added to new file: " + record.getReadName());
@@ -158,6 +165,10 @@ public class SamBamCombiner implements CombinerI {
                 if (!e.getMessage().contains("MAPQ should be 0")) {
                     this.notifyObservers(e.getMessage());
                 } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored  
+            }
+            if (++noReads % 500000 == 0) {
+                finish = System.currentTimeMillis();
+                this.notifyObservers(Benchmark.calculateDuration(startTime, finish, noReads + " reads converted..."));
             }
         }
     }

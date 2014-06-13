@@ -363,22 +363,22 @@ public class CoverageInfoLabel extends javax.swing.JPanel implements CoverageInf
         if(/*mouseOverWanted &&*/ cov != null){
 
             if (!doubleTrackHackBoolean || combineTracks) {
-                this.setPerfectFwd(cov.getPerfectFwdMult(logPos));
-                this.setPerfectRev(cov.getPerfectRevMult(logPos));
-                this.setBmFwd(cov.getBestMatchFwdMult(logPos));
-                this.setBmRev(cov.getBestMatchRevMult(logPos));
-                this.setCommonFwd(cov.getCommonFwdMult(logPos));
-                this.setCommonRev(cov.getCommonRevMult(logPos));
+                this.setPerfectFwd(cov.getPerfectFwd(logPos));
+                this.setPerfectRev(cov.getPerfectRev(logPos));
+                this.setBmFwd(cov.getBestMatchFwd(logPos));
+                this.setBmRev(cov.getBestMatchRev(logPos));
+                this.setCommonFwd(cov.getCommonFwd(logPos));
+                this.setCommonRev(cov.getCommonRev(logPos));
                 this.currentPositionLabel.setText(String.valueOf(logPos));
             }
             // TODO there has to be a much nicer way, maybe alter PersistantTrack or something else
             else {
-                this.setPerfectFwd(cov.getCommonFwdMult(logPos));
-                this.setPerfectRev(cov.getCommonRevMult(logPos));
-                this.setBmFwd(cov.getCommonFwdMultTrack1(logPos));
-                this.setBmRev(cov.getCommonRevMultTrack1(logPos));
-                this.setCommonFwd(cov.getCommonFwdMultTrack2(logPos));
-                this.setCommonRev(cov.getCommonRevMultTrack2(logPos));
+                this.setPerfectFwd(cov.getCommonFwd(logPos));
+                this.setPerfectRev(cov.getCommonRev(logPos));
+                this.setBmFwd(cov.getCommonFwdTrack1(logPos));
+                this.setBmRev(cov.getCommonRevTrack1(logPos));
+                this.setCommonFwd(cov.getCommonFwdTrack2(logPos));
+                this.setCommonRev(cov.getCommonRevTrack2(logPos));
                 this.currentPositionLabel.setText(String.valueOf(logPos));
             }
 

@@ -27,7 +27,6 @@ import java.sql.Timestamp;
  */
 public class TrackJob implements Job {
 
-    private boolean isDbUsed;
     private File file;
     private String description;
     private Timestamp timestamp;
@@ -39,34 +38,23 @@ public class TrackJob implements Job {
     /**
      * Creates a new track job along with its data.
      * @param trackID id of the track to create
-     * @param isDbUsed true, if the track should be stored into the database and false, if 
-     * direct file access is desired
      * @param file the file to be parsed as track
      * @param description the description of the track
      * @param refGen the ReferenceJob with all information about the reference
      * @param parser the parser to use for parsing
-     * @param isAlreadyImported true, if this direct access track was already imported in another
-     * readXplorer db.
+     * @param isAlreadyImported true, if this direct access track was already 
+     * imported in another readXplorer db.
      * @param timestamp the timestamp when it was created
      */
-    public TrackJob(int trackID, boolean isDbUsed, File file, String description,
-            ReferenceJob refGen, MappingParserI parser, boolean isAlreadyImported, Timestamp timestamp) {
+    public TrackJob(int trackID, File file, String description, ReferenceJob refGen, 
+            MappingParserI parser, boolean isAlreadyImported, Timestamp timestamp) {
         this.trackID = trackID;
-        this.isDbUsed = isDbUsed;
         this.file = file;
         this.description = description;
         this.timestamp = timestamp;
         this.parser = parser;
         this.isAlreadyImported = isAlreadyImported;
         this.refGen = refGen;
-    }
-
-    /**
-     * @return true, if the track should be stored into the database and false, if 
-     * direct file access is desired
-     */
-    public boolean isDbUsed() {
-        return isDbUsed;
     }
 
     /**

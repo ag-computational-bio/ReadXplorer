@@ -117,7 +117,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
                         PersistantFeature feature2 = chromFeatures.get(featureIndex);
 
                         if (feature2.getStart() + 20 > feature1.getStop() && //features may overlap at the ends, happens quite often
-                                feature2.getStart() - feature1.getStop() < 1000) { //only features with a max. distance of 1000 are treated as putative operons
+                                feature2.getStart() - feature1.getStop() < 1000) { //TODO: parameter for this
                             this.featureToPutativeOperonMap.put(feature1.getId(), new OperonAdjacency(feature1, feature2, chrom.getId()));
                         }
                     }
@@ -168,11 +168,15 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
         OperonAdjacency putativeOperon;
         PersistantChromosome chrom = refConnector.getChromosomeForGenome(mappingResult.getRequest().getChromId());
         int chromLength = chrom.getLength();
+        boolean isStrandBothOption = operonDetParameters.getReadClassParams().isStrandBothOption();
+        boolean isFeatureStrand = operonDetParameters.getReadClassParams().isStrandFeatureOption();
+        boolean analysisStrand;
 
         List<PersistantFeature> chromFeatures = refConnector.getFeaturesForClosedInterval(0, chromLength, chrom.getId());
         for (int i = 0; i < chromFeatures.size(); ++i) {
             feature1 = chromFeatures.get(i);
             int id1 = feature1.getId();
+            analysisStrand = isFeatureStrand ? feature1.isFwdStrand() : !feature1.isFwdStrand();
             fstFittingMapping = true;
 
             //we can already neglect all features not forming a putative operon
@@ -193,7 +197,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
 
                     if (mapping.getStart() > feature2Stop) {
                         break; //since the mappings are sorted by start position
-                    } else if (mapping.isFwdStrand() != feature1.isFwdStrand() || mapping.getStop() < feature1Stop) {
+                    } else if (!isStrandBothOption && (mapping.isFwdStrand() != analysisStrand || mapping.getStop() < feature1Stop)) {
                         continue;
                     }
 
@@ -254,14 +258,12 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
         PersistantFeature feature1;
         PersistantFeature feature2;
         Operon operon;
-        for (int i = 0; i < featureIds.length; i++) {
-            
-            putativeOperon = featureToPutativeOperonMap.get((Integer) featureIds[i]);
+        for (Object featureId : featureIds) {
+            putativeOperon = featureToPutativeOperonMap.get((Integer) featureId);
             spanningReads = putativeOperon.getSpanningReads();
             internalReads = putativeOperon.getInternalReads();
             feature1 = putativeOperon.getFeature1();
             feature2 = putativeOperon.getFeature2();
-
             /* Detect an operon only, if the number of spanning reads is larger than
              * the threshold. */
             if (spanningReads >= minimumSpanningReads) {
@@ -276,8 +278,8 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
                 }
                 operonAdjacencies.add(putativeOperon);
                 lastAnnoId = feature2.getId();
-
-            // TODO: check if parameter ok or new parameter
+                
+                // TODO: check if parameter ok or new parameter
             } else if (feature2.getStart() - feature1.getStop() > averageReadLength &&
                     internalReads > operonDetParameters.getMinSpanningReads()) {
                 //TODO: think about creating an operon

@@ -110,7 +110,7 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
 
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
         this.openTracksPanel = new OpenTracksWizardPanel(PROP_WIZARD_NAME, referenceId);
-        this.readClassWizPanel = new SelectReadClassWizardPanel(PROP_WIZARD_NAME);
+        this.readClassWizPanel = new SelectReadClassWizardPanel(PROP_WIZARD_NAME, false);
         this.openTracksPanel.setReadClassVisualPanel(readClassWizPanel.getComponent());
         panels.add(openTracksPanel);
         panels.add(new CoverageAnalysisWizardPanel());

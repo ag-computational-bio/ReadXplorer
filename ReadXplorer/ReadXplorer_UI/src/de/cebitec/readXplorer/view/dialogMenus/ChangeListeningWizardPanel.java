@@ -17,6 +17,7 @@
 package de.cebitec.readXplorer.view.dialogMenus;
 
 import de.cebitec.readXplorer.api.objects.JobPanel;
+import de.cebitec.readXplorer.api.objects.NewJobDialogI;
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -113,7 +114,7 @@ public abstract class ChangeListeningWizardPanel implements WizardDescriptor.Pan
             }
         });
         if (this.getComponent() instanceof JobPanel) {
-            isValidated = ((JobPanel) this.getComponent()).isRequiredInfoSet();
+            isValidated = ((NewJobDialogI) this.getComponent()).isRequiredInfoSet();
         }
     }
 

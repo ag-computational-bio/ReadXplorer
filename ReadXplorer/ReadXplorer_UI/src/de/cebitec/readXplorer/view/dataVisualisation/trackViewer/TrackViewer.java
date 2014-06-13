@@ -271,22 +271,22 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
 
             if (isForwardStrand) {
                 if (covType == PersistantCoverage.PERFECT) {
-                    value = this.cov.getPerfectFwdMult(absPos);
+                    value = this.cov.getPerfectFwd(absPos);
                 } else if (covType == PersistantCoverage.BM) {
-                    value = this.cov.getBestMatchFwdMult(absPos);
+                    value = this.cov.getBestMatchFwd(absPos);
                 } else if (covType == PersistantCoverage.NERROR) {
-                    value = this.cov.getCommonFwdMult(absPos);
+                    value = this.cov.getCommonFwd(absPos);
 
                 } else {
                     Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown coverage type!");
                 }
             } else {
                 if (covType == PersistantCoverage.PERFECT) {
-                    value = this.cov.getPerfectRevMult(absPos);
+                    value = this.cov.getPerfectRev(absPos);
                 } else if (covType == PersistantCoverage.BM) {
-                    value = this.cov.getBestMatchRevMult(absPos);
+                    value = this.cov.getBestMatchRev(absPos);
                 } else if (covType == PersistantCoverage.NERROR) {
-                    value = this.cov.getCommonRevMult(absPos);
+                    value = this.cov.getCommonRev(absPos);
                 } else {
                     Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown coverage type!");
                 }
@@ -299,20 +299,20 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         } else {
             if (isForwardStrand) {
                 if (covType == PersistantCoverage.DIFF) {
-                    int value1 = cov.getCommonFwdMultTrack1(absPos);
-                    int value2 = cov.getCommonFwdMultTrack2(absPos);
+                    int value1 = cov.getCommonFwdTrack1(absPos);
+                    int value2 = cov.getCommonFwdTrack2(absPos);
                     if (this.hasNormalizationFactor) {
                         value1 = (int) this.getNormalizedValue(id1, value1);
                         value2 = (int) this.getNormalizedValue(id2, value2);
                     }
                     value = Math.abs(value2 - value1);
                 } else if (covType == PersistantCoverage.TRACK2) {
-                    value = cov.getCommonFwdMultTrack2(absPos);
+                    value = cov.getCommonFwdTrack2(absPos);
                     if (this.hasNormalizationFactor) {
                         value = this.getNormalizedValue(id2, value);
                     }
                 } else if (covType == PersistantCoverage.TRACK1) {
-                    value = cov.getCommonFwdMultTrack1(absPos);
+                    value = cov.getCommonFwdTrack1(absPos);
                     if (this.hasNormalizationFactor) {
                         value = this.getNormalizedValue(id1, value);
                     }
@@ -321,20 +321,20 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
                 }
             } else {
                 if (covType == PersistantCoverage.DIFF) {
-                    int value1 = cov.getCommonRevMultTrack1(absPos);
-                    int value2 = cov.getCommonRevMultTrack2(absPos);
+                    int value1 = cov.getCommonRevTrack1(absPos);
+                    int value2 = cov.getCommonRevTrack2(absPos);
                     if (this.hasNormalizationFactor) {
                         value1 = (int) this.getNormalizedValue(id1, value1);
                         value2 = (int) this.getNormalizedValue(id2, value2);
                     }
                     value = Math.abs(value2 - value1);
                 } else if (covType == PersistantCoverage.TRACK2) {
-                    value = cov.getCommonRevMultTrack2(absPos);
+                    value = cov.getCommonRevTrack2(absPos);
                     if (this.hasNormalizationFactor) {
                         value = this.getNormalizedValue(id2, value);
                     }
                 } else if (covType == PersistantCoverage.TRACK1) {
-                    value = cov.getCommonRevMultTrack1(absPos);
+                    value = cov.getCommonRevTrack1(absPos);
                     if (this.hasNormalizationFactor) {
                         value = this.getNormalizedValue(id1, value);
                     }
@@ -555,14 +555,14 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     public void changeToolTipText(int logPos) {
         if (covLoaded && twoTracks && !hasNormalizationFactor && !combineTracks) {
 
-            int nFwVal = cov.getCommonFwdMult(logPos);
-            int nRvVal = cov.getCommonRevMult(logPos);
+            int nFwVal = cov.getCommonFwd(logPos);
+            int nRvVal = cov.getCommonRev(logPos);
             //track 1 info
-            int nFwValTrack1 = cov.getCommonFwdMultTrack1(logPos);
-            int nRvValTrack1 = cov.getCommonRevMultTrack1(logPos);
+            int nFwValTrack1 = cov.getCommonFwdTrack1(logPos);
+            int nRvValTrack1 = cov.getCommonRevTrack1(logPos);
             //track 2 info
-            int nFwValTrack2 = cov.getCommonFwdMultTrack2(logPos);
-            int nRvValTrack2 = cov.getCommonRevMultTrack2(logPos);
+            int nFwValTrack2 = cov.getCommonFwdTrack2(logPos);
+            int nRvValTrack2 = cov.getCommonRevTrack2(logPos);
 
             Double[] data = new Double[7];
             data[0] = (double) logPos;
@@ -578,12 +578,12 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
 
         } else if (covLoaded && (!twoTracks || this.combineTracks) && !hasNormalizationFactor) {
 
-            int zFwVal = cov.getPerfectFwdMult(logPos);
-            int zRvVal = cov.getPerfectRevMult(logPos);
-            int bFw = cov.getBestMatchFwdMult(logPos);
-            int bRv = cov.getBestMatchRevMult(logPos);
-            int nFwVal = cov.getCommonFwdMult(logPos);
-            int nRvVal = cov.getCommonRevMult(logPos);
+            int zFwVal = cov.getPerfectFwd(logPos);
+            int zRvVal = cov.getPerfectRev(logPos);
+            int bFw = cov.getBestMatchFwd(logPos);
+            int bRv = cov.getBestMatchRev(logPos);
+            int nFwVal = cov.getCommonFwd(logPos);
+            int nRvVal = cov.getCommonRev(logPos);
 
             Double[] data = new Double[7];
             data[0] = (double) logPos;
@@ -598,12 +598,12 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             
         } else if (covLoaded && (!twoTracks || this.combineTracks) && hasNormalizationFactor) {
 
-            int zFwVal = cov.getPerfectFwdMult(logPos);
-            int zRvVal = cov.getPerfectRevMult(logPos);
-            int bFw = cov.getBestMatchFwdMult(logPos);
-            int bRv = cov.getBestMatchRevMult(logPos);
-            int nFwVal = cov.getCommonFwdMult(logPos);
-            int nRvVal = cov.getCommonRevMult(logPos);
+            int zFwVal = cov.getPerfectFwd(logPos);
+            int zRvVal = cov.getPerfectRev(logPos);
+            int bFw = cov.getBestMatchFwd(logPos);
+            int bRv = cov.getBestMatchRev(logPos);
+            int nFwVal = cov.getCommonFwd(logPos);
+            int nRvVal = cov.getCommonRev(logPos);
     
             double zFwValScale = TrackViewer.threeDecAfter(getNormalizedValue(id1,zFwVal));
             double zRvValScale = TrackViewer.threeDecAfter(getNormalizedValue(id1,zRvVal));
@@ -631,14 +631,14 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             
         } else if (covLoaded && twoTracks && hasNormalizationFactor && !combineTracks) {
 
-            int nFwVal = cov.getCommonFwdMult(logPos);
-            int nRvVal = cov.getCommonRevMult(logPos);
+            int nFwVal = cov.getCommonFwd(logPos);
+            int nRvVal = cov.getCommonRev(logPos);
             //track 1 info
-            int nFwValTrack1 = cov.getCommonFwdMultTrack1(logPos);
-            int nRvValTrack1 = cov.getCommonRevMultTrack1(logPos);
+            int nFwValTrack1 = cov.getCommonFwdTrack1(logPos);
+            int nRvValTrack1 = cov.getCommonRevTrack1(logPos);
             //track 2 info
-            int nFwValTrack2 = cov.getCommonFwdMultTrack2(logPos);
-            int nRvValTrack2 = cov.getCommonRevMultTrack2(logPos);
+            int nFwValTrack2 = cov.getCommonFwdTrack2(logPos);
+            int nRvValTrack2 = cov.getCommonRevTrack2(logPos);
 
 
             double nFwScaleTrack1 = TrackViewer.threeDecAfter(getNormalizedValue(id1,nFwValTrack1));
@@ -970,19 +970,19 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
 //        
 //        for (int i = coverages[0].getLeftBound(); i < coverages[0].getRightBound(); ++i) {
 //            for (PersistantCoverage cove : coverages) {
-//                resultCov.setPerfectFwdMult(i, resultCov.getPerfectFwdMult(i) + cove.getPerfectFwdMult(i));
+//                resultCov.setPerfectFwd(i, resultCov.getPerfectFwd(i) + cove.getPerfectFwd(i));
 //                resultCov.setPerfectFwdNum(i, resultCov.getPerfectFwdNum(i) + cove.getPerfectFwdNum(i));
-//                resultCov.setPerfectRevMult(i, resultCov.getPerfectRevMult(i) + cove.getPerfectRevMult(i));
+//                resultCov.setPerfectRev(i, resultCov.getPerfectRev(i) + cove.getPerfectRev(i));
 //                resultCov.setPerfectRevNum(i, resultCov.getPerfectRevNum(i) + cove.getPerfectRevNum(i));
 //                
-//                resultCov.setBestMatchFwdMult(i, resultCov.getBestMatchFwdMult(i) + cove.getBestMatchFwdMult(i));
+//                resultCov.setBestMatchFwd(i, resultCov.getBestMatchFwd(i) + cove.getBestMatchFwd(i));
 //                resultCov.setBestMatchFwdNum(i, resultCov.getBestMatchFwdNum(i) + cove.getBestMatchFwdNum(i));
-//                resultCov.setBestMatchRevMult(i, resultCov.getBestMatchRevMult(i) + cove.getBestMatchRevMult(i));
+//                resultCov.setBestMatchRev(i, resultCov.getBestMatchRev(i) + cove.getBestMatchRev(i));
 //                resultCov.setBestMatchRevNum(i, resultCov.getBestMatchRevNum(i) + cove.getBestMatchRevNum(i));
 //                
-//                resultCov.setCommonFwdMult(i, resultCov.getCommonFwdMult(i) + cove.getCommonFwdMult(i));
+//                resultCov.setCommonFwd(i, resultCov.getCommonFwd(i) + cove.getCommonFwd(i));
 //                resultCov.setCommonFwdNum(i, resultCov.getCommonFwdNum(i) + cove.getCommonFwdNum(i));
-//                resultCov.setCommonRevMult(i, resultCov.getCommonRevMult(i) + cove.getCommonRevMult(i));
+//                resultCov.setCommonRev(i, resultCov.getCommonRev(i) + cove.getCommonRev(i));
 //                resultCov.setCommonRevNum(i, resultCov.getCommonRevNum(i) + cove.getCommonRevNum(i));
 //            }
 //        }

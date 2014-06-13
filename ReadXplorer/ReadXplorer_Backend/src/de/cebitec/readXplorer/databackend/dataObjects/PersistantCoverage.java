@@ -17,11 +17,13 @@
 package de.cebitec.readXplorer.databackend.dataObjects;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Container for all different coverage types for a given interval. If you want
  * to set each coverage position separately you have to call
- * <code>incArraysToIntervalSize()</code>. Otherwise the arrays all have length 0.
+ * <code>incArraysToIntervalSize()</code>. Otherwise the arrays all have length
+ * 0.
  *
  * @author ddoppmeier, rhilker
  */
@@ -29,40 +31,27 @@ public class PersistantCoverage implements Serializable {
     
     private static final long serialVersionUID = 1L;
     
-    //2 for fwd (mult = all & num = without duplicates), and 2 rev
+    //2 for fwd and 2 rev
     
     private int leftBound;
     private int rightBound;
-    private boolean finished;
     private boolean twoTracks = false;
     
-    private int[] perfectFwdMultCov;
-    private int[] perfectRevMultCov;
-    private int[] perfectFwdNumCov;
-    private int[] perfectRevNumCov;
-    private int[] bestMatchFwdMultCov;
-    private int[] bestMatchRevMultCov;
-    private int[] bestMatchFwdNumCov;
-    private int[] bestMatchRevNumCov;
-    private int[] commonFwdMultCov;
-    private int[] commonRevMultCov;
-    private int[] commonFwdNumCov;
-    private int[] commonRevNumCov;
-    
-    private int internalPos = 0;
+    private int[] perfectFwdCov;
+    private int[] perfectRevCov;
+    private int[] bestMatchFwdCov;
+    private int[] bestMatchRevCov;
+    private int[] commonFwdCov;
+    private int[] commonRevCov;
     
     private int highestCoverage;
     
     //coverage Infos of track1
-//    private HashMap<Integer, Integer> commonFwdMultTrack1;
-//    private HashMap<Integer, Integer> commonRevMultTrack1;
-    private int[] commonFwdMultCovTrack1;
-    private int[] commonRevMultCovTrack1;
+    private int[] commonFwdCovTrack1;
+    private int[] commonRevCovTrack1;
     //coverage Infos of track2
-//    private HashMap<Integer, Integer> commonFwdMultTrack2;
-//    private HashMap<Integer, Integer> commonRevMultTrack2;
-    private int[] commonFwdMultCovTrack2;
-    private int[] commonRevMultCovTrack2;
+    private int[] commonFwdCovTrack2;
+    private int[] commonRevCovTrack2;
     
     public static byte PERFECT = 1;
     public static byte BM = 2;
@@ -72,9 +61,10 @@ public class PersistantCoverage implements Serializable {
     public static byte TRACK1 = 3;
 
     /**
-     * Container for all different coverage types for a given interval.
-     * If you want to set each coverage position separately you have to call
-     * <code>incArraysToIntervalSize()</code>. Otherwise the arrays all have length 0.
+     * Container for all different coverage types for a given interval. If you
+     * want to set each coverage position separately you have to call
+     * <code>incArraysToIntervalSize()</code>. Otherwise the arrays all have
+     * length 0.
      * @param leftBound left bound of the interval
      * @param rightBound right bound of the interval
      */
@@ -83,64 +73,39 @@ public class PersistantCoverage implements Serializable {
     }
 
     /**
-     * Container for all different coverage types for a given interval.
-     * If you want to set each coverage position separately you have to call
-     * <code>incArraysToIntervalSize()</code>. Otherwise the arrays all have length 0.
+     * Container for all different coverage types for a given interval. If you
+     * want to set each coverage position separately you have to call
+     * <code>incArraysToIntervalSize()</code>. Otherwise the arrays all have
+     * length 0.
      * @param leftBound left bound of the interval
      * @param rightBound right bound of the interval
-     * @param twoTracks true, if this is a container for storing the coverage of two tracks
+     * @param twoTracks true, if this is a container for storing the coverage of
+     * two tracks
      */
     public PersistantCoverage(int leftBound, int rightBound, boolean twoTracks) {
         this.twoTracks = twoTracks;
         this.leftBound = leftBound;
         this.rightBound = rightBound;
-        this.finished = false;
         
-        perfectFwdMultCov = new int[0];
-        perfectRevMultCov = new int[0];
-        perfectFwdNumCov = new int[0];
-        perfectRevNumCov = new int[0];
+        perfectFwdCov = new int[0];
+        perfectRevCov = new int[0];
+            
+        bestMatchFwdCov = new int[0];
+        bestMatchRevCov = new int[0];
         
-        bestMatchFwdMultCov = new int[0];
-        bestMatchFwdNumCov = new int[0];
-        bestMatchRevMultCov = new int[0];
-        bestMatchRevNumCov = new int[0];
+        commonFwdCov = new int[0];
+        commonRevCov = new int[0];
         
-        commonFwdMultCov = new int[0];
-        commonFwdNumCov = new int[0];
-        commonRevMultCov = new int[0];
-        commonRevNumCov = new int[0];
-        
-        commonFwdMultCovTrack1 = new int[0];
-        commonFwdMultCovTrack2 = new int[0];
-        commonRevMultCovTrack1 = new int[0];
-        commonRevMultCovTrack2 = new int[0];
-        
-//        perfectFwdMult = new HashMap<Integer, Integer>();
-//        perfectFwdNum = new HashMap<Integer, Integer>();
-//        perfectRevMult = new HashMap<Integer, Integer>();
-//        perfectRevNum = new HashMap<Integer, Integer>();
-//        
-//        bestMatchFwdMult = new HashMap<Integer, Integer>();
-//        bestMatchFwdNum = new HashMap<Integer, Integer>();
-//        bestMatchRevMult = new HashMap<Integer, Integer>();
-//        bestMatchRevNum = new HashMap<Integer, Integer>();
-//
-//        commonFwdMult = new HashMap<Integer, Integer>();
-//        commonFwdNum = new HashMap<Integer, Integer>();
-//        commonRevMult = new HashMap<Integer, Integer>();
-//        commonRevNum = new HashMap<Integer, Integer>();
-
-//        commonFwdMult = new HashMap<Integer, Integer>();
-//        commonRevMult = new HashMap<Integer, Integer>();
-//
-//        commonFwdMultTrack1 = new HashMap<Integer, Integer>();
-//        commonFwdMultTrack2 = new HashMap<Integer, Integer>();
-//        commonRevMultTrack1 = new HashMap<Integer, Integer>();
-//        commonRevMultTrack2 = new HashMap<Integer, Integer>();
-
+        commonFwdCovTrack1 = new int[0];
+        commonFwdCovTrack2 = new int[0];
+        commonRevCovTrack1 = new int[0];
+        commonRevCovTrack2 = new int[0];
     }
 
+    /**
+     * @return The left bound of the stored coverage interval. The borders are
+     * inclusive in the data structures.
+     */
     public int getLeftBound() {
         return leftBound;
     }
@@ -161,14 +126,6 @@ public class PersistantCoverage implements Serializable {
         this.rightBound = rightBound;
     }
 
-    public void setFinished() {
-        finished = true;
-    }
-
-    public boolean isFinished() {
-        return finished;
-    }
-
     /**
      * @param left left bound of the interval to check
      * @param right right bound of the interval to check
@@ -182,25 +139,80 @@ public class PersistantCoverage implements Serializable {
             return leftBound <= left && right <= rightBound;
         }
     }
+    
+    /**
+     * Increases the coverage of the coverage arrays in the given list by one.
+     * In these arrays 0 is included.
+     * @param refStart the start pos of the current read, inclusive
+     * @param refStop the stop pos of the current read, inclusive
+     * @param coverageArrays the coverage arrays whose positions should be
+     * updated
+     */
+    public void increaseCoverage(int refStart, int refStop, List<int[]> coverageArrays) {
+        int indexStart = this.getInternalPos(refStart);
+        int indexStop = this.getInternalPos(refStop);
+        for (int i = indexStart; i <= indexStop; i++) {
+            int currentRefPos = refStart + i - indexStart;
+            if (this.coversBounds(currentRefPos, currentRefPos)) {
+                for (int[] covArray : coverageArrays) {
+                    ++covArray[i];
+                }
+            }
+        }
+    }
+    
+    /**
+     * @param logPos reference position to translate
+     * @return The internal index position at which the data for the given 
+     * reference position can be found
+     */
+    private int getInternalPos(int logPos) {
+        return logPos - this.leftBound;
+    }
+    
+    /**
+     * Sets the coverage for a given reference position to a given value in the
+     * given array.
+     * @param logPos the reference position whose coverage shall be updated
+     * @param coverage the coverage value to store
+     * @param covArray the coverage array in which the value shall be stored
+     */
+    private void setCoverage(int logPos, int coverage, int[] covArray) {
+        covArray[this.getInternalPos(logPos)] = coverage;
+    }
+    
+    /**
+     * Increases the coverage for a given reference position to a given value in 
+     * the given array.
+     * @param logPos the reference position whose coverage shall be updated
+     * @param coverage the coverage value to store
+     * @param covArray the coverage array in which the value shall be stored
+     */
+    private void increaseCoverage(int logPos, int valueToAdd, int[] covArray) {
+        covArray[this.getInternalPos(logPos)] += valueToAdd;
+    }
+
+    /**
+     * @param logPos absolute position on the chromosome, whose coverage is
+     * needed
+     * @return the best match forward coverage with duplicates.
+     */
+    private int getCoverage(int logPos, int[] coverageArray) {
+        int internalPos = this.getInternalPos(logPos);
+        if (internalPos < coverageArray.length && internalPos >= 0) {
+            return coverageArray[internalPos];
+        } else {
+            return 0;
+        }
+    }
 
     /**
      * Set the best match forward coverage with duplicates.
      * @param logPos position
      * @param coverage coverage value 
      */
-    public void setBestMatchFwdMult(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
-        this.internalPos = logPos - this.leftBound;
-        bestMatchFwdMultCov[this.internalPos] = coverage;
-    }
-
-    /**
-     * Set the best match forward coverage WITHOUT duplicates.
-     * @param logPos position
-     * @param coverage coverage value 
-     */
-    public void setBestMatchFwdNum(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
-        this.internalPos = logPos - this.leftBound;
-        bestMatchFwdNumCov[this.internalPos] = coverage;
+    public void setBestMatchFwd(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
+        this.setCoverage(logPos, coverage, bestMatchFwdCov);
     }
 
     /**
@@ -208,19 +220,8 @@ public class PersistantCoverage implements Serializable {
      * @param logPos position
      * @param coverage coverage value 
      */
-    public void setBestMatchRevMult(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
-        this.internalPos = logPos - this.leftBound;
-        bestMatchRevMultCov[this.internalPos] = coverage;
-    }
-
-    /**
-     * Set the best match reverse coverage WITHOUT duplicates.
-     * @param logPos position
-     * @param coverage coverage value 
-     */
-    public void setBestMatchRevNum(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
-        this.internalPos = logPos - this.leftBound;
-        bestMatchRevNumCov[this.internalPos] = coverage;
+    public void setBestMatchRev(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
+        this.setCoverage(logPos, coverage, bestMatchRevCov);
     }
 
     /**
@@ -228,19 +229,8 @@ public class PersistantCoverage implements Serializable {
      * @param logPos position
      * @param coverage coverage value 
      */
-    public void setCommonFwdMult(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
-        this.internalPos = logPos - this.leftBound;
-        commonFwdMultCov[this.internalPos] = coverage;
-    }
-
-    /**
-     * Set the common match forward coverage WITHOUT duplicates.
-     * @param logPos position
-     * @param coverage coverage value 
-     */
-    public void setCommonFwdNum(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
-        this.internalPos = logPos - this.leftBound;
-        commonFwdNumCov[this.internalPos] = coverage;
+    public void setCommonFwd(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
+        this.setCoverage(logPos, coverage, commonFwdCov);
     }
 
     /**
@@ -248,19 +238,8 @@ public class PersistantCoverage implements Serializable {
      * @param logPos position
      * @param coverage coverage value 
      */
-    public void setCommonRevMult(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
-        this.internalPos = logPos - this.leftBound;
-        commonRevMultCov[this.internalPos] = coverage;
-    }
-
-    /**
-     * Set the common match reverse coverage WITHOUT duplicates.
-     * @param logPos position
-     * @param coverage coverage value 
-     */
-    public void setCommonRevNum(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
-        this.internalPos = logPos - this.leftBound;
-        commonRevNumCov[this.internalPos] = coverage;
+    public void setCommonRev(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
+        this.setCoverage(logPos, coverage, commonRevCov);
     }
 
     /**
@@ -268,19 +247,8 @@ public class PersistantCoverage implements Serializable {
      * @param logPos position
      * @param coverage coverage value 
      */
-    public void setPerfectFwdMult(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
-        this.internalPos = logPos - this.leftBound;
-        perfectFwdMultCov[this.internalPos] = coverage;
-    }
-
-    /**
-     * Set the perfect match forward coverage WITHOUT duplicates.
-     * @param logPos position
-     * @param coverage coverage value 
-     */
-    public void setPerfectFwdNum(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
-        this.internalPos = logPos - this.leftBound;
-        perfectFwdNumCov[this.internalPos] = coverage;
+    public void setPerfectFwd(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
+        this.setCoverage(logPos, coverage, perfectFwdCov);
     }
 
     /**
@@ -288,19 +256,8 @@ public class PersistantCoverage implements Serializable {
      * @param logPos position
      * @param coverage coverage value 
      */
-    public void setPerfectRevMult(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
-        this.internalPos = logPos - this.leftBound;
-        perfectRevMultCov[this.internalPos] = coverage;
-    }
-
-    /**
-     * Set the perfect match reverse coverage WITHOUT duplicates.
-     * @param logPos position
-     * @param coverage coverage value 
-     */
-    public void setPerfectRevNum(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
-        this.internalPos = logPos - this.leftBound;
-        perfectRevNumCov[this.internalPos] = coverage;
+    public void setPerfectRev(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
+        this.setCoverage(logPos, coverage, perfectRevCov);
     }
     
 
@@ -311,9 +268,8 @@ public class PersistantCoverage implements Serializable {
      * @param logPos position
      * @param coverage coverage value 
      */
-    public void setCommonFwdMultTrack1(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
-        this.internalPos = logPos - this.leftBound;
-        commonFwdMultCovTrack1[this.internalPos] = coverage;
+    public void setCommonFwdTrack1(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
+        this.setCoverage(logPos, coverage, commonFwdCovTrack1);
     }
     
     /**
@@ -322,9 +278,8 @@ public class PersistantCoverage implements Serializable {
      * @param logPos position
      * @param coverage coverage value 
      */
-    public void setCommonFwdMultTrack2(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
-        this.internalPos = logPos - this.leftBound;
-        commonFwdMultCovTrack2[this.internalPos] = coverage;
+    public void setCommonFwdTrack2(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
+        this.setCoverage(logPos, coverage, commonFwdCovTrack2);
     }
     
     /**
@@ -333,9 +288,8 @@ public class PersistantCoverage implements Serializable {
      * @param logPos position
      * @param coverage coverage value 
      */
-    public void setCommonRevMultTrack1(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
-        this.internalPos = logPos - this.leftBound;
-        commonRevMultCovTrack1[this.internalPos] = coverage;
+    public void setCommonRevTrack1(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
+        this.setCoverage(logPos, coverage, commonRevCovTrack1);
     }
     
     /**
@@ -344,114 +298,124 @@ public class PersistantCoverage implements Serializable {
      * @param logPos position
      * @param coverage coverage value 
      */
-    public void setCommonRevMultTrack2(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
-        this.internalPos = logPos - this.leftBound;
-        commonRevMultCovTrack2[this.internalPos] = coverage;
+    public void setCommonRevTrack2(int logPos, int coverage) throws ArrayIndexOutOfBoundsException {
+        this.setCoverage(logPos, coverage, commonRevCovTrack2);
+    }
+    
+    /**
+     * Increases the best match forward coverage with duplicates by one.
+     * @param logPos position to increase
+     */
+    public void increaseBestMatchFwd(int logPos) throws ArrayIndexOutOfBoundsException {
+        this.increaseCoverage(logPos, 1, bestMatchFwdCov);
+    }
+     
+    /**
+     * Increases the best match reverse coverage with duplicates by one.
+     * @param logPos position to increase
+     */
+    public void increaseBestMatchRev(int logPos) throws ArrayIndexOutOfBoundsException {
+        this.increaseCoverage(logPos, 1, bestMatchRevCov);
+    }
+    
+    /**
+     * Increases the perfect match forward coverage with duplicates by one.
+     * @param logPos position to increase
+     */
+    public void increasePerfectFwd(int logPos) throws ArrayIndexOutOfBoundsException {
+        this.increaseCoverage(logPos, 1, perfectFwdCov);
+    }
+    
+    /**
+     * Increases the perfect match reverse coverage with duplicates by one.
+     * @param logPos position to increase
+     */
+    public void increasePerfectRev(int logPos) throws ArrayIndexOutOfBoundsException {
+        this.increaseCoverage(logPos, 1, perfectRevCov);
+    }
+    
+    /**
+     * Increases the common match forward coverage with duplicates by one.
+     * @param logPos position to increase
+     */
+    public void increaseCommonFwd(int logPos) throws ArrayIndexOutOfBoundsException {
+        this.increaseCoverage(logPos, 1, commonFwdCov);
     }
 
+    /**
+     * Increases the common match reverse coverage with duplicates by one.
+     * @param logPos position to increase
+     */
+    public void increaseCommonRev(int logPos) throws ArrayIndexOutOfBoundsException {
+        this.increaseCoverage(logPos, 1, commonRevCov);
+    }
+    
+    /**
+     * Increases the common match forward coverage for track 1 of a double track
+     * viewer with duplicates by one.
+     * @param logPos position to increase
+     */
+    public void increaseCommonFwdTrack1(int logPos) throws ArrayIndexOutOfBoundsException {
+        this.increaseCoverage(logPos, 1, commonFwdCovTrack1);
+    }
+
+    /**
+     * Increases the common match reverse coverage for track 1 of a double track
+     * viewer with duplicates by one.
+     * @param logPos position to increase
+     */
+    public void increaseCommonRevTrack1(int logPos) throws ArrayIndexOutOfBoundsException {
+        this.increaseCoverage(logPos, 1, commonRevCovTrack1);
+    }
+    
+    /**
+     * Increases the common match forward coverage for track 2 of a double track
+     * viewer with duplicates by one.
+     * @param logPos position to increase
+     */
+    public void increaseCommonFwdTrack2(int logPos) throws ArrayIndexOutOfBoundsException {
+        this.increaseCoverage(logPos, 1, commonFwdCovTrack2);
+    }
+
+    /**
+     * Increases the common match reverse coverage for track 2 of a double track
+     * viewer with duplicates by one.
+     * @param logPos position to increase
+     */
+    public void increaseCommonRevTrack2(int logPos) throws ArrayIndexOutOfBoundsException {
+        this.increaseCoverage(logPos, 1, commonRevCovTrack2);
+    }
 
     /**
      * @param logPos absolute position on the chromosome, whose coverage is needed
      * @return the best match forward coverage with duplicates.
      */
-    public int getBestMatchFwdMult(int logPos) {
-        this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.bestMatchFwdMultCov.length && this.internalPos >= 0) {
-            return bestMatchFwdMultCov[this.internalPos];
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * @param logPos absolute position on the chromosome, whose coverage is needed
-     * @return the best match forward coverage WITHOUT duplicates.
-     */
-    public int getBestMatchFwdNum(int logPos) {
-        this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.bestMatchFwdNumCov.length && this.internalPos >= 0) {
-            return bestMatchFwdNumCov[this.internalPos];
-        } else {
-            return 0;
-        }
+    public int getBestMatchFwd(int logPos) {
+        return this.getCoverage(logPos, bestMatchFwdCov);
     }
 
     /**
      * @param logPos absolute position on the chromosome, whose coverage is needed
      * @return the best match reverse coverage with duplicates.
      */
-    public int getBestMatchRevMult(int logPos) {
-        this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.bestMatchRevMultCov.length && this.internalPos >= 0) {
-            return bestMatchRevMultCov[this.internalPos];
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * @param logPos absolute position on the chromosome, whose coverage is needed
-     * @return the best match reverse coverage WITHOUT duplicates.
-     */
-    public int getBestMatchRevNum(int logPos) {
-        this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.bestMatchRevNumCov.length && this.internalPos >= 0) {
-            return bestMatchRevNumCov[this.internalPos];
-        } else {
-            return 0;
-        }
+    public int getBestMatchRev(int logPos) {
+        return this.getCoverage(logPos, bestMatchRevCov);
     }
 
     /**
      * @param logPos absolute position on the chromosome, whose coverage is needed
      * @return the common match forward coverage with duplicates.
      */
-    public int getCommonFwdMult(int logPos) {
-        this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.commonFwdMultCov.length && this.internalPos >= 0) {
-            return commonFwdMultCov[this.internalPos];
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * @param logPos absolute position on the chromosome, whose coverage is needed
-     * @return the common match forward coverage WITHOUT duplicates.
-     */
-    public int getCommonFwdNum(int logPos) {
-        this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.commonFwdNumCov.length && this.internalPos >= 0) {
-            return commonFwdNumCov[this.internalPos];
-        } else {
-            return 0;
-        }
+    public int getCommonFwd(int logPos) {
+        return this.getCoverage(logPos, commonFwdCov);
     }
 
     /**
      * @param logPos absolute position on the chromosome, whose coverage is needed
      * @return the common match reverse coverage with duplicates.
      */
-    public int getCommonRevMult(int logPos) {
-        this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.commonRevMultCov.length && this.internalPos >= 0) {
-            return commonRevMultCov[this.internalPos];
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * @param logPos absolute position on the chromosome, whose coverage is needed
-     * @return the common match reverse coverage WITHOUT duplicates.
-     */
-    public int getCommonRevNum(int logPos) {
-        this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.commonRevNumCov.length && this.internalPos >= 0) {
-            return commonRevNumCov[this.internalPos];
-        } else {
-            return 0;
-        }
+    public int getCommonRev(int logPos) {
+        return this.getCoverage(logPos, commonRevCov);
     }
 
     /**
@@ -459,52 +423,16 @@ public class PersistantCoverage implements Serializable {
      * @return the perfect match forward coverage with duplicates. If the
      * position is not covered 0 is returned.
      */
-    public int getPerfectFwdMult(int logPos) {
-        this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.perfectFwdMultCov.length && this.internalPos >= 0) {
-            return perfectFwdMultCov[this.internalPos];
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * @param logPos absolute position on the chromosome, whose coverage is needed
-     * @return the perfect match forward coverage WITHOUT duplicates.
-     */
-    public int getPerfectFwdNum(int logPos) {
-        this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.perfectFwdNumCov.length && this.internalPos >= 0) {
-            return perfectFwdNumCov[this.internalPos];
-        } else {
-            return 0;
-        }
+    public int getPerfectFwd(int logPos) {
+        return this.getCoverage(logPos, perfectFwdCov);
     }
 
     /**
      * @param logPos absolute position on the chromosome, whose coverage is needed
      * @return the perfect match reverse coverage with duplicates.
      */
-    public int getPerfectRevMult(int logPos) {
-        this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.perfectRevMultCov.length && this.internalPos >= 0) {
-            return perfectRevMultCov[this.internalPos];
-        } else {
-            return 0;
-        }
-    }
-
-    /**
-     * @param logPos absolute position on the chromosome, whose coverage is needed
-     * @return the perfect match reverse coverage WITHOUT duplicates.
-     */
-    public int getPerfectRevNum(int logPos) {
-        this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.perfectRevNumCov.length && this.internalPos >= 0) {
-            return perfectRevNumCov[this.internalPos];
-        } else {
-            return 0;
-        }
+    public int getPerfectRev(int logPos) {
+        return this.getCoverage(logPos, perfectRevCov);
     }
 
     /**
@@ -513,13 +441,8 @@ public class PersistantCoverage implements Serializable {
      * a two track analysis case.
      */
 
-    public int getCommonFwdMultTrack1(int logPos) {
-        this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.commonFwdMultCovTrack1.length && this.internalPos >= 0) {
-            return commonFwdMultCovTrack1[this.internalPos];
-        } else {
-            return 0;
-        }
+    public int getCommonFwdTrack1(int logPos) {
+        return this.getCoverage(logPos, commonFwdCovTrack1);
     }
 
     /**
@@ -527,13 +450,8 @@ public class PersistantCoverage implements Serializable {
      * @return the common match reverse coverage with duplicates for track 1 in
      * a two track analysis case.
      */
-    public int getCommonRevMultTrack1(int logPos) {
-        this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.commonRevMultCovTrack1.length && this.internalPos >= 0) {
-            return commonRevMultCovTrack1[this.internalPos];
-        } else {
-            return 0;
-        }
+    public int getCommonRevTrack1(int logPos) {
+        return this.getCoverage(logPos, commonRevCovTrack1);
     }
 
     /**
@@ -541,13 +459,8 @@ public class PersistantCoverage implements Serializable {
      * @return the common match forward coverage with duplicates for track 2 in
      * a two track analysis case.
      */
-    public int getCommonFwdMultTrack2(int logPos) {
-        this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.commonFwdMultCovTrack2.length && this.internalPos >= 0) {
-            return commonFwdMultCovTrack2[this.internalPos];
-        } else {
-            return 0;
-        }
+    public int getCommonFwdTrack2(int logPos) {
+        return this.getCoverage(logPos, commonFwdCovTrack2);
     }
 
     /**
@@ -555,149 +468,87 @@ public class PersistantCoverage implements Serializable {
      * @return the common match reverse coverage with duplicates for track 2 in
      * a two track analysis case.
      */
-    public int getCommonRevMultTrack2(int logPos) {
-        this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.commonRevMultCovTrack2.length && this.internalPos >= 0) {
-            return commonRevMultCovTrack2[this.internalPos];
-        } else {
-            return 0;
-        }
+    public int getCommonRevTrack2(int logPos) {
+        return this.getCoverage(logPos, commonRevCovTrack2);
     }
     /**
-     * @return Get whole best match fwd mult coverage array for the given
+     * @return Get whole perfect match fwd coverage array for the given
      * interval.
      */
-    public int[] getPerfectFwdMult() {
-        return this.perfectFwdMultCov;
+    public int[] getPerfectFwd() {
+        return this.perfectFwdCov;
     }
     
     /**
-     * @return Get whole best match fwd mult coverage array for the given
+     * @return Get whole perfect match rev coverage array for the given
      * interval.
      */
-    public int[] getPerfectFwdNum() {
-        return this.perfectFwdNumCov;
+    public int[] getPerfectRev() {
+        return this.perfectRevCov;
     }
     
     /**
-     * @return Get whole best match fwd mult coverage array for the given
+     * @return Get whole best match fwd coverage array for the given 
      * interval.
      */
-    public int[] getPerfectRevMult() {
-        return this.perfectRevMultCov;
-    }
-    
-    /**
-     * @return Get whole best match fwd mult coverage array for the given
-     * interval.
-     */
-    public int[] getPerfectRevNum() {
-        return this.perfectRevNumCov;
-    }
-    
-    /**
-     * @return Get whole best match fwd mult coverage array for the given interval.
-     */
-    public int[] getBestMatchFwdMult() {
-        return this.bestMatchFwdMultCov;
+    public int[] getBestMatchFwd() {
+        return this.bestMatchFwdCov;
     }
 
     /**
-     * @return Get whole best match fwd coverage array without replicates for 
-     * the given interval.
+     * @return Get whole best match rev coverage array for the given 
+     * interval.
      */    
-    public int[] getBestMatchFwdNum() {
-        return this.bestMatchFwdNumCov;
+    public int[] getBestMatchRev() {
+        return this.bestMatchRevCov;
     }
-
+    
+     /**
+     * @return Get whole common match fwd coverage array with replicates for 
+     * the given interval.
+     */   
+    public int[] getCommonFwd() {
+        return this.commonFwdCov;
+    }
+    
+     /**
+     * @return Get whole common match rev coverage array with replicates for 
+     * the given interval.
+     */   
+    public int[] getCommonRev() {
+        return this.commonRevCov;
+    }
+        
     /**
-     * @return Get whole best match rev mult coverage array for the given interval.
-     */    
-    public int[] getBestMatchRevMult() {
-        return this.bestMatchRevMultCov;
-    }
-
-     /**
-     * @return Get whole best match rev coverage array without replicates for 
-     * the given interval.
-     */   
-    public int[] getBestMatchRevNum() {
-        return this.bestMatchRevNumCov;
-    }
-    
-     /**
-     * @return Get whole best match rev coverage array without replicates for 
-     * the given interval.
-     */   
-    public int[] getCommonFwdMult() {
-        return this.commonFwdMultCov;
-    }
-    
-     /**
-     * @return Get whole best match rev coverage array without replicates for 
-     * the given interval.
-     */   
-    public int[] getCommonFwdNum() {
-        return this.commonFwdNumCov;
-    }
-    
-     /**
-     * @return Get whole best match rev coverage array without replicates for 
-     * the given interval.
-     */   
-    public int[] getCommonRevMult() {
-        return this.commonRevMultCov;
-    }
-    
-     /**
-     * @return Get whole best match rev coverage array without replicates for 
-     * the given interval.
-     */   
-    public int[] getCommonRevNum() {
-        return this.commonRevNumCov;
-    }
-    
-    /**
-     * @return Get whole common fwd mult coverage array for the given interval
+     * @return Get whole common fwd coverage array for the given interval
      * of track 1
      */
-    public int[] getCommonFwdMultCovTrack1() {
-        return this.commonFwdMultCovTrack1;
+    public int[] getCommonFwdCovTrack1() {
+        return this.commonFwdCovTrack1;
     }
 
     /**
-     * @return Get whole common fwd mult coverage array for the given interval
+     * @return Get whole common fwd coverage array for the given interval
      * of track 2
      */    
-    public int[] getCommonFwdMultCovTrack2() {
-        return this.commonFwdMultCovTrack2;
+    public int[] getCommonFwdCovTrack2() {
+        return this.commonFwdCovTrack2;
     }
 
     /**
-     * @return Get whole common rev mult coverage array for the given interval
+     * @return Get whole common rev coverage array for the given interval
      * of track 1
      */    
-    public int[] getCommonRevMultCovTrack1() {
-        return this.commonRevMultCovTrack1;
+    public int[] getCommonRevCovTrack1() {
+        return this.commonRevCovTrack1;
     }
 
      /**
-     * @return Get whole common rev mult coverage array for the given interval
+     * @return Get whole common rev coverage array for the given interval
      * of track 2
      */   
-    public int[] getCommonRevMultCovTrack2() {
-        return this.commonRevMultCovTrack2;
-    }
-
-
-    /**
-     * @param posToCheck the position which should be checked if it is in the 
-     * bounds
-     * @return true, if the posToCheck is within the bounds of this PersistantCoverage
-     * and false otherwise
-     */
-    public boolean isInBounds(int posToCheck) {
-        return !(posToCheck < leftBound || posToCheck > rightBound && this.internalPos >= 0);
+    public int[] getCommonRevCovTrack2() {
+        return this.commonRevCovTrack2;
     }
 
     /**
@@ -733,68 +584,44 @@ public class PersistantCoverage implements Serializable {
     }
 
     
-    public void setPerfectFwdMult(int[] perfectFwdMultCov) {
-        this.perfectFwdMultCov = perfectFwdMultCov;
+    public void setPerfectFwd(int[] perfectFwdCov) {
+        this.perfectFwdCov = perfectFwdCov;
     }
 
-    public void setPerfectRevMult(int[] perfectRevMultCov) {
-        this.perfectRevMultCov = perfectRevMultCov;
+    public void setPerfectRev(int[] perfectRevCov) {
+        this.perfectRevCov = perfectRevCov;
     }
 
-    public void setPerfectFwdNum(int[] perfectFwdNumCov) {
-        this.perfectFwdNumCov = perfectFwdNumCov;
+    public void setBestMatchFwd(int[] bestMatchFwdCov) {
+        this.bestMatchFwdCov = bestMatchFwdCov;
     }
 
-    public void setPerfectRevNum(int[] perfectRevNumCov) {
-        this.perfectRevNumCov = perfectRevNumCov;
+    public void setBestMatchRev(int[] bestMatchRevCov) {
+        this.bestMatchRevCov = bestMatchRevCov;
     }
 
-    public void setBestMatchFwdMult(int[] bestMatchFwdMultCov) {
-        this.bestMatchFwdMultCov = bestMatchFwdMultCov;
+      public void setCommonFwd(int[] commonFwdCov) {
+        this.commonFwdCov = commonFwdCov;
     }
 
-    public void setBestMatchRevMult(int[] bestMatchRevMultCov) {
-        this.bestMatchRevMultCov = bestMatchRevMultCov;
+    public void setCommonRev(int[] commonRevCov) {
+        this.commonRevCov = commonRevCov;
     }
 
-    public void setBestMatchFwdNum(int[] bestMatchFwdNumCov) {
-        this.bestMatchFwdNumCov = bestMatchFwdNumCov;
+    public void setCommonFwdTrack1(int[] commonFwdCovTrack1) {
+        this.commonFwdCovTrack1 = commonFwdCovTrack1;
     }
 
-    public void setBestMatchRevNum(int[] bestMatchRevNumCov) {
-        this.bestMatchRevNumCov = bestMatchRevNumCov;
+    public void setCommonRevTrack1(int[] commonRevCovTrack1) {
+        this.commonRevCovTrack1 = commonRevCovTrack1;
     }
 
-      public void setCommonFwdMult(int[] commonFwdMultCov) {
-        this.commonFwdMultCov = commonFwdMultCov;
+    public void setCommonFwdTrack2(int[] commonFwdCovTrack2) {
+        this.commonFwdCovTrack2 = commonFwdCovTrack2;
     }
 
-    public void setCommonRevMult(int[] commonRevMultCov) {
-        this.commonRevMultCov = commonRevMultCov;
-    }
-
-    public void setCommonFwdNum(int[] commonFwdNumCov) {
-        this.commonFwdNumCov = commonFwdNumCov;
-    }
-
-    public void setCommonRevNum(int[] commonRevNumCov) {
-        this.commonRevNumCov = commonRevNumCov;
-    }
-
-    public void setCommonFwdMultTrack1(int[] commonFwdMultCovTrack1) {
-        this.commonFwdMultCovTrack1 = commonFwdMultCovTrack1;
-    }
-
-    public void setCommonRevMultTrack1(int[] commonRevMultCovTrack1) {
-        this.commonRevMultCovTrack1 = commonRevMultCovTrack1;
-    }
-
-    public void setCommonFwdMultTrack2(int[] commonFwdMultCovTrack2) {
-        this.commonFwdMultCovTrack2 = commonFwdMultCovTrack2;
-    }
-
-    public void setCommonRevMultTrack2(int[] commonRevMultCovTrack2) {
-        this.commonRevMultCovTrack2 = commonRevMultCovTrack2;
+    public void setCommonRevTrack2(int[] commonRevCovTrack2) {
+        this.commonRevCovTrack2 = commonRevCovTrack2;
     }
     
     /**
@@ -804,30 +631,18 @@ public class PersistantCoverage implements Serializable {
      */
     public void incArraysToIntervalSize() {
         int size = this.rightBound - this.leftBound + 1;
-        if (this.perfectFwdMultCov.length == 0) {
-            perfectFwdMultCov = new int[size];
+        if (this.perfectFwdCov.length == 0) {
+            perfectFwdCov = new int[size];
         }
-        if (this.perfectRevMultCov.length == 0) {
-            perfectRevMultCov = new int[size];
-        }
-        if (this.perfectFwdNumCov.length == 0) {
-            perfectFwdNumCov = new int[size];
-        }
-        if (this.perfectRevNumCov.length == 0) {
-            perfectRevNumCov = new int[size];
+        if (this.perfectRevCov.length == 0) {
+            perfectRevCov = new int[size];
         }
         
-        if (this.bestMatchFwdMultCov.length == 0) {
-            bestMatchFwdMultCov = new int[size];
+        if (this.bestMatchFwdCov.length == 0) {
+            bestMatchFwdCov = new int[size];
         }
-        if (this.bestMatchFwdNumCov.length == 0) {
-            bestMatchFwdNumCov = new int[size];
-        }
-        if (this.bestMatchRevMultCov.length == 0) {
-            bestMatchRevMultCov = new int[size];
-        }
-        if (this.bestMatchRevNumCov.length == 0) {
-            bestMatchRevNumCov = new int[size];
+        if (this.bestMatchRevCov.length == 0) {
+            bestMatchRevCov = new int[size];
         }
         
         this.incCommonCovArraysToIntervalSize(size);
@@ -841,17 +656,17 @@ public class PersistantCoverage implements Serializable {
      */
     public void incDoubleTrackArraysToIntervalSize() {
         int size = this.rightBound > this.leftBound ? this.rightBound - this.leftBound + 1 : 0;
-        if (this.commonFwdMultCovTrack1.length == 0) {
-            commonFwdMultCovTrack1 = new int[size];
+        if (this.commonFwdCovTrack1.length == 0) {
+            commonFwdCovTrack1 = new int[size];
         }
-        if (this.commonRevMultCovTrack1.length == 0) {
-            commonRevMultCovTrack1 = new int[size];
+        if (this.commonRevCovTrack1.length == 0) {
+            commonRevCovTrack1 = new int[size];
         }
-        if (this.commonFwdMultCovTrack2.length == 0) {
-            commonFwdMultCovTrack2 = new int[size];
+        if (this.commonFwdCovTrack2.length == 0) {
+            commonFwdCovTrack2 = new int[size];
         }
-        if (this.commonRevMultCovTrack2.length == 0) {
-            commonRevMultCovTrack2 = new int[size];
+        if (this.commonRevCovTrack2.length == 0) {
+            commonRevCovTrack2 = new int[size];
         }
         this.incCommonCovArraysToIntervalSize(size);
     }
@@ -863,17 +678,11 @@ public class PersistantCoverage implements Serializable {
      * object.
      */
     private void incCommonCovArraysToIntervalSize(int size) {
-        if (this.commonFwdMultCov.length == 0) {
-            commonFwdMultCov = new int[size];
+        if (this.commonFwdCov.length == 0) {
+            commonFwdCov = new int[size];
         }
-        if (this.commonFwdNumCov.length == 0) {
-            commonFwdNumCov = new int[size];
-        }
-        if (this.commonRevMultCov.length == 0) {
-            commonRevMultCov = new int[size];
-        }
-        if (this.commonRevNumCov.length == 0) {
-            commonRevNumCov = new int[size];
+        if (this.commonRevCov.length == 0) {
+            commonRevCov = new int[size];
         }
     }
 }

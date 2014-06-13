@@ -123,6 +123,9 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
         PersistantFeature feature;
         boolean fstFittingMapping;
         int currentChromId = mappingResult.getRequest().getChromId();
+        boolean isStrandBothOption = parametersRPKM.getReadClassParams().isStrandBothOption();
+        boolean isFeatureStrand = parametersRPKM.getReadClassParams().isStrandFeatureOption();
+        boolean analysisStrand;
 
         for (int i = 0; i < this.genomeFeatures.size(); ++i) {
             feature = this.genomeFeatures.get(i);
@@ -130,21 +133,22 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
                 
                 int featStart = feature.getStart();
                 int featStop = feature.getStop();
+                analysisStrand = isFeatureStrand ? feature.isFwdStrand() : !feature.isFwdStrand();
                 fstFittingMapping = true;
 
                 for (int j = this.lastMappingIdx; j < mappings.size(); ++j) {
                     PersistantMapping mapping = mappings.get(j);
 
                     //mappings identified within a feature
-                    if (mapping.getStop() > featStart && feature.isFwdStrand() == mapping.isFwdStrand() //TODO: set as parameter from diff expr.
-                            && mapping.getStart() < featStop) {
+                    if (mapping.getStop() > featStart && mapping.getStart() < featStop) {
 
                         if (fstFittingMapping) {
                             this.lastMappingIdx = j;
                             fstFittingMapping = false;
                         }
-                        this.currentCount += mapping.getNbReplicates();
-
+                        if (isStrandBothOption || analysisStrand == mapping.isFwdStrand()) {
+                            this.currentCount += mapping.getNbReplicates();
+                        }
 
                         //still mappings left, but need next feature
                     } else if (mapping.getStart() > featStop) {
@@ -259,18 +263,6 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
             }
         });
     }
-
-//    /**
-//     * @return Creates a mapping of each feature type to an integer.
-//     */
-//    private Map<FeatureType, Integer> fillInFeatureTypes() {
-//        Map<FeatureType, Integer> featureTypeMap = new HashMap<>();
-//        FeatureType[] allFeatTypes = FeatureType.values();
-//        for (int i = 0; i < allFeatTypes.length; ++i) {
-//            featureTypeMap.put(allFeatTypes[i], 0);
-//        }
-//        return featureTypeMap;
-//    }
     
     /**
      * @return the number of selected genome features of the analyzed reference

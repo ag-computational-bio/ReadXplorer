@@ -34,8 +34,8 @@ import de.cebitec.readXplorer.parser.output.SamBamExtender;
 import de.cebitec.readXplorer.parser.reference.Filter.FeatureFilter;
 import de.cebitec.readXplorer.parser.reference.Filter.FilterRuleSource;
 import de.cebitec.readXplorer.parser.reference.ReferenceParserI;
-import de.cebitec.readXplorer.readPairClassifier.SamBamDirectReadPairClassifier;
-import de.cebitec.readXplorer.readPairClassifier.SamBamDirectReadPairStatsParser;
+import de.cebitec.readXplorer.readPairClassifier.SamBamReadPairClassifier;
+import de.cebitec.readXplorer.readPairClassifier.SamBamReadPairStatsParser;
 import de.cebitec.readXplorer.util.Benchmark;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Observer;
@@ -197,7 +197,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
             for (Iterator<TrackJob> it = tracksJobs.iterator(); it.hasNext();) {
                 TrackJob trackJob = it.next();
 
-                this.parseDirectAccessTrack(trackJob);
+                this.parseBamTrack(trackJob);
 
                 ph.progress(workunits++);
                 it.remove();
@@ -296,7 +296,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                                 }
 
                                 //extension for both classification and read pair info
-                                SamBamDirectReadPairClassifier samBamDirectReadPairClassifier = new SamBamDirectReadPairClassifier(
+                                SamBamReadPairClassifier samBamDirectReadPairClassifier = new SamBamReadPairClassifier(
                                         readPairJobContainer, chromLengthMap);
                                 samBamDirectReadPairClassifier.registerObserver(this);
                                 samBamDirectReadPairClassifier.setStatsContainer(statsContainer);
@@ -306,11 +306,11 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                                 GeneralUtils.deleteOldWorkFile(lastWorkFile);
 
                             } catch (OutOfMemoryError ex) {
-                                this.showMsg("Out of Memory error during parsing of direct access track: " + ex.getMessage());
+                                this.showMsg("Out of Memory error during parsing of bam track: " + ex.getMessage());
                                 this.noErrors = false;
                                 continue;
                             } catch (Exception ex) {
-                                this.showMsg("Error during parsing of direct access track: " + ex.getMessage());
+                                this.showMsg("Error during parsing of bam track: " + ex.getMessage());
                                 Exceptions.printStackTrace(ex);
                                 this.noErrors = false;
                                 continue;
@@ -318,17 +318,17 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                         } else { //else case with 2 already imported tracks is prohibited
                             //we have to calculate the stats
                             ph.progress(workunits++);
-                            SamBamDirectReadPairStatsParser statsParser = new SamBamDirectReadPairStatsParser(readPairJobContainer, chromLengthMap, null);
+                            SamBamReadPairStatsParser statsParser = new SamBamReadPairStatsParser(readPairJobContainer, chromLengthMap, null);
                             statsParser.setStatsContainer(statsContainer);
                             try {
                                 statsParser.registerObserver(this);
                                 statsParser.classifyReadPairs();
                             } catch (OutOfMemoryError ex) {
-                                this.showMsg("Out of Memory error during parsing of direct access track: " + ex.getMessage());
+                                this.showMsg("Out of Memory error during parsing of bam track: " + ex.getMessage());
                                 this.noErrors = false;
                                 continue;
                             } catch (Exception ex) {
-                                this.showMsg("Error during parsing of direct access track: " + ex.getMessage());
+                                this.showMsg("Error during parsing of bam track: " + ex.getMessage());
                                 Exceptions.printStackTrace(ex);
                                 this.noErrors = false;
                                 continue;
@@ -336,14 +336,14 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                         }
 
                         ph.progress(workunits++);
-                        //create position table
+                        //create general track stats
                         SamBamStatsParser statsParser = new SamBamStatsParser();
                         statsParser.setStatsContainer(statsContainer);
                         statsParser.registerObserver(this);
                         ParsedTrack track = statsParser.createTrackStats(trackJob1, chromLengthMap);
                         statsParser.removeObserver(this);
 
-                        this.storeDirectAccessTrack(track, true); // store track entry in db
+                        this.storeBamTrack(track, true); // store track entry in db
                         trackId1 = trackJob1.getID();
                         inputFile1.setWritable(true);
 //                    }
@@ -363,11 +363,11 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
     }
     
     /**
-     * Parses a direct access track and calls the method for storing the
+     * Parses a bam track and calls the method for storing the
      * track relevant data in the db.
-     * @param trackJob the trackjob to import as direct access track
+     * @param trackJob the trackjob to import as bam track
      */
-    private void parseDirectAccessTrack(TrackJob trackJob) {
+    private void parseBamTrack(TrackJob trackJob) {
         
         /*
          * Algorithm:
@@ -404,11 +404,11 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                 if (success) { GeneralUtils.deleteOldWorkFile(lastWorkFile); } //only when we reach this line without exceptions and conversion was successful
 
             } catch (OutOfMemoryError ex) {
-                this.showMsg("Out of memory error during parsing of direct access track: " + ex.getMessage());
+                this.showMsg("Out of memory error during parsing of bam track: " + ex.getMessage());
                 this.noErrors = false;
                 return;
             } catch (Exception ex) {
-                this.showMsg("Error during parsing of direct access track: " + ex.getMessage());
+                this.showMsg("Error during parsing of bam track: " + ex.getMessage());
                 Exceptions.printStackTrace(ex); //TODO: remove this error handling
                 this.noErrors = false;
                 return;
@@ -424,7 +424,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         ParsedTrack track = statsParser.createTrackStats(trackJob, chromLengthMap);
         statsParser.removeObserver(this);
 
-        this.storeDirectAccessTrack(track, false);
+        this.storeBamTrack(track, false);
     }
 
     @Override
@@ -497,14 +497,14 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
     }
 
     /**
-     * Stores a direct access track in the database and gives appropriate status messages.
+     * Stores a bam track in the database and gives appropriate status messages.
      * @param trackJob the information about the track to store
      * @param readPairs true, if this is a readuence pair import, false otherwise
      */
-    private void storeDirectAccessTrack(ParsedTrack track, boolean readPairs) {
+    private void storeBamTrack(ParsedTrack track, boolean readPairs) {
         try {
             io.getOut().println(track.getTrackName() + ": " + this.getBundleString("MSG_ImportThread.import.start.trackdirect"));
-            ProjectConnector.getInstance().storeDirectAccessTrack(track);
+            ProjectConnector.getInstance().storeBamTrack(track);
             ProjectConnector.getInstance().storeTrackStatistics(track);
             if (readPairs) {
                 ProjectConnector.getInstance().storeReadPairTrackStatistics(track.getStatsContainer(), track.getID());

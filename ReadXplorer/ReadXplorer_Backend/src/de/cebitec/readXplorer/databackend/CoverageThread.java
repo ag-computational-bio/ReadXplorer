@@ -213,25 +213,25 @@ public class CoverageThread extends RequestThread {
                 request.isDiffsAndGapsNeeded(),
                 Properties.NORMAL, PersistantCoverage.TRACK1);
         PersistantCoverage intermedCov = this.getCoverageAndDiffsFromFile(newRequest, tracks.get(0)).getCoverage();
-        cov.setCommonFwdMult(new int[cov.getCommonFwdMultCovTrack2().length]);
-        cov.setCommonRevMult(new int[cov.getCommonRevMultCovTrack2().length]);
+        cov.setCommonFwd(new int[cov.getCommonFwdCovTrack2().length]);
+        cov.setCommonRev(new int[cov.getCommonRevCovTrack2().length]);
         for (int i = cov.getLeftBound(); i <= cov.getRightBound(); ++i) {
             //check if cov of track 2 exists at position
-            int nFwMultTrack2 = cov.getCommonFwdMultTrack2(i);
-            int nRvMultTrack2 = cov.getCommonRevMultTrack2(i);
-            int nFwMultTrack1 = intermedCov.getCommonFwdMultTrack1(i);
-            int nRvMultTrack1 = intermedCov.getCommonRevMultTrack1(i);
+            int commonFwdTrack2 = cov.getCommonFwdTrack2(i);
+            int commonRevTrack2 = cov.getCommonRevTrack2(i);
+            int commonFwdTrack1 = intermedCov.getCommonFwdTrack1(i);
+            int commonRevTrack1 = intermedCov.getCommonRevTrack1(i);
 
             //we just set coverage of the diff if cov of  track 2 or track 1 exist
-            if (nFwMultTrack1 != 0 && nFwMultTrack2 != 0) {
-                cov.setCommonFwdMult(i, Math.abs(nFwMultTrack1 - nFwMultTrack2));
+            if (commonFwdTrack1 != 0 && commonFwdTrack2 != 0) {
+                cov.setCommonFwd(i, Math.abs(commonFwdTrack1 - commonFwdTrack2));
             }
-            if (nRvMultTrack1 != 0 && nRvMultTrack2 != 0) {
-                cov.setCommonRevMult(i, Math.abs(nRvMultTrack1 - nRvMultTrack2));
+            if (commonRevTrack1 != 0 && commonRevTrack2 != 0) {
+                cov.setCommonRev(i, Math.abs(commonRevTrack1 - commonRevTrack2));
             }
         }
-        cov.setCommonFwdMultTrack1(intermedCov.getCommonFwdMultCovTrack1());
-        cov.setCommonRevMultTrack1(intermedCov.getCommonRevMultCovTrack1());
+        cov.setCommonFwdTrack1(intermedCov.getCommonFwdCovTrack1());
+        cov.setCommonRevTrack1(intermedCov.getCommonRevCovTrack1());
 
         return new CoverageAndDiffResultPersistant(cov, null, null, request);
     }
@@ -298,8 +298,8 @@ public class CoverageThread extends RequestThread {
                     if (this.doesNotMatchLatestRequestBounds(request)) {
                         this.setLastRequest(request);
                         request.getSender().receiveData(currentCov);
-                    }
-                    else {
+                    
+                    } else {
                         request.getSender().notifySkipped(); 
                     }
                 } else {
@@ -320,16 +320,16 @@ public class CoverageThread extends RequestThread {
      * Method for merging two separate persistant coverage objects.
      * @param cov1
      * @param cov2
-     * @return 
+     * @return The merged coverage object
      */
     private PersistantCoverage mergeMultCoverages(PersistantCoverage cov1, PersistantCoverage cov2) {
         for (int i = cov1.getLeftBound(); i <= cov1.getRightBound(); ++i) {
-            cov1.setPerfectFwdMult(i, cov1.getPerfectFwdMult(i) + cov2.getPerfectFwdMult(i));
-            cov1.setPerfectRevMult(i, cov1.getPerfectRevMult(i) + cov2.getPerfectRevMult(i));
-            cov1.setBestMatchFwdMult(i, cov1.getBestMatchFwdMult(i) + cov2.getBestMatchFwdMult(i));
-            cov1.setBestMatchRevMult(i, cov1.getBestMatchRevMult(i) + cov2.getBestMatchRevMult(i));
-            cov1.setCommonFwdMult(i, cov1.getCommonFwdMult(i) + cov2.getCommonFwdMult(i));
-            cov1.setCommonRevMult(i, cov1.getCommonRevMult(i) + cov2.getCommonRevMult(i));
+            cov1.setPerfectFwd(i, cov1.getPerfectFwd(i) + cov2.getPerfectFwd(i));
+            cov1.setPerfectRev(i, cov1.getPerfectRev(i) + cov2.getPerfectRev(i));
+            cov1.setBestMatchFwd(i, cov1.getBestMatchFwd(i) + cov2.getBestMatchFwd(i));
+            cov1.setBestMatchRev(i, cov1.getBestMatchRev(i) + cov2.getBestMatchRev(i));
+            cov1.setCommonFwd(i, cov1.getCommonFwd(i) + cov2.getCommonFwd(i));
+            cov1.setCommonRev(i, cov1.getCommonRev(i) + cov2.getCommonRev(i));
         }
         return cov1;
     }

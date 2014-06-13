@@ -18,6 +18,7 @@ package de.cebitec.readXplorer.differentialExpression;
 
 import de.cebitec.readXplorer.databackend.AnalysesHandler;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
+import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
@@ -33,7 +34,6 @@ import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
-import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -71,7 +71,6 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
     private int resultsReceivedBack = 0;
     private final int startOffset;
     private final int stopOffset;
-    private final boolean regardReadOrientation;
     public static boolean TESTING_MODE = false;
     private final ParametersReadClasses readClassParams;
 
@@ -122,13 +121,10 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
      * @param stopOffset offset in bases right of each feature stop
      * @param readClassParams Parameter set of the selected read classes for
      * this analysis
-     * @param regardReadOrientation <cc>true</cc>, if the read orientation of
-     * all reads shall be taken into account, <cc>false</cc>, if reads on both
-     * strands are counted for the expression values of genomic features.
      */
     public DeAnalysisHandler(List<PersistantTrack> selectedTracks, int refGenomeID,
             File saveFile, Set<FeatureType> selectedFeatureTypes, int startOffset, int stopOffset,
-            ParametersReadClasses readClassParams, boolean regardReadOrientation) {
+            ParametersReadClasses readClassParams) {
         ProcessingLog.getInstance().resetLog();
         this.selectedTracks = selectedTracks;
         this.refGenomeID = refGenomeID;
@@ -137,7 +133,6 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         this.startOffset = startOffset;
         this.stopOffset = stopOffset;
         this.readClassParams = readClassParams;
-        this.regardReadOrientation = regardReadOrientation;
     }
 
     /**
@@ -161,7 +156,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
             try {
                 TrackConnector tc = (new SaveFileFetcherForGUI()).getTrackConnector(currentTrack);
 
-                CollectCoverageData collCovData = new CollectCoverageData(genomeAnnos, startOffset, stopOffset, regardReadOrientation);
+                CollectCoverageData collCovData = new CollectCoverageData(genomeAnnos, startOffset, stopOffset, readClassParams);
                 collectCoverageDataInstances.put(currentTrack.getId(), collCovData);
                 AnalysesHandler handler = new AnalysesHandler(tc, this, "Collecting coverage data for track "
                         + currentTrack.getDescription() + ".", readClassParams);

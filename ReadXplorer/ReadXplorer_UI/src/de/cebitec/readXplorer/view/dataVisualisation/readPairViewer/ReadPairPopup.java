@@ -41,10 +41,11 @@ import javax.swing.event.ListSelectionListener;
 import org.openide.util.NbBundle;
 
 /**
- * An extension of JPopupMenu for displaying information regarding a sequence pair.
- * It shows all details of the sequence pair and all mappings belonging to that pair.
- * Furthermore it offers the possibility to jump to a certain mapping by clicking on it.
- * 
+ * An extension of JPopupMenu for displaying information regarding a read pair.
+ * It shows all details of the read pair and all mappings belonging to that
+ * pair. Furthermore it offers the possibility to jump to a certain mapping by
+ * clicking on it.
+ *
  * @author Rolf Hilker
  */
 public class ReadPairPopup extends JPopupMenu {
@@ -57,13 +58,13 @@ public class ReadPairPopup extends JPopupMenu {
     private final ArrayList<Color> pairColors;
     
     /**
-     * Displays information regarding a sequence pair in a popup.
-     * It shows all details of the sequence pair and all mappings belonging to that pair.
+     * Displays information regarding a read pair in a popup.
+     * It shows all details of the read pair and all mappings belonging to that pair.
      * Furthermore it offers the possibility to jump to a certain mapping by clicking on it.
      * @param parentViewer the parent viewer
-     * @param pairType the type of the sequence pair already in user readable string format
+     * @param pairType the type of the read pair already in user readable string format
      * @param pairColors 
-     * @param block the sequence pair block
+     * @param block the read pair block
      */
     public ReadPairPopup(AbstractViewer parentViewer, String pairType, ArrayList<Color> pairColors, BlockPair block) {
         this.parentViewer = parentViewer;
@@ -97,11 +98,11 @@ public class ReadPairPopup extends JPopupMenu {
         JPanel readPairMappingInfoPanel = null;
 
         for (int i = 0; i < readPairs.size(); ++i) {
-            JPanel seqPairInfoPanel = new JPanel();
+            JPanel readPairInfoPanel = new JPanel();
             readPairMappingInfoPanel = new JPanel();
             readPairMappingInfoPanel.setLayout(new BoxLayout(readPairMappingInfoPanel, BoxLayout.Y_AXIS));
             readPairMappingInfoPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
-            contentPanel.add(seqPairInfoPanel);
+            contentPanel.add(readPairInfoPanel);
             contentPanel.add(readPairMappingInfoPanel);
             
             readPair = readPairs.get(i);
@@ -119,7 +120,7 @@ public class ReadPairPopup extends JPopupMenu {
                     concat(" ").concat(String.valueOf(readPair.getReadPairReplicates())).concat("<br> ").
                     concat(Bundle.Distance()).
                     concat(" ").concat(String.valueOf(distance)).concat("</html>"));
-            seqPairInfoPanel.add(readPairLabel);
+            readPairInfoPanel.add(readPairLabel);
 
             //handle mappings of pair
             mapping = readPair.getVisibleMapping();
@@ -211,9 +212,9 @@ public class ReadPairPopup extends JPopupMenu {
         
 
 
-//        sb.append(createTableRow("Mismatches", String.valueOf(seqPair.getDifferences())));
-//        this.appendDiffs(seqPair, sb);
-//        this.appendGaps(seqPair, sb);
+//        sb.append(createTableRow("Mismatches", String.valueOf(readPair.getDifferences())));
+//        this.appendDiffs(readPair, sb);
+//        this.appendGaps(readPair, sb);
 
 //        sb.append("List of other mappings with same pair id add database querry");
 //        sb.append("</html>")
@@ -228,7 +229,7 @@ public class ReadPairPopup extends JPopupMenu {
     }
     
     /**
-     * @return all information about this components sequence pair from the DB
+     * @return all information about this components read pair from the DB
      * to show in the popup. If the parent viewer ist not a ReadPairViewer
      * <code>null</code> is returned.
      */

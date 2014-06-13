@@ -116,7 +116,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
         @SuppressWarnings("unchecked")
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
         this.openTracksWizPanel = new OpenTracksWizardPanel(PROP_WIZARD_NAME, referenceId);
-        this.readClassWizPanel = new SelectReadClassWizardPanel(PROP_WIZARD_NAME);
+        this.readClassWizPanel = new SelectReadClassWizardPanel(PROP_WIZARD_NAME, true);
         this.featTypeWizPanel = new SelectFeatureTypeWizardPanel(PROP_WIZARD_NAME);
         this.openTracksWizPanel.setReadClassVisualPanel(readClassWizPanel.getComponent());
         panels.add(openTracksWizPanel);
@@ -163,13 +163,12 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
         boolean getCoveredFeatures = (boolean) wiz.getProperty(CoveredFeaturesWizardPanel.PROP_GET_COVERED_FEATURES);
         int minCoveredPercent = (int) wiz.getProperty(CoveredFeaturesWizardPanel.PROP_MIN_COVERED_PERCENT);
         int minCoverageCount = (int) wiz.getProperty(CoveredFeaturesWizardPanel.PROP_MIN_COVERAGE_COUNT);
-        boolean whateverStrand = (boolean) wiz.getProperty(CoveredFeaturesWizardPanel.PROP_WHATEVER_STRAND);
         ParametersReadClasses readClassesParams = (ParametersReadClasses) wiz.getProperty(readClassWizPanel.getPropReadClassParams());
         this.combineTracks = (boolean) wiz.getProperty(openTracksWizPanel.getPropCombineTracks());
         @SuppressWarnings("unchecked")
         Set<FeatureType> selFeatureTypes = (Set<FeatureType>) wiz.getProperty(featTypeWizPanel.getPropSelectedFeatTypes());
         parameters = new ParameterSetCoveredFeatures(minCoveredPercent, minCoverageCount, 
-                whateverStrand, getCoveredFeatures, readClassesParams, selFeatureTypes);
+                getCoveredFeatures, readClassesParams, selFeatureTypes);
 
         TrackConnector connector;
         if (!combineTracks) {

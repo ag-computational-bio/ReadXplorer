@@ -340,8 +340,7 @@ public class ImportSetupCard extends javax.swing.JPanel {
      */
     private TrackJob createTrackJob(ImportTrackBasePanel importPanel, File mappingFile) {
         ReferenceJob refJob = importPanel.getReferenceJob();
-        TrackJob trackJob = new TrackJob(trackID++, importPanel.isDbUsed(),
-                mappingFile,
+        TrackJob trackJob = new TrackJob(trackID++, mappingFile,
                 importPanel.useMultipleImport() && mappingFile != null ? mappingFile.getName() : importPanel.getTrackName(),
                 importPanel.getReferenceJob(),
                 importPanel.getCurrentParser(),

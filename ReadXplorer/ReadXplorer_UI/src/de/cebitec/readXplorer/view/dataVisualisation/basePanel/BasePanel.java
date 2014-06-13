@@ -57,7 +57,12 @@ public class BasePanel extends JPanel implements MousePositionListener {
     private final Preferences pref = NbPreferences.forModule(Object.class);
     private List<PreferenceChangeListener> listeners = new ArrayList<>();
 
-    public BasePanel(BoundsInfoManager boundsManager, MousePositionListener viewController){
+    /**
+     * A BasePanel serves as basis for other visual components.
+     * @param boundsManager The reference bounds manager for this panel
+     * @param viewController The view controller for this panel
+     */
+    public BasePanel(BoundsInfoManager boundsManager, MousePositionListener viewController) {
         super();
         this.setLayout(new BorderLayout());
         this.centerPanel = new JPanel(new BorderLayout());
@@ -70,7 +75,7 @@ public class BasePanel extends JPanel implements MousePositionListener {
     /**
      * Method to call when this base panel is closed.
      */
-    public void close(){
+    public void close() {
         this.shutdownViewer();
         this.shutdownInfoPanelAndAdjustmentPanel();
         for (PreferenceChangeListener listener : listeners) {
@@ -124,7 +129,7 @@ public class BasePanel extends JPanel implements MousePositionListener {
      * @param viewer The viewer to display in this base panel
      * @param verticalZoom the vertical zoom slider for the viewer
      */
-    public void setViewer(AbstractViewer viewer, JSlider verticalZoom){
+    public void setViewer(AbstractViewer viewer, JSlider verticalZoom) {
         this.viewer = viewer;
         verticalZoom.setOrientation(JSlider.VERTICAL);
         this.boundsManager.addBoundsListener(viewer);
@@ -143,12 +148,12 @@ public class BasePanel extends JPanel implements MousePositionListener {
      * Set an AbstractViewer without a vertical zoom slider into this base panel.
      * @param viewer The viewer to display in this base panel
      */
-    public void setViewer(AbstractViewer viewer){
+    public void setViewer(AbstractViewer viewer) {
         this.viewer = viewer;
         this.boundsManager.addBoundsListener(viewer);
         currentMousePosListeners.add(viewer);
         centerPanel.add(viewer, BorderLayout.CENTER);
-        
+
         this.addPlaceholder();
         this.updateSize();
     }
@@ -157,34 +162,34 @@ public class BasePanel extends JPanel implements MousePositionListener {
      * Sets the horizontal adjustment panel for this base panel.
      * @param adjustmentPanel The horizontal scroll panel
      */
-    public void setHorizontalAdjustmentPanel(AdjustmentPanel adjustmentPanel){
+    public void setHorizontalAdjustmentPanel(AdjustmentPanel adjustmentPanel) {
         this.adjustmentPanelHorizontal = adjustmentPanel;
         centerPanel.add(adjustmentPanel, BorderLayout.NORTH);
         this.updateSize();
     }
     
     /**
-     * Adds a viewer in a scrollpane allowing for vertical scrolling.
-     * Horizontal scrolling is only available by "setHorizontalAdjustmentPanel".
+     * Adds a viewer in a scrollpane allowing for vertical scrolling. Horizontal
+     * scrolling is only available by "setHorizontalAdjustmentPanel".
      * @param viewer viewer to set
      */
-    public void setViewerInScrollpane(AbstractViewer viewer){
+    public void setViewerInScrollpane(AbstractViewer viewer) {
         this.viewer = viewer;
         this.boundsManager.addBoundsListener(viewer);
-      
+
         this.currentMousePosListeners.add(viewer);
         this.centerScrollpane = new JScrollPane(this.viewer);
         this.centerScrollpane.setPreferredSize(new Dimension(490, 200));
         this.centerScrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        
+
         this.centerPanel.add(this.centerScrollpane, BorderLayout.CENTER);
         this.centerScrollpane.setVisible(true);
         this.viewer.setVisible(true);
         this.viewer.setScrollBar(this.centerScrollpane.getVerticalScrollBar());
-        
+
         this.addPlaceholder();
         this.updateSize();
-        
+
     }
     
     /**
@@ -220,21 +225,21 @@ public class BasePanel extends JPanel implements MousePositionListener {
         }
     }
 
-    public void setTopInfoPanel(MousePositionListener infoPanel){
+    public void setTopInfoPanel(MousePositionListener infoPanel) {
         this.topPanel = (Component) infoPanel;
         centerPanel.add(topPanel, BorderLayout.NORTH);
         currentMousePosListeners.add(infoPanel);
         this.updateSize();
     }
 
-    public void setRightInfoPanel(AbstractInfoPanel infoPanel){
+    public void setRightInfoPanel(AbstractInfoPanel infoPanel) {
         this.rightPanel = infoPanel;
         this.add(infoPanel, BorderLayout.EAST);
         currentMousePosListeners.add(infoPanel);
         this.updateSize();
     }
 
-    public void setLeftInfoPanel(AbstractInfoPanel infoPanel){
+    public void setLeftInfoPanel(AbstractInfoPanel infoPanel) {
         this.leftPanel = infoPanel;
         this.add(leftPanel, BorderLayout.WEST);
         this.updateSize();
@@ -251,7 +256,7 @@ public class BasePanel extends JPanel implements MousePositionListener {
 
     @Override
     public void setCurrentMousePosition(int logPos) {
-        for(MousePositionListener c : currentMousePosListeners){
+        for (MousePositionListener c : currentMousePosListeners) {
             c.setCurrentMousePosition(logPos);
         }
     }
@@ -270,11 +275,11 @@ public class BasePanel extends JPanel implements MousePositionListener {
     /**
      * @return The AbstractViewer displayed by this base panel.
      */
-    public AbstractViewer getViewer(){
+    public AbstractViewer getViewer() {
         return viewer;
     }
 
-    private void updateSize(){
+    private void updateSize() {
         this.setMaximumSize(new Dimension(Integer.MAX_VALUE, this.viewer.getPreferredSize().height));
     }
     

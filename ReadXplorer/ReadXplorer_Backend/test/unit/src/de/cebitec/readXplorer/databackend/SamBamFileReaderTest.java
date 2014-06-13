@@ -84,18 +84,18 @@ public class SamBamFileReaderTest {
         IntervalRequest request = new IntervalRequest(from, to, from, to, 1, null, diffsAndGapsNeeded, Properties.NORMAL, trackNeeded, new ParametersReadClasses());
         SamBamFileReader samBamFileReader = new SamBamFileReader(new File("D:\\Programmieren & Studieren\\Pseudomonas aeruginosa Projekt\\SequenceData\\NG-5516_2_2_read_1-F469-with-PAO1.jok_sort.bam"), 1, refGenome);
         PersistantCoverage coverage = samBamFileReader.getCoverageFromBam(request).getCoverage();
-        assertTrue(coverage.getPerfectFwdMult(10000) == 129);
-        assertTrue(coverage.getPerfectFwdMult(15000) == 178);
-        assertTrue(coverage.getPerfectFwdMult(15001) == 179);
-        assertTrue(coverage.getPerfectFwdMult(15002) == 178);
-        assertTrue(coverage.getPerfectFwdMult(15003) == 178);
-        assertTrue(coverage.getPerfectFwdMult(21100) == 208);
+        assertTrue(coverage.getPerfectFwd(10000) == 129);
+        assertTrue(coverage.getPerfectFwd(15000) == 178);
+        assertTrue(coverage.getPerfectFwd(15001) == 179);
+        assertTrue(coverage.getPerfectFwd(15002) == 178);
+        assertTrue(coverage.getPerfectFwd(15003) == 178);
+        assertTrue(coverage.getPerfectFwd(21100) == 208);
         
-        assertTrue(coverage.getPerfectRevMult(10000) == 152);
-        assertTrue(coverage.getPerfectRevMult(15000) == 65);
-        assertTrue(coverage.getPerfectRevMult(15001) == 65);
-        assertTrue(coverage.getPerfectRevMult(15002) == 63);
-        assertTrue(coverage.getPerfectRevMult(15003) == 59);
-        assertTrue(coverage.getPerfectRevMult(21100) == 168);
+        assertTrue(coverage.getPerfectRev(10000) == 152);
+        assertTrue(coverage.getPerfectRev(15000) == 65);
+        assertTrue(coverage.getPerfectRev(15001) == 65);
+        assertTrue(coverage.getPerfectRev(15002) == 63);
+        assertTrue(coverage.getPerfectRev(15003) == 59);
+        assertTrue(coverage.getPerfectRev(21100) == 168);
     }
 }

@@ -34,6 +34,7 @@ public class SelectReadClassWizardPanel extends ChangeListeningWizardPanel {
     public static final String PROP_COMMON_MATCH_SELECTED = "CommonMatchSelected";
     public static final String PROP_UNIQUE_SELECTED = "UniqueSelected";
     public static final String PROP_MIN_MAPPING_QUAL = "minMapQual";
+    public static final String PROP_STRAND_OPTION = "strandOption";
     
     private static final String PROP_READ_CLASS_PARAMS = "ReadClassParams";
     /**
@@ -42,6 +43,7 @@ public class SelectReadClassWizardPanel extends ChangeListeningWizardPanel {
      */
     private SelectReadClassVisualPanel component;
     private final String wizardName;
+    private final boolean isFeatureAnalysis;
 
     /**
      * Panel for showing and handling all available options for the selection of
@@ -49,10 +51,15 @@ public class SelectReadClassWizardPanel extends ChangeListeningWizardPanel {
      * @param wizardName the name of the wizard using this wizard panel. It will
      * be used to store the selected settings for this wizard under a unique 
      * identifier.
+     * @param isFeatureAnalysis <code>true</code> means the analysis runs on
+     * genomic features and should show appropriate texts. <code>false</code>
+     * means the analysis generally runs on both strands and should show
+     * appropriate texts for this case.
      */
-    public SelectReadClassWizardPanel(String wizardName) {
+    public SelectReadClassWizardPanel(String wizardName, boolean isFeatureAnalysis) {
         super("Please select at least one read class to continue and enter a value between 0 and 127 as mapping quality!");
         this.wizardName = wizardName;
+        this.isFeatureAnalysis = isFeatureAnalysis;
     }
 
     // Get the visual component for the panel. In this template, the component
@@ -62,7 +69,7 @@ public class SelectReadClassWizardPanel extends ChangeListeningWizardPanel {
     @Override
     public SelectReadClassVisualPanel getComponent() {
         if (component == null) {
-            component = new SelectReadClassVisualPanel(wizardName);
+            component = new SelectReadClassVisualPanel(wizardName, isFeatureAnalysis);
         }
         return component;
     }
@@ -87,12 +94,14 @@ public class SelectReadClassWizardPanel extends ChangeListeningWizardPanel {
         String isCommonMatchSelected = readClassParams.isCommonMatchUsed() ? "1" : "0";
         String isUniqueSelected = readClassParams.isOnlyUniqueReads() ? "1" : "0";
         String minMappingQuality = String.valueOf(readClassParams.getMinMappingQual());
+        String strandOption = String.valueOf(readClassParams.getStrandOption());
         Preferences pref = NbPreferences.forModule(Object.class);
         pref.put(wizardName + PROP_PERFECT_SELECTED, isPerfectSelected);
         pref.put(wizardName + PROP_BEST_MATCH_SELECTED, isBestMatchSelected);
         pref.put(wizardName + PROP_COMMON_MATCH_SELECTED, isCommonMatchSelected);
         pref.put(wizardName + PROP_UNIQUE_SELECTED, isUniqueSelected);
         pref.put(wizardName + PROP_MIN_MAPPING_QUAL, minMappingQuality);
+        pref.put(wizardName + PROP_STRAND_OPTION, strandOption);
     }
     
     /**

@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.coverageAnalysis;
 
+import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.SequenceUtils;
 
 /**
@@ -77,7 +78,7 @@ public class CoverageInterval {
      */
     public String getStrandString() {
         String output = "no strand";
-        if (strand == SequenceUtils.STRAND_BOTH) {
+        if (strand == Properties.STRAND_BOTH) {
             output = SequenceUtils.STRAND_BOTH_STRING;
         } else if (strand == SequenceUtils.STRAND_FWD) {
             output = SequenceUtils.STRAND_FWD_STRING;

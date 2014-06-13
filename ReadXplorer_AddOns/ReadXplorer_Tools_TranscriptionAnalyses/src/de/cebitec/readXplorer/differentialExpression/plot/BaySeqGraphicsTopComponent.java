@@ -117,6 +117,7 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended imple
         cbm = new DefaultComboBoxModel<>(BaySeqAnalysisHandler.Plot.values());
         initComponents();
         iSymbol.setVisible(false);
+        iSymbol.setToolTipText(org.openide.util.NbBundle.getMessage(BaySeqGraphicsTopComponent.class, "GraphicsTopComponent.iSymbol.toolTipText"));
         setName(Bundle.CTL_BaySeqGraphicsTopComponent());
         setToolTipText(Bundle.HINT_BaySeqGraphicsTopComponent());
         svgCanvas = new JSVGCanvas();

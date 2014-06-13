@@ -83,10 +83,10 @@ public class DataAdminWizardSelectionPanel extends ChangeListeningFinishWizardPa
         
         try {
 
-            List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
-            for (PersistantReference dbGen : dbGens) {
+            List<PersistantReference> refs = ProjectConnector.getInstance().getGenomes();
+            for (PersistantReference ref : refs) {
                 // File and parser parameter meaningless in this context
-                ReferenceJob r = new ReferenceJob(dbGen.getId(), null, null, dbGen.getDescription(), dbGen.getName(), dbGen.getTimeStamp());
+                ReferenceJob r = new ReferenceJob(ref.getId(), null, null, ref.getDescription(), ref.getName(), ref.getTimeStamp());
                 indexedRefs.put(r.getID(), r);
                 refJobs.add(r);
             }
@@ -94,8 +94,7 @@ public class DataAdminWizardSelectionPanel extends ChangeListeningFinishWizardPa
             List<PersistantTrack> dbTracks = ProjectConnector.getInstance().getTracks();
             for (PersistantTrack dbTrack : dbTracks) {
                 // File and parser, refgenjob, runjob parameters meaningless in this context
-                boolean isDbUsed = dbTrack.getFilePath().isEmpty();
-                TrackJob t = new TrackJob(dbTrack.getId(), isDbUsed, new File(dbTrack.getFilePath()), 
+                TrackJob t = new TrackJob(dbTrack.getId(), new File(dbTrack.getFilePath()), 
                         dbTrack.getDescription(), indexedRefs.get(dbTrack.getRefGenID()),
                         null, false, dbTrack.getTimestamp());
 

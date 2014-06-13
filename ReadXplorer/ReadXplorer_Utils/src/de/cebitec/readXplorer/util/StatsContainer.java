@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Statistics container for a track and sequence pair track.
+ * Statistics container for a track and read pair track.
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
@@ -62,7 +62,7 @@ public class StatsContainer {
     private DiscreteCountingDistribution readPairSizeDistribution;
     
     /**
-     * Statistics container for a track and sequence pair track.
+     * Statistics container for a track and read pair track.
      */
     public StatsContainer() {
         statsMap = new HashMap<>();
@@ -88,15 +88,15 @@ public class StatsContainer {
     }
 
     /**
-     * Sets the sequence pair distance distribution for the data set.
-     * @param readPairSizeDistribution The sequence pair distribution to set
+     * Sets the read pair distance distribution for the data set.
+     * @param readPairSizeDistribution The read pair distribution to set
      */
     public void setReadPairDistribution(DiscreteCountingDistribution readPairSizeDistribution) {
         this.readPairSizeDistribution = readPairSizeDistribution;
     }
 
     /**
-     * @return The sequence pair size distribution of the data set.
+     * @return The read pair size distribution of the data set.
      */
     public DiscreteCountingDistribution getReadPairSizeDistribution() {
         return readPairSizeDistribution;
@@ -104,7 +104,7 @@ public class StatsContainer {
 
     /**
      * @return The map containing all initialized statistics of the associated
-     * track or sequence pair track.
+     * track or read pair track.
      */
     public Map<String, Integer> getStatsMap() {
         return statsMap;
@@ -130,7 +130,7 @@ public class StatsContainer {
     }
     
     /**
-     * Fills the stats map with all available entries for a sequence pair track.
+     * Fills the stats map with all available entries for a read pair track.
      */
     public void prepareForReadPairTrack() {
         statsMap.put(NO_SEQ_PAIRS, 0);
@@ -161,9 +161,9 @@ public class StatsContainer {
     }
     
     /**
-     * Increases the sequence pair stats for the given sequence pair type by
+     * Increases the read pair stats for the given read pair type by
      * the given value.
-     * @param type the sequence pair type of the stats to increase
+     * @param type the read pair type of the stats to increase
      * @param value the value to add to the corresponding stats
      */
     public void incReadPairStats(ReadPairType type, int value) {

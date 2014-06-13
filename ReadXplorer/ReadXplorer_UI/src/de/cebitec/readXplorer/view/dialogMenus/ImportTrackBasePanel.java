@@ -23,7 +23,6 @@ import de.cebitec.readXplorer.parser.mappings.MappingParserI;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import net.sf.samtools.SAMFileHeader;
 import net.sf.samtools.SAMFileReader;
@@ -45,7 +44,6 @@ public abstract class ImportTrackBasePanel extends FileSelectionPanel {
     private static final long serialVersionUID = 1L;
     
     private boolean isAlreadyImported = false;
-    private boolean isDbUsed = false;
     private MappingParserI currentParser;
 
     /**
@@ -104,12 +102,9 @@ public abstract class ImportTrackBasePanel extends FileSelectionPanel {
      */
     public ReferenceJob[] getReferenceJobs(List<ReferenceJob> jobs) {
         List<ReferenceJob> refJobList = this.getRefJobList();
-
         refJobList.addAll(jobs);
-
-        ReferenceJob[] refJobs = new ReferenceJob[1];
-        refJobs = refJobList.toArray(refJobs);
         
+        ReferenceJob[] refJobs = refJobList.toArray(new ReferenceJob[1]);
         return refJobs;
     }
 
@@ -118,10 +113,7 @@ public abstract class ImportTrackBasePanel extends FileSelectionPanel {
      */
     public ReferenceJob[] getReferenceJobs() {
         List<ReferenceJob> refJobList = this.getRefJobList();
-        
-        ReferenceJob[] refJobs = new ReferenceJob[1];
-        refJobs = refJobList.toArray(refJobs);
-
+        ReferenceJob[] refJobs = refJobList.toArray(new ReferenceJob[1]);
         return refJobs;
     }
     
@@ -132,9 +124,8 @@ public abstract class ImportTrackBasePanel extends FileSelectionPanel {
         List<ReferenceJob> refJobList = new ArrayList<>();
 
         try {
-            List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
-            for (Iterator<PersistantReference> it = dbGens.iterator(); it.hasNext();) {
-                PersistantReference r = it.next();
+            List<PersistantReference> refs = ProjectConnector.getInstance().getGenomes();
+            for (PersistantReference r : refs) {
                 refJobList.add(new ReferenceJob(r.getId(), r.getFastaFile(), null, r.getDescription(), r.getName(), r.getTimeStamp()));
             }
         } catch (OutOfMemoryError e) {
@@ -176,18 +167,6 @@ public abstract class ImportTrackBasePanel extends FileSelectionPanel {
      */
     protected void setCurrentParser(MappingParserI currentParser) {
         this.currentParser = currentParser;
-    }
-
-    /**
-     * @return true, if the track should be stored into the database and false,
-     * if direct file access is desired
-     */
-    public boolean isDbUsed() {
-        return isDbUsed;
-    }
-
-    protected void setIsDbUsed(boolean isDbUsed) {
-        this.isDbUsed = isDbUsed;
     }
     
     /**

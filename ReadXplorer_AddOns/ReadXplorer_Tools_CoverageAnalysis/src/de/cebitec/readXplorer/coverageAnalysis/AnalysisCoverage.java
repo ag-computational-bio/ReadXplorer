@@ -21,6 +21,7 @@ import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistant;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.readXplorer.util.Observer;
+import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -99,14 +100,14 @@ public class AnalysisCoverage implements Observer, AnalysisI<CoverageIntervalCon
 
         //since read classes are inclusive, we simply check which array to use, starting with the larges read class
         if (this.parameters.getReadClassParams().isCommonMatchUsed()) {
-            coverageArraySumOrFwd = coverage.getCommonFwdMult();
-            coverageArrayRev = coverage.getCommonRevMult();
+            coverageArraySumOrFwd = coverage.getCommonFwd();
+            coverageArrayRev = coverage.getCommonRev();
         } else if (this.parameters.getReadClassParams().isBestMatchUsed()) {
-            coverageArraySumOrFwd = coverage.getBestMatchFwdMult();
-            coverageArrayRev = coverage.getBestMatchRevMult();
+            coverageArraySumOrFwd = coverage.getBestMatchFwd();
+            coverageArrayRev = coverage.getBestMatchRev();
         } else if (this.parameters.getReadClassParams().isPerfectMatchUsed()) {
-            coverageArraySumOrFwd = coverage.getPerfectFwdMult();
-            coverageArrayRev = coverage.getPerfectRevMult();
+            coverageArraySumOrFwd = coverage.getPerfectFwd();
+            coverageArrayRev = coverage.getPerfectRev();
         }
         
         if (this.parameters.isSumCoverageOfBothStrands()) {
@@ -115,7 +116,7 @@ public class AnalysisCoverage implements Observer, AnalysisI<CoverageIntervalCon
         
         /* check temp intervals at first, which might be elongated by the new result */
         int chromId = coverageResult.getRequest().getChromId();
-        byte strandFwdOrBoth = this.parameters.isSumCoverageOfBothStrands() ? SequenceUtils.STRAND_BOTH : SequenceUtils.STRAND_FWD;
+        byte strandFwdOrBoth = this.parameters.isSumCoverageOfBothStrands() ? Properties.STRAND_BOTH : SequenceUtils.STRAND_FWD;
         
         CoverageInterval overlapIntervalSumOrFwdStart = new CoverageInterval(connector.getTrackID(), chromId, strandFwdOrBoth);
         CoverageInterval overlapIntervalRevStart = new CoverageInterval(connector.getTrackID(), chromId, SequenceUtils.STRAND_REV);
@@ -123,24 +124,26 @@ public class AnalysisCoverage implements Observer, AnalysisI<CoverageIntervalCon
         CoverageInterval overlapIntervalRevEnd = new CoverageInterval(connector.getTrackID(), chromId, SequenceUtils.STRAND_REV);
         CoverageInterval currentTempInterval;
         int startPos = coverageResult.getRequest().getFrom();
-        for (int i = 0; i < tempIntervals.size(); i++) {
-            currentTempInterval = tempIntervals.get(i);
+        for (CoverageInterval tempInterval : tempIntervals) {
+            currentTempInterval = tempInterval;
             if (startPos - 1 == currentTempInterval.getStop() && currentTempInterval.getChromId() == chromId) {
-                if (    currentTempInterval.getStrandString().equals(SequenceUtils.STRAND_BOTH_STRING)
-                     || currentTempInterval.getStrandString().equals(SequenceUtils.STRAND_FWD_STRING)) {
-
-                    overlapIntervalSumOrFwdStart = tempIntervals.get(i);
+                if (       currentTempInterval.getStrandString().equals(SequenceUtils.STRAND_BOTH_STRING)
+                        || currentTempInterval.getStrandString().equals(SequenceUtils.STRAND_FWD_STRING)) {
+                    
+                    overlapIntervalSumOrFwdStart = tempInterval;
+                
                 } else {
-                    overlapIntervalRevStart = tempIntervals.get(i);
+                    overlapIntervalRevStart = tempInterval;
                 }
             }
             if (coverageResult.getRequest().getTo() + 1 == currentTempInterval.getStart()) {
-                if (currentTempInterval.getStrandString().equals(SequenceUtils.STRAND_BOTH_STRING)
+                if (       currentTempInterval.getStrandString().equals(SequenceUtils.STRAND_BOTH_STRING)
                         || currentTempInterval.getStrandString().equals(SequenceUtils.STRAND_FWD_STRING)) {
-
-                    overlapIntervalSumOrFwdEnd = tempIntervals.get(i);
+                    
+                    overlapIntervalSumOrFwdEnd = tempInterval;
+                
                 } else {
-                    overlapIntervalRevEnd = tempIntervals.get(i);
+                    overlapIntervalRevEnd = tempInterval;
                 }
             }
         }

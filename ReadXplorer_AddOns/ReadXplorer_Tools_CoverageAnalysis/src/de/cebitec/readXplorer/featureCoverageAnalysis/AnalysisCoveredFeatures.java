@@ -101,7 +101,7 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
             coverageAndDiffResult = (CoverageAndDiffResultPersistant) data;
             this.updateCoverageCountForFeatures(coverageAndDiffResult);
         } else
-        if (data instanceof Byte && ((Byte) data) == AnalysesHandler.COVERAGE_QUERRIES_FINISHED) { //1 means coverage analysis is finished
+        if (data instanceof Byte && ((byte) data) == AnalysesHandler.COVERAGE_QUERRIES_FINISHED) { //1 means coverage analysis is finished
             this.findCoveredFeatures();
         }
     }
@@ -112,9 +112,11 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
      */
     public void updateCoverageCountForFeatures(CoverageAndDiffResultPersistant coverageAndDiffResult) {
 
-        int chromId = coverageAndDiffResult.getRequest().getChromId();
         PersistantCoverage coverage = coverageAndDiffResult.getCoverage();
         int rightBound = coverage.getRightBound();
+        boolean isStrandBothOption = analysisParams.getReadClassParams().isStrandBothOption();
+        boolean isFeatureStrand = analysisParams.getReadClassParams().isStrandFeatureOption();
+        boolean analysisStrand;
 
         PersistantFeature feature;
         int noCoveredBases;
@@ -136,15 +138,16 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
 //                        this.lastFeatureIdx = i; //still works, since one result only contains results for one chromosome
 //                    }
 
-                    if (analysisParams.isWhateverStrand()) {
-                        for (int j = featureStart; j < featureStop; ++j) {
+                    if (isStrandBothOption) {
+                        for (int j = featureStart; j <= featureStop; ++j) {
                             if (this.checkCanIncreaseBothStrands(coverage, j)) {
                                 ++noCoveredBases;
                             }
                         }
                     } else {
-                        for (int j = featureStart; j < featureStop; ++j) {
-                            if (this.checkCanIncreaseOneStrand(coverage, j, feature.isFwdStrand())) {
+                        analysisStrand = isFeatureStrand ? feature.isFwdStrand() : !feature.isFwdStrand(); //only use this if Properties.STRAND_BOTH is not selected
+                        for (int j = featureStart; j <= featureStop; ++j) {
+                            if (this.checkCanIncreaseOneStrand(coverage, j, analysisStrand)) {
                                 ++noCoveredBases;
                             }
                         }
@@ -202,13 +205,13 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
         boolean canIncrease = false;
         ParametersReadClasses readClassParams = analysisParams.getReadClassParams();
         if (readClassParams.isCommonMatchUsed() &&
-            coverage.getCommonFwdMult(j) + coverage.getCommonRevMult(j) >= analysisParams.getMinCoverageCount()) {
+            coverage.getCommonFwd(j) + coverage.getCommonRev(j) >= analysisParams.getMinCoverageCount()) {
                 canIncrease = true;
         } else if (readClassParams.isBestMatchUsed() &&
-            coverage.getBestMatchFwdMult(j) + coverage.getBestMatchRevMult(j) >= analysisParams.getMinCoverageCount()) {
+            coverage.getBestMatchFwd(j) + coverage.getBestMatchRev(j) >= analysisParams.getMinCoverageCount()) {
                 canIncrease = true;
         } else if (readClassParams.isPerfectMatchUsed() &&
-            coverage.getPerfectFwdMult(j) + coverage.getPerfectRevMult(j) >= analysisParams.getMinCoverageCount()) {
+            coverage.getPerfectFwd(j) + coverage.getPerfectRev(j) >= analysisParams.getMinCoverageCount()) {
                 canIncrease = true;
         }
         return canIncrease;
@@ -224,18 +227,18 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
         boolean canIncrease = false;
         ParametersReadClasses readClassParams = analysisParams.getReadClassParams();
         if (readClassParams.isCommonMatchUsed() &&
-            (isFwdStrand && coverage.getCommonFwdMult(j) >= analysisParams.getMinCoverageCount()
-                || !isFwdStrand && coverage.getCommonRevMult(j) >= analysisParams.getMinCoverageCount())) {
+            (isFwdStrand && coverage.getCommonFwd(j) >= analysisParams.getMinCoverageCount()
+                || !isFwdStrand && coverage.getCommonRev(j) >= analysisParams.getMinCoverageCount())) {
                 canIncrease = true;
                 
         } else if (readClassParams.isBestMatchUsed() &&
-            (isFwdStrand && coverage.getBestMatchFwdMult(j) >= analysisParams.getMinCoverageCount()
-                || !isFwdStrand && coverage.getBestMatchRevMult(j) >= analysisParams.getMinCoverageCount())) {
+            (isFwdStrand && coverage.getBestMatchFwd(j) >= analysisParams.getMinCoverageCount()
+                || !isFwdStrand && coverage.getBestMatchRev(j) >= analysisParams.getMinCoverageCount())) {
                 canIncrease = true;
                 
         } else if (readClassParams.isPerfectMatchUsed() &&
-            (isFwdStrand && coverage.getPerfectFwdMult(j) >= analysisParams.getMinCoverageCount()
-                || !isFwdStrand && coverage.getPerfectRevMult(j) >= analysisParams.getMinCoverageCount())) {
+            (isFwdStrand && coverage.getPerfectFwd(j) >= analysisParams.getMinCoverageCount()
+                || !isFwdStrand && coverage.getPerfectRev(j) >= analysisParams.getMinCoverageCount())) {
                 canIncrease = true;
         }
         return canIncrease;

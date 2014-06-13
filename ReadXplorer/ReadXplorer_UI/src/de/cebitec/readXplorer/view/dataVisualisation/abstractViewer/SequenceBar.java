@@ -121,7 +121,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
                     popUp.add(menuItemFactory.getCopyPositionItem(parentViewer.getCurrentMousePos()));
                     //add center current position option
                     popUp.add(menuItemFactory.getJumpToPosItem(parentViewer.getBoundsInformationManager(), parentViewer.getCurrentMousePos()));
-                    popUp.show((JComponent) e.getComponent(), e.getX(), e.getY());
+                    popUp.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
 

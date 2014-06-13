@@ -31,8 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.sf.samtools.BAMFileWriter;
-import net.sf.samtools.SAMFileHeader;
 import net.sf.samtools.SAMFileWriter;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMTag;
@@ -596,32 +594,36 @@ public final class CommonsMappingParser {
      */
     public static char getReadPairTag(SAMRecord record) {
         String readName = record.getReadName();
-        char pairTag = '0';
-        char lastChar = readName.charAt(readName.length() - 1);
+        char pairTag = Properties.EXT_UNDEFINED;
         
-        if (lastChar == Properties.EXT_A1 || lastChar == Properties.EXT_B1) {
-            pairTag = '1';
-        
-        } else if (lastChar == Properties.EXT_A2 || lastChar == Properties.EXT_B2) {
-            pairTag = '2';
-            
-        } else if (lastChar != Properties.EXT_A1 && lastChar != Properties.EXT_B1
-                && lastChar != Properties.EXT_A2 && lastChar != Properties.EXT_B2) {
-            
-            //check for casava > 1.8 paired read
-            String[] nameParts = readName.split(" ");
-            if (nameParts.length == 2) {
-                if (nameParts[1].startsWith("1")) {
-                    pairTag = '1';
-                } else if (nameParts[1].startsWith("2")) {
-                    pairTag = '2';
+        if (readName.length() > 2) {
+            char lastChar = readName.charAt(readName.length() - 1);
+            char prevLastChar = readName.charAt(readName.length() - 2);
+
+            if (prevLastChar == Properties.EXT_SEPARATOR) {
+                if (lastChar == Properties.EXT_A1 || lastChar == Properties.EXT_B1) {
+                    pairTag = Properties.EXT_A1;
+
+                } else if (lastChar == Properties.EXT_A2 || lastChar == Properties.EXT_B2) {
+                    pairTag = Properties.EXT_A2;
+                }
+            } else {
+
+                //check for casava > 1.8 paired read
+                String[] nameParts = readName.split(" ");
+                if (nameParts.length == 2) {
+                    if (nameParts[1].startsWith(Properties.EXT_A1_STRING)) {
+                        pairTag = Properties.EXT_A1;
+                    } else if (nameParts[1].startsWith(Properties.EXT_A2_STRING)) {
+                        pairTag = Properties.EXT_A2;
+                    }
                 }
             }
-            
-            //if tag is not set yet, but paired read flag is set, we can use it
-            if (pairTag == 0 && record.getReadPairedFlag()) { 
-                pairTag = record.getFirstOfPairFlag() ? '1' : '2';
-            }
+        }
+
+        //if tag is not set yet, but paired read flag is set, we can use it
+        if (pairTag == Properties.EXT_UNDEFINED && record.getReadPairedFlag()) {
+            pairTag = record.getFirstOfPairFlag() ? Properties.EXT_A1 : Properties.EXT_A2;
         }
         return pairTag;
     }
@@ -634,15 +636,14 @@ public final class CommonsMappingParser {
      */
     public static boolean isCasavaLarger1Dot8Format(String readName) {
         String[] nameParts = readName.split(" ");
-        if (nameParts.length == 2 && (nameParts[1].startsWith("1") || nameParts[1].startsWith("2"))) {
-            return true;
-        }
-        return false;
+        return nameParts.length == 2 && (nameParts[1].startsWith(Properties.EXT_A1_STRING) 
+                                      || nameParts[1].startsWith(Properties.EXT_A2_STRING));
     }
     
     /**
-     * Adds a "1" or "2" at the end of the given records read name, if it is a
-     * paired read and does not already contain a paired read ending.
+     * Adds a {@link Properties.EXT_A1} or {@link Properties.EXT_A2) at the end
+     * of the given records read name, if it is a paired read and does not 
+     * already contain a paired read ending.
      * @param record the record whose read name should be elongated, if it is a
      * paired read
      * @return The elongated read name or the original one, if it already had a
@@ -654,9 +655,26 @@ public final class CommonsMappingParser {
         if (record.getReadPairedFlag() && pairTag != Properties.EXT_A1 && pairTag != Properties.EXT_B1
                                        && pairTag != Properties.EXT_A2 && pairTag != Properties.EXT_B2
                                        && !isCasavaLarger1Dot8Format(readName)) {
-            readName = readName.concat(record.getFirstOfPairFlag() ? "1" : "2");
+            readName += "/" + (record.getFirstOfPairFlag() ? Properties.EXT_A1 : Properties.EXT_A2);
         }
         return readName;
+    }
+    
+    /**
+     * Checks if the read has a proper pair tag including Casava > 1.8 formatted
+     * reads. If a proper pair tag is available, nothing is changed. If not, 
+     * a new ending is added to the record's read name according to 
+     * <code>isFstFile</code>.
+     * @param record The record to check and update
+     * @param isFstFile if true: "/1" is appended. If false: "/2" is appended
+     * to the read name.
+     */
+    public static void checkOrAddPairTag(SAMRecord record, boolean isFstFile) {
+        char pairTag = CommonsMappingParser.getReadPairTag(record);
+        if (pairTag == Properties.EXT_UNDEFINED) {
+            String pairEnding = "/" + (isFstFile ? Properties.EXT_A1 : Properties.EXT_A2);
+            record.setReadName(record.getReadName().concat(pairEnding));
+        }
     }
 
     /**
@@ -672,11 +690,7 @@ public final class CommonsMappingParser {
             int binaryLength = binaryValue.length();
             String b = binaryValue.substring(binaryLength - 3, binaryLength - 2);
 
-            if (b.equals("1") || startPosition == 0) {
-                isMapped = false;
-            } else {
-                isMapped = true;
-            }
+            isMapped = !b.equals("1") && startPosition != 0;
         }
         return isMapped;
     }
@@ -751,13 +765,13 @@ public final class CommonsMappingParser {
                 record.setAttribute(SAMTag.CC.name(), "=");
             }
             if (differences == 0) { //perfect mapping
-                record.setAttribute(Properties.TAG_READ_CLASS, (int) Properties.PERFECT_COVERAGE);
+                record.setAttribute(Properties.TAG_READ_CLASS, Properties.PERFECT_COVERAGE);
 
             } else if (differences == lowestDiffRate) { //best match mapping
-                record.setAttribute(Properties.TAG_READ_CLASS, (int) Properties.BEST_MATCH_COVERAGE);
+                record.setAttribute(Properties.TAG_READ_CLASS, Properties.BEST_MATCH_COVERAGE);
 
             } else if (differences > lowestDiffRate) { //common mapping
-                record.setAttribute(Properties.TAG_READ_CLASS, (int) Properties.COMPLETE_COVERAGE);
+                record.setAttribute(Properties.TAG_READ_CLASS, Properties.COMPLETE_COVERAGE);
 
             } else { //meaning: differences < lowestDiffRate
                 throw new AssertionError("Cannot contain less than the lowest diff rate number of errors!");
@@ -835,54 +849,54 @@ public final class CommonsMappingParser {
     
     
     
-    /**
-     * TODO: Can be used for homopolymer snp detection, to flag snps in homopolymers. needed?
-     * @param genome
-     * @param snp
-     * @return 
-     */
-        public static boolean snpHasStretch(String genome, int snp) {
-        String beforeSNP = genome.substring(0, 1);
-
-        if (snp == 1) {
-            beforeSNP = genome.substring(snp - 1, snp);
-        } else 
-        if (snp == 2) {
-            beforeSNP = genome.substring(snp - 2, snp);
-        } else 
-        if (snp == 3) {
-            beforeSNP = genome.substring(snp - 3, snp);
-        } else 
-        if (snp >= 4) {
-            beforeSNP = genome.substring(snp - 4, snp);
-        }
-        System.out.println("before" + beforeSNP);
-        String afterSNP = genome.substring(snp, snp + 4);
-        System.out.println("afterSnp:" + afterSNP);
-        boolean hasStretch = false;
-        if (beforeSNP.matches("[atgc]{4,8}") || afterSNP.matches("[atgc]{4,8}")) {
-            hasStretch = true;
-        }
-        if (beforeSNP.matches("[atgc]{1,8}") && afterSNP.matches("[atgc]{3,8}")) {
-            System.out.println("1-3" + hasStretch);
-        }
-        if (beforeSNP.matches("[atgc]{3,8}")) {
-            String charBefore = beforeSNP.substring(beforeSNP.length() - 1, beforeSNP.length());
-            System.out.println("charbefore " + charBefore);
-            String charAfter = afterSNP.substring(0, 1);
-            String regex = charBefore.concat("{1}");
-            if (charAfter.matches(regex)) {
-                System.out.println("3-1" + hasStretch);
-            }
-        }
-        if (afterSNP.matches("[atgc]{3,8}")) {
-            String charBefore = beforeSNP.substring(beforeSNP.length() - 1, beforeSNP.length());
-            String regex = afterSNP.substring(0, 1).concat("{1}");
-            if (charBefore.matches(regex)) {
-                System.out.println("3-1" + hasStretch + " " + regex);
-            }
-        }
-        System.out.println(hasStretch);
-        return hasStretch;
-    }
+//    /**
+//     * TODO: Can be used for homopolymer snp detection, to flag snps in homopolymers. needed?
+//     * @param genome
+//     * @param snp
+//     * @return 
+//     */
+//        public static boolean snpHasStretch(String genome, int snp) {
+//        String beforeSNP = genome.substring(0, 1);
+//
+//        if (snp == 1) {
+//            beforeSNP = genome.substring(snp - 1, snp);
+//        } else 
+//        if (snp == 2) {
+//            beforeSNP = genome.substring(snp - 2, snp);
+//        } else 
+//        if (snp == 3) {
+//            beforeSNP = genome.substring(snp - 3, snp);
+//        } else 
+//        if (snp >= 4) {
+//            beforeSNP = genome.substring(snp - 4, snp);
+//        }
+//        System.out.println("before" + beforeSNP);
+//        String afterSNP = genome.substring(snp, snp + 4);
+//        System.out.println("afterSnp:" + afterSNP);
+//        boolean hasStretch = false;
+//        if (beforeSNP.matches("[atgc]{4,8}") || afterSNP.matches("[atgc]{4,8}")) {
+//            hasStretch = true;
+//        }
+//        if (beforeSNP.matches("[atgc]{1,8}") && afterSNP.matches("[atgc]{3,8}")) {
+//            System.out.println("1-3" + hasStretch);
+//        }
+//        if (beforeSNP.matches("[atgc]{3,8}")) {
+//            String charBefore = beforeSNP.substring(beforeSNP.length() - 1, beforeSNP.length());
+//            System.out.println("charbefore " + charBefore);
+//            String charAfter = afterSNP.substring(0, 1);
+//            String regex = charBefore.concat("{1}");
+//            if (charAfter.matches(regex)) {
+//                System.out.println("3-1" + hasStretch);
+//            }
+//        }
+//        if (afterSNP.matches("[atgc]{3,8}")) {
+//            String charBefore = beforeSNP.substring(beforeSNP.length() - 1, beforeSNP.length());
+//            String regex = afterSNP.substring(0, 1).concat("{1}");
+//            if (charBefore.matches(regex)) {
+//                System.out.println("3-1" + hasStretch + " " + regex);
+//            }
+//        }
+//        System.out.println(hasStretch);
+//        return hasStretch;
+//    }
 }

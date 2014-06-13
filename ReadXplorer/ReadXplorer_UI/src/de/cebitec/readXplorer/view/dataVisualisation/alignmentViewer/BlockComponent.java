@@ -24,6 +24,7 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantReferenceGap;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.view.dataVisualisation.GenomeGapManager;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
+import static de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer.PROP_MOUSEPOSITION_CHANGED;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
 import de.cebitec.readXplorer.view.dialogMenus.MenuItemFactory;
 import de.cebitec.readXplorer.view.dialogMenus.RNAFolderI;
@@ -32,6 +33,8 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -41,6 +44,8 @@ import javax.swing.JPopupMenu;
 import org.openide.util.Lookup;
 
 /**
+ * A <code>BlockComponent</code> represents a read alignment as a colored 
+ * rectangle and has knowledge of all important information of the alignment.
  *
  * @author ddoppmeier
  */
@@ -58,7 +63,21 @@ public class BlockComponent extends JComponent {
     private int phyRight;
     private float percentSandBPerCovUnit;
     private float minSaturationAndBrightness;
+    private final String toolTipInfoPart;
 
+    /**
+     * A <code>BlockComponent</code> represents a read alignment as a colored
+     * rectangle and has knowledge of all important information of the
+     * alignment.
+     * @param block The block representing a read alignment (mapping)
+     * @param parentViewer The parent viewer in which this block shall be shown
+     * @param gapManager The gap manager for this alignment
+     * @param height The height of this block
+     * @param minSaturationAndBrightness The min saturation and brightness of 
+     * this block
+     * @param percentSandBPerCovUnit Percentage saturation and brithness per
+     * coverage unit for this block
+     */
     public BlockComponent(BlockI block, final AbstractViewer parentViewer, GenomeGapManager gapManager, int height, float minSaturationAndBrightness, float percentSandBPerCovUnit) {
         this.block = block;
         this.height = height;
@@ -79,8 +98,25 @@ public class BlockComponent extends JComponent {
         phyRight += offset;
         this.length = phyRight - phyLeft;
 
-        this.setToolTipText(getText());
+        toolTipInfoPart = this.initToolTipTextInfoPart();
 
+        this.addListeners();
+    }
+    
+    /**
+     * Adds all necessary listeners to the component.
+     */
+    private void addListeners() {
+        this.parentViewer.addPropertyChangeListener(new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (evt.getPropertyName().equals(PROP_MOUSEPOSITION_CHANGED)) {
+                    setToolTipText(createToolTipText());
+                }
+            }
+        });
+        
         this.addMouseListener(new MouseListener() {
 
             @Override
@@ -143,7 +179,6 @@ public class BlockComponent extends JComponent {
                 //not in use
             }
         });
-
     }
 
     /**
@@ -157,13 +192,27 @@ public class BlockComponent extends JComponent {
         return readSequence;
     }
 
-    private String getText() {
+    /**
+     * @return Creates the tool tip text for this mapping block.
+     */
+    private String createToolTipText() {
+        StringBuilder sb = new StringBuilder(150);
+
+        sb.append("<html><table>");
+        sb.append(createTableRow("Current position", String.valueOf(parentViewer.getCurrentMousePos())));
+        sb.append(toolTipInfoPart);
+
+        return sb.toString();
+    }
+    
+        /**
+     * @return Initializes the tool tip text for this mapping block for the 
+     * first time.
+     */
+    private String initToolTipTextInfoPart() {
         StringBuilder sb = new StringBuilder(150);
         PersistantMapping mapping = ((PersistantMapping) block.getPersistantObject());
-
-        sb.append("<html>");
-        sb.append("<table>");
-
+        
         sb.append(createTableRow("Start", String.valueOf(mapping.getStart())));
         sb.append(createTableRow("Stop", String.valueOf(mapping.getStop())));
         sb.append(createTableRow("Replicates", String.valueOf(mapping.getNbReplicates())));
@@ -191,8 +240,7 @@ public class BlockComponent extends JComponent {
             sb.append(createTableRow("Trimmed chars from right", mapping.getTrimmedFromRight() + ""));
         }
 
-        sb.append("</table>");
-        sb.append("</html>");
+        sb.append("</table></html>");
 
         return sb.toString();
     }
@@ -425,6 +473,9 @@ public class BlockComponent extends JComponent {
         return length;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getHeight() {
         return height;

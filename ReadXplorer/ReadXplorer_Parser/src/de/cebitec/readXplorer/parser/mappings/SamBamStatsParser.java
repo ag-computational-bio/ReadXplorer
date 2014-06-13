@@ -18,7 +18,6 @@ package de.cebitec.readXplorer.parser.mappings;
 
 import de.cebitec.readXplorer.parser.TrackJob;
 import de.cebitec.readXplorer.parser.common.CoverageContainer;
-import de.cebitec.readXplorer.parser.common.ParsedMappingContainer;
 import de.cebitec.readXplorer.parser.common.ParsedTrack;
 import de.cebitec.readXplorer.util.Benchmark;
 import de.cebitec.readXplorer.util.DiscreteCountingDistribution;
@@ -30,10 +29,8 @@ import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.StatsContainer;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMRecord;
 import net.sf.samtools.SAMRecordIterator;
@@ -108,7 +105,6 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
         coveredPerfectIntervals.add(new Pair<>(0, 0));
         Integer classification;
         Integer mappingCount;
-        ErrorLimit errorLimit = new ErrorLimit();
 //        HashMap<String, Object> readNameSet = new HashMap<>();
         
 //        String[] nameArray;
@@ -233,10 +229,9 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
         coverageContainer.setCoveredBestMatchPositions(this.getCoveredBases(coveredBestMatchIntervals));
         coverageContainer.setCoveredPerfectPositions(this.getCoveredBases(coveredPerfectIntervals));
 
-        ParsedTrack track = new ParsedTrack(trackJob, new ParsedMappingContainer(), coverageContainer);
+        ParsedTrack track = new ParsedTrack(trackJob, coverageContainer);
         statsContainer.setReadLengthDistribution(readLengthDistribution);
         track.setStatsContainer(statsContainer);
-//        this.notifyObservers(track);
         this.coverageContainer = new CoverageContainer();
         
         finish = System.currentTimeMillis();
@@ -278,7 +273,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
     private int getCoveredBases(List<Pair<Integer, Integer>> coveredIntervals) {
         int coveredBases = 0;
         for (Pair<Integer, Integer> interval : coveredIntervals) {
-            coveredBases += (int) interval.getSecond() - (int) interval.getFirst();
+            coveredBases += interval.getSecond() - interval.getFirst();
         }
         return coveredBases;
     }

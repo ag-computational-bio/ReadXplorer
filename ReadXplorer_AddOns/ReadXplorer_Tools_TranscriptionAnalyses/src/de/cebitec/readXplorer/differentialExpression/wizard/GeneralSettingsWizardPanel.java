@@ -94,7 +94,6 @@ public class GeneralSettingsWizardPanel implements WizardDescriptor.ValidatingPa
         if (getComponent().verifyInput()) {
             wiz.putProperty("startOffset", getComponent().getStartOffset());
             wiz.putProperty("stopOffset", getComponent().getStopOffset());
-            wiz.putProperty("regardReadOrientation", getComponent().regaredReadOrientation());
         }
         if (getComponent().isSaveBoxChecked()) {
             //TODO: Input validation

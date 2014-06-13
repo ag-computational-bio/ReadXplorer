@@ -94,6 +94,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
     private boolean performUnannotatedTranscriptDet = false;
     private int minTranscriptExtensionCov = 0;
     private int maxLeaderlessDistance = 0;
+    private boolean isFwdAnalysisDirection = true;
     private int minNumberReads = 0;
     private int maxNumberReads = 0;
     private boolean autoOperonParamEstimation = false;
@@ -190,6 +191,10 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
             performUnannotatedTranscriptDet = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_UNANNOTATED_TRANSCRIPT_DET);
             minTranscriptExtensionCov = (int) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_MIN_TRANSCRIPT_EXTENSION_COV);
             maxLeaderlessDistance = (int) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_MAX_LEADERLESS_DISTANCE);
+            isFwdAnalysisDirection = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_ANALYSIS_DIRECTION);
+            if (readClassParams.isStrandBothOption()) {
+                readClassParams.setStrandOption(isFwdAnalysisDirection ? Properties.STRAND_BOTH_FWD : Properties.STRAND_BOTH_REV);
+            }
         }
         if (performOperonAnalysis) {
             autoOperonParamEstimation = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_AUTO_OPERON_PARAMS);

@@ -61,8 +61,8 @@ public class ExpressTestAnalysisHandler extends DeAnalysisHandler implements Exp
     public ExpressTestAnalysisHandler(List<PersistantTrack> selectedTracks,
             int[] groupA, int[] groupB, Integer refGenomeID, boolean workingWithoutReplicates,
             File saveFile, Set<FeatureType> selectedFeatures, int startOffset, int stopOffset, 
-            ParametersReadClasses readClassParams, boolean regardReadOrientation, List<Integer> normalizationFeatures) {
-        super(selectedTracks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams, regardReadOrientation);
+            ParametersReadClasses readClassParams, List<Integer> normalizationFeatures) {
+        super(selectedTracks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams);
         expressTestAnalysisData = new ExpressTestAnalysisData(selectedTracks.size(),
                 groupA, groupB, workingWithoutReplicates, normalizationFeatures);
         expressTestAnalysisData.setSelectedTracks(selectedTracks);

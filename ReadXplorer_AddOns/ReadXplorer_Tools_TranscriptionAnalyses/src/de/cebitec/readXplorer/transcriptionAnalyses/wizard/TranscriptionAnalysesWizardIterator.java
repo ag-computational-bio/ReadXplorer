@@ -54,8 +54,9 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
     public static final String PROP_MIN_NUMBER_READS = "minNumberReads";
     public static final String PROP_MAX_NUMBER_READS = "maxNumberReads";
     public static final String PROP_MIN_SPANNING_READS = "minNumberSpanningReads";
+    public static final String PROP_ANALYSIS_DIRECTION = "analysisDirection";
     
-    private static final String PROP_WIZARD_NAME = "TransAnalyses";
+    static final String PROP_WIZARD_NAME = "TransAnalyses";
     private static final String FINISH_MSG = "Press 'Finish' to start";
     
     private int index;
@@ -98,7 +99,7 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
     
             openTracksPanel = new OpenTracksWizardPanel(PROP_WIZARD_NAME, referenceId);
             selectionPanel = new TransAnalysesSelectionWizardPanel();
-            readClassPanel = new SelectReadClassWizardPanel(PROP_WIZARD_NAME);
+            readClassPanel = new SelectReadClassWizardPanel(PROP_WIZARD_NAME, true);
             tSSPanel = new TransAnalysesTSSWizardPanel();
             operonPanel = new TransAnalysesOperonWizardPanel();
             rpkmPanel = new TransAnalysesRPKMWizardPanel();

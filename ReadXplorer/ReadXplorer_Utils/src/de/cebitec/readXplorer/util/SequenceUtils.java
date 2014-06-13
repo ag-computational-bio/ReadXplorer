@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@ public final class SequenceUtils {
     public static final byte STRAND_FWD = 1;
     /** Indicates that something is located on the reverse strand (-1). */
     public static final byte STRAND_REV = -1;
-    /** Indicates that something uses both strands (0).*/
-    public static final byte STRAND_BOTH = 0;
     /** Indicates that something is located on the forward strand (Fwd). */
     public static final String STRAND_FWD_STRING = "Fwd";
     /** Indicates that something is located on the reverse strand (Rev). */

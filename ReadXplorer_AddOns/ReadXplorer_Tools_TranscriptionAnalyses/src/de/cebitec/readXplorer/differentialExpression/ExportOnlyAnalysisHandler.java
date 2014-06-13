@@ -35,8 +35,8 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
     private DeAnalysisData data;
     private List<ResultDeAnalysis> results;
 
-    public ExportOnlyAnalysisHandler(List<PersistantTrack> selectedTracks, int refGenomeID, File saveFile, Set<FeatureType> selectedFeatureTypes, int startOffset, int stopOffset, ParametersReadClasses readClassParams, boolean regardReadOrientation) {
-        super(selectedTracks, refGenomeID, saveFile, selectedFeatureTypes, startOffset, stopOffset, readClassParams, regardReadOrientation);
+    public ExportOnlyAnalysisHandler(List<PersistantTrack> selectedTracks, int refGenomeID, File saveFile, Set<FeatureType> selectedFeatureTypes, int startOffset, int stopOffset, ParametersReadClasses readClassParams) {
+        super(selectedTracks, refGenomeID, saveFile, selectedFeatureTypes, startOffset, stopOffset, readClassParams);
         data = new DeAnalysisData(selectedTracks.size());
         data.setSelectedTracks(selectedTracks);
     }

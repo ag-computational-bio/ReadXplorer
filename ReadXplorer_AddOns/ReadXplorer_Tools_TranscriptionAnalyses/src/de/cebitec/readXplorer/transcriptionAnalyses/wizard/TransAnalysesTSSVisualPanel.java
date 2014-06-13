@@ -17,8 +17,20 @@
 package de.cebitec.readXplorer.transcriptionAnalyses.wizard;
 
 import de.cebitec.readXplorer.api.objects.JobPanel;
+import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_ANALYSIS_DIRECTION;
+import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_AUTO_TSS_PARAMS;
+import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MAX_LEADERLESS_DISTANCE;
+import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MAX_LOW_COV_INIT_COUNT;
+import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_LOW_COV_INC;
+import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_PERCENT_INCREASE;
+import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_TOTAL_INCREASE;
+import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_TRANSCRIPT_EXTENSION_COV;
+import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_UNANNOTATED_TRANSCRIPT_DET;
+import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_WIZARD_NAME;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
+import java.util.prefs.Preferences;
+import org.openide.util.NbPreferences;
 
 /**
  * Panel for showing all available options for the transcription start site 
@@ -61,6 +73,7 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        buttonGroup1 = new javax.swing.ButtonGroup();
         transcriptionStartAutomaticBox = new javax.swing.JCheckBox();
         minTotalIncreaseField = new javax.swing.JTextField();
         minTotalIncreaseLabel = new javax.swing.JLabel();
@@ -77,6 +90,10 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         transcriptExtensionLabel = new javax.swing.JLabel();
         maxLeaderlessDistanceField = new javax.swing.JTextField();
         transcriptExtensionLabel1 = new javax.swing.JLabel();
+        analysisDirectionLabel = new javax.swing.JLabel();
+        dirFwdRadioButton = new javax.swing.JRadioButton();
+        dirRevRadioButton = new javax.swing.JRadioButton();
+        analysisDirectionSeparator = new javax.swing.JSeparator();
 
         org.openide.awt.Mnemonics.setLocalizedText(transcriptionStartAutomaticBox, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.transcriptionStartAutomaticBox.text")); // NOI18N
         transcriptionStartAutomaticBox.addActionListener(new java.awt.event.ActionListener() {
@@ -161,6 +178,15 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         org.openide.awt.Mnemonics.setLocalizedText(transcriptExtensionLabel1, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.transcriptExtensionLabel1.text")); // NOI18N
         transcriptExtensionLabel1.setToolTipText(org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.transcriptExtensionLabel1.toolTipText")); // NOI18N
 
+        org.openide.awt.Mnemonics.setLocalizedText(analysisDirectionLabel, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.analysisDirectionLabel.text")); // NOI18N
+
+        buttonGroup1.add(dirFwdRadioButton);
+        dirFwdRadioButton.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(dirFwdRadioButton, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.dirFwdRadioButton.text")); // NOI18N
+
+        buttonGroup1.add(dirRevRadioButton);
+        org.openide.awt.Mnemonics.setLocalizedText(dirRevRadioButton, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.dirRevRadioButton.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -168,31 +194,48 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(analysisDirectionSeparator)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(transcriptExtensionField, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(transcriptExtensionLabel))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(minPercentIncreaseField, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(minPercentIncreaseLabel))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(minTotalIncreaseField, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(minTotalIncreaseLabel))
-                    .addComponent(unannotatedTranscriptsBox)
-                    .addComponent(transcriptionStartAutomaticBox)
-                    .addComponent(additionalOptionPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(maxLeaderlessDistanceField, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(transcriptExtensionLabel1)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(transcriptExtensionField, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(transcriptExtensionLabel))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(minPercentIncreaseField, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(minPercentIncreaseLabel))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(minTotalIncreaseField, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(minTotalIncreaseLabel))
+                            .addComponent(unannotatedTranscriptsBox)
+                            .addComponent(transcriptionStartAutomaticBox)
+                            .addComponent(additionalOptionPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(maxLeaderlessDistanceField, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(transcriptExtensionLabel1))
+                            .addComponent(analysisDirectionLabel)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(dirFwdRadioButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(dirRevRadioButton)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(analysisDirectionLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(dirFwdRadioButton)
+                    .addComponent(dirRevRadioButton))
+                .addGap(3, 3, 3)
+                .addComponent(analysisDirectionSeparator, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(5, 5, 5)
                 .addComponent(transcriptionStartAutomaticBox)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -219,19 +262,20 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void transcriptionStartAutomaticBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transcriptionStartAutomaticBoxActionPerformed
-        this.tssAutomatic = this.transcriptionStartAutomaticBox.isSelected();
-        if (this.tssAutomatic) {
-            this.minPercentIncreaseField.setEnabled(false);
-            this.minTotalIncreaseField.setEnabled(false);
-            this.maxInitialCountField.setEnabled(false);
-            this.minLowCovCountField.setEnabled(false);
-        } else {
-            this.minPercentIncreaseField.setEnabled(true);
-            this.minTotalIncreaseField.setEnabled(true);
-            this.maxInitialCountField.setEnabled(true);
-            this.minLowCovCountField.setEnabled(true);
-        }
+        this.performTssAutoBoxAction();
     }//GEN-LAST:event_transcriptionStartAutomaticBoxActionPerformed
+
+    /**
+     * Updates the gui according to the button selection and stores the 
+     * tssAutomatic parameter.
+     */
+    private void performTssAutoBoxAction() {
+        this.tssAutomatic = this.transcriptionStartAutomaticBox.isSelected();
+        this.minPercentIncreaseField.setEnabled(!tssAutomatic);
+        this.minTotalIncreaseField.setEnabled(!tssAutomatic);
+        this.maxInitialCountField.setEnabled(!tssAutomatic);
+        this.minLowCovCountField.setEnabled(!tssAutomatic);
+    }
 
     private void unannotatedTranscriptsBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_unannotatedTranscriptsBoxActionPerformed
         this.detectUnannotatedTranscripts = this.unannotatedTranscriptsBox.isSelected();
@@ -249,6 +293,11 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel addRestrictionLabel;
     private javax.swing.JPanel additionalOptionPanel;
+    private javax.swing.JLabel analysisDirectionLabel;
+    private javax.swing.JSeparator analysisDirectionSeparator;
+    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JRadioButton dirFwdRadioButton;
+    private javax.swing.JRadioButton dirRevRadioButton;
     private javax.swing.JTextField maxInitialCountField;
     private javax.swing.JLabel maxInitialCountLabel;
     private javax.swing.JTextField maxLeaderlessDistanceField;
@@ -284,8 +333,38 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         this.minLowCovCountField.getDocument().addDocumentListener(this.createDocumentListener());
         this.transcriptExtensionField.getDocument().addDocumentListener(this.createDocumentListener());
         this.maxLeaderlessDistanceField.getDocument().addDocumentListener(this.createDocumentListener());
+        
+        this.loadLastParameterSelection();
     }
     
+    /**
+     * Loads the last selected parameters into the component.
+     */
+    private void loadLastParameterSelection() {
+        Preferences pref = NbPreferences.forModule(Object.class);
+        tssAutomatic = pref.get(PROP_WIZARD_NAME + PROP_AUTO_TSS_PARAMS, "0").equals("1");
+        String minTotalIncreaseString = pref.get(PROP_WIZARD_NAME + PROP_MIN_TOTAL_INCREASE, minTotalIncreaseField.getText());
+        String minPercentIncreaseString = pref.get(PROP_WIZARD_NAME + PROP_MIN_PERCENT_INCREASE, minPercentIncreaseField.getText());
+        String maxInitialLowCov = pref.get(PROP_WIZARD_NAME + PROP_MAX_LOW_COV_INIT_COUNT, maxInitialCountField.getText());
+        String minInitialLowCov = pref.get(PROP_WIZARD_NAME + PROP_MIN_LOW_COV_INC, minLowCovCountField.getText());
+        detectUnannotatedTranscripts = pref.get(PROP_WIZARD_NAME + PROP_UNANNOTATED_TRANSCRIPT_DET, "1").equals("1");
+        String minExtensionCov = pref.get(PROP_WIZARD_NAME + PROP_MIN_TRANSCRIPT_EXTENSION_COV, transcriptExtensionField.getText());
+        String maxLeaderlessDist = pref.get(PROP_WIZARD_NAME + PROP_MAX_LEADERLESS_DISTANCE, maxLeaderlessDistanceField.getText());
+        boolean fwdAnalysisDirection = pref.get(PROP_WIZARD_NAME + PROP_ANALYSIS_DIRECTION, "1").equals("1");
+        
+        transcriptionStartAutomaticBox.setSelected(tssAutomatic);
+        unannotatedTranscriptsBox.setSelected(detectUnannotatedTranscripts);
+        dirFwdRadioButton.setSelected(fwdAnalysisDirection);
+        dirRevRadioButton.setSelected(!fwdAnalysisDirection);
+        minTotalIncreaseField.setText(minTotalIncreaseString);
+        minPercentIncreaseField.setText(minPercentIncreaseString);
+        maxInitialCountField.setText(maxInitialLowCov);
+        minLowCovCountField.setText(minInitialLowCov);
+        transcriptExtensionField.setText(minExtensionCov);
+        maxLeaderlessDistanceField.setText(maxLeaderlessDist);
+        
+        this.performTssAutoBoxAction();
+    }
     /**
      * Checks if all required information to start the transcription start analysis is set.
      */
@@ -365,5 +444,29 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
     public boolean isTssAutomatic() {
         return tssAutomatic;
     }
+    
+    /**
+     * @return <code>true</code>, if the analysis direction for the TSS is fwd,
+     * <code>false</code> if the analysis direction is rev. This means either
+     * only genes on the fwd or genes on the reverse strand can be assigned to
+     * TSS.
+     */
+    public boolean isFwdDirectionSelected() {
+        return dirFwdRadioButton.isSelected();
+    }
+
+    /**
+     * Set all components belonging to the analysis direction options visible
+     * or not.
+     * @param isVisible <code>true</code> if the components shall be visible,
+     * <code>true</code> if not.
+     */
+    public void setDirectionOptionsVisible(boolean isVisible) {
+        analysisDirectionLabel.setVisible(isVisible);
+        dirFwdRadioButton.setVisible(isVisible);
+        dirRevRadioButton.setVisible(isVisible);
+        analysisDirectionSeparator.setVisible(isVisible);
+    }
+
 
 }

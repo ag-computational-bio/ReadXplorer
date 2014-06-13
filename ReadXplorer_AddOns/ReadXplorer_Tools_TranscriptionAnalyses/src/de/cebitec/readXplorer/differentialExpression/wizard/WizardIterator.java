@@ -106,13 +106,12 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
             Set<FeatureType> featureTypes = (Set<FeatureType>) wiz.getProperty("featureType");
             Integer startOffset = (Integer) wiz.getProperty("startOffset");
             Integer stopOffset = (Integer) wiz.getProperty("stopOffset");
-            boolean regardReadOrientation = (boolean) wiz.getProperty("regardReadOrientation");
             DeAnalysisHandler handler = null;
 
             if (tool == DeAnalysisHandler.Tool.BaySeq) {
                 UUID key = GnuR.SecureGnuRInitiliser.reserveGnuRinstance();
                 handler = new BaySeqAnalysisHandler(selectedTracks, createdGroups, genomeID,
-                        replicateStructure, saveFile, featureTypes, startOffset, stopOffset, readClassParams, regardReadOrientation, key);
+                        replicateStructure, saveFile, featureTypes, startOffset, stopOffset, readClassParams, key);
             } else if (tool == DeAnalysisHandler.Tool.DeSeq) {
                 UUID key = GnuR.SecureGnuRInitiliser.reserveGnuRinstance();
                 boolean moreThanTwoConditions = (boolean) wiz.getProperty("moreThanTwoConditions");
@@ -126,14 +125,14 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                 }
                 handler = new DeSeqAnalysisHandler(selectedTracks, design, moreThanTwoConditions, fittingGroupOne,
                         fittingGroupTwo, genomeID, workingWithoutReplicates,
-                        saveFile, featureTypes, startOffset, stopOffset, readClassParams, regardReadOrientation, key);
+                            saveFile, featureTypes, startOffset, stopOffset, readClassParams, key);
             } else if (tool == DeAnalysisHandler.Tool.DeSeq2) {
                 UUID key = GnuR.SecureGnuRInitiliser.reserveGnuRinstance();
                 boolean workingWithoutReplicates = (boolean) wiz.getProperty("workingWithoutReplicates");
                 
                 handler = new DeSeq2AnalysisHandler(selectedTracks, design, null,
                         null, genomeID, workingWithoutReplicates,
-                        saveFile, featureTypes, startOffset, stopOffset, readClassParams, regardReadOrientation, key);
+                        saveFile, featureTypes, startOffset, stopOffset, readClassParams, key);
             } else if (tool == DeAnalysisHandler.Tool.ExpressTest) {
                 List<Integer> groupAList = (List<Integer>) wiz.getProperty("groupA");
                 boolean workingWithoutReplicates = (boolean) wiz.getProperty("workingWithoutReplicates");
@@ -154,11 +153,11 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
                     normalizationFeatures = (List<Integer>) wiz.getProperty("normalizationFeatures");
                 }
 
-                handler = new ExpressTestAnalysisHandler(selectedTracks, groupA, groupB, genomeID,
-                        workingWithoutReplicates, saveFile, featureTypes, startOffset, stopOffset,
-                        readClassParams, regardReadOrientation, normalizationFeatures);
+                handler = new ExpressTestAnalysisHandler(selectedTracks, groupA, groupB, genomeID, workingWithoutReplicates, 
+                        saveFile, featureTypes, startOffset, stopOffset, readClassParams, normalizationFeatures);
+                        
             } else if (tool == DeAnalysisHandler.Tool.ExportCountTable) {
-                handler = new ExportOnlyAnalysisHandler(selectedTracks, genomeID, saveFile, featureTypes, startOffset, stopOffset, readClassParams, regardReadOrientation);
+                handler = new ExportOnlyAnalysisHandler(selectedTracks, genomeID, saveFile, featureTypes, startOffset, stopOffset, readClassParams);
             }
 
             DiffExpResultViewerTopComponent diffExpResultViewerTopComponent = new DiffExpResultViewerTopComponent(handler, tool);
@@ -172,7 +171,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
 
     private void initializePanels() {
         if (allPanels == null) {
-            this.readClassPanel = new SelectReadClassWizardPanel("DiffExprWiz");
+            this.readClassPanel = new SelectReadClassWizardPanel("DiffExprWiz", true);
             allPanels = new ArrayList<>();
             allPanels.add(new ChooseWizardPanel());
             allPanels.add(new DeSeqWizardPanel1());

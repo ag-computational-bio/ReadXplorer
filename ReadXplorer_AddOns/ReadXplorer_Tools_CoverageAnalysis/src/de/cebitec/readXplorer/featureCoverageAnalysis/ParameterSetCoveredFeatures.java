@@ -31,7 +31,6 @@ public class ParameterSetCoveredFeatures extends ParametersFeatureTypes implemen
     
     private int minCoveredPercent;
     private int minCoverageCount;
-    private boolean whateverStrand;
     private boolean getCoveredFeatures;
     private ParametersReadClasses readClassesParams;
 
@@ -42,9 +41,6 @@ public class ParameterSetCoveredFeatures extends ParametersFeatureTypes implemen
      * covered with at least minCoverageCount reads at each position
      * @param minCoverageCount the minimum coverage at a position to be counted
      * as covered
-     * @param whateverStrand <tt>true</tt>, if the strand does not matter for
-     * this analysis, false, if only mappings on the strand of the respective
-     * feature should be considered.
      * @param getCoveredFeatures <code>true</code> if the covered features
      * should be returned, <code>false</code> if the uncovered features should
      * be returned
@@ -53,12 +49,11 @@ public class ParameterSetCoveredFeatures extends ParametersFeatureTypes implemen
      * @param selectedFeatureTypes The set of selected feature types to use for
      * this analysis instance
      */
-    public ParameterSetCoveredFeatures(int minCoveredPercent, int minCoverageCount, boolean whateverStrand,
-            boolean getCoveredFeatures, ParametersReadClasses readClassesParams, Set<FeatureType> selectedFeatureTypes) {
+    public ParameterSetCoveredFeatures(int minCoveredPercent, int minCoverageCount, boolean getCoveredFeatures, 
+            ParametersReadClasses readClassesParams, Set<FeatureType> selectedFeatureTypes) {
         super(selectedFeatureTypes);
         this.minCoveredPercent = minCoveredPercent;
         this.minCoverageCount = minCoverageCount;
-        this.whateverStrand = whateverStrand;
         this.getCoveredFeatures = getCoveredFeatures;
         this.readClassesParams = readClassesParams;
     }
@@ -96,24 +91,6 @@ public class ParameterSetCoveredFeatures extends ParametersFeatureTypes implemen
     public void setMinCoverageCount(int minCoverageCount) {
         this.minCoverageCount = minCoverageCount;
     } 
-
-    /**
-     * @return <tt>true</tt>, if the strand does not matter for this analysis,
-     * false, if only mappings on the strand of the respective feature should be
-     * considered.
-     */
-    public boolean isWhateverStrand() {
-        return whateverStrand;
-    }
-
-    /**
-     * @param whateverStrand <tt>true</tt>, if the strand does not matter for this analysis,
-     * false, if only mappings on the strand of the respective feature should be
-     * considered.
-     */
-    public void setWhateverStrand(boolean whateverStrand) {
-        this.whateverStrand = whateverStrand;
-    }
 
     /**
      * @return <code>true</code> if the covered features should be returned,

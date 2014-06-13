@@ -156,9 +156,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
                 Vector<Vector> tableContents;
                 switch (usedTool) {
                     case ExportCountTable:
-                        colNames.add(0, "Feature");
-                        tableContents = currentResult.getTableContentsContainingRowNames();
-                        break;
+                        //fallthrough, since handling is same as for DESeq2
                     case DeSeq2:
                         colNames.add(0, "Feature");
                         tableContents = currentResult.getTableContentsContainingRowNames();

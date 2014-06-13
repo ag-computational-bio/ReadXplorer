@@ -95,8 +95,7 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended 
     public ExpressTestGraphicsTopComponent() {
         cbmDataSet = new DefaultComboBoxModel<>();
         initComponents();
-        setName(Bundle.CTL_PlotTopComponent());
-        setToolTipText(Bundle.HINT_PlotTopComponent());
+        initAdditionalComponents();
         ChartPanel panel = CreatePlots.createInfPlot(createSamplePoints(500), "X", "Y", new ToolTip());
         plotPanel.add(panel);
         plotPanel.updateUI();
@@ -119,8 +118,13 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended 
         }
         cbmDataSet = new DefaultComboBoxModel<>(descriptions.toArray(new String[descriptions.size()]));
         initComponents();
+        initAdditionalComponents();
+    }
+
+    private void initAdditionalComponents() {
         setName(Bundle.CTL_PlotTopComponent());
         setToolTipText(Bundle.HINT_PlotTopComponent());
+        iSymbol.setToolTipText(org.openide.util.NbBundle.getMessage(ExpressTestGraphicsTopComponent.class, "GraphicsTopComponent.iSymbol.toolTipText"));
     }
 
     public Map<PersistantFeature, Pair<Double, Double>> createSamplePoints(int n) {
@@ -281,7 +285,7 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended 
         final ResultDeAnalysis result = results.get(index);
         switch (type) {
             case MA_Plot:
-                chartPanel = CreatePlots.createInfPlot(ConvertData.createMAvalues(result, usedTool, null, null), "A", "M", new ToolTip());
+                chartPanel = CreatePlots.createInfPlot(ConvertData.createMAvalues(result, usedTool, null, null), "A (normalized mean expression)", "M (log2 fold change)", new ToolTip());
                 plotPanel.add(chartPanel);
                 plotPanel.updateUI();
                 break;

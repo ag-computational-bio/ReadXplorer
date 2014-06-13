@@ -54,7 +54,6 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
         minCoverageCountField = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
         tssTextArea = new javax.swing.JTextArea();
-        strandCheckBox = new javax.swing.JCheckBox();
         detectUncoveredBox = new javax.swing.JCheckBox();
 
         minCoveragePercentField.setText(org.openide.util.NbBundle.getMessage(CoveredFeaturesVisualPanel.class, "CoveredFeaturesVisualPanel.minCoveragePercentField.text")); // NOI18N
@@ -75,9 +74,6 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
         tssTextArea.setWrapStyleWord(true);
         jScrollPane1.setViewportView(tssTextArea);
 
-        strandCheckBox.setSelected(true);
-        org.openide.awt.Mnemonics.setLocalizedText(strandCheckBox, org.openide.util.NbBundle.getMessage(CoveredFeaturesVisualPanel.class, "CoveredFeaturesVisualPanel.strandCheckBox.text")); // NOI18N
-
         org.openide.awt.Mnemonics.setLocalizedText(detectUncoveredBox, org.openide.util.NbBundle.getMessage(CoveredFeaturesVisualPanel.class, "CoveredFeaturesVisualPanel.detectUncoveredBox.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -96,8 +92,7 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
                         .addComponent(minCoverageCountField, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(minCoverageCountLabel))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(strandCheckBox))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 261, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -114,8 +109,6 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
                     .addComponent(minCoverageCountField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(minCoverageCountLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(strandCheckBox)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(detectUncoveredBox)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -128,7 +121,6 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
     private javax.swing.JLabel minCoverageCountLabel;
     private javax.swing.JTextField minCoveragePercentField;
     private javax.swing.JLabel minCoveragePercentLabel;
-    private javax.swing.JCheckBox strandCheckBox;
     private javax.swing.JTextArea tssTextArea;
     // End of variables declaration//GEN-END:variables
 
@@ -188,14 +180,5 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
      */
     public int getMinCoverageCount() {
         return minCoverageCount;
-    }
-
-    /**
-     * @return <tt>true</tt>, if the strand does not matter for this analysis,
-     *      false, if only mappings on the strand of the respective feature 
-     *      should be considered.
-     */
-    public boolean getIsWhateverStrand() {
-        return !this.strandCheckBox.isSelected();
     }
 }

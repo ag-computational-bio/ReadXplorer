@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression;
 
+import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistant;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
@@ -56,15 +57,7 @@ public class CollectCoverageData implements Observer {
      * located exactly indside the feature positions.
      */
     private final int stopOffset;
-    /**
-     * States if the mapping orientation is taken into account. If strand specific
-     * RNA-Seq was used it makes senses to only count the mappings on the same
-     * strand as the corresponding feature. However, not strand specific RNA-Seq
-     * is also used frequently. If this is the case, the reads will map on
-     * forward and reverse strand just by chance. In this case the orientation
-     * of a mapping should not be taken into account.
-     */
-    private final boolean regardReadOrientation;
+    private ParametersReadClasses readClassParams;
 
     /**
      * Constructor of the class.
@@ -74,11 +67,11 @@ public class CollectCoverageData implements Observer {
      * @param perfAnalysis Instance of the calling instance of
      * DeAnalysisHandler.
      */
-    public CollectCoverageData(List<PersistantFeature> genomeFeatures, int startOffset, int stopOffset, boolean regardReadOrientation) {
+    public CollectCoverageData(List<PersistantFeature> genomeFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams) {
         this.genomeFeatures = genomeFeatures;
         this.startOffset = startOffset;
         this.stopOffset = stopOffset;
-        this.regardReadOrientation = regardReadOrientation;
+        this.readClassParams = readClassParams;
         Collections.sort(genomeFeatures);
     }
 
@@ -93,6 +86,9 @@ public class CollectCoverageData implements Observer {
         int lastMappingIdx = 0;
         PersistantFeature feature;
         boolean fstFittingMapping;
+        boolean isStrandBothOption = readClassParams.isStrandBothOption();
+        boolean isFeatureStrand = readClassParams.isStrandFeatureOption();
+        boolean analysisStrand;
 
         for (int i = 0; i < this.genomeFeatures.size(); ++i) {
             feature = this.genomeFeatures.get(i);
@@ -100,6 +96,7 @@ public class CollectCoverageData implements Observer {
 
                 int featStart = feature.getStart() - startOffset;
                 int featStop = feature.getStop() + stopOffset;
+                analysisStrand = isFeatureStrand ? feature.isFwdStrand() : !feature.isFwdStrand(); //only use this if Properties.STRAND_BOTH is not selected
                 fstFittingMapping = true;
                 //If no matching mapping is found, we still need to know that by
                 //writing down a count of zero for this feature.
@@ -109,21 +106,16 @@ public class CollectCoverageData implements Observer {
                 for (int j = lastMappingIdx; j < mappings.size(); ++j) {
                     PersistantMapping mapping = mappings.get(j);
                     //If the orientation of the read does not matter this one is always true.
-                    boolean onSameStrand = true;
-                    //If orientation should be taken into account, this is done here.
-                    if (regardReadOrientation) {
-                        onSameStrand = feature.isFwdStrand() == mapping.isFwdStrand();
-                    }
                     //mappings identified within a feature
-                    if (mapping.getStop() > featStart && onSameStrand
-                            && mapping.getStart() < featStop) {
+                    if (mapping.getStop() > featStart && mapping.getStart() < featStop) {
 
                         if (fstFittingMapping) {
                             lastMappingIdx = j;
                             fstFittingMapping = false;
                         }
-                        int value = countData.get(feature) + mapping.getNbReplicates();
-                        countData.put(feature, value);
+                        if (isStrandBothOption || analysisStrand == mapping.isFwdStrand()) {
+                            countData.put(feature, countData.get(feature) + mapping.getNbReplicates());
+                        }
 
                         //still mappings left, but need next feature
                     } else if (mapping.getStart() > featStop) {

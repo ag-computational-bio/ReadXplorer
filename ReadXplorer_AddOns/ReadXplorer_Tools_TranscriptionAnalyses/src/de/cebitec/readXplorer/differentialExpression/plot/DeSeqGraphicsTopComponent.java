@@ -25,7 +25,6 @@ import static de.cebitec.readXplorer.plotting.ChartExporter.ChartExportStatus.FA
 import static de.cebitec.readXplorer.plotting.ChartExporter.ChartExportStatus.FINISHED;
 import static de.cebitec.readXplorer.plotting.ChartExporter.ChartExportStatus.RUNNING;
 import de.cebitec.readXplorer.plotting.CreatePlots;
-import de.cebitec.readXplorer.differentialExpression.plot.Bundle;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readXplorer.view.TopComponentExtended;
@@ -113,6 +112,7 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
         initComponents();
         setupGraphics();
         iSymbol.setVisible(false);
+        iSymbol.setToolTipText(org.openide.util.NbBundle.getMessage(DeSeqGraphicsTopComponent.class, "GraphicsTopComponent.iSymbol.toolTipText"));
     }
 
     /**
@@ -233,7 +233,7 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
             if (selectedPlot == DeSeqAnalysisHandler.Plot.MAplot) {
                 progressHandle.start();
                 progressHandle.switchToIndeterminate();
-                chartPanel = CreatePlots.createInfPlot(ConvertData.createMAvalues(result, DeAnalysisHandler.Tool.DeSeq, null, null), "A", "M", new ToolTip());
+                chartPanel = CreatePlots.createInfPlot(ConvertData.createMAvalues(result, DeAnalysisHandler.Tool.DeSeq, null, null), "A (normalized mean expression)", "M (log2 fold change)", new ToolTip());
                 if (SVGCanvasActive) {
                     jPanel1.remove(svgCanvas);
                     SVGCanvasActive = false;
