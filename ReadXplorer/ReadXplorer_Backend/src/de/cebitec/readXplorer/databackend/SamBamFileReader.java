@@ -147,7 +147,6 @@ public class SamBamFileReader implements Observable {
     /**
      * Retrieves the mappings from the given interval from the sam or bam file
      * set for this data reader and the reference sequence with the given name.
-     *
      * @param request the request to carry out
      * @return the mappings for the given interval
      */
@@ -158,7 +157,8 @@ public class SamBamFileReader implements Observable {
         try {
             this.checkIndex();
 
-            SAMRecordIterator samRecordIterator = samFileReader.query(reference.getChromosome(request.getChromId()).getName(), request.getTotalFrom(), request.getTotalTo(), false);
+            SAMRecordIterator samRecordIterator = samFileReader.query(reference.getChromosome(
+                    request.getChromId()).getName(), request.getTotalFrom(), request.getTotalTo(), false);
             String refSubSeq;
             int id = 0;
             String cigar;
@@ -187,12 +187,13 @@ public class SamBamFileReader implements Observable {
 
                     //only add mappings, which are valid according to the read classification parameters
                     if (this.isIncludedMapping(classification, numMappingsForRead, mappingQuality, request)) {
-
+                        
                         mapping = this.getMappingForValues(classification, numMappingsForRead, numReplicates, id++,
                                 start, stop, isFwdStrand, mappingQuality, record.getBaseQualities());
+                        mapping.setAlignmentBlocks(samUtils.getAlignmentBlocks(record.getCigar(), start));
                         // We must alway check for Diffs and Gaps even if "classification != Properties.PERFECT_COVERAGE"
                         // because there might still be a split read.
-                        if (request.isDiffsAndGapsNeeded()) {
+                        if (request.isDiffsAndGapsNeeded() && classification != Properties.PERFECT_COVERAGE) {
 
                             //find check alignment via cigar string and add diffs to mapping
                             cigar = record.getCigarString();

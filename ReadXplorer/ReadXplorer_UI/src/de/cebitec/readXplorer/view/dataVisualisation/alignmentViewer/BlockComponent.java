@@ -20,9 +20,12 @@ import de.cebitec.readXplorer.databackend.SamBamFileReader;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantDiff;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantObject;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReferenceGap;
 import de.cebitec.readXplorer.util.ColorProperties;
+import de.cebitec.readXplorer.util.SamAlignmentBlock;
 import de.cebitec.readXplorer.view.dataVisualisation.GenomeGapManager;
+import de.cebitec.readXplorer.view.dataVisualisation.PaintUtilities;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
 import static de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer.PROP_MOUSEPOSITION_CHANGED;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
@@ -31,12 +34,16 @@ import de.cebitec.readXplorer.view.dialogMenus.RNAFolderI;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
@@ -64,6 +71,9 @@ public class BlockComponent extends JComponent {
     private float percentSandBPerCovUnit;
     private float minSaturationAndBrightness;
     private final String toolTipInfoPart;
+    private List<Rectangle> rectList;
+    private List<BrickData> brickDataList;
+    private Color blockColor;
 
     /**
      * A <code>BlockComponent</code> represents a read alignment as a colored
@@ -79,6 +89,10 @@ public class BlockComponent extends JComponent {
      * coverage unit for this block
      */
     public BlockComponent(BlockI block, final AbstractViewer parentViewer, GenomeGapManager gapManager, int height, float minSaturationAndBrightness, float percentSandBPerCovUnit) {
+        super();
+        this.rectList = new ArrayList<>();
+        this.brickDataList = new ArrayList<>();
+        this.blockColor = ColorProperties.COMMON_MATCH;
         this.block = block;
         this.height = height;
         this.parentViewer = parentViewer;
@@ -97,7 +111,8 @@ public class BlockComponent extends JComponent {
         int offset = (int) (numOfGaps * bounds.getPhysWidth());
         phyRight += offset;
         this.length = phyRight - phyLeft;
-
+        
+        this.calcSubComponents();
         toolTipInfoPart = this.initToolTipTextInfoPart();
 
         this.addListeners();
@@ -218,6 +233,9 @@ public class BlockComponent extends JComponent {
         sb.append(createTableRow("Replicates", String.valueOf(mapping.getNbReplicates())));
 //        this.appendReadnames(mapping, sb); //no readnames are stored anymore: RUN domain excluded
         sb.append(createTableRow("Mismatches", String.valueOf(mapping.getDifferences())));
+        if (mapping.getAlignmentBlocks().size() > 1) {
+            sb.append(createTableRow("Alignment blocks", this.printBlocks(mapping.getAlignmentBlocks())));
+        }
         int mappingQual = mapping.getMappingQuality() == -1 ? SamBamFileReader.DEFAULT_MAP_QUAL : mapping.getMappingQuality();
         sb.append(createTableRow("Mapping quality (Phred)", String.valueOf(mappingQual)));
         sb.append(createTableRow("Base qualities (Phred)", this.generateBaseQualString(mapping.getBaseQualities())));
@@ -246,6 +264,24 @@ public class BlockComponent extends JComponent {
     }
 
     /**
+     * Prints the alignment blocks into a String (e.g. (15, 22), (45, 70)).
+     * @param alignmentBlocks The list of alignment blocks
+     * @return The string representing the alignment blocks
+     */
+    private String printBlocks(List<SamAlignmentBlock> alignmentBlocks) {
+        StringBuilder builder = new StringBuilder(10);
+        for (SamAlignmentBlock aBlock : alignmentBlocks) {
+            builder.append("(");
+            builder.append(aBlock.getRefStart());
+            builder.append(", ");
+            builder.append(aBlock.getRefStop());
+            builder.append("), ");
+        }
+        builder.delete(builder.length() - 2, builder.length() - 1);
+        return builder.toString();
+    }
+
+    /**
      * @param baseQualities The array of phred scaled base qualities to convert
      * @return A String representation of the phred scaled base qualities in 
      * the array.
@@ -265,6 +301,8 @@ public class BlockComponent extends JComponent {
             baseQualString = baseQualString.substring(0, baseQualString.length() - 1) + "]";
         } else if (baseQualString.endsWith("<br>")) {
             baseQualString = baseQualString.substring(0, baseQualString.length() - 5) + "]";
+        } else if (baseQualString.length() == 1) {
+            baseQualString = "";
         }
         return baseQualString;
     }
@@ -311,31 +349,53 @@ public class BlockComponent extends JComponent {
     @Override
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
-        graphics.setFont(new Font(Font.MONOSPACED, Font.BOLD, 11));
+        Graphics2D graphics2D = (Graphics2D) graphics;
+        graphics2D.setFont(new Font(Font.MONOSPACED, Font.BOLD, 11));
 
         // paint this block's background
-        graphics.setColor(determineBlockColor());
-        graphics.fillRect(0, 0, length, height);
+        graphics2D.setColor(ColorProperties.BLOCK_BACKGROUND);
+        graphics2D.fillRect(0, 0, length, height);
+        
+        //paint SamAlignmentBlocks (for split read mappings)
+        for (Rectangle rectangle : rectList) {
+            graphics2D.setColor(this.blockColor);
+            graphics2D.fill(rectangle);
+        }
+        
+        //paint all diffs and gaps = bricks
+        for (BrickData brick : brickDataList) {
+            graphics2D.setColor(brick.getBrickColor());
+            graphics2D.fill(brick.getRectangle());
+            int labelWidth = graphics.getFontMetrics().stringWidth(brick.toString());
+            int labelX = brick.getLabelCenter() - labelWidth / 2;
+            graphics2D.setColor(ColorProperties.BRICK_LABEL);
+            graphics2D.drawString(brick.toString(), labelX, height);
+        }
+    }
+    
+    /**
+     * Calculates all subcomponents of this block component.
+     */
+    private void calcSubComponents() {
 
-        Iterator<Brick> it = block.getBrickIterator();
+        this.calcAlignmentBlocks(block.getPersistantObject());
+
         // only count Bricks, that are no genome gaps.
         //Used for determining location of brick in viewer
         int brickCount = 0;
         boolean gapPreceeding = false;
-        while (it.hasNext()) {
-            Brick brick = it.next();
+        Brick brick;
+        for (Iterator<Brick> it = block.getBrickIterator(); it.hasNext();) {
+            brick = it.next();
 
             // only paint brick if mismatch
-            int type = brick.getType();
-            if (type != Brick.MATCH) {
+            if (brick != Brick.MATCH) {
 
                 // get start of brick
                 int logBrickStart = absLogBlockStart + brickCount;
                 PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos(logBrickStart);
                 int x1 = (int) bounds.getLeftPhysBound() - phyLeft;
-                String label = determineBrickLabel(brick);
-                int labelWidth = graphics.getFontMetrics().stringWidth(label);
-                int labelX = ((int) bounds.getPhyMiddle() - phyLeft) - labelWidth / 2;
+                int labelCenter = ((int) bounds.getPhyMiddle() - phyLeft);
 
                 // if Brick before was a gap, this brick has the same position
                 // in the genome as the gap. This forces the viewer to map to
@@ -343,25 +403,24 @@ public class BlockComponent extends JComponent {
                 // at the same location as the gap. So increase values manually
                 if (gapPreceeding) {
                     x1 += bounds.getPhysWidth();
-                    labelX += bounds.getPhysWidth();
+                    labelCenter += bounds.getPhysWidth();
                 }
 
-                graphics.setColor(determineBrickColor(brick));
-                graphics.fillRect(x1, 0, (int) bounds.getPhysWidth(), height);
+                Color brickColor = this.determineBrickColor(brick);
+                Rectangle rectangle = new Rectangle(x1, 0, (int) bounds.getPhysWidth(), height);
+                this.brickDataList.add(new BrickData(brick, rectangle, brickColor, labelCenter));
 
-                graphics.setColor(ColorProperties.BRICK_LABEL);
-                graphics.drawString(label, labelX, height);
-
-                if (type == Brick.FOREIGN_GENOMEGAP
-                        || type == Brick.GENOME_GAP_A
-                        || type == Brick.GENOME_GAP_C
-                        || type == Brick.GENOME_GAP_G
-                        || type == Brick.GENOME_GAP_T
-                        || type == Brick.GENOME_GAP_N) {
-                    brickCount--;
-                    gapPreceeding = true;
-                } else {
-                    gapPreceeding = false;
+                switch (brick) {
+                    case FOREIGN_GENOMEGAP :
+                    case GENOMEGAP_A :
+                    case GENOMEGAP_C :
+                    case GENOMEGAP_G :    
+                    case GENOMEGAP_T :
+                    case GENOMEGAP_N :
+                                    brickCount--;
+                                    gapPreceeding = true;
+                                    break;
+                    default : gapPreceeding = false;
                 }
 
             } else {
@@ -369,6 +428,31 @@ public class BlockComponent extends JComponent {
             }
 
             brickCount++;
+        }
+    }
+    
+    /**
+     * Calculates the alignment blocks to paint for the given mapping.
+     * @param persistantObject The PersistantObject, which should be a
+     * PersistantMapping
+     */
+    private void calcAlignmentBlocks(PersistantObject persistantObject) {
+        PersistantObject persObj = persistantObject;
+        if (persObj instanceof PersistantMapping) {
+            this.blockColor = this.determineBlockColor();
+            PersistantMapping mapping = (PersistantMapping) persObj;
+            
+            if (mapping.getAlignmentBlocks().isEmpty()) {
+                Rectangle blockRect = PaintUtilities.calcBlockBoundaries(
+                            mapping.getStart(), mapping.getStop(), parentViewer, phyLeft, height);
+                this.rectList.add(blockRect);
+            } else {
+                for (SamAlignmentBlock aBlock : mapping.getAlignmentBlocks()) {
+                    Rectangle blockRect = PaintUtilities.calcBlockBoundaries(
+                            aBlock.getRefStart(), aBlock.getRefStop(), parentViewer, phyLeft, height);
+                    this.rectList.add(blockRect);
+                }
+            }
         }
     }
 
@@ -395,71 +479,34 @@ public class BlockComponent extends JComponent {
     }
 
     /**
-     * Determines the label of a brick. This means the character representing
-     * the base, the given brick stands for.
-     * @param brick the brick whose label is needed
-     * @return the character string representing the base of this brick
-     */
-    private String determineBrickLabel(Brick brick) {
-        String label;
-        int type = brick.getType();
-        switch (type) {
-            case Brick.MATCH : label = ""; break;
-            case Brick.BASE_A : label = "A"; break;
-            case Brick.BASE_C : label = "C"; break;
-            case Brick.BASE_G : label = "G"; break;
-            case Brick.BASE_T : label = "T"; break;
-            case Brick.BASE_N : label = "N"; break;
-            case Brick.FOREIGN_GENOMEGAP : label = ""; break;
-            case Brick.READGAP : label = "-"; break;
-            case Brick.GENOME_GAP_A : label = "A"; break;
-            case Brick.GENOME_GAP_C : label = "C"; break;
-            case Brick.GENOME_GAP_G : label = "G"; break;
-            case Brick.GENOME_GAP_T : label = "T"; break;
-            case Brick.GENOME_GAP_N : label = "N"; break;
-            case Brick.SKIPPED : label = "."; break;
-            case Brick.TRIMMED : label = "⌿"; break;
-            case Brick.UNDEF : label = "@"; 
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", type);
-                break;
-            default:
-                label = "@";
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", type);
-        }
-
-        return label;
-    }
-
-    /**
      * Determines the color of a brick, if it deviates from the reference.
      * Matches are not taken into account in this method.
-     * @param block the non-matching block whose color is needed
-     * @return the color of the non-matching block
+     * @param brick the non-matching brick (base) whose color is needed
+     * @return the color of the non-matching brick
      */
-    private Color determineBrickColor(Brick block) {
+    private Color determineBrickColor(Brick brick) {
         Color c;
-        int type = block.getType();
-        switch (type) {
-            case Brick.BASE_A : c = ColorProperties.ALIGNMENT_A; break;
-            case Brick.BASE_C : c = ColorProperties.ALIGNMENT_G; break;
-            case Brick.BASE_G : c = ColorProperties.ALIGNMENT_C; break;
-            case Brick.BASE_T : c = ColorProperties.ALIGNMENT_T; break;
-            case Brick.BASE_N : c = ColorProperties.ALIGNMENT_N; break;
-            case Brick.FOREIGN_GENOMEGAP : c = ColorProperties.ALIGNMENT_FOREIGN_GENOMEGAP; break;
-            case Brick.READGAP : c = ColorProperties.ALIGNMENT_BASE_READGAP; break;
-            case Brick.GENOME_GAP_A : c = ColorProperties.ALIGNMENT_A; break;
-            case Brick.GENOME_GAP_C : c = ColorProperties.ALIGNMENT_C; break;
-            case Brick.GENOME_GAP_G : c = ColorProperties.ALIGNMENT_G; break;
-            case Brick.GENOME_GAP_T : c = ColorProperties.ALIGNMENT_T; break;
-            case Brick.GENOME_GAP_N : c = ColorProperties.ALIGNMENT_N; break;
-            case Brick.SKIPPED : c = ColorProperties.SKIPPED; break;
-            case Brick.TRIMMED : c = ColorProperties.TRIMMED; break;
-            case Brick.UNDEF : c = ColorProperties.ALIGNMENT_BASE_UNDEF;
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", type);
+        switch (brick) {
+            case BASE_A : c = ColorProperties.ALIGNMENT_A; break;
+            case BASE_C : c = ColorProperties.ALIGNMENT_G; break;
+            case BASE_G : c = ColorProperties.ALIGNMENT_C; break;
+            case BASE_T : c = ColorProperties.ALIGNMENT_T; break;
+            case BASE_N : c = ColorProperties.ALIGNMENT_N; break;
+            case FOREIGN_GENOMEGAP : c = ColorProperties.ALIGNMENT_FOREIGN_GENOMEGAP; break;
+            case READGAP : c = ColorProperties.ALIGNMENT_BASE_READGAP; break;
+            case GENOMEGAP_A : c = ColorProperties.ALIGNMENT_A; break;
+            case GENOMEGAP_C : c = ColorProperties.ALIGNMENT_C; break;
+            case GENOMEGAP_G : c = ColorProperties.ALIGNMENT_G; break;
+            case GENOMEGAP_T : c = ColorProperties.ALIGNMENT_T; break;
+            case GENOMEGAP_N : c = ColorProperties.ALIGNMENT_N; break;
+            case SKIPPED : c = ColorProperties.SKIPPED; break;
+            case TRIMMED : c = ColorProperties.TRIMMED; break;
+            case UNDEF : c = ColorProperties.ALIGNMENT_BASE_UNDEF;
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", brick);
                 break;
             default:
                 c = ColorProperties.ALIGNMENT_BASE_UNDEF;
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", type);
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", brick);
         }
         
         return c;
@@ -480,5 +527,5 @@ public class BlockComponent extends JComponent {
     public int getHeight() {
         return height;
     }
-    
+ 
 }

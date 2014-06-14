@@ -100,7 +100,7 @@ public class ColorProperties {
     public static final Color SKIPPED = new Color(255, 255, 255);
     public static final Color TRIMMED = Color.GRAY;
 
-    // sequence pair specific colors
+    // read pair specific colors
     public static final Color BLOCK_PERFECT = Color.GREEN;
     public static final Color BLOCK_DIST_LARGE = Color.YELLOW;
     public static final Color BLOCK_DIST_SMALL = Color.YELLOW;
@@ -108,6 +108,7 @@ public class ColorProperties {
     public static final Color BLOCK_OR_DIST_LARGE = Color.YELLOW;
     public static final Color BLOCK_OR_DIST_SMALL = Color.YELLOW;
     public static final Color BLOCK_UNPAIRED = Color.RED;
+    /** Background color for alignment blocks = Dark gray.*/
     public static final Color BLOCK_BACKGROUND = new Color(200, 200, 200);
 
 }

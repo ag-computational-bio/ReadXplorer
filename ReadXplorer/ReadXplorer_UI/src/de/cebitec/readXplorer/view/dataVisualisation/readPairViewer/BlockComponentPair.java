@@ -22,6 +22,7 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantReadPairGroup;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.ReadPairType;
+import de.cebitec.readXplorer.view.dataVisualisation.PaintUtilities;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
 import java.awt.Color;
@@ -199,24 +200,18 @@ public class BlockComponentPair extends JComponent implements ActionListener {
      */
     private void addRectAndItsColor(Color pairColor, PersistantMapping mapping, boolean addLine) {
         this.colorList.add(this.adjustBlockColor(pairColor, mapping));
-        int absStartMapping = (int) parentViewer.getPhysBoundariesForLogPos(mapping.getStart()).getLeftPhysBound();
-        int absStopMapping = this.phyRight;
-        if (mapping.getStop() < this.block.getAbsStop()) {
-            absStopMapping = (int) parentViewer.getPhysBoundariesForLogPos(mapping.getStop()).getRightPhysBound();
-        }
-        int absLength = absStopMapping - absStartMapping;
-        absLength = absLength < 3 ? 3 : absLength;
-        this.rectList.add(new Rectangle(absStartMapping - this.phyLeft, 0, absLength, this.height));
+        Rectangle blockRect = PaintUtilities.calcBlockBoundaries(mapping.getStart(), mapping.getStop(), parentViewer, phyLeft, height);
+        this.rectList.add(blockRect);
 
         if (addLine) {
-            Rectangle rect = rectList.get(rectList.size() - 2);
-            int startMapping1 = rect.x;
-            int startCurMapping = (absStartMapping - this.phyLeft);
+            Rectangle prevRect = rectList.get(rectList.size() - 2);
+            int startMapping1 = prevRect.x;
+            int startCurMapping = blockRect.x;
             if (startMapping1 < startCurMapping){
-                this.lineList.add(new Line2D.Double(startMapping1 + rect.width, 2, startCurMapping - 1, 2));
+                this.lineList.add(new Line2D.Double(startMapping1 + prevRect.width, 2, startCurMapping - 1, 2));
             } else { //endMapping2 < endMapping1
 //                this.lineList.add(new Line2D.Double(rect.x - 1, 2, absStopMapping, 2));
-                this.lineList.add(new Line2D.Double(startCurMapping + absLength, 2, startMapping1 - 1, 2));
+                this.lineList.add(new Line2D.Double(startCurMapping + blockRect.width, 2, startMapping1 - 1, 2));
             }
         }
     }

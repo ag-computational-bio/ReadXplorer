@@ -16,7 +16,10 @@
  */
 package de.cebitec.readXplorer.databackend.dataObjects;
 
+import de.cebitec.readXplorer.util.SamAlignmentBlock;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -43,6 +46,7 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
     private byte[] baseQualities;
     private int numMappingsForRead;
     private String originalSequence = null;
+    private List<SamAlignmentBlock> alignmentBlocks;
 
     /**
      * Data structure for storing a mapping on a reference genome.
@@ -77,6 +81,7 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
         this.mappingQuality = mappingQuality;
         this.baseQualities = baseQualities;
         this.numMappingsForRead = numMappingsForRead;
+        this.alignmentBlocks = new ArrayList<>(); //initialize as emtpy list
     }
     
     /**
@@ -349,6 +354,31 @@ public class PersistantMapping implements PersistantObject, Comparable<Persistan
      */
     public int getMappingQuality() {
         return mappingQuality;
+    }
+
+    /**
+     * Sets the alignment blocks formed by this mapping, if there are multiple
+     * alignment blocks. For mappings with a a single block representing the
+     * whole mapping it is not stored.Several blocks exist for split read
+     * mappings with {@link CigarOperator.N} bases. The N blocks have to be
+     * omitted in the list. Thus, the list only represents mapped regions.
+     * @param alignmentBlocks The blocks to set for this mapping
+     */
+    public void setAlignmentBlocks(List<SamAlignmentBlock> alignmentBlocks) {
+        if (alignmentBlocks.size() > 1) {
+            this.alignmentBlocks = alignmentBlocks;
+        }
+    }
+
+    /**
+     * @return The alignment blocks formed by this mapping, if there are
+     * multiple alignment blocks. For mappings with a a single block
+     * representing the whole mapping it is not stored.Several blocks exist for
+     * split read mappings with {@link CigarOperator.N} bases. The N blocks have
+     * to be omitted in the list. Thus, the list only represents mapped regions.
+     */
+    public List<SamAlignmentBlock> getAlignmentBlocks() {
+        return this.alignmentBlocks;
     }
    
 
