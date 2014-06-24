@@ -73,133 +73,125 @@ public class DeSeq {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: Unable to load plotting functions. You woun't be able to plot your results!", currentTimestamp);
             }
 
-            if (!DeAnalysisHandler.TESTING_MODE) {
-                //Handing over the count data to Gnu R.
-                int i = 1;
-                StringBuilder concatenate = new StringBuilder("c(");
-                //First the count data for each track is handed over seperatly.
-                while (analysisData.hasCountData()) {
-                    gnuR.assign("inputData" + i, analysisData.pollFirstCountData());
-                    concatenate.append("inputData").append(i++).append(",");
-                }
-                concatenate.deleteCharAt(concatenate.length() - 1);
-                concatenate.append(")");
-                //Then the big count data matrix is created from the single track data handed over.
-                gnuR.eval("inputData <- matrix(" + concatenate.toString() + "," + numberOfFeatures + ")");
-                //The colum names are handed over to Gnu R...
-                gnuR.assign("columNames", analysisData.getTrackDescriptions());
-                //...and assigned to the count data matrix.
-                gnuR.eval("colnames(inputData) <- columNames");
-                //Now we need to name the rows. First hand over the row names to Gnu R...
-                gnuR.assign("rowNames", analysisData.getFeatureNames());
-                //...and then assign them to the count data matrix.
-                gnuR.eval("rownames(inputData) <- rowNames");
+            //Handing over the count data to Gnu R.
+            int i = 1;
+            StringBuilder concatenate = new StringBuilder("c(");
+            //First the count data for each track is handed over seperatly.
+            while (analysisData.hasCountData()) {
+                gnuR.assign("inputData" + i, analysisData.pollFirstCountData());
+                concatenate.append("inputData").append(i++).append(",");
+            }
+            concatenate.deleteCharAt(concatenate.length() - 1);
+            concatenate.append(")");
+            //Then the big count data matrix is created from the single track data handed over.
+            gnuR.eval("inputData <- matrix(" + concatenate.toString() + "," + numberOfFeatures + ")");
+            //The colum names are handed over to Gnu R...
+            gnuR.assign("columNames", analysisData.getTrackDescriptions());
+            //...and assigned to the count data matrix.
+            gnuR.eval("colnames(inputData) <- columNames");
+            //Now we need to name the rows. First hand over the row names to Gnu R...
+            gnuR.assign("rowNames", analysisData.getFeatureNames());
+            //...and then assign them to the count data matrix.
+            gnuR.eval("rownames(inputData) <- rowNames");
                 //Remove all the sides that don't appear under any condition because
-                //those rows produce "NA" rows in the results table.
-                gnuR.eval("inputData <- inputData[rowSums(inputData) > 0,]");
+            //those rows produce "NA" rows in the results table.
+            gnuR.eval("inputData <- inputData[rowSums(inputData) > 0,]");
 
-                //Now we need to hand over the experimental design behind the data.
-                concatenate = new StringBuilder();
-                //First all sub designs are assigned to an individual variable.
-                while (analysisData.hasNextSubDesign()) {
-                    DeSeqAnalysisData.ReturnTupel subDesign = analysisData.getNextSubDesign();
-                    gnuR.assign(subDesign.getKey(), subDesign.getValue());
-                    concatenate.append(subDesign.getKey()).append(",");
-                }
-                concatenate.deleteCharAt(concatenate.length() - 1);
+            //Now we need to hand over the experimental design behind the data.
+            concatenate = new StringBuilder();
+            //First all sub designs are assigned to an individual variable.
+            while (analysisData.hasNextSubDesign()) {
+                DeSeqAnalysisData.ReturnTupel subDesign = analysisData.getNextSubDesign();
+                gnuR.assign(subDesign.getKey(), subDesign.getValue());
+                concatenate.append(subDesign.getKey()).append(",");
+            }
+            concatenate.deleteCharAt(concatenate.length() - 1);
 
-                if (saveFile != null) {
-                    String path = saveFile.getAbsolutePath();
-                    path = path.replace("\\", "\\\\");
-                    gnuR.eval("save.image(\"" + path + "\")");
-                }
+            if (saveFile != null) {
+                String path = saveFile.getAbsolutePath();
+                path = path.replace("\\", "\\\\");
+                gnuR.eval("save.image(\"" + path + "\")");
+            }
 
-                if (analysisData.moreThanTwoConditions()) {
-                    //The individual variables are then used to create the design element
-                    gnuR.eval("design <- data.frame(row.names = colnames(inputData)," + concatenate.toString() + ")");
+            if (analysisData.moreThanTwoConditions()) {
+                //The individual variables are then used to create the design element
+                gnuR.eval("design <- data.frame(row.names = colnames(inputData)," + concatenate.toString() + ")");
                     //Now everything is set up and the count data object on which the main
-                    //analysis will be performed can be created
-                    gnuR.eval("cD <- newCountDataSet(inputData, design)");
-                } else {
-                    //If this is just a two conditons experiment we only create the conds array
-                    gnuR.eval("conds <- factor(" + concatenate.toString() + ")");
+                //analysis will be performed can be created
+                gnuR.eval("cD <- newCountDataSet(inputData, design)");
+            } else {
+                //If this is just a two conditons experiment we only create the conds array
+                gnuR.eval("conds <- factor(" + concatenate.toString() + ")");
                     //Now everything is set up and the count data object on which the main
-                    //analysis will be performed can be created
-                    gnuR.eval("cD <- newCountDataSet(inputData, conds)");
-                }
+                //analysis will be performed can be created
+                gnuR.eval("cD <- newCountDataSet(inputData, conds)");
+            }
 
-                //We estimate the size factor
-                gnuR.eval("cD <- estimateSizeFactors(cD)");
+            //We estimate the size factor
+            gnuR.eval("cD <- estimateSizeFactors(cD)");
 
                 //For multi condition testing estimateDispersions does not converge most of the
-                //times. So we relax the settings in every step a little more.
-                if (analysisData.moreThanTwoConditions()) {
-                    REXP res = gnuR.eval("cD <- estimateDispersions(cD)");
+            //times. So we relax the settings in every step a little more.
+            if (analysisData.moreThanTwoConditions()) {
+                REXP res = gnuR.eval("cD <- estimateDispersions(cD)");
+                if (res == null) {
+                    res = gnuR.eval("cD <- estimateDispersions(cD,fitType=\"local\")");
                     if (res == null) {
-                        res = gnuR.eval("cD <- estimateDispersions(cD,fitType=\"local\")");
-                        if (res == null) {
-                            res = gnuR.eval("cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\")");
-                            if (res == null) {
-                                gnuR.eval("cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\",fitType=\"local\")");
-                            }
-                        }
-                    }
-                } else {
-                    if (analysisData.isWorkingWithoutReplicates()) {
-                        // If there are no replicates for each condition we need to tell
-                        // the function to ignore this fact.
-                        REXP res = gnuR.eval("cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\")");
-                        //For some reasons the above computation fails on some data sets.
-                        //In those cases the following computation should do the trick.
+                        res = gnuR.eval("cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\")");
                         if (res == null) {
                             gnuR.eval("cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\",fitType=\"local\")");
                         }
-                    } else {
-                        //The dispersion is estimated
-                        REXP res = gnuR.eval("cD <- estimateDispersions(cD)");
-                        //For some reasons the above computation fails on some data sets.
-                        //In those cases the following computation should do the trick.
-                        if (res == null) {
-                            gnuR.eval("cD <- estimateDispersions(cD,fitType=\"local\")");
-                        }
                     }
-                }
-
-                if (analysisData.moreThanTwoConditions()) {
-                    //Handing over the first fitting group to Gnu R...
-                    concatenate = new StringBuilder();
-                    List<String> fittingGroupOne = analysisData.getFittingGroupOne();
-                    for (Iterator<String> it = fittingGroupOne.iterator(); it.hasNext();) {
-                        String current = it.next();
-                        concatenate.append(current).append("+");
-                    }
-                    concatenate.deleteCharAt(concatenate.length() - 1);
-                    gnuR.eval("fit1 <- fitNbinomGLMs( cD, count ~ " + concatenate.toString() + " )");
-
-                    //..and then the secound one.
-                    concatenate = new StringBuilder();
-                    List<String> fittingGroupTwo = analysisData.getFittingGroupTwo();
-                    for (Iterator<String> it = fittingGroupTwo.iterator(); it.hasNext();) {
-                        String current = it.next();
-                        concatenate.append(current).append("+");
-                    }
-                    concatenate.deleteCharAt(concatenate.length() - 1);
-                    gnuR.eval("fit0 <- fitNbinomGLMs( cD, count ~ " + concatenate.toString() + " )");
-
-                    gnuR.eval("pvalsGLM <- nbinomGLMTest( fit1, fit0 )");
-                    gnuR.eval("padjGLM <- p.adjust( pvalsGLM, method=\"BH\" )");
-
-                } else {
-                    //Perform the normal test.
-                    String[] levels = analysisData.getLevels();
-                    gnuR.eval("res <- nbinomTest( cD,\"" + levels[0] + "\",\"" + levels[1] + "\")");
                 }
             } else {
-                if (analysisData.moreThanTwoConditions()) {
-                    gnuR.eval("data(multTestData)");
+                if (analysisData.isWorkingWithoutReplicates()) {
+                        // If there are no replicates for each condition we need to tell
+                    // the function to ignore this fact.
+                    REXP res = gnuR.eval("cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\")");
+                        //For some reasons the above computation fails on some data sets.
+                    //In those cases the following computation should do the trick.
+                    if (res == null) {
+                        gnuR.eval("cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\",fitType=\"local\")");
+                    }
                 } else {
-                    gnuR.eval("data(singleTestData)");
+                    //The dispersion is estimated
+                    REXP res = gnuR.eval("cD <- estimateDispersions(cD)");
+                        //For some reasons the above computation fails on some data sets.
+                    //In those cases the following computation should do the trick.
+                    if (res == null) {
+                        gnuR.eval("cD <- estimateDispersions(cD,fitType=\"local\")");
+                    }
                 }
+            }
+
+            if (analysisData.moreThanTwoConditions()) {
+                //Handing over the first fitting group to Gnu R...
+                concatenate = new StringBuilder();
+                List<String> fittingGroupOne = analysisData.getFittingGroupOne();
+                for (Iterator<String> it = fittingGroupOne.iterator(); it.hasNext();) {
+                    String current = it.next();
+                    concatenate.append(current).append("+");
+                }
+                concatenate.deleteCharAt(concatenate.length() - 1);
+                gnuR.eval("fit1 <- fitNbinomGLMs( cD, count ~ " + concatenate.toString() + " )");
+
+                //..and then the secound one.
+                concatenate = new StringBuilder();
+                List<String> fittingGroupTwo = analysisData.getFittingGroupTwo();
+                for (Iterator<String> it = fittingGroupTwo.iterator(); it.hasNext();) {
+                    String current = it.next();
+                    concatenate.append(current).append("+");
+                }
+                concatenate.deleteCharAt(concatenate.length() - 1);
+                gnuR.eval("fit0 <- fitNbinomGLMs( cD, count ~ " + concatenate.toString() + " )");
+
+                gnuR.eval("pvalsGLM <- nbinomGLMTest( fit1, fit0 )");
+                gnuR.eval("padjGLM <- p.adjust( pvalsGLM, method=\"BH\" )");
+
+            } else {
+                //Perform the normal test.
+                String[] levels = analysisData.getLevels();
+                gnuR.eval("res <- nbinomTest( cD,\"" + levels[0] + "\",\"" + levels[1] + "\")");
             }
             if (analysisData.moreThanTwoConditions()) {
                 gnuR.eval("tmp0 <- data.frame(fit1,pvalsGLM,padjGLM)");

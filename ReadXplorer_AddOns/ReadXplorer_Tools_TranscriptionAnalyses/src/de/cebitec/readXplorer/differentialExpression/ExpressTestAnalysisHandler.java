@@ -73,10 +73,10 @@ public class ExpressTestAnalysisHandler extends DeAnalysisHandler implements Exp
         prepareFeatures(expressTestAnalysisData);
         prepareCountData(expressTestAnalysisData, getAllCountData());
 
-        ExpressTestI st = new ExpressTest();
+        ExpressTestI et = new ExpressTest();
 
 
-        st.addObserver(this);
+        et.addObserver(this);
         PersistantFeature[] regionNames = expressTestAnalysisData.getFeatures();
         int[] start = expressTestAnalysisData.getStart();
         int[] stop = expressTestAnalysisData.getStop();
@@ -104,9 +104,9 @@ public class ExpressTestAnalysisHandler extends DeAnalysisHandler implements Exp
             counterIndex++;
         }
         if(expressTestAnalysisData.getNormalizationFeatures() != null){
-            st.setNormalizationFeatures(expressTestAnalysisData.getNormalizationFeatures());
+            et.setNormalizationFeatures(expressTestAnalysisData.getNormalizationFeatures());
         }
-        st.performAnalysis(regionNames, start, stop, groupA, groupB, 30d);
+        et.performAnalysis(regionNames, start, stop, groupA, groupB, 30d);
 
         while (results.isEmpty()) {
             try {

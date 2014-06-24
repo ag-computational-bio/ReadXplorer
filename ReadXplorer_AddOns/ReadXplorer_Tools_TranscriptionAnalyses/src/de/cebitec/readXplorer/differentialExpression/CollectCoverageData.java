@@ -80,7 +80,7 @@ public class CollectCoverageData implements Observer {
      *
      * @param mappings the mappings
      */
-    protected void updateReadCountForFeatures(MappingResultPersistant result) {
+    private void updateReadCountForFeatures(MappingResultPersistant result) {
         List<PersistantMapping> mappings = result.getMappings();
         Collections.sort(mappings);
         int lastMappingIdx = 0;

@@ -95,42 +95,37 @@ public class BaySeq {
             currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Gnu R running on " + processors + " cores.", currentTimestamp);
             gnuR.eval("cl <- makeCluster(" + processors + ", \"SOCK\")");
-            if (!DeAnalysisHandler.TESTING_MODE) {
-                int i = 1;
-                StringBuilder concatenate = new StringBuilder("c(");
-                while (bseqData.hasCountData()) {
-                    gnuR.assign("inputData" + i, bseqData.pollFirstCountData());
-                    concatenate.append("inputData").append(i++).append(",");
-                }
-                concatenate.deleteCharAt(concatenate.length() - 1);
-                concatenate.append(")");
-                gnuR.eval("inputData <- matrix(" + concatenate.toString() + "," + numberOfFeatures + ")");
-                gnuR.assign("inputFeaturesStart", bseqData.getStart());
-                gnuR.assign("inputFeaturesStop", bseqData.getStop());
-                gnuR.assign("inputFeaturesID", bseqData.getFeatureNames());
-                gnuR.eval("features <- data.frame(inputFeaturesID,inputFeaturesStart,inputFeaturesStop)");
-                gnuR.eval("colnames(features) <- c(\"locus\", \"start\", \"stop\")");
-                gnuR.eval("seglens <- features$stop - features$start + 1");
-                gnuR.eval("cD <- new(\"countData\", data = inputData, seglens = seglens, annotation = features)");
-                gnuR.eval("cD@libsizes <- getLibsizes(cD, estimationType = \"quantile\")");
-                gnuR.assign("replicates", bseqData.getReplicateStructure());
-                gnuR.eval("replicates(cD) <- as.factor(c(replicates))");
-                concatenate = new StringBuilder();
-                numberofGroups = 0;
-                while (bseqData.hasGroups()) {
-                    numberofGroups++;
-                    gnuR.assign("group" + numberofGroups, bseqData.getNextGroup());
-                    concatenate.append("group").append(numberofGroups).append("=").append("group").append(numberofGroups).append(",");
-                }
-                concatenate.deleteCharAt(concatenate.length() - 1);
-                gnuR.eval("groups(cD) <- list(" + concatenate.toString() + ")");
-                //parameter samplesize could be added.
-                gnuR.eval("cD <- getPriors.NB(cD, cl = cl)");
-                gnuR.eval("cD <- getLikelihoods.NB(cD, nullData = TRUE, cl = cl)");
-            } else {
-                gnuR.eval("data(testData)");
-                numberofGroups = 2;
+            int i = 1;
+            StringBuilder concatenate = new StringBuilder("c(");
+            while (bseqData.hasCountData()) {
+                gnuR.assign("inputData" + i, bseqData.pollFirstCountData());
+                concatenate.append("inputData").append(i++).append(",");
             }
+            concatenate.deleteCharAt(concatenate.length() - 1);
+            concatenate.append(")");
+            gnuR.eval("inputData <- matrix(" + concatenate.toString() + "," + numberOfFeatures + ")");
+            gnuR.assign("inputFeaturesStart", bseqData.getStart());
+            gnuR.assign("inputFeaturesStop", bseqData.getStop());
+            gnuR.assign("inputFeaturesID", bseqData.getFeatureNames());
+            gnuR.eval("features <- data.frame(inputFeaturesID,inputFeaturesStart,inputFeaturesStop)");
+            gnuR.eval("colnames(features) <- c(\"locus\", \"start\", \"stop\")");
+            gnuR.eval("seglens <- features$stop - features$start + 1");
+            gnuR.eval("cD <- new(\"countData\", data = inputData, seglens = seglens, annotation = features)");
+            gnuR.eval("cD@libsizes <- getLibsizes(cD, estimationType = \"quantile\")");
+            gnuR.assign("replicates", bseqData.getReplicateStructure());
+            gnuR.eval("replicates(cD) <- as.factor(c(replicates))");
+            concatenate = new StringBuilder();
+            numberofGroups = 0;
+            while (bseqData.hasGroups()) {
+                numberofGroups++;
+                gnuR.assign("group" + numberofGroups, bseqData.getNextGroup());
+                concatenate.append("group").append(numberofGroups).append("=").append("group").append(numberofGroups).append(",");
+            }
+            concatenate.deleteCharAt(concatenate.length() - 1);
+            gnuR.eval("groups(cD) <- list(" + concatenate.toString() + ")");
+            //parameter samplesize could be added.
+            gnuR.eval("cD <- getPriors.NB(cD, cl = cl)");
+            gnuR.eval("cD <- getLikelihoods.NB(cD, nullData = TRUE, cl = cl)");
             int resultIndex = 0;
             for (int j = 1; j <= numberofGroups; j++) {
                 gnuR.eval("tCounts" + resultIndex + " <- topCounts(cD , group = " + j + " , number = " + numberOfFeatures + ")");

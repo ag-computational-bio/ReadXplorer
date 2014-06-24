@@ -71,7 +71,6 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
     private int resultsReceivedBack = 0;
     private final int startOffset;
     private final int stopOffset;
-    public static boolean TESTING_MODE = false;
     private final ParametersReadClasses readClassParams;
 
     public static enum Tool {
