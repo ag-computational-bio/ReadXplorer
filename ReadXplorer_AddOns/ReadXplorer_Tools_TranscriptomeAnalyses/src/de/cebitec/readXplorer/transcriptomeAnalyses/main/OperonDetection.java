@@ -1,12 +1,13 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
-import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.OperonAdjacency;
+import de.cebitec.readXplorer.util.FeatureType;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.TreeMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  *
@@ -28,15 +29,14 @@ public class OperonDetection {
      * Creating Operon Data.
      *
      * @param putativeOperonAdjacencies
-     * @param trackConnector Trackconnector.
      * @param bg Background Threshold.
      * @return a List of Operon.
      */
-    public List<Operon> concatOperonAdjacenciesToOperons(HashMap<Integer, OperonAdjacency> putativeOperonAdjacencies, TrackConnector trackConnector, double bg) {
-        Integer[] sortedStartingFeatureIDs = new Integer[putativeOperonAdjacencies.keySet().size()];
-        putativeOperonAdjacencies.keySet().toArray(sortedStartingFeatureIDs);
+    public List<Operon> concatOperonAdjacenciesToOperons(TreeMap<Integer, OperonAdjacency> putativeOperonAdjacencies, double bg) {
+//        Integer[] sortedStartingFeatureIDs = new Integer[putativeOperonAdjacencies.keySet().size()];
+//        putativeOperonAdjacencies.keySet().toArray(sortedStartingFeatureIDs);
 
-        List<Operon> operons = new ArrayList<Operon>();
+        List<Operon> operons = new CopyOnWriteArrayList<>();
         List<OperonAdjacency> operonAdjacencies = new ArrayList<>();
         int lastAnnoId = 0;
         Operon op;
@@ -44,7 +44,7 @@ public class OperonDetection {
         PersistantFeature feature2;
         OperonAdjacency opAdj;
         int spanningReads;
-        for (Integer leadingFeatureID : sortedStartingFeatureIDs) {
+        for (Integer leadingFeatureID : putativeOperonAdjacencies.keySet()) {
             opAdj = putativeOperonAdjacencies.get(leadingFeatureID);
             feature1 = opAdj.getFeature1();
             feature2 = opAdj.getFeature2();
@@ -52,20 +52,47 @@ public class OperonDetection {
 
             if (spanningReads > bg) {
                 if (lastAnnoId != feature1.getId() && lastAnnoId != 0) {
-                    op = new Operon(trackConnector.getTrackID());
+                    op = new Operon(trackId);
                     op.addAllOperonAdjacencies(operonAdjacencies);
                     operons.add(op); //only here the operons are added to final list
                     operonAdjacencies.clear();
                 }
-                operonAdjacencies.add(opAdj);
-                lastAnnoId = feature2.getId();
+                // check
+                boolean check = false;
+                for (OperonAdjacency operonAdjacency : operonAdjacencies) {
+                    if (operonAdjacency.getFeature1().getLocus().equals(feature2.getLocus())) {
+                        check = true;
+                    }
+                }
+
+                if (!check) {
+                    operonAdjacencies.add(opAdj);
+                    lastAnnoId = feature2.getId();
+                }
+            }
+        }
+
+        for (Operon operon : operons) {
+            for (OperonAdjacency operonAdjacency : operon.getOperonAdjacencies()) {
+
+                PersistantFeature featureA = operonAdjacency.getFeature1();
+                PersistantFeature featureB = operonAdjacency.getFeature2();
+                if (featureA.getType() == FeatureType.RRNA) {
+                    operon.removeAdjaceny(operonAdjacency);
+                } else if (featureB.getType() == FeatureType.RRNA) {
+                    operon.removeAdjaceny(operonAdjacency);
+                } else if (featureA.getType() == FeatureType.TRNA) {
+                    operon.removeAdjaceny(operonAdjacency);
+                } else if (featureB.getType() == FeatureType.TRNA) {
+                    operon.removeAdjaceny(operonAdjacency);
+                }
+            }
+            if (operon.getOperonAdjacencies().isEmpty()) {
+                operons.remove(operon);
             }
         }
 
         return operons;
     }
-    
-    public void detectPutativeTranscriptionStart(List<Operon> operons, int[] fwdCoverage, int[] revCoverage, double threshold) {
-        
-    }
+
 }

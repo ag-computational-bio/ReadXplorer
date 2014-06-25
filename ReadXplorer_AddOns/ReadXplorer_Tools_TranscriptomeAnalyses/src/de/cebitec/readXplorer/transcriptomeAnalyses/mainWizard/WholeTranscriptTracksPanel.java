@@ -1,5 +1,6 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard;
 
+import java.io.File;
 import java.util.prefs.Preferences;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
@@ -65,18 +66,32 @@ public class WholeTranscriptTracksPanel implements WizardDescriptor.ValidatingPa
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
-        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_RPKM_ANALYSIS, (boolean) component.isRPKM());
-        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_NOVEL_ANALYSIS, (boolean) component.isNewRegions());
-        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_OPERON_ANALYSIS, (boolean) component.isOperonDetection());
-        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_Fraction, (double) component.getFractionForOperonDetection());
-        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_FRACTION_NOVELREGION_DETECTION, (double) component.getFractionForNewRegionDetection());
-        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_MIN_BOUNDRY_LENGTH, (int) component.getMinBoundaryForNovelRegionDetection());
-        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_INCLUDE_RATIOVALUE_IN_NOVEL_REGION_DETECTION, (boolean) component.isInclusionOfRatioValueSelected());
-
-        if (component.isInclusionOfRatioValueSelected()) {
-            wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_RAIO_NOVELREGION_DETECTION, (int) component.getIncreaseRatioValue());
+        wiz.putProperty(WizardPropertyStrings.PROP_RPKM_ANALYSIS, (boolean) component.isRPKM());
+        wiz.putProperty(WizardPropertyStrings.PROP_NOVEL_ANALYSIS, (boolean) component.isNewRegions());
+        wiz.putProperty(WizardPropertyStrings.PROP_OPERON_ANALYSIS, (boolean) component.isOperonDetection());
+        if (component.isNewRegions()) {
+            wiz.putProperty(WizardPropertyStrings.PROP_Fraction, (double) component.getFractionForNewRegionDetection());
+            wiz.putProperty(WizardPropertyStrings.PROP_MIN_LENGTH_OF_NOVEL_TRANSCRIPT, (int) component.getMinBoundaryForNovelRegionDetection());
+            wiz.putProperty(WizardPropertyStrings.PROP_INCLUDE_RATIO_VALUE_IN_NOVEL_REGION_DETECTION, (boolean) component.isInclusionOfRatioValueSelected());
+            wiz.putProperty(WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_NR, (boolean) component.isIncludeBestMatchedReadsNR());
+            wiz.putProperty(WizardPropertyStrings.PROP_SET_MANAULLY_MIN_STACK_SIZE, (boolean) component.isBgThresholdSetManually_NT());
+            wiz.putProperty(WizardPropertyStrings.PROP_MANAULLY_MIN_STACK_SIZE, (int) component.getBgThresholdSetManually_NT());
+            wiz.putProperty(WizardPropertyStrings.PROP_RATIO_NOVELREGION_DETECTION, (int) component.getIncreaseRatioValue());
+        } else if (component.isOperonDetection()) {
+            wiz.putProperty(WizardPropertyStrings.PROP_Fraction, (double) component.getFractionForOperonDetection());
+            wiz.putProperty(WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_OP, (boolean) component.isIncludeBestMatchedReadsOP());
+            wiz.putProperty(WizardPropertyStrings.PROP_SET_MANAULLY_MIN_STACK_SIZE, (boolean) component.isBgThresholdSetManually_OP());
+            wiz.putProperty(WizardPropertyStrings.PROP_MANAULLY_MIN_STACK_SIZE, (int) component.getBgThresholdSetManually_OP());
         }
+            wiz.putProperty(WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_RPKM, (boolean) component.isIncludeBestMatchedReadsRpkm());
+        
 
+//        wiz.putProperty(WizardPropertyStrings.PROP_FRACTION_NOVELREGION_DETECTION, (double) component.getFractionForNewRegionDetection());
+        File f = component.getRefFile();
+        wiz.putProperty(WizardPropertyStrings.PROP_REFERENCE_FILE_RPKM_DETERMINATION, f);
+//        if (component.isInclusionOfRatioValueSelected()) {
+//            wiz.putProperty(WizardPropertyStrings.PROP_RATIO_NOVELREGION_DETECTION, (int) component.getIncreaseRatioValue());
+//        }
         storePrefs();
     }
 
@@ -85,15 +100,18 @@ public class WholeTranscriptTracksPanel implements WizardDescriptor.ValidatingPa
      */
     private void storePrefs() {
         Preferences pref = NbPreferences.forModule(Object.class);
-        pref.putBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_RPKM_ANALYSIS, component.isRPKM());
-        pref.putBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_NOVEL_ANALYSIS, component.isNewRegions());
-        pref.putBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_OPERON_ANALYSIS, component.isOperonDetection());
-        pref.putDouble(wizardName + TranscriptomeAnalysisWizardIterator.PROP_Fraction, component.getFractionForOperonDetection());
-        pref.putDouble(wizardName + TranscriptomeAnalysisWizardIterator.PROP_FRACTION_NOVELREGION_DETECTION, component.getFractionForNewRegionDetection());
-        pref.putInt(wizardName + TranscriptomeAnalysisWizardIterator.PROP_MIN_BOUNDRY_LENGTH, component.getMinBoundaryForNovelRegionDetection());
-        pref.putBoolean(wizardName + TranscriptomeAnalysisWizardIterator.PROP_INCLUDE_RATIOVALUE_IN_NOVEL_REGION_DETECTION, component.isInclusionOfRatioValueSelected());
+        pref.putBoolean(wizardName + WizardPropertyStrings.PROP_RPKM_ANALYSIS, component.isRPKM());
+        pref.putBoolean(wizardName + WizardPropertyStrings.PROP_NOVEL_ANALYSIS, component.isNewRegions());
+        pref.putBoolean(wizardName + WizardPropertyStrings.PROP_OPERON_ANALYSIS, component.isOperonDetection());
+        if (component.isOperonDetection()) {
+            pref.putDouble(wizardName + WizardPropertyStrings.PROP_Fraction, component.getFractionForOperonDetection());
+        } else if (component.isNewRegions()) {
+            pref.putDouble(wizardName + WizardPropertyStrings.PROP_Fraction, component.getFractionForNewRegionDetection());
+        }
+        pref.putInt(wizardName + WizardPropertyStrings.PROP_MIN_LENGTH_OF_NOVEL_TRANSCRIPT, component.getMinBoundaryForNovelRegionDetection());
+        pref.putBoolean(wizardName + WizardPropertyStrings.PROP_INCLUDE_RATIO_VALUE_IN_NOVEL_REGION_DETECTION, component.isInclusionOfRatioValueSelected());
         if (component.isInclusionOfRatioValueSelected()) {
-            pref.putInt(TranscriptomeAnalysisWizardIterator.PROP_RAIO_NOVELREGION_DETECTION, component.getIncreaseRatioValue());
+            pref.putInt(WizardPropertyStrings.PROP_RATIO_NOVELREGION_DETECTION, component.getIncreaseRatioValue());
         }
     }
 
@@ -116,6 +134,24 @@ public class WholeTranscriptTracksPanel implements WizardDescriptor.ValidatingPa
 
     @Override
     public void validate() throws WizardValidationException {
+
+        double fractionOP;
+        double fractionNT;
+        int bGThreshold_NT;
+        int bGThreshold_OP;
+        int minLength_NT;
+        int ratio_NT;
+
+        try {
+            fractionNT = component.getFractionForNewRegionDetection();
+            fractionOP = component.getFractionForOperonDetection();
+            bGThreshold_NT = component.getBgThresholdSetManually_NT();
+            bGThreshold_OP = component.getBgThresholdSetManually_OP();
+            minLength_NT = component.getMinBoundaryForNovelRegionDetection();
+            ratio_NT = component.getIncreaseRatioValue();
+        } catch (NumberFormatException e) {
+            throw new WizardValidationException(null, "Please check your textfields regarding string input.", null);
+        }
         if (!this.component.isRPKM() && !this.component.isOperonDetection() && !this.component.isNewRegions()) {
             throw new WizardValidationException(null, "Please selct at least one of the given analysis types.", null);
         }

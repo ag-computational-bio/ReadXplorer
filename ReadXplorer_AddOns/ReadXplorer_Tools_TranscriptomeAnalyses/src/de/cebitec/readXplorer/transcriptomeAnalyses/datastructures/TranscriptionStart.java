@@ -2,15 +2,17 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.datastructures;
 
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.TrackChromResultEntry;
+import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.ISequinExporter;
+import de.cebitec.readXplorer.util.FeatureType;
 
 /**
  * Data structure for storing a transcription start site.
  *
  * @author -Rolf Hilker-, modified by -jritter-
  */
-public class TranscriptionStart extends TrackChromResultEntry {
+public class TranscriptionStart extends TrackChromResultEntry implements ISequinExporter {
 
-    private int startPosition;
+    private final int startPosition;
     private boolean isFwdStrand;
     private int readStarts;
     private double relCount;
@@ -18,10 +20,10 @@ public class TranscriptionStart extends TrackChromResultEntry {
     private int offset;
     private int dist2start, dist2stop;
     private PersistantFeature nextDownstreamFeature;
-    private int nextOffset;
+    private int offsetToNextDownstrFeature;
     private boolean leaderless, cdsShift;
     private String detectedFeatStart, detectedFeatStop;
-    private boolean internalTSS;
+    private boolean intragenicTSS, intergenicTSS;
     private boolean putativeAntisense;
     private boolean selected;
     private boolean falsePositive;
@@ -31,10 +33,9 @@ public class TranscriptionStart extends TrackChromResultEntry {
     private int minus10MotifWidth, minus35MotifWidth, rbsMotifWidth;
     private boolean hasRbsFeatureAssigned, hasPromtorFeaturesAssigned;
     private boolean isConsideredTSS;
-    private boolean isIntergenicAntisense;
-    /**
-     * A comment the user can set in the table during the analysis.
-     */
+    private boolean isIntragenicAntisense;
+    private FeatureType assignedFeatureType;
+    private boolean is3PrimeUtrAntisense, is5PrimeUtrAntisense, assignedToStableRNA;
     private String comment;
 
     /**
@@ -71,9 +72,11 @@ public class TranscriptionStart extends TrackChromResultEntry {
      * @param chromId Chromosome ID.
      *
      */
-    public TranscriptionStart(int tssStartPosition, boolean isFwdStrand, int readStarts, double relCount, PersistantFeature detectedGene, int offset, int dist2start, int dist2stop, PersistantFeature nextDownstreamFeature,
+    public TranscriptionStart(int tssStartPosition, boolean isFwdStrand, int readStarts,
+            double relCount, PersistantFeature detectedGene, int offset, int dist2start,
+            int dist2stop, PersistantFeature nextDownstreamFeature,
             int offsetToNextDownstreamFeature, boolean leaderless, boolean cdsShift,
-            String detectedFeatStart, String detectedFeatStop, boolean isInternal, boolean putAS, int chromId, int trackId) {
+            boolean isInternal, boolean putAS, int chromId, int trackId) {
         super(trackId, chromId);
         this.startPosition = tssStartPosition;
         this.isFwdStrand = isFwdStrand;
@@ -84,45 +87,79 @@ public class TranscriptionStart extends TrackChromResultEntry {
         this.dist2start = dist2start;
         this.dist2stop = dist2stop;
         this.nextDownstreamFeature = nextDownstreamFeature;
-        this.nextOffset = offsetToNextDownstreamFeature;
+        this.offsetToNextDownstrFeature = offsetToNextDownstreamFeature;
         this.leaderless = leaderless;
         this.cdsShift = cdsShift;
-        this.detectedFeatStart = detectedFeatStart;
-        this.detectedFeatStop = detectedFeatStop;
-        this.internalTSS = isInternal;
+        this.intragenicTSS = isInternal;
         this.putativeAntisense = putAS;
     }
 
+    public TranscriptionStart(int tssStartPosition, boolean isFwdStrand, int readStarts,
+            double relCount, PersistantFeature detectedGene, int offset, int dist2start,
+            int dist2stop, int offsetToNextDownstreamFeature, boolean leaderless, boolean cdsShift,
+            boolean isInternal, boolean putAS, int chromId, int trackId) {
+        super(trackId, chromId);
+        this.startPosition = tssStartPosition;
+        this.isFwdStrand = isFwdStrand;
+        this.readStarts = readStarts;
+        this.relCount = relCount;
+        this.detectedGene = detectedGene;
+        this.offset = offset;
+        this.dist2start = dist2start;
+        this.dist2stop = dist2stop;
+        this.offsetToNextDownstrFeature = offsetToNextDownstreamFeature;
+        this.leaderless = leaderless;
+        this.cdsShift = cdsShift;
+        this.intragenicTSS = isInternal;
+        this.putativeAntisense = putAS;
+    }
+
+    public TranscriptionStart(int tssStartPosition, boolean isFwdStrand, int readStarts,
+            double relCount, int offset, int dist2start,
+            int dist2stop, PersistantFeature nextDownstreamFeature, int offsetToNextDownstreamFeature, boolean leaderless, boolean cdsShift,
+            boolean isInternal, boolean putAS, int chromId, int trackId) {
+        super(trackId, chromId);
+        this.startPosition = tssStartPosition;
+        this.isFwdStrand = isFwdStrand;
+        this.readStarts = readStarts;
+        this.relCount = relCount;
+        this.offset = offset;
+        this.dist2start = dist2start;
+        this.dist2stop = dist2stop;
+        this.offsetToNextDownstrFeature = offsetToNextDownstreamFeature;
+        this.leaderless = leaderless;
+        this.cdsShift = cdsShift;
+        this.intragenicTSS = isInternal;
+        this.putativeAntisense = putAS;
+        this.nextDownstreamFeature = nextDownstreamFeature;
+    }
+
     /**
-     * @return The position at which the gene start was detected
+     *
+     * @param startPosition
+     * @param isFwdStrand
+     * @param chromosomeId
+     * @param trackId
+     */
+    public TranscriptionStart(int startPosition, boolean isFwdStrand, int chromosomeId, int trackId) {
+        super(trackId, chromosomeId);
+        this.startPosition = startPosition;
+        this.isFwdStrand = isFwdStrand;
+    }
+
+    /**
+     * @return the position of transcriptions start site.
      */
     public int getStartPosition() {
         return this.startPosition;
     }
 
     /**
-     * @return true, if the transcript start was detected on the fwd strand,
-     * false otherwise.
+     * @return <true> if the transcript start was detected on the fwd strand,
+     * <false> otherwise.
      */
     public boolean isFwdStrand() {
         return this.isFwdStrand;
-    }
-
-    /**
-     *
-     * @return true if TSS is on forward strand.
-     */
-    public boolean isIsFwdStrand() {
-        return isFwdStrand;
-    }
-
-    /**
-     * Set Strand of TSS.
-     *
-     * @param isFwdStrand
-     */
-    public void setIsFwdStrand(boolean isFwdStrand) {
-        this.isFwdStrand = isFwdStrand;
     }
 
     /**
@@ -141,18 +178,27 @@ public class TranscriptionStart extends TrackChromResultEntry {
         return putativeAntisense;
     }
 
-    public boolean isIntergenicAntisense() {
-        return isIntergenicAntisense;
+    /**
+     *
+     * @return <true> if transcript starts intragenic antisense else <false>
+     */
+    public boolean isIntragenicAntisense() {
+        return isIntragenicAntisense;
     }
-
-    public void setIntergenicAntisense(boolean isIntergenicAntisense) {
-        this.isIntergenicAntisense = isIntergenicAntisense;
-    }
-    
-    
 
     /**
-     * Set whether this TSS is in antisense location or not.
+     * Set wether this transcript is intragenic antisense or not.
+     *
+     * @param isIntergenicAntisense <true> if transcript is intragenic antisense
+     * else <false>
+     */
+    public void setIntragenicAntisense(boolean isIntergenicAntisense) {
+        this.isIntragenicAntisense = isIntergenicAntisense;
+    }
+
+    /**
+     * Set whether this transcript is in antisense location to another annotated
+     * feature or not.
      *
      * @param putativeAntisense <true> if this TSS is in putative location.
      */
@@ -161,8 +207,9 @@ public class TranscriptionStart extends TrackChromResultEntry {
     }
 
     /**
+     * Set the number of read starts of this transcription start site.
      *
-     * @param readStarts
+     * @param readStarts the number of read starts
      */
     public void setReadStarts(int readStarts) {
         this.readStarts = readStarts;
@@ -170,15 +217,16 @@ public class TranscriptionStart extends TrackChromResultEntry {
 
     /**
      *
-     * @return relative count.
+     * @return the relative count of read starts.
      */
     public double getRelCount() {
         return relCount;
     }
 
     /**
+     * Sets the relative count of read starts.
      *
-     * @param relCount
+     * @param relCount the relative number of read starts
      */
     public void setRelCount(double relCount) {
         this.relCount = relCount;
@@ -186,7 +234,7 @@ public class TranscriptionStart extends TrackChromResultEntry {
 
     /**
      *
-     * @return <true> if transcription start site is leaderless.
+     * @return <true> if transcript is leaderless
      */
     public boolean isLeaderless() {
         return leaderless;
@@ -194,12 +242,16 @@ public class TranscriptionStart extends TrackChromResultEntry {
 
     /**
      *
-     * @return
+     * @return <true> if cds shift occur else <false>
      */
     public boolean isCdsShift() {
         return cdsShift;
     }
 
+    /**
+     *
+     * @param cdsShift
+     */
     public void setCdsShift(boolean cdsShift) {
         this.cdsShift = cdsShift;
     }
@@ -221,8 +273,8 @@ public class TranscriptionStart extends TrackChromResultEntry {
     }
 
     /**
-     * Gets the distance between transcriptions start site and translation start
-     * site, which is the start of an CDS feature.
+     * Returns the distance between transcriptions start site and translation
+     * start site, which is the start of an CDS feature.
      *
      * @return the offset length.
      */
@@ -239,16 +291,20 @@ public class TranscriptionStart extends TrackChromResultEntry {
     }
 
     /**
+     * Returns the distance from transcription start site and the translation
+     * start site of the feauter.
      *
-     * @return
+     * @return the distance to start
      */
     public int getDist2start() {
         return dist2start;
     }
 
     /**
+     * Sets the distance from transcription start site to translation start
+     * site.
      *
-     * @param dist2start
+     * @param dist2start the distance to translation start site
      */
     public void setDist2start(int dist2start) {
         this.dist2start = dist2start;
@@ -256,7 +312,7 @@ public class TranscriptionStart extends TrackChromResultEntry {
 
     /**
      *
-     * @return
+     * @return the distance to translation stop of the assigned feature
      */
     public int getDist2stop() {
         return dist2stop;
@@ -264,7 +320,7 @@ public class TranscriptionStart extends TrackChromResultEntry {
 
     /**
      *
-     * @param dist2stop
+     * @param dist2stop the distance to stop position of the assigned feature
      */
     public void setDist2stop(int dist2stop) {
         this.dist2stop = dist2stop;
@@ -290,16 +346,16 @@ public class TranscriptionStart extends TrackChromResultEntry {
      *
      * @return
      */
-    public int getNextOffset() {
-        return nextOffset;
+    public int getOffsetToNextDownstrFeature() {
+        return offsetToNextDownstrFeature;
     }
 
     /**
      *
-     * @param nextOffset
+     * @param offsetToNextDownstrFeature
      */
-    public void setNextOffset(int nextOffset) {
-        this.nextOffset = nextOffset;
+    public void setOffsetToNextDownstrFeature(int offsetToNextDownstrFeature) {
+        this.offsetToNextDownstrFeature = offsetToNextDownstrFeature;
     }
 
     /**
@@ -326,6 +382,14 @@ public class TranscriptionStart extends TrackChromResultEntry {
         return detectedFeatStart;
     }
 
+    public void setDetectedFeatStart(String detectedFeatStart) {
+        this.detectedFeatStart = detectedFeatStart;
+    }
+
+    public void setDetectedFeatStop(String detectedFeatStop) {
+        this.detectedFeatStop = detectedFeatStop;
+    }
+
     /**
      *
      * @return
@@ -336,14 +400,15 @@ public class TranscriptionStart extends TrackChromResultEntry {
 
     /**
      *
+     * @return <true> if transcript starts intragenic else <false>
      */
-    public boolean isInternalTSS() {
-        return internalTSS;
+    public boolean isIntragenicTSS() {
+        return intragenicTSS;
     }
 
     /**
      *
-     * @return
+     * @return <true> if is selected for upstream analyses else <false>
      */
     public boolean isSelected() {
         return selected;
@@ -551,5 +616,63 @@ public class TranscriptionStart extends TrackChromResultEntry {
 
     public void setFalsePositive(boolean falsePositive) {
         this.falsePositive = falsePositive;
+    }
+
+    public boolean isIntergenicTSS() {
+        return intergenicTSS;
+    }
+
+    public void setIntergenicTSS(boolean intergenicTSS) {
+        this.intergenicTSS = intergenicTSS;
+    }
+
+    public void setLeaderless(boolean leaderless) {
+        this.leaderless = leaderless;
+    }
+
+    public void setIntragenicTSS(boolean intragenicTSS) {
+        this.intragenicTSS = intragenicTSS;
+    }
+
+    public boolean isIs3PrimeUtrAntisense() {
+        return is3PrimeUtrAntisense;
+    }
+
+    public void setIs3PrimeUtrAntisense(boolean is3PrimeUtrAntisense) {
+        this.is3PrimeUtrAntisense = is3PrimeUtrAntisense;
+    }
+
+    public boolean isIs5PrimeUtrAntisense() {
+        return is5PrimeUtrAntisense;
+    }
+
+    public void setIs5PrimeUtrAntisense(boolean is5PrimeUtrAntisense) {
+        this.is5PrimeUtrAntisense = is5PrimeUtrAntisense;
+    }
+
+    public FeatureType getAssignedFeatureType() {
+        return assignedFeatureType;
+    }
+
+    public void setAssignedFeatureType(FeatureType assignedFeatureType) {
+        this.assignedFeatureType = assignedFeatureType;
+    }
+
+    public boolean isAssignedToStableRNA() {
+        return assignedToStableRNA;
+    }
+
+    public void setAssignedToStableRNA(boolean assignedToStableRNA) {
+        this.assignedToStableRNA = assignedToStableRNA;
+    }
+
+    public int getOffsetOfTss() {
+        if (detectedGene != null) {
+            return this.offset;
+        } else if (nextDownstreamFeature != null) {
+            return this.offsetToNextDownstrFeature;
+        } else {
+            return 0;
+        }
     }
 }

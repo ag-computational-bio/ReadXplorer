@@ -43,7 +43,6 @@ public class OperonDetectionStatsPanel extends javax.swing.JPanel {
                 {null},
                 {null},
                 {null},
-                {null},
                 {null}
             },
             new String [] {
@@ -66,6 +65,9 @@ public class OperonDetectionStatsPanel extends javax.swing.JPanel {
             }
         });
         operonDetectionStatsScrollpane.setViewportView(operonDetectionStatsTable);
+        if (operonDetectionStatsTable.getColumnModel().getColumnCount() > 0) {
+            operonDetectionStatsTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(OperonDetectionStatsPanel.class, "OperonDetectionStatsPanel.operonDetectionStatsTable.columnModel.title0_1")); // NOI18N
+        }
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -75,7 +77,7 @@ public class OperonDetectionStatsPanel extends javax.swing.JPanel {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(operonDetectionStatsScrollpane, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(operonDetectionStatsScrollpane, javax.swing.GroupLayout.DEFAULT_SIZE, 109, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -84,44 +86,49 @@ public class OperonDetectionStatsPanel extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
     private void initAdditionalComponents() {
+        double mappingCount = (double) this.operonStatsMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT);
+        double meanMappingLength = (double) this.operonStatsMap.get(ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH);
+        double mappingsPerMio = (double) this.operonStatsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MILLION);
+        double backgroundThreshold = (double) this.operonStatsMap.get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_OVERSPANNING_READS);
         operonDetectionStatsTable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{
                     {"Operon Statistics", ""},
-            {ResultPanelOperonDetection.OPERONS_TOTAL,
-                String.valueOf(this.operonStatsMap.get(ResultPanelOperonDetection.OPERONS_TOTAL))},
-            {ResultPanelOperonDetection.OPERONS_WITH_OVERLAPPING_READS,
-                String.valueOf(this.operonStatsMap.get(ResultPanelOperonDetection.OPERONS_WITH_OVERLAPPING_READS))},
-            {ResultPanelOperonDetection.OPERONS_WITH_INTERNAL_READS, String.valueOf(this.operonStatsMap.get(ResultPanelOperonDetection.OPERONS_WITH_INTERNAL_READS))},
-            {"Mapping Statistics", ""},
-            {ResultPanelTranscriptionStart.MAPPINGS_COUNT,
-                String.valueOf(this.operonStatsMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT))},
-            {ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH, String.valueOf(this.operonStatsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH))},
-            {ResultPanelTranscriptionStart.MAPPINGS_MILLION,
-                String.valueOf(this.operonStatsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MILLION))},
-            {ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD,
-                String.valueOf(this.operonStatsMap.get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD))}
-        },
+                    {ResultPanelOperonDetection.OPERONS_TOTAL,
+                        String.valueOf(this.operonStatsMap.get(ResultPanelOperonDetection.OPERONS_TOTAL))},
+                    {ResultPanelOperonDetection.OPERONS_TWO_GENES,
+                        String.valueOf(this.operonStatsMap.get(ResultPanelOperonDetection.OPERONS_TWO_GENES))},
+                    {ResultPanelOperonDetection.OPERONS_BIGGEST,
+                        String.valueOf(this.operonStatsMap.get(ResultPanelOperonDetection.OPERONS_BIGGEST))},
+                    {"Mapping Statistics", ""},
+                    {ResultPanelTranscriptionStart.MAPPINGS_COUNT,
+                        String.valueOf(String.format("%2.2f", mappingCount))},
+                    {ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH, String.valueOf(String.format("%2.2f", meanMappingLength))},
+                    {ResultPanelTranscriptionStart.MAPPINGS_MILLION,
+                        String.valueOf(String.format("%2.2f", mappingsPerMio))},
+                    {ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_OVERSPANNING_READS,
+                        String.valueOf(String.format("%2.2f", backgroundThreshold))}
+                },
                 new String[]{
-            NbBundle.getMessage(OperonDetectionStatsPanel.class, "OperonDetectionStatsPanel.operonDetectionStatsTable.columnModel.title0"),
-            NbBundle.getMessage(OperonDetectionStatsPanel.class, "OperonDetectionStatsPanel.operonDetectionStatsTable.columnModel.title1")
-        }) {
-            private static final long serialVersionUID = 1L;
-            Class[] types = new Class[]{
-                java.lang.String.class, java.lang.String.class
-            };
-            boolean[] canEdit = new boolean[]{
-                false, false
-            };
+                    NbBundle.getMessage(OperonDetectionStatsPanel.class, "OperonDetectionStatsPanel.operonDetectionStatsTable.columnModel.title0"),
+                    NbBundle.getMessage(OperonDetectionStatsPanel.class, "OperonDetectionStatsPanel.operonDetectionStatsTable.columnModel.title1")
+                }) {
+                    private static final long serialVersionUID = 1L;
+                    Class[] types = new Class[]{
+                        java.lang.String.class, java.lang.String.class
+                    };
+                    boolean[] canEdit = new boolean[]{
+                        false, false
+                    };
 
-            @Override
-            public Class getColumnClass(int columnIndex) {
-                return types[columnIndex];
-            }
+                    @Override
+                    public Class getColumnClass(int columnIndex) {
+                        return types[columnIndex];
+                    }
 
-            @Override
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit[columnIndex];
-            }
-        });
+                    @Override
+                    public boolean isCellEditable(int rowIndex, int columnIndex) {
+                        return canEdit[columnIndex];
+                    }
+                });
     }
 }

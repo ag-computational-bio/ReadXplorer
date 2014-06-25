@@ -26,10 +26,18 @@ public class NovelTranscriptDetection implements Observer, AnalysisI<List<NovelT
         this.trackid = trackID;
     }
 
+    /**
+     * Performs the novel transcript detection.
+     *
+     * @param forwardCDSs
+     * @param reverseCDSs
+     * @param allRegionsInHash
+     * @param stats
+     * @param params
+     */
     public void runningNewRegionsDetection(HashMap<Integer, List<Integer>> forwardCDSs,
             HashMap<Integer, List<Integer>> reverseCDSs, HashMap<Integer, PersistantFeature> allRegionsInHash,
             StatisticsOnMappingData stats, ParameterSetWholeTranscriptAnalyses params) {
-
 
         // Key is flag and Value the count of this flag
         HashMap<Integer, Integer> dropdownsFwd = new HashMap<>();
@@ -40,26 +48,27 @@ public class NovelTranscriptDetection implements Observer, AnalysisI<List<NovelT
         int[][] fwdCov = stats.getFwdCoverage(); // Array with coverage counts of mappings in forward direction.
         int[][] revCov = stats.getRevCoverage(); // Array with coverage counts of mappings in reverse direction.
         double bg = stats.getBgThreshold(); // Background cutoff
+//        double bg = 12;
         int minLengthBoundary = params.getMinLengthBoundary();
         for (PersistantChromosome chrom : refGenome.getChromosomes().values()) {
             int chromId = chrom.getId();
             int chromNo = chrom.getChromNumber();
             int chromLength = chrom.getLength();
             int ratio = 0;
+            int rev_i = 0;
             boolean isInclusionOfRatio = params.isRatioInclusion();
             if (isInclusionOfRatio) {
                 ratio = params.getIncreaseRatioValue();
             }
 
             for (int i = 0; i < chromLength; i++) {
-
+                rev_i = chromLength - i - 1;
                 if (((forward[chromNo - 1][i] > bg) || (reverse[chromNo - 1][i] > bg)) && isInclusionOfRatio) { // background cutoff is passed
                     int f_before = forward[chromNo - 1][i - 1] + 1;
                     int r_before = reverse[chromNo - 1][i + 1] + 1;
 
                     int f_ratio = (forward[chromNo - 1][i] + 1) / f_before;
                     int r_ratio = (reverse[chromNo - 1][i] + 1) / r_before;
-
 
                     if (f_ratio > ratio) { // got through possible forward hits first
                         int j = 0;
@@ -75,6 +84,7 @@ public class NovelTranscriptDetection implements Observer, AnalysisI<List<NovelT
                             }
                             j++;
                         }
+                        end = 0;
                         if (!forwardCDSs.containsKey(i + j - end)) {
 //	    # if the count crosses the threshold far from a gene
                             int k = 0;
@@ -92,66 +102,63 @@ public class NovelTranscriptDetection implements Observer, AnalysisI<List<NovelT
                             } else {
                                 dropdownsFwd.put(flag, 1);
                             }
-//                        newRegion = new NovelTranscript(true, flag, j, trackID);
-//		new_regs{fwd}{flag}++;
-                            int possibleStop = flag + 1;
-//		# and report the likely transcript
+                            int possibleStop = flag;
                             String site = "intergenic";
                             if (reverseCDSs.containsKey(start) || reverseCDSs.containsKey(possibleStop)) {
                                 site = "cis-antisense";
                             }
 
-                            int lengthOfNewRegion = flag - i;
+                            int lengthOfNewRegion = possibleStop - start;
+                            lengthOfNewRegion++;
                             if (dropdownsFwd.get(flag) == 1 && lengthOfNewRegion >= minLengthBoundary) {
-//                            push(@{$new_regs{out}{$start}}, "$pos\t+\t$fwd\t$site") unless ($new_regs{fwd}{$flag} > 1);
-                                newRegion = new NovelTranscript(true, start, possibleStop, site, (possibleStop - start), getSubSeq(chrom, true, start, possibleStop), false, false, trackid, chromId);
-                                System.out.println(newRegion.toString());
+                                newRegion = new NovelTranscript(true, start, possibleStop, site, lengthOfNewRegion, getSubSeq(chrom, true, start, possibleStop), false, false, trackid, chromId);
                                 novelRegions.add(newRegion);
                             }
                         }
                     }
 // #############################################################################
 
-
                     if (r_ratio > ratio) {
                         int j = 0;
                         int end = 0;
-                        while (!reverseCDSs.containsKey(end + i - j)) {
+                        while (!reverseCDSs.containsKey(end + rev_i - j)) {
                             if (j > 700) {
                                 break;
                             }
-                            if ((i - j) == 0) {
+                            if ((rev_i - j) == 0) {
                                 end = chromLength;
                             }
                             j++;
                         }
-                        if (!reverseCDSs.containsKey(end + i - j)) {
+                        end = 0;
+                        if (!reverseCDSs.containsKey(end + rev_i - j)) {
                             int k = 0;
-                            while (revCov[chromNo - 1][end + i - k] > bg) {
-                                if ((i - k) == 0) {
+                            while (revCov[chromNo - 1][end + rev_i - k - 1] > bg) {
+                                if ((rev_i - k) == 0) {
                                     end = chromLength;
                                 }
                                 k++;
                             }
-                            int start = i + 1;
-                            int flag = end + i - k;
-//                      $new_regs{rev}{flag}++;
+                            int start = rev_i;
+                            int flag = end + rev_i - k;
+                            flag--;
                             if (dropdownsRev.containsKey(flag)) {
                                 dropdownsRev.put(flag, dropdownsRev.get(flag) + 1);
                             } else {
                                 dropdownsRev.put(flag, 1);
                             }
-                            int possibleStop = flag + 1;
+                            int possibleStop = flag;
                             String site = "intergenic";
                             if (forwardCDSs.containsKey(start) || forwardCDSs.containsKey(possibleStop)) {
                                 site = "cis-antisense";
                             }
-                            int lengthOfNewRegion = i - flag;
+                            int lengthOfNewRegion = start - possibleStop;
+                            lengthOfNewRegion++;
                             if (dropdownsRev.get(flag) == 1 && lengthOfNewRegion >= minLengthBoundary) { // unless ($new_regs{rev}{$flag} > 1) {
 //                          push(@{$new_regs{out}{$start}}, "$pos\t-\t$rev\t$site");
                                 String reversedSeq = new StringBuffer(getSubSeq(chrom, false, possibleStop, start)).reverse().toString();
                                 String revComplement = getComplement(reversedSeq);
-                                newRegion = new NovelTranscript(false, start, possibleStop, site, (start - possibleStop), revComplement, false, false, trackid, chromId);
+                                newRegion = new NovelTranscript(false, start, possibleStop, site, lengthOfNewRegion, revComplement, false, false, trackid, chromId);
                                 novelRegions.add(newRegion);
                             }
                         }
@@ -172,6 +179,7 @@ public class NovelTranscriptDetection implements Observer, AnalysisI<List<NovelT
                             }
                             j++;
                         }
+                        end = 0;
                         if (!forwardCDSs.containsKey(i + j - end)) {
 //	    # if the count crosses the threshold far from a gene
                             int k = 0;
@@ -179,6 +187,9 @@ public class NovelTranscriptDetection implements Observer, AnalysisI<List<NovelT
                             while (fwdCov[chromNo - 1][i + k - end] > bg) {
                                 if ((i + k) > chromLength) {
                                     end = chromLength;
+                                }
+                                if (i + k - end == 25858 || i + k - end == 28459) {
+                                    System.out.println("i == 25860 || i == 28461");
                                 }
                                 k++;
                             }
@@ -189,71 +200,67 @@ public class NovelTranscriptDetection implements Observer, AnalysisI<List<NovelT
                             } else {
                                 dropdownsFwd.put(flag, 1);
                             }
-//                        newRegion = new NovelTranscript(true, flag, j, trackID);
-//		new_regs{fwd}{flag}++;
-                            int possibleStop = flag + 1;
-//		# and report the likely transcript
+                            int possibleStop = flag;
                             String site = "intergenic";
                             if (reverseCDSs.containsKey(start) || reverseCDSs.containsKey(possibleStop)) {
                                 site = "cis-antisense";
                             }
 
-                            int lengthOfNewRegion = flag - i;
+                            int lengthOfNewRegion = possibleStop - start;
+                            lengthOfNewRegion++;
                             if (dropdownsFwd.get(flag) == 1 && lengthOfNewRegion >= minLengthBoundary) {
-//                            push(@{$new_regs{out}{$start}}, "$pos\t+\t$fwd\t$site") unless ($new_regs{fwd}{$flag} > 1);
-                                newRegion = new NovelTranscript(true, start, possibleStop, site, (possibleStop - start), getSubSeq(chrom, true, start, possibleStop), false, false, trackid, chromId);
-                                System.out.println(newRegion.toString());
+                                newRegion = new NovelTranscript(true, start, possibleStop, site, lengthOfNewRegion, getSubSeq(chrom, true, start, possibleStop), false, false, trackid, chromId);
                                 novelRegions.add(newRegion);
                             }
                         }
                     }
 // #############################################################################
 
-
-                    if (reverse[chromNo - 1][i] > bg) {
+                    if (reverse[chromNo - 1][rev_i] > bg) {
                         int j = 0;
                         int end = 0;
-                        while (!reverseCDSs.containsKey(end + i - j)) {
+                        while (!reverseCDSs.containsKey(end + rev_i - j)) {
                             if (j > 700) {
                                 break;
                             }
-                            if ((i - j) == 0) {
+                            if ((rev_i - j) == 0) {
                                 end = chromLength;
                             }
                             j++;
                         }
-                        if (!reverseCDSs.containsKey(end + i - j)) {
+                        end = 0;
+                        if (!reverseCDSs.containsKey(end + rev_i - j)) {
                             int k = 0;
-                            while (revCov[chromNo - 1][end + i - k] > bg) {
-                                if ((i - k) == 0) {
+                            while (revCov[chromNo - 1][end + rev_i - k - 1] > bg) {
+                                if ((rev_i - k) == 0) {
                                     end = chromLength;
                                 }
                                 k++;
                             }
-                            int start = i + 1;
-                            int flag = end + i - k;
-//                      $new_regs{rev}{flag}++;
+
+                            int start = rev_i;
+                            int flag = end + rev_i - k;
+                            flag--;
                             if (dropdownsRev.containsKey(flag)) {
                                 dropdownsRev.put(flag, dropdownsRev.get(flag) + 1);
                             } else {
                                 dropdownsRev.put(flag, 1);
                             }
-                            int possibleStop = flag + 1;
+                            int possibleStop = flag;
                             String site = "intergenic";
                             if (forwardCDSs.containsKey(start) || forwardCDSs.containsKey(possibleStop)) {
                                 site = "cis-antisense";
                             }
-                            int lengthOfNewRegion = i - flag;
+                            int lengthOfNewRegion = start - possibleStop;
+                            lengthOfNewRegion++;
                             if (dropdownsRev.get(flag) == 1 && lengthOfNewRegion >= minLengthBoundary) { // unless ($new_regs{rev}{$flag} > 1) {
-//                          push(@{$new_regs{out}{$start}}, "$pos\t-\t$rev\t$site");
                                 String reversedSeq = new StringBuffer(getSubSeq(chrom, false, possibleStop, start)).reverse().toString();
                                 String revComplement = getComplement(reversedSeq);
-                                newRegion = new NovelTranscript(false, start, possibleStop, site, (start - possibleStop), revComplement, false, false, trackid, chromId);
+                                newRegion = new NovelTranscript(false, start, possibleStop, site, lengthOfNewRegion, revComplement, false, false, trackid, chromId);
                                 novelRegions.add(newRegion);
                             }
                         }
                     }
-
                 }
             }
         }

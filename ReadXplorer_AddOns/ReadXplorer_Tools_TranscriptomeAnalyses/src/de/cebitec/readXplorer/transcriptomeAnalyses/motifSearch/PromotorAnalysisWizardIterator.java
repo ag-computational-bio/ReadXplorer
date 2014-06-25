@@ -4,6 +4,7 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch;
 
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ChartType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.PurposeEnum;
 import de.cebitec.readXplorer.transcriptomeAnalyses.rbsAnalysis.DataSelectionWizardPanel;
 import java.awt.Component;
@@ -45,7 +46,7 @@ public final class PromotorAnalysisWizardIterator implements WizardDescriptor.It
     private void initializePanels() {
         if (allPanels == null) {
             allPanels = new ArrayList<>();
-            allPanels.add(new DataSelectionWizardPanel(PurposeEnum.MOTIF_SEARCH)); // 0
+            allPanels.add(new DataSelectionWizardPanel(PurposeEnum.PROMOTER_ANALYSIS)); // 0
             allPanels.add(new FivePrimeUTRPromotorSettingsWizardPanel(PROP_WIZARD_NAME)); // 1
             String[] steps = new String[allPanels.size()];
             for (int i = 0; i < allPanels.size(); i++) {

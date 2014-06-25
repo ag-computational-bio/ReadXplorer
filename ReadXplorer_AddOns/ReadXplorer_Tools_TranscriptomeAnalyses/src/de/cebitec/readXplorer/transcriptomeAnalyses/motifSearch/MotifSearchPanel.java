@@ -62,9 +62,9 @@ public class MotifSearchPanel extends javax.swing.JPanel implements Observable {
         regionOfIntrestMinusTenTP.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         this.infoPanel.setBorder(BorderFactory.createTitledBorder("Info panel"));
 
-        this.minus10LogoPanel.setBorder(BorderFactory.createTitledBorder("-10 Motif"));
+        this.minus10LogoPanel.setBorder(BorderFactory.createTitledBorder("Identified -10 motif"));
         this.minus10LogoPanel.setLayout(new BorderLayout());
-        this.minus35LogoPanel.setBorder(BorderFactory.createTitledBorder("-35 Motif"));
+        this.minus35LogoPanel.setBorder(BorderFactory.createTitledBorder("Identified -35 motif"));
         this.minus35LogoPanel.setLayout(new BorderLayout());
     }
 

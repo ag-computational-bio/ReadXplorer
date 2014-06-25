@@ -33,7 +33,15 @@ public class ExportFeature {
     int minus35MotifWidth;
     int rbsMotifWidth;
     int geneStart;
+    int geneStop;
 
+    /**
+     * 
+     * @param feature
+     * @param minus10MotifWidth
+     * @param minus35MotifWidth
+     * @param minusRbsMotifWidth 
+     */
     public ExportFeature(PersistantFeature feature, int minus10MotifWidth, int minus35MotifWidth, int minusRbsMotifWidth) {
         this.minus10MotifWidth = minus10MotifWidth;
         this.minus35MotifWidth = minus35MotifWidth;
@@ -47,6 +55,17 @@ public class ExportFeature {
         this.feature = feature;
     }
 
+    /**
+     * 
+     * @param tssPosition
+     * @param rbsPosistion
+     * @param minus10Position
+     * @param minus35Position
+     * @param hasPromotor
+     * @param hasRbs
+     * @param promotorSequenceLength
+     * @param rbsSequenceLength 
+     */
     public void setValues(int tssPosition, int rbsPosistion, int minus10Position, int minus35Position, boolean hasPromotor, boolean hasRbs, int promotorSequenceLength, int rbsSequenceLength) {
         tssPositions.add(tssPosition);
         rbsAssignments.put(tssPosition, hasRbs);
@@ -62,7 +81,6 @@ public class ExportFeature {
                 minus35Positions.put(tssPosition, minus35Position);
             }
         }
-
 
         if (promotorSequenceLength > 0 && isPromotrSequenceLenghSet == false) {
             this.promotorSequenceLength = promotorSequenceLength;
@@ -172,4 +190,23 @@ public class ExportFeature {
     public int getRbsSequenceLength() {
         return rbsSequenceLength;
     }
+
+    /**
+     * 
+     * @return 
+     */
+    public int getGeneStop() {
+        if (feature != null) {
+            if (feature.isFwdStrand()) {
+                geneStop = feature.getStop();
+                return geneStop;
+            } else {
+                geneStop = feature.getStart();
+                return geneStop;
+            }
+        } else {
+            return 0;
+        }
+    }
+
 }

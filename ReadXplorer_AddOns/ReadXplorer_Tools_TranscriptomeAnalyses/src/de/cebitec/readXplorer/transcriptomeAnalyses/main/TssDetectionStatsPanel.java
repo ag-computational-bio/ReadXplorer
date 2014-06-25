@@ -88,43 +88,52 @@ public class TssDetectionStatsPanel extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
     private void initAdditionalComponents() {
+
+        double mappingCount = (double) this.tssStatisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT);
+        double meanMappingLength = (double) this.tssStatisticsMap.get(ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH);
+        double mappingsPerMio = (double) this.tssStatisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MILLION);
+        double backgroundThreshold = (double) this.tssStatisticsMap.get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_STACKSIZE);
         tssDetectionStatsTable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{
-            {"TSS Statistics", ""},
-            {ResultPanelTranscriptionStart.TSS_TOTAL, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_TOTAL))},
-            {ResultPanelTranscriptionStart.TSS_CORRECT, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_CORRECT))},
-            {ResultPanelTranscriptionStart.TSS_FWD, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_FWD))},
-            {ResultPanelTranscriptionStart.TSS_REV, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_REV))},
-            {ResultPanelTranscriptionStart.TSS_LEADERLESS, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_LEADERLESS))},
-            {ResultPanelTranscriptionStart.TSS_INTERNAL, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_INTERNAL))},
-            {ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE))},
-            {ResultPanelTranscriptionStart.TSS_NO_PUTATIVE_CDS_SHIFTS, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_NO_PUTATIVE_CDS_SHIFTS))},
-            {"Mapping statistics", ""},
-            {ResultPanelTranscriptionStart.MAPPINGS_COUNT, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT))},
-            {ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH))},
-            {ResultPanelTranscriptionStart.MAPPINGS_MILLION, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MILLION))},
-            {ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD))},},
+                    {"TSS Statistics", ""},
+                    {ResultPanelTranscriptionStart.TSS_TOTAL, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_TOTAL))},
+                    {ResultPanelTranscriptionStart.TSS_FWD, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_FWD))},
+                    {ResultPanelTranscriptionStart.TSS_REV, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_REV))},
+                    {ResultPanelTranscriptionStart.TSS_LEADERLESS, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_LEADERLESS))},
+                    {ResultPanelTranscriptionStart.TSS_INTRAGENIC_TSS, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_INTRAGENIC_TSS))},
+                    {ResultPanelTranscriptionStart.TSS_INTERGENIC_TSS, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_INTERGENIC_TSS))},
+                    {ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE_IN_TOTAL, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE_IN_TOTAL))},
+                    {ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE_OF_3_PRIME_UTR, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE_OF_3_PRIME_UTR))},
+                    {ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE_OF_5_PRIME_UTR, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE_OF_5_PRIME_UTR))},
+                    {ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE_INTRAGENIC, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE_INTRAGENIC))},
+                    {ResultPanelTranscriptionStart.TSS_ASSIGNED_TO_STABLE_RNA, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_ASSIGNED_TO_STABLE_RNA))},
+                    {ResultPanelTranscriptionStart.TSS_NO_PUTATIVE_CDS_SHIFTS, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_NO_PUTATIVE_CDS_SHIFTS))},
+                    {"Mapping statistics", ""},
+                    {ResultPanelTranscriptionStart.MAPPINGS_COUNT, String.valueOf(String.format("%2.2f", mappingCount))},
+                    {ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH, String.valueOf(String.format("%2.2f", meanMappingLength))},
+                    {ResultPanelTranscriptionStart.MAPPINGS_MILLION, String.valueOf(String.format("%2.2f", mappingsPerMio))},
+                    {ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_STACKSIZE, String.valueOf(String.format("%2.2f", backgroundThreshold))},},
                 new String[]{
-            NbBundle.getMessage(TssDetectionStatsPanel.class, "TssDetectionStatsPanel.tssDetectionStatsTable.columnModel.title0"),
-            NbBundle.getMessage(TssDetectionStatsPanel.class, "TssDetectionStatsPanel.tssDetectionStatsTable.columnModel.title1")
-        }) {
-            private static final long serialVersionUID = 1L;
-            Class[] types = new Class[]{
-                java.lang.String.class, java.lang.String.class
-            };
-            boolean[] canEdit = new boolean[]{
-                false, false
-            };
+                    NbBundle.getMessage(TssDetectionStatsPanel.class, "TssDetectionStatsPanel.tssDetectionStatsTable.columnModel.title0"),
+                    NbBundle.getMessage(TssDetectionStatsPanel.class, "TssDetectionStatsPanel.tssDetectionStatsTable.columnModel.title1")
+                }) {
+                    private static final long serialVersionUID = 1L;
+                    Class[] types = new Class[]{
+                        java.lang.String.class, java.lang.String.class
+                    };
+                    boolean[] canEdit = new boolean[]{
+                        false, false
+                    };
 
-            @Override
-            public Class getColumnClass(int columnIndex) {
-                return types[columnIndex];
-            }
+                    @Override
+                    public Class getColumnClass(int columnIndex) {
+                        return types[columnIndex];
+                    }
 
-            @Override
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit[columnIndex];
-            }
-        });
+                    @Override
+                    public boolean isCellEditable(int rowIndex, int columnIndex) {
+                        return canEdit[columnIndex];
+                    }
+                });
     }
 }

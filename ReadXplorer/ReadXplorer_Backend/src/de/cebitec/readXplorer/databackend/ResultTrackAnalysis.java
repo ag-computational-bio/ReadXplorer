@@ -11,12 +11,13 @@ import java.util.Map;
 
 /**
  * Data container for a result of an analysis for a list of tracks.
+ *
  * @param <T> class type of the parameter set
- * 
+ *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
-    
+public abstract class ResultTrackAnalysis<T> implements ExcelExportDataI {
+
     private Map<Integer, PersistantTrack> trackMap;
     private Map<Integer, PersistantChromosome> chromMap;
     private List<String> trackNameList;
@@ -27,12 +28,15 @@ public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
     private int filterColumn;
 
     /**
-     * A result of an analysis for a list of tracks. It also fetches and stores 
-     * the map of chromosomes for which the analysis was carried out hashed to 
+     * A result of an analysis for a list of tracks. It also fetches and stores
+     * the map of chromosomes for which the analysis was carried out hashed to
      * their respective chromosomes id.
-     * @param trackMap the map of track ids to the tracks for which the analysis was carried out
-     * @param referenceId id of the reference genome, for which this result was generated
-     * @param combineTracks <cc>true</cc>, if the tracks in the list are 
+     *
+     * @param trackMap the map of track ids to the tracks for which the analysis
+     * was carried out
+     * @param referenceId id of the reference genome, for which this result was
+     * generated
+     * @param combineTracks <cc>true</cc>, if the tracks in the list are
      * combined, <cc>false</cc> otherwise
      * @param trackColumn
      * @param filterColumn
@@ -47,7 +51,7 @@ public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
         this.trackColumn = trackColumn;
         this.filterColumn = filterColumn;
     }
-    
+
     /**
      * @return trackColumn
      */
@@ -69,11 +73,12 @@ public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
     public boolean isCombineTracks() {
         return combineTracks;
     }
-    
+
     /**
-     * Concatenates all track names either in full length or each name trimmed 
+     * Concatenates all track names either in full length or each name trimmed
      * to 20 characters.
-     * @param fullLength <cc>true</cc>, if the track names shall appear in full 
+     *
+     * @param fullLength <cc>true</cc>, if the track names shall appear in full
      * length, <cc>false</cc> otherwise
      * @return The concatenated String containing all track names.
      */
@@ -91,9 +96,9 @@ public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
         if (!concatTrackNames.isEmpty()) {
             concatTrackNames = concatTrackNames.substring(0, concatTrackNames.length() - 2);
         }
-        return concatTrackNames; 
+        return concatTrackNames;
     }
-    
+
 //    private String getCombinedTrackIds() {
 //        String concatTrackIds = "";
 //        for (PersistantTrack track : trackMap.values()) {
@@ -104,15 +109,14 @@ public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
 //        }
 //        return concatTrackIds;
 //    }
-
     /**
      * @param trackId the track id of the track whose entry is needed
-     * @param getFullengthName true, if the concated names shall be returned for 
+     * @param getFullengthName true, if the concated names shall be returned for
      * combined tracks, false, if shortened concated names shall be returned for
-     * combined tracks. For single tracks, this option does not have an 
+     * combined tracks. For single tracks, this option does not have an
      * influence.
-     * @return Either a PersistantTrack entry for a single track or a String
-     * of the track names or ids for a combined list of tracks
+     * @return Either a PersistantTrack entry for a single track or a String of
+     * the track names or ids for a combined list of tracks
      */
     public Object getTrackEntry(int trackId, boolean getFullengthName) {
         Object trackEntry;
@@ -125,8 +129,9 @@ public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
     }
 
     /**
-     * Sets the map of tracks for which the analysis was carried out hashed
-     * to their respective track id
+     * Sets the map of tracks for which the analysis was carried out hashed to
+     * their respective track id
+     *
      * @param trackMap the map of tracks for which the analysis was carried out
      */
     public void setTrackMap(Map<Integer, PersistantTrack> trackMap) {
@@ -141,9 +146,9 @@ public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
     public Map<Integer, PersistantTrack> getTrackMap() {
         return trackMap;
     }
-    
+
     /**
-     * @return The map of chromosomes for which the analysis was carried out 
+     * @return The map of chromosomes for which the analysis was carried out
      * hashed to their respective chromosome id.
      */
     public Map<Integer, PersistantChromosome> getChromosomeMap() {
@@ -159,6 +164,7 @@ public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
 
     /**
      * Sets the parameter set which was used for the analysis
+     *
      * @param parameters the parameter set which was used for the analysis
      */
     public void setParameters(ParameterSetI<T> parameters) {
@@ -182,23 +188,26 @@ public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
 
     /**
      * Sets the statistics map associated with this analysis.
+     *
      * @param statsMap the statistics map associated with this analysis
      */
     public void setStatsMap(Map<String, Integer> statsMap) {
         this.statsMap = statsMap;
     }
-    
+
     /**
      * Adds a key value pair to the stats map.
+     *
      * @param key the key of the pair
      * @param value the value of the pair
      */
     public void addStatsToMap(String key, int value) {
         this.statsMap.put(key, value);
     }
-    
+
     /**
      * Creates a table row for statistic entries by the given identifier
+     *
      * @param identifier the identifier of the statistic value
      * @return the list containing the identifier and its statistic value
      */
@@ -214,7 +223,8 @@ public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
     /**
      * Adds the complete content of the internal statistics map to the given
      * table content (list of object list)
-     * @param statisticsExportData the table content, to which the content of 
+     *
+     * @param statisticsExportData the table content, to which the content of
      * the internal statistics map shall be added
      */
     public void createStatisticTableRows(List<List<Object>> statisticsExportData) {
@@ -222,9 +232,10 @@ public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
             statisticsExportData.add(this.createStatisticTableRow(id));
         }
     }
-    
+
     /**
      * Creates a table row (= object list) with two elemets.
+     *
      * @param fstEntry first entry of the table row
      * @param scndEntry second entry of the table row
      * @return the new table row (= object list)
@@ -235,9 +246,26 @@ public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
         row.add(scndEntry);
         return row;
     }
-    
+
+    /**
+     * Creates a table row (= object list) with three elemets.
+     *
+     * @param fstEntry first entry of the table row
+     * @param scndEntry second entry of the table row
+     * @param thrdEntry third entry of the table row
+     * @return the new table row (= object list)
+     */
+    public static List<Object> createThreeElementTableRow(Object fstEntry, Object scndEntry, Object thrdEntry) {
+        List<Object> row = new ArrayList<>();
+        row.add(fstEntry);
+        row.add(scndEntry);
+        row.add(thrdEntry);
+        return row;
+    }
+
     /**
      * Creates a table row (= object list) with only one element.
+     *
      * @param entry the entry of the table row
      * @return the new table row (= object list)
      */
@@ -246,5 +274,5 @@ public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
         row.add(entry);
         return row;
     }
-    
+
 }

@@ -11,15 +11,15 @@ import org.openide.util.NbBundle;
 public class NovelRegionDetectionStatsPanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
-    private HashMap<String, Object> tssStatisticsMap;
+    private HashMap<String, Object> statisticsMap;
 
     /**
      * Panel for showing the the statistics of a TSS detection result.
      *
-     * @param tssStatisticsMap the snp results statistics to display
+     * @param statisticsMap the snp results statistics to display
      */
-    public NovelRegionDetectionStatsPanel(HashMap<String, Object> tssStatisticsMap) {
-        this.tssStatisticsMap = tssStatisticsMap;
+    public NovelRegionDetectionStatsPanel(HashMap<String, Object> statisticsMap) {
+        this.statisticsMap = statisticsMap;
         initComponents();
         this.initAdditionalComponents();
     }
@@ -38,7 +38,6 @@ public class NovelRegionDetectionStatsPanel extends javax.swing.JPanel {
 
         tssDetectionStatsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null},
                 {null, null},
                 {null, null},
                 {null, null},
@@ -66,8 +65,10 @@ public class NovelRegionDetectionStatsPanel extends javax.swing.JPanel {
             }
         });
         tssDetectionStatsScrollpane.setViewportView(tssDetectionStatsTable);
-        tssDetectionStatsTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionDetectionStatsPanel.class, "NovelRegionDetectionStatsPanel.tssDetectionStatsTable.columnModel.title0")); // NOI18N
-        tssDetectionStatsTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionDetectionStatsPanel.class, "NovelRegionDetectionStatsPanel.tssDetectionStatsTable.columnModel.title1_1")); // NOI18N
+        if (tssDetectionStatsTable.getColumnModel().getColumnCount() > 0) {
+            tssDetectionStatsTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionDetectionStatsPanel.class, "NovelRegionDetectionStatsPanel.tssDetectionStatsTable.columnModel.title0")); // NOI18N
+            tssDetectionStatsTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionDetectionStatsPanel.class, "NovelRegionDetectionStatsPanel.tssDetectionStatsTable.columnModel.title1_1")); // NOI18N
+        }
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -77,7 +78,7 @@ public class NovelRegionDetectionStatsPanel extends javax.swing.JPanel {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(tssDetectionStatsScrollpane, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(tssDetectionStatsScrollpane, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -86,41 +87,44 @@ public class NovelRegionDetectionStatsPanel extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
     private void initAdditionalComponents() {
+        double mappingCount = (double) this.statisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT);
+        double meanMappingLength = (double) this.statisticsMap.get(ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH);
+        double mappingsPerMio = (double) this.statisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MILLION);
+        double backgroundThreshold = (double) this.statisticsMap.get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_STACKSIZE);
         tssDetectionStatsTable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{
                     {"Novel Transcript Statistics", ""},
-            {NovelRegionResultPanel.NOVELREGION_DETECTION_MIN_LENGTH, String.valueOf(this.tssStatisticsMap.get(NovelRegionResultPanel.NOVELREGION_DETECTION_MIN_LENGTH))},
-            {NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_FEATURES, String.valueOf(this.tssStatisticsMap.get(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_FEATURES))},
-            {NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_REV_FEATURES, String.valueOf(this.tssStatisticsMap.get(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_REV_FEATURES))},
-            {NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_FWD_FEATURES, String.valueOf(this.tssStatisticsMap.get(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_FWD_FEATURES))},
-            {NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_CISANTISENSE, String.valueOf(this.tssStatisticsMap.get(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_CISANTISENSE))},
-            {NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_TRANSGENIC, String.valueOf(this.tssStatisticsMap.get(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_TRANSGENIC))},
-            {"Mapping Statistics", ""},
-            {ResultPanelTranscriptionStart.MAPPINGS_COUNT, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT))},
-            {ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH))},
-            {ResultPanelTranscriptionStart.MAPPINGS_MILLION, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MILLION))},
-            {ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD))}},
+                    {NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_FEATURES, String.valueOf(this.statisticsMap.get(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_FEATURES))},
+                    {NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_REV_FEATURES, String.valueOf(this.statisticsMap.get(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_REV_FEATURES))},
+                    {NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_FWD_FEATURES, String.valueOf(this.statisticsMap.get(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_FWD_FEATURES))},
+                    {NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_CISANTISENSE, String.valueOf(this.statisticsMap.get(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_CISANTISENSE))},
+                    {NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_TRANSGENIC, String.valueOf(this.statisticsMap.get(NovelRegionResultPanel.NOVELREGION_DETECTION_NO_OF_TRANSGENIC))},
+                    {"Mapping Statistics", ""},
+                    {ResultPanelTranscriptionStart.MAPPINGS_COUNT, String.valueOf(String.format("%2.2f", mappingCount))},
+                    {ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH, String.valueOf(String.format("%2.2f", meanMappingLength))},
+                    {ResultPanelTranscriptionStart.MAPPINGS_MILLION, String.valueOf(String.format("%2.2f", mappingsPerMio))},
+                    {ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_STACKSIZE, String.valueOf(String.format("%2.2f", backgroundThreshold))}},
                 new String[]{
-            NbBundle.getMessage(NovelRegionDetectionStatsPanel.class, "TssDetectionStatsPanel.tssDetectionStatsTable.columnModel.title0"),
-            NbBundle.getMessage(NovelRegionDetectionStatsPanel.class, "TssDetectionStatsPanel.tssDetectionStatsTable.columnModel.title1")
-        }) {
-            private static final long serialVersionUID = 1L;
-            Class[] types = new Class[]{
-                java.lang.String.class, java.lang.String.class
-            };
-            boolean[] canEdit = new boolean[]{
-                false, false
-            };
+                    NbBundle.getMessage(NovelRegionDetectionStatsPanel.class, "TssDetectionStatsPanel.tssDetectionStatsTable.columnModel.title0"),
+                    NbBundle.getMessage(NovelRegionDetectionStatsPanel.class, "TssDetectionStatsPanel.tssDetectionStatsTable.columnModel.title1")
+                }) {
+                    private static final long serialVersionUID = 1L;
+                    Class[] types = new Class[]{
+                        java.lang.String.class, java.lang.String.class
+                    };
+                    boolean[] canEdit = new boolean[]{
+                        false, false
+                    };
 
-            @Override
-            public Class getColumnClass(int columnIndex) {
-                return types[columnIndex];
-            }
+                    @Override
+                    public Class getColumnClass(int columnIndex) {
+                        return types[columnIndex];
+                    }
 
-            @Override
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit[columnIndex];
-            }
-        });
+                    @Override
+                    public boolean isCellEditable(int rowIndex, int columnIndex) {
+                        return canEdit[columnIndex];
+                    }
+                });
     }
 }

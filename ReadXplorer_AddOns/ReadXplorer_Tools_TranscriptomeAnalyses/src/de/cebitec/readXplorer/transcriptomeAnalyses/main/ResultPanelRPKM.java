@@ -6,9 +6,14 @@ import de.cebitec.readXplorer.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.RPKMvalue;
 import de.cebitec.readXplorer.util.UneditableTableModel;
 import de.cebitec.readXplorer.view.analysis.ResultTablePanel;
+import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.readXplorer.view.tableVisualization.tableFilter.TableRightClickFilter;
+import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
+import de.cebitec.readXplorer.view.tableVisualization.TableUtils;
 import java.util.HashMap;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
@@ -27,10 +32,13 @@ public class ResultPanelRPKM extends ResultTablePanel {
     public static final String RETURNED_FEATURES = "Total number of returned features";
     public static final String FEATURES_TOTAL = "Total number of reference features";
     private RPKMAnalysisResult rpkmCalcResult;
-    private HashMap<String, Integer> filterStatisticsMap;
+    private final HashMap<String, Object> filterStatisticsMap;
     private PersistantFeature feature;
-    private boolean statistics = false;
-    private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
+    private final boolean statistics = false;
+    private BoundsInfoManager boundsInfoManager;
+    private ReferenceViewer referenceViewer;
+    private final TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
+    private ReferenceFeatureTopComp refComp;
 
     /**
      * Panel showing a result of an analysis filtering for features with a min
@@ -41,12 +49,17 @@ public class ResultPanelRPKM extends ResultTablePanel {
         this.rpkmTable.getTableHeader().addMouseListener(tableFilter);
         this.filterStatisticsMap = new HashMap<>();
         this.filterStatisticsMap.put(RETURNED_FEATURES, 0);
+//        this.refComp = ReferenceFeatureTopComp.findInstance();
 
         DefaultListSelectionModel model = (DefaultListSelectionModel) this.rpkmTable.getSelectionModel();
         model.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                showFeatureStartPosition();
+//                showFeatureStartPosition();
+                int posColumnIdx = 3;
+                int chromColumnIdx = 10;
+                TableUtils.showPosition(rpkmTable, posColumnIdx, chromColumnIdx, boundsInfoManager);
+//                refComp.showTableFeature(rpkmTable, 0);
             }
         });
     }
@@ -69,14 +82,14 @@ public class ResultPanelRPKM extends ResultTablePanel {
 
             },
             new String [] {
-                "Feature", "Feature type", "Track", "Chromosome", "Strand", "Feature Start", "Feature Stop", "Length", "RPKM", "Log-RPKM", "Chrom. ID", "Track ID"
+                "Feature", "Feature Type", "Strand", "Feature Start", "Feature Stop", "Feature Length", "Longest Detected 5'-UTR Length", "RPKM", "Log-RPKM", "Mapped Total", "Chromosome", "Chrom. ID", "Track", "Track ID"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Long.class, java.lang.Long.class, java.lang.Long.class, java.lang.Double.class, java.lang.Double.class, java.lang.Integer.class, java.lang.Integer.class
+                java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Long.class, java.lang.Long.class, java.lang.Long.class, java.lang.Integer.class, java.lang.Double.class, java.lang.Double.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -88,18 +101,22 @@ public class ResultPanelRPKM extends ResultTablePanel {
             }
         });
         jScrollPane1.setViewportView(rpkmTable);
-        rpkmTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title0_1")); // NOI18N
-        rpkmTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title5_1")); // NOI18N
-        rpkmTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title8_1")); // NOI18N
-        rpkmTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title4_1")); // NOI18N
-        rpkmTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title9_1")); // NOI18N
-        rpkmTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title1_1")); // NOI18N
-        rpkmTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title2_1")); // NOI18N
-        rpkmTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title7_1_1")); // NOI18N
-        rpkmTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title9_2")); // NOI18N
-        rpkmTable.getColumnModel().getColumn(9).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title10_1")); // NOI18N
-        rpkmTable.getColumnModel().getColumn(10).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title10_2")); // NOI18N
-        rpkmTable.getColumnModel().getColumn(11).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title11_1")); // NOI18N
+        if (rpkmTable.getColumnModel().getColumnCount() > 0) {
+            rpkmTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title0_1")); // NOI18N
+            rpkmTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title5_1")); // NOI18N
+            rpkmTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title9_1")); // NOI18N
+            rpkmTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title1_1")); // NOI18N
+            rpkmTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title2_1")); // NOI18N
+            rpkmTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title7_1_1")); // NOI18N
+            rpkmTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title13_1")); // NOI18N
+            rpkmTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title9_2")); // NOI18N
+            rpkmTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title10_1")); // NOI18N
+            rpkmTable.getColumnModel().getColumn(9).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title12_1")); // NOI18N
+            rpkmTable.getColumnModel().getColumn(10).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title4_1")); // NOI18N
+            rpkmTable.getColumnModel().getColumn(11).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title10_2")); // NOI18N
+            rpkmTable.getColumnModel().getColumn(12).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title8_1")); // NOI18N
+            rpkmTable.getColumnModel().getColumn(13).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.rpkmTable.columnModel.title11_1")); // NOI18N
+        }
 
         exportButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelRPKM.class, "ResultPanelRPKM.exportButton.text_1")); // NOI18N
         exportButton.addActionListener(new java.awt.event.ActionListener() {
@@ -150,6 +167,18 @@ public class ResultPanelRPKM extends ResultTablePanel {
     }
 
     /**
+     * Set the reference viewer needed for updating the currently shown position
+     * and extracting the reference sequence.
+     *
+     * @param referenceViewer the reference viewer belonging to this analysis
+     * result
+     */
+    public void setReferenceViewer(ReferenceViewer referenceViewer) {
+        this.boundsInfoManager = referenceViewer.getBoundsInformationManager();
+        this.referenceViewer = referenceViewer;
+    }
+
+    /**
      * Adds a list of features with read count and RPKM values to this panel.
      *
      * @param newResult the new result to add
@@ -159,7 +188,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
 
         if (newResult instanceof RPKMAnalysisResult) {
             RPKMAnalysisResult rpkmCalcResultNew = (RPKMAnalysisResult) newResult;
-            final int nbColumns = 12;
+            final int nbColumns = 14;
 
             if (this.rpkmCalcResult == null) {
                 this.rpkmCalcResult = rpkmCalcResultNew;
@@ -167,33 +196,40 @@ public class ResultPanelRPKM extends ResultTablePanel {
             } else {
                 this.rpkmCalcResult.getResults().addAll(rpkmCalcResultNew.getResults());
             }
-            DefaultTableModel model = (DefaultTableModel) this.rpkmTable.getModel();
 
-            PersistantFeature feat;
-            for (RPKMvalue rpkm : rpkmCalcResult.getResults()) {
-                feat = rpkm.getFeature();
-                Object[] rowData = new Object[nbColumns];
-                int i = 0;
-                rowData[i++] = feat;
-                rowData[i++] = feat.getType();
-                rowData[i++] = this.rpkmCalcResult.getTrackEntry(rpkm.getTrackId(), false);
-                rowData[i++] = rpkmCalcResultNew.getChromosomeMap().get(feat.getChromId());
-                rowData[i++] = feat.isFwdStrandString();
-                rowData[i++] = feat.isFwdStrand() ? feat.getStart() : feat.getStop();
-                rowData[i++] = feat.isFwdStrand() ? feat.getStop() : feat.getStart();
-                rowData[i++] = feat.getStop() - feat.getStart();
-                rowData[i++] = rpkm.getRPKM();
-                rowData[i++] = rpkm.getLogRpkm();
-                rowData[i++] = feat.getChromId();
-                rowData[i++] = rpkm.getTrackId();
-                
+//            SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
+//                @Override
+//                public void run() {
+                    DefaultTableModel model = (DefaultTableModel) rpkmTable.getModel();
 
-                model.addRow(rowData);
-            }
+                    PersistantFeature feat;
+                    for (RPKMvalue rpkm : rpkmCalcResult.getResults()) {
+                        feat = rpkm.getFeature();
+                        Object[] rowData = new Object[nbColumns];
+                        int i = 0;
+                        rowData[i++] = feat.getLocus();
+                        rowData[i++] = feat.getType();
+                        rowData[i++] = feat.isFwdStrandString();
+                        rowData[i++] = feat.isFwdStrand() ? feat.getStart() : feat.getStop();
+                        rowData[i++] = feat.isFwdStrand() ? feat.getStop() : feat.getStart();
+                        rowData[i++] = ((feat.getStop() + 1) - (feat.getStart() + 1)) + 1;
+                        rowData[i++] = rpkm.getLongestKnownUtrLength();
+                        rowData[i++] = rpkm.getRPKM();
+                        rowData[i++] = rpkm.getLogRpkm();
+                        rowData[i++] = rpkm.getReadCount();
+                        rowData[i++] = rpkmCalcResult.getChromosomeMap().get(feat.getChromId());
+                        rowData[i++] = feat.getChromId();
+                        rowData[i++] = rpkmCalcResult.getTrackEntry(rpkm.getTrackId(), false);
+                        rowData[i++] = rpkm.getTrackId();
 
-            TableRowSorter<TableModel> sorter = new TableRowSorter<>();
-            this.rpkmTable.setRowSorter(sorter);
-            sorter.setModel(model);
+                        model.addRow(rowData);
+                    }
+
+                    TableRowSorter<TableModel> sorter = new TableRowSorter<>();
+                    rpkmTable.setRowSorter(sorter);
+                    sorter.setModel(model);
+//                }
+//            });
         }
     }
 

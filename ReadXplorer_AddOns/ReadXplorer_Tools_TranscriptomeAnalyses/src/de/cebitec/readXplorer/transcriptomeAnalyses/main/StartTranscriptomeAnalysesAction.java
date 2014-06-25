@@ -1,12 +1,18 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.StartCodon;
+import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.FivePrimeEnrichedTracksVisualPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.TranscriptomeAnalysisWizardIterator;
+import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.WizardPropertyStrings;
+import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import javax.swing.JOptionPane;
 import org.openide.DialogDisplayer;
@@ -31,9 +37,7 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
     private final ReferenceViewer refViewer;
     private List<PersistantTrack> tracks;
     private HashMap<Integer, PersistantTrack> trackMap;
-//    private String readClassPropString;
-//    private String selFeatureTypesPropString;
-    private int referenceId;
+    private final int referenceId;
     private FiveEnrichedDataAnalysesHandler fifePrimeAnalysesHandler;
     private WholeTranscriptDataAnalysisHandler wholeTranscriptAnalysesHandler;
     private boolean performFivePrimeAnalyses;
@@ -41,7 +45,9 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
     private double fraction = 0.05;
     private int minBoundaryLength;
     private int increaseRatioValue;
+    private boolean isBgThresholdSetManually;
     private TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
+    private File referenceFile;
 
     public StartTranscriptomeAnalysesAction(ReferenceViewer reference) {
         this.refViewer = reference;
@@ -61,12 +67,6 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
     private void runWizardAndTranscriptionAnalysis() {
         @SuppressWarnings("unchecked")
         TranscriptomeAnalysisWizardIterator transWizardIterator = new TranscriptomeAnalysisWizardIterator(this.referenceId);
-//        boolean containsDBTrack = PersistantTrack.checkForDBTrack(this.tracks);
-//        transWizardIterator.setUsingDBTrack(containsDBTrack);
-//        this.readClassPropString = transWizardIterator.getReadClassPropForWiz();
-//        this.selFeatureTypesPropString = transWizardIterator.getPropSelectedFeatTypes();
-
-
         WizardDescriptor wiz = new WizardDescriptor(transWizardIterator);
         transWizardIterator.setWiz(wiz);
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
@@ -102,20 +102,37 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
     @SuppressWarnings("unchecked")
     private void startTranscriptomeAnalyses(WizardDescriptor wiz) {
         for (PersistantTrack track : this.tracks) {
-            this.performFivePrimeAnalyses = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_FIVEPRIME_DATASET);
-            this.performWholeTrascriptomeAnalyses = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_WHOLEGENOME_DATASET);
+            this.performFivePrimeAnalyses = (boolean) wiz.getProperty(WizardPropertyStrings.PROP_FIVEPRIME_DATASET);
+            this.performWholeTrascriptomeAnalyses = (boolean) wiz.getProperty(WizardPropertyStrings.PROP_WHOLEGENOME_DATASET);
 
             if (performFivePrimeAnalyses) {
-                int ratio = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_RATIO);
-                this.fraction = (double) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_Fraction);
-                boolean excludeInternalTss = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_INTERNAL_TSS);
-                int excludeTSSDistance = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_EXCLUDE_TSS_DISTANCE);
-                int leaderlessDistance = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_LEADERLESS_LIMIT);
-                int keepingInternalTssDistance = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_KEEPINTERNAL_DISTANCE);
-                int cdsShiftPercentage = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_PERCENTAGE_FOR_CDS_ANALYSIS);
+                int ratio = (int) wiz.getProperty(WizardPropertyStrings.PROP_RATIO);
+                this.fraction = (double) wiz.getProperty(WizardPropertyStrings.PROP_Fraction);
+                boolean excludeAllInternalTss = (boolean) wiz.getProperty(WizardPropertyStrings.PROP_EXCLUDE_INTERNAL_TSS);
+                int excludeTSSDistance = (int) wiz.getProperty(WizardPropertyStrings.PROP_UTR_LIMIT);
+                int leaderlessDistance = (int) wiz.getProperty(WizardPropertyStrings.PROP_LEADERLESS_LIMIT);
+                int keepingInternalTssDistance = (int) wiz.getProperty(WizardPropertyStrings.PROP_KEEP_ITRAGENIC_DISTANCE_LIMIT);
+                int cdsShiftPercentage = (int) wiz.getProperty(WizardPropertyStrings.PROP_PERCENTAGE_FOR_CDS_ANALYSIS);
+                boolean keepAllIntragenicTss = (boolean) wiz.getProperty(WizardPropertyStrings.PROP_KEEP_ALL_INTRAGENIC_TSS);
+                boolean keepOnlyAssignedIntragenicTss = (boolean) wiz.getProperty(WizardPropertyStrings.PROP_KEEP_ONLY_ITRAGENIC_TSS_ASSIGNED_TO_FEATURE);
+                boolean includeBestMatchedReads = (boolean) wiz.getProperty(WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_TSS);
+                boolean isThresholdManuallySetted = (boolean) wiz.getProperty(WizardPropertyStrings.PROP_SET_MANAULLY_MIN_STACK_SIZE);
+                int minStackSizeManuallySetted = (int) wiz.getProperty(WizardPropertyStrings.PROP_MANAULLY_MIN_STACK_SIZE);
+                int maxDistantaseFor3UtrAntisenseDetection = (int) wiz.getProperty(WizardPropertyStrings.PROP_MAX_DIST_FOR_3_UTR_ANTISENSE_DETECTION);
+                HashMap<String, StartCodon> validStartCodons = (HashMap<String, StartCodon>) wiz.getProperty(WizardPropertyStrings.PROP_VALID_START_CODONS);
 
-                ParameterSetFiveEnrichedAnalyses parameterSetFiveprime = new ParameterSetFiveEnrichedAnalyses(this.fraction, ratio,
-                        excludeInternalTss, excludeTSSDistance, leaderlessDistance, keepingInternalTssDistance, cdsShiftPercentage);
+                HashSet<FeatureType> excludeFeatureTypes = (HashSet<FeatureType>) wiz.getProperty(FivePrimeEnrichedTracksVisualPanel.PROP_SELECTED_FEAT_TYPES_FADE_OUT);
+
+                ParameterSetFiveEnrichedAnalyses parameterSetFiveprime
+                        = new ParameterSetFiveEnrichedAnalyses(this.fraction, ratio,
+                                excludeAllInternalTss, excludeTSSDistance, leaderlessDistance,
+                                keepingInternalTssDistance, keepAllIntragenicTss, keepOnlyAssignedIntragenicTss,
+                                cdsShiftPercentage, includeBestMatchedReads,
+                                maxDistantaseFor3UtrAntisenseDetection, validStartCodons,
+                                excludeFeatureTypes);
+
+                parameterSetFiveprime.setThresholdManuallySet(isThresholdManuallySetted);
+                parameterSetFiveprime.setManuallySetThreshold(minStackSizeManuallySetted);
 
                 // start five prime transcripts analyses handler
                 this.fifePrimeAnalysesHandler = new FiveEnrichedDataAnalysesHandler(
@@ -126,29 +143,42 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
 
             if (this.performWholeTrascriptomeAnalyses) {
                 // get needed params
-                this.performOperonDetection = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_OPERON_ANALYSIS);
-                this.performNovelRegionDetection = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_NOVEL_ANALYSIS);
+                this.performOperonDetection = (boolean) wiz.getProperty(WizardPropertyStrings.PROP_OPERON_ANALYSIS);
+                this.performNovelRegionDetection = (boolean) wiz.getProperty(WizardPropertyStrings.PROP_NOVEL_ANALYSIS);
+                boolean includeBestMatchedReadsOp = false;
+                boolean includeBestMatchedReadsRpkm = (boolean) wiz.getProperty(WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_RPKM);
+                boolean includeBestMatchedReadsNr = false;
+                this.referenceFile = (File) wiz.getProperty(WizardPropertyStrings.PROP_REFERENCE_FILE_RPKM_DETERMINATION);
+                boolean isThresholdManuallySetted = false;
+                int minStackSizeManuallySetted = 1;
 
-                this.performRpkmAnalysis = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_RPKM_ANALYSIS);
+                this.performRpkmAnalysis = (boolean) wiz.getProperty(WizardPropertyStrings.PROP_RPKM_ANALYSIS);
                 if (this.performOperonDetection) {
-                    this.fraction = (double) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_Fraction);
+                    includeBestMatchedReadsOp = (boolean) wiz.getProperty(WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_OP);
+                    this.fraction = (double) wiz.getProperty(WizardPropertyStrings.PROP_Fraction);
+                    isThresholdManuallySetted = (boolean) wiz.getProperty(WizardPropertyStrings.PROP_SET_MANAULLY_MIN_STACK_SIZE);
+                    minStackSizeManuallySetted = (int) wiz.getProperty(WizardPropertyStrings.PROP_MANAULLY_MIN_STACK_SIZE);
                 }
 
                 if (this.performNovelRegionDetection) {
-                    this.fraction = (double) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_FRACTION_NOVELREGION_DETECTION);
-                    this.minBoundaryLength = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_MIN_BOUNDRY_LENGTH);
-                    this.ratioInclusion = (boolean) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_INCLUDE_RATIOVALUE_IN_NOVEL_REGION_DETECTION);
+                    includeBestMatchedReadsNr = (boolean) wiz.getProperty(WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_NR);
+                    this.fraction = (double) wiz.getProperty(WizardPropertyStrings.PROP_Fraction);
+                    this.minBoundaryLength = (int) wiz.getProperty(WizardPropertyStrings.PROP_MIN_LENGTH_OF_NOVEL_TRANSCRIPT);
+                    this.ratioInclusion = (boolean) wiz.getProperty(WizardPropertyStrings.PROP_INCLUDE_RATIO_VALUE_IN_NOVEL_REGION_DETECTION);
                     if (this.ratioInclusion) {
-                        this.increaseRatioValue = (int) wiz.getProperty(TranscriptomeAnalysisWizardIterator.PROP_RAIO_NOVELREGION_DETECTION);
+                        this.increaseRatioValue = (int) wiz.getProperty(WizardPropertyStrings.PROP_RATIO_NOVELREGION_DETECTION);
                     } else {
                         this.increaseRatioValue = 0;
                     }
-
+                    isThresholdManuallySetted = (boolean) wiz.getProperty(WizardPropertyStrings.PROP_SET_MANAULLY_MIN_STACK_SIZE);
+                    minStackSizeManuallySetted = (int) wiz.getProperty(WizardPropertyStrings.PROP_MANAULLY_MIN_STACK_SIZE);
                 }
 
                 ParameterSetWholeTranscriptAnalyses parameterSetWholeTranscripts = new ParameterSetWholeTranscriptAnalyses(this.performWholeTrascriptomeAnalyses,
                         this.performOperonDetection, this.performNovelRegionDetection,
-                        this.performRpkmAnalysis, this.fraction, this.minBoundaryLength, this.ratioInclusion, this.increaseRatioValue);
+                        this.performRpkmAnalysis, this.referenceFile, this.fraction, this.minBoundaryLength, this.ratioInclusion, this.increaseRatioValue, includeBestMatchedReadsOp, includeBestMatchedReadsRpkm, includeBestMatchedReadsNr);
+                parameterSetWholeTranscripts.setThresholdManuallySet(isThresholdManuallySetted);
+                parameterSetWholeTranscripts.setManuallySetThreshold(minStackSizeManuallySetted);
                 // start whole transcript analyses handler
                 this.wholeTranscriptAnalysesHandler = new WholeTranscriptDataAnalysisHandler(track, parameterSetWholeTranscripts, this.refViewer,
                         this.transcAnalysesTopComp, this.trackMap);

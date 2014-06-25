@@ -5,7 +5,6 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.filterWizard;
 
-import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.TranscriptomeAnalysisWizardIterator;
 import java.util.prefs.Preferences;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
@@ -14,7 +13,21 @@ import org.openide.util.NbPreferences;
 
 public class FilterWizardPanel implements WizardDescriptor.Panel<WizardDescriptor> {
 
-    private String wizardName;
+    public static final String PROP_FILTER_ONLY_TAGGED_FOR_UPSTREAM_ANALYSIS = "only tagged for upstream analysis";
+    public static final String PROP_FILTER_ONLY_INTRAGENIC = "only intragenic TSS";
+    public static final String PROP_FILTER_ONLY_TAGGED_AS_FINISH = "only tagged as finish";
+    public static final String PROP_FILTER_ONLY_INTERGENIC = "only intergenic TSS";
+    public static final String PROP_FILTER_ONLY_ANTISENSE = "only antisense TSS";
+    public static final String PROP_FILTER_ONLY_LEADERLESS = "only leaderless TSS";
+    public static final String PROP_FILTER_COMPLEMENT = "filter complement";
+    public static final String PROP_FILTER_FALSE_POSITIVE = "only false positives";
+    public static final String PROP_FILTER_STABLE_RNA = "only stable rna";
+    public static final String PROP_FILTER_FIVE_PRIME_UTR_ANTISENSE = "only 5'-UTR antisense";
+    public static final String PROP_FILTER_THREE_PRIME_UTR_ANTISENSE = "only 3'-UTR antisense";
+    public static final String PROP_FILTER_INTRAGENIC_ANTISENSE = "only intragenic antisense";
+    public static final String PROP_FILTER_ALL_NON_STABLE_RNA = "only elements assigned to non stable RNA features";
+
+    private final String wizardName;
     public static final String PROP_FILTER_FOR_READSTARTS = "filter for read starts";
     public static final String PROP_FILTER_READSTARTS = "read starts";
     public static final String PROP_FILTER_FOR_SINGLE_TSS = "filter for single TSS";
@@ -79,18 +92,29 @@ public class FilterWizardPanel implements WizardDescriptor.Panel<WizardDescripto
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
         wiz.putProperty(FilterWizardPanel.PROP_FILTER_FOR_MULTIPLE_TSS, component.isMultipleSelected());
-        wiz.putProperty(FilterWizardPanel.PROP_FILTER_FOR_MULTIPLE_TSS_WITH_SHIFTS, component.isMultipleWithShiftsSelected());
         wiz.putProperty(FilterWizardPanel.PROP_FILTER_FOR_READSTARTS, component.isExtractionOfTSSWithAtLeastRSSelected());
         wiz.putProperty(FilterWizardPanel.PROP_FILTER_FOR_SINGLE_TSS, component.isSingleSelected());
         wiz.putProperty(FilterWizardPanel.PROP_FILTER_READSTARTS, component.getAtLeastReadStarts());
-        wiz.putProperty(FilterWizardPanel.PROP_FILTER_WITH_MIN_SHIFT, component.getShift());
+        wiz.putProperty(FilterWizardPanel.PROP_FILTER_ONLY_TAGGED_FOR_UPSTREAM_ANALYSIS, component.isOnlyUpstreamRegions());
+        wiz.putProperty(FilterWizardPanel.PROP_FILTER_ONLY_TAGGED_AS_FINISH, component.isOnlyFinished());
+        wiz.putProperty(FilterWizardPanel.PROP_FILTER_ONLY_INTRAGENIC, component.isOnlyIntragenic());
+        wiz.putProperty(FilterWizardPanel.PROP_FILTER_ONLY_INTERGENIC, component.isOnlyIntergenic());
+        wiz.putProperty(FilterWizardPanel.PROP_FILTER_ONLY_ANTISENSE, component.isOnlyPutativeAntisense());
+        wiz.putProperty(FilterWizardPanel.PROP_FILTER_ONLY_LEADERLESS, component.isOnlyLeaderless());
+        wiz.putProperty(FilterWizardPanel.PROP_FILTER_FALSE_POSITIVE, component.isFalsePositive());
+
+        wiz.putProperty(FilterWizardPanel.PROP_FILTER_INTRAGENIC_ANTISENSE, component.isIntragenicAntisenseSelected());
+        wiz.putProperty(FilterWizardPanel.PROP_FILTER_THREE_PRIME_UTR_ANTISENSE, component.isThreePrimeAntisenseSelected());
+        wiz.putProperty(FilterWizardPanel.PROP_FILTER_FIVE_PRIME_UTR_ANTISENSE, component.isFivePrimeUtrAntisenseSelected());
+
+        wiz.putProperty(FilterWizardPanel.PROP_FILTER_STABLE_RNA, component.isStableRnaSelected());
+        wiz.putProperty(FilterWizardPanel.PROP_FILTER_ALL_NON_STABLE_RNA, component.isOnlyNonStableRnaSelected());
         storePrefs();
     }
 
     private void storePrefs() {
         Preferences pref = NbPreferences.forModule(Object.class);
         pref.put(wizardName + FilterWizardPanel.PROP_FILTER_READSTARTS, component.getAtLeastReadStarts().toString());
-        pref.put(wizardName + FilterWizardPanel.PROP_FILTER_WITH_MIN_SHIFT, component.getShift().toString());
     }
 
 }

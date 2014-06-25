@@ -49,11 +49,11 @@ public class RbsMotifSearchPanel extends javax.swing.JPanel implements Observabl
      */
     private void additionalInits() {
         this.logoPanel.setLayout(new BorderLayout());
-        this.logoPanel.setBorder(BorderFactory.createTitledBorder("Motif - Sequence Logo"));
-        this.jPanel2.setBorder(BorderFactory.createTitledBorder("Regions in Focus"));
+        this.logoPanel.setBorder(BorderFactory.createTitledBorder("Identified motif"));
+        this.jPanel2.setBorder(BorderFactory.createTitledBorder("Selected length of sequence for analysis"));
         this.regionsToAnalyseTP.setEditable(false);
         this.regionsToAnalyseTP.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        this.jPanel3.setBorder(BorderFactory.createTitledBorder("Regions of Intrest"));
+        this.jPanel3.setBorder(BorderFactory.createTitledBorder("Regions of interest"));
         this.regionOfIntrestTP.setEditable(false);
         this.regionOfIntrestTP.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         this.infoPanel.setBorder(BorderFactory.createTitledBorder("Info panel"));
@@ -154,7 +154,7 @@ public class RbsMotifSearchPanel extends javax.swing.JPanel implements Observabl
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 687, Short.MAX_VALUE)
+            .addComponent(jScrollPane2)
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -167,7 +167,7 @@ public class RbsMotifSearchPanel extends javax.swing.JPanel implements Observabl
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+            .addComponent(jScrollPane3)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

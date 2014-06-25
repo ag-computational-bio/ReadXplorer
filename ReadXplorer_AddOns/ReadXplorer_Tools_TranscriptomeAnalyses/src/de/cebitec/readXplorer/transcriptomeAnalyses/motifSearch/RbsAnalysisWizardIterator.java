@@ -4,6 +4,7 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch;
 
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ChartType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.PurposeEnum;
 import de.cebitec.readXplorer.transcriptomeAnalyses.rbsAnalysis.DataSelectionWizardPanel;
 import java.awt.Component;
@@ -37,7 +38,7 @@ public final class RbsAnalysisWizardIterator implements WizardDescriptor.Iterato
     private void initializePanels() {
         if (allPanels == null) {
             allPanels = new ArrayList<>();
-            allPanels.add(new DataSelectionWizardPanel(PurposeEnum.MOTIF_SEARCH));
+            allPanels.add(new DataSelectionWizardPanel(PurposeEnum.RBS_ANALYSIS));
             allPanels.add(new RbsAnalysisWizardPanel(PROP_WIZARD_NAME));
             String[] steps = new String[allPanels.size()];
             for (int i = 0; i < allPanels.size(); i++) {

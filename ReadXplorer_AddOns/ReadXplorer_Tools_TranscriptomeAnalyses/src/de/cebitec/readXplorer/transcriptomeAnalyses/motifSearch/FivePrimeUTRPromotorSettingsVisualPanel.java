@@ -10,7 +10,7 @@ import javax.swing.JPanel;
 import org.openide.util.NbPreferences;
 
 public final class FivePrimeUTRPromotorSettingsVisualPanel extends JPanel {
-
+    
     private final String wizardName;
 
     /**
@@ -53,36 +53,36 @@ public final class FivePrimeUTRPromotorSettingsVisualPanel extends JPanel {
         noTimesTryingTF.setText(pref.get(wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_NUMBER_OF_TRYING, "40"));
         alternativeSpacerTF.setText(pref.get(wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_ALTERNATIVE_SPACER, "29"));
     }
-
+    
     @Override
     public String getName() {
-        return "Parameters for promotor-detection";
+        return "Parameters for Promotor detection using BioProspector";
     }
-
+    
     public Integer getAlternativeSpacer() {
         return Integer.valueOf(this.alternativeSpacerTF.getText());
     }
-
+    
     public Integer getSpacer1Length() {
         return Integer.valueOf(this.minSpacer1TF.getText());
     }
-
+    
     public Integer getSpacer2Length() {
         return Integer.valueOf(this.minSpacer2TF.getText());
     }
-
+    
     public Integer getPutativeMinusTenLength() {
         return Integer.valueOf(this.putativeMinus10RegionTF.getText());
     }
-
+    
     public Integer getPutativeMinusThirtyFiveLength() {
         return Integer.valueOf(this.putativeMinus35RegionTF.getText());
     }
-
+    
     public Integer getMinus10MotifWidth() {
         return Integer.valueOf(this.minus10MotifWidthTF.getText());
     }
-
+    
     public Integer getMinus35MotifWidth() {
         return Integer.valueOf(this.minus35MotifWidthTF.getText());
     }
@@ -124,7 +124,7 @@ public final class FivePrimeUTRPromotorSettingsVisualPanel extends JPanel {
         alternativeSpacerTF = new javax.swing.JTextField();
         jSeparator2 = new javax.swing.JSeparator();
 
-        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cebitec/readXplorer/transcriptomeAnalyses/resources/newPromotorSearch.PNG"))); // NOI18N
+        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cebitec/readXplorer/transcriptomeAnalyses/resources/promotorSearchWizardFig.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLabel6, org.openide.util.NbBundle.getMessage(FivePrimeUTRPromotorSettingsVisualPanel.class, "FivePrimeUTRPromotorSettingsVisualPanel.jLabel6.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(FivePrimeUTRPromotorSettingsVisualPanel.class, "FivePrimeUTRPromotorSettingsVisualPanel.jLabel1.text")); // NOI18N
@@ -183,19 +183,15 @@ public final class FivePrimeUTRPromotorSettingsVisualPanel extends JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(noTimesTryingTF, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel9)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(setToDefaultValuesButton))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING))
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel9)
-                                .addGap(18, 18, 18)
-                                .addComponent(noTimesTryingTF, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(466, 466, 466)
-                                .addComponent(setToDefaultValuesButton))
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
@@ -227,16 +223,19 @@ public final class FivePrimeUTRPromotorSettingsVisualPanel extends JPanel {
                                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                         .addComponent(jLabel2)
                                         .addGap(18, 18, 18)
-                                        .addComponent(putativeMinus10RegionTF, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                        .addGap(0, 0, Short.MAX_VALUE))))
-            .addComponent(jSeparator2)
+                                        .addComponent(putativeMinus10RegionTF, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jLabel6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel6)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -292,6 +291,7 @@ public final class FivePrimeUTRPromotorSettingsVisualPanel extends JPanel {
         this.noTimesTryingTF.setText("40");
         this.putativeMinus10RegionTF.setText("9");
         this.putativeMinus35RegionTF.setText("9");
+        this.alternativeSpacerTF.setText("29");
     }//GEN-LAST:event_setToDefaultValuesButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField alternativeSpacerTF;

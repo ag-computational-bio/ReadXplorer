@@ -5,6 +5,7 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.OperonAdjacency;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
+import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.WizardPropertyStrings;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,19 +58,17 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetWhole
         dataColumnDescriptions.add("Putative Operon Transcript Begin");
         dataColumnDescriptions.add("Feature 1");
         dataColumnDescriptions.add("Feature 2");
-        dataColumnDescriptions.add("Track");
-        dataColumnDescriptions.add("Chromosome");
         dataColumnDescriptions.add("Strand");
         dataColumnDescriptions.add("Start Anno 1");
         dataColumnDescriptions.add("Start Anno 2");
-        dataColumnDescriptions.add("Upstream Analysis");
+        dataColumnDescriptions.add("False Positive");
         dataColumnDescriptions.add("Finished");
-//        dataColumnDescriptions.add("Reads Overlap Stop 1");
-//        dataColumnDescriptions.add("Reads Overlap Start 2");
-//        dataColumnDescriptions.add("Internal Reads");
         dataColumnDescriptions.add("Spanning Reads");
-        dataColumnDescriptions.add("Operon-String");
+        dataColumnDescriptions.add("Operon String");
+        dataColumnDescriptions.add("Number Of Genes");
+        dataColumnDescriptions.add("Chromosome");
         dataColumnDescriptions.add("Chromosome ID");
+        dataColumnDescriptions.add("Track");
         dataColumnDescriptions.add("Track ID");
 
         allSheetDescriptions.add(dataColumnDescriptions);
@@ -94,9 +93,6 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetWhole
             String strand = (operon.getOperonAdjacencies().get(0).getFeature1().isFwdStrandString());
             String startAnno1 = "";
             String startAnno2 = "";
-//            String readsAnno1 = "";
-//            String readsAnno2 = "";
-//            String internalReads = "";
             String spanningReads = "";
             int chromId = operon.getOperonAdjacencies().get(0).getFeature1().getChromId();
 
@@ -105,9 +101,6 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetWhole
                 annoName2 += opAdj.getFeature2().getLocus() + "\n";
                 startAnno1 += opAdj.getFeature1().getStart() + "\n";
                 startAnno2 += opAdj.getFeature2().getStart() + "\n";
-//                readsAnno1 += opAdj.getReadsFeature1() + "\n";
-//                readsAnno2 += opAdj.getReadsFeature2() + "\n";
-//                internalReads += opAdj.getInternalReads() + "\n";
                 spanningReads += opAdj.getSpanningReads() + "\n";
 
             }
@@ -117,24 +110,29 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetWhole
                     : operon.getOperonAdjacencies().get(0).getFeature1().getStop());
             operonsRow.add(annoName1);
             operonsRow.add(annoName2);
-            operonsRow.add(this.getTrackEntry(operon.getTrackId(), true));
-            operonsRow.add(this.getChromosomeMap().get(operon.getOperonAdjacencies().get(0).getFeature1().getChromId()));
+
             operonsRow.add(strand);
             operonsRow.add(startAnno1);
             operonsRow.add(startAnno2);
-            operonsRow.add(operon.isForUpstreamAnalysisMarked());
+            operonsRow.add(operon.isFalsPositive());
             operonsRow.add(operon.isConsidered());
-//            operonsRow.add(readsAnno1);
-//            operonsRow.add(readsAnno2);
-//            operonsRow.add(internalReads);
             operonsRow.add(spanningReads);
             operonsRow.add(operon.toOperonString());
+            operonsRow.add(operon.getNbOfGenes());
+
+            operonsRow.add(this.getChromosomeMap().get(chromId));
             operonsRow.add(chromId);
+            operonsRow.add(this.getTrackEntry(operon.getTrackId(), true));
             operonsRow.add(operon.getTrackId());
             operonResults.add(operonsRow);
         }
 
         exportData.add(operonResults);
+
+        double mappingCount = (double) this.operonStatsMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT);
+        double meanMappingLength = (double) this.operonStatsMap.get(ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH);
+        double mappingsPerMio = (double) this.operonStatsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MILLION);
+        double backgroundThreshold = (double) this.operonStatsMap.get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_OVERSPANNING_READS);
 
         //create statistics sheet
         ParameterSetWholeTranscriptAnalyses operonDetectionParameters = (ParameterSetWholeTranscriptAnalyses) this.getParameters();
@@ -145,31 +143,38 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetWhole
 
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between title and parameters
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("Operon detection parameters:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelOperonDetection.OPERONS_BACKGROUND_THRESHOLD,
-                this.getOperonStatsMap().get(ResultPanelOperonDetection.OPERONS_BACKGROUND_THRESHOLD)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Fraction for Background threshold calculation:",
+        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("Parameters:"));
+//        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelOperonDetection.OPERONS_BACKGROUND_THRESHOLD,
+//                this.getOperonStatsMap().get(ResultPanelOperonDetection.OPERONS_BACKGROUND_THRESHOLD)));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_OP,
+                operonDetectionParameters.isIncludeBestMatchedReadsOP() ? "yes" : "no"));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_FRACTION,
                 operonDetectionParameters.getFraction()));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_MANUALLY_SET_THRESHOLD,
+                operonDetectionParameters.isThresholdManuallySet() ? "yes" : "no"));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_OVERSPANNING_READS,
+                String.valueOf(String.format("%2.2f", backgroundThreshold))));
 
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between parameters and statistics
 
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("Operon detection statistics:"));
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelOperonDetection.OPERONS_TOTAL,
                 this.getOperonStatsMap().get(ResultPanelOperonDetection.OPERONS_TOTAL)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelOperonDetection.OPERONS_WITH_OVERLAPPING_READS,
-                this.getOperonStatsMap().get(ResultPanelOperonDetection.OPERONS_WITH_OVERLAPPING_READS)));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelOperonDetection.OPERONS_TWO_GENES,
+                this.getOperonStatsMap().get(ResultPanelOperonDetection.OPERONS_TWO_GENES)));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelOperonDetection.OPERONS_BIGGEST,
+                this.getOperonStatsMap().get(ResultPanelOperonDetection.OPERONS_BIGGEST)));
+
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.MAPPINGS_COUNT,
-                this.getOperonStatsMap().get(ResultPanelTranscriptionStart.MAPPINGS_COUNT)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH,
-                this.getOperonStatsMap().get(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH)));
+                String.valueOf(String.format("%2.2f", mappingCount))));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH,
+                String.valueOf(String.format("%2.2f", meanMappingLength))));
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.MAPPINGS_MILLION,
-                this.getOperonStatsMap().get(ResultPanelTranscriptionStart.MAPPINGS_MILLION)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD,
-                this.getOperonStatsMap().get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD)));
+                String.valueOf(String.format("%2.2f", mappingsPerMio))));
 
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow(""));
 
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Table Type", TABLE_TYPE.toString()));
+        statisticsExportData.add(ResultTrackAnalysis.createThreeElementTableRow("Table Type", TABLE_TYPE.toString(), ""));
 
         exportData.add(statisticsExportData);
 

@@ -1,5 +1,6 @@
 package de.cebitec.readXplorer.util;
 
+import java.awt.Color;
 import java.awt.Component;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
@@ -21,6 +22,12 @@ public class LineWrapCellRenderer  extends JTextArea implements TableCellRendere
                 this.setText(String.valueOf(value));
                 this.setWrapStyleWord(true);                    
                 this.setLineWrap(true);   
+                
+                //Edit by jritter
+//                if(isSelected) {
+//                    this.setBackground(Color.blue);
+//                }
+                // ========================
                 
                 int fontHeight = this.getFontMetrics(this.getFont()).getHeight();
                 String[] splittedText = this.getText().split("\n");

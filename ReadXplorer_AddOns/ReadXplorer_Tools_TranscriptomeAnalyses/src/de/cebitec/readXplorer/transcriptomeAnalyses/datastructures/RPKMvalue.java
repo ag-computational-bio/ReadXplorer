@@ -6,13 +6,13 @@ import de.cebitec.readXplorer.databackend.dataObjects.TrackChromResultEntry;
 /**
  * Data storage for RPKM and read count values of a reference feature.
  *
- * @author Martin Tötsches, Rolf Hilker
+ * @author Martin Tötsches, Rolf Hilker, extended by jritter
  */
 public class RPKMvalue extends TrackChromResultEntry {
 
     private PersistantFeature feature;
-    private int readCount, coverage;
-    private double rpkm, logRpkm, coverageRpkm, coverageLogRpkm;
+    private int readCount, longestKnownUtrLength;
+    private double rpkm, logRpkm;
 
     /**
      * Data storage for RPKM and read count values of a reference feature.
@@ -35,18 +35,16 @@ public class RPKMvalue extends TrackChromResultEntry {
      * @param feature PersistantFeature for which the RPKM values are.
      * @param rpkm Reads per kilobase of exon per million mapped reads.
      * @param logRpkm
-     * @param coverageRpkm
-     * @param trackId Track id.
+     * @param readstarts
+     * @param trackId Track ID.
+     * @param chromId Chrom ID.
      */
-    public RPKMvalue(PersistantFeature feature, double rpkm, double logRpkm, double coverageRpkm, double coverageLogRpkm,
-            int readstarts, int coverage, int trackId, int chromId) {
+    public RPKMvalue(PersistantFeature feature, double rpkm, double logRpkm,
+            int readstarts, int trackId, int chromId) {
         super(trackId, chromId);
         this.feature = feature;
         this.rpkm = rpkm;
         this.logRpkm = logRpkm;
-        this.coverageRpkm = coverageRpkm;
-        this.coverageLogRpkm = coverageLogRpkm;
-        this.coverage = coverage;
         this.readCount = readstarts;
     }
 
@@ -58,7 +56,9 @@ public class RPKMvalue extends TrackChromResultEntry {
     }
 
     /**
-     * @param rpkm the RPKM value for this feature
+     * Sets the RPKM value.
+     *
+     * @param rpkm the RPKM value
      */
     public void setRpkm(double rpkm) {
         this.rpkm = rpkm;
@@ -72,7 +72,7 @@ public class RPKMvalue extends TrackChromResultEntry {
     }
 
     /**
-     * @param feature feature for which the values shall be stored
+     * @param feature for which the values was determined
      */
     public void setFeature(PersistantFeature feature) {
         this.feature = feature;
@@ -100,27 +100,11 @@ public class RPKMvalue extends TrackChromResultEntry {
         this.logRpkm = logRpkm;
     }
 
-    public double getCoverageRpkm() {
-        return coverageRpkm;
+    public int getLongestKnownUtrLength() {
+        return longestKnownUtrLength;
     }
 
-    public void setCoverageRpkm(double coverageRpkm) {
-        this.coverageRpkm = coverageRpkm;
-    }
-
-    public double getCoverageLogRpkm() {
-        return coverageLogRpkm;
-    }
-
-    public void setCoverageLogRpkm(double coverageLogRpkm) {
-        this.coverageLogRpkm = coverageLogRpkm;
-    }
-
-    public int getCoverage() {
-        return coverage;
-    }
-
-    public void setCoverage(int coverage) {
-        this.coverage = coverage;
+    public void setLongestKnownUtrLength(int longestKnownUtrLength) {
+        this.longestKnownUtrLength = longestKnownUtrLength;
     }
 }

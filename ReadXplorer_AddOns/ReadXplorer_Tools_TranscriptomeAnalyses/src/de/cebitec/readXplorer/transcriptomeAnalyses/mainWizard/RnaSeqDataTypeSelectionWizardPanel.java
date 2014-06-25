@@ -9,15 +9,15 @@ import org.openide.util.HelpCtx;
  * 
  * @author jritter
  */
-public class DataSetChoicePanel implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
+public class RnaSeqDataTypeSelectionWizardPanel implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
-    private DataSetChoiceVisualPanel component;
+    private RnaSeqDataTypeSelectionVisualPanel component;
 
-    public DataSetChoicePanel() {
+    public RnaSeqDataTypeSelectionWizardPanel() {
     }
 
     // Get the visual component for the panel. In this template, the component
@@ -25,9 +25,9 @@ public class DataSetChoicePanel implements WizardDescriptor.ValidatingPanel<Wiza
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
-    public DataSetChoiceVisualPanel getComponent() {
+    public RnaSeqDataTypeSelectionVisualPanel getComponent() {
         if (component == null) {
-            component = new DataSetChoiceVisualPanel();
+            component = new RnaSeqDataTypeSelectionVisualPanel();
         }
         return component;
     }
@@ -61,8 +61,8 @@ public class DataSetChoicePanel implements WizardDescriptor.ValidatingPanel<Wiza
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
-        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_FIVEPRIME_DATASET, this.component.isFiveEnrichedTrack());
-        wiz.putProperty(TranscriptomeAnalysisWizardIterator.PROP_WHOLEGENOME_DATASET, this.component.isWholeGenomeTrack());
+        wiz.putProperty(WizardPropertyStrings.PROP_FIVEPRIME_DATASET, this.component.isFiveEnrichedTrack());
+        wiz.putProperty(WizardPropertyStrings.PROP_WHOLEGENOME_DATASET, this.component.isWholeGenomeTrack());
     }
 
 
@@ -70,7 +70,7 @@ public class DataSetChoicePanel implements WizardDescriptor.ValidatingPanel<Wiza
     public void validate() throws WizardValidationException {
         // one of the checkBoxes in component have to be choosen!
         if (!component.isFiveEnrichedTrack() && !component.isWholeGenomeTrack()) {
-            throw new WizardValidationException(null, "Please selct one of the given data set types.", null);
+            throw new WizardValidationException(null, "Please select one of the given RNA-Seq data types!", null);
         }
     }
 }

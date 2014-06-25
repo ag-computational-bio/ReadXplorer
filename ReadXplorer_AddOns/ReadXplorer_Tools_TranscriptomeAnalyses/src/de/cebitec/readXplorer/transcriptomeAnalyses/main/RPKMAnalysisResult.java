@@ -5,8 +5,10 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.RPKMvalue;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
+import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.WizardPropertyStrings;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +24,7 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetWholeTra
 
     private List<RPKMvalue> rpkmResults;
     private int noGenomeFeatures;
-    private StatisticsOnMappingData stats;
+    private HashMap<String, Object> rpkmStatsMap;
     private static final TableType TABLE_TYPE = TableType.RPKM_TABLE;
 
     /**
@@ -39,7 +41,6 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetWholeTra
     public RPKMAnalysisResult(Map<Integer, PersistantTrack> trackMap, List<RPKMvalue> rpkmResults, int refId) {
         super(trackMap, refId, false, 2, 0);
         this.rpkmResults = rpkmResults;
-        this.stats = stats;
     }
 
     /**
@@ -65,17 +66,18 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetWholeTra
 
         dataColumnDescriptions.add("Feature");
         dataColumnDescriptions.add("Feature Type");
-        dataColumnDescriptions.add("Track");
-        dataColumnDescriptions.add("Chromosome");
         dataColumnDescriptions.add("Start");
         dataColumnDescriptions.add("Stop");
-        dataColumnDescriptions.add("Length");
+        dataColumnDescriptions.add("Feature Length");
         dataColumnDescriptions.add("Strand");
+        dataColumnDescriptions.add("Longest Detected 5'-UTR Length");
         dataColumnDescriptions.add("RPKM");
         dataColumnDescriptions.add("Log RPKM");
+        dataColumnDescriptions.add("Mapped Total");
+        dataColumnDescriptions.add("Chromosome");
         dataColumnDescriptions.add("Chromosome ID");
+        dataColumnDescriptions.add("Track");
         dataColumnDescriptions.add("Track ID");
-
 
         allSheetDescriptions.add(dataColumnDescriptions);
 
@@ -100,15 +102,17 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetWholeTra
             feat = rpkmValue.getFeature();
             rpkmRow.add(feat.getLocus());
             rpkmRow.add(feat.getType());
-            rpkmRow.add(this.getTrackEntry(rpkmValue.getTrackId(), true));
-            rpkmRow.add(this.getChromosomeMap().get(feat.getChromId()));
             rpkmRow.add(feat.isFwdStrand() ? feat.getStart() : feat.getStop());
             rpkmRow.add(feat.isFwdStrand() ? feat.getStop() : feat.getStart());
-            rpkmRow.add(feat.getStop() - feat.getStart());
+            rpkmRow.add(((feat.getStop() + 1) - (feat.getStart() + 1)) + 1);
             rpkmRow.add(feat.isFwdStrandString());
+            rpkmRow.add(rpkmValue.getLongestKnownUtrLength());
             rpkmRow.add(rpkmValue.getRPKM());
             rpkmRow.add(rpkmValue.getLogRpkm());
+            rpkmRow.add(rpkmValue.getReadCount());
+            rpkmRow.add(this.getChromosomeMap().get(feat.getChromId()));
             rpkmRow.add(rpkmValue.getChromId());
+            rpkmRow.add(this.getTrackEntry(rpkmValue.getTrackId(), true));
             rpkmRow.add(rpkmValue.getTrackId());
 
             rpkmResultRows.add(rpkmRow);
@@ -126,15 +130,16 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetWholeTra
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between title and parameters
 
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("RPKM and read count calculation parameters:"));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_RPKM, rpkmCalculationParameters.isIncludeBestMatchedReadsRpkm() ? "yes" : "no"));
 
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between parameters and statistics
 
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("RPKM and read count calculation statistics:"));
-
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Total number of returned features", rpkmResultRows.size()));
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow(""));
-        
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Table Type", TABLE_TYPE.toString()));
-        
+
+        statisticsExportData.add(ResultTrackAnalysis.createThreeElementTableRow("Table Type", TABLE_TYPE.toString(), ""));
+
         exportData.add(statisticsExportData);
 
         return exportData;
@@ -148,17 +153,26 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetWholeTra
     }
 
     /**
+     * @return The statistics map associated with this analysis
+     */
+    public Map<String, Object> getStatsAndParametersMap() {
+        return this.rpkmStatsMap;
+    }
+
+    /**
+     * Sets the statistics map associated with this analysis.
+     *
+     * @param statsMap the statistics map associated with this analysis
+     */
+    public void setStatsAndParametersMap(Map<String, Object> statsMap) {
+        this.rpkmStatsMap = (HashMap<String, Object>) statsMap;
+    }
+
+    /**
      * @return The number of features of the reference genome.
      */
     public int getNoGenomeFeatures() {
         return this.noGenomeFeatures;
     }
 
-    public StatisticsOnMappingData getStats() {
-        return stats;
-    }
-
-    public void setStats(StatisticsOnMappingData stats) {
-        this.stats = stats;
-    }
 }

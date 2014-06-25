@@ -1,6 +1,7 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.ParameterSetI;
+import java.io.File;
 
 /**
  *
@@ -8,11 +9,27 @@ import de.cebitec.readXplorer.databackend.ParameterSetI;
  */
 public class ParameterSetWholeTranscriptAnalyses implements ParameterSetI<ParameterSetWholeTranscriptAnalyses> {
 
-    private boolean performWholeTrascriptomeAnalyses, performOperonDetection, performNovelRegionDetection, performRPKMs, ratioInclusion;
+    private boolean performWholeTrascriptomeAnalyses, performOperonDetection, includeBestMatchedReadsOP, includeBestMatchedReadsRpkm, includeBestMatchedReadsNr, performNovelRegionDetection, performRPKMs, ratioInclusion;
     private double fraction, fractionForNewRegionDetection;
     private int minLengthBoundary, increaseRatioValue;
+    private File referenceFile;
+    private Integer manuallySetThreshold;
+    private boolean thresholdManuallySet;
 
-    public ParameterSetWholeTranscriptAnalyses(boolean performWholeTrascriptomeAnalyses, boolean performOperonDetection, boolean performNovelRegionDetection, boolean rPKMs, double fraction, int minBoundary, boolean ratioInclusion, int increaseRatioValue) {
+    /**
+     *
+     * @param performWholeTrascriptomeAnalyses
+     * @param performOperonDetection
+     * @param performNovelRegionDetection
+     * @param rPKMs
+     * @param referenceFile
+     * @param fraction
+     * @param minBoundary
+     * @param ratioInclusion
+     * @param increaseRatioValue
+     * @param includeBestMatchedReads
+     */
+    public ParameterSetWholeTranscriptAnalyses(boolean performWholeTrascriptomeAnalyses, boolean performOperonDetection, boolean performNovelRegionDetection, boolean rPKMs, File referenceFile, double fraction, int minBoundary, boolean ratioInclusion, int increaseRatioValue, boolean includeBestMatchedReadsOP, boolean includeBestMatchedReadsRpkm, boolean includeBestMatchedReadsNr) {
         this.performWholeTrascriptomeAnalyses = performWholeTrascriptomeAnalyses;
         this.performOperonDetection = performOperonDetection;
         this.performNovelRegionDetection = performNovelRegionDetection;
@@ -21,10 +38,22 @@ public class ParameterSetWholeTranscriptAnalyses implements ParameterSetI<Parame
         this.minLengthBoundary = minBoundary;
         this.increaseRatioValue = increaseRatioValue;
         this.ratioInclusion = ratioInclusion;
+        this.includeBestMatchedReadsOP = includeBestMatchedReadsOP;
+        this.includeBestMatchedReadsRpkm = includeBestMatchedReadsRpkm;
+        this.includeBestMatchedReadsNr = includeBestMatchedReadsNr;
+        this.referenceFile = referenceFile;
     }
 
     public boolean isRatioInclusion() {
         return ratioInclusion;
+    }
+
+    public File getReferenceFile() {
+        return referenceFile;
+    }
+
+    public void setReferenceFile(File referenceFile) {
+        this.referenceFile = referenceFile;
     }
 
     public void setRatioInclusion(boolean ratioInclusion) {
@@ -98,4 +127,45 @@ public class ParameterSetWholeTranscriptAnalyses implements ParameterSetI<Parame
     public double getFractionForNewRegionDetection() {
         return fractionForNewRegionDetection;
     }
+
+    public boolean isIncludeBestMatchedReadsOP() {
+        return includeBestMatchedReadsOP;
+    }
+
+    public void setIncludeBestMatchedReadsOP(boolean includeBestMatchedReadsOP) {
+        this.includeBestMatchedReadsOP = includeBestMatchedReadsOP;
+    }
+
+    public boolean isIncludeBestMatchedReadsRpkm() {
+        return includeBestMatchedReadsRpkm;
+    }
+
+    public void setIncludeBestMatchedReadsRpkm(boolean includeBestMatchedReadsRpkm) {
+        this.includeBestMatchedReadsRpkm = includeBestMatchedReadsRpkm;
+    }
+
+    public boolean isIncludeBestMatchedReadsNr() {
+        return includeBestMatchedReadsNr;
+    }
+
+    public void setIncludeBestMatchedReadsNr(boolean includeBestMatchedReadsNr) {
+        this.includeBestMatchedReadsNr = includeBestMatchedReadsNr;
+    }
+
+    public Integer getManuallySetThreshold() {
+        return manuallySetThreshold;
+    }
+
+    public void setManuallySetThreshold(Integer manuallySetThreshold) {
+        this.manuallySetThreshold = manuallySetThreshold;
+    }
+
+    public boolean isThresholdManuallySet() {
+        return thresholdManuallySet;
+    }
+
+    public void setThresholdManuallySet(boolean thresholdManuallySet) {
+        this.thresholdManuallySet = thresholdManuallySet;
+    }
+
 }

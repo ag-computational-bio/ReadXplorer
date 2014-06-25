@@ -4,9 +4,6 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport;
 
-import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ElementsOfInterest;
-import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.TranscriptomeAnalysisWizardIterator;
-import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.PromotorAnalysisWizardIterator;
 import java.util.prefs.Preferences;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
@@ -16,6 +13,9 @@ import org.openide.util.NbPreferences;
 public class SequinTableSettingsWizardPanel implements WizardDescriptor.Panel<WizardDescriptor> {
 
     public static final String SEQUIN_EXPORT_FEATURE_NAME = "feature name for sequin table export";
+    public static final String SEQUIN_EXPORT_SEPARATOR = "separator";
+    public static final String SEQUIN_EXPORT_STRAIN_LENGTH = "length of prefix strain";
+    public static final String SEQUIN_EXPORT_PARSING_LOCUS_TAG = "Parsing of the locus tag";
 
     public SequinTableSettingsWizardPanel(String wizardName) {
         this.wizardName = wizardName;
@@ -50,7 +50,18 @@ public class SequinTableSettingsWizardPanel implements WizardDescriptor.Panel<Wi
     @Override
     public boolean isValid() {
         // If it is always OK to press Next or Finish, then:
-        return true;
+        boolean separatorCorrect = false;
+        boolean strainAndSuffixLengthOk = false;
+        boolean featureNameIsNotEmpty = false;
+        // Check if Separator 1is a String.
+
+        // Check if strain and suffix length is an Integer value
+        // Check if Featurename is not empty string
+        if (separatorCorrect && strainAndSuffixLengthOk && featureNameIsNotEmpty) {
+            return true;
+        } else {
+            return true;
+        }
         // If it depends on some condition (form filled out...) and
         // this condition changes (last form field filled in...) then
         // use ChangeSupport to implement add/removeChangeListener below.
@@ -74,6 +85,17 @@ public class SequinTableSettingsWizardPanel implements WizardDescriptor.Panel<Wi
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
         wiz.putProperty(SEQUIN_EXPORT_FEATURE_NAME, this.component.getFeatureName());
+        wiz.putProperty(SEQUIN_EXPORT_PARSING_LOCUS_TAG, this.component.isLocusTagParsingSelected());
+
+        if (component.isLocusTagParsingSelected()) {
+            if (this.component.isSeparatorChoosen()) {
+                wiz.putProperty(SEQUIN_EXPORT_SEPARATOR, component.getSeparator());
+            } else {
+                wiz.putProperty(SEQUIN_EXPORT_SEPARATOR, "");
+            }
+            wiz.putProperty(SEQUIN_EXPORT_STRAIN_LENGTH, this.component.getStrainLength());
+//        wiz.putProperty(SEQUIN_EXPORT_SUFFIX_LABEL_LENGTH, this.component.getSuffixLabelLength());
+        }
         storePrefs();
     }
 

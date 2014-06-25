@@ -28,8 +28,10 @@
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="performDeletionOfAllFP" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="jButton1" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="73" max="32767" attributes="0"/>
+              <Component id="jButton1" pref="70" max="32767" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Component id="jButton2" min="-2" max="-2" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="sequinTableExporter" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="exportButton" min="-2" max="-2" attributes="0"/>
@@ -51,6 +53,7 @@
                   <Component id="exportButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="sequinTableExporter" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jButton1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jButton2" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -68,30 +71,31 @@
         <Component class="javax.swing.JTable" name="tSSTable">
           <Properties>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-              <Table columnCount="25" rowCount="0">
+              <Table columnCount="26" rowCount="0">
                 <Column editable="false" title="Position" type="java.lang.Integer"/>
-                <Column editable="false" title="Chromosome" type="java.lang.Integer"/>
                 <Column editable="true" title="Comments" type="java.lang.String"/>
                 <Column editable="false" title="Direction" type="java.lang.String"/>
-                <Column editable="false" title="Read starts" type="java.lang.Integer"/>
-                <Column editable="false" title="Rel. count" type="java.lang.Double"/>
-                <Column editable="false" title="Gene name" type="java.lang.String"/>
-                <Column editable="false" title="Gene locus" type="java.lang.String"/>
-                <Column editable="false" title="offset" type="java.lang.Integer"/>
+                <Column editable="false" title="Read Starts" type="java.lang.Integer"/>
+                <Column editable="false" title="Rel. Count" type="java.lang.Double"/>
+                <Column editable="false" title="Gene Name" type="java.lang.String"/>
+                <Column editable="false" title="Gene Locus" type="java.lang.String"/>
+                <Column editable="false" title="Offset" type="java.lang.Integer"/>
                 <Column editable="true" title="Leaderless" type="java.lang.Boolean"/>
-                <Column editable="true" title="CDS-Shift" type="java.lang.Boolean"/>
-                <Column editable="true" title="False positive" type="java.lang.Boolean"/>
-                <Column editable="true" title="Internal TSS" type="java.lang.Boolean"/>
+                <Column editable="true" title="Putative TLS-Shift" type="java.lang.Boolean"/>
+                <Column editable="true" title="False Positive" type="java.lang.Boolean"/>
+                <Column editable="true" title="Intragenic TSS" type="java.lang.Boolean"/>
+                <Column editable="true" title="Intergenic TSS" type="java.lang.Boolean"/>
                 <Column editable="true" title="Putative Antisense" type="java.lang.Boolean"/>
-                <Column editable="true" title="Upstream region analysis" type="java.lang.Boolean"/>
+                <Column editable="true" title="Upstream Region Analysis" type="java.lang.Boolean"/>
                 <Column editable="true" title="Finished" type="java.lang.Boolean"/>
-                <Column editable="false" title="Gene start" type="java.lang.Integer"/>
-                <Column editable="false" title="Gene stop" type="java.lang.Integer"/>
-                <Column editable="false" title="Gene length" type="java.lang.Integer"/>
+                <Column editable="false" title="Gene Start" type="java.lang.Integer"/>
+                <Column editable="false" title="Gene Stop" type="java.lang.Integer"/>
+                <Column editable="false" title="Gene Length" type="java.lang.Integer"/>
                 <Column editable="false" title="Gene Frame" type="java.lang.Integer"/>
-                <Column editable="false" title="Gene product" type="java.lang.String"/>
-                <Column editable="false" title="Start codon" type="java.lang.String"/>
-                <Column editable="false" title="Stop codon" type="java.lang.String"/>
+                <Column editable="false" title="Gene Product" type="java.lang.String"/>
+                <Column editable="false" title="Start Codon" type="java.lang.String"/>
+                <Column editable="false" title="Stop Codon" type="java.lang.String"/>
+                <Column editable="false" title="Chromosome" type="java.lang.Integer"/>
                 <Column editable="false" title="Chrom ID" type="java.lang.Integer"/>
                 <Column editable="false" title="Track ID" type="java.lang.Integer"/>
               </Table>
@@ -101,13 +105,6 @@
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
                     <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/main/Bundle.properties" key="ResultPanelTranscriptionStart.tSSTable.columnModel.title0_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-                  </Title>
-                  <Editor/>
-                  <Renderer/>
-                </Column>
-                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
-                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/main/Bundle.properties" key="ResultPanelTranscriptionStart.tSSTable.columnModel.title22_2" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
@@ -191,6 +188,13 @@
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/main/Bundle.properties" key="ResultPanelTranscriptionStart.tSSTable.columnModel.title25_2" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
                     <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/main/Bundle.properties" key="ResultPanelTranscriptionStart.tSSTable.columnModel.title19_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
@@ -255,6 +259,13 @@
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
                     <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/main/Bundle.properties" key="ResultPanelTranscriptionStart.tSSTable.columnModel.title28_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/main/Bundle.properties" key="ResultPanelTranscriptionStart.tSSTable.columnModel.title22_2" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
@@ -363,6 +374,16 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="jButton2">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/main/Bundle.properties" key="ResultPanelTranscriptionStart.jButton2.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton2ActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>
