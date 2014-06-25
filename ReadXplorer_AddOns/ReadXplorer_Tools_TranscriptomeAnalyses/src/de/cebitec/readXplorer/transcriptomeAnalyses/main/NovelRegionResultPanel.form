@@ -65,16 +65,16 @@
               <Table columnCount="13" rowCount="0">
                 <Column editable="false" title="Putative Start" type="java.lang.Integer"/>
                 <Column editable="false" title="Strand" type="java.lang.String"/>
-                <Column editable="false" title="Track" type="java.lang.String"/>
-                <Column editable="false" title="Chromosome" type="java.lang.String"/>
-                <Column editable="true" title="FALSE POSITIVE" type="java.lang.Boolean"/>
+                <Column editable="true" title="False Positive" type="java.lang.Boolean"/>
                 <Column editable="true" title="Selection for Blast" type="java.lang.Boolean"/>
                 <Column editable="true" title="Finished" type="java.lang.Boolean"/>
                 <Column editable="false" title="Site" type="java.lang.String"/>
                 <Column editable="false" title="Dropoff Position" type="java.lang.Integer"/>
                 <Column editable="false" title="Length" type="java.lang.Integer"/>
                 <Column editable="true" title="Sequence" type="java.lang.String"/>
+                <Column editable="false" title="Chromosome" type="java.lang.String"/>
                 <Column editable="false" title="Chrom. ID" type="java.lang.Integer"/>
+                <Column editable="false" title="Track" type="java.lang.String"/>
                 <Column editable="false" title="Track ID" type="java.lang.Integer"/>
               </Table>
             </Property>
@@ -90,20 +90,6 @@
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
                     <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/main/Bundle.properties" key="NovelRegionResultPanel.novelRegionTable.columnModel.title1_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-                  </Title>
-                  <Editor/>
-                  <Renderer/>
-                </Column>
-                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
-                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/main/Bundle.properties" key="NovelRegionResultPanel.novelRegionTable.columnModel.title9" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-                  </Title>
-                  <Editor/>
-                  <Renderer/>
-                </Column>
-                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
-                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                    <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/main/Bundle.properties" key="NovelRegionResultPanel.novelRegionTable.columnModel.title10" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>
@@ -159,7 +145,21 @@
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/main/Bundle.properties" key="NovelRegionResultPanel.novelRegionTable.columnModel.title10" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
                     <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/main/Bundle.properties" key="NovelRegionResultPanel.novelRegionTable.columnModel.title11" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  </Title>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
+                  <Title editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+                    <ResourceString bundle="de/cebitec/readXplorer/transcriptomeAnalyses/main/Bundle.properties" key="NovelRegionResultPanel.novelRegionTable.columnModel.title9" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                   </Title>
                   <Editor/>
                   <Renderer/>

@@ -65,11 +65,10 @@ public class DataSelectionWizardPanel implements WizardDescriptor.ValidatingPane
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
         wiz.putProperty(ElementsOfInterest.ALL.toString(), component.isAllElements());
-        wiz.putProperty(ElementsOfInterest.ONLY_ANTISENSE.toString(), component.isOnlyAntisenseElements());
-        wiz.putProperty(ElementsOfInterest.ONLY_LEADERLESS.toString(), component.isOnlyLeaderlessElements());
-        wiz.putProperty(ElementsOfInterest.ONLY_NONE_LEADERLESS.toString(), component.isOnlyNonLeaderlessElements());
-        wiz.putProperty(ElementsOfInterest.ONLY_REAL_TSS.toString(), component.isOnlyRealTSS());
-        wiz.putProperty(ElementsOfInterest.ONLY_SELECTED.toString(), component.isOnlySelected());
+        wiz.putProperty(ElementsOfInterest.ONLY_ANTISENSE_TSS.toString(), component.isOnlyAntisenseElements());
+        wiz.putProperty(ElementsOfInterest.ONLY_LEADERLESS_TRANSCRIPTS.toString(), component.isOnlyLeaderlessElements());
+        wiz.putProperty(ElementsOfInterest.ONLY_TSS_WITH_UTR_EXCEPT_AS_LEADERLESS.toString(), component.isOnlyRealTSS());
+        wiz.putProperty(ElementsOfInterest.ONLY_SELECTED_FOR_UPSTREAM_ANALYSES.toString(), component.isOnlySelected());
         wiz.putProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS, component.getLengthRelativeToTss());
     }
 
@@ -79,7 +78,6 @@ public class DataSelectionWizardPanel implements WizardDescriptor.ValidatingPane
         if (this.component.isAllElements() == false
                 && this.component.isOnlyAntisenseElements() == false
                 && this.component.isOnlyLeaderlessElements() == false
-                && this.component.isOnlyNonLeaderlessElements() == false
                 && this.component.isOnlyRealTSS() == false
                 && this.component.isOnlySelected() == false) {
             throw new WizardValidationException(null, "Plese select one of the possible Element types!", null);

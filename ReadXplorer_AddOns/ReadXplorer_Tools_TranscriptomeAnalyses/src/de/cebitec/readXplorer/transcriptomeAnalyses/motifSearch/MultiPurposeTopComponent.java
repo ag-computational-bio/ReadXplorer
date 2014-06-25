@@ -38,24 +38,52 @@ public class MultiPurposeTopComponent extends TopComponentExtended {
             if (this.getComponent(0) instanceof MotifSearchPanel) {
                 System.out.println("====MotifSearch-Promotor=====");
                 MotifSearchPanel msPanel = (MotifSearchPanel) this.getComponent(0);
-                File parent =  msPanel.getBioProspOutMinus10().getParentFile();
-                msPanel.getBioProspOutMinus10().delete();
-                msPanel.getBioProspOutMinus35().delete();
-                msPanel.getLogoMinus10().delete();
-                msPanel.getLogoMinus35().delete();
-                msPanel.getMinus10Input().delete();
-                msPanel.getMinus35Input().delete();
-                parent.delete();
+                File parent = msPanel.getBioProspOutMinus10().getParentFile();
+                if (msPanel.getBioProspOutMinus10().exists()) {
+                    msPanel.getBioProspOutMinus10().delete();
+                }
+                if (msPanel.getBioProspOutMinus35().exists()) {
+                    msPanel.getBioProspOutMinus35().delete();
+                }
+                if (msPanel.getLogoMinus10() != null) {
+                    msPanel.getLogoMinus10().delete();
+                }
+                if (msPanel.getLogoMinus35() != null) {
+                    msPanel.getLogoMinus35().delete();
+                }
+                if (msPanel.getMinus10Input().exists()) {
+                    msPanel.getMinus10Input().delete();
+                }
+                if (msPanel.getMinus35Input().exists()) {
+                    msPanel.getMinus35Input().delete();
+                }
+                if (msPanel.getInfo().exists()) {
+                    msPanel.getInfo().delete();
+                }
+                if (parent.exists()) {
+                    parent.delete();
+                }
             }
 
             if (this.getComponent(0) instanceof RbsMotifSearchPanel) {
                 System.out.println("====MotifSearch-RBS=====");
                 RbsMotifSearchPanel rbsPanel = (RbsMotifSearchPanel) this.getComponent(0);
                 File parent = rbsPanel.getBioProspInput().getParentFile();
-                rbsPanel.getBioProspInput().delete();
-                rbsPanel.getBioProspOut().delete();
-                rbsPanel.getSequenceLogo().delete();
-                parent.delete();
+                if (rbsPanel.getBioProspInput().exists()) {
+                    rbsPanel.getBioProspInput().delete();
+                }
+                if (rbsPanel.getBioProspOut().exists()) {
+                    rbsPanel.getBioProspOut().delete();
+                }
+                if (rbsPanel.getSequenceLogo() != null) {
+                    rbsPanel.getSequenceLogo().delete();
+                }
+                if (rbsPanel.getInfo().exists()) {
+                    rbsPanel.getInfo().delete();
+                }
+                if (parent.exists()) {
+                    parent.delete();
+                }
             }
         }
         super.componentClosed(); //To change body of generated methods, choose Tools | Templates.

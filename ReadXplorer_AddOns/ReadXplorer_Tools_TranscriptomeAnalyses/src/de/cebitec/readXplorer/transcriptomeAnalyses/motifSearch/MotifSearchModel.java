@@ -1,5 +1,6 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch;
 
+import de.cebitec.readXplorer.databackend.ParameterSetI;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
@@ -7,6 +8,7 @@ import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ElementsOfInterest;
 import de.cebitec.readXplorer.util.Observer;
+import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.awt.Color;
 import java.awt.Font;
@@ -30,6 +32,7 @@ import java.util.logging.Logger;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.MutableAttributeSet;
@@ -38,6 +41,7 @@ import javax.swing.text.StyledDocument;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Exceptions;
+import org.openide.util.NbPreferences;
 
 /**
  * This Class represents the whole model behind the motif search in
@@ -47,7 +51,6 @@ import org.openide.util.Exceptions;
  */
 public class MotifSearchModel implements Observer {
 
-//    private RbsMotifSearchPanel rbsMotifSearchPanel;
     private TreeMap<String, String> upstreamRegionsInHash;
     private TreeMap<String, Integer> contributedSequencesWithShift;
     private File logoMinus10, logoMinus35, logoRbs;
@@ -61,21 +64,18 @@ public class MotifSearchModel implements Observer {
     private float contributingCitesForMinus10Motif, contributingCitesForMinus35Motif, contributingCitesForRbsMotif;
     private int alternativeSpacer;
     private TreeMap<String, Integer> minus10MotifStarts, minus35MotifStarts, rbsStarts;
-    private File rbsBioProspectorInput;
-    private File rbsBioProsFirstHit;
-    JTextPane regionsRelToTLSTextPane;
-    JTextPane regionsForMotifSearch;
-    JLabel rbsLogoLabel;
-    File minus10Input;
-    File minus35Input;
-    File bioProspOutMinus10;
-    File bioProspOutMinus35;
-    JTextPane regionOfIntrestMinus10, regionOfIntrestMinus35;
-    TreeMap<String, Integer> idsToMinus10Shifts;
-    TreeMap<String, Integer> idsToMinus35Shifts;
-    StyledDocument coloredPromotorRegions;
-    JLabel minus10logoLabel;
-    JLabel minus35LogoLabel;
+    private File rbsBioProspectorInput, rbsBioProsFirstHit;
+    private JTextPane regionsRelToTLSTextPane;
+    private JTextPane regionsForMotifSearch;
+    private JLabel rbsLogoLabel;
+    private File minus10Input, minus35Input, bioProspOutMinus10, bioProspOutMinus35, info;
+    private JTextPane regionOfIntrestMinus10, regionOfIntrestMinus35;
+    private TreeMap<String, Integer> idsToMinus10Shifts;
+    private TreeMap<String, Integer> idsToMinus35Shifts;
+    private StyledDocument coloredPromotorRegions;
+    private JLabel minus10logoLabel;
+    private JLabel minus35LogoLabel;
+    private TreeMap<String, TranscriptionStart> locusToTSSs;
 
     /**
      *
@@ -95,9 +95,8 @@ public class MotifSearchModel implements Observer {
      *
      * @param params instance of PromotorSearchParameters.
      */
-//    public MotifSearchPanel utrPromotorAnalysis(PromotorSearchParameters params, List<TranscriptionStart> starts, List<Operon> operons) {
-    public void utrPromotorAnalysis(PromotorSearchParameters params, List<TranscriptionStart> starts, List<Operon> operons) {
-
+    public boolean utrPromotorAnalysis(PromotorSearchParameters params, List<TranscriptionStart> starts, List<Operon> operons) {
+        boolean success = true;
         this.alternativeSpacer = params.getAlternativeSpacer();
         minus10MotifStarts = new TreeMap<>();
         minus35MotifStarts = new TreeMap<>();
@@ -113,12 +112,14 @@ public class MotifSearchModel implements Observer {
         Path bioProspectorOutMinus35Path = null;
         Path minus10InputPath = null;
         Path minus35InputPath = null;
+        Path infoFilePath = null;
         try {
             workingDirPath = Files.createTempDirectory("promotorAnalysis_");
             bioProspectorOutMinus10Path = Files.createTempFile(workingDirPath, "promotorAnalysis_", "bioProspectorOutMinus10.fna");
             bioProspectorOutMinus35Path = Files.createTempFile(workingDirPath, "promotorAnalysis_", "bioProspectorOutMinus35.fna");
             minus10InputPath = Files.createTempFile(workingDirPath, "promotorAnalysis_", "inputBioProspectorMinus10.fna");
             minus35InputPath = Files.createTempFile(workingDirPath, "promotorAnalysis_", "inputBioProspectorMinus35.fna");
+            infoFilePath = Files.createTempFile(workingDirPath, "promotorAnalysis_", "info.txt");
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -128,6 +129,9 @@ public class MotifSearchModel implements Observer {
         minus35Input = minus35InputPath.toFile();
         bioProspOutMinus10 = bioProspectorOutMinus10Path.toFile();
         bioProspOutMinus35 = bioProspectorOutMinus35Path.toFile();
+//        logoMinus10 = new File(workingDir.getAbsolutePath() + "\\minusTenLogo");
+//        logoMinus35 = new File(workingDir.getAbsolutePath() + "\\minus35Logo");
+        info = infoFilePath.toFile();
 
         // 1. write all upstream subregions for -10 analysis
         writeSubRegionFor5UTRInFile(
@@ -140,132 +144,144 @@ public class MotifSearchModel implements Observer {
         String posixPath = "/cygdrive/c";
         String sub = minus10Input.getAbsolutePath().toString().substring(2);
         posixPath += sub.replaceAll("\\\\", "/");
-
+        boolean successfullyBioProspRun = false;
         try {
             // 2. executing bioprospector and parse the best scored (first listed) Hits and write 
-            this.executeBioProspector(
+            successfullyBioProspRun = this.executeBioProspector(
                     posixPath, bioProspOutMinus10, params.getMinusTenMotifWidth(), params.getNoOfTimesTrying(),
                     1, 1);
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
+        if (successfullyBioProspRun) {
+            this.progressHandlePromotorAnalysis.progress("Starting promotor analysis ...", 40);
 
-        this.progressHandlePromotorAnalysis.progress("Starting promotor analysis ...", 40);
+            idsToMinus10Shifts = new TreeMap<>();
+            idsToMinus10Shifts.putAll(this.contributedSequencesWithShift);
 
-        idsToMinus10Shifts = new TreeMap<>();
-        idsToMinus10Shifts.putAll(this.contributedSequencesWithShift);
-
-        // 4. All sequences, which did not contain a motif in the first run for-10 motif serch
-        // will be descard in the next step of the analysis of the -35 motif search
-        writeSubRegionFor5UTRInFile(
-                minus35Input, this.upstreamRegions,
-                params.getMinSpacer1(), params.getSequenceWidthToAnalyzeMinus10(),
-                params.getMinSpacer2(), params.getSequenceWidthToAnalyzeMinus35(),
-                idsToMinus10Shifts);
+            // 4. All sequences, which did not contain a motif in the first run for-10 motif serch
+            // will be descard in the next step of the analysis of the -35 motif search
+            writeSubRegionFor5UTRInFile(
+                    minus35Input, this.upstreamRegions,
+                    params.getMinSpacer1(), params.getSequenceWidthToAnalyzeMinus10(),
+                    params.getMinSpacer2(), params.getSequenceWidthToAnalyzeMinus35(),
+                    idsToMinus10Shifts);
 //                alignmentshiftsOFMinusTenArray, regionOfIntrestMinus10, regionOfIntrestMinus35);
 
-        posixPath = "/cygdrive/c";
-        sub = minus35Input.getAbsolutePath().toString().substring(2);
-        posixPath += sub.replaceAll("\\\\", "/");
+            posixPath = "/cygdrive/c";
+            sub = minus35Input.getAbsolutePath().toString().substring(2);
+            posixPath += sub.replaceAll("\\\\", "/");
 
-        try {
-            // 5. So in this step we just processing subregions which had a hit 
-            // in the -10 region.
-            this.executeBioProspector(
-                    posixPath, bioProspOutMinus35, params.getMinus35MotifWidth(),
-                    params.getNoOfTimesTrying(),
-                    1, 1);
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-        }
+            try {
+                // 5. So in this step we just processing subregions which had a hit 
+                // in the -10 region.
+                this.executeBioProspector(
+                        posixPath, bioProspOutMinus35, params.getMinus35MotifWidth(),
+                        params.getNoOfTimesTrying(),
+                        1, 1);
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
 
-        progressHandlePromotorAnalysis.progress("Starting promotor analysis ...", 60);
+            progressHandlePromotorAnalysis.progress("Starting promotor analysis ...", 60);
 
-        idsToMinus35Shifts = new TreeMap<>();
-        idsToMinus35Shifts.putAll(this.contributedSequencesWithShift);
+            idsToMinus35Shifts = new TreeMap<>();
+            idsToMinus35Shifts.putAll(this.contributedSequencesWithShift);
 
-        int motifWidth10 = params.getMinusTenMotifWidth();
-        int motifWidth35 = params.getMinus35MotifWidth();
-        int seqWidthToAnalyzeMinus10 = params.getSequenceWidthToAnalyzeMinus10();
-        int seqWidthToAnalyzeMinus35 = params.getSequenceWidthToAnalyzeMinus35();
-        int shiftPosMinus10 = 0;
-        int shiftPosMinus35 = 0;
-        int index = 0;
-        String header = "";
-        Font font = new Font(Font.MONOSPACED, Font.PLAIN, 16);
+            int motifWidth10 = params.getMinusTenMotifWidth();
+            int motifWidth35 = params.getMinus35MotifWidth();
+            int seqWidthToAnalyzeMinus10 = params.getSequenceWidthToAnalyzeMinus10();
+            int seqWidthToAnalyzeMinus35 = params.getSequenceWidthToAnalyzeMinus35();
+            int shiftPosMinus10 = 0;
+            int shiftPosMinus35 = 0;
+            int index = 0;
+            String header = "";
+            Font font = new Font(Font.MONOSPACED, Font.PLAIN, 16);
 
-        for (String string : upstreamRegions) {
-            if (string.startsWith(">")) {
-                header = string.substring(1, string.length() - 1);
-                if (idsToMinus10Shifts.containsKey(header)) {
-                    shiftPosMinus10 = idsToMinus10Shifts.get(header);
-                }
-                if (idsToMinus35Shifts.containsKey(header)) {
-                    shiftPosMinus35 = idsToMinus35Shifts.get(header);
-                }
-                try {
-                    regionOfIntrestMinus10.getStyledDocument().insertString(regionOfIntrestMinus10.getStyledDocument().getLength(), string, null);
-                    regionOfIntrestMinus35.getStyledDocument().insertString(regionOfIntrestMinus35.getStyledDocument().getLength(), string, null);
-                } catch (BadLocationException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
-                index++;
-            } else {
-                try {
-                    regionOfIntrestMinus10.getStyledDocument().insertString(regionOfIntrestMinus10.getStyledDocument().getLength(), this.minus10AnalysisStrings.get(index - 1).toLowerCase(), null);
-                    regionOfIntrestMinus35.getStyledDocument().insertString(regionOfIntrestMinus35.getStyledDocument().getLength(), this.minus35AnalysisStrings.get(index - 1).toLowerCase(), null);
+            for (String string : upstreamRegions) {
+                if (string.startsWith(">")) {
+                    header = string.substring(1, string.length() - 1);
                     if (idsToMinus10Shifts.containsKey(header)) {
-                        colorSubstringsInStyledDocument(regionOfIntrestMinus10, font, regionOfIntrestMinus10.getStyledDocument().getLength() - 1 - seqWidthToAnalyzeMinus10 + shiftPosMinus10 - 1, motifWidth10, Color.RED);
+                        shiftPosMinus10 = idsToMinus10Shifts.get(header);
                     }
                     if (idsToMinus35Shifts.containsKey(header)) {
-                        colorSubstringsInStyledDocument(regionOfIntrestMinus35, font, regionOfIntrestMinus35.getStyledDocument().getLength() - 1 - seqWidthToAnalyzeMinus35 + shiftPosMinus35 - 1, motifWidth35, Color.BLUE);
+                        shiftPosMinus35 = idsToMinus35Shifts.get(header);
                     }
-                } catch (BadLocationException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
+                    try {
+                        regionOfIntrestMinus10.getStyledDocument().insertString(regionOfIntrestMinus10.getStyledDocument().getLength(), string, null);
+                        regionOfIntrestMinus35.getStyledDocument().insertString(regionOfIntrestMinus35.getStyledDocument().getLength(), string, null);
+                    } catch (BadLocationException ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
+                    index++;
+                } else {
+                    try {
+                        regionOfIntrestMinus10.getStyledDocument().insertString(regionOfIntrestMinus10.getStyledDocument().getLength(), this.minus10AnalysisStrings.get(index - 1).toLowerCase(), null);
+                        regionOfIntrestMinus35.getStyledDocument().insertString(regionOfIntrestMinus35.getStyledDocument().getLength(), this.minus35AnalysisStrings.get(index - 1).toLowerCase(), null);
+                        if (idsToMinus10Shifts.containsKey(header)) {
+                            colorSubstringsInStyledDocument(regionOfIntrestMinus10, font, regionOfIntrestMinus10.getStyledDocument().getLength() - 1 - seqWidthToAnalyzeMinus10 + shiftPosMinus10 - 1, motifWidth10, Color.RED);
+                        }
+                        if (idsToMinus35Shifts.containsKey(header)) {
+                            colorSubstringsInStyledDocument(regionOfIntrestMinus35, font, regionOfIntrestMinus35.getStyledDocument().getLength() - 1 - seqWidthToAnalyzeMinus35 + shiftPosMinus35 - 1, motifWidth35, Color.BLUE);
+                        }
+                    } catch (BadLocationException ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
 
+                }
             }
+
+            calcMotifStartsAndMeanSpacerLength(this.upstreamRegions, idsToMinus10Shifts, idsToMinus35Shifts, params);
+            setMotifSearchResults(starts, operons, this.minus10MotifStarts, this.minus35MotifStarts, params);
+
+            progressHandlePromotorAnalysis.progress("Starting promotor analysis ...", 70);
+
+            // Color -35 and -10 motifs in the pane with the whole urt region rel. to TSS
+            coloredPromotorRegions = colorPromotorMotifRegions(this.upstreamRegions, this.minus10MotifStarts, this.minus35MotifStarts, params);
+
+            progressHandlePromotorAnalysis.progress("Starting promotor analysis ...", 80);
+            // generating Sequence Logos and adding them into Tabbedpane
+            int logoStart10 = Math.round(this.meanMinus10SpacerToTSS + params.getMinusTenMotifWidth());
+
+            this.logoMinus10 = generateSeqLogo(2.0, bioProspOutMinus10, workingDir.getAbsolutePath() + "\\minusTenLogo",
+                    "PNG", 8.0, -logoStart10, 15, true, true);
+
+            if (logoMinus10 != null) {
+                minus10logoLabel = new JLabel();
+                Icon icon1 = new ImageIcon(this.logoMinus10.getAbsolutePath() + ".png");
+                minus10logoLabel.setIcon(icon1);
+
+                int logoStart35 = Math.round(this.meanMinus35SpacerToMinus10 + params.getMinus35MotifWidth() + logoStart10);
+                progressHandlePromotorAnalysis.progress("Starting promotor analysis ...", 90);
+
+                this.logoMinus35 = generateSeqLogo(2.0, bioProspOutMinus35, workingDir.getAbsolutePath() + "\\minus35Logo",
+                        "PNG", 8.0, -logoStart35, 15, true, true);
+
+                minus35LogoLabel = new JLabel();
+                Icon icon2 = new ImageIcon(this.logoMinus35.getAbsolutePath() + ".png");
+                minus35LogoLabel.setIcon(icon2);
+
+                writeInfoFile(info, false, meanMinus10SpacerToTSS, meanMinus35SpacerToMinus10, (int) contributingCitesForMinus10Motif, (int) contributingCitesForMinus35Motif, upstreamRegions.size() / 2, params);
+                progressHandlePromotorAnalysis.progress("Starting promotor analysis ...", 100);
+                progressHandlePromotorAnalysis.finish();
+            } else {
+                progressHandlePromotorAnalysis.finish();
+                success = false;
+            }
+        } else {
+            progressHandlePromotorAnalysis.finish();
+            success = false;
         }
 
-        calcMotifStartsAndMeanSpacerLength(this.upstreamRegions, idsToMinus10Shifts, idsToMinus35Shifts, params);
-        setMotifSearchResults(starts, operons, this.minus10MotifStarts, this.minus35MotifStarts, params);
-
-        progressHandlePromotorAnalysis.progress("Starting promotor analysis ...", 70);
-
-        // Color -35 and -10 motifs in the pane with the whole urt region rel. to TSS
-        coloredPromotorRegions = colorPromotorMotifRegions(this.upstreamRegions, this.minus10MotifStarts, this.minus35MotifStarts, params);
-
-        progressHandlePromotorAnalysis.progress("Starting promotor analysis ...", 80);
-        // generating Sequence Logos and adding them into Tabbedpane
-        int logoStart10 = Math.round(this.meanMinus10SpacerToTSS + params.getMinusTenMotifWidth());
-
-        this.logoMinus10 = makeSeqLogo(2.0, bioProspOutMinus10, workingDir.getAbsolutePath() + "\\minusTenLogo",
-                "PNG", 8.0, -logoStart10, 15, true, true);
-
-        minus10logoLabel = new JLabel();
-        Icon icon1 = new ImageIcon(this.logoMinus10.getAbsolutePath() + ".png");
-        minus10logoLabel.setIcon(icon1);
-
-        int logoStart35 = Math.round(this.meanMinus35SpacerToMinus10 + params.getMinus35MotifWidth() + logoStart10);
-        progressHandlePromotorAnalysis.progress("Starting promotor analysis ...", 90);
-
-        this.logoMinus35 = makeSeqLogo(2.0, bioProspOutMinus35, workingDir.getAbsolutePath() + "\\minus35Logo",
-                "PNG", 8.0, -logoStart35, 15, true, true);
-
-        minus35LogoLabel = new JLabel();
-        Icon icon2 = new ImageIcon(this.logoMinus35.getAbsolutePath() + ".png");
-        minus35LogoLabel.setIcon(icon2);
-
-        progressHandlePromotorAnalysis.progress("Starting promotor analysis ...", 100);
-        progressHandlePromotorAnalysis.finish();
+        return success;
     }
 
     /**
      *
      * @param rbsParams
      */
-    public void rbsMotifAnalysis(RbsAnalysisParameters rbsParams, List<TranscriptionStart> starts, List<Operon> operons) {
-
+    public boolean rbsMotifAnalysis(RbsAnalysisParameters rbsParams, List<TranscriptionStart> starts, List<Operon> operons) {
+        boolean success = true;
         progressHandleRbsAnalysis.progress("processing rbs analysis ...", 20);
         Path workingDir = null;
         try {
@@ -275,9 +291,12 @@ public class MotifSearchModel implements Observer {
         }
         Path rbsBioProspectorInputPath = null;
         Path rbsBioProsFirstHitPath = null;
+        Path infoFilePath = null;
         try {
             rbsBioProspectorInputPath = Files.createTempFile(workingDir, "rbsAnalysis_", "SequencesOfIntrest.fna");
+            System.out.println(rbsBioProspectorInputPath);
             rbsBioProsFirstHitPath = Files.createTempFile(workingDir, "rbsAnalysis_", "BioProspectorBestHit.fna");
+            infoFilePath = Files.createTempFile(workingDir, "rbsAnalysis_", "info.txt");
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -285,154 +304,162 @@ public class MotifSearchModel implements Observer {
         File parentDir = workingDir.toFile();
         rbsBioProspectorInput = rbsBioProspectorInputPath.toFile();
         rbsBioProsFirstHit = rbsBioProsFirstHitPath.toFile();
+//        logoRbs = new File(parentDir.getAbsolutePath() + "\\RBSLogo");
+        info = infoFilePath.toFile();
 
-//        this.rbsMotifSearchPanel = new RbsMotifSearchPanel();
-//        rbsMotifSearchPanel.setBioProspInput(rbsBioProspectorInput);
-//        rbsMotifSearchPanel.setBioProspOut(rbsBioProsFirstHit);
         this.rbsStarts = new TreeMap<>();
 
         // Make a text pane, set its font and color, then add it to the frame
         regionsRelToTLSTextPane = new JTextPane();
         regionsForMotifSearch = new JTextPane();
 
-        writeSeqaForRbsAnalysisInFile(rbsBioProspectorInput, rbsParams);
+        writeSeqForRbsAnalysisInFile(rbsBioProspectorInput, rbsParams);
         progressHandleRbsAnalysis.progress("processing rbs analysis ...", 60);
 
-        runBioProspForRbsAnalysis(parentDir, rbsBioProspectorInput, rbsParams, rbsBioProsFirstHit);
-
-        Font font = new Font(Font.MONOSPACED, Font.PLAIN, 16);
-        String header = "";
-        int shift = 0;
-        for (String string : this.upstreamRegions) {
-            if (string.startsWith(">")) {
-                header = string.substring(1, string.length() - 1);
-                if (contributedSequencesWithShift.containsKey(header)) {
-                    shift = contributedSequencesWithShift.get(header);
-                }
-                try {
-                    regionsForMotifSearch.getStyledDocument().insertString(regionsForMotifSearch.getStyledDocument().getLength(), string.toLowerCase(), null);
-                } catch (BadLocationException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
-            } else {
-                String subregionForMotifSearch = string.substring(0, string.length() - rbsParams.getMinSpacer() - 1);
-                try {
-                    regionsForMotifSearch.getStyledDocument().insertString(regionsForMotifSearch.getStyledDocument().getLength(), subregionForMotifSearch.toLowerCase() + "\n", null);
-                } catch (BadLocationException ex) {
-                    Exceptions.printStackTrace(ex);
-                }
-                if (contributedSequencesWithShift.containsKey(header)) {
-                    colorSubstringsInStyledDocument(regionsForMotifSearch, font, regionsForMotifSearch.getStyledDocument().getLength() - 1 - subregionForMotifSearch.length() + shift - 1, rbsParams.getMotifWidth(), Color.BLUE);
+        boolean successfullyRun = runBioProspForRbsAnalysis(parentDir, rbsBioProspectorInput, rbsParams, rbsBioProsFirstHit);
+        if (successfullyRun) {
+            Font font = new Font(Font.MONOSPACED, Font.PLAIN, 16);
+            String header = "";
+            int shift = 0;
+            for (String string : this.upstreamRegions) {
+                if (string.startsWith(">")) {
+                    header = string.substring(1, string.length() - 1);
+                    if (contributedSequencesWithShift.containsKey(header)) {
+                        shift = contributedSequencesWithShift.get(header);
+                    }
+                    try {
+                        regionsForMotifSearch.getStyledDocument().insertString(regionsForMotifSearch.getStyledDocument().getLength(), string.toLowerCase(), null);
+                    } catch (BadLocationException ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
+                } else {
+                    String subregionForMotifSearch = string.substring(0, string.length() - rbsParams.getMinSpacer() - 1);
+                    try {
+                        regionsForMotifSearch.getStyledDocument().insertString(regionsForMotifSearch.getStyledDocument().getLength(), subregionForMotifSearch.toLowerCase() + "\n", null);
+                    } catch (BadLocationException ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
+                    if (contributedSequencesWithShift.containsKey(header)) {
+                        colorSubstringsInStyledDocument(regionsForMotifSearch, font, regionsForMotifSearch.getStyledDocument().getLength() - 1 - subregionForMotifSearch.length() + shift - 1, rbsParams.getMotifWidth(), Color.BLUE);
+                    }
                 }
             }
+
+            progressHandleRbsAnalysis.progress("processing rbs analysis ...", 80);
+            try {
+                meanSpacerLengthOfRBSMotif = calculateMotifStartsAndMeanSpacerInRbsAnalysis(this.upstreamRegions, this.regionsRelToTLSTextPane, this.contributedSequencesWithShift, rbsParams, starts, operons);
+            } catch (BadLocationException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+
+            // generating Sequence Logos and adding them into Tabbedpane
+            int logoStart = Math.round(this.meanSpacerLengthOfRBSMotif);
+            logoStart += rbsParams.getMotifWidth();
+
+            this.logoRbs = generateSeqLogo(2.0, rbsBioProsFirstHit, parentDir.getAbsolutePath() + "\\RBSLogo",
+                    "PNG", 8.0, -logoStart, 15, true, true);
+            if (logoRbs != null) {
+                rbsLogoLabel = new JLabel();
+                Icon icon = new ImageIcon(this.logoRbs.getAbsolutePath() + ".png");
+                rbsLogoLabel.setIcon(icon);
+
+                writeInfoFile(info, true, meanSpacerLengthOfRBSMotif, 0, (int) contributingCitesForRbsMotif, 0, upstreamRegions.size() / 2, rbsParams);
+                progressHandleRbsAnalysis.progress("processing rbs analysis ...", 100);
+                progressHandleRbsAnalysis.finish();
+            } else {
+                progressHandleRbsAnalysis.finish();
+                success = false;
+            }
+        } else {
+            progressHandleRbsAnalysis.finish();
+            success = false;
         }
 
-        progressHandleRbsAnalysis.progress("processing rbs analysis ...", 80);
-        try {
-            meanSpacerLengthOfRBSMotif = calculateMotifStartsAndMeanSpacerInRbsAnalysis(this.upstreamRegions, this.regionsRelToTLSTextPane, this.contributedSequencesWithShift, rbsParams, starts, operons);
-        } catch (BadLocationException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-
-//        this.rbsMotifSearchPanel.setContributedSequencesToMotif("" + this.contributingCitesForRbsMotif + "/" + upstreamRegions.size() / 2);
-//        this.rbsMotifSearchPanel.setRegionsToAnalyzeToPane(regionsRelToTLSTextPane.getStyledDocument());
-//        this.rbsMotifSearchPanel.setRegionOfIntrestToPane(regionsForMotifSearch.getStyledDocument());
-        // generating Sequence Logos and adding them into Tabbedpane
-        int logoStart = Math.round(this.meanSpacerLengthOfRBSMotif);
-        logoStart += rbsParams.getMotifWidth();
-//        String roundedMean = String.format("%.1f", this.meanSpacerLengthOfRBSMotif);
-//
-//        this.rbsMotifSearchPanel.setRegionLengthForBioProspector(rbsParams.getSeqLengthToAnalyze());
-//        this.rbsMotifSearchPanel.setMotifWidth(rbsParams.getMotifWidth());
-//        this.rbsMotifSearchPanel.setMeanSpacerLength(roundedMean);
-
-        this.logoRbs = makeSeqLogo(2.0, rbsBioProsFirstHit, parentDir.getAbsolutePath() + "\\RBSLogo",
-                "PNG", 8.0, -logoStart, 15, true, true);
-//        rbsMotifSearchPanel.setSequenceLogo(new File(this.logoRbs.getAbsolutePath() + ".png"));
-        rbsLogoLabel = new JLabel();
-        Icon icon = new ImageIcon(this.logoRbs.getAbsolutePath() + ".png");
-        rbsLogoLabel.setIcon(icon);
-//        this.rbsMotifSearchPanel.setLogo(rbsLogoLabel);
-        progressHandleRbsAnalysis.progress("processing rbs analysis ...", 100);
-        progressHandleRbsAnalysis.finish();
+        return success;
     }
 
     /**
      * This method execute the BioProspector binary with the following
      * parameters.
      *
+     * @param inputFilePath
+     * @param outputFile
      * @param motifWidth
      * @param noOfCycles
      * @param noOfTopMotifs
-     * @param sndMotifBlockWidth
-     * @param isMotifBlockPalindrome
-     * @param minGap
-     * @param maxGap
      * @param justExamineFwd
-     * @param everySeqHasMotif
-     * @return
+     * @throws IOException
      */
-    private void executeBioProspector(String inputFilePath, File outputFile,
+    private boolean executeBioProspector(String inputFilePath, File outputFile,
             int motifWidth, int noOfCycles, int noOfTopMotifs,
             int justExamineFwd) throws IOException {
         this.contributedSequencesWithShift = new TreeMap<>();
 
-        String cmd = "C:\\Users\\jritter\\Documents\\MA-Thesis\\BioProspector.2004\\BioProspector.exe";
+        String cmd = NbPreferences.forModule(Object.class).get("bioprospector location", "");
+        File file = new File(cmd);
+        if (file.exists() && file.canExecute() && file.isDirectory() == false) {
+//        String cmd = "C:\\Users\\jritter\\Documents\\MA-Thesis\\BioProspector.2004\\BioProspector.exe";
 //        String cmd = "C:\\BioProspector.2004\\BioProspector.exe";
-        List<String> commandArguments = new ArrayList<>();
-        commandArguments.add(cmd);
-        commandArguments.add("-i");
-        commandArguments.add(inputFilePath);
-        commandArguments.add("-W");
-        commandArguments.add("" + motifWidth);
-        commandArguments.add("-n");
-        commandArguments.add("" + noOfCycles);
-        commandArguments.add("-r");
-        commandArguments.add("" + noOfTopMotifs);
-        commandArguments.add("-d");
-        commandArguments.add("" + justExamineFwd);
+            List<String> commandArguments = new ArrayList<>();
+            commandArguments.add(cmd);
+            commandArguments.add("-i");
+            commandArguments.add(inputFilePath);
+            commandArguments.add("-W");
+            commandArguments.add("" + motifWidth);
+            commandArguments.add("-n");
+            commandArguments.add("" + noOfCycles);
+            commandArguments.add("-r");
+            commandArguments.add("" + noOfTopMotifs);
+            commandArguments.add("-d");
+            commandArguments.add("" + justExamineFwd);
 
-        ProcessBuilder ps = new ProcessBuilder(commandArguments);
+            ProcessBuilder ps = new ProcessBuilder(commandArguments);
 
-        //From the DOC:  Initially, this property is false, meaning that the 
-        //standard output and error output of a subprocess are sent to two 
-        //separate streams
-        ps.redirectErrorStream(true);
+            //From the DOC:  Initially, this property is false, meaning that the 
+            //standard output and error output of a subprocess are sent to two 
+            //separate streams
+            ps.redirectErrorStream(true);
 
-        Process pr = ps.start();
+            Process pr = ps.start();
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-        String line;
-        String id = null;
-        String start = "";
-        boolean skip = false;
+            BufferedReader in = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+            String line;
+            String id = null;
+            String start = "";
+            boolean skip = false;
 
-        Writer writer = new BufferedWriter(new OutputStreamWriter(
-                new FileOutputStream(outputFile), "utf-8"));
-        while ((line = in.readLine()) != null) {
-            if (line.startsWith("Motif#2")) {
-                break;
+            Writer writer = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(outputFile), "utf-8"));
+            while ((line = in.readLine()) != null) {
+                if (line.startsWith("Motif#2")) {
+                    break;
+                }
+                if (line.startsWith(">")) {
+                    String[] splitted = line.split("\t");
+                    start = splitted[splitted.length - 1].substring(2); // shift where the motif starts in input seq.
+                    id = splitted[0].substring(1); // header
+                    writer.write(line + "\n");
+                    skip = true;
+                } else if (skip) {
+                    this.contributedSequencesWithShift.put(id, Integer.valueOf(start));
+                    writer.write(line + "\n");
+                    skip = false;
+                }
             }
-            if (line.startsWith(">")) {
-                String[] splitted = line.split("\t");
-                start = splitted[splitted.length - 1].substring(2); // shift where the motif starts in input seq.
-                id = splitted[0].substring(1); // header
-                writer.write(line + "\n");
-                skip = true;
-            } else if (skip) {
-                this.contributedSequencesWithShift.put(id, Integer.valueOf(start));
-                writer.write(line + "\n");
-                skip = false;
-            }
-        }
 
-        try {
-            pr.waitFor();
-        } catch (InterruptedException ex) {
-            Logger.getLogger(MotifSearchPanel.class.getName()).log(Level.SEVERE, null, ex);
-            in.close();
-        } finally {
-            writer.close();
+            try {
+                pr.waitFor();
+            } catch (InterruptedException ex) {
+                Logger.getLogger(MotifSearchPanel.class.getName()).log(Level.SEVERE, null, ex);
+                in.close();
+            } finally {
+                writer.close();
+            }
+            return true;
+        } else {
+            JOptionPane.showMessageDialog(rbsLogoLabel, "BioProspector could not be executed. Check the location settings \n"
+                    + "for BioProspector or check the permissions for BioProspector.", "Error during running BioProspector", JOptionPane.ERROR_MESSAGE);
+            return false;
         }
     }
 
@@ -683,8 +710,8 @@ public class MotifSearchModel implements Observer {
 
                 int length = text.getStyledDocument().getLength();
                 if (minus35StartExists) {
-                    int colorStartMinus35 = length - (params.getLengthOfPromotorRegion() - alignmentStartMinus35);
-                    colorSubstringsInStyledDocument(text, font, colorStartMinus35 - 2, params.getMinus35MotifWidth(), Color.BLUE);
+//                    int colorStartMinus35 = length - (params.getLengthOfPromotorRegion() - alignmentStartMinus35);
+//                    colorSubstringsInStyledDocument(text, font, colorStartMinus35 - 2, params.getMinus35MotifWidth(), Color.BLUE);
                     minus35StartExists = false;
                 }
                 if (minus10StartExists) {
@@ -738,7 +765,8 @@ public class MotifSearchModel implements Observer {
     }
 
     /**
-     * Generates a sequence logo from a given input (FASTA format).
+     * Generates a sequence logo from a given multiple fasta file in fasta
+     * format.
      *
      * @param noOfBitsInBar Number of Bits the Logo will be presented.
      * @param inputFile Multiple FASTA file.
@@ -751,66 +779,79 @@ public class MotifSearchModel implements Observer {
      * @param isNumberingOfXAxis Numbering of X-axis if true.
      * @param isYAxis If true, than Y-axis is visible.
      */
-    private File makeSeqLogo(Double noOfBitsInBar, File inputFile, String outputFilePath, String outputFormat, Double hieghtOfLogo,
+    private File generateSeqLogo(Double noOfBitsInBar, File inputFile, String outputFilePath, String outputFormat, Double hieghtOfLogo,
             Integer sequenceStart, Integer logoWidth, boolean isNumberingOfXAxis, boolean isYAxis) {
 
         String perl = "perl";
-        String cmd = "C:\\Users\\jritter\\Documents\\MA-Thesis\\weblogo\\seqlogo";
+        String cmd = NbPreferences.forModule(Object.class).get("seqlogo location", "");
+
+        File file = new File(cmd);
+        if (file.exists() && file.canExecute() && file.isDirectory() == false) {
+//        String cmd = "C:\\Users\\jritter\\Documents\\MA-Thesis\\weblogo\\seqlogo";
 //        String cmd = "C:\\weblogo\\seqlogo";
-        List<String> commandArguments = new ArrayList<>();
-        commandArguments.add(perl);
-        commandArguments.add(cmd);
-        commandArguments.add("-f");
-        commandArguments.add(inputFile.getAbsolutePath());
-        commandArguments.add("-B");
-        commandArguments.add(noOfBitsInBar.toString());
-        commandArguments.add("-F");
-        commandArguments.add(outputFormat);
-        commandArguments.add("-h");
-        commandArguments.add(hieghtOfLogo.toString());
-        commandArguments.add("-o");
-        commandArguments.add(outputFilePath);
-        commandArguments.add("-s");
-        commandArguments.add(sequenceStart.toString());
-        commandArguments.add("-w");
-        commandArguments.add(logoWidth.toString());
-        commandArguments.add("-x");
-        commandArguments.add("average position upstream of TSS");
-        commandArguments.add("-y");
-        commandArguments.add("bits");
-        commandArguments.add("-c");
-        if (isNumberingOfXAxis) {
-            commandArguments.add("-n");
-        }
-        if (isYAxis) {
-            commandArguments.add("-Y");
-        }
+            List<String> commandArguments = new ArrayList<>();
+            commandArguments.add(perl);
+            commandArguments.add(cmd);
+            commandArguments.add("-f");
+            commandArguments.add(inputFile.getAbsolutePath());
+            commandArguments.add("-B");
+            commandArguments.add(noOfBitsInBar.toString());
+            commandArguments.add("-F");
+            commandArguments.add(outputFormat);
+            commandArguments.add("-h");
+            commandArguments.add(hieghtOfLogo.toString());
+            commandArguments.add("-o");
+            commandArguments.add(outputFilePath);
+            commandArguments.add("-s");
+            commandArguments.add(sequenceStart.toString());
+            commandArguments.add("-w");
+            commandArguments.add(logoWidth.toString());
+            commandArguments.add("-x");
+            commandArguments.add("average positions upstream of TSS");
+            commandArguments.add("-y");
+            commandArguments.add("bits");
+            commandArguments.add("-c");
+            if (isNumberingOfXAxis) {
+                commandArguments.add("-n");
+            }
+            if (isYAxis) {
+                commandArguments.add("-Y");
+            }
 
-        ProcessBuilder ps = new ProcessBuilder(commandArguments);
-        ps.redirectErrorStream(true);
-        try {
-            Process pr = ps.start();
-            pr.waitFor();
-        } catch (IOException | InterruptedException ex) {
-            Exceptions.printStackTrace(ex);
-        }
+            ProcessBuilder ps = new ProcessBuilder(commandArguments);
+            ps.redirectErrorStream(true);
+            try {
+                Process pr = ps.start();
+                pr.waitFor();
+            } catch (IOException | InterruptedException ex) {
+                Exceptions.printStackTrace(ex);
+            }
 
-        return new File(outputFilePath);
+            return new File(outputFilePath);
+        } else {
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Please check the setting for Motif-Search, maybe the location\n"
+                    + "to the program seqlogo is wrong. Please read the help section for more information.");
+            JOptionPane.showMessageDialog(null, "Please check the setting for Motif-Search, maybe the location\n"
+                    + "to the program seqlogo is wrong. Please read the help section for more information.", "Program SeqLogo", JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
 
     }
 
     /**
-     * This method gets upstream regions from elements of a spesific type of a
-     * detected transcription start sites.
+     * This method extracts upstream regions from elements of a spesific
+     * detected transcription start sites type.
      *
      * @param type ElementsOfInterest specifies the typ of transcription start
      * site.
-     * @param starts list of detected transcriptional start site objects.
-     * @param length region upstream relative to a TSS
-     * @param isRbsAnalysis true if it needs fo the rbs motif analysis, false
+     * @param allStarts List<TranscriptionStart> of detected transcription start
+     * site instances.
+     * @param length of the region upstream to the transcription start or
+     * translation start
+     * @param isRbsAnalysis <true> for the rbs motif analysis, <false>
      * for promotor motif analysis.
      */
-    public void takeUpstreamRegions(ElementsOfInterest type, List<TranscriptionStart> starts, int length, boolean isRbsAnalysis) {
+    public void takeUpstreamRegions(ElementsOfInterest type, List<TranscriptionStart> allStarts, int length, boolean isRbsAnalysis) {
 
         if (isRbsAnalysis) {
             progressHandleRbsAnalysis.start(100);
@@ -822,326 +863,252 @@ public class MotifSearchModel implements Observer {
 
         this.upstreamRegions = new ArrayList<>();
         this.upstreamRegionsInHash = new TreeMap<>();
-        PersistantFeature currentFeature = null;
-        String substr = "";
+        this.locusToTSSs = new TreeMap<>();
+
+        PersistantFeature currentFeature;
+        String newLocus;
+        String locus;
         int tssStart;
-        int featureStart;
         int uniqueIdx = 1;
 
         if (type == ElementsOfInterest.ALL) {
-            for (TranscriptionStart tss : starts) {
-
+            for (TranscriptionStart tss : allStarts) {
                 currentFeature = tss.getAssignedFeature();
-                String newLocus = currentFeature.getLocus() + "_" + uniqueIdx;
-                if (isRbsAnalysis) {
-                    tss.setRbsSequenceLength(length);
-                    tss.setAdditionalIdentyfier(newLocus);
 
-                    // add header in array
-                    this.upstreamRegions.add(">" + newLocus + "\n");
-                    if (tss.isFwdStrand()) {
-                        if (tss.isLeaderless()) {
-                            tssStart = tss.getStartPosition();
-                            substr = this.ref.getChromSequence(tss.getChromId(), tssStart - length, tssStart);
-                            upstreamRegions.add(substr + "\n");
-                            this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                        } else {
-                            featureStart = currentFeature.getStart();
-                            substr = this.ref.getChromSequence(tss.getChromId(), featureStart - length, featureStart);
-                            upstreamRegions.add(substr + "\n");
-                            this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                        }
-                    } else {
-                        if (tss.isLeaderless()) {
-                            tssStart = tss.getStartPosition();
-                            substr = this.ref.getChromSequence(tss.getChromId(), tssStart, tssStart + length);
-                            upstreamRegions.add(substr + "\n");
-                            this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                        } else {
-                            featureStart = currentFeature.getStop();
-                            substr = this.ref.getChromSequence(tss.getChromId(), featureStart, featureStart + length);
-                            upstreamRegions.add(substr + "\n");
-                            this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                        }
+                if (isRbsAnalysis && currentFeature != null) {
+                    locus = currentFeature.getLocus();
+
+                    tss.setRbsSequenceLength(length);
+                    tss.setAdditionalIdentyfier(locus);
+
+                    if (!locusToTSSs.containsKey(locus)) {
+                        // add header in array
+                        this.upstreamRegions.add(">" + locus + "\n");
+                        getUpstreamRegionRelToFeatureStart(tss, currentFeature, length);
+                        locusToTSSs.put(locus, tss);
                     }
-                } else {
+                } else if (!isRbsAnalysis) {
+                    if (currentFeature != null) {
+                        newLocus = currentFeature.getLocus() + "_" + uniqueIdx;
+                    } else {
+                        newLocus = "putative_novel_transcript" + "_" + uniqueIdx;
+                    }
+                    tss.setPromotorSequenceLength(length);
+                    tss.setAdditionalIdentyfier(newLocus);
+                    tssStart = tss.getStartPosition();
+
+                    this.upstreamRegions.add(">" + newLocus + "\n");
+                    getPromotorSubstring(tss, tssStart, length, newLocus);
+                    uniqueIdx++;
+                }
+            }
+        } else if (type == ElementsOfInterest.ONLY_ANTISENSE_TSS) {
+            for (TranscriptionStart tss : allStarts) {
+                currentFeature = tss.getAssignedFeature();
+
+                if (isRbsAnalysis && tss.isPutativeAntisense() && currentFeature != null) {
+                    locus = currentFeature.getLocus();
+
+                    tss.setRbsSequenceLength(length);
+                    tss.setAdditionalIdentyfier(locus);
+
+                    if (!locusToTSSs.containsKey(locus)) {
+                        // add header in array
+                        this.upstreamRegions.add(">" + locus + "\n");
+                        getUpstreamRegionRelToFeatureStart(tss, currentFeature, length);
+                        locusToTSSs.put(locus, tss);
+                    }
+                } else if (tss.isPutativeAntisense() && !isRbsAnalysis) {
+                    if (currentFeature != null) {
+                        newLocus = currentFeature.getLocus() + "_" + uniqueIdx;
+                    } else {
+                        newLocus = "novelTranscript" + "_" + uniqueIdx;
+                    }
+
                     tss.setPromotorSequenceLength(length);
                     tss.setAdditionalIdentyfier(newLocus);
                     tssStart = tss.getStartPosition();
                     this.upstreamRegions.add(">" + newLocus + "\n");
-                    if (tss.isFwdStrand()) {
-                        substr = this.ref.getChromSequence(tss.getChromId(), tssStart - length, tssStart);
-                        upstreamRegions.add(substr + "\n");
-                        this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                    } else {
-                        substr = this.ref.getChromSequence(tss.getChromId(), tssStart, tssStart + length);
-                        upstreamRegions.add(substr + "\n");
-                        this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                    }
+                    getPromotorSubstring(tss, tssStart, length, newLocus);
+                    uniqueIdx++;
                 }
-                uniqueIdx++;
             }
-        } else if (type == ElementsOfInterest.ONLY_ANTISENSE) {
-            for (TranscriptionStart tss : starts) {
+        } else if (type == ElementsOfInterest.ONLY_LEADERLESS_TRANSCRIPTS) {
+            for (TranscriptionStart tss : allStarts) {
                 currentFeature = tss.getAssignedFeature();
-                String newLocus = currentFeature.getLocus() + "_" + uniqueIdx;
-                if (isRbsAnalysis) {
-                    // add header in array
-                    if (tss.isPutativeAntisense()) {
-                        tss.setRbsSequenceLength(length);
-                        tss.setAdditionalIdentyfier(newLocus);
-                        this.upstreamRegions.add(">" + newLocus + "\n");
-                        if (tss.isFwdStrand()) {
-                            featureStart = currentFeature.getStart();
-                            substr = this.ref.getChromSequence(tss.getChromId(), featureStart - length, featureStart);
-                            upstreamRegions.add(substr + "\n");
-                            this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                        } else {
-                            featureStart = currentFeature.getStop();
-                            substr = this.ref.getChromSequence(tss.getChromId(), featureStart, featureStart + length);
-                            upstreamRegions.add(substr + "\n");
-                            this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                        }
-                    } else {
-                        continue;
-                    }
-                } else {
-                    if (tss.isPutativeAntisense()) {
-                        tss.setPromotorSequenceLength(length);
-                        tss.setAdditionalIdentyfier(newLocus);
-                        tssStart = tss.getStartPosition();
-                        this.upstreamRegions.add(">" + newLocus + "\n");
-                        if (tss.isFwdStrand()) {
-                            substr = this.ref.getChromSequence(tss.getChromId(), tssStart - length, tssStart);
-                            upstreamRegions.add(substr + "\n");
-                            this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                        } else {
-                            substr = this.ref.getChromSequence(tss.getChromId(), tssStart, tssStart + length);
-                            upstreamRegions.add(substr + "\n");
-                            this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                        }
-                    } else {
-                        continue;
-                    }
-                }
-                uniqueIdx++;
-            }
-        } else if (type == ElementsOfInterest.ONLY_LEADERLESS) {
-            for (TranscriptionStart tss : starts) {
-                currentFeature = tss.getAssignedFeature();
-                String newLocus = currentFeature.getLocus() + "_" + uniqueIdx;
                 tssStart = tss.getStartPosition();
-                tss.setAdditionalIdentyfier(newLocus);
-                if (tss.isLeaderless()) {
 
-                    if (isRbsAnalysis) {
-                        tss.setRbsSequenceLength(length);
-                    } else {
-                        tss.setPromotorSequenceLength(length);
+                if (isRbsAnalysis && tss.isLeaderless() && currentFeature != null) {
+                    locus = currentFeature.getLocus();
+
+                    tss.setAdditionalIdentyfier(locus);
+                    tss.setRbsSequenceLength(length);
+
+                    if (!locusToTSSs.containsKey(locus)) {
+                        // add header in array
+                        this.upstreamRegions.add(">" + locus + "\n");
+                        getUpstreamRegionRelToFeatureStart(tss, currentFeature, length);
+                        locusToTSSs.put(locus, tss);
                     }
+                } else if (tss.isLeaderless() && !isRbsAnalysis) {
+                    newLocus = currentFeature.getLocus() + "_" + uniqueIdx;
+
+                    tss.setAdditionalIdentyfier(newLocus);
+                    tss.setPromotorSequenceLength(length);
                     this.upstreamRegions.add(">" + newLocus + "\n");
-                    if (tss.isFwdStrand()) {
-                        substr = this.ref.getChromSequence(tss.getChromId(), tssStart - length, tssStart);
-                        upstreamRegions.add(substr + "\n");
-                        this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                    } else {
-                        substr = this.ref.getChromSequence(tss.getChromId(), tssStart, tssStart + length);
-                        upstreamRegions.add(substr + "\n");
-                        this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                    }
-                } else {
-                    continue;
+                    getPromotorSubstring(tss, tssStart, length, newLocus);
+                    uniqueIdx++;
                 }
-                uniqueIdx++;
             }
-        } else if (type == ElementsOfInterest.ONLY_NONE_LEADERLESS) {
-            for (TranscriptionStart tss : starts) {
+        } else if (type == ElementsOfInterest.ONLY_TSS_WITH_UTR_EXCEPT_AS_LEADERLESS) {
+            for (TranscriptionStart tss : allStarts) {
                 currentFeature = tss.getAssignedFeature();
-                String newLocus = currentFeature.getLocus() + "_" + uniqueIdx;
-                if (isRbsAnalysis) {
-                    // add header in array
-                    if (!tss.isLeaderless()) {
-                        tss.setRbsSequenceLength(length);
-                        tss.setAdditionalIdentyfier(newLocus);
-                        this.upstreamRegions.add(">" + newLocus + "\n");
-                        if (tss.isFwdStrand()) {
-                            featureStart = currentFeature.getStart();
-                            substr = this.ref.getChromSequence(tss.getChromId(), featureStart - length, featureStart);
-                            upstreamRegions.add(substr + "\n");
-                            this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                        } else {
-                            featureStart = currentFeature.getStop();
-                            substr = this.ref.getChromSequence(tss.getChromId(), featureStart, featureStart + length);
-                            upstreamRegions.add(substr + "\n");
-                            this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                        }
-                    } else {
-                        continue;
+
+                if (isRbsAnalysis && currentFeature != null && !tss.isPutativeAntisense() && !tss.isLeaderless() && !tss.isIntragenicTSS()) {
+                    locus = currentFeature.getLocus();
+
+                    tss.setRbsSequenceLength(length);
+                    tss.setAdditionalIdentyfier(locus);
+
+                    if (!locusToTSSs.containsKey(locus)) {
+                        // add header in array
+                        this.upstreamRegions.add(">" + locus + "\n");
+                        getUpstreamRegionRelToFeatureStart(tss, currentFeature, length);
+                        locusToTSSs.put(locus, tss);
                     }
-                } else {
-                    if (!tss.isLeaderless()) {
+                } else if (!tss.isPutativeAntisense() && !tss.isLeaderless() && (tss.isIntragenicTSS() && tss.getOffsetToNextDownstrFeature() > 0) && !isRbsAnalysis) {
+                    if (currentFeature != null) {
+                        newLocus = currentFeature.getLocus() + "_" + uniqueIdx;
+
                         tss.setPromotorSequenceLength(length);
                         tss.setAdditionalIdentyfier(newLocus);
                         tssStart = tss.getStartPosition();
                         this.upstreamRegions.add(">" + newLocus + "\n");
-                        if (tss.isFwdStrand()) {
-                            substr = this.ref.getChromSequence(tss.getChromId(), tssStart - length, tssStart);
-                            upstreamRegions.add(substr + "\n");
-                            this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                        } else {
-                            substr = this.ref.getChromSequence(tss.getChromId(), tssStart, tssStart + length);
-                            upstreamRegions.add(substr + "\n");
-                            this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                        }
-                    } else {
-                        continue;
+                        getPromotorSubstring(tss, tssStart, length, newLocus);
+                        uniqueIdx++;
                     }
                 }
-                uniqueIdx++;
             }
-        } else if (type == ElementsOfInterest.ONLY_REAL_TSS) {
-            for (TranscriptionStart tss : starts) {
+        } else if (type == ElementsOfInterest.ONLY_SELECTED_FOR_UPSTREAM_ANALYSES) {
+            for (TranscriptionStart tss : allStarts) {
                 currentFeature = tss.getAssignedFeature();
-                String newLocus = currentFeature.getLocus() + "_" + uniqueIdx;
-                if (isRbsAnalysis) {
-                    // add header in array
-                    if (!tss.isPutativeAntisense() && !tss.isLeaderless() && !tss.isInternalTSS()) {
-                        tss.setRbsSequenceLength(length);
-                        tss.setAdditionalIdentyfier(newLocus);
-                        this.upstreamRegions.add(">" + newLocus + "\n");
-                        if (tss.isFwdStrand()) {
-                            featureStart = currentFeature.getStart();
-                            substr = this.ref.getChromSequence(tss.getChromId(), featureStart - length, featureStart);
-                            upstreamRegions.add(substr + "\n");
-                            this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                        } else {
-                            featureStart = currentFeature.getStop();
-                            substr = this.ref.getChromSequence(tss.getChromId(), featureStart, featureStart + length);
-                            upstreamRegions.add(substr + "\n");
-                            this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                        }
-                    } else {
-                        continue;
-                    }
-                } else {
-                    if (!tss.isPutativeAntisense() && !tss.isLeaderless() && !tss.isInternalTSS()) {
-                        tss.setPromotorSequenceLength(length);
-                        tss.setAdditionalIdentyfier(newLocus);
-                        tssStart = tss.getStartPosition();
-                        this.upstreamRegions.add(">" + newLocus + "\n");
-                        if (tss.isFwdStrand()) {
-                            substr = this.ref.getChromSequence(tss.getChromId(), tssStart - length, tssStart);
-                            upstreamRegions.add(substr + "\n");
-                            this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                        } else {
-                            substr = this.ref.getChromSequence(tss.getChromId(), tssStart, tssStart + length);
-                            upstreamRegions.add(substr + "\n");
-                            this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                        }
-                    } else {
-                        continue;
-                    }
-                }
-                uniqueIdx++;
-            }
-        } else if (type == ElementsOfInterest.ONLY_SELECTED) {
-            for (TranscriptionStart tss : starts) {
-                currentFeature = tss.getAssignedFeature();
-                String newLocus = currentFeature.getLocus() + "_" + uniqueIdx;
                 tssStart = tss.getStartPosition();
-                if (isRbsAnalysis) {
-                    // add header in array
-                    if (tss.isLeaderless() && tss.isSelected()) {
-                        tss.setRbsSequenceLength(length);
-                        tss.setAdditionalIdentyfier(newLocus);
-                        this.upstreamRegions.add(">" + newLocus + "\n");
-                        if (tss.isFwdStrand()) {
-                            substr = this.ref.getChromSequence(tss.getChromId(), tssStart - length, tssStart);
-                            upstreamRegions.add(substr + "\n");
-                            this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                        } else {
-                            substr = this.ref.getChromSequence(tss.getChromId(), tssStart, tssStart + length);
-                            upstreamRegions.add(substr + "\n");
-                            this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                        }
-                    } else if (!tss.isLeaderless() && tss.isSelected()) {
-                        tss.setRbsSequenceLength(length);
-                        tss.setAdditionalIdentyfier(newLocus);
-                        this.upstreamRegions.add(">" + newLocus + "\n");
-                        if (tss.isFwdStrand()) {
-                            featureStart = currentFeature.getStart();
-                            substr = this.ref.getChromSequence(tss.getChromId(), featureStart - length, featureStart);
-                            upstreamRegions.add(substr + "\n");
-                            this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                        } else {
-                            featureStart = currentFeature.getStop();
-                            substr = this.ref.getChromSequence(tss.getChromId(), featureStart, featureStart + length);
-                            upstreamRegions.add(substr + "\n");
-                            this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                        }
+
+                if (isRbsAnalysis && tss.isSelected() && currentFeature != null) {
+                    locus = currentFeature.getLocus();
+
+                    tss.setRbsSequenceLength(length);
+                    tss.setAdditionalIdentyfier(locus);
+
+                    if (!locusToTSSs.containsKey(locus)) {
+                        // add header in array
+                        this.upstreamRegions.add(">" + locus + "\n");
+                        getUpstreamRegionRelToFeatureStart(tss, currentFeature, length);
+                        locusToTSSs.put(currentFeature.getLocus(), tss);
                     }
-                } else if (tss.isSelected()) {
+                } else if (tss.isSelected() && !isRbsAnalysis) {
+                    if (currentFeature != null) {
+                        newLocus = currentFeature.getLocus() + "_" + uniqueIdx;
+                    } else {
+                        newLocus = "novelTranscript" + "_" + uniqueIdx;
+                    }
+
                     tss.setPromotorSequenceLength(length);
                     tss.setAdditionalIdentyfier(newLocus);
                     this.upstreamRegions.add(">" + newLocus + "\n");
-                    System.out.println(">" + currentFeature.getLocus());
-                    if (tss.isFwdStrand()) {
-                        substr = this.ref.getChromSequence(tss.getChromId(), tssStart - length, tssStart);
-                        upstreamRegions.add(substr + "\n");
-                        this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                        System.out.println(substr);
-                    } else {
-                        substr = this.ref.getChromSequence(tss.getChromId(), tssStart, tssStart + length);
-                        upstreamRegions.add(substr + "\n");
-                        this.upstreamRegionsInHash.put(newLocus, substr + "\n");
-                        System.out.println(substr);
-                    }
+                    getPromotorSubstring(tss, tssStart, length, newLocus);
+                    uniqueIdx++;
                 }
-                uniqueIdx++;
             }
         }
     }
 
     /**
+     * Gets the promotor region upstream to the tss and adds it to the list of
+     * upstream promotor regions.
      *
-     * @param rbsBioProspectorInput
-     * @param regionsForMotifSearch
-     * @param rbsParams
+     * @param tss the TranscriptionStart instance
+     * @param tssStart the transcriptions start site
+     * @param length of the upstream region to extract
+     * @param newLocus the new generated locus name, if no locus exists for
+     * given tss
      */
-    private void writeBioProspInputFromRbsAalysis(File rbsBioProspectorInput, StyledDocument regionsForMotifSearch, RbsAnalysisParameters rbsParams) {
-        Writer writer = null;
-        try {
-            writer = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(rbsBioProspectorInput.getAbsolutePath()), "utf-8"));
-
-            for (String region : this.upstreamRegions) {
-                if (region.startsWith(">")) {
-                    writer.write(region);
-                    regionsForMotifSearch.insertString(regionsForMotifSearch.getLength(), region, null);
-                } else {
-                    String subregionForMotifSearch = region.substring(0, region.length() - rbsParams.getMinSpacer() - 1);
-                    writer.write(subregionForMotifSearch + "\n");
-                    regionsForMotifSearch.insertString(regionsForMotifSearch.getLength(), subregionForMotifSearch + "\n", null);
-                }
+    private void getPromotorSubstring(TranscriptionStart tss, int tssStart, int length, String newLocus) {
+        String substr = "";
+        if (tss.isFwdStrand()) {
+            if (tssStart < length) {
+                int a = length - tssStart;
+                String substr1 = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(this.chromosomes.get(tss.getChromId()).getSequence(this).length() - a - 1, this.chromosomes.get(tss.getChromId()).getSequence(this).length());
+                String substr2 = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(0, tssStart - 1);
+                substr = substr1 + substr2;
+            } else {
+                substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart - (length + 1), tssStart - 1);
             }
-            writer.close();
+            upstreamRegions.add(substr + "\n");
+            this.upstreamRegionsInHash.put(newLocus, substr + "\n");
+        } else {
+            if (tssStart + length > this.chromosomes.get(tss.getChromId()).getSequence(this).length()) {
+                String substr1 = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart - 1, this.chromosomes.get(tss.getChromId()).getSequence(this).length());
+                String substr2 = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(0, length - (this.chromosomes.get(tss.getChromId()).getSequence(this).length() - tssStart));
+                substr = substr1 + substr2;
+            } else {
+                substr = SequenceUtils.getReverseComplement(this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart, tssStart + (length + 1)));
+            }
+            upstreamRegions.add(substr + "\n");
+            this.upstreamRegionsInHash.put(newLocus, substr + "\n");
+        }
+    }
 
-        } catch (UnsupportedEncodingException ex) {
-            Exceptions.printStackTrace(ex);
-        } catch (IOException | BadLocationException ex) {
-            Exceptions.printStackTrace(ex);
+    /**
+     * Gets the upstream region relative to the translation start site of the
+     * feature assigned to the given tss and adds it to the list of upstream
+     * regions.
+     *
+     * @param tss TranscriptionStart
+     * @param currentFeature PersistantFeature which is assigned to the tss
+     * @param length of the upstream region to extract
+     */
+    private void getUpstreamRegionRelToFeatureStart(TranscriptionStart tss, PersistantFeature currentFeature, int length) {
+        int featureStart;
+        String substr = "";
+        String locus = currentFeature.getLocus();
+
+        if (tss.isFwdStrand()) {
+            featureStart = currentFeature.getStart();
+            if (featureStart < length) {
+                // TODO
+                int a = length - featureStart;
+                String substr1 = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(this.chromosomes.get(tss.getChromId()).getSequence(this).length() - a - 1, this.chromosomes.get(tss.getChromId()).getSequence(this).length());
+                String substr2 = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(0, featureStart - 1);
+                substr = substr1 + substr2;
+            } else {
+                substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart - (length + 1), featureStart - 1);
+            }
+            upstreamRegions.add(substr + "\n");
+            this.upstreamRegionsInHash.put(locus, substr + "\n");
+        } else {
+            featureStart = currentFeature.getStop();
+            if (featureStart + length > this.chromosomes.get(tss.getChromId()).getSequence(this).length()) {
+                // TODO
+                String substr1 = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart - 1, this.chromosomes.get(tss.getChromId()).getSequence(this).length());
+                String substr2 = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(0, length - (this.chromosomes.get(tss.getChromId()).getSequence(this).length() - featureStart));
+                substr = substr1 + substr2;
+            } else {
+                substr = SequenceUtils.getReverseComplement(this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart, featureStart + (length + 1)));
+            }
+            upstreamRegions.add(substr + "\n");
+            this.upstreamRegionsInHash.put(locus, substr + "\n");
         }
     }
 
     /**
      *
-     * @param rbsBioProspectorInput
-     * @param rbsParams
+     * @param rbsBioProspectorInput Output file for the BioProspector input.
+     * @param rbsParams RbsAnalysisParameters
      */
-    private void writeSeqaForRbsAnalysisInFile(File rbsBioProspectorInput, RbsAnalysisParameters rbsParams) {
-        Writer writer = null;
+    private void writeSeqForRbsAnalysisInFile(File rbsBioProspectorInput, RbsAnalysisParameters rbsParams) {
         try {
-            writer = new BufferedWriter(new OutputStreamWriter(
+            Writer writer = new BufferedWriter(new OutputStreamWriter(
                     new FileOutputStream(rbsBioProspectorInput.getAbsolutePath()), "utf-8"));
 
             for (String region : this.upstreamRegions) {
@@ -1161,6 +1128,12 @@ public class MotifSearchModel implements Observer {
         }
     }
 
+    /**
+     *
+     * @param operons
+     * @param length
+     * @param isRbsAnalysis
+     */
     public void takeSubRegionsForOperonAnalysis(List<Operon> operons, int length, boolean isRbsAnalysis) {
         if (isRbsAnalysis) {
             progressHandleRbsAnalysis.start(100);
@@ -1201,7 +1174,7 @@ public class MotifSearchModel implements Observer {
             } else {
                 operon.setPromotorSequenceLength(length);
                 operon.setAdditionalLocus(uniqueLocus);
-                int transkriptStart = operon.getStartPositionOfTranscript();
+                int transkriptStart = operon.getStartPositionOfOperonTranscript();
                 this.upstreamRegions.add(">" + uniqueLocus + "\n");
                 if (operon.isFwd()) {
                     substr = this.ref.getChromSequence(leadingFeature.getChromId(), transkriptStart - length, transkriptStart);
@@ -1227,14 +1200,15 @@ public class MotifSearchModel implements Observer {
      * @param rbsBioProsFirstHit File instance, contains the parsed output (best
      * hit from BioProspector).
      */
-    private void runBioProspForRbsAnalysis(File workingDir, File rbsBioProspectorInput, RbsAnalysisParameters rbsParams, File rbsBioProsFirstHit) {
+    private boolean runBioProspForRbsAnalysis(File workingDir, File rbsBioProspectorInput, RbsAnalysisParameters rbsParams, File rbsBioProsFirstHit) {
+        boolean success = false;
         if (workingDir.isDirectory()) {
             String posixPath = "/cygdrive/c";
             String sub = rbsBioProspectorInput.getAbsolutePath().toString().substring(2);
             posixPath += sub.replaceAll("\\\\", "/");
 
             try {
-                this.executeBioProspector(
+                success = this.executeBioProspector(
                         posixPath, rbsBioProsFirstHit, rbsParams.getMotifWidth(),
                         rbsParams.getNumberOfCyclesForBioProspector(),
                         1, 1);
@@ -1242,6 +1216,7 @@ public class MotifSearchModel implements Observer {
                 Exceptions.printStackTrace(ex);
             }
         }
+        return success;
     }
 
     /**
@@ -1333,7 +1308,10 @@ public class MotifSearchModel implements Observer {
      * @param tss
      * @param operons
      */
-    public void storePromoterAnalysisResults(List<String> upstreamRegions, TreeMap<String, Integer> minus10Starts, TreeMap<String, Integer> minus35Starts, TreeMap<String, Integer> minus10Shifts, TreeMap<String, Integer> minus35Shifts, PromotorSearchParameters params, List<TranscriptionStart> tss, List<Operon> operons) {
+    public void storePromoterAnalysisResults(List<String> upstreamRegions,
+            TreeMap<String, Integer> minus10Starts, TreeMap<String, Integer> minus35Starts,
+            TreeMap<String, Integer> minus10Shifts, TreeMap<String, Integer> minus35Shifts,
+            PromotorSearchParameters params, List<TranscriptionStart> tss, List<Operon> operons) {
         if (tss != null) {
             HashMap<String, TranscriptionStart> tssInTreeMap = new HashMap<>();
             for (TranscriptionStart ts : tss) {
@@ -1740,6 +1718,67 @@ public class MotifSearchModel implements Observer {
 
     public void setColoredPromotorRegions(StyledDocument coloredPromotorRegions) {
         this.coloredPromotorRegions = coloredPromotorRegions;
+    }
+
+    /**
+     *
+     * @param file
+     * @param isRbs
+     * @param meanSpacer1
+     * @param meanspacer2
+     * @param contributedSegmentsToFstMotif
+     * @param contributedSegmentsToSndMotif
+     * @param noOfSequences
+     * @param params
+     */
+    private void writeInfoFile(File file, boolean isRbs, float meanSpacer1, float meanspacer2, int contributedSegmentsToFstMotif, int contributedSegmentsToSndMotif, int noOfSequences, ParameterSetI<Object> params) {
+        PromotorSearchParameters promotorParams = null;
+        RbsAnalysisParameters rbsParams = null;
+        if (isRbs) {
+            rbsParams = (RbsAnalysisParameters) params;
+        } else {
+            promotorParams = (PromotorSearchParameters) params;
+        }
+
+        Writer writer = null;
+        try {
+            writer = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(file.getAbsolutePath()), "utf-8"));
+
+            if (isRbs) {
+                writer.write("Infos to RBS analysis\n");
+                writer.write("Length of upstream regions relative to TLS taken for analysis: " + rbsParams.getSeqLengthToAnalyze() + "\n");
+                writer.write("Min. Spacer: " + rbsParams.getMinSpacer() + "\n");
+                writer.write("Motif width: " + rbsParams.getMotifWidth() + "\n");
+                writer.write("Mean spacer width relative to TLS: " + meanSpacer1 + "\n");
+                writer.write("Number of contributed Segments to Motif: " + contributedSegmentsToFstMotif + "/" + noOfSequences + "\n");
+            } else {
+                writer.write("Infos to Promotor analysis\n");
+                writer.write("Length of upstream regions relative to TLS taken for analysis: " + promotorParams.getLengthOfPromotorRegion() + "\n");
+                writer.write("Min. spacer 1: " + promotorParams.getMinSpacer1() + "\n");
+                writer.write("Mean spacer 1: " + meanSpacer1 + "\n");
+                writer.write("Min. spacer 2: " + promotorParams.getMinSpacer2() + "\n");
+                writer.write("Mean spacer 2: " + meanspacer2 + "\n");
+                writer.write("-10 motif width: " + promotorParams.getMinusTenMotifWidth() + "\n");
+                writer.write("-35 motif width: " + promotorParams.getMinus35MotifWidth() + "\n");
+                writer.write("Number of contributed Segments to -10 Motif: " + contributedSegmentsToFstMotif + "/" + noOfSequences + "\n");
+                writer.write("Number of contributed Segments to -35 Motif: " + contributedSegmentsToSndMotif + "/" + noOfSequences + "\n");
+            }
+            writer.close();
+
+        } catch (UnsupportedEncodingException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }
+
+    public File getInfo() {
+        return info;
+    }
+
+    public void setInfo(File info) {
+        this.info = info;
     }
 
 }

@@ -20,12 +20,12 @@ import org.netbeans.api.progress.ProgressHandle;
  * @author jritter
  */
 public class GenomeFeatureParser {
-    
+
     private final TrackConnector trackConnector;
     private final List<int[]> region2Exclude;
-    private final HashMap<Integer, List<Integer>> forwardCDSs;
-    private final HashMap<Integer, List<Integer>> reverseCDSs;
-    private HashMap<Integer, PersistantFeature> allRegionsInHash;
+    private final HashMap<Integer, List<Integer>> fwdFeatures;
+    private final HashMap<Integer, List<Integer>> revFeatures;
+    private HashMap<Integer, PersistantFeature> allFeatures;
     private final ReferenceConnector refConnector;
     private final List<PersistantFeature> genomeFeatures;
     private final ProgressHandle progressHandle;
@@ -33,6 +33,7 @@ public class GenomeFeatureParser {
     private HashMap<Integer, List<Integer>> allRevFeatures;
     private Integer referenceLength;
     private final PersistantReference refGenome;
+    private final int noOfChromosomes;
 
     /**
      * Genome-feature parser, parses the needed information from all Features in
@@ -45,18 +46,20 @@ public class GenomeFeatureParser {
     public GenomeFeatureParser(TrackConnector trackConnector, ProgressHandle progressHandle) {
         this.progressHandle = progressHandle;
         this.trackConnector = trackConnector;
-        this.forwardCDSs = new HashMap<>();
-        this.reverseCDSs = new HashMap<>();
-        this.region2Exclude = new ArrayList<>();
+        this.fwdFeatures = new HashMap<>();
+        this.revFeatures = new HashMap<>();
         this.genomeFeatures = new ArrayList<>();
         this.referenceLength = 0;
         this.refGenome = trackConnector.getRefGenome();
+        this.noOfChromosomes = refGenome.getNoChromosomes();
+        this.region2Exclude = new ArrayList(this.noOfChromosomes);
         this.refConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenome.getId());
         Map<Integer, PersistantChromosome> chroms = refConnector.getChromosomesForGenome();
         for (PersistantChromosome chrom : chroms.values()) {
             this.genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
                     0, chrom.getLength(), chrom.getId()));
-            this.region2Exclude.add(new int[chrom.getLength()]);
+            int chromNo = refGenome.getChromosome(chrom.getId()).getChromNumber();
+            this.region2Exclude.add(chromNo - 1, new int[chrom.getLength()]);
             this.referenceLength += chrom.getLength();
         }
     }
@@ -77,7 +80,7 @@ public class GenomeFeatureParser {
      * @return HashMap<Position in Genome, List<FeatureID>>
      */
     public HashMap<Integer, List<Integer>> getForwardCDSs() {
-        return forwardCDSs;
+        return fwdFeatures;
     }
 
     /**
@@ -85,8 +88,8 @@ public class GenomeFeatureParser {
      *
      * @return HashMap<Position in Genome, List<FeatureID>>
      */
-    public HashMap<Integer, List<Integer>> getReverseCDSs() {
-        return reverseCDSs;
+    public HashMap<Integer, List<Integer>> getRevFeatures() {
+        return revFeatures;
     }
 
     /**
@@ -94,8 +97,8 @@ public class GenomeFeatureParser {
      *
      * @return HashMap<FeatureID, Feature>
      */
-    public HashMap<Integer, PersistantFeature> getAllRegionsInHash() {
-        return allRegionsInHash;
+    public HashMap<Integer, PersistantFeature> getAllFeatures() {
+        return allFeatures;
     }
 
     /**
@@ -112,41 +115,43 @@ public class GenomeFeatureParser {
         // ReadXplorer already has all information we need here
 
         this.progressHandle.progress("Parsing Feature Information", 30);
-        
+
         int size = genomeFeatures.size();
         double interval = size / 7;
         int progress = 40;
-        int start, stop, id;
+        int start, stop, featureID;
         int count = 0;
         boolean isFwd;
         FeatureType type;
-        
+
         for (PersistantFeature feature : genomeFeatures) {
-            
+
             count++;
             if (count >= interval) {
-                this.progressHandle.progress("Parsing Feature Information", progress);
+                this.progressHandle.progress(progress);
                 interval = interval + interval;
                 progress += 10;
             }
 
-            
             start = feature.getStart();
             stop = feature.getStop();
             isFwd = feature.isFwdStrand();
             type = feature.getType();
-            id = feature.getId();
+            featureID = feature.getId();
 
             // create a blocked region (sense & antisense) masking stable (tRNA, rRNA) RNAs
             // tRNA and rRNA regions are entered into the "mask array"
-            if (type.equals(FeatureType.RRNA) || type.equals(FeatureType.TRNA) || type.equals(FeatureType.MISC_RNA)) {
-                maskingRegions(type, isFwd, start, stop, feature.getChromId());
-            } else if (!type.equals(FeatureType.SOURCE) && !type.equals(FeatureType.MISC_RNA)) {
+            if (type.equals(FeatureType.RRNA) || type.equals(FeatureType.TRNA)) {
+                int chromNo = refGenome.getChromosome(feature.getChromId()).getChromNumber();
+                maskingRegions(this.region2Exclude.get(chromNo - 1), type, isFwd, start, stop);
+            }
+
+            if (!type.equals(FeatureType.SOURCE)) {
                 // store the regions in arrays of arrays (allows for overlapping regions)
                 if (isFwd) {
-                    createCDSsStrandInformation(this.forwardCDSs, id, start, stop, isFwd);
+                    createCDSsStrandInformation(this.fwdFeatures, featureID, start, stop);
                 } else {
-                    createCDSsStrandInformation(this.reverseCDSs, id, start, stop, isFwd);
+                    createCDSsStrandInformation(this.revFeatures, featureID, start, stop);
                 }
             }
         }
@@ -165,34 +170,27 @@ public class GenomeFeatureParser {
      * @param stop Stop position of feature.
      * @param isFwd Feature direction is forward if true, otherwise false.
      */
-    private void createCDSsStrandInformation(HashMap<Integer, List<Integer>> list, int featureID, int start, int stop, boolean isFwd) {
-        
-        for (int i = 0; (i + start - 1) < stop; i++) {
-            if (isFwd) {
-                if (list.get(i + start - 1) != null) {
-                    list.get(i + start - 1).add(featureID);
-                } else {
-                    ArrayList<Integer> tmp = new ArrayList<>();
-                    tmp.add(featureID);
-                    list.put(i + start - 1, tmp);
-                }
+    private void createCDSsStrandInformation(HashMap<Integer, List<Integer>> list, int featureID, int start, int stop) {
+
+        for (int i = 0; (i + start) <= stop; i++) {
+            if (list.get(i + start) != null) {
+                list.get(i + start).add(featureID);
             } else {
-                if (list.get(i + start - 1) != null) {
-                    list.get(i + start - 1).add(featureID);
-                } else {
-                    ArrayList<Integer> tmp = new ArrayList<>();
-                    tmp.add(featureID);
-                    list.put(i + start - 1, tmp);
-                }
+                ArrayList<Integer> tmp = new ArrayList<>();
+                tmp.add(featureID);
+                list.put(i + start, tmp);
             }
         }
-        
     }
 
     /**
-     * This method puts an 1 on each Postition in int[] array, where a feature
-     * has the type RRNA or TRNA. This Array excludes this regions from further
-     * analyses.
+     * This method creates an exclusion array for r/tRNA, which has a length of
+     * the representive genome. Is the features type a rRNA, than 520 fields
+     * upstream, the fields from start to stop of the feature and 5 fields
+     * downstream to the start are marked with a 1. For a feature element of
+     * tRNA type, 21 field upstream, the fields from start to stop and 20 fields
+     * downstream from stop position of this feature are marked with a 1. This
+     * regions are going to be excluded in further analysis. analyses.
      *
      * @param feature Persistant Feature list.
      * @param startFeature Startposition of feature.
@@ -200,38 +198,27 @@ public class GenomeFeatureParser {
      * @param isFwdDirection Direction of feature is forward if true, false
      * otherwise.
      */
-    private void maskingRegions(FeatureType type, boolean isFwd, int startFeature, int stopFeature,
-            int chromId) {
-        
+    private void maskingRegions(int[] region2Exclude, FeatureType type, boolean isFwd, int startFeature, int stopFeature) {
+
         if (type.equals(FeatureType.TRNA)) {
             if (isFwd) {
                 for (startFeature -= 21; startFeature < (stopFeature + 20); startFeature++) {
-                    this.region2Exclude.get(chromId - 1)[startFeature] = 1;
+                    region2Exclude[startFeature] = 1;
                 }
             } else {
-                for (startFeature -= 20; startFeature < (stopFeature + 21); stopFeature++) {
-                    this.region2Exclude.get(chromId - 1)[startFeature] = 1;
+                for (startFeature -= 20; startFeature < (stopFeature + 21); startFeature++) {
+                    region2Exclude[startFeature] = 1;
                 }
             }
         } else if (type.equals(FeatureType.RRNA)) {
-            
+
             if (isFwd) {
                 for (startFeature -= 520; startFeature > (stopFeature + 5); startFeature++) {
-                    this.region2Exclude.get(chromId - 1)[startFeature] = 1;
+                    region2Exclude[startFeature] = 1;
                 }
             } else {
-                for (startFeature -= 5; startFeature > (stopFeature + 520); stopFeature++) {
-                    this.region2Exclude.get(chromId - 1)[startFeature] = 1;
-                }
-            }
-        } else if (type.equals(FeatureType.MISC_RNA)) {
-            if (isFwd) {
-                for (; startFeature > stopFeature; startFeature++) {
-                    this.region2Exclude.get(chromId - 1)[startFeature] = 1;
-                }
-            } else {
-                for (; startFeature > stopFeature; stopFeature++) {
-                    this.region2Exclude.get(chromId - 1)[startFeature] = 1;
+                for (startFeature -= 5; startFeature > (stopFeature + 520); startFeature++) {
+                    region2Exclude[startFeature] = 1;
                 }
             }
         }
@@ -246,7 +233,7 @@ public class GenomeFeatureParser {
     public HashMap<Integer, PersistantFeature> getGenomeFeaturesInHash(List<PersistantFeature> genomeFeatures) {
         this.progressHandle.progress("Hashing of Features", 10);
         HashMap<Integer, PersistantFeature> regions = new HashMap<>();
-        
+
         for (PersistantFeature gf : genomeFeatures) {
             regions.put(gf.getId(), gf);
         }
@@ -261,18 +248,18 @@ public class GenomeFeatureParser {
     public void generateAllFeatureStrandInformation(List<PersistantFeature> genomeFeatures) {
         this.allFwdFeatures = new HashMap<>();
         this.allRevFeatures = new HashMap<>();
-        
+
         for (PersistantFeature feature : genomeFeatures) {
-            
+
             int start = feature.getStart();
             int stop = feature.getStop();
             boolean isFwd = feature.isFwdStrand();
             int id = feature.getId();
             // store the regions in arrays of arrays (allows for overlapping regions)
             if (isFwd) {
-                createCDSsStrandInformation(this.allFwdFeatures, id, start, stop, isFwd);
+                createCDSsStrandInformation(this.allFwdFeatures, id, start, stop);
             } else {
-                createCDSsStrandInformation(this.allRevFeatures, id, start, stop, isFwd);
+                createCDSsStrandInformation(this.allRevFeatures, id, start, stop);
             }
         }
     }
@@ -303,11 +290,11 @@ public class GenomeFeatureParser {
     public List<PersistantFeature> getGenomeFeatures() {
         return genomeFeatures;
     }
-    
+
     public HashMap<Integer, List<Integer>> getAllFwdFeatures() {
         return allFwdFeatures;
     }
-    
+
     public void setAllFwdFeatures(HashMap<Integer, List<Integer>> allFwdFeatures) {
         this.allFwdFeatures = allFwdFeatures;
     }
@@ -322,7 +309,7 @@ public class GenomeFeatureParser {
     public HashMap<Integer, List<Integer>> getAllRevFeatures() {
         return allRevFeatures;
     }
-    
+
     public void setAllRevFeatures(HashMap<Integer, List<Integer>> allRevFeatures) {
         this.allRevFeatures = allRevFeatures;
     }

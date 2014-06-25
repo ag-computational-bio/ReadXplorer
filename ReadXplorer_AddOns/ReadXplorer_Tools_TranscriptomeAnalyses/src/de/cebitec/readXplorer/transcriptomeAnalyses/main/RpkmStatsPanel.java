@@ -5,17 +5,18 @@ import org.openide.util.NbBundle;
 
 /**
  * Panel for showing the the statistics of a result of filtered features.
- * 
+ *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class RpkmStatsPanel extends javax.swing.JPanel {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     private HashMap<String, Integer> returnedFeaturesStatsMap;
 
     /**
      * Creates new form RpkmStatsPanel
+     *
      * @param returnedFeaturesStatsMap statistics to display
      */
     public RpkmStatsPanel(HashMap<String, Integer> returnedFeaturesStatsMap) {
@@ -84,35 +85,47 @@ public class RpkmStatsPanel extends javax.swing.JPanel {
     private javax.swing.JScrollPane returnedFeatureStatsScrollpane;
     private javax.swing.JTable returnedFeatureStatsTable;
     // End of variables declaration//GEN-END:variables
-    
+
     private void initAdditionalComponents() {
+        double mappingCount = (double) this.returnedFeaturesStatsMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT);
+        double meanMappingLength = (double) this.returnedFeaturesStatsMap.get(ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH);
+        double mappingsPerMio = (double) this.returnedFeaturesStatsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MILLION);
+        double backgroundThreshold = (double) this.returnedFeaturesStatsMap.get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_STACKSIZE);
         returnedFeatureStatsTable.setModel(new javax.swing.table.DefaultTableModel(
                 new Object[][]{
                     {ResultPanelRPKM.RETURNED_FEATURES, this.returnedFeaturesStatsMap.get(ResultPanelRPKM.RETURNED_FEATURES)},
-                    {ResultPanelRPKM.FEATURES_TOTAL, this.returnedFeaturesStatsMap.get(ResultPanelRPKM.FEATURES_TOTAL)}
+                    {ResultPanelRPKM.FEATURES_TOTAL, this.returnedFeaturesStatsMap.get(ResultPanelRPKM.FEATURES_TOTAL)},
+                    {"Mapping Statistics", ""},
+                    {ResultPanelTranscriptionStart.MAPPINGS_COUNT,
+                        String.valueOf(mappingCount)},
+                    {ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH, String.valueOf(meanMappingLength)},
+                    {ResultPanelTranscriptionStart.MAPPINGS_MILLION,
+                        String.valueOf(mappingsPerMio)},
+                    {ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_STACKSIZE,
+                        String.valueOf(backgroundThreshold)}
                 },
                 new String[]{
                     NbBundle.getMessage(RpkmStatsPanel.class, "RpkmStatsPanel.returnedFeatureStatsTable.columnModel.title0"),
                     NbBundle.getMessage(RpkmStatsPanel.class, "RpkmStatsPanel.returnedFeatureStatsTable.columnModel.title1")
                 }) {
-            private static final long serialVersionUID = 1L;
-            Class[] types = new Class[]{
-                java.lang.String.class, java.lang.String.class
-            };
-            boolean[] canEdit = new boolean[]{
-                false, false
-            };
+                    private static final long serialVersionUID = 1L;
+                    Class[] types = new Class[]{
+                        java.lang.String.class, java.lang.String.class
+                    };
+                    boolean[] canEdit = new boolean[]{
+                        false, false
+                    };
 
-            @Override
-            public Class getColumnClass(int columnIndex) {
-                return types[columnIndex];
-            }
+                    @Override
+                    public Class getColumnClass(int columnIndex) {
+                        return types[columnIndex];
+                    }
 
-            @Override
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit[columnIndex];
-            }
-        });
+                    @Override
+                    public boolean isCellEditable(int rowIndex, int columnIndex) {
+                        return canEdit[columnIndex];
+                    }
+                });
     }
 
 }

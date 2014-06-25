@@ -5,13 +5,16 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration;
 
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ChartType;
-import de.cebitec.readXplorer.transcriptomeAnalyses.main.ResultPanelTranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.RbsAnalysisWizardIterator;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
+import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 
-public class ChartsGenerationSelectChatTypeWizardPanel implements WizardDescriptor.Panel<WizardDescriptor> {
+public class ChartsGenerationSelectChatTypeWizardPanel implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
+
+    public static final String CHARTS_BINING = "Bining all 5'-UTR length";
+    public static final String CHARTS_BINING_SIZE = "Bining size of 5'-UTR length";
 
     /**
      * The visual component that displays this panel. If you need to access the
@@ -67,6 +70,39 @@ public class ChartsGenerationSelectChatTypeWizardPanel implements WizardDescript
         // use wiz.putProperty to remember current panel state
         wiz.putProperty(ChartType.ABSOLUTE_FREQUENCY_OF_5_PRIME_UTRs.toString(), component.isAbsoluteFrequency());
         wiz.putProperty(ChartType.BASE_DISTRIBUTION.toString(), component.isBaseDistribution());
-        wiz.putProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_REGION_LENGTH, component.getRange());
+        wiz.putProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_REGION_LENGTH, component.getRangeOfUpstrSeq());
+        wiz.putProperty(ChartType.PIE_CHART.toString(), component.isPieChart());
+        wiz.putProperty(CHARTS_BINING, component.isBiningSelected());
+        wiz.putProperty(CHARTS_BINING_SIZE, component.getBiningSize());
+        wiz.putProperty(ChartType.CHARTS_BASE_DIST_GA_CT.toString(), component.isDistOfGaCtSelected());
+        wiz.putProperty(ChartType.CHARTS_BASE_DIST_GC_AT.toString(), component.isDistOfGcATSelected());
+
+    }
+
+    @Override
+    public void validate() throws WizardValidationException {
+        int upstreamLength;
+        int binSize;
+
+        if (component.isBaseDistribution()) {
+            if (!component.isDistOfGaCtSelected() && !component.isDistOfGcATSelected()) {
+                throw new WizardValidationException(null, "You've selected the base distribution plot. Please also select one of the given types.", null);
+            }
+        }
+
+        try {
+            upstreamLength = component.getRangeOfUpstrSeq();
+            binSize = component.getBiningSize();
+
+        } catch (NumberFormatException nfe) {
+            throw new WizardValidationException(null, "Please check your textfields regarding string input.", null);
+        }
+
+        if (upstreamLength < 1) {
+            throw new WizardValidationException(null, "Please choose an upstream sequence length greater or equal 1.", null);
+        }
+        if (binSize < 1) {
+            throw new WizardValidationException(null, "Please choose a bin size greater or equal 1.", null);
+        }
     }
 }

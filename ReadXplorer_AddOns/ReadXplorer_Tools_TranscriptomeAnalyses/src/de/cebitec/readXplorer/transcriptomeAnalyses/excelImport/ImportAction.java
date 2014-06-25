@@ -50,11 +50,6 @@ public final class ImportAction implements ActionListener {
                     ExcelImporter importer = new ExcelImporter(progressHandle);
                     importer.startExcelToTableConverter(fc.getSelectedFile(), refViewer, transcAnalysesTopComp);
                     progressHandle.progress(30);
-
-                    JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successfull!",
-                            "Import was successfull!", JOptionPane.INFORMATION_MESSAGE);
-
-                    progressHandle.finish();
                 }
             });
             exportThread.start();

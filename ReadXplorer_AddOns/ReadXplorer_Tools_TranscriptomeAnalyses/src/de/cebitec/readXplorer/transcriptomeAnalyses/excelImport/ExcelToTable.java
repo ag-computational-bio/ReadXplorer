@@ -29,6 +29,7 @@ public class ExcelToTable implements ExcelImportDataI {
     private List<String> columnNames;
     private Object[][] fileContentFirstSheet;
     private HashMap<String, String> fileContentSecondSheet;
+    private HashMap<String, String> fileContentSecondSheetThirdColumn;
 
     /**
      * Constructor for this class, which needs an excel file and a
@@ -42,23 +43,23 @@ public class ExcelToTable implements ExcelImportDataI {
         this.columnNames = new ArrayList<>();
         fetchSheetTableAndParameters(file, handle);
     }
-    
+
     public boolean validateImportFile(File importFile, TableType typeOfTable) {
         boolean validate = false;
-        
-        if(typeOfTable == TableType.TSS_TABLE) {
+
+        if (typeOfTable == TableType.TSS_TABLE) {
             // check 
         }
-        if(typeOfTable == TableType.OPERON_TABLE) {
-            
+        if (typeOfTable == TableType.OPERON_TABLE) {
+
         }
-        if(typeOfTable == TableType.NOVEL_REGION_TABLE) {
-            
+        if (typeOfTable == TableType.NOVEL_TRANSCRIPTS_TABLE) {
+
         }
-        if(typeOfTable == TableType.RPKM_TABLE) {
-            
+        if (typeOfTable == TableType.RPKM_TABLE) {
+
         }
-        
+
         return validate;
     }
 
@@ -77,7 +78,7 @@ public class ExcelToTable implements ExcelImportDataI {
 
             // Get the first sheet
             Sheet sheet = w.getSheet(0);
-            
+
             this.fileContentFirstSheet = new Object[sheet.getRows()][sheet.getColumns()];
 
             // Loop over first 10 column and lines
@@ -97,14 +98,17 @@ public class ExcelToTable implements ExcelImportDataI {
                 }
             }
 
-//             read second Sheet!
+            // read second Sheet!
             sheet = w.getSheet(1);
             handle.progress("Read first sheed with table content ... ", 9);
             fileContentSecondSheet = new HashMap<>();
+            fileContentSecondSheetThirdColumn = new HashMap<>();
             for (int j = 0; j < sheet.getRows(); j++) {
                 Cell cellX = sheet.getCell(0, j);
                 Cell cellY = sheet.getCell(1, j);
+                Cell cellZ = sheet.getCell(2, j);
                 fileContentSecondSheet.put(cellX.getContents(), cellY.getContents());
+                fileContentSecondSheetThirdColumn.put(cellX.getContents(), cellZ.getContents());
             }
 
             w.close();
@@ -119,11 +123,16 @@ public class ExcelToTable implements ExcelImportDataI {
     }
 
     /**
-     * Return the Information from second Sheed in excel file, which consists of only two sheets.
-     * The second sheet consists of two columns.
+     * Return the Information from second Sheed in excel file, which consists of
+     * only two sheets. The second sheet consists of two columns.
+     *
      * @return HashMap<firstColumn Entry, secondColumn Entry>
      */
     public HashMap<String, String> getSecondSheetData() {
         return this.fileContentSecondSheet;
+    }
+
+    public HashMap<String, String> getSecondSheetDataThirdColumn() {
+        return this.fileContentSecondSheetThirdColumn;
     }
 }

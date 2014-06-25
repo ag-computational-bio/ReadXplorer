@@ -54,17 +54,19 @@ public class NovelRegionResultPanel extends ResultTablePanel {
     private BoundsInfoManager boundsInfoManager;
     private ReferenceViewer referenceViewer;
     private HashMap<String, Object> statisticsMap;
-    private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
-    private TableRightClickDeletion<DefaultTableModel> rowDeletion = new TableRightClickDeletion();
+    private final TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
+    private final TableRightClickDeletion<DefaultTableModel> rowDeletion = new TableRightClickDeletion();
     private HashMap<Integer, NovelTranscript> nrInHash;
-    public final TableType tableType = TableType.NOVEL_REGION_TABLE;
-    public static final String NOVELREGION_DETECTION_MIN_LENGTH = "Minimum length of new region";
+    public final TableType tableType = TableType.NOVEL_TRANSCRIPTS_TABLE;
+    public static final String NOVELREGION_DETECTION_MIN_LENGTH = "Minimal length of novel transcript";
     public static final String NOVELREGION_DETECTION_NO_OF_FEATURES = "Number of detected regions";
     public static final String NOVELREGION_DETECTION_NO_OF_REV_FEATURES = "Number of reverse features";
     public static final String NOVELREGION_DETECTION_NO_OF_FWD_FEATURES = "Number of forward features";
     public static final String NOVELREGION_DETECTION_NO_OF_CISANTISENSE = "Number of cis-antisense features";
     public static final String NOVELREGION_DETECTION_NO_OF_TRANSGENIC = "Number of transgenic features";
     private ProgressHandle progresshandle;
+    String separator = "";
+    Integer prefixLength = 0;
 
     /**
      * Creates new form NovelRegionResultPanel
@@ -91,16 +93,15 @@ public class NovelRegionResultPanel extends ResultTablePanel {
      */
     private void initStatsMap() {
         statisticsMap = new HashMap<>();
-        statisticsMap.put(NOVELREGION_DETECTION_MIN_LENGTH, 0);
         statisticsMap.put(NOVELREGION_DETECTION_NO_OF_FEATURES, 0);
         statisticsMap.put(NOVELREGION_DETECTION_NO_OF_REV_FEATURES, 0);
         statisticsMap.put(NOVELREGION_DETECTION_NO_OF_FWD_FEATURES, 0);
         statisticsMap.put(NOVELREGION_DETECTION_NO_OF_CISANTISENSE, 0);
         statisticsMap.put(NOVELREGION_DETECTION_NO_OF_TRANSGENIC, 0);
         statisticsMap.put(ResultPanelTranscriptionStart.MAPPINGS_COUNT, 0.0);
-        statisticsMap.put(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH, 0.0);
+        statisticsMap.put(ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH, 0.0);
         statisticsMap.put(ResultPanelTranscriptionStart.MAPPINGS_MILLION, 0.0);
-        statisticsMap.put(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD, 0.0);
+        statisticsMap.put(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_STACKSIZE, 0.0);
     }
 
     /**
@@ -126,14 +127,14 @@ public class NovelRegionResultPanel extends ResultTablePanel {
 
             },
             new String [] {
-                "Putative Start", "Strand", "Track", "Chromosome", "FALSE POSITIVE", "Selection for Blast", "Finished", "Site", "Dropoff Position", "Length", "Sequence", "Chrom. ID", "Track ID"
+                "Putative Start", "Strand", "False Positive", "Selection for Blast", "Finished", "Site", "Dropoff Position", "Length", "Sequence", "Chromosome", "Chrom. ID", "Track", "Track ID"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.Boolean.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, true, true, true, false, false, false, true, false, false
+                false, false, true, true, true, false, false, false, true, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -145,19 +146,21 @@ public class NovelRegionResultPanel extends ResultTablePanel {
             }
         });
         jScrollPane1.setViewportView(novelRegionTable);
-        novelRegionTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title0_1")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title1_1")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title9")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title10")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title3_1_1")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title7")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title12")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title2_1_1")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title5")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(9).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title6")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(10).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title8")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(11).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title11")); // NOI18N
-        novelRegionTable.getColumnModel().getColumn(12).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title4_1")); // NOI18N
+        if (novelRegionTable.getColumnModel().getColumnCount() > 0) {
+            novelRegionTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title0_1")); // NOI18N
+            novelRegionTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title1_1")); // NOI18N
+            novelRegionTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title3_1_1")); // NOI18N
+            novelRegionTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title7")); // NOI18N
+            novelRegionTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title12")); // NOI18N
+            novelRegionTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title2_1_1")); // NOI18N
+            novelRegionTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title5")); // NOI18N
+            novelRegionTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title6")); // NOI18N
+            novelRegionTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title8")); // NOI18N
+            novelRegionTable.getColumnModel().getColumn(9).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title10")); // NOI18N
+            novelRegionTable.getColumnModel().getColumn(10).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title11")); // NOI18N
+            novelRegionTable.getColumnModel().getColumn(11).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title9")); // NOI18N
+            novelRegionTable.getColumnModel().getColumn(12).setHeaderValue(org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.novelRegionTable.columnModel.title4_1")); // NOI18N
+        }
 
         org.openide.awt.Mnemonics.setLocalizedText(jButton1, org.openide.util.NbBundle.getMessage(NovelRegionResultPanel.class, "NovelRegionResultPanel.jButton1.text_1")); // NOI18N
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -249,7 +252,7 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                 // otherwise specify options as:
                 //     new Object[] { NotifyDescriptor.YES_OPTION, ... etc. },
                 NotifyDescriptor.OK_CANCEL_OPTION // default option is "Yes"
-                );
+        );
         if (DialogDisplayer.getDefault().notify(nd) == NotifyDescriptor.OK_OPTION) {
             TableExportFileChooser fileChooser = new TableExportFileChooser(TableExportFileChooser.getTableFileExtensions(), this.novelRegionResults);
         }
@@ -263,18 +266,26 @@ public class NovelRegionResultPanel extends ResultTablePanel {
         // delete all false positive detected novel regions from table and novelregion array
         List<NovelTranscript> novelRegions = this.updateNovelRegionResults();
         DefaultTableModel tableModel = (DefaultTableModel) novelRegionTable.getModel();
+        List<Integer> valuesToRemove = new ArrayList<>();
+
         for (int i = 0; i < novelRegionTable.getRowCount(); i++) {
             Integer posTableAti = (Integer) novelRegionTable.getValueAt(i, 0);
             NovelTranscript nr = nrInHash.get(posTableAti);
             boolean isFalsePositive = (boolean) novelRegionTable.getValueAt(i, 2);
             if (isFalsePositive) {
                 nrInHash.remove(posTableAti);
-                tableModel.removeRow(i);
+                valuesToRemove.add(i);
                 novelRegions.remove(nr);
             }
         }
 
+        for (int i = valuesToRemove.size() - 1; i >= 0; i--) {
+            Integer x = valuesToRemove.get(i);
+            tableModel.removeRow(x);
+        }
+
         novelRegionTable.setModel(tableModel);
+        novelRegionTable.updateUI();
         novelRegionResults.setResults(novelRegions);
     }//GEN-LAST:event_removeAllFalsePosButtonActionPerformed
 
@@ -291,7 +302,7 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                 for (int i = 0; i < novelRegionTable.getRowCount(); i++) {
                     Integer posTableAti = (Integer) novelRegionTable.getValueAt(i, 0);
                     NovelTranscript nr = nrInHash.get(posTableAti);
-                    if (nr.isFWD()) {
+                    if (nr.isFwdDirection()) {
                         sequences.add("Start\t" + nr.getStartPosition() + "\tLength\t" + nr.getLength() + "\tDirection\tfwd");
                     } else {
                         sequences.add("Start\t" + nr.getStartPosition() + "\tLength\t" + nr.getLength() + "\tDirection\trev");
@@ -334,7 +345,7 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                     NovelTranscript nr = nrInHash.get(posTableAti);
                     boolean isSelected = (boolean) novelRegionTable.getValueAt(i, 3);
                     if (isSelected) {
-                        if (nr.isFWD()) {
+                        if (nr.isFwdDirection()) {
                             sequences.add("Start\t" + nr.getStartPosition() + "\tLength\t" + nr.getLength() + "\tDirection\tfwd");
                         } else {
                             sequences.add("Start\t" + nr.getStartPosition() + "\tLength\t" + nr.getLength() + "\tDirection\trev");
@@ -367,9 +378,6 @@ public class NovelRegionResultPanel extends ResultTablePanel {
         final String wizardName = "Sequin Feature Table Export";
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
         panels.add(new SequinTableSettingsWizardPanel(wizardName));
-//        DataSelectionWizardPanel selection = new DataSelectionWizardPanel();
-//        selection.getComponent().disableTF();
-//        panels.add(selection);
         String[] steps = new String[panels.size()];
         for (int i = 0; i < panels.size(); i++) {
             Component c = panels.get(i).getComponent();
@@ -390,16 +398,20 @@ public class NovelRegionResultPanel extends ResultTablePanel {
         wiz.setTitle("Sequin Feature Table Export");
         if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
 
-//            final ArrayList<Operon> tss = (ArrayList<Operon>) this.updateTssResults();
-//            operonResult.setResults(tss);
             final String featureName = (String) wiz.getProperty(SequinTableSettingsWizardPanel.SEQUIN_EXPORT_FEATURE_NAME);
+            final boolean isParsingLocusTagSelected = (boolean) wiz.getProperty(SequinTableSettingsWizardPanel.SEQUIN_EXPORT_PARSING_LOCUS_TAG);
+
+            if (isParsingLocusTagSelected) {
+                separator = (String) wiz.getProperty(SequinTableSettingsWizardPanel.SEQUIN_EXPORT_SEPARATOR);
+                prefixLength = (Integer) wiz.getProperty(SequinTableSettingsWizardPanel.SEQUIN_EXPORT_STRAIN_LENGTH);
+            }
             this.progresshandle = ProgressHandleFactory.createHandle("Export of feature table!");
             ReadXplorerFileChooser fileChooser = new ReadXplorerFileChooser(new String[]{"tbl"}, "Table files for Sequin export") {
                 @Override
                 public void save(String fileLocation) {
                     progresshandle.start(5);
                     progresshandle.progress(1);
-                    SequinTableFormatExporter exporter = new SequinTableFormatExporter(new File(fileLocation), null, null, (ArrayList<NovelTranscript>) novelRegionResults.getResults(), tableType, featureName); //To change body of generated methods, choose Tools | Templates.
+                    SequinTableFormatExporter exporter = new SequinTableFormatExporter(new File(fileLocation), null, null, (ArrayList<NovelTranscript>) novelRegionResults.getResults(), tableType, featureName, separator, prefixLength, isParsingLocusTagSelected); //To change body of generated methods, choose Tools | Templates.
                     progresshandle.progress(2);
                     exporter.start();
                     progresshandle.progress(3);
@@ -443,72 +455,75 @@ public class NovelRegionResultPanel extends ResultTablePanel {
             } else {
                 novelRegionResults.getResults().addAll(novelRegResults.getResults());
             }
+            SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
+                @Override
+                public void run() {
+                    final int nbColumns = 13;
+                    int noFwdFeatures = 0;
+                    int noRevFeatures = 0;
+                    int noCisAntisense = 0;
+                    int noTransgene = 0;
 
-            final int nbColumns = 13;
-            int noFwdFeatures = 0;
-            int noRevFeatures = 0;
-            int noCisAntisense = 0;
-            int noTransgene = 0;
+                    final DefaultTableModel model = (DefaultTableModel) novelRegionTable.getModel();
 
-            final DefaultTableModel model = (DefaultTableModel) this.novelRegionTable.getModel();
+                    String strand;
 
-            String strand;
+                    for (NovelTranscript nr : novelReggions) {
 
-            for (NovelTranscript nr : novelReggions) {
+                        if (nr.isFwdDirection()) {
+                            strand = SequenceUtils.STRAND_FWD_STRING;
+                            ++noFwdFeatures;
+                        } else {
+                            strand = SequenceUtils.STRAND_REV_STRING;
+                            ++noRevFeatures;
+                        }
 
-                if (nr.isFWD()) {
-                    strand = SequenceUtils.STRAND_FWD_STRING;
-                    ++noFwdFeatures;
-                } else {
-                    strand = SequenceUtils.STRAND_REV_STRING;
-                    ++noRevFeatures;
-                }
+                        final Object[] rowData = new Object[nbColumns];
+                        int position = nr.getStartPosition();
+                        nrInHash.put(position, nr);
+                        int i = 0;
+                        rowData[i++] = position;
+                        rowData[i++] = strand;
+                        rowData[i++] = false;
+                        rowData[i++] = false;
+                        rowData[i++] = nr.isConsidered();
+                        rowData[i++] = nr.getLocation();
+                        if (nr.getLocation().equals("cis-antisense")) {
+                            ++noCisAntisense;
+                        } else {
+                            ++noTransgene;
+                        }
+                        rowData[i++] = nr.getDropOffPos();
+                        rowData[i++] = nr.getLength();
+                        rowData[i++] = nr.getSequence();
+                        rowData[i++] = novelRegResults.getChromosomeMap().get(nr.getChromId());
+                        rowData[i++] = nr.getChromId();
+                        rowData[i++] = novelRegResults.getTrackMap().get(nr.getTrackId());
+                        rowData[i++] = nr.getTrackId();
 
-                final Object[] rowData = new Object[nbColumns];
-                int position = nr.getStartPosition();
-                this.nrInHash.put(position, nr);
-                int i = 0;
-                rowData[i++] = position;
-                rowData[i++] = strand;
-                rowData[i++] = novelRegResults.getTrackMap().get(nr.getTrackId());
-                rowData[i++] = novelRegResults.getChromosomeMap().get(nr.getChromId());
-                rowData[i++] = false;
-                rowData[i++] = false;
-                rowData[i++] = nr.isConsidered();
-                rowData[i++] = nr.getSite();
-                rowData[i++] = nr.getDropOffPos();
-                rowData[i++] = nr.getLength();
-                rowData[i++] = nr.getSequence();
-                rowData[i++] = nr.getChromId();
-                rowData[i++] = nr.getTrackId();
-
-                SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
-                    @Override
-                    public void run() {
                         model.addRow(rowData);
+
                     }
-                });
-            }
 
-            //create statistics
-            ParameterSetWholeTranscriptAnalyses novelRegionParameters = (ParameterSetWholeTranscriptAnalyses) novelRegionResults.getParameters();
-            statisticsMap.put(NOVELREGION_DETECTION_MIN_LENGTH, (Integer) statisticsMap.get(NOVELREGION_DETECTION_MIN_LENGTH) + novelRegionParameters.getMinLengthBoundary());
-            statisticsMap.put(NOVELREGION_DETECTION_NO_OF_FEATURES, (Integer) statisticsMap.get(NOVELREGION_DETECTION_NO_OF_FEATURES) + novelReggions.size());
-            statisticsMap.put(NOVELREGION_DETECTION_NO_OF_REV_FEATURES, (Integer) statisticsMap.get(NOVELREGION_DETECTION_NO_OF_REV_FEATURES) + noRevFeatures);
-            statisticsMap.put(NOVELREGION_DETECTION_NO_OF_FWD_FEATURES, (Integer) statisticsMap.get(NOVELREGION_DETECTION_NO_OF_FWD_FEATURES) + noFwdFeatures);
-            statisticsMap.put(NOVELREGION_DETECTION_NO_OF_CISANTISENSE, (Integer) statisticsMap.get(NOVELREGION_DETECTION_NO_OF_CISANTISENSE) + noCisAntisense);
-            statisticsMap.put(NOVELREGION_DETECTION_NO_OF_TRANSGENIC, (Integer) statisticsMap.get(NOVELREGION_DETECTION_NO_OF_TRANSGENIC) + noTransgene);
-            statisticsMap.put(ResultPanelTranscriptionStart.MAPPINGS_COUNT, (Double) statisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT) + novelRegResults.getStats().getMc());
-            statisticsMap.put(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH, (Double) statisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MEAN_LENGTH) + novelRegResults.getStats().getMc());
-            statisticsMap.put(ResultPanelTranscriptionStart.MAPPINGS_MILLION, (Double) statisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MILLION) + novelRegResults.getStats().getMc());
-            statisticsMap.put(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD, (Double) statisticsMap.get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD) + novelRegResults.getStats().getMc());
+                    //create statistics
+                    statisticsMap.put(NOVELREGION_DETECTION_NO_OF_FEATURES, (Integer) statisticsMap.get(NOVELREGION_DETECTION_NO_OF_FEATURES) + novelReggions.size());
+                    statisticsMap.put(NOVELREGION_DETECTION_NO_OF_REV_FEATURES, (Integer) statisticsMap.get(NOVELREGION_DETECTION_NO_OF_REV_FEATURES) + noRevFeatures);
+                    statisticsMap.put(NOVELREGION_DETECTION_NO_OF_FWD_FEATURES, (Integer) statisticsMap.get(NOVELREGION_DETECTION_NO_OF_FWD_FEATURES) + noFwdFeatures);
+                    statisticsMap.put(NOVELREGION_DETECTION_NO_OF_CISANTISENSE, (Integer) statisticsMap.get(NOVELREGION_DETECTION_NO_OF_CISANTISENSE) + noCisAntisense);
+                    statisticsMap.put(NOVELREGION_DETECTION_NO_OF_TRANSGENIC, (Integer) statisticsMap.get(NOVELREGION_DETECTION_NO_OF_TRANSGENIC) + noTransgene);
+                    statisticsMap.put(ResultPanelTranscriptionStart.MAPPINGS_COUNT, (Double) statisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT) + novelRegResults.getStats().getMappingCount());
+                    statisticsMap.put(ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH, (Double) statisticsMap.get(ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH) + novelRegResults.getStats().getMeanMappingLength());
+                    statisticsMap.put(ResultPanelTranscriptionStart.MAPPINGS_MILLION, (Double) statisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MILLION) + novelRegResults.getStats().getMappingsPerMillion());
+                    statisticsMap.put(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_STACKSIZE, (Double) statisticsMap.get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_STACKSIZE) + novelRegResults.getStats().getBgThreshold());
 
-            novelRegResults.setStatsAndParametersMap(statisticsMap);
+                    novelRegResults.setStatsAndParametersMap(statisticsMap);
 
-            TableRowSorter<TableModel> sorter = new TableRowSorter<>();
-            novelRegionTable.setRowSorter(sorter);
-            sorter.setModel(model);
-            TableComparatorProvider.setPersistantTrackComparator(sorter, 1);
+                    TableRowSorter<TableModel> sorter = new TableRowSorter<>();
+                    novelRegionTable.setRowSorter(sorter);
+                    sorter.setModel(model);
+                    TableComparatorProvider.setPersistantTrackComparator(sorter, 1);
+                }
+            });
         }
     }
 
@@ -529,6 +544,10 @@ public class NovelRegionResultPanel extends ResultTablePanel {
         this.referenceViewer = referenceViewer;
     }
 
+    /**
+     *
+     * @return a new list of NovelRegion instances.
+     */
     private List<NovelTranscript> updateNovelRegionResults() {
         List<NovelTranscript> novelRegions = novelRegionResults.getResults();
         HashMap<Integer, NovelTranscript> tmpHash = new HashMap<>();
@@ -538,10 +557,15 @@ public class NovelRegionResultPanel extends ResultTablePanel {
             Integer posTableAti = (Integer) novelRegionTable.getValueAt(i, 0);
             if (tmpHash.containsKey(posTableAti)) {
 
-                if ((Boolean) novelRegionTable.getValueAt(i, 6)) {
+                if ((Boolean) novelRegionTable.getValueAt(i, 4)) {
                     this.nrInHash.get(posTableAti).setIsConsidered(true);
                 } else {
                     this.nrInHash.get(posTableAti).setIsConsidered(false);
+                }
+                if ((Boolean) novelRegionTable.getValueAt(i, 2)) {
+                    this.nrInHash.get(posTableAti).setIsFalsePositive(true);
+                } else {
+                    this.nrInHash.get(posTableAti).setIsFalsePositive(false);
                 }
 
                 tmpHash.remove(posTableAti);
@@ -555,6 +579,12 @@ public class NovelRegionResultPanel extends ResultTablePanel {
         return novelRegions;
     }
 
+    /**
+     * Write the sequences of interest into a file in fasta format.
+     *
+     * @param fileLocation Determination of the output.
+     * @param seqsOfInterest Sequences of interest.
+     */
     private void writeFastaFileForBlast(String fileLocation, List<String> seqsOfInterest) {
         Writer writer = null;
         int cnt = 1;

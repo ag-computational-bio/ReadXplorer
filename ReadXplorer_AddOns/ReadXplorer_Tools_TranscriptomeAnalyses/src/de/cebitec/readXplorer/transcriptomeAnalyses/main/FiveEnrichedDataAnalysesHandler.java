@@ -4,8 +4,10 @@ import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.AnalysisStatus;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Observable;
@@ -21,26 +23,26 @@ import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 
 /**
- * This class starts all analysis to be performed on a 5'-enriched dataset.
+ * This class is an analysis handler for analyses which has to be performed on a
+ * 5'-enriched dataset.
  *
  * @author jritter
  */
 public class FiveEnrichedDataAnalysesHandler extends Thread implements Observable, DataVisualisationI {
-
+    
     private TrackConnector trackConnector;
-    private PersistantTrack selectedTrack;
-    private int refGenomeID;
-    private List<de.cebitec.readXplorer.util.Observer> observer = new ArrayList<>();
-    private List<int[]> region2Exclude;
+    private final PersistantTrack selectedTrack;
+    private final int refGenomeID;
+    private final List<de.cebitec.readXplorer.util.Observer> observer = new ArrayList<>();
     protected HashMap<Integer, List<Integer>> forwardCDSs, reverseCDSs;
     private StatisticsOnMappingData stats;
     private double backgroundCutoff;
-    private ParameterSetFiveEnrichedAnalyses parameters;
+    private final ParameterSetFiveEnrichedAnalyses parameters;
     private GenomeFeatureParser featureParser;
     private TssDetection tssDetection;
     private ResultPanelTranscriptionStart transcriptionStartResultPanel;
     private final ReferenceViewer refViewer;
-    private TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
+    private final TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
     private Map<Integer, PersistantTrack> trackMap;
     private ProgressHandle progressHandleParsingFeatures;
     /**
@@ -73,7 +75,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
      * Starts the analysis.
      */
     private void startAnalysis() {
-
+        
         try {
             this.trackConnector = (new SaveFileFetcherForGUI()).getTrackConnector(selectedTrack);
         } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
@@ -85,32 +87,24 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
         this.featureParser = new GenomeFeatureParser(this.trackConnector, this.progressHandleParsingFeatures);
         this.allRegionsInHash = this.featureParser.getGenomeFeaturesInHash(this.featureParser.getGenomeFeatures());
         this.featureParser.parseFeatureInformation(this.featureParser.getGenomeFeatures());
-
-        // Initiation of important structures
-        this.region2Exclude = this.featureParser.getRegion2Exclude();
-        this.forwardCDSs = this.featureParser.getForwardCDSs();
-        this.reverseCDSs = this.featureParser.getReverseCDSs();
-
-        this.featureParser = null;
-
-        // Finish Progress of parsing genome features
+        
         this.progressHandleParsingFeatures.finish();
 
-        // geting Mappings and calculate statistics on them.
-        this.stats = new StatisticsOnMappingData(trackConnector.getRefGenome(), parameters.getFraction(), this.forwardCDSs, this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
+        // geting mappings and calculate statistics
+        this.stats = new StatisticsOnMappingData(trackConnector.getRefGenome(), parameters.getFraction(), this.featureParser.getForwardCDSs(), this.featureParser.getRevFeatures(), this.allRegionsInHash, this.featureParser.getRegion2Exclude());
         de.cebitec.readXplorer.databackend.AnalysesHandler handler = new de.cebitec.readXplorer.databackend.AnalysesHandler(trackConnector, this, "Collecting coverage data of track number "
-                + this.selectedTrack.getId(), new ParametersReadClasses(true, false, false, false, new Byte("0"))); // TODO: ParameterReadClasses noch in den Wizard einbauen und die parameter hier mit übergeben!
+                + this.selectedTrack.getId(), new ParametersReadClasses(true, parameters.isIncludeBestMatchedReads(), false, false, new Byte("0")));
         handler.setMappingsNeeded(true);
         handler.setDesiredData(Properties.REDUCED_MAPPINGS);
         handler.registerObserver(this.stats);
         handler.startAnalysis();
     }
-
+    
     @Override
     public void registerObserver(de.cebitec.readXplorer.util.Observer observer) {
         this.observer.add(observer);
     }
-
+    
     @Override
     public void removeObserver(de.cebitec.readXplorer.util.Observer observer) {
         this.observer.remove(observer);
@@ -118,13 +112,13 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
             this.interrupt();
         }
     }
-
+    
     @Override
     public void run() {
         notifyObservers(AnalysisStatus.RUNNING);
         startAnalysis();
     }
-
+    
     @Override
     public void notifyObservers(Object data) {
         List<de.cebitec.readXplorer.util.Observer> tmpObserver = new ArrayList<>(observer);
@@ -133,39 +127,51 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
             currentObserver.update(data);
         }
     }
-
+    
     @Override
     public void showData(Object data) {
         Pair<Integer, String> dataTypePair = (Pair<Integer, String>) data;
         final int trackId = dataTypePair.getFirst();
-
+        
         this.backgroundCutoff = this.stats.calculateBackgroundCutoff(this.parameters.getFraction());
+        System.out.println("Simulated BG-Threshold: " + this.stats.simulateBackgroundThreshold(this.parameters.getFraction()));
         this.stats.setBgThreshold(this.backgroundCutoff);
-
         this.stats.initMappingsStatistics();
+        List<TranscriptionStart> postProcessedTss = new ArrayList<>();
+        
+        this.tssDetection = new TssDetection(trackId);
+        for (PersistantChromosome chrom : this.trackConnector.getRefGenome().getChromosomes().values()) {
+            int chromId = chrom.getId();
+            int chromNo = chrom.getChromNumber();
+            int chromLength = chrom.getLength();
+            if (parameters.isThresholdManuallySet()) {
+                stats.setBgThreshold((double) parameters.getManuallySetThreshold());
+            }
+            this.tssDetection.runningTSSDetection(chrom, this.featureParser.getForwardCDSs(), this.featureParser.getRevFeatures(),
+                    this.allRegionsInHash, this.stats, chromId, chromNo, chromLength, this.parameters);
 
-
-        this.tssDetection = new TssDetection(this.trackConnector.getRefGenome(), trackId);
-        this.tssDetection.runningTSSDetection(this.forwardCDSs, this.reverseCDSs,
-                this.allRegionsInHash, this.stats, this.parameters);
-
+//            List<TranscriptionStart> tssList = this.tssDetection.tssDetermination(stats, chromNo, chromNo, chromId, chromLength);
+//            postProcessedTss = this.tssDetection.postProcessing(chrom, tssList, stats.getMappingsPerMillion(), chromLength, this.featureParser.getForwardCDSs(), this.featureParser.getRevFeatures(), allRegionsInHash, parameters);
+        }
+        
         String trackNames;
         if (this.transcriptionStartResultPanel == null) {
             this.transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
             this.transcriptionStartResultPanel.setReferenceViewer(this.refViewer);
         }
-
+        
         this.stats.clearMemory();
         this.clearMemory();
-
+        
         TSSDetectionResults tssResult = new TSSDetectionResults(this.stats, this.tssDetection.getResults(), getTrackMap(), this.refGenomeID);
+//        TSSDetectionResults tssResult = new TSSDetectionResults(this.stats, postProcessedTss, getTrackMap(), this.refGenomeID);
         tssResult.setParameters(this.parameters);
         this.transcriptionStartResultPanel.addResult(tssResult);
-
+        
         trackNames = GeneralUtils.generateConcatenatedString(tssResult.getTrackNameList(), 120);
-        String panelName = "Detected TSSs for " + trackNames + " (" + transcriptionStartResultPanel.getDataSize() + " hits)";
+        String panelName = "TSS detection results for " + trackNames + " Hits: " + transcriptionStartResultPanel.getDataSize();
         this.transcAnalysesTopComp.openAnalysisTab(panelName, this.transcriptionStartResultPanel);
-
+        
         notifyObservers(AnalysisStatus.FINISHED);
     }
 

@@ -866,7 +866,7 @@ public enum Qualifier {
     //Example         /PCR_conditions="Initial denaturation:94degC,1.5min"
     //Comment         used with primer_bind key
 
-    PCR_CONTITIONS,
+    PCR_CONDITIONS,
     //Qualifier       /PCR_primers=
     //Definition      PCR primers that were used to amplify the sequence.
     //                A single /PCR_primers qualifier should contain all the primers used  

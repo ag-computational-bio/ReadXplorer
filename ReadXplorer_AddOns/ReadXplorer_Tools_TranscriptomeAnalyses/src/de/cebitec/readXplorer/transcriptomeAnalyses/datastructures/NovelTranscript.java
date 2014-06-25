@@ -13,40 +13,41 @@ public class NovelTranscript extends TrackChromResultEntry {
     /**
      * Direction of novel transcript.
      */
-    private boolean isFWD;
+    private final boolean isFwd;
     /**
      * <True> if false positive. Set by user.
      */
-    private boolean isFalsePositive;
+    private final boolean isFalsePositiveDetection;
     /**
      * <True> if selected for fasta export. Set by user.
      */
-    private boolean isSelectedForFastaExport;
+    private final boolean isSelectedForFastaExport;
     /**
      * <True> if selected as finally observed in analysis process. Set by user.
      */
     private boolean isConsidered;
     /**
-     * Start position of putative transcript start.
+     * Start position of putative novel transcript.
      */
-    private int start;
+    private final int start;
     /**
-     * Possible end of novel transcript.
+     * Possible end of putaive novel transcript.
      */
-    private int dropoff;
+    private final int dropoff;
     /**
-     * Intergenic if novel transcript is determined inbetween two annotated gene
-     * features.
+     * Intergenic if putative novel transcript is determined inbetween two
+     * annotated gene features.
      */
-    private String site;
+    private final String location;
     /**
-     * Possible Length of novel transcript.
+     * Possible Length of putative novel transcript.
      */
-    private int length;
+    private final int length;
     /**
-     * Sequence of novel transcript.
+     * Sequence of putative novel transcript.
      */
-    private String sequence;
+    private final String sequence;
+    private boolean isFalsePositive;
 
     /**
      * Novel Transcript defines a region on the reference, which is not
@@ -69,13 +70,13 @@ public class NovelTranscript extends TrackChromResultEntry {
      */
     public NovelTranscript(boolean isFWD, int start, Integer dropoff, String site, int length, String sequence, boolean isFP, boolean isSelected, int trackId, int chromId) {
         super(trackId, chromId);
-        this.isFWD = isFWD;
+        this.isFwd = isFWD;
         this.start = start;
         this.dropoff = dropoff;
-        this.site = site;
+        this.location = site;
         this.length = length;
         this.sequence = sequence;
-        this.isFalsePositive = isFP;
+        this.isFalsePositiveDetection = isFP;
         this.isSelectedForFastaExport = isSelected;
     }
 
@@ -84,12 +85,12 @@ public class NovelTranscript extends TrackChromResultEntry {
      *
      * @return <true> if forward strand else <false>.
      */
-    public boolean isFWD() {
-        return isFWD;
+    public boolean isFwdDirection() {
+        return isFwd;
     }
 
     /**
-     * Gets the possible end of novel transcript.
+     * Returns the possible 3'-end of putative novel transcript.
      *
      * @return end of novel transcript.
      */
@@ -98,7 +99,7 @@ public class NovelTranscript extends TrackChromResultEntry {
     }
 
     /**
-     * Gets possible start position of noval transcript.
+     * Returns possible start position of putative noval transcript.
      *
      * @return
      */
@@ -107,18 +108,18 @@ public class NovelTranscript extends TrackChromResultEntry {
     }
 
     /**
-     * Gets the site. <intergenic> if novel transcript is between two annotated
-     * features. <cis-antisense> if novel transcript is cis-antisense to an
-     * annotated feature.
+     * Returns the location of putative novel transcript. <intergenic> if novel
+     * transcript is located between two annotated features. <cis-antisense> if
+     * novel transcript is located antisense to an annotated feature.
      *
-     * @return site.
+     * @return location.
      */
-    public String getSite() {
-        return site;
+    public String getLocation() {
+        return location;
     }
 
     /**
-     * Gets the length of novel transcript.
+     * Returns the length of putative novel transcript.
      *
      * @return length of novel transcript.
      */
@@ -136,13 +137,14 @@ public class NovelTranscript extends TrackChromResultEntry {
     }
 
     /**
-     * Information about the correctness of the detection.
+     * Information about the correctness of the detection. It can be edit by the
+     * user.
      *
      * @return <true> if it is a false positve detection of a novel region.
      * Default is <false>.
      */
     public boolean isFalsePositive() {
-        return isFalsePositive;
+        return isFalsePositiveDetection;
     }
 
     /**
@@ -165,11 +167,20 @@ public class NovelTranscript extends TrackChromResultEntry {
     }
 
     /**
-     * Set noval transcript as finally considered.
+     * Sets noval transcript as finally considered in analysis process.
      *
      * @param isConsidered <true> if considered.
      */
     public void setIsConsidered(boolean isConsidered) {
         this.isConsidered = isConsidered;
     }
+
+    public boolean isIsFalsePositive() {
+        return isFalsePositive;
+    }
+
+    public void setIsFalsePositive(boolean isFalsePositive) {
+        this.isFalsePositive = isFalsePositive;
+    }
+
 }

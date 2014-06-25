@@ -5,33 +5,42 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.rbsAnalysis;
 
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.PurposeEnum;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
+/**
+ *
+ * @author jritter
+ */
 public final class DataSelectionVisualPanel extends JPanel {
 
-    
     /**
      * Creates new form DataSelectionVisualPanel
      */
     public DataSelectionVisualPanel(PurposeEnum purpose) {
         initComponents();
         this.buttonSelectionGroup.add(onlyLeaderlessElementsCB);
-        this.buttonSelectionGroup.add(onlyNonLeaderlessElementsCB);
         this.buttonSelectionGroup.add(onlyPutAntisenseElementsCB);
         this.buttonSelectionGroup.add(onlyRealTssCB);
         this.buttonSelectionGroup.add(onlySelectedCB);
-        
-        if(purpose == PurposeEnum.CHARTS || purpose == PurposeEnum.SEQUIN_EXPORT) {
+
+        if (purpose == PurposeEnum.CHARTS || purpose == PurposeEnum.SEQUIN_EXPORT) {
             this.disableTF();
             this.lengthLabel.setEnabled(false);
+        }
+        if (purpose == PurposeEnum.RBS_ANALYSIS) {
+            this.lengthRelativeToTSS.setText("20");
         } 
+        if(purpose == PurposeEnum.PROMOTER_ANALYSIS) {
+            this.lengthRelativeToTSS.setText("60");
+        }
     }
 
     @Override
     public String getName() {
         return "Data selection";
     }
-    
+
     public void disableTF() {
         this.lengthRelativeToTSS.setEnabled(false);
     }
@@ -48,10 +57,6 @@ public final class DataSelectionVisualPanel extends JPanel {
         return onlyPutAntisenseElementsCB.isSelected();
     }
 
-    public boolean isOnlyNonLeaderlessElements() {
-        return onlyNonLeaderlessElementsCB.isSelected();
-    }
-
     public boolean isOnlyRealTSS() {
         return onlyRealTssCB.isSelected();
     }
@@ -64,6 +69,26 @@ public final class DataSelectionVisualPanel extends JPanel {
         return onlySelectedCB.isSelected();
     }
 
+    public JCheckBox getAllElementsCB() {
+        return allElementsCB;
+    }
+
+    public JCheckBox getOnlyLeaderlessElementsCB() {
+        return onlyLeaderlessElementsCB;
+    }
+
+    public JCheckBox getOnlyPutAntisenseElementsCB() {
+        return onlyPutAntisenseElementsCB;
+    }
+
+    public JCheckBox getOnlyRealTssCB() {
+        return onlyRealTssCB;
+    }
+
+    public JCheckBox getOnlySelectedCB() {
+        return onlySelectedCB;
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -73,19 +98,15 @@ public final class DataSelectionVisualPanel extends JPanel {
     private void initComponents() {
 
         buttonSelectionGroup = new javax.swing.ButtonGroup();
-        jLabel1 = new javax.swing.JLabel();
         allElementsCB = new javax.swing.JCheckBox();
         onlyLeaderlessElementsCB = new javax.swing.JCheckBox();
         onlyPutAntisenseElementsCB = new javax.swing.JCheckBox();
-        onlyNonLeaderlessElementsCB = new javax.swing.JCheckBox();
-        jLabel2 = new javax.swing.JLabel();
         onlyRealTssCB = new javax.swing.JCheckBox();
         lengthRelativeToTSS = new javax.swing.JTextField();
         lengthLabel = new javax.swing.JLabel();
-        jSeparator1 = new javax.swing.JSeparator();
         onlySelectedCB = new javax.swing.JCheckBox();
-
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(DataSelectionVisualPanel.class, "DataSelectionVisualPanel.jLabel1.text")); // NOI18N
+        title = new javax.swing.JLabel();
+        jSeparator2 = new javax.swing.JSeparator();
 
         org.openide.awt.Mnemonics.setLocalizedText(allElementsCB, org.openide.util.NbBundle.getMessage(DataSelectionVisualPanel.class, "DataSelectionVisualPanel.allElementsCB.text")); // NOI18N
         allElementsCB.addActionListener(new java.awt.event.ActionListener() {
@@ -98,10 +119,6 @@ public final class DataSelectionVisualPanel extends JPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(onlyPutAntisenseElementsCB, org.openide.util.NbBundle.getMessage(DataSelectionVisualPanel.class, "DataSelectionVisualPanel.onlyPutAntisenseElementsCB.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(onlyNonLeaderlessElementsCB, org.openide.util.NbBundle.getMessage(DataSelectionVisualPanel.class, "DataSelectionVisualPanel.onlyNonLeaderlessElementsCB.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(DataSelectionVisualPanel.class, "DataSelectionVisualPanel.jLabel2.text")); // NOI18N
-
         org.openide.awt.Mnemonics.setLocalizedText(onlyRealTssCB, org.openide.util.NbBundle.getMessage(DataSelectionVisualPanel.class, "DataSelectionVisualPanel.onlyRealTssCB.text")); // NOI18N
 
         lengthRelativeToTSS.setText(org.openide.util.NbBundle.getMessage(DataSelectionVisualPanel.class, "DataSelectionVisualPanel.lengthRelativeToTSS.text")); // NOI18N
@@ -109,6 +126,8 @@ public final class DataSelectionVisualPanel extends JPanel {
         org.openide.awt.Mnemonics.setLocalizedText(lengthLabel, org.openide.util.NbBundle.getMessage(DataSelectionVisualPanel.class, "DataSelectionVisualPanel.lengthLabel.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(onlySelectedCB, org.openide.util.NbBundle.getMessage(DataSelectionVisualPanel.class, "DataSelectionVisualPanel.onlySelectedCB.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(title, org.openide.util.NbBundle.getMessage(DataSelectionVisualPanel.class, "DataSelectionVisualPanel.title.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -118,87 +137,76 @@ public final class DataSelectionVisualPanel extends JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(jSeparator2)
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(allElementsCB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)
-                        .addComponent(lengthLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lengthRelativeToTSS, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(13, 13, 13))
+                        .addGap(112, 112, 112))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(21, 21, 21)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(onlySelectedCB)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(onlyRealTssCB)
-                                        .addComponent(onlyPutAntisenseElementsCB, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(onlyLeaderlessElementsCB)
-                                        .addComponent(onlyNonLeaderlessElementsCB)
-                                        .addComponent(jLabel2)
-                                        .addComponent(jSeparator1)))))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(onlySelectedCB)
+                            .addComponent(onlyRealTssCB)
+                            .addComponent(onlyPutAntisenseElementsCB, javax.swing.GroupLayout.PREFERRED_SIZE, 335, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(onlyLeaderlessElementsCB)
+                            .addComponent(title))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(lengthLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(lengthRelativeToTSS, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(allElementsCB)
-                    .addComponent(lengthRelativeToTSS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lengthLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel2)
+                .addComponent(title)
+                .addGap(10, 10, 10)
+                .addComponent(allElementsCB)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(onlyLeaderlessElementsCB)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(onlyPutAntisenseElementsCB)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(onlyNonLeaderlessElementsCB)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(onlyRealTssCB)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(onlySelectedCB)
-                .addContainerGap(46, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lengthRelativeToTSS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lengthLabel))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void allElementsCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allElementsCBActionPerformed
 
         if (allElementsCB.isSelected()) {
+            buttonSelectionGroup.clearSelection();
             this.onlyLeaderlessElementsCB.setEnabled(false);
-            this.onlyNonLeaderlessElementsCB.setEnabled(false);
             this.onlyPutAntisenseElementsCB.setEnabled(false);
             this.onlyRealTssCB.setEnabled(false);
             this.onlySelectedCB.setEnabled(false);
-//            this.lengthRelativeToTSS.setEnabled(true);
         } else {
             this.onlyLeaderlessElementsCB.setEnabled(true);
-            this.onlyNonLeaderlessElementsCB.setEnabled(true);
             this.onlyPutAntisenseElementsCB.setEnabled(true);
             this.onlyRealTssCB.setEnabled(true);
             this.onlySelectedCB.setEnabled(true);
-//            this.lengthRelativeToTSS.setEnabled(false);
         }
 
     }//GEN-LAST:event_allElementsCBActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox allElementsCB;
     private javax.swing.ButtonGroup buttonSelectionGroup;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
     private javax.swing.JLabel lengthLabel;
     private javax.swing.JTextField lengthRelativeToTSS;
     private javax.swing.JCheckBox onlyLeaderlessElementsCB;
-    private javax.swing.JCheckBox onlyNonLeaderlessElementsCB;
     private javax.swing.JCheckBox onlyPutAntisenseElementsCB;
     private javax.swing.JCheckBox onlyRealTssCB;
     private javax.swing.JCheckBox onlySelectedCB;
+    private javax.swing.JLabel title;
     // End of variables declaration//GEN-END:variables
 }

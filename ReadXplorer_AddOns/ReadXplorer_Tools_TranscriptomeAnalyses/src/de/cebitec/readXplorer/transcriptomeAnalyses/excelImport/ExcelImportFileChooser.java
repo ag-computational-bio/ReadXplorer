@@ -14,7 +14,6 @@ public class ExcelImportFileChooser extends ReadXplorerFileChooser {
     DefaultTableModel model;
     ExcelToTable importer;
     HashMap<String, String> secondSheet;
-    private File selectedFileForExport;
 
     public ExcelImportFileChooser(String[] fileExtensions, String fileDescription) {
         super(fileExtensions, fileDescription);

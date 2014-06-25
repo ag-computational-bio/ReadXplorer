@@ -33,21 +33,21 @@ import org.openide.util.Exceptions;
 public class WholeTranscriptDataAnalysisHandler extends Thread implements Observable, DataVisualisationI {
 
     private TrackConnector trackConnector;
-    private PersistantTrack selectedTrack;
-    private Integer refGenomeID;
-    private double fraction;
-    private List<de.cebitec.readXplorer.util.Observer> observer = new ArrayList<>();
+    private final PersistantTrack selectedTrack;
+    private final Integer refGenomeID;
+    private final double fraction;
+    private final List<de.cebitec.readXplorer.util.Observer> observer = new ArrayList<>();
     private List<int[]> region2Exclude;
     protected HashMap<Integer, List<Integer>> forwardCDSs, reverseCDSs;
     private StatisticsOnMappingData stats;
     private double backgroundCutoff;
-    private ParameterSetWholeTranscriptAnalyses parameters;
+    private final ParameterSetWholeTranscriptAnalyses parameters;
     private GenomeFeatureParser featureParser;
     private RPKMValuesCalculation rpkmCalculation;
     private OperonDetection operonDetection;
     private NovelTranscriptDetection newRegionDetection;
     private final ReferenceViewer refViewer;
-    private TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
+    private final TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
     private Map<Integer, PersistantTrack> trackMap;
     private ProgressHandle progressHandle;
     /**
@@ -99,30 +99,34 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
         this.featureParser = new GenomeFeatureParser(this.trackConnector, progressHandle);
         this.allRegionsInHash = this.featureParser.getGenomeFeaturesInHash(this.featureParser.getGenomeFeatures());
 
-        if (parameters.isPerformNovelRegionDetection()) {
-            this.progressHandle.progress("Loading additional feature information ... ", 105);
-            featureParser.generateAllFeatureStrandInformation(this.featureParser.getGenomeFeatures());
-            this.region2Exclude = this.featureParser.getRegion2Exclude();
-            this.forwardCDSs = this.featureParser.getForwardCDSs();
-            this.reverseCDSs = this.featureParser.getReverseCDSs();
-            this.progressHandle.progress(120);
-            this.progressHandle.finish();
-        } else {
-            this.featureParser.parseFeatureInformation(this.featureParser.getGenomeFeatures());
-            this.region2Exclude = this.featureParser.getRegion2Exclude();
-            this.forwardCDSs = this.featureParser.getForwardCDSs();
-            this.reverseCDSs = this.featureParser.getReverseCDSs();
-            this.progressHandle.progress(120);
-            this.progressHandle.finish();
-        }
+        this.featureParser.parseFeatureInformation(this.featureParser.getGenomeFeatures());
+        this.region2Exclude = this.featureParser.getRegion2Exclude();
+        this.forwardCDSs = this.featureParser.getForwardCDSs();
+        this.reverseCDSs = this.featureParser.getRevFeatures();
+        this.progressHandle.progress(120);
+        this.progressHandle.finish();
 
         // geting Mappings and calculate statistics on mappings.
         try {
             trackConnector = (new SaveFileFetcherForGUI()).getTrackConnector(this.selectedTrack);
-            this.stats = new StatisticsOnMappingData(refViewer.getReference(), this.fraction, this.forwardCDSs,
-                    this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
+            this.stats = new StatisticsOnMappingData(refViewer.getReference(), this.fraction, this.forwardCDSs, this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
+            boolean bestMatchesSelected = false;
+            if (parameters.isPerformNovelRegionDetection()) {
+                if (parameters.isIncludeBestMatchedReadsNr()) {
+                    bestMatchesSelected = true;
+                }
+            } else if (parameters.isPerformOperonDetection()) {
+                if (parameters.isIncludeBestMatchedReadsOP()) {
+                    bestMatchesSelected = true;
+                }
+            } else if (parameters.isPerformRPKMs()) {
+                if (parameters.isIncludeBestMatchedReadsRpkm()) {
+                    bestMatchesSelected = true;
+                }
+            }
+
             AnalysesHandler handler = new AnalysesHandler(trackConnector, this, "Collecting coverage data of track number "
-                    + this.selectedTrack.getId(), new ParametersReadClasses(true, false, false, false, new Byte("0"))); // TODO: ParameterReadClasses noch in den Wizard einbauen und die parameter hier mit übergeben!
+                    + this.selectedTrack.getId(), new ParametersReadClasses(true, bestMatchesSelected, false, false, new Byte("0"))); // TODO: ParameterReadClasses noch in den Wizard einbauen und die parameter hier mit übergeben!
             handler.setMappingsNeeded(true);
             handler.setDesiredData(Properties.REDUCED_MAPPINGS);
             handler.registerObserver(this.stats);
@@ -168,35 +172,39 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
 
     @Override
     public void showData(Object data) {
-        Pair<Integer, String> dataTypePair = (Pair<Integer, String>) data;
+        Pair<Integer, String> dataTypePair;
+        dataTypePair = (Pair<Integer, String>) data;
         final int trackId = dataTypePair.getFirst();
         this.backgroundCutoff = this.stats.calculateBackgroundCutoff(this.parameters.getFraction());
         this.stats.setBgThreshold(this.backgroundCutoff);
 
-
         this.stats.initMappingsStatistics();
         if (parameters.isPerformingRPKMs()) {
             rpkmCalculation = new RPKMValuesCalculation(this.allRegionsInHash, this.stats, trackId);
-            rpkmCalculation.calculationExpressionValues(trackConnector.getRefGenome());
+            rpkmCalculation.calculationExpressionValues(trackConnector.getRefGenome(), parameters.getReferenceFile());
 
             String trackNames;
 
             if (rpkmResultPanel == null) {
                 rpkmResultPanel = new ResultPanelRPKM();
-                rpkmResultPanel.setBoundsInfoManager(refViewer.getBoundsInformationManager());
+                rpkmResultPanel.setReferenceViewer(refViewer);
             }
 
             RPKMAnalysisResult rpkmAnalysisResult = new RPKMAnalysisResult(trackMap, rpkmCalculation.getRpkmValues(), refGenomeID);
+            rpkmAnalysisResult.setParameters(parameters);
             rpkmResultPanel.addResult(rpkmAnalysisResult);
             trackNames = GeneralUtils.generateConcatenatedString(rpkmAnalysisResult.getTrackNameList(), 120);
-            String panelName = "RPKM and read count values for " + trackNames + " (" + rpkmResultPanel.getDataSize() + " hits)";
+            String panelName = "RPKM values for " + trackNames + " Hits: " + rpkmResultPanel.getDataSize();
             transcAnalysesTopComp.openAnalysisTab(panelName, rpkmResultPanel);
         }
 
         if (parameters.isPerformNovelRegionDetection()) {
             newRegionDetection = new NovelTranscriptDetection(trackConnector.getRefGenome(), trackId);
 
-            newRegionDetection.runningNewRegionsDetection(featureParser.getAllFwdFeatures(), featureParser.getAllRevFeatures(), allRegionsInHash,
+            if (parameters.isThresholdManuallySet()) {
+                stats.setBgThreshold(parameters.getManuallySetThreshold());
+            }
+            newRegionDetection.runningNewRegionsDetection(featureParser.getForwardCDSs(), featureParser.getRevFeatures(), allRegionsInHash,
                     this.stats, this.parameters);
             String trackNames;
 
@@ -210,7 +218,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
             novelRegionResult.addResult(newRegionResult);
 
             trackNames = GeneralUtils.generateConcatenatedString(newRegionResult.getTrackNameList(), 120);
-            String panelName = "Novel region detection results" + trackNames + " (" + novelRegionResult.getDataSize() + " hits)";
+            String panelName = "Novel region detection results for " + trackNames + " Hits: " + novelRegionResult.getDataSize();
             transcAnalysesTopComp.openAnalysisTab(panelName, novelRegionResult);
         }
 
@@ -222,8 +230,11 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
              */
             List<Operon> fwdOperons, revOperons;
             operonDetection = new OperonDetection(trackId);
-            fwdOperons = operonDetection.concatOperonAdjacenciesToOperons(stats.getPutativeOperonAdjacenciesFWD(), this.trackConnector, stats.getBgThreshold());
-            revOperons = operonDetection.concatOperonAdjacenciesToOperons(stats.getPutativeOperonAdjacenciesREV(), this.trackConnector, this.stats.getBgThreshold());
+            if (parameters.isThresholdManuallySet()) {
+                stats.setBgThreshold(parameters.getManuallySetThreshold());
+            }
+            fwdOperons = operonDetection.concatOperonAdjacenciesToOperons(stats.getPutativeOperonAdjacenciesFWD(), stats.getBgThreshold());
+            revOperons = operonDetection.concatOperonAdjacenciesToOperons(stats.getPutativeOperonAdjacenciesREV(), this.stats.getBgThreshold());
             List<Operon> detectedOperons = new ArrayList<>(fwdOperons);
             detectedOperons.addAll(revOperons);
             String trackNames;
@@ -238,13 +249,12 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
             operonResultPanel.addResult(operonDetectionResult);
 
             trackNames = GeneralUtils.generateConcatenatedString(operonDetectionResult.getTrackNameList(), 120);
-            String panelName = "Operon detection results " + trackNames + " (" + operonResultPanel.getDataSize() + " hits)";
+            String panelName = "Operon detection results for " + trackNames + " Hits: " + operonResultPanel.getDataSize();
             transcAnalysesTopComp.openAnalysisTab(panelName, operonResultPanel);
         }
 
         this.stats.clearMemory();
         this.clearMemory();
-
 
         notifyObservers(AnalysisStatus.FINISHED);
     }

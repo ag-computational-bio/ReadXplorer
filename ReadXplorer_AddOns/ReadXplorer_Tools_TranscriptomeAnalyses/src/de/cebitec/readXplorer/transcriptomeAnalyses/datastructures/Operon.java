@@ -2,11 +2,13 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.datastructures;
 
 import de.cebitec.readXplorer.databackend.dataObjects.TrackResultEntry;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * @author MKD, rhilker
+ * @author MKD, rhilker, edit by jritter
  *
  * Data structure for storing operons. Operons consist of a list of
  * OperonAdjacencies, since each operon can contain more than two genes.
@@ -19,22 +21,40 @@ public class Operon extends TrackResultEntry {
     private int startPositionOfTranscript;
     private boolean markedForUpstreamAnalysis;
     private int minus10MotifWidth, minus35MotifWidth, rbsMotifWidth;
-    private boolean hasRbsFeatureAssigned, hasPromtorFeaturesAssigned;
+    private boolean hasRbsFeatureAssigned, hasPromtorFeaturesAssigned, falsPositive;
     private String additionalLocus;
     private int promotorSequenceLength, rbsSequenceLength;
     private int startMinus10Motif, startMinus35Motif, startRbsMotif;
+    private ArrayList<Integer> tsSites;
+    private ArrayList<Integer> utRegions;
+    private int[] rbsStartStop;
+    private HashMap<Integer, ArrayList<Integer[]>> tssToPromotor;
 
     /**
      *
-     * @param trackId
+     * @param trackId The track ID of the track on which the analysis has taken
+     * place.
      */
     public Operon(int trackId) {
         super(trackId);
-        this.operonAdjacencies = new ArrayList<>();
+        this.operonAdjacencies = new CopyOnWriteArrayList<>();
+        this.tsSites = new ArrayList<>();
+        this.utRegions = new ArrayList<>();
+        this.rbsStartStop = new int[2];
+        this.tssToPromotor = new HashMap<>();
     }
 
     /**
-     * @return the operon adjacencies of this operon
+     * Returns the number of genes the operon consists of.
+     *
+     * @return the number of genes
+     */
+    public int getNbOfGenes() {
+        return this.operonAdjacencies.size() + 1;
+    }
+
+    /**
+     * @return the operon adjacencies
      */
     public List<OperonAdjacency> getOperonAdjacencies() {
         return this.operonAdjacencies;
@@ -81,6 +101,9 @@ public class Operon extends TrackResultEntry {
     public String toOperonString() {
         String operon = "";
 
+        if (operonAdjacencies.get(0).getFeature1().getLocus().equals("BMMGA3_00365")) {
+            System.out.println("");
+        }
         for (Iterator<OperonAdjacency> it = operonAdjacencies.iterator(); it.hasNext();) {
             OperonAdjacency operonAdjacency = it.next();
 
@@ -110,11 +133,11 @@ public class Operon extends TrackResultEntry {
     }
 
     /**
-     * Set Direction of Operon.
+     * Set direction of this operon.
      *
      * @param isFwd <true> if forward.
      */
-    public void setFwd(boolean isFwd) {
+    public void setFwdDirection(boolean isFwd) {
         this.isFwd = isFwd;
     }
 
@@ -136,28 +159,47 @@ public class Operon extends TrackResultEntry {
         this.isConsidered = isConsidered;
     }
 
-    public int getStartPositionOfTranscript() {
+    /**
+     * Returns putative transcription start of this opreron if known, else the
+     * start position of first gene in detected operon.
+     *
+     * @return putative transcription start of this opreron
+     */
+    public int getStartPositionOfOperonTranscript() {
         return startPositionOfTranscript;
     }
 
+    public int getStopPositionOfOperonTranscript() {
+        if (isFwd) {
+            return getOperonAdjacencies().get(getOperonAdjacencies().size() - 1).getFeature2().getStop();
+        } else {
+            return getOperonAdjacencies().get(0).getFeature1().getStart();
+        }
+    }
+
+    /**
+     * Sets putative transcription start of this opreron.
+     *
+     * @param startPositionOfTranscript
+     */
     public void setStartPositionOfTranscript(int startPositionOfTranscript) {
         this.startPositionOfTranscript = startPositionOfTranscript;
     }
 
-    public boolean isForUpstreamAnalysisMarked() {
+    /**
+     *
+     * @return <true> if was marked for upstream analyses else <false>
+     */
+    public boolean isMarkedForUpstreamAnalysis() {
         return markedForUpstreamAnalysis;
     }
 
-    public void setForUpstreamAnalysisMarked(boolean forUpstreamAnalysisMarked) {
-        this.markedForUpstreamAnalysis = forUpstreamAnalysisMarked;
-    }
-
-    public boolean isIsFwd() {
-        return isFwd;
-    }
-
-    public void setIsFwd(boolean isFwd) {
-        this.isFwd = isFwd;
+    /**
+     *
+     * @param markedForUpstreamAnalysis
+     */
+    public void setMarkedForUpstreamAnalysis(boolean markedForUpstreamAnalysis) {
+        this.markedForUpstreamAnalysis = markedForUpstreamAnalysis;
     }
 
     public int getMinus10MotifWidth() {
@@ -246,5 +288,73 @@ public class Operon extends TrackResultEntry {
 
     public void setStartRbsMotif(int startRbsMotif) {
         this.startRbsMotif = startRbsMotif;
+    }
+
+    public boolean isFalsPositive() {
+        return falsPositive;
+    }
+
+    public void setFalsPositive(boolean falsPositive) {
+        this.falsPositive = falsPositive;
+    }
+
+    public void removeAdjaceny(OperonAdjacency adj) {
+        this.operonAdjacencies.remove(adj);
+    }
+
+    public ArrayList<Integer> getTsSites() {
+        return tsSites;
+    }
+
+    public void setTsSites(ArrayList<Integer> tsSites) {
+        this.tsSites = tsSites;
+    }
+
+    public ArrayList<Integer> getUtRegions() {
+        return utRegions;
+    }
+
+    public void setUtRegions(ArrayList<Integer> utRegions) {
+        this.utRegions = utRegions;
+    }
+
+    public int[] getRbsStartStop() {
+        return rbsStartStop;
+    }
+
+    public void setRbsStartStop(int[] rbsStartStop) {
+        this.rbsStartStop = rbsStartStop;
+    }
+
+    public void addTss(int tss) {
+        this.tsSites.add(tss);
+    }
+
+    public void addRbs(int start, int stop) {
+        this.rbsStartStop[0] = start;
+        this.rbsStartStop[1] = stop;
+    }
+
+    public void addUtrs(Integer utr) {
+        this.utRegions.add(utr);
+    }
+
+    public HashMap<Integer, ArrayList<Integer[]>> getTssToPromotor() {
+        return tssToPromotor;
+    }
+
+    public void setTssToPromotor(HashMap<Integer, ArrayList<Integer[]>> tssToPromotor) {
+        this.tssToPromotor = tssToPromotor;
+    }
+
+    public void addTssToPromotor(Integer tss, Integer[] minus35, Integer[] minus10) {
+        List<Integer[]> list = new ArrayList<>();
+        list.add(minus35);
+        list.add(minus10);
+        this.tssToPromotor.put(tss, (ArrayList<Integer[]>) list);
+    }
+
+    public ArrayList<Integer[]> getPromotor(Integer tss) {
+        return this.tssToPromotor.get(tss);
     }
 }

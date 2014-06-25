@@ -7,7 +7,7 @@ import java.io.File;
  *
  * @author jritter
  */
-public class RbsAnalysisParameters implements ParameterSetI<RbsAnalysisParameters>{
+public class RbsAnalysisParameters implements ParameterSetI<Object>{
 
     private File workingDir;
     int seqLengthToAnalyze, motifWidth, numberOfCyclesForBioProspector, minSpacer;

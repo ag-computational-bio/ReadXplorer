@@ -29,9 +29,8 @@ import org.openide.util.NbPreferences;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class SelectFeatureTypeWizardPanel extends ChangeListeningWizardPanel {
-    
+
     public static final String PROP_SELECTED_FEAT_TYPES = "PropSelectedFeatTypes";
-    
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
@@ -66,7 +65,7 @@ public class SelectFeatureTypeWizardPanel extends ChangeListeningWizardPanel {
     public void storeSettings(WizardDescriptor wiz) {
         if (isValid()) {
             wiz.putProperty(getPropSelectedFeatTypes(), new HashSet<>(this.component.getSelectedFeatureTypes()));
-            this.storePrefs(this.component.getSelectedFeatureTypes());
+            this.storeFeatureTypes(this.component.getSelectedFeatureTypes());
         }
     }
 
@@ -75,7 +74,7 @@ public class SelectFeatureTypeWizardPanel extends ChangeListeningWizardPanel {
      * also after restarting the software.
      * @param readClassParams The parameters to store
      */
-    private void storePrefs(List<FeatureType> featureTypeList) {
+    private void storeFeatureTypes(List<FeatureType> featureTypeList) {
         StringBuilder featTypeString = new StringBuilder(30);
         for (FeatureType type : featureTypeList) {
             featTypeString.append(type.getTypeString()).append(",");
@@ -83,7 +82,7 @@ public class SelectFeatureTypeWizardPanel extends ChangeListeningWizardPanel {
         Preferences pref = NbPreferences.forModule(Object.class);
         pref.put(getPropSelectedFeatTypes(), featTypeString.toString());
     }
-    
+
     /**
      * @return The property string for the selected feature type list for the
      * corresponding wizard.
@@ -91,5 +90,5 @@ public class SelectFeatureTypeWizardPanel extends ChangeListeningWizardPanel {
     public String getPropSelectedFeatTypes() {
         return this.analysisName + PROP_SELECTED_FEAT_TYPES;
     }
-    
+
 }
