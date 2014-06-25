@@ -1032,12 +1032,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                 tssResult.getResults().addAll(tssResultNew.getResults());
             }
 
-            //get reference sequence for promotor regions
-            PersistantReference ref = this.referenceViewer.getReference();
-            ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(ref.getId());
-            ChromosomeObserver chromObserver = new ChromosomeObserver();
-            final String chromSeq = refConnector.getRefGenome().getActiveChromSequence(chromObserver);
-            int chromLength = chromSeq.length();
 
             tssResult.setPromotorRegions(promotorRegions);
 
@@ -1047,7 +1041,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                     final int nbColumns = 26;
 
                     // statistic values
-                    int noCorrectStarts = 0;
                     int noFwdFeatures = 0;
                     int noRevFeatures = 0;
                     int noLeaderlessFeatures = 0;
@@ -1062,6 +1055,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
                     final DefaultTableModel model = (DefaultTableModel) tSSTable.getModel();
 
+                    PersistantReference ref = referenceViewer.getReference();
                     String strand;
                     PersistantFeature feature;
                     PersistantFeature nextDownstreamFeature;
@@ -1072,11 +1066,11 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
                         if (tSS.getAssignedFeature() != null) {
                             if (tSS.getAssignedFeature().isFwdStrand()) {
-                                detectedFeatureStart = chromSeq.substring(tSS.getAssignedFeature().getStart() - 1, tSS.getAssignedFeature().getStart() + 2);
-                                detectedFeatureStop = chromSeq.substring(tSS.getAssignedFeature().getStop() - 3, tSS.getAssignedFeature().getStop());
+                                detectedFeatureStart = ref.getChromSequence(tSS.getChromId(), tSS.getAssignedFeature().getStart() - 1, tSS.getAssignedFeature().getStart() + 2);
+                                detectedFeatureStop = ref.getChromSequence(tSS.getChromId(), tSS.getAssignedFeature().getStop() - 3, tSS.getAssignedFeature().getStop());
                             } else {
-                                detectedFeatureStart = SequenceUtils.getReverseComplement(chromSeq.substring(tSS.getAssignedFeature().getStop() - 3, tSS.getAssignedFeature().getStop()));
-                                detectedFeatureStop = SequenceUtils.getReverseComplement(chromSeq.substring(tSS.getAssignedFeature().getStart() - 1, tSS.getAssignedFeature().getStart() + 2));
+                                detectedFeatureStart = SequenceUtils.getReverseComplement(ref.getChromSequence(tSS.getChromId(), tSS.getAssignedFeature().getStop() - 3, tSS.getAssignedFeature().getStop()));
+                                detectedFeatureStop = SequenceUtils.getReverseComplement(ref.getChromSequence(tSS.getChromId(), tSS.getAssignedFeature().getStart() - 1, tSS.getAssignedFeature().getStart() + 2));
                             }
                         }
                         if (tSS.isFwdStrand()) {
@@ -1129,7 +1123,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                             rowData[i++] = feature.toString();
                             rowData[i++] = feature.getLocus();
                             rowData[i++] = tSS.getOffset();
-                            ++noCorrectStarts;
                         } else if (nextDownstreamFeature != null) {
                             rowData[i++] = nextDownstreamFeature.toString();
                             rowData[i++] = nextDownstreamFeature.getLocus();
@@ -1191,11 +1184,10 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                         rowData[i++] = tSS.getChromId();
                         rowData[i++] = tSS.getTrackId();
 
-                        tssTableModel.addRow(rowData);
+                        model.addRow(rowData);
                     }
 
                     //create statistics
-                    ParameterSetFiveEnrichedAnalyses tssParameters = (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters();
                     statisticsMap.put(TSS_TOTAL, (Integer) statisticsMap.get(TSS_TOTAL) + tsss.size());
                     statisticsMap.put(TSS_FWD, (Integer) statisticsMap.get(TSS_FWD) + noFwdFeatures);
                     statisticsMap.put(TSS_REV, (Integer) statisticsMap.get(TSS_REV) + noRevFeatures);
@@ -1222,7 +1214,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                 }
 
             });
-            refConnector.getRefGenome().getActiveChromosome().removeObserver(chromObserver);
         }
     }
 
@@ -1397,27 +1388,17 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
      */
     private void writeReferenceFileForRpkmValueDetermination(String fileLocation, Map<String, String[]> referenceEntries) {
 
-        Writer writer = null;
-        try {
-            writer = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(fileLocation)));
-
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileLocation)))) {
+            
             writer.write("#Locus\tStart of Transcript\tStop of Transcript\tTSSs\tUTRs\tRBS\tPromotors\n");
             for (String locus : referenceEntries.keySet()) {
                 writer.write(locus + "\t" + referenceEntries.get(locus)[0] + "\t" + referenceEntries.get(locus)[1] + "\t" + referenceEntries.get(locus)[2] + "\t" + referenceEntries.get(locus)[3] + "\t" + referenceEntries.get(locus)[4] + "\t" + referenceEntries.get(locus)[5] + "\t" + referenceEntries.get(locus)[6] + "\n");
             }
 
             // report
-        } catch (FileNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
         } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-        } finally {
-            try {
-                writer.close();
-            } catch (Exception ex) {
-            }
-        }
+            JOptionPane.showMessageDialog(this, "An error occured during wrtinging of the reference file: " + ex.getMessage(), "Write Reference Exception", JOptionPane.ERROR_MESSAGE);
+        } 
     }
 
     public void setTssResults(List<TranscriptionStart> currentTss) {

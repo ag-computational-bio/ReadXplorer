@@ -117,7 +117,7 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
                 boolean isThresholdManuallySetted = (boolean) wiz.getProperty(WizardPropertyStrings.PROP_SET_MANAULLY_MIN_STACK_SIZE);
                 int minStackSizeManuallySetted = (int) wiz.getProperty(WizardPropertyStrings.PROP_MANAULLY_MIN_STACK_SIZE);
                 int maxDistantaseFor3UtrAntisenseDetection = (int) wiz.getProperty(WizardPropertyStrings.PROP_MAX_DIST_FOR_3_UTR_ANTISENSE_DETECTION);
-                HashMap<String, StartCodon> validStartCodons = (HashMap<String, StartCodon>) wiz.getProperty(WizardPropertyStrings.PROP_VALID_START_CODONS);
+                Map<String, StartCodon> validStartCodons = (Map<String, StartCodon>) wiz.getProperty(WizardPropertyStrings.PROP_VALID_START_CODONS);
 
                 HashSet<FeatureType> excludeFeatureTypes = (HashSet<FeatureType>) wiz.getProperty(FivePrimeEnrichedTracksVisualPanel.PROP_SELECTED_FEAT_TYPES_FADE_OUT);
 

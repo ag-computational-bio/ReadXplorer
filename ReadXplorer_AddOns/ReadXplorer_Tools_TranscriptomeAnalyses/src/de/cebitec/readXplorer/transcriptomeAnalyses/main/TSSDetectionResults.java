@@ -226,44 +226,46 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
 
         statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between title and parameters
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("Parameters"));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Parameters"));
         statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_RATIO,
                 tssParameters.getRatio()));
         statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_FRACTION,
                 tssParameters.getFraction()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_MANUALLY_SET_THRESHOLD,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_MANUALLY_SET_THRESHOLD,
                 tssParameters.isThresholdManuallySet() ? "yes" : "no"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_STACKSIZE,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_STACKSIZE,
                 String.valueOf(String.format("%2.2f", backgroundThreshold))));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_EXCLUSION_OF_INTERNAL_TSS,
                 tssParameters.isExclusionOfAllIntragenicTSS() ? "yes" : "no"));
 
-        statisticsExportData.add(ResultTrackAnalysis.createThreeElementTableRow(ResultPanelTranscriptionStart.TSS_KEEP_ALL_INTRAGENIC_TSS,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_KEEP_ALL_INTRAGENIC_TSS,
                 tssParameters.isKeepAllIntragenicTss() ? "yes" : "no", String.valueOf(tssParameters.getKeepIntragenicTssDistanceLimit().toString())));
 
-        statisticsExportData.add(ResultTrackAnalysis.createThreeElementTableRow(ResultPanelTranscriptionStart.TSS_KEEP_ONLY_ASSIGNED_INTRAGENIC_TSS,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_KEEP_ONLY_ASSIGNED_INTRAGENIC_TSS,
                 tssParameters.isKeepOnlyAssignedIntragenicTss() ? "yes" : "no", String.valueOf(tssParameters.getKeepIntragenicTssDistanceLimit())));
 
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_TSS,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_TSS,
                 tssParameters.isIncludeBestMatchedReads() ? "yes" : "no"));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_RANGE_FOR_LEADERLESS_DETECTION,
                 tssParameters.getLeaderlessLimit()));
         statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_LIMITATION_FOR_DISTANCE_OFUPSTREM_REGION,
                 tssParameters.getExclusionOfTSSDistance()));
-//        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_LIMITATION_FOR_DISTANCE_KEEPING_INTERNAL_TSS,
+//        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_LIMITATION_FOR_DISTANCE_KEEPING_INTERNAL_TSS,
 //                tssParameters.getKeepIntragenicTssDistanceLimit()));
         statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_PERCENTAGE_FOR_CDSSHIFT_ANALYSIS,
                 tssParameters.getCdsShiftPercentage()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(WizardPropertyStrings.PROP_MAX_DIST_FOR_3_UTR_ANTISENSE_DETECTION,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(WizardPropertyStrings.PROP_MAX_DIST_FOR_3_UTR_ANTISENSE_DETECTION,
                 tssParameters.getThreeUtrLimitAntisenseDetection()));
         String validCodonsString = getValidStartCodonsAsString(tssParameters.getValidStartCodons());
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(WizardPropertyStrings.PROP_VALID_START_CODONS,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(WizardPropertyStrings.PROP_VALID_START_CODONS,
                 validCodonsString));
         String fadeOutTypes = getExcludedFeatureTypesAsString(tssParameters.getExcludeFeatureTypes());
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(FivePrimeEnrichedTracksVisualPanel.PROP_SELECTED_FEAT_TYPES_FADE_OUT,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(FivePrimeEnrichedTracksVisualPanel.PROP_SELECTED_FEAT_TYPES_FADE_OUT,
                 fadeOutTypes));
 
         statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between parameters and statistics
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("TSS statistics:"));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("TSS statistics:"));
         statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_TOTAL,
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.TSS_TOTAL)));
         statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_FWD,
@@ -272,20 +274,21 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.TSS_REV)));
         statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_LEADERLESS,
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.TSS_LEADERLESS)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_INTRAGENIC_TSS,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_INTRAGENIC_TSS,
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.TSS_INTRAGENIC_TSS)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_INTERGENIC_TSS,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_INTERGENIC_TSS,
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.TSS_INTERGENIC_TSS)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE_IN_TOTAL,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE_IN_TOTAL,
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE_IN_TOTAL)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE_OF_3_PRIME_UTR,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE_OF_3_PRIME_UTR,
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE_OF_3_PRIME_UTR)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE_OF_5_PRIME_UTR,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE_OF_5_PRIME_UTR,
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE_OF_5_PRIME_UTR)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE_INTRAGENIC,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE_INTRAGENIC,
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.TSS_PUTATIVE_ANTISENSE_INTRAGENIC)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_ASSIGNED_TO_STABLE_RNA,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_ASSIGNED_TO_STABLE_RNA,
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.TSS_ASSIGNED_TO_STABLE_RNA)));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_NO_PUTATIVE_CDS_SHIFTS,
                 getStatsAndParametersMap().get(ResultPanelTranscriptionStart.TSS_NO_PUTATIVE_CDS_SHIFTS)));
 
         statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between parameters and statistics
@@ -294,7 +297,7 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
 
         statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.MAPPINGS_COUNT,
                 String.valueOf(String.format("%2.2f", mappingCount))));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH,
                 String.valueOf(String.format("%2.2f", meanMappingLength))));
         statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.MAPPINGS_MILLION,
                 String.valueOf(String.format("%2.2f", mappingsPerMio))));
@@ -351,7 +354,7 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
         this.promotorRegions = promotorRegions;
     }
 
-    private String getValidStartCodonsAsString(HashMap<String, StartCodon> validStartCodons) {
+    private String getValidStartCodonsAsString(Map<String, StartCodon> validStartCodons) {
         String result = "";
 
         for (Iterator<StartCodon> it = validStartCodons.values().iterator(); it.hasNext();) {

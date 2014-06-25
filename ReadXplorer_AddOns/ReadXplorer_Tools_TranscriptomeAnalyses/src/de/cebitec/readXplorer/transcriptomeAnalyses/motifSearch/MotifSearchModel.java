@@ -1035,24 +1035,25 @@ public class MotifSearchModel implements Observer {
      */
     private void getPromotorSubstring(TranscriptionStart tss, int tssStart, int length, String newLocus) {
         String substr = "";
+        int chromLength = ref.getChromosome(tss.getChromId()).getLength();
         if (tss.isFwdStrand()) {
             if (tssStart < length) {
                 int a = length - tssStart;
-                String substr1 = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(this.chromosomes.get(tss.getChromId()).getSequence(this).length() - a - 1, this.chromosomes.get(tss.getChromId()).getSequence(this).length());
-                String substr2 = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(0, tssStart - 1);
+                String substr1 = ref.getChromSequence(tss.getChromId(), chromLength - a - 1, chromLength);
+                String substr2 = ref.getChromSequence(tss.getChromId(), 0, tssStart - 1);
                 substr = substr1 + substr2;
             } else {
-                substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart - (length + 1), tssStart - 1);
+                substr = ref.getChromSequence(tss.getChromId(), tssStart - (length + 1), tssStart - 1);
             }
             upstreamRegions.add(substr + "\n");
             this.upstreamRegionsInHash.put(newLocus, substr + "\n");
         } else {
-            if (tssStart + length > this.chromosomes.get(tss.getChromId()).getSequence(this).length()) {
-                String substr1 = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart - 1, this.chromosomes.get(tss.getChromId()).getSequence(this).length());
-                String substr2 = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(0, length - (this.chromosomes.get(tss.getChromId()).getSequence(this).length() - tssStart));
+            if (tssStart + length > chromLength) {
+                String substr1 = ref.getChromSequence(tss.getChromId(), tssStart - 1, chromLength);
+                String substr2 = ref.getChromSequence(tss.getChromId(), 0, length - (chromLength - tssStart));
                 substr = substr1 + substr2;
             } else {
-                substr = SequenceUtils.getReverseComplement(this.chromosomes.get(tss.getChromId()).getSequence(this).substring(tssStart, tssStart + (length + 1)));
+                substr = SequenceUtils.getReverseComplement(ref.getChromSequence(tss.getChromId(), tssStart, tssStart + (length + 1)));
             }
             upstreamRegions.add(substr + "\n");
             this.upstreamRegionsInHash.put(newLocus, substr + "\n");
@@ -1072,29 +1073,29 @@ public class MotifSearchModel implements Observer {
         int featureStart;
         String substr = "";
         String locus = currentFeature.getLocus();
-
+        int chromLength = ref.getChromosome(tss.getChromId()).getLength();
         if (tss.isFwdStrand()) {
             featureStart = currentFeature.getStart();
             if (featureStart < length) {
                 // TODO
                 int a = length - featureStart;
-                String substr1 = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(this.chromosomes.get(tss.getChromId()).getSequence(this).length() - a - 1, this.chromosomes.get(tss.getChromId()).getSequence(this).length());
-                String substr2 = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(0, featureStart - 1);
+                String substr1 = ref.getChromSequence(tss.getChromId(), chromLength - a - 1, chromLength);
+                String substr2 = ref.getChromSequence(tss.getChromId(), 0, featureStart - 1);
                 substr = substr1 + substr2;
             } else {
-                substr = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart - (length + 1), featureStart - 1);
+                substr = ref.getChromSequence(tss.getChromId(), featureStart - (length + 1), featureStart - 1);
             }
             upstreamRegions.add(substr + "\n");
             this.upstreamRegionsInHash.put(locus, substr + "\n");
         } else {
             featureStart = currentFeature.getStop();
-            if (featureStart + length > this.chromosomes.get(tss.getChromId()).getSequence(this).length()) {
+            if (featureStart + length > chromLength) {
                 // TODO
-                String substr1 = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart - 1, this.chromosomes.get(tss.getChromId()).getSequence(this).length());
-                String substr2 = this.chromosomes.get(tss.getChromId()).getSequence(this).substring(0, length - (this.chromosomes.get(tss.getChromId()).getSequence(this).length() - featureStart));
+                String substr1 = ref.getChromSequence(tss.getChromId(), featureStart - 1, chromLength);
+                String substr2 = ref.getChromSequence(tss.getChromId(), 0, length - (chromLength - featureStart));
                 substr = substr1 + substr2;
             } else {
-                substr = SequenceUtils.getReverseComplement(this.chromosomes.get(tss.getChromId()).getSequence(this).substring(featureStart, featureStart + (length + 1)));
+                substr = SequenceUtils.getReverseComplement(ref.getChromSequence(tss.getChromId(), featureStart, featureStart + (length + 1)));
             }
             upstreamRegions.add(substr + "\n");
             this.upstreamRegionsInHash.put(locus, substr + "\n");

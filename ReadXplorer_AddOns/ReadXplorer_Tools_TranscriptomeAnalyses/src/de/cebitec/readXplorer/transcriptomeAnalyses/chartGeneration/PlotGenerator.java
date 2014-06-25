@@ -1,8 +1,5 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration;
 
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.ChromosomeObserver;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ChartType;
@@ -154,7 +151,6 @@ public class PlotGenerator {
                     }
                 }
             }
-            binValue = 0;
             int cnt = 1;
             data.add(0, collectionArrayUpstream[0]);
             for (int i = 1; i < collectionArrayUpstream.length;) {
@@ -224,9 +220,6 @@ public class PlotGenerator {
     private void prepareCsvFileForExport(Map<String, List<TranscriptionStart>> tssToLocus) {
         // get reference sequence for promotor regions
         PersistantReference ref = referenceViewer.getReference();
-        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(ref.getId());
-        ChromosomeObserver chromObserver = new ChromosomeObserver();
-        String chromSeq = refConnector.getRefGenome().getActiveChromSequence(chromObserver);
 
         try {
             this.absFreq5PrimeUtrsInCsv = File.createTempFile("absoluteFrrequencyOf5PrimeUTRs", ".csv");
@@ -246,7 +239,7 @@ public class PlotGenerator {
                     }
                     int geneStart = ts.isFwdStrand() ? ts.getAssignedFeature().getStart() : ts.getAssignedFeature().getStop();
                     writer.write(ts.getAssignedFeature().getLocus() + ";" + direction + ";" + ts.getStartPosition() + ";"
-                            + geneStart + ";" + ts.getDetectedFeatStart() + ";" + offset + ";" + get5PrimeUtrSequence(chromSeq, ts, offset) + "\n");
+                            + geneStart + ";" + ts.getDetectedFeatStart() + ";" + offset + ";" + get5PrimeUtrSequence(ref, ts, offset) + "\n");
                 }
             }
 
@@ -256,7 +249,6 @@ public class PlotGenerator {
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
-        refConnector.getRefGenome().getActiveChromosome().removeObserver(chromObserver);
     }
 
     /**
@@ -275,7 +267,7 @@ public class PlotGenerator {
         List<TranscriptionStart> tssForAnalysis = getTssOfInterest(elements, tss);
 
         if (chartType == ChartType.BASE_DISTRIBUTION) {
-
+            PersistantReference ref = referenceViewer.getReference();
             Map<String, List<TranscriptionStart>> locusToTSSs = new TreeMap<>();
             for (TranscriptionStart ts : tssForAnalysis) {
                 if (ts.getAssignedFeature() != null) {
@@ -289,33 +281,33 @@ public class PlotGenerator {
                     }
                 }
             }
-            HashMap<Integer, PersistantChromosome> chromosomes = (HashMap<Integer, PersistantChromosome>) referenceViewer.getReference().getChromosomes();
             List<String> tmpSubstrings = new ArrayList<>();
             String substr;
             for (List<TranscriptionStart> list : locusToTSSs.values()) {
                 TranscriptionStart tSS = list.get(0);
                 int chromID = tSS.getChromId();
+                int chromLength = ref.getChromosome(chromID).getLength();
                 int featureStart = tSS.getAssignedFeature().getStart();
                 int featureStop = tSS.getAssignedFeature().getStop();
                 if (tSS.getAssignedFeature().isFwdStrand()) {
                     if (featureStart - 1 - length >= 0) {
-                        substr = chromosomes.get(chromID).getSequence(this).substring(featureStart - 1 - length, featureStart + 2);
+                        substr = ref.getChromSequence(chromID, featureStart - 1 - length, featureStart + 2);
                         tmpSubstrings.add(substr);
                     } else {
                         int a = length - featureStart;
-                        String substr1 = chromosomes.get(chromID).getSequence(this).substring(chromosomes.get(chromID).getSequence(this).length() - a - 1, chromosomes.get(chromID).getSequence(this).length());
-                        String substr2 = chromosomes.get(chromID).getSequence(this).substring(0, featureStart - 1);
+                        String substr1 = ref.getChromSequence(chromID, ref.getChromosome(chromID).getLength() - a - 1, chromLength);
+                        String substr2 = ref.getChromSequence(chromID, 0, featureStart - 1);
                         substr = substr1 + substr2;
                         tmpSubstrings.add(substr);
                     }
                 } else {
-                    if (featureStop + length >= chromosomes.get(chromID).getSequence(this).length()) {
-                        String substr1 = chromosomes.get(chromID).getSequence(this).substring(featureStart - 1, chromosomes.get(chromID).getSequence(this).length());
-                        String substr2 = chromosomes.get(chromID).getSequence(this).substring(0, length - (chromosomes.get(chromID).getSequence(this).length() - featureStart));
+                    if (featureStop + length >= chromLength) {
+                        String substr1 = ref.getChromSequence(chromID, featureStart - 1, chromLength);
+                        String substr2 = ref.getChromSequence(chromID, 0, length - (chromLength - featureStart));
                         substr = substr1 + substr2;
                         tmpSubstrings.add(substr);
                     } else {
-                        substr = SequenceUtils.getReverseComplement(chromosomes.get(chromID).getSequence(this).substring(featureStop - 3, featureStop + length));
+                        substr = SequenceUtils.getReverseComplement(ref.getChromSequence(chromID, featureStop - 3, featureStop + length));
                         tmpSubstrings.add(substr);
                     }
                 }
@@ -640,22 +632,22 @@ public class PlotGenerator {
      *
      * @return 5'-UTR sequence as a string
      */
-    private String get5PrimeUtrSequence(String chromSeq, TranscriptionStart tSS, int length) {
+    private String get5PrimeUtrSequence(PersistantReference ref, TranscriptionStart tSS, int length) {
         //Generating promotor regions for the TSS
         String utrRegion = "";
 
         //get the promotor region for each TSS
         int utrStart;
-        int chromLength = chromSeq.length();
+        int chromLength = ref.getChromosome(tSS.getChromId()).getLength();
         if (length != 0) {
             if (tSS.isFwdStrand()) {
                 utrStart = tSS.getAssignedFeature().getStart() - length - 1;
                 utrStart = utrStart < 0 ? 0 : utrStart;
-                utrRegion = chromSeq.substring(utrStart, tSS.getAssignedFeature().getStart());
+                utrRegion = ref.getChromSequence(tSS.getChromId(), utrStart, tSS.getAssignedFeature().getStart());
             } else {
                 utrStart = tSS.getAssignedFeature().getStop() + length;
                 utrStart = utrStart > chromLength ? chromLength : utrStart;
-                utrRegion = SequenceUtils.getReverseComplement(chromSeq.substring(tSS.getAssignedFeature().getStop(), utrStart));
+                utrRegion = SequenceUtils.getReverseComplement(ref.getChromSequence(tSS.getChromId(), tSS.getAssignedFeature().getStop(), utrStart));
             }
         }
 

@@ -29,7 +29,7 @@ import org.netbeans.api.progress.ProgressHandleFactory;
  * @author jritter
  */
 public class FiveEnrichedDataAnalysesHandler extends Thread implements Observable, DataVisualisationI {
-    
+
     private TrackConnector trackConnector;
     private final PersistantTrack selectedTrack;
     private final int refGenomeID;
@@ -75,7 +75,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
      * Starts the analysis.
      */
     private void startAnalysis() {
-        
+
         try {
             this.trackConnector = (new SaveFileFetcherForGUI()).getTrackConnector(selectedTrack);
         } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
@@ -87,7 +87,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
         this.featureParser = new GenomeFeatureParser(this.trackConnector, this.progressHandleParsingFeatures);
         this.allRegionsInHash = this.featureParser.getGenomeFeaturesInHash(this.featureParser.getGenomeFeatures());
         this.featureParser.parseFeatureInformation(this.featureParser.getGenomeFeatures());
-        
+
         this.progressHandleParsingFeatures.finish();
 
         // geting mappings and calculate statistics
@@ -99,12 +99,12 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
         handler.registerObserver(this.stats);
         handler.startAnalysis();
     }
-    
+
     @Override
     public void registerObserver(de.cebitec.readXplorer.util.Observer observer) {
         this.observer.add(observer);
     }
-    
+
     @Override
     public void removeObserver(de.cebitec.readXplorer.util.Observer observer) {
         this.observer.remove(observer);
@@ -112,13 +112,13 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
             this.interrupt();
         }
     }
-    
+
     @Override
     public void run() {
         notifyObservers(AnalysisStatus.RUNNING);
         startAnalysis();
     }
-    
+
     @Override
     public void notifyObservers(Object data) {
         List<de.cebitec.readXplorer.util.Observer> tmpObserver = new ArrayList<>(observer);
@@ -127,18 +127,18 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
             currentObserver.update(data);
         }
     }
-    
+
     @Override
     public void showData(Object data) {
         Pair<Integer, String> dataTypePair = (Pair<Integer, String>) data;
         final int trackId = dataTypePair.getFirst();
-        
+
         this.backgroundCutoff = this.stats.calculateBackgroundCutoff(this.parameters.getFraction());
         System.out.println("Simulated BG-Threshold: " + this.stats.simulateBackgroundThreshold(this.parameters.getFraction()));
         this.stats.setBgThreshold(this.backgroundCutoff);
         this.stats.initMappingsStatistics();
         List<TranscriptionStart> postProcessedTss = new ArrayList<>();
-        
+
         this.tssDetection = new TssDetection(trackId);
         for (PersistantChromosome chrom : this.trackConnector.getRefGenome().getChromosomes().values()) {
             int chromId = chrom.getId();
@@ -147,31 +147,31 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
             if (parameters.isThresholdManuallySet()) {
                 stats.setBgThreshold((double) parameters.getManuallySetThreshold());
             }
-            this.tssDetection.runningTSSDetection(chrom, this.featureParser.getForwardCDSs(), this.featureParser.getRevFeatures(),
+            this.tssDetection.runningTSSDetection(refViewer.getReference(), this.featureParser.getForwardCDSs(), this.featureParser.getRevFeatures(),
                     this.allRegionsInHash, this.stats, chromId, chromNo, chromLength, this.parameters);
 
 //            List<TranscriptionStart> tssList = this.tssDetection.tssDetermination(stats, chromNo, chromNo, chromId, chromLength);
 //            postProcessedTss = this.tssDetection.postProcessing(chrom, tssList, stats.getMappingsPerMillion(), chromLength, this.featureParser.getForwardCDSs(), this.featureParser.getRevFeatures(), allRegionsInHash, parameters);
         }
-        
+
         String trackNames;
         if (this.transcriptionStartResultPanel == null) {
             this.transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
             this.transcriptionStartResultPanel.setReferenceViewer(this.refViewer);
         }
-        
+
         this.stats.clearMemory();
         this.clearMemory();
-        
+
         TSSDetectionResults tssResult = new TSSDetectionResults(this.stats, this.tssDetection.getResults(), getTrackMap(), this.refGenomeID);
 //        TSSDetectionResults tssResult = new TSSDetectionResults(this.stats, postProcessedTss, getTrackMap(), this.refGenomeID);
         tssResult.setParameters(this.parameters);
         this.transcriptionStartResultPanel.addResult(tssResult);
-        
+
         trackNames = GeneralUtils.generateConcatenatedString(tssResult.getTrackNameList(), 120);
         String panelName = "TSS detection results for " + trackNames + " Hits: " + transcriptionStartResultPanel.getDataSize();
         this.transcAnalysesTopComp.openAnalysisTab(panelName, this.transcriptionStartResultPanel);
-        
+
         notifyObservers(AnalysisStatus.FINISHED);
     }
 

@@ -1,16 +1,18 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.api.objects.AnalysisI;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.StartCodon;
 import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.Observer;
+import de.cebitec.readXplorer.util.SequenceUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Provides a method for detecting and classification of Transcription start
@@ -48,13 +50,13 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
         this.revFeaturesIds = new HashMap<>();
     }
 
-    public List<TranscriptionStart> postProcessing(PersistantChromosome chrom, List<TranscriptionStart> detectedTss, double mm, int chromLength,
+    public List<TranscriptionStart> postProcessing(PersistantReference ref, int chromId, List<TranscriptionStart> detectedTss, double mm, int chromLength,
             HashMap<Integer, List<Integer>> fwdFeatures, HashMap<Integer, List<Integer>> revFeatures,
             HashMap<Integer, PersistantFeature> allFeatures, ParameterSetFiveEnrichedAnalyses parameters) {
         List<TranscriptionStart> postProcessedTssList = new ArrayList<>();
         HashSet<FeatureType> fadeOutFeatureTypes = parameters.getExcludeFeatureTypes();
         // settings for checking CDS-shift 
-        HashMap<String, StartCodon> validCodons = parameters.getValidStartCodons();
+        Map<String, StartCodon> validCodons = parameters.getValidStartCodons();
         double relPercentage = (parameters.getCdsShiftPercentage() / 100.0);
 
         int leaderlessRange = parameters.getLeaderlessLimit();
@@ -107,10 +109,10 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                             tss.setPutativeAntisense(true);
                         }
 
-                        cdsShift = checkLeaderlessCdsShift(dist2start, chrom, tss.isFwdStrand(), pos, validCodons, cdsShift);
+                        cdsShift = checkLeaderlessCdsShift(dist2start, ref, chromId, tss.isFwdStrand(), pos, validCodons, cdsShift);
 
                         if (!cdsShift && dist2start > 0) {
-                            cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), pos, dist2start, tss.isFwdStrand(), relPercentage, validCodons);
+                            cdsShift = checkCdsShift(ref, chromId, feature.getStart(), feature.getStop(), pos, dist2start, tss.isFwdStrand(), relPercentage, validCodons);
                         }
                         tss.setCdsShift(cdsShift);
 
@@ -157,7 +159,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                             // the putative corresponding gene for TSS
                             tss.setIntragenicTSS(true);
                             if (!cdsShift && dist2start >= 3) {
-                                cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), pos, dist2start, tss.isFwdStrand(), relPercentage, validCodons);
+                                cdsShift = checkCdsShift(ref, chromId, feature.getStart(), feature.getStop(), pos, dist2start, tss.isFwdStrand(), relPercentage, validCodons);
                             }
                             tss.setNextGene(nextDownstreamFeature);
                             tss.setOffsetToNextDownstrFeature(offsetToNextDownstreamFeature);
@@ -169,7 +171,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                             tss.setIntragenicTSS(true);
 
                             if (!cdsShift && dist2start > 0) {
-                                cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), pos, dist2start, tss.isFwdStrand(), relPercentage, validCodons);
+                                cdsShift = checkCdsShift(ref, chromId, feature.getStart(), feature.getStop(), pos, dist2start, tss.isFwdStrand(), relPercentage, validCodons);
                             }
                             tss.setCdsShift(cdsShift);
                             tss.setDetectedGene(feature);
@@ -214,7 +216,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                             // the putative corresponding gene for TSS
                             tss.setIntragenicTSS(true);
                             if (!cdsShift && dist2start >= 3) {
-                                cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), pos, dist2start, tss.isFwdStrand(), relPercentage, validCodons);
+                                cdsShift = checkCdsShift(ref, chromId, feature.getStart(), feature.getStop(), pos, dist2start, tss.isFwdStrand(), relPercentage, validCodons);
                             }
                             tss.setNextGene(nextDownstreamFeature);
                             tss.setOffsetToNextDownstrFeature(offsetToNextDownstreamFeature);
@@ -233,7 +235,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                         }
                         // check for cdsShift, when offset > and offset+1 mod 3 == 0
                         if (offset > 0 && ((offset + 1) % 3) == 0) {
-                            String startAtTSS = getSubSeq(chrom, tss.isFwdStrand(), pos - 1, pos + 2);
+                            String startAtTSS = getSubSeq(ref, chromId, tss.isFwdStrand(), pos - 1, pos + 2);
                             if (validCodons.containsKey(startAtTSS)) {
                                 cdsShift = true;
                             }
@@ -404,15 +406,14 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                         // check for cdsShift when offset is 0 and distance2Start > 0 and dist2Start mod 3 == 0
 //                            cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), i, dist2start, isFwd, relPercentage, validCodons);
                         if (dist2start > 0 && (dist2start % 3) == 0) {
-                            String startAtTSSRev = getSubSeq(chrom, tss.isFwdStrand(), pos - 3, pos);
-                            String complement = complement(startAtTSSRev);
-                            if (validCodons.containsKey(complement)) {
+                            String startAtTSSRev = getSubSeq(ref, chromId, tss.isFwdStrand(), pos - 3, pos);
+                            if (validCodons.containsKey(startAtTSSRev)) {
                                 cdsShift = true;
                             }
                         }
 
                         if (!cdsShift && dist2start > 0) {
-                            cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), pos, dist2start, tss.isFwdStrand(), relPercentage, validCodons);
+                            cdsShift = checkCdsShift(ref, chromId, feature.getStart(), feature.getStop(), pos, dist2start, tss.isFwdStrand(), relPercentage, validCodons);
                         }
                         tss.setCdsShift(cdsShift);
                         tss.setDetectedGene(feature);
@@ -455,7 +456,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                         if (offsetToNextDownstreamFeature < keepingInternalTssDistance) {
                             tss.setIntragenicTSS(true);
                             if (!cdsShift && dist2start >= 3) {
-                                cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), pos, dist2start, tss.isFalsePositive(), relPercentage, validCodons);
+                                cdsShift = checkCdsShift(ref, chromId, feature.getStart(), feature.getStop(), pos, dist2start, tss.isFalsePositive(), relPercentage, validCodons);
                             }
                             // puttative nextgene
                             tss.setCdsShift(cdsShift);
@@ -465,7 +466,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                             revFeaturesIds.put(nextFeature.getId(), nextFeature.getLocus());
                         } else {
                             if (!cdsShift && dist2start > 0) {
-                                cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), pos, dist2start, tss.isFwdStrand(), relPercentage, validCodons);
+                                cdsShift = checkCdsShift(ref, chromId, feature.getStart(), feature.getStop(), pos, dist2start, tss.isFwdStrand(), relPercentage, validCodons);
                             }
                             tss.setIntragenicTSS(true);
                             tss.setCdsShift(cdsShift);
@@ -507,7 +508,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                         if (offsetToNextDownstreamFeature < keepingInternalTssDistance) {
                             tss.setIntragenicTSS(true);
                             if (!cdsShift && dist2start >= 3) {
-                                cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), pos, dist2start, tss.isFwdStrand(), relPercentage, validCodons);
+                                cdsShift = checkCdsShift(ref, chromId, feature.getStart(), feature.getStop(), pos, dist2start, tss.isFwdStrand(), relPercentage, validCodons);
                             }
                             // puttative nextgene
                             tss.setCdsShift(cdsShift);
@@ -529,9 +530,8 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                         // check for cdsShift when offset is 0 and distance2Start > 0 and mod 3 == 0
                         // cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), i, dist2start, isFwd, relPercentage, validCodons);
                         if (dist2start > 0 && (dist2start % 3) == 0) {
-                            String startAtTSSRev = getSubSeq(chrom, tss.isFwdStrand(), pos - 3, pos);
-                            String complement = complement(startAtTSSRev);
-                            if (validCodons.containsKey(complement)) {
+                            String startAtTSSRev = getSubSeq(ref, chromId, tss.isFwdStrand(), pos - 3, pos);
+                            if (validCodons.containsKey(startAtTSSRev)) {
                                 cdsShift = true;
                             }
                         }
@@ -793,6 +793,18 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
         return feature;
     }
 
+    /**
+     * Determines all putative transcription start sites meet two criteria: the
+     * background threshold (bg) and the increation ratio value (ratio).
+     *
+     * @param statistics Instance of StatisticsOnMappingData
+     * @param ratio the increase raion value of mapped read starts on position i
+     * to i-1
+     * @param chromNo Chromosome number
+     * @param chromId Chromosome ID
+     * @param chromosomLength Chromosome length
+     * @return a list of transcription start sites
+     */
     public List<TranscriptionStart> tssDetermination(StatisticsOnMappingData statistics, int ratio, int chromNo, int chromId, int chromosomLength) {
 
         List<TranscriptionStart> detectedTss = new ArrayList<>(); // List of detected transcription start sites
@@ -804,7 +816,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
         boolean isFwd; // direction
 
         for (int i = 0; i < chromosomLength; i++) {
-            
+
             if (forward[chromNo - 1][i] > bg) { // background cutoff is passed
                 if (forward[chromNo - 1][i - 1] == 0) {
                     f_before = 1;
@@ -821,7 +833,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                     detectedTss.add(ts);
                 }
             }
-            
+
             if (reverse[chromNo - 1][i] > bg) {
                 if (reverse[chromNo - 1][i + 1] == 0) {
                     r_before = 1;
@@ -856,7 +868,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
      * @param distanceForExcludingTss number restricting the distance between
      * TSS and detected gene.
      */
-    public void runningTSSDetection(PersistantChromosome chrom, HashMap<Integer, List<Integer>> fwdFeatures, HashMap<Integer, List<Integer>> revFeatures,
+    public void runningTSSDetection(PersistantReference ref, HashMap<Integer, List<Integer>> fwdFeatures, HashMap<Integer, List<Integer>> revFeatures,
             HashMap<Integer, PersistantFeature> allFeatures, StatisticsOnMappingData statistics, int chromId, int chromNo, int chromosomLength, ParameterSetFiveEnrichedAnalyses parameters) {
 
         int ratio = parameters.getRatio();
@@ -881,7 +893,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
         int fstFeatureId = determineSmallestId(allFeatures);
 
         // settings for checking CDS-shift 
-        HashMap<String, StartCodon> validCodons = parameters.getValidStartCodons();
+        Map<String, StartCodon> validCodons = parameters.getValidStartCodons();
         double relPercentage = (parameters.getCdsShiftPercentage() / 100.0);
 
         int f_before;
@@ -922,7 +934,6 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
 
                     // getting the PersistantFeature 
                     PersistantFeature feature = null;
-
                     boolean flag = true;
 //                    // check for overlapping Features
                     while (flag) {
@@ -947,9 +958,11 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                         }
                     }
 
-                    // Case 1: offset is 0
-                    // => TSS is whether intragenic, leaderless or represents
-                    // a CDS-Shift and can also be located antisense to an annotated feature
+                    /**
+                     * Case 1: offset = 0 => no 5'-UTR => TSS is whether
+                     * intragenic, leaderless or represents a CDS-Shift and can
+                     * also be located antisense to an annotated feature
+                     */
                     if (offset == 0) {
                         dist2start = i - feature.getStart();
                         dist2stop = feature.getStop() - i;
@@ -963,10 +976,10 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                                 isPutAntisense = true;
                             }
 
-                            cdsShift = checkLeaderlessCdsShift(dist2start, chrom, isFwd, i, validCodons, cdsShift);
+                            cdsShift = checkLeaderlessCdsShift(dist2start, ref, chromId, isFwd, i, validCodons, cdsShift);
 
                             if (!cdsShift && dist2start > 0) {
-                                cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), i, dist2start, isFwd, relPercentage, validCodons);
+                                cdsShift = checkCdsShift(ref, chromId, feature.getStart(), feature.getStop(), i, dist2start, isFwd, relPercentage, validCodons);
                             }
 
                             TranscriptionStart tss = new TranscriptionStart(i, isFwd, forward[chromNo - 1][i], rel_count,
@@ -1020,7 +1033,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                                 // putative the corresponding gene for TSS
                                 isIntragenic = true;
                                 if (!cdsShift && dist2start >= 3) {
-                                    cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), i, dist2start, isFwd, relPercentage, validCodons);
+                                    cdsShift = checkCdsShift(ref, chromId, feature.getStart(), feature.getStop(), i, dist2start, isFwd, relPercentage, validCodons);
                                 }
                                 TranscriptionStart tss = new TranscriptionStart(i, isFwd, forward[chromNo - 1][i], rel_count,
                                         null, offset, dist2start, dist2stop, nextDownstreamFeature, offsetToNextDownstreamFeature,
@@ -1031,7 +1044,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                             } else if (keepAllIntragenicTss) {
                                 isIntragenic = true;
                                 if (!cdsShift && dist2start > 0) {
-                                    cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), i, dist2start, isFwd, relPercentage, validCodons);
+                                    cdsShift = checkCdsShift(ref, chromId, feature.getStart(), feature.getStop(), i, dist2start, isFwd, relPercentage, validCodons);
                                 }
                                 TranscriptionStart tss = new TranscriptionStart(i, isFwd, forward[chromNo - 1][i], rel_count,
                                         feature, offset, dist2start, dist2stop, null, offsetToNextDownstreamFeature,
@@ -1048,7 +1061,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                                 isPutAntisense = true;
                             }
                             if (!cdsShift && dist2start > 0) {
-                                cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), i, dist2start, isFwd, relPercentage, validCodons);
+                                cdsShift = checkCdsShift(ref, chromId, feature.getStart(), feature.getStop(), i, dist2start, isFwd, relPercentage, validCodons);
                             }
                             if (cdsShift) {
 //                                if (validFeatureTypes.contains(feature.getType())) {
@@ -1070,7 +1083,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                             }
                             // check for cdsShift, when offset > and offset+1 mod 3 == 0
                             if (offset > 0 && ((offset + 1) % 3) == 0) {
-                                String startAtTSS = getSubSeq(chrom, isFwd, i - 1, i + 2);
+                                String startAtTSS = getSubSeq(ref, chromId, isFwd, i - 1, i + 2);
                                 if (validCodons.containsKey(startAtTSS)) {
                                     cdsShift = true;
                                 }
@@ -1241,15 +1254,14 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                             // check for cdsShift when offset is 0 and distance2Start > 0 and dist2Start mod 3 == 0
 //                            cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), i, dist2start, isFwd, relPercentage, validCodons);
                             if (dist2start > 0 && (dist2start % 3) == 0) {
-                                String startAtTSSRev = getSubSeq(chrom, isFwd, i - 3, i);
-                                String complement = complement(startAtTSSRev);
-                                if (validCodons.containsKey(complement)) {
+                                String startAtTSSRev = getSubSeq(ref, chromId, isFwd, i - 3, i);
+                                if (validCodons.containsKey(startAtTSSRev)) {
                                     cdsShift = true;
                                 }
                             }
 
                             if (!cdsShift && dist2start > 0) {
-                                cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), i, dist2start, isFwd, relPercentage, validCodons);
+                                cdsShift = checkCdsShift(ref, chromId, feature.getStart(), feature.getStop(), i, dist2start, isFwd, relPercentage, validCodons);
                             }
 
                             TranscriptionStart tss = new TranscriptionStart(i, isFwd, reverse[chromNo - 1][i], rel_count, feature, offset, dist2start, dist2stop, null, offsetToNextDownstreamFeature,
@@ -1295,7 +1307,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                             if (offsetToNextDownstreamFeature < keepingInternalTssDistance) {
                                 isIntragenic = true;
                                 if (!cdsShift && dist2start >= 3) {
-                                    cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), i, dist2start, isFwd, relPercentage, validCodons);
+                                    cdsShift = checkCdsShift(ref, chromId, feature.getStart(), feature.getStop(), i, dist2start, isFwd, relPercentage, validCodons);
                                 }
                                 // puttative nextgene
                                 TranscriptionStart tss = new TranscriptionStart(i, isFwd, reverse[chromNo - 1][i], rel_count,
@@ -1305,7 +1317,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                                 revFeaturesIds.put(nextFeature.getId(), nextFeature.getLocus());
                             } else if (keepAllIntragenicTss) {
                                 if (!cdsShift && dist2start > 0) {
-                                    cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), i, dist2start, isFwd, relPercentage, validCodons);
+                                    cdsShift = checkCdsShift(ref, chromId, feature.getStart(), feature.getStop(), i, dist2start, isFwd, relPercentage, validCodons);
                                 }
                                 isIntragenic = true;
                                 TranscriptionStart tss = new TranscriptionStart(i, isFwd, reverse[chromNo - 1][i], rel_count,
@@ -1321,7 +1333,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                                 isPutAntisense = true;
                             }
                             if (!cdsShift && dist2start > 0) {
-                                cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), i, dist2start, isFwd, relPercentage, validCodons);
+                                cdsShift = checkCdsShift(ref, chromId, feature.getStart(), feature.getStop(), i, dist2start, isFwd, relPercentage, validCodons);
                             }
                             if (cdsShift) {
                                 TranscriptionStart tss = new TranscriptionStart(i, isFwd, reverse[chromNo - 1][i], rel_count,
@@ -1342,9 +1354,8 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                             // check for cdsShift when offset is 0 and distance2Start > 0 and mod 3 == 0
 //                            cdsShift = checkCdsShift(chrom, feature.getStart(), feature.getStop(), i, dist2start, isFwd, relPercentage, validCodons);
                             if (dist2start > 0 && (dist2start % 3) == 0) {
-                                String startAtTSSRev = getSubSeq(chrom, isFwd, i - 3, i);
-                                String complement = complement(startAtTSSRev);
-                                if (validCodons.containsKey(complement)) {
+                                String startAtTSSRev = getSubSeq(ref, chromId, isFwd, i - 3, i);
+                                if (validCodons.containsKey(startAtTSSRev)) {
                                     cdsShift = true;
                                 }
                             }
@@ -1527,10 +1538,10 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
 
     }
 
-    private boolean checkLeaderlessCdsShift(int dist2start, PersistantChromosome chrom, boolean isFwd, int i, HashMap<String, StartCodon> validCodons, boolean cdsShift) {
+    private boolean checkLeaderlessCdsShift(int dist2start, PersistantReference ref, int chromId, boolean isFwd, int i, Map<String, StartCodon> validCodons, boolean cdsShift) {
         // check for cdsShift, when offset > and offset+1 mod 3 == 0
         if (dist2start > 0 && (dist2start % 3) == 0) {
-            String startAtTSS = getSubSeq(chrom, isFwd, i - 1, i + 2);
+            String startAtTSS = getSubSeq(ref, chromId, isFwd, i - 1, i + 2);
             if (validCodons.containsKey(startAtTSS)) {
                 cdsShift = true;
             }
@@ -1541,7 +1552,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
     /**
      * Method for checking a potential CDS-Shift.
      *
-     * @param chrom Current processing PersistantChromosome.
+     * @param ref Current processing PersistantChromosome.
      * @param featureStart Start position of PersistantFeature.
      * @param featureStop Stop position of PersistantFeature.
      * @param tssStart Start position of transcription start site.
@@ -1553,9 +1564,9 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
      *
      * @return true, if putative CDS-Shift occur.
      */
-    private boolean checkCdsShift(PersistantChromosome chrom, int featureStart,
+    private boolean checkCdsShift(PersistantReference ref, int chromId, int featureStart,
             int featureStop, int tssStart, int dist2start, boolean isFwd,
-            double relPercentage, HashMap<String, StartCodon> validStartCodons) {
+            double relPercentage, Map<String, StartCodon> validStartCodons) {
         double length = featureStop - featureStart;
         double partOfFeature = dist2start / length;
         int a = 1;
@@ -1571,7 +1582,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
 
             if (isFwd) {
                 while (partOfFeature <= relPercentage) {
-                    String startAtTSS = getSubSeq(chrom, isFwd, startFwd, stopFwd);
+                    String startAtTSS = getSubSeq(ref, chromId, isFwd, startFwd, stopFwd);
                     if (validStartCodons.containsKey(startAtTSS) || startFwd >= tssStart) {
                         return true;
                     }
@@ -1582,9 +1593,8 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                 }
             } else {
                 while (partOfFeature <= relPercentage) {
-                    String startAtTSSRev = getSubSeq(chrom, isFwd, startRev, stopRev);
-                    String complement = complement(startAtTSSRev);
-                    if (validStartCodons.containsKey(complement) && startRev <= tssStart) {
+                    String startAtTSSRev = getSubSeq(ref, chromId, isFwd, startRev, stopRev);
+                    if (validStartCodons.containsKey(startAtTSSRev) && startRev <= tssStart) {
                         return true;
 
                     }
@@ -1601,39 +1611,6 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
     }
 
     /**
-     * Gets a DNA String and complements it. A to T, T to A, G to C and C to G.
-     *
-     * @param seq is DNA String consisting of A,C,G and T.
-     * @return the compliment of seq.
-     */
-    private String complement(String seq) {
-        char BASE_A = 'A';
-        char BASE_C = 'C';
-        char BASE_G = 'G';
-        char BASE_T = 'T';
-        String a = "A";
-        String c = "C";
-        String g = "G";
-        String t = "T";
-        String compliment = "";
-
-        for (int i = 0; i < seq.length(); i++) {
-            if (BASE_A == seq.charAt(i)) {
-                compliment = compliment.concat(t);
-            } else if (BASE_C == (seq.charAt(i))) {
-                compliment = compliment.concat(g);
-
-            } else if (BASE_G == seq.charAt(i)) {
-                compliment = compliment.concat(c);
-
-            } else if (BASE_T == seq.charAt(i)) {
-                compliment = compliment.concat(a);
-            }
-        }
-        return compliment;
-    }
-
-    /**
      * If the direction is reverse, the subsequence will be inverted.
      *
      * @param isFwd direction of sequence.
@@ -1641,17 +1618,19 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
      * @param stop stop of subsequence.
      * @return the subsequence.
      */
-    private String getSubSeq(PersistantChromosome chrom, boolean isFwd, int start, int stop) {
+    private String getSubSeq(PersistantReference ref, int chromId, boolean isFwd, int start, int stop) {
 
         String seq = "";
-        if (start > 0 && stop < chrom.getLength()) {
-            seq = refGenome.getChromSequence(chrom.getId(), start, stop);
+        if (ref.getChromosome(chromId) == null) {
+            System.out.println("");
+        }
+        if (start > 0 && stop < ref.getChromosome(chromId).getLength()) {
+            seq = ref.getChromSequence(chromId, start, stop);
         }
         if (isFwd) {
             return seq;
         } else {
-            String reversedSeq = new StringBuffer(seq).reverse().toString();
-            return reversedSeq;
+            return SequenceUtils.getReverseComplement(seq);
         }
     }
 
@@ -1683,7 +1662,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
 
         return result;
     }
-                "Gesamtanzahl von TSS:\t" + this.totalCntOfTss
+
     /**
      * Determines the smallest FeatureID from a Map with PersistantFeatures.
      *

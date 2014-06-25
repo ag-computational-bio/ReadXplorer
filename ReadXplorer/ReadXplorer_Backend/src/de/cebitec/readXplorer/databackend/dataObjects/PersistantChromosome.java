@@ -28,10 +28,10 @@ import java.util.Objects;
  */
 public class PersistantChromosome {
 
-    private int id;
+    private final int id;
     private final int chromNumber;
-    private int refGenID;
-    private int chromLength;
+    private final int refGenID;
+    private final int chromLength;
     private final String name;
 
     /**
@@ -96,6 +96,7 @@ public class PersistantChromosome {
     /**
      * Checks if the given chromosome is equal to this one.
      * @param object object to compare to this object
+     * @return 
      */
     @Override
     public boolean equals(Object object) {

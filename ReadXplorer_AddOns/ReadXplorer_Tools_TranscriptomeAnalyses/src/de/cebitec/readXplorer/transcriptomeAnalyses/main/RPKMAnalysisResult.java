@@ -130,15 +130,15 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetWholeTra
         statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between title and parameters
 
         statisticsExportData.add(ResultTrackAnalysis.createTableRow("RPKM and read count calculation parameters:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_RPKM, rpkmCalculationParameters.isIncludeBestMatchedReadsRpkm() ? "yes" : "no"));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_RPKM, rpkmCalculationParameters.isIncludeBestMatchedReadsRpkm() ? "yes" : "no"));
 
         statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between parameters and statistics
 
         statisticsExportData.add(ResultTrackAnalysis.createTableRow("RPKM and read count calculation statistics:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Total number of returned features", rpkmResultRows.size()));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Total number of returned features", rpkmResultRows.size()));
         statisticsExportData.add(ResultTrackAnalysis.createTableRow(""));
 
-        statisticsExportData.add(ResultTrackAnalysis.createThreeElementTableRow("Table Type", TABLE_TYPE.toString(), ""));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Table Type", TABLE_TYPE.toString(), ""));
 
         exportData.add(statisticsExportData);
 

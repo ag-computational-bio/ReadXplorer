@@ -172,14 +172,12 @@ public class GenomeFeatureParser {
      */
     private void createCDSsStrandInformation(HashMap<Integer, List<Integer>> list, int featureID, int start, int stop) {
 
-        for (int i = 0; (i + start) <= stop; i++) {
-            if (list.get(i + start) != null) {
-                list.get(i + start).add(featureID);
-            } else {
+        for (int i = start; i <= stop; i++) {
+            if (list.get(i) == null) {
                 ArrayList<Integer> tmp = new ArrayList<>();
-                tmp.add(featureID);
-                list.put(i + start, tmp);
+                list.put(i, tmp);
             }
+            list.get(i).add(featureID);
         }
     }
 

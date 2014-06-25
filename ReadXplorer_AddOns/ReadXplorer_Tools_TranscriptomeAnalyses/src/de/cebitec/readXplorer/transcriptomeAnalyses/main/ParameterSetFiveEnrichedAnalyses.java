@@ -5,6 +5,7 @@ import de.cebitec.readXplorer.transcriptomeAnalyses.enums.StartCodon;
 import de.cebitec.readXplorer.util.FeatureType;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 /**
  * Data storage for all parameters associated with a 5'-ends enriched RNA-seq
@@ -22,7 +23,7 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
     private final Integer leaderlessLimit, exclusionOfTSSDistance, keepingIntragenicTssDistanceLimit;
     private final boolean exclusionOfAllIntragenicTSS, keepAllIntragenicTss, includeBestMatchedReads;
     private final HashSet<FeatureType> excludeFeatureTypes;
-    private HashMap<String, StartCodon> validStartCodons;
+    private Map<String, StartCodon> validStartCodons;
     private boolean keepOnlyAssignedIntragenicTss;
     private boolean thresholdManuallySet;
 
@@ -44,7 +45,9 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
      */
     public ParameterSetFiveEnrichedAnalyses(Double fraction, Integer ratio,
             boolean excludeAllInternalTSS, Integer distanceForExcludionOfTss,
-            Integer leaderlessLimit, int keepInternalDistance, boolean keepInragenicTss, boolean keepOnlyAssignedIntragenicTss, int cdsShiftPercentage, boolean includeBestMatchedReads, int maxDistantaseFor3UtrAntisenseDetection, HashMap<String, StartCodon> validStartCodons, HashSet<FeatureType> fadeOutFeatureTypes) {
+            Integer leaderlessLimit, int keepInternalDistance, boolean keepInragenicTss, boolean keepOnlyAssignedIntragenicTss, 
+            int cdsShiftPercentage, boolean includeBestMatchedReads, int maxDistantaseFor3UtrAntisenseDetection, 
+            Map<String, StartCodon> validStartCodons, HashSet<FeatureType> fadeOutFeatureTypes) {
         this.fraction = fraction;
         this.ratio = ratio;
         this.leaderlessLimit = leaderlessLimit;
@@ -64,7 +67,7 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
         return cdsShiftPercentage;
     }
 
-    public HashMap<String, StartCodon> getValidStartCodons() {
+    public Map<String, StartCodon> getValidStartCodons() {
         return validStartCodons;
     }
 

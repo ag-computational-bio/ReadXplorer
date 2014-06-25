@@ -143,16 +143,16 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetWhole
 
         statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between title and parameters
 
-        statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("Parameters:"));
-//        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelOperonDetection.OPERONS_BACKGROUND_THRESHOLD,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Parameters:"));
+//        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelOperonDetection.OPERONS_BACKGROUND_THRESHOLD,
 //                this.getOperonStatsMap().get(ResultPanelOperonDetection.OPERONS_BACKGROUND_THRESHOLD)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_OP,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_OP,
                 operonDetectionParameters.isIncludeBestMatchedReadsOP() ? "yes" : "no"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_FRACTION,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_FRACTION,
                 operonDetectionParameters.getFraction()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.TSS_MANUALLY_SET_THRESHOLD,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.TSS_MANUALLY_SET_THRESHOLD,
                 operonDetectionParameters.isThresholdManuallySet() ? "yes" : "no"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_OVERSPANNING_READS,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_OVERSPANNING_READS,
                 String.valueOf(String.format("%2.2f", backgroundThreshold))));
 
         statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between parameters and statistics
@@ -160,20 +160,21 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetWhole
         statisticsExportData.add(ResultTrackAnalysis.createTableRow("Operon detection statistics:"));
         statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelOperonDetection.OPERONS_TOTAL,
                 this.getOperonStatsMap().get(ResultPanelOperonDetection.OPERONS_TOTAL)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelOperonDetection.OPERONS_TWO_GENES,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelOperonDetection.OPERONS_TWO_GENES,
                 this.getOperonStatsMap().get(ResultPanelOperonDetection.OPERONS_TWO_GENES)));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelOperonDetection.OPERONS_BIGGEST,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelOperonDetection.OPERONS_BIGGEST,
                 this.getOperonStatsMap().get(ResultPanelOperonDetection.OPERONS_BIGGEST)));
 
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.MAPPINGS_COUNT,
                 String.valueOf(String.format("%2.2f", mappingCount))));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH,
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH,
                 String.valueOf(String.format("%2.2f", meanMappingLength))));
         statisticsExportData.add(ResultTrackAnalysis.createTableRow(ResultPanelTranscriptionStart.MAPPINGS_MILLION,
                 String.valueOf(String.format("%2.2f", mappingsPerMio))));
 
         statisticsExportData.add(ResultTrackAnalysis.createTableRow(""));
 
-        statisticsExportData.add(ResultTrackAnalysis.createThreeElementTableRow("Table Type", TABLE_TYPE.toString(), ""));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Table Type", TABLE_TYPE.toString(), ""));
 
         exportData.add(statisticsExportData);
 
