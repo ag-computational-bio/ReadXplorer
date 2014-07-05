@@ -1,0 +1,27 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <p style="text-align: center;"><span style="font-size: 14pt;"><strong>Genomic Feature Coverage Analysis:</strong></span></p>
+        <p style="text-align: justify;">The Feature Coverage Analysis empowers you to detect all reference features that show predefined characteristics in terms of their coverage. It becomes available after opening a reference. Then it can be carried out for any or multiple tracks, belonging to that reference. An example result is shown in the screenshot below.</p>
+        <ol>
+            <li style="text-align: justify;"><span style="mso-ansi-language: EN-US;" lang="EN-US">Click the corresponding toolbar icon (see <i style="mso-bidi-font-style: normal;">Main Window a)</i>) or choose "<span style="text-decoration: underline;">Tools -&gt; </span></span><span style="mso-ansi-language: EN-US;" lang="EN-US"><span style="text-decoration: underline;">Feature </span></span><span style="mso-ansi-language: EN-US;" lang="EN-US"><span style="text-decoration: underline;">Coverage Analysis</span>".</span></li>
+            <li style="text-align: justify;"><span style="mso-bidi-font-family: Calibri; mso-bidi-theme-font: minor-latin; mso-ansi-language: EN-US;" lang="EN-US"><span style="mso-list: Ignore;"><span style="font: 7.0pt 'Times New Roman';"></span></span> </span><span style="mso-ansi-language: EN-US;" lang="EN-US">Select the track(s) to analyze with a left click.</span></li>
+            <li style="text-align: justify;"><span style="mso-bidi-font-family: Calibri; mso-bidi-theme-font: minor-latin; mso-ansi-language: EN-US;" lang="EN-US"><span style="mso-list: Ignore;"><span style="font: 7.0pt 'Times New Roman';"></span></span> </span><span style="mso-ansi-language: EN-US;" lang="EN-US">Select the analysis parameters. They are explained in the text field above the parameter selection and in the paragraph below.</span></li>
+            <li style="text-align: justify;"><span style="mso-bidi-font-family: Calibri; mso-bidi-theme-font: minor-latin; mso-ansi-language: EN-US;" lang="EN-US"><span style="mso-list: Ignore;"><span style="font: 7.0pt 'Times New Roman';"></span></span> </span><span style="mso-ansi-language: EN-US;" lang="EN-US">Select the mapping classes (see <i style="mso-bidi-font-style: normal;">Read Classification</i>) to include in the analysis. </span></li>
+            <li style="text-align: justify;">S<span style="mso-ansi-language: EN-US;" lang="EN-US">elect the feature types, for which the feature coverage analysis shall be carried out. The other features types are ignored.</span></li>
+            <li style="text-align: justify;"><span style="mso-ansi-language: EN-US;" lang="EN-US">Click "<span style="text-decoration: underline;">Finish</span>" to start the feature coverage analysis.</span></li>
+        </ol>
+        <p style="text-align: justify;">The first parameter defines how many percent of a feature have to be covered with at least a coverage larger or equal to the second parameter value to be detected as "covered feature". <br />The "Only count mappings on the feature strand" checkbox decides whether only the mappings on the strand of a feature are counted, or all mappings within the range of the feature. <br />The "Detect uncovered instead of covered features" checkbox switches the mode from detecting features which have a satisfactory amount of reads to the contrary. Then all reference features are listed, which have a lower coverage than defined by the percentage threshold.</p>
+        <p style="text-align: justify;">This analysis is useful for studies of both, RNA-Seq and resequencing data sets. For RNA-Seq experiments, it facilitates the identification of genes which exhibit a certain minimum coverage or which are not expressed at all. For resequencing experiments it allows to explore the set of common or divergent features between the reference and its tracks and the tracks among one another.</p>
+        <p style="text-align: justify;">In the following example, features with a coverage of less than 20% were queried. The minimum coverage to count for a covered position was 5 and only mappings on the strand of the analyzed feature were taken into consideration. The used parameters are also shown below the result table.</p>
+        <p><span style="font-size: 14pt;"><strong> <img style="display: block; margin-left: auto; margin-right: auto;" src="localmedia/Software/ReadXplorer/feature-coverage-analysis.jpg" alt="feature-coverage-analysis" height="722" width="738" /></strong></span></p>
+    </body>
+</html>
