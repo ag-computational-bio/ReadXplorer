@@ -1,7 +1,5 @@
-ReadXplorer
+ReadXplorer - Visualization and Analysis of Mapped Sequences
 ===========
-
-Visualization and Analysis of Mapped Sequences
 
 ReadXplorer is a freely available comprehensive exploration and evaluation tool for NGS data. It extracts and adds quantity and quality measures to each alignment in order to classify the mapped reads. This classification is then taken into account for the different data views and all supported automatic analysis functions.
 
