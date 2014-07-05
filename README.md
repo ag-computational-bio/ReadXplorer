@@ -8,6 +8,4 @@ ReadXplorer is a freely available comprehensive exploration and evaluation tool 
 
 ReadXplorer is implemented in Java as a Netbeans rich client application. Utilizing a modular programming structure, it enables developers to create their own highly specialized software modules and easily plug them into ReadXplorer.
 
-Visit http://www.readxplorer.org for more information and the download for users.
-
-**The program code will be available here, soon!**
+Here, the **source code** of ReadXplorer is freely available. For **more information** and the **download for end-users**, please visit http://www.readxplorer.org
