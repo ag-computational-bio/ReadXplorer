@@ -51,10 +51,10 @@ public class RbsMotifSearchPanel extends javax.swing.JPanel implements Observabl
         this.logoPanel.setLayout(new BorderLayout());
         this.logoPanel.setBorder(BorderFactory.createTitledBorder("Identified motif"));
         this.jPanel2.setBorder(BorderFactory.createTitledBorder("Selected length of sequence for analysis"));
-        this.regionsToAnalyseTP.setEditable(false);
+        this.regionsToAnalyseTP.setEditable(true);
         this.regionsToAnalyseTP.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         this.jPanel3.setBorder(BorderFactory.createTitledBorder("Regions of interest"));
-        this.regionOfIntrestTP.setEditable(false);
+        this.regionOfIntrestTP.setEditable(true);
         this.regionOfIntrestTP.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         this.infoPanel.setBorder(BorderFactory.createTitledBorder("Info panel"));
         this.observerList = new ArrayList<>();
@@ -321,7 +321,7 @@ public class RbsMotifSearchPanel extends javax.swing.JPanel implements Observabl
             File output = getBioProspOut();
             output.renameTo(new File(fileChooser.getSelectedFile().getAbsolutePath() + "\\bestOutputFromBioProspector.fna"));
             File logo = getSequenceLogo();
-            logo.renameTo(new File(fileChooser.getSelectedFile().getAbsolutePath() + "\\rbsLogo.png"));
+            logo.renameTo(new File(fileChooser.getSelectedFile().getAbsolutePath() + "\\rbsLogo.eps"));
             File info = getInfo();
             info.renameTo(new File(fileChooser.getSelectedFile().getAbsoluteFile()+ "\\info.txt"));
             progressHandle.progress(2);

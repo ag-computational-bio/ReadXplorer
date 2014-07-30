@@ -4,9 +4,7 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch;
 
-import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ChartType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.PurposeEnum;
-import de.cebitec.readXplorer.transcriptomeAnalyses.rbsAnalysis.DataSelectionWizardPanel;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;

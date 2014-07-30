@@ -28,6 +28,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang3.ArrayUtils;
 import org.openide.util.Exceptions;
+import org.supercsv.cellprocessor.ParseBool;
+import org.supercsv.cellprocessor.ParseDouble;
 import org.supercsv.cellprocessor.ParseInt;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.exception.SuperCsvException;
@@ -37,39 +39,41 @@ import org.supercsv.prefs.CsvPreference;
 
 /**
  * A parser for parsing CSV files.
- *  
+ *
  * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
  */
 public class CsvTableParser implements CsvParserI {
 
-    private static String name = "CSV Table Parser";
-    private static String[] fileExtension = new String[]{"csv", "CSV"};
-    private static String fileDescription = "CSV table";
-    
+    private static final String name = "CSV Table Parser";
+    private static final String[] fileExtension = new String[]{"csv", "CSV"};
+    private static final String fileDescription = "CSV table";
+
     private boolean autoDelimiter;
     private CsvPreference csvPref;
     //different CellProcessors for different tables
     public static final CellProcessor[] DEFAULT_TABLE_PROCESSOR = new CellProcessor[0];
-    public static final CellProcessor[] POS_TABLE_PROCESSOR = new CellProcessor[]{ new ParseInt()};
+    public static final CellProcessor[] POS_TABLE_PROCESSOR = new CellProcessor[]{new ParseInt()};
+    public static CellProcessor[] TABLE_PROCESSOR;
     private String tableModel;
 
     public CsvTableParser() {
         this.autoDelimiter = true;
         this.csvPref = null;
     }
-    
+
     /**
      * A method for parsing CSV files in any of the four available formats
-     * supported by the @see CsvPreference class. 
+     * supported by the @see CsvPreference class.
+     *
      * @see CsvPreference
      * @param fileToRead The file containing the table to read.
      * @return Table in form of a list, which contains the row lists of Objects.
      */
     @Override
     public List<List<?>> parseTable(File fileToRead) throws ParsingException {
-        
+
         List<List<?>> tableData = null;
-        
+
         if (autoDelimiter) {
 
             //try all available csv preferences
@@ -80,7 +84,7 @@ public class CsvTableParser implements CsvParserI {
             csvPreferences.add(CsvPreference.TAB_PREFERENCE);
 
             for (CsvPreference pref : csvPreferences) {
-                
+
                 tableData = this.parseTable(fileToRead, pref);
                 if (tableData != null) {
                     Logger.getLogger(CsvTableParser.class.getName()).log(Level.INFO, "Entry delimiter used for this table is: {0}", (char) pref.getDelimiterChar());
@@ -91,10 +95,10 @@ public class CsvTableParser implements CsvParserI {
             if (tableData == null) {
                 throw new ParsingException("Table is not in a readable format and cannot be imported. Use a valid CSV format!");
             }
-        
+
         } else {
             tableData = this.parseTable(fileToRead, csvPref);
-            
+
             if (tableData == null) {
                 throw new ParsingException("Table is not in a readable format and cannot be imported.\n"
                         + "Either choose the correct delimiter and line end characters or try autodetection of delimiter and line end character!");
@@ -103,9 +107,10 @@ public class CsvTableParser implements CsvParserI {
 
         return tableData;
     }
-    
+
     /**
      * Method for parsing a CSV file for a given csv preference.
+     *
      * @param fileToRead The file containing the table to read.
      * @param csvPreference The CscPreference to use for parsing.
      * @return Table in form of a list, which contains the row lists of Objects.
@@ -119,18 +124,19 @@ public class CsvTableParser implements CsvParserI {
 
                 final String[] header = listReader.getHeader(true);
                 tableData.add(Arrays.asList(header));
-                
+
                 CellProcessor[] generalProcessors;
                 if (tableModel.equals(TableType.COVERAGE_ANALYSIS.getName())
                         || tableModel.equals(TableType.POS_TABLE.getName())
                         || tableModel.equals(TableType.SNP_DETECTION.getName())
-                        || tableModel.equals(TableType.TSS_DETECTION.getName())
-                        ) {
+                        || tableModel.equals(TableType.TSS_DETECTION.getName())) {
                     generalProcessors = POS_TABLE_PROCESSOR;
+                } else if (tableModel.equals(TableType.TSS_DETECTION_JR.getName())) {
+                    generalProcessors = TABLE_PROCESSOR;
                 } else {
                     generalProcessors = DEFAULT_TABLE_PROCESSOR;
                 }
-                
+
                 int length;
                 List<Object> rowData;
                 CellProcessor[] processors;
@@ -154,14 +160,14 @@ public class CsvTableParser implements CsvParserI {
             Exceptions.printStackTrace(ex);
         } catch (SuperCsvException ex) {
             tableData = null;
-        }
+        } 
         return tableData;
     }
-    
+
     public void setTableModel(String tableModel) {
         this.tableModel = tableModel;
     }
-    
+
     /**
      * @param autoDelimiter <cc>true</cc>, if the delimiter shall be detected
      * automatically, <cc>false</cc>, if the delimiter was selected by the user.
@@ -178,7 +184,7 @@ public class CsvTableParser implements CsvParserI {
     public void setCsvPref(CsvPreference csvPref) {
         this.csvPref = csvPref;
     }
-    
+
     @Override
     public String getName() {
         return name;
@@ -193,12 +199,17 @@ public class CsvTableParser implements CsvParserI {
     public String getInputFileDescription() {
         return fileDescription;
     }
-    
+
     /**
      * @return The name of the parser.
      */
     @Override
     public String toString() {
         return this.getName();
+    }
+
+    @Override
+    public void setCellProscessors(CellProcessor[] cellProcessors) {
+        CsvTableParser.TABLE_PROCESSOR = cellProcessors;
     }
 }

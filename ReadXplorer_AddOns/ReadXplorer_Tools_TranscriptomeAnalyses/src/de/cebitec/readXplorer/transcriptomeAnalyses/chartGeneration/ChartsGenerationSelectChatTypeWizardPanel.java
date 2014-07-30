@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration;
 
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ChartType;
@@ -11,6 +7,10 @@ import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 
+/**
+ *
+ * @author jritter
+ */
 public class ChartsGenerationSelectChatTypeWizardPanel implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     public static final String CHARTS_BINING = "Bining all 5'-UTR length";
@@ -71,7 +71,6 @@ public class ChartsGenerationSelectChatTypeWizardPanel implements WizardDescript
         wiz.putProperty(ChartType.ABSOLUTE_FREQUENCY_OF_5_PRIME_UTRs.toString(), component.isAbsoluteFrequency());
         wiz.putProperty(ChartType.BASE_DISTRIBUTION.toString(), component.isBaseDistribution());
         wiz.putProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_REGION_LENGTH, component.getRangeOfUpstrSeq());
-        wiz.putProperty(ChartType.PIE_CHART.toString(), component.isPieChart());
         wiz.putProperty(CHARTS_BINING, component.isBiningSelected());
         wiz.putProperty(CHARTS_BINING_SIZE, component.getBiningSize());
         wiz.putProperty(ChartType.CHARTS_BASE_DIST_GA_CT.toString(), component.isDistOfGaCtSelected());

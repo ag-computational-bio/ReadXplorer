@@ -147,8 +147,10 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
             if (parameters.isThresholdManuallySet()) {
                 stats.setBgThreshold((double) parameters.getManuallySetThreshold());
             }
-            this.tssDetection.runningTSSDetection(refViewer.getReference(), this.featureParser.getForwardCDSs(), this.featureParser.getRevFeatures(),
-                    this.allRegionsInHash, this.stats, chromId, chromNo, chromLength, this.parameters);
+            this.tssDetection.runningTSSDetection(refViewer.getReference(),
+                    this.featureParser.getForwardCDSs(),
+                    this.featureParser.getRevFeatures(),
+                    this.allRegionsInHash, this.stats, chromId, this.parameters);
 
 //            List<TranscriptionStart> tssList = this.tssDetection.tssDetermination(stats, chromNo, chromNo, chromId, chromLength);
 //            postProcessedTss = this.tssDetection.postProcessing(chrom, tssList, stats.getMappingsPerMillion(), chromLength, this.featureParser.getForwardCDSs(), this.featureParser.getRevFeatures(), allRegionsInHash, parameters);

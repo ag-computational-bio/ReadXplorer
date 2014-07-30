@@ -4,12 +4,11 @@ import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
-import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.PlotGenerator;
+import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.VisualizationWizardIterator;
+import de.cebitec.readXplorer.transcriptomeAnalyses.controller.VisualizationListener;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ChartType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ElementsOfInterest;
-import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.VisualizationWizardIterator;
-import de.cebitec.readXplorer.transcriptomeAnalyses.controller.VisualizationListener;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.FilterType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.PurposeEnum;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
@@ -17,6 +16,7 @@ import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.SequinTab
 import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.SequinTableSettingsWizardPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.filterWizard.FilterTSS;
 import de.cebitec.readXplorer.transcriptomeAnalyses.filterWizard.FilterWizardPanel;
+import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.DataSelectionWizardPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.MotifSearchModel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.MotifSearchPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.MultiPurposeTopComponent;
@@ -25,7 +25,6 @@ import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.PromotorSearchPa
 import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.RbsAnalysisParameters;
 import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.RbsAnalysisWizardIterator;
 import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.RbsMotifSearchPanel;
-import de.cebitec.readXplorer.transcriptomeAnalyses.rbsAnalysis.DataSelectionWizardPanel;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.SequenceUtils;
@@ -43,7 +42,6 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -68,7 +66,6 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.WizardDescriptor;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
@@ -119,13 +116,11 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
     private TSSDetectionResults tssResult;
     private HashMap<String, Object> statisticsMap;
     private final TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
-    private TableRightClickDeletion<DefaultTableModel> rowDeletion = new TableRightClickDeletion<>();
-    private List<String> promotorList;
+    private final TableRightClickDeletion<DefaultTableModel> rowDeletion = new TableRightClickDeletion<>();
     private HashMap<Integer, TranscriptionStart> tssInHash;
     private MotifSearchModel model;
     private MultiPurposeTopComponent topComponent;
     private ElementsOfInterest elements = null;
-    private PlotGenerator gen;
     private ProgressHandle progresshandle;
     private List<String> promotorRegions;
     private MotifSearchPanel promotorMotifSearchPanel;
@@ -374,7 +369,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
         processResultForExport();
         tssResult.setPromotorRegions(promotorRegions);
-
         NotificationWhenExportingPanel notification = new NotificationWhenExportingPanel();
         NotifyDescriptor nd = new NotifyDescriptor(
                 notification, // instance of your panel
@@ -399,27 +393,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
     }//GEN-LAST:event_tSSTableMouseClicked
 
     private void startChartsOfTssDataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startChartsOfTssDataActionPerformed
-//        List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
-//        panels.add(new ChartsGenerationSelectChatTypeWizardPanel());
-//        panels.add(new DataSelectionWizardPanel(PurposeEnum.CHARTS));
-//        String[] steps = new String[panels.size()];
-//        for (int i = 0; i < panels.size(); i++) {
-//            Component c = panels.get(i).getComponent();
-//            // Default step name to component name of panel.
-//            steps[i] = c.getName();
-//            if (c instanceof JComponent) { // assume Swing components
-//                JComponent jc = (JComponent) c;
-//                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, i);
-//                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DATA, steps);
-//                jc.putClientProperty(WizardDescriptor.PROP_AUTO_WIZARD_STYLE, true);
-//                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DISPLAYED, true);
-//                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_NUMBERED, true);
-//            }
-//        }
-//        WizardDescriptor wiz = new WizardDescriptor(new WizardDescriptor.ArrayIterator<>(panels));
-//        // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
-//        wiz.setTitleFormat(new MessageFormat("{0}"));
-//        wiz.setTitle("Viszaliizations");
         @SuppressWarnings("unchecked")
         VisualizationWizardIterator visualizationWizardIterator = new VisualizationWizardIterator();
         WizardDescriptor wiz = new WizardDescriptor(visualizationWizardIterator);
@@ -433,14 +406,11 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
             final List<TranscriptionStart> currentTss = updateTssResults();
             vizualizationListener = new VisualizationListener(referenceViewer, wiz, currentTss, tssResult);
             vizualizationListener.actionPerformed(new ActionEvent(this, 1, ChartType.WIZARD.toString()));
-            if (vizualizationListener.isIsAbsoluteFrequencyPlot()) {
+            if (vizualizationListener.isAbsoluteFrequencyPlotSelected()) {
                 vizualizationListener.actionPerformed(new ActionEvent(this, 2, ChartType.ABSOLUTE_FREQUENCY_OF_5_PRIME_UTRs.toString()));
             }
-            if (vizualizationListener.isIsBaseDistributionPlot()) {
+            if (vizualizationListener.isBaseDistributionPlotSelected()) {
                 vizualizationListener.actionPerformed(new ActionEvent(this, 3, ChartType.BASE_DISTRIBUTION.toString()));
-            }
-            if (vizualizationListener.isIsPieChart()) {
-                vizualizationListener.actionPerformed(new ActionEvent(this, 4, ChartType.PIE_CHART.toString()));
             }
             this.tssResult.setResults(currentTss);
         }
@@ -535,7 +505,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                 @Override
                 public void run() {
                     model.takeUpstreamRegions(elements, starts, lengthRelToTss, false);
-                    boolean success = model.utrPromotorAnalysis(params, starts, null);
+                    boolean success = model.utrPromotorAnalysis(params, starts);
 
                     if (success) {
                         promotorMotifSearchPanel.setUpstreamRegions(model.getUpstreamRegions());
@@ -560,13 +530,13 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                         String roundedMean = String.format("%.1f", model.getMeanMinus10SpacerToTSS());
                         promotorMotifSearchPanel.setMinSpacer1LengthToLabel(roundedMean);
 
-                        promotorMotifSearchPanel.setLogoMinus10(new File(model.getLogoMinus10().getAbsolutePath() + ".png"));
+                        promotorMotifSearchPanel.setLogoMinus10(new File(model.getLogoMinus10().getAbsolutePath() + ".eps"));
                         promotorMotifSearchPanel.setMinus10LogoToPanel(model.getMinus10logoLabel());
 
                         roundedMean = String.format("%.1f", model.getMeanMinus35SpacerToMinus10());
                         promotorMotifSearchPanel.setMinSpacer2LengthToLabel(roundedMean);
 
-                        promotorMotifSearchPanel.setLogoMinus35(new File(model.getLogoMinus35().getAbsolutePath() + ".png"));
+                        promotorMotifSearchPanel.setLogoMinus35(new File(model.getLogoMinus35().getAbsolutePath() + ".eps"));
                         promotorMotifSearchPanel.setMinus35LogoToPanel(model.getMinus35LogoLabel());
 
                         promotorMotifSearchPanel.setInfo(model.getInfo());
@@ -604,24 +574,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
         if (!cancelled) {
 
-            boolean takeAllElements = (boolean) wiz.getProperty(ElementsOfInterest.ALL.toString());
-            boolean takeOnlyLeaderless = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_LEADERLESS_TRANSCRIPTS.toString());
-            boolean takeOnlyAntisense = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_ANTISENSE_TSS.toString());
-            boolean takeCanonicalTSS = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_TSS_WITH_UTR_EXCEPT_AS_LEADERLESS.toString());
-            boolean takeOnlySelectedElements = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_SELECTED_FOR_UPSTREAM_ANALYSES.toString());
-
-            if (takeAllElements) {
-                elements = ElementsOfInterest.ALL;
-            } else if (takeOnlyLeaderless) {
-                elements = ElementsOfInterest.ONLY_LEADERLESS_TRANSCRIPTS;
-            } else if (takeOnlyAntisense) {
-                elements = ElementsOfInterest.ONLY_ANTISENSE_TSS;
-            } else if (takeCanonicalTSS) {
-                elements = ElementsOfInterest.ONLY_TSS_WITH_UTR_EXCEPT_AS_LEADERLESS;
-            } else if (takeOnlySelectedElements) {
-                elements = ElementsOfInterest.ONLY_SELECTED_FOR_UPSTREAM_ANALYSES;
-            }
-
             final int lengthRelToTls = (int) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS);
             int motifWidth = (int) wiz.getProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_LENGTH_MOTIFWIDTH);
             int noOfTrying = (int) wiz.getProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_NO_TRYING_BIOPROSPECTOR);
@@ -632,8 +584,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
             topComponent = new MultiPurposeTopComponent(PurposeEnum.MOTIF_SEARCH);
             topComponent.setLayout(new BorderLayout());
             topComponent.open();
-            String type = elements.toString().toLowerCase();
-            topComponent.setName("RBS motif search for " + type + " elements in Table");
+            topComponent.setName("RBS motif search");
 
             model = new MotifSearchModel(referenceViewer);
             rbsMotifSearchPanel = new RbsMotifSearchPanel();
@@ -642,7 +593,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
             Thread promotorSearch = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    model.takeUpstreamRegions(elements, currentTss, lengthRelToTls, true);
+                    model.takeUpstreamRegions(ElementsOfInterest.ELEMENTS_FOR_RBS_ANALYSIS, currentTss, lengthRelToTls, true);
                     boolean returnValue = model.rbsMotifAnalysis(params, currentTss, null);
                     if (returnValue) {
                         rbsMotifSearchPanel.setUpstreamRegions(model.getUpstreamRegions());
@@ -658,7 +609,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                         rbsMotifSearchPanel.setRegionLengthForBioProspector(params.getSeqLengthToAnalyze());
                         rbsMotifSearchPanel.setMotifWidth(params.getMotifWidth());
                         rbsMotifSearchPanel.setMeanSpacerLength(roundedMean);
-                        rbsMotifSearchPanel.setSequenceLogo(new File(model.getLogoRbs().getAbsolutePath() + ".png"));
+                        rbsMotifSearchPanel.setSequenceLogo(new File(model.getLogoRbs().getAbsolutePath() + ".eps"));
                         rbsMotifSearchPanel.setLogo(model.getRbsLogoLabel());
                         rbsMotifSearchPanel.setInfo(model.getInfo());
                         topComponent.add(rbsMotifSearchPanel, BorderLayout.CENTER);
@@ -681,9 +632,8 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         final String wizardName = "Sequin Feature Table Export";
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
         panels.add(new SequinTableSettingsWizardPanel(wizardName));
-        DataSelectionWizardPanel selection = new DataSelectionWizardPanel(PurposeEnum.SEQUIN_EXPORT);
-        selection.getComponent().disableTF();
-        panels.add(selection);
+//        DataSelectionWizardPanel selection = new DataSelectionWizardPanel(PurposeEnum.CHARTS);
+//        panels.add(selection);
         String[] steps = new String[panels.size()];
         for (int i = 0; i < panels.size(); i++) {
             Component c = panels.get(i).getComponent();
@@ -716,46 +666,13 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                 separator = (String) wiz.getProperty(SequinTableSettingsWizardPanel.SEQUIN_EXPORT_SEPARATOR);
                 prefixLength = (Integer) wiz.getProperty(SequinTableSettingsWizardPanel.SEQUIN_EXPORT_STRAIN_LENGTH);
             }
-            boolean takeAllElements = (boolean) wiz.getProperty(ElementsOfInterest.ALL.toString());
-            boolean takeOnlyLeaderless = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_LEADERLESS_TRANSCRIPTS.toString());
-            boolean takeOnlyAntisense = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_ANTISENSE_TSS.toString());
-            boolean takeOnlyRealTss = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_TSS_WITH_UTR_EXCEPT_AS_LEADERLESS.toString());
-            boolean takeOnlySelectedElements = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_SELECTED_FOR_UPSTREAM_ANALYSES.toString());
-
-            final List<TranscriptionStart> filteredTssList = new ArrayList<>();
-            if (takeAllElements) {
-                filteredTssList.addAll(tss);
-            } else if (takeOnlyLeaderless) {
-                for (TranscriptionStart ts : tss) {
-                    if (ts.isLeaderless()) {
-                        filteredTssList.add(ts);
-                    }
-                }
-            } else if (takeOnlyAntisense) {
-                for (TranscriptionStart ts : tss) {
-                    if (ts.isPutativeAntisense()) {
-                        filteredTssList.add(ts);
-                    }
-                }
-            } else if (takeOnlyRealTss) {
-                for (TranscriptionStart ts : tss) {
-                    if (!ts.isLeaderless() && (ts.isIntragenicTSS() && ts.getOffsetToNextDownstrFeature() > 0) && !ts.isPutativeAntisense()) {
-                        filteredTssList.add(ts);
-                    }
-                }
-            } else if (takeOnlySelectedElements) {
-                for (TranscriptionStart ts : tss) {
-                    if (ts.isSelected()) {
-                        filteredTssList.add(ts);
-                    }
-                }
-            }
+            
 
             ReadXplorerFileChooser fileChooser = new ReadXplorerFileChooser(new String[]{"tbl"}, "Table files for Sequin export") {
                 @Override
                 public void save(String fileLocation) {
                     progresshandle.start(5);
-                    SequinTableFormatExporter exporter = new SequinTableFormatExporter(new File(fileLocation), (ArrayList<TranscriptionStart>) filteredTssList, null, null, tableType, featureName, separator, prefixLength, isParsingLocusTagSelected); //To change body of generated methods, choose Tools | Templates.
+                    SequinTableFormatExporter exporter = new SequinTableFormatExporter(new File(fileLocation), (ArrayList<TranscriptionStart>) tss, null, null, tableType, featureName, separator, prefixLength, isParsingLocusTagSelected); //To change body of generated methods, choose Tools | Templates.
                     progresshandle.progress(1);
                     exporter.start();
                     progresshandle.progress(2);
@@ -778,7 +695,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
     }//GEN-LAST:event_sequinTableExporterActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // Let's filter the table in sub-table
+        // filter the table in sub-tables
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
         panels.add(new FilterWizardPanel("Filtration"));
         String[] steps = new String[panels.size()];
@@ -821,8 +738,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
             boolean filterForStableRna = (boolean) wiz.getProperty(FilterWizardPanel.PROP_FILTER_STABLE_RNA);
             boolean filterForNonStableRnaElements = (boolean) wiz.getProperty(FilterWizardPanel.PROP_FILTER_ALL_NON_STABLE_RNA);
 
-//            int noOfReadStart = (int) wiz.getProperty(FilterWizardPanel.PROP_FILTER_READSTARTS);
-//            int shift = (int) wiz.getProperiz.getPropety(FilterWizardPanel.PROP_FILTER_WITH_MIN_SHIFT);
             FilterTSS filter = new FilterTSS();
 
             if (filterForStableRna) {
@@ -883,13 +798,13 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // refresh list of TSS
-
         this.progresshandle = ProgressHandleFactory.createHandle("Export Reference File");
         ReadXplorerFileChooser fileChooser = new ReadXplorerFileChooser(new String[]{"txt"}, "Text file") {
             @Override
             public void save(String fileLocation) {
                 progresshandle.start(3);
 
+                // update tss list
                 final List<TranscriptionStart> currentTss = updateTssResults();
                 Map<String, String[]> referenceEntries = new TreeMap<>();
                 progresshandle.progress(1);
@@ -923,7 +838,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                                 }
                             }
                             referenceEntries.get(locus)[2] = referenceEntries.get(locus)[2].concat("-" + transcriptionStart.getStartPosition());
-                            referenceEntries.get(locus)[3] = referenceEntries.get(locus)[3].concat("-" + transcriptionStart.getOffsetOfTss());
+                            referenceEntries.get(locus)[3] = referenceEntries.get(locus)[3].concat("-" + transcriptionStart.getOffsetToAssignedFeature());
                             referenceEntries.get(locus)[4] = referenceEntries.get(locus)[4].concat("-" + transcriptionStart.getStartRbsMotif() + ";" + transcriptionStart.getRbsMotifWidth());
                             referenceEntries.get(locus)[5] = referenceEntries.get(locus)[5].concat("-" + transcriptionStart.getStartMinus10Motif() + ";" + transcriptionStart.getMinus10MotifWidth());
                             referenceEntries.get(locus)[6] = referenceEntries.get(locus)[6].concat("-" + transcriptionStart.getStartMinus35Motif() + ";" + transcriptionStart.getMinus35MotifWidth());
@@ -937,7 +852,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                                 array[1] = "" + feature.getStart();
                             }
                             array[2] = "" + transcriptionStart.getStartPosition();
-                            array[3] = "" + transcriptionStart.getOffsetOfTss();
+                            array[3] = "" + transcriptionStart.getOffsetToAssignedFeature();
                             array[4] = "" + transcriptionStart.getStartRbsMotif() + ";" + transcriptionStart.getRbsMotifWidth();
                             array[5] = "" + transcriptionStart.getStartMinus10Motif() + ";" + transcriptionStart.getMinus10MotifWidth();
                             array[6] = "" + transcriptionStart.getStartMinus35Motif() + ";" + transcriptionStart.getMinus35MotifWidth();
@@ -946,7 +861,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                     }
                 }
                 progresshandle.progress(2);
-                writeReferenceFileForRpkmValueDetermination(fileLocation, referenceEntries);
+                writeReferenceFile(fileLocation, referenceEntries);
                 progresshandle.progress(3);
                 JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successfull!",
                         "Export was successfull!", JOptionPane.INFORMATION_MESSAGE);
@@ -963,10 +878,21 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         fileChooser.openFileChooser(ReadXplorerFileChooser.SAVE_DIALOG);
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void generateFilteredTable(FilterTSS filter, FilterType type, String filteredTableName, List<TranscriptionStart> tss, ParameterSetFiveEnrichedAnalyses params, int readStarts) {
+    /**
+     *
+     * @param filter FilterTSS
+     * @param type FilterType
+     * @param filteredTableName table name for filteret table
+     * @param tss List<TranscriptionStart>
+     * @param params ParameterSetFiveEnrichedAnalyses
+     * @param munNoOfReadStarts the minimum numer of read starts
+     */
+    private void generateFilteredTable(FilterTSS filter, FilterType type,
+            String filteredTableName, List<TranscriptionStart> tss,
+            ParameterSetFiveEnrichedAnalyses params, int munNoOfReadStarts) {
         List<TranscriptionStart> subTSS;
         if (type == FilterType.READSTARTS) {
-            subTSS = filter.filter(type, tss, params, readStarts);
+            subTSS = filter.filter(type, tss, params, munNoOfReadStarts);
         } else {
             subTSS = filter.filter(type, tss, params, 0);
         }
@@ -982,7 +908,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         String trackNames = GeneralUtils.generateConcatenatedString(tssResultNew.getTrackNameList(), 120);
         String panelName = filteredTableName + trackNames + " Hits: " + transcriptionStartResultPanel.getDataSize();
         transcAnalysesTopComp.openAnalysisTab(panelName, transcriptionStartResultPanel);
-
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -1032,7 +957,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                 tssResult.getResults().addAll(tssResultNew.getResults());
             }
 
-
             tssResult.setPromotorRegions(promotorRegions);
 
             SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
@@ -1066,11 +990,11 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
                         if (tSS.getAssignedFeature() != null) {
                             if (tSS.getAssignedFeature().isFwdStrand()) {
-                                detectedFeatureStart = ref.getChromSequence(tSS.getChromId(), tSS.getAssignedFeature().getStart() - 1, tSS.getAssignedFeature().getStart() + 2);
-                                detectedFeatureStop = ref.getChromSequence(tSS.getChromId(), tSS.getAssignedFeature().getStop() - 3, tSS.getAssignedFeature().getStop());
+                                detectedFeatureStart = ref.getChromSequence(tSS.getChromId(), tSS.getAssignedFeature().getStart(), tSS.getAssignedFeature().getStart() + 2);
+                                detectedFeatureStop = ref.getChromSequence(tSS.getChromId(), tSS.getAssignedFeature().getStop() - 2, tSS.getAssignedFeature().getStop());
                             } else {
-                                detectedFeatureStart = SequenceUtils.getReverseComplement(ref.getChromSequence(tSS.getChromId(), tSS.getAssignedFeature().getStop() - 3, tSS.getAssignedFeature().getStop()));
-                                detectedFeatureStop = SequenceUtils.getReverseComplement(ref.getChromSequence(tSS.getChromId(), tSS.getAssignedFeature().getStart() - 1, tSS.getAssignedFeature().getStart() + 2));
+                                detectedFeatureStart = SequenceUtils.getReverseComplement(ref.getChromSequence(tSS.getChromId(), tSS.getAssignedFeature().getStop() - 2, tSS.getAssignedFeature().getStop()));
+                                detectedFeatureStop = SequenceUtils.getReverseComplement(ref.getChromSequence(tSS.getChromId(), tSS.getAssignedFeature().getStart(), tSS.getAssignedFeature().getStart() + 2));
                             }
                         }
                         if (tSS.isFwdStrand()) {
@@ -1162,13 +1086,13 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                             rowData[i++] = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
                             rowData[i++] = feature.isFwdStrand() ? feature.getStop() : feature.getStart();
                             rowData[i++] = feature.getStop() - feature.getStart();
-                            rowData[i++] = getFrame(feature);
+                            rowData[i++] = PersistantFeature.Utils.determineFrame(feature);
                             rowData[i++] = feature.getProduct();
                         } else if (nextDownstreamFeature != null) {
                             rowData[i++] = nextDownstreamFeature.isFwdStrand() ? nextDownstreamFeature.getStart() : nextDownstreamFeature.getStop();
                             rowData[i++] = nextDownstreamFeature.isFwdStrand() ? nextDownstreamFeature.getStop() : nextDownstreamFeature.getStart();
                             rowData[i++] = nextDownstreamFeature.getStop() - nextDownstreamFeature.getStart();
-                            rowData[i++] = getFrame(nextDownstreamFeature);
+                            rowData[i++] = PersistantFeature.Utils.determineFrame(nextDownstreamFeature);
                             rowData[i++] = nextDownstreamFeature.getProduct();
                         } else {
                             rowData[i++] = 0;
@@ -1218,29 +1142,16 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
     }
 
     /**
-     * Returns Promotors in List format. So the feature name of the coresponding
-     * promotor sequence represents the header: >feature_name. And the following
-     * Sequence corresponds to the previous header.
+     * This method checks all entries for changes in current table model.
      *
-     * @return list with alternately header, sequence Entries.
-     */
-    public List<String> getPromotorsAsFastaInList() {
-        return promotorList;
-    }
-
-    public void setFastaList(List<String> fastaList) {
-        this.promotorList = fastaList;
-    }
-
-    /**
-     *
-     * @return
+     * @return the updated List<TranscriptionStart>
      */
     public List<TranscriptionStart> updateTssResults() {
         List<TranscriptionStart> tss = tssResult.getResults();
         HashMap<Integer, TranscriptionStart> tmpHash = new HashMap<>();
         tmpHash.putAll(this.tssInHash);
 
+        // iterating over all table entries
         for (int i = 0; i < tSSTable.getRowCount(); i++) {
             Integer posTableAti = (Integer) tSSTable.getValueAt(i, 0);
             if (tmpHash.containsKey(posTableAti)) {
@@ -1321,13 +1232,13 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                 this.model = new MotifSearchModel(referenceViewer);
                 this.model.storeRbsAnalysisResults(panel.getUpstreamRegions(),
                         panel.getRbsStarts(), panel.getRbsShifts(),
-                        panel.getParams(), this.updateTssResults(),
-                        null);
+                        panel.getParams(), this.updateTssResults()
+                );
             } else {
                 this.model.storeRbsAnalysisResults(panel.getUpstreamRegions(),
                         panel.getRbsStarts(), panel.getRbsShifts(),
-                        panel.getParams(), this.updateTssResults(),
-                        null);
+                        panel.getParams(), this.updateTssResults()
+                );
             }
         }
 
@@ -1338,12 +1249,12 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                 this.model.storePromoterAnalysisResults(panel.getUpstreamRegions(),
                         panel.getMinus10Starts(), panel.getMinus35Starts(),
                         panel.getMinus10Shifts(), panel.getMinus35Shifts(),
-                        panel.getParams(), this.updateTssResults(), null);
+                        panel.getParams(), this.updateTssResults());
             } else {
                 this.model.storePromoterAnalysisResults(panel.getUpstreamRegions(),
                         panel.getMinus10Starts(), panel.getMinus35Starts(),
                         panel.getMinus10Shifts(), panel.getMinus35Shifts(),
-                        panel.getParams(), this.updateTssResults(), null);
+                        panel.getParams(), this.updateTssResults());
             }
         }
     }
@@ -1386,10 +1297,10 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
      * @param fileLocation absolute filelocation.
      * @param referenceEntries
      */
-    private void writeReferenceFileForRpkmValueDetermination(String fileLocation, Map<String, String[]> referenceEntries) {
+    private void writeReferenceFile(String fileLocation, Map<String, String[]> referenceEntries) {
 
         try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileLocation)))) {
-            
+
             writer.write("#Locus\tStart of Transcript\tStop of Transcript\tTSSs\tUTRs\tRBS\tPromotors\n");
             for (String locus : referenceEntries.keySet()) {
                 writer.write(locus + "\t" + referenceEntries.get(locus)[0] + "\t" + referenceEntries.get(locus)[1] + "\t" + referenceEntries.get(locus)[2] + "\t" + referenceEntries.get(locus)[3] + "\t" + referenceEntries.get(locus)[4] + "\t" + referenceEntries.get(locus)[5] + "\t" + referenceEntries.get(locus)[6] + "\n");
@@ -1398,36 +1309,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
             // report
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "An error occured during wrtinging of the reference file: " + ex.getMessage(), "Write Reference Exception", JOptionPane.ERROR_MESSAGE);
-        } 
-    }
-
-    public void setTssResults(List<TranscriptionStart> currentTss) {
-        this.tssResult.setResults(currentTss);
-    }
-
-    private int getFrame(PersistantFeature feature) {
-        if (feature.isFwdStrand()) {
-            int start = feature.getStart();
-            if ((start % 3) == 0) {
-                return 3;
-            } else if (start % 3 == 1) {
-                return 1;
-            } else if (start % 3 == 2) {
-                return 2;
-            } else {
-                return 0;
-            }
-        } else {
-            int start = feature.getStop();
-            if ((start % 3) == 0) {
-                return 1;
-            } else if (start % 3 == 1) {
-                return 3;
-            } else if (start % 3 == 2) {
-                return 2;
-            } else {
-                return 0;
-            }
         }
     }
 }

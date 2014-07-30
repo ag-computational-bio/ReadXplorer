@@ -8,7 +8,6 @@ import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelTranscript;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
-import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.OperonAdjacency;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.util.FeatureType;
 import java.io.BufferedWriter;
@@ -19,12 +18,15 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 import org.openide.util.Exceptions;
 
 /**
+ * This model class deals with the export of detected genome features in Sequin
+ * table format. This is needed for submission of annotation using the tool
+ * sequin. For more informotion see:
+ * http://www.ncbi.nlm.nih.gov/projects/Sequin/table.html
  *
  * @author jritter
  */
@@ -40,37 +42,54 @@ public class SequinTableFormatExporter extends Thread {
     private final Integer prefixLength;
     private final boolean isParsingSelected;
 
-    public SequinTableFormatExporter(File outputFile, ArrayList<TranscriptionStart> tssInputList, ArrayList<Operon> operonInputList, ArrayList<NovelTranscript> novelRegionInputList, TableType tableType, String featureName, String separator, Integer prefixLength, boolean isParsingSelected) {
+    /**
+     * Constructor for this class.
+     *
+     * @param outputFile the output location for the generated sequin table
+     * @param tssInputList list of detected and for submission selected tss
+     * instances
+     * @param operonInputList list of detected and for submission selected
+     * operon instances
+     * @param novelRegionInputList list of detected and for submission selected
+     * novel transcript instances
+     * @param tableType table type
+     * @param organismTag name of the organism
+     * @param separator separator used in locus_Tags names
+     * @param strainLength length of the strain in the locus tag
+     * @param isParsingSelected <true> if parsing is selected else <false>
+     */
+    public SequinTableFormatExporter(File outputFile, ArrayList<TranscriptionStart> tssInputList, ArrayList<Operon> operonInputList, ArrayList<NovelTranscript> novelRegionInputList, TableType tableType, String organismTag, String separator, Integer strainLength, boolean isParsingSelected) {
         this.outputLocation = outputFile;
         this.tssInputList = tssInputList;
         this.operonInputList = operonInputList;
         this.novelRegionInputList = novelRegionInputList;
         this.tableType = tableType;
-        this.featureName = featureName;
+        this.featureName = organismTag;
         this.separator = separator;
-        this.prefixLength = prefixLength;
+        this.prefixLength = strainLength;
         this.isParsingSelected = isParsingSelected;
     }
 
     @Override
     public void run() {
-        createSequinTableFormattedFile(outputLocation, tssInputList, operonInputList, novelRegionInputList, tableType, featureName);
+        createSequinTableFormattedFile(outputLocation, tssInputList, operonInputList, novelRegionInputList, tableType);
     }
 
     /**
+     * Creates a sequin table for the given table type.
      *
-     * @param outputFile
-     * @param tssList
-     * @param operonList
-     * @param novelRegionList
-     * @param tableType
-     * @param featureName
+     * @param outputFile the output location for the generated sequin table
+     * @param tssList ist of detected and for submission selected tss instances
+     * @param operonList list of detected and for submission selected operon
+     * instances
+     * @param novelRegionList list of detected and for submission selected novel
+     * transcript instances
+     * @param tableType table type
      */
-    public void createSequinTableFormattedFile(File outputFile, ArrayList<TranscriptionStart> tssList, ArrayList<Operon> operonList, ArrayList<NovelTranscript> novelRegionList, TableType tableType, String featureNames) {
+    public void createSequinTableFormattedFile(File outputFile, ArrayList<TranscriptionStart> tssList, ArrayList<Operon> operonList, ArrayList<NovelTranscript> novelRegionList, TableType tableType) {
 
-        try {
-            Writer writer = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(outputFile)));
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(outputFile)))) {
             writer.write(">Feature " + featureName + "\n");
 
             if (tssList != null && !tssList.isEmpty() && tableType.equals(TableType.TSS_TABLE)) {
@@ -92,8 +111,7 @@ public class SequinTableFormatExporter extends Thread {
                         if (isFwd) {
                             writer.write(createSequinTableEntry(novel.getStartPosition(), novel.getDropOffPos(), FeatureKey.NC_RNA));
                         } else {
-                            writer.write(createSequinTableEntry(novel.getDropOffPos(), novel.getStartPosition(), FeatureKey.NC_RNA));
-
+                            writer.write(createSequinTableEntry(novel.getStartPosition(), novel.getDropOffPos(), FeatureKey.NC_RNA));
                         }
                         if (novel.getLocation().equals("cis-antisense")) {
                             writer.write(generateSecondLine(Qualifier.NC_RNA, "antisense_RNA"));
@@ -115,13 +133,13 @@ public class SequinTableFormatExporter extends Thread {
                         String startLocus = "";
                         if (isFwd) {
                             if (isParsingSelected) {
-                                startLocus = parseLocusTag(startLocus, ParsingPrefisSuffix.OPERON, separator, prefixLength, 0);
+                                startLocus = parseLocusTag(operon.getOperonAdjacencies().get(0).getFeature1().getLocus(), ParsingPrefisSuffix.OPERON, separator, prefixLength, 0);
                             } else {
                                 startLocus = operon.getOperonAdjacencies().get(0).getFeature1().getLocus();
                             }
                         } else {
                             if (isParsingSelected) {
-                                startLocus = parseLocusTag(startLocus, ParsingPrefisSuffix.OPERON, separator, prefixLength, 0);
+                                startLocus = parseLocusTag(operon.getOperonAdjacencies().get(operon.getOperonAdjacencies().size() - 1).getFeature2().getLocus(), ParsingPrefisSuffix.OPERON, separator, prefixLength, 0);
                             } else {
                                 startLocus = operon.getOperonAdjacencies().get(operon.getOperonAdjacencies().size() - 1).getFeature2().getLocus();
                             }
@@ -139,41 +157,24 @@ public class SequinTableFormatExporter extends Thread {
                         int minus35SignalCnt = 0;
                         // Feature mRNA
                         if (operon.getTsSites() != null) {
-                            if (operon.getTsSites().isEmpty()) {
-                                writer.write(createSequinTableEntry(start, stop, FeatureKey.MRNA));
-                                if (isFwd) {
-                                    if (isParsingSelected) {
-                                        startLocus = parseLocusTag(startLocus, ParsingPrefisSuffix.mRNA, separator, prefixLength, 0);
-                                    } else {
-                                        startLocus = operon.getOperonAdjacencies().get(0).getFeature1().getLocus();
-                                    }
-                                } else {
-                                    if (isParsingSelected) {
-                                        startLocus = parseLocusTag(startLocus, ParsingPrefisSuffix.mRNA, separator, prefixLength, 0);
-                                    } else {
-                                        startLocus = operon.getOperonAdjacencies().get(operon.getOperonAdjacencies().size() - 1).getFeature2().getLocus();
-                                    }
-                                }
-                                writer.write(generateSecondLine(Qualifier.OPERON, startLocus));
-                            }
                             for (Integer tss : operon.getTsSites()) {
                                 mRnaCnt++;
                                 writer.write(createSequinTableEntry(tss, stop, FeatureKey.MRNA));
                                 if (isFwd) {
                                     if (isParsingSelected) {
-                                        startLocus = parseLocusTag(startLocus, ParsingPrefisSuffix.mRNA, separator, prefixLength, mRnaCnt);
+                                        startLocus = parseLocusTag(operon.getOperonAdjacencies().get(0).getFeature1().getLocus(), ParsingPrefisSuffix.OPERON, separator, prefixLength, mRnaCnt);
                                     } else {
                                         startLocus = operon.getOperonAdjacencies().get(0).getFeature1().getLocus();
                                     }
                                 } else {
                                     if (isParsingSelected) {
-                                        startLocus = parseLocusTag(startLocus, ParsingPrefisSuffix.mRNA, separator, prefixLength, mRnaCnt);
+                                        startLocus = parseLocusTag(operon.getOperonAdjacencies().get(operon.getOperonAdjacencies().size() - 1).getFeature2().getLocus(), ParsingPrefisSuffix.OPERON, separator, prefixLength, mRnaCnt);
                                     } else {
                                         startLocus = operon.getOperonAdjacencies().get(operon.getOperonAdjacencies().size() - 1).getFeature2().getLocus();
                                     }
                                 }
-                                writer.write(generateSecondLine(Qualifier.OPERON, startLocus));
-                                // Feature PROMOTOR beginnin at the begin of -35 signal 
+                                writer.write(generateSecondLine(Qualifier.LOCUS_TAG, startLocus));
+                                // Feature PROMOTOR beginnin at the begin of -35 signal
                                 // (if exists)and ending at the end of the -10 signal.
                                 ArrayList<Integer[]> promotor = operon.getPromotor(tss);
                                 Integer[] minus10 = promotor.get(1);
@@ -183,43 +184,43 @@ public class SequinTableFormatExporter extends Thread {
                                         minus35SignalCnt++;
                                         writer.write(createSequinTableEntry(tss - minus35[0], tss - minus35[0] + minus35[1], FeatureKey.MINUS_THIRTYFIVE_SIGNAL));
                                         if (isParsingSelected) {
-                                            startLocus = parseLocusTag(startLocus, ParsingPrefisSuffix.PROMOTER, separator, prefixLength, minus35SignalCnt);
+                                            startLocus = parseLocusTag(operon.getOperonAdjacencies().get(0).getFeature1().getLocus(), ParsingPrefisSuffix.OPERON, separator, prefixLength, minus35SignalCnt);
                                         } else {
                                             startLocus = operon.getOperonAdjacencies().get(0).getFeature1().getLocus();
                                         }
 
-                                        writer.write(generateSecondLine(Qualifier.OPERON, startLocus));
+                                        writer.write(generateSecondLine(Qualifier.LOCUS_TAG, startLocus));
                                     }
                                     if (minus10[0] > 0 && minus10[1] > 0) {
                                         minus10SignalCnt++;
                                         writer.write(createSequinTableEntry(tss - minus10[0], tss - minus10[0] + minus10[1], FeatureKey.MINUS_TEN_SIGNAL));
                                         if (isParsingSelected) {
-                                            startLocus = parseLocusTag(startLocus, ParsingPrefisSuffix.PROMOTER, separator, prefixLength, minus10SignalCnt);
+                                            startLocus = parseLocusTag(operon.getOperonAdjacencies().get(0).getFeature1().getLocus(), ParsingPrefisSuffix.OPERON, separator, prefixLength, minus10SignalCnt);
                                         } else {
                                             startLocus = operon.getOperonAdjacencies().get(0).getFeature1().getLocus();
                                         }
-                                        writer.write(generateSecondLine(Qualifier.OPERON, startLocus));
+                                        writer.write(generateSecondLine(Qualifier.LOCUS_TAG, startLocus));
                                     }
                                 } else {
                                     if (minus35[0] > 0 && minus35[1] > 0) {
                                         minus35SignalCnt++;
                                         writer.write(createSequinTableEntry(tss + minus35[0], tss + minus35[0] - minus35[1], FeatureKey.MINUS_THIRTYFIVE_SIGNAL));
                                         if (isParsingSelected) {
-                                            startLocus = parseLocusTag(startLocus, ParsingPrefisSuffix.PROMOTER, separator, prefixLength, minus35SignalCnt);
+                                            startLocus = parseLocusTag(operon.getOperonAdjacencies().get(operon.getOperonAdjacencies().size() - 1).getFeature2().getLocus(), ParsingPrefisSuffix.OPERON, separator, prefixLength, minus35SignalCnt);
                                         } else {
                                             startLocus = operon.getOperonAdjacencies().get(operon.getOperonAdjacencies().size() - 1).getFeature2().getLocus();
                                         }
-                                        writer.write(generateSecondLine(Qualifier.OPERON, startLocus));
+                                        writer.write(generateSecondLine(Qualifier.LOCUS_TAG, startLocus));
                                     }
                                     if (minus10[0] > 0 && minus10[1] > 0) {
                                         minus10SignalCnt++;
                                         writer.write(createSequinTableEntry(tss + minus10[0], tss + minus10[0] - minus10[1], FeatureKey.MINUS_TEN_SIGNAL));
                                         if (isParsingSelected) {
-                                            startLocus = parseLocusTag(startLocus, ParsingPrefisSuffix.PROMOTER, separator, prefixLength, minus10SignalCnt);
+                                            startLocus = parseLocusTag(operon.getOperonAdjacencies().get(operon.getOperonAdjacencies().size() - 1).getFeature2().getLocus(), ParsingPrefisSuffix.OPERON, separator, prefixLength, minus10SignalCnt);
                                         } else {
                                             startLocus = operon.getOperonAdjacencies().get(operon.getOperonAdjacencies().size() - 1).getFeature2().getLocus();
                                         }
-                                        writer.write(generateSecondLine(Qualifier.OPERON, startLocus));
+                                        writer.write(generateSecondLine(Qualifier.LOCUS_TAG, startLocus));
                                     }
                                 }
                             }
@@ -233,10 +234,22 @@ public class SequinTableFormatExporter extends Thread {
                                     int utrStart = operon.getOperonAdjacencies().get(0).getFeature1().getStart() - utr;
                                     int utrStop = operon.getOperonAdjacencies().get(0).getFeature1().getStart();
                                     writer.write(createSequinTableEntry(utrStart, utrStop, FeatureKey.FiveUTR));
-                                    startLocus = parseLocusTag(startLocus, ParsingPrefisSuffix.UTR, separator, prefixLength, cnt);
-                                    writer.write(generateSecondLine(Qualifier.OPERON, startLocus));
+                                    if (isParsingSelected) {
+                                        startLocus = parseLocusTag(operon.getOperonAdjacencies().get(0).getFeature1().getLocus(), ParsingPrefisSuffix.OPERON, separator, prefixLength, cnt);
+                                    } else {
+                                        startLocus = operon.getOperonAdjacencies().get(0).getFeature1().getLocus();
+                                    }
+                                    writer.write(generateSecondLine(Qualifier.LOCUS_TAG, startLocus));
                                 } else {
-                                    // TODO
+                                    int utrStart = operon.getOperonAdjacencies().get(operon.getOperonAdjacencies().size() - 1).getFeature2().getStop() + utr;
+                                    int utrStop = operon.getOperonAdjacencies().get(operon.getOperonAdjacencies().size() - 1).getFeature2().getStart();
+                                    writer.write(createSequinTableEntry(utrStart, utrStop, FeatureKey.FiveUTR));
+                                    if (isParsingSelected) {
+                                        startLocus = parseLocusTag(operon.getOperonAdjacencies().get(operon.getOperonAdjacencies().size() - 1).getFeature2().getLocus(), ParsingPrefisSuffix.OPERON, separator, prefixLength, cnt);
+                                    } else {
+                                        startLocus = operon.getOperonAdjacencies().get(operon.getOperonAdjacencies().size() - 1).getFeature2().getLocus();
+                                    }
+                                    writer.write(generateSecondLine(Qualifier.LOCUS_TAG, startLocus));
                                 }
                             }
                         }
@@ -245,14 +258,18 @@ public class SequinTableFormatExporter extends Thread {
                             int rbsStart = operon.getRbsStartStop()[0];
                             int rbsStop = operon.getRbsStartStop()[0] + operon.getRbsStartStop()[1];
                             writer.write(createSequinTableEntry(rbsStart, rbsStop, FeatureKey.RBS));
-                            startLocus = parseLocusTag(startLocus, ParsingPrefisSuffix.RBS, separator, prefixLength, 0);
-                            writer.write(generateSecondLine(Qualifier.OPERON, startLocus));
+                            if (isParsingSelected) {
+                                if (isFwd) {
+                                    startLocus = parseLocusTag(operon.getOperonAdjacencies().get(0).getFeature1().getLocus(), ParsingPrefisSuffix.OPERON, separator, prefixLength, 0);
+                                } else {
+                                    startLocus = operon.getOperonAdjacencies().get(operon.getOperonAdjacencies().size() - 1).getFeature2().getLocus();
+                                }
+                            }
+                            writer.write(generateSecondLine(Qualifier.LOCUS_TAG, startLocus));
                         }
                     }
                 }
             }
-
-            writer.close();
         } catch (FileNotFoundException ex) {
             Exceptions.printStackTrace(ex);
         } catch (IOException ex) {
@@ -289,6 +306,9 @@ public class SequinTableFormatExporter extends Thread {
         } else if (featureKey == FeatureKey.RBS) {
             sequinTableEntry += startLocation + "\t" + stopLocation + "\t"
                     + "RBS" + "\n";
+        } else if (featureKey == FeatureKey.NC_RNA) {
+            sequinTableEntry += startLocation + "\t" + stopLocation + "\t"
+                    + "ncRNA" + "\n";
         } else {
             sequinTableEntry += startLocation + "\t" + stopLocation + "\t"
                     + featureKey.toString().toLowerCase() + "\n";
@@ -311,8 +331,7 @@ public class SequinTableFormatExporter extends Thread {
                     + "\t" + qualifierValue + "\n";
         } else if (qualifierKey == Qualifier.NC_RNA) {
             sequinTableEntry = "\t\t\t"
-                    + "ncRNA"
-                    + "\t" + qualifierValue + "\n";
+                    + "ncRNA_class" + "\t" + qualifierValue + "\n";
         } else if (qualifierKey == Qualifier.PCR_CONDITIONS) {
             sequinTableEntry = "\t\t\t"
                     + "PCR_conditions"
@@ -330,9 +349,11 @@ public class SequinTableFormatExporter extends Thread {
     }
 
     /**
+     * Exports the selected tss features in sequin table format.
      *
-     * @param exportFeat
-     * @param writer
+     * @param exportFeat contains all necessary information about the feature to
+     * export
+     * @param writer Writer
      * @throws IOException
      */
     private void exportTSS(ExportFeature exportFeat, Writer writer) throws IOException {
@@ -362,10 +383,7 @@ public class SequinTableFormatExporter extends Thread {
                 writer.write(generateSecondLine(Qualifier.LOCUS_TAG, parsedLocus));
             }
             if (feature.hasFeatureName() && !feature.getName().equals("")) {
-                writer.write(generateSecondLine(Qualifier.STANDARD_NAME, feature.getName()));
-            }
-            if (!feature.getProduct().equals("")) {
-                writer.write(generateSecondLine(Qualifier.PRODUCT, feature.getProduct()));
+                writer.write(generateSecondLine(Qualifier.GENE, feature.getName()));
             }
             // CDS
             if (isFwd) {
@@ -376,7 +394,6 @@ public class SequinTableFormatExporter extends Thread {
             if (!feature.getProduct().equals("")) {
                 writer.write(generateSecondLine(Qualifier.PRODUCT, feature.getProduct()));
             }
-            writer.write(generateSecondLine(Qualifier.CODON_START, "" + feature.getFrame())); // Frame
             if (!feature.getEcNumber().equals("")) {
                 writer.write(generateSecondLine(Qualifier.EC_NUMBER, feature.getEcNumber()));
             }
@@ -415,9 +432,6 @@ public class SequinTableFormatExporter extends Thread {
                     }
                     writer.write(generateSecondLine(Qualifier.LOCUS_TAG, parsedLocus));
                 }
-                if (!feature.getProduct().equals("")) {
-                    writer.write(generateSecondLine(Qualifier.PRODUCT, feature.getProduct()));
-                }
 
                 // 5'-UTR
                 if (isFwd) {
@@ -448,13 +462,16 @@ public class SequinTableFormatExporter extends Thread {
 
                 if (exportFeat.getRbsAssignments().get(start)) {
                     // RBS 
+                    int analysisLength = exportFeat.getRbsSequenceLength();
+                    int rbsPositionShift = exportFeat.getRbsPosistions().get(start);
+                    int rbsMotifWidth = exportFeat.getRbsMotifWidth();
                     if (isFwd) {
-                        int startMotif = exportFeat.getFeature().getStart() - exportFeat.getRbsSequenceLength() + exportFeat.getRbsPosistions().get(start);
-                        int stopMotif = startMotif + exportFeat.getRbsMotifWidth();
+                        int startMotif = feature.getStart() - analysisLength + rbsPositionShift;
+                        int stopMotif = startMotif + rbsMotifWidth;
                         writer.write(createSequinTableEntry(startMotif, stopMotif, FeatureKey.RBS));
                     } else {
-                        int startMotif = exportFeat.getFeature().getStop() + exportFeat.getRbsSequenceLength() - exportFeat.getRbsPosistions().get(start);
-                        int stopMotif = startMotif - exportFeat.getRbsMotifWidth();
+                        int startMotif = exportFeat.getFeature().getStop() + analysisLength - rbsPositionShift;
+                        int stopMotif = startMotif - rbsMotifWidth;
                         writer.write(createSequinTableEntry(startMotif, stopMotif, FeatureKey.RBS));
                     }
                     if (isParsingSelected) {
@@ -466,13 +483,19 @@ public class SequinTableFormatExporter extends Thread {
                 }
 
                 if (exportFeat.getPromotorAssignments().get(start)) {
-
+                    int promotorAnalysisSequenceLength = exportFeat.getPromotorSequenceLength();
+                    int minus10Width = exportFeat.getMinus10MotifWidth();
+                    int minus35Width = exportFeat.getMinus35MotifWidth();
+                    int minus10MotifShift;
+                    int minus35MotifShift;
                     //PROMOTOR
                     if (isFwd) {
                         if (exportFeat.getMinus35Positions().containsKey(start)) {
-                            writer.write(createSequinTableEntry(start - exportFeat.getPromotorSequenceLength() + exportFeat.getMinus35Positions().get(start), start, FeatureKey.PROMOTER));
-                        } else if (exportFeat.minus10Positions.containsKey(start)) {
-                            writer.write(createSequinTableEntry(start - exportFeat.getPromotorSequenceLength() + exportFeat.getMinus10Positions().get(start), start, FeatureKey.PROMOTER));
+                            minus35MotifShift = exportFeat.getMinus35Positions().get(start);
+                            writer.write(createSequinTableEntry(start - promotorAnalysisSequenceLength + minus35MotifShift, start, FeatureKey.PROMOTER));
+                        } else if (exportFeat.getMinus10Positions().containsKey(start)) {
+                            minus10MotifShift = exportFeat.getMinus10Positions().get(start);
+                            writer.write(createSequinTableEntry(start - promotorAnalysisSequenceLength + minus10MotifShift, start, FeatureKey.PROMOTER));
                         }
                         if (isParsingSelected) {
                             parsedLocus = parseLocusTag(feature.getLocus(), ParsingPrefisSuffix.PROMOTER, separator, prefixLength, promotorCnt);
@@ -482,9 +505,11 @@ public class SequinTableFormatExporter extends Thread {
                         writer.write(generateSecondLine(Qualifier.LOCUS_TAG, parsedLocus));
                     } else {
                         if (exportFeat.getMinus35Positions().containsKey(start)) {
-                            writer.write(createSequinTableEntry(start + exportFeat.getPromotorSequenceLength() - exportFeat.getMinus35Positions().get(start), start, FeatureKey.PROMOTER));
-                        } else if (exportFeat.minus10Positions.containsKey(start)) {
-                            writer.write(createSequinTableEntry(start + exportFeat.getPromotorSequenceLength() - exportFeat.getMinus10Positions().get(start), start, FeatureKey.PROMOTER));
+                            minus35MotifShift = exportFeat.getMinus35Positions().get(start);
+                            writer.write(createSequinTableEntry(start + promotorAnalysisSequenceLength - minus35MotifShift, start, FeatureKey.PROMOTER));
+                        } else if (exportFeat.getMinus10Positions().containsKey(start)) {
+                            minus10MotifShift = exportFeat.getMinus10Positions().get(start);
+                            writer.write(createSequinTableEntry(start + promotorAnalysisSequenceLength - minus10MotifShift, start, FeatureKey.PROMOTER));
                         }
                         if (isParsingSelected) {
                             parsedLocus = parseLocusTag(feature.getLocus(), ParsingPrefisSuffix.PROMOTER, separator, prefixLength, promotorCnt);
@@ -496,14 +521,14 @@ public class SequinTableFormatExporter extends Thread {
 
                     // -10 signal
                     if (exportFeat.getMinus10Positions().containsKey(start)) {
-
+                        minus10MotifShift = exportFeat.getMinus10Positions().get(start);
                         if (isFwd) {
-                            int startMotif = start - exportFeat.getPromotorSequenceLength() + exportFeat.getMinus10Positions().get(start);
-                            int stopMotif = startMotif + (exportFeat.getMinus10MotifWidth() - 1);
+                            int startMotif = start - promotorAnalysisSequenceLength + minus10MotifShift;
+                            int stopMotif = startMotif + (minus10Width - 1);
                             writer.write(createSequinTableEntry(startMotif, stopMotif, FeatureKey.MINUS_TEN_SIGNAL));
                         } else {
-                            int startMotif = start + exportFeat.getPromotorSequenceLength() - exportFeat.getMinus10Positions().get(start);
-                            int stopMotif = startMotif - (exportFeat.getMinus10MotifWidth() - 1);
+                            int startMotif = start + promotorAnalysisSequenceLength - minus10MotifShift;
+                            int stopMotif = startMotif - (minus10Width - 1);
                             writer.write(createSequinTableEntry(startMotif, stopMotif, FeatureKey.MINUS_TEN_SIGNAL));
                         }
                         if (isParsingSelected) {
@@ -517,14 +542,14 @@ public class SequinTableFormatExporter extends Thread {
 
                     // -35 signal
                     if (exportFeat.getMinus35Positions().containsKey(start)) {
-
+                        minus35MotifShift = exportFeat.getMinus35Positions().get(start);
                         if (isFwd) {
-                            int startMotif = start - exportFeat.getPromotorSequenceLength() + exportFeat.getMinus35Positions().get(start);
-                            int stopMotif = startMotif + (exportFeat.getMinus35MotifWidth() - 1);
+                            int startMotif = start - promotorAnalysisSequenceLength + minus35MotifShift;
+                            int stopMotif = startMotif + (minus35Width - 1);
                             writer.write(createSequinTableEntry(startMotif, stopMotif, FeatureKey.MINUS_THIRTYFIVE_SIGNAL));
                         } else {
-                            int startMotif = start + exportFeat.getPromotorSequenceLength() - exportFeat.getMinus35Positions().get(start);
-                            int stopMotif = startMotif - (exportFeat.getMinus35MotifWidth() - 1);
+                            int startMotif = start + promotorAnalysisSequenceLength - minus35MotifShift;
+                            int stopMotif = startMotif - (minus35Width - 1);
                             writer.write(createSequinTableEntry(startMotif, stopMotif, FeatureKey.MINUS_THIRTYFIVE_SIGNAL));
                         }
                         if (isParsingSelected) {
@@ -557,7 +582,7 @@ public class SequinTableFormatExporter extends Thread {
         ExportFeature feat;
         for (TranscriptionStart ts : tss) {
             if ((ts.isLeaderless()
-                    && ts.getOffsetOfTss() == 0
+                    && ts.getOffsetToAssignedFeature() == 0
                     && ts.getDist2start() == 0
                     && ts.getAssignedFeature() != null)
                     || (ts.isIntragenicTSS()
@@ -586,12 +611,12 @@ public class SequinTableFormatExporter extends Thread {
      * Parses the locus tag of a genome feature and adds qualifier ids to the
      * start of the suffix.
      *
-     * @param locusTag
-     * @param type
-     * @param separator
-     * @param strainLength
-     * @param count
-     * @return
+     * @param locusTag locus tag of a genome feature.
+     * @param type ParsingPrefisSuffix
+     * @param separator separator for the locus tag
+     * @param strainLength length of the strain in the locus tag
+     * @param count 
+     * @return a new locus tag, which now contains a type (feature key)
      */
     private String parseLocusTag(String locusTag, ParsingPrefisSuffix type, String separator, Integer strainLength, int count) {
 

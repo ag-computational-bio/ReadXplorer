@@ -313,6 +313,11 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                 progresshandle.progress(2);
                 novelRegionResults.setResults(novelRegions);
                 progresshandle.progress(3);
+                progresshandle.progress(5);
+
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successfull!",
+                        "Export was successfull!", JOptionPane.INFORMATION_MESSAGE);
+                progresshandle.finish();
             }
 
             @Override
@@ -322,11 +327,7 @@ public class NovelRegionResultPanel extends ResultTablePanel {
         };
 
         fileChooser.openFileChooser(ReadXplorerFileChooser.SAVE_DIALOG);
-        progresshandle.progress(5);
 
-        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successfull!",
-                "Export was successfull!", JOptionPane.INFORMATION_MESSAGE);
-        progresshandle.finish();
 
     }//GEN-LAST:event_jButton3ActionPerformed
 
@@ -357,6 +358,11 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                 progresshandle.progress(2);
                 novelRegionResults.setResults(novelRegions);
                 progresshandle.progress(3);
+                progresshandle.progress(5);
+
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successfull!",
+                        "Export was successfull!", JOptionPane.INFORMATION_MESSAGE);
+                progresshandle.finish();
 
             }
 
@@ -367,11 +373,7 @@ public class NovelRegionResultPanel extends ResultTablePanel {
         };
 
         fileChooser.openFileChooser(ReadXplorerFileChooser.SAVE_DIALOG);
-        progresshandle.progress(5);
 
-        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successfull!",
-                "Export was successfull!", JOptionPane.INFORMATION_MESSAGE);
-        progresshandle.finish();
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -415,6 +417,12 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                     progresshandle.progress(2);
                     exporter.start();
                     progresshandle.progress(3);
+                    progresshandle.progress(4);
+                    progresshandle.progress(5);
+
+                    JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successfull!",
+                            "Export was successfull!", JOptionPane.INFORMATION_MESSAGE);
+                    progresshandle.finish();
                 }
 
                 @Override
@@ -424,12 +432,7 @@ public class NovelRegionResultPanel extends ResultTablePanel {
             };
 
             fileChooser.openFileChooser(ReadXplorerFileChooser.SAVE_DIALOG);
-            progresshandle.progress(4);
-            progresshandle.progress(5);
 
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successfull!",
-                    "Export was successfull!", JOptionPane.INFORMATION_MESSAGE);
-            progresshandle.finish();
         }
     }//GEN-LAST:event_jButton2ActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -563,9 +566,9 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                     this.nrInHash.get(posTableAti).setIsConsidered(false);
                 }
                 if ((Boolean) novelRegionTable.getValueAt(i, 2)) {
-                    this.nrInHash.get(posTableAti).setIsFalsePositive(true);
+                    this.nrInHash.get(posTableAti).setFalsePositive(true);
                 } else {
-                    this.nrInHash.get(posTableAti).setIsFalsePositive(false);
+                    this.nrInHash.get(posTableAti).setFalsePositive(false);
                 }
 
                 tmpHash.remove(posTableAti);

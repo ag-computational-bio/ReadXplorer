@@ -43,13 +43,25 @@ public class StatisticsOnMappingData implements Observer {
     private final PersistantReference refGenome;
 
     /**
+     * Constructor for test cases.
+     */
+    public StatisticsOnMappingData() {
+        this.refGenome = null;
+    }
+
+    /**
      * Constructor for this class.
      *
-     * @param refGenome
+     * @param refGenome PersistantReference.
      * @param fraction
-     * @param forwardFeatures
-     * @param reverseFeatures
-     * @param allFeatures
+     * @param forwardFeatures all reference features in forward direction. <key>
+     * startposition on the reference, <value> list of different (overlapping)
+     * feature ids on that position
+     * @param reverseFeatures all reference features in reverse direction. <key>
+     * startposition on the reference, <value> list of different (overlapping)
+     * feature ids on that position
+     * @param allFeatures all reference features with feature id as <key> and a
+     * PersistantFeature as <value>
      * @param region2Exclude
      */
     public StatisticsOnMappingData(PersistantReference refGenome, double fraction, HashMap<Integer, List<Integer>> forwardFeatures,
@@ -163,11 +175,13 @@ public class StatisticsOnMappingData implements Observer {
     }
 
     /**
+     * Check two features for putative adjacency.
      *
-     * @param putativeOperonAdjacencies
-     * @param features
-     * @param stop
-     * @param start
+     * @param putativeOperonAdjacencies Tree of putative operon adjacencies
+     * @param features list of PersistantFeature Ids <value> on a reference
+     * position <key>
+     * @param stop stop of certain region
+     * @param start start of certain region
      */
     private void checkOperonAdjacency(TreeMap<Integer, OperonAdjacency> putativeOperonAdjacencies, HashMap<Integer, List<Integer>> features, int stop, int start) {
         PersistantFeature feat1;
@@ -205,20 +219,21 @@ public class StatisticsOnMappingData implements Observer {
     public double calculateBackgroundCutoff(double fraction) {
 //        int length = refSeqLength * 2;
         int wholeGenomeLength = PersistantReference.calcWholeGenomeLength(refGenome.getChromosomes());
-        System.out.println("WholeGenomeLength: " + wholeGenomeLength);
         double mean = (double) this.uniqueCounts / (wholeGenomeLength * 2);
-        System.out.println("uniqueMappings: " + this.uniqueCounts);
-        System.out.println("Mean: " + mean);
         double standardDiviation = Math.sqrt(mean);
-        System.out.println("StandardAbweichung: " + standardDiviation);
         double inverseCdf = 0;
         jsc.distributions.Normal normal = new Normal(mean, standardDiviation);
         inverseCdf = normal.inverseCdf(1 - (fraction / 1000));
-
-        System.out.println("BG: " + inverseCdf);
         return inverseCdf;
     }
 
+    /**
+     * Simalation for a background threshold. We expect ~ one start per kb, and
+     * we want less than $fraction false positives
+     *
+     * @param fraction quantil for false positive mappings.
+     * @return the simmulated background threshold
+     */
     public int simulateBackgroundThreshold(double fraction) {
         int genomeSize = PersistantReference.calcWholeGenomeLength(refGenome.getChromosomes());
         int doubleGenomeSize = genomeSize * 2;
@@ -286,27 +301,21 @@ public class StatisticsOnMappingData implements Observer {
     }
 
     /**
+     * Get array of readstarts in forward orientation.
      *
-     * @return
+     * @return int[chromosome id][reference position]
      */
     public int[][] getForwardReadStarts() {
         return fwdReadStarts;
     }
 
     /**
+     * Get array of readstarts in reverse orientation.
      *
-     * @return
+     * @return int[chromosome id][reference position]
      */
     public int[][] getReverseReadStarts() {
         return revReadStarts;
-    }
-
-    public void setFwdReadStarts(int[][] fwdReadStarts) {
-        this.fwdReadStarts = fwdReadStarts;
-    }
-
-    public void setRevReadStarts(int[][] revReadStarts) {
-        this.revReadStarts = revReadStarts;
     }
 
     /**
@@ -413,7 +422,7 @@ public class StatisticsOnMappingData implements Observer {
     }
 
     /**
-     *
+     * Set all memory inefficient structures to null.
      */
     public void clearMemory() {
         this.allFeatures = null;

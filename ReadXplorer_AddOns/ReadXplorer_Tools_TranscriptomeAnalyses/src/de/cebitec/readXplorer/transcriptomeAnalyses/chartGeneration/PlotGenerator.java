@@ -15,7 +15,6 @@ import de.erichseifert.gral.plots.PiePlot;
 import de.erichseifert.gral.plots.XYPlot;
 import de.erichseifert.gral.plots.areas.AreaRenderer;
 import de.erichseifert.gral.plots.areas.DefaultAreaRenderer2D;
-import de.erichseifert.gral.plots.areas.LineAreaRenderer2D;
 import de.erichseifert.gral.plots.colors.LinearGradient;
 import de.erichseifert.gral.plots.legends.ValueLegend;
 import de.erichseifert.gral.plots.lines.DefaultLineRenderer2D;
@@ -62,7 +61,7 @@ public class PlotGenerator {
     private final ReferenceViewer referenceViewer;
 
     /**
-     * This class contains the logic for plots/charts generation.
+     * Constructor for this class.
      *
      * @param referenceViewer ReferenceViewer
      */
@@ -169,6 +168,7 @@ public class PlotGenerator {
 
                     data.add(cnt, binValue);
                     cnt++;
+                    i += binsize;
                 }
             }
         } else {
@@ -224,26 +224,24 @@ public class PlotGenerator {
         try {
             this.absFreq5PrimeUtrsInCsv = File.createTempFile("absoluteFrrequencyOf5PrimeUTRs", ".csv");
 
-            Writer writer = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(this.absFreq5PrimeUtrsInCsv.getAbsolutePath()), "utf-8"));
-
-            writer.write("Gene;Strand;TSS;Gene Start;Start Codon;5'-UTR Length;5-UTR Sequence\n");
-            for (List<TranscriptionStart> list : tssToLocus.values()) {
-                for (TranscriptionStart ts : list) {
-                    String direction = ts.isFwdStrand() ? "+" : "-";
-                    int offset;
-                    if (ts.getDetectedGene() != null) {
-                        offset = ts.getOffset();
-                    } else {
-                        offset = ts.getOffsetToNextDownstrFeature();
+            try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+                    new FileOutputStream(this.absFreq5PrimeUtrsInCsv.getAbsolutePath()), "utf-8"))) {
+                writer.write("Gene;Strand;TSS;Gene Start;Start Codon;5'-UTR Length;5-UTR Sequence\n");
+                for (List<TranscriptionStart> list : tssToLocus.values()) {
+                    for (TranscriptionStart ts : list) {
+                        String direction = ts.isFwdStrand() ? "+" : "-";
+                        int offset;
+                        if (ts.getDetectedGene() != null) {
+                            offset = ts.getOffset();
+                        } else {
+                            offset = ts.getOffsetToNextDownstrFeature();
+                        }
+                        int geneStart = ts.isFwdStrand() ? ts.getAssignedFeature().getStart() : ts.getAssignedFeature().getStop();
+                        writer.write(ts.getAssignedFeature().getLocus() + ";" + direction + ";" + ts.getStartPosition() + ";"
+                                + geneStart + ";" + ts.getDetectedFeatStart() + ";" + offset + ";" + get5PrimeUtrSequence(ref, ts, offset) + "\n");
                     }
-                    int geneStart = ts.isFwdStrand() ? ts.getAssignedFeature().getStart() : ts.getAssignedFeature().getStop();
-                    writer.write(ts.getAssignedFeature().getLocus() + ";" + direction + ";" + ts.getStartPosition() + ";"
-                            + geneStart + ";" + ts.getDetectedFeatStart() + ";" + offset + ";" + get5PrimeUtrSequence(ref, ts, offset) + "\n");
                 }
             }
-
-            writer.close();
         } catch (UnsupportedEncodingException ex) {
             Exceptions.printStackTrace(ex);
         } catch (IOException ex) {
@@ -289,25 +287,26 @@ public class PlotGenerator {
                 int chromLength = ref.getChromosome(chromID).getLength();
                 int featureStart = tSS.getAssignedFeature().getStart();
                 int featureStop = tSS.getAssignedFeature().getStop();
+
                 if (tSS.getAssignedFeature().isFwdStrand()) {
                     if (featureStart - 1 - length >= 0) {
-                        substr = ref.getChromSequence(chromID, featureStart - 1 - length, featureStart + 2);
+                        substr = ref.getChromSequence(chromID, featureStart - length, featureStart + 2);
                         tmpSubstrings.add(substr);
                     } else {
-                        int a = length - featureStart;
-                        String substr1 = ref.getChromSequence(chromID, ref.getChromosome(chromID).getLength() - a - 1, chromLength);
-                        String substr2 = ref.getChromSequence(chromID, 0, featureStart - 1);
+                        int a = length - featureStart - 1;
+                        String substr1 = ref.getChromSequence(chromID, ref.getChromosome(chromID).getLength() - a, chromLength);
+                        String substr2 = ref.getChromSequence(chromID, 0, featureStart + 2);
                         substr = substr1 + substr2;
                         tmpSubstrings.add(substr);
                     }
                 } else {
                     if (featureStop + length >= chromLength) {
-                        String substr1 = ref.getChromSequence(chromID, featureStart - 1, chromLength);
-                        String substr2 = ref.getChromSequence(chromID, 0, length - (chromLength - featureStart));
+                        String substr1 = ref.getChromSequence(chromID, featureStop - 2, chromLength);
+                        String substr2 = ref.getChromSequence(chromID, 0, length - (chromLength - featureStop));
                         substr = substr1 + substr2;
                         tmpSubstrings.add(substr);
                     } else {
-                        substr = SequenceUtils.getReverseComplement(ref.getChromSequence(chromID, featureStop - 3, featureStop + length));
+                        substr = SequenceUtils.getReverseComplement(ref.getChromSequence(chromID, featureStop - 2, featureStop + length));
                         tmpSubstrings.add(substr);
                     }
                 }
@@ -408,7 +407,7 @@ public class PlotGenerator {
         }
         if (elements == ElementsOfInterest.ONLY_TSS_WITH_UTR_EXCEPT_AS_LEADERLESS) {
             for (TranscriptionStart transcriptionStart : tss) {
-                if (transcriptionStart.getOffsetOfTss() > 0 && !transcriptionStart.isLeaderless()) {
+                if (transcriptionStart.getOffsetToAssignedFeature() > 0 && !transcriptionStart.isLeaderless()) {
                     resultList.add(transcriptionStart);
                 }
             }
@@ -422,7 +421,7 @@ public class PlotGenerator {
         }
         if (elements == ElementsOfInterest.ONLY_TSS_WITH_UTR_INCLUDING_ANTISENSE_LEADERLESS) {
             for (TranscriptionStart transcriptionStart : tss) {
-                if (transcriptionStart.getOffsetOfTss() > 0 || transcriptionStart.isLeaderless() || (transcriptionStart.isPutativeAntisense() && transcriptionStart.getOffsetOfTss() > 0)) {
+                if (transcriptionStart.getOffsetToAssignedFeature() > 0 || transcriptionStart.isLeaderless() || (transcriptionStart.isPutativeAntisense() && transcriptionStart.getOffsetToAssignedFeature() > 0)) {
                     resultList.add(transcriptionStart);
                 }
             }
@@ -540,6 +539,8 @@ public class PlotGenerator {
     }
 
     /**
+     * Generates an overlapped area plot. The input data table is either GC:AT
+     * or GA:CT.
      *
      * @param dataCT DataTable of C:T distribution
      * @param dataGA DataTable of G:A distributino
@@ -576,7 +577,6 @@ public class PlotGenerator {
         formatFilledArea(plot, data2, COLOR1);
 
         return new InteractivePanel(plot);
-
     }
 
     /**
@@ -596,23 +596,6 @@ public class PlotGenerator {
         plot.setLineRenderer(data, line);
         AreaRenderer area = new DefaultAreaRenderer2D();
         area.setColor(GraphicsUtils.deriveWithAlpha(color, 64));
-        plot.setAreaRenderer(data, area);
-    }
-
-    /**
-     *
-     * @param plot XYPlot
-     * @param data DataSource
-     * @param color Color
-     */
-    private static void formatLineArea(XYPlot plot, DataSource data, Color color) {
-        PointRenderer point = new DefaultPointRenderer2D();
-        point.setColor(color);
-        plot.setPointRenderer(data, point);
-        plot.setLineRenderer(data, null);
-        AreaRenderer area = new LineAreaRenderer2D();
-        area.setGap(3.0);
-        area.setColor(color);
         plot.setAreaRenderer(data, area);
     }
 

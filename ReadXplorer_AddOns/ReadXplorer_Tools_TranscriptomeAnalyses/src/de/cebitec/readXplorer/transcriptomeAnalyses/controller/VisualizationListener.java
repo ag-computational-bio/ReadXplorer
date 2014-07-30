@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.readXplorer.transcriptomeAnalyses.controller;
 
 import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.ChartsGenerationSelectChatTypeWizardPanel;
@@ -26,6 +21,7 @@ import java.util.List;
 import org.openide.WizardDescriptor;
 
 /**
+ * Controller class for all visualizations in this module.
  *
  * @author jritter
  */
@@ -43,6 +39,14 @@ public class VisualizationListener implements ActionListener {
     private TSSDetectionResults tssResult;
     ParameterSetFiveEnrichedAnalyses params;
 
+    /**
+     * Constructor.
+     *
+     * @param referenceViewer ReferenceViewer
+     * @param wiz WizardDescriptor
+     * @param currentTss list of current transcription start sites
+     * @param tssResult instance of TSSDetectionResults
+     */
     public VisualizationListener(ReferenceViewer referenceViewer, WizardDescriptor wiz, List<TranscriptionStart> currentTss, TSSDetectionResults tssResult) {
         this.referenceViewer = referenceViewer;
         this.wiz = wiz;
@@ -59,23 +63,15 @@ public class VisualizationListener implements ActionListener {
             boolean takeOnlyAntisense = false;
             boolean takeOnlyRealTss = false;
             boolean takeOnlySelectedElements = false;
-            boolean takeAllElementsWith5UtrInclLeaderlessAntisense = false;
 
-            if ((boolean) wiz.getProperty(ChartType.PIE_CHART.toString())) {
-                takeAllElements = (boolean) wiz.getProperty(ElementsOfInterest.ALL.toString());
-                takeOnlySelectedElements = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_SELECTED_FOR_UPSTREAM_ANALYSES.toString());
-                takeAllElementsWith5UtrInclLeaderlessAntisense = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_TSS_WITH_UTR_INCLUDING_ANTISENSE_LEADERLESS.toString());
-            } else {
-                takeAllElements = (boolean) wiz.getProperty(ElementsOfInterest.ALL.toString());
-                takeOnlyLeaderless = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_LEADERLESS_TRANSCRIPTS.toString());
-                takeOnlyAntisense = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_ANTISENSE_TSS.toString());
-                takeOnlyRealTss = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_TSS_WITH_UTR_EXCEPT_AS_LEADERLESS.toString());
-                takeOnlySelectedElements = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_SELECTED_FOR_UPSTREAM_ANALYSES.toString());
-            }
+            takeAllElements = (boolean) wiz.getProperty(ElementsOfInterest.ALL.toString());
+            takeOnlyLeaderless = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_LEADERLESS_TRANSCRIPTS.toString());
+            takeOnlyAntisense = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_ANTISENSE_TSS.toString());
+            takeOnlyRealTss = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_TSS_WITH_UTR_EXCEPT_AS_LEADERLESS.toString());
+            takeOnlySelectedElements = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_SELECTED_FOR_UPSTREAM_ANALYSES.toString());
 
             isAbsoluteFrequencyPlot = (boolean) wiz.getProperty(ChartType.ABSOLUTE_FREQUENCY_OF_5_PRIME_UTRs.toString());
             isBaseDistributionPlot = (boolean) wiz.getProperty(ChartType.BASE_DISTRIBUTION.toString());
-            isPieChart = (boolean) wiz.getProperty(ChartType.PIE_CHART.toString());
             isBining = (boolean) wiz.getProperty(ChartsGenerationSelectChatTypeWizardPanel.CHARTS_BINING);
             isGaToCtSelected = (boolean) wiz.getProperty(ChartType.CHARTS_BASE_DIST_GA_CT.toString());
             isGcToAtSelected = (boolean) wiz.getProperty(ChartType.CHARTS_BASE_DIST_GC_AT.toString());
@@ -92,8 +88,6 @@ public class VisualizationListener implements ActionListener {
                 elements = ElementsOfInterest.ONLY_TSS_WITH_UTR_EXCEPT_AS_LEADERLESS;
             } else if (takeOnlySelectedElements) {
                 elements = ElementsOfInterest.ONLY_SELECTED_FOR_UPSTREAM_ANALYSES;
-            } else if (takeAllElementsWith5UtrInclLeaderlessAntisense) {
-                elements = ElementsOfInterest.ONLY_TSS_WITH_UTR_INCLUDING_ANTISENSE_LEADERLESS;
             }
         }
         if (command.equals(ChartType.ABSOLUTE_FREQUENCY_OF_5_PRIME_UTRs.toString())) {
@@ -151,39 +145,38 @@ public class VisualizationListener implements ActionListener {
                 });
                 plotGeneration.start();
             }
-        } else if (command.equals(ChartType.PIE_CHART.toString())) {
-            topComponent = new MultiPurposeTopComponent(PurposeEnum.CHARTS);
-            topComponent.setLayout(new BorderLayout());
-            topComponent.open();
-            topComponent.setName("Pie representation of transcript classes");
-            Thread plotGeneration = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    PlotGenerator gen = new PlotGenerator(referenceViewer);
-                    List<DataTable> dataList = gen.prepareData(ChartType.PIE_CHART, ChartType.NONE,
-                            elements, currentTss, params, lengthRelToTls);
-                    InteractivePanel panel = gen.generatePieChart(dataList.get(0));
-                    topComponent.add(panel, BorderLayout.CENTER);
-//                        topComponent.add(new SouthPanel(null), BorderLayout.SOUTH);
-                }
-            });
-            plotGeneration.start();
         }
     }
 
-    public boolean isIsAbsoluteFrequencyPlot() {
+    /**
+     *
+     * @return <true> if absolute frequency plot is selected else <false>
+     */
+    public boolean isAbsoluteFrequencyPlotSelected() {
         return isAbsoluteFrequencyPlot;
     }
 
-    public boolean isIsBaseDistributionPlot() {
+    /**
+     * @return <true> if base distribution plot is selected else <false>
+     *
+     */
+    public boolean isBaseDistributionPlotSelected() {
         return isBaseDistributionPlot;
     }
 
+    /**
+     *
+     * @return length for region of interest
+     */
     public int getLengthRelToTls() {
         return lengthRelToTls;
     }
 
-    public boolean isIsPieChart() {
+    /**
+     *
+     * @return <true> if pie chart representation is selected else <false>
+     */
+    public boolean isPeiChartSelected() {
         return isPieChart;
     }
 

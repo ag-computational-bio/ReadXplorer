@@ -1,13 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration;
 
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ChartType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.PurposeEnum;
-import de.cebitec.readXplorer.transcriptomeAnalyses.rbsAnalysis.DataSelectionWizardPanel;
+import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.DataSelectionWizardPanel;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,44 +11,30 @@ import javax.swing.JComponent;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 
+/**
+ *
+ * @author jritter
+ */
 public final class VisualizationWizardIterator implements WizardDescriptor.Iterator<WizardDescriptor> {
 
-    // Example of invoking this wizard:
-    // @ActionID(category="...", id="...")
-    // @ActionRegistration(displayName="...")
-    // @ActionReference(path="Menu/...")
-    // public static ActionListener run() {
-    //     return new ActionListener() {
-    //         @Override public void actionPerformed(ActionEvent e) {
-    //             WizardDescriptor wiz = new WizardDescriptor(new VisualizationWizardIterator());
-    //             // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()
-    //             // {1} will be replaced by WizardDescriptor.Iterator.name()
-    //             wiz.setTitleFormat(new MessageFormat("{0} ({1})"));
-    //             wiz.setTitle("...dialog title...");
-    //             if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
-    //                 ...do something...
-    //             }
-    //         }
-    //     };
-    // }
     private int index;
 
     private List<WizardDescriptor.Panel<WizardDescriptor>> allPanels;
     private List<WizardDescriptor.Panel<WizardDescriptor>> initPanels;
     private List<WizardDescriptor.Panel<WizardDescriptor>> otherDataSelectionPanels;
-    private List<WizardDescriptor.Panel<WizardDescriptor>> elementsSelectionPanels;
     private List<WizardDescriptor.Panel<WizardDescriptor>> currentPanels;
     private String[] initPanelsIndex;
     private String[] otherDataSelectionPanelsIndex;
-    private String[] elementsSelectionPanelsIndex;
     private WizardDescriptor wiz;
 
+    /**
+     * Initializes all wizard panels.
+     */
     private void initializePanels() {
         if (allPanels == null) {
             allPanels = new ArrayList<>();
             allPanels.add(new ChartsGenerationSelectChatTypeWizardPanel());
             allPanels.add(new DataSelectionWizardPanel(PurposeEnum.CHARTS));
-            allPanels.add(new ElementsSelectionWizardPanel());
             String[] steps = new String[allPanels.size()];
             for (int i = 0; i < allPanels.size(); i++) {
                 Component c = allPanels.get(i).getComponent();
@@ -78,11 +59,6 @@ public final class VisualizationWizardIterator implements WizardDescriptor.Itera
             this.otherDataSelectionPanels.add(allPanels.get(0));
             this.otherDataSelectionPanels.add(allPanels.get(1));
             this.otherDataSelectionPanelsIndex = new String[]{steps[0], steps[1]};
-
-            this.elementsSelectionPanels = new ArrayList<>();
-            this.elementsSelectionPanels.add(allPanels.get(0));
-            this.elementsSelectionPanels.add(allPanels.get(2));
-            this.elementsSelectionPanelsIndex = new String[]{steps[0], steps[2]};
 
             this.currentPanels = initPanels;
             Component c = allPanels.get(0).getComponent();
@@ -132,11 +108,6 @@ public final class VisualizationWizardIterator implements WizardDescriptor.Itera
             if ((boolean) wiz.getProperty(ChartType.ABSOLUTE_FREQUENCY_OF_5_PRIME_UTRs.toString()) || (boolean) wiz.getProperty(ChartType.BASE_DISTRIBUTION.toString())) {
                 this.currentPanels = this.otherDataSelectionPanels;
                 contentData = this.otherDataSelectionPanelsIndex;
-            }
-
-            if ((boolean) wiz.getProperty(ChartType.PIE_CHART.toString())) {
-                this.currentPanels = this.elementsSelectionPanels;
-                contentData = this.elementsSelectionPanelsIndex;
             }
 
             if (contentData != null) {

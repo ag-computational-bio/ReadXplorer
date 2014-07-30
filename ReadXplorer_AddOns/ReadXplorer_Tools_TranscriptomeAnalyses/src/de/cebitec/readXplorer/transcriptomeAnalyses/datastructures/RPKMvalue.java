@@ -92,18 +92,34 @@ public class RPKMvalue extends TrackChromResultEntry {
         this.readCount = readCount;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getLogRpkm() {
         return logRpkm;
     }
 
+    /**
+     *
+     * @param logRpkm
+     */
     public void setLogRpkm(double logRpkm) {
         this.logRpkm = logRpkm;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getLongestKnownUtrLength() {
         return longestKnownUtrLength;
     }
 
+    /**
+     *
+     * @param longestKnownUtrLength
+     */
     public void setLongestKnownUtrLength(int longestKnownUtrLength) {
         this.longestKnownUtrLength = longestKnownUtrLength;
     }

@@ -6,13 +6,14 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.util.FeatureType;
+import java.io.File;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import org.openide.nodes.CookieSet.Before;
-import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -24,13 +25,20 @@ import org.testng.annotations.Test;
 public class TssDetectionTest {
 
     HashMap<Integer, PersistantFeature> allRegionsInHash;
+    ParameterSetFiveEnrichedAnalyses parameters;
+    StatisticsOnMappingData stats;
 
     public TssDetectionTest() {
         allRegionsInHash = new HashMap<>();
+
+        parameters = new ParameterSetFiveEnrichedAnalyses();
+
+        stats = new StatisticsOnMappingData();
     }
 
     @BeforeClass
     public static void setUpClass() {
+
     }
 
     @AfterClass
@@ -43,23 +51,20 @@ public class TssDetectionTest {
     @Test
     public void testRunningTSSDetection() {
         System.out.println("runningTSSDetection");
-        ParameterSetFiveEnrichedAnalyses parameters = new ParameterSetFiveEnrichedAnalyses(0.05, 5, false, 500, 3, 250, true, true, 10, true, 200, null, null);
-        StatisticsOnMappingData stats = new StatisticsOnMappingData(null, 1, 1, 1, 5);
 
         int[][] forwardStarts = new int[1][30000];
         int[][] reverseStarts = new int[1][30000];
 
         fillArraysWithStarts(forwardStarts, reverseStarts);
-
-        stats.setFwdReadStarts(forwardStarts);
-        stats.setRevReadStarts(reverseStarts);
-
         HashMap<Integer, List<Integer>> forwardCDSs = setUpFwdCDSs();
         HashMap<Integer, List<Integer>> reverseCDSs = setUpRevCDSs();
+        int trackId = 1;
+        TssDetection instance = new TssDetection(trackId);
 
-        TssDetection instance = new TssDetection(1);
-
-        instance.runningTSSDetection(null, forwardCDSs, reverseCDSs, allRegionsInHash, stats, 0, 1, 30000, parameters);
+        // needed for running tss detection
+        File persRefFile = new File("C:\\Users\\jritter\\Documents\\MA-Thesis\\AN\\Chromosome.genbank.fasta");
+        PersistantReference persRef = new PersistantReference(1, "B.Methanolicus", "no description", new Timestamp(20014, 7, 21, 11, 12, 50, 0), persRefFile);
+        instance.runningTSSDetection(persRef, forwardCDSs, reverseCDSs, allRegionsInHash, stats, 0, parameters);
         List<TranscriptionStart> detectedStarts = instance.getResults();
         boolean condition = detectedStarts.isEmpty();
 
@@ -112,22 +117,8 @@ public class TssDetectionTest {
         boolean fwdCase11 = false;
 
 //        Assert.assertTrue("The TSS-Array is Empty", condition);
-
     }
 
-    /**
-     * Test of getResults method, of class TssDetection.
-     */
-//    @Test
-//    public void testGetResults() {
-//        System.out.println("getResults");
-//        TssDetection instance = null;
-//        List<TranscriptionStart> expResult = null;
-//        List<TranscriptionStart> result = instance.getResults();
-//        assertEquals(expResult, result);
-//        // TODO review the generated test code and remove the default call to fail.
-//        fail("The test case is a prototype.");
-//    }
     private HashMap<Integer, List<Integer>> setUpFwdCDSs() {
         HashMap<Integer, List<Integer>> forwardCDSs = new HashMap<>();
         PersistantFeature feature1 = new PersistantFeature(1, 1, "", "1", "test_1", "no", 666, 1000, true, FeatureType.CDS, "Test_1");

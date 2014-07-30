@@ -66,7 +66,7 @@ public class RbsAnalysisWizardPanel implements WizardDescriptor.ValidatingPanel<
     @Override
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state
-        this.wholeLengthOfAnalysisRegion = (int) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS);
+//        this.wholeLengthOfAnalysisRegion = (int) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS);
     }
 
     @Override
@@ -75,6 +75,7 @@ public class RbsAnalysisWizardPanel implements WizardDescriptor.ValidatingPanel<
         wiz.putProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_LENGTH_MOTIFWIDTH, component.getExpectedMotifWidth());
         wiz.putProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_NO_TRYING_BIOPROSPECTOR, component.getNoOfTrying());
         wiz.putProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_MIN_SPACER, component.getMinSpacer());
+        wiz.putProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS, component.getLengthForAnalysis());
         storePrefs();
     }
 
@@ -82,6 +83,7 @@ public class RbsAnalysisWizardPanel implements WizardDescriptor.ValidatingPanel<
         Preferences pref = NbPreferences.forModule(Object.class);
         pref.put(wizardName + RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_LENGTH_MOTIFWIDTH, component.getExpectedMotifWidth().toString());
         pref.put(wizardName + RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_MIN_SPACER, component.getMinSpacer().toString());
+        pref.put(wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS, component.getLengthForAnalysis().toString());
     }
 
     @Override
@@ -89,10 +91,10 @@ public class RbsAnalysisWizardPanel implements WizardDescriptor.ValidatingPanel<
         int fstMinSpacer = component.getMinSpacer();
         int rbsMotifWidth = component.getExpectedMotifWidth();
 
-        if (this.wholeLengthOfAnalysisRegion < (fstMinSpacer + rbsMotifWidth)) {
+        if (this.component.getLengthForAnalysis() < (fstMinSpacer + rbsMotifWidth)) {
             throw new WizardValidationException(null, "Please check your Parameters for RBS analysis.", null);
         }
-        if ((this.wholeLengthOfAnalysisRegion - fstMinSpacer) < rbsMotifWidth) {
+        if ((this.component.getLengthForAnalysis() - fstMinSpacer) < rbsMotifWidth) {
             throw new WizardValidationException(null, "Please check on expected RBS motif-width for, beacause it is bigger than the region of interest.", null);
         }
     }

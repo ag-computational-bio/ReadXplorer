@@ -1,6 +1,5 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.excelImport;
 
-import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
@@ -39,6 +38,7 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Exceptions;
 
 /**
@@ -59,6 +59,17 @@ public class ExcelImporter {
     public ExcelImporter(ProgressHandle progressHandle) {
         this.progressHandle = progressHandle;
         this.model = new DefaultTableModel();
+    }
+
+//    public ExcelImporter() {
+//        this.progressHandle = ProgressHandleFactory.createHandle("Import progress ...");
+//        progressHandle.start(30);
+//        this.model = new DefaultTableModel();
+//    }
+    public ExcelImporter() {
+        this.model = new DefaultTableModel();
+        this.progressHandle = ProgressHandleFactory.createHandle("Import progress ...");
+        progressHandle.start(30);
     }
 
     /**
@@ -767,6 +778,239 @@ public class ExcelImporter {
         } else {
             progressHandle.finish();
             JOptionPane.showMessageDialog(null, "Something went wrong, please check the chrosome id. The reference should contain the chromosome id. Check also the database.", "Something went wrong!", JOptionPane.CANCEL_OPTION);
+        }
+    }
+
+    /**
+     * Method for importing all important excel cells to create all TSS
+     * instances.
+     *
+     * @param refViewer ReferenceViewer
+     * @param transcAnalysesTopComp
+     * TranscriptomeAnalysesTopComponentTopComponent
+     * TranscriptomeAnalysesTopComponentTopComponent
+     */
+    public void setUpTSSTable(List<List<?>> fstSheet, List<List<?>> sndSheet, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp) {
+        ResultPanelTranscriptionStart tssResultsPanel = new ResultPanelTranscriptionStart();
+        tssResultsPanel.setReferenceViewer(refViewer);
+
+        String trackId = (String) model.getValueAt(1, model.getColumnCount() - 1);
+        int refID = Integer.valueOf(trackId);
+        String chromID = (String) model.getValueAt(1, model.getColumnCount() - 2);
+        int chromId = Integer.valueOf(chromID);
+        HashMap<Integer, PersistantTrack> trackMap = new HashMap<>();
+
+        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(chromId);
+        if (refConnector != null) {
+            PersistantTrack track = ProjectConnector.getInstance().getTrack(refID);
+            try {
+                trackMap.put(track.getId(), track);
+
+                List<PersistantFeature> genomeFeatures = new ArrayList<>();
+                int genomeId = refConnector.getRefGenome().getId();
+                Map<Integer, PersistantChromosome> chroms = refConnector.getChromosomesForGenome();
+                for (PersistantChromosome chrom : chroms.values()) {
+                    genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
+                            0, chrom.getLength(), chrom.getId()));
+                }
+
+                HashMap<String, PersistantFeature> featureMap = new HashMap();
+                for (PersistantFeature persistantFeature : genomeFeatures) {
+                    featureMap.put(persistantFeature.getLocus(), persistantFeature);
+                }
+
+                progressHandle.progress("Load statistics and parameters from file ... ", 15);
+
+                String tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT);
+                String replaced = tmp.replaceAll(",", ".");
+                double mappingCount = Double.valueOf(replaced);
+
+                tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH);
+                replaced = tmp.replaceAll(",", ".");
+                double mappingMeanLength = Double.valueOf(replaced);
+
+                tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.MAPPINGS_MILLION);
+                replaced = tmp.replaceAll(",", ".");
+                double mappingsPerMillion = Double.valueOf(replaced);
+
+                tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_STACKSIZE);
+                replaced = tmp.replaceAll(",", ".");
+                double backgroundThreshold = Double.valueOf(replaced);
+
+                tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.TSS_FRACTION);
+                replaced = tmp.replaceAll(",", ".");
+                double fraction = Double.valueOf(replaced);
+
+                tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.TSS_RATIO);
+                int ratio = Integer.valueOf(tmp);
+
+                tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.TSS_EXCLUSION_OF_INTERNAL_TSS);
+                boolean isInternalExclusion;
+                isInternalExclusion = !tmp.equals("no");
+
+                tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.TSS_MANUALLY_SET_THRESHOLD);
+                boolean isThresholdSettedManually;
+                isThresholdSettedManually = !tmp.equals("no");
+
+                tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.TSS_KEEP_ALL_INTRAGENIC_TSS);
+                boolean isKeepingAllIntragenicTSS;
+                isKeepingAllIntragenicTSS = !tmp.equals("no");
+
+                Integer isKeepingAllIntragenicTss_Limit = 0;
+                tmp = (String) secondSheetMapThirdCol.get(ResultPanelTranscriptionStart.TSS_KEEP_ALL_INTRAGENIC_TSS);
+                try {
+                    isKeepingAllIntragenicTss_Limit = Integer.parseInt(tmp);
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(refViewer, "Problem in second sheet of excel import file. No integer value for limit distance in field for keeping all intragenic tss.", "Import went wrong!", JOptionPane.CANCEL_OPTION);
+                }
+
+                tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.TSS_KEEP_ONLY_ASSIGNED_INTRAGENIC_TSS);
+                boolean isKeepingOnlyAssignedIntragenicTSS;
+                isKeepingOnlyAssignedIntragenicTSS = !tmp.equals("no");
+
+                Integer isKeepingOnlyAssignedIntragenicTssLimitDistance = 0;
+                tmp = (String) secondSheetMapThirdCol.get(ResultPanelTranscriptionStart.TSS_KEEP_ONLY_ASSIGNED_INTRAGENIC_TSS);
+                try {
+                    isKeepingOnlyAssignedIntragenicTssLimitDistance = Integer.parseInt(tmp);
+                } catch (NumberFormatException e) {
+                    JOptionPane.showMessageDialog(refViewer, "Problem in second sheet of excel import file. No integer value for limit distance in field for keeping all intragenic tss.", "Import went wrong!", JOptionPane.CANCEL_OPTION);
+                }
+
+                tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.TSS_LIMITATION_FOR_DISTANCE_OFUPSTREM_REGION);
+                int rangeForKeepingTSS = Integer.valueOf(tmp);
+
+                tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.TSS_RANGE_FOR_LEADERLESS_DETECTION);
+                int rangeForLeaderlessDetection = Integer.valueOf(tmp);
+
+                tmp = (String) secondSheetMap.get(ResultPanelTranscriptionStart.TSS_PERCENTAGE_FOR_CDSSHIFT_ANALYSIS);
+                replaced = tmp.replaceAll(",", ".");
+                int cdsPercentageValue = Integer.valueOf(replaced);
+
+                boolean includeBestMatchedReads;
+                tmp = (String) secondSheetMap.get(WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_TSS);
+                includeBestMatchedReads = !tmp.equals("no");
+
+                tmp = (String) secondSheetMap.get(WizardPropertyStrings.PROP_MAX_DIST_FOR_3_UTR_ANTISENSE_DETECTION);
+                int maxDistantaseFor3UtrAntisenseDetection = Integer.valueOf(tmp);
+
+                tmp = (String) secondSheetMap.get(WizardPropertyStrings.PROP_VALID_START_CODONS);
+                HashMap<String, StartCodon> validStartCodons = new HashMap<>();
+                if (!tmp.equals("")) {
+                    String[] startCodons = tmp.split(";");
+
+                    for (String string : startCodons) {
+                        switch (string) {
+                            case "ATG":
+                                validStartCodons.put("ATG", StartCodon.ATG);
+                                break;
+                            case "CTG":
+                                validStartCodons.put("CTG", StartCodon.CTG);
+                                break;
+                            case "GTG":
+                                validStartCodons.put("GTG", StartCodon.GTG);
+                                break;
+                            case "TTG":
+                                validStartCodons.put("TTG", StartCodon.TTG);
+                                break;
+                        }
+                    }
+                }
+                tmp = (String) secondSheetMap.get(FivePrimeEnrichedTracksVisualPanel.PROP_SELECTED_FEAT_TYPES_FADE_OUT);
+                List<FeatureType> types = new ArrayList<>();
+                HashSet<FeatureType> featTypes = null;
+                if (!tmp.equals("")) {
+                    String[] typeStings = tmp.split(";");
+
+                    for (String type : typeStings) {
+                        if (type.equals(FeatureType.MISC_RNA.toString())) {
+                            types.add(FeatureType.MISC_RNA);
+                        } else if (type.equals(FeatureType.SOURCE.toString())) {
+                            types.add(FeatureType.SOURCE);
+                        }
+                    }
+                    featTypes = new HashSet<>(types);
+                }
+
+                int keepingInternalRange = 0;
+                if (isKeepingAllIntragenicTSS) {
+                    keepingInternalRange = isKeepingAllIntragenicTss_Limit;
+                } else if (isKeepingOnlyAssignedIntragenicTSS) {
+                    keepingInternalRange = isKeepingOnlyAssignedIntragenicTssLimitDistance;
+                }
+                ParameterSetFiveEnrichedAnalyses params = new ParameterSetFiveEnrichedAnalyses(
+                        fraction, ratio, isInternalExclusion,
+                        rangeForKeepingTSS, rangeForLeaderlessDetection, keepingInternalRange, isKeepingAllIntragenicTSS, isKeepingOnlyAssignedIntragenicTSS, cdsPercentageValue, includeBestMatchedReads, maxDistantaseFor3UtrAntisenseDetection, validStartCodons, featTypes);
+                params.setThresholdManuallySet(isThresholdSettedManually);
+                StatisticsOnMappingData stats = new StatisticsOnMappingData(refConnector.getRefGenome(), mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
+
+                TSSDetectionResults tssResult = new TSSDetectionResults(stats, null, trackMap, genomeId);
+                tssResult.setParameters(params);
+                List<TranscriptionStart> tss = new ArrayList<>();
+                TranscriptionStart ts = null;
+
+                for (List<?> list : fstSheet) {
+                    int tssPosition = (Integer) list.get(0);
+                    boolean isFwd = (Boolean) list.get(1);
+                    String comment = (String) list.get(2);
+                    int readStarts = (Integer) list.get(3);
+                    double relCount = (Double) list.get(4);
+
+                    boolean isInternalTSS = (Boolean) list.get(13);
+                    PersistantFeature detectedGene = null;
+                    PersistantFeature downstreamNextGene = null;
+                    String locus = (String) list.get(6);
+                    if (featureMap.containsKey(locus)) {
+                        if (isInternalTSS) {
+                            downstreamNextGene = featureMap.get(locus);
+                        } else {
+                            detectedGene = featureMap.get(locus);
+                        }
+                    }
+
+                    int offset = (Integer) list.get(7);
+                    int dist2Start = (Integer) list.get(8);
+                    int dist2Stop = (Integer) list.get(9);
+
+                    boolean isLeaderless = (Boolean) list.get(11);
+                    boolean isCdsShift = (Boolean) list.get(12);
+                    boolean isIntergenic = (Boolean) list.get(14);
+                    boolean isPutAntisense = (Boolean) list.get(15);
+                    boolean is5PrimeAntisense = (Boolean) list.get(16);
+                    boolean is3PrimeAntisense = (Boolean) list.get(17);
+                    boolean isIntragenicAntisense = (Boolean) list.get(18);
+                    boolean isAssignedToStableRna = (Boolean) list.get(19);
+                    boolean isFalsePositive = (Boolean) list.get(20);
+                    boolean isSelected = (Boolean) list.get(21);
+                    boolean isConsidered = (Boolean) list.get(22);
+
+                    ts = new TranscriptionStart(tssPosition,
+                            isFwd, readStarts, relCount,
+                            detectedGene, offset,
+                            dist2Start, dist2Stop,
+                            downstreamNextGene, offset, isLeaderless, isCdsShift,
+                            isInternalTSS, isPutAntisense, chromId, refID);
+                    ts.setComment(comment);
+                    ts.setAssignedToStableRNA(isAssignedToStableRna);
+                    ts.setIs5PrimeUtrAntisense(is5PrimeAntisense);
+                    ts.setIs3PrimeUtrAntisense(is3PrimeAntisense);
+                    ts.setIntragenicAntisense(isIntragenicAntisense);
+                    ts.setFalsePositive(isFalsePositive);
+                    ts.setSelected(isSelected);
+                    ts.setIntergenicTSS(isIntergenic);
+                    ts.setIsconsideredTSS(isConsidered);
+                    tss.add(ts);
+                }
+                tssResult.setResults(tss);
+                tssResultsPanel.addResult(tssResult);
+                transcAnalysesTopComp.openAnalysisTab("TSS detection results for: " + refConnector.getAssociatedTrackNames().get(refID) + " Hits: " + tss.size(), tssResultsPanel);
+
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successfull!",
+                        "Import was successfull!", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(refViewer, "Something went wrong, please check the track id. The database should contain the track id.", "Something went wrong!", JOptionPane.CANCEL_OPTION);
+            }
+        } else {
+            JOptionPane.showMessageDialog(refViewer, "Something went wrong, please check the chrosome id. Check the chromosome id. Check also the database.", "Something went wrong!", JOptionPane.CANCEL_OPTION);
         }
     }
 }

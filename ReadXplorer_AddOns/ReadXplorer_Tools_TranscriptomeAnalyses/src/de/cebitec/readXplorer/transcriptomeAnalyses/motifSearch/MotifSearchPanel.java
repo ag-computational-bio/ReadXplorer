@@ -56,9 +56,9 @@ public class MotifSearchPanel extends javax.swing.JPanel implements Observable {
         promotorsInFastaTextPane.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         minus35RegionPanel.setBorder(BorderFactory.createTitledBorder("Region of intrest (-35)"));
         minus10RegionPanel.setBorder(BorderFactory.createTitledBorder("Region of intrest (-10)"));
-        regionOfIntrestMinusThirtyviveTP.setEditable(false);
+        regionOfIntrestMinusThirtyviveTP.setEditable(true);
         regionOfIntrestMinusThirtyviveTP.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        regionOfIntrestMinusTenTP.setEditable(false);
+        regionOfIntrestMinusTenTP.setEditable(true);
         regionOfIntrestMinusTenTP.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         this.infoPanel.setBorder(BorderFactory.createTitledBorder("Info panel"));
 
@@ -386,8 +386,8 @@ public class MotifSearchPanel extends javax.swing.JPanel implements Observable {
             outputMinus35.renameTo(new File(fileChooser.getSelectedFile().getAbsolutePath() + "\\bestOutputFromBioProspectorMinus35.fna"));
             File logoMinus10 = getLogoMinus10();
             File logoMinus35 = getLogoMinus35();
-            logoMinus10.renameTo(new File(fileChooser.getSelectedFile().getAbsolutePath() + "\\sequenceLogoMinus10.png"));
-            logoMinus35.renameTo(new File(fileChooser.getSelectedFile().getAbsolutePath() + "\\sequenceLogoMinus35.png"));
+            logoMinus10.renameTo(new File(fileChooser.getSelectedFile().getAbsolutePath() + "\\sequenceLogoMinus10.eps"));
+            logoMinus35.renameTo(new File(fileChooser.getSelectedFile().getAbsolutePath() + "\\sequenceLogoMinus35.eps"));
             File info = getInfo();
             info.renameTo(new File(fileChooser.getSelectedFile().getAbsoluteFile() + "\\info.txt"));
             progressHandle.progress(2);

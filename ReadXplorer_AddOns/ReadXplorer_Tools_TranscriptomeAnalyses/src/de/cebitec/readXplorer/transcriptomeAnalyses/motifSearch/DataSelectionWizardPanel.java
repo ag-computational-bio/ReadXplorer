@@ -5,6 +5,7 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch;
 
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ElementsOfInterest;
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.PurposeEnum;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
@@ -17,6 +18,11 @@ public class DataSelectionWizardPanel implements WizardDescriptor.ValidatingPane
      * component from this class, just use getComponent().
      */
     private DataSelectionVisualPanel component;
+    private PurposeEnum purpose;
+
+    public DataSelectionWizardPanel(PurposeEnum purpose) {
+        this.purpose = purpose;
+    }
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -25,7 +31,7 @@ public class DataSelectionWizardPanel implements WizardDescriptor.ValidatingPane
     @Override
     public DataSelectionVisualPanel getComponent() {
         if (component == null) {
-            component = new DataSelectionVisualPanel();
+            component = new DataSelectionVisualPanel(this.purpose);
         }
         return component;
     }

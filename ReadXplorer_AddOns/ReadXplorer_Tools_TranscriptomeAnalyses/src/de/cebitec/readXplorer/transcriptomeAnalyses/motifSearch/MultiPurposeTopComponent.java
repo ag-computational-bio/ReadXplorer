@@ -45,12 +45,17 @@ public class MultiPurposeTopComponent extends TopComponentExtended {
                 if (msPanel.getBioProspOutMinus35().exists()) {
                     msPanel.getBioProspOutMinus35().delete();
                 }
+                File fileToDelete35 = new File(msPanel.getLogoMinus35().getParentFile() + "\\minusTenLogo.png");
+                fileToDelete35.delete();
+                File fileToDelete10 = new File(msPanel.getLogoMinus10().getParentFile() + "\\minus35Logo.png");
+                fileToDelete10.delete();
                 if (msPanel.getLogoMinus10() != null) {
                     msPanel.getLogoMinus10().delete();
                 }
                 if (msPanel.getLogoMinus35() != null) {
                     msPanel.getLogoMinus35().delete();
                 }
+
                 if (msPanel.getMinus10Input().exists()) {
                     msPanel.getMinus10Input().delete();
                 }
@@ -76,6 +81,8 @@ public class MultiPurposeTopComponent extends TopComponentExtended {
                     rbsPanel.getBioProspOut().delete();
                 }
                 if (rbsPanel.getSequenceLogo() != null) {
+                    File fileToDelete = new File(rbsPanel.getSequenceLogo().getParentFile() + "\\RBSLogo.png");
+                    fileToDelete.delete();
                     rbsPanel.getSequenceLogo().delete();
                 }
                 if (rbsPanel.getInfo().exists()) {

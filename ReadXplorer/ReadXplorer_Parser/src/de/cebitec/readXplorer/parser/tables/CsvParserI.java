@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.parser.tables;
 
+import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.prefs.CsvPreference;
 
 /**
@@ -24,7 +25,7 @@ import org.supercsv.prefs.CsvPreference;
  * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
  */
 public interface CsvParserI extends TableParserI {
-    
+
     /**
      * @param autoDelimiter <cc>true</cc>, if the delimiter shall be detected
      * automatically, <cc>false</cc>, if the delimiter was selected by the user.
@@ -35,5 +36,11 @@ public interface CsvParserI extends TableParserI {
      * @param csvPref The currently selected CsvPreference.
      */
     public void setCsvPref(CsvPreference csvPref);
-    
+
+    /**
+     *
+     * @param cellProcessors The currently CellProcessor for selected CSV table
+     */
+    public void setCellProscessors(CellProcessor[] cellProcessors);
+
 }

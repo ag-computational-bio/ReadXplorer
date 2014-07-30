@@ -21,14 +21,26 @@ public final class ElementsSelectionVisualPanel extends JPanel {
         return "Data selection";
     }
 
+    /**
+     *
+     * @return <true> if all elements are selected else <false>
+     */
     public boolean isAllElementsSelected() {
         return this.allElementsCB.isSelected();
     }
 
+    /**
+     *
+     * @return <true> if all elements with a 5'-UTR are selected else <false>
+     */
     public boolean isAllWithUtrSelected() {
         return this.allWithUTRCB.isSelected();
     }
 
+    /**
+     *
+     * @return <true> if only selected elements are selected else <false>
+     */
     public boolean isOnlyForUpstrAnalSelected() {
         return this.onlySelectedCB.isSelected();
     }

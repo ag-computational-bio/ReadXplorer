@@ -175,11 +175,20 @@ public class NovelTranscript extends TrackChromResultEntry {
         this.isConsidered = isConsidered;
     }
 
-    public boolean isIsFalsePositive() {
+    /**
+     *
+     * @return <true> if this instance is selected as false positive else
+     * <false>
+     */
+    public boolean isFalsePositiveSelected() {
         return isFalsePositive;
     }
 
-    public void setIsFalsePositive(boolean isFalsePositive) {
+    /**
+     *
+     * @param isFalsePositive <true> if selected as false positive else <false>
+     */
+    public void setFalsePositive(boolean isFalsePositive) {
         this.isFalsePositive = isFalsePositive;
     }
 

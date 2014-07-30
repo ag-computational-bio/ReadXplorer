@@ -286,6 +286,10 @@ public class ResultPanelOperonDetection extends ResultTablePanel implements Obse
                     progresshandle.progress(2);
                     exporter.start();
                     progresshandle.progress(3);
+                    progresshandle.progress(4);
+                    JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successfull!",
+                            "Export was successfull!", JOptionPane.INFORMATION_MESSAGE);
+                    progresshandle.finish();
                 }
 
                 @Override
@@ -295,10 +299,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel implements Obse
             };
 
             fileChooser.openFileChooser(ReadXplorerFileChooser.SAVE_DIALOG);
-            progresshandle.progress(4);
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successfull!",
-                    "Export was successfull!", JOptionPane.INFORMATION_MESSAGE);
-            progresshandle.finish();
+
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -403,7 +404,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel implements Obse
                             String[] rbss = split[5].split("-");
                             for (String rbs : rbss) {
                                 String[] promotor = rbs.split(";");
-                                op.addRbs(Integer.valueOf(Integer.valueOf(promotor[0])), Integer.valueOf(promotor[1]));
+                                op.addRbs(Integer.valueOf(promotor[0]), Integer.valueOf(promotor[1]));
                             }
 
                             operons.put(locus, op);
@@ -425,17 +426,18 @@ public class ResultPanelOperonDetection extends ResultTablePanel implements Obse
                 operonResult.setResults(currentOperons);
                 addResult(operonResult);
                 progresshandle.progress(2);
+                progresshandle.progress(3);
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successfull!",
+                        "Export was successfull!", JOptionPane.INFORMATION_MESSAGE);
+
+                progresshandle.finish();
             }
 
         };
 
         fileChooser.openFileChooser(ReadXplorerFileChooser.OPEN_DIALOG);
 
-        progresshandle.progress(3);
-        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successfull!",
-                "Export was successfull!", JOptionPane.INFORMATION_MESSAGE);
 
-        progresshandle.finish();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

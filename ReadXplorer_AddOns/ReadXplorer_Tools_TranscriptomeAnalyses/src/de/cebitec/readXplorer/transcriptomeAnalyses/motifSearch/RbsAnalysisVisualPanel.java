@@ -34,6 +34,7 @@ public final class RbsAnalysisVisualPanel extends JPanel {
         this.expectedMotifWidth.setInputVerifier(new IntegerVerifier(this.expectedMotifWidth));
         this.noOfTryingTF.setInputVerifier(new IntegerVerifier(this.noOfTryingTF));
         this.minSpacerTF.setInputVerifier(new IntegerVerifier(this.minSpacerTF));
+        this.lengthForAnalysis.setInputVerifier(new IntegerVerifier(this.lengthForAnalysis));
     }
 
     private void updateFields() {
@@ -41,6 +42,7 @@ public final class RbsAnalysisVisualPanel extends JPanel {
         this.expectedMotifWidth.setText(pref.get(wizardName + RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_LENGTH_MOTIFWIDTH, "6"));
         this.noOfTryingTF.setText(pref.get(wizardName + RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_NO_TRYING_BIOPROSPECTOR, "40"));
         this.minSpacerTF.setText(pref.get(wizardName + RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_MIN_SPACER, "6"));
+        this.lengthForAnalysis.setText(pref.get(wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS, "20"));
 
     }
 
@@ -54,6 +56,10 @@ public final class RbsAnalysisVisualPanel extends JPanel {
 
     public Integer getNoOfTrying() {
         return Integer.valueOf(this.noOfTryingTF.getText());
+    }
+
+    public Integer getLengthForAnalysis() {
+        return Integer.valueOf(this.lengthForAnalysis.getText());
     }
 
     public Integer getExpectedMotifWidth() {
@@ -81,6 +87,10 @@ public final class RbsAnalysisVisualPanel extends JPanel {
         jLabel4 = new javax.swing.JLabel();
         minSpacerTF = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
+        jSeparator2 = new javax.swing.JSeparator();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        lengthForAnalysis = new javax.swing.JTextField();
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cebitec/readXplorer/transcriptomeAnalyses/resources/rbsMotifSearchWizardFig.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(RbsAnalysisVisualPanel.class, "RbsAnalysisVisualPanel.jLabel1.text")); // NOI18N
@@ -104,6 +114,12 @@ public final class RbsAnalysisVisualPanel extends JPanel {
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(RbsAnalysisVisualPanel.class, "RbsAnalysisVisualPanel.jLabel2.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(RbsAnalysisVisualPanel.class, "RbsAnalysisVisualPanel.jLabel3.text")); // NOI18N
+
+        lengthForAnalysis.setText(org.openide.util.NbBundle.getMessage(RbsAnalysisVisualPanel.class, "RbsAnalysisVisualPanel.lengthForAnalysis.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -112,6 +128,7 @@ public final class RbsAnalysisVisualPanel extends JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jSeparator1)
+                    .addComponent(jSeparator2)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jLabel1)
@@ -132,7 +149,13 @@ public final class RbsAnalysisVisualPanel extends JPanel {
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(jButton1)
                                         .addGap(11, 11, 11)))))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel3)
+                        .addGap(18, 18, 18)
+                        .addComponent(lengthForAnalysis, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -153,7 +176,14 @@ public final class RbsAnalysisVisualPanel extends JPanel {
                     .addComponent(jLabel7)
                     .addComponent(noOfTryingTF, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton1))
-                .addGap(21, 21, 21))
+                .addGap(18, 18, 18)
+                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel3)
+                    .addComponent(lengthForAnalysis, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(15, 15, 15))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -167,10 +197,14 @@ public final class RbsAnalysisVisualPanel extends JPanel {
     private javax.swing.JTextField expectedMotifWidth;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JTextField lengthForAnalysis;
     private javax.swing.JTextField minSpacerTF;
     private javax.swing.JTextField noOfTryingTF;
     // End of variables declaration//GEN-END:variables

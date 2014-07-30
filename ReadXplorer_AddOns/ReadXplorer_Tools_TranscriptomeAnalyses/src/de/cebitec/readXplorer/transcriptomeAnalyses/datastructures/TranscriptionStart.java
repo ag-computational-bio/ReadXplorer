@@ -2,7 +2,6 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.datastructures;
 
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.TrackChromResultEntry;
-import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.ISequinExporter;
 import de.cebitec.readXplorer.util.FeatureType;
 
 /**
@@ -10,10 +9,10 @@ import de.cebitec.readXplorer.util.FeatureType;
  *
  * @author -Rolf Hilker-, modified by -jritter-
  */
-public class TranscriptionStart extends TrackChromResultEntry implements ISequinExporter {
+public class TranscriptionStart extends TrackChromResultEntry {
 
     private final int startPosition;
-    private boolean isFwdStrand;
+    private final boolean isFwdStrand;
     private int readStarts;
     private double relCount;
     private PersistantFeature detectedGene;
@@ -42,10 +41,10 @@ public class TranscriptionStart extends TrackChromResultEntry implements ISequin
      * Data structure for storing a gene start.
      *
      * @param tssStartPosition The position at which the gene start was detected
-     * @param isFwdStrand true, if the transcript start was detected on the fwd
-     * strand, false otherwise.
+     * @param isFwdStrand <true>, if the transcript start was detected on the
+     * fwd strand, <false> otherwise.
      * @param readStarts The number of read starts at the detected tss position
-     * @param relCount
+     * @param relCount readstarts/mappings per million
      * @param detectedGene feature in downstream direction rel. to the
      * transcription start site with offset > 0.
      * @param offset the distance between transcription start site and detected
@@ -60,14 +59,10 @@ public class TranscriptionStart extends TrackChromResultEntry implements ISequin
      * @param offsetToNextDownstreamFeature if a transcription start site is in
      * between an accupied feature region, than this is the offset to the next
      * feature lying in downstream direction.
-     * @param promotorSequence Sequence in upstream direction rel. to the
-     * transcription start site.
-     * @param leaderless
-     * @param cdsShift
-     * @param detectedFeatStart
-     * @param detectedFeatStop
-     * @param isInternal
-     * @param putAS
+     * @param leaderless <true> if transcript is leaderless else <false>
+     * @param cdsShift <true> if putative CDS-shift was detected else <false>
+     * @param isInternal internal location
+     * @param putAS putative antisense
      * @param trackId Track ID.
      * @param chromId Chromosome ID.
      *
@@ -135,11 +130,13 @@ public class TranscriptionStart extends TrackChromResultEntry implements ISequin
     }
 
     /**
+     * Alternative Constructor.
      *
-     * @param startPosition
-     * @param isFwdStrand
-     * @param chromosomeId
-     * @param trackId
+     * @param startPosition The position at which the gene start was detected
+     * @param isFwdStrand <true>, if the transcript start was detected on the
+     * fwd strand, <false> otherwise.
+     * @param chromosomeId Chromosome ID.
+     * @param trackId Track ID.
      */
     public TranscriptionStart(int startPosition, boolean isFwdStrand, int chromosomeId, int trackId) {
         super(trackId, chromosomeId);
@@ -594,79 +591,155 @@ public class TranscriptionStart extends TrackChromResultEntry implements ISequin
         this.hasPromtorFeaturesAssigned = isAssigned;
     }
 
+    /**
+     * 
+     * @return 
+     */
     public boolean isConsideredTSS() {
         return isConsideredTSS;
     }
 
+    /**
+     * 
+     * @param isconsideredTSS 
+     */
     public void setIsconsideredTSS(boolean isconsideredTSS) {
         this.isConsideredTSS = isconsideredTSS;
     }
 
+    /**
+     * 
+     * @return 
+     */
     public String getComment() {
         return comment;
     }
 
+    /**
+     * 
+     * @param comment 
+     */
     public void setComment(String comment) {
         this.comment = comment;
     }
 
+    /**
+     * 
+     * @return 
+     */
     public boolean isFalsePositive() {
         return falsePositive;
     }
 
+    /**
+     * 
+     * @param falsePositive 
+     */
     public void setFalsePositive(boolean falsePositive) {
         this.falsePositive = falsePositive;
     }
 
+    /**
+     * 
+     * @return 
+     */
     public boolean isIntergenicTSS() {
         return intergenicTSS;
     }
 
+    /**
+     * 
+     * @param intergenicTSS 
+     */
     public void setIntergenicTSS(boolean intergenicTSS) {
         this.intergenicTSS = intergenicTSS;
     }
 
+    /**
+     * 
+     * @param leaderless 
+     */
     public void setLeaderless(boolean leaderless) {
         this.leaderless = leaderless;
     }
 
+    /**
+     * 
+     * @param intragenicTSS 
+     */
     public void setIntragenicTSS(boolean intragenicTSS) {
         this.intragenicTSS = intragenicTSS;
     }
 
+    /**
+     * 
+     * @return 
+     */
     public boolean isIs3PrimeUtrAntisense() {
         return is3PrimeUtrAntisense;
     }
 
+    /**
+     * 
+     * @param is3PrimeUtrAntisense 
+     */
     public void setIs3PrimeUtrAntisense(boolean is3PrimeUtrAntisense) {
         this.is3PrimeUtrAntisense = is3PrimeUtrAntisense;
     }
 
+    /**
+     * 
+     * @return 
+     */
     public boolean isIs5PrimeUtrAntisense() {
         return is5PrimeUtrAntisense;
     }
 
+    /**
+     * 
+     * @param is5PrimeUtrAntisense 
+     */
     public void setIs5PrimeUtrAntisense(boolean is5PrimeUtrAntisense) {
         this.is5PrimeUtrAntisense = is5PrimeUtrAntisense;
     }
 
+    /**
+     * 
+     * @return 
+     */
     public FeatureType getAssignedFeatureType() {
         return assignedFeatureType;
     }
 
+    /**
+     * 
+     * @param assignedFeatureType 
+     */
     public void setAssignedFeatureType(FeatureType assignedFeatureType) {
         this.assignedFeatureType = assignedFeatureType;
     }
 
+    /**
+     * 
+     * @return 
+     */
     public boolean isAssignedToStableRNA() {
         return assignedToStableRNA;
     }
 
+    /**
+     * 
+     * @param assignedToStableRNA 
+     */
     public void setAssignedToStableRNA(boolean assignedToStableRNA) {
         this.assignedToStableRNA = assignedToStableRNA;
     }
 
-    public int getOffsetOfTss() {
+    /**
+     * 
+     * @return 
+     */
+    public int getOffsetToAssignedFeature() {
         if (detectedGene != null) {
             return this.offset;
         } else if (nextDownstreamFeature != null) {

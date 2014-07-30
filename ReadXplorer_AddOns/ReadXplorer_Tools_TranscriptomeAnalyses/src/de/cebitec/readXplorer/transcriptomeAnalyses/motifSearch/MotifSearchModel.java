@@ -1,7 +1,6 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch;
 
 import de.cebitec.readXplorer.databackend.ParameterSetI;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
@@ -53,31 +52,30 @@ public class MotifSearchModel implements Observer {
 
     private TreeMap<String, String> upstreamRegionsInHash;
     private TreeMap<String, Integer> contributedSequencesWithShift;
-    private File logoMinus10, logoMinus35, logoRbs;
+    private File logoMinus10, logoMinus35, logoRbs, minus10Input, minus35Input,
+            bioProspOutMinus10, bioProspOutMinus35, info, rbsBioProspectorInput,
+            rbsBioProsFirstHit;
     private final PersistantReference ref;
     private List<String> upstreamRegions;
-    private float meanMinus10SpacerToTSS, meanMinus35SpacerToMinus10;
-    private float meanSpacerLengthOfRBSMotif;
-    private final ProgressHandle progressHandlePromotorAnalysis, progressHandleRbsAnalysis;
+    private float meanMinus10SpacerToTSS, meanMinus35SpacerToMinus10,
+            meanSpacerLengthOfRBSMotif;
+    private final ProgressHandle progressHandlePromotorAnalysis,
+            progressHandleRbsAnalysis;
     private final String handlerTitlePromotorAnalysis, handlerTitleRBSAnalysis;
     private List<String> minus10AnalysisStrings, minus35AnalysisStrings;
-    private float contributingCitesForMinus10Motif, contributingCitesForMinus35Motif, contributingCitesForRbsMotif;
+    private float contributingCitesForMinus10Motif, contributingCitesForMinus35Motif,
+            contributingCitesForRbsMotif;
     private int alternativeSpacer;
     private TreeMap<String, Integer> minus10MotifStarts, minus35MotifStarts, rbsStarts;
-    private File rbsBioProspectorInput, rbsBioProsFirstHit;
-    private JTextPane regionsRelToTLSTextPane;
-    private JTextPane regionsForMotifSearch;
-    private JLabel rbsLogoLabel;
-    private File minus10Input, minus35Input, bioProspOutMinus10, bioProspOutMinus35, info;
-    private JTextPane regionOfIntrestMinus10, regionOfIntrestMinus35;
-    private TreeMap<String, Integer> idsToMinus10Shifts;
-    private TreeMap<String, Integer> idsToMinus35Shifts;
+    private JTextPane regionsRelToTLSTextPane, regionsForMotifSearch,
+            regionOfIntrestMinus10, regionOfIntrestMinus35;
+    private JLabel rbsLogoLabel, minus10logoLabel, minus35LogoLabel;
+    private TreeMap<String, Integer> idsToMinus10Shifts, idsToMinus35Shifts;
     private StyledDocument coloredPromotorRegions;
-    private JLabel minus10logoLabel;
-    private JLabel minus35LogoLabel;
     private TreeMap<String, TranscriptionStart> locusToTSSs;
 
     /**
+     * Provides all methods for the automated motif search analysis.
      *
      * @param refViewer
      */
@@ -90,12 +88,14 @@ public class MotifSearchModel implements Observer {
     }
 
     /**
-     * This method provide a motif search for cosensus regions in 5'-UTR,
+     * This method provides a motif search for cosensus regions in 5'-UTR,
      * usually the -35 and -10 region.
      *
      * @param params instance of PromotorSearchParameters.
+     * @param starts list of transcriptions start sites from which the 5'-UTR
+     * have to be analysed
      */
-    public boolean utrPromotorAnalysis(PromotorSearchParameters params, List<TranscriptionStart> starts, List<Operon> operons) {
+    public boolean utrPromotorAnalysis(PromotorSearchParameters params, List<TranscriptionStart> starts) {
         boolean success = true;
         this.alternativeSpacer = params.getAlternativeSpacer();
         minus10MotifStarts = new TreeMap<>();
@@ -232,7 +232,7 @@ public class MotifSearchModel implements Observer {
             }
 
             calcMotifStartsAndMeanSpacerLength(this.upstreamRegions, idsToMinus10Shifts, idsToMinus35Shifts, params);
-            setMotifSearchResults(starts, operons, this.minus10MotifStarts, this.minus35MotifStarts, params);
+            setMotifSearchResults(starts, this.minus10MotifStarts, this.minus35MotifStarts, params);
 
             progressHandlePromotorAnalysis.progress("Starting promotor analysis ...", 70);
 
@@ -244,21 +244,27 @@ public class MotifSearchModel implements Observer {
             int logoStart10 = Math.round(this.meanMinus10SpacerToTSS + params.getMinusTenMotifWidth());
 
             this.logoMinus10 = generateSeqLogo(2.0, bioProspOutMinus10, workingDir.getAbsolutePath() + "\\minusTenLogo",
-                    "PNG", 8.0, -logoStart10, 15, true, true);
+                    "EPS", 8.0, -logoStart10, 15, true, true);
+//            File logoMinus10_show_in_Panel = generateSeqLogo(2.0, bioProspOutMinus10, workingDir.getAbsolutePath() + "\\minusTenLogoPanel",
+//                    "PNG", 8.0, -logoStart10, 15, true, true);
+            File logoMinus10_show_in_Panel = convertEpsToPng(logoMinus10.getAbsolutePath() + ".eps", 15, 8);
 
-            if (logoMinus10 != null) {
+            if (logoMinus10_show_in_Panel != null) {
                 minus10logoLabel = new JLabel();
-                Icon icon1 = new ImageIcon(this.logoMinus10.getAbsolutePath() + ".png");
+                Icon icon1 = new ImageIcon(logoMinus10_show_in_Panel.getAbsolutePath());
                 minus10logoLabel.setIcon(icon1);
 
                 int logoStart35 = Math.round(this.meanMinus35SpacerToMinus10 + params.getMinus35MotifWidth() + logoStart10);
                 progressHandlePromotorAnalysis.progress("Starting promotor analysis ...", 90);
 
                 this.logoMinus35 = generateSeqLogo(2.0, bioProspOutMinus35, workingDir.getAbsolutePath() + "\\minus35Logo",
-                        "PNG", 8.0, -logoStart35, 15, true, true);
+                        "EPS", 8.0, -logoStart35, 15, true, true);
+//                File logoMinus35_show_in_Panel = generateSeqLogo(2.0, bioProspOutMinus35, workingDir.getAbsolutePath() + "\\minus35LogoPanel",
+//                        "PNG", 8.0, -logoStart35, 15, true, true);
+                File logoMinus35_show_in_Panel = convertEpsToPng(logoMinus35.getAbsolutePath() + ".eps", 15, 8);
 
                 minus35LogoLabel = new JLabel();
-                Icon icon2 = new ImageIcon(this.logoMinus35.getAbsolutePath() + ".png");
+                Icon icon2 = new ImageIcon(logoMinus35_show_in_Panel.getAbsolutePath());
                 minus35LogoLabel.setIcon(icon2);
 
                 writeInfoFile(info, false, meanMinus10SpacerToTSS, meanMinus35SpacerToMinus10, (int) contributingCitesForMinus10Motif, (int) contributingCitesForMinus35Motif, upstreamRegions.size() / 2, params);
@@ -279,6 +285,9 @@ public class MotifSearchModel implements Observer {
     /**
      *
      * @param rbsParams
+     * @param starts
+     * @param operons
+     * @return
      */
     public boolean rbsMotifAnalysis(RbsAnalysisParameters rbsParams, List<TranscriptionStart> starts, List<Operon> operons) {
         boolean success = true;
@@ -357,10 +366,13 @@ public class MotifSearchModel implements Observer {
             logoStart += rbsParams.getMotifWidth();
 
             this.logoRbs = generateSeqLogo(2.0, rbsBioProsFirstHit, parentDir.getAbsolutePath() + "\\RBSLogo",
-                    "PNG", 8.0, -logoStart, 15, true, true);
-            if (logoRbs != null) {
+                    "EPS", 8.0, -logoStart, 15, true, true);
+//            File logoRbs_inPanel = generateSeqLogo(2.0, rbsBioProsFirstHit, parentDir.getAbsolutePath() + "\\RBSLogo_show_in_panel",
+//                    "PNG", 8.0, -logoStart, 15, true, true);
+            File logoRbs_inPanel = convertEpsToPng(logoRbs.getAbsolutePath() + ".eps", 15.0, 8.0);
+            if (logoRbs_inPanel != null && logoRbs_inPanel.exists()) {
                 rbsLogoLabel = new JLabel();
-                Icon icon = new ImageIcon(this.logoRbs.getAbsolutePath() + ".png");
+                Icon icon = new ImageIcon(logoRbs_inPanel.getAbsolutePath());
                 rbsLogoLabel.setIcon(icon);
 
                 writeInfoFile(info, true, meanSpacerLengthOfRBSMotif, 0, (int) contributingCitesForRbsMotif, 0, upstreamRegions.size() / 2, rbsParams);
@@ -382,11 +394,11 @@ public class MotifSearchModel implements Observer {
      * This method execute the BioProspector binary with the following
      * parameters.
      *
-     * @param inputFilePath
-     * @param outputFile
-     * @param motifWidth
-     * @param noOfCycles
-     * @param noOfTopMotifs
+     * @param inputFilePath absolute path to the input file
+     * @param outputFile absolute path to the output file
+     * @param motifWidth width of the motif
+     * @param noOfCycles number of cycles
+     * @param noOfTopMotifs number of top motifs
      * @param justExamineFwd
      * @throws IOException
      */
@@ -398,8 +410,6 @@ public class MotifSearchModel implements Observer {
         String cmd = NbPreferences.forModule(Object.class).get("bioprospector location", "");
         File file = new File(cmd);
         if (file.exists() && file.canExecute() && file.isDirectory() == false) {
-//        String cmd = "C:\\Users\\jritter\\Documents\\MA-Thesis\\BioProspector.2004\\BioProspector.exe";
-//        String cmd = "C:\\BioProspector.2004\\BioProspector.exe";
             List<String> commandArguments = new ArrayList<>();
             commandArguments.add(cmd);
             commandArguments.add("-i");
@@ -467,8 +477,7 @@ public class MotifSearchModel implements Observer {
      * This method writes all regions of interest for the Motif detection into a
      * file.
      *
-     * @param workDir
-     * @param nameOfRegion
+     * @param outFile output file
      * @param seqs
      * @param noOfBasesToTSS
      * @param spacer
@@ -483,7 +492,6 @@ public class MotifSearchModel implements Observer {
             int spacer, int seqLengthForMotifSearch, int spacer2,
             int seqLengthForMotifSearch2, TreeMap<String, Integer> alignmentShifts) {
 
-        Writer writer = null;
         int cnt = 1;
         int shift = 0;
         boolean isShifts = false;
@@ -493,9 +501,8 @@ public class MotifSearchModel implements Observer {
             isShifts = true;
         }
 
-        try {
-            writer = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(outFile.getAbsolutePath()), "utf-8"));
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(outFile.getAbsolutePath()), "utf-8"))) {
             for (String string : seqs) {
                 if (cnt == 1) {
                     if (isShifts) {
@@ -538,13 +545,7 @@ public class MotifSearchModel implements Observer {
 
         } catch (IOException ex) {
             // report
-        } finally {
-            try {
-                writer.close();
-            } catch (Exception ex) {
-            }
         }
-//        return outFile;
     }
 
     /**
@@ -597,7 +598,6 @@ public class MotifSearchModel implements Observer {
                 }
             }
         }
-//        storeRbsAnalysisResults(this.rbsStarts, tss, rbsShifts, params, operons);
         return sumOfMinsSpacer / contributingCitesForRbsMotif;
     }
 
@@ -611,7 +611,6 @@ public class MotifSearchModel implements Observer {
      * @param shifts10 shifts to the -10 motif start.
      * @param shifts35 shifts to the -35 motif start.
      * @param params instance of PromotorSearchParameters.
-     * @return
      */
     private void calcMotifStartsAndMeanSpacerLength(List<String> upstreamRegions, TreeMap<String, Integer> shifts10,
             TreeMap<String, Integer> shifts35, PromotorSearchParameters params) {
@@ -728,9 +727,9 @@ public class MotifSearchModel implements Observer {
      * Colorize the defined range between start and stop with the given color.
      *
      * @param styledDoc StyledDocument in which the subregion have to be toned.
-     * @param start Start position of coloring.
-     * @param length Length of subregion to be toned.
-     * @param color Color.
+     * @param start Start position of coloring
+     * @param length length of subregion to be toned.
+     * @param color tone color
      */
     private void colorSubstringsInStyledDocument(JTextPane textPane, Font font, int start, int length, Color color) {
         // Start with the current input attributes for the JTextPane. This
@@ -787,8 +786,6 @@ public class MotifSearchModel implements Observer {
 
         File file = new File(cmd);
         if (file.exists() && file.canExecute() && file.isDirectory() == false) {
-//        String cmd = "C:\\Users\\jritter\\Documents\\MA-Thesis\\weblogo\\seqlogo";
-//        String cmd = "C:\\weblogo\\seqlogo";
             List<String> commandArguments = new ArrayList<>();
             commandArguments.add(perl);
             commandArguments.add(cmd);
@@ -871,58 +868,59 @@ public class MotifSearchModel implements Observer {
         int tssStart;
         int uniqueIdx = 1;
 
+        if (isRbsAnalysis) {
+            if (type == ElementsOfInterest.ELEMENTS_FOR_RBS_ANALYSIS) {
+                for (TranscriptionStart tss : allStarts) {
+                    // take only tss with an assigned feature, and only non leaderless
+                    // if intragenic tss, than the tss.getNextGene()
+                    currentFeature = tss.getAssignedFeature();
+
+                    if (currentFeature != null && !tss.isLeaderless()) {
+                        if (tss.isIntergenicTSS() && tss.getNextGene() != null) {
+                            currentFeature = tss.getNextGene();
+                        }
+
+                        locus = currentFeature.getLocus();
+
+                        tss.setRbsSequenceLength(length);
+                        tss.setAdditionalIdentyfier(locus);
+
+                        if (!locusToTSSs.containsKey(locus)) {
+                            // add header in array
+                            this.upstreamRegions.add(">" + locus + "\n");
+                            getUpstreamRegionRelToFeatureStart(currentFeature, length);
+                            locusToTSSs.put(locus, tss);
+                        }
+                    }
+                }
+            }
+        }
+
         if (type == ElementsOfInterest.ALL) {
             for (TranscriptionStart tss : allStarts) {
                 currentFeature = tss.getAssignedFeature();
-
-                if (isRbsAnalysis && currentFeature != null) {
-                    locus = currentFeature.getLocus();
-
-                    tss.setRbsSequenceLength(length);
-                    tss.setAdditionalIdentyfier(locus);
-
-                    if (!locusToTSSs.containsKey(locus)) {
-                        // add header in array
-                        this.upstreamRegions.add(">" + locus + "\n");
-                        getUpstreamRegionRelToFeatureStart(tss, currentFeature, length);
-                        locusToTSSs.put(locus, tss);
-                    }
-                } else if (!isRbsAnalysis) {
-                    if (currentFeature != null) {
-                        newLocus = currentFeature.getLocus() + "_" + uniqueIdx;
-                    } else {
-                        newLocus = "putative_novel_transcript" + "_" + uniqueIdx;
-                    }
-                    tss.setPromotorSequenceLength(length);
-                    tss.setAdditionalIdentyfier(newLocus);
-                    tssStart = tss.getStartPosition();
-
-                    this.upstreamRegions.add(">" + newLocus + "\n");
-                    getPromotorSubstring(tss, tssStart, length, newLocus);
-                    uniqueIdx++;
+                if (currentFeature != null) {
+                    newLocus = currentFeature.getLocus() + "_" + uniqueIdx;
+                } else {
+                    newLocus = "putative_novel_transcript_" + tss.getStartPosition() + "_" + uniqueIdx;
                 }
+                tss.setPromotorSequenceLength(length);
+                tss.setAdditionalIdentyfier(newLocus);
+                tssStart = tss.getStartPosition();
+
+                this.upstreamRegions.add(">" + newLocus + "\n");
+                getPromotorSubstring(tss, tssStart, length, newLocus);
+                uniqueIdx++;
             }
         } else if (type == ElementsOfInterest.ONLY_ANTISENSE_TSS) {
             for (TranscriptionStart tss : allStarts) {
                 currentFeature = tss.getAssignedFeature();
 
-                if (isRbsAnalysis && tss.isPutativeAntisense() && currentFeature != null) {
-                    locus = currentFeature.getLocus();
-
-                    tss.setRbsSequenceLength(length);
-                    tss.setAdditionalIdentyfier(locus);
-
-                    if (!locusToTSSs.containsKey(locus)) {
-                        // add header in array
-                        this.upstreamRegions.add(">" + locus + "\n");
-                        getUpstreamRegionRelToFeatureStart(tss, currentFeature, length);
-                        locusToTSSs.put(locus, tss);
-                    }
-                } else if (tss.isPutativeAntisense() && !isRbsAnalysis) {
+                if (tss.isPutativeAntisense()) {
                     if (currentFeature != null) {
                         newLocus = currentFeature.getLocus() + "_" + uniqueIdx;
                     } else {
-                        newLocus = "novelTranscript" + "_" + uniqueIdx;
+                        newLocus = "novelTranscript_" + tss.getStartPosition() + "_" + uniqueIdx;
                     }
 
                     tss.setPromotorSequenceLength(length);
@@ -938,19 +936,7 @@ public class MotifSearchModel implements Observer {
                 currentFeature = tss.getAssignedFeature();
                 tssStart = tss.getStartPosition();
 
-                if (isRbsAnalysis && tss.isLeaderless() && currentFeature != null) {
-                    locus = currentFeature.getLocus();
-
-                    tss.setAdditionalIdentyfier(locus);
-                    tss.setRbsSequenceLength(length);
-
-                    if (!locusToTSSs.containsKey(locus)) {
-                        // add header in array
-                        this.upstreamRegions.add(">" + locus + "\n");
-                        getUpstreamRegionRelToFeatureStart(tss, currentFeature, length);
-                        locusToTSSs.put(locus, tss);
-                    }
-                } else if (tss.isLeaderless() && !isRbsAnalysis) {
+                if (tss.isLeaderless()) {
                     newLocus = currentFeature.getLocus() + "_" + uniqueIdx;
 
                     tss.setAdditionalIdentyfier(newLocus);
@@ -964,19 +950,8 @@ public class MotifSearchModel implements Observer {
             for (TranscriptionStart tss : allStarts) {
                 currentFeature = tss.getAssignedFeature();
 
-                if (isRbsAnalysis && currentFeature != null && !tss.isPutativeAntisense() && !tss.isLeaderless() && !tss.isIntragenicTSS()) {
-                    locus = currentFeature.getLocus();
-
-                    tss.setRbsSequenceLength(length);
-                    tss.setAdditionalIdentyfier(locus);
-
-                    if (!locusToTSSs.containsKey(locus)) {
-                        // add header in array
-                        this.upstreamRegions.add(">" + locus + "\n");
-                        getUpstreamRegionRelToFeatureStart(tss, currentFeature, length);
-                        locusToTSSs.put(locus, tss);
-                    }
-                } else if (!tss.isPutativeAntisense() && !tss.isLeaderless() && (tss.isIntragenicTSS() && tss.getOffsetToNextDownstrFeature() > 0) && !isRbsAnalysis) {
+                if (!tss.isPutativeAntisense() && !tss.isLeaderless()
+                        || (tss.isIntragenicTSS() && tss.getOffsetToNextDownstrFeature() > 0)) {
                     if (currentFeature != null) {
                         newLocus = currentFeature.getLocus() + "_" + uniqueIdx;
 
@@ -994,23 +969,11 @@ public class MotifSearchModel implements Observer {
                 currentFeature = tss.getAssignedFeature();
                 tssStart = tss.getStartPosition();
 
-                if (isRbsAnalysis && tss.isSelected() && currentFeature != null) {
-                    locus = currentFeature.getLocus();
-
-                    tss.setRbsSequenceLength(length);
-                    tss.setAdditionalIdentyfier(locus);
-
-                    if (!locusToTSSs.containsKey(locus)) {
-                        // add header in array
-                        this.upstreamRegions.add(">" + locus + "\n");
-                        getUpstreamRegionRelToFeatureStart(tss, currentFeature, length);
-                        locusToTSSs.put(currentFeature.getLocus(), tss);
-                    }
-                } else if (tss.isSelected() && !isRbsAnalysis) {
+                if (tss.isSelected()) {
                     if (currentFeature != null) {
                         newLocus = currentFeature.getLocus() + "_" + uniqueIdx;
                     } else {
-                        newLocus = "novelTranscript" + "_" + uniqueIdx;
+                        newLocus = "novelTranscript_" + tss.getStartPosition() + "_" + uniqueIdx;
                     }
 
                     tss.setPromotorSequenceLength(length);
@@ -1039,21 +1002,21 @@ public class MotifSearchModel implements Observer {
         if (tss.isFwdStrand()) {
             if (tssStart < length) {
                 int a = length - tssStart;
-                String substr1 = ref.getChromSequence(tss.getChromId(), chromLength - a - 1, chromLength);
+                String substr1 = ref.getChromSequence(tss.getChromId(), chromLength - a, chromLength);
                 String substr2 = ref.getChromSequence(tss.getChromId(), 0, tssStart - 1);
                 substr = substr1 + substr2;
             } else {
-                substr = ref.getChromSequence(tss.getChromId(), tssStart - (length + 1), tssStart - 1);
+                substr = ref.getChromSequence(tss.getChromId(), tssStart - length, tssStart - 1);
             }
             upstreamRegions.add(substr + "\n");
             this.upstreamRegionsInHash.put(newLocus, substr + "\n");
         } else {
             if (tssStart + length > chromLength) {
-                String substr1 = ref.getChromSequence(tss.getChromId(), tssStart - 1, chromLength);
+                String substr1 = ref.getChromSequence(tss.getChromId(), tssStart + 1, chromLength);
                 String substr2 = ref.getChromSequence(tss.getChromId(), 0, length - (chromLength - tssStart));
                 substr = substr1 + substr2;
             } else {
-                substr = SequenceUtils.getReverseComplement(ref.getChromSequence(tss.getChromId(), tssStart, tssStart + (length + 1)));
+                substr = SequenceUtils.getReverseComplement(ref.getChromSequence(tss.getChromId(), tssStart + 1, tssStart + length));
             }
             upstreamRegions.add(substr + "\n");
             this.upstreamRegionsInHash.put(newLocus, substr + "\n");
@@ -1069,21 +1032,22 @@ public class MotifSearchModel implements Observer {
      * @param currentFeature PersistantFeature which is assigned to the tss
      * @param length of the upstream region to extract
      */
-    private void getUpstreamRegionRelToFeatureStart(TranscriptionStart tss, PersistantFeature currentFeature, int length) {
+    private void getUpstreamRegionRelToFeatureStart(PersistantFeature currentFeature, int length) {
         int featureStart;
         String substr = "";
         String locus = currentFeature.getLocus();
-        int chromLength = ref.getChromosome(tss.getChromId()).getLength();
-        if (tss.isFwdStrand()) {
+        int chromId = currentFeature.getChromId();
+        int chromLength = ref.getChromosome(chromId).getLength();
+        if (currentFeature.isFwdStrand()) {
             featureStart = currentFeature.getStart();
             if (featureStart < length) {
                 // TODO
                 int a = length - featureStart;
-                String substr1 = ref.getChromSequence(tss.getChromId(), chromLength - a - 1, chromLength);
-                String substr2 = ref.getChromSequence(tss.getChromId(), 0, featureStart - 1);
+                String substr1 = ref.getChromSequence(chromId, chromLength - a, chromLength);
+                String substr2 = ref.getChromSequence(chromId, 0, featureStart - 1);
                 substr = substr1 + substr2;
             } else {
-                substr = ref.getChromSequence(tss.getChromId(), featureStart - (length + 1), featureStart - 1);
+                substr = ref.getChromSequence(chromId, featureStart - length, featureStart - 1);
             }
             upstreamRegions.add(substr + "\n");
             this.upstreamRegionsInHash.put(locus, substr + "\n");
@@ -1091,11 +1055,11 @@ public class MotifSearchModel implements Observer {
             featureStart = currentFeature.getStop();
             if (featureStart + length > chromLength) {
                 // TODO
-                String substr1 = ref.getChromSequence(tss.getChromId(), featureStart - 1, chromLength);
-                String substr2 = ref.getChromSequence(tss.getChromId(), 0, length - (chromLength - featureStart));
+                String substr1 = ref.getChromSequence(chromId, featureStart + 1, chromLength);
+                String substr2 = ref.getChromSequence(chromId, 0, length - (chromLength - featureStart));
                 substr = substr1 + substr2;
             } else {
-                substr = SequenceUtils.getReverseComplement(ref.getChromSequence(tss.getChromId(), featureStart, featureStart + (length + 1)));
+                substr = SequenceUtils.getReverseComplement(ref.getChromSequence(chromId, featureStart + 1, featureStart + length));
             }
             upstreamRegions.add(substr + "\n");
             this.upstreamRegionsInHash.put(locus, substr + "\n");
@@ -1103,15 +1067,16 @@ public class MotifSearchModel implements Observer {
     }
 
     /**
+     * Writes all sequences used for the RBS-analysis into a file. This file
+     * will be the input file for the motif search tool BioProspector.
      *
      * @param rbsBioProspectorInput Output file for the BioProspector input.
      * @param rbsParams RbsAnalysisParameters
      */
     private void writeSeqForRbsAnalysisInFile(File rbsBioProspectorInput, RbsAnalysisParameters rbsParams) {
-        try {
-            Writer writer = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(rbsBioProspectorInput.getAbsolutePath()), "utf-8"));
 
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(rbsBioProspectorInput.getAbsolutePath()), "utf-8"))) {
             for (String region : this.upstreamRegions) {
                 if (region.startsWith(">")) {
                     writer.write(region);
@@ -1120,7 +1085,6 @@ public class MotifSearchModel implements Observer {
                     writer.write(subregionForMotifSearch + "\n");
                 }
             }
-            writer.close();
 
         } catch (UnsupportedEncodingException ex) {
             Exceptions.printStackTrace(ex);
@@ -1130,82 +1094,23 @@ public class MotifSearchModel implements Observer {
     }
 
     /**
-     *
-     * @param operons
-     * @param length
-     * @param isRbsAnalysis
-     */
-    public void takeSubRegionsForOperonAnalysis(List<Operon> operons, int length, boolean isRbsAnalysis) {
-        if (isRbsAnalysis) {
-            progressHandleRbsAnalysis.start(100);
-            progressHandleRbsAnalysis.progress(10);
-        } else {
-            progressHandlePromotorAnalysis.start(100);
-            progressHandlePromotorAnalysis.progress(10);
-        }
-
-        this.upstreamRegions = new ArrayList<>();
-        this.upstreamRegionsInHash = new TreeMap<>();
-        PersistantFeature leadingFeature = null;
-        String substr = "";
-        int featureStart;
-        int uniqueIdx = 1;
-
-        for (Operon operon : operons) {
-
-            leadingFeature = operon.getOperonAdjacencies().get(0).getFeature1();
-            String uniqueLocus = leadingFeature.getLocus() + "_" + uniqueIdx;
-            if (isRbsAnalysis) {
-                operon.setRbsSequenceLength(length);
-                operon.setAdditionalLocus(uniqueLocus);
-
-                // add header in array
-                this.upstreamRegions.add(">" + uniqueLocus + "\n");
-                if (operon.isFwd()) {
-                    featureStart = leadingFeature.getStart();
-                    substr = this.ref.getChromSequence(leadingFeature.getChromId(), featureStart - length, featureStart);
-                    upstreamRegions.add(substr + "\n");
-                    this.upstreamRegionsInHash.put(uniqueLocus, substr + "\n");
-                } else {
-                    featureStart = leadingFeature.getStop();
-                    substr = this.ref.getChromSequence(leadingFeature.getChromId(), featureStart, featureStart + length);
-                    upstreamRegions.add(substr + "\n");
-                    this.upstreamRegionsInHash.put(uniqueLocus, substr + "\n");
-                }
-            } else {
-                operon.setPromotorSequenceLength(length);
-                operon.setAdditionalLocus(uniqueLocus);
-                int transkriptStart = operon.getStartPositionOfOperonTranscript();
-                this.upstreamRegions.add(">" + uniqueLocus + "\n");
-                if (operon.isFwd()) {
-                    substr = this.ref.getChromSequence(leadingFeature.getChromId(), transkriptStart - length, transkriptStart);
-                    upstreamRegions.add(substr + "\n");
-                    this.upstreamRegionsInHash.put(uniqueLocus, substr + "\n");
-                } else {
-                    substr = this.ref.getChromSequence(leadingFeature.getChromId(), transkriptStart, transkriptStart + length);
-                    upstreamRegions.add(substr + "\n");
-                    this.upstreamRegionsInHash.put(uniqueLocus, substr + "\n");
-                }
-            }
-            uniqueIdx++;
-        }
-    }
-
-    /**
      * Wrapper method to start the executeBioProspector method.
      *
      * @param workingDir Current working directory File instance.
-     * @param rbsBioProspectorInput
-     * @param bioProspectorOut
-     * @param rbsParams
+     * @param rbsBioProspectorInput Input file for motif analysis tool
+     * BioProspector
+     * @param bioProspectorOut Output file of the motif search tool
+     * BioProspector
+     * @param rbsParams RbsAnalysisParameters
      * @param rbsBioProsFirstHit File instance, contains the parsed output (best
      * hit from BioProspector).
+     * @return <true> if excecution wass seccessfully, else <false>
      */
     private boolean runBioProspForRbsAnalysis(File workingDir, File rbsBioProspectorInput, RbsAnalysisParameters rbsParams, File rbsBioProsFirstHit) {
         boolean success = false;
         if (workingDir.isDirectory()) {
             String posixPath = "/cygdrive/c";
-            String sub = rbsBioProspectorInput.getAbsolutePath().toString().substring(2);
+            String sub = rbsBioProspectorInput.getAbsolutePath().substring(2);
             posixPath += sub.replaceAll("\\\\", "/");
 
             try {
@@ -1225,12 +1130,12 @@ public class MotifSearchModel implements Observer {
      * positions at which the -10 and -35 motif starts and which length the
      * motifs have.
      *
-     * @param starts List of Transcription start site instances.
-     * @param minus10Starts
-     * @param minus35Starts
-     * @param params
+     * @param starts List of Transcription start sites
+     * @param minus10Starts all detected -10 start sites
+     * @param minus35Starts all detected -35 start sites
+     * @param params PromotorSearchParameters instance
      */
-    private void setMotifSearchResults(List<TranscriptionStart> starts, List<Operon> operons, TreeMap<String, Integer> minus10Starts, TreeMap<String, Integer> minus35Starts, PromotorSearchParameters params) {
+    private void setMotifSearchResults(List<TranscriptionStart> starts, TreeMap<String, Integer> minus10Starts, TreeMap<String, Integer> minus35Starts, PromotorSearchParameters params) {
 
         if (starts != null) {
             // Setting start positions of Promotorelements (-35 -10) to TSS objects
@@ -1241,12 +1146,11 @@ public class MotifSearchModel implements Observer {
                     startsInTreeMap.put(tss.getAdditionalIdentyfier(), tss);
                 }
             }
-            for (int i = 0; i < this.upstreamRegions.size(); i++) {
-                String str = this.upstreamRegions.get(i);
+            for (String str : this.upstreamRegions) {
                 String locus;
                 if (str.startsWith(">")) {
                     locus = str.substring(1, str.length() - 1);
-                    if (startsInTreeMap.containsKey(locus.toString())) {
+                    if (startsInTreeMap.containsKey(locus)) {
                         TranscriptionStart start = startsInTreeMap.get(locus);
                         if (minus10Starts.containsKey(locus)) {
                             start.setPromotorFeaturesAssigned(true);
@@ -1260,59 +1164,28 @@ public class MotifSearchModel implements Observer {
                         }
                         startsInTreeMap.put(locus, start);
                     }
-                } else {
-                    continue;
-                }
-            }
-        } else if (operons != null) {
-            HashMap<String, Operon> operonsInTreeMap = new HashMap<>();
-            for (Operon op : operons) {
-                if (op.getAdditionalLocus() != null) {
-                    operonsInTreeMap.put(op.getAdditionalLocus(), op);
-                }
-            }
-            for (int i = 0; i < this.upstreamRegions.size(); i++) {
-                String str = this.upstreamRegions.get(i);
-                String locus;
-                if (str.startsWith(">")) {
-                    locus = str.substring(1, str.length() - 1);
-                    if (operonsInTreeMap.containsKey(locus.toString())) {
-                        Operon start = operonsInTreeMap.get(locus);
-                        if (minus10Starts.containsKey(locus)) {
-                            start.setHasPromtorFeaturesAssigned(true);
-                            start.setStartMinus10Motif(minus10Starts.get(locus));
-                            start.setMinus10MotifWidth(params.getMinusTenMotifWidth());
-                        }
-                        if (minus35Starts.containsKey(locus)) {
-                            start.setHasPromtorFeaturesAssigned(true);
-                            start.setStartMinus35Motif(minus35Starts.get(locus));
-                            start.setMinus35MotifWidth(params.getMinus35MotifWidth());
-                        }
-                        operonsInTreeMap.put(locus, start);
-                    }
-                } else {
-                    continue;
                 }
             }
         }
-
     }
 
     /**
+     * Stores all results of the promotor analysis into the transcription start
+     * site instances.
      *
-     * @param upstreamRegions
-     * @param minus10Starts
-     * @param minus35Starts
-     * @param minus10Shifts
-     * @param minus35Shifts
-     * @param params
-     * @param tss
-     * @param operons
+     * @param upstreamRegions all for the analysis used upstream regions.
+     * @param minus10Starts TreeMap<String, Integer>
+     * @param minus35Starts TreeMap<String, Integer>
+     * @param minus10Shifts TreeMap<String, Integer>
+     * @param minus35Shifts TreeMap<String, Integer>
+     * @param params PromotorSearchParameters
+     * @param tss all for the motif search used transcriptions start site
+     * instances
      */
     public void storePromoterAnalysisResults(List<String> upstreamRegions,
             TreeMap<String, Integer> minus10Starts, TreeMap<String, Integer> minus35Starts,
             TreeMap<String, Integer> minus10Shifts, TreeMap<String, Integer> minus35Shifts,
-            PromotorSearchParameters params, List<TranscriptionStart> tss, List<Operon> operons) {
+            PromotorSearchParameters params, List<TranscriptionStart> tss) {
         if (tss != null) {
             HashMap<String, TranscriptionStart> tssInTreeMap = new HashMap<>();
             for (TranscriptionStart ts : tss) {
@@ -1323,12 +1196,11 @@ public class MotifSearchModel implements Observer {
                 }
             }
 
-            for (int i = 0; i < upstreamRegions.size(); i++) {
-                String str = upstreamRegions.get(i);
+            for (String str : upstreamRegions) {
                 String locus;
                 if (str.startsWith(">")) {
                     locus = str.substring(1, str.length() - 1);
-                    if (tssInTreeMap.containsKey(locus.toString())) {
+                    if (tssInTreeMap.containsKey(locus)) {
                         TranscriptionStart start = tssInTreeMap.get(locus);
                         if (minus10Shifts.containsKey(locus)) {
                             start.setPromotorFeaturesAssigned(true);
@@ -1344,51 +1216,21 @@ public class MotifSearchModel implements Observer {
                     }
                 }
             }
-        } else if (operons != null) {
-            HashMap<String, Operon> operonsInTreeMap = new HashMap<>();
-            for (Operon op : operons) {
-                if (op.getAdditionalLocus() != null) {
-                    operonsInTreeMap.put(op.getAdditionalLocus(), op);
-                    // reset
-                    op.setHasPromtorFeaturesAssigned(false);
-                }
-            }
-
-            for (int i = 0; i < upstreamRegions.size(); i++) {
-                String str = upstreamRegions.get(i);
-                String locus;
-                if (str.startsWith(">")) {
-                    locus = str.substring(1, str.length() - 1);
-                    if (operonsInTreeMap.containsKey(locus.toString())) {
-                        Operon op = operonsInTreeMap.get(locus);
-                        if (minus10Shifts.containsKey(locus)) {
-                            op.setHasPromtorFeaturesAssigned(true);
-                            op.setStartMinus10Motif(minus10Starts.get(locus));
-                            op.setMinus10MotifWidth(params.getMinusTenMotifWidth());
-                        }
-
-                        if (minus35Shifts.containsKey(locus)) {
-                            op.setHasPromtorFeaturesAssigned(true);
-                            op.setStartMinus10Motif(minus35Starts.get(locus));
-                            op.setMinus10MotifWidth(params.getMinus35MotifWidth());
-                        }
-                        operonsInTreeMap.put(locus, op);
-                    }
-                }
-            }
         }
     }
 
     /**
+     * Stores the results from rbs analysis.
      *
-     * @param upstreamRegions
-     * @param rbsStarts
-     * @param rbsShifts
-     * @param params
-     * @param tss
-     * @param operons
+     * @param upstreamRegions all for the analysis used upstream regions.
+     * @param rbsStarts start of ribosomal binding site
+     * @param rbsShifts shift in upstream region to start of ribosomal binding
+     * site
+     * @param params RbsAnalysisParameters
+     * @param tss all transcription start site instaces used for upstream
+     * analysis
      */
-    public void storeRbsAnalysisResults(List<String> upstreamRegions, TreeMap<String, Integer> rbsStarts, TreeMap<String, Integer> rbsShifts, RbsAnalysisParameters params, List<TranscriptionStart> tss, List<Operon> operons) {
+    public void storeRbsAnalysisResults(List<String> upstreamRegions, TreeMap<String, Integer> rbsStarts, TreeMap<String, Integer> rbsShifts, RbsAnalysisParameters params, List<TranscriptionStart> tss) {
         if (tss != null) {
             HashMap<String, TranscriptionStart> tssInTreeMap = new HashMap<>();
             for (TranscriptionStart ts : tss) {
@@ -1412,32 +1254,6 @@ public class MotifSearchModel implements Observer {
                             start.setRbsMotifWidth(params.getMotifWidth());
                         }
                         tssInTreeMap.put(locus, start);
-                    }
-                }
-            }
-        } else if (operons != null) {
-            HashMap<String, Operon> operonsInTreeMap = new HashMap<>();
-            for (Operon op : operons) {
-                if (op.getAdditionalLocus() != null) {
-                    operonsInTreeMap.put(op.getAdditionalLocus(), op);
-                    // reset
-                    op.setRbsFeatureAssigned(false);
-                }
-            }
-
-            for (int i = 0; i < upstreamRegions.size(); i++) {
-                String str = upstreamRegions.get(i);
-                String locus;
-                if (str.startsWith(">")) {
-                    locus = str.substring(1, str.length() - 1);
-                    if (operonsInTreeMap.containsKey(locus.toString())) {
-                        Operon op = operonsInTreeMap.get(locus);
-                        if (rbsShifts.containsKey(locus)) {
-                            op.setRbsFeatureAssigned(true);
-                            op.setStartRbsMotif(rbsStarts.get(locus));
-                            op.setRbsMotifWidth(params.getMotifWidth());
-                        }
-                        operonsInTreeMap.put(locus, op);
                     }
                 }
             }
@@ -1685,54 +1501,45 @@ public class MotifSearchModel implements Observer {
         return regionOfIntrestMinus10;
     }
 
-    public void setRegionOfIntrestMinus10(JTextPane regionOfIntrestMinus10) {
-        this.regionOfIntrestMinus10 = regionOfIntrestMinus10;
-    }
-
     public JTextPane getRegionOfIntrestMinus35() {
         return regionOfIntrestMinus35;
-    }
-
-    public void setRegionOfIntrestMinus35(JTextPane regionOfIntrestMinus35) {
-        this.regionOfIntrestMinus35 = regionOfIntrestMinus35;
     }
 
     public TreeMap<String, Integer> getIdsToMinus10Shifts() {
         return idsToMinus10Shifts;
     }
 
-    public void setIdsToMinus10Shifts(TreeMap<String, Integer> idsToMinus10Shifts) {
-        this.idsToMinus10Shifts = idsToMinus10Shifts;
-    }
-
     public TreeMap<String, Integer> getIdsToMinus35Shifts() {
         return idsToMinus35Shifts;
-    }
-
-    public void setIdsToMinus35Shifts(TreeMap<String, Integer> idsToMinus35Shifts) {
-        this.idsToMinus35Shifts = idsToMinus35Shifts;
     }
 
     public StyledDocument getColoredPromotorRegions() {
         return coloredPromotorRegions;
     }
 
-    public void setColoredPromotorRegions(StyledDocument coloredPromotorRegions) {
-        this.coloredPromotorRegions = coloredPromotorRegions;
-    }
-
     /**
+     * Writes the info file. It contains all information about the motif search
+     * analysis.
      *
-     * @param file
-     * @param isRbs
-     * @param meanSpacer1
-     * @param meanspacer2
-     * @param contributedSegmentsToFstMotif
-     * @param contributedSegmentsToSndMotif
-     * @param noOfSequences
-     * @param params
+     * @param file destination file
+     * @param isRbs <true> if the info file is about the RBS-analysis
+     * @param meanSpacer1 if RBS analysis was performed, it is the mean spacer
+     * between translation start site and the RBS-motif. If the promotor
+     * analysis was performed, meanspacer1 ist the mean spacer between the tss
+     * and the -10 motif
+     * @param meanspacer2 If the promotor analysis was performed, meanspacer2
+     * ist the mean spacer from the -10 motif to the -35 motif
+     * @param contributedSegmentsToFstMotif number of sequences that
+     * contdributed to the -10/RBS motif
+     * @param contributedSegmentsToSndMotif number of sequences that
+     * contdributed to the -35 motif
+     * @param noOfSequences number of all for the motif search used sequences
+     * @param params ParameterSetIs
      */
-    private void writeInfoFile(File file, boolean isRbs, float meanSpacer1, float meanspacer2, int contributedSegmentsToFstMotif, int contributedSegmentsToSndMotif, int noOfSequences, ParameterSetI<Object> params) {
+    private void writeInfoFile(File file, boolean isRbs, float meanSpacer1,
+            float meanspacer2, int contributedSegmentsToFstMotif,
+            int contributedSegmentsToSndMotif, int noOfSequences,
+            ParameterSetI<Object> params) {
         PromotorSearchParameters promotorParams = null;
         RbsAnalysisParameters rbsParams = null;
         if (isRbs) {
@@ -1741,11 +1548,8 @@ public class MotifSearchModel implements Observer {
             promotorParams = (PromotorSearchParameters) params;
         }
 
-        Writer writer = null;
-        try {
-            writer = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(file.getAbsolutePath()), "utf-8"));
-
+        try (Writer writer = new BufferedWriter(new OutputStreamWriter(
+                new FileOutputStream(file.getAbsolutePath()), "utf-8"))) {
             if (isRbs) {
                 writer.write("Infos to RBS analysis\n");
                 writer.write("Length of upstream regions relative to TLS taken for analysis: " + rbsParams.getSeqLengthToAnalyze() + "\n");
@@ -1765,7 +1569,6 @@ public class MotifSearchModel implements Observer {
                 writer.write("Number of contributed Segments to -10 Motif: " + contributedSegmentsToFstMotif + "/" + noOfSequences + "\n");
                 writer.write("Number of contributed Segments to -35 Motif: " + contributedSegmentsToSndMotif + "/" + noOfSequences + "\n");
             }
-            writer.close();
 
         } catch (UnsupportedEncodingException ex) {
             Exceptions.printStackTrace(ex);
@@ -1774,12 +1577,51 @@ public class MotifSearchModel implements Observer {
         }
     }
 
+    /**
+     *
+     * @return info file
+     */
     public File getInfo() {
         return info;
     }
 
-    public void setInfo(File info) {
-        this.info = info;
-    }
+    /**
+     * Converts the EPS into PNG using ghostscript.
+     *
+     * @param epsPath absolute path to the EPS-file (Encapsulated Post Script)
+     * @param logoWidth logo width
+     * @param logoHeight logo heigth
+     * @return the converted .png file.
+     */
+    private File convertEpsToPng(String epsPath, double logoWidth, double logoHeight) {
+        int height = (int) (logoHeight * (72 / 2.54));  // user specifies height of logo line
+        int width = (int) (logoWidth * (72 / 2.54));
+        String pngFilePath = epsPath.substring(0, epsPath.length() - 4) + ".png";
+        File returnFile = new File(pngFilePath);
+        String cmd = "gs";
 
+        List<String> commandArguments = new ArrayList<>();
+        commandArguments.add(cmd);
+        commandArguments.add("-o");
+        commandArguments.add(pngFilePath);
+        commandArguments.add("-sDEVICE=png16m");
+        commandArguments.add("-q");
+        commandArguments.add("-r96");
+        commandArguments.add("-dDEVICEWIDTHPOINTS=" + width);
+        commandArguments.add("-dDEVICEHEIGHTPOINTS=" + height);
+        commandArguments.add("-dTextAlphaBits=4"); // $antialias = (defined $input->{ANTIALIAS} && $input->{ANTIALIAS}) ? "-dTextAlphaBits=4" : "";
+        commandArguments.add("-dSAFER");
+        commandArguments.add(epsPath);
+
+        String commandsString = commandArguments.toString();
+        System.out.println(commandsString);
+        ProcessBuilder ps = new ProcessBuilder(commandArguments);
+        try {
+            Process pr = ps.start();
+            pr.waitFor();
+            return returnFile;
+        } catch (IOException | InterruptedException ex) {
+            return null;
+        }
+    }
 }

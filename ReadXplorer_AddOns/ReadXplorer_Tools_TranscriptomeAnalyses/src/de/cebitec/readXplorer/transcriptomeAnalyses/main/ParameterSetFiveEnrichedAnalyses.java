@@ -28,11 +28,26 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
     private boolean thresholdManuallySet;
 
     /**
+     * Constructor for tasting cases.
+     */
+    public ParameterSetFiveEnrichedAnalyses() {
+        this.ratio = 0;
+        this.leaderlessLimit = 0;
+        this.exclusionOfTSSDistance = 0;
+        this.keepingIntragenicTssDistanceLimit = 0;
+        this.exclusionOfAllIntragenicTSS = false;
+        this.keepAllIntragenicTss = false;
+        this.includeBestMatchedReads = false;
+        this.excludeFeatureTypes = new HashSet<>();
+    }
+
+    /**
      * Data storage for all parameters associated with a 5'-ends enriched
      * RNA-seq data analyses.
      *
      * @param fraction
-     * @param ratio
+     * @param ratio minimal increase value for readstarts on position i-1 to
+     * readstarts on position i.
      * @param excludeAllInternalTSS
      * @param distanceForExcludionOfTss
      * @param leaderlessLimit
@@ -45,8 +60,8 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
      */
     public ParameterSetFiveEnrichedAnalyses(Double fraction, Integer ratio,
             boolean excludeAllInternalTSS, Integer distanceForExcludionOfTss,
-            Integer leaderlessLimit, int keepInternalDistance, boolean keepInragenicTss, boolean keepOnlyAssignedIntragenicTss, 
-            int cdsShiftPercentage, boolean includeBestMatchedReads, int maxDistantaseFor3UtrAntisenseDetection, 
+            Integer leaderlessLimit, int keepInternalDistance, boolean keepInragenicTss, boolean keepOnlyAssignedIntragenicTss,
+            int cdsShiftPercentage, boolean includeBestMatchedReads, int maxDistantaseFor3UtrAntisenseDetection,
             Map<String, StartCodon> validStartCodons, HashSet<FeatureType> fadeOutFeatureTypes) {
         this.fraction = fraction;
         this.ratio = ratio;
@@ -63,14 +78,29 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
         this.keepOnlyAssignedIntragenicTss = keepOnlyAssignedIntragenicTss;
     }
 
+    /**
+     * Get percentage for CDS-shift check.
+     *
+     * @return cdsShiftPercentage
+     */
     public Integer getCdsShiftPercentage() {
         return cdsShiftPercentage;
     }
 
+    /**
+     * Get Map of valid start codons for analysis.
+     *
+     * @return Map<String, StartCodon>
+     */
     public Map<String, StartCodon> getValidStartCodons() {
         return validStartCodons;
     }
 
+    /**
+     * Get valid start codons as a string representation.
+     *
+     * @return string representation of valid start codons
+     */
     public String getValidStartCodonsAsString() {
         String val = "";
         for (String startCodon : validStartCodons.keySet()) {
@@ -79,34 +109,73 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
         return val;
     }
 
+    /**
+     * Get the Hash of feature types, that schould be excluded from analysis.
+     *
+     * @return HashSet<FeatureType>
+     */
     public HashSet<FeatureType> getExcludeFeatureTypes() {
         return excludeFeatureTypes;
     }
 
+    /**
+     * Set Hash of valid start codons.
+     *
+     * @param validStartCodons
+     */
     public void setValidStartCodons(HashMap<String, StartCodon> validStartCodons) {
         this.validStartCodons = validStartCodons;
     }
 
+    /**
+     * Set Percentage for CDS-shift check.
+     *
+     * @param cdsShiftPercentage
+     */
     public void setCdsShiftPercentage(int cdsShiftPercentage) {
         this.cdsShiftPercentage = cdsShiftPercentage;
     }
 
+    /**
+     * Get fraction.
+     *
+     * @return fraction
+     */
     public double getFraction() {
         return fraction;
     }
 
+    /**
+     * Set fraction.
+     *
+     * @param fraction
+     */
     public void setFraction(double fraction) {
         this.fraction = fraction;
     }
 
+    /**
+     * Get ratio value.
+     *
+     * @return ration value
+     */
     public Integer getRatio() {
         return ratio;
     }
 
+    /**
+     * Get range for leaderless classification.
+     *
+     * @return leaderless limit
+     */
     public Integer getLeaderlessLimit() {
         return leaderlessLimit;
     }
 
+    /**
+     *
+     * @return
+     */
     public Integer getExclusionOfTSSDistance() {
         return exclusionOfTSSDistance;
     }
@@ -129,42 +198,67 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
         return keepingIntragenicTssDistanceLimit;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isKeepAllIntragenicTss() {
         return keepAllIntragenicTss;
     }
 
+    /**
+     *
+     * @return
+     */
     public Integer getThreeUtrLimitAntisenseDetection() {
         return threeUtrLimitAntisenseDetection;
     }
 
-    public void setThreeUtrLimitAntisenseDetection(Integer threeUtrLimitAntisenseDetection) {
-        this.threeUtrLimitAntisenseDetection = threeUtrLimitAntisenseDetection;
-    }
-
+    /**
+     *
+     * @return
+     */
     public boolean isIncludeBestMatchedReads() {
         return includeBestMatchedReads;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isKeepOnlyAssignedIntragenicTss() {
         return keepOnlyAssignedIntragenicTss;
     }
 
-    public void setKeepOnlyAssignedIntragenicTss(boolean keepOnlyAssignedIntragenicTss) {
-        this.keepOnlyAssignedIntragenicTss = keepOnlyAssignedIntragenicTss;
-    }
-
+    /**
+     * Get manually setted background threshold.
+     *
+     * @return manuallySetThreshold
+     */
     public Integer getManuallySetThreshold() {
         return manuallySetThreshold;
     }
 
+    /**
+     *
+     * @param manuallySetThreshold
+     */
     public void setManuallySetThreshold(Integer manuallySetThreshold) {
         this.manuallySetThreshold = manuallySetThreshold;
     }
 
+    /**
+     *
+     * @return <true> if threshold is setted manually else <false>
+     */
     public boolean isThresholdManuallySet() {
         return thresholdManuallySet;
     }
 
+    /**
+     *
+     * @param thresholdManuallySet
+     */
     public void setThresholdManuallySet(boolean thresholdManuallySet) {
         this.thresholdManuallySet = thresholdManuallySet;
     }

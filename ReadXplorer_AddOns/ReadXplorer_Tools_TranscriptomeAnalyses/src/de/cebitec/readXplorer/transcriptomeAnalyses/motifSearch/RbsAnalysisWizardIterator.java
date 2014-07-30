@@ -4,9 +4,6 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch;
 
-import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ChartType;
-import de.cebitec.readXplorer.transcriptomeAnalyses.enums.PurposeEnum;
-import de.cebitec.readXplorer.transcriptomeAnalyses.rbsAnalysis.DataSelectionWizardPanel;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +35,7 @@ public final class RbsAnalysisWizardIterator implements WizardDescriptor.Iterato
     private void initializePanels() {
         if (allPanels == null) {
             allPanels = new ArrayList<>();
-            allPanels.add(new DataSelectionWizardPanel(PurposeEnum.RBS_ANALYSIS));
+//            allPanels.add(new DataSelectionWizardPanel(PurposeEnum.RBS_ANALYSIS));
             allPanels.add(new RbsAnalysisWizardPanel(PROP_WIZARD_NAME));
             String[] steps = new String[allPanels.size()];
             for (int i = 0; i < allPanels.size(); i++) {
@@ -56,8 +53,9 @@ public final class RbsAnalysisWizardIterator implements WizardDescriptor.Iterato
             }
             this.currentPanels = new ArrayList<>();
             currentPanels.add(this.allPanels.get(0));
-            currentPanels.add(this.allPanels.get(1));
-            currentPanelsIndex = new String[]{steps[0], steps[1]};
+//            currentPanels.add(this.allPanels.get(1));
+//            currentPanelsIndex = new String[]{steps[0], steps[1]};
+            currentPanelsIndex = new String[]{steps[0]};
 
             Component c = allPanels.get(0).getComponent();
             if (c instanceof JComponent) {

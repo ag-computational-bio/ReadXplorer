@@ -38,18 +38,34 @@ public final class ChartsGenerationSelectChatTypeVisualPanel extends JPanel {
         return Integer.valueOf(this.rangeOfUpstreamSeqTF.getText());
     }
 
+    /**
+     *
+     * @return <true> if GA content analysis is selected else <false>
+     */
     public boolean isDistOfGaCtSelected() {
         return gaToCtCB.isSelected();
     }
 
+    /**
+     *
+     * @return <true> if GC content analysis is selected else <false>
+     */
     public boolean isDistOfGcATSelected() {
         return gcToAtCB.isSelected();
     }
 
+    /**
+     *
+     * @return <true> if bining of 5'-UTR length is selected else <false>
+     */
     public boolean isBiningSelected() {
         return biningCB.isSelected();
     }
 
+    /**
+     * 
+     * @return the binning size
+     */
     public Integer getBiningSize() {
         return Integer.parseInt(biningSizeTF.getText());
     }
@@ -71,14 +87,6 @@ public final class ChartsGenerationSelectChatTypeVisualPanel extends JPanel {
         return this.absoluteFrequencyOfupstreamLengthCB.isSelected();
     }
 
-    /**
-     *
-     * @return <true> if pie chart for Transcript classes was choosen, else
-     * <false>
-     */
-    public boolean isPieChart() {
-        return this.piChartCB.isSelected();
-    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -93,7 +101,6 @@ public final class ChartsGenerationSelectChatTypeVisualPanel extends JPanel {
         rangeOfUpstreamSeqTF = new javax.swing.JTextField();
         lengthOfAnalyzedRegionLabel = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
-        piChartCB = new javax.swing.JCheckBox();
         gaToCtCB = new javax.swing.JCheckBox();
         gcToAtCB = new javax.swing.JCheckBox();
         biningCB = new javax.swing.JCheckBox();
@@ -116,13 +123,6 @@ public final class ChartsGenerationSelectChatTypeVisualPanel extends JPanel {
         rangeOfUpstreamSeqTF.setText(org.openide.util.NbBundle.getMessage(ChartsGenerationSelectChatTypeVisualPanel.class, "ChartsGenerationSelectChatTypeVisualPanel.rangeOfUpstreamSeqTF.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(lengthOfAnalyzedRegionLabel, org.openide.util.NbBundle.getMessage(ChartsGenerationSelectChatTypeVisualPanel.class, "ChartsGenerationSelectChatTypeVisualPanel.lengthOfAnalyzedRegionLabel.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(piChartCB, org.openide.util.NbBundle.getMessage(ChartsGenerationSelectChatTypeVisualPanel.class, "ChartsGenerationSelectChatTypeVisualPanel.piChartCB.text")); // NOI18N
-        piChartCB.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                piChartCBActionPerformed(evt);
-            }
-        });
 
         org.openide.awt.Mnemonics.setLocalizedText(gaToCtCB, org.openide.util.NbBundle.getMessage(ChartsGenerationSelectChatTypeVisualPanel.class, "ChartsGenerationSelectChatTypeVisualPanel.gaToCtCB.text")); // NOI18N
 
@@ -154,7 +154,6 @@ public final class ChartsGenerationSelectChatTypeVisualPanel extends JPanel {
                             .addComponent(jSeparator1)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(piChartCB)
                                     .addComponent(baseDistrPlotCB)
                                     .addComponent(absoluteFrequencyOfupstreamLengthCB)
                                     .addGroup(layout.createSequentialGroup()
@@ -193,8 +192,6 @@ public final class ChartsGenerationSelectChatTypeVisualPanel extends JPanel {
                 .addGap(9, 9, 9)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(piChartCB)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(absoluteFrequencyOfupstreamLengthCB)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -204,16 +201,6 @@ public final class ChartsGenerationSelectChatTypeVisualPanel extends JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    private void piChartCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_piChartCBActionPerformed
-        if (piChartCB.isSelected()) {
-            // deselect all other
-            absoluteFrequencyOfupstreamLengthCB.setSelected(false);
-            biningCB.setSelected(false);
-            biningSizeTF.setEnabled(false);
-            baseDistrPlotCB.setSelected(false);
-        }
-    }//GEN-LAST:event_piChartCBActionPerformed
-
     private void baseDistrPlotCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_baseDistrPlotCBActionPerformed
         if (this.baseDistrPlotCB.isSelected()) {
             lengthOfAnalyzedRegionLabel.setEnabled(true);
@@ -222,7 +209,6 @@ public final class ChartsGenerationSelectChatTypeVisualPanel extends JPanel {
             gcToAtCB.setEnabled(true);
 
             // deselect all other
-            piChartCB.setSelected(false);
             absoluteFrequencyOfupstreamLengthCB.setSelected(false);
             biningCB.setSelected(false);
             biningSizeTF.setEnabled(false);
@@ -237,11 +223,7 @@ public final class ChartsGenerationSelectChatTypeVisualPanel extends JPanel {
     private void absoluteFrequencyOfupstreamLengthCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_absoluteFrequencyOfupstreamLengthCBActionPerformed
         if (absoluteFrequencyOfupstreamLengthCB.isSelected()) {
             biningCB.setEnabled(true);
-//            biningSizeTF.setEnabled(true);
-//            biningLeaderlessIntoZeroBinCB.setEnabled(true);
-
             // deselect all other
-            piChartCB.setSelected(false);
             baseDistrPlotCB.setSelected(false);
         } else {
             biningCB.setEnabled(false);
@@ -257,10 +239,8 @@ public final class ChartsGenerationSelectChatTypeVisualPanel extends JPanel {
     private void biningCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_biningCBActionPerformed
         if (biningCB.isSelected()) {
             biningSizeTF.setEnabled(true);
-//            biningLeaderlessIntoZeroBinCB.setEnabled(true);
         } else {
             biningSizeTF.setEnabled(false);
-//            biningLeaderlessIntoZeroBinCB.setEnabled(false);
         }
     }//GEN-LAST:event_biningCBActionPerformed
 
@@ -273,7 +253,6 @@ public final class ChartsGenerationSelectChatTypeVisualPanel extends JPanel {
     private javax.swing.JCheckBox gcToAtCB;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JLabel lengthOfAnalyzedRegionLabel;
-    private javax.swing.JCheckBox piChartCB;
     private javax.swing.JTextField rangeOfUpstreamSeqTF;
     // End of variables declaration//GEN-END:variables
 }

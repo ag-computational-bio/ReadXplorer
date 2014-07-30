@@ -4,7 +4,6 @@ import de.cebitec.readXplorer.transcriptomeAnalyses.main.TranscriptomeAnalysesTo
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.JOptionPane;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.awt.ActionID;

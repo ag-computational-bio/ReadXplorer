@@ -14,11 +14,9 @@ import org.openide.util.NbPreferences;
 public final class SequinTableSettingsVisualPanel extends JPanel {
 
     private final String wizardName;
-    private final String descriptionText = "<html><p align='justify'>For the "
-            + "parsing of the loci of each genome feature to export in sequin "
-            + "file, the algorithm need to know how the loci are composit. The "
-            + "parsing is necessary for assigning qualifiers to each locus_tag "
-            + "in sequin table. </p></html>";
+    private final String descriptionText = "<html><p align='justify'>The parsing "
+            + "of the loci_tags is needed, if you want to assign the qualifiers "
+            + "to each locus_tag in sequin table. </p></html>";
     private String separator = "";
 
     /**

@@ -36,6 +36,8 @@ public enum TableType {
     SNP_DETECTION("SNP Detection Table"),
     /** TSS detection table. */
     TSS_DETECTION("TSS Detection Table"),
+    /** TSS detection table JR. */
+    TSS_DETECTION_JR("TSS Detection Table JR"),
     /** Arbitrary table starting with a position column. */
     DIFF_GENE_EXPRESSION("Differential Gene Expression Table"),
     /** Arbitrary table starting with a position column. */

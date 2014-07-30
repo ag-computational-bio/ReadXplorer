@@ -202,151 +202,305 @@ public class Operon extends TrackResultEntry {
         this.markedForUpstreamAnalysis = markedForUpstreamAnalysis;
     }
 
+    /**
+     *
+     * @return the width of -10 motif
+     */
     public int getMinus10MotifWidth() {
         return minus10MotifWidth;
     }
 
+    /**
+     * Set -10 motif width.
+     *
+     * @param minus10MotifWidth
+     */
     public void setMinus10MotifWidth(int minus10MotifWidth) {
         this.minus10MotifWidth = minus10MotifWidth;
     }
 
+    /**
+     *
+     * @return the width of the -35 motif.
+     */
     public int getMinus35MotifWidth() {
         return minus35MotifWidth;
     }
 
+    /**
+     * Set -35 motif width.
+     *
+     * @param minus35MotifWidth
+     */
     public void setMinus35MotifWidth(int minus35MotifWidth) {
         this.minus35MotifWidth = minus35MotifWidth;
     }
 
+    /**
+     * Get width of ribosome binding site motif.
+     *
+     * @return width of ribosome binding site motif
+     */
     public int getRbsMotifWidth() {
         return rbsMotifWidth;
     }
 
+    /**
+     *
+     * @param rbsMotifWidth
+     */
     public void setRbsMotifWidth(int rbsMotifWidth) {
         this.rbsMotifWidth = rbsMotifWidth;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isHasRbsFeatureAssigned() {
         return hasRbsFeatureAssigned;
     }
 
+    /**
+     *
+     * @param hasRbsFeatureAssigned
+     */
     public void setRbsFeatureAssigned(boolean hasRbsFeatureAssigned) {
         this.hasRbsFeatureAssigned = hasRbsFeatureAssigned;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isHasPromtorFeaturesAssigned() {
         return hasPromtorFeaturesAssigned;
     }
 
+    /**
+     *
+     * @param hasPromtorFeaturesAssigned
+     */
     public void setHasPromtorFeaturesAssigned(boolean hasPromtorFeaturesAssigned) {
         this.hasPromtorFeaturesAssigned = hasPromtorFeaturesAssigned;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getAdditionalLocus() {
         return additionalLocus;
     }
 
+    /**
+     *
+     * @param additionalLocus
+     */
     public void setAdditionalLocus(String additionalLocus) {
         this.additionalLocus = additionalLocus;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getPromotorSequenceLength() {
         return promotorSequenceLength;
     }
 
+    /**
+     *
+     * @param promotorSequenceLength
+     */
     public void setPromotorSequenceLength(int promotorSequenceLength) {
         this.promotorSequenceLength = promotorSequenceLength;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getRbsSequenceLength() {
         return rbsSequenceLength;
     }
 
+    /**
+     *
+     * @param rbsSequenceLength
+     */
     public void setRbsSequenceLength(int rbsSequenceLength) {
         this.rbsSequenceLength = rbsSequenceLength;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getStartMinus10Motif() {
         return startMinus10Motif;
     }
 
+    /**
+     *
+     * @param startMinus10Motif
+     */
     public void setStartMinus10Motif(int startMinus10Motif) {
         this.startMinus10Motif = startMinus10Motif;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getStartMinus35Motif() {
         return startMinus35Motif;
     }
 
+    /**
+     *
+     * @param startMinus35Motif
+     */
     public void setStartMinus35Motif(int startMinus35Motif) {
         this.startMinus35Motif = startMinus35Motif;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getStartRbsMotif() {
         return startRbsMotif;
     }
 
+    /**
+     *
+     * @param startRbsMotif
+     */
     public void setStartRbsMotif(int startRbsMotif) {
         this.startRbsMotif = startRbsMotif;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isFalsPositive() {
         return falsPositive;
     }
 
+    /**
+     *
+     * @param falsPositive
+     */
     public void setFalsPositive(boolean falsPositive) {
         this.falsPositive = falsPositive;
     }
 
+    /**
+     *
+     * @param adj
+     */
     public void removeAdjaceny(OperonAdjacency adj) {
         this.operonAdjacencies.remove(adj);
     }
 
+    /**
+     *
+     * @return
+     */
     public ArrayList<Integer> getTsSites() {
         return tsSites;
     }
 
+    /**
+     *
+     * @param tsSites
+     */
     public void setTsSites(ArrayList<Integer> tsSites) {
         this.tsSites = tsSites;
     }
 
+    /**
+     *
+     * @return
+     */
     public ArrayList<Integer> getUtRegions() {
         return utRegions;
     }
 
+    /**
+     *
+     * @param utRegions
+     */
     public void setUtRegions(ArrayList<Integer> utRegions) {
         this.utRegions = utRegions;
     }
 
+    /**
+     *
+     * @return
+     */
     public int[] getRbsStartStop() {
         return rbsStartStop;
     }
 
+    /**
+     *
+     * @param rbsStartStop
+     */
     public void setRbsStartStop(int[] rbsStartStop) {
         this.rbsStartStop = rbsStartStop;
     }
 
+    /**
+     *
+     * @param tss
+     */
     public void addTss(int tss) {
         this.tsSites.add(tss);
     }
 
+    /**
+     *
+     * @param start
+     * @param stop
+     */
     public void addRbs(int start, int stop) {
         this.rbsStartStop[0] = start;
         this.rbsStartStop[1] = stop;
     }
 
+    /**
+     *
+     * @param utr
+     */
     public void addUtrs(Integer utr) {
         this.utRegions.add(utr);
     }
 
+    /**
+     *
+     * @return
+     */
     public HashMap<Integer, ArrayList<Integer[]>> getTssToPromotor() {
         return tssToPromotor;
     }
 
+    /**
+     *
+     * @param tssToPromotor
+     */
     public void setTssToPromotor(HashMap<Integer, ArrayList<Integer[]>> tssToPromotor) {
         this.tssToPromotor = tssToPromotor;
     }
 
+    /**
+     *
+     * @param tss
+     * @param minus35
+     * @param minus10
+     */
     public void addTssToPromotor(Integer tss, Integer[] minus35, Integer[] minus10) {
         List<Integer[]> list = new ArrayList<>();
         list.add(minus35);
@@ -354,6 +508,11 @@ public class Operon extends TrackResultEntry {
         this.tssToPromotor.put(tss, (ArrayList<Integer[]>) list);
     }
 
+    /**
+     *
+     * @param tss
+     * @return
+     */
     public ArrayList<Integer[]> getPromotor(Integer tss) {
         return this.tssToPromotor.get(tss);
     }

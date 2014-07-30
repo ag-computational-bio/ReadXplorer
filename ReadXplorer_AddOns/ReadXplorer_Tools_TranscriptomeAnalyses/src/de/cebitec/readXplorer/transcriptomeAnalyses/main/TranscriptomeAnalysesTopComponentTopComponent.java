@@ -30,7 +30,7 @@ import org.openide.windows.WindowManager;
         preferredID = "TranscriptomeAnalysesTopComponentTopComponent")
 @Messages({
     "CTL_TranscriptomeAnalysesTopComponentAction=TranscriptomeAnalysesTopComponent",
-    "CTL_TranscriptomeAnalysesTopComponentTopComponent=TranscriptomeAnalysesTopComponent Window",
+    "CTL_TranscriptomeAnalysesTopComponentTopComponent=Analyses Result Window",
     "HINT_TranscriptomeAnalysesTopComponentTopComponent=This is a TranscriptomeAnalysesTopComponent window"
 })
 public final class TranscriptomeAnalysesTopComponentTopComponent extends TopComponent {

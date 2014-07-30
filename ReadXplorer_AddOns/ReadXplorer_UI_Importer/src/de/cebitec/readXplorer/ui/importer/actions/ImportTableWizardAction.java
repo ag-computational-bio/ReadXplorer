@@ -28,6 +28,7 @@ import de.cebitec.readXplorer.ui.importer.dataTable.ImportTableWizardPanel;
 import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.readXplorer.util.UneditableTableModel;
 import de.cebitec.readXplorer.util.VisualisationUtils;
+import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.readXplorer.view.tableVisualization.PosTablePanel;
 import de.cebitec.readXplorer.view.tableVisualization.TableTopComponent;
 import de.cebitec.readXplorer.view.tableVisualization.TableUtils;
@@ -47,6 +48,10 @@ import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
+import org.supercsv.cellprocessor.ParseBool;
+import org.supercsv.cellprocessor.ParseDouble;
+import org.supercsv.cellprocessor.ParseInt;
+import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.prefs.CsvPreference;
 
 @ActionID(
@@ -66,6 +71,7 @@ public final class ImportTableWizardAction implements ActionListener {
     /**
      * Action to import an arbitrary table into ReadXplorer and display it in a
      * new TopComonent.
+     *
      * @param context A LoginCookie to assure, that a DB has already been
      * opened.
      */
@@ -74,7 +80,7 @@ public final class ImportTableWizardAction implements ActionListener {
     }
 
     @NbBundle.Messages({"WizardTitle=Import any data table wizard",
-            "ErrorHeader=Import Table Error"})
+        "ErrorHeader=Import Table Error"})
     @Override
     public void actionPerformed(ActionEvent e) {
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
@@ -83,7 +89,7 @@ public final class ImportTableWizardAction implements ActionListener {
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
         wiz.setTitleFormat(new MessageFormat("{0}"));
         wiz.setTitle(Bundle.WizardTitle());
-        
+
         //wizard has finished
         if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
             final TableType tableType = (TableType) wiz.getProperty(ImportTableWizardPanel.PROP_TABLE_TYPE);
@@ -92,14 +98,18 @@ public final class ImportTableWizardAction implements ActionListener {
             final boolean autoDelimiter = (boolean) wiz.getProperty(ImportTableWizardPanel.PROP_AUTO_DELEMITER);
             final CsvPreference csvPref = (CsvPreference) wiz.getProperty(ImportTableWizardPanel.PROP_SEL_PREF);
             final TableParserI parser = (TableParserI) wiz.getProperty(ImportTableWizardPanel.PROP_SEL_PARSER);
-            
+
             if (parser instanceof CsvTableParser) {
                 CsvTableParser csvParser = (CsvTableParser) parser;
                 csvParser.setAutoDelimiter(autoDelimiter);
                 csvParser.setCsvPref(csvPref);
+                if (tableType == TableType.TSS_DETECTION_JR) {
+                    CellProcessor[] TSS_CELL_PROCESSOR = getTssCellProcessor();
+                    csvParser.setCellProscessors(TSS_CELL_PROCESSOR);
+                }
                 csvParser.setTableModel(tableType.getName());
             }
-            
+
             //parse file in readable format for a table
             final File tableFile = new File(fileLocation);
             try {
@@ -110,15 +120,22 @@ public final class ImportTableWizardAction implements ActionListener {
                 SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
                     @Override
                     public void run() {
-                        PosTablePanel tablePanel = new PosTablePanel(tableModel);
-                        tablePanel.setReferenceGenome(ref);
-                        tablePanel.setTableType(tableType);
-                        checkAndOpenRefViewer(ref, tablePanel);
+                        if (tableType == TableType.TSS_DETECTION_JR) {
+//                            ExcelImporter importer = new ExcelImporter();
+//                            imorter.setUpTSSTable(List<List<?>> fstSheet, List<List<?>> sndSheet,
+//                                    ReferenceViewer refViewer, 
+//                                    TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp):
+                        } else {
+                            PosTablePanel tablePanel = new PosTablePanel(tableModel);
+                            tablePanel.setReferenceGenome(ref);
+                            tablePanel.setTableType(tableType);
+                            checkAndOpenRefViewer(ref, tablePanel);
 
-                        String panelName = "Imported table from: " + tableFile.getName();
-                        topComp = (TableTopComponent) WindowManager.getDefault().findTopComponent("TableTopComponent");
-                        topComp.open();
-                        topComp.openTableTab(panelName, tablePanel);
+                            String panelName = "Imported table from: " + tableFile.getName();
+                            topComp = (TableTopComponent) WindowManager.getDefault().findTopComponent("TableTopComponent");
+                            topComp.open();
+                            topComp.openTableTab(panelName, tablePanel);
+                        }
                     }
                 });
             } catch (ParsingException ex) {
@@ -139,7 +156,7 @@ public final class ImportTableWizardAction implements ActionListener {
                 break;
             }
         }
-        
+
         if (!alreadyOpen) {
             //open reference genome now
             AppPanelTopComponent appPanelTopComponent = new AppPanelTopComponent();
@@ -150,6 +167,50 @@ public final class ImportTableWizardAction implements ActionListener {
             appPanelTopComponent.requestActive();
             tablePanel.setBoundsInfoManager(viewController.getBoundsManager());
         }
+    }
+
+    /**
+     * Generates a cellprocessor for the tss analysis result table.
+     *
+     * @return List of CellProcessors.
+     */
+    private CellProcessor[] getTssCellProcessor() {
+
+        return new CellProcessor[]{
+            new ParseInt(), // Position
+            new ParseBool(), // Strand
+            null, // Comment
+            new ParseInt(), // Read Starts
+            new ParseDouble(), // Rel. Count
+            null, // Feature Name
+            null, // Feature Locus
+            new ParseInt(), // Offset
+            new ParseInt(), // Dist. To Start
+            new ParseInt(), // Dist. To Stop
+            null, // Sequence
+            new ParseBool(), // Leaderless
+            new ParseBool(), // Putative TLS-Shift
+            new ParseBool(), // Intragenic TSS
+            new ParseBool(), // Intergenic TSS
+            new ParseBool(), // Putative Antisense
+            new ParseBool(), // Putative 5'-UTR Antisense
+            new ParseBool(), // Putative 3'-UTR Antisense
+            new ParseBool(), // Putative Intragenic Antisense
+            new ParseBool(), // Assigned To Stable RNA
+            new ParseBool(), // False Positive
+            new ParseBool(), // Selected For Upstream Region Analysis
+            new ParseBool(), // Finished
+            new ParseInt(), // Gene Start
+            new ParseInt(), // Gene Stop
+            new ParseInt(), // Gene Length In Bp	
+            new ParseInt(), // Frame
+            null, // Gene Product
+            null, // Start Codon
+            null, // Stop Codon
+            null, // Chromosome	
+            new ParseInt(), // Chrom ID	
+            new ParseInt() //Track ID
+        };
     }
 
 }

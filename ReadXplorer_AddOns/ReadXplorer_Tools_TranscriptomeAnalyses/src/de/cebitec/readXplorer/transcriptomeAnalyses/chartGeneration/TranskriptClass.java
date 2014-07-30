@@ -11,8 +11,8 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration;
  * @author jritter
  */
 public enum TranskriptClass {
-    LEADERLESS,
-    INTRAGENIC,
-    ANTISENSE,
-    WITH_UTR,
+    LEADERLESS, // leaderless transcript
+    INTRAGENIC, // intragenic transcript
+    ANTISENSE, // antisense transcript
+    WITH_UTR, // native transcript with a 5'-UTR of length > 0
 }
