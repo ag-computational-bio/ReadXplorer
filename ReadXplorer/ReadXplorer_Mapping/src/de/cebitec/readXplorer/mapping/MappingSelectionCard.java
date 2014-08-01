@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,9 +31,6 @@ import org.openide.util.NbBundle;
 public class MappingSelectionCard extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
     
-    private File sourceFile;
-    private File referenceFile;
-
     /** 
      * Creates new form TrimSelectionCard
      */
@@ -77,7 +74,6 @@ public class MappingSelectionCard extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jComboBox1 = new javax.swing.JComboBox();
         sourceFileLabel = new javax.swing.JLabel();
         sourceFileField = new javax.swing.JTextField();
         openSourceButton = new javax.swing.JButton();
@@ -86,8 +82,6 @@ public class MappingSelectionCard extends javax.swing.JPanel {
         openReferenceButton = new javax.swing.JButton();
         mappingParamLabel = new javax.swing.JLabel();
         mappingParamField = new javax.swing.JTextField();
-
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
         org.openide.awt.Mnemonics.setLocalizedText(sourceFileLabel, org.openide.util.NbBundle.getMessage(MappingSelectionCard.class, "MappingSelectionCard.sourceFileLabel.text")); // NOI18N
 
@@ -177,9 +171,6 @@ public class MappingSelectionCard extends javax.swing.JPanel {
         File file = FileUtils.showFileOpenDialogAndChangePrefs("TrimSelection.Filepath",
                 new FileNameExtensionFilter("FNA, FASTQ, FASTA File", "fna", "fastq", "fasta"),
                 sourceFileField, MappingSelectionCard.class, this);
-        if (file!=null) {
-            sourceFile = file;
-        }
     }//GEN-LAST:event_openSourceButtonActionPerformed
     
     public String getSourcePath() {
@@ -199,9 +190,6 @@ public class MappingSelectionCard extends javax.swing.JPanel {
         File file = FileUtils.showFileOpenDialogAndChangePrefs("TrimSelection.Referencepath",
                 new FileNameExtensionFilter("Fasta File", "fasta"), 
                 referenceFileField, MappingSelectionCard.class, this); 
-        if (file!=null) {
-            referenceFile = file;
-        } 
     }//GEN-LAST:event_openReferenceButtonActionPerformed
 
     private void referenceFileFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_referenceFileFieldActionPerformed
@@ -214,7 +202,6 @@ public class MappingSelectionCard extends javax.swing.JPanel {
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox jComboBox1;
     private javax.swing.JTextField mappingParamField;
     private javax.swing.JLabel mappingParamLabel;
     private javax.swing.JButton openReferenceButton;

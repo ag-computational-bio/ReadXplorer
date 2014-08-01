@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@ package de.cebitec.readXplorer.transcriptionAnalyses;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.RPKMvalue;
 import de.cebitec.readXplorer.util.GeneralUtils;
@@ -46,17 +47,16 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
      * @param trackMap the map of track ids to the PersistantTrack used for this
      * analysis
      * @param rpkmResults The result list of RPKM values and read counts
-     * @param referenceId id of the reference genome, for which this result was
-     * generated
+     * @param reference reference genome, for which this result was generated
      * @param combineTracks <cc>true</cc>, if the tracks in the list are
      * combined, <cc>false</cc> otherwise
      * @param trackColumn column in which the track is stored
      * @param filterColumn column which shall be used for filtering the results
      * among results of other tracks (e.g. the feature column for RPKM analysis)
      */
-    public RPKMAnalysisResult(Map<Integer, PersistantTrack> trackMap, List<RPKMvalue> rpkmResults, int referenceId, 
+    public RPKMAnalysisResult(Map<Integer, PersistantTrack> trackMap, List<RPKMvalue> rpkmResults, PersistantReference reference, 
             boolean combineTracks, int trackColumn, int filterColumn) {
-        super(trackMap, referenceId, combineTracks, trackColumn, filterColumn);
+        super(reference, trackMap, combineTracks, trackColumn, filterColumn);
         this.rpkmResults = rpkmResults;
     }
     

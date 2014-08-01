@@ -2,6 +2,7 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.StartCodon;
@@ -34,10 +35,10 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
      * @param stats
      * @param results
      * @param trackMap
-     * @param refId
+     * @param reference
      */
-    public TSSDetectionResults(StatisticsOnMappingData stats, List<TranscriptionStart> results, Map<Integer, PersistantTrack> trackMap, int refId) {
-        super(trackMap, refId, false, 22, 0);
+    public TSSDetectionResults(StatisticsOnMappingData stats, List<TranscriptionStart> results, Map<Integer, PersistantTrack> trackMap, PersistantReference reference) {
+        super(reference, trackMap, false, 22, 0);
         this.results = results;
         this.stats = stats;
         this.statsMap = new HashMap<>();

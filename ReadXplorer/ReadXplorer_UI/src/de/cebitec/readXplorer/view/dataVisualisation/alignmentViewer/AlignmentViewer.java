@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistant;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.util.ColorProperties;
+import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
@@ -36,6 +37,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
+import java.util.prefs.Preferences;
+import org.openide.util.NbPreferences;
 
 /**
  * Viewer to show alignments of reads to the reference.
@@ -49,15 +54,13 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
     private LayoutI layout;
     private int blockHeight;
     private int layerHeight;
-    private int maxCountInInterval;
+    private int maxReplicates;
     private int fwdMappingsInInterval;
     private int revMappingsInInterval;
     private int maxCoverageInInterval;
-    private float minSaturationAndBrightness;
-    private float maxSaturationAndBrightness;
-    private float percentSandBPerCovUnit;
     private int oldLogLeft;
     private int oldLogRight;
+    private boolean showBaseQualities;
     MappingResultPersistant mappingResult;
     HashMap<Integer, Integer> completeCoverage;
 
@@ -75,28 +78,52 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
         this.showSequenceBar(true, true);
         blockHeight = 8;
         layerHeight = blockHeight + 2;
-        minSaturationAndBrightness = 0.3f;
-        maxSaturationAndBrightness = 0.9f;
         mappingResult = new MappingResultPersistant(new ArrayList<PersistantMapping>(), null);
         completeCoverage = new HashMap<>();
         this.setHorizontalMargin(10);
         this.setActive(false);
         this.setAutomaticCentering(true);
+        this.handleBaseQualityOption();
         setupComponents();
     }
-
     
+    /**
+     * Initializes the base quality option boolean and creates a 
+     * PreferenceChangeListener for the base quality option.
+     */
+    private void handleBaseQualityOption() {
+        final Preferences pref = NbPreferences.forModule(Object.class);
+        this.showBaseQualities = pref.getBoolean(Properties.BASE_QUALITY_OPTION, true);
+        pref.addPreferenceChangeListener(new PreferenceChangeListener() {
+
+            @Override
+            public void preferenceChange(PreferenceChangeEvent evt) {
+                if (evt.getKey().equals(Properties.BASE_QUALITY_OPTION)) {
+                    showBaseQualities = pref.getBoolean(Properties.BASE_QUALITY_OPTION, true);
+                    showData();
+                }
+            }
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getMaximalHeight() {
         return this.getHeight();
     }
 
-    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void changeToolTipText(int logPos) {
     }
 
-    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void boundsChangedHook() {
         if (this.isInMaxZoomLevel() && isActive()) {
@@ -196,7 +223,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
      */
     private void findMinAndMaxCount(Collection<PersistantMapping> mappings) {
 //        this.minCountInInterval = Integer.MAX_VALUE; //uncomment all these lines to get min count
-        this.maxCountInInterval = Integer.MIN_VALUE;
+        this.maxReplicates = Integer.MIN_VALUE;
         this.fwdMappingsInInterval = 0;
 
         for (PersistantMapping m : mappings) {
@@ -204,16 +231,14 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
 //            if(coverage < minCountInInterval) {
 //                minCountInInterval = coverage;
 //            }
-            if (coverage > maxCountInInterval) {
-                maxCountInInterval = coverage;
+            if (coverage > maxReplicates) {
+                maxReplicates = coverage;
             }
             if (m.isFwdStrand()) {
                 ++this.fwdMappingsInInterval;
             }
         }
         this.revMappingsInInterval = mappings.size() - this.fwdMappingsInInterval;
-
-        percentSandBPerCovUnit = (maxSaturationAndBrightness - minSaturationAndBrightness) / maxCountInInterval;
     }
 
     /**
@@ -272,7 +297,10 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
             layerCounter += countingStep;
         }
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
@@ -291,7 +319,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
      * @param layerCounter determines in which layer the block should be painted
      */
     private void createJBlock(BlockI block, int layerCounter) {
-        BlockComponent jb = new BlockComponent(block, this, layout.getGenomeGapManager(), blockHeight, minSaturationAndBrightness, percentSandBPerCovUnit);
+        BlockComponent jb = new BlockComponent(block, this, layout.getGenomeGapManager(), blockHeight, maxReplicates, showBaseQualities);
 
         // negative layer counter means reverse strand
         int lower = (layerCounter < 0 ? getPaintingAreaInfo().getReverseLow() : getPaintingAreaInfo().getForwardLow());
@@ -314,6 +342,9 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
         graphics.drawLine(info.getPhyLeft(), info.getReverseLow(), info.getPhyRight(), info.getReverseLow());
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int transformToLogicalCoord(int physPos) {
         int logPos = super.transformToLogicalCoord(physPos);
@@ -325,6 +356,9 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public double transformToPhysicalCoord(int logPos) {
 
@@ -336,6 +370,9 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
         return super.transformToPhysicalCoord(logPos);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int getWidthOfMouseOverlay(int position) {
         PhysicalBaseBounds mouseAreaLeft = getPhysBoundariesForLogPos(position);
@@ -366,6 +403,9 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
         this.revalidate();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void notifySkipped() {
         throw new UnsupportedOperationException("Not supported yet.");

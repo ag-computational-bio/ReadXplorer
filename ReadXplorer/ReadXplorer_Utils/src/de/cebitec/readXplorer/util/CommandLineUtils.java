@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,15 +53,15 @@ public class CommandLineUtils {
         ProcessBuilder processBuilder = new ProcessBuilder(command).redirectErrorStream(true);
         Process process = processBuilder.start();
         
-        InputStream is = process.getInputStream();
-        BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-        
-        // And print each line
-        String s;
-        while ((s = reader.readLine()) != null) {
-            this.showMsg(s);
+        try (InputStream is = process.getInputStream()) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            
+            // And print each line
+            String s;
+            while ((s = reader.readLine()) != null) {
+                this.showMsg(s);
+            }
         }
-        is.close();
         
         //Wait to get exit value
         try {

@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -277,16 +277,22 @@ public class BasePanelFactory {
 
         // create a legend
         JPanel alignmentPanelLegend = this.getAlignmentViewLegend(viewer);
-        viewer.setupLegend(new MenuLabel(alignmentPanelLegend, MenuLabel.TITLE_LEGEND), alignmentPanelLegend);
+        MenuLabel legendLabel = new MenuLabel(alignmentPanelLegend, MenuLabel.TITLE_LEGEND);
+        viewer.setupLegend(legendLabel, alignmentPanelLegend);
 
         // create and set up options (currently normalization)
         JPanel alignmentViewerOptions = this.getAlignmentViewerOptions(viewer);
         MenuLabel optionsLabel = new MenuLabel(alignmentViewerOptions, MenuLabel.TITLE_OPTIONS);
         viewer.setupOptions(optionsLabel, alignmentViewerOptions);
+        
+        //assign observers to handle visualization correctly
+        legendLabel.registerObserver(optionsLabel);
+        optionsLabel.registerObserver(legendLabel);
 
         // add panels to basepanel and add scrollbars
         int maxSliderValue = 500;
         b.setViewerInScrollpane(viewer);
+        viewer.createListenerForScrollBar();
         b.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, false, maxSliderValue));
         b.setTitlePanel(this.getTitlePanel(connector.getAssociatedTrackName()));
 
@@ -394,7 +400,7 @@ public class BasePanelFactory {
 
         entry.add(color);
         if (viewer != null) {
-            entry.add(this.getCheckBox(type, viewer));
+            entry.add(this.getFeatureTypeBox(type, viewer));
         } else {
             entry.add(new JLabel(type.getTypeString()));
         }
@@ -408,7 +414,7 @@ public class BasePanelFactory {
      * @return a check box for the given feature type, connected to the given
      * viewer.
      */
-    private JCheckBox getCheckBox(FeatureType type, AbstractViewer viewer) {
+    private JCheckBox getFeatureTypeBox(FeatureType type, AbstractViewer viewer) {
         JCheckBox checker = new JCheckBox(type.getTypeString());
         //special cases are handled here
         if (type != FeatureType.UNDEFINED) {
@@ -471,9 +477,11 @@ public class BasePanelFactory {
         JPanel legend = new JPanel();
         JPanel legend1 = new JPanel();
         JPanel legend2 = new JPanel();
-        legend.setLayout(new BorderLayout());
+        JPanel legend3 = new JPanel();
+        legend.setLayout(new BoxLayout(legend, BoxLayout.X_AXIS));
         legend1.setLayout(new BoxLayout(legend1, BoxLayout.PAGE_AXIS));
         legend2.setLayout(new BoxLayout(legend2, BoxLayout.PAGE_AXIS));
+        legend3.setLayout(new BoxLayout(legend3, BoxLayout.Y_AXIS));
         legend.setBackground(ColorProperties.LEGEND_BACKGROUND);
 
         legend1.add(this.getLegendEntry(ColorProperties.CDS, FeatureType.CDS, viewer));
@@ -481,14 +489,21 @@ public class BasePanelFactory {
         legend1.add(this.getLegendEntry(ColorProperties.EXON, FeatureType.EXON, viewer));
         legend1.add(this.getLegendEntry(ColorProperties.REPEAT_UNIT, FeatureType.REPEAT_UNIT, viewer));
         legend1.add(this.getLegendEntry(ColorProperties.MRNA, FeatureType.MRNA, viewer));
-        legend2.add(this.getLegendEntry(ColorProperties.MI_RNA, FeatureType.MIRNA, viewer));
+        legend1.add(this.getLegendEntry(ColorProperties.MI_RNA, FeatureType.MIRNA, viewer));
         legend2.add(this.getLegendEntry(ColorProperties.RRNA, FeatureType.RRNA, viewer));
         legend2.add(this.getLegendEntry(ColorProperties.TRNA, FeatureType.TRNA, viewer));
         legend2.add(this.getLegendEntry(ColorProperties.MISC_RNA, FeatureType.MISC_RNA, viewer));
-        legend2.add(this.getLegendEntry(ColorProperties.UNDEF_FEATURE, FeatureType.UNDEFINED, viewer));
+        legend2.add(this.getLegendEntry(ColorProperties.NC_RNA, FeatureType.NC_RNA, viewer));
+        legend2.add(this.getLegendEntry(ColorProperties.FIVE_UTR, FeatureType.FIVE_UTR, viewer));
+        legend2.add(this.getLegendEntry(ColorProperties.THREE_UTR, FeatureType.THREE_UTR, viewer));
+        legend3.add(this.getLegendEntry(ColorProperties.RBS, FeatureType.RBS, viewer));
+        legend3.add(this.getLegendEntry(ColorProperties.MINUS_THIRTYFIVE, FeatureType.MINUS_THIRTYFIVE, viewer));
+        legend3.add(this.getLegendEntry(ColorProperties.MINUS_TEN, FeatureType.MINUS_TEN, viewer));
+        legend3.add(this.getLegendEntry(ColorProperties.UNDEF_FEATURE, FeatureType.UNDEFINED, viewer));
 
-        legend.add(legend1, BorderLayout.WEST);
-        legend.add(legend2, BorderLayout.EAST);
+        legend.add(legend1);
+        legend.add(legend2);
+        legend.add(legend3);
 
         return legend;
     }
@@ -638,7 +653,7 @@ public class BasePanelFactory {
         legend.add(this.getLegendEntry(ColorProperties.PERFECT_MATCH, FeatureType.PERFECT_COVERAGE, viewer));
         legend.add(this.getLegendEntry(ColorProperties.BEST_MATCH, FeatureType.BEST_MATCH_COVERAGE, viewer));
         legend.add(this.getLegendEntry(ColorProperties.COMMON_MATCH, FeatureType.COMMON_COVERAGE, viewer));
-        legend.add(this.getLegendEntry(ColorProperties.ALIGNMENT_A, FeatureType.DIFF, null));
+        legend.add(this.getLegendEntry(ColorProperties.MISMATCH_BACKGROUND, FeatureType.DIFF, null));
         legend.add(this.getGradientEntry("Replicates: High to low"));
         legend.add(this.getLegendEntry(ColorProperties.BEST_MATCH, FeatureType.MULTIPLE_MAPPED_READ, viewer));
         return legend;

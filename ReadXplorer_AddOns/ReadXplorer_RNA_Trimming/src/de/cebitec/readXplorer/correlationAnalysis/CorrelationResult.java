@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 package de.cebitec.readXplorer.correlationAnalysis;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import java.util.ArrayList;
@@ -40,15 +41,15 @@ public class CorrelationResult extends ResultTrackAnalysis<CorrelationResult> {
     /**
      * New CorrelationResult data object.
      * @param correlationsList list of found correlations
-     * @param trackMap hashmap of track ids to tracks used in the analysis
-     * @param referenceId id of the reference genome, for which this result was
+     * @param reference id of the reference genome, for which this result was
      * generated
+     * @param trackMap hashmap of track ids to tracks used in the analysis
      * @param combineTracks <cc>true</cc>, if the tracks in the list are
      * combined, <cc>false</cc> otherwise
      */
     public CorrelationResult(List<CorrelatedInterval> correlationsList, Map<Integer, PersistantTrack> trackMap, 
-            int referenceId, boolean combineTracks, int trackColumn, int filterColumn) {
-        super(trackMap, referenceId, combineTracks, trackColumn, filterColumn);
+            PersistantReference reference, boolean combineTracks, int trackColumn, int filterColumn) {
+        super(reference, trackMap, combineTracks, trackColumn, filterColumn);
         this.correlationsList = correlationsList;
     }
     

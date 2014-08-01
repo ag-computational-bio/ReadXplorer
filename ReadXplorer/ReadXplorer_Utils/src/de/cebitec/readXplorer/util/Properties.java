@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -143,9 +143,9 @@ public class Properties {
     
     /** Property for the height of data viewers. */
     public static final String VIEWER_HEIGHT = "VIEWER_HEIGHT";
-    /** Small viewer height = "120" pixels. */
-    public static final int SMALL_HEIGHT = 120;
-    /** Medium viewer height = "200" pixels. */
+    /** Minimum viewer height = "120" pixels. */
+    public static final int MIN_HEIGHT = 120;
+    /** Medium/default viewer height = "200" pixels. */
     public static final int DEFAULT_HEIGHT = 200;
     /** Large viewer height = "250" pixels. */
     public static final int MAX_HEIGHT = 250;
@@ -168,4 +168,7 @@ public class Properties {
     public static final String STRAND_FEATURE_STRING = String.valueOf(STRAND_FEATURE);
     /** 2 = Opposite strand option string.*/
     public static final String STRAND_OPPOSITE_STRING = String.valueOf(STRAND_OPPOSITE);
+    
+    /** 2 = Opposite strand option string.*/
+    public static final String BASE_QUALITY_OPTION = "BASE_QUALITY_OPTION";
 }

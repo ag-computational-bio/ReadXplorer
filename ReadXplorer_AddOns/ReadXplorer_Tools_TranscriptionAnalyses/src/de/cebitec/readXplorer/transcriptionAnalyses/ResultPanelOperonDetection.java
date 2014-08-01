@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
 
     private OperonDetectionResult operonResult;
     private HashMap<String, Integer> operonDetStats;
-    private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
+    private TableRightClickFilter<UneditableTableModel> tableFilter;
 
     /**
      * This panel is capable of showing a table with detected operons and
@@ -68,6 +68,10 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
      */
     public ResultPanelOperonDetection(ParameterSetOperonDet operonDetParameters) {
         initComponents();
+        final int posColumnIdx = 5;
+        final int trackColumnIdx = 2;
+        final int chromColumnIdx = 3;
+        tableFilter = new TableRightClickFilter<>(UneditableTableModel.class, posColumnIdx, trackColumnIdx);
         this.operonDetectionTable.getTableHeader().addMouseListener(tableFilter);
         this.initStatsMap();        
 
@@ -76,8 +80,6 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                int posColumnIdx = 5;
-                int chromColumnIdx = 3;
                 TableUtils.showPosition(operonDetectionTable, posColumnIdx, chromColumnIdx, getBoundsInfoManager());
             }
         });
@@ -208,6 +210,9 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
      */
     @Override
     public void addResult(ResultTrackAnalysis newResult) {
+        
+        tableFilter.setTrackMap(newResult.getTrackMap());
+        
         if (newResult instanceof OperonDetectionResult) {
             OperonDetectionResult operonResultNew = (OperonDetectionResult) newResult;
             final int nbColumns = 11;

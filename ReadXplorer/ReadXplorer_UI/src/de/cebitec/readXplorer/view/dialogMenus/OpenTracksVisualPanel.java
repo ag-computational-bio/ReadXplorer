@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,6 +37,7 @@ import org.openide.nodes.Node;
 import org.openide.util.Exceptions;
 
 /**
+ * A panel for the selection of tracks for a given reference.
  *
  * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
  */
@@ -50,7 +51,7 @@ public class OpenTracksVisualPanel extends JobPanel implements ExplorerManager.P
     private List<PersistantTrack> selectedTracks;
 
     /**
-     * Creates new form OpenTracksVisualPanel
+     * Creates a new panel for the selection of tracks for a given reference.
      * @param referenceID id of the reference genome
      */
     public OpenTracksVisualPanel(int referenceID) {
@@ -74,6 +75,8 @@ public class OpenTracksVisualPanel extends JobPanel implements ExplorerManager.P
 
         trackListPanel = new javax.swing.JPanel();
         combineTracksBox = new javax.swing.JCheckBox();
+        buttonSelectAll = new javax.swing.JButton();
+        buttonDeselectAll = new javax.swing.JButton();
 
         javax.swing.GroupLayout trackListPanelLayout = new javax.swing.GroupLayout(trackListPanel);
         trackListPanel.setLayout(trackListPanelLayout);
@@ -83,11 +86,25 @@ public class OpenTracksVisualPanel extends JobPanel implements ExplorerManager.P
         );
         trackListPanelLayout.setVerticalGroup(
             trackListPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 180, Short.MAX_VALUE)
+            .addGap(0, 176, Short.MAX_VALUE)
         );
 
         org.openide.awt.Mnemonics.setLocalizedText(combineTracksBox, org.openide.util.NbBundle.getMessage(OpenTracksVisualPanel.class, "OpenTracksVisualPanel.combineTracksBox.text")); // NOI18N
         combineTracksBox.setToolTipText(org.openide.util.NbBundle.getMessage(OpenTracksVisualPanel.class, "OpenTracksVisualPanel.combineTracksBox.toolTipText")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(buttonSelectAll, org.openide.util.NbBundle.getMessage(OpenTracksVisualPanel.class, "OpenTracksVisualPanel.buttonSelectAll.text")); // NOI18N
+        buttonSelectAll.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonSelectAllActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(buttonDeselectAll, org.openide.util.NbBundle.getMessage(OpenTracksVisualPanel.class, "OpenTracksVisualPanel.buttonDeselectAll.text")); // NOI18N
+        buttonDeselectAll.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonDeselectAllActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -96,6 +113,10 @@ public class OpenTracksVisualPanel extends JobPanel implements ExplorerManager.P
             .addComponent(trackListPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(combineTracksBox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(buttonSelectAll)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(buttonDeselectAll)
                 .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -103,10 +124,34 @@ public class OpenTracksVisualPanel extends JobPanel implements ExplorerManager.P
             .addGroup(layout.createSequentialGroup()
                 .addComponent(trackListPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(combineTracksBox))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(combineTracksBox)
+                    .addComponent(buttonSelectAll)
+                    .addComponent(buttonDeselectAll)))
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    private void buttonSelectAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonSelectAllActionPerformed
+        this.updateSelectionOfAllItems(true);
+    }//GEN-LAST:event_buttonSelectAllActionPerformed
+
+    private void buttonDeselectAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonDeselectAllActionPerformed
+        this.updateSelectionOfAllItems(false);
+    }//GEN-LAST:event_buttonDeselectAllActionPerformed
+
+    /**
+     * Either selects or deselects all items contained in the outline view and
+     * the explorer manager.
+     * @param selectAll true, if all items shall be selected, false otherwise
+     */
+    private void updateSelectionOfAllItems(boolean selectAll) {
+        StandardItem.setSelectionOfAllItems(outlineView, explorerManager.getRootContext().getChildren().getNodes(), selectAll);
+        this.isRequiredInfoSet();
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton buttonDeselectAll;
+    private javax.swing.JButton buttonSelectAll;
     private javax.swing.JCheckBox combineTracksBox;
     private javax.swing.JPanel trackListPanel;
     // End of variables declaration//GEN-END:variables
@@ -198,7 +243,11 @@ public class OpenTracksVisualPanel extends JobPanel implements ExplorerManager.P
         this.checkSelectedRowBoxes();
         
         boolean requiredInfoSet = this.getAllMarkedNodes().size() > 0;
-        if (requiredInfoSet) { this.storeSelectedTracks(); }
+        if (requiredInfoSet) { 
+            this.storeSelectedTracks(); 
+        } else {
+            this.selectedTracks.clear();
+        }
         firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, requiredInfoSet);
         return requiredInfoSet;
     }
@@ -212,11 +261,8 @@ public class OpenTracksVisualPanel extends JobPanel implements ExplorerManager.P
             if (selectedNodes[i] instanceof TrackNode) {
                 StandardItem item = ((StandardNode) selectedNodes[i]).getData();
                 if (item instanceof TrackItem) {
-                    TrackItem trackItem = (TrackItem) item;
-                    if (!selectedTracks.contains(trackItem.getTrack())) {
-                        if (!item.getSelected()) {
-                            item.setSelected(true);
-                        }
+                    if (!selectedTracks.contains(((TrackItem) item).getTrack()) && !item.getSelected()) {
+                        item.setSelected(true);
                     }
                 }
             }

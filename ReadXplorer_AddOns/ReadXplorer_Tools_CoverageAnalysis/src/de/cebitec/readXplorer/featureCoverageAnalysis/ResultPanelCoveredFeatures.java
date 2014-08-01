@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 package de.cebitec.readXplorer.featureCoverageAnalysis;
 
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.readXplorer.util.UneditableTableModel;
@@ -52,9 +51,8 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
     private BoundsInfoManager bim;
     private CoveredFeatureResult coveredFeaturesResult;
     private Map<String, Integer> coveredStatisticsMap;
-    private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
+    private TableRightClickFilter<UneditableTableModel> tableFilter;
     private ReferenceFeatureTopComp refFeatureComp;
-    private PersistantReference refGenome;
     
     
     /**
@@ -64,6 +62,10 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
      */
     public ResultPanelCoveredFeatures() {
         initComponents();
+        final int posColumnIdx = 0;
+        final int trackColumnIdx = 1;
+        final int chromColumnIdx = 2;
+        tableFilter = new TableRightClickFilter<>(UneditableTableModel.class, posColumnIdx, trackColumnIdx);
         this.coveredFeaturesTable.getTableHeader().addMouseListener(tableFilter);
         this.coveredStatisticsMap = new HashMap<>();
         this.refFeatureComp = ReferenceFeatureTopComp.findInstance();
@@ -73,8 +75,6 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                int posColumnIdx = 0;
-                int chromColumnIdx = 2;
                 TableUtils.showPosition(coveredFeaturesTable, posColumnIdx, chromColumnIdx, bim);
                 refFeatureComp.showTableFeature(coveredFeaturesTable, 0);
             }
@@ -196,6 +196,8 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
      * @param coveredFeaturesResultNew 
      */
     public void addCoveredFeatures(final CoveredFeatureResult coveredFeaturesResultNew) {
+        tableFilter.setTrackMap(coveredFeaturesResultNew.getTrackMap());
+        
         final int nbColumns = 9;
         final List<CoveredFeature> features = new ArrayList<>(coveredFeaturesResultNew.getResults());
         
@@ -249,9 +251,5 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
      */
     public int getResultSize() {
         return this.coveredFeaturesResult.getResults().size();
-    }
-    
-    public void setReferenceGenome(PersistantReference refGenome) {
-        this.refGenome = refGenome;
     }
 }

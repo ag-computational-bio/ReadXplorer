@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,12 @@ package de.cebitec.readXplorer.util;
 public class PositionUtils {
 
     /**
+     * Utility class. Instantiation is not allowed.
+     */
+    private PositionUtils() {
+    }
+
+    /**
      * Converts a position string to the corresponding integer position.
      * @param posString position as string, which might include a '_' 
      * @return corresponding position value as integer
@@ -33,5 +39,25 @@ public class PositionUtils {
             posString = posString.substring(0, posString.lastIndexOf('_'));
         }
         return Integer.parseInt(posString);
+    }
+
+    /**
+     * Determines the frame of an element at a given genomic position on the fwd
+     * strand.
+     * @param position genomic position whose frame needs to be determined
+     * @return 1, 2, 3 depending on the reading frame of the feature
+     */
+    public static int determineFwdFrame(int position) {
+        return (position - 1) % 3 + 1;
+    }
+
+    /**
+     * Determines the frame of an element at a given genomic position on the rev
+     * strand.
+     * @param position genomic position whose frame needs to be determined
+     * @return -1, -2, -3 depending on the reading frame of the feature
+     */
+    public static int determineRevFrame(int position) {
+        return (position - 1) % 3 - 3;
     }
 }

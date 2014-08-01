@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ package de.cebitec.readXplorer.util;
  */
 import java.io.IOException;
 import java.io.OutputStream;
-
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 
@@ -49,12 +48,14 @@ public class TextAreaOutputStream extends OutputStream {
    @Override
    public void write(int b) throws IOException {
 
-      if (b == '\r')
+      if (b == '\r') {
          return;
+      }
 
       if (b == '\n') {
          final String text = sb.toString() + "\n";
          SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                textArea.append(text);
             }

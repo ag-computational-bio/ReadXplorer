@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -532,7 +532,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
      * @param bp BasePanel where user has clicked
      */
     private void updateCurrentFeature(BasePanel bp) {
-        ReferenceFeatureTopComp comp = (ReferenceFeatureTopComp) WindowManager.getDefault().findTopComponent("ReferenceFeatureTopComp");
+        ReferenceFeatureTopComp comp = ReferenceFeatureTopComp.findInstance();
         if (comp != null) {
             for (PersistantFeature feature : featureToTrackpanelList.keySet()) {
                 if (featureToTrackpanelList.get(feature).contains(bp)) {

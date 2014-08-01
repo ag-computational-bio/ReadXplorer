@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readXplorer.view.TopComponentExtended;
 import de.cebitec.readXplorer.view.dialogMenus.explorer.CustomOutlineCellRenderer;
 import de.cebitec.readXplorer.view.dialogMenus.explorer.StandardItem;
+import de.cebitec.readXplorer.view.dialogMenus.explorer.StandardNode;
 import de.cebitec.readXplorer.view.login.LoginWizardAction;
 import java.awt.EventQueue;
 import java.awt.event.MouseAdapter;
@@ -243,12 +244,10 @@ public final class DashboardWindowTopComponent extends TopComponentExtended impl
      */
     private DBItem getItemForNode(Node n) {
         DBItem item = null;
-        if (n instanceof DBItemNode) {
-            StandardItem standardItem = ((DBItemNode) n).getData();
-            if (standardItem instanceof DBItem) {
+            StandardItem standardItem = StandardNode.getItemForNode(n);
+            if (standardItem != null && standardItem instanceof DBItem) {
                 item = (DBItem) standardItem;
             }
-        }
         return item;
     }
     
@@ -521,28 +520,12 @@ public final class DashboardWindowTopComponent extends TopComponentExtended impl
     }//GEN-LAST:event_createDBButtonActionPerformed
 
     private void selectAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectAllButtonActionPerformed
-        setSelectionOfAllNodes(em.getRootContext().getChildren().getNodes(), true);
+        StandardItem.setSelectionOfAllItems(ov, em.getRootContext().getChildren().getNodes(), true);
     }//GEN-LAST:event_selectAllButtonActionPerformed
 
     private void deselectAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deselectAllButtonActionPerformed
-        setSelectionOfAllNodes(em.getRootContext().getChildren().getNodes(), false);
+        StandardItem.setSelectionOfAllItems(ov, em.getRootContext().getChildren().getNodes(), false);
     }//GEN-LAST:event_deselectAllButtonActionPerformed
-
-    /**
-     * Selects or deselects all nodes in the explorer, depending on the given
-     * parameter.
-     * @param selected true, if all nodes shall be selected, false otherwise
-     */
-    private void setSelectionOfAllNodes(Node[] nodes, boolean selected) {
-        for (int i = 0; i < nodes.length; ++i) {
-            DBItem dbItem = getItemForNode(nodes[i]);
-            if (dbItem != null) {
-                dbItem.setSelected(selected);
-            }
-            this.setSelectionOfAllNodes(nodes[i].getChildren().getNodes(), selected);
-        }
-        ov.repaint();
-    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel buttonPanel;

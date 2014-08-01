@@ -9,7 +9,6 @@ import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.BasePanelFactory;
-import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.readxplorer.vcf.visualization.Snp_VcfResult;
 import de.cebitec.readxplorer.vcf.visualization.Snp_VcfResultPanel;
 import de.cebitec.readxplorer.vcf.visualization.Snp_VcfResultTopComponent;
@@ -58,8 +57,7 @@ public final class VcfImportAction implements ActionListener {
     private List<VariantContext> variantCList;
     
     private Map<Integer, PersistantTrack> trackMap = new HashMap<>();
-    private PersistantReference persRef;
-    private int referenceId;
+    private PersistantReference reference;
     private boolean combineTracks;
     
     private AppPanelTopComponent appPanelTopComp;
@@ -121,8 +119,7 @@ public final class VcfImportAction implements ActionListener {
     private void openResultWindow() {
        
         // Saves required information for generating a Snp_VcfResult Object
-        persRef = (PersistantReference) wiz.getProperty(VcfImportWizardPanel.PROP_SELECTED_REF);
-        referenceId = persRef.getId();
+        reference = (PersistantReference) wiz.getProperty(VcfImportWizardPanel.PROP_SELECTED_REF);
         combineTracks = false;
 
         // Opens VcfResultPanel
@@ -131,7 +128,7 @@ public final class VcfImportAction implements ActionListener {
         }
         vcfResultTopComp.open();
 
-        Snp_VcfResult vcfResult = new Snp_VcfResult(variantCList, trackMap, referenceId, combineTracks);
+        Snp_VcfResult vcfResult = new Snp_VcfResult(variantCList, trackMap, reference, combineTracks);
         resultPanel.addResult(vcfResult);
         vcfResultTopComp.openAnalysisTab("Result Panel", resultPanel);
     }
@@ -144,7 +141,7 @@ public final class VcfImportAction implements ActionListener {
     private void openView(List<VariantContext> variantList) {
         
         // Saves required information for generating a VcfViewer-Object
-        ViewController viewController = this.checkAndOpenRefViewer(persRef);
+        ViewController viewController = this.checkAndOpenRefViewer(reference);
         resultPanel.setBoundsInfoManager(viewController.getBoundsManager());
         BasePanelFactory basePanelFac = viewController.getBasePanelFac();
         BasePanel basePanel = basePanelFac.getGenericBasePanel(false, false, false, null);
@@ -157,14 +154,14 @@ public final class VcfImportAction implements ActionListener {
             for (TopComponent topComp : topComps) {
                 if (topComp instanceof AppPanelTopComponent) {
                     AppPanelTopComponent appTopComp = (AppPanelTopComponent) topComp;
-                    if (appTopComp.getReferenceViewer().getReference().getId() == referenceId) {
+                    if (appTopComp.getReferenceViewer().getReference().getId() == reference.getId()) {
                         appPanelTopComp = appTopComp;
                     }
                 }
             }
         }
         
-        snpVcfViewer = new Snp_VcfViewer(viewController.getBoundsManager(), basePanel, persRef);
+        snpVcfViewer = new Snp_VcfViewer(viewController.getBoundsManager(), basePanel, reference);
         snpVcfViewer.setVariants(variantList);
         basePanel.setViewer(snpVcfViewer);
         appPanelTopComp.showBasePanel(basePanel);

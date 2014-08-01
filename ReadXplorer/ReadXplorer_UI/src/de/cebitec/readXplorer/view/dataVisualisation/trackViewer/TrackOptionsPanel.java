@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.LegendAndOptionsProvider;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
@@ -97,7 +96,7 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
      */
     private void initOtherComponents() {
         
-        this.createHeader();
+        LegendAndOptionsProvider.createHeader("General:");
         this.createQualityFilter();
         this.createScalingOption();
         this.createNormalizationOption();
@@ -106,21 +105,10 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
     }
 
     /**
-     * Sets the header of the panel.
-     */
-    private void createHeader() {
-        JLabel header = this.createLabel("General:");
-        final JPanel headerPanel = this.createStandardPanel();
-        headerPanel.add(header, BorderLayout.CENTER);
-        headerPanel.setPreferredSize(new Dimension(headerPanel.getPreferredSize().width, headerPanel.getPreferredSize().height + 2));
-        this.add(headerPanel);
-    }
-
-    /**
      * Creates the quality filter.
      */
     private void createQualityFilter() {
-        JPanel qualityPanel = this.createStandardPanel();
+        JPanel qualityPanel = LegendAndOptionsProvider.createStandardPanel();
         LegendAndOptionsProvider.createMappingQualityFilter(trackViewer, qualityPanel);
         this.add(qualityPanel);
     }
@@ -129,9 +117,8 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
      * Creates a check box for automatic scaling of the coverage.
      */
     private void createScalingOption() {
-        JPanel generalPanel = this.createStandardPanel();
-        final JCheckBox scaleBox = new JCheckBox("Automatic scaling enabled");
-        scaleBox.setBackground(ColorProperties.LEGEND_BACKGROUND);
+        JPanel generalPanel = LegendAndOptionsProvider.createStandardPanel();
+        final JCheckBox scaleBox = LegendAndOptionsProvider.createStandardCheckBox("Automatic scaling enabled");
         scaleBox.setSelected(pref.getBoolean(Properties.VIEWER_AUTO_SCALING, false));
 
         //automatic scaling enabled event
@@ -149,7 +136,7 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
             @Override
             public void preferenceChange(PreferenceChangeEvent evt) {
                 if (evt.getKey().equals(Properties.VIEWER_AUTO_SCALING)) {
-                    scaleBox.setSelected(evt.getNewValue().equals("true"));
+                    scaleBox.setSelected(pref.getBoolean(Properties.VIEWER_AUTO_SCALING, false));
                 }
             }
         });
@@ -161,8 +148,8 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
      * Creates the normalization options.
      */
     private void createNormalizationOption() {
-        JLabel header2 = this.createLabel("Normalization");
-        final JPanel headerPanel2 = this.createStandardPanel();
+        JLabel header2 = LegendAndOptionsProvider.createLabel("Normalization");
+        final JPanel headerPanel2 = LegendAndOptionsProvider.createStandardPanel();
         headerPanel2.add(header2, BorderLayout.CENTER);
         headerPanel2.setPreferredSize(new Dimension(headerPanel2.getPreferredSize().width, headerPanel2.getPreferredSize().height + 2));
         this.add(headerPanel2);
@@ -192,11 +179,8 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
             this.createNormalizationLabel(trackPanel, name);
         }
 
-        final JCheckBox log = new JCheckBox("Log2");
-        log.setBackground(ColorProperties.LEGEND_BACKGROUND);
-
-        final JCheckBox factor = new JCheckBox("Factor");
-        factor.setBackground(ColorProperties.LEGEND_BACKGROUND);
+        final JCheckBox log = LegendAndOptionsProvider.createStandardCheckBox("Log2");
+        final JCheckBox factor = LegendAndOptionsProvider.createStandardCheckBox("Factor");
 
         final JSpinner scaleFactorSpinner = new JSpinner();
         scaleFactorSpinner.setMaximumSize(new Dimension(50, 20));
@@ -295,9 +279,9 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
      */
     private void createNormalizationLabel(JPanel trackPanel, String name) {
         JPanel placeholder = LegendAndOptionsProvider.createPlaceholder();
-        JLabel nameLabel = this.createLabel("Track: " + name);
+        JLabel nameLabel = LegendAndOptionsProvider.createLabel("Track: " + name);
 
-        final JPanel labelPanel = this.createStandardPanel();
+        final JPanel labelPanel = LegendAndOptionsProvider.createStandardPanel();
         labelPanel.add(placeholder, BorderLayout.WEST);
         labelPanel.add(nameLabel, BorderLayout.CENTER);
         labelPanel.setPreferredSize(new Dimension(labelPanel.getPreferredSize().width, labelPanel.getPreferredSize().height + 2));
@@ -319,28 +303,5 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
         }
         return new NormalizationSettings(trackViewer.getTrackCon().getTrackIds(), bools, factors, hasNorm);
     }
-    
-    /**
-     * @param text Text to place on the label.
-     * @return A label with ColorProperties.LEGEND_BACKGROUND background color
-     * and font Arial in 11 with the given text.
-     */
-    private JLabel createLabel(String text) {
-        final JLabel label = new JLabel(text);
-        label.setBackground(ColorProperties.LEGEND_BACKGROUND);
-        label.setFont(new Font("Arial", Font.BOLD, 11));
-        return label;
-    }
-    
-    /**
-     * @return A JPanel with ColorProperties.LEGEND_BACKGROUND background color
-     * and a standard border layout.
-     */
-    private JPanel createStandardPanel() {
-        final JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(ColorProperties.LEGEND_BACKGROUND);
-        return panel;
-    }
-
 
 }

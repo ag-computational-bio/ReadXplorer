@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -77,8 +77,8 @@ public class PersistantCoverage implements Serializable {
      * want to set each coverage position separately you have to call
      * <code>incArraysToIntervalSize()</code>. Otherwise the arrays all have
      * length 0.
-     * @param leftBound left bound of the interval
-     * @param rightBound right bound of the interval
+     * @param leftBound left bound of the interval in reference coordinates
+     * @param rightBound right bound of the interval in reference coordinates
      * @param twoTracks true, if this is a container for storing the coverage of
      * two tracks
      */
@@ -103,25 +103,33 @@ public class PersistantCoverage implements Serializable {
     }
 
     /**
-     * @return The left bound of the stored coverage interval. The borders are
-     * inclusive in the data structures.
+     * @return The left bound of the stored coverage interval in reference
+     * coordinates. The borders are inclusive in the data structures.
      */
     public int getLeftBound() {
         return leftBound;
     }
 
     /**
-     * @return The right bound of the stored coverage interval. The borders are
-     * inclusive in the data structures.
+     * @return The right bound of the stored coverage interval in reference
+     * coordinates. The borders are inclusive in the data structures.
      */
     public int getRightBound() {
         return rightBound;
     }
 
+    /**
+     * @param leftBound The left bound of the stored coverage interval in
+     * reference coordinates. The borders are inclusive in the data structures.
+     */
     public void setLeftBound(int leftBound) {
         this.leftBound = leftBound;
     }
 
+    /**
+     * @param rightBound The right bound of the stored coverage interval in
+     * reference coordinates. The borders are inclusive in the data structures.
+     */
     public void setRightBound(int rightBound) {
         this.rightBound = rightBound;
     }
@@ -129,8 +137,8 @@ public class PersistantCoverage implements Serializable {
     /**
      * @param left left bound of the interval to check
      * @param right right bound of the interval to check
-     * @return <code>true</code>, if this coverage object covers the given interval,
-     * <code>false</code> otherwise
+     * @return <code>true</code>, if this coverage object covers the given
+     * interval, <code>false</code> otherwise
      */
     public boolean coversBounds(int left, int right) {
         if (this.leftBound == 0 && this.rightBound == 0) {
@@ -166,7 +174,7 @@ public class PersistantCoverage implements Serializable {
      * @return The internal index position at which the data for the given 
      * reference position can be found
      */
-    private int getInternalPos(int logPos) {
+    public int getInternalPos(int logPos) {
         return logPos - this.leftBound;
     }
     

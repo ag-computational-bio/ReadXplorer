@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.util.CodonUtilities;
 import de.cebitec.readXplorer.util.Pair;
+import de.cebitec.readXplorer.util.PositionUtils;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import java.util.ArrayList;
@@ -157,8 +158,8 @@ public class StartCodonFilter implements RegionFilterI {
                      * -2 = (pos 5 - 1) % 3 = 1 -> 1 - 3 = frame -2
                      * -3 = (pos 4 - 1) % 3 = 0 -> 0 - 3 = frame -3
                      */
-                    if ((start - 1) % 3 + 1 == this.frameCurrFeature ||
-                         (stop - 1) % 3 - 3 == this.frameCurrFeature) {
+                    if (    PositionUtils.determineFwdFrame(start) == this.frameCurrFeature ||
+                            PositionUtils.determineFwdFrame(stop)  == this.frameCurrFeature) {
                         regions.add(new Region(start, stop, isForwardStrand, type));
                     }
                 } else {

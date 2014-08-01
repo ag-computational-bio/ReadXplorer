@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,9 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantObject;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReferenceGap;
 import de.cebitec.readXplorer.util.ColorProperties;
+import de.cebitec.readXplorer.util.ColorUtils;
 import de.cebitec.readXplorer.util.SamAlignmentBlock;
+import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.view.dataVisualisation.GenomeGapManager;
 import de.cebitec.readXplorer.view.dataVisualisation.PaintUtilities;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
@@ -68,12 +70,12 @@ public class BlockComponent extends JComponent {
     private int absLogBlockStop;
     private int phyLeft;
     private int phyRight;
-    private float percentSandBPerCovUnit;
-    private float minSaturationAndBrightness;
+    private int maxReplicates;
     private final String toolTipInfoPart;
     private List<Rectangle> rectList;
     private List<BrickData> brickDataList;
     private Color blockColor;
+    private final boolean showBaseQualities;
 
     /**
      * A <code>BlockComponent</code> represents a read alignment as a colored
@@ -83,12 +85,12 @@ public class BlockComponent extends JComponent {
      * @param parentViewer The parent viewer in which this block shall be shown
      * @param gapManager The gap manager for this alignment
      * @param height The height of this block
-     * @param minSaturationAndBrightness The min saturation and brightness of 
-     * this block
-     * @param percentSandBPerCovUnit Percentage saturation and brithness per
-     * coverage unit for this block
+     * @param maxReplicates The maximum count of replicates in the current 
+     * interval among all mappings
+     * @param showBaseQualities
      */
-    public BlockComponent(BlockI block, final AbstractViewer parentViewer, GenomeGapManager gapManager, int height, float minSaturationAndBrightness, float percentSandBPerCovUnit) {
+    public BlockComponent(BlockI block, final AbstractViewer parentViewer, GenomeGapManager gapManager, int height, int maxReplicates,
+            boolean showBaseQualities) {
         super();
         this.rectList = new ArrayList<>();
         this.brickDataList = new ArrayList<>();
@@ -98,8 +100,8 @@ public class BlockComponent extends JComponent {
         this.parentViewer = parentViewer;
         this.absLogBlockStart = block.getAbsStart();
         this.absLogBlockStop = block.getAbsStop();
-        this.minSaturationAndBrightness = minSaturationAndBrightness;
-        this.percentSandBPerCovUnit = percentSandBPerCovUnit;
+        this.maxReplicates = maxReplicates;
+        this.showBaseQualities = showBaseQualities;
         this.gapManager = gapManager;
 
         PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos(absLogBlockStart);
@@ -378,19 +380,18 @@ public class BlockComponent extends JComponent {
      */
     private void calcSubComponents() {
 
+        PersistantMapping mapping = (PersistantMapping) block.getPersistantObject();
         this.calcAlignmentBlocks(block.getPersistantObject());
 
         // only count Bricks, that are no genome gaps.
         //Used for determining location of brick in viewer
         int brickCount = 0;
-        boolean gapPreceeding = false;
+        int gapCount = 0;
         Brick brick;
         for (Iterator<Brick> it = block.getBrickIterator(); it.hasNext();) {
             brick = it.next();
 
-            // only paint brick if mismatch
-            if (brick != Brick.MATCH) {
-
+            if (brick != Brick.MATCH || showBaseQualities) {
                 // get start of brick
                 int logBrickStart = absLogBlockStart + brickCount;
                 PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos(logBrickStart);
@@ -401,33 +402,45 @@ public class BlockComponent extends JComponent {
                 // in the genome as the gap. This forces the viewer to map to
                 // the same position, which would lead to this Brick being painted
                 // at the same location as the gap. So increase values manually
-                if (gapPreceeding) {
-                    x1 += bounds.getPhysWidth();
-                    labelCenter += bounds.getPhysWidth();
+                if (gapCount > 0) {
+                    x1 += bounds.getPhysWidth() * gapCount;
+                    labelCenter += bounds.getPhysWidth() * gapCount;
+                }
+                Rectangle rectangle = new Rectangle(x1, 0, (int) Math.ceil(bounds.getPhysWidth()), height);
+
+                Color brickColor = null;
+                if (brick != Brick.MATCH) {
+                    brickColor = this.determineMismatchBrickColor(brick);
+
+                    switch (brick) {
+                        case FOREIGN_GENOMEGAP:
+                        case GENOMEGAP_A:
+                        case GENOMEGAP_C:
+                        case GENOMEGAP_G:
+                        case GENOMEGAP_T:
+                        case GENOMEGAP_N:
+                            --brickCount;
+                            ++gapCount;
+                            break;
+                        default:
+                            gapCount = 0;
+                    }
+
+                } else {
+                    if (mapping.getBaseQualities().length > brickCount) {
+                        brickColor = ColorUtils.getAdaptedColor(mapping.getBaseQualities()[brickCount], SequenceUtils.MAX_PHRED, blockColor);
+                    }
+                    gapCount = 0;
                 }
 
-                Color brickColor = this.determineBrickColor(brick);
-                Rectangle rectangle = new Rectangle(x1, 0, (int) bounds.getPhysWidth(), height);
-                this.brickDataList.add(new BrickData(brick, rectangle, brickColor, labelCenter));
-
-                switch (brick) {
-                    case FOREIGN_GENOMEGAP :
-                    case GENOMEGAP_A :
-                    case GENOMEGAP_C :
-                    case GENOMEGAP_G :    
-                    case GENOMEGAP_T :
-                    case GENOMEGAP_N :
-                                    brickCount--;
-                                    gapPreceeding = true;
-                                    break;
-                    default : gapPreceeding = false;
+                if (brickColor != null) {
+                    this.brickDataList.add(new BrickData(brick, rectangle, brickColor, labelCenter));
                 }
-
             } else {
-                gapPreceeding = false;
+                gapCount = 0;
             }
 
-            brickCount++;
+            ++brickCount;
         }
     }
     
@@ -457,25 +470,21 @@ public class BlockComponent extends JComponent {
     }
 
     /**
-     * Determines the color, brithness and saturation of a block.
+     * Determines the color, brigthness and saturation of a block.
      * @return The color of the block.
      */
     private Color determineBlockColor() {
         PersistantMapping m = ((PersistantMapping) block.getPersistantObject());
-        Color tmp;
+        Color color;
         if (m.getDifferences() == 0) {
-            tmp = ColorProperties.BLOCK_MATCH;
+            color = ColorProperties.BLOCK_MATCH;
         } else if (m.isBestMatch()) {
-            tmp = ColorProperties.BLOCK_BEST_MATCH;
+            color = ColorProperties.BLOCK_BEST_MATCH;
         } else {
-            tmp = ColorProperties.BLOCK_N_ERROR;
+            color = ColorProperties.BLOCK_N_ERROR;
         }
 
-        float[] values = Color.RGBtoHSB(tmp.getRed(), tmp.getGreen(), tmp.getBlue(), null);
-        float sAndB = minSaturationAndBrightness + m.getNbReplicates() * percentSandBPerCovUnit;
-        tmp = Color.getHSBColor(values[0], sAndB, sAndB);
-
-        return tmp;
+        return ColorUtils.getAdaptedColor(m.getNbReplicates(), maxReplicates + 1, color);
     }
 
     /**
@@ -484,28 +493,28 @@ public class BlockComponent extends JComponent {
      * @param brick the non-matching brick (base) whose color is needed
      * @return the color of the non-matching brick
      */
-    private Color determineBrickColor(Brick brick) {
+    private Color determineMismatchBrickColor(Brick brick) {
         Color c;
         switch (brick) {
-            case BASE_A : c = ColorProperties.ALIGNMENT_A; break;
-            case BASE_C : c = ColorProperties.ALIGNMENT_G; break;
-            case BASE_G : c = ColorProperties.ALIGNMENT_C; break;
-            case BASE_T : c = ColorProperties.ALIGNMENT_T; break;
-            case BASE_N : c = ColorProperties.ALIGNMENT_N; break;
+            case BASE_A : //fallthrough
+            case BASE_C : //fallthrough
+            case BASE_G : //fallthrough
+            case BASE_T : //fallthrough
+            case BASE_N : //fallthrough
+            case READGAP     : //fallthrough
+            case GENOMEGAP_A : //fallthrough
+            case GENOMEGAP_C : //fallthrough
+            case GENOMEGAP_G : //fallthrough
+            case GENOMEGAP_T : //fallthrough
+            case GENOMEGAP_N : //fallthrough
+            case SKIPPED     : c = ColorProperties.MISMATCH_BACKGROUND; break;
             case FOREIGN_GENOMEGAP : c = ColorProperties.ALIGNMENT_FOREIGN_GENOMEGAP; break;
-            case READGAP : c = ColorProperties.ALIGNMENT_BASE_READGAP; break;
-            case GENOMEGAP_A : c = ColorProperties.ALIGNMENT_A; break;
-            case GENOMEGAP_C : c = ColorProperties.ALIGNMENT_C; break;
-            case GENOMEGAP_G : c = ColorProperties.ALIGNMENT_G; break;
-            case GENOMEGAP_T : c = ColorProperties.ALIGNMENT_T; break;
-            case GENOMEGAP_N : c = ColorProperties.ALIGNMENT_N; break;
-            case SKIPPED : c = ColorProperties.SKIPPED; break;
             case TRIMMED : c = ColorProperties.TRIMMED; break;
-            case UNDEF : c = ColorProperties.ALIGNMENT_BASE_UNDEF;
+            case UNDEF : c = ColorProperties.MISMATCH_BACKGROUND;
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", brick);
                 break;
             default:
-                c = ColorProperties.ALIGNMENT_BASE_UNDEF;
+                c = ColorProperties.MISMATCH_BACKGROUND;
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", brick);
         }
         

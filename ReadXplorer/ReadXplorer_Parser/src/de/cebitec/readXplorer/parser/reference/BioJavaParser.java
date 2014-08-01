@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -352,6 +352,10 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
         if (featureMap.containsKey(FeatureType.TRNA)) {
             rnaList.addAll(featureMap.get(FeatureType.TRNA));
             featureMap.remove(FeatureType.TRNA);
+        }
+        if (featureMap.containsKey(FeatureType.NC_RNA)) {
+            rnaList.addAll(featureMap.get(FeatureType.NC_RNA));
+            featureMap.remove(FeatureType.NC_RNA);
         }
 
         if (featureMap.containsKey(FeatureType.CDS)) {

@@ -38,7 +38,7 @@ public class Snp_VcfResultPanel extends  ResultTablePanel {
     private static final long serialVersionUID = 1L;
     private Map<String, Integer> vcfStatsMap;
     private Snp_VcfResult completeVcfData;
-    private final TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
+    private final TableRightClickFilter<UneditableTableModel> tableFilter;
     private Object[] rowData;
 
     /**
@@ -46,6 +46,10 @@ public class Snp_VcfResultPanel extends  ResultTablePanel {
      */
     public Snp_VcfResultPanel() {
         initComponents();
+        final int sourColumn = 3;
+        final int trackColumn = 2;
+        final int chromColumn = 1;
+        tableFilter = new TableRightClickFilter<>(UneditableTableModel.class, sourColumn, trackColumn);
         this.vcfTable.getTableHeader().addMouseListener(tableFilter);
         //ensures number of lines will adapt to number of translations (features) for each snp
         
@@ -56,8 +60,6 @@ public class Snp_VcfResultPanel extends  ResultTablePanel {
 
             @Override
             public void valueChanged(ListSelectionEvent lse) {
-                int sourColumn = 3;
-                int chromColumn = 1;
                 TableUtils.showPosition(vcfTable, sourColumn, chromColumn, getBoundsInfoManager());
                 
             }

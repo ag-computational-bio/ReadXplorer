@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.GeneralUtils;
@@ -73,7 +74,7 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
     
     private final ReferenceViewer context;
     
-    private int referenceId;
+    private PersistantReference reference;
     private List<PersistantTrack> tracks;
     private Map<Integer, PersistantTrack> trackMap;
     private SNP_DetectionTopComponent snpDetectionTopComp;
@@ -95,7 +96,7 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
      */
     public OpenSnpDetectionAction(ReferenceViewer context) {
         this.context = context;
-        this.referenceId = this.context.getReference().getId();
+        this.reference = this.context.getReference();
     }
 
     /**
@@ -125,10 +126,9 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
         
         @SuppressWarnings("unchecked")
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
-        this.openTracksPanel = new OpenTracksWizardPanel(PROP_WIZARD_NAME, referenceId);
+        this.openTracksPanel = new OpenTracksWizardPanel(PROP_WIZARD_NAME, reference.getId());
         this.readClassWizPanel = new SelectReadClassWizardPanel(PROP_WIZARD_NAME, false);
         this.featureTypePanel = new SelectFeatureTypeWizardPanel(PROP_WIZARD_NAME);
-        this.openTracksPanel.setReadClassVisualPanel(readClassWizPanel.getComponent());
         panels.add(openTracksPanel);
         panels.add(new SNPWizardPanel());
         panels.add(readClassWizPanel);
@@ -143,9 +143,8 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
         boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
         List<PersistantTrack> selectedTracks = openTracksPanel.getComponent().getSelectedTracks();
         if (!cancelled && !selectedTracks.isEmpty()) {
-            this.tracks = new ArrayList<>();
-            this.trackMap = ProjectConnector.getTrackMap(tracks);
             this.tracks = selectedTracks;
+            this.trackMap = ProjectConnector.getTrackMap(tracks);
 
             this.snpDetectionTopComp = (SNP_DetectionTopComponent) WindowManager.getDefault().findTopComponent("SNP_DetectionTopComponent");
             this.snpDetectionTopComp.setName(Bundle.TITLE_SNPDetectionTopComp());
@@ -233,7 +232,7 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
 
                 AnalysisSNPs analysisSNPs = trackToAnalysisMap.get(trackId);
                 final SnpDetectionResult result = new SnpDetectionResult(analysisSNPs.getResults(), 
-                        trackMap, referenceId, combineTracks, 2, 0);
+                        trackMap, reference, combineTracks, 2, 0);
                 result.setParameters(parametersSNPs);
 
                 SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread

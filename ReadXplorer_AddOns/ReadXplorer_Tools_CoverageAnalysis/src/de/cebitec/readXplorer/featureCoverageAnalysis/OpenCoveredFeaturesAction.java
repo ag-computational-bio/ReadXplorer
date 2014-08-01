@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.Pair;
@@ -73,7 +74,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
     private static final String PROP_WIZARD_NAME = "FeatureCoverageWiz";
     
     private final ReferenceViewer context;
-    private int referenceId;
+    private PersistantReference reference;
     private List<PersistantTrack> tracks;
     private CoveredFeaturesAnalysisTopComponent coveredAnnoAnalysisTopComp;
     private Map<Integer, AnalysisCoveredFeatures> trackToAnalysisMap;
@@ -92,7 +93,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
      */
     public OpenCoveredFeaturesAction(ReferenceViewer context) {
         this.context = context;
-        this.referenceId = this.context.getReference().getId();
+        this.reference = this.context.getReference();
         this.trackToAnalysisMap = new HashMap<>();
     }
 
@@ -115,10 +116,9 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
 
         @SuppressWarnings("unchecked")
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
-        this.openTracksWizPanel = new OpenTracksWizardPanel(PROP_WIZARD_NAME, referenceId);
+        this.openTracksWizPanel = new OpenTracksWizardPanel(PROP_WIZARD_NAME, reference.getId());
         this.readClassWizPanel = new SelectReadClassWizardPanel(PROP_WIZARD_NAME, true);
         this.featTypeWizPanel = new SelectFeatureTypeWizardPanel(PROP_WIZARD_NAME);
-        this.openTracksWizPanel.setReadClassVisualPanel(readClassWizPanel.getComponent());
         panels.add(openTracksWizPanel);
         panels.add(new CoveredFeaturesWizardPanel());
         panels.add(readClassWizPanel);
@@ -231,7 +231,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
 
                 AnalysisCoveredFeatures analysisCoveredFeatures = trackToAnalysisMap.get(trackId);
                 final CoveredFeatureResult result = new CoveredFeatureResult(analysisCoveredFeatures.getResults(), 
-                        trackMap, referenceId, combineTracks, 1, 0);
+                        trackMap, reference, combineTracks, 1, 0);
                 result.setParameters(parameters);
                 Map<String, Integer> statsMap = new HashMap<>();
                 statsMap.put(ResultPanelCoveredFeatures.FEATURES_TOTAL, analysisCoveredFeatures.getNoGenomeFeatures());

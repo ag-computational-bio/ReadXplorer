@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,45 +20,28 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * A brick represents one base or gap of a DNA sequence and stores its typeInt.
+ * A brick represents one base or gap of a DNA sequence.
  * 
  * @author rhilker
  */
 public enum Brick {
     
-    READGAP(Brick.READGAP_INT, Brick.READGAP_STRING),
-    FOREIGN_GENOMEGAP(Brick.FOREIGN_GENOMEGAP_INT, Brick.FOREIGN_GENOMEGAP_STRING),
-    BASE_N(Brick.BASE_N_INT, Brick.BASE_N_STRING),
-    BASE_A(Brick.BASE_A_INT, Brick.BASE_A_STRING),
-    BASE_G(Brick.BASE_G_INT, Brick.BASE_G_STRING),
-    BASE_C(Brick.BASE_C_INT, Brick.BASE_C_STRING),
-    BASE_T(Brick.BASE_T_INT, Brick.BASE_T_STRING),
-    MATCH(Brick.MATCH_INT, Brick.MATCH_STRING),
-    GENOMEGAP_N(Brick.GENOME_GAP_N_INT, Brick.GENOME_GAP_N_STRING),
-    GENOMEGAP_A(Brick.GENOME_GAP_A_INT, Brick.GENOME_GAP_A_STRING),
-    GENOMEGAP_G(Brick.GENOME_GAP_G_INT, Brick.GENOME_GAP_G_STRING),
-    GENOMEGAP_C(Brick.GENOME_GAP_C_INT, Brick.GENOME_GAP_C_STRING),
-    GENOMEGAP_T(Brick.GENOME_GAP_T_INT, Brick.GENOME_GAP_T_STRING),
-    UNDEF(Brick.UNDEF_INT, Brick.UNDEF_STRING),
-    SKIPPED(Brick.SKIPPED_INT, Brick.SKIPPED_STRING),
-    TRIMMED(Brick.TRIMMED_INT, Brick.TRIMMED_STRING);
-
-    private final static int READGAP_INT = 1;
-    private final static int FOREIGN_GENOMEGAP_INT = 3;
-    private final static int BASE_N_INT = 4;
-    private final static int BASE_A_INT = 5;
-    private final static int BASE_G_INT = 6;
-    private final static int BASE_C_INT = 7;
-    private final static int BASE_T_INT = 8;
-    private final static int MATCH_INT = 9;
-    private final static int GENOME_GAP_N_INT = 10;
-    private final static int GENOME_GAP_A_INT = 11;
-    private final static int GENOME_GAP_G_INT = 12;
-    private final static int GENOME_GAP_C_INT = 13;
-    private final static int GENOME_GAP_T_INT = 14;
-    private final static int UNDEF_INT = 15;
-    private final static int SKIPPED_INT = 16;
-    private final static int TRIMMED_INT = 17;
+    READGAP(Brick.READGAP_STRING),
+    FOREIGN_GENOMEGAP(Brick.FOREIGN_GENOMEGAP_STRING),
+    BASE_N(Brick.BASE_N_STRING),
+    BASE_A(Brick.BASE_A_STRING),
+    BASE_G(Brick.BASE_G_STRING),
+    BASE_C(Brick.BASE_C_STRING),
+    BASE_T(Brick.BASE_T_STRING),
+    MATCH(Brick.MATCH_STRING),
+    GENOMEGAP_N(Brick.GENOME_GAP_N_STRING),
+    GENOMEGAP_A(Brick.GENOME_GAP_A_STRING),
+    GENOMEGAP_G(Brick.GENOME_GAP_G_STRING),
+    GENOMEGAP_C(Brick.GENOME_GAP_C_STRING),
+    GENOMEGAP_T(Brick.GENOME_GAP_T_STRING),
+    UNDEF(Brick.UNDEF_STRING),
+    SKIPPED(Brick.SKIPPED_STRING),
+    TRIMMED(Brick.TRIMMED_STRING);
     
     private final static String READGAP_STRING = "_";
     private final static String FOREIGN_GENOMEGAP_STRING = "";
@@ -77,23 +60,14 @@ public enum Brick {
     private final static String SKIPPED_STRING = ".";
     private final static String TRIMMED_STRING = "⌿";
 
-    private int typeInt;
     private String typeString;
 
     /**
-     * A brick represents one base or gap of a dna sequence and stores its typeInt.
-     * @param typeInt typeInt of the base or gap
+     * A brick represents one base or gap of a dna sequence.
+     * @param typeString String representation of the base or gap
      */
-    private Brick(int typeInt, String typeString){
-        this.typeInt = typeInt;
+    private Brick(String typeString) {
         this.typeString = typeString;
-    }
-
-    /**
-     * @return the integer typeInt of this brick, which represents a certain base.
-     */
-    public int getType(){
-        return typeInt;
     }
 
     /**

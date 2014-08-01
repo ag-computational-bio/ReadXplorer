@@ -19,6 +19,10 @@
           <Component id="trackListPanel" max="32767" attributes="0"/>
           <Group type="102" attributes="0">
               <Component id="combineTracksBox" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="buttonSelectAll" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="buttonDeselectAll" min="-2" max="-2" attributes="0"/>
               <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
           </Group>
       </Group>
@@ -28,7 +32,11 @@
           <Group type="102" alignment="0" attributes="0">
               <Component id="trackListPanel" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="combineTracksBox" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="combineTracksBox" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="buttonSelectAll" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="buttonDeselectAll" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
           </Group>
       </Group>
     </DimensionLayout>
@@ -44,7 +52,7 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="180" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="176" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>
@@ -52,12 +60,32 @@
     <Component class="javax.swing.JCheckBox" name="combineTracksBox">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/vamp/view/dialogMenus/Bundle.properties" key="OpenTracksVisualPanel.combineTracksBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readXplorer/view/dialogMenus/Bundle.properties" key="OpenTracksVisualPanel.combineTracksBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
         <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="de/cebitec/vamp/view/dialogMenus/Bundle.properties" key="OpenTracksVisualPanel.combineTracksBox.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="buttonSelectAll">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/readXplorer/view/dialogMenus/Bundle.properties" key="OpenTracksVisualPanel.buttonSelectAll.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonSelectAllActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="buttonDeselectAll">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/readXplorer/view/dialogMenus/Bundle.properties" key="OpenTracksVisualPanel.buttonDeselectAll.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="buttonDeselectAllActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

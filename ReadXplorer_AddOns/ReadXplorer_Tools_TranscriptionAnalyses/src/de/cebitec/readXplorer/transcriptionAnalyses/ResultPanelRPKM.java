@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
     private HashMap<String, Integer> filterStatisticsMap;
     private PersistantFeature feature;
     private boolean statistics = false;
-    private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
+    private TableRightClickFilter<UneditableTableModel> tableFilter;
     private ReferenceFeatureTopComp refComp;
     
     /**
@@ -61,6 +61,10 @@ public class ResultPanelRPKM extends ResultTablePanel {
      */
     public ResultPanelRPKM() {
         initComponents();
+        final int posIdx = 0;
+        final int trackIdx = 2;
+        final int chromIdx = 3;
+        tableFilter = new TableRightClickFilter<>(UneditableTableModel.class, posIdx, trackIdx);
         this.rpkmTable.getTableHeader().addMouseListener(tableFilter);
         this.filterStatisticsMap = new HashMap<>();
         this.filterStatisticsMap.put(RETURNED_FEATURES, 0);
@@ -71,8 +75,6 @@ public class ResultPanelRPKM extends ResultTablePanel {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                int posIdx = 0;
-                int chromIdx = 3;
                 TableUtils.showPosition(rpkmTable, posIdx, chromIdx, getBoundsInfoManager());
                 refComp.showTableFeature(rpkmTable, 0);
             }
@@ -214,6 +216,8 @@ public class ResultPanelRPKM extends ResultTablePanel {
     @Override
     public void addResult(ResultTrackAnalysis newResult) {
 
+        tableFilter.setTrackMap(newResult.getTrackMap());
+        
         if (newResult instanceof RPKMAnalysisResult) {
             RPKMAnalysisResult rpkmCalcResultNew = (RPKMAnalysisResult) newResult;
 //            boolean moreThanOneChrom = rpkmCalcResultNew.getChromosomeMap().size() > 1;

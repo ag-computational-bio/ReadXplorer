@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,12 +16,10 @@
  */
 package de.cebitec.readXplorer.rnaTrimming;
 
-import de.cebitec.readXplorer.rnaTrimming.TrimMethodResult;
-import de.cebitec.readXplorer.rnaTrimming.RegularExpressionTrimMethod;
 import org.junit.After;
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *

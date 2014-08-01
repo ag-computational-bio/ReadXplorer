@@ -134,7 +134,6 @@ public class ExcelImporter {
                 trackMap.put(track.getId(), track);
 
                 List<PersistantFeature> genomeFeatures = new ArrayList<>();
-                int genomeId = refConnector.getRefGenome().getId();
                 Map<Integer, PersistantChromosome> chroms = refConnector.getChromosomesForGenome();
                 for (PersistantChromosome chrom : chroms.values()) {
                     genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
@@ -270,7 +269,7 @@ public class ExcelImporter {
                 params.setThresholdManuallySet(isThresholdSettedManually);
                 StatisticsOnMappingData stats = new StatisticsOnMappingData(refConnector.getRefGenome(), mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
 
-                TSSDetectionResults tssResult = new TSSDetectionResults(stats, null, trackMap, genomeId);
+                TSSDetectionResults tssResult = new TSSDetectionResults(stats, null, trackMap, refConnector.getRefGenome());
                 tssResult.setParameters(params);
                 List<TranscriptionStart> tss = new ArrayList<>();
                 TranscriptionStart ts = null;
@@ -482,7 +481,7 @@ public class ExcelImporter {
                 }
                 progressHandle.progress(27);
 
-                RPKMAnalysisResult rpkmResult = new RPKMAnalysisResult(trackMap, rpkms, refConnector.getRefGenome().getId());
+                RPKMAnalysisResult rpkmResult = new RPKMAnalysisResult(trackMap, rpkms, refConnector.getRefGenome());
                 resultPanel.addResult(rpkmResult);
                 rpkmResult.setParameters(params);
                 transcAnalysesTopComp.openAnalysisTab("RPKM values for " + refConnector.getAssociatedTrackNames().get(track.getId()) + " Hits:" + rpkmResult.getResults().size(), resultPanel);
@@ -618,7 +617,7 @@ public class ExcelImporter {
                     operons.add(operon);
                 }
                 progressHandle.progress(27);
-                OperonDetectionResult operonResults = new OperonDetectionResult(stats, trackMap, operons, refConnector.getRefGenome().getId());
+                OperonDetectionResult operonResults = new OperonDetectionResult(stats, trackMap, operons, refConnector.getRefGenome());
                 operonResults.setParameters(params);
                 resultPanel.addResult(operonResults);
                 transcAnalysesTopComp.openAnalysisTab("Operon detection results for " + refConnector.getAssociatedTrackNames().get(track.getId()) + " Hits: " + operonResults.getResults().size(), resultPanel);
@@ -708,7 +707,7 @@ public class ExcelImporter {
                 params.setThresholdManuallySet(isThresholdSettedManually);
                 StatisticsOnMappingData stats = new StatisticsOnMappingData(refConnector.getRefGenome(), mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
 
-                NovelRegionResult novelRegionResults = new NovelRegionResult(stats, trackMap, null, false);
+                NovelRegionResult novelRegionResults = new NovelRegionResult(refConnector.getRefGenome(), stats, trackMap, null, false);
                 novelRegionResults.setParameters(params);
                 List<NovelTranscript> novelRegions = new ArrayList<>();
                 NovelTranscript novelRegion = null;

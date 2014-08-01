@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,11 +31,17 @@ import org.openide.util.NbPreferences;
 
 /**
  * MappingAPI provides functions that can be accessed from outside this package
- * to use mapping fuctions
+ * to use mapping fuctions.
  * 
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 public class MappingApi {
+    
+    /**
+     * Utility class.
+     */
+    private MappingApi() {
+    }
     
     /**
      * Load the path to the mapper script from Netbeans preferences.
@@ -47,7 +53,7 @@ public class MappingApi {
         String path = NbPreferences.forModule(Object.class).get(Properties.MAPPER_PATH, "");
         
         //try to locate bwa_mapper.sh, if we are not on windows (bwa_mapper.sh works only on unix systems)
-        if ((path.equals("")) && (!(System.getProperty("os.name").toLowerCase().indexOf("win") >= 0))  ) {
+        if ((path.isEmpty()) && (!System.getProperty("os.name").toLowerCase().contains("win"))  ) {
             File result = InstalledFileLocator.getDefault().locate("Mapper/bwa_mapper.sh", "ReadXplorer_Mapping", false);
             if (result!=null) {
                 //try to set executable permission, if we are the owner
@@ -127,7 +133,7 @@ public class MappingApi {
                 return false;
             }
         }   
-        else return true;
+        else { return true; }
         
     }
 }

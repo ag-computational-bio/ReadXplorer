@@ -2,6 +2,7 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.RPKMvalue;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
@@ -38,8 +39,8 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetWholeTra
      * @param rpkmResults The result list of RPKM values and read counts
      * otherwise
      */
-    public RPKMAnalysisResult(Map<Integer, PersistantTrack> trackMap, List<RPKMvalue> rpkmResults, int refId) {
-        super(trackMap, refId, false, 2, 0);
+    public RPKMAnalysisResult(Map<Integer, PersistantTrack> trackMap, List<RPKMvalue> rpkmResults, PersistantReference reference) {
+        super(reference, trackMap, false, 2, 0);
         this.rpkmResults = rpkmResults;
     }
 

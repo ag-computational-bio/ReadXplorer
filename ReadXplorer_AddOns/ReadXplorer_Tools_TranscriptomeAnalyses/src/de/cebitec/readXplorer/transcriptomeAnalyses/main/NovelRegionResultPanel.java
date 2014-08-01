@@ -54,8 +54,8 @@ public class NovelRegionResultPanel extends ResultTablePanel {
     private BoundsInfoManager boundsInfoManager;
     private ReferenceViewer referenceViewer;
     private HashMap<String, Object> statisticsMap;
-    private final TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
-    private final TableRightClickDeletion<DefaultTableModel> rowDeletion = new TableRightClickDeletion();
+    private final TableRightClickFilter<UneditableTableModel> tableFilter;
+    private final TableRightClickDeletion<DefaultTableModel> rowDeletion = new TableRightClickDeletion<>();
     private HashMap<Integer, NovelTranscript> nrInHash;
     public final TableType tableType = TableType.NOVEL_TRANSCRIPTS_TABLE;
     public static final String NOVELREGION_DETECTION_MIN_LENGTH = "Minimal length of novel transcript";
@@ -74,6 +74,10 @@ public class NovelRegionResultPanel extends ResultTablePanel {
     public NovelRegionResultPanel() {
         initComponents();
         initStatsMap();
+        final int posColumnIdx = 0;
+        final int trackColumnIdx = 11;
+        final int chromColumnIdx = 2;
+        tableFilter = new TableRightClickFilter<>(UneditableTableModel.class, posColumnIdx, trackColumnIdx);
         this.novelRegionTable.getTableHeader().addMouseListener(tableFilter);
         this.novelRegionTable.addMouseListener(rowDeletion);
 
@@ -81,8 +85,6 @@ public class NovelRegionResultPanel extends ResultTablePanel {
         model.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                int posColumnIdx = 0;
-                int chromColumnIdx = 2;
                 TableUtils.showPosition(novelRegionTable, posColumnIdx, chromColumnIdx, boundsInfoManager);
             }
         });

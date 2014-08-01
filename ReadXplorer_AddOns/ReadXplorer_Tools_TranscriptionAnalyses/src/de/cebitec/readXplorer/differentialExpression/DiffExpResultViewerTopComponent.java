@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Kai Bernd Stadermann
+ * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -87,6 +87,9 @@ import org.openide.windows.TopComponent;
 public final class DiffExpResultViewerTopComponent extends TopComponentExtended implements Observer, ItemListener {
 
     private static final long serialVersionUID = 1L;
+    private static final int posIdx = 0;
+    private static final int trackIdx = 2;
+    private static final int chromIdx = 1;
     private TableModel tm;
     private ComboBoxModel<Object> cbm;
     private final ArrayList<DefaultTableModel> tableModels = new ArrayList<>();
@@ -96,7 +99,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
     private DeAnalysisHandler analysisHandler;
     private DeAnalysisHandler.Tool usedTool;
     private final ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Differential Gene Expression Analysis");
-    private final TableRightClickFilter<UneditableTableModel> rktm = new TableRightClickFilter<>(UneditableTableModel.class);
+    private final TableRightClickFilter<UneditableTableModel> rktm = new TableRightClickFilter<>(UneditableTableModel.class, posIdx, trackIdx);
     private ReferenceFeatureTopComp refComp;
 
     public DiffExpResultViewerTopComponent() {
@@ -127,15 +130,11 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
      * reference position of the currently selected genomic feature.
      */
     private void showPosition() {
-        Collection<ViewController> viewControllers
-                = (Collection<ViewController>) CentralLookup.getDefault().lookupAll(ViewController.class);
-        analysisHandler.getRefGenomeID();
-        for (Iterator<ViewController> it = viewControllers.iterator(); it.hasNext();) {
-            ViewController tmpVCon = it.next();
+        Collection<? extends ViewController> viewControllers = CentralLookup.getDefault().lookupAll(ViewController.class);
+        for (ViewController tmpVCon : viewControllers) {
             BoundsInfoManager bm = tmpVCon.getBoundsManager();
             if (bm != null && analysisHandler.getRefGenomeID() == tmpVCon.getCurrentRefGen().getId()) {
-                int posIdx = 0;
-                int chromIdx = 1;
+                
                 TableUtils.showPosition(topCountsTable, posIdx, chromIdx, bm);
             }
         }

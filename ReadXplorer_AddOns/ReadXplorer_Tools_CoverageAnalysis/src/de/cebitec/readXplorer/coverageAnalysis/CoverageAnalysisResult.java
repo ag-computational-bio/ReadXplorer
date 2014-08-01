@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 package de.cebitec.readXplorer.coverageAnalysis;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.exporter.tables.ExportDataI;
 import de.cebitec.readXplorer.util.GeneralUtils;
@@ -36,8 +37,8 @@ public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCove
     private CoverageIntervalContainer results;
 
     public CoverageAnalysisResult(CoverageIntervalContainer results, Map<Integer, PersistantTrack> trackMap, 
-            int referenceId, boolean combineTracks) {
-        super(trackMap, referenceId, combineTracks, 0, 3);
+            PersistantReference reference, boolean combineTracks) {
+        super(reference, trackMap, combineTracks, 0, 3);
         this.results = results;
     }
 

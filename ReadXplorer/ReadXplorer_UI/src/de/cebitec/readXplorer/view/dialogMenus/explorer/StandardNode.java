@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ public class StandardNode extends BeanNode<StandardItem> {
      * StandardItems and StandardItemChildren to the node and can return its
      * item.
      * @param bean the StandardItems to associate with this node
-     * @param children the children of the given <cc>bean</cc>
+     * @param children the children of the given <code>bean</code>
      * @throws IntrospectionException
      */
     public StandardNode(StandardItem bean, StandardItemChildren children) throws IntrospectionException {
@@ -81,6 +81,19 @@ public class StandardNode extends BeanNode<StandardItem> {
             }
         }
         return selectedNodes;
+    }
+    
+    /**
+     * @param n the node to check
+     * @return The <code>StandardItem</code> for the given node, if it contains 
+     * a <code>StandardItem</code>, if not, <code>null</code> is returned
+     */
+    public static StandardItem getItemForNode(Node n) {
+        StandardItem item = null;
+        if (n instanceof StandardNode) {
+            item = ((StandardNode) n).getData();
+        }
+        return item;
     }
     
 }

@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.parser.output.OutputParser;
 import de.cebitec.readXplorer.util.CodonUtilities;
-import de.cebitec.readXplorer.util.fileChooser.FastaFileChooser;
+import de.cebitec.readXplorer.util.fileChooser.StoreStringFileChooser;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.Region;
 import java.awt.Toolkit;
@@ -208,7 +208,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
                     String header = "Copied sequence from: " + refName + " position " + seqStart + " to " + seqEnd;
                     output = OutputParser.generateFasta(sequence, header);
                 }
-                new FastaFileChooser(new String[]{"fasta"}, "fasta", output);
+                new StoreStringFileChooser(new String[]{"fasta"}, "fasta", output);
             }
 
             /**
@@ -253,7 +253,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
                             + "bp, Amino Acids: " + length / 3;
                     output += OutputParser.generateFasta(sequencesToStore.get(i), header);
                 }
-                new FastaFileChooser(new String[]{"fasta"}, "fasta", output);
+                new StoreStringFileChooser(new String[]{"fasta"}, "fasta", output);
             }
         });
         return storeFastaCdsItem;

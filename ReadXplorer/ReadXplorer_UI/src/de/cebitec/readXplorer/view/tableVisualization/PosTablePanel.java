@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ public class PosTablePanel extends TablePanel {
     private final UneditableTableModel tableData;
     private PersistantReference reference;
     private TableType tableType;
-    private TableRightClickFilter<UneditableTableModel> filterListener = new TableRightClickFilter<>(UneditableTableModel.class);
+    private TableRightClickFilter<UneditableTableModel> filterListener;
 
     /**
      * Creates a new position table panel. A position table starts with a column
@@ -44,15 +44,38 @@ public class PosTablePanel extends TablePanel {
      */
     public PosTablePanel(UneditableTableModel tableData) {
         this.tableData = tableData;
+        final int posColumn = 0;
+        final int trackColumn;
+        final int chromColumn;
+        switch (tableType) {
+            case COVERAGE_ANALYSIS: //fallthrough
+            case RPKM_ANALYSIS: //fallthrough
+            case SNP_DETECTION: //fallthrough
+            case OPERON_DETECTION:
+                trackColumn = 2;
+                chromColumn = 3;
+                break;
+            case DIFF_GENE_EXPRESSION:
+                chromColumn = 1;
+                trackColumn = 2;
+                break;
+            case FEATURE_COVERAGE_ANALYSIS: //fallthrough
+            case TSS_DETECTION: //fallthrough
+            default:
+                trackColumn = 1;
+                chromColumn = 2;
+                break; //for all other tables
+        }
         this.initComponents();
-        this.initAdditionalComponents();
+        this.initAdditionalComponents(posColumn, chromColumn);
+        filterListener = new TableRightClickFilter<>(UneditableTableModel.class, posColumn, trackColumn);
         this.dataTable.getTableHeader().addMouseListener(filterListener);
     }
 
     /**
      * Initializes additionals stuff for this panel.
      */
-    private void initAdditionalComponents() {
+    private void initAdditionalComponents(final int posColumn, final int chromColumn) {
         this.dataTable.setModel(this.tableData);
         
         DefaultListSelectionModel model = (DefaultListSelectionModel) dataTable.getSelectionModel();
@@ -60,20 +83,8 @@ public class PosTablePanel extends TablePanel {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                
-            final int posColumn = 0;
-            final int chromColumn;
-            switch (tableType) {
-                case COVERAGE_ANALYSIS          : //fallthrough
-                case RPKM_ANALYSIS              : //fallthrough
-                case SNP_DETECTION              : //fallthrough
-                case OPERON_DETECTION           : chromColumn = 3; break;
-                case DIFF_GENE_EXPRESSION       : chromColumn = 1; break;
-                case FEATURE_COVERAGE_ANALYSIS  : //fallthrough
-                case TSS_DETECTION              : //fallthrough
-                default                         : chromColumn = 2; break; //for all other tables
-            }//TODO: feature position - map mit features im ram halten
-            //TODO: after closing of ref and reopening, it does not react anymore
+                //TODO: feature position - map mit features im ram halten
+                //TODO: after closing of ref and reopening, it does not react anymore
                 TableUtils.showPosition(dataTable, posColumn, chromColumn, getBoundsInfoManager(), reference);
             }
         });

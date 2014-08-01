@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -463,36 +463,38 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
      * @param viewer The viewer to navigate
      */
     public void setViewer(AbstractViewer viewer) {
-        boolean firstCall = this.viewer == null || this.chromObserver == null;
-        this.updateFeatTableObserver(this.refGenome, viewer, firstCall);
-        this.viewer = viewer;
-        this.refGenome = viewer.getReference();
-        this.boundsManager = viewer.getBoundsInformationManager();
-        refGenCon = ProjectConnector.getInstance().getRefGenomeConnector(refGenome.getId());
-        
-        if (refGenome.getNoChromosomes() > 1) {
+        if (viewer != this.viewer) {
+            boolean firstCall = this.viewer == null || this.chromObserver == null;
+            this.updateFeatTableObserver(this.refGenome, viewer, firstCall);
+            this.viewer = viewer;
+            this.refGenome = viewer.getReference();
+            this.boundsManager = viewer.getBoundsInformationManager();
+            refGenCon = ProjectConnector.getInstance().getRefGenomeConnector(refGenome.getId());
 
-            ChromosomeVisualizationHelper chromHelper = new ChromosomeVisualizationHelper();
-            if (firstCall) {
-                //Update the observer for changes to the chromosome selection anywhere else
-                this.chromObserver = chromHelper.createChromBoxWithObserver(chromComboBox, refGenome);
+            if (refGenome.getNoChromosomes() > 1) {
 
-                //Update the listener for changes to the chromosome selection in this box
-                chromListener = chromHelper.new ChromosomeListener(chromComboBox, viewer);
+                ChromosomeVisualizationHelper chromHelper = new ChromosomeVisualizationHelper();
+                if (firstCall) {
+                    //Update the observer for changes to the chromosome selection anywhere else
+                    this.chromObserver = chromHelper.createChromBoxWithObserver(chromComboBox, refGenome);
+
+                    //Update the listener for changes to the chromosome selection in this box
+                    chromListener = chromHelper.new ChromosomeListener(chromComboBox, viewer);
+                } else {
+                    this.chromObserver.setRefGenome(refGenome);
+                    this.chromListener.setViewer(viewer);
+                    chromHelper.updateChromBoxContent(chromComboBox, refGenome);
+                }
+
+                this.chromComboBox.setVisible(true);
+                this.chromCheckBox.setVisible(true);
+                this.chromComboBox.repaint();
             } else {
-                this.chromObserver.setRefGenome(refGenome);
-                this.chromListener.setViewer(viewer);
-                chromHelper.updateChromBoxContent(chromComboBox, refGenome);
+                this.chromComboBox.setVisible(false);
+                this.chromCheckBox.setVisible(false);
             }
-
-            this.chromComboBox.setVisible(true);
-            this.chromCheckBox.setVisible(true);
-            this.chromComboBox.repaint();
-        } else {
-            this.chromComboBox.setVisible(false);
-            this.chromCheckBox.setVisible(false);
+            this.fillFeatureList();
         }
-        this.fillFeatureList();
     }
     
     /**
@@ -541,6 +543,7 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
                     FeatureType.ANY, refGenome.getActiveChromId());
         }
         Collections.sort(features, new FeatureNameSorter());
+        PersistantFeature.Utils.addParentFeatures(features);
         PersistantFeature[] featureData = features.toArray(new PersistantFeature[features.size()]);
 
         //Create new Model for Table

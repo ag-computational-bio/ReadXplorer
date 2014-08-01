@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.VisualisationUtils;
@@ -68,7 +69,7 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
 
     private static final String PROP_WIZARD_NAME = "CoverageAnalysisWiz";
     private final ReferenceViewer context;
-    private int referenceId;
+    private PersistantReference reference;
     private List<PersistantTrack> tracks;
     private Map<Integer, AnalysisCoverage> trackToAnalysisMap;
     private ParameterSetCoverageAnalysis parameters;
@@ -87,7 +88,7 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
      */
     public OpenCoverageAnalysisAction(ReferenceViewer context) {
         this.context = context;
-        this.referenceId = this.context.getReference().getId();
+        this.reference = this.context.getReference();
         this.trackToAnalysisMap = new HashMap<>();
     }
 
@@ -109,9 +110,8 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
     private void runWizarAndCoverageAnnoAnalysis() {
 
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
-        this.openTracksPanel = new OpenTracksWizardPanel(PROP_WIZARD_NAME, referenceId);
+        this.openTracksPanel = new OpenTracksWizardPanel(PROP_WIZARD_NAME, reference.getId());
         this.readClassWizPanel = new SelectReadClassWizardPanel(PROP_WIZARD_NAME, false);
-        this.openTracksPanel.setReadClassVisualPanel(readClassWizPanel.getComponent());
         panels.add(openTracksPanel);
         panels.add(new CoverageAnalysisWizardPanel());
         panels.add(readClassWizPanel);
@@ -211,7 +211,7 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
 
                 AnalysisCoverage analysisCoverage = trackToAnalysisMap.get(trackId);
                 analysisCoverage.finishAnalysis();
-                final CoverageAnalysisResult result = new CoverageAnalysisResult(analysisCoverage.getResults(), trackMap, referenceId, combineTracks);
+                final CoverageAnalysisResult result = new CoverageAnalysisResult(analysisCoverage.getResults(), trackMap, reference, combineTracks);
            
                 result.setParameters(parameters);
                 

@@ -5,6 +5,7 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.VisualizationWizardIterator;
+import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.VisualizationWizardIterator;
 import de.cebitec.readXplorer.transcriptomeAnalyses.controller.VisualizationListener;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ChartType;
@@ -115,7 +116,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
     private ReferenceViewer referenceViewer;
     private TSSDetectionResults tssResult;
     private HashMap<String, Object> statisticsMap;
-    private final TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
+    private final TableRightClickFilter<UneditableTableModel> tableFilter;
     private final TableRightClickDeletion<DefaultTableModel> rowDeletion = new TableRightClickDeletion<>();
     private HashMap<Integer, TranscriptionStart> tssInHash;
     private MotifSearchModel model;
@@ -135,6 +136,10 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
      */
     public ResultPanelTranscriptionStart() {
         this.initComponents();
+        final int posColumnIdx = 0;
+        final int trackColumnIdx = 25;
+        final int chromColumnIdx = 1;
+        tableFilter = new TableRightClickFilter<>(UneditableTableModel.class, posColumnIdx, trackColumnIdx);
         this.tSSTable.getTableHeader().addMouseListener(tableFilter);
         this.tSSTable.addMouseListener(rowDeletion);
         this.initStatsMap();
@@ -143,8 +148,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         listSelectionModel.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                int posColumnIdx = 0;
-                int chromColumnIdx = 1;
                 TableUtils.showPosition(tSSTable, posColumnIdx, chromColumnIdx, boundsInfoManager);
             }
         });
@@ -899,7 +902,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
         ResultPanelTranscriptionStart transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
         transcriptionStartResultPanel.setReferenceViewer(this.referenceViewer);
-        TSSDetectionResults tssResultNew = new TSSDetectionResults(this.tssResult.getStats(), subTSS, tssResult.getTrackMap(), this.referenceViewer.getReference().getId());
+        TSSDetectionResults tssResultNew = new TSSDetectionResults(this.tssResult.getStats(), subTSS, tssResult.getTrackMap(), this.referenceViewer.getReference());
         tssResultNew.setResults(subTSS);
         tssResultNew.setParameters(this.tssResult.getParameters());
         transcriptionStartResultPanel.addResult(tssResultNew);

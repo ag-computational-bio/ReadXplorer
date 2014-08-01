@@ -12,7 +12,6 @@ import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.OperonAdjacen
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.SequinTableFormatExporter;
 import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.SequinTableSettingsWizardPanel;
-import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.PromotorSearchParameters;
 import de.cebitec.readXplorer.util.LineWrapCellRenderer;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.SequenceUtils;
@@ -67,7 +66,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel implements Obse
     private ReferenceViewer referenceViewer;
     private OperonDetectionResult operonResult;
     private HashMap<String, Object> operonDetStats;
-    private final TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
+    private final TableRightClickFilter<UneditableTableModel> tableFilter;
     private ProgressHandle progresshandle;
     private HashMap<Integer, Operon> operonsInHash;
     String separator = "";
@@ -79,6 +78,10 @@ public class ResultPanelOperonDetection extends ResultTablePanel implements Obse
      */
     public ResultPanelOperonDetection() {
         initComponents();
+        final int posColumnIdx = 0;
+        final int trackColumnIdx = 13;
+        final int chromColumnIdx = 4;
+        tableFilter = new TableRightClickFilter<>(UneditableTableModel.class, posColumnIdx, trackColumnIdx);
         this.operonDetectionTable.getTableHeader().addMouseListener(tableFilter);
         this.initStatsMap();
 
@@ -86,8 +89,6 @@ public class ResultPanelOperonDetection extends ResultTablePanel implements Obse
         model.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                int posColumnIdx = 0;
-                int chromColumnIdx = 4;
                 TableUtils.showPosition(operonDetectionTable, posColumnIdx, chromColumnIdx, boundsInfoManager);
             }
         });

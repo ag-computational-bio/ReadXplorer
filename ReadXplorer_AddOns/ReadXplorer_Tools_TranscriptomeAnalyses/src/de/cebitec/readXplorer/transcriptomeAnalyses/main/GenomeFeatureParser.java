@@ -52,7 +52,7 @@ public class GenomeFeatureParser {
         this.referenceLength = 0;
         this.refGenome = trackConnector.getRefGenome();
         this.noOfChromosomes = refGenome.getNoChromosomes();
-        this.region2Exclude = new ArrayList(this.noOfChromosomes);
+        this.region2Exclude = new ArrayList<>(this.noOfChromosomes);
         this.refConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenome.getId());
         Map<Integer, PersistantChromosome> chroms = refConnector.getChromosomesForGenome();
         for (PersistantChromosome chrom : chroms.values()) {
@@ -129,7 +129,7 @@ public class GenomeFeatureParser {
             count++;
             if (count >= interval) {
                 this.progressHandle.progress(progress);
-                interval = interval + interval;
+                interval += interval;
                 progress += 10;
             }
 

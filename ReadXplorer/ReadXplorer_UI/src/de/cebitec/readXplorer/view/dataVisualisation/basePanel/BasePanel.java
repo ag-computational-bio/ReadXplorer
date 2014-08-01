@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -174,20 +174,11 @@ public class BasePanel extends JPanel implements MousePositionListener {
      * @param viewer viewer to set
      */
     public void setViewerInScrollpane(AbstractViewer viewer) {
-        this.viewer = viewer;
-        this.boundsManager.addBoundsListener(viewer);
-
-        this.currentMousePosListeners.add(viewer);
-        this.centerScrollpane = new JScrollPane(this.viewer);
+        this.prepareViewerInScrollpane(viewer);
         this.centerScrollpane.setPreferredSize(new Dimension(490, 200));
-        this.centerScrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
-        this.centerPanel.add(this.centerScrollpane, BorderLayout.CENTER);
         this.centerScrollpane.setVisible(true);
         this.viewer.setVisible(true);
-        this.viewer.setScrollBar(this.centerScrollpane.getVerticalScrollBar());
-
-        this.addPlaceholder();
+        
         this.updateSize();
 
     }
@@ -198,19 +189,23 @@ public class BasePanel extends JPanel implements MousePositionListener {
      * @param viewer viewer to set
      * @param verticalZoom vertical zoom slider
      */
-    public void setViewerInScrollpane(AbstractViewer viewer, JSlider verticalZoom){
-        this.viewer = viewer;
+    public void setViewerInScrollpane(AbstractViewer viewer, JSlider verticalZoom) {
+        this.prepareViewerInScrollpane(viewer);
         verticalZoom.setOrientation(JSlider.VERTICAL);
+        this.centerPanel.add(verticalZoom, BorderLayout.WEST);
+        this.updateSize();
+    }
+    
+    private void prepareViewerInScrollpane(AbstractViewer viewer) {
+        this.viewer = viewer;
         this.boundsManager.addBoundsListener(viewer);
         this.currentMousePosListeners.add(viewer);
         this.centerScrollpane = new JScrollPane(this.viewer);
         this.centerScrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         this.centerPanel.add(this.centerScrollpane, BorderLayout.CENTER);
-        this.centerPanel.add(verticalZoom, BorderLayout.WEST);
-        this.viewer.setScrollBar(this.centerScrollpane.getVerticalScrollBar());
+        this.viewer.setScrollPane(this.centerScrollpane);
         
         this.addPlaceholder();
-        this.updateSize();
     }
     
     /**

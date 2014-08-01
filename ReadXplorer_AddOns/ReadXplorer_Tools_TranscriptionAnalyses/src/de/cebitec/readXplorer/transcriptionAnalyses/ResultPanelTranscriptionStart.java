@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -67,7 +67,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
     private ReferenceViewer referenceViewer;
     private TssDetectionResult tssResult;
     private HashMap<String, Integer> statisticsMap;
-    private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
+    private TableRightClickFilter<UneditableTableModel> tableFilter;
     
     
     /**
@@ -76,6 +76,10 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
      */
     public ResultPanelTranscriptionStart() {
         this.initComponents();
+        final int posColumnIdx = 0;
+        final int trackColumnIdx = 1;
+        final int chroColumnIdx = 2;
+        tableFilter = new TableRightClickFilter<>(UneditableTableModel.class, posColumnIdx, trackColumnIdx);
         this.tSSTable.getTableHeader().addMouseListener(tableFilter);
         this.initStatsMap();
        
@@ -84,8 +88,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                int posColumnIdx = 0;
-                int chroColumnIdx = 2;
                 TableUtils.showPosition(tSSTable, posColumnIdx, chroColumnIdx, getBoundsInfoManager());
             }
         });
@@ -229,6 +231,8 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
     @NbBundle.Messages("ResultPanelTranscriptionStart.parametersLabel.text_1=Parameters: min no read starts:  {0},  min coverage increase percent: {1}%,  max leaderless dist.: {2},  init. low cov. read start max:  {3},  min low cov. read starts: {4},  detect novel transcripts: {5},  transcript extension cov.: {6}")
     public void addResult(final ResultTrackAnalysis newResult) {
 
+        tableFilter.setTrackMap(newResult.getTrackMap());
+        
         if (newResult instanceof TssDetectionResult) {
             final TssDetectionResult tssResultNew = (TssDetectionResult) newResult;
             final List<TranscriptionStart> tsss = new ArrayList<>(tssResultNew.getResults());

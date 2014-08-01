@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,6 +31,9 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -47,6 +50,7 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import org.openide.util.Exceptions;
@@ -65,13 +69,18 @@ import org.openide.util.Exceptions;
 public abstract class AbstractViewer extends JPanel implements LogicalBoundsListener, MousePositionListener {
 
     private static final long serialVersionUID = 1L;
-    // logical coordinates for genome interval
+    /** x position of a legend label or menu. */
+    private static final int LEGEND_X = 2; 
+    /** x position of an options label or menu. */
+    private static final int OPTIONS_X = 70;
+    
+    /** logical coordinates for genome interval. */
     private BoundsInfo bounds;
     private boolean isPanning = false;
     private boolean canPan = true;
-    // correlation factor to compute physical position from logical position
+    /** Correlation factor to convert logical position into physical position */
     private double correlationFactor;
-    // gap at the sides of panel
+    /** Gap at the edges of the panel. */
     private int horizontalMargin;
     private int verticalMargin;
     private int zoom = 1;
@@ -79,7 +88,8 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     private double basewidth;
     private BoundsInfoManager boundsManager;
     private int oldLogMousePos;
-    private int currentLogMousePos; //the position of the genome, where to mouse is currently hovering
+    /** the position of the genome, where to mouse is currently hovering. */
+    private int currentLogMousePos;
     private int lastPhysPos = 0;
     private boolean printMouseOver;
     private BasePanel basePanel;
@@ -104,7 +114,8 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     public static final String PROP_MOUSEPOSITION_CHANGED = "mousePos changed";
     public static final String PROP_MOUSEOVER_REQUESTED = "mouseOver requested";
     public static final Color backgroundColor = new Color(240, 240, 240); //to prevent wrong color on mac
-    private JScrollBar scrollBar; /* Scrollbar, which should adapt, when component is repainted. */
+    /** Scrollpane, which should adapt, when component is repainted. */
+    private JScrollPane scrollPane; 
     private boolean centerScrollBar = false;
     private BufferedImage loadingIndicator;
     private boolean newDataRequestNeeded = false;
@@ -187,10 +198,8 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     public void setupLegend(MenuLabel label, JPanel legend) {
         this.hasLegend = true;
 
-        int labelX = 2;
         int labelY = 0;
-
-        this.setupMenu(label, legend, labelX, labelY);
+        this.setupMenu(label, legend, LEGEND_X, labelY);
         
         this.legendLabel = label;
         this.legend = legend;
@@ -204,10 +213,8 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     public void setupOptions(MenuLabel label, JPanel options) {
         this.hasOptions = true;
 
-        int labelX = 70; // this.getWidth() - 72;
         int labelY = 0;
-        
-        this.setupMenu(label, options, labelX, labelY);
+        this.setupMenu(label, options, OPTIONS_X, labelY);
 
         this.optionsLabel = label;
         this.options = options;
@@ -607,8 +614,38 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
             this.repaint();
         }
 
-        if (this.scrollBar != null && this.centerScrollBar) {
-            this.scrollBar.setValue(this.scrollBar.getMaximum() / 2 - this.getParent().getHeight() / 2);
+        if (this.scrollPane != null && this.centerScrollBar) {
+            JScrollBar verticalBar = this.scrollPane.getVerticalScrollBar();
+            verticalBar.setValue(verticalBar.getMaximum() / 2 - this.getParent().getHeight() / 2);
+        }
+    }
+    
+    /**
+     * Calling this method adds an AdjustmentListener to to the JScrollPane, in
+     * which this AbstractViewer is placed. This listener updates the vertical
+     * legend and option label and panel positions. If the viewer is not placed
+     * in a JScrollPane, nothing is done.
+     */
+    public void createListenerForScrollBar() {
+        if (this.scrollPane != null) {
+            this.scrollPane.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
+
+                @Override
+                public void adjustmentValueChanged(AdjustmentEvent e) {
+                    Rectangle visibleRect = scrollPane.getViewport().getViewRect();
+                    if (hasLegend()) {
+                        getLegendLabel().setLocation(visibleRect.x + LEGEND_X, visibleRect.y);
+                        getLegendPanel().setLocation(visibleRect.x + LEGEND_X, visibleRect.y + getLegendLabel().getSize().height + 2);
+                    }
+                    if (hasOptions()) {
+                        getOptionsLabel().setLocation(visibleRect.x + OPTIONS_X, visibleRect.y);
+                        getOptionsPanel().setLocation(visibleRect.x + OPTIONS_X, visibleRect.y + getOptionsLabel().getSize().height + 2);
+                    }
+                    if (hasChromSelectionPanel()) {
+                        getChromSelectionPanel().setLocation(visibleRect.x + OPTIONS_X, visibleRect.y);
+                    }
+                }
+            });
         }
     }
 
@@ -933,19 +970,20 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     }
 
     /**
-     * A scrollbar should be handed over, in case the scrollbar should adapt its
-     * value to the middle position, whenever the genome position was updated.
-     * @param scrollBar the scrollbar which should adapt
+     * A scrollpane should be handed over, in case the scrollpane should adapt
+     * its vertical value to the middle position, whenever the genome position
+     * was updated.
+     * @param scrollPane the scrollpane which should adapt
      */
-    public void setScrollBar(JScrollBar scrollBar) {
-        this.scrollBar = scrollBar;
+    public void setScrollPane(JScrollPane scrollPane) {
+        this.scrollPane = scrollPane;
     }
     
     /**
-     * Sets the property for centering the scrollbar around the center (sequence bar) (true)
-     * or not (false).
-     * @param centerScrollBar true, if the scrollbar should center around the sequence bar,
-     *              false otherwise
+     * Sets the property for centering the scrollbar around the center (sequence
+     * bar) (true) or not (false).
+     * @param centerScrollBar true, if the scrollbar should center around the
+     * sequence bar, false otherwise
      */
     public void setAutomaticCentering(boolean centerScrollBar) {
         this.centerScrollBar = centerScrollBar;

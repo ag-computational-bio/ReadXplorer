@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -105,7 +105,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         }
         
         this.analysisResult = new CorrelationResult(this.correlationsList, trackMap, 
-                referenceViewer.getReference().getId(), false, -1, -1);
+                referenceViewer.getReference(), false, -1, -1);
         Map<String, Object> params = new HashMap<>();
         params.put("CorrelationCoefficient", cc);
         params.put("intervalLength", intervalLength);

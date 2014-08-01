@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,10 +21,13 @@ import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -59,7 +62,7 @@ public class LegendAndOptionsProvider {
         minMappingQualityField.setMaximumSize(new Dimension(50, 20));
         final JButton minMappingQualityButton = new JButton(Bundle.MinMappingQualityText());
 
-        //automatic centering around the sequence bar enabled event
+        //create listener for updating the viewer when the filter value has been changed
         minMappingQualityButton.addActionListener(new ActionListener() {
 
             @Override
@@ -99,5 +102,51 @@ public class LegendAndOptionsProvider {
         placeholder.setMinimumSize(new Dimension(3, 20));
         placeholder.setPreferredSize(new Dimension(3, 20));
         return placeholder;
+    }
+    
+    /**
+     * @param text Text to place on the label.
+     * @return A label with ColorProperties.LEGEND_BACKGROUND background color
+     * and font Arial in 11 with the given text.
+     */
+    public static JLabel createLabel(String text) {
+        final JLabel label = new JLabel(text);
+        label.setBackground(ColorProperties.LEGEND_BACKGROUND);
+        label.setFont(new Font("Arial", Font.BOLD, 11));
+        return label;
+    }
+
+    /**
+     * @return A JPanel with ColorProperties.LEGEND_BACKGROUND background color
+     * and a standard border layout.
+     */
+    public static JPanel createStandardPanel() {
+        final JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(ColorProperties.LEGEND_BACKGROUND);
+        return panel;
+    }
+
+    /**
+     * @param text The text to place on the check box
+     * @return A JCheckBox with ColorProperties.LEGEND_BACKGROUND background 
+     * color.
+     */
+    public static JCheckBox createStandardCheckBox(String text) {
+        final JCheckBox checkBox = new JCheckBox(text);
+        checkBox.setBackground(ColorProperties.LEGEND_BACKGROUND);
+        return checkBox;
+    }    
+    
+    /**
+     * Creates a panel to use as header for some other component.
+     * @param text The text to place on the header panel
+     * @return The header panel
+     */
+    public static JPanel createHeader(String text) {
+        JLabel header = LegendAndOptionsProvider.createLabel(text);
+        final JPanel headerPanel = LegendAndOptionsProvider.createStandardPanel();
+        headerPanel.add(header, BorderLayout.CENTER);
+        headerPanel.setPreferredSize(new Dimension(headerPanel.getPreferredSize().width, headerPanel.getPreferredSize().height + 2));
+        return headerPanel;
     }
 }

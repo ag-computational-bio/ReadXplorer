@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -105,7 +105,6 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
             rpkmPanel = new TransAnalysesRPKMWizardPanel();
             featTypeRPKMPanel = new SelectFeatureTypeWizardPanel(PROP_RPKM_ANALYSIS);
             featTypeOperonPanel = new SelectFeatureTypeWizardPanel(PROP_OPERON_ANALYSIS);
-            openTracksPanel.setReadClassVisualPanel(readClassPanel.getComponent());
             featTypeOperonPanel.getComponent().showDisplayName(true);
             featTypeRPKMPanel.getComponent().showDisplayName(true);
 

@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
+import javax.swing.ImageIcon;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
 import jxl.write.Label;
@@ -36,6 +36,7 @@ import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 import org.netbeans.api.progress.ProgressHandle;
+import org.openide.awt.NotificationDisplayer;
 import org.openide.util.NbBundle;
 
 
@@ -102,8 +103,8 @@ public class ExcelExporter implements TableExporterI {
      * @throws WriteException
      * @throws OutOfMemoryError  
      */
-    @NbBundle.Messages({"ExcelExporterSuccessMsg=Excel exporter stored data successfully: ", 
-        "ExcelExporterSuccessHeader=Information Message"})
+    @NbBundle.Messages({"SuccessMsg=Excel exporter stored data successfully: ", 
+                        "SuccessHeader=Success"})
     @Override
     public File writeFile(File file) throws FileNotFoundException, IOException, WriteException, OutOfMemoryError {
 
@@ -143,8 +144,7 @@ public class ExcelExporter implements TableExporterI {
         workbook.write();
         workbook.close();
 
-        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), Bundle.ExcelExporterSuccessMsg() + sheetNames.get(0),
-                Bundle.ExcelExporterSuccessHeader(), JOptionPane.INFORMATION_MESSAGE);
+        NotificationDisplayer.getDefault().notify(Bundle.SuccessHeader(), new ImageIcon(), Bundle.SuccessMsg() + sheetNames.get(0), null);
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished writing Excel file!");
 

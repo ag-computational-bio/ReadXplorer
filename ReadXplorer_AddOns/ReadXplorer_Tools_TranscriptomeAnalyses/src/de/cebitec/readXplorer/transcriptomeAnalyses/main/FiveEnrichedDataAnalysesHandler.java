@@ -6,6 +6,7 @@ import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.AnalysisStatus;
@@ -32,7 +33,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
 
     private TrackConnector trackConnector;
     private final PersistantTrack selectedTrack;
-    private final int refGenomeID;
+    private final PersistantReference reference;
     private final List<de.cebitec.readXplorer.util.Observer> observer = new ArrayList<>();
     protected HashMap<Integer, List<Integer>> forwardCDSs, reverseCDSs;
     private StatisticsOnMappingData stats;
@@ -64,7 +65,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
      */
     public FiveEnrichedDataAnalysesHandler(PersistantTrack selectedTrack, ParameterSetFiveEnrichedAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, Map<Integer, PersistantTrack> trackMap) {
         this.selectedTrack = selectedTrack;
-        this.refGenomeID = refViewer.getReference().getId();
+        this.reference = refViewer.getReference();
         this.parameters = parameterset;
         this.refViewer = refViewer;
         this.transcAnalysesTopComp = transcAnalysesTopComp;
@@ -165,7 +166,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
         this.stats.clearMemory();
         this.clearMemory();
 
-        TSSDetectionResults tssResult = new TSSDetectionResults(this.stats, this.tssDetection.getResults(), getTrackMap(), this.refGenomeID);
+        TSSDetectionResults tssResult = new TSSDetectionResults(this.stats, this.tssDetection.getResults(), getTrackMap(), this.reference);
 //        TSSDetectionResults tssResult = new TSSDetectionResults(this.stats, postProcessedTss, getTrackMap(), this.refGenomeID);
         tssResult.setParameters(this.parameters);
         this.transcriptionStartResultPanel.addResult(tssResult);

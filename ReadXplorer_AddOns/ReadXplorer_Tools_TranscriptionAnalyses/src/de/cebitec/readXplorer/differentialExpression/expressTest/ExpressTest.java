@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Kai Bernd Stadermann
+ * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

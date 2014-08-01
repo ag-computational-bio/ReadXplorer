@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,9 +46,15 @@ import org.w3c.dom.Document;
 public class ScreenshotUtils {
     
     /**
-     * Creates an SVG screenshot of an arbitrary <cc>Container</cc> and opens
+     * Utility class. Not instantiable.
+     */
+    private ScreenshotUtils() {
+    }
+    
+    /**
+     * Creates an SVG screenshot of an arbitrary <code>Container</code> and opens
      * a save dialog to store the svg somewhere.
-     * @param container the <cc>Container</cc>, for which a screenshot shall be 
+     * @param container the <code>Container</code>, for which a screenshot shall be 
      * stored
      */
     public static void saveScreenshot(final Container container) {
@@ -128,7 +134,7 @@ public class ScreenshotUtils {
     /**
      * Calculates the optimal screen size for the given container. Optimal size
      * means, that all subcomponents can be displayed in their full size. Starts
-     * the calculation with the given <cc>currentDim</cc>.
+     * the calculation with the given <code>currentDim</code>.
      * @param container the container whose optimal subcomponents size shall be 
      * calculated
      * @param currentDim the current dimension to start with, any smaller 
@@ -166,6 +172,5 @@ public class ScreenshotUtils {
         }
         return currentDim;
     }
-
             
 }

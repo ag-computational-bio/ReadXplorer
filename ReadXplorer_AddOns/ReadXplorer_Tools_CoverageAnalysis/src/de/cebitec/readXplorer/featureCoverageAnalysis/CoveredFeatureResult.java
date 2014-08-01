@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@ package de.cebitec.readXplorer.featureCoverageAnalysis;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.exporter.tables.ExportDataI;
 import de.cebitec.readXplorer.util.GeneralUtils;
@@ -45,9 +46,9 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
      * feature detection was carried out
      * @param currentTrack the track on which this analysis result was generated
      */
-    public CoveredFeatureResult(List<CoveredFeature> results, Map<Integer, PersistantTrack> trackMap, int referenceId, 
+    public CoveredFeatureResult(List<CoveredFeature> results, Map<Integer, PersistantTrack> trackMap, PersistantReference reference, 
             boolean combineTracks, int trackColumn, int filterColumn) {
-        super(trackMap, referenceId, combineTracks, trackColumn, filterColumn);
+        super(reference, trackMap, combineTracks, trackColumn, filterColumn);
         this.results = results;
         
     }

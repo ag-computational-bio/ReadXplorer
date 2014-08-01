@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ package de.cebitec.readXplorer.tools.snp;
 import de.cebitec.common.sequencetools.geneticcode.AminoAcidProperties;
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.CodonSnp;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.databackend.dataObjects.Snp;
 import de.cebitec.readXplorer.databackend.dataObjects.SnpI;
@@ -44,14 +45,13 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
      * New snp data object.
      * @param snpList list of snps of the analysis
      * @param trackMap hashmap of track ids to the tracks used in the analysis
-     * @param referenceId id of the reference genome, for which this result was
-     * generated
+     * @param reference reference genome, for which this result was generated
      * @param combineTracks <code>true</code>, if the tracks in the list are
      * combined, <code>false</code> otherwise
      */
-    public SnpDetectionResult(List<SnpI> snpList, Map<Integer, PersistantTrack> trackMap, int referenceId, boolean combineTracks,
+    public SnpDetectionResult(List<SnpI> snpList, Map<Integer, PersistantTrack> trackMap, PersistantReference reference, boolean combineTracks,
             int trackColumn, int filterColumn) {
-        super(trackMap, referenceId, combineTracks, trackColumn, filterColumn);
+        super(reference, trackMap, combineTracks, trackColumn, filterColumn);
         this.snpList = snpList;
     }
     

@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 package de.cebitec.readXplorer.databackend.dataObjects;
 
 import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.PositionUtils;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.util.polyTree.Node;
@@ -288,6 +289,12 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
     public static class Utils {
 
         /**
+         * Utility class, no instantiation allowed.
+         */
+        private Utils() {
+        }
+        
+        /**
          * @param feature feature whose frame has to be determined
          * @return 1, 2, 3, -1, -2, -3 depending on the reading frame of the
          * feature
@@ -296,9 +303,9 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
             int frame;
 
             if (feature.isFwdStrand()) { // forward strand
-                frame = (feature.getStart() - 1) % 3 + 1;
+                frame = PositionUtils.determineFwdFrame(feature.getStart());
             } else { // reverse strand. start <= stop ALWAYS! so use stop for reverse strand
-                frame = (feature.getStop() - 1) % 3 - 3;
+                frame = PositionUtils.determineRevFrame(feature.getStop());
             }
             return frame;
         }
@@ -428,12 +435,12 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
         /**
          * Creates a new array list of the genomic features, which are among the
          * allowed feature types. All features, whose feature type is not in the
-         * <cc>selectedFeatureTypes</cc> list is dismissed.
+         * <code>selectedFeatureTypes</code> list is dismissed.
          * @param featuresToFilter the list of features to filter
          * @param selectedFeatureTypes the set of feature types, which shall be
          * contained in the returned list of features
          * @return the filtered list of features. Only features of a type from
-         * the <cc>selectedFeatureTypes</cc> are returned
+         * the <code>selectedFeatureTypes</code> are returned
          */
         public static List<PersistantFeature> filterFeatureTypes(List<PersistantFeature> featuresToFilter, Set<FeatureType> selectedFeatureTypes) {
             List<PersistantFeature> newFeatures = new ArrayList<>();
@@ -448,12 +455,12 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
         /**
          * Creates a new array list of the genomic features, which are of the
          * allowed feature type. All features, whose feature type is different 
-         * than the <cc>selectedFeatureType</cc> is dismissed.
+         * than the <code>selectedFeatureType</code> is dismissed.
          * @param featuresToFilter the list of features to filter
          * @param selectedFeatureType the feature type, which shall be contained 
          * in the returned list of features
          * @return the filtered list of features. Only features of the type from
-         * the <cc>selectedFeatureType</cc> are returned
+         * the <code>selectedFeatureType</code> are returned
          */
         public static List<PersistantFeature> filterFeatureTypes(List<PersistantFeature> featuresToFilter, FeatureType selectedFeatureType) {
             Set<FeatureType> featureTypeSet = new HashSet<>();

@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@ package de.cebitec.readXplorer.transcriptionAnalyses;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.Operon;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.OperonAdjacency;
@@ -36,8 +37,8 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetOpero
     private final List<Operon> detectedOperons;
 
     public OperonDetectionResult(Map<Integer, PersistantTrack> trackList, List<Operon> detectedOperons, 
-            int referenceId, boolean combineTracks, int trackColumn, int filterColumn) {
-        super(trackList, referenceId, combineTracks, trackColumn, filterColumn);
+            PersistantReference reference, boolean combineTracks, int trackColumn, int filterColumn) {
+        super(reference, trackList, combineTracks, trackColumn, filterColumn);
         this.detectedOperons = detectedOperons;
     }
 

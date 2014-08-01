@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,6 +52,18 @@ public enum FeatureType {
     MIRNA(FeatureType.MIRNA_INT, FeatureType.MIRNA_STRING), 
     /** getType() returns '10' = To be used for exons. */
     EXON(FeatureType.EXON_INT, FeatureType.EXON_STRING),
+    /** getType() returns '10' = To be used for exons. */
+    FIVE_UTR(FeatureType.FIVE_UTR_INT, FeatureType.FIVE_UTR_STRING),
+    /** getType() returns '10' = To be used for exons. */
+    THREE_UTR(FeatureType.THREE_UTR_INT, FeatureType.THREE_UTR_STRING),
+    /** getType() returns '10' = To be used for exons. */
+    NC_RNA(FeatureType.NC_RNA_INT, FeatureType.NC_RNA_STRING),
+    /** getType() returns '10' = To be used for exons. */
+    MINUS_THIRTYFIVE(FeatureType.MINUS_THIRTYFIVE_INT, FeatureType.MINUS_THIRTYFIVE_STRING),
+    /** getType() returns '10' = To be used for exons. */
+    MINUS_TEN(FeatureType.MINUS_TEN_INT, FeatureType.MINUS_TEN_STRING),
+    /** getType() returns '10' = To be used for exons. */
+    RBS(FeatureType.RBS_INT, FeatureType.RBS_STRING),
 
     //feature types for the mapping classes
     PERFECT_COVERAGE(FeatureType.PERFECT_COVERAGE_INT, FeatureType.PERFECT_COVERAGE_STRING),
@@ -95,6 +107,12 @@ public enum FeatureType {
     private static final int GENE_INT = 8;
     private static final int MIRNA_INT = 9;
     private static final int EXON_INT = 10;
+    private static final int FIVE_UTR_INT = 29;
+    private static final int THREE_UTR_INT = 30;
+    private static final int NC_RNA_INT = 31;
+    private static final int MINUS_THIRTYFIVE_INT = 32;
+    private static final int MINUS_TEN_INT = 33;
+    private static final int RBS_INT = 34;
     
     //feature types for the track viewer
     private static final int PERFECT_COVERAGE_INT = 11;
@@ -126,7 +144,8 @@ public enum FeatureType {
     
     
     
-    //feature types supported by the reference viewer
+    //feature types supported by ReadXplorer
+    //Underscore Strings are needed to parse the official feature keys
     private static final String ANY_STRING = "any";
     private static final String UNDEFINED_STRING = "unknown";
     private static final String MRNA_STRING = "mRNA";
@@ -145,6 +164,16 @@ public enum FeatureType {
     private static final String GENE_STRING = "Gene";
     private static final String MIRNA_STRING = "miRNA";
     private static final String EXON_STRING = "Exon";
+    private static final String FIVE_UTR_STRING = "5'UTR";
+    private static final String THREE_UTR_STRING = "3'UTR";
+    private static final String NC_RNA_STRING = "non-coding RNA";
+    private static final String MINUS_THIRTYFIVE_STRING = "-35 signal";
+    /** -35 signal string with underscore "-35_signal". */
+    private static final String MINUS_THIRTYFIVE_STRING_UNDERSCORE = "-35_signal";
+    private static final String MINUS_TEN_STRING = "-10 signal";
+    /** -10 signal string with underscore "-10_signal". */
+    private static final String MINUS_TEN_STRING_UNDERSCORE = "-10_signal";
+    private static final String RBS_STRING = "RBS";
     
     //feature types for the track viewer
     private static final String PERFECT_COVERAGE_STRING = "Perfect match cov.";
@@ -180,7 +209,7 @@ public enum FeatureType {
     /**
      * FeatureTypes that are GUI selectable.
      */
-    public static final FeatureType[] SELECTABLE_FEATURE_TYPES = {GENE, CDS, EXON, UNDEFINED, MRNA, MISC_RNA, RRNA, REPEAT_UNIT, SOURCE, TRNA, MIRNA};
+    public static final FeatureType[] SELECTABLE_FEATURE_TYPES = {GENE, CDS, EXON, UNDEFINED, MRNA, MISC_RNA, RRNA, REPEAT_UNIT, SOURCE, TRNA, MIRNA, NC_RNA};
    
     private FeatureType(int typeInt, String typeString) {
         this.typeInt = typeInt;
@@ -208,18 +237,24 @@ public enum FeatureType {
      */
     public static FeatureType getFeatureType(int type){
         switch (type) { 
-            case ANY_INT:           return ANY;
-            case MRNA_INT:          return MRNA;
-            case CDS_INT:           return CDS;
-            case MISC_RNA_INT:      return MISC_RNA;
-            case RRNA_INT:          return RRNA;
-            case REPEAT_UNIT_INT:   return REPEAT_UNIT;
-            case SOURCE_INT:        return SOURCE;
-            case TRNA_INT:          return TRNA;
-            case GENE_INT:          return GENE;
-            case MIRNA_INT:         return MIRNA;
-            case EXON_INT:          return EXON;
-            default:                return UNDEFINED;
+            case ANY_INT:               return ANY;
+            case MRNA_INT:              return MRNA;
+            case CDS_INT:               return CDS;
+            case MISC_RNA_INT:          return MISC_RNA;
+            case RRNA_INT:              return RRNA;
+            case REPEAT_UNIT_INT:       return REPEAT_UNIT;
+            case SOURCE_INT:            return SOURCE;
+            case TRNA_INT:              return TRNA;
+            case GENE_INT:              return GENE;
+            case MIRNA_INT:             return MIRNA;
+            case EXON_INT:              return EXON;
+            case FIVE_UTR_INT:          return FIVE_UTR;
+            case THREE_UTR_INT:         return THREE_UTR;
+            case NC_RNA_INT:            return NC_RNA;
+            case MINUS_THIRTYFIVE_INT:  return MINUS_THIRTYFIVE;
+            case MINUS_TEN_INT:         return MINUS_TEN;
+            case RBS_INT:               return RBS;
+            default:                    return UNDEFINED;
         }
     }
     
@@ -256,6 +291,18 @@ public enum FeatureType {
             featType = SOURCE;
         } else if (type.equalsIgnoreCase(ANY_STRING)) {
             featType = ANY;
+        } else if (type.equalsIgnoreCase(FIVE_UTR_STRING)) {
+            featType = FIVE_UTR;
+        }  else if (type.equalsIgnoreCase(THREE_UTR_STRING)) {
+            featType = THREE_UTR;
+        } else if (type.equalsIgnoreCase(NC_RNA_STRING)) {
+            featType = NC_RNA;
+        } else if (type.equalsIgnoreCase(MINUS_THIRTYFIVE_STRING) || type.equalsIgnoreCase(MINUS_THIRTYFIVE_STRING_UNDERSCORE)) {
+            featType = MINUS_THIRTYFIVE;
+        } else if (type.equalsIgnoreCase(MINUS_TEN_STRING) || type.equalsIgnoreCase(MINUS_TEN_STRING_UNDERSCORE)) {
+            featType = MINUS_TEN;
+        } else if (type.equalsIgnoreCase(RBS_STRING)) {
+            featType = RBS;
         } else {
             featType = UNDEFINED;
         }

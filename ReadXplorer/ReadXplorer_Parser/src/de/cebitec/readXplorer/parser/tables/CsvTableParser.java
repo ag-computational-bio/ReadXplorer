@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ public class CsvTableParser implements CsvParserI {
     private CsvPreference csvPref;
     //different CellProcessors for different tables
     public static final CellProcessor[] DEFAULT_TABLE_PROCESSOR = new CellProcessor[0];
-    public static final CellProcessor[] POS_TABLE_PROCESSOR = new CellProcessor[]{new ParseInt()};
+    public static final CellProcessor[] POS_TABLE_PROCESSOR = new CellProcessor[]{ new ParseInt() };
     public static CellProcessor[] TABLE_PROCESSOR;
     private String tableModel;
 
@@ -169,8 +169,8 @@ public class CsvTableParser implements CsvParserI {
     }
 
     /**
-     * @param autoDelimiter <cc>true</cc>, if the delimiter shall be detected
-     * automatically, <cc>false</cc>, if the delimiter was selected by the user.
+     * @param autoDelimiter <code>true</code>, if the delimiter shall be detected
+     * automatically, <code>false</code>, if the delimiter was selected by the user.
      */
     @Override
     public void setAutoDelimiter(boolean autoDelimiter) {

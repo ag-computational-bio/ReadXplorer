@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,6 @@
 package de.cebitec.readXplorer.mapping;
 
 import de.cebitec.readXplorer.mapping.api.MappingApi;
-import java.util.Iterator;
-import java.util.List;
 import org.openide.util.NbBundle;
 
 /**

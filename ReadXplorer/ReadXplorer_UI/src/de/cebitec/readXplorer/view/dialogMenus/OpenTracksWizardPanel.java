@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,6 @@ public class OpenTracksWizardPanel extends ChangeListeningWizardPanel {
     private OpenTracksVisualPanel component;
     private String wizardName;
     private final int referenceId;
-    private SelectReadClassVisualPanel readClassVisualPanel;
     
     /**
      * A WizardPanel for opening tracks.
@@ -80,14 +79,5 @@ public class OpenTracksWizardPanel extends ChangeListeningWizardPanel {
      */
     public String getPropCombineTracks() {
         return this.wizardName + PROP_COMBINE_TRACKS;
-    }
-    
-    /**
-     * @param readClassVisualPanel A ReadClassVisualPanel, which shall be 
-     * informed, if a track completely stored in the DB is used in the current
-     * track selection.
-     */
-    public void setReadClassVisualPanel(SelectReadClassVisualPanel readClassVisualPanel) {
-        this.readClassVisualPanel = readClassVisualPanel;
     }
 }

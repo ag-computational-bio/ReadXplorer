@@ -6,6 +6,7 @@ import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.AnalysisStatus;
@@ -34,7 +35,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
 
     private TrackConnector trackConnector;
     private final PersistantTrack selectedTrack;
-    private final Integer refGenomeID;
+    private final PersistantReference reference;
     private final double fraction;
     private final List<de.cebitec.readXplorer.util.Observer> observer = new ArrayList<>();
     private List<int[]> region2Exclude;
@@ -72,7 +73,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
      */
     public WholeTranscriptDataAnalysisHandler(PersistantTrack selectedTrack, ParameterSetWholeTranscriptAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, Map<Integer, PersistantTrack> trackMap) {
         this.selectedTrack = selectedTrack;
-        this.refGenomeID = refViewer.getReference().getId();
+        this.reference = refViewer.getReference();
         this.fraction = parameterset.getFraction();
         this.parameters = parameterset;
         this.refViewer = refViewer;
@@ -190,7 +191,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
                 rpkmResultPanel.setReferenceViewer(refViewer);
             }
 
-            RPKMAnalysisResult rpkmAnalysisResult = new RPKMAnalysisResult(trackMap, rpkmCalculation.getRpkmValues(), refGenomeID);
+            RPKMAnalysisResult rpkmAnalysisResult = new RPKMAnalysisResult(trackMap, rpkmCalculation.getRpkmValues(), reference);
             rpkmAnalysisResult.setParameters(parameters);
             rpkmResultPanel.addResult(rpkmAnalysisResult);
             trackNames = GeneralUtils.generateConcatenatedString(rpkmAnalysisResult.getTrackNameList(), 120);
@@ -213,7 +214,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
                 novelRegionResult.setReferenceViewer(refViewer);
             }
 
-            NovelRegionResult newRegionResult = new NovelRegionResult(stats, trackMap, newRegionDetection.getNovelRegions(), false);
+            NovelRegionResult newRegionResult = new NovelRegionResult(reference, stats, trackMap, newRegionDetection.getNovelRegions(), false);
             newRegionResult.setParameters(this.parameters);
             novelRegionResult.addResult(newRegionResult);
 
@@ -244,7 +245,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
                 operonResultPanel.setReferenceViewer(refViewer);
             }
 
-            OperonDetectionResult operonDetectionResult = new OperonDetectionResult(this.stats, this.trackMap, detectedOperons, refGenomeID);
+            OperonDetectionResult operonDetectionResult = new OperonDetectionResult(this.stats, this.trackMap, detectedOperons, reference);
             operonDetectionResult.setParameters(this.parameters);
             operonResultPanel.addResult(operonDetectionResult);
 

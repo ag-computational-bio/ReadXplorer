@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -68,7 +68,7 @@ public class ReferenceViewer extends AbstractViewer {
      * @param refGenome the persistant reference, which is always accessible through the getReference 
      *      method in any abstract viewer.
      */
-    public ReferenceViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGenome){
+    public ReferenceViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGenome) {
         super(boundsInfoManager, basePanel, refGenome);
         this.features = new ArrayList<>();
         this.refGenConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenome.getId());
@@ -85,18 +85,18 @@ public class ReferenceViewer extends AbstractViewer {
      * selected at a time.
      * @param feature The feature, which shall be selected
      */
-    public void setSelectedFeature(JFeature feature){
-        
+    public void setSelectedFeature(JFeature feature) {
+
         firePropertyChange(PROP_FEATURE_SELECTED, selectedFeature, feature);
 
         // if the currently selected feature is clicked again, de-select it
-        if (selectedFeature == feature){
+        if (selectedFeature == feature) {
             selectedFeature.setSelected(false);
             selectedFeature = null;
         } else {
 
             // if there was a feature selected before, de-select it
-            if (selectedFeature != null){
+            if (selectedFeature != null) {
                 selectedFeature.setSelected(false);
             }
 
@@ -105,8 +105,8 @@ public class ReferenceViewer extends AbstractViewer {
         }
 
         //only recalculate if reading frame was switched
-        if (selectedFeature == null || this.getSequenceBar().getFrameCurrFeature() != 
-                PersistantFeature.Utils.determineFrame(selectedFeature.getPersistantFeature())){
+        if (selectedFeature == null || this.getSequenceBar().getFrameCurrFeature()
+                != PersistantFeature.Utils.determineFrame(selectedFeature.getPersistantFeature())) {
             this.getSequenceBar().findCodons(); //update codons for current selection
         }
     }

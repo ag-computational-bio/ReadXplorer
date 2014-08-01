@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -189,7 +189,7 @@ public class JFeature extends JComponent {
     }
 
     /**
-     * Set the color an feature is displayed with. Depends on the feature type,
+     * Set the color a feature is displayed with. Depends on the feature type.
      * @param feature the feature
      * @return the color for this feature
      */
@@ -218,6 +218,18 @@ public class JFeature extends JComponent {
             c = ColorProperties.EXON;
         } else if (feature.getType() == FeatureType.UNDEFINED) {
             c = ColorProperties.UNDEF_FEATURE;
+        } else if (feature.getType() == FeatureType.FIVE_UTR) {
+            c = ColorProperties.FIVE_UTR;
+        } else if (feature.getType() == FeatureType.THREE_UTR) {
+            c = ColorProperties.THREE_UTR;
+        } else if (feature.getType() == FeatureType.NC_RNA) {
+            c = ColorProperties.NC_RNA;
+        } else if (feature.getType() == FeatureType.RBS) {
+            c = ColorProperties.RBS;
+        } else if (feature.getType() == FeatureType.MINUS_THIRTYFIVE) {
+            c = ColorProperties.MINUS_THIRTYFIVE;
+        } else if (feature.getType() == FeatureType.MINUS_TEN) {
+            c = ColorProperties.MINUS_TEN;
         } else {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown type for feature {0}", feature.getType());
             c = ColorProperties.UNDEF_FEATURE;

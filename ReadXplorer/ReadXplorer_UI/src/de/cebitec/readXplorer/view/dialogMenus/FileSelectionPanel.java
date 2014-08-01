@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -158,7 +158,7 @@ public class FileSelectionPanel extends JPanel {
             multiTrackScrollPane.setVisible(false);
             multiTrackList.setVisible(false);
             multiTrackListLabel.setVisible(false);
-            fileTextField.setText("");
+            fileTextField.setText(getMappingFile() != null ? getMappingFile().getAbsolutePath() : "");
             getMappingFiles().clear();
             multiTrackList.setModel(new DefaultListModel<String>());
         }

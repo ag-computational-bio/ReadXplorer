@@ -4,16 +4,15 @@ import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.RPKMvalue;
+import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.readXplorer.util.UneditableTableModel;
 import de.cebitec.readXplorer.view.analysis.ResultTablePanel;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.readXplorer.view.tableVisualization.tableFilter.TableRightClickFilter;
-import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.readXplorer.view.tableVisualization.TableUtils;
+import de.cebitec.readXplorer.view.tableVisualization.tableFilter.TableRightClickFilter;
 import java.util.HashMap;
 import javax.swing.DefaultListSelectionModel;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
@@ -37,7 +36,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
     private final boolean statistics = false;
     private BoundsInfoManager boundsInfoManager;
     private ReferenceViewer referenceViewer;
-    private final TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
+    private final TableRightClickFilter<UneditableTableModel> tableFilter;
     private ReferenceFeatureTopComp refComp;
 
     /**
@@ -46,6 +45,10 @@ public class ResultPanelRPKM extends ResultTablePanel {
      */
     public ResultPanelRPKM() {
         initComponents();
+        final int trackColumnIdx = 12;
+        final int posColumnIdx = 3;
+        final int chromColumnIdx = 10;
+        tableFilter = new TableRightClickFilter<>(UneditableTableModel.class, posColumnIdx, trackColumnIdx);
         this.rpkmTable.getTableHeader().addMouseListener(tableFilter);
         this.filterStatisticsMap = new HashMap<>();
         this.filterStatisticsMap.put(RETURNED_FEATURES, 0);
@@ -56,8 +59,6 @@ public class ResultPanelRPKM extends ResultTablePanel {
             @Override
             public void valueChanged(ListSelectionEvent e) {
 //                showFeatureStartPosition();
-                int posColumnIdx = 3;
-                int chromColumnIdx = 10;
                 TableUtils.showPosition(rpkmTable, posColumnIdx, chromColumnIdx, boundsInfoManager);
 //                refComp.showTableFeature(rpkmTable, 0);
             }

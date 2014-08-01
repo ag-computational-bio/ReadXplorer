@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -106,8 +106,9 @@ public class BioJavaGff2Parser implements ReferenceParserI {
                 @SuppressWarnings("unchecked")
                 public void recordLine(GFFRecord gffr) {
                     
+                    final String UNKNOWN_LOCUS_TAG = "unknown locus tag";
                     String parsedType;
-                    String locusTag = "unknown locus tag";
+                    String locusTag = UNKNOWN_LOCUS_TAG;
                     String geneName = "";
                     String product = "";
                     String ecNumber = "";
@@ -152,30 +153,35 @@ public class BioJavaGff2Parser implements ReferenceParserI {
                                     attribute = ((List) value).get(0); //currently only one item per tag is supported, except for parent
                                     if (attribute instanceof String) {
                                         attrString = (String) attribute;
-                                        switch (keyString) {
-                                            case "ID":   locusTag = attrString; 
-                                                         identifier = attrString; break;
-                                            case "Name": geneName = attrString; break;
-//                                            case "ORF": geneName = attrString; break;
-//                                            case "CDS": geneName = attrString; break;
-//                                            case "GENE": geneName = attrString; break;
-//                                    case "Target": break; //other available fields according to gff3 definition
-//                                    case "Gap": break;
-//                                    case "Derives_from": break;
-                                            case "Note": product = attrString; break;
-//                                    case "Dbxref":  break;
-//                                    case "Ontology_term": break;
-//                                    case "Is_circular": break;
-                                            default: ;
+                                        if (keyString.equalsIgnoreCase("ID")) {
+                                            identifier = attrString;
+                                            if (locusTag.equals(UNKNOWN_LOCUS_TAG)) {
+                                                locusTag = attrString;
+                                            }
+                                        }  else if (keyString.equalsIgnoreCase("product")) {
+                                            product = attrString;
+                                        } else if (attrString.length() < 20 && 
+                                                (keyString.equalsIgnoreCase("name") ||
+                                                 keyString.equalsIgnoreCase("gene") ||
+                                                 keyString.equalsIgnoreCase("gene_name") ||
+                                                 keyString.equalsIgnoreCase("genename"))) {
+                                            geneName = attrString;
+                                        } else if ((keyString.equalsIgnoreCase("name") ||
+                                                    keyString.equalsIgnoreCase("gene_id") ||
+                                                    keyString.equalsIgnoreCase("gene_name") ||
+                                                    keyString.equalsIgnoreCase("gene")) && product.isEmpty()) {
+                                            product = attrString;
+                                        } else if (keyString.equalsIgnoreCase("alias") ||
+                                                   keyString.equalsIgnoreCase("locus") ||
+                                                   keyString.equalsIgnoreCase("locus_tag")) {
+                                            locusTag = attrString;
                                         }
                                         if (keyString.equalsIgnoreCase(parsedType)) {
                                             geneName = attrString;
                                         }
                                     }
-                                    //process tags with multiple entries in a block
-                                    switch (keyString) {
-                                        case "Parent": parentIds = (List<String>) value; break;
-                                    }
+                                    
+                                    //parents not available in GFF2, only grouping is possible via the attribute field
                                     
 //                                    //process tags with multiple entries here
 //                                    for (Object attr : (List) value) {
@@ -188,15 +194,6 @@ public class BioJavaGff2Parser implements ReferenceParserI {
 //                                    }
                                 }
                             }
-                        }
-                        
-                        final String geneNameString = "geneName";
-                        if (attributes.containsKey(geneNameString)) {
-                            geneName = (String) attributes.get(geneNameString);
-                        }
-                        final String aliasString = "Alias";
-                        if (attributes.containsKey(aliasString)) {
-                            locusTag = (String) attributes.get(aliasString);
                         }
                         
                         FeatureType type = FeatureType.getFeatureType(parsedType);

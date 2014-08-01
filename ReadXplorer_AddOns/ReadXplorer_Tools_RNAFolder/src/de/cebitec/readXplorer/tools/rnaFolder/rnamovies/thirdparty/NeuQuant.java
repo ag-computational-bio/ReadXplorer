@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,25 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cebitec.readXplorer.tools.rnaFolder.rnamovies.thirdparty;
-/* NeuQuant Neural-Net Quantization Algorithm
- * ------------------------------------------
- *
- * Copyright (c) 1994 Anthony Dekker
- *
- * NEUQUANT Neural-Net quantization algorithm by Anthony Dekker, 1994.
- * See "Kohonen neural networks for optimal colour quantization"
- * in "Network: Computation in Neural Systems" Vol. 5 (1994) pp 351-367.
- * for a discussion of the algorithm.
- *
- * Any party obtaining a copy of these files from the author, directly or
- * indirectly, is granted, free of charge, a full and unrestricted irrevocable,
- * world-wide, paid up, royalty-free, nonexclusive right and license to deal
- * in this software and documentation files (the "Software"), including without
- * limitation the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons who receive
- * copies from any such party to do so, with the only requirement being
- * that this copyright notice remain intact.
- */
 
 // Ported to Java 12/00 K Weiner
 

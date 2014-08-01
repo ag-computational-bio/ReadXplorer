@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,6 +64,8 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
     private JMenuItem occurrenceFilter;
     private final Class<E> classType;
     private Map<Integer, PersistantTrack> trackMap;
+    private final int posColumn;
+    private final int trackColumn;
 
     /**
      * A MouseAdapter, which offers a filter for the columns of a table. An
@@ -73,9 +75,13 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
      *
      * @param classType the type of the table model, which has to extend the
      * DefaultTableModel.
+     * @param posColumn column containing the position information
+     * @param trackColumn column containing the track information
      */
-    public TableRightClickFilter(Class<E> classType) {
+    public TableRightClickFilter(Class<E> classType, int posColumn, int trackColumn) {
         this.classType = classType;
+        this.posColumn = posColumn;
+        this.trackColumn = trackColumn;
         init();
     }
 
@@ -121,7 +127,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
             public void actionPerformed(ActionEvent e) {
                 OccurrenceSelectionPanel occurrencePanel = new OccurrenceSelectionPanel();
                 final JButton okButton = new JButton("OK");
-                ActionListener okButtonListener = this.createOkButtonListener(occurrencePanel);
+                ActionListener okButtonListener = this.createOccurrenceFilterListener(occurrencePanel);
                 DialogDescriptor dialogDescriptor = new DialogDescriptor(occurrencePanel,
                         Bundle.Occurrence_Filter(), true,
                         new JButton[]{okButton}, okButton, DialogDescriptor.DEFAULT_ALIGN, null, okButtonListener);
@@ -138,15 +144,18 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
              * @return the action to filter a table by occurrences of the same 
              * event in different tracks.
              */
-            private ActionListener createOkButtonListener(final OccurrenceSelectionPanel occurrencePanel) {
+            private ActionListener createOccurrenceFilterListener(final OccurrenceSelectionPanel occurrencePanel) {
                 ActionListener listener = new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         // The OccurrenceField only accepts positive numbers
                         String occurrenceNumberString = occurrencePanel.getOccurrenceField().getText();
-                        Integer occurrenceNumber = Integer.parseInt(occurrenceNumberString); 
-                        FilterOccurrence<E> filter = new FilterOccurrence<>(occurrencePanel.getSelectedButton(), 
-                        occurrenceNumber, TableRightClickFilter.this, 2, 0);
+                        Integer occurrenceCount = 0;
+                        if (!occurrenceNumberString.isEmpty()) {
+                            occurrenceCount = Integer.parseInt(occurrenceNumberString);
+                        }
+                        FilterOccurrence<E> filter = new FilterOccurrence<>(occurrencePanel.getSelectedButton(),
+                                occurrenceCount, TableRightClickFilter.this, trackColumn, posColumn);
                         filter.filterTable();
                     }
                 };

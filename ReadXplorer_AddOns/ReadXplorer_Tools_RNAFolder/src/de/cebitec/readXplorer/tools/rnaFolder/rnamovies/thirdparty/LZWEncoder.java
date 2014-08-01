@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cebitec.readXplorer.tools.rnaFolder.rnamovies.thirdparty;
-import java.io.OutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 //==============================================================================
 //  Adapted from Jef Poskanzer's Java port by way of J. M. G. Elliott.

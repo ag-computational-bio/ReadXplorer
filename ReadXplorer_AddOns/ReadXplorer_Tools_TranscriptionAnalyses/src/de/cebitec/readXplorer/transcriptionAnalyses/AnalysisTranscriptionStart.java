@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -219,19 +219,21 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         readStarts.setCommonFwd(this.fixLeftCoverageBound(readStarts.getCommonFwd(), 0));
         readStarts.setCommonRev(this.fixLeftCoverageBound(readStarts.getCommonRev(), commonReadStartsLastRevPos));
 
+        int idx;
         for (int i = fixedLeftBound; i < rightBound; ++i) {
+            idx = coverage.getInternalPos(i);
             
             if (parametersTSS.getReadClassParams().isCommonMatchUsed()) {
                 this.gatherDataAndDetect(chromId, chromLength, chromFeatures, coverage.getCommonFwd(), 
-                        coverage.getCommonRev(), readStarts.getCommonFwd(), readStarts.getCommonRev(), i);
+                        coverage.getCommonRev(), readStarts.getCommonFwd(), readStarts.getCommonRev(), idx);
             
             } else if (parametersTSS.getReadClassParams().isBestMatchUsed()) {
                 this.gatherDataAndDetect(chromId, chromLength, chromFeatures, coverage.getBestMatchFwd(), 
-                        coverage.getBestMatchRev(), readStarts.getBestMatchFwd(), readStarts.getBestMatchRev(), i);
+                        coverage.getBestMatchRev(), readStarts.getBestMatchFwd(), readStarts.getBestMatchRev(), idx);
             
             } else {//if (parametersTSS.getReadClassParams().isPerfectMatchUsed()) {
                 this.gatherDataAndDetect(chromId, chromLength, chromFeatures, coverage.getPerfectFwd(), 
-                        coverage.getPerfectFwd(), readStarts.getPerfectFwd(), readStarts.getPerfectRev(), i);
+                        coverage.getPerfectFwd(), readStarts.getPerfectFwd(), readStarts.getPerfectRev(), idx);
             }
         }
 

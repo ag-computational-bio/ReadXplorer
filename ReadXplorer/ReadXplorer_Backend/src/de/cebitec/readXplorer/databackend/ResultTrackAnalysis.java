@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,8 +16,8 @@
  */
 package de.cebitec.readXplorer.databackend;
 
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.exporter.tables.ExportDataI;
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ import java.util.Map;
 public abstract class ResultTrackAnalysis<T> implements ExportDataI {
 
     private Map<Integer, PersistantTrack> trackMap;
-    private Map<Integer, PersistantChromosome> chromMap;
+    private PersistantReference reference;
     private List<String> trackNameList;
     private ParameterSetI<T> parameters;
     private Map<String, Integer> statsMap;
@@ -48,18 +48,18 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
      * A result of an analysis for a list of tracks. It also fetches and stores
      * the map of chromosomes for which the analysis was carried out hashed to
      * their respective chromosomes id.
-     *
+     * @param reference reference for which the analysis result was generated
      * @param trackMap the map of track ids to the tracks for which the analysis
      * @param combineTracks <code>true</code>, if the tracks in the list are 
      * combined, <code>false</code> otherwise
      * generated
-     * @param trackColumn
-     * @param filterColumn
+     * @param trackColumn column of the track id in result tables
+     * @param filterColumn column of the position or genomic feature in result tables
      */
-    public ResultTrackAnalysis(Map<Integer, PersistantTrack> trackMap, int referenceId, boolean combineTracks,
+    public ResultTrackAnalysis(PersistantReference reference, Map<Integer, PersistantTrack> trackMap, boolean combineTracks,
             int trackColumn, int filterColumn) {
+        this.reference = reference;
         this.trackMap = trackMap;
-        this.chromMap = ProjectConnector.getInstance().getRefGenomeConnector(referenceId).getChromosomesForGenome();
         this.trackNameList = PersistantTrack.generateTrackDescriptionList(trackMap.values());
         this.statsMap = new HashMap<>();
         this.combineTracks = combineTracks;
@@ -68,14 +68,14 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
     }
 
     /**
-     * @return trackColumn
+     * @return trackColumn column of the track id in result tables
      */
     public int getTrackColumn() {
         return trackColumn;
     }
 
     /**
-     * @return filterColumn
+     * @return filterColumn column of the position or genomic feature in result tables
      */
     public int getFilterColumn() {
         return filterColumn;
@@ -123,6 +123,7 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
 //        }
 //        return concatTrackIds;
 //    }
+    
     /**
      * @param trackId the track id of the track whose entry is needed
      * @param getFullengthName true, if the concated names shall be returned for
@@ -166,7 +167,14 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
      * hashed to their respective chromosome id.
      */
     public Map<Integer, PersistantChromosome> getChromosomeMap() {
-        return chromMap;
+        return reference.getChromosomes();
+    }
+
+    /**
+     * @return Reference genome for which the analysis was carried out
+     */
+    public PersistantReference getReference() {
+        return reference;
     }
 
     /**

@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,12 +70,16 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
     private SnpDetectionResult completeSnpData;
     private Map<String, Integer> snpStatsMap;
     private PersistantReference reference;
-    private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
+    private TableRightClickFilter<UneditableTableModel> tableFilter;
     
 
     /** Creates new form SNP_DetectionResultPanel */
     public SNP_DetectionResultPanel() {
         initComponents();
+        final int posColumn = 0;
+        final int trackColumn = 2;
+        final int chromColumn = 3;
+        tableFilter = new TableRightClickFilter<>(UneditableTableModel.class, posColumn, trackColumn);
         this.snpTable.getTableHeader().addMouseListener(tableFilter);
         
         //ensures number of lines will adapt to number of translations (features) for each snp
@@ -89,8 +93,6 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                int posColumn = 0;
-                int chromColumn = 3;
                 TableUtils.showPosition(snpTable, posColumn, chromColumn, getBoundsInfoManager());
             }
         });
@@ -262,6 +264,8 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
      */
     @Override
     public void addResult(ResultTrackAnalysis newResult) {
+        
+        tableFilter.setTrackMap(newResult.getTrackMap());
         
         if (newResult instanceof SnpDetectionResult) {
             SnpDetectionResult snpData = (SnpDetectionResult) newResult;

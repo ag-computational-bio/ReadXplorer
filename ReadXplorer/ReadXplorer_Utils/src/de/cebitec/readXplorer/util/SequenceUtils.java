@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,6 +36,9 @@ public final class SequenceUtils {
     
     /** String for tagging positions or anything else as not having a gene with "No gene".*/
     public static final String NO_GENE = "No gene";
+    
+    /** Maximum phred quality score as byte = 60. */
+    public static final byte MAX_PHRED = 60;
     
     private SequenceUtils(){
         //do not instantiate
