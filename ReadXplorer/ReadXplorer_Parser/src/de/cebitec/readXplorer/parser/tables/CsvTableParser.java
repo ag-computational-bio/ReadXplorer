@@ -112,7 +112,7 @@ public class CsvTableParser implements CsvParserI {
      * Method for parsing a CSV file for a given csv preference.
      *
      * @param fileToRead The file containing the table to read.
-     * @param csvPreference The CscPreference to use for parsing.
+     * @param csvPreference The CsvPreference to use for parsing.
      * @return Table in form of a list, which contains the row lists of Objects.
      */
     public List<List<?>> parseTable(File fileToRead, CsvPreference csvPreference) {
@@ -132,7 +132,13 @@ public class CsvTableParser implements CsvParserI {
                         || tableModel.equals(TableType.TSS_DETECTION.getName())) {
                     generalProcessors = POS_TABLE_PROCESSOR;
                 } else if (tableModel.equals(TableType.TSS_DETECTION_JR.getName())) {
-                    generalProcessors = TABLE_PROCESSOR;
+                    generalProcessors = getTssCellProcessor();
+                } else if (tableModel.equals(TableType.OPERON_DETECTION_JR.getName())) {
+                    generalProcessors = getOperonCellProcessor();
+                } else if (tableModel.equals(TableType.RPKM_ANALYSIS_JR.getName())) {
+                    generalProcessors = getRpkmCellProcessor();
+                } else if (tableModel.equals(TableType.NOVEL_TRANSCRIPT_DETECTION_JR.getName())) {
+                    generalProcessors = getNovelTranscriptCellProcessor();
                 } else {
                     generalProcessors = DEFAULT_TABLE_PROCESSOR;
                 }
@@ -160,7 +166,7 @@ public class CsvTableParser implements CsvParserI {
             Exceptions.printStackTrace(ex);
         } catch (SuperCsvException ex) {
             tableData = null;
-        } 
+        }
         return tableData;
     }
 
@@ -212,4 +218,135 @@ public class CsvTableParser implements CsvParserI {
     public void setCellProscessors(CellProcessor[] cellProcessors) {
         CsvTableParser.TABLE_PROCESSOR = cellProcessors;
     }
+
+    /**
+     * Generates a cellprocessor for the tss analysis result table.
+     *
+     * @return List of CellProcessors.
+     */
+    private CellProcessor[] getTssCellProcessor() {
+
+        return new CellProcessor[]{
+            new ParseInt(), // Position
+            null, // Strand
+            null, // Comment
+            new ParseInt(), // Read Starts
+            //            new ParseDouble(), // Rel. Count
+            null, // Rel. Count
+            null, // Feature Name
+            null, // Feature Locus
+            new ParseInt(), // Offset
+            new ParseInt(), // Dist. To Start
+            new ParseInt(), // Dist. To Stop
+            null, // Sequence
+            new ParseBool(), // Leaderless
+            new ParseBool(), // Putative TLS-Shift
+            new ParseBool(), // Intragenic TSS
+            new ParseBool(), // Intergenic TSS
+            new ParseBool(), // Putative Antisense
+            new ParseBool(), // Putative 5'-UTR Antisense
+            new ParseBool(), // Putative 3'-UTR Antisense
+            new ParseBool(), // Putative Intragenic Antisense
+            new ParseBool(), // Assigned To Stable RNA
+            new ParseBool(), // False Positive
+            new ParseBool(), // Selected For Upstream Region Analysis
+            new ParseBool(), // Finished
+            new ParseInt(), // Gene Start
+            new ParseInt(), // Gene Stop
+            new ParseInt(), // Gene Length In Bp	
+            new ParseInt(), // Frame
+            null, // Gene Product
+            null, // Start Codon
+            null, // Stop Codon
+            null, // Chromosome	
+            new ParseInt(), // Chrom ID	
+            new ParseInt() //Track ID
+        };
+    }
+
+    /**
+     * Generates a cellprocessor for the operon analysis result table.
+     *
+     * @return List of CellProcessors.
+     */
+    private CellProcessor[] getOperonCellProcessor() {
+        return new CellProcessor[]{
+            new ParseInt(), // Putative Operon Transcript Begin
+            null, // Feature1
+            null, // Feature2
+            null, // Strand
+            new ParseInt(), // Start annotation 1
+            new ParseInt(), // Start annotation 2
+            new ParseBool(), // false positive
+            new ParseBool(), // marked as finish observed
+            new ParseInt(), // Spanning reads
+            null, // Operon String
+            new ParseInt(), // Number of Genes 
+            null, // Chromosome name
+            new ParseInt(), // Chromosome id
+            null, // Track name
+            new ParseInt(), // Track id
+        };
+    }
+
+    /**
+     * Generates a cellprocessor for the RPKM analysis result table.
+     *
+     * @return List of CellProcessors.
+     */
+    private CellProcessor[] getRpkmCellProcessor() {
+        return new CellProcessor[]{
+            null, // Feature
+            null, // Feature Type
+            new ParseInt(), // Start
+            new ParseInt(), // Stop
+            new ParseInt(), // Feature length
+            null, // Strand
+            new ParseInt(), // Longest Detected 5'-UTR Length
+            new ParseDouble(), // RPKM
+            new ParseDouble(), // Log-RPKM
+            new ParseInt(), // Mapped Total
+            null, // Chromosome
+            new ParseInt(), // Chromosome id
+            null,
+            new ParseInt(), // Track id
+        };
+    }
+
+    /**
+     * Generates a cellprocessor for the novel transcript analysis result table.
+     *
+     * @return List of CellProcessors.
+     */
+    private CellProcessor[] getNovelTranscriptCellProcessor() {
+        return new CellProcessor[]{
+            new ParseInt(), // Putative start position
+            null, // Strand
+            new ParseBool(), // False positive
+            new ParseBool(), // Selected for Blast export
+            new ParseBool(), // markd as finished
+            null, // Site
+            new ParseInt(), // Coverage Dropoff
+            new ParseInt(), // Length in BP
+            null, // Sequence
+            null, // Chromosome name
+            new ParseInt(), // Chromosome id
+            null, // Track name
+            new ParseInt(), // Track id
+        };
+    }
+
+    /**
+     * Generates a cellprocessor for the novel transcript analysis result table.
+     *
+     * @return List of CellProcessors.
+     */
+    private CellProcessor[] getSndSheedProcessor() {
+        return new CellProcessor[]{
+            null,
+            null,
+            null
+        };
+    }
+
 }

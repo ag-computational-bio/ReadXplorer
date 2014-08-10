@@ -39,6 +39,22 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>de.cebitec.readXplorer.parser</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>1.0.2</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>de.cebitec.readXplorer.ui.importer</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>1.0.2</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>de.cebitec.readXplorer.ui.visualisation</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
