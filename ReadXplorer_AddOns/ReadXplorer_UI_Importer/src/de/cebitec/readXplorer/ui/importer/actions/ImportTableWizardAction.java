@@ -24,11 +24,11 @@ import de.cebitec.readXplorer.parser.common.ParsingException;
 import de.cebitec.readXplorer.parser.tables.CsvTableParser;
 import de.cebitec.readXplorer.parser.tables.TableParserI;
 import de.cebitec.readXplorer.parser.tables.TableType;
+import de.cebitec.readXplorer.ui.importer.TranscriptomeTableViewI;
 import de.cebitec.readXplorer.ui.importer.dataTable.ImportTableWizardPanel;
 import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.readXplorer.util.UneditableTableModel;
 import de.cebitec.readXplorer.util.VisualisationUtils;
-import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.readXplorer.view.tableVisualization.PosTablePanel;
 import de.cebitec.readXplorer.view.tableVisualization.TableTopComponent;
 import de.cebitec.readXplorer.view.tableVisualization.TableUtils;
@@ -46,12 +46,9 @@ import org.openide.WizardDescriptor;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
-import org.supercsv.cellprocessor.ParseBool;
-import org.supercsv.cellprocessor.ParseDouble;
-import org.supercsv.cellprocessor.ParseInt;
-import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.prefs.CsvPreference;
 
 @ActionID(
@@ -98,15 +95,12 @@ public final class ImportTableWizardAction implements ActionListener {
             final boolean autoDelimiter = (boolean) wiz.getProperty(ImportTableWizardPanel.PROP_AUTO_DELEMITER);
             final CsvPreference csvPref = (CsvPreference) wiz.getProperty(ImportTableWizardPanel.PROP_SEL_PREF);
             final TableParserI parser = (TableParserI) wiz.getProperty(ImportTableWizardPanel.PROP_SEL_PARSER);
+            final TranscriptomeTableViewI tableView = Lookup.getDefault().lookup(TranscriptomeTableViewI.class);
 
             if (parser instanceof CsvTableParser) {
                 CsvTableParser csvParser = (CsvTableParser) parser;
                 csvParser.setAutoDelimiter(autoDelimiter);
                 csvParser.setCsvPref(csvPref);
-                if (tableType == TableType.TSS_DETECTION_JR) {
-                    CellProcessor[] TSS_CELL_PROCESSOR = getTssCellProcessor();
-                    csvParser.setCellProscessors(TSS_CELL_PROCESSOR);
-                }
                 csvParser.setTableModel(tableType.getName());
             }
 
@@ -114,28 +108,34 @@ public final class ImportTableWizardAction implements ActionListener {
             final File tableFile = new File(fileLocation);
             try {
                 List<List<?>> tableData = parser.parseTable(tableFile);
+                
+                if (tableView != null) {
+                    if (tableType.equals(TableType.OPERON_DETECTION_JR) 
+                            || tableType.equals(TableType.RPKM_ANALYSIS_JR) 
+                            || tableType.equals(TableType.NOVEL_TRANSCRIPT_DETECTION_JR) 
+                            || tableType.equals(TableType.TSS_DETECTION_JR)) {
+                        final File parametersFile = new File(tableFile.getParent()+"/"+tableFile.getName()+"_parameters.csv");
+                        System.out.println(parametersFile.getAbsolutePath());
+                        List<List<?>> tableData2 = parser.parseTable(parametersFile);
+                        tableView.process(tableData, tableData2, tableType);
+                        
+                    }
+                }
                 final UneditableTableModel tableModel = TableUtils.transformDataToTableModel(tableData);
 
                 //open table visualization panel with given reference for jumping to the position
                 SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
                     @Override
                     public void run() {
-                        if (tableType == TableType.TSS_DETECTION_JR) {
-//                            ExcelImporter importer = new ExcelImporter();
-//                            imorter.setUpTSSTable(List<List<?>> fstSheet, List<List<?>> sndSheet,
-//                                    ReferenceViewer refViewer, 
-//                                    TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp):
-                        } else {
-                            PosTablePanel tablePanel = new PosTablePanel(tableModel);
-                            tablePanel.setReferenceGenome(ref);
-                            tablePanel.setTableType(tableType);
-                            checkAndOpenRefViewer(ref, tablePanel);
+                        PosTablePanel tablePanel = new PosTablePanel(tableModel);
+                        tablePanel.setReferenceGenome(ref);
+                        tablePanel.setTableType(tableType);
+                        checkAndOpenRefViewer(ref, tablePanel);
 
-                            String panelName = "Imported table from: " + tableFile.getName();
-                            topComp = (TableTopComponent) WindowManager.getDefault().findTopComponent("TableTopComponent");
-                            topComp.open();
-                            topComp.openTableTab(panelName, tablePanel);
-                        }
+                        String panelName = "Imported table from: " + tableFile.getName();
+                        topComp = (TableTopComponent) WindowManager.getDefault().findTopComponent("TableTopComponent");
+                        topComp.open();
+                        topComp.openTableTab(panelName, tablePanel);
                     }
                 });
             } catch (ParsingException ex) {
@@ -168,49 +168,4 @@ public final class ImportTableWizardAction implements ActionListener {
             tablePanel.setBoundsInfoManager(viewController.getBoundsManager());
         }
     }
-
-    /**
-     * Generates a cellprocessor for the tss analysis result table.
-     *
-     * @return List of CellProcessors.
-     */
-    private CellProcessor[] getTssCellProcessor() {
-
-        return new CellProcessor[]{
-            new ParseInt(), // Position
-            new ParseBool(), // Strand
-            null, // Comment
-            new ParseInt(), // Read Starts
-            new ParseDouble(), // Rel. Count
-            null, // Feature Name
-            null, // Feature Locus
-            new ParseInt(), // Offset
-            new ParseInt(), // Dist. To Start
-            new ParseInt(), // Dist. To Stop
-            null, // Sequence
-            new ParseBool(), // Leaderless
-            new ParseBool(), // Putative TLS-Shift
-            new ParseBool(), // Intragenic TSS
-            new ParseBool(), // Intergenic TSS
-            new ParseBool(), // Putative Antisense
-            new ParseBool(), // Putative 5'-UTR Antisense
-            new ParseBool(), // Putative 3'-UTR Antisense
-            new ParseBool(), // Putative Intragenic Antisense
-            new ParseBool(), // Assigned To Stable RNA
-            new ParseBool(), // False Positive
-            new ParseBool(), // Selected For Upstream Region Analysis
-            new ParseBool(), // Finished
-            new ParseInt(), // Gene Start
-            new ParseInt(), // Gene Stop
-            new ParseInt(), // Gene Length In Bp	
-            new ParseInt(), // Frame
-            null, // Gene Product
-            null, // Start Codon
-            null, // Stop Codon
-            null, // Chromosome	
-            new ParseInt(), // Chrom ID	
-            new ParseInt() //Track ID
-        };
-    }
-
 }
