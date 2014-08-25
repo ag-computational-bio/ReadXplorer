@@ -2,9 +2,8 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.cebitec.readXplorer.transcriptomeAnalyses.excelImport;
+package de.cebitec.readXplorer.parser.tables;
 
-import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,7 +14,6 @@ import jxl.Cell;
 import jxl.Sheet;
 import jxl.Workbook;
 import jxl.read.biff.BiffException;
-import org.netbeans.api.progress.ProgressHandle;
 
 /**
  * This class includes a method that extracts the data from the sheets in the
@@ -39,28 +37,9 @@ public class ExcelToTable implements ExcelImportDataI {
      * @param handle ProgressHandle
      * @throws IOException
      */
-    public ExcelToTable(File file, ProgressHandle handle) throws IOException {
+    public ExcelToTable(File file) throws IOException {
         this.columnNames = new ArrayList<>();
-        fetchSheetTableAndParameters(file, handle);
-    }
-
-    public boolean validateImportFile(File importFile, TableType typeOfTable) {
-        boolean validate = false;
-
-        if (typeOfTable == TableType.TSS_TABLE) {
-            // check 
-        }
-        if (typeOfTable == TableType.OPERON_TABLE) {
-
-        }
-        if (typeOfTable == TableType.NOVEL_TRANSCRIPTS_TABLE) {
-
-        }
-        if (typeOfTable == TableType.RPKM_TABLE) {
-
-        }
-
-        return validate;
+        fetchSheetTableAndParameters(file);
     }
 
     /**
@@ -70,7 +49,7 @@ public class ExcelToTable implements ExcelImportDataI {
      * @param handle ProgressHandle
      * @throws IOException
      */
-    private void fetchSheetTableAndParameters(File file, ProgressHandle handle) throws IOException {
+    private void fetchSheetTableAndParameters(File file) throws IOException {
         File inputWorkbook = file;
         Workbook w;
         try {
@@ -89,7 +68,7 @@ public class ExcelToTable implements ExcelImportDataI {
 
             // hier kann man noch die Columns auf Richtigkeit testen, wenn man den Typ
             // der Analyse kennt!
-            handle.progress("Read first sheed with table content ... ", 6);
+            //handle.progress("Read first sheed with table content ... ", 6);
             for (int j = 0; j < sheet.getRows(); j++) {
 //                handle.progress("Read lines ... ", j);
                 for (int i = 0; i < sheet.getColumns(); i++) {
@@ -100,7 +79,7 @@ public class ExcelToTable implements ExcelImportDataI {
 
             // read second Sheet!
             sheet = w.getSheet(1);
-            handle.progress("Read first sheed with table content ... ", 9);
+            //handle.progress("Read first sheed with table content ... ", 9);
             fileContentSecondSheet = new HashMap<>();
             fileContentSecondSheetThirdColumn = new HashMap<>();
             for (int j = 0; j < sheet.getRows(); j++) {

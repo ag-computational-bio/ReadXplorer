@@ -24,6 +24,7 @@ import de.cebitec.readXplorer.parser.common.ParsingException;
 import de.cebitec.readXplorer.parser.tables.CsvTableParser;
 import de.cebitec.readXplorer.parser.tables.TableParserI;
 import de.cebitec.readXplorer.parser.tables.TableType;
+import de.cebitec.readXplorer.parser.tables.XlsTranscriptomeTableParser;
 import de.cebitec.readXplorer.ui.importer.TranscriptomeTableViewI;
 import de.cebitec.readXplorer.ui.importer.dataTable.ImportTableWizardPanel;
 import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
@@ -38,9 +39,11 @@ import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
+import javax.swing.table.DefaultTableModel;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
 import org.openide.awt.ActionID;
@@ -91,6 +94,7 @@ public final class ImportTableWizardAction implements ActionListener {
         if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
             final TableType tableType = (TableType) wiz.getProperty(ImportTableWizardPanel.PROP_TABLE_TYPE);
             final String fileLocation = (String) wiz.getProperty(ImportTableWizardPanel.PROP_SELECTED_FILE);
+            final String statsFileLocation = (String) wiz.getProperty(ImportTableWizardPanel.PROP_SELECTED_STATS_FILE);
             final PersistantReference ref = (PersistantReference) wiz.getProperty(ImportTableWizardPanel.PROP_SELECTED_REF);
             final boolean autoDelimiter = (boolean) wiz.getProperty(ImportTableWizardPanel.PROP_AUTO_DELEMITER);
             final CsvPreference csvPref = (CsvPreference) wiz.getProperty(ImportTableWizardPanel.PROP_SEL_PREF);
@@ -101,43 +105,61 @@ public final class ImportTableWizardAction implements ActionListener {
                 CsvTableParser csvParser = (CsvTableParser) parser;
                 csvParser.setAutoDelimiter(autoDelimiter);
                 csvParser.setCsvPref(csvPref);
-                csvParser.setTableModel(tableType.getName());
+                csvParser.setTableModel(tableType);
             }
 
             //parse file in readable format for a table
             final File tableFile = new File(fileLocation);
+            List<List<?>> tableData = new ArrayList<>();
             try {
-                List<List<?>> tableData = parser.parseTable(tableFile);
-                
-                if (tableView != null) {
-                    if (tableType.equals(TableType.OPERON_DETECTION_JR) 
-                            || tableType.equals(TableType.RPKM_ANALYSIS_JR) 
-                            || tableType.equals(TableType.NOVEL_TRANSCRIPT_DETECTION_JR) 
-                            || tableType.equals(TableType.TSS_DETECTION_JR)) {
-                        final File parametersFile = new File(tableFile.getParent()+"/"+tableFile.getName()+"_parameters.csv");
-                        System.out.println(parametersFile.getAbsolutePath());
+//                List<List<?>> tableData = parser.parseTable(tableFile);
+
+                if (tableView != null && (tableType.equals(TableType.OPERON_DETECTION_JR)
+                        || tableType.equals(TableType.RPKM_ANALYSIS_JR)
+                        || tableType.equals(TableType.NOVEL_TRANSCRIPT_DETECTION_JR)
+                        || tableType.equals(TableType.TSS_DETECTION_JR))) {
+
+                    //xls handling of transcriptome tables
+                    if (parser instanceof XlsTranscriptomeTableParser) {
+                        XlsTranscriptomeTableParser xlsParser = (XlsTranscriptomeTableParser) parser;
+                        xlsParser.setTableType(tableType);
+                        xlsParser.parseTable(new File(fileLocation));
+                        DefaultTableModel model = xlsParser.getModel();
+                        HashMap<String, String> secondSheetMap = xlsParser.getSecondSheetMap();
+                        HashMap<String, String> secondSheetMapThirdCol = xlsParser.getSecondSheetMapThirdCol();
+                        tableView.processXlsInput(ref, model, secondSheetMap, secondSheetMapThirdCol);
+
+                    } else if (parser instanceof CsvTableParser) {
+                        CsvTableParser csvParser = (CsvTableParser) parser;
+                        final File parametersFile = new File(statsFileLocation);
+                        tableData = csvParser.parseTable(tableFile);
+                        csvParser.setTableModel(TableType.STATS_TABLE);
                         List<List<?>> tableData2 = parser.parseTable(parametersFile);
-                        tableView.process(tableData, tableData2, tableType);
-                        
+                        tableView.processCsvInput(tableData, tableData2, tableType, ref);
+
                     }
+                } else {
+                    tableData = parser.parseTable(tableFile);
+
+                    final UneditableTableModel tableModel = TableUtils.transformDataToTableModel(tableData);
+
+                    //open table visualization panel with given reference for jumping to the position
+                    SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
+                        @Override
+                        public void run() {
+                            PosTablePanel tablePanel = new PosTablePanel(tableModel, tableType);
+                            tablePanel.setReferenceGenome(ref);
+//                            tablePanel.setTableType(tableType);
+                            checkAndOpenRefViewer(ref, tablePanel);
+
+                            String panelName = "Imported table from: " + tableFile.getName();
+                            topComp = (TableTopComponent) WindowManager.getDefault().findTopComponent("TableTopComponent");
+                            topComp.open();
+                            topComp.openTableTab(panelName, tablePanel);
+                        }
+                    });
                 }
-                final UneditableTableModel tableModel = TableUtils.transformDataToTableModel(tableData);
 
-                //open table visualization panel with given reference for jumping to the position
-                SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
-                    @Override
-                    public void run() {
-                        PosTablePanel tablePanel = new PosTablePanel(tableModel);
-                        tablePanel.setReferenceGenome(ref);
-                        tablePanel.setTableType(tableType);
-                        checkAndOpenRefViewer(ref, tablePanel);
-
-                        String panelName = "Imported table from: " + tableFile.getName();
-                        topComp = (TableTopComponent) WindowManager.getDefault().findTopComponent("TableTopComponent");
-                        topComp.open();
-                        topComp.openTableTab(panelName, tablePanel);
-                    }
-                });
             } catch (ParsingException ex) {
                 JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), ex.getMessage() + "\nFile: " + fileLocation,
                         Bundle.ErrorHeader(), JOptionPane.INFORMATION_MESSAGE);

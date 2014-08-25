@@ -58,15 +58,15 @@ public class PlotGenerator {
      */
     protected static final Color COLOR2 = new Color(200, 80, 75);
     private File absFreq5PrimeUtrsInCsv;
-    private final ReferenceViewer referenceViewer;
+    private final PersistantReference persistantReference;
 
     /**
      * Constructor for this class.
      *
      * @param referenceViewer ReferenceViewer
      */
-    public PlotGenerator(ReferenceViewer referenceViewer) {
-        this.referenceViewer = referenceViewer;
+    public PlotGenerator(PersistantReference reference) {
+        this.persistantReference = reference;
     }
 
     /**
@@ -218,9 +218,6 @@ public class PlotGenerator {
      * @param tssToLocus List<TranscriptionStart>>
      */
     private void prepareCsvFileForExport(Map<String, List<TranscriptionStart>> tssToLocus) {
-        // get reference sequence for promotor regions
-        PersistantReference ref = referenceViewer.getReference();
-
         try {
             this.absFreq5PrimeUtrsInCsv = File.createTempFile("absoluteFrrequencyOf5PrimeUTRs", ".csv");
 
@@ -238,7 +235,7 @@ public class PlotGenerator {
                         }
                         int geneStart = ts.isFwdStrand() ? ts.getAssignedFeature().getStart() : ts.getAssignedFeature().getStop();
                         writer.write(ts.getAssignedFeature().getLocus() + ";" + direction + ";" + ts.getStartPosition() + ";"
-                                + geneStart + ";" + ts.getDetectedFeatStart() + ";" + offset + ";" + get5PrimeUtrSequence(ref, ts, offset) + "\n");
+                                + geneStart + ";" + ts.getDetectedFeatStart() + ";" + offset + ";" + get5PrimeUtrSequence(this.persistantReference, ts, offset) + "\n");
                     }
                 }
             }
@@ -265,7 +262,7 @@ public class PlotGenerator {
         List<TranscriptionStart> tssForAnalysis = getTssOfInterest(elements, tss);
 
         if (chartType == ChartType.BASE_DISTRIBUTION) {
-            PersistantReference ref = referenceViewer.getReference();
+            PersistantReference ref = this.persistantReference;
             Map<String, List<TranscriptionStart>> locusToTSSs = new TreeMap<>();
             for (TranscriptionStart ts : tssForAnalysis) {
                 if (ts.getAssignedFeature() != null) {

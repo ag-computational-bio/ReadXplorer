@@ -34,15 +34,15 @@ public class PosTablePanel extends TablePanel {
     private static final long serialVersionUID = 1L;
     private final UneditableTableModel tableData;
     private PersistantReference reference;
-    private TableType tableType;
     private TableRightClickFilter<UneditableTableModel> filterListener;
 
     /**
      * Creates a new position table panel. A position table starts with a column
      * containing the position.
      * @param tableData The data to display in this panel's table.
+     * @param tableType The type of data table.
      */
-    public PosTablePanel(UneditableTableModel tableData) {
+    public PosTablePanel(UneditableTableModel tableData, TableType tableType) {
         this.tableData = tableData;
         final int posColumn = 0;
         final int trackColumn;
@@ -159,7 +159,4 @@ public class PosTablePanel extends TablePanel {
         return this.reference;
     }
 
-    public void setTableType(TableType tableType) {
-        this.tableType = tableType;
-    }
 }

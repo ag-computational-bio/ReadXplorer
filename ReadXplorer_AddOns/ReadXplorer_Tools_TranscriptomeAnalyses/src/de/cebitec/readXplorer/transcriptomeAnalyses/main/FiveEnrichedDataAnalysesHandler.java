@@ -161,6 +161,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
         if (this.transcriptionStartResultPanel == null) {
             this.transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
             this.transcriptionStartResultPanel.setReferenceViewer(this.refViewer);
+            this.transcriptionStartResultPanel.setPersistantReference(this.reference);
         }
 
         this.stats.clearMemory();

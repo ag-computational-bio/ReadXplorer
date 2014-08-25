@@ -5,7 +5,6 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.VisualizationWizardIterator;
-import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.VisualizationWizardIterator;
 import de.cebitec.readXplorer.transcriptomeAnalyses.controller.VisualizationListener;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ChartType;
@@ -17,7 +16,6 @@ import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.SequinTab
 import de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.SequinTableSettingsWizardPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.filterWizard.FilterTSS;
 import de.cebitec.readXplorer.transcriptomeAnalyses.filterWizard.FilterWizardPanel;
-import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.DataSelectionWizardPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.MotifSearchModel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.MotifSearchPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.MultiPurposeTopComponent;
@@ -129,6 +127,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
     private VisualizationListener vizualizationListener;
     String separator = "";
     Integer prefixLength = 0;
+    PersistantReference persistantRef;
 
     /**
      * This panel is capable of showing a table with transcription start sites
@@ -407,7 +406,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         //action to perform after successfully finishing the wizard
         if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
             final List<TranscriptionStart> currentTss = updateTssResults();
-            vizualizationListener = new VisualizationListener(referenceViewer, wiz, currentTss, tssResult);
+            vizualizationListener = new VisualizationListener(this.persistantRef, wiz, currentTss, tssResult);
             vizualizationListener.actionPerformed(new ActionEvent(this, 1, ChartType.WIZARD.toString()));
             if (vizualizationListener.isAbsoluteFrequencyPlotSelected()) {
                 vizualizationListener.actionPerformed(new ActionEvent(this, 2, ChartType.ABSOLUTE_FREQUENCY_OF_5_PRIME_UTRs.toString()));
@@ -500,7 +499,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
             String type = elements.toString().toLowerCase();
             this.topComponent.setName("Promotor motif search for " + type + " elements in Table");
 
-            model = new MotifSearchModel(referenceViewer);
+            model = new MotifSearchModel(this.persistantRef);
             promotorMotifSearchPanel = new MotifSearchPanel();
             promotorMotifSearchPanel.registerObserver(this);
 
@@ -589,7 +588,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
             topComponent.open();
             topComponent.setName("RBS motif search");
 
-            model = new MotifSearchModel(referenceViewer);
+            model = new MotifSearchModel(this.persistantRef);
             rbsMotifSearchPanel = new RbsMotifSearchPanel();
             rbsMotifSearchPanel.registerObserver(this);
 
@@ -669,7 +668,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                 separator = (String) wiz.getProperty(SequinTableSettingsWizardPanel.SEQUIN_EXPORT_SEPARATOR);
                 prefixLength = (Integer) wiz.getProperty(SequinTableSettingsWizardPanel.SEQUIN_EXPORT_STRAIN_LENGTH);
             }
-            
 
             ReadXplorerFileChooser fileChooser = new ReadXplorerFileChooser(new String[]{"tbl"}, "Table files for Sequin export") {
                 @Override
@@ -901,8 +899,10 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         }
 
         ResultPanelTranscriptionStart transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
-        transcriptionStartResultPanel.setReferenceViewer(this.referenceViewer);
-        TSSDetectionResults tssResultNew = new TSSDetectionResults(this.tssResult.getStats(), subTSS, tssResult.getTrackMap(), this.referenceViewer.getReference());
+//        transcriptionStartResultPanel.setRefAndBoundsManager(this.persistantRef, this.boundsInfoManager);
+        transcriptionStartResultPanel.setPersistantReference(this.persistantRef);
+        transcriptionStartResultPanel.setBoundsInfoManager(this.boundsInfoManager);
+        TSSDetectionResults tssResultNew = new TSSDetectionResults(this.tssResult.getStats(), subTSS, tssResult.getTrackMap(), this.persistantRef);
         tssResultNew.setResults(subTSS);
         tssResultNew.setParameters(this.tssResult.getParameters());
         transcriptionStartResultPanel.addResult(tssResultNew);
@@ -937,6 +937,10 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
     public void setReferenceViewer(ReferenceViewer referenceViewer) {
         this.boundsInfoManager = referenceViewer.getBoundsInformationManager();
         this.referenceViewer = referenceViewer;
+    }
+
+    public void setPersistantReference(PersistantReference reference) {
+        this.persistantRef = reference;
     }
 
     /**
@@ -982,14 +986,14 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
                     final DefaultTableModel model = (DefaultTableModel) tSSTable.getModel();
 
-                    PersistantReference ref = referenceViewer.getReference();
+                    PersistantReference ref = persistantRef;
                     String strand;
                     PersistantFeature feature;
                     PersistantFeature nextDownstreamFeature;
 
                     for (TranscriptionStart tSS : tsss) {
-                        String detectedFeatureStart = "-";
-                        String detectedFeatureStop = "-";
+                        String detectedFeatureStart = "0";
+                        String detectedFeatureStop = "0";
 
                         if (tSS.getAssignedFeature() != null) {
                             if (tSS.getAssignedFeature().isFwdStrand()) {
@@ -1100,7 +1104,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                         } else {
                             rowData[i++] = 0;
                             rowData[i++] = 0;
-                            rowData[i++] = "-";
+                            rowData[i++] = "0";
                             rowData[i++] = 0;
                             rowData[i++] = "-";
                         }
@@ -1232,7 +1236,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         if (args instanceof RbsMotifSearchPanel) {
             RbsMotifSearchPanel panel = (RbsMotifSearchPanel) args;
             if (this.model == null) {
-                this.model = new MotifSearchModel(referenceViewer);
+                this.model = new MotifSearchModel(this.persistantRef);
                 this.model.storeRbsAnalysisResults(panel.getUpstreamRegions(),
                         panel.getRbsStarts(), panel.getRbsShifts(),
                         panel.getParams(), this.updateTssResults()
@@ -1248,7 +1252,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         if (args instanceof MotifSearchPanel) {
             MotifSearchPanel panel = (MotifSearchPanel) args;
             if (this.model == null) {
-                this.model = new MotifSearchModel(referenceViewer);
+                this.model = new MotifSearchModel(this.persistantRef);
                 this.model.storePromoterAnalysisResults(panel.getUpstreamRegions(),
                         panel.getMinus10Starts(), panel.getMinus35Starts(),
                         panel.getMinus10Shifts(), panel.getMinus35Shifts(),
@@ -1271,21 +1275,20 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         this.promotorRegions = new ArrayList<>();
 
         //get reference sequence for promotor regions
-        PersistantReference ref = this.referenceViewer.getReference();
         String promotor;
 
         //get the promotor region for each TSS
         int promotorStart;
-        int chromLength = ref.getActiveChromosome().getLength();
+        int chromLength = this.persistantRef.getActiveChromosome().getLength();
         for (TranscriptionStart tSS : this.tssResult.getResults()) {
             if (tSS.isFwdStrand()) {
                 promotorStart = tSS.getStartPosition() - 70;
                 promotorStart = promotorStart < 0 ? 0 : promotorStart;
-                promotor = ref.getActiveChromSequence(promotorStart, tSS.getStartPosition());
+                promotor = this.persistantRef.getActiveChromSequence(promotorStart, tSS.getStartPosition());
             } else {
                 promotorStart = tSS.getStartPosition() + 70;
                 promotorStart = promotorStart > chromLength ? chromLength : promotorStart;
-                promotor = SequenceUtils.getReverseComplement(ref.getActiveChromSequence(tSS.getStartPosition(), promotorStart));
+                promotor = SequenceUtils.getReverseComplement(this.persistantRef.getActiveChromSequence(tSS.getStartPosition(), promotorStart));
             }
             this.promotorRegions.add(promotor);
         }

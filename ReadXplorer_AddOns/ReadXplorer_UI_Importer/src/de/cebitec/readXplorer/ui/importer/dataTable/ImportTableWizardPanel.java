@@ -29,6 +29,7 @@ public class ImportTableWizardPanel extends ChangeListeningFinishWizardPanel {
 
     public static final String PROP_TABLE_TYPE = "selTableType";
     public static final String PROP_SELECTED_FILE = "selFile";
+    public static final String PROP_SELECTED_STATS_FILE = "selStatsFile";
     public static final String PROP_SELECTED_REF = "selRef";
     public static final String PROP_AUTO_DELEMITER = "autoDelimiter";
     public static final String PROP_SEL_PREF = "selPref";
@@ -57,6 +58,7 @@ public class ImportTableWizardPanel extends ChangeListeningFinishWizardPanel {
         if (this.isValid()) {
             wiz.putProperty(PROP_TABLE_TYPE, this.component.getSelectedTableType());
             wiz.putProperty(PROP_SELECTED_FILE, this.component.getFileLocation());
+            wiz.putProperty(PROP_SELECTED_STATS_FILE, this.component.getStatsFileLocation());
             wiz.putProperty(PROP_SELECTED_REF, this.component.getReference());
             wiz.putProperty(PROP_AUTO_DELEMITER, this.component.isAutodetectDelimiter());
             wiz.putProperty(PROP_SEL_PREF, this.component.getCsvPref());

@@ -48,6 +48,8 @@ public enum TableType {
     DIFF_GENE_EXPRESSION("Differential Gene Expression Table"),
     /** Arbitrary table starting with a position column. */
     POS_TABLE("Any table starting with position column"),
+    /** A statistics table. */
+    STATS_TABLE("A statistics table"),
     /** Any arbitrary table with no synchronization in the viewers. */
     ANY_TABLE("Any other table");
 

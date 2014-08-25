@@ -110,7 +110,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
         // geting Mappings and calculate statistics on mappings.
         try {
             trackConnector = (new SaveFileFetcherForGUI()).getTrackConnector(this.selectedTrack);
-            this.stats = new StatisticsOnMappingData(refViewer.getReference(), this.fraction, this.forwardCDSs, this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
+            this.stats = new StatisticsOnMappingData(this.reference, this.fraction, this.forwardCDSs, this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
             boolean bestMatchesSelected = false;
             if (parameters.isPerformNovelRegionDetection()) {
                 if (parameters.isIncludeBestMatchedReadsNr()) {
@@ -212,6 +212,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
             if (novelRegionResult == null) {
                 novelRegionResult = new NovelRegionResultPanel();
                 novelRegionResult.setReferenceViewer(refViewer);
+                novelRegionResult.setPersistantReference(reference);
             }
 
             NovelRegionResult newRegionResult = new NovelRegionResult(reference, stats, trackMap, newRegionDetection.getNovelRegions(), false);
@@ -243,6 +244,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
             if (operonResultPanel == null) {
                 operonResultPanel = new ResultPanelOperonDetection();
                 operonResultPanel.setReferenceViewer(refViewer);
+                operonResultPanel.setPersistantReference(reference);
             }
 
             OperonDetectionResult operonDetectionResult = new OperonDetectionResult(this.stats, this.trackMap, detectedOperons, reference);

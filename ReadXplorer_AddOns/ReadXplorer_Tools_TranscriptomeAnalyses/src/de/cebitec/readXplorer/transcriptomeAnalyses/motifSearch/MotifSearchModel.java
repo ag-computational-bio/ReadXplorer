@@ -79,8 +79,8 @@ public class MotifSearchModel implements Observer {
      *
      * @param refViewer
      */
-    public MotifSearchModel(ReferenceViewer refViewer) {
-        this.ref = refViewer.getReference();
+    public MotifSearchModel(PersistantReference reference) {
+        this.ref = reference;
         this.handlerTitlePromotorAnalysis = "Processing promotor analysis";
         this.handlerTitleRBSAnalysis = "Processing rbs analysis";
         this.progressHandlePromotorAnalysis = ProgressHandleFactory.createHandle(handlerTitlePromotorAnalysis);

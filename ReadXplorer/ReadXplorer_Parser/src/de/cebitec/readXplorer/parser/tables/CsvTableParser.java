@@ -54,7 +54,7 @@ public class CsvTableParser implements CsvParserI {
     public static final CellProcessor[] DEFAULT_TABLE_PROCESSOR = new CellProcessor[0];
     public static final CellProcessor[] POS_TABLE_PROCESSOR = new CellProcessor[]{ new ParseInt() };
     public static CellProcessor[] TABLE_PROCESSOR;
-    private String tableModel;
+    private TableType tableModel;
 
     public CsvTableParser() {
         this.autoDelimiter = true;
@@ -126,20 +126,22 @@ public class CsvTableParser implements CsvParserI {
                 tableData.add(Arrays.asList(header));
 
                 CellProcessor[] generalProcessors;
-                if (tableModel.equals(TableType.COVERAGE_ANALYSIS.getName())
-                        || tableModel.equals(TableType.POS_TABLE.getName())
-                        || tableModel.equals(TableType.SNP_DETECTION.getName())
-                        || tableModel.equals(TableType.TSS_DETECTION.getName())) {
+                if (tableModel == TableType.COVERAGE_ANALYSIS
+                        || tableModel == TableType.POS_TABLE
+                        || tableModel == TableType.SNP_DETECTION
+                        || tableModel == TableType.TSS_DETECTION) {
                     generalProcessors = POS_TABLE_PROCESSOR;
-                } else if (tableModel.equals(TableType.TSS_DETECTION_JR.getName())) {
+                } else if (tableModel == TableType.TSS_DETECTION_JR) {
                     generalProcessors = getTssCellProcessor();
-                } else if (tableModel.equals(TableType.OPERON_DETECTION_JR.getName())) {
+                } else if (tableModel == TableType.OPERON_DETECTION_JR) {
                     generalProcessors = getOperonCellProcessor();
-                } else if (tableModel.equals(TableType.RPKM_ANALYSIS_JR.getName())) {
+                } else if (tableModel == TableType.RPKM_ANALYSIS_JR) {
                     generalProcessors = getRpkmCellProcessor();
-                } else if (tableModel.equals(TableType.NOVEL_TRANSCRIPT_DETECTION_JR.getName())) {
+                } else if (tableModel == TableType.NOVEL_TRANSCRIPT_DETECTION_JR) {
                     generalProcessors = getNovelTranscriptCellProcessor();
-                } else {
+                } else if (tableModel == TableType.STATS_TABLE) {
+                    generalProcessors = this.getStatsProcessor();
+                }else {
                     generalProcessors = DEFAULT_TABLE_PROCESSOR;
                 }
 
@@ -170,7 +172,7 @@ public class CsvTableParser implements CsvParserI {
         return tableData;
     }
 
-    public void setTableModel(String tableModel) {
+    public void setTableModel(TableType tableModel) {
         this.tableModel = tableModel;
     }
 
@@ -275,11 +277,11 @@ public class CsvTableParser implements CsvParserI {
             null, // Feature1
             null, // Feature2
             null, // Strand
-            new ParseInt(), // Start annotation 1
-            new ParseInt(), // Start annotation 2
+            null, // Start annotation 1
+            null, // Start annotation 2
             new ParseBool(), // false positive
             new ParseBool(), // marked as finish observed
-            new ParseInt(), // Spanning reads
+            null, // Spanning reads
             null, // Operon String
             new ParseInt(), // Number of Genes 
             null, // Chromosome name
@@ -303,8 +305,8 @@ public class CsvTableParser implements CsvParserI {
             new ParseInt(), // Feature length
             null, // Strand
             new ParseInt(), // Longest Detected 5'-UTR Length
-            new ParseDouble(), // RPKM
-            new ParseDouble(), // Log-RPKM
+            null, // RPKM
+            null, // Log-RPKM
             new ParseInt(), // Mapped Total
             null, // Chromosome
             new ParseInt(), // Chromosome id
@@ -341,7 +343,7 @@ public class CsvTableParser implements CsvParserI {
      *
      * @return List of CellProcessors.
      */
-    private CellProcessor[] getSndSheedProcessor() {
+    private CellProcessor[] getStatsProcessor() {
         return new CellProcessor[]{
             null,
             null,

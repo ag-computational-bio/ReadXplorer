@@ -57,38 +57,38 @@ public class XlsTableParser implements TableParserI {
         
         List<List<?>> tableData = new ArrayList<>();
         
-        try {
-            WorkbookSettings wbSettings = new WorkbookSettings();
-            wbSettings.setLocale(new Locale("en", "EN"));
-            Workbook workbook;
-            workbook = Workbook.getWorkbook(fileToRead);
-            boolean fstSheet = true;
-            String headerStartFstSheet = "";
-            for (Sheet sheet : workbook.getSheets()) { //TODO: filter stats and parametersheet
-                for (int i = 0; i < sheet.getRows(); i++) {
-                    if (fstSheet) {
-                        headerStartFstSheet = sheet.getCell(0, 0).getContents();
-                        fstSheet = false;
-                    }
-                    //only read all sheets from the beginning, which seem to contain the data = has the same header start than the first sheet
-                    if (headerStartFstSheet.equals(sheet.getCell(0, 0).getContents())) {
+            try {
+                WorkbookSettings wbSettings = new WorkbookSettings();
+                wbSettings.setLocale(new Locale("en", "EN"));
+                Workbook workbook;
+                workbook = Workbook.getWorkbook(fileToRead);
+                boolean fstSheet = true;
+                String headerStartFstSheet = "";
+                for (Sheet sheet : workbook.getSheets()) { //TODO: filter stats and parametersheet
+                    for (int i = 0; i < sheet.getRows(); i++) {
+                        if (fstSheet) {
+                            headerStartFstSheet = sheet.getCell(0, 0).getContents();
+                            fstSheet = false;
+                        }
+                        //only read all sheets from the beginning, which seem to contain the data = has the same header start than the first sheet
+                        if (headerStartFstSheet.equals(sheet.getCell(0, 0).getContents())) {
 
-                        Cell[] cells = sheet.getRow(i);
-                        List<Object> rowData = new ArrayList<>();
-                        for (Cell cell : cells) {
-                            String content = cell.getContents();
-                            rowData.add(content);
+                            Cell[] cells = sheet.getRow(i);
+                            List<Object> rowData = new ArrayList<>();
+                            for (Cell cell : cells) {
+                                String content = cell.getContents();
+                                rowData.add(content);
 //                        CellType type = cell.getType(); other usefule stuff, if needed
 //                        CellFeatures feature = cell.getCellFeatures();
 //                        CellFormat format = cell.getCellFormat();
+                            }
+                            tableData.add(rowData);
                         }
-                        tableData.add(rowData);
                     }
                 }
+            } catch (IOException | BiffException ex) {
+                Exceptions.printStackTrace(ex);
             }
-        } catch (IOException | BiffException ex) {
-            Exceptions.printStackTrace(ex);
-        }
         
         return tableData;
 

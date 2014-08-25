@@ -2,9 +2,8 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package de.cebitec.readXplorer.transcriptomeAnalyses.excelImport;
+package de.cebitec.readXplorer.parser.tables;
 
-import java.util.List;
 import javax.swing.table.DefaultTableModel;
 
 /**

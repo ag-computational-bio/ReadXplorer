@@ -6,6 +6,7 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.main;
  * Created on 27.01.2012, 14:31:03
  */
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.OperonAdjacency;
@@ -64,6 +65,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel implements Obse
     public final TableType tableType = TableType.OPERON_TABLE;
     private BoundsInfoManager boundsInfoManager;
     private ReferenceViewer referenceViewer;
+    private PersistantReference persistantRef;
     private OperonDetectionResult operonResult;
     private HashMap<String, Object> operonDetStats;
     private final TableRightClickFilter<UneditableTableModel> tableFilter;
@@ -611,6 +613,10 @@ public class ResultPanelOperonDetection extends ResultTablePanel implements Obse
     public void setReferenceViewer(ReferenceViewer referenceViewer) {
         this.boundsInfoManager = referenceViewer.getBoundsInformationManager();
         this.referenceViewer = referenceViewer;
+    }
+
+    public void setPersistantReference(PersistantReference reference) {
+        this.persistantRef = reference;
     }
 
     /**
