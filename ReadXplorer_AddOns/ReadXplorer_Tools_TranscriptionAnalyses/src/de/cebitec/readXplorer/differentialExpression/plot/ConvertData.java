@@ -53,10 +53,10 @@ public class ConvertData {
                 input = convertBaySeqResults(result.getTableContents(), sampleA, sampleB);
                 break;
             case DeSeq:
-                input = createDataPairForFeature(result.getTableContents(), 0, 3, 4);
+                input = createDataPairForFeature(result.getTableContents(), 0, 2, 3);
                 break;
             case ExpressTest:
-                input = createDataPairForFeature(result.getTableContents(), 0, 4, 6);
+                input = createDataPairForFeature(result.getTableContents(), 0, 3, 5);
                 break;
         }
         Map<PersistantFeature, Pair<Double, Double>> ret = new HashMap<>();
