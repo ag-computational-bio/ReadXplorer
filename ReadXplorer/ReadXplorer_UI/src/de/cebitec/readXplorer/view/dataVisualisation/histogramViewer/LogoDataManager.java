@@ -17,7 +17,7 @@
 package de.cebitec.readXplorer.view.dataVisualisation.histogramViewer;
 
 import de.cebitec.readXplorer.databackend.dataObjects.Difference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReferenceGap;
+import de.cebitec.readXplorer.databackend.dataObjects.ReferenceGap;
 import de.cebitec.readXplorer.view.dataVisualisation.GenomeGapManager;
 import java.util.Collection;
 import java.util.logging.Level;
@@ -193,8 +193,8 @@ public class LogoDataManager {
      * @param gaps the collection of gaps to add
      * @param gapManager the genome gap manager for the given gaps
      */
-    public void addGaps(Collection<PersistentReferenceGap> gaps, GenomeGapManager gapManager) {
-        for (PersistentReferenceGap gap : gaps) {
+    public void addGaps(Collection<ReferenceGap> gaps, GenomeGapManager gapManager) {
+        for (ReferenceGap gap : gaps) {
             int origPos = gap.getPosition();
             
             if (origPos > this.absStart && origPos < this.stop) {

@@ -23,7 +23,7 @@ import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI.UserCanceledTrac
 import de.cebitec.readXplorer.databackend.ThreadListener;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.Coverage;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistent;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResult;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
@@ -66,7 +66,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     private Integer intervalLength;
     private CorrelationResultPanel resultView;
     
-    private List<CoverageAndDiffResultPersistent> resultList;
+    private List<CoverageAndDiffResult> resultList;
     private List<TrackConnector> trackConnectors;
     private boolean ready = false;
     private final Map<Integer, PersistentChromosome> chromMap;
@@ -155,7 +155,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         //this.io.getOut().println(msg);
     }
     
-    private int getCoverageAt(CoverageAndDiffResultPersistent coverageResult, int position, StrandDirection direction) {
+    private int getCoverageAt(CoverageAndDiffResult coverageResult, int position, StrandDirection direction) {
         Coverage coverage = coverageResult.getCovManager().getCoverage(MappingClass.COMMON_MATCH);
         if (direction == StrandDirection.REV) {
             return coverage.getRevCov(position);
@@ -170,7 +170,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
      * contain zero coverage at the current position
      */
     private boolean allCoverageEqualZero(StrandDirection direction, int position) {
-        for (CoverageAndDiffResultPersistent result : this.resultList) {
+        for (CoverageAndDiffResult result : this.resultList) {
             if (getCoverageAt(result, position, direction) != 0) {
                 return false;
             }
@@ -181,7 +181,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     /** computes the maximum peak covage from the currently loaded result list */
     private int getPeakCoverage(StrandDirection direction, int position) {
         int peakCoverage = 0;
-        for (CoverageAndDiffResultPersistent result : this.resultList) {
+        for (CoverageAndDiffResult result : this.resultList) {
             peakCoverage = Math.max(peakCoverage, getCoverageAt(result, position, direction));
         }
         return peakCoverage;
@@ -205,7 +205,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
      * @param to
      * @return 
      */
-    private double[] copyCoverage(CoverageAndDiffResultPersistent coverageResult, StrandDirection direction, int from, int to) {
+    private double[] copyCoverage(CoverageAndDiffResult coverageResult, StrandDirection direction, int from, int to) {
         if (to < from) { throw new IllegalArgumentException("from value must be less than the to value"); }
         double[] result = new double[to-from];
         int writeIndex = 0;
@@ -353,9 +353,9 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
      * Wait until the data for all tracks has arrived */
     @Override
     public synchronized void receiveData(Object data) {
-        if (data instanceof CoverageAndDiffResultPersistent) {
+        if (data instanceof CoverageAndDiffResult) {
             //TODO: possible problem when results from the same track are quicker returned than from the other track. Separate resultlist
-            this.resultList.add((CoverageAndDiffResultPersistent) data);
+            this.resultList.add((CoverageAndDiffResult) data);
             if (this.resultList.size() == this.trackConnectors.size()) {
                 this.computeStep(this.currentDirection);
             }

@@ -20,7 +20,7 @@ import de.cebitec.readXplorer.api.objects.AnalysisI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistent;
+import de.cebitec.readXplorer.databackend.dataObjects.MappingResult;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
@@ -133,10 +133,10 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
     @Override
     public void update(Object data) {
         //the mappings are sorted by their start position!
-        MappingResultPersistent mappingResult = new MappingResultPersistent(null, null);
+        MappingResult mappingResult = new MappingResult(null, null);
         if (data.getClass() == mappingResult.getClass()) {
 
-            MappingResultPersistent mappings = ((MappingResultPersistent) data);
+            MappingResult mappings = ((MappingResult) data);
             this.sumReadCounts(mappings);
         }
         if (data instanceof Byte && ((Byte) data) == 2) {
@@ -158,7 +158,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
      * Sums up the read counts for the features the mappings are located in.
      * @param mappingResult the result containing the mappings to be investigated
      */
-    public void sumReadCounts(MappingResultPersistent mappingResult) {
+    public void sumReadCounts(MappingResult mappingResult) {
 
         List<Mapping> mappings = mappingResult.getMappings();
         PersistentFeature feature1;

@@ -19,8 +19,8 @@ package de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer;
 import de.cebitec.readXplorer.databackend.IntervalRequest;
 import de.cebitec.readXplorer.databackend.ThreadListener;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistent;
 import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
+import de.cebitec.readXplorer.databackend.dataObjects.MappingResult;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.Properties;
@@ -61,7 +61,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
     private int oldLogLeft;
     private int oldLogRight;
     private boolean showBaseQualities;
-    MappingResultPersistent mappingResult;
+    MappingResult mappingResult;
     HashMap<Integer, Integer> completeCoverage;
 
     /**
@@ -78,7 +78,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
         this.showSequenceBar(true, true);
         blockHeight = 8;
         layerHeight = blockHeight + 2;
-        mappingResult = new MappingResultPersistent(new ArrayList<Mapping>(), null);
+        mappingResult = new MappingResult(new ArrayList<Mapping>(), null);
         completeCoverage = new HashMap<>();
         this.setHorizontalMargin(10);
         this.setActive(false);
@@ -171,7 +171,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
     
     /**
      * Method called, when data is available. If the avialable data is a
-     * MappingResultPersistent, then the viewer is updated with the new mapping
+     * MappingResult, then the viewer is updated with the new mapping
      * data.
      * @param data the new mapping data to show
      */
@@ -179,7 +179,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
     @SuppressWarnings("unchecked")
     public void receiveData(Object data) {
         if (data.getClass().equals(mappingResult.getClass())) {
-            this.mappingResult = ((MappingResultPersistent) data);
+            this.mappingResult = ((MappingResult) data);
             this.showData();
         }
     }

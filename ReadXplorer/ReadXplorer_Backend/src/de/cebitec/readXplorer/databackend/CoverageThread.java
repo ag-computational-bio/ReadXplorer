@@ -19,11 +19,11 @@ package de.cebitec.readXplorer.databackend;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.Coverage;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistent;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResult;
 import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
 import de.cebitec.readXplorer.databackend.dataObjects.Difference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReferenceGap;
+import de.cebitec.readXplorer.databackend.dataObjects.ReferenceGap;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.VisualisationUtils;
@@ -48,7 +48,7 @@ public class CoverageThread extends RequestThread {
     private long trackID2;
     private List<PersistentTrack> tracks;
     ConcurrentLinkedQueue<IntervalRequest> requestQueue;
-    private CoverageAndDiffResultPersistent currentCov;
+    private CoverageAndDiffResult currentCov;
 //    private double requestCounter = 0;
 //    private double skippedCounter = 0;
     private PersistentReference referenceGenome;
@@ -80,19 +80,19 @@ public class CoverageThread extends RequestThread {
     private void singleCoverageThread(long trackID) {
         this.trackID = trackID;
         this.trackID2 = 0;
-        this.currentCov = new CoverageAndDiffResultPersistent(new CoverageManager(0, 0), null, null, null);
+        this.currentCov = new CoverageAndDiffResult(new CoverageManager(0, 0), null, null, null);
     }
 
     private void doubleCoverageThread(long trackID, long trackID2) {
         this.trackID = trackID;
         this.trackID2 = trackID2;
-        currentCov = new CoverageAndDiffResultPersistent(new CoverageManager(0, 0, true), null, null, null);
+        currentCov = new CoverageAndDiffResult(new CoverageManager(0, 0, true), null, null, null);
     }
 
     private void multipleCoverageThread() {
         this.trackID = 0;
         this.trackID2 = 0;
-        currentCov = new CoverageAndDiffResultPersistent(new CoverageManager(0, 0), null, null, null);
+        currentCov = new CoverageAndDiffResult(new CoverageManager(0, 0), null, null, null);
     }
 
     @Override
@@ -108,14 +108,14 @@ public class CoverageThread extends RequestThread {
      * @param track the track for which the coverage is requested
      * @return the container with the desired data
      */
-    CoverageAndDiffResultPersistent getCoverageAndDiffsFromFile(IntervalRequest request, PersistentTrack track) {
+    CoverageAndDiffResult getCoverageAndDiffsFromFile(IntervalRequest request, PersistentTrack track) {
         File file = new File(track.getFilePath());
         if (this.referenceGenome == null) {
             ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(track.getRefGenID());
             this.referenceGenome = refConnector.getRefGenome();
         }
         SamBamFileReader externalDataReader = new SamBamFileReader(file, track.getId(), referenceGenome);
-        CoverageAndDiffResultPersistent result = externalDataReader.getCoverageFromBam(request);
+        CoverageAndDiffResult result = externalDataReader.getCoverageFromBam(request);
         externalDataReader.close();
         return result;
 
@@ -128,8 +128,8 @@ public class CoverageThread extends RequestThread {
      * @return the coverage and diff result containing the read starts, the
      * coverage and no diffs and gaps
      */
-    CoverageAndDiffResultPersistent getCoverageAndReadStartsFromFile(IntervalRequest request, PersistentTrack track) {
-        CoverageAndDiffResultPersistent result;
+    CoverageAndDiffResult getCoverageAndReadStartsFromFile(IntervalRequest request, PersistentTrack track) {
+        CoverageAndDiffResult result;
         File file = new File(track.getFilePath());
         if (this.referenceGenome == null) {
             ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(track.getRefGenID());
@@ -151,9 +151,9 @@ public class CoverageThread extends RequestThread {
      * @param request
      * @return 
      */
-    CoverageAndDiffResultPersistent loadReadStartsAndCoverageMultiple(IntervalRequest request) {
+    CoverageAndDiffResult loadReadStartsAndCoverageMultiple(IntervalRequest request) {
 
-        CoverageAndDiffResultPersistent result;
+        CoverageAndDiffResult result;
         int from = request.getTotalFrom();
         int to = request.getTotalTo();
         CoverageManager cov = new CoverageManager(from, to);
@@ -163,11 +163,11 @@ public class CoverageThread extends RequestThread {
 
         if (tracks.size() > 1) {
             for (int i = 0; i < this.tracks.size(); ++i) {
-                CoverageAndDiffResultPersistent intermedRes = this.getCoverageAndReadStartsFromFile(request, tracks.get(i));
+                CoverageAndDiffResult intermedRes = this.getCoverageAndReadStartsFromFile(request, tracks.get(i));
                 cov = this.mergeMultCoverages(cov, intermedRes.getCovManager());
                 readStarts = this.mergeMultCoverages(readStarts, intermedRes.getReadStarts());
             }
-            result = new CoverageAndDiffResultPersistent(cov, null, null, request);
+            result = new CoverageAndDiffResult(cov, null, null, request);
             result.setReadStarts(readStarts);
         } else {
             result = this.getCoverageAndReadStartsFromFile(request, tracks.get(0));
@@ -187,7 +187,7 @@ public class CoverageThread extends RequestThread {
  in both tracks.
      * @throws SQLException
      */
-    CoverageAndDiffResultPersistent loadCoverageDouble(IntervalRequest request) {
+    CoverageAndDiffResult loadCoverageDouble(IntervalRequest request) {
         int from = request.getTotalFrom();
         int to = request.getTotalTo();
         CoverageManager cov1 = new CoverageManager(from, to);
@@ -207,7 +207,7 @@ public class CoverageThread extends RequestThread {
                 Properties.NORMAL, 
                 CoverageManager.TRACK2,
                 request.getReadClassParams());
-        CoverageAndDiffResultPersistent result = this.getCoverageAndDiffsFromFile(newRequest, tracks.get(1));
+        CoverageAndDiffResult result = this.getCoverageAndDiffsFromFile(newRequest, tracks.get(1));
 
         newRequest = new IntervalRequest(
                 request.getFrom(),
@@ -233,31 +233,31 @@ public class CoverageThread extends RequestThread {
      * @return the coverage of multiple track combined in one CoverageManager
  object.
      */
-    CoverageAndDiffResultPersistent loadCoverageMultiple(IntervalRequest request) {
+    CoverageAndDiffResult loadCoverageMultiple(IntervalRequest request) {
         int from = request.getTotalFrom(); // calcCenterLeft(request);
         int to = request.getTotalTo(); // calcCenterRight(request);
 
         CoverageManager covManager = new CoverageManager(from, to);
         List<Difference> diffs = new ArrayList<>();
-        List<PersistentReferenceGap> gaps = new ArrayList<>();
+        List<ReferenceGap> gaps = new ArrayList<>();
         covManager.incArraysToIntervalSize();
 
         //get coverage of all direct tracks
         if (tracks.size() > 1) {
             for (PersistentTrack track : tracks) {
-                CoverageAndDiffResultPersistent intermedRes = this.getCoverageAndDiffsFromFile(request, track);
+                CoverageAndDiffResult intermedRes = this.getCoverageAndDiffsFromFile(request, track);
                 covManager = this.mergeMultCoverages(covManager, intermedRes.getCovManager());
                 diffs.addAll(intermedRes.getDiffs());
                 gaps.addAll(intermedRes.getGaps());
             }
         } else {
-            CoverageAndDiffResultPersistent result = this.getCoverageAndDiffsFromFile(request, tracks.get(0));
+            CoverageAndDiffResult result = this.getCoverageAndDiffsFromFile(request, tracks.get(0));
             covManager = result.getCovManager();
             diffs = result.getDiffs();
             gaps = result.getGaps();
         }
 
-        return new CoverageAndDiffResultPersistent(covManager, diffs, gaps, request);
+        return new CoverageAndDiffResult(covManager, diffs, gaps, request);
     }
 
     @Override

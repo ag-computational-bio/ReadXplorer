@@ -20,7 +20,7 @@ import de.cebitec.readXplorer.databackend.IntervalRequest;
 import de.cebitec.readXplorer.databackend.ThreadListener;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistent;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResult;
 import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.ColorProperties;
@@ -421,8 +421,8 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
 
     @Override
     public synchronized void receiveData(Object coverageData) {
-        if (coverageData instanceof CoverageAndDiffResultPersistent) {
-            CoverageAndDiffResultPersistent covResult = (CoverageAndDiffResultPersistent) coverageData;
+        if (coverageData instanceof CoverageAndDiffResult) {
+            CoverageAndDiffResult covResult = (CoverageAndDiffResult) coverageData;
             this.covManagers = covResult.getCovManagers();
             this.covManager = covResult.getCovManager();
 

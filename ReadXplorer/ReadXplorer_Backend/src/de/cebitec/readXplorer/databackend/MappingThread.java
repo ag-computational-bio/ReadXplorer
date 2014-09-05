@@ -19,8 +19,8 @@ package de.cebitec.readXplorer.databackend;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistent;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReadPairGroup;
+import de.cebitec.readXplorer.databackend.dataObjects.MappingResult;
+import de.cebitec.readXplorer.databackend.dataObjects.ReadPairGroup;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.databackend.dataObjects.ReadPairResultPersistent;
@@ -50,7 +50,7 @@ public class MappingThread extends RequestThread {
     private List<PersistentTrack> tracks;
     ConcurrentLinkedQueue<IntervalRequest> requestQueue;
     private List<Mapping> currentMappings;
-    private Collection<PersistentReadPairGroup> currentReadPairs;
+    private Collection<ReadPairGroup> currentReadPairs;
     private PersistentReference refGenome;
 
     /**
@@ -144,15 +144,15 @@ public class MappingThread extends RequestThread {
      * @return the collection of read pair mappings for the given interval
      * and typeFlag
      */
-    public Collection<PersistentReadPairGroup> getReadPairMappings(IntervalRequest request) {
-        Collection<PersistentReadPairGroup> readPairs = new ArrayList<>();
+    public Collection<ReadPairGroup> getReadPairMappings(IntervalRequest request) {
+        Collection<ReadPairGroup> readPairs = new ArrayList<>();
         int from = request.getFrom();
         int to = request.getTo();
         
         if (from > 0 && to > 0 && from < to) {
             for (PersistentTrack track : tracks) {
                 SamBamFileReader reader = new SamBamFileReader(new File(track.getFilePath()), track.getId(), refGenome);
-                Collection<PersistentReadPairGroup> intermedRes = reader.getReadPairMappingsFromBam(request);
+                Collection<ReadPairGroup> intermedRes = reader.getReadPairMappingsFromBam(request);
                 readPairs.addAll(intermedRes);
             }
         }
@@ -179,7 +179,7 @@ public class MappingThread extends RequestThread {
                     }
                     //switch between ordinary mappings and read pairs
                     if (request.getDesiredData() != Properties.READ_PAIRS) {
-                        request.getSender().receiveData(new MappingResultPersistent(currentMappings, request));
+                        request.getSender().receiveData(new MappingResult(currentMappings, request));
                     } else {
                         request.getSender().receiveData(new ReadPairResultPersistent(currentReadPairs, request));
                     }

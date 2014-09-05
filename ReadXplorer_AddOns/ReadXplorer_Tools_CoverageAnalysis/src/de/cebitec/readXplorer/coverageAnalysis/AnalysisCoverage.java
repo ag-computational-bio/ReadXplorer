@@ -18,7 +18,7 @@ package de.cebitec.readXplorer.coverageAnalysis;
 
 import de.cebitec.readXplorer.api.objects.AnalysisI;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistent;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResult;
 import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Properties;
@@ -62,8 +62,8 @@ public class AnalysisCoverage implements Observer, AnalysisI<CoverageIntervalCon
      */
     @Override
     public void update(Object data) {
-        if (data instanceof CoverageAndDiffResultPersistent) {
-            CoverageAndDiffResultPersistent coverageResult = ((CoverageAndDiffResultPersistent) data);
+        if (data instanceof CoverageAndDiffResult) {
+            CoverageAndDiffResult coverageResult = ((CoverageAndDiffResult) data);
             this.processResult(coverageResult);
         }
     }
@@ -80,7 +80,7 @@ public class AnalysisCoverage implements Observer, AnalysisI<CoverageIntervalCon
      * Actually processes a new result.
      * @param coverageResult the result to process
      */
-    private void processResult(CoverageAndDiffResultPersistent coverageResult) {
+    private void processResult(CoverageAndDiffResult coverageResult) {
         
         /**
          * Algorithm:

@@ -16,8 +16,8 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.readPairViewer;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentObject;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReadPairGroup;
+import de.cebitec.readXplorer.databackend.dataObjects.ObjectWithId;
+import de.cebitec.readXplorer.databackend.dataObjects.ReadPairGroup;
 import de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer.BlockI;
 import de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer.Brick;
 import java.util.Iterator;
@@ -32,7 +32,7 @@ public class BlockPair implements BlockI {
 
     private int absStart;
     private int absStop;
-    private PersistentReadPairGroup readPairGroup;
+    private ReadPairGroup readPairGroup;
 
     /**
      * A block is a block that contains detailed information about one read pair id = all corresponding mappings.
@@ -40,7 +40,7 @@ public class BlockPair implements BlockI {
      * @param absStop stop of the block as sequence position (might be smaller than stop of mapping, when not in visible interval)
      * @param readPairGroup read pair group of this block
      */
-    public BlockPair(int absStart, int absStop, PersistentReadPairGroup readPairGroup){
+    public BlockPair(int absStart, int absStop, ReadPairGroup readPairGroup){
         this.absStart = absStart;
         this.absStop = absStop;
         this.readPairGroup = readPairGroup;
@@ -89,7 +89,7 @@ public class BlockPair implements BlockI {
      * @return The associated seq pair group.
      */
     @Override
-    public PersistentObject getPersistentObject() {
+    public ObjectWithId getObjectWithId() {
         return this.readPairGroup;
     }
 }

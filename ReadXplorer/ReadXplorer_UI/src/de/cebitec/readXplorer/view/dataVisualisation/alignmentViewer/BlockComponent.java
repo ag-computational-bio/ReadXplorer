@@ -20,8 +20,8 @@ import de.cebitec.readXplorer.databackend.SamBamFileReader;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.Difference;
 import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentObject;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReferenceGap;
+import de.cebitec.readXplorer.databackend.dataObjects.ObjectWithId;
+import de.cebitec.readXplorer.databackend.dataObjects.ReferenceGap;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.ColorUtils;
 import de.cebitec.readXplorer.util.SamAlignmentBlock;
@@ -166,7 +166,7 @@ public class BlockComponent extends JComponent {
              * @return the header for the sequence
              */
             private String getHeader() {
-                Mapping mapping = (Mapping) BlockComponent.this.block.getPersistentObject();
+                Mapping mapping = (Mapping) BlockComponent.this.block.getObjectWithId();
                 final String strand = mapping.isFwdStrand() ? ">>" : "<<";
                 HashMap<Integer, String> trackNames = ProjectConnector.getInstance().getOpenedTrackNames();
                 String name = "Reference seq from ";
@@ -202,8 +202,8 @@ public class BlockComponent extends JComponent {
      * @return The reference sequence 
      */
     public String getSequence() {
-        int start = ((Mapping) block.getPersistentObject()).getStart();
-        int stop = ((Mapping) block.getPersistentObject()).getStop();
+        int start = ((Mapping) block.getObjectWithId()).getStart();
+        int stop = ((Mapping) block.getObjectWithId()).getStop();
         //string first pos is zero
         String readSequence = parentViewer.getReference().getActiveChromSequence(start - 1, stop);
         return readSequence;
@@ -228,7 +228,7 @@ public class BlockComponent extends JComponent {
      */
     private String initToolTipTextInfoPart() {
         StringBuilder sb = new StringBuilder(150);
-        Mapping mapping = ((Mapping) block.getPersistentObject());
+        Mapping mapping = ((Mapping) block.getObjectWithId());
         
         sb.append(createTableRow("Start", String.valueOf(mapping.getStart())));
         sb.append(createTableRow("Stop", String.valueOf(mapping.getStop())));
@@ -330,7 +330,7 @@ public class BlockComponent extends JComponent {
                 printLabel = false;
             }
             StringBuilder tmp = new StringBuilder(10);
-            for (PersistentReferenceGap g : mapping.getGenomeGapsAtPosition(pos)) {
+            for (ReferenceGap g : mapping.getGenomeGapsAtPosition(pos)) {
                 tmp.append(g.getBase()).append(", ");
             }
             tmp.deleteCharAt(tmp.toString().lastIndexOf(','));
@@ -380,8 +380,8 @@ public class BlockComponent extends JComponent {
      */
     private void calcSubComponents() {
 
-        Mapping mapping = (Mapping) block.getPersistentObject();
-        this.calcAlignmentBlocks(block.getPersistentObject());
+        Mapping mapping = (Mapping) block.getObjectWithId();
+        this.calcAlignmentBlocks(block.getObjectWithId());
 
         // only count Bricks, that are no genome gaps.
         //Used for determining location of brick in viewer
@@ -446,11 +446,11 @@ public class BlockComponent extends JComponent {
     
     /**
      * Calculates the alignment blocks to paint for the given mapping.
-     * @param persistentObject The PersistentObject, which should be a
+     * @param ObjectWithId The ObjectWithId, which should be a
  Mapping
      */
-    private void calcAlignmentBlocks(PersistentObject persistentObject) {
-        PersistentObject persObj = persistentObject;
+    private void calcAlignmentBlocks(ObjectWithId ObjectWithId) {
+        ObjectWithId persObj = ObjectWithId;
         if (persObj instanceof Mapping) {
             this.blockColor = this.determineBlockColor();
             Mapping mapping = (Mapping) persObj;
@@ -474,7 +474,7 @@ public class BlockComponent extends JComponent {
      * @return The color of the block.
      */
     private Color determineBlockColor() {
-        Mapping m = ((Mapping) block.getPersistentObject());
+        Mapping m = ((Mapping) block.getObjectWithId());
         Color color;
         if (m.getDifferences() == 0) {
             color = ColorProperties.BLOCK_MATCH;

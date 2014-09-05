@@ -17,7 +17,7 @@
 package de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer;
 
 import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReferenceGap;
+import de.cebitec.readXplorer.databackend.dataObjects.ReferenceGap;
 import de.cebitec.readXplorer.view.dataVisualisation.GenomeGapManager;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -73,7 +73,7 @@ public class Block implements BlockI {
 
     private void fillWithOwnGenomeGaps(Mapping mapping, int position) {
         // do not only paint one gap, but ALL of them
-        for (PersistentReferenceGap gap : mapping.getGenomeGapsAtPosition(position)) {
+        for (ReferenceGap gap : mapping.getGenomeGapsAtPosition(position)) {
             bricks.add(Brick.determineGapType(gap.getBase()));
         }
     }
@@ -105,7 +105,7 @@ public class Block implements BlockI {
     }
 
     @Override
-    public Mapping getPersistentObject() {
+    public Mapping getObjectWithId() {
         return mapping;
     }
 

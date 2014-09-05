@@ -20,7 +20,7 @@ import de.cebitec.readXplorer.api.objects.AnalysisI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistent;
+import de.cebitec.readXplorer.databackend.dataObjects.MappingResult;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
@@ -94,10 +94,10 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
     
     @Override
     public void update(Object data) {
-         MappingResultPersistent mappingResult = new MappingResultPersistent(null, null);
+         MappingResult mappingResult = new MappingResult(null, null);
         
         if (data.getClass() == mappingResult.getClass()) {
-            MappingResultPersistent mappings = (MappingResultPersistent) data;
+            MappingResult mappings = (MappingResult) data;
             this.updateReadCountForFeatures(mappings);
         } else
         if (data instanceof Byte && ((Byte) data) == 2) { //2 means mapping analysis is finished
@@ -118,7 +118,7 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
      * all mappings in the mappings list.
      * @param mappingResult the result containing all mappings to add to the feature count
      */
-    public void updateReadCountForFeatures(MappingResultPersistent mappingResult) {
+    public void updateReadCountForFeatures(MappingResult mappingResult) {
         List<Mapping> mappings = mappingResult.getMappings();
         PersistentFeature feature;
         boolean fstFittingMapping;

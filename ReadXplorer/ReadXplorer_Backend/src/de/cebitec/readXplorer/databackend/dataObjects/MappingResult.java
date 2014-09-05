@@ -25,7 +25,7 @@ import java.util.List;
  * 
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class MappingResultPersistent extends PersistentResult {
+public class MappingResult extends AnalysisResult {
     
     private static final long serialVersionUID = 1L;
     
@@ -37,7 +37,7 @@ public class MappingResultPersistent extends PersistentResult {
      * @param mappings the list of mappings to store
      * @param request the request for which the result was generated 
      */
-    public MappingResultPersistent(List<Mapping> mappings, IntervalRequest request) {
+    public MappingResult(List<Mapping> mappings, IntervalRequest request) {
         super(request);
         this.mappings = mappings;
     }

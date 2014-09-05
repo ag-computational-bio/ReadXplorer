@@ -29,7 +29,7 @@ import java.util.TreeSet;
  * 
  * @author ddoppmeier, rhilker
  */
-public class Mapping implements PersistentObject, Comparable<Mapping> {
+public class Mapping implements ObjectWithId, Comparable<Mapping> {
 
     private int id;
     private int start;
@@ -38,7 +38,7 @@ public class Mapping implements PersistentObject, Comparable<Mapping> {
     private boolean isFwdStrand;
     private int numReplicates;
     private Map<Integer, Difference> diffs;
-    private TreeMap<Integer, TreeSet<PersistentReferenceGap>> gaps;
+    private TreeMap<Integer, TreeSet<ReferenceGap>> gaps;
     private int differences;
     private int sequenceID;
     private boolean isBestMatch;
@@ -131,7 +131,7 @@ public class Mapping implements PersistentObject, Comparable<Mapping> {
     /**
      * @return The complete TreeMap of genome gaps for this mapping
      */
-    public TreeMap<Integer, TreeSet<PersistentReferenceGap>> getGenomeGaps(){
+    public TreeMap<Integer, TreeSet<ReferenceGap>> getGenomeGaps(){
         return gaps;
     }
 
@@ -214,7 +214,7 @@ public class Mapping implements PersistentObject, Comparable<Mapping> {
      * @return A TreeSet containing the reference gaps for the given position.
      * If no gaps are stored for the position <code>null</code> is returned
      */
-    public TreeSet<PersistentReferenceGap> getGenomeGapsAtPosition(int position) {
+    public TreeSet<ReferenceGap> getGenomeGapsAtPosition(int position) {
         return gaps.get(position);
     }
 
@@ -242,9 +242,9 @@ public class Mapping implements PersistentObject, Comparable<Mapping> {
      * Adds a genome gap for a position of this mapping.
      * @param gap the gap to add to this mapping
      */
-    public void addGenomeGap(PersistentReferenceGap gap) {
+    public void addGenomeGap(ReferenceGap gap) {
         if (!gaps.containsKey(gap.getPosition())) {
-            gaps.put(gap.getPosition(), new TreeSet<PersistentReferenceGap>());
+            gaps.put(gap.getPosition(), new TreeSet<ReferenceGap>());
         }
         gaps.get(gap.getPosition()).add(gap);
     }

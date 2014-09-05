@@ -21,14 +21,14 @@ import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.databackend.ThreadListener;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.Coverage;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistent;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResult;
 import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
 import de.cebitec.readXplorer.databackend.dataObjects.Difference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReferenceGap;
+import de.cebitec.readXplorer.databackend.dataObjects.ReferenceGap;
 import de.cebitec.readXplorer.util.ColorProperties;
-import de.cebitec.readXplorer.util.classification.MappingClass;
 import de.cebitec.readXplorer.util.SequenceUtils;
+import de.cebitec.readXplorer.util.classification.MappingClass;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.GenomeGapManager;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
@@ -69,7 +69,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
     private int lowerBound;
     private int upperBound;
     private int width;
-    private List<PersistentReferenceGap> gaps;
+    private List<ReferenceGap> gaps;
     private List<Difference> diffs;
     private LogoDataManager logoData;
     private CoverageManager cov;
@@ -253,8 +253,8 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
 
     @Override
     public synchronized void receiveData(Object data) {
-        if (data instanceof CoverageAndDiffResultPersistent) {
-            final CoverageAndDiffResultPersistent result = (CoverageAndDiffResultPersistent) data;
+        if (data instanceof CoverageAndDiffResult) {
+            final CoverageAndDiffResult result = (CoverageAndDiffResult) data;
             SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
@@ -560,11 +560,11 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
      */
     private void fillGapManager() {
         HashMap<Integer, Integer> positionToNum = new HashMap<>();
-        PersistentReferenceGap gap;
+        ReferenceGap gap;
         int gapPosition;
         int gapOrder;
         int oldValue;
-        for (Iterator<PersistentReferenceGap> it = gaps.iterator(); it.hasNext();) {
+        for (Iterator<ReferenceGap> it = gaps.iterator(); it.hasNext();) {
             gap = it.next();
             gapPosition = gap.getPosition();
             gapOrder = gap.getOrder() + 1;

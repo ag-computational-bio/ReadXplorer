@@ -48,14 +48,16 @@ import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 
 /**
- * Sam/Bam parser for the data needed for a direct file access track. This means
- * the classification of the reads has to be carried out. 
+ * Sam/Bam parser for the data needed for a sam/bam track. This means the
+ * classification of the reads is carried out and an extended bam file
+ * containing the classification information in the SAMRecords is stored on the
+ * disk next to the original file. Original files are not changed!
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
 
-    private static String name = "SAM/BAM Direct Access Parser";
+    private static String name = "SAM/BAM Parser";
     private static String[] fileExtension = new String[]{"sam", "SAM", "Sam", "bam", "BAM", "Bam"};
     private static String fileDescription = "SAM/BAM Read Mappings";
     
@@ -66,8 +68,10 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
     private boolean deleteSortedFile;
 
     /**
-     * Sam/Bam parser for the data needed for a direct file access track. This
-     * means the classification of the reads has to be carried out.
+     * Sam/Bam parser for the data needed for a sam/bam track. This means the
+     * classification of the reads is carried out and an extended bam file
+     * containing the classification information in the SAMRecords is stored on
+     * the disk next to the original file. Original files are not changed!
      */
     public SamBamParser() {
         this.observers = new ArrayList<>();
@@ -92,7 +96,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
     }
 
     /**
-     * Does nothing, as the sam bam direct parser currently does not need any conversions.
+     * Does nothing, as the sam bam parser currently does not need any conversions.
      * @param trackJob
      * @param chromLengthMap the mapping of chromosome name to chromosome length
      * for this track
@@ -107,6 +111,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
 
     /**
      * Sorts the input sam/bam file contained in the track job by read name
+     * and stores the sorted data in a new file next to the input file.
      * @param trackJob the trackjob to preprocess
      * @return true, if the method succeeded, false otherwise
      * @throws ParsingException
@@ -123,8 +128,12 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
     }
 
     /**
-     * First calls the preprocessing method, which currently does nothing and 
-     * then parses the input determined by the track job.
+     * First calls the preprocessing method, which sorts the input sam/bam file
+     * contained in the track job by read name and then classifies the read
+     * mapping classes of the input determined by the track job. After the 
+     * classification is done, a new extended bam file is created next to the
+     * original one, containing the SAMRecords including the classification 
+     * data.
      * @param trackJob the track job to parse
      * @param chromLengthMap the map of chromosome names to chromosome sequence
      * @return a direct access data container constisting of:

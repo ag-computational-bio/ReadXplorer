@@ -17,7 +17,7 @@
 package de.cebitec.readXplorer.databackend;
 
 import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistent;
+import de.cebitec.readXplorer.databackend.dataObjects.MappingResult;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.Properties;
 import java.util.List;
@@ -58,7 +58,7 @@ public class MappingThreadAnalyses extends MappingThread {
                 } else {
                     currentMappings = this.loadMappings(request);
                 }
-                request.getSender().receiveData(new MappingResultPersistent(currentMappings, request));
+                request.getSender().receiveData(new MappingResult(currentMappings, request));
 
             } else {
                 try {

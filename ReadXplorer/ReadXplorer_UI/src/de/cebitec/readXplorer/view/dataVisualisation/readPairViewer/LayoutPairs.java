@@ -17,8 +17,8 @@
 package de.cebitec.readXplorer.view.dataVisualisation.readPairViewer;
 
 import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReadPair;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReadPairGroup;
+import de.cebitec.readXplorer.databackend.dataObjects.ReadPair;
+import de.cebitec.readXplorer.databackend.dataObjects.ReadPairGroup;
 import de.cebitec.readXplorer.util.classification.Classification;
 import de.cebitec.readXplorer.view.dataVisualisation.GenomeGapManager;
 import de.cebitec.readXplorer.view.dataVisualisation.PaintUtilities;
@@ -52,7 +52,7 @@ public class LayoutPairs implements LayoutI {
      * @param readPairs all read pairs to add to the layout
      * @param exclusionList list of excluded feature types 
      */
-    public LayoutPairs(int absStart, int absStop, Collection<PersistentReadPairGroup> readPairs, List<Classification> exclusionList) {
+    public LayoutPairs(int absStart, int absStop, Collection<ReadPairGroup> readPairs, List<Classification> exclusionList) {
         this.absStart = absStart;
         this.absStop = absStop;
         this.reverseLayers = new ArrayList<>();
@@ -67,20 +67,20 @@ public class LayoutPairs implements LayoutI {
      * Each read pair group gets one block.
      * @param readPairList read pairs in current interval
      */
-    private void createBlocks(Collection<PersistentReadPairGroup> readPairList) {
-        Iterator<PersistentReadPairGroup> groupIt = readPairList.iterator();
+    private void createBlocks(Collection<ReadPairGroup> readPairList) {
+        Iterator<ReadPairGroup> groupIt = readPairList.iterator();
         while (groupIt.hasNext()) {
-            PersistentReadPairGroup group = groupIt.next();
-            List<PersistentReadPair> readPairs = group.getReadPairs();
+            ReadPairGroup group = groupIt.next();
+            List<ReadPair> readPairs = group.getReadPairs();
             List<Mapping> singleMappings = group.getSingleMappings();
-            Iterator<PersistentReadPair> pairIt = readPairs.iterator();
+            Iterator<ReadPair> pairIt = readPairs.iterator();
             Iterator<Mapping> singleIt = singleMappings.iterator();
             long start = Long.MAX_VALUE;
             long stop = Long.MIN_VALUE;
             boolean containsVisibleMapping = false;
             //handle pairs
             while (pairIt.hasNext()) {
-                PersistentReadPair pair = pairIt.next();
+                ReadPair pair = pairIt.next();
                 containsVisibleMapping = !PaintUtilities.inExclusionList(pair.getVisibleMapping(), exclusionList) || 
                                          !PaintUtilities.inExclusionList(pair.getVisibleMapping2(), exclusionList);
 

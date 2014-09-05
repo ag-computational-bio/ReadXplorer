@@ -20,11 +20,11 @@ import de.cebitec.readXplorer.api.objects.AnalysisI;
 import de.cebitec.readXplorer.databackend.IntervalRequest;
 import de.cebitec.readXplorer.databackend.SamBamFileReader;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistent;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResult;
 import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
 import de.cebitec.readXplorer.databackend.dataObjects.Difference;
 import de.cebitec.readXplorer.databackend.dataObjects.GapCount;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReferenceGap;
+import de.cebitec.readXplorer.databackend.dataObjects.ReferenceGap;
 import de.cebitec.readXplorer.databackend.dataObjects.Snp;
 import de.cebitec.readXplorer.databackend.dataObjects.SnpI;
 import de.cebitec.readXplorer.util.Observer;
@@ -90,10 +90,10 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
      */
     @Override
     public void update(Object data) {
-        CoverageAndDiffResultPersistent covAndDiffs = new CoverageAndDiffResultPersistent(new CoverageManager(0, 0), null, null, null);
+        CoverageAndDiffResult covAndDiffs = new CoverageAndDiffResult(new CoverageManager(0, 0), null, null, null);
 
         if (data.getClass() == covAndDiffs.getClass()) {
-            covAndDiffs = (CoverageAndDiffResultPersistent) data;
+            covAndDiffs = (CoverageAndDiffResult) data;
             this.updateSnpResults(covAndDiffs);
         }
     }
@@ -190,10 +190,10 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
      * then stored in the SNP result.
      * @param covAndDiffs the coverage and diff result to handle here
      */
-    private void updateSnpResults(CoverageAndDiffResultPersistent covAndDiffs) {
+    private void updateSnpResults(CoverageAndDiffResult covAndDiffs) {
         CoverageManager coverage = covAndDiffs.getCovManager();
         List<Difference> diffs = covAndDiffs.getDiffs();
-        List<PersistentReferenceGap> gaps = covAndDiffs.getGaps();
+        List<ReferenceGap> gaps = covAndDiffs.getGaps();
         
         
         //in base array the first index is the relative position. The second aindex is the base index, the third contains count (0) and average base quality (1)
@@ -225,7 +225,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
         }
         
         int relativeGapPos;
-        for (PersistentReferenceGap gap : gaps) {
+        for (ReferenceGap gap : gaps) {
             if (gap.getPosition() >= coverage.getLeftBound() && gap.getPosition() < coverage.getRightBound() &&
                     (gap.getBaseQuality() == -1 || gap.getBaseQuality() > analysisParams.getMinBaseQuality())) {
                 relativeGapPos = gap.getPosition() - coverage.getLeftBound();

@@ -24,11 +24,11 @@ import java.util.Map;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class PersistentDiffAndGapResult {
+public class DiffAndGapResult {
     private int errors;
     private Map<Integer, Integer> gapOrderIndex;
     private List<Difference> diffs;
-    private List<PersistentReferenceGap> gaps;
+    private List<ReferenceGap> gaps;
 
     /**
      * A diff and gap result data storage for persistent objects for one mapping.
@@ -37,7 +37,7 @@ public class PersistentDiffAndGapResult {
      * @param gapOrderIndex order of the gaps
      * @param errors total number of differences to the reference
      */
-    public PersistentDiffAndGapResult(List<Difference> diffs, List<PersistentReferenceGap> gaps, Map<Integer, Integer> gapOrderIndex, int errors) {
+    public DiffAndGapResult(List<Difference> diffs, List<ReferenceGap> gaps, Map<Integer, Integer> gapOrderIndex, int errors) {
         this.diffs = diffs;
         this.gaps = gaps;
         this.gapOrderIndex = gapOrderIndex;
@@ -54,7 +54,7 @@ public class PersistentDiffAndGapResult {
     /**
      * @return the gaps of one mapping
      */
-    public List<PersistentReferenceGap> getGaps() {
+    public List<ReferenceGap> getGaps() {
         return gaps;
     }
 

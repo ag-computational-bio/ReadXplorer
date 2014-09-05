@@ -17,8 +17,8 @@
 package de.cebitec.readXplorer.view.dataVisualisation.readPairViewer;
 
 import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReadPair;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReadPairGroup;
+import de.cebitec.readXplorer.databackend.dataObjects.ReadPair;
+import de.cebitec.readXplorer.databackend.dataObjects.ReadPairGroup;
 import de.cebitec.readXplorer.util.ReadPairType;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
 import java.awt.Color;
@@ -80,7 +80,7 @@ public class ReadPairPopup extends JPopupMenu {
                         "Replicates=Replicates:",
                         "Distance=Distance:"})
     private void initDataAndComponents() {
-        PersistentReadPairGroup readPairData = this.getReadPairInfo(); //TODO: get infos from elswhere
+        ReadPairGroup readPairData = this.getReadPairInfo(); //TODO: get infos from elswhere
         
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
@@ -91,9 +91,9 @@ public class ReadPairPopup extends JPopupMenu {
         this.add(contentScrollpane);
 
         //handle read pair data
-        List<PersistentReadPair> readPairs = readPairData.getReadPairs();
+        List<ReadPair> readPairs = readPairData.getReadPairs();
         List<Mapping> singleMappings = readPairData.getSingleMappings();
-        PersistentReadPair readPair;
+        ReadPair readPair;
         Mapping mapping;
         JPanel readPairMappingInfoPanel = null;
 
@@ -107,7 +107,7 @@ public class ReadPairPopup extends JPopupMenu {
             
             readPair = readPairs.get(i);
             ReadPairType type = readPair.getReadPairType();
-            String hex = Integer.toHexString(PersistentReadPair.determineReadPairColor(type).getRGB());
+            String hex = Integer.toHexString(ReadPair.determineReadPairColor(type).getRGB());
             hex = hex.substring(2, hex.length());
             
             long distance = Math.abs(readPair.getStop() - readPair.getStart());
@@ -233,10 +233,10 @@ public class ReadPairPopup extends JPopupMenu {
      * to show in the popup. If the parent viewer ist not a ReadPairViewer
      * <code>null</code> is returned.
      */
-    private PersistentReadPairGroup getReadPairInfo() {
-        PersistentReadPairGroup readPairGroup = null;
+    private ReadPairGroup getReadPairInfo() {
+        ReadPairGroup readPairGroup = null;
         if (parentViewer instanceof ReadPairViewer) {
-            readPairGroup = (PersistentReadPairGroup) this.block.getPersistentObject();
+            readPairGroup = (ReadPairGroup) this.block.getObjectWithId();
         }
         return readPairGroup;
     }

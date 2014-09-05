@@ -16,14 +16,14 @@
  */
 package de.cebitec.readXplorer.databackend;
 
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistent;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResult;
 import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
 import de.cebitec.readXplorer.databackend.dataObjects.Difference;
 import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentDiffAndGapResult;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReadPairGroup;
+import de.cebitec.readXplorer.databackend.dataObjects.DiffAndGapResult;
+import de.cebitec.readXplorer.databackend.dataObjects.ReadPairGroup;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReferenceGap;
+import de.cebitec.readXplorer.databackend.dataObjects.ReferenceGap;
 import de.cebitec.readXplorer.parser.mappings.CommonsMappingParser;
 import de.cebitec.readXplorer.util.IndexFileNotificationPanel;
 import de.cebitec.readXplorer.util.Observable;
@@ -326,9 +326,9 @@ public class SamBamFileReader implements Observable {
      * @param request request to carry out
      * @return the coverage for the given interval
      */
-    public Collection<PersistentReadPairGroup> getReadPairMappingsFromBam(IntervalRequest request) {
-        Map<Long, PersistentReadPairGroup> readPairs = new HashMap<>();
-        Collection<PersistentReadPairGroup> readPairGroups = new ArrayList<>();
+    public Collection<ReadPairGroup> getReadPairMappingsFromBam(IntervalRequest request) {
+        Map<Long, ReadPairGroup> readPairs = new HashMap<>();
+        Collection<ReadPairGroup> readPairGroups = new ArrayList<>();
 
         int from = request.getTotalFrom();
         int to = request.getTotalTo();
@@ -357,7 +357,7 @@ public class SamBamFileReader implements Observable {
             boolean bothVisible;
             Mapping mapping;
             Mapping mate;
-            PersistentReadPairGroup newGroup;
+            ReadPairGroup newGroup;
             int numReplicates = 1;
             int mappingQuality;
 
@@ -389,7 +389,7 @@ public class SamBamFileReader implements Observable {
                             readPairId = pairId;
                             readPairType = ReadPairType.getReadPairType(pairType);
                             if (!readPairs.containsKey(readPairId)) {
-                                newGroup = new PersistentReadPairGroup();
+                                newGroup = new ReadPairGroup();
                                 newGroup.setReadPairId(pairId);
                                 readPairs.put(readPairId, newGroup);
                             } //TODO: check where ids are needed
@@ -456,7 +456,7 @@ public class SamBamFileReader implements Observable {
      * @param request the request to carry out
      * @return the coverage for the given interval
      */
-    public CoverageAndDiffResultPersistent getReadStartsFromBam(IntervalRequest request) {
+    public CoverageAndDiffResult getReadStartsFromBam(IntervalRequest request) {
 
         int from = request.getTotalFrom();
         int to = request.getTotalTo();
@@ -466,9 +466,9 @@ public class SamBamFileReader implements Observable {
         coverage.incArraysToIntervalSize();
 
         List<Difference> diffs = new ArrayList<>(); //both empty for read starts
-        List<PersistentReferenceGap> gaps = new ArrayList<>();
+        List<ReferenceGap> gaps = new ArrayList<>();
 
-        CoverageAndDiffResultPersistent result = new CoverageAndDiffResultPersistent(coverage, diffs, gaps, request);
+        CoverageAndDiffResult result = new CoverageAndDiffResult(coverage, diffs, gaps, request);
         try {
             this.checkIndex();
             SAMRecordIterator samRecordIterator = samFileReader.query(reference.getChromosome(request.getChromId()).getName(), from, to, false);
@@ -504,7 +504,7 @@ public class SamBamFileReader implements Observable {
                     }
                 }
             samRecordIterator.close();
-            result = new CoverageAndDiffResultPersistent(coverage, diffs, gaps, request);
+            result = new CoverageAndDiffResult(coverage, diffs, gaps, request);
 
         } catch (NullPointerException | IllegalArgumentException | SAMException | ArrayIndexOutOfBoundsException e) {
             this.notifyObservers(e);
@@ -522,7 +522,7 @@ public class SamBamFileReader implements Observable {
      * @param request the request to carry out
      * @return the coverage for the given interval
      */
-    public CoverageAndDiffResultPersistent getCoverageAndReadStartsFromBam(IntervalRequest request) {
+    public CoverageAndDiffResult getCoverageAndReadStartsFromBam(IntervalRequest request) {
 
         byte trackNeeded = request.getWhichTrackNeeded();
         int from = request.getTotalFrom();
@@ -535,10 +535,10 @@ public class SamBamFileReader implements Observable {
         readStarts.incArraysToIntervalSize();
 
         List<Difference> diffs = new ArrayList<>();
-        List<PersistentReferenceGap> gaps = new ArrayList<>();
-        PersistentDiffAndGapResult diffsAndGaps;
+        List<ReferenceGap> gaps = new ArrayList<>();
+        DiffAndGapResult diffsAndGaps;
 
-        CoverageAndDiffResultPersistent result = new CoverageAndDiffResultPersistent(coverage, diffs, gaps, request);
+        CoverageAndDiffResult result = new CoverageAndDiffResult(coverage, diffs, gaps, request);
         try {
             this.checkIndex();
 
@@ -604,7 +604,7 @@ public class SamBamFileReader implements Observable {
                 }
             }
             samRecordIterator.close();
-            result = new CoverageAndDiffResultPersistent(coverage, diffs, gaps, request);
+            result = new CoverageAndDiffResult(coverage, diffs, gaps, request);
             result.setReadStarts(readStarts);
 
         } catch (NullPointerException | NumberFormatException | SAMException | ArrayIndexOutOfBoundsException e) {
@@ -623,7 +623,7 @@ public class SamBamFileReader implements Observable {
      * @param request the request to carry out
      * @return the coverage for the given interval
      */
-    public CoverageAndDiffResultPersistent getCoverageFromBam(IntervalRequest request) {
+    public CoverageAndDiffResult getCoverageFromBam(IntervalRequest request) {
 
         int from = request.getTotalFrom();
         int to = request.getTotalTo();
@@ -633,10 +633,10 @@ public class SamBamFileReader implements Observable {
         coverage.incArraysToIntervalSize();
 
         List<Difference> diffs = new ArrayList<>();
-        List<PersistentReferenceGap> gaps = new ArrayList<>();
-        PersistentDiffAndGapResult diffsAndGaps;
+        List<ReferenceGap> gaps = new ArrayList<>();
+        DiffAndGapResult diffsAndGaps;
 
-        CoverageAndDiffResultPersistent result = new CoverageAndDiffResultPersistent(coverage, diffs, gaps, request);
+        CoverageAndDiffResult result = new CoverageAndDiffResult(coverage, diffs, gaps, request);
         try {
             this.checkIndex();
 
@@ -681,7 +681,7 @@ public class SamBamFileReader implements Observable {
                 }
             }
             samRecordIterator.close();
-            result = new CoverageAndDiffResultPersistent(coverage, diffs, gaps, request);
+            result = new CoverageAndDiffResult(coverage, diffs, gaps, request);
 
         } catch (NullPointerException | NumberFormatException | SAMException | ArrayIndexOutOfBoundsException e) {
             this.notifyObservers(e);
@@ -771,15 +771,15 @@ public class SamBamFileReader implements Observable {
      * @param mapping if a mapping is handed over to the method it adds the
      * diffs and gaps directly to the mapping and updates it's number of
      * differences to the reference. If null is passed, only the
-     * PersistentDiffAndGapResult contains all the diff and gap data.
-     * @return PersistentDiffAndGapResult containing all the diffs and gaps
+     * DiffAndGapResult contains all the diff and gap data.
+     * @return DiffAndGapResult containing all the diffs and gaps
      */
-    private PersistentDiffAndGapResult createDiffsAndGaps(SAMRecord record, int nbReplicates,
+    private DiffAndGapResult createDiffsAndGaps(SAMRecord record, int nbReplicates,
             String refSeq, Mapping mapping) throws NumberFormatException {
 
         Map<Integer, Integer> gapOrderIndex = new HashMap<>();
         List<Difference> diffs = new ArrayList<>();
-        List<PersistentReferenceGap> gaps = new ArrayList<>();
+        List<ReferenceGap> gaps = new ArrayList<>();
         int differences = 0;
         String cigar = record.getCigarString();
         String readSeq = record.getReadString();
@@ -862,7 +862,7 @@ public class SamBamFileReader implements Observable {
                             base = SequenceUtils.getDnaComplement(base);
                         }
                         baseQuality = baseQualities.length == 0 ? -1 : baseQualities[j];
-                        PersistentReferenceGap gap = new PersistentReferenceGap(refPos + start, base,
+                        ReferenceGap gap = new ReferenceGap(refPos + start, base,
                                 CommonsMappingParser.getOrderForGap(refPos + start, gapOrderIndex),
                                 isFwdStrand, nbReplicates, baseQuality, mappingQuality);
                         if (mapping != null) {
@@ -893,7 +893,7 @@ public class SamBamFileReader implements Observable {
             mapping.setDifferences(differences);
         }
 
-        return new PersistentDiffAndGapResult(diffs, gaps, gapOrderIndex, differences);
+        return new DiffAndGapResult(diffs, gaps, gapOrderIndex, differences);
     }
 
     /**

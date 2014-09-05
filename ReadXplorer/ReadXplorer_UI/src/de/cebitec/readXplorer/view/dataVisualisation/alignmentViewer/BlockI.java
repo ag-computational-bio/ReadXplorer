@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentObject;
+import de.cebitec.readXplorer.databackend.dataObjects.ObjectWithId;
 import java.util.Iterator;
 
 /**
@@ -31,7 +31,7 @@ public interface BlockI {
     
     public Iterator<Brick> getBrickIterator();
 
-    public PersistentObject getPersistentObject();
+    public ObjectWithId getObjectWithId();
 
     public int getNumOfBricks();
 }

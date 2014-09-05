@@ -21,7 +21,7 @@ import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.Coverage;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistent;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResult;
 import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
@@ -163,8 +163,8 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      */
     @Override
     public void update(Object data) {
-        if (data instanceof CoverageAndDiffResultPersistent) {
-            CoverageAndDiffResultPersistent result = ((CoverageAndDiffResultPersistent) data);
+        if (data instanceof CoverageAndDiffResult) {
+            CoverageAndDiffResult result = ((CoverageAndDiffResult) data);
             this.detectTSSs(result);
         } else 
         if (data instanceof Byte && ((Byte) data) == 1) {
@@ -189,7 +189,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      * @param result the coverage and diff result for predicting the 
      * transcription start sites.
      */
-    public void detectTSSs(CoverageAndDiffResultPersistent result) {
+    public void detectTSSs(CoverageAndDiffResult result) {
         
         CoverageManager coverage = result.getCovManager();
         CoverageManager readStarts = result.getReadStarts();

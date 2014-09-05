@@ -23,7 +23,7 @@ import java.io.Serializable;
  *
  * @author ddoppmeier, Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
  */
-public class PersistentReferenceGap extends BasicDiff implements Comparable<PersistentReferenceGap>, Serializable {
+public class ReferenceGap extends BasicDiff implements Comparable<ReferenceGap>, Serializable {
     
     private static final long serialVersionUID = 1L;
 
@@ -42,7 +42,7 @@ public class PersistentReferenceGap extends BasicDiff implements Comparable<Pers
      * @param mappingQuality The phred mapping quality value of the read from
      * which the diff originated
      */
-    public PersistentReferenceGap(int position, Character base, int order, boolean isForwardStrand, int count, byte baseQuality, Byte mappingQuality){
+    public ReferenceGap(int position, Character base, int order, boolean isForwardStrand, int count, byte baseQuality, Byte mappingQuality){
         super(position, base, isForwardStrand, count, baseQuality, mappingQuality);
         this.order = order;
     }
@@ -61,7 +61,7 @@ public class PersistentReferenceGap extends BasicDiff implements Comparable<Pers
      * @return 
      */
     @Override
-    public int compareTo(PersistentReferenceGap o) {
+    public int compareTo(ReferenceGap o) {
 
         // order by position
         if (this.getPosition() < o.getPosition()) {

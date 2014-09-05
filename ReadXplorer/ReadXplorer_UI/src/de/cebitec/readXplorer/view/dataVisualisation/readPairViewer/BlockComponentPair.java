@@ -17,8 +17,8 @@
 package de.cebitec.readXplorer.view.dataVisualisation.readPairViewer;
 
 import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReadPair;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReadPairGroup;
+import de.cebitec.readXplorer.databackend.dataObjects.ReadPair;
+import de.cebitec.readXplorer.databackend.dataObjects.ReadPairGroup;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.ReadPairType;
 import de.cebitec.readXplorer.util.classification.Classification;
@@ -139,12 +139,12 @@ public class BlockComponentPair extends JComponent implements ActionListener {
      * content of the BlockComponentPair
      */
     private void calcMappingBoundaries() {
-        PersistentReadPairGroup readPairGroup = (PersistentReadPairGroup) this.block.getPersistentObject();
-        List<PersistentReadPair> readPairs = readPairGroup.getReadPairs();
+        ReadPairGroup readPairGroup = (ReadPairGroup) this.block.getObjectWithId();
+        List<ReadPair> readPairs = readPairGroup.getReadPairs();
         List<Mapping> singleMappings = readPairGroup.getSingleMappings();
 
         Color blockColor;
-        PersistentReadPair readPair;
+        ReadPair readPair;
         Mapping mapping;
 
         for (int i = 0; i < readPairs.size(); ++i) {
@@ -289,7 +289,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
      * Determines the color and type of a block.
      * @return the color representing this block
      */
-    private Color determineBlockColor(PersistentReadPair readPair) {
+    private Color determineBlockColor(ReadPair readPair) {
 
         Color blockColor;
         ReadPairType type = readPair.getReadPairType();
@@ -326,8 +326,8 @@ public class BlockComponentPair extends JComponent implements ActionListener {
 
     public void setSequence() {
         JTextField j = new JTextField(); //TODO: return read sequence of currently clicked read, not the pair
-        int start = (int) ((PersistentReadPair) block.getPersistentObject()).getStart();
-        int stop = (int) ((PersistentReadPair) block.getPersistentObject()).getStop();
+        int start = (int) ((ReadPair) block.getObjectWithId()).getStart();
+        int stop = (int) ((ReadPair) block.getObjectWithId()).getStop();
         //string first pos is zero
         String readSequence = parentViewer.getReference().getActiveChromSequence(start - 1, stop);
         j.setText(readSequence);
@@ -351,8 +351,8 @@ public class BlockComponentPair extends JComponent implements ActionListener {
      */
     private String determineReadPairType(BlockPair block) {
         String type = "Not a read pair object";
-        if (block.getPersistentObject() instanceof PersistentReadPairGroup) {
-            List<PersistentReadPair> readPairs = ((PersistentReadPairGroup) block.getPersistentObject()).getReadPairs();
+        if (block.getObjectWithId() instanceof ReadPairGroup) {
+            List<ReadPair> readPairs = ((ReadPairGroup) block.getObjectWithId()).getReadPairs();
             if (readPairs.size() > 0) {
                 type = readPairs.get(0).getReadPairType().getTypeString();
             } else {

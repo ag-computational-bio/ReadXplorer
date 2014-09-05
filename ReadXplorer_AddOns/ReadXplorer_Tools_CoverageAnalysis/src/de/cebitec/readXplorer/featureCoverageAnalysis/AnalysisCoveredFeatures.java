@@ -22,7 +22,7 @@ import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistent;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResult;
 import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
@@ -96,10 +96,10 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
      */
     @Override
     public void update(Object data) {
-        CoverageAndDiffResultPersistent coverageAndDiffResult = new CoverageAndDiffResultPersistent(new CoverageManager(0, 0), null, null, null);
+        CoverageAndDiffResult coverageAndDiffResult = new CoverageAndDiffResult(new CoverageManager(0, 0), null, null, null);
         
         if (data.getClass() == coverageAndDiffResult.getClass()) {
-            coverageAndDiffResult = (CoverageAndDiffResultPersistent) data;
+            coverageAndDiffResult = (CoverageAndDiffResult) data;
             this.updateCoverageCountForFeatures(coverageAndDiffResult);
         } else
         if (data instanceof Byte && ((byte) data) == AnalysesHandler.COVERAGE_QUERRIES_FINISHED) { //1 means coverage analysis is finished
@@ -111,7 +111,7 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
      * Updates the coverage count for the features with the coverage positions.
      * @param coverageAndDiffResult the coverage and diff result
      */
-    public void updateCoverageCountForFeatures(CoverageAndDiffResultPersistent coverageAndDiffResult) {
+    public void updateCoverageCountForFeatures(CoverageAndDiffResult coverageAndDiffResult) {
 
         CoverageManager covManager = coverageAndDiffResult.getCovManager();
         int rightBound = covManager.getRightBound();

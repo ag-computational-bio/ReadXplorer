@@ -343,13 +343,13 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
 //     * Minimum count is currently disabled as it was not needed.
 //     * @param readPairs 
 //     */
-//    private void findMinAndMaxCount(Collection<PersistentReadPairGroup> readPairs) {
+//    private void findMinAndMaxCount(Collection<ReadPairGroup> readPairs) {
 ////        this.minCountInInterval = Integer.MAX_VALUE; //uncomment all these lines to get min count
 //        this.maxCountInInterval = Integer.MIN_VALUE;
 ////        this.fwdMappingsInInterval = 0;
 //        this.pairCountInInterval = 0;
 //
-////        for (PersistentReadPairGroup pair : readPairs) {
+////        for (ReadPairGroup pair : readPairs) {
 //            ++this.pairCountInInterval;
 ////            if (pair.getVisibleMapping().isForwardStrand()){
 ////                ++this.fwdMappingsInInterval;

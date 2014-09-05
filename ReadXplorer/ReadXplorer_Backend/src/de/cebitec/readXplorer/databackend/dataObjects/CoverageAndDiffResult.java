@@ -23,33 +23,31 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Able to store the result for coverage, diffs and gaps. Called persistent, because
- * it needs the persistent data types from its own package.
+ * Able to store the result for coverage, diffs and gaps.
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class CoverageAndDiffResultPersistent extends PersistentResult implements Serializable {
+public class CoverageAndDiffResult extends AnalysisResult implements Serializable {
     
-    /** important: this id was used, when saving a CoverageAndDiffResultPersistent in the objectcache
- raise this number, if any change to the class structure will be made in the future */
     public static final long serialVersionUID = 42L;
-    
+
     private List<CoverageManager> covManagers;
     private CoverageManager readStarts; //TODO: do the same for the other data structures as for the coverage
     private List<Difference> diffs;
-    private List<PersistentReferenceGap> gaps;
+    private List<ReferenceGap> gaps;
     
     /**
      * Data storage for a single coverageManager, diffs and gaps.
-     * @param covManager the coverage manager to store. If it is not used, you can
-     *      add an empty coverage manager.
-     * @param diffs the list of diffs to store, if they are not used, you can add null
-     *      or an empty list.
-     * @param gaps the list of gaps to store, if they are not use, you can add null
-     *      or an empty list
+     *
+     * @param covManager the coverage manager to store. If it is not used, you
+     * can add an empty coverage manager.
+     * @param diffs the list of diffs to store, if they are not used, you can
+     * add null or an empty list.
+     * @param gaps the list of gaps to store, if they are not use, you can add
+     * null or an empty list
      * @param request the interval request for which this result was generated
      */
-    public CoverageAndDiffResultPersistent(CoverageManager covManager, List<Difference> diffs, List<PersistentReferenceGap> gaps, 
+    public CoverageAndDiffResult(CoverageManager covManager, List<Difference> diffs, List<ReferenceGap> gaps, 
             IntervalRequest request) {
         this(new ArrayList<>(Arrays.asList(covManager)), diffs, gaps, request);
     }
@@ -64,7 +62,7 @@ public class CoverageAndDiffResultPersistent extends PersistentResult implements
      * null or an empty list
      * @param request the interval request for which this result was generated
      */
-    public CoverageAndDiffResultPersistent(List<CoverageManager> covManagers, List<Difference> diffs, List<PersistentReferenceGap> gaps,
+    public CoverageAndDiffResult(List<CoverageManager> covManagers, List<Difference> diffs, List<ReferenceGap> gaps,
             IntervalRequest request) {
         super(request);
         this.covManagers = covManagers;
@@ -89,7 +87,7 @@ public class CoverageAndDiffResultPersistent extends PersistentResult implements
      * @return the gaps, if they are stored. If they are not, 
      * the list is empty.
      */
-    public List<PersistentReferenceGap> getGaps() {
+    public List<ReferenceGap> getGaps() {
         if (this.gaps != null) {
             return this.gaps;
         } else {

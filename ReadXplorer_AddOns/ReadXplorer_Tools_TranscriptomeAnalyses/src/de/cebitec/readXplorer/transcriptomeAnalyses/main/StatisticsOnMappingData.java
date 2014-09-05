@@ -1,6 +1,6 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
-import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistent;
+import de.cebitec.readXplorer.databackend.dataObjects.MappingResult;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
@@ -129,7 +129,7 @@ public class StatisticsOnMappingData implements Observer {
      *
      * @param result MappingResultPersistent contains List of PersistenMappings.
      */
-    private void parseMappings(MappingResultPersistent result) {
+    private void parseMappings(MappingResult result) {
 
         // Sorting all mappingResults
         int chromId = result.getRequest().getChromId();
@@ -379,8 +379,8 @@ public class StatisticsOnMappingData implements Observer {
 
     @Override
     public void update(Object args) {
-        if (args instanceof MappingResultPersistent) {
-            MappingResultPersistent result = (MappingResultPersistent) args;
+        if (args instanceof MappingResult) {
+            MappingResult result = (MappingResult) args;
             this.parseMappings(result);
         }
     }

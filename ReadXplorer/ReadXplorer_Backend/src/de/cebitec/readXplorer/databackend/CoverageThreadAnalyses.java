@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.databackend;
 
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistent;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResult;
 import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.Properties;
@@ -50,7 +50,7 @@ public class CoverageThreadAnalyses extends CoverageThread {
         while (!interrupted()) {
 
             IntervalRequest request = requestQueue.poll();
-            CoverageAndDiffResultPersistent currentCov = new CoverageAndDiffResultPersistent(new CoverageManager(0, 0), null, null, request);
+            CoverageAndDiffResult currentCov = new CoverageAndDiffResult(new CoverageManager(0, 0), null, null, request);
             if (request != null) {
                 if (request.getDesiredData() == Properties.READ_STARTS) {
                     currentCov = this.loadReadStartsAndCoverageMultiple(request);

@@ -27,7 +27,7 @@ import java.awt.Color;
  * 
  * @author Rolf Hilker
  */
-public class PersistentReadPair implements PersistentObject {
+public class ReadPair implements ObjectWithId {
 
     private long readPairID;
     private long mapping2Id;
@@ -47,7 +47,7 @@ public class PersistentReadPair implements PersistentObject {
      * @param readPairReplicates number of replicates of this pair
      * @param visibleMapping currently visible mapping of the pair
      */
-    public PersistentReadPair(long readPairID, long mapping1ID, long mapping2ID, ReadPairType readPairType, 
+    public ReadPair(long readPairID, long mapping1ID, long mapping2ID, ReadPairType readPairType, 
             int readPairReplicates, Mapping visibleMapping) {
         this.readPairID = readPairID;
         this.mapping2Id = mapping1ID == visibleMapping.getId() ? mapping2ID : mapping1ID;
@@ -69,7 +69,7 @@ public class PersistentReadPair implements PersistentObject {
      * @param visibleMapping currently visible mapping of the pair
      * @param mate the mate of the visibleMapping = other read of the pair 
      */
-    public PersistentReadPair(long readPairID, long mapping1ID, long mapping2ID, ReadPairType readPairType,
+    public ReadPair(long readPairID, long mapping1ID, long mapping2ID, ReadPairType readPairType,
             int readPairReplicates, Mapping visibleMapping, Mapping mate) {
         this.readPairID = readPairID;
         this.mapping2Id = mapping1ID == visibleMapping.getId() ? mapping2ID : mapping1ID;

@@ -18,7 +18,7 @@ package CoverageAnalysis;
 
 import de.cebitec.readXplorer.coverageAnalysis.ParameterSetCoverageAnalysis;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistent;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResult;
 import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
 import de.cebitec.readXplorer.util.classification.Classification;
 import de.cebitec.readXplorer.util.classification.FeatureType;
@@ -137,7 +137,7 @@ public class AnalysisCoverageTest {
             coverage.getCoverage(MappingClass.BEST_MATCH).setRevCoverage(bmArrayRev);
             coverage.getCoverage(MappingClass.COMMON_MATCH).setFwdCoverage(commonArrayFwd);
             coverage.getCoverage(MappingClass.COMMON_MATCH).setRevCoverage(commonArrayRev);
-            CoverageAndDiffResultPersistent coverageResult = new CoverageAndDiffResultPersistent(coverage, null, null, null);
+            CoverageAndDiffResult coverageResult = new CoverageAndDiffResult(coverage, null, null, null);
             
             coverage2.getCoverage(MappingClass.PERFECT_MATCH).setFwdCoverage(perfArrayFwd2);
             coverage2.getCoverage(MappingClass.PERFECT_MATCH).setRevCoverage(perfArrayRev2);
@@ -145,7 +145,7 @@ public class AnalysisCoverageTest {
             coverage2.getCoverage(MappingClass.BEST_MATCH).setRevCoverage(bmArrayRev2);
             coverage2.getCoverage(MappingClass.COMMON_MATCH).setFwdCoverage(commonArrayFwd2);
             coverage2.getCoverage(MappingClass.COMMON_MATCH).setRevCoverage(commonArrayRev2);
-            CoverageAndDiffResultPersistent coverageResult2 = new CoverageAndDiffResultPersistent(coverage2, null, null, null);
+            CoverageAndDiffResult coverageResult2 = new CoverageAndDiffResult(coverage2, null, null, null);
             
             coverage3.getCoverage(MappingClass.PERFECT_MATCH).setFwdCoverage(perfArrayFwd3);
             coverage3.getCoverage(MappingClass.PERFECT_MATCH).setRevCoverage(perfArrayRev3);
@@ -153,7 +153,7 @@ public class AnalysisCoverageTest {
             coverage3.getCoverage(MappingClass.BEST_MATCH).setRevCoverage(bmArrayRev3);
             coverage3.getCoverage(MappingClass.COMMON_MATCH).setFwdCoverage(commonArrayFwd3);
             coverage3.getCoverage(MappingClass.COMMON_MATCH).setRevCoverage(commonArrayRev3);
-            CoverageAndDiffResultPersistent coverageResult3 = new CoverageAndDiffResultPersistent(coverage3, null, null, null);
+            CoverageAndDiffResult coverageResult3 = new CoverageAndDiffResult(coverage3, null, null, null);
             
             coverage4.getCoverage(MappingClass.PERFECT_MATCH).setFwdCoverage(perfArrayFwd4);
             coverage4.getCoverage(MappingClass.PERFECT_MATCH).setRevCoverage(perfArrayRev4);
@@ -161,7 +161,7 @@ public class AnalysisCoverageTest {
             coverage4.getCoverage(MappingClass.BEST_MATCH).setRevCoverage(bmArrayRev4);
             coverage4.getCoverage(MappingClass.COMMON_MATCH).setFwdCoverage(commonArrayFwd4);
             coverage4.getCoverage(MappingClass.COMMON_MATCH).setRevCoverage(commonArrayRev4);
-            CoverageAndDiffResultPersistent coverageResult4 = new CoverageAndDiffResultPersistent(coverage4, null, null, null);
+            CoverageAndDiffResult coverageResult4 = new CoverageAndDiffResult(coverage4, null, null, null);
             
             //standard order
 //            instanceSumPerfect.update(coverageResult);

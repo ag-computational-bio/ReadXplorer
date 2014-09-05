@@ -20,26 +20,26 @@ import de.cebitec.readXplorer.databackend.IntervalRequest;
 import java.io.Serializable;
 
 /**
- * Contains the basic functionality of a persistent result.
+ * Contains the basic functionality of an analysis result.
  * 
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class PersistentResult implements Serializable {
+public class AnalysisResult implements Serializable {
     private static final long serialVersionUID = 1L;
     
     private IntervalRequest request;
 
     /**
-     * Common functionality of a persistent result.
+     * Common functionality of of an analysis result.
      * @param request the interval request for which the result was created
      */
-    public PersistentResult(IntervalRequest request) {
+    public AnalysisResult(IntervalRequest request) {
         this.request = request;
     }
     
     /** a parameterless constructor is needed to enable deserialization 
      *  of child classed */
-    public PersistentResult() {
+    public AnalysisResult() {
         this.request = new IntervalRequest(-1, -1, -1, null, false);
     }
     

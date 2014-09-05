@@ -17,7 +17,7 @@
 package de.cebitec.readXplorer.differentialExpression;
 
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
-import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistent;
+import de.cebitec.readXplorer.databackend.dataObjects.MappingResult;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
 import de.cebitec.readXplorer.util.Observer;
@@ -80,7 +80,7 @@ public class CollectCoverageData implements Observer {
      *
      * @param mappings the mappings
      */
-    private void updateReadCountForFeatures(MappingResultPersistent result) {
+    private void updateReadCountForFeatures(MappingResult result) {
         List<Mapping> mappings = result.getMappings();
         Collections.sort(mappings);
         int lastMappingIdx = 0;
@@ -128,8 +128,8 @@ public class CollectCoverageData implements Observer {
 
     @Override
     public void update(Object args) {
-        if (args instanceof MappingResultPersistent) {
-            MappingResultPersistent result = (MappingResultPersistent) args;
+        if (args instanceof MappingResult) {
+            MappingResult result = (MappingResult) args;
             updateReadCountForFeatures(result);
         }
     }

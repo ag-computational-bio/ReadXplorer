@@ -25,11 +25,11 @@ import java.util.Collection;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class ReadPairResultPersistent extends PersistentResult {
+public class ReadPairResultPersistent extends AnalysisResult {
     
     private static final long serialVersionUID = 1L;
     
-    private final Collection<PersistentReadPairGroup> readPairs;
+    private final Collection<ReadPairGroup> readPairs;
 
     /**
      * Able to store the result for read pair calls. Called persistent, because it
@@ -37,7 +37,7 @@ public class ReadPairResultPersistent extends PersistentResult {
      * @param readPairs colleaction of read pairs to store
      * @param request the request for which the result was generated 
      */
-    public ReadPairResultPersistent(Collection<PersistentReadPairGroup> readPairs, IntervalRequest request) {
+    public ReadPairResultPersistent(Collection<ReadPairGroup> readPairs, IntervalRequest request) {
         super(request);
         this.readPairs = readPairs;
     }
@@ -45,7 +45,7 @@ public class ReadPairResultPersistent extends PersistentResult {
     /**
      * @return the collection of read pairs
      */
-    public Collection<PersistentReadPairGroup> getReadPairs() {
+    public Collection<ReadPairGroup> getReadPairs() {
         return readPairs;
     }
     
