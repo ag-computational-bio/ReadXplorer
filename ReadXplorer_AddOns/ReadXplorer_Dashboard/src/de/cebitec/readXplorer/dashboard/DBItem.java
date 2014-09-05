@@ -16,8 +16,8 @@
  */
 package de.cebitec.readXplorer.dashboard;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.view.dialogMenus.explorer.StandardItem;
 import java.util.Date;
 
@@ -42,7 +42,7 @@ public class DBItem extends StandardItem {
      * dashboard of ReadXplorer. It represents a track or a genome.
      * @param ref reference genome to store in this object
      */
-    public DBItem(PersistantReference ref) {
+    public DBItem(PersistentReference ref) {
         this.setChild(DBItem.Child.GENOME);
         this.setID(ref.getId());
         this.setTitleHidden(ref.getName());
@@ -56,7 +56,7 @@ public class DBItem extends StandardItem {
      * dashboard of ReadXplorer. It represents a track or a genome.
      * @param track track to store in this object
      */
-    public DBItem(PersistantTrack track) {
+    public DBItem(PersistentTrack track) {
         this.setChild(DBItem.Child.TRACK);
         this.setID(track.getId()); 
         this.setTitleHidden("Track #" + track.getId());

@@ -1,6 +1,6 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.datastructures;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 
 /**
  * A putative operon is a data structure for storing two neighboring features,
@@ -11,8 +11,8 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
  */
 public class OperonAdjacency {
 
-    private final PersistantFeature feature1;
-    private final PersistantFeature feature2;
+    private final PersistentFeature feature1;
+    private final PersistentFeature feature2;
     private int readsFeature1;
     private int spanningReads;
     private int readsFeature2;
@@ -24,7 +24,7 @@ public class OperonAdjacency {
      * only associated to feature1/2, the spanning and the internal read
      * counts.
      */
-    public OperonAdjacency(PersistantFeature feature1, PersistantFeature feature2) {
+    public OperonAdjacency(PersistentFeature feature1, PersistentFeature feature2) {
         this.feature1 = feature1;
         this.feature2 = feature2;
     }
@@ -32,14 +32,14 @@ public class OperonAdjacency {
     /**
      * @return the first feature of the operon
      */
-    public PersistantFeature getFeature1() {
+    public PersistentFeature getFeature1() {
         return feature1;
     }
 
     /**
      * @return the second feature of the operon
      */
-    public PersistantFeature getFeature2() {
+    public PersistentFeature getFeature2() {
         return feature2;
     }
 

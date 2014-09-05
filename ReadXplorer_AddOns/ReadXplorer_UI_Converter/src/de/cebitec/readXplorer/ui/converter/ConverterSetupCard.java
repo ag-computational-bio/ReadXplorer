@@ -17,8 +17,8 @@
 package de.cebitec.readXplorer.ui.converter;
 
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.parser.output.ConverterI;
 import de.cebitec.readXplorer.parser.output.JokToBamConverter;
 import de.cebitec.readXplorer.util.GeneralUtils;
@@ -47,7 +47,7 @@ public class ConverterSetupCard extends FileSelectionPanel {
     private String refChromName;
     private int chromLength;
     private boolean canConvert;
-    private PersistantChromosome selectedChrom;
+    private PersistentChromosome selectedChrom;
     
     /**
      * Visual wizard panel for selection of files to convert and selection of a
@@ -56,7 +56,7 @@ public class ConverterSetupCard extends FileSelectionPanel {
     public ConverterSetupCard() {
         initComponents();
         this.initAdditionalData();
-        this.selectedChrom = (PersistantChromosome) this.chromComboBox.getSelectedItem();
+        this.selectedChrom = (PersistentChromosome) this.chromComboBox.getSelectedItem();
         this.setVisibleComponents(true);
         this.multiTrackScrollPane.setVisible(false);
         this.multiTrackListLabel.setVisible(false);
@@ -339,11 +339,11 @@ public class ConverterSetupCard extends FileSelectionPanel {
     }//GEN-LAST:event_refCheckBoxActionPerformed
 
     private void chromComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chromComboBoxActionPerformed
-        this.selectedChrom = (PersistantChromosome) chromComboBox.getSelectedItem();
+        this.selectedChrom = (PersistentChromosome) chromComboBox.getSelectedItem();
     }//GEN-LAST:event_chromComboBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox<PersistantChromosome> chromComboBox;
+    private javax.swing.JComboBox<PersistentChromosome> chromComboBox;
     private javax.swing.JLabel chromComboLabel;
     private javax.swing.JComboBox<ConverterI> converterComboBox;
     private javax.swing.JLabel converterLabel;
@@ -355,7 +355,7 @@ public class ConverterSetupCard extends FileSelectionPanel {
     private javax.swing.JScrollPane multiTrackScrollPane;
     private javax.swing.JButton openFileButton;
     private javax.swing.JCheckBox refCheckBox;
-    private javax.swing.JComboBox<PersistantReference> refComboBox;
+    private javax.swing.JComboBox<PersistentReference> refComboBox;
     private javax.swing.JLabel refComboLabel;
     private javax.swing.JLabel refSelectionLabel;
     private javax.swing.JTextField referenceLengthField;
@@ -444,11 +444,11 @@ public class ConverterSetupCard extends FileSelectionPanel {
      */
     private void updateChromComboBox() {
         if (this.refComboBox.getSelectedItem() != null) {
-            Collection<PersistantChromosome> chromCollection = ((PersistantReference) this.refComboBox.getSelectedItem()).getChromosomes().values();
-            PersistantChromosome[] chroms = new PersistantChromosome[0];
+            Collection<PersistentChromosome> chromCollection = ((PersistentReference) this.refComboBox.getSelectedItem()).getChromosomes().values();
+            PersistentChromosome[] chroms = new PersistentChromosome[0];
             chroms = chromCollection.toArray(chroms);
             this.chromComboBox.setModel(new DefaultComboBoxModel<>(chroms));
-            this.selectedChrom = (PersistantChromosome) chromComboBox.getSelectedItem();
+            this.selectedChrom = (PersistentChromosome) chromComboBox.getSelectedItem();
         }
     }
 

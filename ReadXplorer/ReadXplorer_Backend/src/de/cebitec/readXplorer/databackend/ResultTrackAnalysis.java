@@ -16,9 +16,9 @@
  */
 package de.cebitec.readXplorer.databackend;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.exporter.tables.ExportDataI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,8 +35,8 @@ import java.util.Map;
  */
 public abstract class ResultTrackAnalysis<T> implements ExportDataI {
 
-    private Map<Integer, PersistantTrack> trackMap;
-    private PersistantReference reference;
+    private Map<Integer, PersistentTrack> trackMap;
+    private PersistentReference reference;
     private List<String> trackNameList;
     private ParameterSetI<T> parameters;
     private Map<String, Integer> statsMap;
@@ -56,11 +56,11 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
      * @param trackColumn column of the track id in result tables
      * @param filterColumn column of the position or genomic feature in result tables
      */
-    public ResultTrackAnalysis(PersistantReference reference, Map<Integer, PersistantTrack> trackMap, boolean combineTracks,
+    public ResultTrackAnalysis(PersistentReference reference, Map<Integer, PersistentTrack> trackMap, boolean combineTracks,
             int trackColumn, int filterColumn) {
         this.reference = reference;
         this.trackMap = trackMap;
-        this.trackNameList = PersistantTrack.generateTrackDescriptionList(trackMap.values());
+        this.trackNameList = PersistentTrack.generateTrackDescriptionList(trackMap.values());
         this.statsMap = new HashMap<>();
         this.combineTracks = combineTracks;
         this.trackColumn = trackColumn;
@@ -99,7 +99,7 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
     private String getCombinedTrackNames(boolean fullLength) {
         String concatTrackNames = "";
         String description;
-        for (PersistantTrack track : trackMap.values()) {
+        for (PersistentTrack track : trackMap.values()) {
             if (fullLength || track.getDescription().length() <= 20) {
                 description = track.getDescription();
             } else {
@@ -115,7 +115,7 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
 
 //    private String getCombinedTrackIds() {
 //        String concatTrackIds = "";
-//        for (PersistantTrack track : trackMap.values()) {
+//        for (PersistentTrack track : trackMap.values()) {
 //            concatTrackIds += track.getId() + ", ";
 //        }
 //        if (!concatTrackIds.isEmpty()) {
@@ -130,8 +130,8 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
      * combined tracks, false, if shortened concated names shall be returned for
      * combined tracks. For single tracks, this option does not have an
      * influence.
-     * @return Either a PersistantTrack entry for a single track or a String of
-     * the track names or ids for a combined list of tracks
+     * @return Either a Track entry for a single track or a String of
+ the track names or ids for a combined list of tracks
      */
     public Object getTrackEntry(int trackId, boolean getFullengthName) {
         Object trackEntry;
@@ -149,16 +149,16 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
      *
      * @param trackMap the map of tracks for which the analysis was carried out
      */
-    public void setTrackMap(Map<Integer, PersistantTrack> trackMap) {
+    public void setTrackMap(Map<Integer, PersistentTrack> trackMap) {
         this.trackMap = trackMap;
-        this.trackNameList = PersistantTrack.generateTrackDescriptionList(trackMap.values());
+        this.trackNameList = PersistentTrack.generateTrackDescriptionList(trackMap.values());
     }
 
     /**
      * @return the map of tracks for which the analysis was carried out hashed
      * to their respective track id
      */
-    public Map<Integer, PersistantTrack> getTrackMap() {
+    public Map<Integer, PersistentTrack> getTrackMap() {
         return trackMap;
     }
 
@@ -166,14 +166,14 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
      * @return The map of chromosomes for which the analysis was carried out
      * hashed to their respective chromosome id.
      */
-    public Map<Integer, PersistantChromosome> getChromosomeMap() {
+    public Map<Integer, PersistentChromosome> getChromosomeMap() {
         return reference.getChromosomes();
     }
 
     /**
      * @return Reference genome for which the analysis was carried out
      */
-    public PersistantReference getReference() {
+    public PersistentReference getReference() {
         return reference;
     }
 

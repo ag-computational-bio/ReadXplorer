@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.featureCoverageAnalysis;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.TrackResultEntry;
 
 /**
@@ -27,7 +27,7 @@ import de.cebitec.readXplorer.databackend.dataObjects.TrackResultEntry;
  */
 public class CoveredFeature extends TrackResultEntry {
     
-    private PersistantFeature coveredFeature;
+    private PersistentFeature coveredFeature;
     private int annoLength;
     private int noCoveredBases;
     private int percentCovered;
@@ -38,7 +38,7 @@ public class CoveredFeature extends TrackResultEntry {
      * @param coveredFeature the feature which is detected as covered
      * @param noCoveredBases the number of covered bases of this feature
      */
-    public CoveredFeature(PersistantFeature coveredFeature, int trackId) {
+    public CoveredFeature(PersistentFeature coveredFeature, int trackId) {
         super(trackId);
         this.coveredFeature = coveredFeature;
         this.annoLength = Math.abs(coveredFeature.getStop() - coveredFeature.getStart());
@@ -56,7 +56,7 @@ public class CoveredFeature extends TrackResultEntry {
     /**
      * @return the feature which is detected as covered
      */
-    public PersistantFeature getCoveredFeature() {
+    public PersistentFeature getCoveredFeature() {
         return this.coveredFeature;
     }
 

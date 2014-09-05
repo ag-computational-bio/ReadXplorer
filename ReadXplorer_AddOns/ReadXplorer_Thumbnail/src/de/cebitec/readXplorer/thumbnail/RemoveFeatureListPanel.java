@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.thumbnail;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import java.util.List;
 
 /**
@@ -24,18 +24,18 @@ import java.util.List;
  * @author Denis
  */
 public class RemoveFeatureListPanel extends javax.swing.JPanel {
-    private List<PersistantFeature> selectedFeatures;
+    private List<PersistentFeature> selectedFeatures;
     
     /** Creates new form RemoveTrackListPanel */
     public RemoveFeatureListPanel() {
         initComponents();
     }
 
-    private PersistantFeature[] fillList(){
-        return selectedFeatures.toArray(new PersistantFeature[0]);
+    private PersistentFeature[] fillList(){
+        return selectedFeatures.toArray(new PersistentFeature[0]);
     }
 
-    RemoveFeatureListPanel(List<PersistantFeature> features) {
+    RemoveFeatureListPanel(List<PersistentFeature> features) {
         selectedFeatures = features;
         initComponents();        
     }

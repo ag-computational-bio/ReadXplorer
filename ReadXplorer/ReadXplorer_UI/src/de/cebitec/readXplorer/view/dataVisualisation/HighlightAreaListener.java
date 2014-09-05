@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.CodonUtilities;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
@@ -66,7 +66,7 @@ public class HighlightAreaListener extends MouseAdapter {
      */
     public HighlightAreaListener(final SequenceBar parentComponent, final int baseLineY, final int offsetY) {
         this.parentComponent = parentComponent;
-        this.refName = parentComponent.getPersistantReference().getName();
+        this.refName = parentComponent.getPersistentReference().getName();
         this.baseLineY = baseLineY;
         this.offsetY = offsetY;
         this.startX = -1;
@@ -74,7 +74,7 @@ public class HighlightAreaListener extends MouseAdapter {
         this.freezeRect = false;
         this.isFwdStrand = true;
         this.specialRegionList = new HashMap<>();
-       // this.feature = parentComponent.getPersistantReference()
+       // this.feature = parentComponent.getPersistentReference()
     }
 
     @Override
@@ -216,14 +216,14 @@ public class HighlightAreaListener extends MouseAdapter {
     private String getMarkedSequence() {
         BoundsInfo bounds = parentComponent.getViewerBoundsInfo();
         final double baseWidth = parentComponent.getBaseWidth();
-        final int chromLength = parentComponent.getPersistantReference().getActiveChromosome().getLength();
+        final int chromLength = parentComponent.getPersistentReference().getActiveChromosome().getLength();
         int logleft = bounds.getLogLeft() + Math.round((float) ((highlightRect.x - parentComponent.getViewerHorizontalMargin()) / baseWidth));
         int logright = logleft - 1 + (int) (Math.round(highlightRect.width / baseWidth));
         logleft = logleft < 0 ? 0 : logleft;
         logleft = logleft > chromLength ? chromLength : logleft;
         logright = logright < 0 ? 0 : logright;
         logright = logright > chromLength ? chromLength : logright;
-        String selSequence = parentComponent.getPersistantReference().getActiveChromSequence(logleft, logright);
+        String selSequence = parentComponent.getPersistentReference().getActiveChromSequence(logleft, logright);
         this.seqStart = logleft + 1;
         this.seqEnd = logright;
         
@@ -242,7 +242,7 @@ public class HighlightAreaListener extends MouseAdapter {
      */
     private String getHeader() {
         final String strand = isFwdStrand ? ">>" : "<<";
-        return this.parentComponent.getPersistantReference().getName() + " (" + strand + " " + seqStart + "-" + seqEnd + ")";
+        return this.parentComponent.getPersistentReference().getName() + " (" + strand + " " + seqStart + "-" + seqEnd + ")";
     }
 
     /**
@@ -337,11 +337,11 @@ public class HighlightAreaListener extends MouseAdapter {
             if (specialRegion.getType() == Properties.START) {
                 if (isFwdStrand && specialRegion.getY() < this.baseLineY) {
                     //detect stop pos of special region for fwd strand
-                    Region cdsToHighlight = this.findNextStopPos(specialRegion.getStart(), parentComponent.getPersistantReference());
+                    Region cdsToHighlight = this.findNextStopPos(specialRegion.getStart(), parentComponent.getPersistentReference());
                     cdsRegions.add(cdsToHighlight);
                 } else if (!isFwdStrand && specialRegion.getY() > this.baseLineY) {
                     //detect stop pos (which is the start pos in pixels) of special region for rev strand
-                    Region cdsToHighlight = this.findNextStopPos(specialRegion.getStop(), parentComponent.getPersistantReference());
+                    Region cdsToHighlight = this.findNextStopPos(specialRegion.getStop(), parentComponent.getPersistentReference());
                     cdsRegions.add(cdsToHighlight);
                 }
             }
@@ -355,7 +355,7 @@ public class HighlightAreaListener extends MouseAdapter {
      * @param reference
      * @return The next stop position in the reference from the given start
      */
-    private Region findNextStopPos(int start, PersistantReference reference) {
+    private Region findNextStopPos(int start, PersistentReference reference) {
         Pair<String[], String[]> geneticCode = CodonUtilities.getGeneticCodeArrays();
         String[] stopCodons = geneticCode.getSecond();
         List<Integer> results = new ArrayList<>();
@@ -385,7 +385,7 @@ public class HighlightAreaListener extends MouseAdapter {
     private List<String> generateCdsString(List<Region> cdsRegions) {
         List<String> cdsStrings = new ArrayList<>();
         for (Region cds : cdsRegions) {
-            String cdsSeq = parentComponent.getPersistantReference().getActiveChromSequence(cds.getStart() - 1, cds.getStop()); //-1 because its an index, not genome pos
+            String cdsSeq = parentComponent.getPersistentReference().getActiveChromSequence(cds.getStart(), cds.getStop());
             if (!isFwdStrand) {
                 cdsSeq = SequenceUtils.getReverseComplement(cdsSeq);
             }

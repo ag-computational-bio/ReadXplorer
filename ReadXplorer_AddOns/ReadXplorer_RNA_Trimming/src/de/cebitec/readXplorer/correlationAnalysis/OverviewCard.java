@@ -18,7 +18,7 @@ package de.cebitec.readXplorer.correlationAnalysis;
 
 import de.cebitec.readXplorer.correlationAnalysis.CorrelationAnalysisAction.CorrelationCoefficient;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.util.List;
 import org.openide.util.NbBundle;
 
@@ -75,7 +75,7 @@ public class OverviewCard extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
 
-    void showGenereateOverview(CorrelationCoefficient cc, List<PersistantTrack> list, String intervallength, 
+    void showGenereateOverview(CorrelationCoefficient cc, List<PersistentTrack> list, String intervallength, 
             String mincorrelation, String minpeakcoverage) {
         overviewTextArea.setText("Correlation coefficient:\n");
         overviewTextArea.append(cc+"\n");
@@ -86,7 +86,7 @@ public class OverviewCard extends javax.swing.JPanel {
         );
         
         overviewTextArea.append("Selected tracks:\n");
-        for(PersistantTrack track : list) {
+        for(PersistentTrack track : list) {
             overviewTextArea.append("Track " + track.getId() + ": " + track.getDescription());
         }
         

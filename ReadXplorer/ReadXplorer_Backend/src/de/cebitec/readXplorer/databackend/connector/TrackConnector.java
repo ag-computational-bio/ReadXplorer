@@ -27,8 +27,8 @@ import de.cebitec.readXplorer.databackend.MappingThreadAnalyses;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.databackend.SQLStatements;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.DiscreteCountingDistribution;
 import de.cebitec.readXplorer.util.StatsContainer;
 import java.io.File;
@@ -49,7 +49,7 @@ import java.util.logging.Logger;
  */
 public class TrackConnector {
 
-    private List<PersistantTrack> associatedTracks;
+    private List<PersistentTrack> associatedTracks;
     private int trackID;
     private CoverageThread coverageThread;
     private MappingThread mappingThread;
@@ -57,14 +57,14 @@ public class TrackConnector {
     private MappingThreadAnalyses mappingThreadAnalyses; 
     private Connection con;
     public static int FIXED_INTERVAL_LENGTH = 1000;
-    private PersistantReference refGenome;
+    private PersistentReference refGenome;
 
     /**
      * A track connector for a single track. It handles all data requests for this track.
      * @param track the track for which this connector is created
      * @throws FileNotFoundException  
      */
-    protected TrackConnector(PersistantTrack track) throws FileNotFoundException {
+    protected TrackConnector(PersistentTrack track) throws FileNotFoundException {
         this.associatedTracks = new ArrayList<>();
         this.associatedTracks.add(track);
         this.initTrackConnector(track.getId(), false);
@@ -78,7 +78,7 @@ public class TrackConnector {
      *      it should be kept separated
      * @throws FileNotFoundException  
      */
-    protected TrackConnector(int id, List<PersistantTrack> tracks, boolean combineTracks) throws FileNotFoundException {
+    protected TrackConnector(int id, List<PersistentTrack> tracks, boolean combineTracks) throws FileNotFoundException {
         if (tracks.size() > 2 && !combineTracks) {
             throw new UnsupportedOperationException("More than two tracks not supported yet.");
         }
@@ -93,7 +93,7 @@ public class TrackConnector {
      * false if it should be kept separated
      */
     private void initTrackConnector(int trackId, boolean combineTracks) throws FileNotFoundException {
-        for (PersistantTrack track : associatedTracks) {
+        for (PersistentTrack track : associatedTracks) {
             if (!new File(track.getFilePath()).exists()) {
                 throw new FileNotFoundException(track.getFilePath());
             }
@@ -261,7 +261,7 @@ public class TrackConnector {
 
     public List<String> getAssociatedTrackNames() {
         List<String> trackNames = new ArrayList<>();
-        for (PersistantTrack track : this.associatedTracks) {
+        for (PersistentTrack track : this.associatedTracks) {
             trackNames.add(track.getDescription());
         }
         return trackNames;
@@ -269,7 +269,7 @@ public class TrackConnector {
 
     public List<Integer> getTrackIds() {
         List<Integer> trackIds = new ArrayList<>();
-        for (PersistantTrack track : this.associatedTracks) {
+        for (PersistentTrack track : this.associatedTracks) {
             trackIds.add(track.getId());
         }
         return trackIds;
@@ -379,7 +379,7 @@ public class TrackConnector {
     /**
      * @return the reference genome associated to this connector
      */
-    public PersistantReference getRefGenome() {
+    public PersistentReference getRefGenome() {
         return this.refGenome;
     }
 

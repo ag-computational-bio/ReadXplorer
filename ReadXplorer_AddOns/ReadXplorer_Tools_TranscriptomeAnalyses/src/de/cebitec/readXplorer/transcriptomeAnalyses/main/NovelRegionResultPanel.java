@@ -1,7 +1,7 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelTranscript;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
@@ -54,7 +54,7 @@ public class NovelRegionResultPanel extends ResultTablePanel {
     private NovelRegionResult novelRegionResults;
     private BoundsInfoManager boundsInfoManager;
     private ReferenceViewer referenceViewer;
-    private PersistantReference persistantRef;
+    private PersistentReference persistantRef;
     private HashMap<String, Object> statisticsMap;
     private final TableRightClickFilter<UneditableTableModel> tableFilter;
     private final TableRightClickDeletion<DefaultTableModel> rowDeletion = new TableRightClickDeletion<>();
@@ -528,7 +528,7 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                     TableRowSorter<TableModel> sorter = new TableRowSorter<>();
                     novelRegionTable.setRowSorter(sorter);
                     sorter.setModel(model);
-                    TableComparatorProvider.setPersistantTrackComparator(sorter, 1);
+                    TableComparatorProvider.setPersistentTrackComparator(sorter, 1);
                 }
             });
         }
@@ -551,7 +551,7 @@ public class NovelRegionResultPanel extends ResultTablePanel {
         this.referenceViewer = referenceViewer;
     }
     
-    public void setPersistantReference(PersistantReference reference) {
+    public void setPersistentReference(PersistentReference reference) {
         this.persistantRef = reference;
     }
 

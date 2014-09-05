@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.featureCoverageAnalysis;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.readXplorer.util.UneditableTableModel;
@@ -211,7 +211,7 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
         
         DefaultTableModel model = (DefaultTableModel) coveredFeaturesTable.getModel();
 
-        PersistantFeature feature;
+        PersistentFeature feature;
         for (CoveredFeature coveredFeature : features) {
 
             Object[] rowData = new Object[nbColumns];

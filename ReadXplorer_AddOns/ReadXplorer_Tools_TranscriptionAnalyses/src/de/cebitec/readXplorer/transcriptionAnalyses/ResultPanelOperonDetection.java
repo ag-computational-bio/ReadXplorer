@@ -22,7 +22,7 @@ package de.cebitec.readXplorer.transcriptionAnalyses;
  * Created on 27.01.2012, 14:31:03
  */
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.Operon;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.OperonAdjacency;
@@ -240,7 +240,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
             int operonsWithInternal = 0;
             boolean hasOverlappingReads;
             boolean hasInternalReads;
-            PersistantFeature feat1;
+            PersistentFeature feat1;
 
             for (Operon operon : operons) {
                 feat1 = operon.getOperonAdjacencies().get(0).getFeature1();

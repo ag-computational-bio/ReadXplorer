@@ -20,6 +20,7 @@ import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.DetectedFeatures;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.TransStartUnannotated;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.TranscriptionStart;
+import de.cebitec.readXplorer.util.classification.MappingClass;
 
 /**
  * Starts the TSS analysis including the detection of unannotated transcripts.
@@ -71,12 +72,12 @@ public class AnalysisUnannotatedTransStart extends AnalysisTranscriptionStart {
                 features.getUpstreamFeature() == null) {
             
             if (tss.isFwdStrand()) {
-                while (currentCoverage.getBestMatchFwd(currentPos) > this.getParametersTSS().getMinTranscriptExtensionCov()) {
+                while (currentCoverage.getCoverage(MappingClass.BEST_MATCH).getFwdCov(currentPos) > this.getParametersTSS().getMinTranscriptExtensionCov()) {
                     ++currentPos;
                 }
                 --currentPos;
             } else {
-                while (currentCoverage.getBestMatchRev(currentPos) > this.getParametersTSS().getMinTranscriptExtensionCov()) { // TODO: && currentPos < referenceLength > 0
+                while (currentCoverage.getCoverage(MappingClass.BEST_MATCH).getRevCov(currentPos) > this.getParametersTSS().getMinTranscriptExtensionCov()) { // TODO: && currentPos < referenceLength > 0
                     --currentPos;
                 }
                 ++currentPos;

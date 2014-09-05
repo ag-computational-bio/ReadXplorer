@@ -17,7 +17,7 @@
 package de.cebitec.readXplorer.transcriptionAnalyses;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.RPKMvalue;
 import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
@@ -50,7 +50,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
 
     private RPKMAnalysisResult rpkmCalcResult;
     private HashMap<String, Integer> filterStatisticsMap;
-    private PersistantFeature feature;
+    private PersistentFeature feature;
     private boolean statistics = false;
     private TableRightClickFilter<UneditableTableModel> tableFilter;
     private ReferenceFeatureTopComp refComp;
@@ -231,7 +231,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
             }
             DefaultTableModel model = (DefaultTableModel) this.rpkmTable.getModel();
 
-            PersistantFeature feat;
+            PersistentFeature feat;
             for (RPKMvalue rpkm : rpkmCalcResult.getResults()) {
                 feat = rpkm.getFeature();
                 Object[] rowData = new Object[nbColumns];

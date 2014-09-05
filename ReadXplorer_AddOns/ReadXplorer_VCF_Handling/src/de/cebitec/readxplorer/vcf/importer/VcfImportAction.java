@@ -3,8 +3,8 @@ package de.cebitec.readxplorer.vcf.importer;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readXplorer.api.cookies.LoginCookie;
 import de.cebitec.readXplorer.controller.ViewController;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.BasePanel;
@@ -56,8 +56,8 @@ public final class VcfImportAction implements ActionListener {
     private LoginCookie context;
     private List<VariantContext> variantCList;
     
-    private Map<Integer, PersistantTrack> trackMap = new HashMap<>();
-    private PersistantReference reference;
+    private Map<Integer, PersistentTrack> trackMap = new HashMap<>();
+    private PersistentReference reference;
     private boolean combineTracks;
     
     private AppPanelTopComponent appPanelTopComp;
@@ -119,7 +119,7 @@ public final class VcfImportAction implements ActionListener {
     private void openResultWindow() {
        
         // Saves required information for generating a Snp_VcfResult Object
-        reference = (PersistantReference) wiz.getProperty(VcfImportWizardPanel.PROP_SELECTED_REF);
+        reference = (PersistentReference) wiz.getProperty(VcfImportWizardPanel.PROP_SELECTED_REF);
         combineTracks = false;
 
         // Opens VcfResultPanel
@@ -173,7 +173,7 @@ public final class VcfImportAction implements ActionListener {
      * @param ref
      * @return 
      */
-     private ViewController checkAndOpenRefViewer(PersistantReference ref) {
+    private ViewController checkAndOpenRefViewer(PersistentReference ref) {
         ViewController viewController = null;
         
         @SuppressWarnings("unchecked")

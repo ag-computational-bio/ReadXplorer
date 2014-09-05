@@ -1,6 +1,6 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.controller;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.ChartsGenerationSelectChatTypeWizardPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.PlotGenerator;
 import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.SouthPanel;
@@ -35,7 +35,7 @@ public class VisualizationListener implements ActionListener {
     boolean isBining;
     int lengthRelToTls, biningSize;
     boolean isGaToCtSelected, isGcToAtSelected;
-    private final PersistantReference persistantReference;
+    private final PersistentReference persistentReference;
     private MultiPurposeTopComponent topComponent;
     private TSSDetectionResults tssResult;
     ParameterSetFiveEnrichedAnalyses params;
@@ -43,13 +43,13 @@ public class VisualizationListener implements ActionListener {
     /**
      * Constructor.
      *
-     * @param reference PersistantReference
+     * @param reference PersistentReference
      * @param wiz WizardDescriptor
      * @param currentTss list of current transcription start sites
      * @param tssResult instance of TSSDetectionResults
      */
-    public VisualizationListener(PersistantReference reference, WizardDescriptor wiz, List<TranscriptionStart> currentTss, TSSDetectionResults tssResult) {
-        this.persistantReference = reference;
+    public VisualizationListener(PersistentReference reference, WizardDescriptor wiz, List<TranscriptionStart> currentTss, TSSDetectionResults tssResult) {
+        this.persistentReference = reference;
         this.wiz = wiz;
         this.currentTss = currentTss;
         this.params = (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters();
@@ -99,7 +99,7 @@ public class VisualizationListener implements ActionListener {
             Thread plotGeneration = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    PlotGenerator gen = new PlotGenerator(persistantReference);
+                    PlotGenerator gen = new PlotGenerator(persistentReference);
                     List<DataTable> dataList = gen.prepareDataForUtrDistr(elements, currentTss, params, isBining, biningSize);
                     InteractivePanel panel = gen.generateBarPlot(dataList.get(0), "5′-UTR lenght (distance between TSS and TLS)", "Absolute frequency");
                     topComponent.add(panel, BorderLayout.CENTER);
@@ -117,7 +117,7 @@ public class VisualizationListener implements ActionListener {
                 Thread plotGeneration = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        PlotGenerator gen = new PlotGenerator(persistantReference);
+                        PlotGenerator gen = new PlotGenerator(persistentReference);
                         List<DataTable> dataList = gen.prepareData(ChartType.BASE_DISTRIBUTION, ChartType.CHARTS_BASE_DIST_GA_CT,
                                 elements, currentTss, params, lengthRelToTls);
                         InteractivePanel panel = gen.generateOverlappedAreaPlot(ChartType.CHARTS_BASE_DIST_GA_CT, dataList.get(0), dataList.get(1), "upstream position relative to start codon (nt)", "purine/pyrimidine distribution (relative abundance)");
@@ -136,7 +136,7 @@ public class VisualizationListener implements ActionListener {
                 Thread plotGeneration = new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        PlotGenerator gen = new PlotGenerator(persistantReference);
+                        PlotGenerator gen = new PlotGenerator(persistentReference);
                         List<DataTable> dataList = gen.prepareData(ChartType.BASE_DISTRIBUTION, ChartType.CHARTS_BASE_DIST_GC_AT,
                                 elements, currentTss, params, lengthRelToTls);
                         InteractivePanel panel = gen.generateOverlappedAreaPlot(ChartType.CHARTS_BASE_DIST_GC_AT, dataList.get(0), dataList.get(1), "upstream position relative to start codon (nt)", "purine/pyrimidine distribution (relative abundance)");

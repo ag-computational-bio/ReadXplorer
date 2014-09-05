@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.view.dialogMenus;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.util.List;
 import org.openide.WizardDescriptor;
 
@@ -59,7 +59,7 @@ public class OpenTracksWizardPanel extends ChangeListeningWizardPanel {
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         if (isValid()) {
-            List<PersistantTrack> tracks = this.component.getSelectedTracks();
+            List<PersistentTrack> tracks = this.component.getSelectedTracks();
             wiz.putProperty(getPropSelectedTracks(), tracks);
             wiz.putProperty(getPropCombineTracks(), this.component.isCombineTracks());
         }

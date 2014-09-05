@@ -18,7 +18,7 @@ package de.cebitec.readXplorer.differentialExpression;
 
 //package de.cebitec.readXplorer.differentialExpression;
 //
-//import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+//import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 //import de.cebitec.readXplorer.differentialExpression.GnuR.JRILibraryNotInPathException;
 //import de.cebitec.readXplorer.differentialExpression.GnuR.PackageNotLoadableException;
 //import de.cebitec.readXplorer.differentialExpression.GnuR.UnknownGnuRException;
@@ -52,7 +52,7 @@ package de.cebitec.readXplorer.differentialExpression;
 //    private static DeSeq instance = new DeSeq();
 //    private static int numberOfFeatures;
 //    private static int numberOfTracks;
-//    private static List<PersistantTrack> selectedTracks;
+//    private static List<PersistentTrack> selectedTracks;
 //    private static List<String> loci;
 //    private static List<String> tracks;
 //    private static List<List<Integer>> allCountData;
@@ -139,7 +139,7 @@ package de.cebitec.readXplorer.differentialExpression;
 //        selectedTracks = new ArrayList<>();
 //        for (int i = 0; i < tracks.size(); i++) {
 //            Timestamp currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-//            selectedTracks.add(new PersistantTrack(i, "", tracks.get(i), currentTimestamp, 0, 0));
+//            selectedTracks.add(new PersistentTrack(i, "", tracks.get(i), currentTimestamp, 0, 0));
 //        }
 //
 //        numberOfFeatures = loci.size();
@@ -187,27 +187,27 @@ package de.cebitec.readXplorer.differentialExpression;
 //        analysisData = new DeSeqAnalysisData(tracks.size(), new HashMap<>(TwoFactorDesign), false, new ArrayList<>(fit1), new ArrayList<>(fit2), false);
 //        analysisData.setLoci(loci.toArray(new String[loci.size()]));
 //        
-//        List<PersistantTrack> selectedTracksTwoFactor = new ArrayList<>();
+//        List<PersistentTrack> selectedTracksTwoFactor = new ArrayList<>();
 //        
 //        List<Integer> current = allCountData.get(2);
 //        analysisData.addCountDataForTrack(current.toArray(new Integer[current.size()])); 
 //        Timestamp currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-//        selectedTracksTwoFactor.add(new PersistantTrack(2, "", tracks.get(2), currentTimestamp, 0, 0));
+//        selectedTracksTwoFactor.add(new PersistentTrack(2, "", tracks.get(2), currentTimestamp, 0, 0));
 //        
 //        current = allCountData.get(3);
 //        analysisData.addCountDataForTrack(current.toArray(new Integer[current.size()]));
 //        currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-//        selectedTracksTwoFactor.add(new PersistantTrack(3, "", tracks.get(3), currentTimestamp, 0, 0));
+//        selectedTracksTwoFactor.add(new PersistentTrack(3, "", tracks.get(3), currentTimestamp, 0, 0));
 //        
 //        current = allCountData.get(5);
 //        analysisData.addCountDataForTrack(current.toArray(new Integer[current.size()])); 
 //        currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-//        selectedTracksTwoFactor.add(new PersistantTrack(5, "", tracks.get(5), currentTimestamp, 0, 0));
+//        selectedTracksTwoFactor.add(new PersistentTrack(5, "", tracks.get(5), currentTimestamp, 0, 0));
 //        
 //        current = allCountData.get(6);
 //        analysisData.addCountDataForTrack(current.toArray(new Integer[current.size()]));  
 //        currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-//        selectedTracksTwoFactor.add(new PersistantTrack(6, "", tracks.get(6), currentTimestamp, 0, 0));
+//        selectedTracksTwoFactor.add(new PersistentTrack(6, "", tracks.get(6), currentTimestamp, 0, 0));
 //        
 //        analysisData.setSelectedTracks(selectedTracksTwoFactor);
 //        try {

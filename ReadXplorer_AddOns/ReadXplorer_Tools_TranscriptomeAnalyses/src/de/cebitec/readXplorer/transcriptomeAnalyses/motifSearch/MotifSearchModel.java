@@ -1,8 +1,8 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch;
 
 import de.cebitec.readXplorer.databackend.ParameterSetI;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ElementsOfInterest;
@@ -55,7 +55,7 @@ public class MotifSearchModel implements Observer {
     private File logoMinus10, logoMinus35, logoRbs, minus10Input, minus35Input,
             bioProspOutMinus10, bioProspOutMinus35, info, rbsBioProspectorInput,
             rbsBioProsFirstHit;
-    private final PersistantReference ref;
+    private final PersistentReference ref;
     private List<String> upstreamRegions;
     private float meanMinus10SpacerToTSS, meanMinus35SpacerToMinus10,
             meanSpacerLengthOfRBSMotif;
@@ -79,7 +79,7 @@ public class MotifSearchModel implements Observer {
      *
      * @param refViewer
      */
-    public MotifSearchModel(PersistantReference reference) {
+    public MotifSearchModel(PersistentReference reference) {
         this.ref = reference;
         this.handlerTitlePromotorAnalysis = "Processing promotor analysis";
         this.handlerTitleRBSAnalysis = "Processing rbs analysis";
@@ -862,7 +862,7 @@ public class MotifSearchModel implements Observer {
         this.upstreamRegionsInHash = new TreeMap<>();
         this.locusToTSSs = new TreeMap<>();
 
-        PersistantFeature currentFeature;
+        PersistentFeature currentFeature;
         String newLocus;
         String locus;
         int tssStart;
@@ -1029,10 +1029,10 @@ public class MotifSearchModel implements Observer {
      * regions.
      *
      * @param tss TranscriptionStart
-     * @param currentFeature PersistantFeature which is assigned to the tss
+     * @param currentFeature PersistentFeature which is assigned to the tss
      * @param length of the upstream region to extract
      */
-    private void getUpstreamRegionRelToFeatureStart(PersistantFeature currentFeature, int length) {
+    private void getUpstreamRegionRelToFeatureStart(PersistentFeature currentFeature, int length) {
         int featureStart;
         String substr = "";
         String locus = currentFeature.getLocus();

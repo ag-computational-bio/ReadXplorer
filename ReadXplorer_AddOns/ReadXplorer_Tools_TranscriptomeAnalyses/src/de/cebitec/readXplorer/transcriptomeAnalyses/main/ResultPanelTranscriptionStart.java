@@ -1,8 +1,8 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.VisualizationWizardIterator;
 import de.cebitec.readXplorer.transcriptomeAnalyses.controller.VisualizationListener;
@@ -127,7 +127,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
     private VisualizationListener vizualizationListener;
     String separator = "";
     Integer prefixLength = 0;
-    PersistantReference persistantRef;
+    PersistentReference persistantRef;
 
     /**
      * This panel is capable of showing a table with transcription start sites
@@ -811,7 +811,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                 progresshandle.progress(1);
 
                 for (TranscriptionStart transcriptionStart : currentTss) {
-                    PersistantFeature feature = transcriptionStart.getAssignedFeature();
+                    PersistentFeature feature = transcriptionStart.getAssignedFeature();
 
                     if (feature != null) {
                         if (transcriptionStart.getOffset() == 0 && transcriptionStart.getDist2start() > 0) {
@@ -900,7 +900,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
         ResultPanelTranscriptionStart transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
 //        transcriptionStartResultPanel.setRefAndBoundsManager(this.persistantRef, this.boundsInfoManager);
-        transcriptionStartResultPanel.setPersistantReference(this.persistantRef);
+        transcriptionStartResultPanel.setPersistentReference(this.persistantRef);
         transcriptionStartResultPanel.setBoundsInfoManager(this.boundsInfoManager);
         TSSDetectionResults tssResultNew = new TSSDetectionResults(this.tssResult.getStats(), subTSS, tssResult.getTrackMap(), this.persistantRef);
         tssResultNew.setResults(subTSS);
@@ -939,7 +939,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         this.referenceViewer = referenceViewer;
     }
 
-    public void setPersistantReference(PersistantReference reference) {
+    public void setPersistentReference(PersistentReference reference) {
         this.persistantRef = reference;
     }
 
@@ -986,10 +986,10 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
                     final DefaultTableModel model = (DefaultTableModel) tSSTable.getModel();
 
-                    PersistantReference ref = persistantRef;
+                    PersistentReference ref = persistantRef;
                     String strand;
-                    PersistantFeature feature;
-                    PersistantFeature nextDownstreamFeature;
+                    PersistentFeature feature;
+                    PersistentFeature nextDownstreamFeature;
 
                     for (TranscriptionStart tSS : tsss) {
                         String detectedFeatureStart = "0";
@@ -1093,13 +1093,13 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                             rowData[i++] = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
                             rowData[i++] = feature.isFwdStrand() ? feature.getStop() : feature.getStart();
                             rowData[i++] = feature.getStop() - feature.getStart();
-                            rowData[i++] = PersistantFeature.Utils.determineFrame(feature);
+                            rowData[i++] = PersistentFeature.Utils.determineFrame(feature);
                             rowData[i++] = feature.getProduct();
                         } else if (nextDownstreamFeature != null) {
                             rowData[i++] = nextDownstreamFeature.isFwdStrand() ? nextDownstreamFeature.getStart() : nextDownstreamFeature.getStop();
                             rowData[i++] = nextDownstreamFeature.isFwdStrand() ? nextDownstreamFeature.getStop() : nextDownstreamFeature.getStart();
                             rowData[i++] = nextDownstreamFeature.getStop() - nextDownstreamFeature.getStart();
-                            rowData[i++] = PersistantFeature.Utils.determineFrame(nextDownstreamFeature);
+                            rowData[i++] = PersistentFeature.Utils.determineFrame(nextDownstreamFeature);
                             rowData[i++] = nextDownstreamFeature.getProduct();
                         } else {
                             rowData[i++] = 0;
@@ -1141,7 +1141,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                     TableRowSorter<TableModel> sorter = new TableRowSorter<>();
                     tSSTable.setRowSorter(sorter);
                     sorter.setModel(model);
-                    TableComparatorProvider.setPersistantTrackComparator(sorter, 1);
+                    TableComparatorProvider.setPersistentTrackComparator(sorter, 1);
                 }
 
             });

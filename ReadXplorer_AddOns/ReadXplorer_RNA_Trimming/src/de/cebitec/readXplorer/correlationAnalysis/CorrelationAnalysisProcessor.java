@@ -22,10 +22,12 @@ import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException;
 import de.cebitec.readXplorer.databackend.ThreadListener;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistant;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.Coverage;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistent;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readXplorer.util.classification.MappingClass;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,10 +66,10 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     private Integer intervalLength;
     private CorrelationResultPanel resultView;
     
-    private List<CoverageAndDiffResultPersistant> resultList;
+    private List<CoverageAndDiffResultPersistent> resultList;
     private List<TrackConnector> trackConnectors;
     private boolean ready = false;
-    private final Map<Integer, PersistantChromosome> chromMap;
+    private final Map<Integer, PersistentChromosome> chromMap;
     private int lastChromId = 0;
     
     public enum StrandDirection { FWD, REV };
@@ -83,7 +85,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
      * @param minPeakCoverage
      */
     public CorrelationAnalysisProcessor(CorrelationAnalysisAction.CorrelationCoefficient cc,
-            ReferenceViewer referenceViewer, List<PersistantTrack> tracks,
+            ReferenceViewer referenceViewer, List<PersistentTrack> tracks,
             Integer intervalLength, Integer minCorrelation, Integer minPeakCoverage) {
 
         this.ready = false;
@@ -92,9 +94,9 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         this.correlationsList = new ArrayList<>();
 
         this.trackConnectors = new ArrayList<>();
-        Map<Integer, PersistantTrack> trackMap = new HashMap<>();
+        Map<Integer, PersistentTrack> trackMap = new HashMap<>();
         SaveFileFetcherForGUI fetcher = new SaveFileFetcherForGUI();
-        for (PersistantTrack track : tracks) {
+        for (PersistentTrack track : tracks) {
             try {
                 trackConnectors.add(fetcher.getMultiTrackConnector(track));
             } catch (UserCanceledTrackPathUpdateException ex) {
@@ -114,7 +116,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         this.analysisResult.setAnalysisParameters(params);
 
         this.chromMap = referenceViewer.getReference().getChromosomes();
-        this.rightBound = PersistantReference.calcWholeGenomeLength(chromMap);
+        this.rightBound = PersistentReference.calcWholeGenomeLength(chromMap);
         this.createProcessHandle(NbBundle.getMessage(CorrelationAnalysisAction.class, "CTL_CorrelationAnalysisProcess.name", "FWD"));
 
         this.intervalLength = intervalLength;
@@ -153,27 +155,22 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
         //this.io.getOut().println(msg);
     }
     
-    
-    private int getFwdCoverageAt(CoverageAndDiffResultPersistant coverageResult, int position) {
-        return coverageResult.getCoverage().getCommonFwd(position)
-                + coverageResult.getCoverage().getPerfectFwd(position);
-    }
-    
-    private int getRevCoverageAt(CoverageAndDiffResultPersistant coverageResult, int position) {
-        return coverageResult.getCoverage().getCommonRev(position)
-                + coverageResult.getCoverage().getPerfectRev(position);
-    }
-    
-    private int getCoverageAt(CoverageAndDiffResultPersistant coverageResult, int position, StrandDirection direction) {
-        if (direction == StrandDirection.REV) {return getRevCoverageAt(coverageResult, position); }
-        else { return getFwdCoverageAt(coverageResult, position); }
+    private int getCoverageAt(CoverageAndDiffResultPersistent coverageResult, int position, StrandDirection direction) {
+        Coverage coverage = coverageResult.getCovManager().getCoverage(MappingClass.COMMON_MATCH);
+        if (direction == StrandDirection.REV) {
+            return coverage.getRevCov(position);
+        } else {
+            return coverage.getFwdCov(position);
+        }
     }
     
     
-    /** checks if all coverage results in the currently loaded result list
-     * contain zero coverage on the current position */
+    /**
+     * Checks if all coverage results in the currently loaded result list
+     * contain zero coverage at the current position
+     */
     private boolean allCoverageEqualZero(StrandDirection direction, int position) {
-        for (CoverageAndDiffResultPersistant result : this.resultList) {
+        for (CoverageAndDiffResultPersistent result : this.resultList) {
             if (getCoverageAt(result, position, direction) != 0) {
                 return false;
             }
@@ -184,7 +181,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     /** computes the maximum peak covage from the currently loaded result list */
     private int getPeakCoverage(StrandDirection direction, int position) {
         int peakCoverage = 0;
-        for (CoverageAndDiffResultPersistant result : this.resultList) {
+        for (CoverageAndDiffResultPersistent result : this.resultList) {
             peakCoverage = Math.max(peakCoverage, getCoverageAt(result, position, direction));
         }
         return peakCoverage;
@@ -208,7 +205,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
      * @param to
      * @return 
      */
-    private double[] copyCoverage(CoverageAndDiffResultPersistant coverageResult, StrandDirection direction, int from, int to) {
+    private double[] copyCoverage(CoverageAndDiffResultPersistent coverageResult, StrandDirection direction, int from, int to) {
         if (to < from) { throw new IllegalArgumentException("from value must be less than the to value"); }
         double[] result = new double[to-from];
         int writeIndex = 0;
@@ -225,7 +222,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
      * @param direction 
      */
     private void computeStep(StrandDirection direction) {
-        int maximumCoveredPosition = this.resultList.get(0).getCoverage().getRightBound();
+        int maximumCoveredPosition = this.resultList.get(0).getCovManager().getRightBound();
         int chromId = this.resultList.get(0).getRequest().getChromId();
         int track1Id = this.trackConnectors.get(0).getTrackID();
         int track2Id = this.trackConnectors.get(1).getTrackID();
@@ -356,9 +353,9 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
      * Wait until the data for all tracks has arrived */
     @Override
     public synchronized void receiveData(Object data) {
-        if (data instanceof CoverageAndDiffResultPersistant) {
+        if (data instanceof CoverageAndDiffResultPersistent) {
             //TODO: possible problem when results from the same track are quicker returned than from the other track. Separate resultlist
-            this.resultList.add((CoverageAndDiffResultPersistant) data);
+            this.resultList.add((CoverageAndDiffResultPersistent) data);
             if (this.resultList.size() == this.trackConnectors.size()) {
                 this.computeStep(this.currentDirection);
             }

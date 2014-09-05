@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression.plot;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.plotting.PlotDataItem;
 import org.jfree.chart.labels.XYToolTipGenerator;
 import org.jfree.data.xy.XYDataset;
@@ -32,7 +32,7 @@ public class ToolTip implements XYToolTipGenerator {
     public String generateToolTip(XYDataset xyd, int seriesIndex, int itemIndex) {
         XYSeriesCollection dataset = (XYSeriesCollection) xyd;
         PlotDataItem clickedItem = (PlotDataItem) dataset.getSeries(seriesIndex).getDataItem(itemIndex);
-        PersistantFeature feature = clickedItem.getFeature();       
+        PersistentFeature feature = clickedItem.getFeature();       
         StringBuilder sb = new StringBuilder("<html>");
         sb.append("Type: ").append(feature.getType()).append("<br>");
         sb.append("Locus: ").append(feature.getLocus()).append("<br>");

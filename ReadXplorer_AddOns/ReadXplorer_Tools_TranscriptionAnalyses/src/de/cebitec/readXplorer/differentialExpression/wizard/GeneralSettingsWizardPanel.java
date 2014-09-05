@@ -19,7 +19,7 @@ package de.cebitec.readXplorer.differentialExpression.wizard;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler.Tool;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;

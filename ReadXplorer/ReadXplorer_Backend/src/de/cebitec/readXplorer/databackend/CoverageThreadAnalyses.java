@@ -16,9 +16,9 @@
  */
 package de.cebitec.readXplorer.databackend;
 
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistant;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantCoverage;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistent;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.Properties;
 import java.util.List;
 import java.util.logging.Level;
@@ -40,7 +40,7 @@ public class CoverageThreadAnalyses extends CoverageThread {
      * @param combineTracks true, if more than one track is added and their
      * coverage should be combined in the results
      */
-    public CoverageThreadAnalyses(List<PersistantTrack> tracks, boolean combineTracks) {
+    public CoverageThreadAnalyses(List<PersistentTrack> tracks, boolean combineTracks) {
         super(tracks, combineTracks);
     }
 
@@ -50,11 +50,11 @@ public class CoverageThreadAnalyses extends CoverageThread {
         while (!interrupted()) {
 
             IntervalRequest request = requestQueue.poll();
-            CoverageAndDiffResultPersistant currentCov = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0), null, null, request);
+            CoverageAndDiffResultPersistent currentCov = new CoverageAndDiffResultPersistent(new CoverageManager(0, 0), null, null, request);
             if (request != null) {
                 if (request.getDesiredData() == Properties.READ_STARTS) {
                     currentCov = this.loadReadStartsAndCoverageMultiple(request);
-                } else if (!currentCov.getCoverage().coversBounds(request.getFrom(), request.getTo())) {
+                } else if (!currentCov.getCovManager().coversBounds(request.getFrom(), request.getTo())) {
                     if (this.getTrackId2() != 0) {
                         currentCov = this.loadCoverageDouble(request); //at the moment we only need the complete coverage here
                     } else if (this.getTrackId() != 0 || this.canQueryCoverage()) {

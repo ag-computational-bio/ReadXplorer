@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.coverageAnalysis;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantResult;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentResult;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +27,7 @@ import java.util.List;
  *
  * @author Tobias Zimmermann, Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
  */
-public class CoverageIntervalContainer extends PersistantResult {
+public class CoverageIntervalContainer extends PersistentResult {
     private static final long serialVersionUID = 1L;
 
     private List<CoverageInterval> coverageInfo;

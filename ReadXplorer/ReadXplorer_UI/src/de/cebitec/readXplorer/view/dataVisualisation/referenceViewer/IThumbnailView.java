@@ -17,7 +17,7 @@
 package de.cebitec.readXplorer.view.dataVisualisation.referenceViewer;
 
 import de.cebitec.readXplorer.controller.ViewController;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import java.awt.event.MouseEvent;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
@@ -31,7 +31,7 @@ public interface IThumbnailView {
      * @param feature
      * @param refViewer the currently viewed ReferenceViewer
      */
-    public void addFeatureToList(PersistantFeature feature, ReferenceViewer refViewer);
+    public void addFeatureToList(PersistentFeature feature, ReferenceViewer refViewer);
 
     public void showThumbnailView(ReferenceViewer refViewer);
 
@@ -39,9 +39,9 @@ public interface IThumbnailView {
 
     public void removeAllFeatures(ReferenceViewer refViewer);
 
-    public void removeCertainFeature(PersistantFeature feature);
+    public void removeCertainFeature(PersistentFeature feature);
 
-    public void showPopUp(PersistantFeature feature, ReferenceViewer refViewer, MouseEvent e, JPopupMenu popUp);
+    public void showPopUp(PersistentFeature feature, ReferenceViewer refViewer, MouseEvent e, JPopupMenu popUp);
 
     public void showTablePopUp(JTable table, ReferenceViewer refViewer, MouseEvent e);
 

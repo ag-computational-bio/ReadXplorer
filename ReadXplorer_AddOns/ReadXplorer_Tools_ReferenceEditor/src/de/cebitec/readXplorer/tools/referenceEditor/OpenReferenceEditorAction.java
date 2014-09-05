@@ -16,20 +16,36 @@
  */
 package de.cebitec.readXplorer.tools.referenceEditor;
 
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+/**
+ * Action for opening a reference editor.
+ * 
+ * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ */
 public final class OpenReferenceEditorAction implements ActionListener {
 
     private final ReferenceViewer context;
 
+    /**
+     * Action for opening a reference editor.
+     * @param context The reference associated to the reference editor
+     */
     public OpenReferenceEditorAction(ReferenceViewer context) {
         this.context = context;
     }
 
     @Override
     public void actionPerformed(ActionEvent ev) {
-        ReferenceEditor referenceEditor = new ReferenceEditor(context.getReference());
+        PersistentReference reference = this.context.getReference();
+        ReferenceEditorTopComponent referenceEditor = new ReferenceEditorTopComponent();
+        referenceEditor.setName("Reference editor of ".concat(reference.getName()));
+        referenceEditor.setReference(reference);
+        referenceEditor.open();
+        referenceEditor.requestActive();
+        referenceEditor.toFront();
     }
 }

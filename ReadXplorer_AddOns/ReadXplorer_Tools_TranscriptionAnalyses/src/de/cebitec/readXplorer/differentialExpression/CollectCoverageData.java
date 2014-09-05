@@ -17,9 +17,9 @@
 package de.cebitec.readXplorer.differentialExpression;
 
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
-import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistant;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
+import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistent;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
 import de.cebitec.readXplorer.util.Observer;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,13 +36,13 @@ public class CollectCoverageData implements Observer {
     /**
      * The whole set of features for the current genome.
      */
-    private final List<PersistantFeature> genomeFeatures;
+    private final List<PersistentFeature> genomeFeatures;
     /**
      * The storage holding the collected coverage data, also named count data.
      * The Key value of this HashMap is the ID of the feature. The value value
      * represents the corresponding number of counted coverage data.
      */
-    private final Map<PersistantFeature, Integer> countData = new HashMap<>();
+    private final Map<PersistentFeature, Integer> countData = new HashMap<>();
     /**
      * Adjusts how many bases downstream from the start position of a feature a
      * mapping should still be considered a hit. The features in the database are
@@ -67,7 +67,7 @@ public class CollectCoverageData implements Observer {
      * @param perfAnalysis Instance of the calling instance of
      * DeAnalysisHandler.
      */
-    public CollectCoverageData(List<PersistantFeature> genomeFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams) {
+    public CollectCoverageData(List<PersistentFeature> genomeFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams) {
         this.genomeFeatures = genomeFeatures;
         this.startOffset = startOffset;
         this.stopOffset = stopOffset;
@@ -80,11 +80,11 @@ public class CollectCoverageData implements Observer {
      *
      * @param mappings the mappings
      */
-    private void updateReadCountForFeatures(MappingResultPersistant result) {
-        List<PersistantMapping> mappings = result.getMappings();
+    private void updateReadCountForFeatures(MappingResultPersistent result) {
+        List<Mapping> mappings = result.getMappings();
         Collections.sort(mappings);
         int lastMappingIdx = 0;
-        PersistantFeature feature;
+        PersistentFeature feature;
         boolean fstFittingMapping;
         boolean isStrandBothOption = readClassParams.isStrandBothOption();
         boolean isFeatureStrand = readClassParams.isStrandFeatureOption();
@@ -104,7 +104,7 @@ public class CollectCoverageData implements Observer {
                     countData.put(feature, 0);
                 }
                 for (int j = lastMappingIdx; j < mappings.size(); ++j) {
-                    PersistantMapping mapping = mappings.get(j);
+                    Mapping mapping = mappings.get(j);
                     //If the orientation of the read does not matter this one is always true.
                     //mappings identified within a feature
                     if (mapping.getStop() > featStart && mapping.getStart() < featStop) {
@@ -128,13 +128,13 @@ public class CollectCoverageData implements Observer {
 
     @Override
     public void update(Object args) {
-        if (args instanceof MappingResultPersistant) {
-            MappingResultPersistant result = (MappingResultPersistant) args;
+        if (args instanceof MappingResultPersistent) {
+            MappingResultPersistent result = (MappingResultPersistent) args;
             updateReadCountForFeatures(result);
         }
     }
 
-    public Map<PersistantFeature, Integer> getCountData() {
+    public Map<PersistentFeature, Integer> getCountData() {
         return countData;
     }
 }

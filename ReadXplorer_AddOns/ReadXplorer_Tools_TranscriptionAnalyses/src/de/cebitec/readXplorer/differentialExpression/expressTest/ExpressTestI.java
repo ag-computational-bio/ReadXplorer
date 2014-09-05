@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression.expressTest;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import java.util.List;
 import java.util.Vector;
 
@@ -34,7 +34,7 @@ public interface ExpressTestI {
      * @throws IllegalArgumentException if not all arrays have a proper
      * dimension
      */
-    public void performAnalysis(PersistantFeature[] regionNames, int[] start, int[] stop, int[][] groupA, int[][] groupB, double cutOff) throws IllegalArgumentException;
+    public void performAnalysis(PersistentFeature[] regionNames, int[] start, int[] stop, int[][] groupA, int[][] groupB, double cutOff) throws IllegalArgumentException;
 
     /**
      * Adds a new observer listening for results.

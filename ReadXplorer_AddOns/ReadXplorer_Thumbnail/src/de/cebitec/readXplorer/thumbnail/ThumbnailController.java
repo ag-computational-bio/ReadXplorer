@@ -23,8 +23,8 @@ import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI.UserCanceledTrac
 import de.cebitec.readXplorer.databackend.connector.MultiTrackConnector;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.thumbnail.Actions.ASyncSliderCookie;
 import de.cebitec.readXplorer.thumbnail.Actions.OpenThumbCookie;
 import de.cebitec.readXplorer.thumbnail.Actions.RemoveCookie;
@@ -95,14 +95,14 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     private ThumbNailViewTopComponent activeTopComp;
     private ReferenceViewer activeViewer;
     //Gives access to all Features which are displayed for a referenceViewer
-    private HashMap<ReferenceViewer, List<PersistantFeature>> selectedFeatures;
+    private HashMap<ReferenceViewer, List<PersistentFeature>> selectedFeatures;
     //Gives access to all BasePanels for Feature
-    private HashMap<PersistantFeature, List<BasePanel>> featureToTrackpanelList;
-    //Gives access to PersistantTrack from BasePanel
-    private HashMap<BasePanel, PersistantTrack> trackPanelToTrack;
+    private HashMap<PersistentFeature, List<BasePanel>> featureToTrackpanelList;
+    //Gives access to PersistentTrack from BasePanel
+    private HashMap<BasePanel, PersistentTrack> trackPanelToTrack;
     //Gives access to LayoutWidget for currentFeature
-    private HashMap<PersistantFeature, Widget> featureToLayoutWidget;
-    private PersistantFeature currentFeature;
+    private HashMap<PersistentFeature, Widget> featureToLayoutWidget;
+    private PersistentFeature currentFeature;
     private ViewController controller;
     private InstanceContent content;
     //Controller of ThumbnailController
@@ -228,7 +228,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         //synchronize all Sliders for all RefrenceViewer's ThumbnailViewTopComponents
         for (ReferenceViewer oneViewer : refThumbTopComponents.keySet()) {
             if (selectedFeatures.containsKey(oneViewer)) {
-                for (PersistantFeature feature : selectedFeatures.get(oneViewer)) {
+                for (PersistentFeature feature : selectedFeatures.get(oneViewer)) {
                     ZoomChangeListener zoomChangeListener = new ZoomChangeListener();
                     for (BasePanel bp : featureToTrackpanelList.get(feature)) {
                         try {
@@ -262,7 +262,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         //Get all associated Tracks for Reference
         ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector(controller.getCurrentRefGen().getId());
         if (activeViewer != null && selectedFeatures.containsKey(activeViewer)) {
-            for (PersistantFeature feature : selectedFeatures.get(activeViewer)) {
+            for (PersistentFeature feature : selectedFeatures.get(activeViewer)) {
                 this.addFeatureToView(feature, refCon);
             }
             if (!(WindowManager.getDefault().getRegistry().getActivated() == activeTopComp)) {
@@ -279,7 +279,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     /**
      * Creates BasePanel for one Track with TrackViewer and ZoomSlider for wrapping into ComponentWidget.
      */
-    private BasePanel createTrackPanel(PersistantTrack track, ViewController controller, CheckBoxActionListener cbListener) {
+    private BasePanel createTrackPanel(PersistentTrack track, ViewController controller, CheckBoxActionListener cbListener) {
         BoundsInfoManager boundsManager = new BoundsInfoManager(controller.getCurrentRefGen());
         BasePanel basePanel = new BasePanel(boundsManager, controller);
         basePanel.setName(track.getDescription());
@@ -328,7 +328,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
      * @param tracks Tracks to compare.
      * @return
      */
-    private BasePanel createMultipleTrackPanel(List<PersistantTrack> tracks, PersistantFeature feature) {
+    private BasePanel createMultipleTrackPanel(List<PersistentTrack> tracks, PersistentFeature feature) {
         BoundsInfoManager boundsManager = new BoundsInfoManager(controller.getCurrentRefGen());
         BasePanel b = new BasePanel(boundsManager, controller);
         controller.addMousePositionListener(b);
@@ -403,7 +403,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     }
 
     @Override
-    public void removeCertainFeature(PersistantFeature f) {
+    public void removeCertainFeature(PersistentFeature f) {
         selectedFeatures.get(activeViewer).remove(f);
         //If all Features for activeViewer have been removed it is also removed as key from the list
         if (selectedFeatures.get(activeViewer).isEmpty()) {
@@ -412,9 +412,9 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     }
 
     @Override
-    public void addFeatureToList(PersistantFeature feature, final ReferenceViewer refViewer) {
+    public void addFeatureToList(PersistentFeature feature, final ReferenceViewer refViewer) {
         if (!selectedFeatures.containsKey(refViewer)) {
-            ArrayList<PersistantFeature> list = new ArrayList<>();
+            ArrayList<PersistentFeature> list = new ArrayList<>();
             list.add(feature);
             selectedFeatures.put(refViewer, list);
         } else {
@@ -446,7 +446,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
                     //Removes all Selected Features from Scene and ArrayLists
                     if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION)) {
                         for (Object f : rfp.getSelectedValues()) {
-                            PersistantFeature feat = (PersistantFeature) f;
+                            PersistentFeature feat = (PersistentFeature) f;
                             removeCertainFeature(feat);
                             if (featureToLayoutWidget.containsKey(feat) && featureToTrackpanelList.containsKey(feat)) {
                                 activeTopComp.getScene().removeChild(featureToLayoutWidget.get(feat));
@@ -479,7 +479,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
      * @param tracks
      * @param feature
      */
-    private void compareTwoTracks(List<PersistantTrack> tracks, PersistantFeature feature) {
+    private void compareTwoTracks(List<PersistentTrack> tracks, PersistentFeature feature) {
         BasePanel bp = createMultipleTrackPanel(tracks, feature);
         bp.addMouseListener(this);
         featureToTrackpanelList.get(feature).add(bp);
@@ -534,7 +534,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     private void updateCurrentFeature(BasePanel bp) {
         ReferenceFeatureTopComp comp = ReferenceFeatureTopComp.findInstance();
         if (comp != null) {
-            for (PersistantFeature feature : featureToTrackpanelList.keySet()) {
+            for (PersistentFeature feature : featureToTrackpanelList.keySet()) {
                 if (featureToTrackpanelList.get(feature).contains(bp)) {
                     currentFeature = feature;
                     comp.showFeatureDetails(feature);
@@ -545,7 +545,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     }
 
     @Override
-    public void showPopUp(final PersistantFeature f, final ReferenceViewer viewer, MouseEvent e, final JPopupMenu popUp) {
+    public void showPopUp(final PersistentFeature f, final ReferenceViewer viewer, MouseEvent e, final JPopupMenu popUp) {
         JMenuItem addListItem = new JMenuItem(NbBundle.getMessage(ThumbnailController.class, "ThumbController.Add"));
         addListItem.addActionListener(new ActionListener() {
 
@@ -584,7 +584,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
                 if (selectedRows.length > 0) {
                     for (int i : selectedRows) {
                         int correctedRow = table.convertRowIndexToModel(i);
-                        PersistantFeature feature = (PersistantFeature) table.getModel().getValueAt(correctedRow, 0);
+                        PersistentFeature feature = (PersistentFeature) table.getModel().getValueAt(correctedRow, 0);
                         addFeatureToList(feature, refViewer);
                     }
                 }
@@ -651,7 +651,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
      * @param feature
      * @param refCon
      */
-    private void addFeatureToView(PersistantFeature feature, ReferenceConnector refCon) {
+    private void addFeatureToView(PersistentFeature feature, ReferenceConnector refCon) {
         this.currentFeature = feature;
         //Create LayoutWidget to layout all Tracks for a feature in GridLayout
         Widget layoutWidg = new Widget(activeTopComp.getScene());
@@ -661,7 +661,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         //Save all BasePanels for feature in List to put into HashMap
         List<BasePanel> bps = new ArrayList<>();
         CheckBoxActionListener cbListener = new CheckBoxActionListener();
-        for (PersistantTrack track : refCon.getAssociatedTracks()) {
+        for (PersistentTrack track : refCon.getAssociatedTracks()) {
             BasePanel trackPanel = createTrackPanel(track, controller, cbListener);
             if (trackPanel != null) {
                 bps.add(trackPanel);
@@ -706,7 +706,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         void startCompare(ActionEvent e) {
             try {
                 BasePanel secondTrackBP = (BasePanel) ((Component) e.getSource()).getParent().getParent();
-                ArrayList<PersistantTrack> trackList = new ArrayList<>();
+                ArrayList<PersistentTrack> trackList = new ArrayList<>();
                 trackList.add(trackPanelToTrack.get(firstTrackPanelToCompare));
                 trackList.add(trackPanelToTrack.get(secondTrackBP));
                 compareTwoTracks(trackList, currentFeature);

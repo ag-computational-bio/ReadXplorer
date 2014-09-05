@@ -6,7 +6,7 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.main;
  * Created on 27.01.2012, 14:31:03
  */
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.OperonAdjacency;
@@ -65,7 +65,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel implements Obse
     public final TableType tableType = TableType.OPERON_TABLE;
     private BoundsInfoManager boundsInfoManager;
     private ReferenceViewer referenceViewer;
-    private PersistantReference persistantRef;
+    private PersistentReference persistantRef;
     private OperonDetectionResult operonResult;
     private HashMap<String, Object> operonDetStats;
     private final TableRightClickFilter<UneditableTableModel> tableFilter;
@@ -579,7 +579,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel implements Obse
                     TableComparatorProvider.setStringComparator(sorter, 4);
                     TableComparatorProvider.setStringComparator(sorter, 5);
 
-                    TableComparatorProvider.setPersistantTrackComparator(sorter, 3);
+                    TableComparatorProvider.setPersistentTrackComparator(sorter, 3);
 
                     operonDetStats.put(OPERONS_TOTAL, (Integer) operonDetStats.get(OPERONS_TOTAL) + operons.size());
                     operonDetStats.put(OPERONS_TWO_GENES, (Integer) operonDetStats.get(OPERONS_TWO_GENES) + numberOfTwoGenesOperons);
@@ -615,7 +615,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel implements Obse
         this.referenceViewer = referenceViewer;
     }
 
-    public void setPersistantReference(PersistantReference reference) {
+    public void setPersistentReference(PersistentReference reference) {
         this.persistantRef = reference;
     }
 

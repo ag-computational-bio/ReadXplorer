@@ -17,6 +17,8 @@
 package de.cebitec.readXplorer.view.dialogMenus;
 
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
+import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readXplorer.util.classification.MappingClass;
 import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbPreferences;
@@ -32,6 +34,9 @@ public class SelectReadClassWizardPanel extends ChangeListeningWizardPanel {
     public static final String PROP_PERFECT_SELECTED = "PerfectSelected";
     public static final String PROP_BEST_MATCH_SELECTED = "BestMatchSelected";
     public static final String PROP_COMMON_MATCH_SELECTED = "CommonMatchSelected";
+    public static final String PROP_SINGLE_PERFECT_SELECTED = "SinglePerfectSelected";
+    public static final String PROP_SINGLE_BEST_MATCH_SELECTED = "SingleBestMatchSelected";
+    public static final String PROP_SINGLE_COMMON_MATCH_SELECTED = "SingleCommonMatchSelected";
     public static final String PROP_UNIQUE_SELECTED = "UniqueSelected";
     public static final String PROP_MIN_MAPPING_QUAL = "minMapQual";
     public static final String PROP_STRAND_OPTION = "strandOption";
@@ -89,16 +94,22 @@ public class SelectReadClassWizardPanel extends ChangeListeningWizardPanel {
      * @param readClassParams The parameters to store
      */
     private void storePrefs(ParametersReadClasses readClassParams) {
-        String isPerfectSelected = readClassParams.isPerfectMatchUsed() ? "1" : "0";
-        String isBestMatchSelected = readClassParams.isBestMatchUsed() ? "1" : "0";
-        String isCommonMatchSelected = readClassParams.isCommonMatchUsed() ? "1" : "0";
-        String isUniqueSelected = readClassParams.isOnlyUniqueReads() ? "1" : "0";
+        String isPerfectSelected = readClassParams.isClassificationAllowed(MappingClass.PERFECT_MATCH) ? "1" : "0";
+        String isBestMatchSelected = readClassParams.isClassificationAllowed(MappingClass.BEST_MATCH) ? "1" : "0";
+        String isCommonMatchSelected = readClassParams.isClassificationAllowed(MappingClass.COMMON_MATCH) ? "1" : "0";
+        String isSinglePerfectSelected = readClassParams.isClassificationAllowed(MappingClass.SINGLE_PERFECT_MATCH) ? "1" : "0";
+        String isSingleBestMatchSelected = readClassParams.isClassificationAllowed(MappingClass.SINGLE_BEST_MATCH) ? "1" : "0";
+        String isSingleCommonMatchSelected = readClassParams.isClassificationAllowed(MappingClass.SINGLE_COMMON_MATCH) ? "1" : "0";
+        String isUniqueSelected = readClassParams.isClassificationAllowed(FeatureType.MULTIPLE_MAPPED_READ) ? "1" : "0";
         String minMappingQuality = String.valueOf(readClassParams.getMinMappingQual());
         String strandOption = String.valueOf(readClassParams.getStrandOption());
         Preferences pref = NbPreferences.forModule(Object.class);
         pref.put(wizardName + PROP_PERFECT_SELECTED, isPerfectSelected);
         pref.put(wizardName + PROP_BEST_MATCH_SELECTED, isBestMatchSelected);
         pref.put(wizardName + PROP_COMMON_MATCH_SELECTED, isCommonMatchSelected);
+        pref.put(wizardName + PROP_SINGLE_PERFECT_SELECTED, isSinglePerfectSelected);
+        pref.put(wizardName + PROP_SINGLE_BEST_MATCH_SELECTED, isSingleBestMatchSelected);
+        pref.put(wizardName + PROP_SINGLE_COMMON_MATCH_SELECTED, isSingleCommonMatchSelected);
         pref.put(wizardName + PROP_UNIQUE_SELECTED, isUniqueSelected);
         pref.put(wizardName + PROP_MIN_MAPPING_QUAL, minMappingQuality);
         pref.put(wizardName + PROP_STRAND_OPTION, strandOption);

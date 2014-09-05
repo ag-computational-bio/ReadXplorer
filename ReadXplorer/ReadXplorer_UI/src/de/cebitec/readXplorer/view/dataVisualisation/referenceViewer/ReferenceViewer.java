@@ -18,11 +18,11 @@ package de.cebitec.readXplorer.view.dataVisualisation.referenceViewer;
 
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeatureI;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeatureI;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.ColorProperties;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.polyTree.Node;
 import de.cebitec.readXplorer.util.polyTree.NodeVisitor;
 import de.cebitec.readXplorer.util.polyTree.Polytree;
@@ -65,10 +65,10 @@ public class ReferenceViewer extends AbstractViewer {
      * Creates a new reference viewer. 
      * @param boundsInfoManager the global bounds info manager 
      * @param basePanel the base panel
-     * @param refGenome the persistant reference, which is always accessible through the getReference 
+     * @param refGenome the persistent reference, which is always accessible through the getReference 
      *      method in any abstract viewer.
      */
-    public ReferenceViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGenome) {
+    public ReferenceViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistentReference refGenome) {
         super(boundsInfoManager, basePanel, refGenome);
         this.features = new ArrayList<>();
         this.refGenConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenome.getId());
@@ -106,7 +106,7 @@ public class ReferenceViewer extends AbstractViewer {
 
         //only recalculate if reading frame was switched
         if (selectedFeature == null || this.getSequenceBar().getFrameCurrFeature()
-                != PersistantFeature.Utils.determineFrame(selectedFeature.getPersistantFeature())) {
+                != PersistentFeature.Utils.determineFrame(selectedFeature.getPersistentFeature())) {
             this.getSequenceBar().findCodons(); //update codons for current selection
         }
     }
@@ -152,14 +152,14 @@ public class ReferenceViewer extends AbstractViewer {
             this.add(this.getChromSelectionPanel());
         }
 
-        List<PersistantFeature> featureList = refGenConnector.getFeaturesForRegion(
+        List<PersistentFeature> featureList = refGenConnector.getFeaturesForRegion(
                 getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight(), FeatureType.ANY, this.getReference().getActiveChromId());
-        List<Polytree> featureTrees = PersistantFeature.Utils.createFeatureTrees(featureList);
+        List<Polytree> featureTrees = PersistentFeature.Utils.createFeatureTrees(featureList);
         
         int frame = 0;
         for (Polytree featTree : featureTrees) { //this means if two roots are on different frames, 
             for (Node root : featTree.getRoots()) { //all children are painted on the frame of the last root node
-                frame = PersistantFeature.Utils.determineFrame((PersistantFeature) root); 
+                frame = PersistentFeature.Utils.determineFrame((PersistentFeature) root); 
             }
             PaintNodeVisitor paintVisitor = new PaintNodeVisitor(frame);
             featTree.bottomUp(paintVisitor);
@@ -178,7 +178,7 @@ public class ReferenceViewer extends AbstractViewer {
      * about the currently viewed reference interval.
      * @param feature the feature to register
      */
-    private void registerFeatureInStats(PersistantFeatureI feature) {
+    private void registerFeatureInStats(PersistentFeatureI feature) {
         FeatureType type = feature.getType();
         if (!this.featureStats.containsKey(type)) {
             this.featureStats.put(type, 0);
@@ -190,7 +190,7 @@ public class ReferenceViewer extends AbstractViewer {
      * Creates a feature component for a given feature and adds it to the reference viewer.
      * @param feature the feature to add to the viewer.
      */
-    private void addFeatureComponent(PersistantFeature feature) {
+    private void addFeatureComponent(PersistentFeature feature) {
         int frame = feature.getFrame();
         int yCoord = this.determineYFromFrame(frame);
         PaintingAreaInfo bounds = getPaintingAreaInfo();
@@ -223,7 +223,7 @@ public class ReferenceViewer extends AbstractViewer {
             jFeature.setBounds((int) phyStart, yFrom, jFeature.getSize().width, jFeature.getHeight());
 
             if (selectedFeature != null) {
-                if (feature.getId() == selectedFeature.getPersistantFeature().getId()) {
+                if (feature.getId() == selectedFeature.getPersistentFeature().getId()) {
                     setSelectedFeature(jFeature);
                 }
             }
@@ -390,8 +390,8 @@ public class ReferenceViewer extends AbstractViewer {
         
         @Override
         public void visit(Node node) {
-            if (node instanceof PersistantFeature) {
-                PersistantFeature feature = (PersistantFeature) node;
+            if (node instanceof PersistentFeature) {
+                PersistentFeature feature = (PersistentFeature) node;
                 feature.setFrame(frame);
                 addFeatureComponent(feature);
                 registerFeatureInStats(feature);

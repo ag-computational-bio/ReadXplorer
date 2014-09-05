@@ -3,7 +3,7 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.StartCodon;
 import de.cebitec.readXplorer.transcriptomeAnalyses.verifier.DoubleVerifier;
 import de.cebitec.readXplorer.transcriptomeAnalyses.verifier.IntegerVerifier;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.HashSet;

@@ -16,10 +16,8 @@
  */
 package de.cebitec.readXplorer.ui.importer.actions;
 
-import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readXplorer.api.cookies.LoginCookie;
-import de.cebitec.readXplorer.controller.ViewController;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.parser.common.ParsingException;
 import de.cebitec.readXplorer.parser.tables.CsvTableParser;
 import de.cebitec.readXplorer.parser.tables.TableParserI;
@@ -27,7 +25,7 @@ import de.cebitec.readXplorer.parser.tables.TableType;
 import de.cebitec.readXplorer.parser.tables.XlsTranscriptomeTableParser;
 import de.cebitec.readXplorer.ui.importer.TranscriptomeTableViewI;
 import de.cebitec.readXplorer.ui.importer.dataTable.ImportTableWizardPanel;
-import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
+import de.cebitec.readXplorer.ui.visualisation.TableVisualizationHelper;
 import de.cebitec.readXplorer.util.UneditableTableModel;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readXplorer.view.tableVisualization.PosTablePanel;
@@ -38,7 +36,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import javax.swing.JOptionPane;
@@ -95,7 +92,7 @@ public final class ImportTableWizardAction implements ActionListener {
             final TableType tableType = (TableType) wiz.getProperty(ImportTableWizardPanel.PROP_TABLE_TYPE);
             final String fileLocation = (String) wiz.getProperty(ImportTableWizardPanel.PROP_SELECTED_FILE);
             final String statsFileLocation = (String) wiz.getProperty(ImportTableWizardPanel.PROP_SELECTED_STATS_FILE);
-            final PersistantReference ref = (PersistantReference) wiz.getProperty(ImportTableWizardPanel.PROP_SELECTED_REF);
+            final PersistentReference ref = (PersistentReference) wiz.getProperty(ImportTableWizardPanel.PROP_SELECTED_REF);
             final boolean autoDelimiter = (boolean) wiz.getProperty(ImportTableWizardPanel.PROP_AUTO_DELEMITER);
             final CsvPreference csvPref = (CsvPreference) wiz.getProperty(ImportTableWizardPanel.PROP_SEL_PREF);
             final TableParserI parser = (TableParserI) wiz.getProperty(ImportTableWizardPanel.PROP_SEL_PARSER);
@@ -150,7 +147,7 @@ public final class ImportTableWizardAction implements ActionListener {
                             PosTablePanel tablePanel = new PosTablePanel(tableModel, tableType);
                             tablePanel.setReferenceGenome(ref);
 //                            tablePanel.setTableType(tableType);
-                            checkAndOpenRefViewer(ref, tablePanel);
+                            TableVisualizationHelper.checkAndOpenRefViewer(ref, tablePanel);
 
                             String panelName = "Imported table from: " + tableFile.getName();
                             topComp = (TableTopComponent) WindowManager.getDefault().findTopComponent("TableTopComponent");
@@ -167,27 +164,4 @@ public final class ImportTableWizardAction implements ActionListener {
         }
     }
 
-    private void checkAndOpenRefViewer(PersistantReference ref, PosTablePanel tablePanel) {
-        @SuppressWarnings("unchecked")
-        Collection<ViewController> viewControllers = (Collection<ViewController>) CentralLookup.getDefault().lookupAll(ViewController.class);
-        boolean alreadyOpen = false;
-        for (ViewController tmpVCon : viewControllers) {
-            if (tmpVCon.getCurrentRefGen().equals(ref)) {
-                alreadyOpen = true;
-                tablePanel.setBoundsInfoManager(tmpVCon.getBoundsManager());
-                break;
-            }
-        }
-
-        if (!alreadyOpen) {
-            //open reference genome now
-            AppPanelTopComponent appPanelTopComponent = new AppPanelTopComponent();
-            appPanelTopComponent.open();
-            ViewController viewController = appPanelTopComponent.getLookup().lookup(ViewController.class);
-            viewController.openGenome(ref);
-            appPanelTopComponent.setName(viewController.getDisplayName());
-            appPanelTopComponent.requestActive();
-            tablePanel.setBoundsInfoManager(viewController.getBoundsManager());
-        }
-    }
 }

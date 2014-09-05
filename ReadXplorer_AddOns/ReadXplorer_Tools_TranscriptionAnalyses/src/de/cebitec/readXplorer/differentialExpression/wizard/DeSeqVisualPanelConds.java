@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -25,10 +25,10 @@ import javax.swing.JPanel;
 
 public final class DeSeqVisualPanelConds extends JPanel {
 
-    private DefaultListModel<PersistantTrack> trackListModel = new DefaultListModel<>();
-    private DefaultListModel<PersistantTrack> conditionOneModel = new DefaultListModel<>();
-    private DefaultListModel<PersistantTrack> conditionTwoModel = new DefaultListModel<>();
-    private List<PersistantTrack> selectedTracks = new ArrayList<>();
+    private DefaultListModel<PersistentTrack> trackListModel = new DefaultListModel<>();
+    private DefaultListModel<PersistentTrack> conditionOneModel = new DefaultListModel<>();
+    private DefaultListModel<PersistentTrack> conditionTwoModel = new DefaultListModel<>();
+    private List<PersistentTrack> selectedTracks = new ArrayList<>();
     private String[] conds;
     private List<Integer> groupA = new ArrayList<>();
     private List<Integer> groupB = new ArrayList<>();
@@ -45,7 +45,7 @@ public final class DeSeqVisualPanelConds extends JPanel {
         return "Select conditions";
     }
 
-    public void updateTrackList(List<PersistantTrack> selectedTracks) {
+    public void updateTrackList(List<PersistentTrack> selectedTracks) {
         if (!this.selectedTracks.equals(selectedTracks)) {
             this.selectedTracks = selectedTracks;
             trackListModel.clear();
@@ -54,9 +54,9 @@ public final class DeSeqVisualPanelConds extends JPanel {
             groupA.clear();
             groupB.clear();
             conds = new String[selectedTracks.size()];
-            for (Iterator<PersistantTrack> it = selectedTracks.iterator(); it.hasNext();) {
-                PersistantTrack persistantTrack = it.next();
-                trackListModel.addElement(persistantTrack);
+            for (Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext();) {
+                PersistentTrack persistentTrack = it.next();
+                trackListModel.addElement(persistentTrack);
             }
         }
     }
@@ -213,58 +213,58 @@ public final class DeSeqVisualPanelConds extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void addToConditionOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addToConditionOneActionPerformed
-        List<PersistantTrack> tracks = trackList.getSelectedValuesList();
-        for (Iterator<PersistantTrack> it = tracks.iterator(); it.hasNext();) {
-            PersistantTrack persistantTrack = it.next();
-            trackListModel.removeElement(persistantTrack);
-            conditionOneModel.addElement(persistantTrack);
-            conds[selectedTracks.indexOf(persistantTrack)] = "ONE";
+        List<PersistentTrack> tracks = trackList.getSelectedValuesList();
+        for (Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext();) {
+            PersistentTrack persistentTrack = it.next();
+            trackListModel.removeElement(persistentTrack);
+            conditionOneModel.addElement(persistentTrack);
+            conds[selectedTracks.indexOf(persistentTrack)] = "ONE";
             //Java indexing starts at 0 but these values will be passed directly to
             //Gnu R and should correspond to the columns of the count data. Therefore
             //you have to add one to the index used by Java.
-            groupA.add((Integer) (selectedTracks.indexOf(persistantTrack) + 1));
+            groupA.add((Integer) (selectedTracks.indexOf(persistentTrack) + 1));
         }
     }//GEN-LAST:event_addToConditionOneActionPerformed
 
     private void addToConditionTwoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addToConditionTwoActionPerformed
-        List<PersistantTrack> tracks = trackList.getSelectedValuesList();
-        for (Iterator<PersistantTrack> it = tracks.iterator(); it.hasNext();) {
-            PersistantTrack persistantTrack = it.next();
-            trackListModel.removeElement(persistantTrack);
-            conditionTwoModel.addElement(persistantTrack);
-            conds[selectedTracks.indexOf(persistantTrack)] = "TWO";
+        List<PersistentTrack> tracks = trackList.getSelectedValuesList();
+        for (Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext();) {
+            PersistentTrack persistentTrack = it.next();
+            trackListModel.removeElement(persistentTrack);
+            conditionTwoModel.addElement(persistentTrack);
+            conds[selectedTracks.indexOf(persistentTrack)] = "TWO";
             //Java indexing starts at 0 but these values will be passed directly to
             //Gnu R and should correspond to the columns of the count data. Therefore
             //you have to add one to the index used by Java.
-            groupB.add((Integer) (selectedTracks.indexOf(persistantTrack) + 1));
+            groupB.add((Integer) (selectedTracks.indexOf(persistentTrack) + 1));
         }
     }//GEN-LAST:event_addToConditionTwoActionPerformed
 
     private void removeFromConditionOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeFromConditionOneActionPerformed
-        List<PersistantTrack> tracks = conditionOneList.getSelectedValuesList();
-        for (Iterator<PersistantTrack> it = tracks.iterator(); it.hasNext();) {
-            PersistantTrack persistantTrack = it.next();
-            conditionOneModel.removeElement(persistantTrack);
-            trackListModel.addElement(persistantTrack);
-            conds[selectedTracks.indexOf(persistantTrack)] = null;
+        List<PersistentTrack> tracks = conditionOneList.getSelectedValuesList();
+        for (Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext();) {
+            PersistentTrack persistentTrack = it.next();
+            conditionOneModel.removeElement(persistentTrack);
+            trackListModel.addElement(persistentTrack);
+            conds[selectedTracks.indexOf(persistentTrack)] = null;
             //Java indexing starts at 0 but these values will be passed directly to
             //Gnu R and should correspond to the columns of the count data. Therefore
             //you have to add one to the index used by Java.
-            groupA.remove((Integer) (selectedTracks.indexOf(persistantTrack) + 1));
+            groupA.remove((Integer) (selectedTracks.indexOf(persistentTrack) + 1));
         }
     }//GEN-LAST:event_removeFromConditionOneActionPerformed
 
     private void removeFromConditionTwoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeFromConditionTwoActionPerformed
-        List<PersistantTrack> tracks = conditionTwoList.getSelectedValuesList();
-        for (Iterator<PersistantTrack> it = tracks.iterator(); it.hasNext();) {
-            PersistantTrack persistantTrack = it.next();
-            conditionTwoModel.removeElement(persistantTrack);
-            trackListModel.addElement(persistantTrack);
-            conds[selectedTracks.indexOf(persistantTrack)] = null;
+        List<PersistentTrack> tracks = conditionTwoList.getSelectedValuesList();
+        for (Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext();) {
+            PersistentTrack persistentTrack = it.next();
+            conditionTwoModel.removeElement(persistentTrack);
+            trackListModel.addElement(persistentTrack);
+            conds[selectedTracks.indexOf(persistentTrack)] = null;
             //Java indexing starts at 0 but these values will be passed directly to
             //Gnu R and should correspond to the columns of the count data. Therefore
             //you have to add one to the index used by Java.
-            groupB.remove((Integer) (selectedTracks.indexOf(persistantTrack) + 1));
+            groupB.remove((Integer) (selectedTracks.indexOf(persistentTrack) + 1));
         }
     }//GEN-LAST:event_removeFromConditionTwoActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables

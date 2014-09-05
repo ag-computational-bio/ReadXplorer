@@ -18,7 +18,7 @@ package de.cebitec.readXplorer.ui.importer.dataTable;
 
 import de.cebitec.readXplorer.api.objects.JobPanel;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.parser.tables.CsvPreferenceForUsers;
 import de.cebitec.readXplorer.parser.tables.CsvTableParser;
 import de.cebitec.readXplorer.parser.tables.TableParserI;
@@ -76,7 +76,7 @@ public final class ImportTableVisualPanel extends JobPanel {
         tableComboBox = new javax.swing.JComboBox<>(new javax.swing.DefaultComboBoxModel<>(de.cebitec.readXplorer.parser.tables.TableType.values()));
         fileTextField = new javax.swing.JTextField();
         fileButton = new javax.swing.JButton();
-        PersistantReference[] refArray = new PersistantReference[0];
+        PersistentReference[] refArray = new PersistentReference[0];
         refArray = ProjectConnector.getInstance().getGenomes().toArray(refArray);
         refComboBox = new javax.swing.JComboBox<>(new DefaultComboBoxModel<>(refArray));
         tableLabel = new javax.swing.JLabel();
@@ -302,7 +302,7 @@ public final class ImportTableVisualPanel extends JobPanel {
     private javax.swing.JTextField fileTextField;
     private javax.swing.JComboBox<TableParserI> parserComboBox;
     private javax.swing.JLabel parserLabel;
-    private javax.swing.JComboBox<PersistantReference> refComboBox;
+    private javax.swing.JComboBox<PersistentReference> refComboBox;
     private javax.swing.JLabel refLabel;
     private javax.swing.JButton statsAndParamsButton;
     private javax.swing.JTextField statsAndParamsFileTextField;
@@ -342,8 +342,8 @@ public final class ImportTableVisualPanel extends JobPanel {
     /**
      * @return The reference for which the table shall be imported.
      */
-    public PersistantReference getReference() {
-        return (PersistantReference) refComboBox.getSelectedItem();
+    public PersistentReference getReference() {
+        return (PersistentReference) refComboBox.getSelectedItem();
     }
 
     /**

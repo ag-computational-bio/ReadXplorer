@@ -16,8 +16,8 @@
  */
 package de.cebitec.readXplorer.dashboard;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -68,9 +68,9 @@ public class DashboardTest {
     
     @Test
     public void testEquals() {
-        PersistantReference r1 = new PersistantReference(1, "", "", new Timestamp(111111111), new File(""));
-        PersistantReference r2 = new PersistantReference(1, "", "", new Timestamp(111111111), new File(""));
-        PersistantReference r3 = new PersistantReference(2, "", "", new Timestamp(111111111), new File(""));
+        PersistentReference r1 = new PersistentReference(1, "", "", new Timestamp(111111111), new File(""));
+        PersistentReference r2 = new PersistentReference(1, "", "", new Timestamp(111111111), new File(""));
+        PersistentReference r3 = new PersistentReference(2, "", "", new Timestamp(111111111), new File(""));
         assertTrue(r1.equals(r2));
         assertFalse(r1.equals(r3));
         
@@ -92,10 +92,10 @@ public class DashboardTest {
     
     @Test
     public void testMap2() {
-        HashMap<PersistantReference, List<PersistantTrack>> tracks_by_reference = new HashMap<>();
-        PersistantReference r1 = new PersistantReference(1, "", "", new Timestamp(111111111), new File(""));
-        PersistantReference r2 = new PersistantReference(1, "", "", new Timestamp(111111111), new File(""));
-        List<PersistantTrack> list = new ArrayList<>();
+        HashMap<PersistentReference, List<PersistentTrack>> tracks_by_reference = new HashMap<>();
+        PersistentReference r1 = new PersistentReference(1, "", "", new Timestamp(111111111), new File(""));
+        PersistentReference r2 = new PersistentReference(1, "", "", new Timestamp(111111111), new File(""));
+        List<PersistentTrack> list = new ArrayList<>();
         tracks_by_reference.put(r1, list);
         assertNotNull(tracks_by_reference.get(r2));
         

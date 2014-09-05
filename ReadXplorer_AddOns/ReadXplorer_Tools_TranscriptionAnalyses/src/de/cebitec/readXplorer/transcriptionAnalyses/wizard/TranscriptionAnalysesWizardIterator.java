@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.transcriptionAnalyses.wizard;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.view.dialogMenus.OpenTracksWizardPanel;
 import de.cebitec.readXplorer.view.dialogMenus.SelectFeatureTypeWizardPanel;
 import de.cebitec.readXplorer.view.dialogMenus.SelectReadClassWizardPanel;
@@ -297,7 +297,7 @@ public final class TranscriptionAnalysesWizardIterator implements WizardDescript
     /**
      * @return The list of track selected in this wizard.
      */
-    public List<PersistantTrack> getSelectedTracks() {
+    public List<PersistentTrack> getSelectedTracks() {
         return this.openTracksPanel.getComponent().getSelectedTracks();
     }
 

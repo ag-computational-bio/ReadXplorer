@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.databackend;
 
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.util.Set;
 
 /**

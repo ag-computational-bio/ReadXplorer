@@ -57,11 +57,7 @@ public class H2SQLStatements {
     public final static String INDEX_CHROMOSOME =
             "CREATE INDEX IF NOT EXISTS INDEXCHROMOSOM ON " + FieldNames.TABLE_CHROMOSOME 
             + " (" + FieldNames.CHROM_REFERENCE_ID + ") ";
-    
-    
-    public final static String INDEX_OBJECTCACHE =
-            "CREATE INDEX IF NOT EXISTS INDEXOBJECTCACHE ON " + FieldNames.TABLE_OBJECTCACHE + "(" + FieldNames.OBJECTCACHE_FAMILY + ", " + FieldNames.OBJECTCACHE_KEY + ") ";
-   
+       
     
     public final static String SETUP_FEATURES =
             "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_FEATURES

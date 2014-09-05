@@ -21,11 +21,10 @@ import de.cebitec.readXplorer.databackend.FieldNames;
 import de.cebitec.readXplorer.databackend.GenericSQLQueries;
 import de.cebitec.readXplorer.databackend.H2SQLStatements;
 import de.cebitec.readXplorer.databackend.MySQLStatements;
-import de.cebitec.readXplorer.databackend.ObjectCache;
 import de.cebitec.readXplorer.databackend.SQLStatements;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.parser.common.CoverageContainer;
 import de.cebitec.readXplorer.parser.common.ParsedChromosome;
 import de.cebitec.readXplorer.parser.common.ParsedFeature;
@@ -262,9 +261,6 @@ public class ProjectConnector extends Observable {
             
             con.prepareStatement(H2SQLStatements.SETUP_COUNT_DISTRIBUTION).executeUpdate();
             con.prepareStatement(H2SQLStatements.INDEX_COUNT_DIST).executeUpdate();
-            
-            con.prepareStatement(SQLStatements.SETUP_OBJECTCACHE).executeUpdate();
-            con.prepareStatement(H2SQLStatements.INDEX_OBJECTCACHE).executeUpdate();
             
             con.prepareStatement(SQLStatements.SETUP_DB_VERSION_TABLE).executeUpdate();
 
@@ -676,7 +672,7 @@ public class ProjectConnector extends Observable {
                     insertFeature.setLong(1, feature.getId());
                     insertFeature.setLong(2, chrom.getID());
                     insertFeature.setString(3, feature.getParentIdsConcat());
-                    insertFeature.setInt(4, feature.getType().getTypeInt());
+                    insertFeature.setInt(4, feature.getType().getTypeByte());
                     insertFeature.setInt(5, feature.getStart());
                     insertFeature.setInt(6, feature.getStop());
                     insertFeature.setString(7, feature.getLocusTag());
@@ -712,7 +708,7 @@ public class ProjectConnector extends Observable {
     
     /**
      * Adds a track to the database with its file path. This means, it is stored
-     * as a track for direct file access and adds the persistant track id to the 
+     * as a track for direct file access and adds the persistent track id to the 
      * track job.
      * @param track the track job containing the track information to store
      */
@@ -1025,7 +1021,7 @@ public class ProjectConnector extends Observable {
     }
 
     
-    public TrackConnector getTrackConnector(PersistantTrack track) throws FileNotFoundException {
+    public TrackConnector getTrackConnector(PersistentTrack track) throws FileNotFoundException {
         // only return new object, if no suitable connector was created before
         int trackID = track.getId();
         if (!trackConnectors.containsKey(trackID)) {
@@ -1035,10 +1031,10 @@ public class ProjectConnector extends Observable {
     }
 
     
-    public TrackConnector getTrackConnector(List<PersistantTrack> tracks, boolean combineTracks) throws FileNotFoundException {
+    public TrackConnector getTrackConnector(List<PersistentTrack> tracks, boolean combineTracks) throws FileNotFoundException {
         // makes sure the track id is not already used
         int id = 9999;
-        for (PersistantTrack track : tracks) {
+        for (PersistentTrack track : tracks) {
             id += track.getId();
         }
         // only return new object, if no suitable connector was created before
@@ -1047,7 +1043,7 @@ public class ProjectConnector extends Observable {
     }
     
 
-    public MultiTrackConnector getMultiTrackConnector(PersistantTrack track) throws FileNotFoundException {
+    public MultiTrackConnector getMultiTrackConnector(PersistentTrack track) throws FileNotFoundException {
         // only return new object, if no suitable connector was created before
         int trackID = track.getId();
         if (!multiTrackConnectors.containsKey(trackID)) { //old solution, which does not work anymore
@@ -1057,10 +1053,10 @@ public class ProjectConnector extends Observable {
     }
     
     
-    public MultiTrackConnector getMultiTrackConnector(List<PersistantTrack> tracks) throws FileNotFoundException {
+    public MultiTrackConnector getMultiTrackConnector(List<PersistentTrack> tracks) throws FileNotFoundException {
         // makes sure the track id is not already used
         int id = 9999;
-        for (PersistantTrack track : tracks) {
+        for (PersistentTrack track : tracks) {
             id += track.getId();
         }
         // only return new object, if no suitable connector was created before
@@ -1163,9 +1159,9 @@ public class ProjectConnector extends Observable {
      * objects each time the method is called.
      * @throws OutOfMemoryError 
      */
-    public List<PersistantReference> getGenomes() {
+    public List<PersistentReference> getGenomes() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Reading reference genome data from database");
-        List<PersistantReference> refGens = new ArrayList<>();
+        List<PersistentReference> refGens = new ArrayList<>();
 
         try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_GENOMES)) {
             
@@ -1178,7 +1174,7 @@ public class ProjectConnector extends Observable {
                 String fileName = rs.getString(FieldNames.REF_GEN_FASTA_FILE); //special handling for backwards compatibility with old DBs
                 fileName = fileName == null ? "" : fileName;
                 File fastaFile = new File(fileName);
-                refGens.add(new PersistantReference(id, name, description, timestamp, fastaFile));
+                refGens.add(new PersistentReference(id, name, description, timestamp, fastaFile));
             }
             rs.close();
 
@@ -1193,9 +1189,9 @@ public class ProjectConnector extends Observable {
      * for getGenomes().
      * @return Array of genomes
      */
-    public PersistantReference[] getGenomesAsArray() {
-        List<PersistantReference> references = this.getGenomes();
-        PersistantReference[] refArray = new PersistantReference[references.size()];
+    public PersistentReference[] getGenomesAsArray() {
+        List<PersistentReference> references = this.getGenomes();
+        PersistentReference[] refArray = new PersistentReference[references.size()];
         return references.toArray(refArray);
     }
 
@@ -1203,12 +1199,12 @@ public class ProjectConnector extends Observable {
      * @return A map of all tracks in the connected DB mapped on their
      * respective reference.
      */
-    public Map<PersistantReference, List<PersistantTrack>> getGenomesAndTracks() {
-        List<PersistantReference> genomes = this.getGenomes();
-        List<PersistantTrack> tracks = this.getTracks();
-        Map<Integer, List<PersistantTrack>> tracksByReferenceId = new HashMap<>();
-        for (PersistantTrack t : tracks) {
-            List<PersistantTrack> list = tracksByReferenceId.get(t.getRefGenID());
+    public Map<PersistentReference, List<PersistentTrack>> getGenomesAndTracks() {
+        List<PersistentReference> genomes = this.getGenomes();
+        List<PersistentTrack> tracks = this.getTracks();
+        Map<Integer, List<PersistentTrack>> tracksByReferenceId = new HashMap<>();
+        for (PersistentTrack t : tracks) {
+            List<PersistentTrack> list = tracksByReferenceId.get(t.getRefGenID());
             if (list == null) {
                 list = new ArrayList<>();
                 tracksByReferenceId.put(t.getRefGenID(), list);
@@ -1216,9 +1212,9 @@ public class ProjectConnector extends Observable {
             list.add(t);
         }
 
-        Map<PersistantReference, List<PersistantTrack>> tracksByReference = new HashMap<>();
-        for (PersistantReference reference : genomes) {
-            List<PersistantTrack> currentTrackList = tracksByReferenceId.get(reference.getId());
+        Map<PersistentReference, List<PersistentTrack>> tracksByReference = new HashMap<>();
+        for (PersistentReference reference : genomes) {
+            List<PersistentTrack> currentTrackList = tracksByReferenceId.get(reference.getId());
             //if the current reference genome does not have any tracks, 
             //just create an empty list
             if (currentTrackList == null) {
@@ -1235,9 +1231,9 @@ public class ProjectConnector extends Observable {
      * tracks are re-queried from the DB and returned in new, independent 
      * objects each time the method is called.
      */
-    public List<PersistantTrack> getTracks() {
+    public List<PersistentTrack> getTracks() {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Reading track data from database");
-        List<PersistantTrack> tracks = new ArrayList<>();
+        List<PersistentTrack> tracks = new ArrayList<>();
 
         try {
             PreparedStatement fetchTracks = con.prepareStatement(SQLStatements.FETCH_TRACKS);
@@ -1250,7 +1246,7 @@ public class ProjectConnector extends Observable {
                 int refGenID = rs.getInt(FieldNames.TRACK_REFERENCE_ID);
                 String filePath = rs.getString(FieldNames.TRACK_PATH);
                 int readPairId = rs.getInt(FieldNames.TRACK_READ_PAIR_ID);
-                tracks.add(new PersistantTrack(id, filePath, description, date, refGenID, -1, readPairId));
+                tracks.add(new PersistentTrack(id, filePath, description, date, refGenID, -1, readPairId));
             }
 
         } catch (SQLException ex) {
@@ -1264,9 +1260,9 @@ public class ProjectConnector extends Observable {
          * @param trackID 
          * @return The track for the given track id in a fresh track object
      */
-    public PersistantTrack getTrack(int trackID) {
+    public PersistentTrack getTrack(int trackID) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Reading track data from database");
-        PersistantTrack track = null;
+        PersistentTrack track = null;
 
         try {
             PreparedStatement fetchTracks = con.prepareStatement(SQLStatements.FETCH_TRACK);
@@ -1280,7 +1276,7 @@ public class ProjectConnector extends Observable {
                 int refGenID = rs.getInt(FieldNames.TRACK_REFERENCE_ID);
                 String filePath = rs.getString(FieldNames.TRACK_PATH);
                 int readPairId = rs.getInt(FieldNames.TRACK_READ_PAIR_ID);
-                track = new PersistantTrack(id, filePath, description, date, refGenID, readPairId);
+                track = new PersistentTrack(id, filePath, description, date, refGenID, readPairId);
             }
 
         } catch (SQLException ex) {
@@ -1321,10 +1317,6 @@ public class ProjectConnector extends Observable {
             deleteCountDistributions.execute();
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Track...");
             deleteTrack.execute();
-            
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Deleting Track Cache...");
-            ObjectCache.getInstance().deleteFamily("loadCoverage."+trackID);
-            ObjectCache.getInstance().delete(ObjectCache.getTrackCacherFieldFamily(), "Track."+trackID);
 
             con.commit();
 
@@ -1355,8 +1347,8 @@ public class ProjectConnector extends Observable {
             
             con.setAutoCommit(false);
             
-            Map<Integer,PersistantChromosome> chroms = refCon.getChromosomesForGenome();
-            for (PersistantChromosome chrom : chroms.values()) {
+            Map<Integer,PersistentChromosome> chroms = refCon.getChromosomesForGenome();
+            for (PersistentChromosome chrom : chroms.values()) {
                 
                 deleteFeatures.setLong(1, chrom.getId());
                 deleteChrom.setInt(1, chrom.getId());
@@ -1399,7 +1391,7 @@ public class ProjectConnector extends Observable {
      * @param track track whose file path has to be resetted.
      * @throws StorageException
      */
-    public void resetTrackPath(PersistantTrack track) throws StorageException {
+    public void resetTrackPath(PersistentTrack track) throws StorageException {
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Preparing statements for storing track data");
 
@@ -1430,7 +1422,7 @@ public class ProjectConnector extends Observable {
      * @param ref The reference genome, whose file shall be updated
      * @throws StorageException
      */
-    public void resetRefPath(File fastaFile, PersistantReference ref) throws StorageException {
+    public void resetRefPath(File fastaFile, PersistentReference ref) throws StorageException {
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Preparing statements for storing track data");
 
@@ -1519,10 +1511,10 @@ public class ProjectConnector extends Observable {
         //add column chromosome id to features
         this.runSqlStatement(GenericSQLQueries.genAddColumnString(FieldNames.TABLE_FEATURES, FieldNames.FEATURE_CHROMOSOME_ID, BIGINT_UNSIGNED));
         
-        List<PersistantReference> refList = this.getGenomesDbUpgrade();
+        List<PersistentReference> refList = this.getGenomesDbUpgrade();
         
         
-        for (PersistantReference ref : refList) {
+        for (PersistentReference ref : refList) {
             try (PreparedStatement fetchRefSeq = con.prepareStatement(SQLStatements.FETCH_REF_SEQ);) {
                 
                 fetchRefSeq.setInt(1, ref.getId());
@@ -1567,7 +1559,7 @@ public class ProjectConnector extends Observable {
 
                     //Update chromosome ids of the features for this reference
                     //Since there is exactly one chrom for the current genome, we can query it as follows:
-                    PersistantChromosome chrom = getRefGenomeConnector(ref.getId()).getChromosomesForGenome().values().iterator().next();
+                    PersistentChromosome chrom = getRefGenomeConnector(ref.getId()).getChromosomesForGenome().values().iterator().next();
 
                     PreparedStatement updateFeatureTable = con.prepareStatement(SQLStatements.UPDATE_FEATURE_TABLE);
                     updateFeatureTable.setInt(1, chrom.getId());
@@ -1597,9 +1589,9 @@ public class ProjectConnector extends Observable {
      * objects each time the method is called. No check of fasta files is performed
      * @throws OutOfMemoryError 
      */
-    public List<PersistantReference> getGenomesDbUpgrade() throws OutOfMemoryError {
+    public List<PersistentReference> getGenomesDbUpgrade() throws OutOfMemoryError {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Reading reference genome data from database");
-        List<PersistantReference> refGens = new ArrayList<>();
+        List<PersistentReference> refGens = new ArrayList<>();
 
         try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_GENOMES)) {
             
@@ -1612,7 +1604,7 @@ public class ProjectConnector extends Observable {
                 String fileName = rs.getString(FieldNames.REF_GEN_FASTA_FILE); //special handling for backwards compatibility with old DBs
                 fileName = fileName == null ? "" : fileName;
                 File fastaFile = new File(fileName);
-                refGens.add(new PersistantReference(id, 1, name, description, timestamp, fastaFile, false));
+                refGens.add(new PersistentReference(id, 1, name, description, timestamp, fastaFile, false));
             }
             rs.close();
 
@@ -1635,9 +1627,9 @@ public class ProjectConnector extends Observable {
      * @return Converts the given track list into a map of tracks to their track
      * id.
      */
-    public static Map<Integer, PersistantTrack> getTrackMap(List<PersistantTrack> tracks) {
-        Map<Integer, PersistantTrack> trackMap = new HashMap<>();
-        for (PersistantTrack track : tracks) {
+    public static Map<Integer, PersistentTrack> getTrackMap(List<PersistentTrack> tracks) {
+        Map<Integer, PersistentTrack> trackMap = new HashMap<>();
+        for (PersistentTrack track : tracks) {
             trackMap.put(track.getId(), track);
         }
         return trackMap;

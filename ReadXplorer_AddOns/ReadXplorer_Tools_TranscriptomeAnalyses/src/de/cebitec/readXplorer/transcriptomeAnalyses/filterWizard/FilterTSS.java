@@ -1,6 +1,6 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.filterWizard;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.FilterType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.ParameterSetFiveEnrichedAnalyses;
@@ -30,7 +30,7 @@ public class FilterTSS {
     public List<TranscriptionStart> filter(FilterType type, List<TranscriptionStart> tss, ParameterSetFiveEnrichedAnalyses params, int param) {
         List<TranscriptionStart> resultList = new ArrayList<>();
         String locus = "";
-        PersistantFeature f;
+        PersistentFeature f;
 
         if (type == FilterType.MULTIPLE) {
             Map<String, List<TranscriptionStart>> starts = new TreeMap<>();

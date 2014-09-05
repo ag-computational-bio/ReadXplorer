@@ -1,9 +1,9 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.api.objects.AnalysisI;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelTranscript;
 import de.cebitec.readXplorer.util.Observer;
 import java.util.ArrayList;
@@ -17,10 +17,10 @@ import java.util.List;
 public class NovelTranscriptDetection implements Observer, AnalysisI<List<NovelTranscript>> {
 
     private List<NovelTranscript> novelRegions;
-    private final PersistantReference refGenome;
+    private final PersistentReference refGenome;
     private int trackid;
 
-    public NovelTranscriptDetection(PersistantReference refGenome, int trackID) {
+    public NovelTranscriptDetection(PersistentReference refGenome, int trackID) {
         this.novelRegions = new ArrayList<>();
         this.refGenome = refGenome;
         this.trackid = trackID;
@@ -36,7 +36,7 @@ public class NovelTranscriptDetection implements Observer, AnalysisI<List<NovelT
      * @param params
      */
     public void runningNewRegionsDetection(HashMap<Integer, List<Integer>> forwardCDSs,
-            HashMap<Integer, List<Integer>> reverseCDSs, HashMap<Integer, PersistantFeature> allRegionsInHash,
+            HashMap<Integer, List<Integer>> reverseCDSs, HashMap<Integer, PersistentFeature> allRegionsInHash,
             StatisticsOnMappingData stats, ParameterSetWholeTranscriptAnalyses params) {
 
         // Key is flag and Value the count of this flag
@@ -45,12 +45,12 @@ public class NovelTranscriptDetection implements Observer, AnalysisI<List<NovelT
         NovelTranscript newRegion = null;
         int[][] forward = stats.getForwardReadStarts(); // Array with startsite count information for forward mapping positions.
         int[][] reverse = stats.getReverseReadStarts(); // Array with startsite count information for reverse mapping positions.
-        int[][] fwdCov = stats.getFwdCoverage(); // Array with coverage counts of mappings in forward direction.
-        int[][] revCov = stats.getRevCoverage(); // Array with coverage counts of mappings in reverse direction.
+        int[][] fwdCov = stats.getFwdCov(); // Array with coverage counts of mappings in forward direction.
+        int[][] revCov = stats.getRevCov(); // Array with coverage counts of mappings in reverse direction.
         double bg = stats.getBgThreshold(); // Background cutoff
 //        double bg = 12;
         int minLengthBoundary = params.getMinLengthBoundary();
-        for (PersistantChromosome chrom : refGenome.getChromosomes().values()) {
+        for (PersistentChromosome chrom : refGenome.getChromosomes().values()) {
             int chromId = chrom.getId();
             int chromNo = chrom.getChromNumber();
             int chromLength = chrom.getLength();
@@ -282,7 +282,7 @@ public class NovelTranscriptDetection implements Observer, AnalysisI<List<NovelT
      * @param stop stop of subsequence.
      * @return the subsequence.
      */
-    private String getSubSeq(PersistantChromosome chrom, boolean isFwd, int start, int stop) {
+    private String getSubSeq(PersistentChromosome chrom, boolean isFwd, int start, int stop) {
 
         String seq = "";
         if (start > 0 && stop < chrom.getLength()) {

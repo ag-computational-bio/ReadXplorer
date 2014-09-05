@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.transcriptionAnalyses.dataStructures;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.TrackResultEntry;
 
 /**
@@ -26,7 +26,7 @@ import de.cebitec.readXplorer.databackend.dataObjects.TrackResultEntry;
  */
 public class RPKMvalue extends TrackResultEntry {
     
-    private PersistantFeature feature;
+    private PersistentFeature feature;
     private double rpkm;
     private int readCount;
     
@@ -37,7 +37,7 @@ public class RPKMvalue extends TrackResultEntry {
      * @param readCount the raw read count for this feature
      * @param trackId the trackId for which these result values where calculated
      */
-    public RPKMvalue(PersistantFeature feature, double rpkm, int readCount, int trackId) {
+    public RPKMvalue(PersistentFeature feature, double rpkm, int readCount, int trackId) {
         super(trackId);
         this.feature = feature;
         this.rpkm = rpkm;
@@ -61,14 +61,14 @@ public class RPKMvalue extends TrackResultEntry {
     /**
      * @return the feature for which the values shall be stored.
      */
-    public PersistantFeature getFeature() {
+    public PersistentFeature getFeature() {
         return feature;
     }
 
     /**
      * @param feature feature for which the values shall be stored
      */
-    public void setFeature(PersistantFeature feature) {
+    public void setFeature(PersistentFeature feature) {
         this.feature = feature;
     }
 

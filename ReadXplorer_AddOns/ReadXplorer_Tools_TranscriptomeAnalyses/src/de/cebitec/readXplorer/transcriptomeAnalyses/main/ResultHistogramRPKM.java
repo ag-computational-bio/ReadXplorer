@@ -27,7 +27,7 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements Component
     private static final long serialVersionUID = 1L;
 
     private JFXPanel fxPanel;
-    private TopComponentExtended appPanelTopComponent;
+    private TopComponentExtended rpkmHistogramTopComp;
     private JPanel mainPanel;
     private List<RPKMvalue> rpkmValues;
     private BarChart<String, Number> barChart;
@@ -40,13 +40,13 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements Component
      */
     public ResultHistogramRPKM(List<RPKMvalue> rpkmValues) {
         this.rpkmValues = rpkmValues;
-        this.appPanelTopComponent = new TopComponentExtended();
-        this.appPanelTopComponent.setLayout(new BorderLayout());
+        this.rpkmHistogramTopComp = new TopComponentExtended();
+        this.rpkmHistogramTopComp.setLayout(new BorderLayout());
         initSwingComponents();
         initFxComponents();
-        this.appPanelTopComponent.addComponentListener(this);
-        this.appPanelTopComponent.open();
-        this.appPanelTopComponent.setName("Histogram of RPKM values");
+        this.rpkmHistogramTopComp.addComponentListener(this);
+        this.rpkmHistogramTopComp.open();
+        this.rpkmHistogramTopComp.setName("Histogram of RPKM values");
     }
 
     private void initSwingComponents() {
@@ -54,7 +54,7 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements Component
         fxPanel = new JFXPanel();
         mainPanel.setSize(300, 300);
         mainPanel.add(fxPanel, BorderLayout.CENTER);
-        this.appPanelTopComponent.add(mainPanel, BorderLayout.CENTER);
+        this.rpkmHistogramTopComp.add(mainPanel, BorderLayout.CENTER);
     }
 
     /**
@@ -180,7 +180,7 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements Component
     }
     
     public void close() {
-        this.appPanelTopComponent.close();
+        this.rpkmHistogramTopComp.close();
     }
 
     @Override

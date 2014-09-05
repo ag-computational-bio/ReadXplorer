@@ -17,9 +17,9 @@
 package de.cebitec.readXplorer.featureCoverageAnalysis;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.exporter.tables.ExportDataI;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
      * feature detection was carried out
      * @param currentTrack the track on which this analysis result was generated
      */
-    public CoveredFeatureResult(List<CoveredFeature> results, Map<Integer, PersistantTrack> trackMap, PersistantReference reference, 
+    public CoveredFeatureResult(List<CoveredFeature> results, Map<Integer, PersistentTrack> trackMap, PersistentReference reference, 
             boolean combineTracks, int trackColumn, int filterColumn) {
         super(reference, trackMap, combineTracks, trackColumn, filterColumn);
         this.results = results;
@@ -108,7 +108,7 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
         List<List<List<Object>>> coveredFeaturesExport = new ArrayList<>();
         List<List<Object>> coveredFeaturesResultList = new ArrayList<>();
 
-        PersistantFeature feature;
+        PersistentFeature feature;
         for (CoveredFeature coveredFeature : this.results) {
             List<Object> coveredFeatureRow = new ArrayList<>();
             feature = coveredFeature.getCoveredFeature();

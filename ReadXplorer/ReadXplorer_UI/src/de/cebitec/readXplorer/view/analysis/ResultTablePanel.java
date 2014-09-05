@@ -20,7 +20,7 @@ import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.view.tableVisualization.TablePanel;
 
 /**
- * This panel is a basic result panel for showing a PersistantResult.
+ * This panel is a basic result panel for showing a PersistentResult.
  * It shall be used for creating any kind of result panels for analysis 
  * functions.
  * 
@@ -30,7 +30,7 @@ public abstract class ResultTablePanel extends TablePanel {
     private static final long serialVersionUID = 1L;
 
     /**
-     * This panel is a result panel for showing a PersistantResult. It shall be
+     * This panel is a result panel for showing a PersistentResult. It shall be
      * used for creating any kind of result panels for analysis functions.
      */
     public ResultTablePanel() {

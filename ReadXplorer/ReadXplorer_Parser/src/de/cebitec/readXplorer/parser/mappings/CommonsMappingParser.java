@@ -24,6 +24,7 @@ import de.cebitec.readXplorer.parser.common.RefSeqFetcher;
 import de.cebitec.readXplorer.util.MessageSenderI;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.SequenceUtils;
+import de.cebitec.readXplorer.util.classification.MappingClass;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -697,53 +698,6 @@ public final class CommonsMappingParser {
     
     /**
      * Adds the classification data (type and number of mapped positions) to the
-     * sam record. Use this method, if the number of differences is already
-     * known. No data is added to reads, which do not occur in the 
-     * classification map.
-     * @param record the sam record to update
-     * @param differences the number of differences the record has to the
-     * reference
-     * @param classificationMap the classification map from which the 
-     * classification data has to be retrieved
-     * @throws AssertionError
-     */
-    public static void addClassificationData(SAMRecord record, int differences,
-            Map<String, ParsedClassification> classificationMap) throws AssertionError {
-        
-        String readName = CommonsMappingParser.elongatePairedReadName(record);
-        ParsedClassification classification;
-        int nextMappingPos;
-        if (classificationMap.get(readName) != null) {
-            classification = classificationMap.get(readName);
-            int lowestDiffRate = classification.getMinMismatches();
-
-            nextMappingPos = classification.getNextMappingStart(record.getAlignmentStart());
-
-            if (nextMappingPos > 0) {
-                record.setAttribute(SAMTag.CP.name(), nextMappingPos);
-                record.setAttribute(SAMTag.CC.name(), "=");
-            }
-
-            if (differences == 0) { //perfect mapping
-                record.setAttribute(Properties.TAG_READ_CLASS, Properties.PERFECT_COVERAGE);
-
-            } else if (differences == lowestDiffRate) { //best match mapping
-                record.setAttribute(Properties.TAG_READ_CLASS, Properties.BEST_MATCH_COVERAGE);
-
-            } else if (differences > lowestDiffRate) { //common mapping
-                record.setAttribute(Properties.TAG_READ_CLASS, Properties.COMPLETE_COVERAGE);
-
-            } else { //meaning: differences < lowestDiffRate
-                throw new AssertionError("Cannot contain less than the lowest diff rate number of errors!");
-            }
-            record.setAttribute(Properties.TAG_MAP_COUNT, classification.getNumberOccurrences());
-        } else {
-            //currently no data is added to reads with errors, since they are not contained in the classification map
-        }
-    }
-    
-    /**
-     * Adds the classification data (type and number of mapped positions) to the
      * sam records. Use this method, if the number of differences is already
      * known.
      * @param recordToDiffMap map of sam records to their number of mismatches
@@ -754,32 +708,63 @@ public final class CommonsMappingParser {
     public static void addClassificationData(Map<SAMRecord, Integer> recordToDiffMap,
             ParsedClassification classification) throws AssertionError {
 
+        int lowestDiffRate = classification.getMinMismatches();
+        Map<Integer, Integer> mismatchCountMap = classification.getMismatchCountMap();
+        
         for (Map.Entry<SAMRecord, Integer> entry : recordToDiffMap.entrySet()) {
             SAMRecord record = entry.getKey();
             Integer differences = entry.getValue();
-            int lowestDiffRate = classification.getMinMismatches();
             int nextMappingPos = classification.getNextMappingStart(record.getAlignmentStart());
             
             if (nextMappingPos > 0) {
                 record.setAttribute(SAMTag.CP.name(), nextMappingPos);
                 record.setAttribute(SAMTag.CC.name(), "=");
             }
+            
+            int sameMismatchCount = 1;
+            if (mismatchCountMap.containsKey(differences)) {
+                sameMismatchCount = mismatchCountMap.get(differences);
+            }
+            
             if (differences == 0) { //perfect mapping
-                record.setAttribute(Properties.TAG_READ_CLASS, Properties.PERFECT_COVERAGE);
+                if (sameMismatchCount == 1) {
+                    record.setAttribute(Properties.TAG_READ_CLASS, MappingClass.SINGLE_PERFECT_MATCH.getTypeByte());
+                } else {
+                    record.setAttribute(Properties.TAG_READ_CLASS, MappingClass.PERFECT_MATCH.getTypeByte());
+                }
 
             } else if (differences == lowestDiffRate) { //best match mapping
-                record.setAttribute(Properties.TAG_READ_CLASS, Properties.BEST_MATCH_COVERAGE);
+                if (sameMismatchCount == 1) {
+                    record.setAttribute(Properties.TAG_READ_CLASS, MappingClass.SINGLE_BEST_MATCH.getTypeByte());
+                } else {
+                    record.setAttribute(Properties.TAG_READ_CLASS, MappingClass.BEST_MATCH.getTypeByte());
+                }
 
             } else if (differences > lowestDiffRate) { //common mapping
-                record.setAttribute(Properties.TAG_READ_CLASS, Properties.COMPLETE_COVERAGE);
+                if (classification.isSingleCommonMatch(differences)) {
+                    record.setAttribute(Properties.TAG_READ_CLASS, MappingClass.SINGLE_COMMON_MATCH.getTypeByte());
+                } else {
+                    record.setAttribute(Properties.TAG_READ_CLASS, MappingClass.COMMON_MATCH.getTypeByte());
+                }
 
             } else { //meaning: differences < lowestDiffRate
-                throw new AssertionError("Cannot contain less than the lowest diff rate number of errors!");
+                throw new AssertionError("Cannot contain less than the lowest diff rate number of differences!");
             }
             record.setAttribute(Properties.TAG_MAP_COUNT, classification.getNumberOccurrences());
         }
     }
     
+    /**
+     * Adds the classificationData (type and number of mapped positions) to the
+     * SAM records in the diffMap. After extending the SAM records, they are
+     * written by the given writer. The diffMap is cleared after writing the
+     * data.
+     * @param diffMap map of sam records to the number of differences to the
+     * reference
+     * @param classificationData parsed classification data to add to the
+     * records
+     * @param samBamWriter writer to write the SAM records to
+     */
     public static void writeSamRecord(Map<SAMRecord, Integer> diffMap, ParsedClassification classificationData, 
             SAMFileWriter samBamWriter) {
         
@@ -793,6 +778,23 @@ public final class CommonsMappingParser {
         diffMap.clear();
     }
     
+    /**
+     * Checks if a mapping contains consistent data. For consistent mappings,
+     * the ReadXplorer classification data is created and stored in the given
+     * classificationData.
+     * @param record record to classify
+     * @param messageSender Sender who should be updated, if errors occur
+     * @param chromLengthMap chromosome length map
+     * @param file mapping file from which the record originates
+     * @param lineno the line number of the current record in the file
+     * @param refSeqFetcher a fetcher for the reference sequence
+     * @param diffMap map of sam records to the number of differences to the
+     * reference, is updated by this method
+     * @param classificationData object in which the classification data is 
+     * stored by this method
+     * @return <code>true</code>, if the mapping data is consistent, 
+     * <code>false</code> otherwise
+     */
     public static boolean classifyRead(SAMRecord record, MessageSenderI messageSender, Map<String, Integer> chromLengthMap, File file, int lineno,
             RefSeqFetcher refSeqFetcher, Map<SAMRecord, Integer> diffMap, ParsedClassification classificationData) {
         String cigar = record.getCigarString();
@@ -822,6 +824,7 @@ public final class CommonsMappingParser {
             diffMap.put(record, mismatches);
             classificationData.addReadStart(start);
             classificationData.updateMinMismatches(mismatches);
+            classificationData.updateMismatchCountMap(mismatches);
         }
         return isConsistent;
     }

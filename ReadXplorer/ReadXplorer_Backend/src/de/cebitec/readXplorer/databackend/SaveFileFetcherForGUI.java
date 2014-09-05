@@ -20,8 +20,8 @@ import de.cebitec.readXplorer.databackend.connector.MultiTrackConnector;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.StorageException;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.FastaUtils;
 import java.awt.Dialog;
 import java.io.File;
@@ -61,20 +61,20 @@ public class SaveFileFetcherForGUI {
     }
 
     /**
-     * Returns the TrackConnector for the given track. If the track is stored in
+     * Returns the Persistent^Connector for the given track. If the track is stored in
      * a sam/bam file and the path to this file has changed, the method will
      * open a window and ask for the new file path.
      * @throws UserCanceledTrackPathUpdateException if the no track path could be resolved.
      * @param track Track the TrackConnector should be received for.
      * @return TrackConnector for the Track handed over
      */
-    public TrackConnector getTrackConnector(PersistantTrack track) throws UserCanceledTrackPathUpdateException {
+    public TrackConnector getTrackConnector(PersistentTrack track) throws UserCanceledTrackPathUpdateException {
         TrackConnector tc = null;
         ProjectConnector connector = ProjectConnector.getInstance();
         try {
             tc = connector.getTrackConnector(track);
         } catch (FileNotFoundException e) {
-            PersistantTrack newTrack = getNewFilePath(track, connector);
+            PersistentTrack newTrack = getNewFilePath(track, connector);
             if (newTrack != null) {
                 try {
                     tc = connector.getTrackConnector(newTrack);
@@ -104,7 +104,7 @@ public class SaveFileFetcherForGUI {
      * tracks are removed if their path cannot be resolved and the user refuses 
      * to set a new one.
      */
-    public TrackConnector getTrackConnector(List<PersistantTrack> tracks, boolean combineTracks) throws UserCanceledTrackPathUpdateException {
+    public TrackConnector getTrackConnector(List<PersistentTrack> tracks, boolean combineTracks) throws UserCanceledTrackPathUpdateException {
         TrackConnector tc = null;
         ProjectConnector connector = ProjectConnector.getInstance();
         try {
@@ -113,9 +113,9 @@ public class SaveFileFetcherForGUI {
             //we keep track about the number of tracks with unresolved path errors.
             int unresolvedTracks = 0;
             for (int i = 0; i < tracks.size(); ++i) {                
-                PersistantTrack track = tracks.get(i);
+                PersistentTrack track = tracks.get(i);
                 if (!(new File(track.getFilePath())).exists()) {
-                    PersistantTrack newTrack = getNewFilePath(track, connector);
+                    PersistentTrack newTrack = getNewFilePath(track, connector);
                     //Everything is fine, path is set correctly
                     if (newTrack != null) {
                         tracks.set(i, newTrack);                   
@@ -156,8 +156,8 @@ public class SaveFileFetcherForGUI {
      * 
      * @author rhilker, kstaderm
      */
-    private PersistantTrack getNewFilePath(PersistantTrack track, ProjectConnector connector) {
-        PersistantTrack newTrack;
+    private PersistentTrack getNewFilePath(PersistentTrack track, ProjectConnector connector) {
+        PersistentTrack newTrack;
         Preferences prefs = NbPreferences.forModule(Object.class);
         File oldTrackFile = new File(track.getFilePath());
         String basePath = prefs.get("ResetTrack.Filepath", ".");
@@ -181,11 +181,11 @@ public class SaveFileFetcherForGUI {
      *
      * @author rhilker, kstaderm
      */
-    private PersistantTrack checkFileExists(String basePath, File oldTrackFile, PersistantTrack track, ProjectConnector connector) {
-        PersistantTrack newTrack = null;
+    private PersistentTrack checkFileExists(String basePath, File oldTrackFile, PersistentTrack track, ProjectConnector connector) {
+        PersistentTrack newTrack = null;
         File newTrackFile = new File(basePath + "/" + oldTrackFile.getName());
         if (newTrackFile.exists()) {
-            newTrack = new PersistantTrack(track.getId(),
+            newTrack = new PersistentTrack(track.getId(),
                     newTrackFile.getAbsolutePath(), track.getDescription(), track.getTimestamp(),
                     track.getRefGenID(), track.getReadPairId());
             try {
@@ -214,8 +214,8 @@ public class SaveFileFetcherForGUI {
      * @author rhilker, kstaderm
      */
     @Messages({"MSG_WrongTrackFileChosen=You did not choose a \"bam\" file, please select a bam file to proceed."})
-    private PersistantTrack openResetFilePathDialog(PersistantTrack track, ProjectConnector connector) {
-        PersistantTrack newTrack = null;
+    private PersistentTrack openResetFilePathDialog(PersistentTrack track, ProjectConnector connector) {
+        PersistentTrack newTrack = null;
         ResetFilePanel resetPanel = new ResetFilePanel(track.getFilePath());
         DialogDescriptor dialogDescriptor = new DialogDescriptor(resetPanel, "Reset File Path");
         Dialog resetFileDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
@@ -226,7 +226,7 @@ public class SaveFileFetcherForGUI {
                 File selectedFile = new File(resetPanel.getNewFileLocation());
                 if (selectedFile.exists() && selectedFile.isFile() && selectedFile.getName().endsWith(".bam")) {
                     try {
-                        newTrack = new PersistantTrack(track.getId(),
+                        newTrack = new PersistentTrack(track.getId(),
                                 resetPanel.getNewFileLocation(), track.getDescription(), track.getTimestamp(),
                                 track.getRefGenID(), track.getReadPairId());
                         connector.resetTrackPath(newTrack);
@@ -249,13 +249,13 @@ public class SaveFileFetcherForGUI {
         return newTrack;
     }
 
-    public MultiTrackConnector getMultiTrackConnector(PersistantTrack track) throws UserCanceledTrackPathUpdateException {
+    public MultiTrackConnector getMultiTrackConnector(PersistentTrack track) throws UserCanceledTrackPathUpdateException {
         MultiTrackConnector mtc = null;
         ProjectConnector connector = ProjectConnector.getInstance();
         try {
             mtc = connector.getMultiTrackConnector(track);
         } catch (FileNotFoundException e) {
-            PersistantTrack newTrack = getNewFilePath(track, connector);
+            PersistentTrack newTrack = getNewFilePath(track, connector);
             if (newTrack != null) {
                 try {
                     mtc = connector.getMultiTrackConnector(newTrack);
@@ -282,7 +282,7 @@ public class SaveFileFetcherForGUI {
      * @param tracks List of tracks the TrackConnector should be received for.
      * @return  
      */
-    public MultiTrackConnector getMultiTrackConnector(List<PersistantTrack> tracks) throws UserCanceledTrackPathUpdateException {
+    public MultiTrackConnector getMultiTrackConnector(List<PersistentTrack> tracks) throws UserCanceledTrackPathUpdateException {
         MultiTrackConnector mtc = null;
         ProjectConnector connector = ProjectConnector.getInstance();
         try {
@@ -291,9 +291,9 @@ public class SaveFileFetcherForGUI {
             //we keep track about the number of tracks with unresolved path errors.
             int unresolvedTracks = 0;
             for (int i = 0; i < tracks.size(); ++i) {
-                PersistantTrack track = tracks.get(i);
+                PersistentTrack track = tracks.get(i);
                 if (!(new File(track.getFilePath())).exists()) {
-                    PersistantTrack newTrack = getNewFilePath(track, connector);
+                    PersistentTrack newTrack = getNewFilePath(track, connector);
                     //Everything is fine, path is set correctly
                     if (newTrack != null) {
                         tracks.set(i, newTrack);
@@ -339,7 +339,7 @@ public class SaveFileFetcherForGUI {
      */
     @Messages({"# {0} - fasta path", "MSG_FastaMissing=The following reference fasta file is missing! Please restore it in order to use this DB:\n {0}",
                 "TITLE_FastaMissing=Fasta missing error"})
-    public IndexedFastaSequenceFile checkRefFile(PersistantReference ref) throws UserCanceledTrackPathUpdateException {
+    public IndexedFastaSequenceFile checkRefFile(PersistentReference ref) throws UserCanceledTrackPathUpdateException {
         File fastaFile = ref.getFastaFile();
         IndexedFastaSequenceFile indexedRefFile;
         FastaUtils fastaUtils = new FastaUtils(); //TODO: observers are empty, add observers!
@@ -372,7 +372,7 @@ public class SaveFileFetcherForGUI {
      * @author rhilker
      */
     @Messages({"MSG_WrongRefFileChosen=You did not choose a \"fasta\" file, please select a fasta file to proceed."})
-    private IndexedFastaSequenceFile resetRefFile(PersistantReference ref) {
+    private IndexedFastaSequenceFile resetRefFile(PersistentReference ref) {
         IndexedFastaSequenceFile newFastaFile = null;
         ProjectConnector connector = ProjectConnector.getInstance();
         

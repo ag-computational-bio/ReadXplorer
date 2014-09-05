@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
@@ -135,7 +135,7 @@ public final class DeSeqVisualPanelDesign extends JPanel {
     private javax.swing.JComboBox rowNumberSelection;
     // End of variables declaration//GEN-END:variables
 
-    protected void setTracks(List<PersistantTrack> tracks) {     
+    protected void setTracks(List<PersistentTrack> tracks) {     
         String[] columnNames = new String[tracks.size() + 1];
         columnNames[0] = "Group name";
         for (int i = 0; i < tracks.size(); i++) {

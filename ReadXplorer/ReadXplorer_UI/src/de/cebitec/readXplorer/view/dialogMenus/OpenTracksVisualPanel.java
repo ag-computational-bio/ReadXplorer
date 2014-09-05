@@ -19,7 +19,7 @@ package de.cebitec.readXplorer.view.dialogMenus;
 import de.cebitec.readXplorer.api.objects.JobPanel;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.view.dialogMenus.explorer.CustomOutlineCellRenderer;
 import de.cebitec.readXplorer.view.dialogMenus.explorer.StandardItem;
 import de.cebitec.readXplorer.view.dialogMenus.explorer.StandardNode;
@@ -48,7 +48,7 @@ public class OpenTracksVisualPanel extends JobPanel implements ExplorerManager.P
     private ExplorerManager explorerManager;
     private OutlineView outlineView;
     private ReferenceConnector refGenConnector;
-    private List<PersistantTrack> selectedTracks;
+    private List<PersistentTrack> selectedTracks;
 
     /**
      * Creates a new panel for the selection of tracks for a given reference.
@@ -210,7 +210,7 @@ public class OpenTracksVisualPanel extends JobPanel implements ExplorerManager.P
     /**
      * @return The list of selected tracks from this panel.
      */
-    public List<PersistantTrack> getSelectedTracks() {
+    public List<PersistentTrack> getSelectedTracks() {
         return this.selectedTracks;
     }
     
@@ -218,7 +218,7 @@ public class OpenTracksVisualPanel extends JobPanel implements ExplorerManager.P
      * Stores all seleceted tracks in the internal selectedTracks list.
      */
     public void storeSelectedTracks() {
-        List<PersistantTrack> trackList = new ArrayList<>();
+        List<PersistentTrack> trackList = new ArrayList<>();
         List<Node> markedNodes = this.getAllMarkedNodes();
         for (Node node : markedNodes) {
             StandardNode markedNode = (StandardNode) node;
@@ -275,18 +275,18 @@ public class OpenTracksVisualPanel extends JobPanel implements ExplorerManager.P
      */
     public class TrackItem extends StandardItem {
 
-        private PersistantTrack track;
+        private PersistentTrack track;
 
         /**
          *
          * @param track
          */
-        public TrackItem(PersistantTrack track) {
+        public TrackItem(PersistentTrack track) {
             super();
             this.track = track;
         }
 
-        public PersistantTrack getTrack() {
+        public PersistentTrack getTrack() {
             return this.track;
         }
     }
@@ -303,14 +303,14 @@ public class OpenTracksVisualPanel extends JobPanel implements ExplorerManager.P
         }
     }
 
-    public class RootChildren extends Children.Keys<List<PersistantTrack>> {
+    public class RootChildren extends Children.Keys<List<PersistentTrack>> {
 
         @Override
-        protected Node[] createNodes(List<PersistantTrack> trackList) {
+        protected Node[] createNodes(List<PersistentTrack> trackList) {
             Node[] trackNodes = new Node[trackList.size()];
             for (int i = 0; i < trackList.size(); i++) {
                 try {
-                    PersistantTrack track = trackList.get(i);
+                    PersistentTrack track = trackList.get(i);
                     trackNodes[i] = new TrackNode(new TrackItem(track));
                 } catch (IntrospectionException ex) {
                     Exceptions.printStackTrace(ex);
@@ -322,7 +322,7 @@ public class OpenTracksVisualPanel extends JobPanel implements ExplorerManager.P
         @Override
         protected void addNotify() {
             super.addNotify();
-            Collection<List<PersistantTrack>> list = new ArrayList<>();
+            Collection<List<PersistentTrack>> list = new ArrayList<>();
             list.add(refGenConnector.getAssociatedTracks());
             this.setKeys(list);
         }

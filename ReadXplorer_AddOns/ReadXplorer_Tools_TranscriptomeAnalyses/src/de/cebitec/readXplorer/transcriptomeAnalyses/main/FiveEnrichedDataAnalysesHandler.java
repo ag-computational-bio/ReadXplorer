@@ -1,19 +1,23 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
+import de.cebitec.readXplorer.databackend.AnalysesHandler;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.AnalysisStatus;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readXplorer.util.classification.Classification;
+import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readXplorer.util.classification.MappingClass;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,8 +36,8 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 public class FiveEnrichedDataAnalysesHandler extends Thread implements Observable, DataVisualisationI {
 
     private TrackConnector trackConnector;
-    private final PersistantTrack selectedTrack;
-    private final PersistantReference reference;
+    private final PersistentTrack selectedTrack;
+    private final PersistentReference reference;
     private final List<de.cebitec.readXplorer.util.Observer> observer = new ArrayList<>();
     protected HashMap<Integer, List<Integer>> forwardCDSs, reverseCDSs;
     private StatisticsOnMappingData stats;
@@ -44,26 +48,26 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
     private ResultPanelTranscriptionStart transcriptionStartResultPanel;
     private final ReferenceViewer refViewer;
     private final TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
-    private Map<Integer, PersistantTrack> trackMap;
+    private Map<Integer, PersistentTrack> trackMap;
     private ProgressHandle progressHandleParsingFeatures;
     /**
-     * Key: featureID , Value: PersistantFeature
+     * Key: featureID , Value: PersistentFeature
      */
-    private HashMap<Integer, PersistantFeature> allRegionsInHash;
+    private HashMap<Integer, PersistentFeature> allRegionsInHash;
 
     /**
      * Constructor for FiveEnrichedDataAnalysesHandler.
      *
-     * @param selectedTrack PersistantTrack the analysis is based on.
+     * @param selectedTrack Track the analysis is based on.
      * @param parameterset ParameterSetFiveEnrichedAnalyses stores all
      * paramaters for 5'-enriched based datasets analysis.
      * @param refViewer ReferenceViewer
      * @param transcAnalysesTopComp
      * TranscriptomeAnalysesTopComponentTopComponent output widow for computed
      * results.
-     * @param trackMap contains all PersistantTracks used for this analysis-run.
+     * @param trackMap contains all PersistentTracks used for this analysis-run.
      */
-    public FiveEnrichedDataAnalysesHandler(PersistantTrack selectedTrack, ParameterSetFiveEnrichedAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, Map<Integer, PersistantTrack> trackMap) {
+    public FiveEnrichedDataAnalysesHandler(PersistentTrack selectedTrack, ParameterSetFiveEnrichedAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, Map<Integer, PersistentTrack> trackMap) {
         this.selectedTrack = selectedTrack;
         this.reference = refViewer.getReference();
         this.parameters = parameterset;
@@ -93,8 +97,12 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
 
         // geting mappings and calculate statistics
         this.stats = new StatisticsOnMappingData(trackConnector.getRefGenome(), parameters.getFraction(), this.featureParser.getForwardCDSs(), this.featureParser.getRevFeatures(), this.allRegionsInHash, this.featureParser.getRegion2Exclude());
-        de.cebitec.readXplorer.databackend.AnalysesHandler handler = new de.cebitec.readXplorer.databackend.AnalysesHandler(trackConnector, this, "Collecting coverage data of track number "
-                + this.selectedTrack.getId(), new ParametersReadClasses(true, parameters.isIncludeBestMatchedReads(), false, false, new Byte("0")));
+        List<Classification> excludedClasses = new ArrayList<>();
+        excludedClasses.add(MappingClass.COMMON_MATCH);
+        excludedClasses.add(FeatureType.MULTIPLE_MAPPED_READ);
+        if (!this.parameters.isIncludeBestMatchedReads()) { excludedClasses.add(FeatureType.MULTIPLE_MAPPED_READ); }
+        AnalysesHandler handler = new AnalysesHandler(trackConnector, this, "Collecting coverage data of track number "
+                + this.selectedTrack.getId(), new ParametersReadClasses(excludedClasses, new Byte("0")));
         handler.setMappingsNeeded(true);
         handler.setDesiredData(Properties.REDUCED_MAPPINGS);
         handler.registerObserver(this.stats);
@@ -141,7 +149,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
         List<TranscriptionStart> postProcessedTss = new ArrayList<>();
 
         this.tssDetection = new TssDetection(trackId);
-        for (PersistantChromosome chrom : this.trackConnector.getRefGenome().getChromosomes().values()) {
+        for (PersistentChromosome chrom : this.trackConnector.getRefGenome().getChromosomes().values()) {
             int chromId = chrom.getId();
             int chromNo = chrom.getChromNumber();
             int chromLength = chrom.getLength();
@@ -161,7 +169,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
         if (this.transcriptionStartResultPanel == null) {
             this.transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
             this.transcriptionStartResultPanel.setReferenceViewer(this.refViewer);
-            this.transcriptionStartResultPanel.setPersistantReference(this.reference);
+            this.transcriptionStartResultPanel.setPersistentReference(this.reference);
         }
 
         this.stats.clearMemory();
@@ -182,10 +190,10 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
     /**
      * Getter for the trackMap.
      *
-     * @return HashMap<Integer, PersistantTrack> containing all PersistantTracks
+     * @return HashMap<Integer, PersistentTrack> containing all PersistentTracks
      * used for this analysis-run.
      */
-    public Map<Integer, PersistantTrack> getTrackMap() {
+    public Map<Integer, PersistentTrack> getTrackMap() {
         return trackMap;
     }
 

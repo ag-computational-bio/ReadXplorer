@@ -1,12 +1,12 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.api.objects.AnalysisI;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.StartCodon;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import java.util.ArrayList;
@@ -36,7 +36,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
      * Provides a method for detecting and classification of Transcription start
      * sites.
      *
-     * @param refGenome PersistantReference instance.
+     * @param refGenome PersistentReference instance.
      * @param trackID for wich the Transcription start site detection shall
      * running.
      */
@@ -53,7 +53,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
 
     /**
      *
-     * @param ref PersistantReference
+     * @param ref PersistentReference
      * @param chromId the chromosome id
      * @param detectedTss all detected putative transcription start sites
      * @param mm mappings per million
@@ -64,9 +64,9 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
      * @param parameters ParameterSetFiveEnrichedAnalyses
      * @return
      */
-    public List<TranscriptionStart> postProcessing(PersistantReference ref, int chromId, List<TranscriptionStart> detectedTss, double mm, int chromLength,
+    public List<TranscriptionStart> postProcessing(PersistentReference ref, int chromId, List<TranscriptionStart> detectedTss, double mm, int chromLength,
             HashMap<Integer, List<Integer>> fwdFeatures, HashMap<Integer, List<Integer>> revFeatures,
-            HashMap<Integer, PersistantFeature> allFeatures, ParameterSetFiveEnrichedAnalyses parameters) {
+            HashMap<Integer, PersistentFeature> allFeatures, ParameterSetFiveEnrichedAnalyses parameters) {
         List<TranscriptionStart> postProcessedTssList = new ArrayList<>();
         HashSet<FeatureType> fadeOutFeatureTypes = parameters.getExcludeFeatureTypes();
         // settings for checking CDS-shift 
@@ -106,7 +106,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
 
                 double rel_count = tss.getReadStarts() / mm;
                 tss.setRelCount(rel_count);
-                PersistantFeature feature = getCorrespondingFeature(fwdFeatures, pos, offset, end, allFeatures, fadeOutFeatureTypes, chromLength);
+                PersistentFeature feature = getCorrespondingFeature(fwdFeatures, pos, offset, end, allFeatures, fadeOutFeatureTypes, chromLength);
 
                 if (offset == 0) {
                     dist2start = pos - feature.getStart();
@@ -140,8 +140,8 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                     } else if (dist2start > leaderlessRange && keepAllIntragenicTss) {
                         int currentFeatureID = feature.getId();
                         // Getting next Feature
-                        // PersistantFeature nextDownstreamFeature = getNextDownstreamFeature(fadeOutFeatureTypes, feature, offsetToNextDownstreamFeature, currentFeatureID, lastFeatureId, fstFeatureId, allFeatures, chromLength, pos);
-                        PersistantFeature nextDownstreamFeature = null;
+                        // PersistentFeature nextDownstreamFeature = getNextDownstreamFeature(fadeOutFeatureTypes, feature, offsetToNextDownstreamFeature, currentFeatureID, lastFeatureId, fstFeatureId, allFeatures, chromLength, pos);
+                        PersistentFeature nextDownstreamFeature = null;
                         boolean flag = true;
                         if (flag) {
                             while (nextDownstreamFeature == null || nextDownstreamFeature.isFwdStrand() == false || fadeOutFeatureTypes.contains(nextDownstreamFeature.getType()) || feature.getLocus().equals(nextDownstreamFeature.getLocus())) {
@@ -197,8 +197,8 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                     } else if (dist2start > leaderlessRange && keepOnlyAssignedIntragenicTss) {
                         int currentFeatureID = feature.getId();
                         // Getting next Feature
-                        // PersistantFeature nextDownstreamFeature = getNextDownstreamFeature(fadeOutFeatureTypes, feature, offsetToNextDownstreamFeature, currentFeatureID, lastFeatureId, fstFeatureId, allFeatures, chromLength, pos);
-                        PersistantFeature nextDownstreamFeature = null;
+                        // PersistentFeature nextDownstreamFeature = getNextDownstreamFeature(fadeOutFeatureTypes, feature, offsetToNextDownstreamFeature, currentFeatureID, lastFeatureId, fstFeatureId, allFeatures, chromLength, pos);
+                        PersistentFeature nextDownstreamFeature = null;
                         boolean flag = true;
                         if (flag) {
                             while (nextDownstreamFeature == null || nextDownstreamFeature.isFwdStrand() == false || fadeOutFeatureTypes.contains(nextDownstreamFeature.getType()) || feature.getLocus().equals(nextDownstreamFeature.getLocus())) {
@@ -377,7 +377,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
 
                 double rel_count = tss.getReadStarts() / mm;
 
-                PersistantFeature feature = null;
+                PersistentFeature feature = null;
 
                 boolean flag = true;
 //                    // check for overlapping Features
@@ -438,7 +438,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                         }
                     } else if (dist2start > leaderlessRange && keepAllIntragenicTss) {
                         int currentFeatureID = feature.getId();
-                        PersistantFeature nextFeature = null;
+                        PersistentFeature nextFeature = null;
 
                         flag = true;
                         if (flag) {
@@ -490,7 +490,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                         }
                     } else if (dist2start > leaderlessRange && keepOnlyAssignedIntragenicTss) {
                         int currentFeatureID = feature.getId();
-                        PersistantFeature nextFeature = null;
+                        PersistentFeature nextFeature = null;
 
                         flag = true;
                         if (flag) {
@@ -723,7 +723,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
      *
      * @param fadeOutFeatureTypes features which are excluded from the analysis
      * by the user
-     * @param feature PersistantFeature
+     * @param feature PersistentFeature
      * @param offsetToNextDownstreamFeature offset to the next downstream
      * located features
      * @param currentFeatureID the id of current assigned feature to putative
@@ -735,8 +735,8 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
      * @param pos current position during iteraing the chromosome
      * @return
      */
-    private PersistantFeature getNextDownstreamFeature(HashSet<FeatureType> fadeOutFeatureTypes, PersistantFeature feature, int offsetToNextDownstreamFeature, int currentFeatureID, int lastFeatureId, int fstFeatureId, HashMap<Integer, PersistantFeature> allFeatures, int chromLength, int pos) {
-        PersistantFeature nextDownstreamFeature = null;
+    private PersistentFeature getNextDownstreamFeature(HashSet<FeatureType> fadeOutFeatureTypes, PersistentFeature feature, int offsetToNextDownstreamFeature, int currentFeatureID, int lastFeatureId, int fstFeatureId, HashMap<Integer, PersistentFeature> allFeatures, int chromLength, int pos) {
+        PersistentFeature nextDownstreamFeature = null;
         boolean flag = true;
         if (flag) {
             while (nextDownstreamFeature == null || nextDownstreamFeature.isFwdStrand() == false || fadeOutFeatureTypes.contains(nextDownstreamFeature.getType()) || feature.getLocus().equals(nextDownstreamFeature.getLocus())) {
@@ -766,20 +766,20 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
     /**
      * This method determines the offset to the current feature.
      *
-     * @param fwdFeatures All persistant features in forward direction.
+     * @param fwdFeatures All persistent features in forward direction.
      * @param pos Transcription start position
      * @param offset length from transcription start site to translation start
      * site
      * @param end
-     * @param allFeatures All persistant features in both directions
+     * @param allFeatures All persistent features in both directions
      * @param fadeOutFeatureTypes Feature types which have to be excluded from
      * analysis
      * @param chromLength Chromosome length.
-     * @return the current persistant feature
+     * @return the current persistent feature
      */
-    private PersistantFeature getCorrespondingFeature(HashMap<Integer, List<Integer>> fwdFeatures, int pos, int offset, int end, HashMap<Integer, PersistantFeature> allFeatures, HashSet<FeatureType> fadeOutFeatureTypes, int chromLength) {
-        // getting the PersistantFeature
-        PersistantFeature feature = null;
+    private PersistentFeature getCorrespondingFeature(HashMap<Integer, List<Integer>> fwdFeatures, int pos, int offset, int end, HashMap<Integer, PersistentFeature> allFeatures, HashSet<FeatureType> fadeOutFeatureTypes, int chromLength) {
+        // getting the PersistentFeature
+        PersistentFeature feature = null;
 
         /**
          * check for overlapping Features and determining the corresponding
@@ -905,10 +905,10 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
      * @param distanceForExcludingTss number restricting the distance between
      * TSS and detected gene.
      */
-    public void runningTSSDetection(PersistantReference ref, HashMap<Integer, List<Integer>> fwdFeatures, HashMap<Integer, List<Integer>> revFeatures,
-            HashMap<Integer, PersistantFeature> allFeatures, StatisticsOnMappingData statistics, int chromId, ParameterSetFiveEnrichedAnalyses parameters) {
+    public void runningTSSDetection(PersistentReference ref, HashMap<Integer, List<Integer>> fwdFeatures, HashMap<Integer, List<Integer>> revFeatures,
+            HashMap<Integer, PersistentFeature> allFeatures, StatisticsOnMappingData statistics, int chromId, ParameterSetFiveEnrichedAnalyses parameters) {
 
-        PersistantChromosome chromosome = ref.getChromosome(chromId);
+        PersistentChromosome chromosome = ref.getChromosome(chromId);
         int chromosomeLength = chromosome.getLength();
         int chromNo = chromosome.getChromNumber();
         
@@ -964,8 +964,8 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                     int end = offsetAndArray[1];
                     double rel_count = forward[chromNo - 1][i] / mm;
 
-                    // getting the PersistantFeature 
-                    PersistantFeature feature = null;
+                    // getting the PersistentFeature 
+                    PersistentFeature feature = null;
                     boolean flag = true;
                     // check for overlapping Features
                     while (flag) {
@@ -1030,7 +1030,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                              * Getting next Feature
                              */
                             int currentFeatureID = feature.getId();
-                            PersistantFeature nextDownstreamFeature = null;
+                            PersistentFeature nextDownstreamFeature = null;
                             flag = true;
 
                             if (flag) {
@@ -1235,7 +1235,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
 
                     double rel_count = reverse[chromNo - 1][i] / mm;
 
-                    PersistantFeature feature = null;
+                    PersistentFeature feature = null;
 
                     boolean flag = true;
 //                    // check for overlapping Features
@@ -1288,7 +1288,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                             }
                         } else if (dist2start > leaderlessRange && isExclusionOfAllIntragenicTss == false) {
                             int currentFeatureID = feature.getId();
-                            PersistantFeature nextFeature = null;
+                            PersistentFeature nextFeature = null;
 
                             flag = true;
 
@@ -1542,14 +1542,14 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
      *
      * @param dist2start if tss is intragenic, the distance between tss and
      * start of the overlapping feature is the distance to start
-     * @param ref the PersistantReference
+     * @param ref the PersistentReference
      * @param chromId the chromosome id
      * @param isFwd <true> if direction is forward else <false>
      * @param tss transcription start site
      * @param validCodons all from user selected start codons to evaluate
      * @return <true> if a putative CDS-shift occur else <false>
      */
-    private boolean checkLeaderlessCdsShift(int dist2start, PersistantReference ref, int chromId, boolean isFwd, int tss, Map<String, StartCodon> validCodons) {
+    private boolean checkLeaderlessCdsShift(int dist2start, PersistentReference ref, int chromId, boolean isFwd, int tss, Map<String, StartCodon> validCodons) {
         // check for cdsShift, when offset > and offset+1 mod 3 == 0
         boolean cdsShift = false;
         String startAtTSS = "";
@@ -1569,19 +1569,19 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
     /**
      * Method checking for a potential CDS-shift.
      *
-     * @param ref Current processing PersistantChromosome.
-     * @param feature PersistantFeature with information about the start anf
-     * stop
+     * @param ref Current processing PersistentChromosome.
+     * @param feature PersistentFeature with information about the start anf
+ stop
      * @param tssStart Start position of transcription start site.
      * @param dist2start Distance from transcription start site to start
-     * position of PersistantFeature.
+ position of PersistentFeature.
      * @param isFwd true if is forward direction.
      * @param relPercentage relative region of feature in which the tss occur.
      * @param validStartCodons Map of Codons, which has to be validated.
      *
      * @return true, if putative CDS-Shift occur.
      */
-    private boolean checkCdsShift(PersistantReference ref, int chromId, PersistantFeature feature, int tssStart, int dist2start, boolean isFwd,
+    private boolean checkCdsShift(PersistentReference ref, int chromId, PersistentFeature feature, int tssStart, int dist2start, boolean isFwd,
             double relPercentage, Map<String, StartCodon> validStartCodons) {
         double length = feature.getStop() - feature.getStart();
         double partOfFeature = dist2start / length;
@@ -1627,7 +1627,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
      * @param stop stop of subsequence.
      * @return the subsequence.
      */
-    private String getSubSeq(PersistantReference ref, int chromId, boolean isFwd, int start, int stop) {
+    private String getSubSeq(PersistentReference ref, int chromId, boolean isFwd, int start, int stop) {
 
         String seq = "";
         if (start > 0 && stop < ref.getChromosome(chromId).getLength()) {
@@ -1651,18 +1651,18 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
     }
 
     /**
-     * Determines the biggest Feature id in a map of PersistantFeatures, whereby
+     * Determines the biggest Feature id in a map of PersistentFeatures, whereby
      * the Key is the featureID.
      *
-     * @param features HashMap: Key => FeatureID, Value => PersistantFeatures
+     * @param features HashMap: Key => FeatureID, Value => PersistentFeatures
      * @return biggest FeatureID
      */
-    private int determineBiggestId(HashMap<Integer, PersistantFeature> features) {
+    private int determineBiggestId(HashMap<Integer, PersistentFeature> features) {
         int result = 0;
 
-        for (PersistantFeature persistantFeature : features.values()) {
-            if (persistantFeature.getId() > result) {
-                result = persistantFeature.getId();
+        for (PersistentFeature persistentFeature : features.values()) {
+            if (persistentFeature.getId() > result) {
+                result = persistentFeature.getId();
             }
         }
 
@@ -1670,21 +1670,21 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
     }
 
     /**
-     * Determines the smallest Feature ID from a Map with PersistantFeatures.
+     * Determines the smallest Feature ID from a Map with PersistentFeatures.
      *
-     * @param features Map: Key => FeatureID, Value => PersistantFeature.
+     * @param features Map: Key => FeatureID, Value => PersistentFeature.
      * @return smallest FeatureID
      */
-    private int determineSmallestId(HashMap<Integer, PersistantFeature> features) {
+    private int determineSmallestId(HashMap<Integer, PersistentFeature> features) {
         int result = 0;
-        for (PersistantFeature persistantFeature : features.values()) {
-            result = persistantFeature.getId();
+        for (PersistentFeature persistentFeature : features.values()) {
+            result = persistentFeature.getId();
             break;
         }
 
-        for (PersistantFeature persistantFeature : features.values()) {
-            if (persistantFeature.getId() < result) {
-                result = persistantFeature.getId();
+        for (PersistentFeature persistentFeature : features.values()) {
+            if (persistentFeature.getId() < result) {
+                result = persistentFeature.getId();
             }
         }
 

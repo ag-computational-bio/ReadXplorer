@@ -56,9 +56,17 @@ public class FileSelectionPanel extends JPanel {
     public void addFile(File file, JTextField mappingFileField) {
         if (file.canRead()) {
             addMappingFile(file);
+            /*TODO: Read sam header & check against reference, show a mapping of references up to 100? entries. Show button to list more/all
+            //try (SAMFileReader samReader = new SAMFileReader(trackJob.getFile())) {
+            //samReader.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
+            //SAMFileHeader header = samReader.getFileHeader();
+            //} } catch (Exception e) {
+            this.notifyObservers(e.getMessage() != null ? e.getMessage() : e);
+            Exceptions.printStackTrace(e);
+            } */ 
             mappingFileField.setText(file.getAbsolutePath());
         } else {
-            Logger.getLogger(ImportTrackBasePanel.class.getName()).log(Level.WARNING, "Couldn't read file");
+            Logger.getLogger(FileSelectionPanel.class.getName()).log(Level.WARNING, "Couldn't read file");
         }
     }
     
@@ -145,19 +153,16 @@ public class FileSelectionPanel extends JPanel {
     public void updateGuiForMultipleFiles(boolean multiFileImportEnabled, JScrollPane multiTrackScrollPane, JList<String> multiTrackList,
             JLabel multiTrackListLabel, JTextField fileTextField) {
         this.setUseMultipleImport(multiFileImportEnabled);
+        multiTrackScrollPane.setVisible(this.useMultipleImport());
+        multiTrackList.setVisible(this.useMultipleImport());
+        multiTrackListLabel.setVisible(this.useMultipleImport());
         if (this.useMultipleImport()) {
-            multiTrackScrollPane.setVisible(true);
-            multiTrackList.setVisible(true);
-            multiTrackListLabel.setVisible(true);
             fileTextField.setText(getMappingFiles().size() + " tracks to import");
             DefaultListModel<String> model = new DefaultListModel<>();
             fillMultipleImportTable(model, getMappingFiles(), "Mapping file list:");
             multiTrackList.setModel(model);
             this.setSize(this.getPreferredSize());
         } else {
-            multiTrackScrollPane.setVisible(false);
-            multiTrackList.setVisible(false);
-            multiTrackListLabel.setVisible(false);
             fileTextField.setText(getMappingFile() != null ? getMappingFile().getAbsolutePath() : "");
             getMappingFiles().clear();
             multiTrackList.setModel(new DefaultListModel<String>());

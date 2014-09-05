@@ -1,6 +1,6 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.datastructures;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.TrackChromResultEntry;
 
 /**
@@ -10,7 +10,7 @@ import de.cebitec.readXplorer.databackend.dataObjects.TrackChromResultEntry;
  */
 public class RPKMvalue extends TrackChromResultEntry {
 
-    private PersistantFeature feature;
+    private PersistentFeature feature;
     private int readCount, longestKnownUtrLength;
     private double rpkm, logRpkm;
 
@@ -22,7 +22,7 @@ public class RPKMvalue extends TrackChromResultEntry {
      * @param readCount the raw read count for this feature
      * @param trackId the trackId for which these result values where calculated
      */
-    public RPKMvalue(PersistantFeature feature, double rpkm, int readCount, int trackId, int chromId) {
+    public RPKMvalue(PersistentFeature feature, double rpkm, int readCount, int trackId, int chromId) {
         super(trackId, chromId);
         this.feature = feature;
         this.rpkm = rpkm;
@@ -32,14 +32,14 @@ public class RPKMvalue extends TrackChromResultEntry {
     /**
      * Data storage for RPKM and read count values of a reference feature.
      *
-     * @param feature PersistantFeature for which the RPKM values are.
+     * @param feature PersistentFeature for which the RPKM values are.
      * @param rpkm Reads per kilobase of exon per million mapped reads.
      * @param logRpkm
      * @param readstarts
      * @param trackId Track ID.
      * @param chromId Chrom ID.
      */
-    public RPKMvalue(PersistantFeature feature, double rpkm, double logRpkm,
+    public RPKMvalue(PersistentFeature feature, double rpkm, double logRpkm,
             int readstarts, int trackId, int chromId) {
         super(trackId, chromId);
         this.feature = feature;
@@ -67,14 +67,14 @@ public class RPKMvalue extends TrackChromResultEntry {
     /**
      * @return the feature for which the values shall be stored.
      */
-    public PersistantFeature getFeature() {
+    public PersistentFeature getFeature() {
         return feature;
     }
 
     /**
      * @param feature for which the values was determined
      */
-    public void setFeature(PersistantFeature feature) {
+    public void setFeature(PersistentFeature feature) {
         this.feature = feature;
     }
 

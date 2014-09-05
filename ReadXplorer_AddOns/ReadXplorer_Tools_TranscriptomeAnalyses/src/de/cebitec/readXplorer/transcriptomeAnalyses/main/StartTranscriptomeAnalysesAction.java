@@ -1,12 +1,12 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.StartCodon;
 import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.FivePrimeEnrichedTracksVisualPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.TranscriptomeAnalysisWizardIterator;
 import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.WizardPropertyStrings;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -36,8 +36,8 @@ import org.openide.windows.WindowManager;
 public final class StartTranscriptomeAnalysesAction implements ActionListener {
 
     private final ReferenceViewer refViewer;
-    private List<PersistantTrack> tracks;
-    private Map<Integer, PersistantTrack> trackMap;
+    private List<PersistentTrack> tracks;
+    private Map<Integer, PersistentTrack> trackMap;
     private final int referenceId;
     private FiveEnrichedDataAnalysesHandler fifePrimeAnalysesHandler;
     private WholeTranscriptDataAnalysisHandler wholeTranscriptAnalysesHandler;
@@ -76,7 +76,7 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
 
         //action to perform after successfully finishing the wizard
         boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
-        List<PersistantTrack> selectedTracks = transWizardIterator.getSelectedTracks();
+        List<PersistentTrack> selectedTracks = transWizardIterator.getSelectedTracks();
         if (!cancelled && !selectedTracks.isEmpty()) {
             this.tracks = selectedTracks;
             this.trackMap = ProjectConnector.getTrackMap(tracks);
@@ -99,7 +99,7 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
      */
     @SuppressWarnings("unchecked")
     private void startTranscriptomeAnalyses(WizardDescriptor wiz) {
-        for (PersistantTrack track : this.tracks) {
+        for (PersistentTrack track : this.tracks) {
             this.performFivePrimeAnalyses = (boolean) wiz.getProperty(WizardPropertyStrings.PROP_FIVEPRIME_DATASET);
             this.performWholeTrascriptomeAnalyses = (boolean) wiz.getProperty(WizardPropertyStrings.PROP_WHOLEGENOME_DATASET);
 

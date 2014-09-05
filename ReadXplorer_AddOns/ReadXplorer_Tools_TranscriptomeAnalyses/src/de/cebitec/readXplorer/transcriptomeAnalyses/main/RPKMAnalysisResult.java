@@ -1,9 +1,9 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.RPKMvalue;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.WizardPropertyStrings;
@@ -34,12 +34,12 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetWholeTra
      * readable for the ExcelExporter. Generates all three, the sheet names,
      * headers and data to write.
      *
-     * @param trackMap the map of track ids to the PersistantTrack used for this
-     * analysis
+     * @param trackMap the map of track ids to the Track used for this
+ analysis
      * @param rpkmResults The result list of RPKM values and read counts
      * otherwise
      */
-    public RPKMAnalysisResult(Map<Integer, PersistantTrack> trackMap, List<RPKMvalue> rpkmResults, PersistantReference reference) {
+    public RPKMAnalysisResult(Map<Integer, PersistentTrack> trackMap, List<RPKMvalue> rpkmResults, PersistentReference reference) {
         super(reference, trackMap, false, 2, 0);
         this.rpkmResults = rpkmResults;
     }
@@ -95,7 +95,7 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetWholeTra
     public List<List<List<Object>>> dataToExcelExportList() {
         List<List<List<Object>>> exportData = new ArrayList<>();
         List<List<Object>> rpkmResultRows = new ArrayList<>();
-        PersistantFeature feat;
+        PersistentFeature feat;
 
         for (RPKMvalue rpkmValue : this.rpkmResults) {
             List<Object> rpkmRow = new ArrayList<>();

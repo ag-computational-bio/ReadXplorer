@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.correlationAnalysis;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.awt.event.ActionEvent;
@@ -84,7 +84,7 @@ public final class CorrelationAnalysisAction implements ActionListener {
             new CorrelationAnalysisProcessor(  
                 (CorrelationCoefficient) wiz.getProperty(CorrelationAnalysisAction.PROP_CORRELATIONCOEFFICIENT),
                 context,
-                (List<PersistantTrack>) wiz.getProperty(CorrelationAnalysisAction.PROP_SELECTED_TRACKS),
+                (List<PersistentTrack>) wiz.getProperty(CorrelationAnalysisAction.PROP_SELECTED_TRACKS),
                 (Integer) wiz.getProperty(CorrelationAnalysisAction.PROP_INTERVALLENGTH),
                 (Integer) wiz.getProperty(CorrelationAnalysisAction.PROP_MINCORRELATION),
                 (Integer) wiz.getProperty(CorrelationAnalysisAction.PROP_MINPEAKCOVERAGE)

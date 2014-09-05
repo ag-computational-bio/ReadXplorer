@@ -22,8 +22,8 @@ import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
@@ -69,15 +69,15 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
 
     private static final String PROP_WIZARD_NAME = "CoverageAnalysisWiz";
     private final ReferenceViewer context;
-    private PersistantReference reference;
-    private List<PersistantTrack> tracks;
+    private PersistentReference reference;
+    private List<PersistentTrack> tracks;
     private Map<Integer, AnalysisCoverage> trackToAnalysisMap;
     private ParameterSetCoverageAnalysis parameters;
     private boolean combineTracks;
     private SelectReadClassWizardPanel readClassWizPanel;
     private OpenTracksWizardPanel openTracksPanel;
     private CoverageAnalysisTopComponent coveredAnnoAnalysisTopComp;
-    private Map<Integer, PersistantTrack> trackMap;
+    private Map<Integer, PersistentTrack> trackMap;
     private int finishedCovAnalyses = 0;
     private ResultPanelCoverageAnalysis coverageAnalysisResultPanel;
 
@@ -122,7 +122,7 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
 
         //action to perform after successfully finishing the wizard
         boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
-        List<PersistantTrack> selectedTracks = openTracksPanel.getComponent().getSelectedTracks();
+        List<PersistentTrack> selectedTracks = openTracksPanel.getComponent().getSelectedTracks();
         if (!cancelled && !selectedTracks.isEmpty()) {
             this.tracks = selectedTracks;
             this.trackMap = ProjectConnector.getTrackMap(tracks);
@@ -154,7 +154,7 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
 
         TrackConnector connector;
         if (!combineTracks) {
-            for (PersistantTrack track : this.tracks) {
+            for (PersistentTrack track : this.tracks) {
                 try {
                     connector = (new SaveFileFetcherForGUI()).getTrackConnector(track);
                 } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
@@ -230,7 +230,7 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
                             //get track name(s) for tab descriptions
                             String trackNames = "";
                             if (tracks != null && !tracks.isEmpty()) {
-                                for (PersistantTrack track : tracks) {
+                                for (PersistentTrack track : tracks) {
                                     trackNames = trackNames.concat(track.getDescription()).concat(" and ");
                                 }
                                 trackNames = trackNames.substring(0, trackNames.length() - 5);

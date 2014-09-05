@@ -19,7 +19,7 @@ package de.cebitec.readXplorer.databackend.dataObjects;
 import java.sql.Timestamp;
 
 /**
- * Since the RUN domain has been excluded a PersistantRun is not needed anymore!
+ * Since the RUN domain has been excluded a PersistentRun is not needed anymore!
  *
  * @author ddoppmeier
  */

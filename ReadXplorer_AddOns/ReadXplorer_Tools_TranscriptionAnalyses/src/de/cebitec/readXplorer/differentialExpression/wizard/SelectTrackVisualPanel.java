@@ -18,8 +18,8 @@ package de.cebitec.readXplorer.differentialExpression.wizard;
 
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.DefaultListModel;
@@ -37,10 +37,10 @@ import javax.swing.event.ListSelectionListener;
 public final class SelectTrackVisualPanel extends JPanel implements ListSelectionListener {
     private static final long serialVersionUID = 1L;
 
-    private PersistantReference[] references;
+    private PersistentReference[] references;
     private int selectedIndex = -1;
-    private PersistantReference selectedRef;
-    private DefaultListModel<PersistantTrack> trackListModel = new DefaultListModel<>();
+    private PersistentReference selectedRef;
+    private DefaultListModel<PersistentTrack> trackListModel = new DefaultListModel<>();
 
     /**
      * Panel to first select a reference and then some tracks associated with
@@ -122,8 +122,8 @@ public final class SelectTrackVisualPanel extends JPanel implements ListSelectio
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JList<PersistantReference> referenceList;
-    private javax.swing.JList<PersistantTrack> trackList;
+    private javax.swing.JList<PersistentReference> referenceList;
+    private javax.swing.JList<PersistentTrack> trackList;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -132,11 +132,11 @@ public final class SelectTrackVisualPanel extends JPanel implements ListSelectio
             selectedIndex = referenceList.getSelectedIndex();
             selectedRef = references[selectedIndex];
             ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector(selectedRef.getId());
-            List<PersistantTrack> tracks = refCon.getAssociatedTracks();
+            List<PersistentTrack> tracks = refCon.getAssociatedTracks();
             trackListModel.clear();
-            for (Iterator<PersistantTrack> it = tracks.iterator(); it.hasNext();) {
-                PersistantTrack persistantTrack = it.next();
-                trackListModel.addElement(persistantTrack);
+            for (Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext();) {
+                PersistentTrack persistentTrack = it.next();
+                trackListModel.addElement(persistentTrack);
             }
         }
     }
@@ -148,7 +148,7 @@ public final class SelectTrackVisualPanel extends JPanel implements ListSelectio
     /**
      * @return The list of selected tracks for the single selected reference.
      */
-    public List<PersistantTrack> getSelectedTracks() {
+    public List<PersistentTrack> getSelectedTracks() {
         return trackList.getSelectedValuesList();
     }
 
@@ -160,7 +160,7 @@ public final class SelectTrackVisualPanel extends JPanel implements ListSelectio
         if (trackList.isSelectionEmpty()) {
             return false;
         } else {
-            List<PersistantTrack> selectedTracks = trackList.getSelectedValuesList();
+            List<PersistentTrack> selectedTracks = trackList.getSelectedValuesList();
             if (selectedTracks.size() >= 2) {
                 return true;
             } else {

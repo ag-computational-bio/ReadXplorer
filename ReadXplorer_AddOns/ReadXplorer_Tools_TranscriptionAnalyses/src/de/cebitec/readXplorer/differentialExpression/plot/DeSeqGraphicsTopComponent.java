@@ -124,7 +124,7 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
     private void initComponents() {
 
         jSplitPane1 = new javax.swing.JSplitPane();
-        jPanel2 = new javax.swing.JPanel();
+        optionsPanel = new javax.swing.JPanel();
         iSymbol = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         messages = new javax.swing.JTextArea();
@@ -132,7 +132,9 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
         plotButton = new javax.swing.JButton();
         plotType = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
-        jPanel1 = new javax.swing.JPanel();
+        plotPanel = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        plotDescriptionArea = new javax.swing.JTextArea();
 
         iSymbol.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         iSymbol.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cebitec/readXplorer/differentialExpression/plot/i.png"))); // NOI18N
@@ -169,28 +171,28 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(DeSeqGraphicsTopComponent.class, "DeSeqGraphicsTopComponent.jLabel1.text")); // NOI18N
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        javax.swing.GroupLayout optionsPanelLayout = new javax.swing.GroupLayout(optionsPanel);
+        optionsPanel.setLayout(optionsPanelLayout);
+        optionsPanelLayout.setHorizontalGroup(
+            optionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(optionsPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(optionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(optionsPanelLayout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(plotType, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(plotButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(saveButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(25, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, optionsPanelLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(iSymbol)
                 .addContainerGap())
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        optionsPanelLayout.setVerticalGroup(
+            optionsPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(optionsPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -201,16 +203,31 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
                 .addComponent(saveButton)
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 210, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 261, Short.MAX_VALUE)
                 .addComponent(iSymbol)
                 .addContainerGap())
         );
 
-        jSplitPane1.setLeftComponent(jPanel2);
+        jSplitPane1.setLeftComponent(optionsPanel);
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        jPanel1.setLayout(new java.awt.BorderLayout());
-        jSplitPane1.setRightComponent(jPanel1);
+        plotPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        plotPanel.setLayout(new java.awt.BorderLayout());
+
+        plotDescriptionArea.setEditable(false);
+        plotDescriptionArea.setBackground(new java.awt.Color(240, 240, 240));
+        plotDescriptionArea.setColumns(3);
+        plotDescriptionArea.setFont(new java.awt.Font("Tahoma", 0, 11)); // NOI18N
+        plotDescriptionArea.setLineWrap(true);
+        plotDescriptionArea.setRows(3);
+        plotDescriptionArea.setWrapStyleWord(true);
+        plotDescriptionArea.setMaximumSize(new java.awt.Dimension(2147483647, 42));
+        plotDescriptionArea.setMinimumSize(new java.awt.Dimension(164, 42));
+        plotDescriptionArea.setPreferredSize(new java.awt.Dimension(164, 42));
+        jScrollPane2.setViewportView(plotDescriptionArea);
+
+        plotPanel.add(jScrollPane2, java.awt.BorderLayout.PAGE_END);
+
+        jSplitPane1.setRightComponent(plotPanel);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -233,22 +250,26 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
             if (selectedPlot == DeSeqAnalysisHandler.Plot.MAplot) {
                 progressHandle.start();
                 progressHandle.switchToIndeterminate();
-                chartPanel = CreatePlots.createInfPlot(ConvertData.createMAvalues(result, DeAnalysisHandler.Tool.DeSeq, null, null), "A (normalized mean expression)", "M (log2 fold change)", new ToolTip());
+                chartPanel = CreatePlots.createInfPlot(ConvertData.createMAvalues(result, DeAnalysisHandler.Tool.DeSeq, null, null), "A (normalized mean expression (0.5 * log2 (baseMeanA * baseMeanB)))", "M (log2 fold change)", new ToolTip());
                 if (SVGCanvasActive) {
-                    jPanel1.remove(svgCanvas);
+                    plotPanel.remove(svgCanvas);
                     SVGCanvasActive = false;
                 }
-                jPanel1.add(chartPanel, BorderLayout.CENTER);
-                jPanel1.updateUI();
+//                plotDescriptionArea.setText("A (normalized mean expression (0.5 * log2 (baseMeanA * baseMeanB))) against M (log2 fold change)");
+                plotDescriptionArea.setVisible(false);
+                plotPanel.add(chartPanel, BorderLayout.CENTER);
+                plotPanel.repaint();
+                plotPanel.updateUI();
                 plotButton.setEnabled(true);
                 saveButton.setEnabled(true);
                 progressHandle.switchToDeterminate(100);
                 progressHandle.finish();
             } else {
+                plotDescriptionArea.setVisible(true);
                 if (!SVGCanvasActive) {
-                    jPanel1.remove(chartPanel);
-                    jPanel1.add(svgCanvas, BorderLayout.CENTER);
-                    jPanel1.updateUI();
+                    plotPanel.remove(chartPanel);
+                    plotPanel.add(svgCanvas, BorderLayout.CENTER);
+                    plotPanel.updateUI();
                     SVGCanvasActive = true;
                 }
                 currentlyDisplayed = ((DeSeqAnalysisHandler) analysisHandler).plot(selectedPlot);
@@ -256,6 +277,7 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
                 svgCanvas.setVisible(true);
                 svgCanvas.repaint();
             }
+            plotDescriptionArea.repaint();
         } catch (IOException ex) {
             Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
@@ -303,12 +325,14 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel iSymbol;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JTextArea messages;
+    private javax.swing.JPanel optionsPanel;
     private javax.swing.JButton plotButton;
+    private javax.swing.JTextArea plotDescriptionArea;
+    private javax.swing.JPanel plotPanel;
     private javax.swing.JComboBox plotType;
     private javax.swing.JButton saveButton;
     // End of variables declaration//GEN-END:variables
@@ -339,7 +363,7 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
         setName(Bundle.CTL_DeSeqGraphicsTopComponent());
         setToolTipText(Bundle.HINT_DeSeqGraphicsTopComponent());
         svgCanvas = new JSVGCanvas();
-        jPanel1.add(svgCanvas, BorderLayout.CENTER);
+        plotPanel.add(svgCanvas, BorderLayout.CENTER);
         SVGCanvasActive = true;
         svgCanvas.addSVGDocumentLoaderListener(new SVGDocumentLoaderListener() {
             @Override
@@ -354,6 +378,25 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
                 progressHandle.finish();
                 saveButton.setEnabled(true);
                 plotButton.setEnabled(true);
+//                DispEsts("Per gene estimates against normalized mean expression"),
+//        DE("Log2 fold change against base means"),
+//        HIST("Histogram of p values"),
+                String description = "";
+                switch ((DeSeqAnalysisHandler.Plot) plotType.getSelectedItem()) {
+                    case DispEsts : 
+                        description = "DESeq's dispersion estimates plot: Empirical (black dots) per gene and fitted (red line) dispersion values (Y) plotted against mean expression strength (X) (doubly logarithmic)";
+                        break;
+                    case DE : 
+                        description = "Normalized mean expression (A) against log2 fold change (M) = MA plot";
+                        break;
+                    case HIST :
+                        description = "p-value histogram: Probability of genes not to be differentially expressed against its frequency in the experiment";
+                        break;
+                    default:
+                        description = "";
+                }
+                plotDescriptionArea.setText(description);
+                plotDescriptionArea.repaint();
             }
 
             @Override

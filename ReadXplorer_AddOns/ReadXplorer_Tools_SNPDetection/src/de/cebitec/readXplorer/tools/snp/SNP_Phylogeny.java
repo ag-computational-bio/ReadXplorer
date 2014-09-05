@@ -16,9 +16,9 @@
  */
 package de.cebitec.readXplorer.tools.snp;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
 import de.cebitec.readXplorer.databackend.dataObjects.Snp;
 import de.cebitec.readXplorer.databackend.dataObjects.SnpI;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -62,7 +62,7 @@ public class SNP_Phylogeny {
         HashMap<Integer, HashMap<Integer, String>> bases = new HashMap<>();
         HashMap<Integer, String> refBases = new HashMap<>();
         List<SnpI> snps = snpData.getSnpList();
-        Map<Integer, PersistantTrack> trackNames = snpData.getTrackMap();
+        Map<Integer, PersistentTrack> trackNames = snpData.getTrackMap();
         List<Integer> trackIdsWithSnps = new ArrayList<>();
 
         for (SnpI snpi : snps) {

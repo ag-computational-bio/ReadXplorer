@@ -17,9 +17,9 @@
 package de.cebitec.readXplorer.transcriptionAnalyses;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.DetectedFeatures;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.TransStartUnannotated;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.TranscriptionStart;
@@ -49,8 +49,8 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
      * @param combineTracks <cc>true</cc>, if the tracks in the list are
      * combined, <cc>false</cc> otherwise
      */
-    public TssDetectionResult(List<TranscriptionStart> results, Map<Integer, PersistantTrack> trackList, 
-            PersistantReference reference, boolean combineTracks, int trackColumn, int filterColumn) {
+    public TssDetectionResult(List<TranscriptionStart> results, Map<Integer, PersistentTrack> trackList, 
+            PersistentReference reference, boolean combineTracks, int trackColumn, int filterColumn) {
         super(reference, trackList, combineTracks, trackColumn, filterColumn);
         this.results = results;
     }
@@ -137,7 +137,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         List<List<List<Object>>> tSSExport = new ArrayList<>();
         List<List<Object>> tSSResults = new ArrayList<>();
         
-        PersistantFeature feature;
+        PersistentFeature feature;
         
         for (int i = 0; i < results.size(); ++i) {      
             TranscriptionStart tss = results.get(i);
@@ -245,7 +245,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
      * @param addDistance true, if the distance from the feature start to the
      * current TSS shall be printed, too
      */
-    private void addFeatureRows(PersistantFeature feature, List<Object> tssRow, TranscriptionStart tss, boolean addDistance) {
+    private void addFeatureRows(PersistentFeature feature, List<Object> tssRow, TranscriptionStart tss, boolean addDistance) {
         if (feature != null) {
             tssRow.add(feature.toString());
             tssRow.add(feature.getLocus());

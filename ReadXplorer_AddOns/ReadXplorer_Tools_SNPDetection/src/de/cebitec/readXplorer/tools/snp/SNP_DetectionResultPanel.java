@@ -21,9 +21,9 @@ import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.CodonSnp;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.databackend.dataObjects.Snp;
 import de.cebitec.readXplorer.databackend.dataObjects.SnpI;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
@@ -69,7 +69,7 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
     private static final long serialVersionUID = 1L;
     private SnpDetectionResult completeSnpData;
     private Map<String, Integer> snpStatsMap;
-    private PersistantReference reference;
+    private PersistentReference reference;
     private TableRightClickFilter<UneditableTableModel> tableFilter;
     
 
@@ -313,8 +313,8 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
             ReferenceConnector refGenCon = ProjectConnector.getInstance().getRefGenomeConnector(this.reference.getId());
             
             ParameterSetSNPs snpAnalysisParams = (ParameterSetSNPs) snpData.getParameters();
-            for (PersistantChromosome chrom : reference.getChromosomes().values()) {
-                List<PersistantFeature> featuresSorted = refGenCon.getFeaturesForRegionInclParents(0, chrom.getLength(), 
+            for (PersistentChromosome chrom : reference.getChromosomes().values()) {
+                List<PersistentFeature> featuresSorted = refGenCon.getFeaturesForRegionInclParents(0, chrom.getLength(), 
                         snpAnalysisParams.getSelFeatureTypes(), chrom.getId());
 
                 SnpTranslator snpTranslator = new SnpTranslator(featuresSorted, chrom, reference);
@@ -328,7 +328,7 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
                 String effect;
                 String ids;
                 char aminoAcid;
-                List<PersistantFeature> featuresFound;
+                List<PersistentFeature> featuresFound;
                 SequenceComparison type;
 
                 for (SnpI snpi : snps) {
@@ -433,7 +433,7 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
                                     type = SequenceComparison.UNKNOWN;
                                 }
 
-                                for (PersistantFeature feature : featuresFound) {
+                                for (PersistentFeature feature : featuresFound) {
                                     ids += feature + "\n";
                                     snp.addCodon(new CodonSnp("", "", ' ', ' ', type, feature));
                                 }
@@ -469,7 +469,7 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
                 TableRowSorter<TableModel> sorter = new TableRowSorter<>();
                 this.snpTable.setRowSorter(sorter);
                 sorter.setModel(model);
-                TableComparatorProvider.setPersistantTrackComparator(sorter, 2);
+                TableComparatorProvider.setPersistentTrackComparator(sorter, 2);
 
                 snpStatsMap.put(SNPS_TOTAL, this.completeSnpData.getSnpList().size());
                 snpStatsMap.put(SNPS_INTERGENEIC, noIntergenicSnps);
@@ -494,7 +494,7 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
         }
     }
     
-    public void setReferenceGenome(PersistantReference reference){
+    public void setReferenceGenome(PersistentReference reference){
         this.reference = reference;
     }
 

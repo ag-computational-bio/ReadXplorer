@@ -16,11 +16,12 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.readPairViewer;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReadPair;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReadPairGroup;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReadPair;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReadPairGroup;
+import de.cebitec.readXplorer.util.classification.Classification;
 import de.cebitec.readXplorer.view.dataVisualisation.GenomeGapManager;
+import de.cebitec.readXplorer.view.dataVisualisation.PaintUtilities;
 import de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer.BlockContainer;
 import de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer.BlockI;
 import de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer.LayerI;
@@ -42,7 +43,7 @@ public class LayoutPairs implements LayoutI {
     private int absStop;
     private ArrayList<LayerI> reverseLayers;
     private BlockContainer reverseBlockContainer;
-    private final List<FeatureType> exclusionList;
+    private final List<Classification> exclusionList;
 
     /**
      * Creates a new layout for read pairs.
@@ -51,7 +52,7 @@ public class LayoutPairs implements LayoutI {
      * @param readPairs all read pairs to add to the layout
      * @param exclusionList list of excluded feature types 
      */
-    public LayoutPairs(int absStart, int absStop, Collection<PersistantReadPairGroup> readPairs, List<FeatureType> exclusionList) {
+    public LayoutPairs(int absStart, int absStop, Collection<PersistentReadPairGroup> readPairs, List<Classification> exclusionList) {
         this.absStart = absStart;
         this.absStop = absStop;
         this.reverseLayers = new ArrayList<>();
@@ -66,21 +67,22 @@ public class LayoutPairs implements LayoutI {
      * Each read pair group gets one block.
      * @param readPairList read pairs in current interval
      */
-    private void createBlocks(Collection<PersistantReadPairGroup> readPairList) {
-        Iterator<PersistantReadPairGroup> groupIt = readPairList.iterator();
+    private void createBlocks(Collection<PersistentReadPairGroup> readPairList) {
+        Iterator<PersistentReadPairGroup> groupIt = readPairList.iterator();
         while (groupIt.hasNext()) {
-            PersistantReadPairGroup group = groupIt.next();
-            List<PersistantReadPair> readPairs = group.getReadPairs();
-            List<PersistantMapping> singleMappings = group.getSingleMappings();
-            Iterator<PersistantReadPair> pairIt = readPairs.iterator();
-            Iterator<PersistantMapping> singleIt = singleMappings.iterator();
+            PersistentReadPairGroup group = groupIt.next();
+            List<PersistentReadPair> readPairs = group.getReadPairs();
+            List<Mapping> singleMappings = group.getSingleMappings();
+            Iterator<PersistentReadPair> pairIt = readPairs.iterator();
+            Iterator<Mapping> singleIt = singleMappings.iterator();
             long start = Long.MAX_VALUE;
             long stop = Long.MIN_VALUE;
             boolean containsVisibleMapping = false;
             //handle pairs
             while (pairIt.hasNext()) {
-                PersistantReadPair pair = pairIt.next();
-                containsVisibleMapping = !inExclusionList(pair.getVisibleMapping()) || !inExclusionList(pair.getVisibleMapping2());
+                PersistentReadPair pair = pairIt.next();
+                containsVisibleMapping = !PaintUtilities.inExclusionList(pair.getVisibleMapping(), exclusionList) || 
+                                         !PaintUtilities.inExclusionList(pair.getVisibleMapping2(), exclusionList);
 
                 if (containsVisibleMapping) {
                     // get start position
@@ -97,8 +99,8 @@ public class LayoutPairs implements LayoutI {
 
             //handle single mappings
             while (singleIt.hasNext()) {
-                PersistantMapping mapping = singleIt.next();
-                containsVisibleMapping = containsVisibleMapping ? containsVisibleMapping : inExclusionList(mapping);
+                Mapping mapping = singleIt.next();
+                containsVisibleMapping = containsVisibleMapping ? containsVisibleMapping : PaintUtilities.inExclusionList(mapping, exclusionList);
 
                 //update start position, if necessary
                 if (mapping.getStart() > this.absStart && mapping.getStart() < start) {
@@ -175,19 +177,5 @@ public class LayoutPairs implements LayoutI {
     @Override
     public GenomeGapManager getGenomeGapManager() {
         return null;
-    }
-    
-    /**
-     * Returns true if the type of the current mapping is in the exclusion list.
-     * This means it should not be displayed.
-     * @param m the mapping to test, if it should be displayed
-     * @return true, if the mapping should be excluded from being displayed,
-     * false otherwise
-     */
-    private boolean inExclusionList(PersistantMapping m) {
-        return (m.getDifferences() == 0 && this.exclusionList.contains(FeatureType.PERFECT_COVERAGE))
-                || (m.getDifferences() > 0 && m.isBestMatch() && this.exclusionList.contains(FeatureType.BEST_MATCH_COVERAGE))
-                || (!m.isUnique() && this.exclusionList.contains(FeatureType.MULTIPLE_MAPPED_READ))
-                || (m.getDifferences() > 0 && !m.isBestMatch() && this.exclusionList.contains(FeatureType.COMMON_COVERAGE));
     }
 }

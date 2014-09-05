@@ -7,8 +7,8 @@
 package de.cebitec.readxplorer.vcf.visualization;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +29,7 @@ public class Snp_VcfResult extends ResultTrackAnalysis<Object>  {
      * @param reference
      * @param combineTracks
      */
-    public Snp_VcfResult(List<VariantContext> snpVcfList, Map<Integer, PersistantTrack> trackMap, PersistantReference reference, boolean combineTracks) {
+    public Snp_VcfResult(List<VariantContext> snpVcfList, Map<Integer, PersistentTrack> trackMap, PersistentReference reference, boolean combineTracks) {
         super(reference, trackMap, combineTracks, -1, 0);
         this.snpVcfList = snpVcfList;
     }

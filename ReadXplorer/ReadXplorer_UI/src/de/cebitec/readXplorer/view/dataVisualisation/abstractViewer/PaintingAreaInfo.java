@@ -22,7 +22,7 @@ import java.awt.geom.Point2D;
  * Contains useful info about a painting area, such as heights, widths,
  * left and right end positions.
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class PaintingAreaInfo {
 
@@ -40,14 +40,13 @@ public class PaintingAreaInfo {
 
     private int completeHeight;
 
+    public PaintingAreaInfo() {
 
-    public PaintingAreaInfo(){
-        
     }
 
     @Override
-    public String toString(){
-        StringBuilder sb = new StringBuilder();
+    public String toString() {
+        StringBuilder sb = new StringBuilder(20);
         sb.append("left: ").append(phyLeft).append("\n");
         sb.append("right: ").append(phyRight).append("\n");
         sb.append("width: ").append(phyWidth).append("\n");
@@ -72,8 +71,8 @@ public class PaintingAreaInfo {
         updateCompleteHeight();
     }
 
-    private void updateCompleteHeight(){
-        completeHeight = reverseHigh - forwardHigh +1;
+    private void updateCompleteHeight() {
+        completeHeight = reverseHigh - forwardHigh + 1;
     }
 
     public int getForwardLow() {
@@ -93,8 +92,8 @@ public class PaintingAreaInfo {
     }
 
     /**
-     * Sets the left physical boundary (pixel) in the painting area and recalculates
-     * the width.
+     * Sets the left physical boundary (pixel) in the painting area and
+     * recalculates the width.
      * @param phyLeft left physical boundary (pixel) of the painting area
      */
     public void setPhyLeft(int phyLeft) {
@@ -110,8 +109,8 @@ public class PaintingAreaInfo {
     }
 
     /**
-     * Sets the right physical boundary (pixel) of the painting area and recalculates
-     * the width.
+     * Sets the right physical boundary (pixel) of the painting area and
+     * recalculates the width.
      * @param phyRight right physical boundary (pixel) of the painting area
      */
     public void setPhyRight(int phyRight) {
@@ -148,16 +147,16 @@ public class PaintingAreaInfo {
     /**
      * Recalculates the physical width (pixel) of the painting area
      */
-    private void recalcWidth(){
-        this.phyWidth = phyRight - phyLeft +1;
+    private void recalcWidth() {
+        this.phyWidth = phyRight - phyLeft + 1;
     }
 
-    private void updateAvailableForwardHeight(){
-        availableForwardHeight = forwardLow - forwardHigh +1;
+    private void updateAvailableForwardHeight() {
+        availableForwardHeight = forwardLow - forwardHigh + 1;
     }
-    
-    private void updateAvailableReverseHeight(){
-        availableReverseHeight = reverseHigh - reverseLow +1;
+
+    private void updateAvailableReverseHeight() {
+        availableReverseHeight = reverseHigh - reverseLow + 1;
     }
 
     public int getAvailableForwardHeight() {
@@ -172,44 +171,28 @@ public class PaintingAreaInfo {
         return completeHeight;
     }
 
-    public boolean fitsIntoArea(Point2D p){
+    public boolean fitsIntoArea(Point2D p) {
         boolean fitsX = false;
-        if(p.getX() >= phyLeft && p.getX() <= phyRight){
+        if (p.getX() >= phyLeft && p.getX() <= phyRight) {
             fitsX = true;
         }
         boolean fitsY = false;
-        if(p.getY() >= forwardHigh && p.getY() <= reverseHigh){
+        if (p.getY() >= forwardHigh && p.getY() <= reverseHigh) {
             fitsY = true;
         }
 
-        if(fitsX && fitsY){
-            return true;
-        } else {
-            return false;
-        }
+        return fitsX && fitsY;
     }
 
-    public boolean fitsIntoAreaY(int yValue){
-        if(yValue >= forwardHigh && yValue <= reverseHigh){
-            return true;
-        } else {
-            return false;
-        }
+    public boolean fitsIntoAreaY(int yValue) {
+        return yValue >= forwardHigh && yValue <= reverseHigh;
     }
 
-    public boolean fitsIntoAvailableForwardSpace(double yValue){
-        if(yValue <= availableForwardHeight){
-            return true;
-        } else {
-            return false;
-        }
+    public boolean fitsIntoAvailableForwardSpace(double yValue) {
+        return yValue <= availableForwardHeight;
     }
 
-    public boolean fitsIntoAvailableReverseSpace(double yValue){
-        if(yValue <= availableReverseHeight){
-            return true;
-        } else {
-            return false;
-        }
+    public boolean fitsIntoAvailableReverseSpace(double yValue) {
+        return yValue <= availableReverseHeight;
     }
 }

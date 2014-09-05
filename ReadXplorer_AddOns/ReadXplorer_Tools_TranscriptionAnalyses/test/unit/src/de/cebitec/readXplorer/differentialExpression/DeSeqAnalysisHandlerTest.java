@@ -18,7 +18,7 @@ package de.cebitec.readXplorer.differentialExpression;
 
 //package de.cebitec.readXplorer.differentialExpression;
 //
-//import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+//import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 //import de.cebitec.readXplorer.util.FeatureType;
 //import java.sql.Timestamp;
 //import java.util.ArrayList;
@@ -41,7 +41,7 @@ package de.cebitec.readXplorer.differentialExpression;
 //
 //    private DeSeqAnalysisHandler instance;
 //    private static final int numberOfTracks = 4;
-//    private static List<PersistantTrack> selectedTracks;
+//    private static List<PersistentTrack> selectedTracks;
 //    private static Map<String, String[]> MultiFactorDesign;
 //    private static Map<String, String[]> TwoFactorDesign;
 //
@@ -54,7 +54,7 @@ package de.cebitec.readXplorer.differentialExpression;
 //        selectedTracks = new ArrayList<>();
 //        for (int i = 0; i < numberOfTracks; i++) {
 //            Timestamp currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-//            selectedTracks.add(new PersistantTrack(i, "", "track" + i, currentTimestamp, 0, 0));
+//            selectedTracks.add(new PersistentTrack(i, "", "track" + i, currentTimestamp, 0, 0));
 //        }
 //
 //        MultiFactorDesign = new HashMap<>();

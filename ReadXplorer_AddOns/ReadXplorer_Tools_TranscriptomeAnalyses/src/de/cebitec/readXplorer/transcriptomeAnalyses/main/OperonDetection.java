@@ -1,9 +1,9 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.OperonAdjacency;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
@@ -40,8 +40,8 @@ public class OperonDetection {
         List<OperonAdjacency> operonAdjacencies = new ArrayList<>();
         int lastAnnoId = 0;
         Operon op;
-        PersistantFeature feature1;
-        PersistantFeature feature2;
+        PersistentFeature feature1;
+        PersistentFeature feature2;
         OperonAdjacency opAdj;
         int spanningReads;
         for (Integer leadingFeatureID : putativeOperonAdjacencies.keySet()) {
@@ -75,8 +75,8 @@ public class OperonDetection {
         for (Operon operon : operons) {
             for (OperonAdjacency operonAdjacency : operon.getOperonAdjacencies()) {
 
-                PersistantFeature featureA = operonAdjacency.getFeature1();
-                PersistantFeature featureB = operonAdjacency.getFeature2();
+                PersistentFeature featureA = operonAdjacency.getFeature1();
+                PersistentFeature featureB = operonAdjacency.getFeature2();
                 if (featureA.getType() == FeatureType.RRNA) {
                     operon.removeAdjaceny(operonAdjacency);
                 } else if (featureB.getType() == FeatureType.RRNA) {

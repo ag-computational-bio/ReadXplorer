@@ -134,14 +134,14 @@ public class ReferenceJob implements Job {
         return timestamp;
     }
 
-    public boolean isPersistant() {
+    public boolean isPersistent() {
         return id != null;
     }
 
     /**
-     * @param id Set this reference job persistant by setting its unique db id.
+     * @param id Set this reference job persistent by setting its unique db id.
      */
-    public void setPersistant(int id){
+    public void setPersistent(int id){
         this.id = id;
     }
 
@@ -155,7 +155,7 @@ public class ReferenceJob implements Job {
 
     @Override
     public String toString() {
-        if (isPersistant()) {
+        if (isPersistent()) {
             return " db: " + name + " " + timestamp;
         } else {
             return "new: " + name + " " + timestamp;

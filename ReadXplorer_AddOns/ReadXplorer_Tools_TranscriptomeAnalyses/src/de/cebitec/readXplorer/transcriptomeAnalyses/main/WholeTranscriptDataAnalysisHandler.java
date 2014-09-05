@@ -5,9 +5,9 @@ import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.AnalysisStatus;
 import de.cebitec.readXplorer.util.GeneralUtils;
@@ -15,6 +15,9 @@ import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readXplorer.util.classification.Classification;
+import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readXplorer.util.classification.MappingClass;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -34,8 +37,8 @@ import org.openide.util.Exceptions;
 public class WholeTranscriptDataAnalysisHandler extends Thread implements Observable, DataVisualisationI {
 
     private TrackConnector trackConnector;
-    private final PersistantTrack selectedTrack;
-    private final PersistantReference reference;
+    private final PersistentTrack selectedTrack;
+    private final PersistentReference reference;
     private final double fraction;
     private final List<de.cebitec.readXplorer.util.Observer> observer = new ArrayList<>();
     private List<int[]> region2Exclude;
@@ -49,12 +52,12 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
     private NovelTranscriptDetection newRegionDetection;
     private final ReferenceViewer refViewer;
     private final TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
-    private Map<Integer, PersistantTrack> trackMap;
+    private Map<Integer, PersistentTrack> trackMap;
     private ProgressHandle progressHandle;
     /**
-     * Key: featureID , Value: PersistantFeature
+     * Key: featureID , Value: PersistentFeature
      */
-    private HashMap<Integer, PersistantFeature> allRegionsInHash;
+    private HashMap<Integer, PersistentFeature> allRegionsInHash;
     private ResultPanelRPKM rpkmResultPanel;
     private NovelRegionResultPanel novelRegionResult;
     private ResultPanelOperonDetection operonResultPanel;
@@ -62,16 +65,16 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
     /**
      * Constructor for WholeTranscriptDataAnalysisHandler.
      *
-     * @param selectedTrack PersistantTrack the analysis is based on.
+     * @param selectedTrack Track the analysis is based on.
      * @param parameterset ParameterSetWholeTranscriptAnalyses stores all
      * paramaters for whole transcript dataset analysis.
      * @param refViewer ReferenceViewer
      * @param transcAnalysesTopComp
      * TranscriptomeAnalysesTopComponentTopComponent output widow for computed
      * results.
-     * @param trackMap contains all PersistantTracks used for this analysis-run.
+     * @param trackMap contains all PersistentTracks used for this analysis-run.
      */
-    public WholeTranscriptDataAnalysisHandler(PersistantTrack selectedTrack, ParameterSetWholeTranscriptAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, Map<Integer, PersistantTrack> trackMap) {
+    public WholeTranscriptDataAnalysisHandler(PersistentTrack selectedTrack, ParameterSetWholeTranscriptAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, Map<Integer, PersistentTrack> trackMap) {
         this.selectedTrack = selectedTrack;
         this.reference = refViewer.getReference();
         this.fraction = parameterset.getFraction();
@@ -126,8 +129,14 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
                 }
             }
 
+            List<Classification> excludedClasses = new ArrayList<>();
+            excludedClasses.add(MappingClass.COMMON_MATCH);
+            excludedClasses.add(FeatureType.MULTIPLE_MAPPED_READ);
+            if (!bestMatchesSelected) {
+                excludedClasses.add(FeatureType.MULTIPLE_MAPPED_READ);
+            }
             AnalysesHandler handler = new AnalysesHandler(trackConnector, this, "Collecting coverage data of track number "
-                    + this.selectedTrack.getId(), new ParametersReadClasses(true, bestMatchesSelected, false, false, new Byte("0"))); // TODO: ParameterReadClasses noch in den Wizard einbauen und die parameter hier mit übergeben!
+                    + this.selectedTrack.getId(), new ParametersReadClasses(excludedClasses, new Byte("0"))); // TODO: ParameterReadClasses noch in den Wizard einbauen und die parameter hier mit übergeben!
             handler.setMappingsNeeded(true);
             handler.setDesiredData(Properties.REDUCED_MAPPINGS);
             handler.registerObserver(this.stats);
@@ -212,7 +221,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
             if (novelRegionResult == null) {
                 novelRegionResult = new NovelRegionResultPanel();
                 novelRegionResult.setReferenceViewer(refViewer);
-                novelRegionResult.setPersistantReference(reference);
+                novelRegionResult.setPersistentReference(reference);
             }
 
             NovelRegionResult newRegionResult = new NovelRegionResult(reference, stats, trackMap, newRegionDetection.getNovelRegions(), false);
@@ -244,7 +253,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
             if (operonResultPanel == null) {
                 operonResultPanel = new ResultPanelOperonDetection();
                 operonResultPanel.setReferenceViewer(refViewer);
-                operonResultPanel.setPersistantReference(reference);
+                operonResultPanel.setPersistentReference(reference);
             }
 
             OperonDetectionResult operonDetectionResult = new OperonDetectionResult(this.stats, this.trackMap, detectedOperons, reference);

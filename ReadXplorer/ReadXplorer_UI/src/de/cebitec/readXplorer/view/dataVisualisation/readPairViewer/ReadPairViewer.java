@@ -20,12 +20,12 @@ import de.cebitec.readXplorer.databackend.IntervalRequest;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.databackend.ThreadListener;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.ReadPairResultPersistant;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.ReadPairResultPersistent;
 import de.cebitec.readXplorer.util.Benchmark;
 import de.cebitec.readXplorer.util.ColorProperties;
-import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readXplorer.util.classification.Classification;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
@@ -54,7 +54,7 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
     private static final long serialVersionUID = 234765253;
     private TrackConnector trackConnector;
     private LayoutI layout;
-    private PersistantReference refGen;
+    private PersistentReference refGen;
     private int blockHeight;
     private int layerHeight;
 //    private int minCountInInterval;
@@ -68,7 +68,7 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
 //    private float percentSandBPerCovUnit;
     private int oldLogLeft;
     private int oldLogRight;
-    private ReadPairResultPersistant readPairs;
+    private ReadPairResultPersistent readPairs;
     private boolean mappingsLoading = false;
     private List<BlockComponentPair> jBlockList;
     
@@ -83,7 +83,7 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
      * @param refGen the reference genome
      * @param trackConnector track connector of one of the two read pair tracks
      */
-    public ReadPairViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGen, TrackConnector trackConnector) {
+    public ReadPairViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistentReference refGen, TrackConnector trackConnector) {
         super(boundsInfoManager, basePanel, refGen);
 //        this.createFocusListener();
 //        this.paintPanel = new JPanel();
@@ -97,7 +97,7 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
         this.setHorizontalMargin(10);
         this.setupComponents();
         this.setActive(false);
-        this.readPairs = new ReadPairResultPersistant(null, null);
+        this.readPairs = new ReadPairResultPersistent(null, null);
     }
 
     @Override
@@ -145,11 +145,10 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
         this.jBlockList = new ArrayList<>();
         this.removeAll();
         //check for feature types in the exclusion list and adapt database query for performance
-        List<FeatureType> excludedFeatureTypes = this.getExcludedFeatureTypes();
+        List<Classification> excludedFeatureTypes = this.getExcludedFeatureTypes(); //TODO: this does not do anything in the reader! rethink filtering here
         //TODO: add unique filter to read pair viewer
         this.mappingsLoading = true;
-        ParametersReadClasses readClassParams = new ParametersReadClasses(!excludedFeatureTypes.contains(FeatureType.PERFECT_PAIR),
-                !excludedFeatureTypes.contains(FeatureType.DISTORTED_PAIR), !excludedFeatureTypes.contains(FeatureType.SINGLE_MAPPING), false, new Byte("0"));
+        ParametersReadClasses readClassParams = new ParametersReadClasses(excludedFeatureTypes, new Byte("0"));
         trackConnector.addMappingRequest(new IntervalRequest(from, to, from - 1000, to + 1000, this.getRefGen().getActiveChromId(), this, false, 
                 Properties.READ_PAIRS, Byte.valueOf("0"), readClassParams));
         this.oldLogLeft = from;
@@ -160,7 +159,7 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
     @SuppressWarnings("unchecked")
     public void receiveData(Object data) {
         if (data.getClass().equals(readPairs.getClass())) {
-            this.readPairs = (ReadPairResultPersistant) data;
+            this.readPairs = (ReadPairResultPersistent) data;
             stop = System.currentTimeMillis();
             System.out.println(Benchmark.calculateDuration(start, stop, "Request: "));
             this.createAndShowNewLayout();
@@ -298,7 +297,7 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
         return width;
     }
 
-    public PersistantReference getRefGen() {
+    public PersistentReference getRefGen() {
         return refGen;
     }
 
@@ -344,13 +343,13 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
 //     * Minimum count is currently disabled as it was not needed.
 //     * @param readPairs 
 //     */
-//    private void findMinAndMaxCount(Collection<PersistantReadPairGroup> readPairs) {
+//    private void findMinAndMaxCount(Collection<PersistentReadPairGroup> readPairs) {
 ////        this.minCountInInterval = Integer.MAX_VALUE; //uncomment all these lines to get min count
 //        this.maxCountInInterval = Integer.MIN_VALUE;
 ////        this.fwdMappingsInInterval = 0;
 //        this.pairCountInInterval = 0;
 //
-////        for (PersistantReadPairGroup pair : readPairs) {
+////        for (PersistentReadPairGroup pair : readPairs) {
 //            ++this.pairCountInInterval;
 ////            if (pair.getVisibleMapping().isForwardStrand()){
 ////                ++this.fwdMappingsInInterval;

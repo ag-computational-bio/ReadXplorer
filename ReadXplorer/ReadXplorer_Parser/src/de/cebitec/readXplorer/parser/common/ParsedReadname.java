@@ -19,7 +19,7 @@ package de.cebitec.readXplorer.parser.common;
 import java.util.HashSet;
 
 /**
- * Since the RUN domain has been excluded a PersistantRun is not needed anymore!
+ * Since the RUN domain has been excluded a PersistentRun is not needed anymore!
  * Should be deprecated as long as it is not needed for anything else.
  *
  * @author ddoppmeier

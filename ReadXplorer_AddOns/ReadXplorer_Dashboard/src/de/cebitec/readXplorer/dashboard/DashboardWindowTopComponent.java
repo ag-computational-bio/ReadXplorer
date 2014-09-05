@@ -19,8 +19,8 @@ package de.cebitec.readXplorer.dashboard;
 import de.cebitec.readXplorer.controller.ViewController;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference; 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference; 
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readXplorer.view.TopComponentExtended;
@@ -157,18 +157,18 @@ public final class DashboardWindowTopComponent extends TopComponentExtended impl
             openButton.setVisible(true);
             openDBButton.setText(Bundle.DashboardWindowTopComponent_openDBButton_loggedIn());
             try {
-                final Map<PersistantReference, List<PersistantTrack>> genomesAndTracks =
+                final Map<PersistentReference, List<PersistentTrack>> genomesAndTracks =
                         ProjectConnector.getInstance().getGenomesAndTracks();
 
-                Node rootNode = new AbstractNode(new Children.Keys<PersistantReference>() {
+                Node rootNode = new AbstractNode(new Children.Keys<PersistentReference>() {
                     @Override
-                    protected Node[] createNodes(PersistantReference genome) {
+                    protected Node[] createNodes(PersistentReference genome) {
                         try {
-                            List<PersistantTrack> tracks = genomesAndTracks.get(genome);
+                            List<PersistentTrack> tracks = genomesAndTracks.get(genome);
 
                             if (tracks != null) {
                                 List<DBItem> trackItems = new ArrayList<>();
-                                for (PersistantTrack track : tracks) {
+                                for (PersistentTrack track : tracks) {
                                     trackItems.add(new DBItem(track));
                                 }
                                 return new Node[]{new DBItemNode(new DBItem(genome), new DBItemChildren(trackItems))};
@@ -477,13 +477,13 @@ public final class DashboardWindowTopComponent extends TopComponentExtended impl
         
         this.updateOpenList();
         
-        Map<PersistantReference, List<PersistantTrack>> genomesAndTracks = ProjectConnector.getInstance().getGenomesAndTracks();
+        Map<PersistentReference, List<PersistentTrack>> genomesAndTracks = ProjectConnector.getInstance().getGenomesAndTracks();
         
         for (Long genomeId : genomesAndTracksToOpen.keySet()) {
             Set<Long> trackIds = genomesAndTracksToOpen.get(genomeId);
             
             ReferenceConnector rc = ProjectConnector.getInstance().getRefGenomeConnector(genomeId.intValue());
-            PersistantReference genome = rc.getRefGenome();
+            PersistentReference genome = rc.getRefGenome();
             
             //open reference genome now
             AppPanelTopComponent appPanelTopComponent = new AppPanelTopComponent();
@@ -494,9 +494,9 @@ public final class DashboardWindowTopComponent extends TopComponentExtended impl
              
             
             //open tracks for this genome now
-            List<PersistantTrack> allTracksForThisGenome = genomesAndTracks.get(genome);
-            List<PersistantTrack> tracksToShow = new ArrayList<>();
-            for (PersistantTrack track : allTracksForThisGenome) {
+            List<PersistentTrack> allTracksForThisGenome = genomesAndTracks.get(genome);
+            List<PersistentTrack> tracksToShow = new ArrayList<>();
+            for (PersistentTrack track : allTracksForThisGenome) {
                 if (trackIds.contains(new Long(track.getId()))) {
                     tracksToShow.add(track);
                 }

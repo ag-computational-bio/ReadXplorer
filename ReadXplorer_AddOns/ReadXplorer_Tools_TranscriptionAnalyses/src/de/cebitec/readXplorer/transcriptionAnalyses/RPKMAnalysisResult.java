@@ -17,9 +17,9 @@
 package de.cebitec.readXplorer.transcriptionAnalyses;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.RPKMvalue;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import java.util.ArrayList;
@@ -44,8 +44,8 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
      * result. Also converts the list of returned features into the format
      * readable for the ExcelExporter. Generates all three, the sheet names,
      * headers and data to write.
-     * @param trackMap the map of track ids to the PersistantTrack used for this
-     * analysis
+     * @param trackMap the map of track ids to the PersistentTrack used for this
+ analysis
      * @param rpkmResults The result list of RPKM values and read counts
      * @param reference reference genome, for which this result was generated
      * @param combineTracks <cc>true</cc>, if the tracks in the list are
@@ -54,7 +54,7 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
      * @param filterColumn column which shall be used for filtering the results
      * among results of other tracks (e.g. the feature column for RPKM analysis)
      */
-    public RPKMAnalysisResult(Map<Integer, PersistantTrack> trackMap, List<RPKMvalue> rpkmResults, PersistantReference reference, 
+    public RPKMAnalysisResult(Map<Integer, PersistentTrack> trackMap, List<RPKMvalue> rpkmResults, PersistentReference reference, 
             boolean combineTracks, int trackColumn, int filterColumn) {
         super(reference, trackMap, combineTracks, trackColumn, filterColumn);
         this.rpkmResults = rpkmResults;
@@ -110,7 +110,7 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
     public List<List<List<Object>>> dataToExcelExportList() {
         List<List<List<Object>>> exportData = new ArrayList<>();
         List<List<Object>> rpkmResultRows = new ArrayList<>();
-        PersistantFeature feat;
+        PersistentFeature feat;
 
         for (RPKMvalue rpkmValue : this.rpkmResults) {
             List<Object> rpkmRow = new ArrayList<>();

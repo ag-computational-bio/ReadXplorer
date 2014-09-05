@@ -2,7 +2,7 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.ParameterSetI;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.StartCodon;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;

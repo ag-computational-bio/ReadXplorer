@@ -1,16 +1,16 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.StartCodon;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.FivePrimeEnrichedTracksVisualPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.WizardPropertyStrings;
-import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.GeneralUtils;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,7 +37,7 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
      * @param trackMap
      * @param reference
      */
-    public TSSDetectionResults(StatisticsOnMappingData stats, List<TranscriptionStart> results, Map<Integer, PersistantTrack> trackMap, PersistantReference reference) {
+    public TSSDetectionResults(StatisticsOnMappingData stats, List<TranscriptionStart> results, Map<Integer, PersistentTrack> trackMap, PersistentReference reference) {
         super(reference, trackMap, false, 22, 0);
         this.results = results;
         this.stats = stats;
@@ -127,8 +127,8 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
             tssRow.add(tss.getReadStarts());
             tssRow.add(tss.getRelCount());
 
-            PersistantFeature detectedGene = tss.getDetectedGene();
-            PersistantFeature nextDownstreamGene = tss.getNextGene();
+            PersistentFeature detectedGene = tss.getDetectedGene();
+            PersistentFeature nextDownstreamGene = tss.getNextGene();
 
             if (detectedGene != null) {
                 tssRow.add(tss.getDetectedGene().toString());

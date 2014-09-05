@@ -17,7 +17,7 @@
 package de.cebitec.readXplorer.view.dialogMenus;
 
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.parser.ReferenceJob;
 import de.cebitec.readXplorer.parser.mappings.MappingParserI;
 import de.cebitec.readXplorer.util.VisualisationUtils;
@@ -124,8 +124,8 @@ public abstract class ImportTrackBasePanel extends FileSelectionPanel {
         List<ReferenceJob> refJobList = new ArrayList<>();
 
         try {
-            List<PersistantReference> refs = ProjectConnector.getInstance().getGenomes();
-            for (PersistantReference r : refs) {
+            List<PersistentReference> refs = ProjectConnector.getInstance().getGenomes();
+            for (PersistentReference r : refs) {
                 refJobList.add(new ReferenceJob(r.getId(), r.getFastaFile(), null, r.getDescription(), r.getName(), r.getTimeStamp()));
             }
         } catch (OutOfMemoryError e) {

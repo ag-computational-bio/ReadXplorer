@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.coverageAnalysis;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.util.UneditableTableModel;
@@ -298,7 +298,7 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
         StringBuilder results = new StringBuilder(100);
         List<CoverageInterval> coverageIntervals = coverageAnalysisResult.getResults().getCoverageIntervals();
         coverageIntervals.addAll(coverageAnalysisResult.getResults().getCoverageIntervalsRev());
-        PersistantReference reference = coverageAnalysisResult.getReference();
+        PersistentReference reference = coverageAnalysisResult.getReference();
         int start;
         int stop;
         String seq;

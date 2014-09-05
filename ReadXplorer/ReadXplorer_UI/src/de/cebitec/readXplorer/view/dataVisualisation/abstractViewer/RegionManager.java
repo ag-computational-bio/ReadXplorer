@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfo;
 import de.cebitec.readXplorer.view.dataVisualisation.HighlightAreaListener;
@@ -56,7 +56,7 @@ public class RegionManager {
      *          detected by this manager play a special role for this listener.
      */
     public RegionManager(SequenceBar regionVisualizer, AbstractViewer parentViewer, 
-                PersistantReference refGen, HighlightAreaListener highlightListener) {
+                PersistentReference refGen, HighlightAreaListener highlightListener) {
         
         this.regionVisualizer = regionVisualizer;
         this.parentViewer = parentViewer;

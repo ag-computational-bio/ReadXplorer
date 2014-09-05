@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.CodonUtilities;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.PositionUtils;
@@ -42,7 +42,7 @@ public class StartCodonFilter implements RegionFilterI {
     private List<Region> regions;
     private int absStart;
     private int absStop;
-    private PersistantReference refGen;
+    private PersistentReference refGen;
     private String sequence;
     private ArrayList<Boolean> selectedStarts;
     private ArrayList<Boolean> selectedStops;
@@ -58,7 +58,7 @@ public class StartCodonFilter implements RegionFilterI {
      * @param absStop end of the region to search in
      * @param refGen the reference in which to search
      */
-    public StartCodonFilter(int absStart, int absStop, PersistantReference refGen) {
+    public StartCodonFilter(int absStart, int absStop, PersistentReference refGen) {
         this.regions = new ArrayList<>();
         this.absStart = absStart;
         this.absStop = absStop;
@@ -159,7 +159,7 @@ public class StartCodonFilter implements RegionFilterI {
                      * -3 = (pos 4 - 1) % 3 = 0 -> 0 - 3 = frame -3
                      */
                     if (    PositionUtils.determineFwdFrame(start) == this.frameCurrFeature ||
-                            PositionUtils.determineFwdFrame(stop)  == this.frameCurrFeature) {
+                            PositionUtils.determineRevFrame(stop)  == this.frameCurrFeature) {
                         regions.add(new Region(start, stop, isForwardStrand, type));
                     }
                 } else {

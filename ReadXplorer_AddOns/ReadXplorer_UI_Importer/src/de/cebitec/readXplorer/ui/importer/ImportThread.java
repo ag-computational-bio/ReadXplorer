@@ -19,7 +19,7 @@ package de.cebitec.readXplorer.ui.importer;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.StorageException;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readXplorer.parser.ReadPairJobContainer;
 import de.cebitec.readXplorer.parser.ReferenceJob;
 import de.cebitec.readXplorer.parser.TrackJob;
@@ -30,7 +30,6 @@ import de.cebitec.readXplorer.parser.common.ParsingException;
 import de.cebitec.readXplorer.parser.mappings.MappingParserI;
 import de.cebitec.readXplorer.parser.mappings.SamBamStatsParser;
 import de.cebitec.readXplorer.parser.output.SamBamCombiner;
-import de.cebitec.readXplorer.parser.output.SamBamExtender;
 import de.cebitec.readXplorer.parser.reference.Filter.FeatureFilter;
 import de.cebitec.readXplorer.parser.reference.Filter.FilterRuleSource;
 import de.cebitec.readXplorer.parser.reference.ReferenceParserI;
@@ -118,7 +117,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Start storing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath());
 
         int refGenID = ProjectConnector.getInstance().addRefGenome(refGenome);
-        refGenJob.setPersistant(refGenID);
+        refGenJob.setPersistent(refGenID);
 
         Logger.getLogger(ImportThread.class.getName()).log(Level.INFO, "Finished storing reference genome from source \"{0}\"", refGenJob.getFile().getAbsolutePath());
     }
@@ -181,8 +180,8 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
     private void setChromLengthMap(TrackJob trackJob) {
         chromLengthMap = new HashMap<>();
         int id = trackJob.getRefGen().getID();
-        Map<Integer, PersistantChromosome> chromIdMap = ProjectConnector.getInstance().getRefGenomeConnector(id).getRefGenome().getChromosomes();
-        for (PersistantChromosome chrom : chromIdMap.values()) {
+        Map<Integer, PersistentChromosome> chromIdMap = ProjectConnector.getInstance().getRefGenomeConnector(id).getRefGenome().getChromosomes();
+        for (PersistentChromosome chrom : chromIdMap.values()) {
             chromLengthMap.put(chrom.getName(), chrom.getLength());
         }
     }
@@ -227,7 +226,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                         /*
                          * Algorithm:
                          * start file
-                         * if (track not yet imported) {
+                         * if (PersistentTrack not yet imported) {
                          *      convert file 1 to sam/bam, if necessary
                          *      if (isTwoTracks) { 
                          *          convert file 2 to sam/bam, if necessary
@@ -371,7 +370,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         
         /*
          * Algorithm:
-         * if (track not yet imported) {
+         * if (PersistentTrack not yet imported) {
          *      convert to sam/bam, if necessary (NEW FILE)
          *      parse mappings 
          *      extend bam file (NEW FILE) - deleteOldFile
@@ -522,36 +521,5 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
      */
     private String getBundleString(String name) {
         return NbBundle.getMessage(ImportThread.class, name);
-    }
-
-    /**
-     * Extends a sam or bam file with ReadXplorers classification data.
-     * @param classificationMap the classification map of classification data
-     * @param trackJob the track job containing the file to extend
-     * @param chromLengthMap the mapping of chromosome names to chromosome length
-     * @return true, if the extension was successful, false otherwise
-     */
-    private boolean extendSamBamFile(Map<String, ParsedClassification> classificationMap, TrackJob trackJob, Map<String, Integer> chromLengthMap) {
-        boolean success;
-        try {
-            io.getOut().println(NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.start.extension", trackJob.getFile().getName()));
-            long start = System.currentTimeMillis();
-            
-            //sorts file again by genome coordinate (position) & stores classification data
-            SamBamExtender bamExtender = new SamBamExtender(classificationMap);
-            bamExtender.setDataToConvert(trackJob, chromLengthMap);
-            bamExtender.registerObserver(this);
-            success = bamExtender.convert();
-            
-            long finish = System.currentTimeMillis();
-            String msg = NbBundle.getMessage(ImportThread.class, "MSG_ImportThread.import.finish.extension", trackJob.getFile().getName());
-            io.getOut().println(Benchmark.calculateDuration(start, finish, msg));
-            
-        } catch (ParsingException ex) {
-            this.showMsg(ex.toString());
-            success = false;
-        }
-        
-        return success;
     }
 }

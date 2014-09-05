@@ -16,14 +16,14 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReferenceGap;
+import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReferenceGap;
 import de.cebitec.readXplorer.view.dataVisualisation.GenomeGapManager;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- * A block contains detailed information about one PersistantMapping.
+ * A block contains detailed information about one Mapping.
  * 
  * @author ddoppmei, Rolf Hilker
  */
@@ -31,18 +31,18 @@ public class Block implements BlockI {
 
     private int absStart;
     private int absStop;
-    private PersistantMapping mapping;
+    private Mapping mapping;
     private GenomeGapManager gapManager;
     private ArrayList<Brick> bricks;
 
     /**
-     * A block contains detailed information about one PersistantMapping.
+     * A block contains detailed information about one Mapping.
      * @param absStart start of the block (might be larger than start of mapping)
      * @param absStop stop of the block (might be smaller than stop of mapping)
      * @param mapping mapping whose detailed information is needed
      * @param gapManager gap manager of the mapping
      */
-    public Block(int absStart, int absStop, PersistantMapping mapping, GenomeGapManager gapManager) {
+    public Block(int absStart, int absStop, Mapping mapping, GenomeGapManager gapManager) {
         this.absStart = absStart;
         this.absStop = absStop;
         this.mapping = mapping;
@@ -71,9 +71,9 @@ public class Block implements BlockI {
         }
     }
 
-    private void fillWithOwnGenomeGaps(PersistantMapping mapping, int position) {
+    private void fillWithOwnGenomeGaps(Mapping mapping, int position) {
         // do not only paint one gap, but ALL of them
-        for (PersistantReferenceGap gap : mapping.getGenomeGapsAtPosition(position)) {
+        for (PersistentReferenceGap gap : mapping.getGenomeGapsAtPosition(position)) {
             bricks.add(Brick.determineGapType(gap.getBase()));
         }
     }
@@ -84,7 +84,7 @@ public class Block implements BlockI {
         }
     }
 
-    private void addDiffOrMatchBrick(PersistantMapping mapping, int position) {
+    private void addDiffOrMatchBrick(Mapping mapping, int position) {
         Brick type;
         if (mapping.hasDiffAtPosition(position)) {
             type = Brick.determineDiffType(mapping.getDiffAtPosition(position));
@@ -105,7 +105,7 @@ public class Block implements BlockI {
     }
 
     @Override
-    public PersistantMapping getPersistantObject() {
+    public Mapping getPersistentObject() {
         return mapping;
     }
 

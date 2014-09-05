@@ -16,12 +16,13 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.readPairViewer;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReadPair;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReadPairGroup;
+import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReadPair;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReadPairGroup;
 import de.cebitec.readXplorer.util.ColorProperties;
-import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.ReadPairType;
+import de.cebitec.readXplorer.util.classification.Classification;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.view.dataVisualisation.PaintUtilities;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
@@ -138,13 +139,13 @@ public class BlockComponentPair extends JComponent implements ActionListener {
      * content of the BlockComponentPair
      */
     private void calcMappingBoundaries() {
-        PersistantReadPairGroup readPairGroup = (PersistantReadPairGroup) this.block.getPersistantObject();
-        List<PersistantReadPair> readPairs = readPairGroup.getReadPairs();
-        List<PersistantMapping> singleMappings = readPairGroup.getSingleMappings();
+        PersistentReadPairGroup readPairGroup = (PersistentReadPairGroup) this.block.getPersistentObject();
+        List<PersistentReadPair> readPairs = readPairGroup.getReadPairs();
+        List<Mapping> singleMappings = readPairGroup.getSingleMappings();
 
         Color blockColor;
-        PersistantReadPair readPair;
-        PersistantMapping mapping;
+        PersistentReadPair readPair;
+        Mapping mapping;
 
         for (int i = 0; i < readPairs.size(); ++i) {
             readPair = readPairs.get(i);
@@ -176,7 +177,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
      * @return true, if the given read typ is on the exclusion list
      */
     public boolean inExclusionList(ReadPairType readPairType) {
-        List<FeatureType> excludedFeatureTypes = this.parentViewer.getExcludedFeatureTypes();
+        List<Classification> excludedFeatureTypes = this.parentViewer.getExcludedFeatureTypes();
         FeatureType typeOfPair;
         if (readPairType == ReadPairType.PERFECT_PAIR || 
               readPairType == ReadPairType.PERFECT_UNQ_PAIR) {
@@ -198,7 +199,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
      * @param mapping mapping to create a colored rectangle for
      * @param addLine true if this is the second mapping of a pair and a connecting line is desired, false otherwise
      */
-    private void addRectAndItsColor(Color pairColor, PersistantMapping mapping, boolean addLine) {
+    private void addRectAndItsColor(Color pairColor, Mapping mapping, boolean addLine) {
         this.colorList.add(this.adjustBlockColor(pairColor, mapping));
         Rectangle blockRect = PaintUtilities.calcBlockBoundaries(mapping.getStart(), mapping.getStop(), parentViewer, phyLeft, height);
         this.rectList.add(blockRect);
@@ -222,7 +223,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
      * @param mapping mapping whose color needs to be adjusted
      * @return new color of the block for the mapping
      */
-    private Color adjustBlockColor(Color blockColor, PersistantMapping mapping) {
+    private Color adjustBlockColor(Color blockColor, Mapping mapping) {
         // order of addition to blockList and mappingTypeList has to be correct always!
         float hue = Color.RGBtoHSB(blockColor.getRed(), blockColor.getGreen(), blockColor.getBlue(), null)[0];
         if (mapping.getDifferences() == 0) {
@@ -288,7 +289,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
      * Determines the color and type of a block.
      * @return the color representing this block
      */
-    private Color determineBlockColor(PersistantReadPair readPair) {
+    private Color determineBlockColor(PersistentReadPair readPair) {
 
         Color blockColor;
         ReadPairType type = readPair.getReadPairType();
@@ -325,8 +326,8 @@ public class BlockComponentPair extends JComponent implements ActionListener {
 
     public void setSequence() {
         JTextField j = new JTextField(); //TODO: return read sequence of currently clicked read, not the pair
-        int start = (int) ((PersistantReadPair) block.getPersistantObject()).getStart();
-        int stop = (int) ((PersistantReadPair) block.getPersistantObject()).getStop();
+        int start = (int) ((PersistentReadPair) block.getPersistentObject()).getStart();
+        int stop = (int) ((PersistentReadPair) block.getPersistentObject()).getStop();
         //string first pos is zero
         String readSequence = parentViewer.getReference().getActiveChromSequence(start - 1, stop);
         j.setText(readSequence);
@@ -350,8 +351,8 @@ public class BlockComponentPair extends JComponent implements ActionListener {
      */
     private String determineReadPairType(BlockPair block) {
         String type = "Not a read pair object";
-        if (block.getPersistantObject() instanceof PersistantReadPairGroup) {
-            List<PersistantReadPair> readPairs = ((PersistantReadPairGroup) block.getPersistantObject()).getReadPairs();
+        if (block.getPersistentObject() instanceof PersistentReadPairGroup) {
+            List<PersistentReadPair> readPairs = ((PersistentReadPairGroup) block.getPersistentObject()).getReadPairs();
             if (readPairs.size() > 0) {
                 type = readPairs.get(0).getReadPairType().getTypeString();
             } else {

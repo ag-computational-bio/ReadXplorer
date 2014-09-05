@@ -17,9 +17,9 @@
 package de.cebitec.readXplorer.view.tableVisualization;
 
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.PositionUtils;
 import de.cebitec.readXplorer.util.UneditableTableModel;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
@@ -69,18 +69,18 @@ public class TableUtils {
     
     /**
      * Updates the navigator bar of all viewers to the given position and
-     * chromosome, which might be in String or Integer format or updates the
-     * viewers to the start position of a selected PersistantFeature with
-     * respect to the strand on which the feature is located.
+ chromosome, which might be in String or Integer format or updates the
+ viewers to the start position of a selected PersistentFeature with
+ respect to the strand on which the feature is located.
      *
      * @param table the table whose selected element's position is to be shown
      * @param posColumnIndex the index of the table model column holding the
      * position
      * @param chromColumnIdx The index of the table model column holding the
-     * chromosome on which the position to show is located. If the position
-     * column contains PersistantFeatures, the chromColumnIdx can be set to -1
-     * and the chromosome information is obtained from the selected
-     * PersistantFeature.
+ chromosome on which the position to show is located. If the position
+ column contains PersistentFeatures, the chromColumnIdx can be set to -1
+ and the chromosome information is obtained from the selected
+ PersistentFeature.
      * @param bim the bounds information manager which should be updated
      */
     public static void showPosition(JTable table, int posColumnIndex, int chromColumnIdx,
@@ -90,33 +90,33 @@ public class TableUtils {
     
     /**
      * Updates the navigator bar of all viewers to the given position and
-     * chromosome, which might be in String or Integer format or updates the
-     * viewers to the start position of a selected PersistantFeature with
-     * respect to the strand on which the feature is located.
+ chromosome, which might be in String or Integer format or updates the
+ viewers to the start position of a selected PersistentFeature with
+ respect to the strand on which the feature is located.
      * @param table the table whose selected element's position is to be shown
      * @param posColumnIndex the index of the table model column holding the
      * position
      * @param chromColumnIdx The index of the table model column holding the
-     * chromosome on which the position to show is located. If the position
-     * column contains PersistantFeatures, the chromColumnIdx can be set to -1
-     * and the chromosome information is obtained from the selected 
-     * PersistantFeature.
+ chromosome on which the position to show is located. If the position
+ column contains PersistentFeatures, the chromColumnIdx can be set to -1
+ and the chromosome information is obtained from the selected 
+ PersistentFeature.
      * @param bim the bounds information manager which should be updated
      * @param reference The reference belonging to this data table. NOTE: It is
      * only needed, if the chromosome column does not contain the chromosome,
      * but only its name! Otherwise the reference can be <code>null</code>
      */
     public static void showPosition(JTable table, int posColumnIndex, int chromColumnIdx, 
-            BoundsInfoManager bim, PersistantReference reference) {
+            BoundsInfoManager bim, PersistentReference reference) {
         
         int selectedModelRow = TableUtils.getSelectedModelRow(table);
         if (selectedModelRow > -1) {
             Object posValue = table.getModel().getValueAt(selectedModelRow, posColumnIndex);
 
-            if (posValue instanceof PersistantFeature) {
+            if (posValue instanceof PersistentFeature) {
 
                 //switch chromosome
-                PersistantFeature feature = (PersistantFeature) posValue;
+                PersistentFeature feature = (PersistentFeature) posValue;
                 bim.chromosomeChanged(feature.getChromId());
                 //jump to position
                 int pos = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
@@ -124,11 +124,11 @@ public class TableUtils {
 
             } else {
                 Object chromValue = table.getModel().getValueAt(selectedModelRow, chromColumnIdx);
-                PersistantChromosome chrom = null;
-                if (chromValue instanceof PersistantChromosome) {
-                    bim.chromosomeChanged(((PersistantChromosome) chromValue).getId());
+                PersistentChromosome chrom = null;
+                if (chromValue instanceof PersistentChromosome) {
+                    bim.chromosomeChanged(((PersistentChromosome) chromValue).getId());
                 } else if (chromValue instanceof String && reference != null) {
-                    Map<String, PersistantChromosome> chromMap = PersistantChromosome.getChromNameMap(reference.getChromosomes().values());
+                    Map<String, PersistentChromosome> chromMap = PersistentChromosome.getChromNameMap(reference.getChromosomes().values());
                     String chromName = (String) chromValue;
                     if (chromMap.containsKey(chromName)) {
                         chrom = chromMap.get(chromName);
@@ -148,12 +148,12 @@ public class TableUtils {
                     } catch (NumberFormatException e) {
                         //could be a feature locus then for imported tables
                         if (reference != null && chrom != null) {
-                            List<PersistantFeature> features = ProjectConnector.getInstance().getRefGenomeConnector(reference.getId())
+                            List<PersistentFeature> features = ProjectConnector.getInstance().getRefGenomeConnector(reference.getId())
                                     .getFeaturesForClosedInterval(0, chrom.getLength(), chrom.getId());
-                            Map<String, PersistantFeature> featMap = PersistantFeature.Utils.getFeatureLocusMap(features);
+                            Map<String, PersistentFeature> featMap = PersistentFeature.Utils.getFeatureLocusMap(features);
                             String featLocus = (String) posValue;
                             if (featMap.containsKey(featLocus)) {
-                                PersistantFeature feature = featMap.get(featLocus);
+                                PersistentFeature feature = featMap.get(featLocus);
                                 int pos = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
                                 bim.navigatorBarUpdated(pos);
                             }
@@ -166,12 +166,12 @@ public class TableUtils {
 
      /**
      * Updates the navigator bar of all viewers to the start position of the
-     * selected PersistantFeature on the correct chromosome with respect to the
-     * strand on which the feature is located.
-     * @param table the table whose selected PersistantFeature position is to be
-     * shown
+ selected PersistentFeature on the correct chromosome with respect to the
+ strand on which the feature is located.
+     * @param table the table whose selected PersistentFeature position is to be
+ shown
      * @param featColumnIndex the index of the table model column holding the
-     * PersistantFeature
+ PersistentFeature
      * @param bim the bounds information manager which should be updated
      */
     public static void showFeaturePosition(JTable table, int featColumnIndex, BoundsInfoManager bim) {

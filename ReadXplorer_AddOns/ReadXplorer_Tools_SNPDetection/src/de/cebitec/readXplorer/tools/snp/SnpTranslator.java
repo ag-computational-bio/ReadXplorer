@@ -19,14 +19,14 @@ package de.cebitec.readXplorer.tools.snp;
 import de.cebitec.common.sequencetools.geneticcode.AminoAcidProperties;
 import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
 import de.cebitec.readXplorer.databackend.dataObjects.CodonSnp;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.databackend.dataObjects.Snp;
 import de.cebitec.readXplorer.util.CodonUtilities;
-import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.SequenceComparison;
 import de.cebitec.readXplorer.util.SequenceUtils;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.polyTree.Node;
 import de.cebitec.readXplorer.util.polyTree.NodeVisitor;
 import java.util.ArrayList;
@@ -46,9 +46,9 @@ import java.util.List;
  */
 public class SnpTranslator {
 
-    private final PersistantChromosome chromosome;
+    private final PersistentChromosome chromosome;
     private long refLength;
-    private List<PersistantFeature> genomicFeatures;
+    private List<PersistentFeature> genomicFeatures;
     private GeneticCode code;
     private int featIdx;
     private int subPos; //summed up bases in subfeatures up to the snp position regarding the strand of the feature
@@ -59,11 +59,11 @@ public class SnpTranslator {
     private boolean posAtLeftSubBorder;
     private boolean posAtRightSubBorder;
     private boolean snpInSubfeature; //if not and we have subfeatures, then this snp will not be translated
-    private PersistantFeature borderSubfeat;
-    private PersistantFeature subfeatBefore; //only set if pos is at borders
-    private PersistantFeature subfeatAfter;
+    private PersistentFeature borderSubfeat;
+    private PersistentFeature subfeatBefore; //only set if pos is at borders
+    private PersistentFeature subfeatAfter;
     private boolean subFeatureFound;
-    private final PersistantReference reference;
+    private final PersistentReference reference;
 
     /**
      * Generates all translations possible for a given snp for the given genomic features
@@ -77,7 +77,7 @@ public class SnpTranslator {
      * @param chromosome the chromosome for the current analysis
      * @param reference the reference sequence for the current analysis
      */
-    public SnpTranslator(List<PersistantFeature> genomicFeatures, PersistantChromosome chromosome, PersistantReference reference) {
+    public SnpTranslator(List<PersistentFeature> genomicFeatures, PersistentChromosome chromosome, PersistentReference reference) {
         this.genomicFeatures = genomicFeatures;
         this.chromosome = chromosome;
         this.reference = reference;
@@ -90,16 +90,16 @@ public class SnpTranslator {
      * @param position check, if this position is covered by at least one feature (gene) 
      * @return the list of features covering the given position
      */
-    public List<PersistantFeature> checkCoveredByFeature(int position) {
+    public List<PersistentFeature> checkCoveredByFeature(int position) {
 
         //find feature/s which cover current snp position
-        List<PersistantFeature> featuresFound = new ArrayList<>();
+        List<PersistentFeature> featuresFound = new ArrayList<>();
         int stopIndex = featIdx;
         boolean fstFoundFeat = true;
 
         while (featIdx < this.genomicFeatures.size()) {
             
-            PersistantFeature feature = this.genomicFeatures.get(featIdx++);
+            PersistentFeature feature = this.genomicFeatures.get(featIdx++);
             if (feature.getStart() <= position && feature.getStop() >= position) {
                 //found hit, also try next index
                 featuresFound.add(feature);
@@ -133,7 +133,7 @@ public class SnpTranslator {
     public void checkForFeature(Snp snp) {
 
         //find feature/s which cover current snp position
-        List<PersistantFeature> featuresFound = this.checkCoveredByFeature(snp.getPosition());
+        List<PersistentFeature> featuresFound = this.checkCoveredByFeature(snp.getPosition());
 
         //amino acid substitution calculations
         List<CodonSnp> codonSnpList = this.calcSnpList(featuresFound, snp);
@@ -152,7 +152,7 @@ public class SnpTranslator {
      * @param code genetic code to retrieve the amino acid translation
      * @return list of CodonSnps for the current snp position "pos"
      */
-    private List<CodonSnp> calcSnpList(List<PersistantFeature> featuresFound, Snp snp) {
+    private List<CodonSnp> calcSnpList(List<PersistentFeature> featuresFound, Snp snp) {
         
         int pos = snp.getPosition();
         posDirectAtLeftChromBorder = pos < 2; //pos is never smaller than 1, 1 is min
@@ -163,7 +163,7 @@ public class SnpTranslator {
         //handle feature knowledge:
         //get each strand and triplet for correct reading frame for translation
         List<CodonSnp> codonSnpList = new ArrayList<>();
-        for (PersistantFeature feature : featuresFound) {
+        for (PersistentFeature feature : featuresFound) {
             int mod; //fwdStrand: 1 = left base, 2 = middle base, 0 = right base / revStrand: 1 = left base, 2 = middle base, 0 = right base
             String tripletRef = "";
             String tripletSnp = "";
@@ -235,7 +235,7 @@ public class SnpTranslator {
                                 tripletRef = reference.getChromSequence(chromosome.getId(), pos, pos + 1) + reference.getChromSequence(chromosome.getId(), subfeatAfter.getStart(), subfeatAfter.getStart());
                             }
                         } else {
-                            tripletRef = reference.getChromSequence(chromosome.getId(), pos - 1, pos + 2);
+                            tripletRef = reference.getChromSequence(chromosome.getId(), pos, pos + 2);
                         }
                         tripletSnp = snp.getBase().toLowerCase().concat(tripletRef.substring(1));
 
@@ -307,7 +307,7 @@ public class SnpTranslator {
      * @param type the feature type for which the length sum and total read count
      * is needed
      */
-    private void calcFeatureData(final PersistantFeature feature, final int pos, final FeatureType type) {
+    private void calcFeatureData(final PersistentFeature feature, final int pos, final FeatureType type) {
         //calc length of all exons of the mRNA and number of reads mapped to exon regions
         subfeatAfter = null;
         subfeatBefore = null;
@@ -319,7 +319,7 @@ public class SnpTranslator {
             @Override
             public void visit(Node node) {
                 
-                PersistantFeature subFeature = (PersistantFeature) node;
+                PersistentFeature subFeature = (PersistentFeature) node;
                 final boolean fwdStrand = feature.isFwdStrand();
                 if (subFeature.getType() == type) {
                     subFeatureFound = true;

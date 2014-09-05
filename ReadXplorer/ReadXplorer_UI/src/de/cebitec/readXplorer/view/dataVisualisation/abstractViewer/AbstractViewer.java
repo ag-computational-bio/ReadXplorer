@@ -17,9 +17,9 @@
 package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
 
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.ColorProperties;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.Classification;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfo;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.LogicalBoundsListener;
@@ -96,7 +96,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     private SequenceBar seqBar;
     private boolean centerSeqBar;
     private PaintingAreaInfo paintingAreaInfo;
-    private PersistantReference reference;
+    private PersistentReference reference;
     private boolean isInMaxZoomLevel;
     private boolean inDrawingMode;
     private boolean isActive;
@@ -108,7 +108,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     private boolean hasOptions;
     private JPanel chromSelectionPanel;
     private boolean hasChromSelection;
-    private List<FeatureType> excludedFeatureTypes;
+    private List<Classification> excludedFeatureTypes;
     private byte minMappingQuality = 0;
     private boolean pAInfoIsAvailable = false;
     public static final String PROP_MOUSEPOSITION_CHANGED = "mousePos changed";
@@ -132,7 +132,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      * @param basePanel the base panel to paint data on
      * @param reference the associated reference genome
      */
-    public AbstractViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference reference) {
+    public AbstractViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistentReference reference) {
         super();
         
         //read loadingIndicator icon from package resources
@@ -838,7 +838,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     /**
      * @return The reference genome associated with this ReferenceViewer instance.
      */
-    public PersistantReference getReference() {
+    public PersistentReference getReference() {
         return this.reference;
     }
 
@@ -902,7 +902,11 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         return this.chromSelectionPanel;
     }
 
-    public List<FeatureType> getExcludedFeatureTypes() {
+    /**
+     * @return The list of feature (classification) types, which are currently
+     * excluded from the view/calculations by the user.
+     */
+    public List<Classification> getExcludedFeatureTypes() {
         return this.excludedFeatureTypes;
     }
     
@@ -928,11 +932,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      * parameter selection and converts them to a ParametersReadClasses object.
      */
     public ParametersReadClasses getReadClassParams() {
-        boolean perfectCovWanted = !this.getExcludedFeatureTypes().contains(FeatureType.PERFECT_COVERAGE);
-        boolean bestMatchCovWanted = !this.getExcludedFeatureTypes().contains(FeatureType.BEST_MATCH_COVERAGE);
-        boolean commonCovWanted = !this.getExcludedFeatureTypes().contains(FeatureType.COMMON_COVERAGE);
-        boolean multipleMappedReadsWanted = this.getExcludedFeatureTypes().contains(FeatureType.MULTIPLE_MAPPED_READ);
-        return new ParametersReadClasses(perfectCovWanted, bestMatchCovWanted, commonCovWanted, multipleMappedReadsWanted, this.getMinMappingQuality());
+        return new ParametersReadClasses(this.getExcludedFeatureTypes(), this.getMinMappingQuality());
     }
 
     public boolean isMouseOverPaintingRequested() {

@@ -37,7 +37,6 @@ public class FieldNames {
     public static final String TABLE_TRACK = "TRACK";
     public static final String TABLE_STATISTICS = "STATISTICS";  
     public static final String TABLE_COUNT_DISTRIBUTION = "COUNT_DISTRIBUTION";
-    public static final String TABLE_OBJECTCACHE = "OBJECT_CACHE"; 
     public static final String TABLE_DB_VERSION = "DB_VERSION"; 
     
     
@@ -60,12 +59,6 @@ public class FieldNames {
     public static final String CHROM_REFERENCE_ID = "REFERENCE_ID";
     public static final String CHROM_NAME = "NAME";
     public static final String CHROM_LENGTH = "LENGTH";
-
-    // objectcache table fields
-    public static final String OBJECTCACHE_ID = "ID";
-    public static final String OBJECTCACHE_FAMILY = "FAMILY";
-    public static final String OBJECTCACHE_KEY = "KEY";
-    public static final String OBJECTCACHE_DATA = "DATA";
     
     //all feature table fields
     public static final String FEATURE_ID = "ID";

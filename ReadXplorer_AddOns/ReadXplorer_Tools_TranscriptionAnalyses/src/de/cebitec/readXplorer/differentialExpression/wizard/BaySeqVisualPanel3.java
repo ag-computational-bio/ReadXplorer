@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.differentialExpression.Group;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -29,10 +29,10 @@ import javax.swing.event.ListSelectionListener;
 
 public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionListener {
 
-    private DefaultListModel<PersistantTrack> trackListModel = new DefaultListModel<>();
+    private DefaultListModel<PersistentTrack> trackListModel = new DefaultListModel<>();
     private DefaultListModel<String> groupListModel = new DefaultListModel<>();
     private List<Group> createdGroups = new ArrayList<>();
-    private List<PersistantTrack> selectedTracks = new ArrayList<>();
+    private List<PersistentTrack> selectedTracks = new ArrayList<>();
     private Integer[] currentGroupBeingCreated = null;
     private int currentGroupNumber = 1;
     private int selectedIndex = -1;
@@ -44,7 +44,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
         initComponents();
     }
 
-    public void updateTrackList(List<PersistantTrack> selectedTracks) {
+    public void updateTrackList(List<PersistentTrack> selectedTracks) {
         if (!this.selectedTracks.equals(selectedTracks)) {
             this.selectedTracks = selectedTracks;
             currentGroupNumber = 1;
@@ -54,10 +54,10 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
             groupListModel.clear();
             Integer[] defaultGroup = new Integer[selectedTracks.size()];
             StringBuilder strBuilder = new StringBuilder("{");
-            for (Iterator<PersistantTrack> it = selectedTracks.iterator(); it.hasNext();) {
-                PersistantTrack persistantTrack = it.next();
-                defaultGroup[selectedTracks.indexOf(persistantTrack)] = currentGroupNumber;
-                strBuilder.append(persistantTrack.getDescription());
+            for (Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext();) {
+                PersistentTrack persistentTrack = it.next();
+                defaultGroup[selectedTracks.indexOf(persistentTrack)] = currentGroupNumber;
+                strBuilder.append(persistentTrack.getDescription());
                 if (it.hasNext()) {
                     strBuilder.append(",");
                 } else {
@@ -69,9 +69,9 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
             infoText.setText("The group "+strBuilder.toString()+" is created automatically.");
         }
         trackListModel.clear();
-        for (Iterator<PersistantTrack> it = selectedTracks.iterator(); it.hasNext();) {
-            PersistantTrack persistantTrack = it.next();
-            trackListModel.addElement(persistantTrack);
+        for (Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext();) {
+            PersistentTrack persistentTrack = it.next();
+            trackListModel.addElement(persistentTrack);
         }
     }
 
@@ -212,13 +212,13 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
             currentGroupBeingCreated = new Integer[selectedTracks.size()];
         }
         if (!trackList.isSelectionEmpty()) {
-            List<PersistantTrack> tracks = trackList.getSelectedValuesList();
+            List<PersistentTrack> tracks = trackList.getSelectedValuesList();
             StringBuilder strBuilder = new StringBuilder(groupCreationField.getText() + "{");
-            for (Iterator<PersistantTrack> it = tracks.iterator(); it.hasNext();) {
-                PersistantTrack persistantTrack = it.next();
-                currentGroupBeingCreated[selectedTracks.indexOf(persistantTrack)] = currentGroupNumber;
-                strBuilder.append(persistantTrack.getDescription());
-                trackListModel.removeElement(persistantTrack);
+            for (Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext();) {
+                PersistentTrack persistentTrack = it.next();
+                currentGroupBeingCreated[selectedTracks.indexOf(persistentTrack)] = currentGroupNumber;
+                strBuilder.append(persistentTrack.getDescription());
+                trackListModel.removeElement(persistentTrack);
                 if (it.hasNext()) {
                     strBuilder.append(",");
                 } else {

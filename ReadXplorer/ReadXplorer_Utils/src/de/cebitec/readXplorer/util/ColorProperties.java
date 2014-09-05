@@ -39,16 +39,49 @@ public class ColorProperties {
     public static final float SPAN_SATURATION_AND_BRIGTHNESS = MAX_SATURATION_AND_BRIGTHNESS - MIN_SATURATION_AND_BRIGTHNESS;
 
     // read class specific colors
-    /** Standard color for best match reads = yellow.*/
-    public static final Color BEST_MATCH = new Color(244, 225, 49);
     /** Standard color for common match reads = red.*/
-    public static final Color COMMON_MATCH = new Color(180, 41, 36);
+    public static final Color COMMON_MATCH = new Color(222, 96, 92);
+    /** Standard color for single common match reads = light red.*/
+    public static Color COMMON_MATCH_SINGLE = new Color(180, 41, 36);
+    /** Standard color for best match reads = yellow.*/
+    public static final Color BEST_MATCH = new Color(255, 250, 28);
+    /** Standard color for single best match reads = light yellow.*/
+    public static Color BEST_MATCH_SINGLE = new Color(238, 216, 13);
     /** Standard color for perfect match reads = green.*/
-    public static final Color PERFECT_MATCH = new Color(38, 180, 36);
+    public static final Color PERFECT_MATCH = new Color(115, 226, 112);
+    /** Standard color for single perfect match reads = light green.*/
+    public static Color PERFECT_MATCH_SINGLE = new Color(38, 180, 36);
     // double track panel specific colors
+    /** Standard color for coverage difference of two tracks = blue.*/
     public static final Color COV_DIFF_COLOR = Color.BLUE;
-    public static final Color TRACK1_COLOR = new Color(255,117,48);
-    public static final Color TRACK2_COLOR = Color.cyan;
+    /** Standard color for the first track in the double track viewer = cyan.*/
+    public static final Color TRACK1_COLOR = Color.cyan;
+    /** Standard color for the second track in the double track viewer = orange.*/
+    public static final Color TRACK2_COLOR = new Color(255, 117, 48);
+    
+    /** Property string for the perfect match color. */
+    public static final String PERFECT_MATCH_STRING = "perfectMatchColor";
+    /** Property string for the best match color. */
+    public static final String BEST_MATCH_STRING = "bestMatchColor";
+    /** Property string for the common match color. */
+    public static final String COMMON_MATCH_STRING = "commonMatchColor";
+    /** Property string for the single perfect match color. */
+    public static final String SINGLE_PERFECT_MATCH_STRING = "singlePerfectMatchColor";
+    /** Property string for the single best match color. */
+    public static final String SINGLE_BEST_MATCH_STRING = "singleBestMatchColor";
+    /** Property string for the single common match color. */
+    public static final String SINGLE_COMMON_MATCH_STRING = "singleCommonMatchColor";
+    /** Property string for uniform color. */
+    public static final String UNIFORM_COLOR_STRING = "uniformColor";
+    /** Property string to address if uniform coloring is desired. */
+    public static final String UNIFORM_DESIRED = "uniformDesired";
+    /** Property string for the coverage difference color of two tracks. */
+    public static final String COV_DIFF_STRING = "covDiffColor";
+    /** Property string for the first track color in the double track viewer. */
+    public static final String TRACK1_COLOR_STRING = "track1Color";
+    /** Property string for the first track color in the double track viewer. */
+    public static final String TRACK2_COLOR_STRING = "track2Color";
+    
 
     // global colors
     public static final Color TRACKPANEL_SCALE_LINES = new Color(153, 153, 153);

@@ -65,8 +65,8 @@ public class NovelTranscript extends TrackChromResultEntry {
      * transcript.
      * @param isSelected <true> if user selects novel transcript for fasta
      * export.
-     * @param trackId PersistantTrack ID.
-     * @param chromId PersistantChromosome ID.
+     * @param trackId PersistentTrack ID.
+     * @param chromId PersistentChromosome ID.
      */
     public NovelTranscript(boolean isFWD, int start, Integer dropoff, String site, int length, String sequence, boolean isFP, boolean isSelected, int trackId, int chromId) {
         super(trackId, chromId);

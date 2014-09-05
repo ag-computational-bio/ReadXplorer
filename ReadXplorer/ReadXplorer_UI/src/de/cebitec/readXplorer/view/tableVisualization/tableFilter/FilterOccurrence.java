@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.view.tableVisualization.tableFilter;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -140,7 +140,7 @@ class FilterOccurrence<E extends DefaultTableModel> {
             if (!uniqueTracksPerPosition.containsKey(currentPosition)) {
                 uniqueTracksPerPosition.put(currentPosition, new HashSet<Integer>());
             }
-            Integer currentTrack = ((PersistantTrack) currentRow.get(trackColumn)).getId();
+            Integer currentTrack = ((PersistentTrack) currentRow.get(trackColumn)).getId();
             uniqueTracksPerPosition.get(currentPosition).add(currentTrack);
         }
 

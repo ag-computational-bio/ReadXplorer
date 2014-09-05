@@ -1,10 +1,10 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.RPKMvalue;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,9 +26,9 @@ public class RPKMValuesCalculation {
 
     private final List<RPKMvalue> rpkmValues;
     /**
-     * Key: featureID , Value: PersistantFeature
+     * Key: featureID , Value: PersistentFeature
      */
-    private final HashMap<Integer, PersistantFeature> allRegionsInHash;
+    private final HashMap<Integer, PersistentFeature> allRegionsInHash;
     private final StatisticsOnMappingData stats;
     private final int[][] forwardStarts, reverseStarts;
     private final double mm, mc;
@@ -37,11 +37,11 @@ public class RPKMValuesCalculation {
     /**
      * This class provides all methods for RPKM value calculation.
      *
-     * @param persFeatures All persistant genome features.
+     * @param persFeatures All persistent genome features.
      * @param stats StatisticsOnMappingData instance.
      * @param trackId Currently used Track id.
      */
-    public RPKMValuesCalculation(HashMap<Integer, PersistantFeature> persFeatures, StatisticsOnMappingData stats, int trackId) {
+    public RPKMValuesCalculation(HashMap<Integer, PersistentFeature> persFeatures, StatisticsOnMappingData stats, int trackId) {
         this.allRegionsInHash = persFeatures;
         this.rpkmValues = new ArrayList<>();
         this.stats = stats;
@@ -56,18 +56,18 @@ public class RPKMValuesCalculation {
     /**
      * This method calculates two kind of RPKM values.
      *
-     * @param refGenome Persistant reference genome.
+     * @param refGenome Persistent reference genome.
      */
-    public void calculationExpressionValues(PersistantReference refGenome, File referenceFile) {
+    public void calculationExpressionValues(PersistentReference refGenome, File referenceFile) {
         Map<String, Integer[]> staticRegions = null;
         if (referenceFile != null) {
             staticRegions = parseStaticRegionFile(referenceFile);
         }
 
-        Map<Integer, PersistantFeature> allRegionsSorted = new TreeMap<>(this.allRegionsInHash);
-        HashMap<Integer, PersistantChromosome> chromosomes = (HashMap<Integer, PersistantChromosome>) refGenome.getChromosomes();
+        Map<Integer, PersistentFeature> allRegionsSorted = new TreeMap<>(this.allRegionsInHash);
+        HashMap<Integer, PersistentChromosome> chromosomes = (HashMap<Integer, PersistentChromosome>) refGenome.getChromosomes();
 
-        for (PersistantFeature feature : allRegionsSorted.values()) {
+        for (PersistentFeature feature : allRegionsSorted.values()) {
             if (feature.getType() != FeatureType.CDS) {
                 continue;
             }

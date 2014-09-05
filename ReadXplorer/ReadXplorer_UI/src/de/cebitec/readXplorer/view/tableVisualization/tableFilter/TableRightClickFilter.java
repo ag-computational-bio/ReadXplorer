@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.view.tableVisualization.tableFilter;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.GenerateRowSorter;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
@@ -63,7 +63,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
     private JMenuItem resetItem;
     private JMenuItem occurrenceFilter;
     private final Class<E> classType;
-    private Map<Integer, PersistantTrack> trackMap;
+    private Map<Integer, PersistentTrack> trackMap;
     private final int posColumn;
     private final int trackColumn;
 
@@ -306,11 +306,11 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
         return filteredTableModel;
     }
 
-    public void setTrackMap(Map<Integer, PersistantTrack> trackMap) {
+    public void setTrackMap(Map<Integer, PersistentTrack> trackMap) {
         this.trackMap = trackMap;
 }
     
-    public Map<Integer, PersistantTrack> getTrackMap(){
+    public Map<Integer, PersistentTrack> getTrackMap(){
         return trackMap;
     }
 

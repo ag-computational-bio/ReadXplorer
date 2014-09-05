@@ -1,8 +1,8 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelTranscript;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.WizardPropertyStrings;
@@ -23,7 +23,7 @@ public class NovelRegionResult extends ResultTrackAnalysis<ParameterSetWholeTran
     private Map<String, Object> statsMap;
     private static final TableType TABLE_TYPE = TableType.NOVEL_TRANSCRIPTS_TABLE;
 
-    public NovelRegionResult(PersistantReference reference, StatisticsOnMappingData stats, Map<Integer, PersistantTrack> trackMap, 
+    public NovelRegionResult(PersistentReference reference, StatisticsOnMappingData stats, Map<Integer, PersistentTrack> trackMap, 
             List<NovelTranscript> novelRegions, boolean combineTracks) {
         super(reference, trackMap, combineTracks, 2, 0);
         this.results = novelRegions;

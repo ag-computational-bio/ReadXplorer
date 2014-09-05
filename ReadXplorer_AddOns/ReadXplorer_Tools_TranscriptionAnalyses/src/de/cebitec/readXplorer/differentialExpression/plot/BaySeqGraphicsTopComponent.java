@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression.plot;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.differentialExpression.BaySeq;
 import de.cebitec.readXplorer.differentialExpression.BaySeqAnalysisHandler;
 import de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler;
@@ -89,8 +89,8 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended imple
     private BaySeqAnalysisHandler baySeqAnalysisHandler;
     private JSVGCanvas svgCanvas;
     private ComboBoxModel<BaySeqAnalysisHandler.Plot> cbm;
-    private DefaultListModel<PersistantTrack> samplesA = new DefaultListModel<>();
-    private DefaultListModel<PersistantTrack> samplesB = new DefaultListModel<>();
+    private DefaultListModel<PersistentTrack> samplesA = new DefaultListModel<>();
+    private DefaultListModel<PersistentTrack> samplesB = new DefaultListModel<>();
     private File currentlyDisplayed;
     private ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Creating plot");
     private ResultDeAnalysis result;
@@ -152,11 +152,11 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended imple
     private void addResults() {
         List<Group> groups = baySeqAnalysisHandler.getGroups();
         groupComboBox.setModel(new DefaultComboBoxModel(groups.toArray()));
-        List<PersistantTrack> tracks = baySeqAnalysisHandler.getSelectedTracks();
-        for (Iterator<PersistantTrack> it = tracks.iterator(); it.hasNext();) {
-            PersistantTrack persistantTrack = it.next();
-            samplesA.addElement(persistantTrack);
-            samplesB.addElement(persistantTrack);
+        List<PersistentTrack> tracks = baySeqAnalysisHandler.getSelectedTracks();
+        for (Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext();) {
+            PersistentTrack persistentTrack = it.next();
+            samplesA.addElement(persistentTrack);
+            samplesB.addElement(persistentTrack);
         }
     }
 

@@ -1,8 +1,7 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.view.dialogMenus.OpenTracksWizardPanel;
-import de.cebitec.readXplorer.view.dialogMenus.SelectFeatureTypeWizardPanel;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;
@@ -189,7 +188,7 @@ public final class TranscriptomeAnalysisWizardIterator implements WizardDescript
     /**
      * @return The list of track selected in this wizard.
      */
-    public List<PersistantTrack> getSelectedTracks() {
+    public List<PersistentTrack> getSelectedTracks() {
         return this.openTracksPanel.getComponent().getSelectedTracks();
     }
 }

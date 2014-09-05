@@ -1,8 +1,8 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.OperonAdjacency;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
@@ -25,7 +25,7 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetWhole
     private HashMap<String, Object> operonStatsMap;
     private static final TableType TABLE_TYPE = TableType.OPERON_TABLE;
 
-    public OperonDetectionResult(StatisticsOnMappingData stats, Map<Integer, PersistantTrack> trackList, List<Operon> detectedOperons, PersistantReference reference) {//, PersistantTrack currentTrack) {
+    public OperonDetectionResult(StatisticsOnMappingData stats, Map<Integer, PersistentTrack> trackList, List<Operon> detectedOperons, PersistentReference reference) {//, Track currentTrack) {
         super(reference, trackList, false, 2, 1);
         this.detectedOperons = detectedOperons;
         this.stats = stats;

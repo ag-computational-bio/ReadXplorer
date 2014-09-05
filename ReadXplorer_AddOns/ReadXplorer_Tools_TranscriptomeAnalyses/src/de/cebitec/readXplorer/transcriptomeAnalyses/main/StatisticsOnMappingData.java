@@ -1,12 +1,12 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
-import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistant;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistent;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.OperonAdjacency;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.Observer;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,14 +33,14 @@ public class StatisticsOnMappingData implements Observer {
     protected HashMap<Integer, List<Integer>> fwdFeatures, revFeatures;
     protected List<List<List<Integer>>> fwdFeatureIds, revFeatureIds;
     /**
-     * Key: featureID , Value: PersistantFeature
+     * Key: featureID , Value: PersistentFeature
      */
-    private HashMap<Integer, PersistantFeature> allFeatures;
+    private HashMap<Integer, PersistentFeature> allFeatures;
     /**
      * Key, FeatureID of the first Feature,
      */
     private TreeMap<Integer, OperonAdjacency> putativeOperonAdjacenciesFWD, putativeOperonAdjacenciesREV;
-    private final PersistantReference refGenome;
+    private final PersistentReference refGenome;
 
     /**
      * Constructor for test cases.
@@ -52,7 +52,7 @@ public class StatisticsOnMappingData implements Observer {
     /**
      * Constructor for this class.
      *
-     * @param refGenome PersistantReference.
+     * @param refGenome PersistentReference.
      * @param fraction
      * @param forwardFeatures all reference features in forward direction. <key>
      * startposition on the reference, <value> list of different (overlapping)
@@ -61,11 +61,11 @@ public class StatisticsOnMappingData implements Observer {
      * startposition on the reference, <value> list of different (overlapping)
      * feature ids on that position
      * @param allFeatures all reference features with feature id as <key> and a
-     * PersistantFeature as <value>
+ PersistentFeature as <value>
      * @param region2Exclude
      */
-    public StatisticsOnMappingData(PersistantReference refGenome, double fraction, HashMap<Integer, List<Integer>> forwardFeatures,
-            HashMap<Integer, List<Integer>> reverseFeatures, HashMap<Integer, PersistantFeature> allFeatures, List<int[]> region2Exclude) {
+    public StatisticsOnMappingData(PersistentReference refGenome, double fraction, HashMap<Integer, List<Integer>> forwardFeatures,
+            HashMap<Integer, List<Integer>> reverseFeatures, HashMap<Integer, PersistentFeature> allFeatures, List<int[]> region2Exclude) {
 
         this.refGenome = refGenome;
         this.totalCount = 0;
@@ -77,8 +77,8 @@ public class StatisticsOnMappingData implements Observer {
         this.fwdCoverage = new int[chromCount][];
         this.revCoverage = new int[chromCount][];
 
-        Map<Integer, PersistantChromosome> chroms = refGenome.getChromosomes();
-        for (PersistantChromosome chrom : chroms.values()) {
+        Map<Integer, PersistentChromosome> chroms = refGenome.getChromosomes();
+        for (PersistentChromosome chrom : chroms.values()) {
             int chromId = chrom.getId();
             int chromNo = refGenome.getChromosome(chromId).getChromNumber();
             this.fwdReadStarts = new int[chromNo][chrom.getLength()];
@@ -98,13 +98,13 @@ public class StatisticsOnMappingData implements Observer {
     /**
      * This Constructor needed for import of existing analysis tables.
      *
-     * @param refGenome Persistant Reference.
+     * @param refGenome Persistent Reference.
      * @param mml Mean mapping length.
      * @param mm Mean per million.
      * @param mc Mapping count.
      * @param bg Backgrount threshold.
      */
-    public StatisticsOnMappingData(PersistantReference refGenome, double mml, double mm, double mc, double bg) {
+    public StatisticsOnMappingData(PersistentReference refGenome, double mml, double mm, double mc, double bg) {
         this.refGenome = refGenome;
         this.meanMappingLength = mml;
         this.mappingsPerMillion = mm;
@@ -127,17 +127,17 @@ public class StatisticsOnMappingData implements Observer {
      * mappingResults and the total base count of the mappingResults. By the way
      * it cunstructs a List with OperonAdjacencies for further analyses.
      *
-     * @param result MappingResultPersistant contains List of PersistenMappings.
+     * @param result MappingResultPersistent contains List of PersistenMappings.
      */
-    private void parseMappings(MappingResultPersistant result) {
+    private void parseMappings(MappingResultPersistent result) {
 
         // Sorting all mappingResults
         int chromId = result.getRequest().getChromId();
         int chromNo = refGenome.getChromosome(chromId).getChromNumber();
-        List<PersistantMapping> mappings = result.getMappings();
+        List<Mapping> mappings = result.getMappings();
         Collections.sort(mappings);
         int length = region2Exclude.get(chromNo - 1).length;
-        for (PersistantMapping mapping : mappings) {
+        for (Mapping mapping : mappings) {
             this.totalCount++;
             int start = mapping.getStart();
             int stop = mapping.getStop();
@@ -178,14 +178,14 @@ public class StatisticsOnMappingData implements Observer {
      * Check two features for putative adjacency.
      *
      * @param putativeOperonAdjacencies Tree of putative operon adjacencies
-     * @param features list of PersistantFeature Ids <value> on a reference
+     * @param features list of PersistentFeature Ids <value> on a reference
      * position <key>
      * @param stop stop of certain region
      * @param start start of certain region
      */
     private void checkOperonAdjacency(TreeMap<Integer, OperonAdjacency> putativeOperonAdjacencies, HashMap<Integer, List<Integer>> features, int stop, int start) {
-        PersistantFeature feat1;
-        PersistantFeature feat2;
+        PersistentFeature feat1;
+        PersistentFeature feat2;
         if (features.containsKey(Integer.valueOf(stop)) && features.containsKey(Integer.valueOf(start))) {
             for (int featureIDrev1 : features.get(start)) {
                 feat1 = allFeatures.get(featureIDrev1);
@@ -218,7 +218,7 @@ public class StatisticsOnMappingData implements Observer {
      */
     public double calculateBackgroundCutoff(double fraction) {
 //        int length = refSeqLength * 2;
-        int wholeGenomeLength = PersistantReference.calcWholeGenomeLength(refGenome.getChromosomes());
+        int wholeGenomeLength = PersistentReference.calcWholeGenomeLength(refGenome.getChromosomes());
         double mean = (double) this.uniqueCounts / (wholeGenomeLength * 2);
         double standardDiviation = Math.sqrt(mean);
         double inverseCdf = 0;
@@ -235,7 +235,7 @@ public class StatisticsOnMappingData implements Observer {
      * @return the simmulated background threshold
      */
     public int simulateBackgroundThreshold(double fraction) {
-        int genomeSize = PersistantReference.calcWholeGenomeLength(refGenome.getChromosomes());
+        int genomeSize = PersistentReference.calcWholeGenomeLength(refGenome.getChromosomes());
         int doubleGenomeSize = genomeSize * 2;
         int maxRandomVariableValue = 0; // Das ist der Wert der größten Zufallsvariable
         int backgroundCutoff = 0;
@@ -322,7 +322,7 @@ public class StatisticsOnMappingData implements Observer {
      *
      * @return
      */
-    public int[][] getFwdCoverage() {
+    public int[][] getFwdCov() {
         return fwdCoverage;
     }
 
@@ -330,7 +330,7 @@ public class StatisticsOnMappingData implements Observer {
      *
      * @return
      */
-    public int[][] getRevCoverage() {
+    public int[][] getRevCov() {
         return revCoverage;
     }
 
@@ -379,8 +379,8 @@ public class StatisticsOnMappingData implements Observer {
 
     @Override
     public void update(Object args) {
-        if (args instanceof MappingResultPersistant) {
-            MappingResultPersistant result = (MappingResultPersistant) args;
+        if (args instanceof MappingResultPersistent) {
+            MappingResultPersistent result = (MappingResultPersistent) args;
             this.parseMappings(result);
         }
     }

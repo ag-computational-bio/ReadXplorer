@@ -216,7 +216,7 @@
       </Events>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JComboBox&lt;&gt;(ProjectConnector.getInstance().getGenomesAsArray())"/>
-        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;PersistantReference&gt;"/>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;de.cebitec.readXplorer.databackend.dataObjects.PersistentReference&gt;"/>
       </AuxValues>
     </Component>
     <Component class="javax.swing.JLabel" name="refComboLabel">
@@ -282,7 +282,7 @@
       </Events>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JComboBox&lt;&gt;()"/>
-        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;PersistantChromosome&gt;"/>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome&gt;"/>
       </AuxValues>
     </Component>
     <Component class="javax.swing.JLabel" name="chromComboLabel">

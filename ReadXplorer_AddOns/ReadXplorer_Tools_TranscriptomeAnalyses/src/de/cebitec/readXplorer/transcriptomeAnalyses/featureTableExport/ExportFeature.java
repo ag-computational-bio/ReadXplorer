@@ -4,7 +4,7 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class ExportFeature {
 
-    private PersistantFeature feature;
+    private PersistentFeature feature;
     /**
      * Key: TSS-Start position
      */
@@ -42,7 +42,7 @@ public class ExportFeature {
      * @param minus35MotifWidth
      * @param minusRbsMotifWidth 
      */
-    public ExportFeature(PersistantFeature feature, int minus10MotifWidth, int minus35MotifWidth, int minusRbsMotifWidth) {
+    public ExportFeature(PersistentFeature feature, int minus10MotifWidth, int minus35MotifWidth, int minusRbsMotifWidth) {
         this.minus10MotifWidth = minus10MotifWidth;
         this.minus35MotifWidth = minus35MotifWidth;
         this.rbsMotifWidth = minusRbsMotifWidth;
@@ -111,11 +111,11 @@ public class ExportFeature {
         }
     }
 
-    public PersistantFeature getFeature() {
+    public PersistentFeature getFeature() {
         return feature;
     }
 
-    public void setFeature(PersistantFeature feature) {
+    public void setFeature(PersistentFeature feature) {
         this.feature = feature;
     }
 

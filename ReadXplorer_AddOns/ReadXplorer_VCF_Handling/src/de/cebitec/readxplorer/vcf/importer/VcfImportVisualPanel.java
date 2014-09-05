@@ -7,7 +7,7 @@ package de.cebitec.readxplorer.vcf.importer;
 
 import de.cebitec.readXplorer.api.objects.JobPanel;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import java.io.File;
 import org.openide.WizardDescriptor;
@@ -39,8 +39,8 @@ public final class VcfImportVisualPanel extends JobPanel {
         return "VCF Parser";
     }
     
-    public PersistantReference getReference() {
-        return (PersistantReference) jComboBox1.getSelectedItem();
+    public PersistentReference getReference() {
+        return (PersistentReference) jComboBox1.getSelectedItem();
         
     }
 
@@ -121,7 +121,7 @@ public final class VcfImportVisualPanel extends JobPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton chooseButton;
     private javax.swing.JTextField fileTextField;
-    private javax.swing.JComboBox<PersistantReference> jComboBox1;
+    private javax.swing.JComboBox<PersistentReference> jComboBox1;
     // End of variables declaration//GEN-END:variables
  
     @Override

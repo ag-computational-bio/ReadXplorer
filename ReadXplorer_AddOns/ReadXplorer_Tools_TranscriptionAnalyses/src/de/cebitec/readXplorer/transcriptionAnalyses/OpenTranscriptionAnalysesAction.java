@@ -22,13 +22,13 @@ import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator;
-import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -70,15 +70,15 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
 
     private TranscriptionAnalysesTopComponent transcAnalysesTopComp;
     private final ReferenceViewer refViewer;
-    private PersistantReference reference;
-    private List<PersistantTrack> tracks;
+    private PersistentReference reference;
+    private List<PersistentTrack> tracks;
     private int finishedCovAnalyses = 0;
     private int finishedMappingAnalyses = 0;
     private ParameterSetTSS parametersTss;
     private ParameterSetOperonDet parametersOperonDet;
     private ParameterSetRPKM parametersRPKM;
     private boolean combineTracks;
-    private Map<Integer, PersistantTrack> trackMap;
+    private Map<Integer, PersistentTrack> trackMap;
     private Map<Integer, AnalysisContainer> trackToAnalysisMap;
     private ResultPanelTranscriptionStart transcriptionStartResultPanel;
     private ResultPanelOperonDetection operonResultPanel;
@@ -151,7 +151,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
 
         //action to perform after successfully finishing the wizard
         boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
-        List<PersistantTrack> selectedTracks = transWizardIterator.getSelectedTracks();
+        List<PersistentTrack> selectedTracks = transWizardIterator.getSelectedTracks();
         if (!cancelled && !selectedTracks.isEmpty()) {
             this.tracks = selectedTracks;
             this.trackMap = ProjectConnector.getTrackMap(tracks);
@@ -217,7 +217,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
 
         TrackConnector connector;
         if (!combineTracks) {
-            for (PersistantTrack track : this.tracks) {
+            for (PersistentTrack track : this.tracks) {
 
                 try {
                     connector = (new SaveFileFetcherForGUI()).getTrackConnector(track);

@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.view.tableVisualization;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.parser.tables.TableType;
 import de.cebitec.readXplorer.util.UneditableTableModel;
 import de.cebitec.readXplorer.view.tableVisualization.tableFilter.TableRightClickFilter;
@@ -33,7 +33,7 @@ import javax.swing.event.ListSelectionListener;
 public class PosTablePanel extends TablePanel {
     private static final long serialVersionUID = 1L;
     private final UneditableTableModel tableData;
-    private PersistantReference reference;
+    private PersistentReference reference;
     private TableRightClickFilter<UneditableTableModel> filterListener;
 
     /**
@@ -148,14 +148,14 @@ public class PosTablePanel extends TablePanel {
     /**
      * @param reference The reference genome, for which this table was imported.
      */
-    public void setReferenceGenome(PersistantReference reference) {
+    public void setReferenceGenome(PersistentReference reference) {
         this.reference = reference;
     }
     
     /**
      * @return The reference genome, for which this table was imported.
      */
-    public PersistantReference getReferenceGenome() {
+    public PersistentReference getReferenceGenome() {
         return this.reference;
     }
 

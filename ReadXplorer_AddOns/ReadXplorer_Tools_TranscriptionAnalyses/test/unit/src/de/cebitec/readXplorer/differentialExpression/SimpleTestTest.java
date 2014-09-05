@@ -18,7 +18,7 @@ package de.cebitec.readXplorer.differentialExpression;
 
 //package de.cebitec.readXplorer.differentialExpression;
 //
-//import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+//import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 //import de.cebitec.readXplorer.differentialExpression.GnuR.JRILibraryNotInPathException;
 //import de.cebitec.readXplorer.differentialExpression.GnuR.UnknownGnuRException;
 //import java.io.BufferedReader;
@@ -49,7 +49,7 @@ package de.cebitec.readXplorer.differentialExpression;
 //    private static List<String> loci;
 //    private static List<String> tracks;
 //    private static List<List<Integer>> allCountData;
-//    private static List<PersistantTrack> selectedTracks;
+//    private static List<PersistentTrack> selectedTracks;
 //    private static int[] groupA;
 //    private static int[] groupB;
 //    private static File saveFile = new File("C:\\Users\\Kai\\Desktop\\newTest.rdata");
@@ -115,7 +115,7 @@ package de.cebitec.readXplorer.differentialExpression;
 //        selectedTracks = new ArrayList<>();
 //        for (int i = 0; i < tracks.size(); i++) {
 //            Timestamp currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-//            selectedTracks.add(new PersistantTrack(i, "", tracks.get(i), currentTimestamp, 0, 0));
+//            selectedTracks.add(new PersistentTrack(i, "", tracks.get(i), currentTimestamp, 0, 0));
 //        }
 //
 //        numberOfFeatures = loci.size();

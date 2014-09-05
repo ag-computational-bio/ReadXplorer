@@ -17,7 +17,14 @@
 package de.cebitec.readXplorer.databackend;
 
 import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readXplorer.util.classification.Classification;
+import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readXplorer.util.classification.MappingClass;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.prefs.Preferences;
+import org.openide.util.NbPreferences;
 
 /**
  * Creates a parameters set which contains all parameters concerning the usage
@@ -28,10 +35,9 @@ import java.util.List;
  */
 public class ParametersReadClasses {
     
-    private boolean usePerfectMatch; 
-    private boolean useBestMatch;
-    private boolean useCommonMatch;
-    private boolean useOnlyUniqueReads;
+    private final Preferences pref = NbPreferences.forModule(Object.class);
+    private boolean useExtendedClassification = pref.getBoolean(Properties.VIEWER_CLASSIFICATION, false); //TODO: change this for future version
+    private List<Classification> excludedClasses;
     private final byte minMappingQual;
     private byte strandOption;
 
@@ -39,14 +45,8 @@ public class ParametersReadClasses {
      * Creates a parameter set which contains all parameters concerning the
      * usage of ReadXplorer's coverage classes and if only uniquely mapped reads
      * shall be used, or all reads.
-     * @param usePerfectMatch <code>true</code>, if the perfect match class used
-     * in this parameter set, <code>false</code> otherwise
-     * @param useBestMatch <code>true</code>, if the best match class used in
-     * this parameter set, <code>false</code> otherwise
-     * @param useCommonMatch <code>true</code>, if the common match class used
-     * in this parameter set, <code>false</code> otherwise
-     * @param useOnlyUniqueReads <code>true</code>, if only uniquely mapped
-     * reads are used in this parameter set, <code>false</code> otherwise
+     * @param excludedClasses List of classifications to exclude when this 
+     * parameter set is used
      * @param minMappingQual Minimum phred scaled mapping quality.
      * @param strandOption The strand option: Determines if mappings from the
      * feature strand, from the opposite strand or combined from both strands
@@ -55,12 +55,8 @@ public class ParametersReadClasses {
      * {@link Properties.STRAND_OPPOSITE} and<br> 
      * {@link Properties.STRAND_BOTH}
      */
-    public ParametersReadClasses(boolean usePerfectMatch, boolean useBestMatch, boolean useCommonMatch, 
-            boolean useOnlyUniqueReads, byte minMappingQual, byte strandOption) {
-        this.usePerfectMatch = usePerfectMatch;
-        this.useBestMatch = useBestMatch;
-        this.useCommonMatch = useCommonMatch;
-        this.useOnlyUniqueReads = useOnlyUniqueReads;
+    public ParametersReadClasses(List<Classification> excludedClasses, byte minMappingQual, byte strandOption) {
+        this.excludedClasses = excludedClasses;
         this.minMappingQual = minMappingQual;
         this.strandOption = strandOption;
     }
@@ -69,19 +65,12 @@ public class ParametersReadClasses {
      * Creates a parameter set which contains all parameters concerning the
      * usage of ReadXplorer's coverage classes and if only uniquely mapped reads
      * shall be used, or all reads.
-     * @param usePerfectMatch <code>true</code>, if the perfect match class used
-     * in this parameter set, <code>false</code> otherwise
-     * @param useBestMatch <code>true</code>, if the best match class used in
-     * this parameter set, <code>false</code> otherwise
-     * @param useCommonMatch <code>true</code>, if the common match class used
-     * in this parameter set, <code>false</code> otherwise
-     * @param useOnlyUniqueReads <code>true</code>, if only uniquely mapped
-     * reads are used in this parameter set, <code>false</code> otherwise
+     * @param excludedClasses List of classifications to exclude when this 
+     * parameter set is used
      * @param minMappingQual Minimum phred scaled mapping quality.
      */
-    public ParametersReadClasses(boolean usePerfectMatch, boolean useBestMatch, boolean useCommonMatch, 
-            boolean useOnlyUniqueReads, byte minMappingQual) {
-        this(usePerfectMatch, useBestMatch, useCommonMatch, useOnlyUniqueReads, minMappingQual, Properties.STRAND_FEATURE);
+    public ParametersReadClasses(List<Classification> excludedClasses, byte minMappingQual) {
+        this(excludedClasses, minMappingQual, Properties.STRAND_FEATURE);
     }
 
     /**
@@ -89,39 +78,7 @@ public class ParametersReadClasses {
      * included here.
      */
     public ParametersReadClasses() {
-        this(true, true, true, false, Byte.valueOf("0"), Properties.STRAND_FEATURE);
-    }
-
-    /**
-     * @return <code>true</code>, if the perfect match class is included,
-     * <code>false</code> otherwise.
-     */
-    public boolean isPerfectMatchUsed() {
-        return usePerfectMatch;
-    }
-
-    /**
-     * @return <code>true</code>, if the best match class is included,
-     * <code>false</code> otherwise.
-     */
-    public boolean isBestMatchUsed() {
-        return useBestMatch;
-    }
-
-    /**
-     * @return <code>true</code>, if the common match class is included, 
-     * <code>false</code> otherwise.
-     */
-    public boolean isCommonMatchUsed() {
-        return useCommonMatch;
-    }
-
-    /**
-     * @return <code>true</code>, if only unique reads shall be used,
-     * <code>false</code> if all reads shall be used.
-     */
-    public boolean isOnlyUniqueReads() {
-        return useOnlyUniqueReads;
+        this(new ArrayList<Classification>(), Byte.valueOf("0"), Properties.STRAND_FEATURE);
     }
 
     /**
@@ -149,13 +106,31 @@ public class ParametersReadClasses {
      * @return true, if the given classification is allowed to be used, false
      * otherwise
      */
-    public boolean isClassificationAllowed(int classification) {
-        switch (classification) {
-            case Properties.PERFECT_COVERAGE : return isPerfectMatchUsed();
-            case Properties.BEST_MATCH_COVERAGE : return isBestMatchUsed();
-            case Properties.COMPLETE_COVERAGE : return isCommonMatchUsed();
-            default: return false;
+    public boolean isClassificationAllowed(Classification classification) {
+        boolean isAllowed;
+        if (useExtendedClassification) { //easy default case
+            isAllowed = !this.excludedClasses.contains(classification);
+        
+        } else {
+            if (classification.equals(MappingClass.SINGLE_PERFECT_MATCH)) {
+                isAllowed = !this.excludedClasses.contains(MappingClass.PERFECT_MATCH);
+            } else if (classification.equals(MappingClass.SINGLE_BEST_MATCH)) {
+                isAllowed = !this.excludedClasses.contains(MappingClass.BEST_MATCH);
+            } else if (classification.equals(MappingClass.SINGLE_COMMON_MATCH)) {
+               isAllowed = !this.excludedClasses.contains(MappingClass.COMMON_MATCH); 
+            } else {
+                isAllowed = !this.excludedClasses.contains(classification);
+            }
         }
+        return isAllowed;
+    }
+
+    /**
+     * @return The list of the currently excluded classifications when using
+     * this parameter set.
+     */
+    public List<Classification> getExcludedClasses() {
+        return this.excludedClasses;
     }
     
     /**
@@ -165,10 +140,13 @@ public class ParametersReadClasses {
      */
     public void addReadClassParamsToStats(List<List<Object>> statisticsExportData) {
         statisticsExportData.add(ResultTrackAnalysis.createTableRow("Minimum mapping quality:", this.getMinMappingQual()));
-        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Perfect match class included:", this.isPerfectMatchUsed() ? "yes" : "no"));
-        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Best match class included:", this.isBestMatchUsed() ? "yes" : "no"));
-        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Common match class included:", this.isCommonMatchUsed() ? "yes" : "no"));
-        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Only unique mappings included:", this.isOnlyUniqueReads() ? "yes" : "no"));
+        List<Classification> classList = new ArrayList<>();
+        classList.addAll(Arrays.asList(MappingClass.values()));
+        classList.add(FeatureType.MULTIPLE_MAPPED_READ);
+        for (Classification classType : classList) {
+            String isAllowed = isClassificationAllowed(classType) ? "yes" : "no";
+            statisticsExportData.add(ResultTrackAnalysis.createTableRow(classType.getTypeString() + " included:", isAllowed));
+        }
         statisticsExportData.add(ResultTrackAnalysis.createTableRow("Mapping strand selection:", this.getStrandOptionString()));
     }
     

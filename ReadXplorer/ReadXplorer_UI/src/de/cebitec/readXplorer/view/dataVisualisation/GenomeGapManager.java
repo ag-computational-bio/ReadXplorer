@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReferenceGap;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReferenceGap;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
@@ -61,13 +61,13 @@ public class GenomeGapManager {
     }
 
     /**
-     * Add GenomeGaps from a PersistantMapping to this GenomeGapManager.
+     * Add GenomeGaps from a PersistentMapping to this GenomeGapManager.
      * Each TreeSet of this Collection contains gaps for one position. Mulitple
      * values in the TreeSet indicate multiple genome gaps at one position
      * in the reference genome.
      * @param values
      */
-    public void addGapsFromMapping(TreeMap<Integer,TreeSet<PersistantReferenceGap>> values) {
+    public void addGapsFromMapping(TreeMap<Integer,TreeSet<PersistentReferenceGap>> values) {
         Iterator<Integer> positionIt = values.keySet().iterator();
         while(positionIt.hasNext()){
             Integer pos = positionIt.next();
@@ -77,7 +77,7 @@ public class GenomeGapManager {
                 // of gap introduced shifts
                 continue;
             }
-            TreeSet<PersistantReferenceGap> gapsPerPosition = values.get(pos);
+            TreeSet<PersistentReferenceGap> gapsPerPosition = values.get(pos);
             int numOfGapsPerPosition = gapsPerPosition.size();
             int oldValue = getNumOfGapsAt(pos);
             // if the current mapping has more gaps at current position,

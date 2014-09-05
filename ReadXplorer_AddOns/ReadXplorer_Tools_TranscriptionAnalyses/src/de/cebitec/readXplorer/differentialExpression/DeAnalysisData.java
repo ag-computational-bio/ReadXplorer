@@ -16,8 +16,8 @@
  */
 package de.cebitec.readXplorer.differentialExpression;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -37,7 +37,7 @@ public class DeAnalysisData {
     /**
      * Contains ID of the reference features as keys and corresponding feature as values.
      */
-    private Map<String, PersistantFeature> featureData;
+    private Map<String, PersistentFeature> featureData;
     /**
      * Contains the count data for all the tracks. The first Integer array
      * represents the count data for the selected track with the lowest id. The
@@ -48,7 +48,7 @@ public class DeAnalysisData {
     /**
      * The tracks selected by the user to perform the analysis on.
      */
-    private List<PersistantTrack> selectedTracks;
+    private List<PersistentTrack> selectedTracks;
     /**
      * Track Descriptions. Each description just appears one time.
      */
@@ -148,8 +148,8 @@ public class DeAnalysisData {
      * Returns the reference features.
      * @return Reference features as an Array.
      */
-    public PersistantFeature[] getFeatures() {
-        PersistantFeature[] features = new PersistantFeature[featureData.keySet().size()];
+    public PersistentFeature[] getFeatures() {
+        PersistentFeature[] features = new PersistentFeature[featureData.keySet().size()];
         int i = 0;
         for (Iterator<String> it = featureData.keySet().iterator(); it.hasNext(); i++) {
             String key = it.next();
@@ -161,9 +161,9 @@ public class DeAnalysisData {
     /**
      * Returns the tracks selected by the user to perform the analysis on.
      *
-     * @return List of PersistantTrack containing the selected tracks.
+     * @return List of PersistentTrack containing the selected tracks.
      */
-    public List<PersistantTrack> getSelectedTracks() {
+    public List<PersistentTrack> getSelectedTracks() {
         return selectedTracks;
     }
 
@@ -171,28 +171,28 @@ public class DeAnalysisData {
         return trackDescriptions;
     }
 
-    public PersistantFeature getPersistantFeatureByGNURName(String gnuRName) {
+    public PersistentFeature getPersistentFeatureByGNURName(String gnuRName) {
         return featureData.get(gnuRName);
     }
 
-    public boolean existsPersistantFeatureForGNURName(String gnuRName) {
+    public boolean existsPersistentFeatureForGNURName(String gnuRName) {
         return featureData.containsKey(gnuRName);
     }
 
-    public void setFeatures(List<PersistantFeature> features) {
+    public void setFeatures(List<PersistentFeature> features) {
         featureData = new LinkedHashMap<>();
         int counter = 1;
-        for (Iterator<PersistantFeature> it = features.iterator(); it.hasNext();) {
-            PersistantFeature persistantFeature = it.next();
-            if (featureData.containsKey(persistantFeature.getLocus())) {
-                featureData.put(persistantFeature.getLocus() + "_DN_" + counter++, persistantFeature);
+        for (Iterator<PersistentFeature> it = features.iterator(); it.hasNext();) {
+            PersistentFeature persistentFeature = it.next();
+            if (featureData.containsKey(persistentFeature.getLocus())) {
+                featureData.put(persistentFeature.getLocus() + "_DN_" + counter++, persistentFeature);
             } else {
-                featureData.put(persistantFeature.getLocus(), persistantFeature);
+                featureData.put(persistentFeature.getLocus(), persistentFeature);
             }
         }
     }
 
-    public void setSelectedTracks(List<PersistantTrack> selectedTracks) {
+    public void setSelectedTracks(List<PersistentTrack> selectedTracks) {
         this.selectedTracks = selectedTracks;
         Set<String> tmpSet = new LinkedHashSet<>();
         int counter = 1;

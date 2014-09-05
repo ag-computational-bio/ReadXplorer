@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.ui.visualisation.reference.FeatureTableModel;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ public final class ExpressTestVisualPanelNormalization extends JPanel {
     private ButtonGroup bg = new ButtonGroup();
     private FeatureTableModel tm;
     private DefaultTableModel emptyTm = new DefaultTableModel();
-    private List<PersistantFeature> features;
+    private List<PersistentFeature> features;
     private TableRowSorter trs;
 
     /**
@@ -69,9 +69,9 @@ public final class ExpressTestVisualPanelNormalization extends JPanel {
         return "Select Normalization";
     }
 
-    public void setFeatureList(List<PersistantFeature> features) {
+    public void setFeatureList(List<PersistentFeature> features) {
         this.features = features;
-        tm = new FeatureTableModel(features.toArray(new PersistantFeature[features.size()]));
+        tm = new FeatureTableModel(features.toArray(new PersistentFeature[features.size()]));
         trs = new TableRowSorter<>(tm);
         featureTable.setRowSorter(trs);
         updateFilter();

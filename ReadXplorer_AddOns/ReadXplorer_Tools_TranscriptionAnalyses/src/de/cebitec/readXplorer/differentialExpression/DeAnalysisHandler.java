@@ -23,17 +23,17 @@ import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.differentialExpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.readXplorer.differentialExpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readXplorer.differentialExpression.GnuR.UnknownGnuRException;
-import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -59,15 +59,15 @@ import javax.swing.JOptionPane;
 public abstract class DeAnalysisHandler extends Thread implements Observable, DataVisualisationI {
 
     private ReferenceConnector referenceConnector;
-    private List<PersistantFeature> genomeAnnos;
-    private final List<PersistantTrack> selectedTracks;
+    private List<PersistentFeature> genomeAnnos;
+    private final List<PersistentTrack> selectedTracks;
     private Map<Integer, CollectCoverageData> collectCoverageDataInstances;
     private final int refGenomeID;
     private List<ResultDeAnalysis> results;
     private final List<de.cebitec.readXplorer.util.Observer> observerList = new ArrayList<>();
     private File saveFile = null;
     private final Set<FeatureType> selectedFeatureTypes;
-    private final Map<Integer, Map<PersistantFeature, Integer>> allCountData = new HashMap<>();
+    private final Map<Integer, Map<PersistentFeature, Integer>> allCountData = new HashMap<>();
     private int resultsReceivedBack = 0;
     private final int startOffset;
     private final int stopOffset;
@@ -121,7 +121,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
      * @param readClassParams Parameter set of the selected read classes for
      * this analysis
      */
-    public DeAnalysisHandler(List<PersistantTrack> selectedTracks, int refGenomeID,
+    public DeAnalysisHandler(List<PersistentTrack> selectedTracks, int refGenomeID,
             File saveFile, Set<FeatureType> selectedFeatureTypes, int startOffset, int stopOffset,
             ParametersReadClasses readClassParams) {
         ProcessingLog.getInstance().resetLog();
@@ -145,13 +145,13 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         List<AnalysesHandler> allHandler = new ArrayList<>();
         genomeAnnos = new ArrayList<>();
 
-        for (PersistantChromosome chrom : referenceConnector.getRefGenome().getChromosomes().values()) {
+        for (PersistentChromosome chrom : referenceConnector.getRefGenome().getChromosomes().values()) {
             genomeAnnos.addAll(referenceConnector.getFeaturesForRegionInclParents(1, chrom.getLength(), selectedFeatureTypes, chrom.getId()));
         }
 
-        for (Iterator<PersistantTrack> it = selectedTracks.iterator(); it.hasNext();) {
+        for (Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext();) {
 
-            PersistantTrack currentTrack = it.next();
+            PersistentTrack currentTrack = it.next();
             try {
                 TrackConnector tc = (new SaveFileFetcherForGUI()).getTrackConnector(currentTrack);
 
@@ -183,15 +183,15 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         analysisData.setSelectedTracks(selectedTracks);
     }
 
-    protected void prepareCountData(DeAnalysisData analysisData, Map<Integer, Map<PersistantFeature, Integer>> allCountData) {
-        for (Iterator<PersistantTrack> it = selectedTracks.iterator(); it.hasNext();) {
+    protected void prepareCountData(DeAnalysisData analysisData, Map<Integer, Map<PersistentFeature, Integer>> allCountData) {
+        for (Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext();) {
             Integer key = it.next().getId();
             Integer[] data = new Integer[getPersAnno().size()];
-            Map<PersistantFeature, Integer> currentTrack = allCountData.get(key);
+            Map<PersistentFeature, Integer> currentTrack = allCountData.get(key);
             int j = 0;
-            for (Iterator<PersistantFeature> it1 = getPersAnno().iterator(); it1.hasNext(); j++) {
-                PersistantFeature persistantFeature = it1.next();
-                data[j] = currentTrack.get(persistantFeature);
+            for (Iterator<PersistentFeature> it1 = getPersAnno().iterator(); it1.hasNext(); j++) {
+                PersistentFeature persistentFeature = it1.next();
+                data[j] = currentTrack.get(persistentFeature);
             }
             analysisData.addCountDataForTrack(data);
         }
@@ -221,7 +221,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         this.results = results;
     }
 
-    public Map<Integer, Map<PersistantFeature, Integer>> getAllCountData() {
+    public Map<Integer, Map<PersistentFeature, Integer>> getAllCountData() {
         return allCountData;
     }
 
@@ -229,11 +229,11 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         return saveFile;
     }
 
-    public List<PersistantFeature> getPersAnno() {
+    public List<PersistentFeature> getPersAnno() {
         return genomeAnnos;
     }
 
-    public List<PersistantTrack> getSelectedTracks() {
+    public List<PersistentTrack> getSelectedTracks() {
         return selectedTracks;
     }
 

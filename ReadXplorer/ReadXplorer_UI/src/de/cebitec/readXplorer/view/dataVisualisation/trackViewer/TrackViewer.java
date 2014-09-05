@@ -20,12 +20,15 @@ import de.cebitec.readXplorer.databackend.IntervalRequest;
 import de.cebitec.readXplorer.databackend.ThreadListener;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistant;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantCoverage;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistent;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.ColorProperties;
+import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.SequenceUtils;
+import de.cebitec.readXplorer.util.classification.Classification;
+import de.cebitec.readXplorer.util.classification.MappingClass;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.PaintingAreaInfo;
@@ -38,6 +41,7 @@ import java.awt.RenderingHints;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +66,8 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     private NormalizationSettings normSetting = null;
     private TrackConnector trackCon;
     private List<Integer> trackIDs ;
-    private PersistantCoverage cov;
+    private List<CoverageManager> covManagers;
+    private CoverageManager covManager;
     private boolean covLoaded;
     private boolean twoTracks;
     private int id1;
@@ -70,6 +75,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     private boolean colorChanges;
     private boolean hasNormalizationFactor = false;
     private boolean automaticScaling = pref.getBoolean(Properties.VIEWER_AUTO_SCALING, false);
+    private boolean useExtendedClassification = pref.getBoolean(Properties.VIEWER_CLASSIFICATION, false); //TODO: change this for future version
     private boolean useMinimalIntervalLength = true;
     
     private JSlider verticalSlider = null;
@@ -78,17 +84,10 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     private double scaleFactor;
     private int scaleLineStep;
     private int labelMargin;
-    // create pathes for the coverages
-    private GeneralPath bmFw;
-    private GeneralPath bmRv;
-    private GeneralPath zFw;
-    private GeneralPath zRv;
-    private GeneralPath nFw;
-    private GeneralPath nRv;
-    // colors for the pathes
-    private static Color bmC = ColorProperties.BEST_MATCH;
-    private static Color zC = ColorProperties.PERFECT_MATCH;
-    private static Color nC = ColorProperties.COMMON_MATCH;
+    //mapping class list determining the order of the paths
+    private List<Classification> classList;
+    private Map<Classification, Color> classToColorMap;
+    private Map<Classification, Pair<GeneralPath, GeneralPath>> classToPathsMap;
  //   public static final String PROP_TRACK_CLICKED = "track clicked";
   //  public static final String PROP_TRACK_ENTERED = "track entered";
     private boolean combineTracks;
@@ -102,10 +101,11 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * @param combineTracks true, if the coverage of the tracks contained in the
      *      track connector should be combined.
      */
-    public TrackViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference refGen, 
+    public TrackViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistentReference refGen, 
             TrackConnector trackCon, boolean combineTracks) {
         super(boundsManager, basePanel, refGen);
         
+        this.covManager = new CoverageManager(0, 0);
         this.trackCon = trackCon;
         this.twoTracks = this.trackCon.getAssociatedTrackNames().size() > 1; 
         this.combineTracks = combineTracks;
@@ -115,21 +115,16 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         labelMargin = 3;
         scaleFactor = 1;
         covLoaded = false;
-        bmFw = new GeneralPath();
-        bmRv = new GeneralPath();
-        zFw = new GeneralPath();
-        zRv = new GeneralPath();
-        nFw = new GeneralPath();
-        nRv = new GeneralPath();
-       
-         
-        this.setColors(pref);
-
+        classToColorMap = new HashMap<>();
+        classToPathsMap = new HashMap<>();
+    
+        this.setupClassesAndColors();
+        
         pref.addPreferenceChangeListener(new PreferenceChangeListener() {
 
             @Override
             public void preferenceChange(PreferenceChangeEvent evt) {
-                TrackViewer.this.setColors(pref);
+                setColors(createColors(pref));
                 repaint();
             }
         });
@@ -138,34 +133,91 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     }
 
     /**
+     * Sets up the mapping classes and associates them to their respective
+     * colors and paths painted by this viewer.
+     */
+    private void setupClassesAndColors() {
+        this.classList = this.createVisibleClasses();
+        for (Classification mappingClass : classList) { //init paths map with empty paths
+            classToPathsMap.put(mappingClass, new Pair<>(new GeneralPath(), new GeneralPath()));
+        }
+
+        this.setColors(this.createColors(pref));
+    }
+    
+    /**
+     * @return The list of classifications used in this viewer. The order of 
+     * the classes is important for painting the classes later. They are painted
+     * ascending from index 0.
+     */
+    protected List<Classification> createVisibleClasses() {
+        List<Classification> newClassList = new ArrayList<>();
+        newClassList.add(MappingClass.COMMON_MATCH);
+        if (this.useExtendedClassification) {
+            newClassList.add(MappingClass.SINGLE_COMMON_MATCH);
+        }
+        newClassList.add(MappingClass.BEST_MATCH);
+        if (this.useExtendedClassification) {
+            newClassList.add(MappingClass.SINGLE_BEST_MATCH);
+        }
+        newClassList.add(MappingClass.PERFECT_MATCH);
+        if (this.useExtendedClassification) {
+            newClassList.add(MappingClass.SINGLE_PERFECT_MATCH);
+        }
+        
+        return newClassList;
+    }
+    
+    /**
      * Updates the colors of the coverage in this viewer.
      * @param pref The preference object containing the new colors
+     * @return 
      */
-    private void setColors(Preferences pref) {
-        boolean uniformColouration = pref.getBoolean("uniformDesired", false);
-        if (uniformColouration) {
-            String colourRGB = pref.get("uniformColour", "");
-            if (!colourRGB.isEmpty()) {
-                bmC = new Color(Integer.parseInt(colourRGB));
-                nC = new Color(Integer.parseInt(colourRGB));
-                zC = new Color(Integer.parseInt(colourRGB));
+    protected Map<Classification, Color> createColors(Preferences pref) {
+        Map<Classification, Color> newClassToColorMap = new HashMap<>();
+        boolean uniformColoration = pref.getBoolean(ColorProperties.UNIFORM_DESIRED, false);
+        if (uniformColoration) {
+            String colorRGB = pref.get(ColorProperties.UNIFORM_COLOR_STRING, "");
+            if (!colorRGB.isEmpty()) {
+                for (Classification classType : classList) {
+                    newClassToColorMap.put(classType, new Color(Integer.parseInt(colorRGB)));
+                }
             }
         } else {
-            String bestColour = pref.get("bestMatchColour", "");
-            String perfectColour = pref.get("perfectMatchColour", "");
-            String commonColour = pref.get("commonMatchColour", "");
-
-            if (!bestColour.isEmpty()) {
-                bmC = new Color(Integer.parseInt(bestColour));
-            }
-            if (!perfectColour.isEmpty()) {
-                zC = new Color(Integer.parseInt(perfectColour));
-            }
-            if (!commonColour.isEmpty()) {
-                nC = new Color(Integer.parseInt(commonColour));
-            }
+            
+            Color commonColor = this.checkColor(pref.get(ColorProperties.COMMON_MATCH_STRING, ""), ColorProperties.COMMON_MATCH);
+            Color singleCommonColor = this.checkColor(pref.get(ColorProperties.SINGLE_COMMON_MATCH_STRING, ""), ColorProperties.COMMON_MATCH_SINGLE);
+            Color bestColor = this.checkColor(pref.get(ColorProperties.BEST_MATCH_STRING, ""), ColorProperties.BEST_MATCH);
+            Color singleBestColor = this.checkColor(pref.get(ColorProperties.SINGLE_BEST_MATCH_STRING, ""), ColorProperties.BEST_MATCH_SINGLE);
+            Color perfectColor = this.checkColor(pref.get(ColorProperties.PERFECT_MATCH_STRING, ""), ColorProperties.PERFECT_MATCH);
+            Color singlePerfectColor = this.checkColor(pref.get(ColorProperties.SINGLE_PERFECT_MATCH_STRING, ""), ColorProperties.PERFECT_MATCH_SINGLE);
+            newClassToColorMap.put(MappingClass.COMMON_MATCH, commonColor);
+            newClassToColorMap.put(MappingClass.SINGLE_COMMON_MATCH, singleCommonColor);
+            newClassToColorMap.put(MappingClass.BEST_MATCH, bestColor);
+            newClassToColorMap.put(MappingClass.SINGLE_BEST_MATCH, singleBestColor);
+            newClassToColorMap.put(MappingClass.PERFECT_MATCH, perfectColor);
+            newClassToColorMap.put(MappingClass.SINGLE_PERFECT_MATCH, singlePerfectColor);
+        }
+        
+        return newClassToColorMap;
+    }
+    
+    /**
+     * Updates the colors of the coverage in this viewer.
+     * @param classToColorMap
+     */
+    protected final void setColors(Map<Classification, Color> classToColorMap) {
+        this.classToColorMap = classToColorMap;
+    }
+    
+    protected Color checkColor(String colorProp, Color defaultColor) {
+        if (!colorProp.isEmpty()) {
+            return new Color(Integer.parseInt(colorProp));
+        } else {
+            return defaultColor;
         }
     }
+    
 
     @Override
     public void paintComponent(Graphics graphics) {
@@ -178,59 +230,8 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         g.setRenderingHints(hints);
 
         if (this.covLoaded || this.colorChanges) {
-            if (!this.twoTracks || this.twoTracks && this.combineTracks) {
-                               
-                // fill and draw all coverage pathes
 
-                // n error mappings
-                g.setColor(nC);
-                g.fill(nFw);
-                g.draw(nFw);
-                g.fill(nRv);
-                g.draw(nRv);
-
-                // best match mappings
-                g.setColor(bmC);
-                g.fill(bmFw);
-                g.draw(bmFw);
-                g.fill(bmRv);
-                g.draw(bmRv);
-
-                // zero error mappings
-                g.setColor(zC);
-                g.fill(zFw);
-                g.draw(zFw);
-                g.fill(zRv);
-                g.draw(zRv);
-            } else {
-                // fill and draw all coverage pathes
-
-                Color difference = ColorProperties.COV_DIFF_COLOR;
-                Color track1 = ColorProperties.TRACK1_COLOR;
-                Color track2 = ColorProperties.TRACK2_COLOR;
-
-                // track 1 n cov
-                g.setColor(track1);
-                g.fill(nFw);
-                g.draw(nFw);
-                g.fill(nRv);
-                g.draw(nRv);
-
-                // track2 n cov
-                g.setColor(track2);
-                g.fill(bmFw);
-                g.draw(bmFw);
-                g.fill(bmRv);
-                g.draw(bmRv);
-
-                // diff n cov
-                g.setColor(difference);
-                g.fill(zFw);
-                g.draw(zFw);
-                g.fill(zRv);
-                g.draw(zRv);
-
-            }
+            this.paintCoverage(g);
 
         } else {
             Color fillcolor = ColorProperties.TITLE_BACKGROUND;
@@ -251,6 +252,31 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         drawBaseLines(g);
     }
 
+    /**
+     * Paints the coverage paths into the given Graphics2D object in the order
+     * stored in the mappingClassList
+     * @param g the graphics object to paint on
+     */
+    private void paintCoverage(Graphics2D g) {
+        // fill and draw all coverage paths 
+        for (Classification classType : this.classList) {
+            if (classToColorMap.containsKey(classType) && classToPathsMap.containsKey(classType)) {
+                Pair<GeneralPath, GeneralPath> pathPair = classToPathsMap.get(classType);
+                Color color = classToColorMap.get(classType);
+
+                g.setColor(color);
+                g.fill(pathPair.getFirst());
+                g.draw(pathPair.getFirst());
+                g.fill(pathPair.getSecond());
+                g.draw(pathPair.getSecond());
+            }
+        }
+    }
+
+    /**
+     * Draws the separating lines in the middle of the viewer.
+     * @param graphics The graphics to paint on
+     */
     private void drawBaseLines(Graphics2D graphics) {
         PaintingAreaInfo info = getPaintingAreaInfo();
         graphics.drawLine(info.getPhyLeft(), info.getForwardLow(), info.getPhyRight(), info.getForwardLow());
@@ -258,108 +284,55 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     }
 
     /**
-     * Returns the coverage value for the given strand, coverage type and position.
+     * Returns the () coverage value for the given strand, coverage type and position.
      * @param isForwardStrand if -1, coverage is drawn from bottom to top, if 1 otherwise
-     * @param covType the mapping classification type of the coverage path handled here
+     * @param classType the mapping classification type of the coverage path handled here
      * @param absPos the reference position for which the coverage should be obtained
      * @return the coverage value for the given strand, coverage type and position.
      */
-    private double getCoverageValue(boolean isForwardStrand, byte covType, int absPos) {
-        double value = 0;
-
-        if (!this.twoTracks || this.twoTracks && this.combineTracks) {
-
-            if (isForwardStrand) {
-                if (covType == PersistantCoverage.PERFECT) {
-                    value = this.cov.getPerfectFwd(absPos);
-                } else if (covType == PersistantCoverage.BM) {
-                    value = this.cov.getBestMatchFwd(absPos);
-                } else if (covType == PersistantCoverage.NERROR) {
-                    value = this.cov.getCommonFwd(absPos);
-
-                } else {
-                    Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown coverage type!");
-                }
-            } else {
-                if (covType == PersistantCoverage.PERFECT) {
-                    value = this.cov.getPerfectRev(absPos);
-                } else if (covType == PersistantCoverage.BM) {
-                    value = this.cov.getBestMatchRev(absPos);
-                } else if (covType == PersistantCoverage.NERROR) {
-                    value = this.cov.getCommonRev(absPos);
-                } else {
-                    Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown coverage type!");
-                }
-            }
-            
-            if (this.hasNormalizationFactor) {
-                value = this.getNormalizedValue(this.id1, value);
-            }
-
-        } else {
-            if (isForwardStrand) {
-                if (covType == PersistantCoverage.DIFF) {
-                    int value1 = cov.getCommonFwdTrack1(absPos);
-                    int value2 = cov.getCommonFwdTrack2(absPos);
-                    if (this.hasNormalizationFactor) {
-                        value1 = (int) this.getNormalizedValue(id1, value1);
-                        value2 = (int) this.getNormalizedValue(id2, value2);
-                    }
-                    value = Math.abs(value2 - value1);
-                } else if (covType == PersistantCoverage.TRACK2) {
-                    value = cov.getCommonFwdTrack2(absPos);
-                    if (this.hasNormalizationFactor) {
-                        value = this.getNormalizedValue(id2, value);
-                    }
-                } else if (covType == PersistantCoverage.TRACK1) {
-                    value = cov.getCommonFwdTrack1(absPos);
-                    if (this.hasNormalizationFactor) {
-                        value = this.getNormalizedValue(id1, value);
-                    }
-                } else {
-                    Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown coverage type!");
-                }
-            } else {
-                if (covType == PersistantCoverage.DIFF) {
-                    int value1 = cov.getCommonRevTrack1(absPos);
-                    int value2 = cov.getCommonRevTrack2(absPos);
-                    if (this.hasNormalizationFactor) {
-                        value1 = (int) this.getNormalizedValue(id1, value1);
-                        value2 = (int) this.getNormalizedValue(id2, value2);
-                    }
-                    value = Math.abs(value2 - value1);
-                } else if (covType == PersistantCoverage.TRACK2) {
-                    value = cov.getCommonRevTrack2(absPos);
-                    if (this.hasNormalizationFactor) {
-                        value = this.getNormalizedValue(id2, value);
-                    }
-                } else if (covType == PersistantCoverage.TRACK1) {
-                    value = cov.getCommonRevTrack1(absPos);
-                    if (this.hasNormalizationFactor) {
-                        value = this.getNormalizedValue(id1, value);
-                    }
-                } else {
-                    Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown coverage type!");
-                }
-            }
-        }
+    private double getCoverageValue(boolean isForwardStrand, Classification classType, int absPos) {
+        double value = this.calcCoverageValue(isForwardStrand, classType, absPos);
         
-        if (value > this.cov.getHighestCoverage()) {
-            this.cov.setHighestCoverage((int) Math.ceil(value));
+        if (value > this.covManager.getHighestCoverage()) {
+            this.covManager.setHighestCoverage((int) Math.ceil(value));
         }
         
         return value;
 
     }
+
+    /**
+     * Calculates the (normalized) coverage value for the given strand, coverage type and position.
+     * @param isForwardStrand if -1, coverage is drawn from bottom to top, if 1 otherwise
+     * @param classType the mapping classification type of the coverage path handled here
+     * @param absPos the reference position for which the coverage should be obtained
+     * @return the coverage value for the given strand, coverage type and position.
+     */
+    protected double calcCoverageValue(boolean isForwardStrand, Classification classType, int absPos) {
+        double value = 0;
+        try {
+            if (isForwardStrand) {
+                value = this.covManager.getCoverage(classType).getFwdCov(absPos);
+            } else {
+                value = this.covManager.getCoverage(classType).getRevCov(absPos);
+            }
+        } catch (IllegalArgumentException e) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown mapping classification type!");
+        }
+        value = this.getNormalizedValue(this.id1, value);
+        
+        return value;
+    }
     
     /**
-     * Normalizes the value handed over to the method acodeording to the normalization
-     * method choosen for the given track.
+     * Normalizes the value handed over to the method acodeording to the
+     * normalization method choosen for the given track. If no normalization is
+     * active, the value is returned unchanged.
      * @param trackID the track id this value belongs to
      * @param value the value that should be normalized
      * @return the normalized value.
      */
-    private double getNormalizedValue(int trackID, double value) {
+    protected double getNormalizedValue(int trackID, double value) {
         if (this.normSetting != null && this.normSetting.getHasNormFac(trackID)) {
             return this.normSetting.getIsLogNorm(trackID) ? TrackViewer.log2(value) : value * this.normSetting.getFactors(trackID);
         } else {
@@ -370,10 +343,10 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     /**
      * Create a GeneralPath that represents the coverage of a certain type.
      * @param isForwardStrand if -1, coverage is drawn from bottom to top, if 1 otherwise
-     * @param covType the type of the coverage path handled here
+     * @param classType the type of the coverage path handled here
      * @return GeneralPath representing the coverage of a certain type
      */
-    private GeneralPath getCoveragePath(boolean isForwardStrand, byte covType) {
+    private GeneralPath getCoveragePath(boolean isForwardStrand, Classification classType) {
         GeneralPath covPath = new GeneralPath();
         int orientation = (isForwardStrand ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD);
 
@@ -381,26 +354,26 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         int low = (orientation < 0 ? info.getForwardLow() : info.getReverseLow());
         // paint every physical position
         covPath.moveTo(info.getPhyLeft(), low);
-        for (int d = info.getPhyLeft(); d < info.getPhyRight(); d++) {
+        for (int pixel = info.getPhyLeft(); pixel < info.getPhyRight(); pixel++) {
 
-            int left = this.transformToLogicalCoord(d);
-            int right = this.transformToLogicalCoord(d + 1) - 1;
+            int left = this.transformToLogicalCoord(pixel);
+            int right = this.transformToLogicalCoord(pixel + 1) - 1;
 
-            // physical coordinate d and d+1 may cover the same base, depending on zoomlevel,
-            // if not compute max of range of values represented at position d
+            // physical coordinate pixel and pixel+1 may cover the same base, depending on zoomlevel,
+            // if not compute max of range of values represented at position pixel
             double value;
             if (right > left) {
 
                 double max = 0;
                 for (int i = left; i <= right; i++) {
-                    if (this.getCoverageValue(isForwardStrand, covType, i) > max) {
-                        max = this.getCoverageValue(isForwardStrand, covType, i);
+                    if (this.getCoverageValue(isForwardStrand, classType, i) > max) {
+                        max = this.getCoverageValue(isForwardStrand, classType, i);
                     }
                 }
                 value = max;
 
             } else {
-                value = this.getCoverageValue(isForwardStrand, covType, left);
+                value = this.getCoverageValue(isForwardStrand, classType, left);
             }
 
             value = this.getCoverageYValue(value);
@@ -416,7 +389,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
                 }
             }
 
-            covPath.lineTo(d, low + value * orientation);
+            covPath.lineTo(pixel, low + value * orientation);
         }
 
         covPath.lineTo(info.getPhyRight(), low);
@@ -448,17 +421,12 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
 
     @Override
     public synchronized void receiveData(Object coverageData) {
-        if (coverageData instanceof CoverageAndDiffResultPersistant) {
-            CoverageAndDiffResultPersistant covResult = (CoverageAndDiffResultPersistant) coverageData;
-            this.cov = covResult.getCoverage();
-            this.cov.setHighestCoverage(0);
-//            this.trackInfo.setCoverage(this.cov);
+        if (coverageData instanceof CoverageAndDiffResultPersistent) {
+            CoverageAndDiffResultPersistent covResult = (CoverageAndDiffResultPersistent) coverageData;
+            this.covManagers = covResult.getCovManagers();
+            this.covManager = covResult.getCovManager();
 
-            if (this.cov.isTwoTracks() && !this.combineTracks) {
-                this.createCoveragePathsDiffOfTwoTracks();
-            } else {
-                this.createCoveragePaths();
-            }
+            this.createCoveragePaths();
             
             this.computeAutomaticScaling();
             this.computeScaleStep();
@@ -470,19 +438,13 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
 
     @Override
     public void boundsChangedHook() {
-        if (this.cov == null || this.isNewDataRequestNeeded() ||
-                !this.cov.coversBounds(getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight())) {
+        if (this.covManager == null || this.isNewDataRequestNeeded() ||
+                !this.covManager.coversBounds(getBoundsInfo().getLogLeft(), getBoundsInfo().getLogRight())) {
             this.requestCoverage();
         } else {
             // coverage already loaded
+            this.createCoveragePaths();
             
-//            this.trackInfo.setCoverage(this.cov);
-            
-            if (cov.isTwoTracks()) {
-                this.createCoveragePathsDiffOfTwoTracks();
-            } else {
-                this.createCoveragePaths();
-            }
             this.computeAutomaticScaling();
             this.covLoaded = true;
         }
@@ -501,43 +463,20 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     /**
      * Creates the coverage paths, which are later painted in the viewer.
      */
-    private void createCoveragePaths() {
-        this.cov.setHighestCoverage(0);
-        
-//        if (!this.getExcludedFeatureTypes().contains(FeatureType.PERFECT_COVERAGE)) {
-            zFw = this.getCoveragePath(true, PersistantCoverage.PERFECT);
-            zRv = this.getCoveragePath(false, PersistantCoverage.PERFECT);
+    protected void createCoveragePaths() {
+        this.covManager.setHighestCoverage(0);
+
+//        if (!this.getExcludedFeatureTypes().contains(FeatureType.PERFECT_MATCH)) {
+        for (Classification classType : classList) {
+
+            GeneralPath fwdPath = this.getCoveragePath(true, classType);
+            GeneralPath revPath = this.getCoveragePath(false, classType);
+            classToPathsMap.put(classType, new Pair<>(fwdPath, revPath));
 //        } else {
 //            zFw.reset();
 //            zRv.reset();
 //        }
-//        if (!this.getExcludedFeatureTypes().contains(FeatureType.BEST_MATCH_COVERAGE)) {
-            bmFw = this.getCoveragePath(true, PersistantCoverage.BM);
-            bmRv = this.getCoveragePath(false, PersistantCoverage.BM);
-//
-//        } else {
-//            bmFw.reset();
-//            bmRv.reset();
-//        }
-//        if (!this.getExcludedFeatureTypes().contains(FeatureType.COMMON_COVERAGE)) {
-            nFw = this.getCoveragePath(true, PersistantCoverage.NERROR);
-            nRv = this.getCoveragePath(false, PersistantCoverage.NERROR);
-//        } else {
-//            nFw.reset();
-//            nRv.reset();
-//        }
-    }
-
-    
-    private void createCoveragePathsDiffOfTwoTracks() {
-        this.cov.setHighestCoverage(0);
-        
-        nFw = this.getCoveragePath(true, PersistantCoverage.TRACK1);
-        nRv = this.getCoveragePath(false, PersistantCoverage.TRACK1);
-        bmFw = this.getCoveragePath(true, PersistantCoverage.TRACK2);
-        bmRv = this.getCoveragePath(false, PersistantCoverage.TRACK2);
-        zFw = this.getCoveragePath(true, PersistantCoverage.DIFF);
-        zRv = this.getCoveragePath(false, PersistantCoverage.DIFF);
+        }
     }
 
     /**
@@ -553,190 +492,81 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      */
     @Override
     public void changeToolTipText(int logPos) {
-        if (covLoaded && twoTracks && !hasNormalizationFactor && !combineTracks) {
+        
+        StringBuilder sb = new StringBuilder(200);
+        sb.append("<html>");
+        sb.append("<b>Position</b>: ").append(logPos);
+        sb.append("<br>");
+        sb.append("<table>");
+        sb.append("<tr><td align=\"left\"><b>Forward strand (").append(getCovSum(logPos, true)).append("</b></td></tr>");
 
-            int nFwVal = cov.getCommonFwd(logPos);
-            int nRvVal = cov.getCommonRev(logPos);
-            //track 1 info
-            int nFwValTrack1 = cov.getCommonFwdTrack1(logPos);
-            int nRvValTrack1 = cov.getCommonRevTrack1(logPos);
-            //track 2 info
-            int nFwValTrack2 = cov.getCommonFwdTrack2(logPos);
-            int nRvValTrack2 = cov.getCommonRevTrack2(logPos);
-
-            Double[] data = new Double[7];
-            data[0] = (double) logPos;
-            data[1] = (double) nFwVal;
-            data[2] = (double) nRvVal;
-            data[3] = (double) nFwValTrack1;
-            data[4] = (double) nRvValTrack1;
-            data[5] = (double) nFwValTrack2;
-            data[6] = (double) nRvValTrack2;
-
-
-            this.setToolTipText(toolTipDouble(data, hasNormalizationFactor));
-
-        } else if (covLoaded && (!twoTracks || this.combineTracks) && !hasNormalizationFactor) {
-
-            int zFwVal = cov.getPerfectFwd(logPos);
-            int zRvVal = cov.getPerfectRev(logPos);
-            int bFw = cov.getBestMatchFwd(logPos);
-            int bRv = cov.getBestMatchRev(logPos);
-            int nFwVal = cov.getCommonFwd(logPos);
-            int nRvVal = cov.getCommonRev(logPos);
-
-            Double[] data = new Double[7];
-            data[0] = (double) logPos;
-            data[1] = (double) zFwVal;
-            data[2] = (double) zRvVal;
-            data[3] = (double) bFw;
-            data[4] = (double) bRv;
-            data[5] = (double) nFwVal;
-            data[6] = (double) nRvVal;
-            
-            this.setToolTipText(toolTipSingle(data, hasNormalizationFactor));
-            
-        } else if (covLoaded && (!twoTracks || this.combineTracks) && hasNormalizationFactor) {
-
-            int zFwVal = cov.getPerfectFwd(logPos);
-            int zRvVal = cov.getPerfectRev(logPos);
-            int bFw = cov.getBestMatchFwd(logPos);
-            int bRv = cov.getBestMatchRev(logPos);
-            int nFwVal = cov.getCommonFwd(logPos);
-            int nRvVal = cov.getCommonRev(logPos);
-    
-            double zFwValScale = TrackViewer.threeDecAfter(getNormalizedValue(id1,zFwVal));
-            double zRvValScale = TrackViewer.threeDecAfter(getNormalizedValue(id1,zRvVal));
-            double bFwScale = TrackViewer.threeDecAfter(getNormalizedValue(id1,bFw));
-            double bRvScale = TrackViewer.threeDecAfter(getNormalizedValue(id1,bRv));
-            double nFwValScale = TrackViewer.threeDecAfter(getNormalizedValue(id1,nFwVal));
-            double nRvValScale = TrackViewer.threeDecAfter(getNormalizedValue(id1,nRvVal));
-
-            Double[] data = new Double[13];
-            data[0] = (double) logPos;
-            data[1] = (double) zFwVal;
-            data[2] = zFwValScale;
-            data[3] = (double) zRvVal;
-            data[4] = zRvValScale;
-            data[5] = (double) bFw;
-            data[6] = bFwScale; 
-            data[7] = (double) bRv;
-            data[8] = bRvScale;
-            data[9] = (double) nFwVal;
-            data[10] = nFwValScale;
-            data[11] = (double) nRvVal;
-            data[12] = nRvValScale;
-
-            this.setToolTipText(toolTipSingle(data, hasNormalizationFactor));
-            
-        } else if (covLoaded && twoTracks && hasNormalizationFactor && !combineTracks) {
-
-            int nFwVal = cov.getCommonFwd(logPos);
-            int nRvVal = cov.getCommonRev(logPos);
-            //track 1 info
-            int nFwValTrack1 = cov.getCommonFwdTrack1(logPos);
-            int nRvValTrack1 = cov.getCommonRevTrack1(logPos);
-            //track 2 info
-            int nFwValTrack2 = cov.getCommonFwdTrack2(logPos);
-            int nRvValTrack2 = cov.getCommonRevTrack2(logPos);
-
-
-            double nFwScaleTrack1 = TrackViewer.threeDecAfter(getNormalizedValue(id1,nFwValTrack1));
-            double nRvScaleTrack1 = TrackViewer.threeDecAfter(getNormalizedValue(id1,nRvValTrack1));
-            double nFwValScaleTrack2 = TrackViewer.threeDecAfter(getNormalizedValue(id2,nFwValTrack2));
-            double nRvValScaleTrack2 = TrackViewer.threeDecAfter(getNormalizedValue(id2,nRvValTrack2));
-            
-            double diffFw = (nFwValScaleTrack2 - nFwScaleTrack1);
-            double diffRv = (nRvValScaleTrack2 - nRvScaleTrack1);
-            double nFwValScale = TrackViewer.threeDecAfter(diffFw < 0 ? diffFw *-1 : diffFw);
-            double nRvValScale = TrackViewer.threeDecAfter(diffRv < 0 ? diffRv *-1 : diffRv);
-            nFwValScale = nFwValScale < 0 ? nFwValScale *-1 : nFwValScale;
-            nRvValScale = nRvValScale < 0 ? nRvValScale *-1 : nRvValScale;
-             
-            Double[] data = new Double[13];
-            data[0] = (double) logPos;
-            data[1] = (double) nFwVal;
-            data[2] = nFwValScale;
-            data[3] = (double) nRvVal;
-            data[4] = nRvValScale;
-            data[5] = (double) nFwValTrack1;
-            data[6] = nFwScaleTrack1;
-            data[7] = (double) nRvValTrack1;
-            data[8] = nRvScaleTrack1;
-            data[9] =  (double) nFwValTrack2;
-            data[10] = nFwValScaleTrack2;
-            data[11] = (double) nRvValTrack2;
-            data[12] = nRvValScaleTrack2;
-            
-            this.setToolTipText(toolTipDouble(data,hasNormalizationFactor));
-            
-        } else {
-            this.setToolTipText(null);
+        for (int i = this.classList.size(); --i >= 0;) {
+            double fwd = covManager.getCoverage(classList.get(i)).getFwdCov(logPos);
+            this.addToBuilder(sb, classList.get(i), fwd);
         }
-    }
-
-    private String toolTipDouble(Double[] data, boolean hasNormFac) {
-        StringBuilder sb = new StringBuilder(200);
-        sb.append("<html>");
-        sb.append("<b>Position</b>: ").append(data[0]);
-        sb.append("<br>");
-        sb.append("<table>");
-        sb.append("<tr><td align=\"left\"><b>Difference(Blue):</b></td></tr>");
-        sb.append(hasNormFac ? createTableRow("Forward cov.", data[1], data[2]) : createTableRow("Forward cov", data[1]));
-        sb.append(hasNormFac ? createTableRow("Reverse cov.", data[3], data[4]) : createTableRow("Reverse cov.", data[2]));
         sb.append("</table>");
 
         sb.append("<table>");
-        sb.append("<tr><td align=\"left\"><b>Track 1(Orange):</b></td></tr>");
-
-        sb.append(hasNormFac ? createTableRow("Forward cov.", data[5], data[6]) : createTableRow("Forward cov.", data[3]));
-        sb.append(hasNormFac ? createTableRow("Reverse cov.", data[7], data[8]) : createTableRow("Reverse cov.", data[4]));
-        sb.append("</table>");
-
-        sb.append("<table>");
-        sb.append("<tr><td align=\"left\"><b>Track 2(Cyan):</b></td></tr>");
-
-        sb.append(hasNormFac ? createTableRow("Forward cov.", data[9], data[10]) : createTableRow("Forward cov.", data[5]));
-        sb.append(hasNormFac ? createTableRow("Reverse cov.", data[11], data[12]) : createTableRow("Reverse cov.", data[6]));
-        sb.append("</table>");
-        sb.append("</html>");
-        return sb.toString();
-    }
-
-    private String toolTipSingle(Double[] data, boolean hasNormFac) {
-        StringBuilder sb = new StringBuilder(200);
-        sb.append("<html>");
-        sb.append("<b>Position</b>: ").append(data[0]);
-        sb.append("<br>");
-        sb.append("<table>");
-        sb.append("<tr><td align=\"left\"><b>Forward strand</b></td></tr>");
-        sb.append(hasNormFac ? createTableRow("Perfect match cov.", data[1], data[2]) : createTableRow("Perfect match cov.", data[1]));
-        sb.append(hasNormFac ? createTableRow("Best match cov.", data[5], data[6]) : createTableRow("Best match cov.", data[3]));
-        sb.append(hasNormFac ? createTableRow("Complete cov.", data[9], data[10]) : createTableRow("Complete cov.", data[5]));
-        sb.append("</table>");
-
-        sb.append("<table>");
-        sb.append("<tr><td align=\"left\"><b>Reverse strand</b></td></tr>");
-        sb.append(hasNormFac ? createTableRow("Perfect match cov.", data[3], data[4]) : createTableRow("Perfect match cov.", data[2]));
-        sb.append(hasNormFac ? createTableRow("Best match cov.", data[7], data[8]) : createTableRow("Best match cov.", data[4]));
-        sb.append(hasNormFac ? createTableRow("Complete cov.", data[11], data[12]) : createTableRow("Complete cov.", data[6]));
+        sb.append("<tr><td align=\"left\"><b>Reverse strand").append(getCovSum(logPos, false)).append("</b></td></tr>");
+        for (int i = this.classList.size(); --i >= 0;) {
+            double rev = covManager.getCoverage(classList.get(i)).getRevCov(logPos);
+            this.addToBuilder(sb, classList.get(i), rev);
+        }
         sb.append("</table>");
         sb.append("</html>");
 
-        return sb.toString();
+        this.setToolTipText(sb.toString());
+    }
+    
+    /**
+     * @param logPos current genome position
+     * @param isFwdStrand true, if fwd strand, false otherwise
+     * @return the complete coverage sum at the current position
+     */
+    private double getCovSum(int logPos, boolean isFwdStrand) {
+        double cov = 0;
+        int newCov;
+        for (int i = this.classList.size(); --i >= 0;) {
+            if (isFwdStrand) {
+                newCov = covManager.getCoverage(classList.get(i)).getFwdCov(logPos);
+            } else {
+                newCov = covManager.getCoverage(classList.get(i)).getRevCov(logPos);
+            }
+            if (newCov > cov) { cov = newCov; }
+        }
+        if (this.classList.contains(MappingClass.SINGLE_COMMON_MATCH)) { //this classification needs to be added 
+            if (isFwdStrand) {
+                cov += covManager.getCoverage(MappingClass.SINGLE_COMMON_MATCH).getFwdCov(logPos);
+            } else {
+                cov += covManager.getCoverage(MappingClass.SINGLE_COMMON_MATCH).getRevCov(logPos);
+            }
+        }
+        return cov;
+    }
+    
+    /**
+     * Adds the given coverage value for the given mapping classification index
+     * to the given string builder as a nice table row.
+     * @param sb The string builder to add to
+     * @param classification The current mapping classification
+     * @param coverage The coverage value to store in the StringBuilder
+     */
+    private void addToBuilder(StringBuilder sb, Classification classification, double coverage) {
+        String classType = classification.getTypeString();
+            if (hasNormalizationFactor) {
+                sb.append(createTableRow(classType, coverage, TrackViewer.threeDecAfter(getNormalizedValue(id1, coverage))));
+            } else {
+                sb.append(createTableRow(classType, coverage));
+            }
     }
 
-    private String createTableRow(String label, double value) {
+    protected String createTableRow(String label, double value) {
         return "<tr><td align=\"right\">" + label + ":</td><td align=\"left\">" + String.valueOf((int) value) + "</td></tr>";
     }
 
-    private String createTableRow(String label, double value, double scaleFacVal) {
+    protected String createTableRow(String label, double value, double scaleFacVal) {
         return "<tr><td align=\"right\">" + label + ":</td><td align=\"left\">" + String.valueOf(scaleFacVal) + " (" + String.valueOf((int) value) + ")" + "</td></tr>";
     }
-
-//    public void setTrackInfoPanel(CoverageInfoI info) {
-//        this.trackInfo = info;
-//    }
 
     /**
      * @param coverage the coverage for a certain position
@@ -770,19 +600,15 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     public void verticalZoomLevelUpdated(int value) {
         this.scaleFactor = value < 1 ? 1 : Math.pow(value, 2);
  
-        if (this.cov != null) {
-            if (this.cov.isTwoTracks() && !this.combineTracks) {
-                this.createCoveragePathsDiffOfTwoTracks();
-            } else {
-                this.createCoveragePaths();
-            }
+        if (this.covManager != null) {
+            this.createCoveragePaths();
         }
         
         this.computeScaleStep();
         this.repaint();
     }
 
-    private static double threeDecAfter(double val) {
+    protected static double threeDecAfter(double val) {
         int tmp = (int) (val * 1000);
         return tmp / 1000.0;
     }
@@ -846,10 +672,10 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * shrinked to fit the available painting area.
      */
     private void computeAutomaticScaling() {
-        if (this.automaticScaling && this.cov != null && this.verticalSlider != null) {
+        if (this.automaticScaling && this.covManager != null && this.verticalSlider != null) {
             double oldScaleFactor = this.scaleFactor;
             double availablePixels = this.getPaintingAreaInfo().getAvailableForwardHeight();
-            this.scaleFactor = Math.ceil(this.cov.getHighestCoverage() / availablePixels);
+            this.scaleFactor = Math.ceil(this.covManager.getHighestCoverage() / availablePixels);
             this.scaleFactor = this.scaleFactor < 1 ? 1.0 : this.scaleFactor;
 
             //set the inverse of the value set in verticalZoomLevelUpdated
@@ -861,6 +687,11 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         }
     }
 
+    /**
+     * Creates the scaling lines in the background.
+     * @param step The scaling step to paint
+     * @param g The graphics object to paint on
+     */
     private void createLines(int step, Graphics2D g) {
         PaintingAreaInfo info = this.getPaintingAreaInfo();
 
@@ -960,29 +791,29 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
 
 //    /**
 //     * In case this viewer should receive the ability to combine coverages from a
-//     * PersistantCoverage array, this method provides this functionality.
+//     * CoverageManager array, this method provides this functionality.
 //     * @param coverages the coverages of different tracks, which should be combined
 //     * @return 
 //     */
-//    private PersistantCoverage combineCoverages(PersistantCoverage[] coverages) {
+//    private CoverageManager combineCoverages(CoverageManager[] coverages) {
 //        
-//        PersistantCoverage resultCov = new PersistantCoverage(coverages[0].getLeftBound(), coverages[0].getRightBound());
+//        CoverageManager resultCov = new CoverageManager(coverages[0].getLeftBound(), coverages[0].getRightBound());
 //        
 //        for (int i = coverages[0].getLeftBound(); i < coverages[0].getRightBound(); ++i) {
-//            for (PersistantCoverage cove : coverages) {
-//                resultCov.setPerfectFwd(i, resultCov.getPerfectFwd(i) + cove.getPerfectFwd(i));
+//            for (CoverageManager cove : coverages) {
+//                resultCov.getCoverage(MappingClass.PERFECT_MATCH).setFwdCoverage(i, resultCov.getCovManager(MappingClass.PERFECT_MATCH).getFwdCov(i) + cove.getCovManager(MappingClass.PERFECT_MATCH).getFwdCov(i));
 //                resultCov.setPerfectFwdNum(i, resultCov.getPerfectFwdNum(i) + cove.getPerfectFwdNum(i));
-//                resultCov.setPerfectRev(i, resultCov.getPerfectRev(i) + cove.getPerfectRev(i));
+//                resultCov.getCoverage(MappingClass.PERFECT_MATCH).setRevCoverage(i, resultCov.getCovManager(MappingClass.PERFECT_MATCH).getRevCov(i) + cove.getCovManager(MappingClass.PERFECT_MATCH).getRevCov(i));
 //                resultCov.setPerfectRevNum(i, resultCov.getPerfectRevNum(i) + cove.getPerfectRevNum(i));
 //                
-//                resultCov.setBestMatchFwd(i, resultCov.getBestMatchFwd(i) + cove.getBestMatchFwd(i));
+//                resultCov.getCoverage(MappingClass.BEST_MATCH).setFwdCoverage(i, resultCov.getCoverage(MappingClass.BEST_MATCH).getFwdCov(i) + cove.getCoverage(MappingClass.BEST_MATCH).getFwdCov(i));
 //                resultCov.setBestMatchFwdNum(i, resultCov.getBestMatchFwdNum(i) + cove.getBestMatchFwdNum(i));
-//                resultCov.setBestMatchRev(i, resultCov.getBestMatchRev(i) + cove.getBestMatchRev(i));
+//                resultCov.getCoverage(MappingClass.BEST_MATCH).setRevCoverage(i, resultCov.getCoverage(MappingClass.BEST_MATCH).getRevCov(i) + cove.getCoverage(MappingClass.BEST_MATCH).getRevCov(i));
 //                resultCov.setBestMatchRevNum(i, resultCov.getBestMatchRevNum(i) + cove.getBestMatchRevNum(i));
 //                
-//                resultCov.setCommonFwd(i, resultCov.getCommonFwd(i) + cove.getCommonFwd(i));
+//                resultCov.getCoverage(MappingClass.COMMON_MATCH).setFwdCoverage(i, resultCov.getCovManager(MappingClass.COMMON_MATCH).getFwdCov(i) + cove.getCovManager(MappingClass.COMMON_MATCH).getFwdCov(i));
 //                resultCov.setCommonFwdNum(i, resultCov.getCommonFwdNum(i) + cove.getCommonFwdNum(i));
-//                resultCov.setCommonRev(i, resultCov.getCommonRev(i) + cove.getCommonRev(i));
+//                resultCov.getCoverage(MappingClass.COMMON_MATCH).setRevCoverage(i, resultCov.getCovManager(MappingClass.COMMON_MATCH).getRevCov(i) + cove.getCovManager(MappingClass.COMMON_MATCH).getRevCov(i));
 //                resultCov.setCommonRevNum(i, resultCov.getCommonRevNum(i) + cove.getCommonRevNum(i));
 //            }
 //        }
@@ -1030,6 +861,43 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      */
     public void setUseMinimalIntervalLength(boolean useMinimalIntervalLength) {
         this.useMinimalIntervalLength = useMinimalIntervalLength;
+    }
+    
+    /**
+     * @return The coverage managers of this viewer
+     */
+    protected List<CoverageManager> getCoverageManagers() {
+        return this.covManagers;
+    }
+    
+    protected boolean hasNormalizationFactor() {
+        return this.hasNormalizationFactor;
+    }
+
+    /**
+     * @param useExtendedClassification Set <code>true</code>, if the extended
+     * classification including single perfect/best/common match classes shall
+     * be used and <code>false</code>, if only the three standard classes
+     * perfect/best/commmon match shall be used.
+     */
+    public void setUseExtendedClassification(boolean useExtendedClassification) {
+        this.useExtendedClassification = useExtendedClassification;
+        this.setupClassesAndColors();
+        this.boundsChangedHook();
+    }
+    
+    /**
+     * @return True, if the extended classification is used, false otherwise.
+     */
+    protected boolean isUseExtendedClassification() {
+        return this.useExtendedClassification;
+    }
+
+    /**
+     * @return The list of available classifications for this viewer.
+     */
+    protected List<Classification> getClassList() {
+        return classList;
     }
     
 }

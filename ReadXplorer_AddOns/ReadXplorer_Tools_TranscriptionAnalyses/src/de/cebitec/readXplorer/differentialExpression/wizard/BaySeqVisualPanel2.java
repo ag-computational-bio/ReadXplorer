@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -25,8 +25,8 @@ import javax.swing.JPanel;
 
 public final class BaySeqVisualPanel2 extends JPanel {
 
-    private List<PersistantTrack> selectedTracks = new ArrayList<>();
-    private DefaultListModel<PersistantTrack> trackListModel = new DefaultListModel<>();
+    private List<PersistentTrack> selectedTracks = new ArrayList<>();
+    private DefaultListModel<PersistentTrack> trackListModel = new DefaultListModel<>();
     private int[] replicateStructure = new int[1];
     private int currentReplicateNumber = 1;
 
@@ -42,7 +42,7 @@ public final class BaySeqVisualPanel2 extends JPanel {
         return "Define replicates structure";
     }
 
-    public void updateTrackList(List<PersistantTrack> selectedTracks) {
+    public void updateTrackList(List<PersistentTrack> selectedTracks) {
         if (!this.selectedTracks.equals(selectedTracks)) {
             this.selectedTracks = selectedTracks;
             resetTrackList();
@@ -52,9 +52,9 @@ public final class BaySeqVisualPanel2 extends JPanel {
     
     private void resetTrackList() {
         trackListModel.clear();
-        for (Iterator<PersistantTrack> it = selectedTracks.iterator(); it.hasNext();) {
-            PersistantTrack persistantTrack = it.next();
-            trackListModel.addElement(persistantTrack);
+        for (Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext();) {
+            PersistentTrack persistentTrack = it.next();
+            trackListModel.addElement(persistentTrack);
             replicateStructure = new int[1];
             replicateStructureField.setText("");
             addAsReplicates.setEnabled(true);
@@ -147,13 +147,13 @@ public final class BaySeqVisualPanel2 extends JPanel {
             replicateStructure = new int[selectedTracks.size()];
         }
         if (!trackList.isSelectionEmpty()) {
-            List<PersistantTrack> tracks = trackList.getSelectedValuesList();
+            List<PersistentTrack> tracks = trackList.getSelectedValuesList();
             StringBuilder strBuilder = new StringBuilder(replicateStructureField.getText() + "{");
-            for (Iterator<PersistantTrack> it = tracks.iterator(); it.hasNext();) {
-                PersistantTrack persistantTrack = it.next();
-                replicateStructure[selectedTracks.indexOf(persistantTrack)] = currentReplicateNumber;
-                strBuilder.append(persistantTrack.getDescription());
-                trackListModel.removeElement(persistantTrack);
+            for (Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext();) {
+                PersistentTrack persistentTrack = it.next();
+                replicateStructure[selectedTracks.indexOf(persistentTrack)] = currentReplicateNumber;
+                strBuilder.append(persistentTrack.getDescription());
+                trackListModel.removeElement(persistentTrack);
                 if (it.hasNext()) {
                     strBuilder.append(",");
                 } else {

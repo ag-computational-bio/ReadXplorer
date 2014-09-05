@@ -20,18 +20,20 @@ import de.cebitec.readXplorer.api.objects.AnalysisI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistant;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantCoverage;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.Coverage;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistent;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.DetectedFeatures;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.TranscriptionStart;
 import de.cebitec.readXplorer.util.DiscreteCountingDistribution;
-import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readXplorer.util.classification.MappingClass;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -87,8 +89,8 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
     private HashMap<Integer, Integer> exactReadStartDist = new HashMap<>(); //exact read start distribution
     private HashMap<Integer, Integer> exactCovIncPercDist = new HashMap<>(); //exact coverage increase percent distribution
     
-    protected PersistantCoverage currentCoverage;
-    private Map<Integer, PersistantChromosome> chromosomes;
+    protected CoverageManager currentCoverage;
+    private Map<Integer, PersistentChromosome> chromosomes;
 
     /**
      * Carries out the logic behind the transcription start site analysis.
@@ -142,7 +144,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
             this.parametersTSS.setMinNoReadStarts(0);
             this.parametersTSS.setMinPercentIncrease(0);
             if (!this.calcCoverageDistributions) {
-                int genomeLength = PersistantReference.calcWholeGenomeLength(chromosomes);
+                int genomeLength = PersistentReference.calcWholeGenomeLength(chromosomes);
                 parametersTSS.setMinNoReadStarts(this.estimateCutoff(genomeLength, readStartDistribution, 0)); //+ 0,05%
                 parametersTSS.setMinPercentIncrease(this.estimateCutoff(genomeLength, covIncPercentDistribution, 0));// (int) (this.genomeSize / 1000)); //0,1%
             } else {
@@ -156,13 +158,13 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
     }
     
     /**
-     * Detects TSSs for a new PersistantCoverage object or calls the finish method.
-     * @param data the data to handle: Either PersistantCoverage or "1" = coverage querries are done.
+     * Detects TSSs for a new CoverageManager object or calls the finish method.
+     * @param data the data to handle: Either CoverageManager or "1" = coverage querries are done.
      */
     @Override
     public void update(Object data) {
-        if (data instanceof CoverageAndDiffResultPersistant) {
-            CoverageAndDiffResultPersistant result = ((CoverageAndDiffResultPersistant) data);
+        if (data instanceof CoverageAndDiffResultPersistent) {
+            CoverageAndDiffResultPersistent result = ((CoverageAndDiffResultPersistent) data);
             this.detectTSSs(result);
         } else 
         if (data instanceof Byte && ((Byte) data) == 1) {
@@ -187,13 +189,13 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      * @param result the coverage and diff result for predicting the 
      * transcription start sites.
      */
-    public void detectTSSs(CoverageAndDiffResultPersistant result) {
+    public void detectTSSs(CoverageAndDiffResultPersistent result) {
         
-        PersistantCoverage coverage = result.getCoverage();
-        PersistantCoverage readStarts = result.getReadStarts();
+        CoverageManager coverage = result.getCovManager();
+        CoverageManager readStarts = result.getReadStarts();
         int chromId = result.getRequest().getChromId();
         int chromLength = chromosomes.get(chromId).getLength();
-        List<PersistantFeature> chromFeatures = refConnector.getFeaturesForClosedInterval(0, chromLength, chromId);
+        List<PersistentFeature> chromFeatures = refConnector.getFeaturesForClosedInterval(0, chromLength, chromId);
         this.currentCoverage = coverage;
         isStrandBothOption = parametersTSS.getReadClassParams().isStrandBothOption();
         isBothFwdDirection = parametersTSS.getReadClassParams().isStrandBothFwdOption();
@@ -206,46 +208,54 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         
         coverage.setLeftBound(fixedLeftBound); //add left coverage value from last request (or 0) to left
         readStarts.setLeftBound(fixedLeftBound); //of all coverage arrays.
-        coverage.setPerfectFwd(this.fixLeftCoverageBound(coverage.getPerfectFwd(), perfectCovLastFwdPos));
-        coverage.setPerfectRev(this.fixLeftCoverageBound(coverage.getPerfectRev(), perfectCovLastRevPos));
-        coverage.setBestMatchFwd(this.fixLeftCoverageBound(coverage.getBestMatchFwd(), bmCovLastFwdPos));
-        coverage.setBestMatchRev(this.fixLeftCoverageBound(coverage.getBestMatchRev(), bmCovLastRevPos));
-        coverage.setCommonFwd(this.fixLeftCoverageBound(coverage.getCommonFwd(), commonCovLastFwdPos));
-        coverage.setCommonRev(this.fixLeftCoverageBound(coverage.getCommonRev(), commonCovLastRevPos));
-        readStarts.setPerfectFwd(this.fixLeftCoverageBound(readStarts.getPerfectFwd(), 0)); //for read starts the left pos is not important
-        readStarts.setPerfectRev(this.fixLeftCoverageBound(readStarts.getPerfectRev(), perfectReadStartsLastRevPos)); //on fwd strand
-        readStarts.setBestMatchFwd(this.fixLeftCoverageBound(readStarts.getBestMatchFwd(), 0));
-        readStarts.setBestMatchRev(this.fixLeftCoverageBound(readStarts.getBestMatchRev(), bmReadStartsLastRevPos));
-        readStarts.setCommonFwd(this.fixLeftCoverageBound(readStarts.getCommonFwd(), 0));
-        readStarts.setCommonRev(this.fixLeftCoverageBound(readStarts.getCommonRev(), commonReadStartsLastRevPos));
+        
+        Coverage perfectCov = coverage.getCoverage(MappingClass.PERFECT_MATCH);
+        Coverage bestCov = coverage.getCoverage(MappingClass.BEST_MATCH);
+        Coverage commonCov = coverage.getCoverage(MappingClass.COMMON_MATCH);
+        Coverage perfectStarts = readStarts.getCoverage(MappingClass.PERFECT_MATCH);
+        Coverage bestStarts = readStarts.getCoverage(MappingClass.BEST_MATCH);
+        Coverage commonStarts = readStarts.getCoverage(MappingClass.COMMON_MATCH);
+        
+        perfectCov.setFwdCoverage(this.fixLeftCoverageBound(perfectCov.getFwdCov(), perfectCovLastFwdPos));
+        perfectCov.setRevCoverage(this.fixLeftCoverageBound(perfectCov.getRevCov(), perfectCovLastRevPos));
+        bestCov.setFwdCoverage(this.fixLeftCoverageBound(bestCov.getFwdCov(), bmCovLastFwdPos));
+        bestCov.setRevCoverage(this.fixLeftCoverageBound(bestCov.getRevCov(), bmCovLastRevPos));
+        commonCov.setFwdCoverage(this.fixLeftCoverageBound(commonCov.getFwdCov(), commonCovLastFwdPos));
+        commonCov.setRevCoverage(this.fixLeftCoverageBound(commonCov.getRevCov(), commonCovLastRevPos));
+        perfectStarts.setFwdCoverage(this.fixLeftCoverageBound(perfectStarts.getFwdCov(), 0)); //for read starts the left pos is not important
+        perfectStarts.setRevCoverage(this.fixLeftCoverageBound(perfectStarts.getRevCov(), perfectReadStartsLastRevPos)); //on fwd strand
+        bestStarts.setFwdCoverage(this.fixLeftCoverageBound(bestStarts.getFwdCov(), 0));
+        bestStarts.setRevCoverage(this.fixLeftCoverageBound(bestStarts.getRevCov(), bmReadStartsLastRevPos));
+        commonStarts.setFwdCoverage(this.fixLeftCoverageBound(commonStarts.getFwdCov(), 0));
+        commonStarts.setRevCoverage(this.fixLeftCoverageBound(commonStarts.getRevCov(), commonReadStartsLastRevPos));
 
         int idx;
         for (int i = fixedLeftBound; i < rightBound; ++i) {
             idx = coverage.getInternalPos(i);
             
-            if (parametersTSS.getReadClassParams().isCommonMatchUsed()) {
-                this.gatherDataAndDetect(chromId, chromLength, chromFeatures, coverage.getCommonFwd(), 
-                        coverage.getCommonRev(), readStarts.getCommonFwd(), readStarts.getCommonRev(), idx);
+            if (parametersTSS.getReadClassParams().isClassificationAllowed(MappingClass.COMMON_MATCH)) {
+                this.gatherDataAndDetect(chromId, chromLength, chromFeatures, commonCov.getFwdCov(), 
+                        commonCov.getRevCov(), commonStarts.getFwdCov(), commonStarts.getRevCov(), idx);
             
-            } else if (parametersTSS.getReadClassParams().isBestMatchUsed()) {
-                this.gatherDataAndDetect(chromId, chromLength, chromFeatures, coverage.getBestMatchFwd(), 
-                        coverage.getBestMatchRev(), readStarts.getBestMatchFwd(), readStarts.getBestMatchRev(), idx);
+            } else if (parametersTSS.getReadClassParams().isClassificationAllowed(MappingClass.BEST_MATCH)) {
+                this.gatherDataAndDetect(chromId, chromLength, chromFeatures, bestCov.getFwdCov(), 
+                        bestCov.getRevCov(), bestStarts.getFwdCov(), bestStarts.getRevCov(), idx);
             
-            } else {//if (parametersTSS.getReadClassParams().isPerfectMatchUsed()) {
-                this.gatherDataAndDetect(chromId, chromLength, chromFeatures, coverage.getPerfectFwd(), 
-                        coverage.getPerfectFwd(), readStarts.getPerfectFwd(), readStarts.getPerfectRev(), idx);
+            } else {//if (parametersTSS.getReadClassParams().isClassificationAllowed(MappingClass.PERFECT_MATCH)) {
+                this.gatherDataAndDetect(chromId, chromLength, chromFeatures, perfectCov.getFwdCov(), 
+                        perfectCov.getFwdCov(), perfectStarts.getFwdCov(), perfectStarts.getRevCov(), idx);
             }
         }
 
-        perfectCovLastFwdPos = coverage.getPerfectFwd(rightBound);
-        perfectCovLastRevPos = coverage.getPerfectRev(rightBound);
-        bmCovLastFwdPos = coverage.getBestMatchFwd(rightBound);
-        bmCovLastRevPos = coverage.getBestMatchRev(rightBound);
-        commonCovLastFwdPos = coverage.getCommonFwd(rightBound);
-        commonCovLastRevPos = coverage.getCommonRev(rightBound);
-        perfectReadStartsLastRevPos = readStarts.getPerfectRev(rightBound);
-        bmReadStartsLastRevPos = readStarts.getBestMatchRev(rightBound);
-        commonReadStartsLastRevPos = readStarts.getCommonRev(rightBound);
+        perfectCovLastFwdPos = perfectCov.getFwdCov(rightBound);
+        perfectCovLastRevPos = perfectCov.getRevCov(rightBound);
+        bmCovLastFwdPos = bestCov.getFwdCov(rightBound);
+        bmCovLastRevPos = bestCov.getRevCov(rightBound);
+        commonCovLastFwdPos = commonCov.getFwdCov(rightBound);
+        commonCovLastRevPos = commonCov.getRevCov(rightBound);
+        perfectReadStartsLastRevPos = perfectStarts.getRevCov(rightBound);
+        bmReadStartsLastRevPos = bestStarts.getRevCov(rightBound);
+        commonReadStartsLastRevPos = commonStarts.getRevCov(rightBound);
     }
     
     /**
@@ -262,7 +272,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      * class
      * @param pos the currently investigated position
      */
-    private void gatherDataAndDetect(int chromId, int chromLength, List<PersistantFeature> chromFeatures, 
+    private void gatherDataAndDetect(int chromId, int chromLength, List<PersistentFeature> chromFeatures, 
             int[] covArrayFwd, int[] covArrayRev, int[] readStartArrayFwd, int[] readStartArrayRev, int pos) {
         int fwdCov1;
         int revCov1;
@@ -333,7 +343,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
     /**
      * Method for analyzing the coverage of one pair of neighboring positions and
      * detecting a transcription start site, if the parameters are satisfied.
-     * @param coverage the PersistantCoverage container
+     * @param coverage the CoverageManager container
      * @param pos the position defining the pair to analyse: pos and (pos + 1)
      * on the fwd strand the TSS pos is "pos+1" and on the reverse strand the TSS
      * position is "pos"
@@ -344,7 +354,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      * @param diffFwd 
      * @param diffRev 
      */
-    private void detectStart(int pos, int chromId, int chromLength, List<PersistantFeature> chromFeatures, int readStartsFwd, 
+    private void detectStart(int pos, int chromId, int chromLength, List<PersistentFeature> chromFeatures, int readStartsFwd, 
                     int readStartsRev, int increaseFwd, int increaseRev, int percentIncreaseFwd, int percentIncreaseRev) {
         
         
@@ -387,11 +397,11 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      * @return the genomic features, which can be associated to the
      * given transcription start site and strand.
      */
-    private DetectedFeatures findNextFeatures(int tssPos, int chromLength, List<PersistantFeature> chromFeatures, boolean isFwdStrand) {
+    private DetectedFeatures findNextFeatures(int tssPos, int chromLength, List<PersistentFeature> chromFeatures, boolean isFwdStrand) {
         final int maxDeviation = 1000;
         int minStartPos = tssPos - maxDeviation < 0 ? 0 : tssPos - maxDeviation;
         int maxStartPos = tssPos + maxDeviation > chromLength ? chromLength : tssPos + maxDeviation;
-        PersistantFeature feature;
+        PersistentFeature feature;
         DetectedFeatures detectedFeatures = new DetectedFeatures();
         int start;
         boolean fstFittingFeature = true;
@@ -422,7 +432,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                          * cases the feature can be stored, since we also use CDS features for TSS detection,
                          * if no gene feature is available.
                          */
-                        PersistantFeature upstreamAnno = detectedFeatures.getUpstreamFeature();
+                        PersistentFeature upstreamAnno = detectedFeatures.getUpstreamFeature();
                         if (    upstreamAnno != null && 
                                 feature.getType() == FeatureType.CDS && 
                                 upstreamAnno.getType() == FeatureType.GENE &&
@@ -485,7 +495,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                          * except the current feature is a CDS feature and no gene feature is present for
                          * that gene, starting earlier.
                          */
-                        PersistantFeature upstreamAnno = detectedFeatures.getUpstreamFeature();
+                        PersistentFeature upstreamAnno = detectedFeatures.getUpstreamFeature();
                         if (    upstreamAnno != null && 
                                 feature.getType() == FeatureType.CDS && 
                                 start == upstreamAnno.getStop() &&
@@ -650,7 +660,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
             ProjectConnector.getInstance().insertCountDistribution(readStartDistribution, this.trackConnector.getTrackID());
             ProjectConnector.getInstance().insertCountDistribution(covIncPercentDistribution, this.trackConnector.getTrackID());
             if (this.parametersTSS.isAutoTssParamEstimation()) {
-                for (PersistantChromosome chrom : chromosomes.values()) {
+                for (PersistentChromosome chrom : chromosomes.values()) {
                     parametersTSS.setMinNoReadStarts(parametersTSS.getMinNoReadStarts()
                             + this.estimateCutoff(chrom.getLength(), readStartDistribution, 0)); //+ 0,05%
                     parametersTSS.setMinPercentIncrease(parametersTSS.getMinPercentIncrease()
@@ -715,7 +725,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      * @return 
      */
     private int getNewThreshold(HashMap<Integer, Integer> distribution, int thresholdEnlarger) {
-        int maxValue = (int) (PersistantReference.calcWholeGenomeLength(chromosomes) * 0.0025 + thresholdEnlarger);
+        int maxValue = (int) (PersistentReference.calcWholeGenomeLength(chromosomes) * 0.0025 + thresholdEnlarger);
         maxValue /= chromosomes.values().size();
         int nbValues = 0;
         List<Integer> keyList = new ArrayList<>(distribution.keySet());

@@ -28,6 +28,7 @@ import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.StatsContainer;
+import de.cebitec.readXplorer.util.classification.MappingClass;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -76,12 +77,14 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
      * @return  
      */
     @SuppressWarnings("fallthrough")
+    @NbBundle.Messages({"StatsParser.Finished=Finished creating track statistics for {0}. ", 
+                        "StatsParser.Start=Start creating track statistics for {0}"})
     public ParsedTrack createTrackStats(TrackJob trackJob, Map<String, Integer> chromLengthMap) {
         
         long startTime = System.currentTimeMillis();
         long finish;
         String fileName = trackJob.getFile().getName();
-        this.notifyObservers(NbBundle.getMessage(SamBamStatsParser.class, "StatsParser.Start", fileName));
+        this.notifyObservers(Bundle.StatsParser_Start(fileName));
 
 //        int noMappings = 0;
 //        long starti = System.currentTimeMillis();
@@ -95,7 +98,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
         String readName;
         String readSeq;
         String cigar;
-        int readClass;
+        MappingClass mappingClass;
         int mapCount;
         List<Pair<Integer, Integer>> coveredCommonIntervals = new ArrayList<>();
         List<Pair<Integer, Integer>> coveredBestMatchIntervals = new ArrayList<>();
@@ -103,7 +106,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
         coveredCommonIntervals.add(new Pair<>(0, 0));
         coveredBestMatchIntervals.add(new Pair<>(0, 0));
         coveredPerfectIntervals.add(new Pair<>(0, 0));
-        Integer classification;
+        Byte classification;
         Integer mappingCount;
 //        HashMap<String, Object> readNameSet = new HashMap<>();
         
@@ -140,21 +143,23 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
                             mapCount = 0;
                         }
 
-                        classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
+                        classification = Byte.valueOf(record.getAttribute(Properties.TAG_READ_CLASS).toString());
                         if (classification != null) {
-                            readClass = classification;
+                            mappingClass = MappingClass.getFeatureType(classification);
                             if (mapCount == 1) {
-                                switch (classification) { //fallthrough is necessary
-                                    case (int) Properties.PERFECT_COVERAGE: 
+                                switch (mappingClass) { //fallthrough is necessary
+                                    case SINGLE_PERFECT_MATCH : 
+                                    case PERFECT_MATCH :
                                         statsContainer.increaseValue(StatsContainer.NO_UNIQ_PERF_MAPPINGS, mapCount);
-                                    case (int) Properties.BEST_MATCH_COVERAGE:
+                                    case SINGLE_BEST_MATCH : 
+                                    case BEST_MATCH :
                                         statsContainer.increaseValue(StatsContainer.NO_UNIQ_BM_MAPPINGS, mapCount);
-                                    default:
+                                    default :
                                         statsContainer.increaseValue(StatsContainer.NO_UNIQ_MAPPINGS, mapCount);
                                 }
                             }
                         } else {
-                            readClass = Properties.COMPLETE_COVERAGE;
+                            mappingClass = MappingClass.COMMON_MATCH;
                             if (mapCount == 1) {
                                 statsContainer.increaseValue(StatsContainer.NO_UNIQ_MAPPINGS, mapCount);
                             }
@@ -180,16 +185,19 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
                         lastReadSeq = readSeq;
 
                         this.updateIntervals(coveredCommonIntervals, start, stop);
-                        if (readClass == Properties.PERFECT_COVERAGE) {
-                            this.updateIntervals(coveredPerfectIntervals, start, stop);
-                            this.updateIntervals(coveredBestMatchIntervals, start, stop);
-                            statsContainer.increaseValue(StatsContainer.NO_PERFECT_MAPPINGS, 1);
-                            statsContainer.increaseValue(StatsContainer.NO_BESTMATCH_MAPPINGS, 1);
-                        } else if (readClass == Properties.BEST_MATCH_COVERAGE) {
-                            this.updateIntervals(coveredBestMatchIntervals, start, stop);
-                            statsContainer.increaseValue(StatsContainer.NO_BESTMATCH_MAPPINGS, 1);
+                        switch (mappingClass) { //fallthrough is necessary
+                            case SINGLE_PERFECT_MATCH : 
+                            case PERFECT_MATCH :
+                                this.updateIntervals(coveredPerfectIntervals, start, stop);
+                                statsContainer.increaseValue(StatsContainer.NO_PERFECT_MAPPINGS, mapCount);
+                            case SINGLE_BEST_MATCH : 
+                            case BEST_MATCH :
+                                this.updateIntervals(coveredBestMatchIntervals, start, stop);
+                                statsContainer.increaseValue(StatsContainer.NO_BESTMATCH_MAPPINGS, mapCount);
+                            case SINGLE_COMMON_MATCH :
+                            default :
+                                statsContainer.increaseValue(StatsContainer.NO_COMMON_MAPPINGS, mapCount);
                         }
-                        statsContainer.increaseValue(StatsContainer.NO_COMMON_MAPPINGS, 1);
                         //saruman starts genome at 0 other algorithms like bwa start genome at 1
                         
 //                        //can be used for debugging performance
@@ -235,7 +243,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
         this.coverageContainer = new CoverageContainer();
         
         finish = System.currentTimeMillis();
-        String msg = NbBundle.getMessage(SamBamStatsParser.class, "StatsParser.Finished", fileName);
+        String msg = Bundle.StatsParser_Finished(fileName);
         this.notifyObservers(Benchmark.calculateDuration(startTime, finish, msg));
         
         return track;

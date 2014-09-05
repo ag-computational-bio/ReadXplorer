@@ -19,9 +19,9 @@ package de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer;
 import de.cebitec.readXplorer.databackend.IntervalRequest;
 import de.cebitec.readXplorer.databackend.ThreadListener;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistant;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistent;
+import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
@@ -61,7 +61,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
     private int oldLogLeft;
     private int oldLogRight;
     private boolean showBaseQualities;
-    MappingResultPersistant mappingResult;
+    MappingResultPersistent mappingResult;
     HashMap<Integer, Integer> completeCoverage;
 
     /**
@@ -71,14 +71,14 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
      * @param refGenome the reference genome
      * @param trackConnector connector of the track to show in this viewer
      */
-    public AlignmentViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGenome, TrackConnector trackConnector) {
+    public AlignmentViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistentReference refGenome, TrackConnector trackConnector) {
         super(boundsInfoManager, basePanel, refGenome);
         this.trackConnector = trackConnector;
         this.setInDrawingMode(true);
         this.showSequenceBar(true, true);
         blockHeight = 8;
         layerHeight = blockHeight + 2;
-        mappingResult = new MappingResultPersistant(new ArrayList<PersistantMapping>(), null);
+        mappingResult = new MappingResultPersistent(new ArrayList<Mapping>(), null);
         completeCoverage = new HashMap<>();
         this.setHorizontalMargin(10);
         this.setActive(false);
@@ -170,16 +170,16 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
     }
     
     /**
-     * Method called, when data is available. If the avialable data is a 
-     * MappingResultPersistant, then the viewer is updated with the new
-     * mapping data.
+     * Method called, when data is available. If the avialable data is a
+     * MappingResultPersistent, then the viewer is updated with the new mapping
+     * data.
      * @param data the new mapping data to show
      */
     @Override
     @SuppressWarnings("unchecked")
     public void receiveData(Object data) {
         if (data.getClass().equals(mappingResult.getClass())) {
-            this.mappingResult = ((MappingResultPersistant) data);
+            this.mappingResult = ((MappingResultPersistent) data);
             this.showData();
         }
     }
@@ -210,7 +210,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
             }
 
             getSequenceBar().setGenomeGapManager(layout.getGenomeGapManager());
-            this.addBlocks(layout);
+            this.addAllBlocks(layout);
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             
             this.repaint();
@@ -221,12 +221,12 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
      * Minimum count is currently disabled as it was not needed.
      * @param mappingResult 
      */
-    private void findMinAndMaxCount(Collection<PersistantMapping> mappings) {
+    private void findMinAndMaxCount(Collection<Mapping> mappings) {
 //        this.minCountInInterval = Integer.MAX_VALUE; //uncomment all these lines to get min count
         this.maxReplicates = Integer.MIN_VALUE;
         this.fwdMappingsInInterval = 0;
 
-        for (PersistantMapping m : mappings) {
+        for (Mapping m : mappings) {
             int coverage = m.getNbReplicates();
 //            if(coverage < minCountInInterval) {
 //                minCountInInterval = coverage;
@@ -264,32 +264,33 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
      * Each block component depicts one mapping.
      * @param layout the layout containing all information about the mappingResult to paint
      */
-    private void addBlocks(LayoutI layout) {
+    private void addAllBlocks(LayoutI layout) {
 
         // forward strand
-        int layerCounter = 1;
         int countingStep = 1;
         Iterator<LayerI> it = layout.getForwardIterator();
-        while (it.hasNext()) {
-            LayerI b = it.next();
-            Iterator<BlockI> blockIt = b.getBlockIterator();
-            while (blockIt.hasNext()) {
-                BlockI block = blockIt.next();
-                this.createJBlock(block, layerCounter);
-            }
-
-            layerCounter += countingStep;
-        }
-
+        this.addBlocks(it, countingStep);
 
         // reverse strand
-        layerCounter = -1;
         countingStep = -1;
         Iterator<LayerI> itRev = layout.getReverseIterator();
-        while (itRev.hasNext()) {
-            LayerI b = itRev.next();
-            Iterator<BlockI> blockIt = b.getBlockIterator();
-            while (blockIt.hasNext()) {
+        this.addBlocks(itRev, countingStep);
+    }
+    
+    /**
+     * After creating a layout this method creates all visual components which
+     * represent the part of the layout stored in the given layer iterator.
+     * Thus, it creates all block components for each iterator entry. Each block
+     * component depicts one mapping.
+     * @param layerIt the layer iterator containing all information about the
+     * mappings to paint on the current layer
+     * @param countingStep define how to count each step (e.g. +1 or -1)
+     */
+    private void addBlocks(Iterator<LayerI> layerIt, final int countingStep) {
+        int layerCounter = countingStep;
+        while (layerIt.hasNext()) {
+            LayerI b = layerIt.next();
+            for (Iterator<BlockI> blockIt = b.getBlockIterator(); blockIt.hasNext();) {
                 BlockI block = blockIt.next();
                 this.createJBlock(block, layerCounter);
             }

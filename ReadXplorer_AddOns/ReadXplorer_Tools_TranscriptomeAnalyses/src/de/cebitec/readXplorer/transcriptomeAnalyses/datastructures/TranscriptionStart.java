@@ -1,8 +1,8 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.datastructures;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.TrackChromResultEntry;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 
 /**
  * Data structure for storing a transcription start site.
@@ -15,10 +15,10 @@ public class TranscriptionStart extends TrackChromResultEntry {
     private final boolean isFwdStrand;
     private int readStarts;
     private double relCount;
-    private PersistantFeature detectedGene;
+    private PersistentFeature detectedGene;
     private int offset;
     private int dist2start, dist2stop;
-    private PersistantFeature nextDownstreamFeature;
+    private PersistentFeature nextDownstreamFeature;
     private int offsetToNextDownstrFeature;
     private boolean leaderless, cdsShift;
     private String detectedFeatStart, detectedFeatStop;
@@ -68,8 +68,8 @@ public class TranscriptionStart extends TrackChromResultEntry {
      *
      */
     public TranscriptionStart(int tssStartPosition, boolean isFwdStrand, int readStarts,
-            double relCount, PersistantFeature detectedGene, int offset, int dist2start,
-            int dist2stop, PersistantFeature nextDownstreamFeature,
+            double relCount, PersistentFeature detectedGene, int offset, int dist2start,
+            int dist2stop, PersistentFeature nextDownstreamFeature,
             int offsetToNextDownstreamFeature, boolean leaderless, boolean cdsShift,
             boolean isInternal, boolean putAS, int chromId, int trackId) {
         super(trackId, chromId);
@@ -90,7 +90,7 @@ public class TranscriptionStart extends TrackChromResultEntry {
     }
 
     public TranscriptionStart(int tssStartPosition, boolean isFwdStrand, int readStarts,
-            double relCount, PersistantFeature detectedGene, int offset, int dist2start,
+            double relCount, PersistentFeature detectedGene, int offset, int dist2start,
             int dist2stop, int offsetToNextDownstreamFeature, boolean leaderless, boolean cdsShift,
             boolean isInternal, boolean putAS, int chromId, int trackId) {
         super(trackId, chromId);
@@ -111,7 +111,7 @@ public class TranscriptionStart extends TrackChromResultEntry {
 
     public TranscriptionStart(int tssStartPosition, boolean isFwdStrand, int readStarts,
             double relCount, int offset, int dist2start,
-            int dist2stop, PersistantFeature nextDownstreamFeature, int offsetToNextDownstreamFeature, boolean leaderless, boolean cdsShift,
+            int dist2stop, PersistentFeature nextDownstreamFeature, int offsetToNextDownstreamFeature, boolean leaderless, boolean cdsShift,
             boolean isInternal, boolean putAS, int chromId, int trackId) {
         super(trackId, chromId);
         this.startPosition = tssStartPosition;
@@ -257,7 +257,7 @@ public class TranscriptionStart extends TrackChromResultEntry {
      *
      * @return
      */
-    public PersistantFeature getDetectedGene() {
+    public PersistentFeature getDetectedGene() {
         return detectedGene;
     }
 
@@ -265,7 +265,7 @@ public class TranscriptionStart extends TrackChromResultEntry {
      *
      * @param detectedGene
      */
-    public void setDetectedGene(PersistantFeature detectedGene) {
+    public void setDetectedGene(PersistentFeature detectedGene) {
         this.detectedGene = detectedGene;
     }
 
@@ -327,7 +327,7 @@ public class TranscriptionStart extends TrackChromResultEntry {
      *
      * @return
      */
-    public PersistantFeature getNextGene() {
+    public PersistentFeature getNextGene() {
         return nextDownstreamFeature;
     }
 
@@ -335,7 +335,7 @@ public class TranscriptionStart extends TrackChromResultEntry {
      *
      * @param nextGene
      */
-    public void setNextGene(PersistantFeature nextGene) {
+    public void setNextGene(PersistentFeature nextGene) {
         this.nextDownstreamFeature = nextGene;
     }
 
@@ -422,7 +422,7 @@ public class TranscriptionStart extends TrackChromResultEntry {
      *
      * @return
      */
-    public PersistantFeature getAssignedFeature() {
+    public PersistentFeature getAssignedFeature() {
         if (getDetectedGene() != null) {
             return getDetectedGene();
         } else {

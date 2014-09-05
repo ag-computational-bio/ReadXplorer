@@ -17,8 +17,8 @@
 package de.cebitec.readXplorer.transcriptionAnalyses;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.DetectedFeatures;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.TransStartUnannotated;
@@ -263,7 +263,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                     String strand;
                     int distance;
                     DetectedFeatures detFeatures;
-                    PersistantFeature feature;
+                    PersistentFeature feature;
                     TransStartUnannotated tSSU;
 
                     for (TranscriptionStart tss : tsss) {
@@ -345,7 +345,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                     TableRowSorter<TableModel> sorter = new TableRowSorter<>();
                     tSSTable.setRowSorter(sorter);
                     sorter.setModel(model);
-                    TableComparatorProvider.setPersistantTrackComparator(sorter, 1);
+                    TableComparatorProvider.setPersistentTrackComparator(sorter, 1);
 
                     String unannotatedTranscriptDet = tssParameters.isPerformUnannotatedTranscriptDet() ? "yes" : "no";
                     parametersLabel.setText(Bundle.ResultPanelTranscriptionStart_parametersLabel_text_1(tssParameters.getMinNoReadStarts(), tssParameters.getMinPercentIncrease(),
@@ -385,7 +385,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
         this.promotorRegions = new ArrayList<>();
         
         //get reference sequence for promotor regions
-        PersistantReference ref = this.referenceViewer.getReference();
+        PersistentReference ref = this.referenceViewer.getReference();
         String promotor;
         
         //get the promotor region for each TSS

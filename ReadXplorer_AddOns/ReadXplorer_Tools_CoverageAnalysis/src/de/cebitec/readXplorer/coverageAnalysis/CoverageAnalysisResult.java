@@ -17,8 +17,8 @@
 package de.cebitec.readXplorer.coverageAnalysis;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.exporter.tables.ExportDataI;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import java.util.ArrayList;
@@ -36,8 +36,8 @@ public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCove
 
     private CoverageIntervalContainer results;
 
-    public CoverageAnalysisResult(CoverageIntervalContainer results, Map<Integer, PersistantTrack> trackMap, 
-            PersistantReference reference, boolean combineTracks) {
+    public CoverageAnalysisResult(CoverageIntervalContainer results, Map<Integer, PersistentTrack> trackMap, 
+            PersistentReference reference, boolean combineTracks) {
         super(reference, trackMap, combineTracks, 0, 3);
         this.results = results;
     }

@@ -5,11 +5,11 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport;
 
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelTranscript;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -357,7 +357,7 @@ public class SequinTableFormatExporter extends Thread {
      * @throws IOException
      */
     private void exportTSS(ExportFeature exportFeat, Writer writer) throws IOException {
-        PersistantFeature feature = exportFeat.getFeature();
+        PersistentFeature feature = exportFeat.getFeature();
         boolean isFwd = feature.isFwdStrand();
         int geneStart;
         int geneStop;

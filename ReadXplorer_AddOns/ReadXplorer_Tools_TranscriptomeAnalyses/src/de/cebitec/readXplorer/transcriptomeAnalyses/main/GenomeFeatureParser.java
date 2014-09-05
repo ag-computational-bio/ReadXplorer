@@ -3,10 +3,10 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,14 +25,14 @@ public class GenomeFeatureParser {
     private final List<int[]> region2Exclude;
     private final HashMap<Integer, List<Integer>> fwdFeatures;
     private final HashMap<Integer, List<Integer>> revFeatures;
-    private HashMap<Integer, PersistantFeature> allFeatures;
+    private HashMap<Integer, PersistentFeature> allFeatures;
     private final ReferenceConnector refConnector;
-    private final List<PersistantFeature> genomeFeatures;
+    private final List<PersistentFeature> genomeFeatures;
     private final ProgressHandle progressHandle;
     private HashMap<Integer, List<Integer>> allFwdFeatures;
     private HashMap<Integer, List<Integer>> allRevFeatures;
     private Integer referenceLength;
-    private final PersistantReference refGenome;
+    private final PersistentReference refGenome;
     private final int noOfChromosomes;
 
     /**
@@ -54,8 +54,8 @@ public class GenomeFeatureParser {
         this.noOfChromosomes = refGenome.getNoChromosomes();
         this.region2Exclude = new ArrayList<>(this.noOfChromosomes);
         this.refConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenome.getId());
-        Map<Integer, PersistantChromosome> chroms = refConnector.getChromosomesForGenome();
-        for (PersistantChromosome chrom : chroms.values()) {
+        Map<Integer, PersistentChromosome> chroms = refConnector.getChromosomesForGenome();
+        for (PersistentChromosome chrom : chroms.values()) {
             this.genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
                     0, chrom.getLength(), chrom.getId()));
             int chromNo = refGenome.getChromosome(chrom.getId()).getChromNumber();
@@ -97,7 +97,7 @@ public class GenomeFeatureParser {
      *
      * @return HashMap<FeatureID, Feature>
      */
-    public HashMap<Integer, PersistantFeature> getAllFeatures() {
+    public HashMap<Integer, PersistentFeature> getAllFeatures() {
         return allFeatures;
     }
 
@@ -110,7 +110,7 @@ public class GenomeFeatureParser {
      *
      * @param genomeFeatures
      */
-    public void parseFeatureInformation(List<PersistantFeature> genomeFeatures) {
+    public void parseFeatureInformation(List<PersistentFeature> genomeFeatures) {
         //at first we need connection to the reference (Projectconnector->ReferenceConnector)
         // ReadXplorer already has all information we need here
 
@@ -124,7 +124,7 @@ public class GenomeFeatureParser {
         boolean isFwd;
         FeatureType type;
 
-        for (PersistantFeature feature : genomeFeatures) {
+        for (PersistentFeature feature : genomeFeatures) {
 
             count++;
             if (count >= interval) {
@@ -165,7 +165,7 @@ public class GenomeFeatureParser {
      * different feature ids because of the three reading frames for the forward
      * and reverse direction.
      *
-     * @param featureID Persistant feature id.
+     * @param featureID Persistent feature id.
      * @param start Start position of feature.
      * @param stop Stop position of feature.
      * @param isFwd Feature direction is forward if true, otherwise false.
@@ -190,7 +190,7 @@ public class GenomeFeatureParser {
      * downstream from stop position of this feature are marked with a 1. This
      * regions are going to be excluded in further analysis. analyses.
      *
-     * @param feature Persistant Feature list.
+     * @param feature Persistent Feature list.
      * @param startFeature Startposition of feature.
      * @param stopFeature Stortposition of feature.
      * @param isFwdDirection Direction of feature is forward if true, false
@@ -225,14 +225,14 @@ public class GenomeFeatureParser {
     /**
      * Fetch all genome features and load them in a HashMap<FeatureID, Feature>.
      *
-     * @param genomeFeatures List of Persistant Features.
+     * @param genomeFeatures List of Persistent Features.
      * @return a HashMap<FeatureID, Feature> with all genome features.
      */
-    public HashMap<Integer, PersistantFeature> getGenomeFeaturesInHash(List<PersistantFeature> genomeFeatures) {
+    public HashMap<Integer, PersistentFeature> getGenomeFeaturesInHash(List<PersistentFeature> genomeFeatures) {
         this.progressHandle.progress("Hashing of Features", 10);
-        HashMap<Integer, PersistantFeature> regions = new HashMap<>();
+        HashMap<Integer, PersistentFeature> regions = new HashMap<>();
 
-        for (PersistantFeature gf : genomeFeatures) {
+        for (PersistentFeature gf : genomeFeatures) {
             regions.put(gf.getId(), gf);
         }
         this.progressHandle.progress("Hashing of Features", 20);
@@ -243,11 +243,11 @@ public class GenomeFeatureParser {
      * Running trough all features in genome and divided by direction in which
      * strand the features are located and creates two hash structures.
      */
-    public void generateAllFeatureStrandInformation(List<PersistantFeature> genomeFeatures) {
+    public void generateAllFeatureStrandInformation(List<PersistentFeature> genomeFeatures) {
         this.allFwdFeatures = new HashMap<>();
         this.allRevFeatures = new HashMap<>();
 
-        for (PersistantFeature feature : genomeFeatures) {
+        for (PersistentFeature feature : genomeFeatures) {
 
             int start = feature.getStart();
             int stop = feature.getStop();
@@ -281,11 +281,11 @@ public class GenomeFeatureParser {
     }
 
     /**
-     * Returns a list with persistant features.
+     * Returns a list with persistent features.
      *
-     * @return List with persistant features
+     * @return List with persistent features
      */
-    public List<PersistantFeature> getGenomeFeatures() {
+    public List<PersistentFeature> getGenomeFeatures() {
         return genomeFeatures;
     }
 

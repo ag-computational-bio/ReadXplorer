@@ -1,12 +1,11 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ChartType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ElementsOfInterest;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.ParameterSetFiveEnrichedAnalyses;
 import de.cebitec.readXplorer.util.SequenceUtils;
-import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.erichseifert.gral.data.DataSeries;
 import de.erichseifert.gral.data.DataSource;
 import de.erichseifert.gral.data.DataTable;
@@ -58,15 +57,15 @@ public class PlotGenerator {
      */
     protected static final Color COLOR2 = new Color(200, 80, 75);
     private File absFreq5PrimeUtrsInCsv;
-    private final PersistantReference persistantReference;
+    private final PersistentReference reference;
 
     /**
      * Constructor for this class.
      *
-     * @param referenceViewer ReferenceViewer
+     * @param reference PersistentReference
      */
-    public PlotGenerator(PersistantReference reference) {
-        this.persistantReference = reference;
+    public PlotGenerator(PersistentReference reference) {
+        this.reference = reference;
     }
 
     /**
@@ -235,7 +234,7 @@ public class PlotGenerator {
                         }
                         int geneStart = ts.isFwdStrand() ? ts.getAssignedFeature().getStart() : ts.getAssignedFeature().getStop();
                         writer.write(ts.getAssignedFeature().getLocus() + ";" + direction + ";" + ts.getStartPosition() + ";"
-                                + geneStart + ";" + ts.getDetectedFeatStart() + ";" + offset + ";" + get5PrimeUtrSequence(this.persistantReference, ts, offset) + "\n");
+                                + geneStart + ";" + ts.getDetectedFeatStart() + ";" + offset + ";" + get5PrimeUtrSequence(this.reference, ts, offset) + "\n");
                     }
                 }
             }
@@ -262,7 +261,7 @@ public class PlotGenerator {
         List<TranscriptionStart> tssForAnalysis = getTssOfInterest(elements, tss);
 
         if (chartType == ChartType.BASE_DISTRIBUTION) {
-            PersistantReference ref = this.persistantReference;
+            PersistentReference ref = this.reference;
             Map<String, List<TranscriptionStart>> locusToTSSs = new TreeMap<>();
             for (TranscriptionStart ts : tssForAnalysis) {
                 if (ts.getAssignedFeature() != null) {
@@ -612,7 +611,7 @@ public class PlotGenerator {
      *
      * @return 5'-UTR sequence as a string
      */
-    private String get5PrimeUtrSequence(PersistantReference ref, TranscriptionStart tSS, int length) {
+    private String get5PrimeUtrSequence(PersistentReference ref, TranscriptionStart tSS, int length) {
         //Generating promotor regions for the TSS
         String utrRegion = "";
 

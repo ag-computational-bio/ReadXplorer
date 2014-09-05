@@ -16,9 +16,9 @@
  */
 package de.cebitec.readXplorer.databackend;
 
-import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistant;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
+import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistent;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.Properties;
 import java.util.List;
 import java.util.logging.Level;
@@ -38,7 +38,7 @@ public class MappingThreadAnalyses extends MappingThread {
      * file.
      * @param tracks the list of tracks for which this mapping thread is created
      */
-    public MappingThreadAnalyses(List<PersistantTrack> tracks) {
+    public MappingThreadAnalyses(List<PersistentTrack> tracks) {
         super(tracks);
     }
 
@@ -51,14 +51,14 @@ public class MappingThreadAnalyses extends MappingThread {
         while (!interrupted()) {
 
             IntervalRequest request = requestQueue.poll();
-            List<PersistantMapping> currentMappings;
+            List<Mapping> currentMappings;
             if (request != null) {
                 if (request.getDesiredData() == Properties.REDUCED_MAPPINGS) {
                     currentMappings = this.loadReducedMappings(request);
                 } else {
                     currentMappings = this.loadMappings(request);
                 }
-                request.getSender().receiveData(new MappingResultPersistant(currentMappings, request));
+                request.getSender().receiveData(new MappingResultPersistent(currentMappings, request));
 
             } else {
                 try {

@@ -43,7 +43,7 @@ public enum Brick {
     SKIPPED(Brick.SKIPPED_STRING),
     TRIMMED(Brick.TRIMMED_STRING);
     
-    private final static String READGAP_STRING = "_";
+    private final static String READGAP_STRING = "-";
     private final static String FOREIGN_GENOMEGAP_STRING = "";
     private final static String BASE_N_STRING = "N";
     private final static String BASE_A_STRING = "A";
@@ -58,7 +58,7 @@ public enum Brick {
     private final static String GENOME_GAP_T_STRING = "T";
     private final static String UNDEF_STRING = "@";
     private final static String SKIPPED_STRING = ".";
-    private final static String TRIMMED_STRING = "⌿";
+    private final static String TRIMMED_STRING = "|";
 
     private String typeString;
 
@@ -98,8 +98,10 @@ public enum Brick {
             case 'G' : type = Brick.BASE_G; break;
             case 'T' : type = Brick.BASE_T; break;
             case 'N' : type = Brick.BASE_N; break;
-            case '_' : type = Brick.READGAP; break;
+            case '-' : type = Brick.READGAP; break;
             case '.' : type = Brick.SKIPPED; break;
+            case '|' : type = Brick.TRIMMED; break;
+            case '@' : type = Brick.UNDEF; break;
             default  : type = Brick.UNDEF;
                 Logger.getLogger(Brick.class.getName()).log(Level.SEVERE, "found unknown brick type {0}", c);
         }

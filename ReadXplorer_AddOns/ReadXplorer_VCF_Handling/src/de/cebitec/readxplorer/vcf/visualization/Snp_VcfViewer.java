@@ -2,16 +2,12 @@
 package de.cebitec.readxplorer.vcf.visualization;
 
 import de.cebitec.readXplorer.databackend.ThreadListener;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistant;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantCoverage;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.BasePanel;
-import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.CoverageInfoI;
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -42,7 +38,6 @@ public class Snp_VcfViewer extends AbstractViewer implements ThreadListener {
     private final int scaleFactor;
     private final boolean snpsLoaded;
     private List<VariantContext> visibleSNPs;
-    private CoverageInfoI trackInfo;
  
 
     private static Color SNP_A = new Color(178, 34, 34);
@@ -64,7 +59,7 @@ public class Snp_VcfViewer extends AbstractViewer implements ThreadListener {
      * @param combineTracks true, if the coverage of the tracks contained in the
      * track connector should be combined.
      */
-    public Snp_VcfViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference refGen) {
+    public Snp_VcfViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistentReference refGen) {
         super(boundsManager, basePanel, refGen);
 
         snpVcfList = new ArrayList<>();

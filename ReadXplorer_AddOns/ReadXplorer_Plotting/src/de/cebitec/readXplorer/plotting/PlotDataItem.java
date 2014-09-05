@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.plotting;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import java.awt.Paint;
 import org.jfree.data.xy.XYDataItem;
 
@@ -26,20 +26,20 @@ import org.jfree.data.xy.XYDataItem;
  */
 public class PlotDataItem extends XYDataItem{
 
-    private PersistantFeature feature;
+    private PersistentFeature feature;
     private Paint paint;
     
-    public PlotDataItem(PersistantFeature feature, Number x, Number y) {
+    public PlotDataItem(PersistentFeature feature, Number x, Number y) {
         super(x, y);
         this.feature = feature;
     }
 
-    public PlotDataItem(PersistantFeature feature, double x, double y) {
+    public PlotDataItem(PersistentFeature feature, double x, double y) {
         super(x, y);
         this.feature = feature;
     }
 
-    public PersistantFeature getFeature() {
+    public PersistentFeature getFeature() {
         return feature;
     }
 

@@ -18,9 +18,9 @@ package de.cebitec.readXplorer.differentialExpression.wizard;
 
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -76,8 +76,8 @@ public class ExpressTestWizardPanelNormalization implements WizardDescriptor.Val
         int id = (int) wiz.getProperty("genomeID");
         Set<FeatureType> usedFeatures = (Set<FeatureType>) wiz.getProperty("featureType");
         ReferenceConnector referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(id);
-        List<PersistantFeature> allRefFeatures = new ArrayList<>();
-        for (PersistantChromosome chrom : referenceConnector.getChromosomesForGenome().values()) {
+        List<PersistentFeature> allRefFeatures = new ArrayList<>();
+        for (PersistentChromosome chrom : referenceConnector.getChromosomesForGenome().values()) {
             int chromLength = chrom.getLength();
             allRefFeatures.addAll(referenceConnector.getFeaturesForRegion(1, chromLength, usedFeatures, chrom.getId()));
         }

@@ -81,9 +81,9 @@ public class BlockContainer {
                 } else {
                     // stop position are identical, too
                     // use mapping id to distinguish and order
-                    if(o1.getPersistantObject().getId() < o2.getPersistantObject().getId()){
+                    if(o1.getPersistentObject().getId() < o2.getPersistentObject().getId()){
                         return -1;
-                    } else if(o1.getPersistantObject().getId() > o2.getPersistantObject().getId()){
+                    } else if(o1.getPersistentObject().getId() > o2.getPersistentObject().getId()){
                         return 1;
                     } else {
                         return 0;

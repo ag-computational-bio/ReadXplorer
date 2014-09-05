@@ -17,8 +17,8 @@
 package de.cebitec.readXplorer.correlationAnalysis;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,8 +47,8 @@ public class CorrelationResult extends ResultTrackAnalysis<CorrelationResult> {
      * @param combineTracks <cc>true</cc>, if the tracks in the list are
      * combined, <cc>false</cc> otherwise
      */
-    public CorrelationResult(List<CorrelatedInterval> correlationsList, Map<Integer, PersistantTrack> trackMap, 
-            PersistantReference reference, boolean combineTracks, int trackColumn, int filterColumn) {
+    public CorrelationResult(List<CorrelatedInterval> correlationsList, Map<Integer, PersistentTrack> trackMap, 
+            PersistentReference reference, boolean combineTracks, int trackColumn, int filterColumn) {
         super(reference, trackMap, combineTracks, trackColumn, filterColumn);
         this.correlationsList = correlationsList;
     }

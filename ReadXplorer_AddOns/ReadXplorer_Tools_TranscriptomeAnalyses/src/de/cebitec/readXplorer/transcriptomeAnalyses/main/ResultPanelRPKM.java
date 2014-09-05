@@ -1,7 +1,7 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.RPKMvalue;
 import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
@@ -32,7 +32,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
     public static final String FEATURES_TOTAL = "Total number of reference features";
     private RPKMAnalysisResult rpkmCalcResult;
     private final HashMap<String, Object> filterStatisticsMap;
-    private PersistantFeature feature;
+    private PersistentFeature feature;
     private final boolean statistics = false;
     private BoundsInfoManager boundsInfoManager;
     private ReferenceViewer referenceViewer;
@@ -161,7 +161,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
         DefaultListSelectionModel model = (DefaultListSelectionModel) this.rpkmTable.getSelectionModel();
         int selectedView = model.getLeadSelectionIndex();
         int selectedModel = this.rpkmTable.convertRowIndexToModel(selectedView);
-        feature = (PersistantFeature) this.rpkmTable.getModel().getValueAt(selectedModel, 0);
+        feature = (PersistentFeature) this.rpkmTable.getModel().getValueAt(selectedModel, 0);
         int pos = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
 
         getBoundsInfoManager().navigatorBarUpdated(pos);
@@ -203,7 +203,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
 //                public void run() {
                     DefaultTableModel model = (DefaultTableModel) rpkmTable.getModel();
 
-                    PersistantFeature feat;
+                    PersistentFeature feat;
                     for (RPKMvalue rpkm : rpkmCalcResult.getResults()) {
                         feat = rpkm.getFeature();
                         Object[] rowData = new Object[nbColumns];

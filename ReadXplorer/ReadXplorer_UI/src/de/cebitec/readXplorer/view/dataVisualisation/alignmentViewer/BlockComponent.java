@@ -18,10 +18,10 @@ package de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer;
 
 import de.cebitec.readXplorer.databackend.SamBamFileReader;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantDiff;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantObject;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReferenceGap;
+import de.cebitec.readXplorer.databackend.dataObjects.Difference;
+import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentObject;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReferenceGap;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.ColorUtils;
 import de.cebitec.readXplorer.util.SamAlignmentBlock;
@@ -166,7 +166,7 @@ public class BlockComponent extends JComponent {
              * @return the header for the sequence
              */
             private String getHeader() {
-                PersistantMapping mapping = (PersistantMapping) BlockComponent.this.block.getPersistantObject();
+                Mapping mapping = (Mapping) BlockComponent.this.block.getPersistentObject();
                 final String strand = mapping.isFwdStrand() ? ">>" : "<<";
                 HashMap<Integer, String> trackNames = ProjectConnector.getInstance().getOpenedTrackNames();
                 String name = "Reference seq from ";
@@ -202,8 +202,8 @@ public class BlockComponent extends JComponent {
      * @return The reference sequence 
      */
     public String getSequence() {
-        int start = ((PersistantMapping) block.getPersistantObject()).getStart();
-        int stop = ((PersistantMapping) block.getPersistantObject()).getStop();
+        int start = ((Mapping) block.getPersistentObject()).getStart();
+        int stop = ((Mapping) block.getPersistentObject()).getStop();
         //string first pos is zero
         String readSequence = parentViewer.getReference().getActiveChromSequence(start - 1, stop);
         return readSequence;
@@ -228,7 +228,7 @@ public class BlockComponent extends JComponent {
      */
     private String initToolTipTextInfoPart() {
         StringBuilder sb = new StringBuilder(150);
-        PersistantMapping mapping = ((PersistantMapping) block.getPersistantObject());
+        Mapping mapping = ((Mapping) block.getPersistentObject());
         
         sb.append(createTableRow("Start", String.valueOf(mapping.getStart())));
         sb.append(createTableRow("Stop", String.valueOf(mapping.getStop())));
@@ -309,9 +309,9 @@ public class BlockComponent extends JComponent {
         return baseQualString;
     }
 
-    private void appendDiffs(PersistantMapping mapping, StringBuilder sb) {
+    private void appendDiffs(Mapping mapping, StringBuilder sb) {
         boolean printLabel = true;
-        for (PersistantDiff d : mapping.getDiffs().values()) {
+        for (Difference d : mapping.getDiffs().values()) {
             String key = "";
             if (printLabel) {
                 key = "Differences to reference";
@@ -321,7 +321,7 @@ public class BlockComponent extends JComponent {
         }
     }
 
-    private void appendGaps(PersistantMapping mapping, StringBuilder sb) {
+    private void appendGaps(Mapping mapping, StringBuilder sb) {
         boolean printLabel = true;
         for (Integer pos : mapping.getGenomeGaps().keySet()) {
             String key = "";
@@ -330,7 +330,7 @@ public class BlockComponent extends JComponent {
                 printLabel = false;
             }
             StringBuilder tmp = new StringBuilder(10);
-            for (PersistantReferenceGap g : mapping.getGenomeGapsAtPosition(pos)) {
+            for (PersistentReferenceGap g : mapping.getGenomeGapsAtPosition(pos)) {
                 tmp.append(g.getBase()).append(", ");
             }
             tmp.deleteCharAt(tmp.toString().lastIndexOf(','));
@@ -380,8 +380,8 @@ public class BlockComponent extends JComponent {
      */
     private void calcSubComponents() {
 
-        PersistantMapping mapping = (PersistantMapping) block.getPersistantObject();
-        this.calcAlignmentBlocks(block.getPersistantObject());
+        Mapping mapping = (Mapping) block.getPersistentObject();
+        this.calcAlignmentBlocks(block.getPersistentObject());
 
         // only count Bricks, that are no genome gaps.
         //Used for determining location of brick in viewer
@@ -446,14 +446,14 @@ public class BlockComponent extends JComponent {
     
     /**
      * Calculates the alignment blocks to paint for the given mapping.
-     * @param persistantObject The PersistantObject, which should be a
-     * PersistantMapping
+     * @param persistentObject The PersistentObject, which should be a
+ Mapping
      */
-    private void calcAlignmentBlocks(PersistantObject persistantObject) {
-        PersistantObject persObj = persistantObject;
-        if (persObj instanceof PersistantMapping) {
+    private void calcAlignmentBlocks(PersistentObject persistentObject) {
+        PersistentObject persObj = persistentObject;
+        if (persObj instanceof Mapping) {
             this.blockColor = this.determineBlockColor();
-            PersistantMapping mapping = (PersistantMapping) persObj;
+            Mapping mapping = (Mapping) persObj;
             
             if (mapping.getAlignmentBlocks().isEmpty()) {
                 Rectangle blockRect = PaintUtilities.calcBlockBoundaries(
@@ -474,7 +474,7 @@ public class BlockComponent extends JComponent {
      * @return The color of the block.
      */
     private Color determineBlockColor() {
-        PersistantMapping m = ((PersistantMapping) block.getPersistantObject());
+        Mapping m = ((Mapping) block.getPersistentObject());
         Color color;
         if (m.getDifferences() == 0) {
             color = ColorProperties.BLOCK_MATCH;

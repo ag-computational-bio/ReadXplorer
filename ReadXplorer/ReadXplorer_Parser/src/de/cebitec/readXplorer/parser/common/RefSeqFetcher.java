@@ -71,7 +71,7 @@ public class RefSeqFetcher implements Observable {
      * the reference file stored in this object.
      */
     public String getSubSequence(String refName, int start, int stop) {
-        return new String(refFile.getSubsequenceAt(refName, start, stop).getBases(), Charset.forName("UTF-8")).toUpperCase();
+            return new String(refFile.getSubsequenceAt(refName, start, stop).getBases(), Charset.forName("UTF-8")).toUpperCase();
     }
 
     @Override

@@ -9,10 +9,10 @@ import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readXplorer.controller.ViewController;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.parser.tables.TableType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelTranscript;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
@@ -35,7 +35,7 @@ import de.cebitec.readXplorer.transcriptomeAnalyses.main.TranscriptomeAnalysesTo
 import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.FivePrimeEnrichedTracksVisualPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.WizardPropertyStrings;
 import de.cebitec.readXplorer.ui.importer.TranscriptomeTableViewI;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.view.analysis.ResultTablePanel;
 import java.awt.HeadlessException;
 import java.util.ArrayList;
@@ -46,7 +46,6 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import org.netbeans.api.progress.ProgressHandle;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
@@ -65,7 +64,7 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
     }
 
     @Override
-    public void processCsvInput(List<List<?>> tableData, List<List<?>> tableData2, TableType type, PersistantReference ref) {
+    public void processCsvInput(List<List<?>> tableData, List<List<?>> tableData2, TableType type, PersistentReference ref) {
         TopComponent findTopComponent = WindowManager.getDefault().findTopComponent(TranscriptomeAnalysesTopComponentTopComponent.PREFERRED_ID);
         if (findTopComponent != null) {
             this.transcAnalysesTopComp = (TranscriptomeAnalysesTopComponentTopComponent) findTopComponent;
@@ -88,30 +87,30 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
         }
     }
 
-    public void setUpOperonTable(List<List<?>> fstSheet, List<List<?>> sndSheet, PersistantReference reference, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp) {
+    public void setUpOperonTable(List<List<?>> fstSheet, List<List<?>> sndSheet, PersistentReference reference, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp) {
         ResultPanelOperonDetection resultPanel = new ResultPanelOperonDetection();
-        resultPanel.setPersistantReference(reference);
+        resultPanel.setPersistentReference(reference);
 //        resultPanel.setReferenceViewer(reference);
         checkAndOpenRefViewer(reference, resultPanel);
 
         int trackID = (Integer) fstSheet.get(1).get(fstSheet.get(0).size() - 1);
         int chromId = (Integer) fstSheet.get(1).get(fstSheet.get(0).size() - 3);
 
-        PersistantTrack track = ProjectConnector.getInstance().getTrack(trackID);
-        Map<Integer, PersistantTrack> trackMap = new HashMap<>();
+        PersistentTrack track = ProjectConnector.getInstance().getTrack(trackID);
+        Map<Integer, PersistentTrack> trackMap = new HashMap<>();
 
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(chromId);
         if (refConnector != null) {
             try {
                 trackMap.put(track.getId(), track);
-                List<PersistantFeature> genomeFeatures = new ArrayList<>();
-                Map<Integer, PersistantChromosome> chroms = refConnector.getChromosomesForGenome();
-                for (PersistantChromosome chrom : chroms.values()) {
+                List<PersistentFeature> genomeFeatures = new ArrayList<>();
+                Map<Integer, PersistentChromosome> chroms = refConnector.getChromosomesForGenome();
+                for (PersistentChromosome chrom : chroms.values()) {
                     genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
                             0, chrom.getLength(), chrom.getId()));
                 }
-                HashMap<String, PersistantFeature> featureMap = new HashMap<>();
-                for (PersistantFeature persistantFeature : genomeFeatures) {
+                HashMap<String, PersistentFeature> featureMap = new HashMap<>();
+                for (PersistentFeature persistantFeature : genomeFeatures) {
                     featureMap.put(persistantFeature.getLocus(), persistantFeature);
                 }
 
@@ -224,25 +223,25 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
 
         int trackID = (Integer) fstSheet.get(1).get(fstSheet.get(1).size() - 1);
         int chromId = (Integer) fstSheet.get(1).get(fstSheet.get(1).size() - 3);
-        Map<Integer, PersistantTrack> trackMap = new HashMap<>();
+        Map<Integer, PersistentTrack> trackMap = new HashMap<>();
 
-        PersistantTrack track = ProjectConnector.getInstance().getTrack(trackID);
+        PersistentTrack track = ProjectConnector.getInstance().getTrack(trackID);
 
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(chromId);
-        List<PersistantFeature> genomeFeatures = new ArrayList<>();
+        List<PersistentFeature> genomeFeatures = new ArrayList<>();
 
         if (refConnector != null) {
 
             try {
                 trackMap.put(track.getId(), track);
 
-                Map<Integer, PersistantChromosome> chroms = refConnector.getChromosomesForGenome();
-                for (PersistantChromosome chrom : chroms.values()) {
+                Map<Integer, PersistentChromosome> chroms = refConnector.getChromosomesForGenome();
+                for (PersistentChromosome chrom : chroms.values()) {
                     genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
                             0, chrom.getLength(), chrom.getId()));
                 }
-                HashMap<String, PersistantFeature> featureMap = new HashMap<>();
-                for (PersistantFeature persistantFeature : genomeFeatures) {
+                HashMap<String, PersistentFeature> featureMap = new HashMap<>();
+                for (PersistentFeature persistantFeature : genomeFeatures) {
                     featureMap.put(persistantFeature.getLocus(), persistantFeature);
                 }
 
@@ -297,31 +296,31 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
         }
     }
 
-    public void setUpNovelTranscriptsTable(List<List<?>> fstSheet, List<List<?>> sndSheet, PersistantReference reference, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp) {
+    public void setUpNovelTranscriptsTable(List<List<?>> fstSheet, List<List<?>> sndSheet, PersistentReference reference, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp) {
         NovelRegionResultPanel novelRegionsResultsPanel = new NovelRegionResultPanel();
 //        novelRegionsResultsPanel.setReferenceViewer(reference);
-        novelRegionsResultsPanel.setPersistantReference(reference);
+        novelRegionsResultsPanel.setPersistentReference(reference);
         checkAndOpenRefViewer(reference, novelRegionsResultsPanel);
 
         int refID = (Integer) fstSheet.get(1).get(fstSheet.get(0).size() - 1);
         int chromId = (Integer) fstSheet.get(1).get(fstSheet.get(0).size() - 3);
 
-        PersistantTrack track = ProjectConnector.getInstance().getTrack(refID);
-        Map<Integer, PersistantTrack> trackMap = new HashMap<>();
+        PersistentTrack track = ProjectConnector.getInstance().getTrack(refID);
+        Map<Integer, PersistentTrack> trackMap = new HashMap<>();
         trackMap.put(track.getId(), track);
 
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(chromId);
         if (refConnector != null) {
 
             try {
-                List<PersistantFeature> genomeFeatures = new ArrayList<>();
-                Map<Integer, PersistantChromosome> chroms = refConnector.getChromosomesForGenome();
-                for (PersistantChromosome chrom : chroms.values()) {
+                List<PersistentFeature> genomeFeatures = new ArrayList<>();
+                Map<Integer, PersistentChromosome> chroms = refConnector.getChromosomesForGenome();
+                for (PersistentChromosome chrom : chroms.values()) {
                     genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
                             0, chrom.getLength(), chrom.getId()));
                 }
-                HashMap<String, PersistantFeature> featureMap = new HashMap<>();
-                for (PersistantFeature persistantFeature : genomeFeatures) {
+                HashMap<String, PersistentFeature> featureMap = new HashMap<>();
+                for (PersistentFeature persistantFeature : genomeFeatures) {
                     featureMap.put(persistantFeature.getLocus(), persistantFeature);
                 }
 
@@ -431,32 +430,32 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
      * TranscriptomeAnalysesTopComponentTopComponent
      *
      */
-    public void setUpTSSTable(List<List<?>> fstSheet, List<List<?>> sndSheet, PersistantReference ref, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp) {
+    public void setUpTSSTable(List<List<?>> fstSheet, List<List<?>> sndSheet, PersistentReference ref, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp) {
         ResultPanelTranscriptionStart tssResultsPanel = new ResultPanelTranscriptionStart();
         checkAndOpenRefViewer(ref, tssResultsPanel);
-        tssResultsPanel.setPersistantReference(ref);
+        tssResultsPanel.setPersistentReference(ref);
 
         int refID = (Integer) fstSheet.get(1).get(fstSheet.get(0).size() - 1);
         int chromId = (Integer) fstSheet.get(1).get(fstSheet.get(0).size() - 2);
         // needed once!
-        HashMap<Integer, PersistantTrack> trackMap = new HashMap<>();
+        HashMap<Integer, PersistentTrack> trackMap = new HashMap<>();
 
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(chromId);
         if (refConnector != null) {
-            PersistantTrack track = ProjectConnector.getInstance().getTrack(refID);
+            PersistentTrack track = ProjectConnector.getInstance().getTrack(refID);
             try {
                 trackMap.put(track.getId(), track);
 
-                List<PersistantFeature> genomeFeatures = new ArrayList<>();
+                List<PersistentFeature> genomeFeatures = new ArrayList<>();
                 int genomeId = refConnector.getRefGenome().getId();
-                Map<Integer, PersistantChromosome> chroms = refConnector.getChromosomesForGenome();
-                for (PersistantChromosome chrom : chroms.values()) {
+                Map<Integer, PersistentChromosome> chroms = refConnector.getChromosomesForGenome();
+                for (PersistentChromosome chrom : chroms.values()) {
                     genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
                             0, chrom.getLength(), chrom.getId()));
                 }
 
-                HashMap<String, PersistantFeature> featureMap = new HashMap<>();
-                for (PersistantFeature persistantFeature : genomeFeatures) {
+                HashMap<String, PersistentFeature> featureMap = new HashMap<>();
+                for (PersistentFeature persistantFeature : genomeFeatures) {
                     featureMap.put(persistantFeature.getLocus(), persistantFeature);
                 }
 
@@ -624,8 +623,8 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                     double relCount = Double.parseDouble(relCountStr);
 
                     boolean isInternalTSS = (Boolean) list.get(13);
-                    PersistantFeature detectedGene = null;
-                    PersistantFeature downstreamNextGene = null;
+                    PersistentFeature detectedGene = null;
+                    PersistentFeature downstreamNextGene = null;
                     String locus = (String) list.get(6);
                     if (featureMap.containsKey(locus)) {
                         if (isInternalTSS) {
@@ -682,7 +681,7 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
         }
     }
 
-    private void checkAndOpenRefViewer(PersistantReference ref, ResultTablePanel tablePanel) {
+    private void checkAndOpenRefViewer(PersistentReference ref, ResultTablePanel tablePanel) {
         @SuppressWarnings("unchecked")
         Collection<ViewController> viewControllers = (Collection<ViewController>) CentralLookup.getDefault().lookupAll(ViewController.class);
         for (ViewController tmpVCon : viewControllers) {
@@ -694,7 +693,7 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
     }
 
     @Override
-    public void processXlsInput(PersistantReference reference, DefaultTableModel model, Map<String, String> secondSheetMap, Map<String, String> secondSheetMapThirdCol) {
+    public void processXlsInput(PersistentReference reference, DefaultTableModel model, Map<String, String> secondSheetMap, Map<String, String> secondSheetMapThirdCol) {
 
         TopComponent findTopComponent = WindowManager.getDefault().findTopComponent(TranscriptomeAnalysesTopComponentTopComponent.PREFERRED_ID);
         if (findTopComponent != null) {
@@ -730,36 +729,36 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
      * TranscriptomeAnalysesTopComponentTopComponent
      * TranscriptomeAnalysesTopComponentTopComponent
      */
-    public void setUpTSSDataStructuresAndTable(PersistantReference reference,
+    public void setUpTSSDataStructuresAndTable(PersistentReference reference,
             TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp,
             DefaultTableModel model, Map<String, String> secondSheetMap,
             Map<String, String> secondSheetMapThirdCol) {
         ResultPanelTranscriptionStart tssResultsPanel = new ResultPanelTranscriptionStart();
 //        tssResultsPanel.setReferenceViewer(reference);
         checkAndOpenRefViewer(reference, tssResultsPanel);
-        tssResultsPanel.setPersistantReference(reference);
+        tssResultsPanel.setPersistentReference(reference);
 
         String trackId = (String) model.getValueAt(1, model.getColumnCount() - 1);
         int refID = Integer.valueOf(trackId);
         String chromID = (String) model.getValueAt(1, model.getColumnCount() - 2);
         int chromId = Integer.valueOf(chromID);
-        HashMap<Integer, PersistantTrack> trackMap = new HashMap<>();
+        HashMap<Integer, PersistentTrack> trackMap = new HashMap<>();
 
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(chromId);
         if (refConnector != null) {
-            PersistantTrack track = ProjectConnector.getInstance().getTrack(refID);
+            PersistentTrack track = ProjectConnector.getInstance().getTrack(refID);
             try {
                 trackMap.put(track.getId(), track);
 
-                List<PersistantFeature> genomeFeatures = new ArrayList<>();
-                Map<Integer, PersistantChromosome> chroms = refConnector.getChromosomesForGenome();
-                for (PersistantChromosome chrom : chroms.values()) {
+                List<PersistentFeature> genomeFeatures = new ArrayList<>();
+                Map<Integer, PersistentChromosome> chroms = refConnector.getChromosomesForGenome();
+                for (PersistentChromosome chrom : chroms.values()) {
                     genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
                             0, chrom.getLength(), chrom.getId()));
                 }
 
-                HashMap<String, PersistantFeature> featureMap = new HashMap<>();
-                for (PersistantFeature persistantFeature : genomeFeatures) {
+                HashMap<String, PersistentFeature> featureMap = new HashMap<>();
+                for (PersistentFeature persistantFeature : genomeFeatures) {
                     featureMap.put(persistantFeature.getLocus(), persistantFeature);
                 }
 
@@ -897,8 +896,8 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                     boolean isInternalTSS;
                     isInternalTSS = !tmp.equals("false");
 
-                    PersistantFeature detectedGene = null;
-                    PersistantFeature downstreamNextGene = null;
+                    PersistentFeature detectedGene = null;
+                    PersistentFeature downstreamNextGene = null;
                     String locus = (String) model.getValueAt(row, 6);
 
                     if (featureMap.containsKey(locus)) {
@@ -1042,25 +1041,25 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
         int trackID = Integer.valueOf(trackId);
         String chromID = (String) model.getValueAt(1, model.getColumnCount() - 3);
         int chromId = Integer.valueOf(chromID);
-        Map<Integer, PersistantTrack> trackMap = new HashMap<>();
+        Map<Integer, PersistentTrack> trackMap = new HashMap<>();
 
-        PersistantTrack track = ProjectConnector.getInstance().getTrack(trackID);
+        PersistentTrack track = ProjectConnector.getInstance().getTrack(trackID);
 
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(chromId);
-        List<PersistantFeature> genomeFeatures = new ArrayList<>();
+        List<PersistentFeature> genomeFeatures = new ArrayList<>();
 
         if (refConnector != null) {
 
 //            try {
             trackMap.put(track.getId(), track);
 
-            Map<Integer, PersistantChromosome> chroms = refConnector.getChromosomesForGenome();
-            for (PersistantChromosome chrom : chroms.values()) {
+            Map<Integer, PersistentChromosome> chroms = refConnector.getChromosomesForGenome();
+            for (PersistentChromosome chrom : chroms.values()) {
                 genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
                         0, chrom.getLength(), chrom.getId()));
             }
-            HashMap<String, PersistantFeature> featureMap = new HashMap<>();
-            for (PersistantFeature persistantFeature : genomeFeatures) {
+            HashMap<String, PersistentFeature> featureMap = new HashMap<>();
+            for (PersistentFeature persistantFeature : genomeFeatures) {
                 featureMap.put(persistantFeature.getLocus(), persistantFeature);
             }
 //        }catch (Exception e) {
@@ -1105,10 +1104,10 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
         }
     }
 
-    public void setUpOperonStructuresAndTable(PersistantReference reference, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, DefaultTableModel model, Map<String, String> secondSheetMap,
+    public void setUpOperonStructuresAndTable(PersistentReference reference, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, DefaultTableModel model, Map<String, String> secondSheetMap,
             Map<String, String> secondSheetMapThirdCol) {
         ResultPanelOperonDetection resultPanel = new ResultPanelOperonDetection();
-        resultPanel.setPersistantReference(reference);
+        resultPanel.setPersistentReference(reference);
         checkAndOpenRefViewer(reference, resultPanel);
 //        resultPanel.setReferenceViewer(reference);
 
@@ -1116,21 +1115,21 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
         int trackID = Integer.valueOf(trackId);
         String chromID = (String) model.getValueAt(1, model.getColumnCount() - 3);
         int chromId = Integer.valueOf(chromID);
-        PersistantTrack track = ProjectConnector.getInstance().getTrack(trackID);
-        Map<Integer, PersistantTrack> trackMap = new HashMap<>();
+        PersistentTrack track = ProjectConnector.getInstance().getTrack(trackID);
+        Map<Integer, PersistentTrack> trackMap = new HashMap<>();
 
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(chromId);
         if (refConnector != null) {
             try {
                 trackMap.put(track.getId(), track);
-                List<PersistantFeature> genomeFeatures = new ArrayList<>();
-                Map<Integer, PersistantChromosome> chroms = refConnector.getChromosomesForGenome();
-                for (PersistantChromosome chrom : chroms.values()) {
+                List<PersistentFeature> genomeFeatures = new ArrayList<>();
+                Map<Integer, PersistentChromosome> chroms = refConnector.getChromosomesForGenome();
+                for (PersistentChromosome chrom : chroms.values()) {
                     genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
                             0, chrom.getLength(), chrom.getId()));
                 }
-                HashMap<String, PersistantFeature> featureMap = new HashMap<>();
-                for (PersistantFeature persistantFeature : genomeFeatures) {
+                HashMap<String, PersistentFeature> featureMap = new HashMap<>();
+                for (PersistentFeature persistantFeature : genomeFeatures) {
                     featureMap.put(persistantFeature.getLocus(), persistantFeature);
                 }
 
@@ -1238,10 +1237,10 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
         }
     }
 
-    public void setUpNovelTranscriptsStructuresAndTable(PersistantReference reference, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, DefaultTableModel model, Map<String, String> secondSheetMap,
+    public void setUpNovelTranscriptsStructuresAndTable(PersistentReference reference, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, DefaultTableModel model, Map<String, String> secondSheetMap,
             Map<String, String> secondSheetMapThirdCol) {
         NovelRegionResultPanel novelRegionsResultsPanel = new NovelRegionResultPanel();
-        novelRegionsResultsPanel.setPersistantReference(reference);
+        novelRegionsResultsPanel.setPersistentReference(reference);
         checkAndOpenRefViewer(reference, novelRegionsResultsPanel);
 //        novelRegionsResultsPanel.setReferenceViewer(reference);
 
@@ -1249,23 +1248,23 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
         int refID = Integer.valueOf(trackId);
         String chromID = (String) model.getValueAt(1, model.getColumnCount() - 3);
         int chromId = Integer.valueOf(chromID);
-        PersistantTrack track = ProjectConnector.getInstance().getTrack(refID);
-        Map<Integer, PersistantTrack> trackMap = new HashMap<>();
+        PersistentTrack track = ProjectConnector.getInstance().getTrack(refID);
+        Map<Integer, PersistentTrack> trackMap = new HashMap<>();
         trackMap.put(track.getId(), track);
 
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(chromId);
         if (refConnector != null) {
 
 //            try {
-            List<PersistantFeature> genomeFeatures = new ArrayList<>();
-            Map<Integer, PersistantChromosome> chroms = refConnector.getChromosomesForGenome();
-            for (PersistantChromosome chrom : chroms.values()) {
+            List<PersistentFeature> genomeFeatures = new ArrayList<>();
+            Map<Integer, PersistentChromosome> chroms = refConnector.getChromosomesForGenome();
+            for (PersistentChromosome chrom : chroms.values()) {
                 genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
                         0, chrom.getLength(), chrom.getId()));
             }
 
-            HashMap<String, PersistantFeature> featureMap = new HashMap<>();
-            for (PersistantFeature persistantFeature : genomeFeatures) {
+            HashMap<String, PersistentFeature> featureMap = new HashMap<>();
+            for (PersistentFeature persistantFeature : genomeFeatures) {
                 featureMap.put(persistantFeature.getLocus(), persistantFeature);
             }
 //            } catch (Exception e) {
