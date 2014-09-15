@@ -108,7 +108,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     private boolean hasOptions;
     private JPanel chromSelectionPanel;
     private boolean hasChromSelection;
-    private List<Classification> excludedFeatureTypes;
+    private List<Classification> excludedClassifications;
     private byte minMappingQuality = 0;
     private boolean pAInfoIsAvailable = false;
     public static final String PROP_MOUSEPOSITION_CHANGED = "mousePos changed";
@@ -143,7 +143,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
             Exceptions.printStackTrace(ex);
         }
         
-        this.excludedFeatureTypes = new ArrayList<>();
+        this.excludedClassifications = new ArrayList<>();
         this.setLayout(null);
         this.setBackground(AbstractViewer.backgroundColor);
         this.boundsManager = boundsManager;
@@ -903,11 +903,11 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     }
 
     /**
-     * @return The list of feature (classification) types, which are currently
+     * @return The list of classification types, which are currently
      * excluded from the view/calculations by the user.
      */
-    public List<Classification> getExcludedFeatureTypes() {
-        return this.excludedFeatureTypes;
+    public List<Classification> getExcludedClassifications() {
+        return this.excludedClassifications;
     }
     
     /**
@@ -932,7 +932,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      * parameter selection and converts them to a ParametersReadClasses object.
      */
     public ParametersReadClasses getReadClassParams() {
-        return new ParametersReadClasses(this.getExcludedFeatureTypes(), this.getMinMappingQuality());
+        return new ParametersReadClasses(this.getExcludedClassifications(), this.getMinMappingQuality());
     }
 
     public boolean isMouseOverPaintingRequested() {

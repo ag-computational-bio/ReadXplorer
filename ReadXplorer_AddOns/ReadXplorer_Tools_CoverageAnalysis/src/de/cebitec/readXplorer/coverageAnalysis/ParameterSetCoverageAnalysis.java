@@ -17,6 +17,7 @@
 package de.cebitec.readXplorer.coverageAnalysis;
 
 import de.cebitec.readXplorer.databackend.ParameterSetI;
+import de.cebitec.readXplorer.databackend.ParameterSetWithReadClasses;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 
 /**
@@ -24,12 +25,11 @@ import de.cebitec.readXplorer.databackend.ParametersReadClasses;
  *
  * @author Tobias Zimmermann, Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
  */
-public class ParameterSetCoverageAnalysis implements ParameterSetI<ParameterSetCoverageAnalysis> {
+public class ParameterSetCoverageAnalysis extends ParameterSetWithReadClasses implements ParameterSetI<ParameterSetCoverageAnalysis> {
 
     private int minCoverageCount;
     private boolean isSumCoverage;
     private boolean detectCoveredIntervals;
-    private ParametersReadClasses readClassesParams;
 
     /**
      * Data storage for all parameters associated with the coverage analysis.
@@ -45,28 +45,10 @@ public class ParameterSetCoverageAnalysis implements ParameterSetI<ParameterSetC
      * separately
      */
     public ParameterSetCoverageAnalysis(int minCoverageCount, boolean isSumCoverage, boolean detectCoveredIntervals, ParametersReadClasses readClassesParams) {
+        super(readClassesParams);
         this.minCoverageCount = minCoverageCount;
         this.isSumCoverage = isSumCoverage;
         this.detectCoveredIntervals = detectCoveredIntervals;
-        this.readClassesParams = readClassesParams;
-    }
-
-    
-    /**
-     * @param readClassesParams the read classes, which shall be taken into 
-     * account for this analysis
-     */
-    public void setReadClassesParams(ParametersReadClasses readClassesParams) {
-        this.readClassesParams = readClassesParams;
-    }
-
-    
-    /**
-     * @return the read classes, which shall be taken into account for this 
-     * analysis
-     */
-    public ParametersReadClasses getReadClassParams() {
-        return readClassesParams;
     }
 
     /**

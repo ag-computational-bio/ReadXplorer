@@ -55,8 +55,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     private File zipFile;
     private String user_dir = System.getProperty("netbeans.user");
     private File r_dir = new File(user_dir + File.separator + "R");
-    private static final String SOURCE_URI = "ftp://ftp.cebitec.uni-bielefeld.de/pub/readxplorer_repo/R/R.tar.gz";
-    private static final String R_ZIP = "ftp://ftp.cebitec.uni-bielefeld.de/pub/readxplorer_repo/R/R.zip";
+    private static final String SOURCE_URI = "R.tar.gz";
+    private static final String R_ZIP = "R.zip";
     private static final String DEFAULT_CRAN_MIRROR = "ftp://ftp.cebitec.uni-bielefeld.de/pub/readxplorer_repo/R/";
     private String license = "		    GNU GENERAL PUBLIC LICENSE\n"
             + "		       Version 2, June 1991\n"
@@ -404,9 +404,10 @@ final class GnuRPanel extends OptionsPanel implements Observer {
 
     GnuRPanel(GnuROptionsPanelController controller) {
         this.controller = controller;
-        initComponents();
-        sourceFileTextField.setText(SOURCE_URI);
         this.pref = NbPreferences.forModule(Object.class);
+        initComponents();
+        String source_uri = pref.get(Properties.CRAN_MIRROR, DEFAULT_CRAN_MIRROR) + SOURCE_URI;
+        sourceFileTextField.setText(source_uri);
         jProgressBar1.setMaximum(100);
         setUpListener();
         String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
@@ -460,6 +461,11 @@ final class GnuRPanel extends OptionsPanel implements Observer {
 
         cranMirror.setText(org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.cranMirror.text")); // NOI18N
         cranMirror.setToolTipText(org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.cranMirror.toolTipText")); // NOI18N
+        cranMirror.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                cranMirrorKeyReleased(evt);
+            }
+        });
 
         org.openide.awt.Mnemonics.setLocalizedText(installButton, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.installButton.text")); // NOI18N
         installButton.setEnabled(false);
@@ -538,7 +544,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             try {
                 zipFile = File.createTempFile("ReadXplorer_GNU_R_bundle_", ".zip");
                 zipFile.deleteOnExit();
-                downloader = new Downloader(R_ZIP, zipFile);
+                String rZip = cranMirror.getText() + R_ZIP;
+                downloader = new Downloader(rZip, zipFile);
                 downloader.registerObserver(this);
                 Thread th = new Thread(downloader);
                 th.start();
@@ -553,13 +560,17 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         if (Desktop.isDesktopSupported()) {
             Desktop desk = Desktop.getDesktop();
             try {
-                desk.browse(new URI(SOURCE_URI));
+                desk.browse(new URI(cranMirror.getText() + SOURCE_URI));
             } catch (URISyntaxException | IOException ex) {
                 Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
                 Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "{0}: Could not open URI to GNU R source file.", currentTimestamp);
             }
         }
     }//GEN-LAST:event_sourceFileTextFieldMouseReleased
+
+    private void cranMirrorKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_cranMirrorKeyReleased
+        this.sourceFileTextField.setText(cranMirror.getText() + SOURCE_URI);
+    }//GEN-LAST:event_cranMirrorKeyReleased
 
     @Override
     void load() {

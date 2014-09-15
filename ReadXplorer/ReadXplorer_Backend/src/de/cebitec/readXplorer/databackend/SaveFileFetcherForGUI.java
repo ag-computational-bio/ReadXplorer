@@ -184,7 +184,7 @@ public class SaveFileFetcherForGUI {
     private PersistentTrack checkFileExists(String basePath, File oldTrackFile, PersistentTrack track, ProjectConnector connector) {
         PersistentTrack newTrack = null;
         File newTrackFile = new File(basePath + "/" + oldTrackFile.getName());
-        if (newTrackFile.exists()) {
+        if (newTrackFile.exists() && newTrackFile.isFile()) {
             newTrack = new PersistentTrack(track.getId(),
                     newTrackFile.getAbsolutePath(), track.getDescription(), track.getTimestamp(),
                     track.getRefGenID(), track.getReadPairId());
@@ -343,7 +343,7 @@ public class SaveFileFetcherForGUI {
         File fastaFile = ref.getFastaFile();
         IndexedFastaSequenceFile indexedRefFile;
         FastaUtils fastaUtils = new FastaUtils(); //TODO: observers are empty, add observers!
-        if (fastaFile.exists()) {
+        if (fastaFile.exists() && fastaFile.isFile()) {
             try { //check for index and recreate it with notificaiton, if necessary
                 new IndexedFastaSequenceFile(fastaFile);
             } catch (FileNotFoundException e) {

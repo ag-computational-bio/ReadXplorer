@@ -290,8 +290,8 @@ public class ResultPanelOperonDetection extends ResultTablePanel implements Obse
                     exporter.start();
                     progresshandle.progress(3);
                     progresshandle.progress(4);
-                    JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successfull!",
-                            "Export was successfull!", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successful!",
+                            "Export was successful!", JOptionPane.INFORMATION_MESSAGE);
                     progresshandle.finish();
                 }
 
@@ -430,8 +430,8 @@ public class ResultPanelOperonDetection extends ResultTablePanel implements Obse
                 addResult(operonResult);
                 progresshandle.progress(2);
                 progresshandle.progress(3);
-                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successfull!",
-                        "Export was successfull!", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successful!",
+                        "Export was successful!", JOptionPane.INFORMATION_MESSAGE);
 
                 progresshandle.finish();
             }

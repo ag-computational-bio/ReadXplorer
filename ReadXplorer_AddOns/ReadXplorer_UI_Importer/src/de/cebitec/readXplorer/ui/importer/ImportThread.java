@@ -246,7 +246,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                         this.setChromLengthMap(trackJob1);
                         File inputFile1 = trackJob1.getFile();
                         inputFile1.setReadOnly(); //prevents changes or deletion of original file!
-                        boolean success;
+                        Boolean success;
                         StatsContainer statsContainer = new StatsContainer();
                         statsContainer.prepareForTrack();
                         statsContainer.prepareForReadPairTrack();
@@ -256,7 +256,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                             try {
                                 //executes any conversion before other calculations, if the parser supports any
                                 trackJob1.getParser().registerObserver(this);
-                                success = (boolean) trackJob1.getParser().convert(trackJob1, chromLengthMap);
+                                success = trackJob1.getParser().convert(trackJob1, chromLengthMap);
                                 trackJob1.getParser().removeObserver(this);
                                 if (!success) {
                                     this.noErrors = false;
@@ -270,7 +270,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                                     File inputFile2 = trackJob2.getFile();
                                     inputFile2.setReadOnly();
                                     trackJob2.getParser().registerObserver(this);
-                                    success = (boolean) trackJob2.getParser().convert(trackJob2, chromLengthMap);
+                                    success = trackJob2.getParser().convert(trackJob2, chromLengthMap);
                                     trackJob2.getParser().removeObserver(this);
                                     File lastWorkFile2 = trackJob2.getFile();
                                     if (!success) {
@@ -342,7 +342,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                         ParsedTrack track = statsParser.createTrackStats(trackJob1, chromLengthMap);
                         statsParser.removeObserver(this);
 
-                        this.storeBamTrack(track, true); // store track entry in db
+                        this.storeBamTrack(track); // store track entry in db
                         trackId1 = trackJob1.getID();
                         inputFile1.setWritable(true);
 //                    }
@@ -423,7 +423,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         ParsedTrack track = statsParser.createTrackStats(trackJob, chromLengthMap);
         statsParser.removeObserver(this);
 
-        this.storeBamTrack(track, false);
+        this.storeBamTrack(track);
     }
 
     @Override
@@ -498,16 +498,12 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
     /**
      * Stores a bam track in the database and gives appropriate status messages.
      * @param trackJob the information about the track to store
-     * @param readPairs true, if this is a readuence pair import, false otherwise
      */
-    private void storeBamTrack(ParsedTrack track, boolean readPairs) {
+    private void storeBamTrack(ParsedTrack track) {
         try {
             io.getOut().println(track.getTrackName() + ": " + this.getBundleString("MSG_ImportThread.import.start.trackdirect"));
             ProjectConnector.getInstance().storeBamTrack(track);
-            ProjectConnector.getInstance().storeTrackStatistics(track);
-            if (readPairs) {
-                ProjectConnector.getInstance().storeReadPairTrackStatistics(track.getStatsContainer(), track.getID());
-            }
+            ProjectConnector.getInstance().storeTrackStatistics(track.getStatsContainer(), track.getID());
             io.getOut().println(this.getBundleString("MSG_ImportThread.import.success.trackdirect"));
             
         } catch(OutOfMemoryError e) {

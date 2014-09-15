@@ -20,10 +20,10 @@ import de.cebitec.readXplorer.api.objects.AnalysisI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
+import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
 import de.cebitec.readXplorer.databackend.dataObjects.MappingResult;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.Operon;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.OperonAdjacency;
 import de.cebitec.readXplorer.util.Observer;
@@ -203,13 +203,13 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
 
                     //mappings identified between both features
                     if (mapping.getStart() <= feature1Stop && mapping.getStop() > feature1Stop && mapping.getStop() < feature2Start) {
-                        readsFeature1 += mapping.getNbReplicates();
+                        ++readsFeature1;
                     } else if (mapping.getStart() > feature1Stop && mapping.getStart() < feature2Start && mapping.getStop() >= feature2Start) {
-                        readsFeature2 += mapping.getNbReplicates();
+                        ++readsFeature2;
                     } else if (mapping.getStart() <= feature1Stop && mapping.getStop() >= feature2Start) {
-                        spanningReads += mapping.getNbReplicates();
+                        ++spanningReads;
                     } else if (mapping.getStart() > feature1Stop && mapping.getStop() < feature2Start) {
-                        internalReads += mapping.getNbReplicates();
+                        ++internalReads;
                     }
 
                     if (fstFittingMapping) { //TODO: either add to each if clause above or add surrounding if clause!

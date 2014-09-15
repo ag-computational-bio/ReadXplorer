@@ -538,7 +538,6 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended imple
             samplesBList.setEnabled(false);
             samplesBLabel.setEnabled(false);
             groupComboBox.setEnabled(true);
-            iSymbol.setVisible(true);
         }
         if (item == BaySeqAnalysisHandler.Plot.Posteriors) {
             samplesAList.setEnabled(true);
@@ -546,8 +545,8 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended imple
             samplesBList.setEnabled(true);
             samplesBLabel.setEnabled(true);
             groupComboBox.setEnabled(true);
-            iSymbol.setVisible(false);
         }
+        iSymbol.setVisible(item == BaySeqAnalysisHandler.Plot.MACD);
     }
 }
 

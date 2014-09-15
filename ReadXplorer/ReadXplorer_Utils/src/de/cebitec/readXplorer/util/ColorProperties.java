@@ -38,11 +38,9 @@ public class ColorProperties {
     /** The span between general max and min saturation and brightness for colored elements in ReadXplorer. */
     public static final float SPAN_SATURATION_AND_BRIGTHNESS = MAX_SATURATION_AND_BRIGTHNESS - MIN_SATURATION_AND_BRIGTHNESS;
 
-    // read class specific colors
+    // read mapping class specific colors
     /** Standard color for common match reads = red.*/
-    public static final Color COMMON_MATCH = new Color(222, 96, 92);
-    /** Standard color for single common match reads = light red.*/
-    public static Color COMMON_MATCH_SINGLE = new Color(180, 41, 36);
+    public static final Color COMMON_MATCH = new Color(180, 41, 36);
     /** Standard color for best match reads = yellow.*/
     public static final Color BEST_MATCH = new Color(255, 250, 28);
     /** Standard color for single best match reads = light yellow.*/
@@ -69,8 +67,6 @@ public class ColorProperties {
     public static final String SINGLE_PERFECT_MATCH_STRING = "singlePerfectMatchColor";
     /** Property string for the single best match color. */
     public static final String SINGLE_BEST_MATCH_STRING = "singleBestMatchColor";
-    /** Property string for the single common match color. */
-    public static final String SINGLE_COMMON_MATCH_STRING = "singleCommonMatchColor";
     /** Property string for uniform color. */
     public static final String UNIFORM_COLOR_STRING = "uniformColor";
     /** Property string to address if uniform coloring is desired. */
@@ -142,6 +138,7 @@ public class ColorProperties {
     public static final Color MISMATCH_BACKGROUND = Color.white;
     public static final Color ALIGNMENT_FOREIGN_GENOMEGAP = Color.LIGHT_GRAY;
     public static final Color TRIMMED = Color.GRAY;
+    public static final Color SKIPPED = Color.GRAY;
 
     // read pair specific colors
     public static final Color BLOCK_PERFECT = Color.GREEN;

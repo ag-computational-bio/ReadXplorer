@@ -17,7 +17,7 @@
 package de.cebitec.readXplorer.transcriptionAnalyses;
 
 import de.cebitec.readXplorer.databackend.ParameterSetI;
-import de.cebitec.readXplorer.databackend.ParametersFeatureTypes;
+import de.cebitec.readXplorer.databackend.ParametersFeatureTypesAndReadClasses;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.util.Set;
@@ -27,12 +27,11 @@ import java.util.Set;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class ParameterSetOperonDet extends ParametersFeatureTypes implements ParameterSetI<ParameterSetOperonDet> {
+public class ParameterSetOperonDet extends ParametersFeatureTypesAndReadClasses implements ParameterSetI<ParameterSetOperonDet> {
     
     private boolean performOperonAnalysis;
     private int minSpanningReads;
     private boolean autoOperonParamEstimation;
-    private final ParametersReadClasses readClassParams;
 
     /**
      * Data storage for all parameters associated with an operon detection.
@@ -46,11 +45,10 @@ public class ParameterSetOperonDet extends ParametersFeatureTypes implements Par
      */
     public ParameterSetOperonDet(boolean performOperonAnalysis, int minSpanningReads, 
             boolean autoOperonParamEstimation, Set<FeatureType> selFeatureTypes, ParametersReadClasses readClassParams) {
-        super(selFeatureTypes);
+        super(selFeatureTypes, readClassParams);
         this.performOperonAnalysis = performOperonAnalysis;
         this.minSpanningReads = minSpanningReads;
         this.autoOperonParamEstimation = autoOperonParamEstimation;
-        this.readClassParams = readClassParams;
     }
 
     /**
@@ -97,10 +95,6 @@ public class ParameterSetOperonDet extends ParametersFeatureTypes implements Par
      */
     public void setAutoOperonParamEstimation(boolean autoOperonParamEstimation) {
         this.autoOperonParamEstimation = autoOperonParamEstimation;
-    }
-
-    public ParametersReadClasses getReadClassParams() {
-        return readClassParams;
     }
     
 }

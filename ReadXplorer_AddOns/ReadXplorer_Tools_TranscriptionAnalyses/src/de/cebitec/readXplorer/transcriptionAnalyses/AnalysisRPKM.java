@@ -20,13 +20,13 @@ import de.cebitec.readXplorer.api.objects.AnalysisI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
+import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
 import de.cebitec.readXplorer.databackend.dataObjects.MappingResult;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.RPKMvalue;
-import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.Observer;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.polyTree.Node;
 import de.cebitec.readXplorer.util.polyTree.NodeVisitor;
 import java.util.ArrayList;
@@ -147,7 +147,7 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
                             fstFittingMapping = false;
                         }
                         if (isStrandBothOption || analysisStrand == mapping.isFwdStrand()) {
-                            this.currentCount += mapping.getNbReplicates();
+                            ++this.currentCount;
                         }
 
                         //still mappings left, but need next feature

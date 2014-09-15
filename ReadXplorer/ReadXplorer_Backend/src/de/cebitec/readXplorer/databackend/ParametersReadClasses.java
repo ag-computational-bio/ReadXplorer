@@ -23,8 +23,6 @@ import de.cebitec.readXplorer.util.classification.MappingClass;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.prefs.Preferences;
-import org.openide.util.NbPreferences;
 
 /**
  * Creates a parameters set which contains all parameters concerning the usage
@@ -35,8 +33,6 @@ import org.openide.util.NbPreferences;
  */
 public class ParametersReadClasses {
     
-    private final Preferences pref = NbPreferences.forModule(Object.class);
-    private boolean useExtendedClassification = pref.getBoolean(Properties.VIEWER_CLASSIFICATION, false); //TODO: change this for future version
     private List<Classification> excludedClasses;
     private final byte minMappingQual;
     private byte strandOption;
@@ -107,22 +103,7 @@ public class ParametersReadClasses {
      * otherwise
      */
     public boolean isClassificationAllowed(Classification classification) {
-        boolean isAllowed;
-        if (useExtendedClassification) { //easy default case
-            isAllowed = !this.excludedClasses.contains(classification);
-        
-        } else {
-            if (classification.equals(MappingClass.SINGLE_PERFECT_MATCH)) {
-                isAllowed = !this.excludedClasses.contains(MappingClass.PERFECT_MATCH);
-            } else if (classification.equals(MappingClass.SINGLE_BEST_MATCH)) {
-                isAllowed = !this.excludedClasses.contains(MappingClass.BEST_MATCH);
-            } else if (classification.equals(MappingClass.SINGLE_COMMON_MATCH)) {
-               isAllowed = !this.excludedClasses.contains(MappingClass.COMMON_MATCH); 
-            } else {
-                isAllowed = !this.excludedClasses.contains(classification);
-            }
-        }
-        return isAllowed;
+        return !this.excludedClasses.contains(classification);
     }
 
     /**

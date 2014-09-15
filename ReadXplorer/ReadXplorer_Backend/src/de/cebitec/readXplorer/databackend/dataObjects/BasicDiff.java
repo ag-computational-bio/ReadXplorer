@@ -37,7 +37,6 @@ class BasicDiff {
      * Depicts a difference in a mapping to the reference genome. Therefore, it
      * contains base, position, number of replicates, strand information, base
      * quality and mapping quality value.
-     *
      * @param position
      * @param base the base already converted to the correct strand and upper
      * case

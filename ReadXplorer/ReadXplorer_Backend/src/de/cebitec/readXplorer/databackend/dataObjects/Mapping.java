@@ -17,6 +17,7 @@
 package de.cebitec.readXplorer.databackend.dataObjects;
 
 import de.cebitec.readXplorer.util.SamAlignmentBlock;
+import de.cebitec.readXplorer.util.classification.MappingClass;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -36,12 +37,11 @@ public class Mapping implements ObjectWithId, Comparable<Mapping> {
     private int trackId;
     private int stop;
     private boolean isFwdStrand;
-    private int numReplicates;
     private Map<Integer, Difference> diffs;
     private TreeMap<Integer, TreeSet<ReferenceGap>> gaps;
     private int differences;
     private int sequenceID;
-    private boolean isBestMatch;
+    private MappingClass mappingClass;
     private int mappingQuality;
     private byte[] baseQualities;
     private int numMappingsForRead;
@@ -55,51 +55,31 @@ public class Mapping implements ObjectWithId, Comparable<Mapping> {
      * @param stop
      * @param trackId
      * @param isFwdStrand
-     * @param numReplicates
      * @param mismatches
      * @param sequenceID
-     * @param isBestMapping 
+     * @param mappingClass classification of this mapping
      * @param mappingQuality phred mapping quality (if available it is > 0 or -1
      * for 255), otherwise 0
      * @param baseQualities phred score array of base qualities, (if available
      * it is > 0 or -1 for 255), otherwise 0
      * @param numMappingsForRead number of mappings for the read of this mapping
      */
-    public Mapping(int id, int start, int stop, int trackId, boolean isFwdStrand, int numReplicates, 
-            int mismatches, int sequenceID, boolean isBestMapping, int mappingQuality, byte[] baseQualities, int numMappingsForRead) {
+    public Mapping(int id, int start, int stop, int trackId, boolean isFwdStrand, int mismatches, 
+            int sequenceID, MappingClass mappingClass, int mappingQuality, byte[] baseQualities, int numMappingsForRead) {
         this.id = id;
         this.start = start;
         this.stop = stop;
-        this.numReplicates = numReplicates;
         this.trackId = trackId;
         this.isFwdStrand = isFwdStrand;
         this.diffs = new HashMap<>();
         this.gaps = new TreeMap<>();
         this.differences = mismatches;
         this.sequenceID = sequenceID;
-        this.isBestMatch = isBestMapping;
+        this.mappingClass = mappingClass;
         this.mappingQuality = mappingQuality;
         this.baseQualities = baseQualities;
         this.numMappingsForRead = numMappingsForRead;
         this.alignmentBlocks = new ArrayList<>(); //initialize as emtpy list
-    }
-    
-    /**
-     * Data structure for storing a mapping on a reference genome, in case no information is 
-     * given about the number of mappings for the read.
-     * @param id
-     * @param start
-     * @param stop
-     * @param trackId
-     * @param isFwdStrand
-     * @param numReplicates
-     * @param mismatches
-     * @param sequenceID
-     * @param isBestMapping 
-     */
-    public Mapping(int id, int start, int stop, int trackId, boolean isFwdStrand, int numReplicates, 
-            int mismatches, int sequenceID, boolean isBestMapping) {
-        this(id, start, stop, trackId, isFwdStrand, numReplicates, mismatches, sequenceID, isBestMapping, 0, new byte[0], -1);
     }
     
     /*
@@ -107,18 +87,10 @@ public class Mapping implements ObjectWithId, Comparable<Mapping> {
      * data. For this only start, stop and direction are needed. Everything else
      * isn't needed and can be left out in order to save some memory
      */
-    public Mapping(int start, int stop, boolean isFwdStrand, int numReplicates) {
+    public Mapping(int start, int stop, boolean isFwdStrand) {
         this.start = start;
         this.stop = stop;
         this.isFwdStrand = isFwdStrand;
-        this.numReplicates = numReplicates;
-    }
-
-    /**
-     * @return The number of replicates of this mapping
-     */
-    public int getNbReplicates() {
-        return numReplicates;
     }
     
     /**
@@ -194,10 +166,10 @@ public class Mapping implements ObjectWithId, Comparable<Mapping> {
     }
 
     /**
-     * @return <code>true</code>, if this mapping belongs to the best match class
+     * @return The <code>MappingClass</code> = classification of this mapping.
      */
-    public boolean isBestMatch() {
-        return isBestMatch;
+    public MappingClass getMappingClass() {
+        return mappingClass;
     }
     
     /**

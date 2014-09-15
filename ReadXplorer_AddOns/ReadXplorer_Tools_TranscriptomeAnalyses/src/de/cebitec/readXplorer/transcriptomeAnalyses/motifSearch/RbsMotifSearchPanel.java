@@ -329,8 +329,8 @@ public class RbsMotifSearchPanel extends javax.swing.JPanel implements Observabl
         progressHandle.progress(3);
         progressHandle.progress(4);
 
-        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successfull!",
-                "Export was successfull!", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successful!",
+                "Export was successful!", JOptionPane.INFORMATION_MESSAGE);
         progressHandle.finish();
     }//GEN-LAST:event_jButton1ActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables

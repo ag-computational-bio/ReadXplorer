@@ -26,6 +26,7 @@ import de.cebitec.readXplorer.parser.tables.TableType;
 import de.cebitec.readXplorer.parser.tables.XlsTranscriptomeTableParser;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
+import java.awt.Graphics;
 import java.io.File;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ScrollPaneConstants;
@@ -76,7 +77,7 @@ public final class ImportTableVisualPanel extends JobPanel {
         tableComboBox = new javax.swing.JComboBox<>(new javax.swing.DefaultComboBoxModel<>(de.cebitec.readXplorer.parser.tables.TableType.values()));
         fileTextField = new javax.swing.JTextField();
         fileButton = new javax.swing.JButton();
-        PersistentReference[] refArray = new PersistentReference[0];
+        de.cebitec.readXplorer.databackend.dataObjects.PersistentReference[] refArray = new de.cebitec.readXplorer.databackend.dataObjects.PersistentReference[0];
         refArray = ProjectConnector.getInstance().getGenomes().toArray(refArray);
         refComboBox = new javax.swing.JComboBox<>(new DefaultComboBoxModel<>(refArray));
         tableLabel = new javax.swing.JLabel();
@@ -131,7 +132,7 @@ public final class ImportTableVisualPanel extends JobPanel {
             }
         });
 
-        csvPrefComboBox.setVisible(!this.delimiterCheckBox.isSelected());
+        csvPrefComboBox.setVisible(true);
 
         org.openide.awt.Mnemonics.setLocalizedText(parserLabel, org.openide.util.NbBundle.getMessage(ImportTableVisualPanel.class, "ImportTableVisualPanel.parserLabel.text")); // NOI18N
 
@@ -142,6 +143,7 @@ public final class ImportTableVisualPanel extends JobPanel {
             }
         });
 
+        statsAndParamsFileTextField.setEditable(false);
         statsAndParamsFileTextField.setText(org.openide.util.NbBundle.getMessage(ImportTableVisualPanel.class, "ImportTableVisualPanel.statsAndParamsFileTextField.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(statsAndParamsButton, org.openide.util.NbBundle.getMessage(ImportTableVisualPanel.class, "ImportTableVisualPanel.statsAndParamsButton.text")); // NOI18N
@@ -302,7 +304,7 @@ public final class ImportTableVisualPanel extends JobPanel {
     private javax.swing.JTextField fileTextField;
     private javax.swing.JComboBox<TableParserI> parserComboBox;
     private javax.swing.JLabel parserLabel;
-    private javax.swing.JComboBox<PersistentReference> refComboBox;
+    private javax.swing.JComboBox<de.cebitec.readXplorer.databackend.dataObjects.PersistentReference> refComboBox;
     private javax.swing.JLabel refLabel;
     private javax.swing.JButton statsAndParamsButton;
     private javax.swing.JTextField statsAndParamsFileTextField;
@@ -367,6 +369,11 @@ public final class ImportTableVisualPanel extends JobPanel {
      */
     public TableParserI getParser() {
         return (TableParserI) this.parserComboBox.getSelectedItem();
+    }
+    
+    public void paint(Graphics g) {
+        super.paint(g);
+        this.csvPrefComboBox.setVisible(!delimiterCheckBox.isSelected());
     }
 
 }

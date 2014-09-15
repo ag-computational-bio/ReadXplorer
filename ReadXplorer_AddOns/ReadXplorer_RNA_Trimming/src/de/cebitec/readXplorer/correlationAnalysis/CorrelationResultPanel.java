@@ -18,6 +18,7 @@ package de.cebitec.readXplorer.correlationAnalysis;
 
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.util.GeneralUtils;
+import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JPanel;
@@ -32,6 +33,7 @@ import javax.swing.table.TableRowSorter;
  */
 //@TopComponent.Registration(mode = "output", openAtStartup = false)
 public class CorrelationResultPanel extends JPanel {
+    private static final long serialVersionUID = 1L;
     private BoundsInfoManager bim;
 
     /**
@@ -92,12 +94,14 @@ public class CorrelationResultPanel extends JPanel {
             }
         });
         jScrollPane1.setViewportView(correlationTable);
-        correlationTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title5")); // NOI18N
-        correlationTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title0")); // NOI18N
-        correlationTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title1")); // NOI18N
-        correlationTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title2")); // NOI18N
-        correlationTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title3")); // NOI18N
-        correlationTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title4")); // NOI18N
+        if (correlationTable.getColumnModel().getColumnCount() > 0) {
+            correlationTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title5")); // NOI18N
+            correlationTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title0")); // NOI18N
+            correlationTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title1")); // NOI18N
+            correlationTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title2")); // NOI18N
+            correlationTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title3")); // NOI18N
+            correlationTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.correlationTable.columnModel.title4")); // NOI18N
+        }
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(CorrelationResultPanel.class, "CorrelationResultPanel.jLabel1.text")); // NOI18N
 
@@ -189,7 +193,9 @@ public class CorrelationResultPanel extends JPanel {
 
     public void addData(CorrelatedInterval data) {
         DefaultTableModel model = (DefaultTableModel) this.correlationTable.getModel();
-        model.addRow(new Object[] {data.getDirection(), data.getFrom(), data.getTo(), data.getCorrelation(), data.getMinPeakCoverage()});
+        //TODO: get chromosome map and set chromosome correctly
+        String strandString = data.getDirection() == SequenceUtils.STRAND_FWD ? SequenceUtils.STRAND_FWD_STRING : SequenceUtils.STRAND_REV_STRING;
+        model.addRow(new Object[] {data.getChromId(), strandString, data.getFrom(), data.getTo(), data.getCorrelation(), data.getMinPeakCoverage()});
     }
     
     public void ready(CorrelationResult analysisResult) {

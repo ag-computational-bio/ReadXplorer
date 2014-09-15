@@ -18,7 +18,6 @@ package de.cebitec.readXplorer.featureCoverageAnalysis;
 
 import de.cebitec.readXplorer.api.objects.AnalysisI;
 import de.cebitec.readXplorer.databackend.AnalysesHandler;
-import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
@@ -27,7 +26,7 @@ import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.util.Observer;
-import de.cebitec.readXplorer.util.classification.MappingClass;
+import de.cebitec.readXplorer.util.classification.Classification;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -203,22 +202,10 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
      * @return true, if the position can be increased, false otherwise
      */
     private boolean checkCanIncreaseBothStrands(CoverageManager coverage, int j) {
-        boolean canIncrease = false;
-        ParametersReadClasses readClassParams = analysisParams.getReadClassParams();
-        if (readClassParams.isClassificationAllowed(MappingClass.COMMON_MATCH) 
-                && coverage.getCoverage(MappingClass.COMMON_MATCH).getFwdCov(j) 
-                 + coverage.getCoverage(MappingClass.COMMON_MATCH).getRevCov(j) >= analysisParams.getMinCoverageCount()) {
-                canIncrease = true;
-        } else if (readClassParams.isClassificationAllowed(MappingClass.BEST_MATCH) 
-                && coverage.getCoverage(MappingClass.BEST_MATCH).getFwdCov(j) 
-                 + coverage.getCoverage(MappingClass.BEST_MATCH).getRevCov(j) >= analysisParams.getMinCoverageCount()) {
-                canIncrease = true;
-        } else if (readClassParams.isClassificationAllowed(MappingClass.PERFECT_MATCH) 
-                && coverage.getCoverage(MappingClass.PERFECT_MATCH).getFwdCov(j) 
-                 + coverage.getCoverage(MappingClass.PERFECT_MATCH).getRevCov(j) >= analysisParams.getMinCoverageCount()) {
-                canIncrease = true;
-        }
-        return canIncrease;
+        List<Classification> excludedClasses = analysisParams.getReadClassParams().getExcludedClasses();
+        return  coverage.getTotalCoverage(excludedClasses, j, true) + 
+                coverage.getTotalCoverage(excludedClasses, j, false) 
+                >= analysisParams.getMinCoverageCount();
     }
     
     /**
@@ -228,23 +215,7 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
      * @return true, if the position can be increased, false otherwise
      */
     private boolean checkCanIncreaseOneStrand(CoverageManager coverage, int j, boolean isFwdStrand) {
-        boolean canIncrease = false;
-        ParametersReadClasses readClassParams = analysisParams.getReadClassParams();
-        if (readClassParams.isClassificationAllowed(MappingClass.COMMON_MATCH) &&
-            (       isFwdStrand && coverage.getCoverage(MappingClass.COMMON_MATCH).getFwdCov(j) >= analysisParams.getMinCoverageCount()
-                || !isFwdStrand && coverage.getCoverage(MappingClass.COMMON_MATCH).getRevCov(j) >= analysisParams.getMinCoverageCount())) {
-                canIncrease = true;
-                
-        } else if (readClassParams.isClassificationAllowed(MappingClass.BEST_MATCH) &&
-            (       isFwdStrand && coverage.getCoverage(MappingClass.BEST_MATCH).getFwdCov(j) >= analysisParams.getMinCoverageCount()
-                || !isFwdStrand && coverage.getCoverage(MappingClass.BEST_MATCH).getRevCov(j) >= analysisParams.getMinCoverageCount())) {
-                canIncrease = true;
-                
-        } else if (readClassParams.isClassificationAllowed(MappingClass.PERFECT_MATCH) &&
-            (       isFwdStrand && coverage.getCoverage(MappingClass.PERFECT_MATCH).getFwdCov(j) >= analysisParams.getMinCoverageCount()
-                || !isFwdStrand && coverage.getCoverage(MappingClass.PERFECT_MATCH).getRevCov(j) >= analysisParams.getMinCoverageCount())) {
-                canIncrease = true;
-        }
-        return canIncrease;
+        List<Classification> excludedClasses = analysisParams.getReadClassParams().getExcludedClasses();
+        return coverage.getTotalCoverage(excludedClasses, j, isFwdStrand) >= analysisParams.getMinCoverageCount();
     }
 }

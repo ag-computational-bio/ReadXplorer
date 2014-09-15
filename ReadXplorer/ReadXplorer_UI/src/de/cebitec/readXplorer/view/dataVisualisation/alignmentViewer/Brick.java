@@ -57,7 +57,7 @@ public enum Brick {
     private final static String GENOME_GAP_C_STRING = "C";
     private final static String GENOME_GAP_T_STRING = "T";
     private final static String UNDEF_STRING = "@";
-    private final static String SKIPPED_STRING = ".";
+    private final static String SKIPPED_STRING = " ";
     private final static String TRIMMED_STRING = "|";
 
     private String typeString;
@@ -99,7 +99,7 @@ public enum Brick {
             case 'T' : type = Brick.BASE_T; break;
             case 'N' : type = Brick.BASE_N; break;
             case '-' : type = Brick.READGAP; break;
-            case '.' : type = Brick.SKIPPED; break;
+            case ' ' : type = Brick.SKIPPED; break;
             case '|' : type = Brick.TRIMMED; break;
             case '@' : type = Brick.UNDEF; break;
             default  : type = Brick.UNDEF;

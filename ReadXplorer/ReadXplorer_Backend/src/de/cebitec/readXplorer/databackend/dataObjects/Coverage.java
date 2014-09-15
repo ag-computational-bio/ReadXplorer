@@ -140,11 +140,25 @@ public class Coverage {
 
     /**
      * @param logPos absolute position on the chromosome, whose coverage is needed
-     * @return the reverse coverage with duplicates. If the position is not
+     * @return the reverse coverage. If the position is not
      * covered 0 is returned.
      */
     public int getRevCov(int logPos) {
         return this.getCoverage(logPos, revCoverage);
+    }
+    
+    /**
+     * @param logPos absolute position on the chromosome, whose coverage is needed
+     * @param isFwdStrand
+     * @return the coverage for the given strand at the given position. If the 
+     * position is not covered 0 is returned.
+     */
+    public int getCoverage(int logPos, boolean isFwdStrand) {
+        if (isFwdStrand) {
+            return this.getFwdCov(logPos);
+        } else {
+            return this.getRevCov(logPos);
+        }
     }
     
     /**
@@ -161,6 +175,18 @@ public class Coverage {
         return this.revCoverage;
     }
     
+    /**
+     * @param isFwdStrand
+     * @return Get whole coverage array for the given strand and the interval
+     * stored in this coverage object.
+     */
+    public int[] getCoverage(boolean isFwdStrand) {
+        if (isFwdStrand) {
+            return this.getFwdCov();
+        } else {
+            return this.getRevCov();
+        }
+    }    
     /**
      * Replaces the fwd coverage array in this coverage object by the given one.
      * @param perfectFwdCov The complete fwd coverage array to set

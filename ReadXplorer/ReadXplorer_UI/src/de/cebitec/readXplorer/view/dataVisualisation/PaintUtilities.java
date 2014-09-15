@@ -16,13 +16,8 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation;
 
-import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readXplorer.util.classification.Classification;
-import de.cebitec.readXplorer.util.classification.FeatureType;
-import de.cebitec.readXplorer.util.classification.MappingClass;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
 import java.awt.Rectangle;
-import java.util.List;
 
 /**
  * Utility class for common methods to aid painting of data.
@@ -54,20 +49,5 @@ public class PaintUtilities {
         int minBlockLength = 3;
         absLength = absLength < minBlockLength ? minBlockLength : absLength;
         return new Rectangle(startPixel - phyLeft, 0, absLength, height);
-    }
-    
-    /**
-     * Returns true if the type of the current mapping is in the exclusion list.
-     * This means it should not be displayed.
-     * @param m the mapping to test, if it should be displayed
-     * @param exclusionList
-     * @return true, if the mapping should be excluded from being displayed,
-     * false otherwise
-     */
-    public static boolean inExclusionList(Mapping m, List<Classification> exclusionList) {
-        return (m.getDifferences() == 0 && exclusionList.contains(MappingClass.PERFECT_MATCH))
-                || (m.getDifferences() > 0 && m.isBestMatch() && exclusionList.contains(MappingClass.BEST_MATCH)) 
-                || (!m.isUnique() && exclusionList.contains(FeatureType.MULTIPLE_MAPPED_READ))
-                || (m.getDifferences() > 0 && !m.isBestMatch() && exclusionList.contains(MappingClass.COMMON_MATCH));
     }
 }

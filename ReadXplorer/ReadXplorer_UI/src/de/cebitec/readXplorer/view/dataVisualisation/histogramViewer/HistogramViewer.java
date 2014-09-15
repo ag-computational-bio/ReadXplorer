@@ -28,7 +28,6 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.databackend.dataObjects.ReferenceGap;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.SequenceUtils;
-import de.cebitec.readXplorer.util.classification.MappingClass;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.GenomeGapManager;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
@@ -140,26 +139,26 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
                 }
             }
             
-            Coverage commonCov = cov.getCoverage(MappingClass.COMMON_MATCH);
-            int complete = commonCov.getFwdCov(logPos);
-            if (complete != 0) {
-                appendStatsTable(sb, complete, relPos, true, "Forward strand", false);
+            Coverage totalCov = cov.getTotalCoverage(this.getExcludedClassifications());
+            int coverage = totalCov.getFwdCov(logPos);
+            if (coverage != 0) {
+                appendStatsTable(sb, coverage, relPos, true, "Forward strand", false);
             }
 
-            complete = commonCov.getRevCov(logPos);
-            if (complete != 0) {
-                appendStatsTable(sb, complete, relPos, false, "Reverse strand", false);
+            coverage = totalCov.getRevCov(logPos);
+            if (coverage != 0) {
+                appendStatsTable(sb, coverage, relPos, false, "Reverse strand", false);
             }
 
             if (gapManager != null && gapManager.hasGapAt(logPos)) {
                 int tmp = logPos + gapManager.getNumOfGapsSmaller(logPos);
                 for (int i = 0; i < gapManager.getNumOfGapsAt(logPos); ++i) {
                     sb.append("<tr><td align=\"left\"><b>Gap position ").append(logPos).append("_").append(i+1).append("</b></td></tr>");
-                    complete = commonCov.getFwdCov(logPos);
-                    appendStatsTable(sb, complete, tmp, true, "Genome gaps forward", true);
+                    coverage = totalCov.getFwdCov(logPos);
+                    appendStatsTable(sb, coverage, tmp, true, "Genome gaps forward", true);
 
-                    complete = commonCov.getFwdCov(logPos);
-                    appendStatsTable(sb, complete, tmp, false, "Genome gaps reverse", true);
+                    coverage = totalCov.getRevCov(logPos);
+                    appendStatsTable(sb, coverage, tmp, false, "Genome gaps reverse", true);
                     ++tmp;
                 }
             }
@@ -599,9 +598,8 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         int relPos;
         for (int i = lowerBound; i <= upperBound; i++) {
             relPos = i + gapManager.getNumOfGapsAt(i) + gapManager.getNumOfGapsSmaller(i);
-            logoData.setCoverageAt(relPos, cov.getCoverage(MappingClass.COMMON_MATCH).getFwdCov(i), true);
-            logoData.setCoverageAt(relPos, cov.getCoverage(MappingClass.COMMON_MATCH).getRevCov(i), false);
-
+            logoData.setCoverageAt(relPos, cov.getTotalCoverage(getExcludedClassifications(), i, true), true);
+            logoData.setCoverageAt(relPos, cov.getTotalCoverage(getExcludedClassifications(), i, false), false);
         }
 
         // store diff information from the reference genome in logo data

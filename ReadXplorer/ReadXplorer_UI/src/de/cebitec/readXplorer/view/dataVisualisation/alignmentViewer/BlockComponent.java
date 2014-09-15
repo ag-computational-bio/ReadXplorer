@@ -26,6 +26,7 @@ import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.ColorUtils;
 import de.cebitec.readXplorer.util.SamAlignmentBlock;
 import de.cebitec.readXplorer.util.SequenceUtils;
+import de.cebitec.readXplorer.util.classification.Classification;
 import de.cebitec.readXplorer.view.dataVisualisation.GenomeGapManager;
 import de.cebitec.readXplorer.view.dataVisualisation.PaintUtilities;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
@@ -46,6 +47,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
@@ -56,7 +58,7 @@ import org.openide.util.Lookup;
  * A <code>BlockComponent</code> represents a read alignment as a colored 
  * rectangle and has knowledge of all important information of the alignment.
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class BlockComponent extends JComponent {
 
@@ -70,12 +72,12 @@ public class BlockComponent extends JComponent {
     private int absLogBlockStop;
     private int phyLeft;
     private int phyRight;
-    private int maxReplicates;
     private final String toolTipInfoPart;
     private List<Rectangle> rectList;
     private List<BrickData> brickDataList;
     private Color blockColor;
     private final boolean showBaseQualities;
+    private Map<Classification, Color> classToColorMap;
 
     /**
      * A <code>BlockComponent</code> represents a read alignment as a colored
@@ -85,13 +87,12 @@ public class BlockComponent extends JComponent {
      * @param parentViewer The parent viewer in which this block shall be shown
      * @param gapManager The gap manager for this alignment
      * @param height The height of this block
-     * @param maxReplicates The maximum count of replicates in the current 
-     * interval among all mappings
      * @param showBaseQualities
      */
-    public BlockComponent(BlockI block, final AbstractViewer parentViewer, GenomeGapManager gapManager, int height, int maxReplicates,
-            boolean showBaseQualities) {
+    public BlockComponent(BlockI block, final AbstractViewer parentViewer, GenomeGapManager gapManager, int height, boolean showBaseQualities) {
+            
         super();
+        this.classToColorMap = ColorUtils.updateMappingClassColors();
         this.rectList = new ArrayList<>();
         this.brickDataList = new ArrayList<>();
         this.blockColor = ColorProperties.COMMON_MATCH;
@@ -100,7 +101,6 @@ public class BlockComponent extends JComponent {
         this.parentViewer = parentViewer;
         this.absLogBlockStart = block.getAbsStart();
         this.absLogBlockStop = block.getAbsStop();
-        this.maxReplicates = maxReplicates;
         this.showBaseQualities = showBaseQualities;
         this.gapManager = gapManager;
 
@@ -232,7 +232,6 @@ public class BlockComponent extends JComponent {
         
         sb.append(createTableRow("Start", String.valueOf(mapping.getStart())));
         sb.append(createTableRow("Stop", String.valueOf(mapping.getStop())));
-        sb.append(createTableRow("Replicates", String.valueOf(mapping.getNbReplicates())));
 //        this.appendReadnames(mapping, sb); //no readnames are stored anymore: RUN domain excluded
         sb.append(createTableRow("Mismatches", String.valueOf(mapping.getDifferences())));
         if (mapping.getAlignmentBlocks().size() > 1) {
@@ -446,8 +445,7 @@ public class BlockComponent extends JComponent {
     
     /**
      * Calculates the alignment blocks to paint for the given mapping.
-     * @param ObjectWithId The ObjectWithId, which should be a
- Mapping
+     * @param ObjectWithId The ObjectWithId, which should be a Mapping
      */
     private void calcAlignmentBlocks(ObjectWithId ObjectWithId) {
         ObjectWithId persObj = ObjectWithId;
@@ -470,21 +468,12 @@ public class BlockComponent extends JComponent {
     }
 
     /**
-     * Determines the color, brigthness and saturation of a block.
+     * Determines the color of a block.
      * @return The color of the block.
      */
     private Color determineBlockColor() {
         Mapping m = ((Mapping) block.getObjectWithId());
-        Color color;
-        if (m.getDifferences() == 0) {
-            color = ColorProperties.BLOCK_MATCH;
-        } else if (m.isBestMatch()) {
-            color = ColorProperties.BLOCK_BEST_MATCH;
-        } else {
-            color = ColorProperties.BLOCK_N_ERROR;
-        }
-
-        return ColorUtils.getAdaptedColor(m.getNbReplicates(), maxReplicates + 1, color);
+        return this.classToColorMap.get(m.getMappingClass());
     }
 
     /**
@@ -506,8 +495,8 @@ public class BlockComponent extends JComponent {
             case GENOMEGAP_C : //fallthrough
             case GENOMEGAP_G : //fallthrough
             case GENOMEGAP_T : //fallthrough
-            case GENOMEGAP_N : //fallthrough
-            case SKIPPED     : c = ColorProperties.MISMATCH_BACKGROUND; break;
+            case GENOMEGAP_N : c = ColorProperties.MISMATCH_BACKGROUND; break;
+            case SKIPPED     : c = ColorProperties.SKIPPED; break;
             case FOREIGN_GENOMEGAP : c = ColorProperties.ALIGNMENT_FOREIGN_GENOMEGAP; break;
             case TRIMMED : c = ColorProperties.TRIMMED; break;
             case UNDEF : c = ColorProperties.MISMATCH_BACKGROUND;
@@ -521,10 +510,16 @@ public class BlockComponent extends JComponent {
         return c;
     }
 
+    /**
+     * @return the left physical boundary (pixel) of the block.
+     */
     public int getPhyStart() {
         return phyLeft;
     }
 
+    /**
+     * @return the physical width (pixel) of the block.
+     */
     public int getPhyWidth() {
         return length;
     }

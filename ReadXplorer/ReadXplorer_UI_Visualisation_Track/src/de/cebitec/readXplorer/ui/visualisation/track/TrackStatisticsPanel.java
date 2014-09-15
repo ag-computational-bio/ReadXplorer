@@ -18,6 +18,8 @@ package de.cebitec.readXplorer.ui.visualisation.track;
 
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.util.StatsContainer;
+import de.cebitec.readXplorer.util.classification.MappingClass;
+import de.cebitec.readXplorer.util.classification.TotalCoverage;
 import java.util.Map;
 import javax.swing.SwingUtilities;
 
@@ -39,7 +41,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
     public TrackStatisticsPanel(TrackConnector trackCon) {
         this.trackCon = trackCon;
         this.initComponents();
-        this.hideSeqPairLabels();
+        this.hideReadPairLabels();
       //  this.computeStats();
     }
 
@@ -53,7 +55,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
         if (trackCon != null && trackCon.getTrackID() != trackID) {
             trackID = trackCon.getTrackID();
             nameLabel.setText(trackCon.getAssociatedTrackName());
-            this.computeStats();
+            this.computeStats(); //TODO: create map of gui component to statistic to avoid copy-paste code
         }
     }
 
@@ -83,7 +85,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
         compPercentageLabel = new javax.swing.JLabel();
         perfectPercentage = new javax.swing.JLabel();
         bmPercentage = new javax.swing.JLabel();
-        compPercentage = new javax.swing.JLabel();
+        commonPercentage = new javax.swing.JLabel();
         labelNameLabel = new javax.swing.JLabel();
         nameLabel = new javax.swing.JLabel();
         numberReadsLabel = new javax.swing.JLabel();
@@ -99,6 +101,19 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
         numLargerPairsAbsLabel = new javax.swing.JLabel();
         singleMappings = new javax.swing.JLabel();
         singleMappingsLabel = new javax.swing.JLabel();
+        singlePerfectLabel = new javax.swing.JLabel();
+        singlePerfectAbsLabel = new javax.swing.JLabel();
+        singleBestMatchLabel = new javax.swing.JLabel();
+        singleBestMatchAbsLabel = new javax.swing.JLabel();
+        commonMappingsLabel = new javax.swing.JLabel();
+        commonMappingsAbsLabel = new javax.swing.JLabel();
+        singleBMPercentage = new javax.swing.JLabel();
+        singlePerfectPercentage = new javax.swing.JLabel();
+        singlePerfPercentageLabel = new javax.swing.JLabel();
+        singleBMPercentageLabel = new javax.swing.JLabel();
+        totalCovPercentageLabel = new javax.swing.JLabel();
+        totalCovPercentage = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JSeparator();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Global Track Statistics"));
         setPreferredSize(new java.awt.Dimension(200, 400));
@@ -110,9 +125,9 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
         singletonMappingsAbsLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         singletonMappingsAbsLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
-        perfectMappingsLabel.setText("Perfect:");
+        perfectMappingsLabel.setText("Perfect Mappings:");
 
-        bestMatchMappingsLabel.setText("Best-Match:");
+        bestMatchMappingsLabel.setText("Best-Match Mappings:");
 
         numMappingsLabel.setText("Mappings:");
 
@@ -132,7 +147,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
 
         bmPercentageLabel.setText("Best Match Coverage:");
 
-        compPercentageLabel.setText("Complete Coverage:");
+        compPercentageLabel.setText("Common Match Coverage:");
 
         perfectPercentage.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         perfectPercentage.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
@@ -140,8 +155,8 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
         bmPercentage.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         bmPercentage.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
-        compPercentage.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        compPercentage.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        commonPercentage.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        commonPercentage.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
         labelNameLabel.setText("Name:");
 
@@ -185,20 +200,24 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
         readPairPanelLayout.setHorizontalGroup(
             readPairPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(readPairPanelLayout.createSequentialGroup()
-                .addGap(12, 12, 12)
-                .addGroup(readPairPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(singleMappingsLabel)
-                    .addComponent(numPerfReadPairsLabel)
-                    .addComponent(numReadPairsLabel)
-                    .addComponent(numSmallerPairsLabel)
-                    .addComponent(numLargerPairsLabel))
+                .addGroup(readPairPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(readPairPanelLayout.createSequentialGroup()
+                        .addGap(81, 81, 81)
+                        .addComponent(numReadPairsLabel))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, readPairPanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(readPairPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(numPerfReadPairsLabel, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(numSmallerPairsLabel, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(numLargerPairsLabel, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(singleMappingsLabel, javax.swing.GroupLayout.Alignment.TRAILING))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(readPairPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(nummallerPairsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 67, Short.MAX_VALUE)
-                    .addComponent(numLargerPairsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 67, Short.MAX_VALUE)
-                    .addComponent(singleMappings, javax.swing.GroupLayout.DEFAULT_SIZE, 67, Short.MAX_VALUE)
-                    .addComponent(numReadPairsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 67, Short.MAX_VALUE)
-                    .addComponent(numPerfReadPairsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 67, Short.MAX_VALUE))
+                    .addComponent(nummallerPairsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(numLargerPairsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(singleMappings, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(numReadPairsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(numPerfReadPairsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         readPairPanelLayout.setVerticalGroup(
@@ -227,89 +246,182 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 .addGap(23, 23, 23))
         );
 
+        singlePerfectLabel.setText("Single Perfect Mappings:");
+
+        singlePerfectAbsLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        singlePerfectAbsLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+
+        singleBestMatchLabel.setText("Single Best-Match Mappings:");
+
+        singleBestMatchAbsLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        singleBestMatchAbsLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+
+        commonMappingsLabel.setText("Common Mappings:");
+
+        commonMappingsAbsLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        commonMappingsAbsLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+
+        singleBMPercentage.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        singleBMPercentage.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+
+        singlePerfectPercentage.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        singlePerfectPercentage.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+
+        singlePerfPercentageLabel.setText("Single Perfect Coverage:");
+
+        singleBMPercentageLabel.setText("Single Best Match Coverage:");
+
+        totalCovPercentageLabel.setText("Total Coverage:");
+
+        totalCovPercentage.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        totalCovPercentage.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(readPairPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(progressbar, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
+            .addComponent(progressbar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING)
+            .addComponent(readPairPanel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(bmPercentageLabel)
-                            .addComponent(labelNameLabel)
-                            .addComponent(numMappingsLabel)
-                            .addComponent(singletonMappingsLabel)
-                            .addComponent(uniqueSequencesLabel)
-                            .addComponent(numberReadsLabel)
-                            .addComponent(bestMatchMappingsLabel)
-                            .addComponent(perfectMappingsLabel)
-                            .addComponent(perfPercentageLabel)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(20, 20, 20)
+                                .addComponent(singlePerfectLabel)
+                                .addGap(6, 6, 6))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(labelNameLabel)
+                                    .addComponent(numMappingsLabel)
+                                    .addComponent(singletonMappingsLabel))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(nameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 128, Short.MAX_VALUE)
+                            .addComponent(singlePerfectAbsLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(numMappingsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(singletonMappingsAbsLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(18, 18, 18)
-                        .addComponent(compPercentageLabel)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(compPercentage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(perfectPercentage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(perfectMappingsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(numMappingsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
-                    .addComponent(nameLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
-                    .addComponent(singletonMappingsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
-                    .addComponent(uniqueSequencesAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
-                    .addComponent(numberReadsAbsLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
-                    .addComponent(bestMatchMappingsAbsLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(bmPercentage, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(commonMappingsLabel)
+                            .addComponent(singlePerfPercentageLabel)
+                            .addComponent(perfPercentageLabel)
+                            .addComponent(bmPercentageLabel)
+                            .addComponent(singleBMPercentageLabel))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(singleBMPercentage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(bmPercentage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(perfectPercentage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(singlePerfectPercentage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(commonMappingsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(perfectMappingsLabel)
+                            .addComponent(bestMatchMappingsLabel)
+                            .addComponent(singleBestMatchLabel))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(perfectMappingsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(singleBestMatchAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(bestMatchMappingsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(80, 80, 80)
+                                .addComponent(uniqueSequencesLabel))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(64, 64, 64)
+                                .addComponent(numberReadsLabel)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(numberReadsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(uniqueSequencesAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(59, 59, 59)
+                        .addComponent(totalCovPercentageLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(totalCovPercentage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(compPercentageLabel)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(commonPercentage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(labelNameLabel)
-                    .addComponent(nameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(9, 9, 9)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(numMappingsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(numMappingsLabel))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(nameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(labelNameLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(singletonMappingsLabel)
-                    .addComponent(singletonMappingsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(numMappingsLabel)
+                    .addComponent(numMappingsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(uniqueSequencesLabel)
-                    .addComponent(uniqueSequencesAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(singletonMappingsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(singletonMappingsLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(uniqueSequencesAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(uniqueSequencesLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(numberReadsLabel)
                     .addComponent(numberReadsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(bestMatchMappingsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(bestMatchMappingsLabel))
+                    .addComponent(singlePerfectLabel)
+                    .addComponent(singlePerfectAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(9, 9, 9)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(perfectMappingsLabel)
+                    .addComponent(perfectMappingsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(perfectMappingsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(perfectMappingsLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(perfectPercentage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(perfPercentageLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(singleBestMatchLabel)
+                    .addComponent(singleBestMatchAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(bmPercentage, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(bmPercentageLabel))
+                    .addComponent(bestMatchMappingsLabel)
+                    .addComponent(bestMatchMappingsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(compPercentage, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(compPercentageLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(commonMappingsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(commonMappingsLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(singlePerfPercentageLabel)
+                    .addComponent(singlePerfectPercentage, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(perfectPercentage, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(perfPercentageLabel, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(singleBMPercentageLabel)
+                    .addComponent(singleBMPercentage, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(bmPercentageLabel)
+                    .addComponent(bmPercentage, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(compPercentageLabel)
+                    .addComponent(commonPercentage, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(totalCovPercentageLabel)
+                    .addComponent(totalCovPercentage, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(readPairPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(progressbar, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -319,8 +431,11 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
     private javax.swing.JLabel bestMatchMappingsLabel;
     private javax.swing.JLabel bmPercentage;
     private javax.swing.JLabel bmPercentageLabel;
-    private javax.swing.JLabel compPercentage;
+    private javax.swing.JLabel commonMappingsAbsLabel;
+    private javax.swing.JLabel commonMappingsLabel;
+    private javax.swing.JLabel commonPercentage;
     private javax.swing.JLabel compPercentageLabel;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JLabel labelNameLabel;
     private javax.swing.JLabel nameLabel;
     private javax.swing.JLabel numLargerPairsAbsLabel;
@@ -341,10 +456,20 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
     private javax.swing.JLabel perfectPercentage;
     private javax.swing.JProgressBar progressbar;
     private javax.swing.JPanel readPairPanel;
+    private javax.swing.JLabel singleBMPercentage;
+    private javax.swing.JLabel singleBMPercentageLabel;
+    private javax.swing.JLabel singleBestMatchAbsLabel;
+    private javax.swing.JLabel singleBestMatchLabel;
     private javax.swing.JLabel singleMappings;
     private javax.swing.JLabel singleMappingsLabel;
+    private javax.swing.JLabel singlePerfPercentageLabel;
+    private javax.swing.JLabel singlePerfectAbsLabel;
+    private javax.swing.JLabel singlePerfectLabel;
+    private javax.swing.JLabel singlePerfectPercentage;
     private javax.swing.JLabel singletonMappingsAbsLabel;
     private javax.swing.JLabel singletonMappingsLabel;
+    private javax.swing.JLabel totalCovPercentage;
+    private javax.swing.JLabel totalCovPercentageLabel;
     private javax.swing.JLabel uniqueSequencesAbsLabel;
     private javax.swing.JLabel uniqueSequencesLabel;
     // End of variables declaration//GEN-END:variables
@@ -375,7 +500,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 Map<String, Integer> statsMap = statsContainer.getStatsMap();
 
                 //read pair stuff
-                int numReadPairs = statsMap.get(StatsContainer.NO_SEQ_PAIRS);
+                int numReadPairs = statsMap.get(StatsContainer.NO_READ_PAIRS);
                 if (numReadPairs == -1) {
 //                        TrackStatisticsPanel.this.remove(numReadPairsLabel);
 //                        TrackStatisticsPanel.this.remove(numReadPairsAbsLabel);
@@ -448,23 +573,20 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                     singleMappings.setText(String.valueOf(numSingleMappings));
                 }
 
-                int numOfMappings = statsMap.get(StatsContainer.NO_COMMON_MAPPINGS);
+                int numOfMappings = statsMap.get(StatsContainer.NO_MAPPINGS);
                 if (numOfMappings == -1) {
-                    
                     recalculated = true;
                 }
                 numMappingsAbsLabel.setText(String.valueOf(numOfMappings));
 
                 int numUniqueMappings = statsMap.get(StatsContainer.NO_UNIQ_MAPPINGS);
                 if (numUniqueMappings == -1) {
-                    
                     recalculated = true;
                 }
                 singletonMappingsAbsLabel.setText(String.valueOf(numUniqueMappings));
 
-                int numUniqueSequences = statsMap.get(StatsContainer.NO_UNIQUE_SEQS); //NOT CALCULATED CURRENTLY
+                int numUniqueSequences = statsMap.get(StatsContainer.NO_UNIQUE_SEQS);
                 if (numUniqueSequences == -1) {
-                    
                     recalculated = true;
                 }
                 uniqueSequencesAbsLabel.setVisible(false);
@@ -480,35 +602,63 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                     numberReadsAbsLabel.setText(String.valueOf(numReads));
                 }
 
-                int numOfPerfectMappings = statsMap.get(StatsContainer.NO_PERFECT_MAPPINGS);
+                int numOfPerfectMappings = statsMap.get(MappingClass.PERFECT_MATCH.getTypeString());
                 if (numOfPerfectMappings == -1) {
-                    
                     recalculated = true;
                 }
                 perfectMappingsAbsLabel.setText(String.valueOf(numOfPerfectMappings));
 
-                int numOfBestMatchMappings = statsMap.get(StatsContainer.NO_BESTMATCH_MAPPINGS);
+                int numOfBestMatchMappings = statsMap.get(MappingClass.BEST_MATCH.getTypeString());
                 if (numOfBestMatchMappings == -1) {
-                    
                     recalculated = true;
                 }
                 bestMatchMappingsAbsLabel.setText(String.valueOf(numOfBestMatchMappings));
+                
+                int numOfCommonMatchMappings = statsMap.get(MappingClass.COMMON_MATCH.getTypeString());
+                if (numOfCommonMatchMappings == -1) {
+                    recalculated = true;
+                }
+                commonMappingsAbsLabel.setText(String.valueOf(numOfCommonMatchMappings));
+                
+                int numOfSPerfectMappings = statsMap.get(MappingClass.SINGLE_PERFECT_MATCH.getTypeString());
+                if (numOfSPerfectMappings == -1) {
+                    recalculated = true;
+                }
+                singlePerfectAbsLabel.setText(String.valueOf(numOfSPerfectMappings));
 
-                double percentagePerfectCovered = (double) statsMap.get(StatsContainer.COVERAGE_PERFECT_GENOME) / chromLength * 100;
+                int numOfSBestMatchMappings = statsMap.get(MappingClass.SINGLE_BEST_MATCH.getTypeString());
+                if (numOfSBestMatchMappings == -1) {
+                    recalculated = true;
+                }
+                singleBestMatchAbsLabel.setText(String.valueOf(numOfSBestMatchMappings));
+
+                double percentagePerfectCovered = (double) statsMap.get(MappingClass.PERFECT_MATCH.getTypeString() + StatsContainer.COVERAGE_STRING) / chromLength * 100;
                 if (percentagePerfectCovered == -1) {
-                    
                     recalculated = true;
                 }
 
-                double percentageBMCovered = (double) statsMap.get(StatsContainer.COVERAGE_BM_GENOME) / chromLength * 100;
+                double percentageBMCovered = (double) statsMap.get(MappingClass.BEST_MATCH.getTypeString() + StatsContainer.COVERAGE_STRING) / chromLength * 100;
                 if (percentageBMCovered == -1) {
-                    
                     recalculated = true;
                 }
 
-                double percentageNErrorCovered = (double) statsMap.get(StatsContainer.COVERAGE_COMPLETE_GENOME) / chromLength * 100;;
-                if (percentageNErrorCovered == -1) {
-                    
+                double percentageCommonCovered = (double) statsMap.get(MappingClass.COMMON_MATCH.getTypeString() + StatsContainer.COVERAGE_STRING) / chromLength * 100;
+                if (percentageCommonCovered == -1) {
+                    recalculated = true;
+                }
+                
+                double percentageSPerfectCovered = (double) statsMap.get(MappingClass.SINGLE_PERFECT_MATCH.getTypeString() + StatsContainer.COVERAGE_STRING) / chromLength * 100;
+                if (percentageSPerfectCovered == -1) {
+                    recalculated = true;
+                }
+
+                double percentageSBMCovered = (double) statsMap.get(MappingClass.SINGLE_BEST_MATCH.getTypeString() + StatsContainer.COVERAGE_STRING) / chromLength * 100;
+                if (percentageSBMCovered == -1) {
+                    recalculated = true;
+                }
+                
+                double percentageTotalCovered = (double) statsMap.get(TotalCoverage.TOTAL_COVERAGE.getTypeString() + StatsContainer.COVERAGE_STRING) / chromLength * 100;
+                if (percentageTotalCovered == -1) {
                     recalculated = true;
                 }
 
@@ -522,13 +672,19 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
 //                            numLargerSeqPairs, numSingleMappings);
 //                }
 
+                String singlePerfectCov = String.format("%.2f%%", percentageSPerfectCovered);
                 String perfectCov = String.format("%.2f%%", percentagePerfectCovered);
+                String singleBMCov = String.format("%.2f%%", percentageSBMCovered);
                 String bmCov = String.format("%.2f%%", percentageBMCovered);
-                String nErrorCov = String.format("%.2f%%", percentageNErrorCovered);
+                String commonCov = String.format("%.2f%%", percentageCommonCovered);
+                String totalCov = String.format("%.2f%%", percentageTotalCovered);
 
+                singlePerfectPercentage.setText(singlePerfectCov);
                 perfectPercentage.setText(perfectCov);
+                singleBMPercentage.setText(singleBMCov);
                 bmPercentage.setText(bmCov);
-                compPercentage.setText(nErrorCov);
+                commonPercentage.setText(commonCov);
+                totalCovPercentage.setText(totalCov);
                 statsFinished();
             }
         }) {
@@ -555,10 +711,10 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
     }
 
     /**
-     * Used for hiding all sequence pair associated labels until they are really
+     * Used for hiding all read pair associated labels until they are really
      * needed.
      */
-    private void hideSeqPairLabels() {
+    private void hideReadPairLabels() {
         this.numberReadsLabel.setVisible(false);
         this.numberReadsAbsLabel.setVisible(false);
 

@@ -272,29 +272,13 @@ public class ReadPairPopup extends JPopupMenu {
                     NbBundle.getMessage(BlockComponentPair.class, "Fwd") : 
                     NbBundle.getMessage(BlockComponentPair.class, "Rev");
         return NbBundle.getMessage(BlockComponentPair.class, "Type").concat(" ").
-                    concat(this.getMappingTypeString(mapping)).
+                    concat(mapping.getMappingClass().getTypeString()).
                     concat(NbBundle.getMessage(BlockComponentPair.class, "Start")).concat(" ").
                     concat(String.valueOf(mapping.getStart())).
                     concat(NbBundle.getMessage(BlockComponentPair.class, "Stop")).concat(" ").
                     concat(String.valueOf(mapping.getStop())).
                     concat(NbBundle.getMessage(BlockComponentPair.class, "Orientation")).concat(" ").
                     concat(strand);
-    }
-    
-    /**
-     * @param mapping whose type should be determined
-     * @return the type of the mapping (Perfect Match, Best Match or Common Match)
-     */
-    private String getMappingTypeString(Mapping mapping) {
-        String mappingType;
-        if (mapping.getDifferences() == 0) {
-            mappingType = "Perfect Match";
-        } else if (mapping.isBestMatch()) {
-            mappingType = "Best Match";
-        } else {
-            mappingType = "Common Match";
-        }
-        return mappingType;
     }
     
     /**

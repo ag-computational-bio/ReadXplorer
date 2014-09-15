@@ -21,7 +21,6 @@ import de.cebitec.readXplorer.databackend.dataObjects.ReadPair;
 import de.cebitec.readXplorer.databackend.dataObjects.ReadPairGroup;
 import de.cebitec.readXplorer.util.classification.Classification;
 import de.cebitec.readXplorer.view.dataVisualisation.GenomeGapManager;
-import de.cebitec.readXplorer.view.dataVisualisation.PaintUtilities;
 import de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer.BlockContainer;
 import de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer.BlockI;
 import de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer.LayerI;
@@ -81,8 +80,8 @@ public class LayoutPairs implements LayoutI {
             //handle pairs
             while (pairIt.hasNext()) {
                 ReadPair pair = pairIt.next();
-                containsVisibleMapping = !PaintUtilities.inExclusionList(pair.getVisibleMapping(), exclusionList) || 
-                                         !PaintUtilities.inExclusionList(pair.getVisibleMapping2(), exclusionList);
+                containsVisibleMapping = !exclusionList.contains(pair.getVisibleMapping().getMappingClass()) || 
+                                         !exclusionList.contains(pair.getVisibleMapping2().getMappingClass());
 
                 if (containsVisibleMapping) {
                     // get start position
@@ -100,7 +99,7 @@ public class LayoutPairs implements LayoutI {
             //handle single mappings
             while (singleIt.hasNext()) {
                 Mapping mapping = singleIt.next();
-                containsVisibleMapping = containsVisibleMapping ? containsVisibleMapping : PaintUtilities.inExclusionList(mapping, exclusionList);
+                containsVisibleMapping = containsVisibleMapping ? containsVisibleMapping : !exclusionList.contains(mapping.getMappingClass());
 
                 //update start position, if necessary
                 if (mapping.getStart() > this.absStart && mapping.getStart() < start) {

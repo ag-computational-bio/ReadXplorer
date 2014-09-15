@@ -23,7 +23,6 @@ import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.SequenceUtils;
-import de.cebitec.readXplorer.util.classification.MappingClass;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -98,19 +97,9 @@ public class AnalysisCoverage implements Observer, AnalysisI<CoverageIntervalCon
         }
 
         CoverageManager coverage = coverageResult.getCovManager();
+        coverageArraySumOrFwd = coverage.getTotalCoverage(parameters.getReadClassParams().getExcludedClasses()).getFwdCov();
+        coverageArrayRev = coverage.getTotalCoverage(parameters.getReadClassParams().getExcludedClasses()).getRevCov();
 
-        //since read classes are inclusive, we simply check which array to use, starting with the larges read class
-        if (this.parameters.getReadClassParams().isClassificationAllowed(MappingClass.COMMON_MATCH)) {
-            coverageArraySumOrFwd = coverage.getCoverage(MappingClass.COMMON_MATCH).getFwdCov();
-            coverageArrayRev = coverage.getCoverage(MappingClass.COMMON_MATCH).getRevCov();
-        } else if (this.parameters.getReadClassParams().isClassificationAllowed(MappingClass.BEST_MATCH)) {
-            coverageArraySumOrFwd = coverage.getCoverage(MappingClass.BEST_MATCH).getFwdCov();
-            coverageArrayRev = coverage.getCoverage(MappingClass.BEST_MATCH).getRevCov();
-        } else if (this.parameters.getReadClassParams().isClassificationAllowed(MappingClass.PERFECT_MATCH)) {
-            coverageArraySumOrFwd = coverage.getCoverage(MappingClass.PERFECT_MATCH).getFwdCov();
-            coverageArrayRev = coverage.getCoverage(MappingClass.PERFECT_MATCH).getRevCov();
-        }
-        
         if (this.parameters.isSumCoverageOfBothStrands()) {
             coverageArraySumOrFwd = this.sumValues(coverageArraySumOrFwd, coverageArrayRev);
         }

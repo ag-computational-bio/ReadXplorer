@@ -43,6 +43,10 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
+import java.util.prefs.Preferences;
+import org.openide.util.NbPreferences;
 
 /**
  * Viewer for read pairs.
@@ -98,6 +102,15 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
         this.setupComponents();
         this.setActive(false);
         this.readPairs = new ReadPairResultPersistent(null, null);
+        
+        final Preferences pref = NbPreferences.forModule(Object.class);
+        pref.addPreferenceChangeListener(new PreferenceChangeListener() {
+
+            @Override
+            public void preferenceChange(PreferenceChangeEvent evt) {
+                addBlocks(layout);
+            }
+        });
     }
 
     @Override
@@ -145,7 +158,7 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
         this.jBlockList = new ArrayList<>();
         this.removeAll();
         //check for feature types in the exclusion list and adapt database query for performance
-        List<Classification> excludedFeatureTypes = this.getExcludedFeatureTypes(); //TODO: this does not do anything in the reader! rethink filtering here
+        List<Classification> excludedFeatureTypes = this.getExcludedClassifications(); //TODO: this does not do anything in the reader! rethink filtering here
         //TODO: add unique filter to read pair viewer
         this.mappingsLoading = true;
         ParametersReadClasses readClassParams = new ParametersReadClasses(excludedFeatureTypes, new Byte("0"));
@@ -179,7 +192,7 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
         if (this.hasSequenceBar()) {
             this.add(this.getSequenceBar());
         }
-        layout = new LayoutPairs(oldLogLeft, oldLogRight, readPairs.getReadPairs(), this.getExcludedFeatureTypes());
+        layout = new LayoutPairs(oldLogLeft, oldLogRight, readPairs.getReadPairs(), this.getExcludedClassifications());
         start = System.currentTimeMillis();
         this.addBlocks(layout);
         stop = System.currentTimeMillis();

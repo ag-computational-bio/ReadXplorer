@@ -17,7 +17,6 @@
 package de.cebitec.readXplorer.parser.mappings;
 
 import de.cebitec.readXplorer.parser.TrackJob;
-import de.cebitec.readXplorer.parser.common.CoverageContainer;
 import de.cebitec.readXplorer.parser.common.ParsedTrack;
 import de.cebitec.readXplorer.util.Benchmark;
 import de.cebitec.readXplorer.util.DiscreteCountingDistribution;
@@ -28,8 +27,11 @@ import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.StatsContainer;
+import de.cebitec.readXplorer.util.classification.Classification;
 import de.cebitec.readXplorer.util.classification.MappingClass;
+import de.cebitec.readXplorer.util.classification.TotalCoverage;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.sf.samtools.SAMFileReader;
@@ -50,7 +52,6 @@ import org.openide.util.NbBundle;
 public class SamBamStatsParser implements Observable, MessageSenderI {
 
     private List<Observer> observers;
-    private CoverageContainer coverageContainer;
     private StatsContainer statsContainer;
     private DiscreteCountingDistribution readLengthDistribution;
     private ErrorLimit errorLimit;
@@ -62,7 +63,6 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
      */
     public SamBamStatsParser() {
         this.observers = new ArrayList<>();
-        this.coverageContainer = new CoverageContainer();
         this.errorLimit = new ErrorLimit(100);
         this.readLengthDistribution = new DiscreteCountingDistribution(400);
         readLengthDistribution.setType(Properties.READ_LENGTH_DISTRIBUTION);
@@ -100,12 +100,14 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
         String cigar;
         MappingClass mappingClass;
         int mapCount;
-        List<Pair<Integer, Integer>> coveredCommonIntervals = new ArrayList<>();
-        List<Pair<Integer, Integer>> coveredBestMatchIntervals = new ArrayList<>();
-        List<Pair<Integer, Integer>> coveredPerfectIntervals = new ArrayList<>();
-        coveredCommonIntervals.add(new Pair<>(0, 0));
-        coveredBestMatchIntervals.add(new Pair<>(0, 0));
-        coveredPerfectIntervals.add(new Pair<>(0, 0));
+        //Map with one covered interval list for each mapping class
+        Map<Classification, List<Pair<Integer, Integer>>> classToCoveredIntervalsMap = new HashMap<>();
+        for (MappingClass mapClass : MappingClass.values()) {
+            classToCoveredIntervalsMap.put(mapClass, new ArrayList<Pair<Integer, Integer>>());
+            classToCoveredIntervalsMap.get(mapClass).add(new Pair<>(0, 0));
+        }
+        classToCoveredIntervalsMap.put(TotalCoverage.TOTAL_COVERAGE, new ArrayList<Pair<Integer, Integer>>());
+        classToCoveredIntervalsMap.get(TotalCoverage.TOTAL_COVERAGE).add(new Pair<>(0, 0));
         Byte classification;
         Integer mappingCount;
 //        HashMap<String, Object> readNameSet = new HashMap<>();
@@ -143,26 +145,16 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
                             mapCount = 0;
                         }
 
+                        if (mapCount == 1) {
+                            statsContainer.increaseValue(StatsContainer.NO_UNIQ_MAPPINGS, mapCount);
+                        }
+                        statsContainer.increaseValue(StatsContainer.NO_MAPPINGS, 1);
+                        
                         classification = Byte.valueOf(record.getAttribute(Properties.TAG_READ_CLASS).toString());
                         if (classification != null) {
                             mappingClass = MappingClass.getFeatureType(classification);
-                            if (mapCount == 1) {
-                                switch (mappingClass) { //fallthrough is necessary
-                                    case SINGLE_PERFECT_MATCH : 
-                                    case PERFECT_MATCH :
-                                        statsContainer.increaseValue(StatsContainer.NO_UNIQ_PERF_MAPPINGS, mapCount);
-                                    case SINGLE_BEST_MATCH : 
-                                    case BEST_MATCH :
-                                        statsContainer.increaseValue(StatsContainer.NO_UNIQ_BM_MAPPINGS, mapCount);
-                                    default :
-                                        statsContainer.increaseValue(StatsContainer.NO_UNIQ_MAPPINGS, mapCount);
-                                }
-                            }
                         } else {
                             mappingClass = MappingClass.COMMON_MATCH;
-                            if (mapCount == 1) {
-                                statsContainer.increaseValue(StatsContainer.NO_UNIQ_MAPPINGS, mapCount);
-                            }
                         }
                         readLengthDistribution.increaseDistribution(readSeq.length());
                         
@@ -184,20 +176,9 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
                         ++seqCount;
                         lastReadSeq = readSeq;
 
-                        this.updateIntervals(coveredCommonIntervals, start, stop);
-                        switch (mappingClass) { //fallthrough is necessary
-                            case SINGLE_PERFECT_MATCH : 
-                            case PERFECT_MATCH :
-                                this.updateIntervals(coveredPerfectIntervals, start, stop);
-                                statsContainer.increaseValue(StatsContainer.NO_PERFECT_MAPPINGS, mapCount);
-                            case SINGLE_BEST_MATCH : 
-                            case BEST_MATCH :
-                                this.updateIntervals(coveredBestMatchIntervals, start, stop);
-                                statsContainer.increaseValue(StatsContainer.NO_BESTMATCH_MAPPINGS, mapCount);
-                            case SINGLE_COMMON_MATCH :
-                            default :
-                                statsContainer.increaseValue(StatsContainer.NO_COMMON_MAPPINGS, mapCount);
-                        }
+                        statsContainer.increaseValue(mappingClass.getTypeString(), mapCount);
+                        this.updateIntervals(classToCoveredIntervalsMap.get(mappingClass), start, stop);
+                        this.updateIntervals(classToCoveredIntervalsMap.get(TotalCoverage.TOTAL_COVERAGE), start, stop);
                         //saruman starts genome at 0 other algorithms like bwa start genome at 1
                         
 //                        //can be used for debugging performance
@@ -233,14 +214,11 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
         }
         
         //finish statistics and return the track with the statistics data in the end
-        coverageContainer.setCoveredCommonMatchPositions(this.getCoveredBases(coveredCommonIntervals));
-        coverageContainer.setCoveredBestMatchPositions(this.getCoveredBases(coveredBestMatchIntervals));
-        coverageContainer.setCoveredPerfectPositions(this.getCoveredBases(coveredPerfectIntervals));
+        statsContainer.setCoveredPositionsImport(classToCoveredIntervalsMap);
 
-        ParsedTrack track = new ParsedTrack(trackJob, coverageContainer);
+        ParsedTrack track = new ParsedTrack(trackJob);
         statsContainer.setReadLengthDistribution(readLengthDistribution);
         track.setStatsContainer(statsContainer);
-        this.coverageContainer = new CoverageContainer();
         
         finish = System.currentTimeMillis();
         String msg = Bundle.StatsParser_Finished(fileName);
@@ -271,19 +249,6 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
         if (this.errorLimit.allowOutput()) {
             this.notifyObservers(msg);
         }
-    }
-    
-    /**
-     * Counts all  bases, which are covered by reads in this data set
-     * @param coveredIntervals the covered intervals of the data set
-     * @return the number of bases covered in the data set
-     */
-    private int getCoveredBases(List<Pair<Integer, Integer>> coveredIntervals) {
-        int coveredBases = 0;
-        for (Pair<Integer, Integer> interval : coveredIntervals) {
-            coveredBases += interval.getSecond() - interval.getFirst();
-        }
-        return coveredBases;
     }
     
     /**

@@ -121,11 +121,11 @@ public class Operon extends TrackResultEntry {
     /**
      * Returns the direction of this Operon.
      *
-     * @return <true> if forward direction.
+     * @return true if forward direction.
      */
     public boolean isFwd() {
         this.isFwd = false;
-        if (operonAdjacencies.isEmpty()) {
+        if (operonAdjacencies.isEmpty() || operonAdjacencies.get(0).getFeature1() == null) {
             return isFwd;
         } else {
             return isFwd = operonAdjacencies.get(0).getFeature1().isFwdStrand();

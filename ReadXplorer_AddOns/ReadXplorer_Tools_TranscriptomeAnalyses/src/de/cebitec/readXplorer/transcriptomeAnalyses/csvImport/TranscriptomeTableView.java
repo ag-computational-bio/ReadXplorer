@@ -35,6 +35,7 @@ import de.cebitec.readXplorer.transcriptomeAnalyses.main.TranscriptomeAnalysesTo
 import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.FivePrimeEnrichedTracksVisualPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.WizardPropertyStrings;
 import de.cebitec.readXplorer.ui.importer.TranscriptomeTableViewI;
+import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.view.analysis.ResultTablePanel;
 import java.awt.HeadlessException;
@@ -71,6 +72,7 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
         } else {
             transcAnalysesTopComp = new TranscriptomeAnalysesTopComponentTopComponent();
         }
+        transcAnalysesTopComp.open();
 
         if (type == TableType.TSS_DETECTION_JR) {
             // TSS TAble
@@ -173,17 +175,17 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                     operon.setStartPositionOfTranscript(transcriptStart);
 
                     String firstFeatures = (String) fstSheet.get(row).get(1);
-                    String[] splitedFeatures = firstFeatures.split("\n");
+                    String[] splittedFeatures = firstFeatures.split("\n");
                     String secondFeatures = (String) fstSheet.get(row).get(2);
                     String[] splitedSecFeatures = secondFeatures.split("\n");
                     String spanningReadCount = (String) fstSheet.get(row).get(8);
                     String[] splitedSpanningReadCounts = spanningReadCount.split("\n");
 
-                    for (int i = 0; i < splitedFeatures.length; i++) {
-                        String firstFeature = splitedFeatures[i];
+                    for (int i = 0; i < splittedFeatures.length; i++) {
+                        String firstFeature = splittedFeatures[i];
                         String secondFeature = splitedSecFeatures[i];
                         int spanningReads = Integer.valueOf(splitedSpanningReadCounts[i]);
-                        OperonAdjacency adj = new OperonAdjacency(featureMap.get(firstFeature), featureMap.get(secondFeature));
+                        OperonAdjacency adj = new OperonAdjacency(featureMap.get(firstFeature), featureMap.get(secondFeature)); //TODO: when import on wrong genome: nullpointerexception
                         adj.setSpanningReads(spanningReads);
                         adjacencies.add(adj);
                     }
@@ -208,8 +210,8 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                 resultPanel.addResult(operonResults);
                 transcAnalysesTopComp.openAnalysisTab("Operon detection results for " + refConnector.getAssociatedTrackNames().get(track.getId()) + " Hits: " + operonResults.getResults().size(), resultPanel);
 
-                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successfull!",
-                        "Import was successfull!", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successful!",
+                        "Import was successful!", JOptionPane.INFORMATION_MESSAGE);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, "Something went wrong, please check the track id. The database should contain the track id.", "Something went wrong!", JOptionPane.CANCEL_OPTION);
             }
@@ -286,8 +288,8 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                 rpkmResult.setParameters(params);
                 transcAnalysesTopComp.openAnalysisTab("RPKM values for " + refConnector.getAssociatedTrackNames().get(track.getId()) + " Hits:" + rpkmResult.getResults().size(), resultPanel);
 
-                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successfull!",
-                        "Import was successfull!", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successful!",
+                        "Import was successful!", JOptionPane.INFORMATION_MESSAGE);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, "Something went wrong, please check the track id. The database should contain the track id.", "Something went wrong!", JOptionPane.CANCEL_OPTION);
             }
@@ -411,8 +413,8 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                 novelRegionsResultsPanel.addResult(novelRegionResults);
                 transcAnalysesTopComp.openAnalysisTab("Novel Region detection results for " + refConnector.getAssociatedTrackNames().get(track.getId()) + " Hits: " + novelRegions.size(), novelRegionsResultsPanel);
 
-                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successfull!",
-                        "Import was successfull!", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successful!",
+                        "Import was successful!", JOptionPane.INFORMATION_MESSAGE);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, "Something went wrong, please check the track id. The database should contain the track id.", "Something went wrong!", JOptionPane.CANCEL_OPTION);
             }
@@ -633,10 +635,10 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                             detectedGene = featureMap.get(locus);
                         }
                     }
-
-                    int offset = (Integer) list.get(7);
-                    int dist2Start = (Integer) list.get(8);
-                    int dist2Stop = (Integer) list.get(9);
+                    
+                    int offset = GeneralUtils.isValidNumberInput((String) list.get(7)) ? Integer.valueOf((String) list.get(7)) : 0;
+                    int dist2Start = GeneralUtils.isValidNumberInput((String) list.get(8)) ? Integer.valueOf((String) list.get(8)) : 0;
+                    int dist2Stop = GeneralUtils.isValidNumberInput((String) list.get(9)) ? Integer.valueOf((String) list.get(9)) : 0;
 
                     boolean isLeaderless = (Boolean) list.get(11);
                     boolean isCdsShift = (Boolean) list.get(12);
@@ -671,8 +673,8 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                 tssResultsPanel.addResult(tssResult);
                 transcAnalysesTopComp.openAnalysisTab("TSS detection results for: " + refConnector.getAssociatedTrackNames().get(refID) + " Hits: " + tss.size(), tssResultsPanel);
 
-                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successfull!",
-                        "Import was successfull!", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successful!",
+                        "Import was successful!", JOptionPane.INFORMATION_MESSAGE);
             } catch (NumberFormatException | HeadlessException e) {
                 JOptionPane.showMessageDialog(null, "Something went wrong, please check the track id. The database should contain the track id.", "Something went wrong!", JOptionPane.CANCEL_OPTION);
             }
@@ -1023,8 +1025,8 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                 tssResultsPanel.addResult(tssResult);
                 transcAnalysesTopComp.openAnalysisTab("TSS detection results for: " + refConnector.getAssociatedTrackNames().get(refID) + " Hits: " + tss.size(), tssResultsPanel);
 
-                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successfull!",
-                        "Import was successfull!", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successful!",
+                        "Import was successful!", JOptionPane.INFORMATION_MESSAGE);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, "Something went wrong, please check the track id. The database should contain the track id.", "Something went wrong!", JOptionPane.CANCEL_OPTION);
             }
@@ -1097,8 +1099,8 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
             rpkmResult.setParameters(params);
             transcAnalysesTopComp.openAnalysisTab("RPKM values for " + refConnector.getAssociatedTrackNames().get(track.getId()) + " Hits:" + rpkmResult.getResults().size(), resultPanel);
 
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successfull!",
-                    "Import was successfull!", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successful!",
+                    "Import was successful!", JOptionPane.INFORMATION_MESSAGE);
         } else {
             JOptionPane.showMessageDialog(null, "Something went wrong, please check the chrosome id. The reference should contain the chromosome id. Check also the database.", "Something went wrong!", JOptionPane.CANCEL_OPTION);
         }
@@ -1227,8 +1229,8 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                 resultPanel.addResult(operonResults);
                 transcAnalysesTopComp.openAnalysisTab("Operon detection results for " + refConnector.getAssociatedTrackNames().get(track.getId()) + " Hits: " + operonResults.getResults().size(), resultPanel);
 
-                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successfull!",
-                        "Import was successfull!", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successful!",
+                        "Import was successful!", JOptionPane.INFORMATION_MESSAGE);
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(null, "Something went wrong, please check the track id. The database should contain the track id.", "Something went wrong!", JOptionPane.CANCEL_OPTION);
             }
@@ -1373,8 +1375,8 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
             novelRegionsResultsPanel.addResult(novelRegionResults);
             transcAnalysesTopComp.openAnalysisTab("Novel Region detection results for " + refConnector.getAssociatedTrackNames().get(track.getId()) + " Hits: " + novelRegions.size(), novelRegionsResultsPanel);
 
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successfull!",
-                    "Import was successfull!", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successful!",
+                    "Import was successful!", JOptionPane.INFORMATION_MESSAGE);
 
         } else {
             JOptionPane.showMessageDialog(null, "Something went wrong, please check the chrosome id. The reference should contain the chromosome id. Check also the database.", "Something went wrong!", JOptionPane.CANCEL_OPTION);

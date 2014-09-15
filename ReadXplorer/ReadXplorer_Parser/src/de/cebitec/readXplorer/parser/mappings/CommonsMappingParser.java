@@ -741,11 +741,7 @@ public final class CommonsMappingParser {
                 }
 
             } else if (differences > lowestDiffRate) { //common mapping
-                if (classification.isSingleCommonMatch(differences)) {
-                    record.setAttribute(Properties.TAG_READ_CLASS, MappingClass.SINGLE_COMMON_MATCH.getTypeByte());
-                } else {
-                    record.setAttribute(Properties.TAG_READ_CLASS, MappingClass.COMMON_MATCH.getTypeByte());
-                }
+                record.setAttribute(Properties.TAG_READ_CLASS, MappingClass.COMMON_MATCH.getTypeByte());
 
             } else { //meaning: differences < lowestDiffRate
                 throw new AssertionError("Cannot contain less than the lowest diff rate number of differences!");

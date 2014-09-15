@@ -17,7 +17,7 @@
 package de.cebitec.readXplorer.featureCoverageAnalysis;
 
 import de.cebitec.readXplorer.databackend.ParameterSetI;
-import de.cebitec.readXplorer.databackend.ParametersFeatureTypes;
+import de.cebitec.readXplorer.databackend.ParametersFeatureTypesAndReadClasses;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.util.Set;
@@ -27,12 +27,11 @@ import java.util.Set;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class ParameterSetCoveredFeatures extends ParametersFeatureTypes implements ParameterSetI<ParameterSetCoveredFeatures> {
+public class ParameterSetCoveredFeatures extends ParametersFeatureTypesAndReadClasses implements ParameterSetI<ParameterSetCoveredFeatures> {
     
     private int minCoveredPercent;
     private int minCoverageCount;
     private boolean getCoveredFeatures;
-    private ParametersReadClasses readClassesParams;
 
     /**
      * Data storage for all parameters associated with filtering features.
@@ -51,11 +50,10 @@ public class ParameterSetCoveredFeatures extends ParametersFeatureTypes implemen
      */
     public ParameterSetCoveredFeatures(int minCoveredPercent, int minCoverageCount, boolean getCoveredFeatures, 
             ParametersReadClasses readClassesParams, Set<FeatureType> selectedFeatureTypes) {
-        super(selectedFeatureTypes);
+        super(selectedFeatureTypes, readClassesParams);
         this.minCoveredPercent = minCoveredPercent;
         this.minCoverageCount = minCoverageCount;
         this.getCoveredFeatures = getCoveredFeatures;
-        this.readClassesParams = readClassesParams;
     }
 
     /**
@@ -107,12 +105,4 @@ public class ParameterSetCoveredFeatures extends ParametersFeatureTypes implemen
     public void setGetCoveredFeatures(boolean getCoveredFeatures) {
         this.getCoveredFeatures = getCoveredFeatures;
     }  
-    
-    /**
-     * @return The parameter set for the used read classes for this analysis
-     * instance.
-     */
-    public ParametersReadClasses getReadClassParams() {
-        return readClassesParams;
-    }
 }

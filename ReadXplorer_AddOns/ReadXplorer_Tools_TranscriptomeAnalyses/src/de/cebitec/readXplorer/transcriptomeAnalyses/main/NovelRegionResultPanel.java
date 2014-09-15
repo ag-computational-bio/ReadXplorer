@@ -319,8 +319,8 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                 progresshandle.progress(3);
                 progresshandle.progress(5);
 
-                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successfull!",
-                        "Export was successfull!", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successful!",
+                        "Export was successful!", JOptionPane.INFORMATION_MESSAGE);
                 progresshandle.finish();
             }
 
@@ -364,8 +364,8 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                 progresshandle.progress(3);
                 progresshandle.progress(5);
 
-                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successfull!",
-                        "Export was successfull!", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successful!",
+                        "Export was successful!", JOptionPane.INFORMATION_MESSAGE);
                 progresshandle.finish();
 
             }
@@ -424,8 +424,8 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                     progresshandle.progress(4);
                     progresshandle.progress(5);
 
-                    JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successfull!",
-                            "Export was successfull!", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successful!",
+                            "Export was successful!", JOptionPane.INFORMATION_MESSAGE);
                     progresshandle.finish();
                 }
 

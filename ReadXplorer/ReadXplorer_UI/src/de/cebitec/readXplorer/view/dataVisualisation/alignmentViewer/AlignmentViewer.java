@@ -54,7 +54,6 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
     private LayoutI layout;
     private int blockHeight;
     private int layerHeight;
-    private int maxReplicates;
     private int fwdMappingsInInterval;
     private int revMappingsInInterval;
     private int maxCoverageInInterval;
@@ -83,7 +82,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
         this.setHorizontalMargin(10);
         this.setActive(false);
         this.setAutomaticCentering(true);
-        this.handleBaseQualityOption();
+        this.addPreferenceListeners();
         setupComponents();
     }
     
@@ -91,7 +90,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
      * Initializes the base quality option boolean and creates a 
      * PreferenceChangeListener for the base quality option.
      */
-    private void handleBaseQualityOption() {
+    private void addPreferenceListeners() {
         final Preferences pref = NbPreferences.forModule(Object.class);
         this.showBaseQualities = pref.getBoolean(Properties.BASE_QUALITY_OPTION, true);
         pref.addPreferenceChangeListener(new PreferenceChangeListener() {
@@ -100,8 +99,8 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
             public void preferenceChange(PreferenceChangeEvent evt) {
                 if (evt.getKey().equals(Properties.BASE_QUALITY_OPTION)) {
                     showBaseQualities = pref.getBoolean(Properties.BASE_QUALITY_OPTION, true);
-                    showData();
                 }
+                showData();
             }
         });
     }
@@ -192,7 +191,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
             this.findMinAndMaxCount(mappingResult.getMappings()); //for currently shown mappingResult
             this.findMaxCoverage(completeCoverage);
             this.setViewerHeight();
-            this.layout = new Layout(mappingResult.getRequest().getFrom(), mappingResult.getRequest().getTo(), mappingResult.getMappings(), getExcludedFeatureTypes());
+            this.layout = new Layout(mappingResult.getRequest().getFrom(), mappingResult.getRequest().getTo(), mappingResult.getMappings(), getExcludedClassifications());
 
             this.removeAll();
 
@@ -223,17 +222,12 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
      */
     private void findMinAndMaxCount(Collection<Mapping> mappings) {
 //        this.minCountInInterval = Integer.MAX_VALUE; //uncomment all these lines to get min count
-        this.maxReplicates = Integer.MIN_VALUE;
         this.fwdMappingsInInterval = 0;
 
         for (Mapping m : mappings) {
-            int coverage = m.getNbReplicates();
 //            if(coverage < minCountInInterval) {
 //                minCountInInterval = coverage;
 //            }
-            if (coverage > maxReplicates) {
-                maxReplicates = coverage;
-            }
             if (m.isFwdStrand()) {
                 ++this.fwdMappingsInInterval;
             }
@@ -320,7 +314,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
      * @param layerCounter determines in which layer the block should be painted
      */
     private void createJBlock(BlockI block, int layerCounter) {
-        BlockComponent jb = new BlockComponent(block, this, layout.getGenomeGapManager(), blockHeight, maxReplicates, showBaseQualities);
+        BlockComponent jb = new BlockComponent(block, this, layout.getGenomeGapManager(), blockHeight, showBaseQualities);
 
         // negative layer counter means reverse strand
         int lower = (layerCounter < 0 ? getPaintingAreaInfo().getReverseLow() : getPaintingAreaInfo().getForwardLow());

@@ -169,26 +169,5 @@ public class ParsedClassification {
         }
         mismatchCountMap.put(noMismatches, mismatchCountMap.get(noMismatches) + 1);
     }
-
-    /**
-     * Checks if the current common match mapping with the given number of 
-     * differences is a single common match mapping (<code>true</code>), or has multiple
-     * common match mappings (<code>false</code>).
-     * @param differences Number of differences of a mapping already classified
-     * as common match
-     * @return <code>true</code>, if this is the only common match mapping of 
-     * the read from which the number of differences originates, <code>false</code>, 
-     * if there are multiple common match mappings for this read.
-     */
-    public boolean isSingleCommonMatch(int differences) {
-        boolean isSingleCommonMatch = false;
-        int count = 0;
-        for (Map.Entry<Integer, Integer> mismatchCount : mismatchCountMap.entrySet()) {
-            if (minMismatches < mismatchCount.getValue()) {
-                if (isSingleCommonMatch = ++count > 1) { break; }
-            }
-        }
-        return isSingleCommonMatch;
-    }
     
 }

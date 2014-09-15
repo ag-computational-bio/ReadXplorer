@@ -206,7 +206,7 @@
       </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JComboBox&lt;&gt;(CsvPreferenceForUsers.values())"/>
-        <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="csvPrefComboBox.setVisible(!this.delimiterCheckBox.isSelected());"/>
+        <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="csvPrefComboBox.setVisible(true);"/>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;CsvPreferenceForUsers&gt;"/>
       </AuxValues>
     </Component>
@@ -229,6 +229,7 @@
     </Component>
     <Component class="javax.swing.JTextField" name="statsAndParamsFileTextField">
       <Properties>
+        <Property name="editable" type="boolean" value="false"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="de/cebitec/readXplorer/ui/importer/dataTable/Bundle.properties" key="ImportTableVisualPanel.statsAndParamsFileTextField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>

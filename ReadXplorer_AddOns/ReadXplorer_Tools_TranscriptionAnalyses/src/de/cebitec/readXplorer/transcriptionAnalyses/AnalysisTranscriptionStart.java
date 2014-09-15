@@ -33,7 +33,6 @@ import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.classification.FeatureType;
-import de.cebitec.readXplorer.util.classification.MappingClass;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -66,28 +65,22 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
     private boolean isStrandBothOption;
     private boolean isBothFwdDirection;
     private boolean isFeatureStrand;
-    private boolean isFeatureStrandAnalysis;
+    private boolean isFeatureStrandAnalysis; //TODO: is this still needed?
     protected List<TranscriptionStart> detectedStarts;
     private DiscreteCountingDistribution readStartDistribution;
     private DiscreteCountingDistribution covIncPercentDistribution;
     private boolean calcCoverageDistributions;
     
     //varibles for transcription start site detection
-    private int perfectCovLastFwdPos;
-    private int perfectCovLastRevPos;
-    private int bmCovLastFwdPos;
-    private int bmCovLastRevPos;
-    private int commonCovLastFwdPos;
-    private int commonCovLastRevPos;
-    private int perfectReadStartsLastRevPos;
-    private int bmReadStartsLastRevPos;
-    private int commonReadStartsLastRevPos;
+    private int totalCovLastFwdPos;
+    private int totalCovLastRevPos;
+    private int totalReadStartsLastRevPos;
     private int lastFeatureIdxGenStartsFwd;
     private int lastFeatureIdxGenStartsRev;
     private ReferenceConnector refConnector;
     
-    private HashMap<Integer, Integer> exactReadStartDist = new HashMap<>(); //exact read start distribution
-    private HashMap<Integer, Integer> exactCovIncPercDist = new HashMap<>(); //exact coverage increase percent distribution
+    private Map<Integer, Integer> exactReadStartDist = new HashMap<>(); //exact read start distribution
+    private Map<Integer, Integer> exactCovIncPercDist = new HashMap<>(); //exact coverage increase percent distribution
     
     protected CoverageManager currentCoverage;
     private Map<Integer, PersistentChromosome> chromosomes;
@@ -111,15 +104,9 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         this.parametersTSS = parametersTSS;
         
         this.detectedStarts = new ArrayList<>();
-        this.perfectCovLastFwdPos = 0;
-        this.perfectCovLastRevPos = 0;
-        this.bmCovLastFwdPos = 0;
-        this.bmCovLastRevPos = 0;
-        this.commonCovLastFwdPos = 0;
-        this.commonCovLastRevPos = 0;
-        this.perfectReadStartsLastRevPos = 0;
-        this.bmReadStartsLastRevPos = 0;
-        this.commonReadStartsLastRevPos = 0;
+        this.totalCovLastFwdPos = 0;
+        this.totalCovLastRevPos = 0;
+        this.totalReadStartsLastRevPos = 0;
         this.lastFeatureIdxGenStartsFwd = 0;
         this.lastFeatureIdxGenStartsRev = 0;
         
@@ -209,53 +196,24 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         coverage.setLeftBound(fixedLeftBound); //add left coverage value from last request (or 0) to left
         readStarts.setLeftBound(fixedLeftBound); //of all coverage arrays.
         
-        Coverage perfectCov = coverage.getCoverage(MappingClass.PERFECT_MATCH);
-        Coverage bestCov = coverage.getCoverage(MappingClass.BEST_MATCH);
-        Coverage commonCov = coverage.getCoverage(MappingClass.COMMON_MATCH);
-        Coverage perfectStarts = readStarts.getCoverage(MappingClass.PERFECT_MATCH);
-        Coverage bestStarts = readStarts.getCoverage(MappingClass.BEST_MATCH);
-        Coverage commonStarts = readStarts.getCoverage(MappingClass.COMMON_MATCH);
+        Coverage totalCoverage = coverage.getTotalCoverage(this.parametersTSS.getReadClassParams().getExcludedClasses());
+        Coverage totalStarts = readStarts.getTotalCoverage(this.parametersTSS.getReadClassParams().getExcludedClasses());
         
-        perfectCov.setFwdCoverage(this.fixLeftCoverageBound(perfectCov.getFwdCov(), perfectCovLastFwdPos));
-        perfectCov.setRevCoverage(this.fixLeftCoverageBound(perfectCov.getRevCov(), perfectCovLastRevPos));
-        bestCov.setFwdCoverage(this.fixLeftCoverageBound(bestCov.getFwdCov(), bmCovLastFwdPos));
-        bestCov.setRevCoverage(this.fixLeftCoverageBound(bestCov.getRevCov(), bmCovLastRevPos));
-        commonCov.setFwdCoverage(this.fixLeftCoverageBound(commonCov.getFwdCov(), commonCovLastFwdPos));
-        commonCov.setRevCoverage(this.fixLeftCoverageBound(commonCov.getRevCov(), commonCovLastRevPos));
-        perfectStarts.setFwdCoverage(this.fixLeftCoverageBound(perfectStarts.getFwdCov(), 0)); //for read starts the left pos is not important
-        perfectStarts.setRevCoverage(this.fixLeftCoverageBound(perfectStarts.getRevCov(), perfectReadStartsLastRevPos)); //on fwd strand
-        bestStarts.setFwdCoverage(this.fixLeftCoverageBound(bestStarts.getFwdCov(), 0));
-        bestStarts.setRevCoverage(this.fixLeftCoverageBound(bestStarts.getRevCov(), bmReadStartsLastRevPos));
-        commonStarts.setFwdCoverage(this.fixLeftCoverageBound(commonStarts.getFwdCov(), 0));
-        commonStarts.setRevCoverage(this.fixLeftCoverageBound(commonStarts.getRevCov(), commonReadStartsLastRevPos));
+        totalCoverage.setFwdCoverage(this.fixLeftCoverageBound(totalCoverage.getFwdCov(), totalCovLastFwdPos));
+        totalCoverage.setRevCoverage(this.fixLeftCoverageBound(totalCoverage.getRevCov(), totalCovLastRevPos));
+        totalStarts.setFwdCoverage(this.fixLeftCoverageBound(totalStarts.getFwdCov(), 0)); //for read starts the left pos is not important
+        totalStarts.setRevCoverage(this.fixLeftCoverageBound(totalStarts.getRevCov(), totalReadStartsLastRevPos)); //on fwd strand
 
         int idx;
         for (int i = fixedLeftBound; i < rightBound; ++i) {
             idx = coverage.getInternalPos(i);
-            
-            if (parametersTSS.getReadClassParams().isClassificationAllowed(MappingClass.COMMON_MATCH)) {
-                this.gatherDataAndDetect(chromId, chromLength, chromFeatures, commonCov.getFwdCov(), 
-                        commonCov.getRevCov(), commonStarts.getFwdCov(), commonStarts.getRevCov(), idx);
-            
-            } else if (parametersTSS.getReadClassParams().isClassificationAllowed(MappingClass.BEST_MATCH)) {
-                this.gatherDataAndDetect(chromId, chromLength, chromFeatures, bestCov.getFwdCov(), 
-                        bestCov.getRevCov(), bestStarts.getFwdCov(), bestStarts.getRevCov(), idx);
-            
-            } else {//if (parametersTSS.getReadClassParams().isClassificationAllowed(MappingClass.PERFECT_MATCH)) {
-                this.gatherDataAndDetect(chromId, chromLength, chromFeatures, perfectCov.getFwdCov(), 
-                        perfectCov.getFwdCov(), perfectStarts.getFwdCov(), perfectStarts.getRevCov(), idx);
-            }
+            this.gatherDataAndDetect(chromId, chromLength, chromFeatures, totalCoverage.getFwdCov(), 
+                        totalCoverage.getRevCov(), totalStarts.getFwdCov(), totalStarts.getRevCov(), idx);
         }
 
-        perfectCovLastFwdPos = perfectCov.getFwdCov(rightBound);
-        perfectCovLastRevPos = perfectCov.getRevCov(rightBound);
-        bmCovLastFwdPos = bestCov.getFwdCov(rightBound);
-        bmCovLastRevPos = bestCov.getRevCov(rightBound);
-        commonCovLastFwdPos = commonCov.getFwdCov(rightBound);
-        commonCovLastRevPos = commonCov.getRevCov(rightBound);
-        perfectReadStartsLastRevPos = perfectStarts.getRevCov(rightBound);
-        bmReadStartsLastRevPos = bestStarts.getRevCov(rightBound);
-        commonReadStartsLastRevPos = commonStarts.getRevCov(rightBound);
+        totalCovLastFwdPos = totalCoverage.getFwdCov(rightBound);
+        totalCovLastRevPos = totalCoverage.getRevCov(rightBound);
+        totalReadStartsLastRevPos = totalStarts.getRevCov(rightBound);
     }
     
     /**
@@ -641,7 +599,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      * @param value the value (key) which should be increased
      * @param threshold the threshold the value has to exceed, to be added to the map
      */
-    private void increaseDistribution(HashMap<Integer, Integer> map, int value, int threshold) {
+    private void increaseDistribution(Map<Integer, Integer> map, int value, int threshold) {
         if (value > threshold) {
             if (!map.containsKey(value)) {
                 map.put(value, 0);
@@ -724,7 +682,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      * @param thresholdEnlarger absolute value to be added to the new threshold
      * @return 
      */
-    private int getNewThreshold(HashMap<Integer, Integer> distribution, int thresholdEnlarger) {
+    private int getNewThreshold(Map<Integer, Integer> distribution, int thresholdEnlarger) {
         int maxValue = (int) (PersistentReference.calcWholeGenomeLength(chromosomes) * 0.0025 + thresholdEnlarger);
         maxValue /= chromosomes.values().size();
         int nbValues = 0;

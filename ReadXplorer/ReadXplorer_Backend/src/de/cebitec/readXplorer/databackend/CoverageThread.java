@@ -23,8 +23,8 @@ import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResult;
 import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
 import de.cebitec.readXplorer.databackend.dataObjects.Difference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.databackend.dataObjects.ReferenceGap;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.ReferenceGap;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readXplorer.util.classification.Classification;
@@ -179,12 +179,12 @@ public class CoverageThread extends RequestThread {
     /**
      * Loads the coverage for two tracks, which should not be combined, but
      * viewed as two data sets like in the DoubleTrackViewer. The returned
- CoverageManager will also contain the coverage difference for all
- positions, which are covered in both tracks.
+     * CoverageManager will also contain the coverage difference for all
+     * positions, which are covered in both tracks.
      * @param request the genome request for two tracks.
-     * @return CoverageManager of the interval of both tracks, also
- containing the coverage difference for all positions, which are covered
- in both tracks.
+     * @return CoverageManager of the interval of both tracks, also containing
+     * the coverage difference for all positions, which are covered in both
+     * tracks.
      * @throws SQLException
      */
     CoverageAndDiffResult loadCoverageDouble(IntervalRequest request) {
@@ -207,7 +207,7 @@ public class CoverageThread extends RequestThread {
                 Properties.NORMAL, 
                 CoverageManager.TRACK2,
                 request.getReadClassParams());
-        CoverageAndDiffResult result = this.getCoverageAndDiffsFromFile(newRequest, tracks.get(1));
+        CoverageAndDiffResult result = this.getCoverageAndDiffsFromFile(newRequest, tracks.get(0));
 
         newRequest = new IntervalRequest(
                 request.getFrom(),
@@ -220,18 +220,18 @@ public class CoverageThread extends RequestThread {
                 Properties.NORMAL, 
                 CoverageManager.TRACK1,
                 request.getReadClassParams());
-        result.addCoverageManager(this.getCoverageAndDiffsFromFile(newRequest, tracks.get(0)).getCovManager());
+        result.addCoverageManager(this.getCoverageAndDiffsFromFile(newRequest, tracks.get(1)).getCovManager());
 
         return result;
     }
 
     /**
-     * Loads the coverage for multiple tracks in one CoverageManager object.
-     * This is more efficient, than storing it in several CoverageManager
- objects, each for one track.
+     * Loads the coverage for multiple tracks in one CoverageAndDiffResult 
+     * object. This is more efficient, than storing it in several
+     * CoverageAndDiffResult objects, each for one track.
      * @param request the genome request to carry out
-     * @return the coverage of multiple track combined in one CoverageManager
- object.
+     * @return the coverage of multiple tracks combined in one 
+     * CoverageAndDiffResult object.
      */
     CoverageAndDiffResult loadCoverageMultiple(IntervalRequest request) {
         int from = request.getTotalFrom(); // calcCenterLeft(request);
@@ -242,7 +242,7 @@ public class CoverageThread extends RequestThread {
         List<ReferenceGap> gaps = new ArrayList<>();
         covManager.incArraysToIntervalSize();
 
-        //get coverage of all direct tracks
+        //get coverage of all tracks
         if (tracks.size() > 1) {
             for (PersistentTrack track : tracks) {
                 CoverageAndDiffResult intermedRes = this.getCoverageAndDiffsFromFile(request, track);
@@ -268,17 +268,15 @@ public class CoverageThread extends RequestThread {
                 IntervalRequest request = requestQueue.poll();
                 if (request != null) {
                     if (!currentCov.getCovManager().coversBounds(request.getFrom(), request.getTo())
-                            || currentCov.getRequest().getChromId() != request.getChromId()
                             || (!currentCov.getRequest().isDiffsAndGapsNeeded() && request.isDiffsAndGapsNeeded())
-                            || !this.readClassParamsFulfilled(request)) {
-//                        requestCounter++;
-                        if (doesNotMatchLatestRequestBounds(request)) {
+                            || !this.readClassParamsFulfilled(request)
+                            || doesNotMatchLatestRequestBounds(request)) {
                             if (trackID2 != 0) {
                                 currentCov = this.loadCoverageDouble(request); //at the moment we only need the complete coverage here
                             } else if (this.trackID != 0 || this.canQueryCoverage()) {
                                 currentCov = this.loadCoverageMultiple(request);
                             }
-                        } /*else {
+                        /*else {
                          skippedCounter++;
                          request.getSender().notifySkipped();
                          }*/
@@ -307,9 +305,11 @@ public class CoverageThread extends RequestThread {
 
     /**
      * Method for merging two separate persistent coverage objects.
-     * @param cov1
-     * @param cov2
-     * @return The merged coverage object
+     * @param covManager1 The previous coverage manager containing the total
+     * merged coverage of all tracks merged until now
+     * @param covManager2 The current coverage manager containing coverage to
+     * add to the total coverage manager
+     * @return The merged coverage manager
      */
     private CoverageManager mergeMultCoverages(CoverageManager covManager1, CoverageManager covManager2) {
         List<Classification> includedClasses = covManager1.getIncludedClassifications();
@@ -317,37 +317,11 @@ public class CoverageThread extends RequestThread {
             Coverage cov1 = covManager1.getCoverage(classification);
             Coverage cov2 = covManager2.getCoverage(classification);
             for (int i = cov1.getLeftBound(); i <= cov1.getRightBound(); ++i) {
-                this.mergeFwdCoverage(i, cov1, cov2);
-                this.mergeRevCoverage(i, cov1, cov2);
+                cov1.setFwdCoverage(i, cov1.getFwdCov(i) + cov2.getFwdCov(i));
+                cov1.setRevCoverage(i, cov1.getRevCov(i) + cov2.getRevCov(i));
             }
         }
         return covManager1;
-    }
-
-    /**
-     * Merges the fwd coverage values from the given index position of both
-     * given <code>Coverage</code> objects.
-     * @param i index position within the arrays
-     * @param cov1 first coverage object. This one is updated with the sum of
-     * both values.
-     * @param cov2 second coverage object
-     * @throws ArrayIndexOutOfBoundsException 
-     */
-    private void mergeFwdCoverage(int i, Coverage cov1, Coverage cov2) throws ArrayIndexOutOfBoundsException {
-        cov1.setFwdCoverage(i, cov1.getFwdCov(i) + cov2.getFwdCov(i));
-    }
-    
-    /**
-     * Merges the rev coverage values from the given index position of both
-     * given <code>Coverage</code> objects.
-     * @param i index position within the arrays
-     * @param cov1 first coverage object. This one is updated with the sum of
-     * both values.
-     * @param cov2 second coverage object
-     * @throws ArrayIndexOutOfBoundsException
-     */
-    private void mergeRevCoverage(int i, Coverage cov1, Coverage cov2) throws ArrayIndexOutOfBoundsException {
-        cov1.setRevCoverage(i, cov1.getRevCov(i) + cov2.getRevCov(i));
     }
     
     protected long getTrackId() {

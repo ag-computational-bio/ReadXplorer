@@ -23,6 +23,7 @@ import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.ReadPairType;
 import de.cebitec.readXplorer.util.classification.Classification;
 import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readXplorer.util.classification.MappingClass;
 import de.cebitec.readXplorer.view.dataVisualisation.PaintUtilities;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
@@ -164,7 +165,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
             }
         }
 
-        if (!parentViewer.getExcludedFeatureTypes().contains(FeatureType.SINGLE_MAPPING)) {
+        if (!parentViewer.getExcludedClassifications().contains(FeatureType.SINGLE_MAPPING)) {
             for (int i = 0; i < singleMappings.size(); ++i) {
                 mapping = singleMappings.get(i);
                 this.addRectAndItsColor(ColorProperties.BLOCK_UNPAIRED, mapping, false);
@@ -177,7 +178,7 @@ public class BlockComponentPair extends JComponent implements ActionListener {
      * @return true, if the given read typ is on the exclusion list
      */
     public boolean inExclusionList(ReadPairType readPairType) {
-        List<Classification> excludedFeatureTypes = this.parentViewer.getExcludedFeatureTypes();
+        List<Classification> excludedFeatureTypes = this.parentViewer.getExcludedClassifications();
         FeatureType typeOfPair;
         if (readPairType == ReadPairType.PERFECT_PAIR || 
               readPairType == ReadPairType.PERFECT_UNQ_PAIR) {
@@ -226,9 +227,10 @@ public class BlockComponentPair extends JComponent implements ActionListener {
     private Color adjustBlockColor(Color blockColor, Mapping mapping) {
         // order of addition to blockList and mappingTypeList has to be correct always!
         float hue = Color.RGBtoHSB(blockColor.getRed(), blockColor.getGreen(), blockColor.getBlue(), null)[0];
-        if (mapping.getDifferences() == 0) {
+        MappingClass mappingClass = mapping.getMappingClass();
+        if (mappingClass == MappingClass.PERFECT_MATCH || mappingClass == MappingClass.SINGLE_PERFECT_MATCH) {
             blockColor = Color.getHSBColor(hue, minSatAndBright, minSatAndBright);
-        } else if (mapping.isBestMatch()) {
+        } else if (mappingClass == MappingClass.BEST_MATCH || mappingClass == MappingClass.SINGLE_BEST_MATCH) {
             blockColor = Color.getHSBColor(hue, minSatAndBright - satAndBrightSubtrahend, minSatAndBright - satAndBrightSubtrahend);
         } else {
             blockColor = Color.getHSBColor(hue, minSatAndBright - satAndBrightSubtrahend * 2, minSatAndBright - satAndBrightSubtrahend * 2);
@@ -304,10 +306,16 @@ public class BlockComponentPair extends JComponent implements ActionListener {
 
     }
 
+    /**
+     * @return the left physical boundary (pixel) of the block.
+     */
     public int getPhyStart() {
         return phyLeft;
     }
 
+    /**
+     * @return the physical width (pixel) of the block.
+     */
     public int getPhyWidth() {
         return length;
     }

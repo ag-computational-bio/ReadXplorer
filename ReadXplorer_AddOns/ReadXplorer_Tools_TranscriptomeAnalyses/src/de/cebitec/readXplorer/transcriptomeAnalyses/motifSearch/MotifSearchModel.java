@@ -144,16 +144,16 @@ public class MotifSearchModel implements Observer {
         String posixPath = "/cygdrive/c";
         String sub = minus10Input.getAbsolutePath().toString().substring(2);
         posixPath += sub.replaceAll("\\\\", "/");
-        boolean successfullyBioProspRun = false;
+        boolean successfulyBioProspRun = false;
         try {
             // 2. executing bioprospector and parse the best scored (first listed) Hits and write 
-            successfullyBioProspRun = this.executeBioProspector(
+            successfulyBioProspRun = this.executeBioProspector(
                     posixPath, bioProspOutMinus10, params.getMinusTenMotifWidth(), params.getNoOfTimesTrying(),
                     1, 1);
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }
-        if (successfullyBioProspRun) {
+        if (successfulyBioProspRun) {
             this.progressHandlePromotorAnalysis.progress("Starting promotor analysis ...", 40);
 
             idsToMinus10Shifts = new TreeMap<>();
@@ -325,8 +325,8 @@ public class MotifSearchModel implements Observer {
         writeSeqForRbsAnalysisInFile(rbsBioProspectorInput, rbsParams);
         progressHandleRbsAnalysis.progress("processing rbs analysis ...", 60);
 
-        boolean successfullyRun = runBioProspForRbsAnalysis(parentDir, rbsBioProspectorInput, rbsParams, rbsBioProsFirstHit);
-        if (successfullyRun) {
+        boolean successfulyRun = runBioProspForRbsAnalysis(parentDir, rbsBioProspectorInput, rbsParams, rbsBioProsFirstHit);
+        if (successfulyRun) {
             Font font = new Font(Font.MONOSPACED, Font.PLAIN, 16);
             String header = "";
             int shift = 0;

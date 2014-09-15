@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 import org.apache.commons.lang3.ArrayUtils;
 import org.openide.util.Exceptions;
 import org.supercsv.cellprocessor.ParseBool;
-import org.supercsv.cellprocessor.ParseDouble;
 import org.supercsv.cellprocessor.ParseInt;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.exception.SuperCsvException;
@@ -115,7 +114,7 @@ public class CsvTableParser implements CsvParserI {
      * @param csvPreference The CsvPreference to use for parsing.
      * @return Table in form of a list, which contains the row lists of Objects.
      */
-    public List<List<?>> parseTable(File fileToRead, CsvPreference csvPreference) {
+    public List<List<?>> parseTable(File fileToRead, CsvPreference csvPreference) throws ParsingException {
         ICsvListReader listReader = null;
         List<List<?>> tableData = new ArrayList<>();
         try {
@@ -151,9 +150,15 @@ public class CsvTableParser implements CsvParserI {
                 while (listReader.read() != null) {
                     if ((length = listReader.length()) > 0) {
                         processors = generalProcessors.clone();
-                        processors = ArrayUtils.addAll(processors, new CellProcessor[length - processors.length]);
-                        rowData = listReader.executeProcessors(processors);
-                        tableData.add(rowData);
+                        int numProcessorsToAdd = length - processors.length;
+                        if (numProcessorsToAdd >= 0) {
+                            processors = ArrayUtils.addAll(processors, new CellProcessor[numProcessorsToAdd]);
+                            rowData = listReader.executeProcessors(processors);
+                            tableData.add(rowData);
+                        } else {
+                            throw new ParsingException("It seems that the wrong delimiter or table format has been chosen. "
+                                    + "The number of columns (" + length + ") in a row does not correspond to the expected number of columns (" + processors.length + ")!"); 
+                        }
                     }
                 }
 
@@ -237,9 +242,9 @@ public class CsvTableParser implements CsvParserI {
             null, // Rel. Count
             null, // Feature Name
             null, // Feature Locus
-            new ParseInt(), // Offset
-            new ParseInt(), // Dist. To Start
-            new ParseInt(), // Dist. To Stop
+            null, // Offset, may be '-' instead of integer
+            null, // Dist. To Start, may be '-' instead of integer
+            null, // Dist. To Stop, may be '-' instead of integer
             null, // Sequence
             new ParseBool(), // Leaderless
             new ParseBool(), // Putative TLS-Shift
@@ -253,10 +258,10 @@ public class CsvTableParser implements CsvParserI {
             new ParseBool(), // False Positive
             new ParseBool(), // Selected For Upstream Region Analysis
             new ParseBool(), // Finished
-            new ParseInt(), // Gene Start
-            new ParseInt(), // Gene Stop
-            new ParseInt(), // Gene Length In Bp	
-            new ParseInt(), // Frame
+            null, // Gene Start, may be '-' instead of integer
+            null, // Gene Stop, may be '-' instead of integer
+            null, // Gene Length In Bp	, may be '-' instead of integer
+            null, // Frame, may be '-' instead of integer
             null, // Gene Product
             null, // Start Codon
             null, // Stop Codon

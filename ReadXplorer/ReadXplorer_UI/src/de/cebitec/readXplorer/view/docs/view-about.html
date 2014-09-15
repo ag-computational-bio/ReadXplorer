@@ -42,7 +42,9 @@
             <li style="text-align: justify;">RAM monitor (available via right-click on the toolbar -> Performance)<br /></li>
         </ol>
         <p style="text-align: justify;">b) <span style="text-decoration: underline;">Position navigator</span>: 
-            By clicking "Jump to Pos", the entered position is centered for the currently viewed reference.justify;">
+            By clicking "Jump to Pos", the entered position is centered for the currently viewed reference. 
+            If the reference contains multiple chromosomes/contigs/other sequences, a selection box is displayed as well. 
+            The position is then chosen from the selected chromosome.justify;">
         <p style="text-align: justify;">c) <span style="text-decoration: underline;">Pattern filter</span>: Searches and 
             centers the next occurrence of the entered pattern/sequence and highlights all occurrences in the currently 
             visible interval on the sequence bar of the Reference Viewer in blue. By clicking the "Search Pattern" button 
@@ -56,7 +58,8 @@
                 legend</span>: It displays the reference features in a six frame view, with a sequence bar in the middle. 
             The legend displays the coloring of each available feature type and contains a checkbox to enable or disable 
             viewing of the respective feature type. In the example all features are shown, except the features of the 
-            type "unknown".</p>
+            type "unknown". Next to the legend, a chromosome selection box is shown, if multiple chromosomes/contigs/other sequences 
+            are contained in the current reference.</p>
         <p style="text-align: justify;">f) <span style="text-decoration: underline;">Scrollbar and zoom slider</span>: 
             They are included in each viewer. The scrollbar allows to scroll to each reference position and the zoom slider 
             allows to adjust the zoom level of the currently viewed reference interval.</p>
@@ -85,17 +88,19 @@
                 (Genbank, EMBL), a gene is the top parent feature and can contain exons, CDS and different RNAs. An exon can 
                 again contain CDS or RNA annotations.</p>
             <p style="text-align: justify;">j) <span style="text-decoration: underline;">Track Viewer and its Legend</span>: 
-                Displays the coloring of the three mapping classes used by ReadXplorer. The green area (perfect) depicts reads 
-                that perfectly map to the reference sequence, the yellow area (best match) depicts reads that map to the 
-                respective location of the reference with the least possible number of mismatches in the whole reference. But 
-                there can be more than one mapping for one read on the reference with e.g. 2 mismatches. In this case both are 
-                shown in yellow. A red area (common) depicts reads that still match to the red colored region of the reference 
-                with less than the maximum allowed mismatches during the mapping process, but there is another position in the 
-                reference, where they fit with less mismatches. The three mapping classes are proper subsets of each other. For 
-                further details see <i><a href="nbdocs://de.cebitec.readXplorer.view/de/cebitec/readXplorer/view/docs/classification-about.html">Read Classification</a></i>. The options menu of the Track Viewer is described in 
-                <em>m)</em>.<br /></p>
+                Displays the coloring of the five mapping classes used by ReadXplorer. The green area ((Single) Perfect) depicts 
+                reads that perfectly map to the reference sequence with either exactly one (Single Perfect Match, green) or multiple 
+                perfect mappings (Perfect Match, light green), the yellow area ((Single) Best Match) depicts reads that map to the 
+                respective location of the reference with the least possible number of mismatches in the whole reference. If exactly 
+                one Best Match mapping exists for the read, it is a Single Best Match (dark yellow), but there can be more than one 
+                mapping for one read on the reference with e.g. 2 mismatches. In this case both belong to the Best Match class (bright yellow). 
+                A red area (Common Match) depicts reads that still match to the red colored region of the reference with less than the 
+                maximum allowed mismatches during the mapping process, but there is another position in the reference, where they fit 
+                with less mismatches. For further details see 
+                <i><a href="nbdocs://de.cebitec.readXplorer.view/de/cebitec/readXplorer/view/docs/classification-about.html">Read Classification</a></i>. 
+                The options menu of the Track Viewer is described in <em>m)</em>.<br /></p>
             <p style="text-align: justify;">k) <span style="text-decoration: underline;">Track Viewer tooltip</span>: The 
-                tooltip shows the coverage of the hovered reference position for all three supported mapping classes separated 
+                tooltip shows the coverage of the hovered reference position for all five supported mapping classes separated 
                 by strand.</p>
             <p style="text-align: justify;">l) <span style="text-decoration: underline;">Track Statistics Window</span>: 
                 Displays the global data set statistics of the currently selected track. </p>
@@ -104,16 +109,24 @@
                     mapped to this reference.</li>
                 <li style="text-align: justify;">Unique mappings: The total number of mappings among the number of "Mappings", 
                     which where only mapped once to the reference.</li>
-                <li style="text-align: justify;">Best match mappings: The total number of mappings belonging to the best match 
+                <li style="text-align: justify;">Single Perfect mappings: The total number of mappings belonging to the Single 
+                    Perfect Match class in the whole track data set.</li>
+                <li style="text-align: justify;">Perfect mappings: The total number of mappings belonging to the Perfect Match 
                     class in the whole track data set.</li>
-                <li style="text-align: justify;">Perfect mappings: The total number of mappings belonging to the perfect match 
-                    class in the whole track data set.</li>
-                <li style="text-align: justify;">Perfect coverage: The percentage of the reference sequence, covered with at 
-                    least one mapping of the perfect match mapping class.</li>
-                <li style="text-align: justify;">Best match coverage: The percentage of the reference sequence, covered with 
-                    at least one mapping of the best match mapping class.</li>
-                <li style="text-align: justify;">Common coverage: The percentage of the reference sequence, covered with at 
-                    least one mapping of the common match mapping class.<br /></li>
+                <li style="text-align: justify;">Single Best Match mappings: The total number of mappings belonging to the Single 
+                    Best Match class in the whole track data set.</li>
+                <li style="text-align: justify;">Best Match mappings: The total number of mappings belonging to the best match class 
+                    in the whole track data set.</li>
+                <li style="text-align: justify;">Single Perfect Match coverage: The percentage of the reference sequence, covered by 
+                    at least one mapping of the Single Perfect Match mapping class.</li>
+                <li style="text-align: justify;">Perfect Match coverage: The percentage of the reference sequence, covered by at 
+                    least one mapping of the Perfect Match mapping class.</li>
+                <li style="text-align: justify;">Single Best Match coverage: The percentage of the reference sequence, covered by 
+                    at least one mapping of the Single Best Match mapping class.</li>
+                <li style="text-align: justify;">Best Match coverage: The percentage of the reference sequence, covered by at least 
+                    one mapping of the Best Match mapping class.</li>
+                <li style="text-align: justify;">Common Match coverage: The percentage of the reference sequence, covered by at least one mapping 
+                    of the Common Match mapping class.<br /></li>
             </ol>
             <p style="text-align: justify;">If the currently viewed track is a read pair (paired-end or mate pair) data set, 
                 the read pair statistic is displayed:</p>

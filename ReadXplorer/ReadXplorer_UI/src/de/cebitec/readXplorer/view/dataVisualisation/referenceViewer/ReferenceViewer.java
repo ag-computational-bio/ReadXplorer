@@ -73,8 +73,8 @@ public class ReferenceViewer extends AbstractViewer {
         this.features = new ArrayList<>();
         this.refGenConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenome.getId());
         this.featureStats = new EnumMap<>(FeatureType.class);
-        this.getExcludedFeatureTypes().add(FeatureType.UNDEFINED);
-        this.getExcludedFeatureTypes().add(FeatureType.SOURCE);
+        this.getExcludedClassifications().add(FeatureType.UNDEFINED);
+        this.getExcludedClassifications().add(FeatureType.SOURCE);
         this.showSequenceBar(true, true);
         this.labelMargin = 3;
         this.setViewerSize();
@@ -118,7 +118,7 @@ public class ReferenceViewer extends AbstractViewer {
         this.refGenConnector = null;
         this.featureStats.clear();
         this.features.clear();
-        this.getExcludedFeatureTypes().clear();
+        this.getExcludedClassifications().clear();
     }
 
     @Override
@@ -195,7 +195,7 @@ public class ReferenceViewer extends AbstractViewer {
         int yCoord = this.determineYFromFrame(frame);
         PaintingAreaInfo bounds = getPaintingAreaInfo();
         
-        if (!this.getExcludedFeatureTypes().contains(feature.getType())) {
+        if (!this.getExcludedClassifications().contains(feature.getType())) {
             byte border = JFeature.BORDER_NONE;
             // get left boundary of the feature
             double phyStart = this.getPhysBoundariesForLogPos(feature.getStart()).getLeftPhysBound();

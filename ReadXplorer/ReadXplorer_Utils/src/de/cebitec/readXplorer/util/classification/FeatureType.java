@@ -68,12 +68,6 @@ public enum FeatureType implements Classification {
     /** feature type for multiple mapped reads (non-unique) */
     MULTIPLE_MAPPED_READ(FeatureType.MULTIPLE_MAPPED_READ_INT, FeatureType.MULTIPLE_MAPPED_READ_STRING),
     
-    //feature types for the double track viewer
-    /** Type for the double track complete coverage. */
-    COMPLETE_COVERAGE(FeatureType.COMPLETE_COVERAGE_INT, FeatureType.COMPLETE_COVERAGE_STRING),
-    TRACK1_COVERAGE(FeatureType.TRACK1_COVERAGE_INT, FeatureType.TRACK1_COVERAGE_STRING),
-    TRACK2_COVERAGE(FeatureType.TRACK2_COVERAGE_INT, FeatureType.TRACK2_COVERAGE_STRING),
-    
     //feature types for the histogram viewer
     BASE_A(FeatureType.BASE_A_INT, FeatureType.BASE_A_STRING),
     BASE_C(FeatureType.BASE_C_INT, FeatureType.BASE_C_STRING),

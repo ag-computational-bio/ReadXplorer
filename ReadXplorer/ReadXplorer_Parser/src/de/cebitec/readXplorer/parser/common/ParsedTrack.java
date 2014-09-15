@@ -21,6 +21,7 @@ import de.cebitec.readXplorer.util.StatsContainer;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Contains all data (description, mappings and coverageContainer) belonging
@@ -31,9 +32,8 @@ import java.util.HashMap;
 public class ParsedTrack {
 
     private TrackJob trackJob;
-    private HashMap<String, Integer> readNameToSeqIDMap1;
-    private HashMap<String, Integer> readNameToSeqIDMap2;
-    private CoverageContainer coverageContainer;
+    private Map<String, Integer> readNameToSeqIDMap1;
+    private Map<String, Integer> readNameToSeqIDMap2;
     private boolean isFirstTrack;
     private int batchPos; /** Stop position of the current batch in the ref. genome. */
     private StatsContainer statsContainer;
@@ -42,20 +42,11 @@ public class ParsedTrack {
      * Contains all data (description, mappings and coverageContainer) belonging
      * to a track, which can be stored into a database now.
      * @param trackJob the track job for which the track is created
-     * @param coverageContainer coverage container of the track
      */
-    public ParsedTrack(TrackJob trackJob, CoverageContainer coverageContainer){
+    public ParsedTrack(TrackJob trackJob){
         this.trackJob = trackJob;
         this.readNameToSeqIDMap1 = new HashMap<>();
         this.readNameToSeqIDMap2 = new HashMap<>();
-        this.coverageContainer = coverageContainer;
-    }
-
-    /**
-     * @return the coverage container of this track with all coverage information
-     */
-    public CoverageContainer getCoverageContainer(){
-        return this.coverageContainer;
     }
 
     /**
@@ -108,21 +99,7 @@ public class ParsedTrack {
     public void setIsFirstTrack(boolean isFirstTrack) {
         this.isFirstTrack = isFirstTrack;
     }
-    
-    /**
-     * @return the readname to sequence id map for read 1 of the pair
-     */
-    public HashMap<String, Integer> getReadnameToSeqIdMap1(){
-        return this.readNameToSeqIDMap1;
-    }
 
-    /**
-     * @return the readname to sequence id map for read 2 of the pair
-     */
-    public HashMap<String, Integer> getReadnameToSeqIdMap2() {
-        return this.readNameToSeqIDMap2;
-    }
-    
     /**
      * Needed additional information from sequence pair parsers.
      * @param seqToIdMap mapping of readname to sequence id for read 1 of the pair
@@ -145,7 +122,6 @@ public class ParsedTrack {
      */
     public void clear(){
         this.readNameToSeqIDMap1.clear();
-        this.coverageContainer.clearCoverageContainer();
     }
 
     /**

@@ -403,7 +403,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         wiz.setTitleFormat(new MessageFormat("{0}"));
         wiz.setTitle("Visualizations");
 
-        //action to perform after successfully finishing the wizard
+        //action to perform after successfuly finishing the wizard
         if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
             final List<TranscriptionStart> currentTss = updateTssResults();
             vizualizationListener = new VisualizationListener(this.persistantRef, wiz, currentTss, tssResult);
@@ -455,7 +455,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         wiz.setTitleFormat(new MessageFormat("{0}"));
         wiz.setTitle(NbBundle.getMessage(ResultPanelTranscriptionStart.class, "TTL_MotifSearchWizardTitle"));
 
-        //action to perform after successfully finishing the wizard
+        //action to perform after successfuly finishing the wizard
         boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
         if (!cancelled) {
 
@@ -572,7 +572,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         wiz.setTitleFormat(new MessageFormat("{0}"));
         wiz.setTitle(NbBundle.getMessage(ResultPanelTranscriptionStart.class, "TTL_MotifSearchWizardTitle"));
 
-        //action to perform after successfully finishing the wizard
+        //action to perform after successfuly finishing the wizard
         boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
         if (!cancelled) {
 
@@ -680,8 +680,8 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                     progresshandle.progress(3);
                     progresshandle.progress(5);
 
-                    JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successfull!",
-                            "Export was successfull!", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successful!",
+                            "Export was successful!", JOptionPane.INFORMATION_MESSAGE);
                     progresshandle.finish();
                 }
 
@@ -864,8 +864,8 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                 progresshandle.progress(2);
                 writeReferenceFile(fileLocation, referenceEntries);
                 progresshandle.progress(3);
-                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successfull!",
-                        "Export was successfull!", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successful!",
+                        "Export was successful!", JOptionPane.INFORMATION_MESSAGE);
                 progresshandle.finish();
             }
 

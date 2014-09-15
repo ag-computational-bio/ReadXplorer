@@ -78,8 +78,7 @@ public abstract class RequestThread extends Thread {
     public boolean readClassParamsFulfilled(IntervalRequest request) {
         List<Classification> lastExcludedClasses = lastRequest.getReadClassParams().getExcludedClasses();
         List<Classification> excludedClasses = new ArrayList<>(request.getReadClassParams().getExcludedClasses());
-        excludedClasses.removeAll(lastExcludedClasses);
-        return excludedClasses.isEmpty();
+        return excludedClasses.containsAll(lastExcludedClasses) && lastExcludedClasses.containsAll(excludedClasses);
     }
 
     /**

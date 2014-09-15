@@ -19,7 +19,6 @@ package de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer;
 import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
 import de.cebitec.readXplorer.util.classification.Classification;
 import de.cebitec.readXplorer.view.dataVisualisation.GenomeGapManager;
-import de.cebitec.readXplorer.view.dataVisualisation.PaintUtilities;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -74,7 +73,7 @@ public class Layout implements LayoutI {
         Iterator<Mapping> it = mappings.iterator();
         while (it.hasNext()) {
             Mapping mapping = it.next();
-            if (!PaintUtilities.inExclusionList(mapping, exclusionList)) {
+            if (!exclusionList.contains(mapping.getMappingClass())) {
                 gapManager.addGapsFromMapping(mapping.getGenomeGaps());
             }
         }
@@ -105,26 +104,26 @@ public class Layout implements LayoutI {
         Iterator<Mapping> mappingIt = mappings.iterator();
         while (mappingIt.hasNext()) {
             Mapping mapping = mappingIt.next();
-            if (!PaintUtilities.inExclusionList(mapping, exclusionList)) {
+            if (!exclusionList.contains(mapping.getMappingClass())) {
 
                 int start = mapping.getStart();
                 int stop = mapping.getStop();
-                
-                if (mapping.getTrimmedFromLeft()>0) {
+
+                if (mapping.getTrimmedFromLeft() > 0) {
                     if (mapping.isFwdStrand()) {
                         start -= mapping.getTrimmedFromLeft();
                     } else {
                         stop += mapping.getTrimmedFromLeft();
                     }
                 }
-                if (mapping.getTrimmedFromRight()>0) {
+                if (mapping.getTrimmedFromRight() > 0) {
                     if (mapping.isFwdStrand()) {
                         stop += mapping.getTrimmedFromRight();
                     } else {
                         start -= mapping.getTrimmedFromRight();
                     }
                 }
-                
+
                 if (start < this.absStart) {
                     start = this.absStart;
                 }

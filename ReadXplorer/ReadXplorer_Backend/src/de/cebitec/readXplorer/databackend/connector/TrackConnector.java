@@ -214,33 +214,9 @@ public class TrackConnector {
             fetch.setInt(1, wantedTrackId);
             ResultSet rs = fetch.executeQuery();
             while (rs.next()) {
-                statsContainer.increaseValue(StatsContainer.NO_BESTMATCH_MAPPINGS, rs.getInt(FieldNames.STATISTICS_NUMBER_OF_BM_MAPPINGS));
-                statsContainer.increaseValue(StatsContainer.NO_COMMON_MAPPINGS, rs.getInt(FieldNames.STATISTICS_NUMBER_OF_MAPPINGS));
-                statsContainer.increaseValue(StatsContainer.NO_LARGE_DIST_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_LARGE_DIST_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_LARGE_ORIENT_WRONG_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_LARGE_ORIENT_WRONG_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_ORIENT_WRONG_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_ORIENT_WRONG_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_PERFECT_MAPPINGS, rs.getInt(FieldNames.STATISTICS_NUMBER_OF_PERFECT_MAPPINGS));
-                statsContainer.increaseValue(StatsContainer.NO_PERF_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_PERFECT_SEQUENCE_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_READS, rs.getInt(FieldNames.STATISTICS_NUMBER_READS));
-                statsContainer.increaseValue(StatsContainer.NO_REPEATED_SEQ, rs.getInt(FieldNames.STATISTICS_NUMBER_OF_REPEATED_SEQ));
-                statsContainer.increaseValue(StatsContainer.NO_SEQ_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_SEQUENCE_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_SINGLE_MAPPIGNS, rs.getInt(FieldNames.STATISTICS_NUM_SINGLE_MAPPINGS));
-                statsContainer.increaseValue(StatsContainer.NO_SMALL_DIST_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_SMALL_DIST_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_SMALL_ORIENT_WRONG_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_SMALL_ORIENT_WRONG_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_UNIQUE_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_UNIQUE_SEQUENCE_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_UNIQUE_SEQS, rs.getInt(FieldNames.STATISTICS_NUMBER_OF_UNIQUE_SEQ));
-                statsContainer.increaseValue(StatsContainer.NO_UNIQ_LARGE_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_UNIQ_LARGE_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_UNIQ_MAPPINGS, rs.getInt(FieldNames.STATISTICS_NUMBER_UNIQUE_MAPPINGS));
-                statsContainer.increaseValue(StatsContainer.NO_UNIQ_ORIENT_WRONG_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_UNIQ_ORIENT_WRNG_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_UNIQ_PERF_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_UNIQUE_PERFECT_SEQUENCE_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_UNIQ_SMALL_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_UNIQ_SMALL_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_UNIQ_WRNG_ORIENT_LARGE_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_UNIQ_LARGE_ORIENT_WRNG_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_UNIQ_WRNG_ORIENT_SMALL_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_UNIQ_SMALL_ORIENT_WRNG_PAIRS));
-                statsContainer.increaseValue(StatsContainer.AVERAGE_READ_LENGTH, rs.getInt(FieldNames.STATISTICS_AVERAGE_READ_LENGTH));
-                statsContainer.increaseValue(StatsContainer.AVERAGE_READ_PAIR_SIZE, rs.getInt(FieldNames.STATISTICS_AVERAGE_SEQ_PAIR_LENGTH));
-                statsContainer.increaseValue(StatsContainer.COVERAGE_BM_GENOME, rs.getInt(FieldNames.STATISTICS_BM_COVERAGE_OF_GENOME));
-                statsContainer.increaseValue(StatsContainer.COVERAGE_COMPLETE_GENOME, rs.getInt(FieldNames.STATISTICS_COMPLETE_COVERAGE_OF_GENOME));
-                statsContainer.increaseValue(StatsContainer.COVERAGE_PERFECT_GENOME, rs.getInt(FieldNames.STATISTICS_PERFECT_COVERAGE_OF_GENOME));
+                String statsKey = rs.getString(FieldNames.STATISTICS_KEY);
+                int statsValue = rs.getInt(FieldNames.STATISTICS_VALUE);
+                statsContainer.increaseValue(statsKey, statsValue);
             }
             rs.close();
 
@@ -250,15 +226,23 @@ public class TrackConnector {
         return statsContainer;
     }
     
+    /**
+     * @return The unique database id of the track.
+     */
     public int getTrackID() {
         return trackID;
     }    
     
-
+    /**
+     * @return The description of the first track stored in this connector.
+     */
     public String getAssociatedTrackName() {
         return associatedTracks.get(0).getDescription();
     }
 
+    /**
+     * @return The list of descriptions of all tracks stored in this connector.
+     */
     public List<String> getAssociatedTrackNames() {
         List<String> trackNames = new ArrayList<>();
         for (PersistentTrack track : this.associatedTracks) {
@@ -267,6 +251,10 @@ public class TrackConnector {
         return trackNames;
     }
 
+    /**
+     * @return The list of unique database ids assigned to the tracks stored in 
+     * this connector.
+     */
     public List<Integer> getTrackIds() {
         List<Integer> trackIds = new ArrayList<>();
         for (PersistentTrack track : this.associatedTracks) {
@@ -316,7 +304,7 @@ public class TrackConnector {
     }
 
     /**
-     * @return True, if this is a sequence pair track, false otherwise.
+     * @return True, if this is a read pair track, false otherwise.
      */
     public boolean isReadPairTrack() {
         return this.getReadPairToTrackID() != 0;

@@ -16,7 +16,6 @@
  */
 package de.cebitec.readXplorer.databackend.dataObjects;
 
-import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.classification.Classification;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.classification.MappingClass;
@@ -25,8 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.prefs.Preferences;
-import org.openide.util.NbPreferences;
 
 /**
  * Container for all different coverage types for a given interval. If you want
@@ -47,8 +44,6 @@ public class CoverageManager implements Serializable {
     private boolean twoTracks = false;
     
     private Map<Classification, Coverage> coverageMap;
-    private final Preferences pref = NbPreferences.forModule(Object.class);
-    private boolean useExtendedClassification = pref.getBoolean(Properties.VIEWER_CLASSIFICATION, false); //TODO: change this for future version
     
     private int highestCoverage;
     
@@ -143,22 +138,21 @@ public class CoverageManager implements Serializable {
     }
     
     /**
-     * Increases the coverage of the coverage arrays in the given list by one.
+     * Increases the coverage of the respective positions of the given coverage 
+     * array by one.
      * In these arrays 0 is included.
-     * @param refStart the start pos of the current read, inclusive
-     * @param refStop the stop pos of the current read, inclusive
-     * @param coverageArrays the coverage arrays whose positions should be
-     * updated
+     * @param refStart the start pos of the current mapping, inclusive
+     * @param refStop the stop pos of the current mapping, inclusive
+     * @param coverageArray the coverage array whose coverage should be
+     * updated for the given interval
      */
-    public void increaseCoverage(int refStart, int refStop, List<int[]> coverageArrays) {
+    public void increaseCoverage(int refStart, int refStop, int[] coverageArray) {
         int indexStart = this.getInternalPos(refStart);
         int indexStop = this.getInternalPos(refStop);
         for (int i = indexStart; i <= indexStop; i++) {
             int currentRefPos = refStart + i - indexStart;
             if (this.coversBounds(currentRefPos, currentRefPos)) {
-                for (int[] covArray : coverageArrays) {
-                    ++covArray[i];
-                }
+                ++coverageArray[i];
             }
         }
     }
@@ -232,112 +226,76 @@ public class CoverageManager implements Serializable {
     }
     
     /**
-     * Calculates the total summed coverage value of all allowed classifications
-     * for the given strand, coverage type and position.
+     * Calculates the total summed coverage value for a SINGLE POSITION of all 
+     * allowed classifications for the given strand and coverage type.
      * @param excludedClasses The list of excluded read mapping classes
-     * @param isFwdStrand true, if the coverage from the fwd strand is needed,
-     * false otherwise
-     * @param pos the reference position for which the coverage should be obtained
-     * @return the total coverage value for the given strand, coverage type and position.
+     * @param pos the reference position for which the coverage should be
+     * obtained
+     * @param isFwdStrand <code>true</code>, if the coverage from the fwd strand
+     * is needed, <code>false</code> otherwise
+     * @return The total summed coverage value for the given SINGLE POSITION.
      */
     public int getTotalCoverage(List<Classification> excludedClasses, int pos, boolean isFwdStrand) {
         int value = 0;
 
-        // Calculate the correct coverage composed of the different mapping classes and depending on the currently excluded classes
-        if (!excludedClasses.contains(MappingClass.COMMON_MATCH)) {
-            value = this.updateCovValue(MappingClass.COMMON_MATCH, isFwdStrand, pos);
-            return value; //no other data can be added to common match
-
-        } else if (!excludedClasses.contains(MappingClass.SINGLE_COMMON_MATCH)) {
-            value = this.updateCovValue(MappingClass.SINGLE_COMMON_MATCH, isFwdStrand, pos);
-        }
-
-        if (!excludedClasses.contains(MappingClass.BEST_MATCH)) {
-            value += this.updateCovValue(MappingClass.BEST_MATCH, isFwdStrand, pos);
-            return value; //no other data can be added to best match, if common match is not included, we have to add single common match (if included) nonetheless
-
-        } else if (!excludedClasses.contains(MappingClass.SINGLE_BEST_MATCH)) {
-            value += this.updateCovValue(MappingClass.SINGLE_BEST_MATCH, isFwdStrand, pos);
-        }
-
-        if (!excludedClasses.contains(MappingClass.PERFECT_MATCH)) {
-            value += this.updateCovValue(MappingClass.PERFECT_MATCH, isFwdStrand, pos);
-            if (this.useExtendedClassification && !excludedClasses.contains(MappingClass.SINGLE_BEST_MATCH)) {
-                value -= this.updateCovValue(MappingClass.SINGLE_PERFECT_MATCH, isFwdStrand, pos);
+        for (MappingClass mappingClass : MappingClass.values()) {
+            if (!excludedClasses.contains(mappingClass)) {
+                value += this.getCoverage(mappingClass).getCoverage(pos, isFwdStrand);
             }
-            return value; //no other data can be added to perfect match, since single perfect match is a subset of perfect match
-
-        } else if (!excludedClasses.contains(MappingClass.SINGLE_PERFECT_MATCH) && excludedClasses.contains(MappingClass.SINGLE_BEST_MATCH)) { //only add, 
-            value += this.updateCovValue(MappingClass.SINGLE_PERFECT_MATCH, isFwdStrand, pos);  //single best match is not included (sp is subset)
-        }
-
-        return value;
-    }
-
-    private int updateCovValue(Classification mappingClass, boolean isFwdStrand, int pos) {
-        Coverage coverage = this.getCoverage(mappingClass);
-        int value = 0;
-        if (isFwdStrand) {
-            value = coverage.getFwdCov(pos);
-        } else {
-            value = coverage.getRevCov(pos);
         }
         return value;
     }
     
+    /**
+     * Calculates the total coverage of the WHOLE INTERVAL composed of the
+     * different mapping classes and depending on the currently excluded
+     * classes. <br>
+     * As long as the data query by which this manager was created
+     * contained the excludedClasses list, this method can also be used with an
+     * empty list. Passing an empty list when some classifications were excluded
+     * originally decreases the performance of the method, because it sums all
+     * coverage arrays for all classifications, even if the array only contains
+     * 0 entries.
+     * @param excludedClasses The list of mapping classes currently excluded
+     * from the calculation
+     * @return The total coverage of the WHOLE INTERVAL.
+     */
+    public Coverage getTotalCoverage(List<Classification> excludedClasses) {
+        if (this.totalCoverage == null) {
+            this.totalCoverage = new Coverage(leftBound, rightBound, FeatureType.ANY);
+            this.totalCoverage.incArraysToIntervalSize();
+
+            for (MappingClass mappingClass : MappingClass.values()) {
+                if (!excludedClasses.contains(mappingClass)) {
+                    this.updateTotalCoverage(mappingClass);
+                }
+            }
+        }
+        return this.totalCoverage;
+    }
+    
+    /**
+     * Adds the coverage of each position in the coverage array of the given
+     * mapping class to the totalCoverage object.
+     * @param mappingClass The mappings class whose data shall be added
+     */
+    private void updateTotalCoverage(MappingClass mappingClass) {
+        Coverage coverage = this.getCoverage(mappingClass);
+        int[] fwdCov = coverage.getFwdCov();
+        int[] revCov = coverage.getRevCov();
+        int[] fwdTotal = this.totalCoverage.getFwdCov();
+        int[] revTotal = this.totalCoverage.getRevCov();
+        for (int i = 0; i < fwdCov.length; ++i) {
+            fwdTotal[i] += fwdCov[i];
+            revTotal[i] += revCov[i];
+        }
+    }
+
     /**
      * @return The list of classifications for which the coverage is maintained
      * by this coverage manager.
      */
     public List<Classification> getIncludedClassifications() {
         return new ArrayList<>(this.coverageMap.keySet());
-    }
-    
-    public Coverage getTotalCoverage() {
-        if (this.totalCoverage == null) {
-            this.totalCoverage = new Coverage(leftBound, rightBound, FeatureType.ANY);
-            this.totalCoverage.incArraysToIntervalSize();
-        }
-        //TODO: finish getTotalCoverage Methods
-//        // Calculate the correct coverage composed of the different mapping classes and depending on the currently excluded classes
-//        if (!excludedClasses.contains(MappingClass.COMMON_MATCH)) {
-//            this.totalCoverage = this.getCoverage(MappingClass.COMMON_MATCH);
-//            //no other data can be added to common match
-//
-//        } else if (!excludedClasses.contains(MappingClass.SINGLE_COMMON_MATCH)) {
-//            this.totalCoverage = this.getCoverage(MappingClass.SINGLE_COMMON_MATCH);
-//        }
-//
-//        if (!excludedClasses.contains(MappingClass.BEST_MATCH)) {
-//            this.updateTotalCoverage(MappingClass.BEST_MATCH);
-//            //no other data can be added to best match, if common match is not included, we have to add single common match (if included) nonetheless
-//
-//        } else if (!excludedClasses.contains(MappingClass.SINGLE_BEST_MATCH)) {
-//            this.updateTotalCoverage(MappingClass.SINGLE_BEST_MATCH);
-//        }
-//
-//        if (!excludedClasses.contains(MappingClass.PERFECT_MATCH)) {
-//            this.updateTotalCoverage(MappingClass.PERFECT_MATCH);
-//            if (this.useExtendedClassification && !excludedClasses.contains(MappingClass.SINGLE_BEST_MATCH)) {
-//                value -= this.updateCovValue(MappingClass.SINGLE_PERFECT_MATCH, isFwdStrand, pos);
-//            }
-//            return value; //no other data can be added to perfect match, since single perfect match is a subset of perfect match
-//
-//        } else if (!excludedClasses.contains(MappingClass.SINGLE_PERFECT_MATCH) && excludedClasses.contains(MappingClass.SINGLE_BEST_MATCH)) { //only add, 
-//            this.updateTotalCoverage(MappingClass.SINGLE_PERFECT_MATCH);  //single best match is not included (sp is subset)
-//        }
-        return this.totalCoverage;
-    }
-    
-    private void updateTotalCoverage(MappingClass mappingClass) {
-        Coverage coverage = this.getCoverage(mappingClass);
-        int[] fwdCov = coverage.getFwdCov();
-        int[] revCov = coverage.getRevCov();
-        for (int i = 0; i < fwdCov.length; ++i) {
-            fwdCov[i] += this.totalCoverage.getFwdCov(i);
-            revCov[i] += this.totalCoverage.getRevCov(i);
-        }
-        totalCoverage.setFwdCoverage(fwdCov);
-        totalCoverage.setRevCoverage(revCov);
     }
 }

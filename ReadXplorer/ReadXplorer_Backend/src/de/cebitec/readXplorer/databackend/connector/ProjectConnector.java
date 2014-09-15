@@ -25,7 +25,6 @@ import de.cebitec.readXplorer.databackend.SQLStatements;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
-import de.cebitec.readXplorer.parser.common.CoverageContainer;
 import de.cebitec.readXplorer.parser.common.ParsedChromosome;
 import de.cebitec.readXplorer.parser.common.ParsedFeature;
 import de.cebitec.readXplorer.parser.common.ParsedReference;
@@ -34,6 +33,7 @@ import de.cebitec.readXplorer.util.DiscreteCountingDistribution;
 import de.cebitec.readXplorer.util.FastaUtils;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.StatsContainer;
+import de.cebitec.readXplorer.util.classification.MappingClass;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -57,7 +57,7 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.h2.jdbc.JdbcSQLException;
-import org.openide.util.Exceptions;
+import org.openide.util.NbBundle;
 
 /**
  * Responsible for the connection between user interface and data base.
@@ -68,7 +68,7 @@ import org.openide.util.Exceptions;
 public class ProjectConnector extends Observable {
 
     private static ProjectConnector dbConnector;
-    private static final int DB_VERSION_NO = 2;
+    private static final int DB_VERSION_NO = 3;
     private Connection con;
     private String url;
     private String user;
@@ -85,19 +85,6 @@ public class ProjectConnector extends Observable {
     private static final String VARCHAR400 = "VARCHAR(400)";
     private static final String VARCHAR1000 = "VARCHAR(1000)";
     
-    private int numReads = 0;
-    private int noUniqueSeq = 0;
-    private int noRepeatedSeq = 0;
-    private int noUniqueMappings = 0;
-    private int noUniqueBMMappings = 0;
-    private int noUniquePerfectMappings = 0;
-    private int numMappings = 0;
-    private int numPerfectMappings = 0;
-    private int numBmMappings = 0;
-    private int averageReadLengthPart = 0;
-    private int containerCount = 0;
-    private DiscreteCountingDistribution readLengthDistribution;
-    private DiscreteCountingDistribution readPairLengthDistribution;
     private String dbLocation;
     
     /**
@@ -316,78 +303,11 @@ public class ProjectConnector extends Observable {
         
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Checking DB structure...");
 
-        //remove statics table (replaced by STATISTICS table)
+        //remove all old tables not used anymore
         this.runSqlStatement(SQLStatements.DROP_TABLE + "STATICS");
         this.runSqlStatement(SQLStatements.DROP_TABLE + "SUBFEATURES");
         this.runSqlStatement(SQLStatements.DROP_TABLE + "COVERAGE_DISTRIBUTION");
         this.runSqlStatement(SQLStatements.DROP_TABLE + "POSITIONS");
-
-        //stats table
-        this.runSqlStatement(GenericSQLQueries.genAddColumnString(FieldNames.TABLE_STATISTICS, 
-                    FieldNames.STATISTICS_NUMBER_OF_REPEATED_SEQ, BIGINT_UNSIGNED));
-        
-        this.runSqlStatement(GenericSQLQueries.genAddColumnString(
-                FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_NUMBER_UNIQUE_BM_MAPPINGS, BIGINT_UNSIGNED));
-        
-        this.runSqlStatement(GenericSQLQueries.genAddColumnString(
-                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_NUMBER_UNIQUE_PERFECT_MAPPINGS, BIGINT_UNSIGNED));
-        
-        this.runSqlStatement(GenericSQLQueries.genAddColumnString(
-                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_NUMBER_OF_UNIQUE_SEQ, BIGINT_UNSIGNED));
-
-        this.runSqlStatement(GenericSQLQueries.genAddColumnString(
-                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_NUMBER_READS, BIGINT_UNSIGNED));
-
-        this.runSqlStatement(GenericSQLQueries.genAddColumnString(
-                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_NUM_SEQUENCE_PAIRS, BIGINT_UNSIGNED));
-        
-        this.runSqlStatement(GenericSQLQueries.genAddColumnString(
-                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_NUM_UNIQUE_SEQUENCE_PAIRS, BIGINT_UNSIGNED));
-
-        this.runSqlStatement(GenericSQLQueries.genAddColumnString(
-                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_NUM_PERFECT_SEQUENCE_PAIRS, BIGINT_UNSIGNED));
-
-        this.runSqlStatement(GenericSQLQueries.genAddColumnString(
-                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_NUM_UNIQUE_PERFECT_SEQUENCE_PAIRS, BIGINT_UNSIGNED));
-
-        this.runSqlStatement(GenericSQLQueries.genAddColumnString(
-                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_NUM_SINGLE_MAPPINGS, BIGINT_UNSIGNED));
-        
-        this.runSqlStatement(GenericSQLQueries.genAddColumnString(FieldNames.TABLE_STATISTICS, 
-                    FieldNames.STATISTICS_NUM_SMALL_DIST_PAIRS, BIGINT_UNSIGNED));
-        
-        this.runSqlStatement(GenericSQLQueries.genAddColumnString(FieldNames.TABLE_STATISTICS,
-                    FieldNames.STATISTICS_NUM_UNIQ_SMALL_PAIRS, BIGINT_UNSIGNED));
-        
-        this.runSqlStatement(GenericSQLQueries.genAddColumnString(FieldNames.TABLE_STATISTICS, 
-                    FieldNames.STATISTICS_NUM_SMALL_ORIENT_WRONG_PAIRS, BIGINT_UNSIGNED));
-        
-        this.runSqlStatement(GenericSQLQueries.genAddColumnString(FieldNames.TABLE_STATISTICS, 
-                    FieldNames.STATISTICS_NUM_UNIQ_SMALL_ORIENT_WRNG_PAIRS, BIGINT_UNSIGNED));
-        
-        this.runSqlStatement(GenericSQLQueries.genAddColumnString(FieldNames.TABLE_STATISTICS, 
-                    FieldNames.STATISTICS_NUM_ORIENT_WRONG_PAIRS, BIGINT_UNSIGNED));
-        
-        this.runSqlStatement(GenericSQLQueries.genAddColumnString(FieldNames.TABLE_STATISTICS, 
-                    FieldNames.STATISTICS_NUM_UNIQ_ORIENT_WRNG_PAIRS, BIGINT_UNSIGNED));
-        
-        this.runSqlStatement(GenericSQLQueries.genAddColumnString(FieldNames.TABLE_STATISTICS, 
-                    FieldNames.STATISTICS_NUM_LARGE_DIST_PAIRS, BIGINT_UNSIGNED));
-        
-        this.runSqlStatement(GenericSQLQueries.genAddColumnString(FieldNames.TABLE_STATISTICS, 
-                    FieldNames.STATISTICS_NUM_UNIQ_LARGE_PAIRS, BIGINT_UNSIGNED));
-        
-        this.runSqlStatement(GenericSQLQueries.genAddColumnString(FieldNames.TABLE_STATISTICS, 
-                    FieldNames.STATISTICS_NUM_LARGE_ORIENT_WRONG_PAIRS, BIGINT_UNSIGNED));
-        
-        this.runSqlStatement(GenericSQLQueries.genAddColumnString(FieldNames.TABLE_STATISTICS, 
-                    FieldNames.STATISTICS_NUM_UNIQ_LARGE_ORIENT_WRNG_PAIRS, BIGINT_UNSIGNED));
-        
-        this.runSqlStatement(GenericSQLQueries.genAddColumnString(
-                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_AVERAGE_READ_LENGTH, INT_UNSIGNED));
-        
-        this.runSqlStatement(GenericSQLQueries.genAddColumnString(
-                    FieldNames.TABLE_STATISTICS, FieldNames.STATISTICS_AVERAGE_SEQ_PAIR_LENGTH, INT_UNSIGNED));
 
         //add read pair id column in tracks if not existent
         this.runSqlStatement(GenericSQLQueries.genAddColumnString(
@@ -736,89 +656,42 @@ public class ProjectConnector extends Observable {
 
     /**
      * Stores the statistics for a track in the db.
-     * @param track the track to store containing a coverage container
+     * @param statsContainer The container with all statistics for the given 
+     * track ID
+     * @param trackID  the track id whose data shall be stored
      */
-    public void storeTrackStatistics(ParsedTrack track) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track statistics data...");
+    public void storeTrackStatistics(StatsContainer statsContainer, int trackID) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start storing track statistics...");
 
-        int coveragePerf = 0;
-        int coverageBM = 0;
-        int coverageComplete = 0;
-        int trackID = track.getID();
-        StatsContainer statsContainer = track.getStatsContainer();
         Map<String, Integer> statsMap = statsContainer.getStatsMap();
-        numMappings += statsMap.get(StatsContainer.NO_COMMON_MAPPINGS);
-        numPerfectMappings += statsMap.get(StatsContainer.NO_PERFECT_MAPPINGS);
-        numBmMappings += statsMap.get(StatsContainer.NO_BESTMATCH_MAPPINGS);
-        noUniqueMappings += statsMap.get(StatsContainer.NO_UNIQ_MAPPINGS);
-        noUniqueBMMappings += statsMap.get(StatsContainer.NO_UNIQ_BM_MAPPINGS);
-        noUniquePerfectMappings += statsMap.get(StatsContainer.NO_UNIQ_PERF_MAPPINGS);
-        noUniqueSeq += statsMap.get(StatsContainer.NO_UNIQUE_SEQS);
-        noRepeatedSeq += statsMap.get(StatsContainer.NO_REPEATED_SEQ);
-        numReads += statsMap.get(StatsContainer.NO_READS);
-        averageReadLengthPart += statsContainer.getReadLengthDistribution().getAverageValue();
-        ++containerCount;
-//            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "...can't get the statistics list (MappingInfos are null)");
-
-        try {
-            // get latest id for statistic
-            long latestID = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_STATISTICS_ID, con);
-
-            CoverageContainer cov = track.getCoverageContainer();
-            if (cov.getCoveredPerfectPositions() > 0) {
-                coveragePerf = cov.getCoveredPerfectPositions();
-            } 
-
-            if (cov.getCoveredBestMatchPositions() > 0) {
-                coverageBM = cov.getCoveredBestMatchPositions();
-            } 
-
-            if (cov.getCoveredCommonMatchPositions() > 0) {
-                coverageComplete = cov.getCoveredCommonMatchPositions();
-            } 
-
-            //calculate average read length
-            int averageReadLength = this.containerCount > 0 ? this.averageReadLengthPart / this.containerCount : 0;
-            try (PreparedStatement insertStatistics = con.prepareStatement(SQLStatements.INSERT_STATISTICS)) {
-                insertStatistics.setLong(1, latestID);
-                insertStatistics.setLong(2, trackID);
-                insertStatistics.setInt(3, this.numMappings);
-                insertStatistics.setInt(4, this.numPerfectMappings);
-                insertStatistics.setInt(5, this.numBmMappings);
-                insertStatistics.setInt(6, this.noUniqueMappings);
-                insertStatistics.setInt(7, this.noUniqueBMMappings);
-                insertStatistics.setInt(8, this.noUniquePerfectMappings);
-                insertStatistics.setInt(9, coveragePerf);
-                insertStatistics.setInt(10, coverageBM);
-                insertStatistics.setInt(11, coverageComplete);
-                insertStatistics.setInt(12, this.noUniqueSeq);
-                insertStatistics.setInt(13, this.noRepeatedSeq);
-                insertStatistics.setInt(14, this.numReads);
-                insertStatistics.setInt(15, averageReadLength);
-                insertStatistics.execute();
-
-                readLengthDistribution = statsContainer.getReadLengthDistribution();
-                if (!readLengthDistribution.isEmpty()) {
-                    this.insertCountDistribution(readLengthDistribution, trackID);
-                }
-                readPairLengthDistribution = statsContainer.getReadPairSizeDistribution();
-                if (!readPairLengthDistribution.isEmpty()) {
-                    this.insertCountDistribution(readPairLengthDistribution, trackID);
-                }
-            }
-
-            this.numMappings = 0;
-            this.numPerfectMappings = 0;
-            this.numBmMappings = 0;
-            this.noUniqueSeq = 0;
-            this.noRepeatedSeq = 0;
-            this.noUniqueMappings = 0;
-            this.numReads = 0;
-            this.averageReadLengthPart = 0;
-
-        } catch (SQLException ex) {
-            this.rollbackOnError(this.getClass().getName(), ex);
+        
+        DiscreteCountingDistribution readLengthDistribution = statsContainer.getReadLengthDistribution();
+        if (!readLengthDistribution.isEmpty()) {
+            this.insertCountDistribution(readLengthDistribution, trackID);
+            statsMap.put(StatsContainer.AVERAGE_READ_LENGTH, readLengthDistribution.getAverageValue());
         }
+        DiscreteCountingDistribution readPairLengthDistribution = statsContainer.getReadPairSizeDistribution();
+        if (!readPairLengthDistribution.isEmpty()) {
+            this.insertCountDistribution(readPairLengthDistribution, trackID);
+            statsMap.put(StatsContainer.AVERAGE_READ_PAIR_SIZE, readPairLengthDistribution.getAverageValue());
+        }
+        
+        // get latest id for statistic
+        long latestID = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_STATISTICS_ID, con);
+        
+        for (Map.Entry<String, Integer> entry : statsMap.entrySet()) {
+            try (PreparedStatement insertStats = con.prepareStatement(SQLStatements.INSERT_STATISTICS);) {
+                insertStats.setLong(1, latestID++);
+                insertStats.setInt(2, trackID);
+                insertStats.setString(3, entry.getKey());
+                insertStats.setInt(4, entry.getValue());
+                insertStats.executeUpdate();
+            
+            } catch (SQLException ex) {
+                this.rollbackOnError(this.getClass().getName(), ex);
+            }
+        }
+
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track statistics data");
     }
     
@@ -845,66 +718,6 @@ public class ProjectConnector extends Observable {
         } catch (SQLException ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
         }
-    }
-    
-    /**
-     * Stores read pair statistics
-     * @param statsContainer container with the statistics
-     * @param trackId track id 
-     */
-    public void storeReadPairTrackStatistics(StatsContainer statsContainer, int trackId) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing read pair statistics...");
-
-        Map<String, Integer> statsMap = statsContainer.getStatsMap();
-
-        try {
-            long numReadPairs = statsMap.get(StatsContainer.NO_SEQ_PAIRS);
-            long numUniqueReadPairs = statsMap.get(StatsContainer.NO_UNIQUE_PAIRS);
-            long numPerfReadPairs = statsMap.get(StatsContainer.NO_PERF_PAIRS);
-            long numUniquePerfReadPairs = statsMap.get(StatsContainer.NO_UNIQ_PERF_PAIRS);
-            long numSmallDistPairs = statsMap.get(StatsContainer.NO_SMALL_DIST_PAIRS);
-            long numSmallUniqPairs = statsMap.get(StatsContainer.NO_UNIQ_SMALL_PAIRS);
-            long numLargeDistPairs = statsMap.get(StatsContainer.NO_LARGE_DIST_PAIRS);
-            long numLargeUniqPairs = statsMap.get(StatsContainer.NO_UNIQ_LARGE_PAIRS);
-            long numOrientWrongPairs = statsMap.get(StatsContainer.NO_ORIENT_WRONG_PAIRS);
-            long numOrientWrongUniqPairs = statsMap.get(StatsContainer.NO_UNIQ_ORIENT_WRONG_PAIRS);
-            long numSmallOrientWrongPairs = statsMap.get(StatsContainer.NO_SMALL_ORIENT_WRONG_PAIRS);
-            long numSmallOrientUniqPairs = statsMap.get(StatsContainer.NO_UNIQ_WRNG_ORIENT_SMALL_PAIRS);
-            long numLargeOrientWrongPairs = statsMap.get(StatsContainer.NO_LARGE_ORIENT_WRONG_PAIRS);
-            long numLargeOrientUniqPairs = statsMap.get(StatsContainer.NO_UNIQ_WRNG_ORIENT_LARGE_PAIRS);
-            long numSingleMappings = statsMap.get(StatsContainer.NO_SINGLE_MAPPIGNS);
-
-            try (PreparedStatement addStatistics = con.prepareStatement(SQLStatements.INSERT_READPAIR_STATISTICS)) {
-
-                // store track stats in table
-                addStatistics.setLong(1, numReadPairs);
-                addStatistics.setLong(2, numUniqueReadPairs);
-                addStatistics.setLong(3, numPerfReadPairs);
-                addStatistics.setLong(4, numUniquePerfReadPairs);
-                addStatistics.setLong(5, numSmallDistPairs);
-                addStatistics.setLong(6, numSmallUniqPairs);
-                addStatistics.setLong(7, numLargeDistPairs);
-                addStatistics.setLong(8, numLargeUniqPairs);
-                addStatistics.setLong(9, numOrientWrongPairs);
-                addStatistics.setLong(10, numOrientWrongUniqPairs);
-                addStatistics.setLong(11, numSmallOrientWrongPairs);
-                addStatistics.setLong(12, numSmallOrientUniqPairs);
-                addStatistics.setLong(13, numLargeOrientWrongPairs);
-                addStatistics.setLong(14, numLargeOrientUniqPairs);
-                addStatistics.setLong(15, numSingleMappings);
-                addStatistics.setLong(16, statsContainer.getReadPairSizeDistribution().getAverageValue());
-                addStatistics.setLong(17, trackId);
-
-                addStatistics.execute();
-
-            } catch (SQLException ex) {
-                this.rollbackOnError(this.getClass().getName(), ex);
-            }
-        } catch (Exception e) {
-            Exceptions.printStackTrace(e);
-        }
-
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing sequence pair statistics");
     }
 
     /**
@@ -1470,6 +1283,12 @@ public class ProjectConnector extends Observable {
                 dbVersion = rs.getInt(FieldNames.DB_VERSION_DB_VERSION_NO);
             } 
             
+            //restructure statistics table
+            if (dbVersion < 3) {
+                updateNeeded = true;
+                this.restructureStatisticsTable();
+            }
+            
             ResultSet fileColumn = con.getMetaData().getColumns(con.getCatalog(), "PUBLIC", FieldNames.TABLE_REFERENCE, FieldNames.REF_GEN_FASTA_FILE);
             boolean columnFastafileMissing = !fileColumn.next();
             
@@ -1496,6 +1315,89 @@ public class ProjectConnector extends Observable {
         }
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Done checking DB version and updated to latest version");
     }
+    
+    
+    /**
+     * Restructures the statistics table:<br>
+     * 1. Reads stats content into one StatsContainer per track<br>
+     * 2. Drops old table<br>
+     * 3. Creates new table with 4 columns<br>
+     * 4. Inserts the data of all StatsContainers in the new table
+     * This method is intended for DBs < version 3.
+     */
+    @NbBundle.Messages({"TITLE_FileReset=Reset track file path",
+                        "MSG_FileReset=If you do not reset the track file location, it cannot be opened"})
+    private void restructureStatisticsTable() throws SQLException {
+        Map<Integer, StatsContainer> trackIdToStatsMap = new HashMap<>();
+        ProjectConnector projectConnector = ProjectConnector.getInstance();
+        List<PersistentTrack> tracks = projectConnector.getTracks();
+        for (PersistentTrack track : tracks) {
+            trackIdToStatsMap.put(track.getId(), projectConnector.getTrackStats(track.getId()));
+        }
+        
+        this.runSqlStatement(SQLStatements.DROP_TABLE + "STATISTICS");
+        con.prepareStatement(SQLStatements.SETUP_STATISTICS).executeUpdate();
+        
+        for (PersistentTrack track : tracks) {
+            if (trackIdToStatsMap.containsKey(track.getId())) {
+                StatsContainer statsContainer = trackIdToStatsMap.get(track.getId());
+                projectConnector.storeTrackStatistics(statsContainer, track.getId());
+            }
+        }
+    }
+    
+    /**
+     * Method for downward compatibility of old databases with old statistics
+     * tables. DO NOT USE FOR OTHER PURPOSES!
+     * @param wantedTrackId the id of the track, whose statistics are needed.
+     * @return The complete statistics for the track specified by the given id.
+     */
+    private StatsContainer getTrackStats(int wantedTrackId) {
+        StatsContainer statsContainer = new StatsContainer();
+        statsContainer.prepareForTrack();
+        statsContainer.prepareForReadPairTrack();
+
+        try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_STATS_FOR_TRACK)) {
+            fetch.setInt(1, wantedTrackId);
+            ResultSet rs = fetch.executeQuery();
+            while (rs.next()) {
+                //General data
+                statsContainer.increaseValue(MappingClass.PERFECT_MATCH.getTypeString(), rs.getInt(FieldNames.STATISTICS_NUMBER_PERFECT_MAPPINGS));
+                statsContainer.increaseValue(MappingClass.BEST_MATCH.getTypeString(), rs.getInt(FieldNames.STATISTICS_NUMBER_BM_MAPPINGS));
+                statsContainer.increaseValue(MappingClass.COMMON_MATCH.getTypeString(), rs.getInt(FieldNames.STATISTICS_NUMBER_OF_MAPPINGS));
+                statsContainer.increaseValue(MappingClass.PERFECT_MATCH.getTypeString() + StatsContainer.COVERAGE_STRING, rs.getInt(FieldNames.STATISTICS_PERFECT_COVERAGE_OF_GENOME));
+                statsContainer.increaseValue(MappingClass.BEST_MATCH.getTypeString() + StatsContainer.COVERAGE_STRING, rs.getInt(FieldNames.STATISTICS_BM_COVERAGE_OF_GENOME));
+                statsContainer.increaseValue(MappingClass.COMMON_MATCH.getTypeString() + StatsContainer.COVERAGE_STRING, rs.getInt(FieldNames.STATISTICS_COMPLETE_COVERAGE_OF_GENOME));
+                statsContainer.increaseValue(StatsContainer.NO_READS, rs.getInt(FieldNames.STATISTICS_NUMBER_READS));
+                statsContainer.increaseValue(StatsContainer.NO_REPEATED_SEQ, rs.getInt(FieldNames.STATISTICS_NUMBER_OF_REPEATED_SEQ));
+                statsContainer.increaseValue(StatsContainer.NO_UNIQUE_SEQS, rs.getInt(FieldNames.STATISTICS_NUMBER_OF_UNIQUE_SEQ));
+                statsContainer.increaseValue(StatsContainer.NO_UNIQ_MAPPINGS, rs.getInt(FieldNames.STATISTICS_NUMBER_UNIQUE_MAPPINGS));
+                statsContainer.increaseValue(StatsContainer.AVERAGE_READ_LENGTH, rs.getInt(FieldNames.STATISTICS_AVERAGE_READ_LENGTH));
+                //Read pair data
+                statsContainer.increaseValue(StatsContainer.NO_LARGE_DIST_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_LARGE_DIST_PAIRS));
+                statsContainer.increaseValue(StatsContainer.NO_LARGE_ORIENT_WRONG_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_LARGE_ORIENT_WRONG_PAIRS));
+                statsContainer.increaseValue(StatsContainer.NO_ORIENT_WRONG_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_ORIENT_WRONG_PAIRS));
+                statsContainer.increaseValue(StatsContainer.NO_PERF_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_PERFECT_SEQUENCE_PAIRS));
+                statsContainer.increaseValue(StatsContainer.NO_READ_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_SEQUENCE_PAIRS));
+                statsContainer.increaseValue(StatsContainer.NO_SINGLE_MAPPIGNS, rs.getInt(FieldNames.STATISTICS_NUM_SINGLE_MAPPINGS));
+                statsContainer.increaseValue(StatsContainer.NO_SMALL_DIST_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_SMALL_DIST_PAIRS));
+                statsContainer.increaseValue(StatsContainer.NO_SMALL_ORIENT_WRONG_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_SMALL_ORIENT_WRONG_PAIRS));
+                statsContainer.increaseValue(StatsContainer.NO_UNIQUE_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_UNIQUE_SEQUENCE_PAIRS));
+                statsContainer.increaseValue(StatsContainer.NO_UNIQ_LARGE_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_UNIQ_LARGE_PAIRS));
+                statsContainer.increaseValue(StatsContainer.NO_UNIQ_ORIENT_WRONG_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_UNIQ_ORIENT_WRNG_PAIRS));
+                statsContainer.increaseValue(StatsContainer.NO_UNIQ_PERF_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_UNIQUE_PERFECT_SEQUENCE_PAIRS));
+                statsContainer.increaseValue(StatsContainer.NO_UNIQ_SMALL_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_UNIQ_SMALL_PAIRS));
+                statsContainer.increaseValue(StatsContainer.NO_UNIQ_WRNG_ORIENT_LARGE_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_UNIQ_LARGE_ORIENT_WRNG_PAIRS));
+                statsContainer.increaseValue(StatsContainer.NO_UNIQ_WRNG_ORIENT_SMALL_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_UNIQ_SMALL_ORIENT_WRNG_PAIRS));
+                statsContainer.increaseValue(StatsContainer.AVERAGE_READ_PAIR_SIZE, rs.getInt(FieldNames.STATISTICS_AVERAGE_SEQ_PAIR_LENGTH));
+            }
+            rs.close();
+
+        } catch (SQLException e) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, e);
+        }
+        return statsContainer;
+    }
 
     /**
      * Moves all reference sequences, still stored in the reference table into
@@ -1512,7 +1414,6 @@ public class ProjectConnector extends Observable {
         this.runSqlStatement(GenericSQLQueries.genAddColumnString(FieldNames.TABLE_FEATURES, FieldNames.FEATURE_CHROMOSOME_ID, BIGINT_UNSIGNED));
         
         List<PersistentReference> refList = this.getGenomesDbUpgrade();
-        
         
         for (PersistentReference ref : refList) {
             try (PreparedStatement fetchRefSeq = con.prepareStatement(SQLStatements.FETCH_REF_SEQ);) {

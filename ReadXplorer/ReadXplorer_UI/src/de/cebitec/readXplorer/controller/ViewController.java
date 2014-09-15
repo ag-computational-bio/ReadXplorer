@@ -246,10 +246,6 @@ public class ViewController implements MousePositionListener {
                     if (viewer instanceof TrackViewer) {
                         ((TrackViewer) viewer).setAutomaticScaling(evt.getNewValue().equals("true"));
                     }
-                } else if (evt.getKey().equals(Properties.VIEWER_CLASSIFICATION)) {
-                    if (viewer instanceof TrackViewer) {
-                        ((TrackViewer) viewer).setUseExtendedClassification(evt.getNewValue().equals("true"));
-                    }
                 }
             }
         };

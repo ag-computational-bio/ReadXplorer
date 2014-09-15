@@ -17,9 +17,9 @@
 package de.cebitec.readXplorer.differentialExpression;
 
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
+import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
 import de.cebitec.readXplorer.databackend.dataObjects.MappingResult;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
 import de.cebitec.readXplorer.util.Observer;
 import java.util.Collections;
 import java.util.HashMap;
@@ -114,7 +114,7 @@ public class CollectCoverageData implements Observer {
                             fstFittingMapping = false;
                         }
                         if (isStrandBothOption || analysisStrand == mapping.isFwdStrand()) {
-                            countData.put(feature, countData.get(feature) + mapping.getNbReplicates());
+                            countData.put(feature, countData.get(feature) + 1);
                         }
 
                         //still mappings left, but need next feature

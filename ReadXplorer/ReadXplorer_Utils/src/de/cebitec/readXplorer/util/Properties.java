@@ -142,8 +142,6 @@ public class Properties {
     public static final int MAX_HEIGHT = 250;
     /** Property for auto scaling of viewers. */
     public static final String VIEWER_AUTO_SCALING = "AUTO_SCALING";
-    /** Property for the classification mode selection in the viewers and analyses. */
-    public static String VIEWER_CLASSIFICATION = "CLASSIFICATION";
     
     /** 0 = Combine data of both strands option.*/
     public static final byte STRAND_BOTH = 0;

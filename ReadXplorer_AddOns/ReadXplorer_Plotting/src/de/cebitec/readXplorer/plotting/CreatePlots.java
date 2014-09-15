@@ -88,8 +88,8 @@ public class CreatePlots {
         XYSeriesCollection posInf = new XYSeriesCollection();
         XYSeriesCollection negInf = new XYSeriesCollection();
         XYSeries nor = new XYSeries("Normal");
-        XYSeries pos = new XYSeries("Positiv Infinit");
-        XYSeries neg = new XYSeries("Negativ Infinit");
+        XYSeries pos = new XYSeries("Positive Infinite");
+        XYSeries neg = new XYSeries("Negative Infinite");
         for (Iterator<PersistentFeature> it = data.keySet().iterator(); it.hasNext();) {
             PersistentFeature key = it.next();
             Pair<Double, Double> pair = data.get(key);

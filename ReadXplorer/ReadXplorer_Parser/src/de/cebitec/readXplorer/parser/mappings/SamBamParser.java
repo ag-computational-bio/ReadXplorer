@@ -17,8 +17,6 @@
 package de.cebitec.readXplorer.parser.mappings;
 
 import de.cebitec.readXplorer.parser.TrackJob;
-import de.cebitec.readXplorer.parser.common.CoverageContainer;
-import de.cebitec.readXplorer.parser.common.DirectAccessDataContainer;
 import de.cebitec.readXplorer.parser.common.ParsedClassification;
 import de.cebitec.readXplorer.parser.common.ParsingException;
 import de.cebitec.readXplorer.parser.common.RefSeqFetcher;
@@ -105,7 +103,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
      * @throws OutOfMemoryError
      */
     @Override
-    public Object convert(TrackJob trackJob, Map<String, Integer> chromLengthMap) throws ParsingException, OutOfMemoryError {
+    public Boolean convert(TrackJob trackJob, Map<String, Integer> chromLengthMap) throws ParsingException, OutOfMemoryError {
         return true;
     }
 
@@ -118,7 +116,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
      * @throws OutOfMemoryError
      */
     @Override
-    public Object preprocessData(TrackJob trackJob) throws ParsingException, OutOfMemoryError {
+    public Boolean preprocessData(TrackJob trackJob) throws ParsingException, OutOfMemoryError {
         SamBamSorter sorter = new SamBamSorter();
         sorter.registerObserver(this);
         boolean success = sorter.sortSamBam(trackJob, SAMFileHeader.SortOrder.queryname, SamUtils.SORT_READNAME_STRING);
@@ -146,7 +144,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
      * @throws OutOfMemoryError
      */
     @Override
-    public DirectAccessDataContainer parseInput(TrackJob trackJob, Map<String, Integer> chromLengthMap) throws ParsingException, OutOfMemoryError {
+    public Boolean parseInput(TrackJob trackJob, Map<String, Integer> chromLengthMap) throws ParsingException, OutOfMemoryError {
         
         //new algorithm:
        /* 1. sort by read name
@@ -157,7 +155,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
         */
                 
         this.refSeqFetcher = new RefSeqFetcher(trackJob.getRefGen().getFile(), this);
-        boolean success = (boolean) this.preprocessData(trackJob);
+        Boolean success = this.preprocessData(trackJob);
         if (!success) {
             throw new ParsingException("Sorting of the input file by read name was not successful, please try again and make sure to have enough "
                     + "free space in your systems temp directory to store intermediate files for sorting (e.g. on Windows 7 the hard disk containing: "
@@ -219,8 +217,13 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
 
                         
                     } else { // else read is unmapped or belongs to another reference
-                        this.sendMsgIfAllowed(NbBundle.getMessage(SamBamParser.class,
-                                "Parser.Parsing.CorruptData", lineno, record.getReadName()));
+                        if (record.getReadUnmappedFlag()) {
+                            this.sendMsgIfAllowed(NbBundle.getMessage(SamBamParser.class,
+                                    "Parser.Parsing.Unmapped", lineno, record.getSAMString()));
+                        } else {
+                            this.sendMsgIfAllowed(NbBundle.getMessage(SamBamParser.class,
+                                    "Parser.Parsing.WrongReference", lineno, record.getSAMString()));
+                        }
                     }
                 } catch (SAMFormatException e) {
                     if (!e.getMessage().contains("MAPQ should be 0")) {
@@ -271,7 +274,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
         this.notifyObservers(Benchmark.calculateDuration(startTime, finish, msg));
         statsContainer.increaseValue(StatsContainer.NO_READS, noReads);
 
-        return new DirectAccessDataContainer(new CoverageContainer(), new HashMap<String, ParsedClassification>());
+        return success;
     }
 
     @Override

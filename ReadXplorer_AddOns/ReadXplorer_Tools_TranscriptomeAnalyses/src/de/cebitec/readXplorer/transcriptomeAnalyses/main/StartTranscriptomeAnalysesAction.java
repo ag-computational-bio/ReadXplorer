@@ -74,7 +74,7 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
         wiz.setTitleFormat(new MessageFormat("{0}"));
         wiz.setTitle(NbBundle.getMessage(StartTranscriptomeAnalysesAction.class, "TTL_TransAnalysesWizardTitle"));
 
-        //action to perform after successfully finishing the wizard
+        //action to perform after successfuly finishing the wizard
         boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
         List<PersistentTrack> selectedTracks = transWizardIterator.getSelectedTracks();
         if (!cancelled && !selectedTracks.isEmpty()) {

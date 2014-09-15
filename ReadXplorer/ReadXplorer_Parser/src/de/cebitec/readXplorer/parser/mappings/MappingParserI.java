@@ -38,7 +38,7 @@ public interface MappingParserI extends ParserI, Observable, PreprocessorI {
      * @throws ParsingException
      * @throws OutOfMemoryError 
      */
-    public Object parseInput(TrackJob trackJob, Map<String, Integer> chromLengthMap) throws ParsingException, OutOfMemoryError;
+    public Boolean parseInput(TrackJob trackJob, Map<String, Integer> chromLengthMap) throws ParsingException, OutOfMemoryError;
     
     /**
      * Converts some data for the given track job and the given reference.
@@ -49,7 +49,7 @@ public interface MappingParserI extends ParserI, Observable, PreprocessorI {
      * @throws ParsingException
      * @throws OutOfMemoryError  
      */
-    public Object convert(TrackJob trackJob, Map<String, Integer> chromLengthMap) throws ParsingException, OutOfMemoryError;
+    public Boolean convert(TrackJob trackJob, Map<String, Integer> chromLengthMap) throws ParsingException, OutOfMemoryError;
         
     /**
      * Sets the given stats container to this parser. Then this parser can

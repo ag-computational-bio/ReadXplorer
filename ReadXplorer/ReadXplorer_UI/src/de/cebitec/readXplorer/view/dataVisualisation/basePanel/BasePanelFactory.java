@@ -23,9 +23,10 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.ColorProperties;
+import de.cebitec.readXplorer.util.ColorUtils;
 import de.cebitec.readXplorer.util.Observer;
-import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.classification.Classification;
+import de.cebitec.readXplorer.util.classification.ComparisonClass;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.classification.MappingClass;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfo;
@@ -56,6 +57,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
 import java.util.List;
+import java.util.Map;
+import java.util.prefs.PreferenceChangeEvent;
+import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
@@ -227,7 +231,7 @@ public class BasePanelFactory {
     private void initializeLegendAndOptions(BasePanel basePanel, TrackViewer trackV, boolean combineTracks) {
         // create and set up legend
         JPanel trackPanelLegend;
-        if (combineTracks) {
+        if (combineTracks || !trackV.isTwoTracks()) {
             trackPanelLegend = this.getTrackPanelLegend(trackV);
         } else {
             trackPanelLegend = this.getDoubleTrackPanelLegend(trackV);
@@ -381,15 +385,26 @@ public class BasePanelFactory {
      * this case a simple label is returned instead of the checkbox.
      * @return A legend entry for a feature type.
      */
-    private JPanel getLegendEntry(Color typeColor, Classification type, AbstractViewer viewer) {
+    private JPanel getLegendEntry(Color typeColor, final Classification type, AbstractViewer viewer) {
         JPanel entry = new JPanel(new FlowLayout(FlowLayout.LEADING));
         entry.setBackground(ColorProperties.LEGEND_BACKGROUND);
 
-        ColorPanel color = new ColorPanel();
-        color.setSize(new Dimension(10, 10));
-        color.setBackground(typeColor);
+        final ColorPanel colorPanel = new ColorPanel();
+        colorPanel.setSize(new Dimension(10, 10));
+        colorPanel.setBackground(typeColor);
+        pref.addPreferenceChangeListener(new PreferenceChangeListener() {
 
-        entry.add(color);
+            @Override
+            public void preferenceChange(PreferenceChangeEvent evt) {
+                Map<Classification, Color> classificationColors = ColorUtils.updateClassificationColors();
+                if (classificationColors.containsKey(type)) {
+                    colorPanel.setBackground(classificationColors.get(type));
+                    colorPanel.repaint();
+                }
+            }
+        });
+
+        entry.add(colorPanel);
         if (viewer != null) {
             entry.add(this.getFeatureTypeBox(type, viewer));
         } else {
@@ -397,6 +412,19 @@ public class BasePanelFactory {
         }
         entry.setAlignmentX(Component.LEFT_ALIGNMENT);
         return entry;
+    }
+    
+    /**
+     * @param typeColor color of the feature type
+     * @param type the feature type whose legend entry is created
+     * @param viewer the viewer to which the legend entry belongs. If no
+     * function is assigend to the legend entry, viewer can be set to null. In
+     * this case a simple label is returned instead of the checkbox.
+     * @return A legend entry for a feature type.
+     */
+    private JPanel getLegendEntry(Classification type, AbstractViewer viewer) {
+        Map<Classification, Color> classToColorMap = ColorUtils.updateClassificationColors();
+        return this.getLegendEntry(classToColorMap.get(type), type, viewer);
     }
 
     /**
@@ -514,17 +542,12 @@ public class BasePanelFactory {
         legend2.setLayout(new BoxLayout(legend2, BoxLayout.PAGE_AXIS));
         legend.setBackground(ColorProperties.LEGEND_BACKGROUND);
 
-        legend1.add(this.getLegendEntry(ColorProperties.PERFECT_MATCH, MappingClass.PERFECT_MATCH, viewer));
-        legend1.add(this.getLegendEntry(ColorProperties.BEST_MATCH, MappingClass.BEST_MATCH, viewer));
-        legend1.add(this.getLegendEntry(ColorProperties.COMMON_MATCH, MappingClass.COMMON_MATCH, viewer));
-        legend1.add(this.getLegendEntry(ColorProperties.BEST_MATCH, FeatureType.MULTIPLE_MAPPED_READ, viewer));
-        
-        //make extended classification optional
-        if (NbPreferences.forModule(Object.class).getBoolean(Properties.VIEWER_CLASSIFICATION, false)) {
-            legend2.add(this.getLegendEntry(ColorProperties.PERFECT_MATCH_SINGLE, MappingClass.SINGLE_PERFECT_MATCH, viewer));
-            legend2.add(this.getLegendEntry(ColorProperties.BEST_MATCH_SINGLE, MappingClass.SINGLE_BEST_MATCH, viewer));
-            legend2.add(this.getLegendEntry(ColorProperties.COMMON_MATCH_SINGLE, MappingClass.SINGLE_COMMON_MATCH, viewer));
-        }
+        legend1.add(this.getLegendEntry(MappingClass.PERFECT_MATCH, viewer));
+        legend1.add(this.getLegendEntry(MappingClass.BEST_MATCH, viewer));
+        legend1.add(this.getLegendEntry(MappingClass.COMMON_MATCH, viewer));
+        legend2.add(this.getLegendEntry(MappingClass.SINGLE_PERFECT_MATCH, viewer));
+        legend2.add(this.getLegendEntry(MappingClass.SINGLE_BEST_MATCH, viewer));
+        legend2.add(this.getLegendEntry(Color.white, FeatureType.MULTIPLE_MAPPED_READ, viewer));        
 
         legend.add(legend1);
         legend.add(legend2);
@@ -549,19 +572,15 @@ public class BasePanelFactory {
         legend3.setLayout(new BoxLayout(legend3, BoxLayout.Y_AXIS));
         legend.setBackground(ColorProperties.LEGEND_BACKGROUND);
 
-        legend1.add(this.getLegendEntry(ColorProperties.COV_DIFF_COLOR, FeatureType.COMPLETE_COVERAGE, null));
-        legend1.add(this.getLegendEntry(ColorProperties.TRACK1_COLOR, FeatureType.TRACK1_COVERAGE, null));
-        legend1.add(this.getLegendEntry(ColorProperties.TRACK2_COLOR, FeatureType.TRACK2_COVERAGE, null));
-        legend1.add(this.getLegendEntry(ColorProperties.PERFECT_MATCH, MappingClass.PERFECT_MATCH, viewer));
-        legend2.add(this.getLegendEntry(ColorProperties.BEST_MATCH, MappingClass.BEST_MATCH, viewer));
-        legend2.add(this.getLegendEntry(ColorProperties.COMMON_MATCH, MappingClass.COMMON_MATCH, viewer));
-        legend2.add(this.getLegendEntry(ColorProperties.BEST_MATCH, FeatureType.MULTIPLE_MAPPED_READ, viewer));
-        //make extended classification optional
-        if (NbPreferences.forModule(Object.class).getBoolean(Properties.VIEWER_CLASSIFICATION, false)) {
-            legend3.add(this.getLegendEntry(ColorProperties.PERFECT_MATCH_SINGLE, MappingClass.SINGLE_PERFECT_MATCH, viewer));
-            legend3.add(this.getLegendEntry(ColorProperties.BEST_MATCH_SINGLE, MappingClass.SINGLE_BEST_MATCH, viewer));
-            legend3.add(this.getLegendEntry(ColorProperties.COMMON_MATCH_SINGLE, MappingClass.SINGLE_COMMON_MATCH, viewer));
-        }
+        legend1.add(this.getLegendEntry(ComparisonClass.DIFF_COVERAGE, null));
+        legend1.add(this.getLegendEntry(ComparisonClass.TRACK1_COVERAGE, null));
+        legend1.add(this.getLegendEntry(ComparisonClass.TRACK2_COVERAGE, null));
+        legend2.add(this.getLegendEntry(MappingClass.SINGLE_PERFECT_MATCH, viewer));
+        legend2.add(this.getLegendEntry(MappingClass.PERFECT_MATCH, viewer));
+        legend2.add(this.getLegendEntry(MappingClass.SINGLE_BEST_MATCH, viewer));
+        legend3.add(this.getLegendEntry(MappingClass.BEST_MATCH, viewer));
+        legend3.add(this.getLegendEntry(MappingClass.COMMON_MATCH, viewer));
+        legend3.add(this.getLegendEntry(Color.white, FeatureType.MULTIPLE_MAPPED_READ, viewer));
 
         legend.add(legend1);
         legend.add(legend2);
@@ -645,24 +664,37 @@ public class BasePanelFactory {
      * @return A new legend panel for a histogram viewer.
      */
     private JPanel getHistogramViewerLegend(AbstractViewer viewer) {
+        
         JPanel legend = new JPanel();
-        legend.setLayout(new BoxLayout(legend, BoxLayout.PAGE_AXIS));
+        JPanel legend1 = new JPanel();
+        JPanel legend2 = new JPanel();
+        legend.setLayout(new BoxLayout(legend, BoxLayout.X_AXIS));
+        legend1.setLayout(new BoxLayout(legend1, BoxLayout.PAGE_AXIS));
+        legend2.setLayout(new BoxLayout(legend2, BoxLayout.PAGE_AXIS));
         legend.setBackground(ColorProperties.LEGEND_BACKGROUND);
 
-        legend.add(this.getLegendEntry(ColorProperties.LOGO_A, FeatureType.BASE_A, null));
-        legend.add(this.getLegendEntry(ColorProperties.LOGO_C, FeatureType.BASE_C, null));
-        legend.add(this.getLegendEntry(ColorProperties.LOGO_G, FeatureType.BASE_G, null));
-        legend.add(this.getLegendEntry(ColorProperties.LOGO_T, FeatureType.BASE_T, null));
-        legend.add(this.getLegendEntry(ColorProperties.LOGO_N, FeatureType.BASE_N, null));
-        legend.add(this.getLegendEntry(ColorProperties.LOGO_MATCH, FeatureType.MATCH, null));
-        legend.add(this.getLegendEntry(ColorProperties.LOGO_READGAP, FeatureType.GAP, null));
-        legend.add(this.getLegendEntry(ColorProperties.BEST_MATCH, FeatureType.MULTIPLE_MAPPED_READ, viewer));
+        legend1.add(this.getLegendEntry(ColorProperties.LOGO_A, FeatureType.BASE_A, null));
+        legend1.add(this.getLegendEntry(ColorProperties.LOGO_C, FeatureType.BASE_C, null));
+        legend1.add(this.getLegendEntry(ColorProperties.LOGO_G, FeatureType.BASE_G, null));
+        legend1.add(this.getLegendEntry(ColorProperties.LOGO_T, FeatureType.BASE_T, null));
+        legend1.add(this.getLegendEntry(ColorProperties.LOGO_N, FeatureType.BASE_N, null));
+        legend1.add(this.getLegendEntry(ColorProperties.LOGO_MATCH, FeatureType.MATCH, null));
+        legend1.add(this.getLegendEntry(ColorProperties.LOGO_READGAP, FeatureType.GAP, null));
+        legend2.add(this.getLegendEntry(Color.white, FeatureType.MULTIPLE_MAPPED_READ, viewer));
+        legend2.add(this.getLegendEntry(MappingClass.SINGLE_PERFECT_MATCH, viewer));
+        legend2.add(this.getLegendEntry(MappingClass.PERFECT_MATCH, viewer));
+        legend2.add(this.getLegendEntry(MappingClass.SINGLE_BEST_MATCH, viewer));
+        legend2.add(this.getLegendEntry(MappingClass.BEST_MATCH, viewer));
+        legend2.add(this.getLegendEntry(MappingClass.COMMON_MATCH, viewer));
+
+        legend.add(legend1);
+        legend.add(legend2);
 
         return legend;
     }
 
     /**
-     * @param viewer the alignment viewer for which the legend panel should be
+     * @param viewer The alignment viewer for which the legend panel should be
      * created.
      * @return A new legend panel for an alignment viewer.
      */
@@ -671,18 +703,15 @@ public class BasePanelFactory {
         legend.setLayout(new BoxLayout(legend, BoxLayout.PAGE_AXIS));
         legend.setBackground(ColorProperties.LEGEND_BACKGROUND);
 
-        legend.add(this.getLegendEntry(ColorProperties.PERFECT_MATCH, MappingClass.PERFECT_MATCH, viewer));
-        legend.add(this.getLegendEntry(ColorProperties.BEST_MATCH, MappingClass.BEST_MATCH, viewer));
-        legend.add(this.getLegendEntry(ColorProperties.COMMON_MATCH, MappingClass.COMMON_MATCH, viewer));
+        legend.add(this.getLegendEntry(MappingClass.SINGLE_PERFECT_MATCH, viewer));
+        legend.add(this.getLegendEntry(MappingClass.PERFECT_MATCH, viewer));
+        legend.add(this.getLegendEntry(MappingClass.SINGLE_BEST_MATCH, viewer));
+        legend.add(this.getLegendEntry(MappingClass.BEST_MATCH, viewer));
+        legend.add(this.getLegendEntry(MappingClass.COMMON_MATCH, viewer));
+        legend.add(this.getLegendEntry(Color.white, FeatureType.MULTIPLE_MAPPED_READ, viewer));
         legend.add(this.getLegendEntry(ColorProperties.MISMATCH_BACKGROUND, FeatureType.DIFF, null));
         legend.add(this.getGradientEntry("Replicates: High to low"));
-        legend.add(this.getLegendEntry(ColorProperties.BEST_MATCH, FeatureType.MULTIPLE_MAPPED_READ, viewer));
-        //make extended classification optional
-        if (NbPreferences.forModule(Object.class).getBoolean(Properties.VIEWER_CLASSIFICATION, false)) {
-            legend.add(this.getLegendEntry(ColorProperties.PERFECT_MATCH_SINGLE, MappingClass.SINGLE_PERFECT_MATCH, viewer));
-            legend.add(this.getLegendEntry(ColorProperties.BEST_MATCH_SINGLE, MappingClass.SINGLE_BEST_MATCH, viewer));
-            legend.add(this.getLegendEntry(ColorProperties.COMMON_MATCH_SINGLE, MappingClass.SINGLE_COMMON_MATCH, viewer));
-        }
+        legend.add(this.getGradientEntry("Base Quality: High to low"));
         return legend;
     }
 
@@ -700,7 +729,7 @@ public class BasePanelFactory {
         legend.add(this.getLegendEntry(ColorProperties.BLOCK_DIST_LARGE, FeatureType.DISTORTED_PAIR, viewer));
         legend.add(this.getLegendEntry(ColorProperties.BLOCK_UNPAIRED, FeatureType.SINGLE_MAPPING, viewer));
         legend.add(this.getGradientEntry("Perfect to best to common mappings"));
-        legend.add(this.getLegendEntry(ColorProperties.BEST_MATCH, FeatureType.MULTIPLE_MAPPED_READ, viewer));
+        legend.add(this.getLegendEntry(Color.white, FeatureType.MULTIPLE_MAPPED_READ, viewer));
 
         return legend;
     }
@@ -733,9 +762,9 @@ public class BasePanelFactory {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (((AbstractButton) e.getSource()).isSelected()) {
-                this.viewer.getExcludedFeatureTypes().remove(this.type);
+                this.viewer.getExcludedClassifications().remove(this.type);
             } else {
-                this.viewer.getExcludedFeatureTypes().add(this.type);
+                this.viewer.getExcludedClassifications().add(this.type);
             }
             this.viewer.setNewDataRequestNeeded(true);
             this.viewer.boundsChangedHook();

@@ -24,9 +24,9 @@ import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResult;
 import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.ColorProperties;
+import de.cebitec.readXplorer.util.ColorUtils;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
-import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.util.classification.Classification;
 import de.cebitec.readXplorer.util.classification.MappingClass;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
@@ -75,12 +75,10 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     private boolean colorChanges;
     private boolean hasNormalizationFactor = false;
     private boolean automaticScaling = pref.getBoolean(Properties.VIEWER_AUTO_SCALING, false);
-    private boolean useExtendedClassification = pref.getBoolean(Properties.VIEWER_CLASSIFICATION, false); //TODO: change this for future version
     private boolean useMinimalIntervalLength = true;
     
     private JSlider verticalSlider = null;
  
-//    private CoverageInfoI trackInfo;
     private double scaleFactor;
     private int scaleLineStep;
     private int labelMargin;
@@ -152,18 +150,11 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      */
     protected List<Classification> createVisibleClasses() {
         List<Classification> newClassList = new ArrayList<>();
-        newClassList.add(MappingClass.COMMON_MATCH);
-        if (this.useExtendedClassification) {
-            newClassList.add(MappingClass.SINGLE_COMMON_MATCH);
-        }
-        newClassList.add(MappingClass.BEST_MATCH);
-        if (this.useExtendedClassification) {
-            newClassList.add(MappingClass.SINGLE_BEST_MATCH);
-        }
+        newClassList.add(MappingClass.SINGLE_PERFECT_MATCH);
         newClassList.add(MappingClass.PERFECT_MATCH);
-        if (this.useExtendedClassification) {
-            newClassList.add(MappingClass.SINGLE_PERFECT_MATCH);
-        }
+        newClassList.add(MappingClass.SINGLE_BEST_MATCH);
+        newClassList.add(MappingClass.BEST_MATCH);
+        newClassList.add(MappingClass.COMMON_MATCH);
         
         return newClassList;
     }
@@ -185,37 +176,17 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             }
         } else {
             
-            Color commonColor = this.checkColor(pref.get(ColorProperties.COMMON_MATCH_STRING, ""), ColorProperties.COMMON_MATCH);
-            Color singleCommonColor = this.checkColor(pref.get(ColorProperties.SINGLE_COMMON_MATCH_STRING, ""), ColorProperties.COMMON_MATCH_SINGLE);
-            Color bestColor = this.checkColor(pref.get(ColorProperties.BEST_MATCH_STRING, ""), ColorProperties.BEST_MATCH);
-            Color singleBestColor = this.checkColor(pref.get(ColorProperties.SINGLE_BEST_MATCH_STRING, ""), ColorProperties.BEST_MATCH_SINGLE);
-            Color perfectColor = this.checkColor(pref.get(ColorProperties.PERFECT_MATCH_STRING, ""), ColorProperties.PERFECT_MATCH);
-            Color singlePerfectColor = this.checkColor(pref.get(ColorProperties.SINGLE_PERFECT_MATCH_STRING, ""), ColorProperties.PERFECT_MATCH_SINGLE);
-            newClassToColorMap.put(MappingClass.COMMON_MATCH, commonColor);
-            newClassToColorMap.put(MappingClass.SINGLE_COMMON_MATCH, singleCommonColor);
-            newClassToColorMap.put(MappingClass.BEST_MATCH, bestColor);
-            newClassToColorMap.put(MappingClass.SINGLE_BEST_MATCH, singleBestColor);
-            newClassToColorMap.put(MappingClass.PERFECT_MATCH, perfectColor);
-            newClassToColorMap.put(MappingClass.SINGLE_PERFECT_MATCH, singlePerfectColor);
+            newClassToColorMap = ColorUtils.updateMappingClassColors();
         }
-        
         return newClassToColorMap;
     }
-    
+
     /**
      * Updates the colors of the coverage in this viewer.
      * @param classToColorMap
      */
     protected final void setColors(Map<Classification, Color> classToColorMap) {
         this.classToColorMap = classToColorMap;
-    }
-    
-    protected Color checkColor(String colorProp, Color defaultColor) {
-        if (!colorProp.isEmpty()) {
-            return new Color(Integer.parseInt(colorProp));
-        } else {
-            return defaultColor;
-        }
     }
     
 
@@ -253,14 +224,15 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     }
 
     /**
-     * Paints the coverage paths into the given Graphics2D object in the order
-     * stored in the mappingClassList
+     * Paints the coverage paths into the given Graphics2D object in the reverse
+     * order stored in the classList
      * @param g the graphics object to paint on
      */
     private void paintCoverage(Graphics2D g) {
         // fill and draw all coverage paths 
-        for (Classification classType : this.classList) {
-            if (classToColorMap.containsKey(classType) && classToPathsMap.containsKey(classType)) {
+        for (int i = classList.size(); --i >= 0;) {
+            Classification classType = classList.get(i);
+            if (classList.contains(classType) && classToPathsMap.containsKey(classType)) {
                 Pair<GeneralPath, GeneralPath> pathPair = classToPathsMap.get(classType);
                 Color color = classToColorMap.get(classType);
 
@@ -282,47 +254,6 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         graphics.drawLine(info.getPhyLeft(), info.getForwardLow(), info.getPhyRight(), info.getForwardLow());
         graphics.drawLine(info.getPhyLeft(), info.getReverseLow(), info.getPhyRight(), info.getReverseLow());
     }
-
-    /**
-     * Returns the () coverage value for the given strand, coverage type and position.
-     * @param isForwardStrand if -1, coverage is drawn from bottom to top, if 1 otherwise
-     * @param classType the mapping classification type of the coverage path handled here
-     * @param absPos the reference position for which the coverage should be obtained
-     * @return the coverage value for the given strand, coverage type and position.
-     */
-    private double getCoverageValue(boolean isForwardStrand, Classification classType, int absPos) {
-        double value = this.calcCoverageValue(isForwardStrand, classType, absPos);
-        
-        if (value > this.covManager.getHighestCoverage()) {
-            this.covManager.setHighestCoverage((int) Math.ceil(value));
-        }
-        
-        return value;
-
-    }
-
-    /**
-     * Calculates the (normalized) coverage value for the given strand, coverage type and position.
-     * @param isForwardStrand if -1, coverage is drawn from bottom to top, if 1 otherwise
-     * @param classType the mapping classification type of the coverage path handled here
-     * @param absPos the reference position for which the coverage should be obtained
-     * @return the coverage value for the given strand, coverage type and position.
-     */
-    protected double calcCoverageValue(boolean isForwardStrand, Classification classType, int absPos) {
-        double value = 0;
-        try {
-            if (isForwardStrand) {
-                value = this.covManager.getCoverage(classType).getFwdCov(absPos);
-            } else {
-                value = this.covManager.getCoverage(classType).getRevCov(absPos);
-            }
-        } catch (IllegalArgumentException e) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown mapping classification type!");
-        }
-        value = this.getNormalizedValue(this.id1, value);
-        
-        return value;
-    }
     
     /**
      * Normalizes the value handed over to the method acodeording to the
@@ -338,64 +269,6 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         } else {
             return value;
         }
-    }
-
-    /**
-     * Create a GeneralPath that represents the coverage of a certain type.
-     * @param isForwardStrand if -1, coverage is drawn from bottom to top, if 1 otherwise
-     * @param classType the type of the coverage path handled here
-     * @return GeneralPath representing the coverage of a certain type
-     */
-    private GeneralPath getCoveragePath(boolean isForwardStrand, Classification classType) {
-        GeneralPath covPath = new GeneralPath();
-        int orientation = (isForwardStrand ? SequenceUtils.STRAND_REV : SequenceUtils.STRAND_FWD);
-
-        PaintingAreaInfo info = getPaintingAreaInfo();
-        int low = (orientation < 0 ? info.getForwardLow() : info.getReverseLow());
-        // paint every physical position
-        covPath.moveTo(info.getPhyLeft(), low);
-        for (int pixel = info.getPhyLeft(); pixel < info.getPhyRight(); pixel++) {
-
-            int left = this.transformToLogicalCoord(pixel);
-            int right = this.transformToLogicalCoord(pixel + 1) - 1;
-
-            // physical coordinate pixel and pixel+1 may cover the same base, depending on zoomlevel,
-            // if not compute max of range of values represented at position pixel
-            double value;
-            if (right > left) {
-
-                double max = 0;
-                for (int i = left; i <= right; i++) {
-                    if (this.getCoverageValue(isForwardStrand, classType, i) > max) {
-                        max = this.getCoverageValue(isForwardStrand, classType, i);
-                    }
-                }
-                value = max;
-
-            } else {
-                value = this.getCoverageValue(isForwardStrand, classType, left);
-            }
-
-            value = this.getCoverageYValue(value);
-            if (orientation < 0) {
-                // forward
-                if (!this.getPaintingAreaInfo().fitsIntoAvailableForwardSpace(value)) {
-                    value = getPaintingAreaInfo().getAvailableForwardHeight();
-                }
-            } else {
-                // reverse
-                if (!this.getPaintingAreaInfo().fitsIntoAvailableReverseSpace(value)) {
-                    value = getPaintingAreaInfo().getAvailableReverseHeight();
-                }
-            }
-
-            covPath.lineTo(pixel, low + value * orientation);
-        }
-
-        covPath.lineTo(info.getPhyRight(), low);
-        covPath.closePath();
-
-        return covPath;
     }
 
     /**
@@ -465,18 +338,142 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      */
     protected void createCoveragePaths() {
         this.covManager.setHighestCoverage(0);
-
-//        if (!this.getExcludedFeatureTypes().contains(FeatureType.PERFECT_MATCH)) {
-        for (Classification classType : classList) {
-
-            GeneralPath fwdPath = this.getCoveragePath(true, classType);
-            GeneralPath revPath = this.getCoveragePath(false, classType);
-            classToPathsMap.put(classType, new Pair<>(fwdPath, revPath));
-//        } else {
-//            zFw.reset();
-//            zRv.reset();
-//        }
+        if (this.getCoverageManagers() != null && !this.getCoverageManagers().isEmpty()) {
+            Map<Classification, GeneralPath> fwdPaths = this.getCoveragePath(true);
+            Map<Classification, GeneralPath> revPaths = this.getCoveragePath(false);
+            for (Classification classType : classList) {
+                classToPathsMap.put(classType, new Pair<>(fwdPaths.get(classType), revPaths.get(classType)));
+            }
         }
+    }
+    
+    /**
+     * Create a Map of GeneralPaths to their classification that represents the
+     * coverage of a certain class.
+     * @param isFwdStrand if true, coverage is drawn from bottom to top, if
+     * false otherwise
+     * @return Map of GeneralPaths to their classification representing the
+     * coverage of their certain class
+     */
+    protected Map<Classification, GeneralPath> getCoveragePath(boolean isFwdStrand) {
+        
+        Map<Classification, GeneralPath> classToPathMap = new HashMap<>();
+        for (Classification classType : classList) {
+            classToPathMap.put(classType, new GeneralPath());
+        }
+
+        PaintingAreaInfo info = getPaintingAreaInfo();
+        int orientation = (isFwdStrand ? -1 : 1); //opposite of strand
+        int yLow = (isFwdStrand ? info.getForwardLow() : info.getReverseLow());
+        for (int pixelX = info.getPhyLeft(); pixelX < info.getPhyRight(); pixelX++) {
+
+            int left = this.transformToLogicalCoord(pixelX); //this only once per class
+            int right = this.transformToLogicalCoord(pixelX + 1) - 1;
+            double totalCovPixel = -1;
+            for (Classification classType : classList) {
+                
+                if (this.getPaintingAreaInfo().fitsIntoAvailableSpace(totalCovPixel + 1, isFwdStrand)) {
+                    // physical coordinate pixel and pixel+1 may cover the same base, depending on zoomlevel,
+                    // if not compute max of range of values represented at position pixel
+                    double yValue;
+                    if (right > left) {
+
+                        double max = 0;
+                        for (int i = left; i <= right; i++) {
+                            double covValue = this.getCoverageValue(isFwdStrand, classType, i);
+                            if (covValue > max) {
+                                max = covValue;
+                            }
+                        }
+                        yValue = max;
+
+                    } else {
+                        yValue = this.getCoverageValue(isFwdStrand, classType, left);
+                    }
+
+                    if (yValue > 0) {
+                        GeneralPath covPath = classToPathMap.get(classType);
+                        // paint every physical position
+                        double start = yLow + totalCovPixel * orientation;
+                        covPath.moveTo(pixelX, start);
+                        
+                        yValue = this.getCoverageYValue(yValue);
+                        totalCovPixel += yValue;
+
+                        if (!this.getPaintingAreaInfo().fitsIntoAvailableSpace(totalCovPixel, isFwdStrand)) {
+                            totalCovPixel = this.getPaintingAreaInfo().getAvailableHeight(isFwdStrand);
+                        }
+                        covPath.lineTo(pixelX, yLow + totalCovPixel * orientation);
+                        covPath.lineTo(pixelX, start);
+                        covPath.closePath();
+                    }
+                } //otherwise we do not paint the path if it is out of reach
+            }
+        }
+
+        return classToPathMap;
+    }
+
+    /**
+     * Returns the coverage value for the given strand, coverage type and
+     * position.
+     * @param isFwdStrand if true, coverage is drawn from bottom to top, if
+     * false otherwise
+     * @param classType the mapping classification type of the coverage path
+     * handled here
+     * @param absPos the reference position for which the coverage should be
+     * obtained
+     * @return the coverage value for the given strand, coverage type and
+     * position.
+     */
+    protected double getCoverageValue(boolean isFwdStrand, Classification classType, int absPos) {
+        double value = this.calcCoverageValue(isFwdStrand, classType, absPos);
+
+        if (value > this.covManager.getHighestCoverage()) {
+            this.covManager.setHighestCoverage((int) Math.ceil(value));
+        }
+
+        return value;
+
+    }
+
+    /**
+     * Calculates the (normalized) coverage value for the given strand, coverage
+     * type and position.
+     * @param isFwdStrand if true, coverage is drawn from bottom to top, if
+     * false otherwise
+     * @param classType the mapping classification type of the coverage path
+     * handled here
+     * @param absPos the reference position for which the coverage should be
+     * obtained
+     * @return the coverage value for the given strand, coverage type and
+     * position.
+     */
+    protected double calcCoverageValue(boolean isFwdStrand, Classification classType, int absPos) {
+        double value = 0;
+        try {
+            value = this.covManager.getCoverage(classType).getCoverage(absPos, isFwdStrand);
+        } catch (IllegalArgumentException e) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown mapping classification type!");
+        }
+        value = this.getNormalizedValue(this.id1, value);
+
+        return value;
+    }
+
+    /**
+     * @param coverage the coverage for a certain position
+     * @return The current y value of the given coverage path. This represents
+     * the absoulte position on the screen (pixel) up to which the coverage path
+     * should reach.
+     */
+    protected int getCoverageYValue(double coverage) {
+        int value = (int) Math.round(coverage / this.scaleFactor);
+        if (coverage > 0) {
+            value = (value > 0 ? value : 1);
+        }
+
+        return value;
     }
 
     /**
@@ -498,20 +495,14 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         sb.append("<b>Position</b>: ").append(logPos);
         sb.append("<br>");
         sb.append("<table>");
-        sb.append("<tr><td align=\"left\"><b>Forward strand (").append(getCovSum(logPos, true)).append("</b></td></tr>");
+        sb.append("<tr><td align=\"left\"><b>Forward strand (").append(getCovSum(logPos, true)).append(")</b></td></tr>");
 
-        for (int i = this.classList.size(); --i >= 0;) {
-            double fwd = covManager.getCoverage(classList.get(i)).getFwdCov(logPos);
-            this.addToBuilder(sb, classList.get(i), fwd);
-        }
+        this.appendTooltipCoverage(logPos, true, sb);
         sb.append("</table>");
 
         sb.append("<table>");
-        sb.append("<tr><td align=\"left\"><b>Reverse strand").append(getCovSum(logPos, false)).append("</b></td></tr>");
-        for (int i = this.classList.size(); --i >= 0;) {
-            double rev = covManager.getCoverage(classList.get(i)).getRevCov(logPos);
-            this.addToBuilder(sb, classList.get(i), rev);
-        }
+        sb.append("<tr><td align=\"left\"><b>Reverse strand (").append(getCovSum(logPos, false)).append(")</b></td></tr>");
+        this.appendTooltipCoverage(logPos, false, sb);
         sb.append("</table>");
         sb.append("</html>");
 
@@ -524,24 +515,21 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * @return the complete coverage sum at the current position
      */
     private double getCovSum(int logPos, boolean isFwdStrand) {
-        double cov = 0;
-        int newCov;
-        for (int i = this.classList.size(); --i >= 0;) {
-            if (isFwdStrand) {
-                newCov = covManager.getCoverage(classList.get(i)).getFwdCov(logPos);
-            } else {
-                newCov = covManager.getCoverage(classList.get(i)).getRevCov(logPos);
-            }
-            if (newCov > cov) { cov = newCov; }
+        return covManager.getTotalCoverage(getExcludedClassifications(), logPos, isFwdStrand);
+    }
+    
+    /**
+     * Fetches and appends the coverage of all mapping classes for the given
+     * position and strand to the given StringBuilder.
+     * @param logPos genomic position of interest
+     * @param isFwdStrand true, if fwd strand, false otherwise
+     * @param sb the StringBuilder to add the coverage entry to
+     */
+    private void appendTooltipCoverage(int logPos, boolean isFwdStrand, StringBuilder sb) {
+        for (Classification classType : classList) {
+            double fwd = covManager.getCoverage(classType).getCoverage(logPos, isFwdStrand);
+            this.addToBuilder(sb, classType, fwd);
         }
-        if (this.classList.contains(MappingClass.SINGLE_COMMON_MATCH)) { //this classification needs to be added 
-            if (isFwdStrand) {
-                cov += covManager.getCoverage(MappingClass.SINGLE_COMMON_MATCH).getFwdCov(logPos);
-            } else {
-                cov += covManager.getCoverage(MappingClass.SINGLE_COMMON_MATCH).getRevCov(logPos);
-            }
-        }
-        return cov;
     }
     
     /**
@@ -553,11 +541,11 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      */
     private void addToBuilder(StringBuilder sb, Classification classification, double coverage) {
         String classType = classification.getTypeString();
-            if (hasNormalizationFactor) {
-                sb.append(createTableRow(classType, coverage, TrackViewer.threeDecAfter(getNormalizedValue(id1, coverage))));
-            } else {
-                sb.append(createTableRow(classType, coverage));
-            }
+        if (hasNormalizationFactor) {
+            sb.append(createTableRow(classType, coverage, TrackViewer.threeDecAfter(getNormalizedValue(id1, coverage))));
+        } else {
+            sb.append(createTableRow(classType, coverage));
+        }
     }
 
     protected String createTableRow(String label, double value) {
@@ -566,21 +554,6 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
 
     protected String createTableRow(String label, double value, double scaleFacVal) {
         return "<tr><td align=\"right\">" + label + ":</td><td align=\"left\">" + String.valueOf(scaleFacVal) + " (" + String.valueOf((int) value) + ")" + "</td></tr>";
-    }
-
-    /**
-     * @param coverage the coverage for a certain position
-     * @return The current y value of the given coverage path. This represents
-     * the absoulte position on the screen (pixel) up to which the coverage path
-     * should reach.
-     */
-    private int getCoverageYValue(double coverage) {
-        int value = (int) Math.round(coverage / this.scaleFactor);
-        if (coverage > 0) {
-            value = (value > 0 ? value : 1);
-        }
-
-        return value;
     }
 
     @Override
@@ -872,25 +845,6 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     
     protected boolean hasNormalizationFactor() {
         return this.hasNormalizationFactor;
-    }
-
-    /**
-     * @param useExtendedClassification Set <code>true</code>, if the extended
-     * classification including single perfect/best/common match classes shall
-     * be used and <code>false</code>, if only the three standard classes
-     * perfect/best/commmon match shall be used.
-     */
-    public void setUseExtendedClassification(boolean useExtendedClassification) {
-        this.useExtendedClassification = useExtendedClassification;
-        this.setupClassesAndColors();
-        this.boundsChangedHook();
-    }
-    
-    /**
-     * @return True, if the extended classification is used, false otherwise.
-     */
-    protected boolean isUseExtendedClassification() {
-        return this.useExtendedClassification;
     }
 
     /**
