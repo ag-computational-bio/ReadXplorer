@@ -72,11 +72,6 @@ public final class CoverageAnalysisVisualPanel extends JobPanel {
         org.openide.awt.Mnemonics.setLocalizedText(countStrandsSeparatelyButton, org.openide.util.NbBundle.getMessage(CoverageAnalysisVisualPanel.class, "CoverageAnalysisVisualPanel.countStrandsSeparatelyButton.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(uncoveredCheckBox, org.openide.util.NbBundle.getMessage(CoverageAnalysisVisualPanel.class, "CoverageAnalysisVisualPanel.uncoveredCheckBox.text")); // NOI18N
-        uncoveredCheckBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                uncoveredCheckBoxActionPerformed(evt);
-            }
-        });
 
         tssTextArea.setEditable(false);
         tssTextArea.setBackground(new java.awt.Color(240, 240, 240));
@@ -126,10 +121,6 @@ public final class CoverageAnalysisVisualPanel extends JobPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-
-    private void uncoveredCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_uncoveredCheckBoxActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_uncoveredCheckBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup2;

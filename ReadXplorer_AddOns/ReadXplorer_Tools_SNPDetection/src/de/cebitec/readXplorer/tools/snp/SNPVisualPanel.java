@@ -109,11 +109,6 @@ public final class SNPVisualPanel extends JobPanel {
 
         useMainBaseBox.setSelected(true);
         org.openide.awt.Mnemonics.setLocalizedText(useMainBaseBox, org.openide.util.NbBundle.getMessage(SNPVisualPanel.class, "SNPVisualPanel.useMainBaseBox.text")); // NOI18N
-        useMainBaseBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                useMainBaseBoxActionPerformed(evt);
-            }
-        });
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(SNPVisualPanel.class, "SNPVisualPanel.jLabel3.text")); // NOI18N
 
@@ -241,10 +236,6 @@ public final class SNPVisualPanel extends JobPanel {
     private void percentSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_percentSpinnerStateChanged
         this.isRequiredInfoSet();
     }//GEN-LAST:event_percentSpinnerStateChanged
-
-    private void useMainBaseBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_useMainBaseBoxActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_useMainBaseBoxActionPerformed
     
     
     

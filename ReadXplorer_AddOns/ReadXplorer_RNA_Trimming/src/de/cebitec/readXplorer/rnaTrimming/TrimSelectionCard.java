@@ -119,11 +119,6 @@ public class TrimSelectionCard extends javax.swing.JPanel {
             RegularExpressionTrimMethod.createNewInstance(RegularExpressionTrimMethod.Type.FIXED_LEFT),
             RegularExpressionTrimMethod.createNewInstance(RegularExpressionTrimMethod.Type.FIXED_BOTH)
         }));
-        trimMethodCombo.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                trimMethodComboActionPerformed(evt);
-            }
-        });
 
         org.openide.awt.Mnemonics.setLocalizedText(sourceFileLabel1, org.openide.util.NbBundle.getMessage(TrimSelectionCard.class, "TrimSelectionCard.sourceFileLabel1.text")); // NOI18N
 
@@ -233,10 +228,6 @@ public class TrimSelectionCard extends javax.swing.JPanel {
         this.mappingParamField.setText(lastMappingParams);
     }
     
-    private void trimMethodComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_trimMethodComboActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_trimMethodComboActionPerformed
-
     private void openReferenceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openReferenceButtonActionPerformed
         File file = FileUtils.showFileOpenDialogAndChangePrefs("TrimSelection.Referencepath",
                 new FileNameExtensionFilter("Fasta File", "fasta"), 

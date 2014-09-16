@@ -97,11 +97,6 @@ public class MappingSelectionCard extends javax.swing.JPanel {
         org.openide.awt.Mnemonics.setLocalizedText(sourceFileLabel1, org.openide.util.NbBundle.getMessage(MappingSelectionCard.class, "MappingSelectionCard.sourceFileLabel1.text")); // NOI18N
 
         referenceFileField.setText(org.openide.util.NbBundle.getMessage(MappingSelectionCard.class, "MappingSelectionCard.referenceFileField.text")); // NOI18N
-        referenceFileField.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                referenceFileFieldActionPerformed(evt);
-            }
-        });
 
         org.openide.awt.Mnemonics.setLocalizedText(openReferenceButton, org.openide.util.NbBundle.getMessage(MappingSelectionCard.class, "MappingSelectionCard.openReferenceButton.text")); // NOI18N
         openReferenceButton.addActionListener(new java.awt.event.ActionListener() {
@@ -191,10 +186,6 @@ public class MappingSelectionCard extends javax.swing.JPanel {
                 new FileNameExtensionFilter("Fasta File", "fasta"), 
                 referenceFileField, MappingSelectionCard.class, this); 
     }//GEN-LAST:event_openReferenceButtonActionPerformed
-
-    private void referenceFileFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_referenceFileFieldActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_referenceFileFieldActionPerformed
     
     @Override
     public String getName() {

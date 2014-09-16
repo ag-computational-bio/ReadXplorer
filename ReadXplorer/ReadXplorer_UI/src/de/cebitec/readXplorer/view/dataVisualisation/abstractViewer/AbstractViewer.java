@@ -597,7 +597,6 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     @Override
     public void updateLogicalBounds(BoundsInfo bounds) {
         if (this.isActive() && !this.bounds.equals(bounds)) {
-            this.newDataRequestNeeded = true;
             this.bounds = bounds;
             this.calcBaseWidth();
             this.recalcCorrelationFactor();

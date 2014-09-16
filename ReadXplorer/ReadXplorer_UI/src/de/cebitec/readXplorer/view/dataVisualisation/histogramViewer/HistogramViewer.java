@@ -242,6 +242,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
                 this.setupData();
             }
         } else {
+            this.setNewDataRequestNeeded(false);
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
             this.coverageLoaded = false;
             this.diffsLoaded = false;

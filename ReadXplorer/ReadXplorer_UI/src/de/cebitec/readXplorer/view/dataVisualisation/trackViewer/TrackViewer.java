@@ -280,7 +280,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         setCursor(new Cursor(Cursor.WAIT_CURSOR));
         int totalFrom = getBoundsInfo().getLogLeft();
         int totalTo = getBoundsInfo().getLogRight();
-        if (this.useMinimalIntervalLength) {
+        if (this.useMinimalIntervalLength && totalTo - totalFrom < MININTERVALLENGTH) {
             totalFrom -= MININTERVALLENGTH;
             totalTo += MININTERVALLENGTH;
         }

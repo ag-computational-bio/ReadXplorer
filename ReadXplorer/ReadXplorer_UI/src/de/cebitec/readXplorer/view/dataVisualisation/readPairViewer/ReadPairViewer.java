@@ -153,6 +153,7 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
      * @param to right (larger) border of interval
      */
     private void requestData(int from, int to) {  
+        this.setNewDataRequestNeeded(false);
         start = System.currentTimeMillis();
         setCursor(new Cursor(Cursor.WAIT_CURSOR));
         this.jBlockList = new ArrayList<>();

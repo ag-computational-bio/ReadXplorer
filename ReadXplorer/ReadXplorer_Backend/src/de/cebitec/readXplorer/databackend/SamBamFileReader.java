@@ -83,6 +83,8 @@ public class SamBamFileReader implements Observable {
     private SAMFileReader samFileReader;
     private String header;
     private List<Observer> observers;
+//    long startTime;
+//    long finish;
 
     /**
      * A SamBamFileReader has different methods to read data from a bam or sam
@@ -616,7 +618,7 @@ public class SamBamFileReader implements Observable {
      * @return the coverage for the given interval
      */
     public CoverageAndDiffResult getCoverageFromBam(IntervalRequest request) {
-
+//        startTime = System.currentTimeMillis();
         int from = request.getTotalFrom();
         int to = request.getTotalTo();
         ParametersReadClasses readClassParams = request.getReadClassParams();
@@ -679,6 +681,10 @@ public class SamBamFileReader implements Observable {
         } catch (BufferUnderflowException e) {
             //do nothing
         }
+//        finish = System.currentTimeMillis(); //for performance testing
+//        System.out.println(Benchmark.calculateDuration(startTime, finish, "get coverage "));
+//        System.out.println("start: " + request.getTotalFrom() + ", stop: " + request.getTotalTo());
+//        startTime = System.currentTimeMillis();
 
         return result;
     }
@@ -888,7 +894,6 @@ public class SamBamFileReader implements Observable {
      * otherwise
      */
     private boolean isIncludedMapping(MappingClass mappingClass, Integer numMappingsForRead, int mappingQuality, ParametersReadClasses readClassParams) {
-        //TODO: make sure it knows if extended classification is used. if not, replace single perfect... by perfect...
         boolean isIncludedMapping = (readClassParams.isClassificationAllowed(FeatureType.MULTIPLE_MAPPED_READ)
                 || !readClassParams.isClassificationAllowed(FeatureType.MULTIPLE_MAPPED_READ) && numMappingsForRead != null && numMappingsForRead == 1)
                 && (mappingQuality == UNKNOWN_MAP_QUAL

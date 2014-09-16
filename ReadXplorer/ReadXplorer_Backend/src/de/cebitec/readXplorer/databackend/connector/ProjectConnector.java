@@ -1395,6 +1395,9 @@ public class ProjectConnector extends Observable {
 
         } catch (SQLException e) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, e);
+            JOptionPane.showMessageDialog(new JPanel(), "Unfortunately, the Statistics table seems to be broken. In this case the DB has to be re-created"
+                    + " to get the correct statistics entries for each track again.",
+                        "Statistics table format error", JOptionPane.ERROR_MESSAGE);
         }
         return statsContainer;
     }
@@ -1467,6 +1470,9 @@ public class ProjectConnector extends Observable {
                     updateFeatureTable.setInt(2, ref.getId());
                     updateFeatureTable.executeUpdate();
                 }
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(new JPanel(), "Unfortunately, the DB seems to have a broken reference table. In this case the DB has to be re-created.",
+                        "Reference table format error", JOptionPane.ERROR_MESSAGE);
             }
         }
 

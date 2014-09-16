@@ -118,9 +118,6 @@
           <ResourceString bundle="de/cebitec/readXplorer/mapping/Bundle.properties" key="MappingSelectionCard.referenceFileField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="referenceFileFieldActionPerformed"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="openReferenceButton">
       <Properties>
