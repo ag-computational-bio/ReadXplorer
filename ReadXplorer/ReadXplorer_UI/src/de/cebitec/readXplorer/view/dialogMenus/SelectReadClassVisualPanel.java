@@ -118,6 +118,7 @@ public class SelectReadClassVisualPanel extends JobPanel {
         decriptionStrandTextArea.setWrapStyleWord(true);
         descriptionStrandScrollPane.setViewportView(decriptionStrandTextArea);
 
+        checkBoxPerfect.setSelected(true);
         org.openide.awt.Mnemonics.setLocalizedText(checkBoxPerfect, org.openide.util.NbBundle.getMessage(SelectReadClassVisualPanel.class, "SelectReadClassVisualPanel.checkBoxPerfect.text")); // NOI18N
         checkBoxPerfect.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -215,9 +216,7 @@ public class SelectReadClassVisualPanel extends JobPanel {
                                 .addComponent(minMappingQualLabel))
                             .addComponent(checkBoxUnique))
                         .addGap(0, 160, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(descriptionRCScrollPane)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                    .addComponent(descriptionRCScrollPane)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(strandLabel)

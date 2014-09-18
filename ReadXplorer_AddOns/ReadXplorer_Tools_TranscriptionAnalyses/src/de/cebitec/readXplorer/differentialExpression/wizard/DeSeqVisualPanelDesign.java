@@ -66,17 +66,20 @@ public final class DeSeqVisualPanelDesign extends JPanel {
             }
         ));
         jTable2.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_OFF);
+        jTable2.setMaximumSize(new java.awt.Dimension(99999, 99999));
+        jTable2.setMinimumSize(new java.awt.Dimension(490, 330));
+        jTable2.setPreferredSize(new java.awt.Dimension(490, 334));
         jTable2.setRowSelectionAllowed(false);
         jScrollPane2.setViewportView(jTable2);
 
-        org.openide.awt.Mnemonics.setLocalizedText(addRowButton, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelDesign.class, "DeSeqVisualPanelDesign.addRowButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(addRowButton, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelDesign.class, "DeSeqVisualPanelDesign.addRowButton.text_1")); // NOI18N
         addRowButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addRowButtonActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(removeRow, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelDesign.class, "DeSeqVisualPanelDesign.removeRow.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(removeRow, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelDesign.class, "DeSeqVisualPanelDesign.removeRow.text_1")); // NOI18N
         removeRow.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 removeRowActionPerformed(evt);
@@ -92,21 +95,20 @@ public final class DeSeqVisualPanelDesign extends JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 490, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(addRowButton)
-                        .addGap(173, 173, 173)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(removeRow)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(rowNumberSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(rowNumberSelection, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 334, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(addRowButton)

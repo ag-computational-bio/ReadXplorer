@@ -112,43 +112,43 @@ public final class DeSeqVisualPanelConds extends JPanel {
         removeFromConditionOne = new javax.swing.JButton();
         removeFromConditionTwo = new javax.swing.JButton();
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.jLabel1.text_1")); // NOI18N
 
         trackList.setModel(trackListModel);
         jScrollPane1.setViewportView(trackList);
 
-        org.openide.awt.Mnemonics.setLocalizedText(addToConditionOne, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.addToConditionOne.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(addToConditionOne, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.addToConditionOne.text_1")); // NOI18N
         addToConditionOne.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addToConditionOneActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(addToConditionTwo, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.addToConditionTwo.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(addToConditionTwo, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.addToConditionTwo.text_1")); // NOI18N
         addToConditionTwo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addToConditionTwoActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.jLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.jLabel2.text_1")); // NOI18N
 
         conditionOneList.setModel(conditionOneModel);
         jScrollPane2.setViewportView(conditionOneList);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.jLabel3.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.jLabel3.text_1")); // NOI18N
 
         conditionTwoList.setModel(conditionTwoModel);
         jScrollPane3.setViewportView(conditionTwoList);
 
-        org.openide.awt.Mnemonics.setLocalizedText(removeFromConditionOne, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.removeFromConditionOne.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(removeFromConditionOne, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.removeFromConditionOne.text_1")); // NOI18N
         removeFromConditionOne.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 removeFromConditionOneActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(removeFromConditionTwo, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.removeFromConditionTwo.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(removeFromConditionTwo, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.removeFromConditionTwo.text_1")); // NOI18N
         removeFromConditionTwo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 removeFromConditionTwoActionPerformed(evt);
@@ -162,23 +162,20 @@ public final class DeSeqVisualPanelConds extends JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(27, 27, 27)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(addToConditionTwo, javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(addToConditionOne, javax.swing.GroupLayout.Alignment.TRAILING))
-                            .addComponent(removeFromConditionOne)
-                            .addComponent(removeFromConditionTwo))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
+                            .addComponent(removeFromConditionOne, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(addToConditionOne, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(addToConditionTwo, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(removeFromConditionTwo, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel2)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel3))))
                 .addContainerGap())
         );
@@ -191,13 +188,13 @@ public final class DeSeqVisualPanelConds extends JPanel {
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(26, 26, 26)
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1))
                 .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addGap(54, 54, 54)
@@ -208,7 +205,7 @@ public final class DeSeqVisualPanelConds extends JPanel {
                 .addComponent(addToConditionTwo)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(removeFromConditionTwo)
-                .addGap(50, 50, 50))
+                .addGap(47, 47, 47))
         );
     }// </editor-fold>//GEN-END:initComponents
 

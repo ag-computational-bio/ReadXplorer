@@ -79,20 +79,20 @@ public final class BaySeqVisualPanel2 extends JPanel {
         jScrollPane2 = new javax.swing.JScrollPane();
         replicateStructureField = new javax.swing.JTextField();
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(BaySeqVisualPanel2.class, "BaySeqVisualPanel2.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(BaySeqVisualPanel2.class, "BaySeqVisualPanel2.jLabel1.text_1")); // NOI18N
 
         jScrollPane1.setViewportView(trackList);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(BaySeqVisualPanel2.class, "BaySeqVisualPanel2.jLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(BaySeqVisualPanel2.class, "BaySeqVisualPanel2.jLabel2.text_1")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(addAsReplicates, org.openide.util.NbBundle.getMessage(BaySeqVisualPanel2.class, "BaySeqVisualPanel2.addAsReplicates.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(addAsReplicates, org.openide.util.NbBundle.getMessage(BaySeqVisualPanel2.class, "BaySeqVisualPanel2.addAsReplicates.text_1")); // NOI18N
         addAsReplicates.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addAsReplicatesActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(removeReplicates, org.openide.util.NbBundle.getMessage(BaySeqVisualPanel2.class, "BaySeqVisualPanel2.removeReplicates.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(removeReplicates, org.openide.util.NbBundle.getMessage(BaySeqVisualPanel2.class, "BaySeqVisualPanel2.removeReplicates.text_1")); // NOI18N
         removeReplicates.setEnabled(false);
         removeReplicates.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -101,7 +101,7 @@ public final class BaySeqVisualPanel2 extends JPanel {
         });
 
         replicateStructureField.setEditable(false);
-        replicateStructureField.setText(org.openide.util.NbBundle.getMessage(BaySeqVisualPanel2.class, "BaySeqVisualPanel2.replicateStructureField.text")); // NOI18N
+        replicateStructureField.setText(org.openide.util.NbBundle.getMessage(BaySeqVisualPanel2.class, "BaySeqVisualPanel2.replicateStructureField.text_1")); // NOI18N
         replicateStructureField.setBorder(null);
         jScrollPane2.setViewportView(replicateStructureField);
 
@@ -111,26 +111,28 @@ public final class BaySeqVisualPanel2 extends JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 371, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(jLabel1)
-                        .addComponent(jLabel2)
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(addAsReplicates)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(removeReplicates))
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 371, Short.MAX_VALUE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 490, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(addAsReplicates)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(removeReplicates))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel1))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGap(6, 6, 6)
+                .addContainerGap()
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 221, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(addAsReplicates)
                     .addComponent(removeReplicates))
@@ -138,7 +140,7 @@ public final class BaySeqVisualPanel2 extends JPanel {
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
