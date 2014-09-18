@@ -16,10 +16,10 @@
  */
 package de.cebitec.readXplorer.databackend.dataObjects;
 
-import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.PositionUtils;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.SequenceUtils;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.polyTree.Node;
 import de.cebitec.readXplorer.util.polyTree.Polytree;
 import java.util.ArrayList;
@@ -169,6 +169,29 @@ public class PersistentFeature extends Node implements PersistentFeatureI, Compa
     @Override
     public int getStop() {
         return stop;
+    }
+    
+    /**
+     * @return The length of the feature in base pairs.
+     */
+    public int getLength() {
+        return stop - start + 1;
+    }
+    
+    /**
+     * @return The start position on the feature strand = smaller position for
+     * features on the fwd and larger position for features on the rev strand.
+     */
+    public int getStartOnStrand() {
+        return this.isFwdStrand ? start : stop;
+    }
+    
+    /**
+     * @return The stop position on the feature strand = smaller position for
+     * features on the rev and larger position for features on the fwd strand.
+     */
+    public int getStopOnStrand() {
+        return this.isFwdStrand ? stop : start;
     }
 
     /**

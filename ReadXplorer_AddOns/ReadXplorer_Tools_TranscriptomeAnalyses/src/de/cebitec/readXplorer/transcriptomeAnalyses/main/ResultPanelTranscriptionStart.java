@@ -1090,8 +1090,8 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
                         // additionally informations about detected gene
                         if (feature != null) {
-                            rowData[i++] = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
-                            rowData[i++] = feature.isFwdStrand() ? feature.getStop() : feature.getStart();
+                            rowData[i++] = feature.getStartOnStrand();
+                            rowData[i++] = feature.getStopOnStrand();
                             rowData[i++] = feature.getStop() - feature.getStart();
                             rowData[i++] = PersistentFeature.Utils.determineFrame(feature);
                             rowData[i++] = feature.getProduct();

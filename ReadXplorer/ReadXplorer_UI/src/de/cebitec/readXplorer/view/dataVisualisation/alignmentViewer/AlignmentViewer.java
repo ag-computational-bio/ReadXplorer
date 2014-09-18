@@ -35,8 +35,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
@@ -61,7 +61,6 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
     private int oldLogRight;
     private boolean showBaseQualities;
     MappingResult mappingResult;
-    HashMap<Integer, Integer> completeCoverage;
 
     /**
      * Viewer to show alignments of reads to the reference.
@@ -78,7 +77,6 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
         blockHeight = 8;
         layerHeight = blockHeight + 2;
         mappingResult = new MappingResult(new ArrayList<Mapping>(), null);
-        completeCoverage = new HashMap<>();
         this.setHorizontalMargin(10);
         this.setActive(false);
         this.setAutomaticCentering(true);
@@ -190,8 +188,8 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
     private void showData() {
 
             this.findMinAndMaxCount(mappingResult.getMappings()); //for currently shown mappingResult
-            this.findMaxCoverage(completeCoverage);
             this.setViewerHeight();
+            this.adjustPaintingAreaInfoPrefSize();
             this.layout = new Layout(mappingResult.getRequest().getFrom(), mappingResult.getRequest().getTo(), mappingResult.getMappings(), getExcludedClassifications());
 
             this.removeAll();
@@ -240,7 +238,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
      * Determines maximum coverage in the currently displayed interval.
      * @param coverage  coverage hashmap of positions for current interval
      */
-    private void findMaxCoverage(HashMap<Integer, Integer> coverage) {
+    private void findMaxCoverage(Map<Integer, Integer> coverage) {
         this.maxCoverageInInterval = 0;
 
         int coverageAtPos;
@@ -320,14 +318,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
         // negative layer counter means reverse strand
         int lower = (layerCounter < 0 ? getPaintingAreaInfo().getReverseLow() : getPaintingAreaInfo().getForwardLow());
         int yPosition = lower - layerCounter * layerHeight;
-        if (layerCounter < 0) {
-            // reverse/negative layer
-            yPosition -= jb.getHeight() / 2;
-        } else {
-            // forward/positive layer
-            yPosition -= jb.getHeight() / 2;
-        }
-
+        yPosition -= jb.getHeight() / 2;
         jb.setBounds(jb.getPhyStart(), yPosition, jb.getPhyWidth(), jb.getHeight());
         this.add(jb);
     }

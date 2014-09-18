@@ -119,7 +119,7 @@ public class TableUtils {
                 PersistentFeature feature = (PersistentFeature) posValue;
                 bim.chromosomeChanged(feature.getChromId());
                 //jump to position
-                int pos = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
+                int pos = feature.getStartOnStrand();
                 bim.navigatorBarUpdated(pos);
 
             } else {
@@ -154,7 +154,7 @@ public class TableUtils {
                             String featLocus = (String) posValue;
                             if (featMap.containsKey(featLocus)) {
                                 PersistentFeature feature = featMap.get(featLocus);
-                                int pos = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
+                                int pos = feature.getStartOnStrand();
                                 bim.navigatorBarUpdated(pos);
                             }
                         }

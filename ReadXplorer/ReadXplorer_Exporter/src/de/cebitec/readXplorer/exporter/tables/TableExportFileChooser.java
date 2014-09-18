@@ -72,10 +72,10 @@ public class TableExportFileChooser extends ReadXplorerFileChooser {
 
     @Override
     @NbBundle.Messages({
-        "IoExceptionMsg=An error occured while reading the specified file",
+        "IoExceptionMsg=An error occurred while reading the specified file",
         "FailHeader=Failure", 
         "ProgressName=Table export progress", 
-        "FailMsg=A write error occured during saving progress!", 
+        "FailMsg=A write error occurred during saving progress!", 
         "OomMsg=Out of Memory: Data too large for table export."})
     public void save(final String fileLocation) {
 

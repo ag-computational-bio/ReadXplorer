@@ -86,6 +86,7 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
         resultDescriptions.add("Start");
         resultDescriptions.add("Stop");
         resultDescriptions.add("Length");
+        resultDescriptions.add("Mean Coverage");
         resultDescriptions.add("Covered Percent");
         resultDescriptions.add("Covered Bases Count");
         resultDescriptions.add("Locus");
@@ -116,9 +117,10 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
             coveredFeatureRow.add(this.getTrackEntry(coveredFeature.getTrackId(), true));
             coveredFeatureRow.add(this.getChromosomeMap().get(feature.getChromId()));
             coveredFeatureRow.add(feature.isFwdStrandString());
-            coveredFeatureRow.add(feature.isFwdStrand() ? feature.getStart() : feature.getStop());
-            coveredFeatureRow.add(feature.isFwdStrand() ? feature.getStop() : feature.getStart());
-            coveredFeatureRow.add(feature.getStop() - feature.getStart());
+            coveredFeatureRow.add(feature.getStartOnStrand());
+            coveredFeatureRow.add(feature.getStopOnStrand());
+            coveredFeatureRow.add(feature.getLength());
+            coveredFeatureRow.add(coveredFeature.getMeanCoverage());
             coveredFeatureRow.add(coveredFeature.getPercentCovered());
             coveredFeatureRow.add(coveredFeature.getNoCoveredBases());
             coveredFeatureRow.add(feature.getLocus());

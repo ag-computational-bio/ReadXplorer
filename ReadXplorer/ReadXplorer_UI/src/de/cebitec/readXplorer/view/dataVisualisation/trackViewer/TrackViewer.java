@@ -394,7 +394,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
                     if (yValue > 0) {
                         GeneralPath covPath = classToPathMap.get(classType);
                         // paint every physical position
-                        double start = yLow + totalCovPixel * orientation;
+                        double start = yLow + orientation + totalCovPixel * orientation;
                         covPath.moveTo(pixelX, start);
                         
                         yValue = this.getCoverageYValue(yValue);
@@ -403,7 +403,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
                         if (!this.getPaintingAreaInfo().fitsIntoAvailableSpace(totalCovPixel, isFwdStrand)) {
                             totalCovPixel = this.getPaintingAreaInfo().getAvailableHeight(isFwdStrand);
                         }
-                        covPath.lineTo(pixelX, yLow + totalCovPixel * orientation);
+                        covPath.lineTo(pixelX, yLow + orientation + totalCovPixel * orientation);
                         covPath.lineTo(pixelX, start);
                         covPath.closePath();
                     }

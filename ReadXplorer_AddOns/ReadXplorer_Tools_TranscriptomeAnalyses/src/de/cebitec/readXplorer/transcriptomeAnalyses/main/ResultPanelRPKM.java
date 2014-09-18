@@ -162,7 +162,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
         int selectedView = model.getLeadSelectionIndex();
         int selectedModel = this.rpkmTable.convertRowIndexToModel(selectedView);
         feature = (PersistentFeature) this.rpkmTable.getModel().getValueAt(selectedModel, 0);
-        int pos = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
+        int pos = feature.getStartOnStrand();
 
         getBoundsInfoManager().navigatorBarUpdated(pos);
     }

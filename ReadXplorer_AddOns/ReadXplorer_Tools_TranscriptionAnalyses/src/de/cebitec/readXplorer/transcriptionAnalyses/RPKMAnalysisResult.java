@@ -123,9 +123,9 @@ public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
             rpkmRow.add(feat.getType());
             rpkmRow.add(this.getTrackEntry(rpkmValue.getTrackId(), true));
             rpkmRow.add(this.getChromosomeMap().get(feat.getChromId()));
-            rpkmRow.add(feat.isFwdStrand() ? feat.getStart() : feat.getStop());
-            rpkmRow.add(feat.isFwdStrand() ? feat.getStop() : feat.getStart());
-            rpkmRow.add(feat.getStop() - feat.getStart());
+            rpkmRow.add(feat.getStartOnStrand());
+            rpkmRow.add(feat.getStopOnStrand());
+            rpkmRow.add(feat.getLength());
             rpkmRow.add(feat.isFwdStrandString());
             rpkmRow.add(rpkmValue.getRPKM());
             rpkmRow.add(rpkmValue.getReadCount());

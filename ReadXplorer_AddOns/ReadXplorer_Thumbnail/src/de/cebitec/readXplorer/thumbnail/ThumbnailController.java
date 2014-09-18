@@ -38,7 +38,7 @@ import de.cebitec.readXplorer.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.IThumbnailView;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.CoverageZoomSlider;
-import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.MultipleTrackViewer;
+import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.DoubleTrackViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.Color;
 import java.awt.Component;
@@ -324,65 +324,6 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     }
 
     /**
-     * Creates BasePanel of two Tracks which have been compared.
-     * @param tracks Tracks to compare.
-     * @return
-     */
-    private BasePanel createMultipleTrackPanel(List<PersistentTrack> tracks, PersistentFeature feature) {
-        BoundsInfoManager boundsManager = new BoundsInfoManager(controller.getCurrentRefGen());
-        BasePanel b = new BasePanel(boundsManager, controller);
-        controller.addMousePositionListener(b);
-
-        // get double track connector
-        MultiTrackConnector trackCon;
-        SaveFileFetcherForGUI fetcher = new SaveFileFetcherForGUI();
-        try {
-            trackCon = fetcher.getMultiTrackConnector(tracks);
-        } catch (UserCanceledTrackPathUpdateException ex) {
-            SaveFileFetcherForGUI.showPathSelectionErrorMsg();
-            return null; //cannot occur, since both tracks are already open in the thumbnail viewer
-        }
-        MultipleTrackViewer trackV = new MultipleTrackViewer(boundsManager, b, controller.getCurrentRefGen(), trackCon, false);
-        trackV.setUseMinimalIntervalLength(false);
-        trackV.setIsPanModeOn(false);
-        trackV.setCanZoom(false);
- 
-        //eigener ComponentListener für TrackV
-        trackV.addComponentListener(new TrackViewerCompListener(feature, trackV));
-
-//        // create info panel
-//        CoverageInfoLabel cil = new CoverageInfoLabel();
-//        cil.renameFields();
-//        trackV.setTrackInfoPanel(cil);
-
-        // create zoom slider and set its value based on other slider's values for this Feature
-        CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
-        BasePanel p = featureToTrackpanelList.get(feature).get(0);
-        try {
-            int sValue = ((JSlider) ((Container) p.getComponent(0)).getComponent(1)).getValue();
-            slider.setValue(sValue);
-        } catch (ClassCastException e) {
-            Logger.getLogger(ThumbnailController.class.getName()).log(
-                    Level.WARNING, "{0}: Can't set value MultipleTrackPanel-Slider", e.getMessage());
-        }
-
-        // add panels to basepanel
-        b.setViewer(trackV, slider);
-
-        //TitlePanel
-        String title = tracks.get(0).getDescription() + " - " + tracks.get(1).getDescription();
-        JPanel tp = new JPanel();
-        tp.add(new JLabel(title));
-        tp.setBackground(ColorProperties.TITLE_BACKGROUND);
-        b.setTitlePanel(tp);
-        //estimate current size of other BPs based on first BP
-        BasePanel refBP = featureToTrackpanelList.get(feature).get(0);
-        b.setMinimumSize(new Dimension(200, 150));
-        b.setPreferredSize(new Dimension(refBP.getBounds().width, refBP.getBounds().height));
-        return b;
-    }
-
-    /**
      * TitlePanel for TrackPanel with Label and Checkbox.
      * @param title
      * @return
@@ -472,38 +413,6 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             });
         }
         addOpenCookie();
-    }
-
-    /**
-     * Creates Widgets for CompareTrackBasePanel to display in TopComponent's Scene
-     * @param tracks
-     * @param feature
-     */
-    private void compareTwoTracks(List<PersistentTrack> tracks, PersistentFeature feature) {
-        BasePanel bp = createMultipleTrackPanel(tracks, feature);
-        bp.addMouseListener(this);
-        featureToTrackpanelList.get(feature).add(bp);
-        //If Sliders are currently synchronized, synchronize again for new MultipleTrackViewer
-        if (getLookup().lookup(ASyncSliderCookie.class) != null) {
-            sliderSynchronisation(true);
-        }
-        ComponentWidget compWidg = new ComponentWidget(activeTopComp.getScene(), bp);
-        compWidg.setBorder(BorderFactory.createResizeBorder(6, Color.GRAY, false));
-        compWidg.getActions().addAction(ActionFactory.createResizeAction(new ResizeStrategy() {
-
-            @Override
-            public Rectangle boundsSuggested(Widget widget, Rectangle originalBounds, Rectangle suggestedBounds, ControlPoint controlPoint) {
-                Widget layout = widget.getParentWidget();
-                for (Widget child : layout.getChildren()) {
-                    child.setPreferredBounds(suggestedBounds);
-                }
-                return suggestedBounds;
-            }
-        }, ActionFactory.createDefaultResizeProvider()));
-
-        //Add MultipleTrackPanel to Layout for currentFeature
-        featureToLayoutWidget.get(currentFeature).addChild(compWidg);
-        activeTopComp.getScene().validate();
     }
 
     /**
@@ -703,17 +612,108 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             countTracks = 0;
         }
 
-        void startCompare(ActionEvent e) {
+        private void startCompare(ActionEvent e) {
             try {
                 BasePanel secondTrackBP = (BasePanel) ((Component) e.getSource()).getParent().getParent();
                 ArrayList<PersistentTrack> trackList = new ArrayList<>();
                 trackList.add(trackPanelToTrack.get(firstTrackPanelToCompare));
                 trackList.add(trackPanelToTrack.get(secondTrackBP));
-                compareTwoTracks(trackList, currentFeature);
+                this.compareTwoTracks(trackList, currentFeature);
             } catch (ClassCastException ex) {
                 Logger.getLogger(ThumbnailController.class.getName()).log(
                         Level.WARNING, ex.getMessage());
             }
+        }
+        
+        /**
+         * Creates Widgets for CompareTrackBasePanel to display in
+         * TopComponent's Scene
+         * @param tracks
+         * @param feature
+         */
+        private void compareTwoTracks(List<PersistentTrack> tracks, PersistentFeature feature) {
+            BasePanel bp = createDoubleTrackPanel(tracks, feature);
+            bp.addMouseListener(ThumbnailController.this);
+            featureToTrackpanelList.get(feature).add(bp);
+            //If Sliders are currently synchronized, synchronize again for new MultipleTrackViewer
+            if (getLookup().lookup(ASyncSliderCookie.class) != null) {
+                sliderSynchronisation(true);
+            }
+            ComponentWidget compWidg = new ComponentWidget(activeTopComp.getScene(), bp);
+            compWidg.setBorder(BorderFactory.createResizeBorder(6, Color.GRAY, false));
+            compWidg.getActions().addAction(ActionFactory.createResizeAction(new ResizeStrategy() {
+
+                @Override
+                public Rectangle boundsSuggested(Widget widget, Rectangle originalBounds, Rectangle suggestedBounds, ControlPoint controlPoint) {
+                    Widget layout = widget.getParentWidget();
+                    for (Widget child : layout.getChildren()) {
+                        child.setPreferredBounds(suggestedBounds);
+                    }
+                    return suggestedBounds;
+                }
+            }, ActionFactory.createDefaultResizeProvider()));
+
+            //Add MultipleTrackPanel to Layout for currentFeature
+            featureToLayoutWidget.get(currentFeature).addChild(compWidg);
+            activeTopComp.getScene().validate();
+        }
+        
+        /**
+         * Creates BasePanel of two Tracks which have been compared.
+         * @param tracks Tracks to compare.
+         * @return
+         */
+        private BasePanel createDoubleTrackPanel(List<PersistentTrack> tracks, PersistentFeature feature) {
+            BoundsInfoManager boundsManager = new BoundsInfoManager(controller.getCurrentRefGen());
+            BasePanel b = new BasePanel(boundsManager, controller);
+            controller.addMousePositionListener(b);
+
+            // get double track connector
+            MultiTrackConnector trackCon;
+            SaveFileFetcherForGUI fetcher = new SaveFileFetcherForGUI();
+            try {
+                trackCon = fetcher.getMultiTrackConnector(tracks);
+            } catch (UserCanceledTrackPathUpdateException ex) {
+                SaveFileFetcherForGUI.showPathSelectionErrorMsg();
+                return null; //cannot occur, since both tracks are already open in the thumbnail viewer
+            }
+            DoubleTrackViewer trackV = new DoubleTrackViewer(boundsManager, b, controller.getCurrentRefGen(), trackCon);
+            trackV.setUseMinimalIntervalLength(false);
+            trackV.setIsPanModeOn(false);
+            trackV.setCanZoom(false);
+
+            //eigener ComponentListener für TrackV
+            trackV.addComponentListener(new TrackViewerCompListener(feature, trackV));
+
+//        // create info panel
+//        CoverageInfoLabel cil = new CoverageInfoLabel();
+//        cil.renameFields();
+//        trackV.setTrackInfoPanel(cil);
+            // create zoom slider and set its value based on other slider's values for this Feature
+            CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
+            BasePanel p = featureToTrackpanelList.get(feature).get(0);
+            try {
+                int sValue = ((JSlider) ((Container) p.getComponent(0)).getComponent(1)).getValue();
+                slider.setValue(sValue);
+            } catch (ClassCastException e) {
+                Logger.getLogger(ThumbnailController.class.getName()).log(
+                        Level.WARNING, "{0}: Can't set value MultipleTrackPanel-Slider", e.getMessage());
+            }
+
+            // add panels to basepanel
+            b.setViewer(trackV, slider);
+
+            //TitlePanel
+            String title = tracks.get(0).getDescription() + " - " + tracks.get(1).getDescription();
+            JPanel tp = new JPanel();
+            tp.add(new JLabel(title));
+            tp.setBackground(ColorProperties.TITLE_BACKGROUND);
+            b.setTitlePanel(tp);
+            //estimate current size of other BPs based on first BP
+            BasePanel refBP = featureToTrackpanelList.get(feature).get(0);
+            b.setMinimumSize(new Dimension(200, 150));
+            b.setPreferredSize(new Dimension(refBP.getBounds().width, refBP.getBounds().height));
+            return b;
         }
 
         @Override

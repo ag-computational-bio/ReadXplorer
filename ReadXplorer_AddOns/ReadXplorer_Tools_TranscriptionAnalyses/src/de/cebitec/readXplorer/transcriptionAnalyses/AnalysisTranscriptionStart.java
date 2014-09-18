@@ -204,11 +204,8 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         totalStarts.setFwdCoverage(this.fixLeftCoverageBound(totalStarts.getFwdCov(), 0)); //for read starts the left pos is not important
         totalStarts.setRevCoverage(this.fixLeftCoverageBound(totalStarts.getRevCov(), totalReadStartsLastRevPos)); //on fwd strand
 
-        int idx;
         for (int i = fixedLeftBound; i < rightBound; ++i) {
-            idx = coverage.getInternalPos(i);
-            this.gatherDataAndDetect(chromId, chromLength, chromFeatures, totalCoverage.getFwdCov(), 
-                        totalCoverage.getRevCov(), totalStarts.getFwdCov(), totalStarts.getRevCov(), idx);
+            this.gatherDataAndDetect(chromId, chromLength, chromFeatures, totalCoverage, totalStarts, i);
         }
 
         totalCovLastFwdPos = totalCoverage.getFwdCov(rightBound);
@@ -222,16 +219,18 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      * @param chromId the chromosome to analyze
      * @param chromLength the length of this chromosome
      * @param chromFeatures all features of the chromosome
-     * @param covArrayFwd the fwd coverage array of the selected mapping class
-     * @param covArrayRev the rev coverage array of the selected mapping class
-     * @param readStartArrayFwd the fwd read start array of the selected mapping 
+     * @param coverage the fwd coverage array of the selected mapping class
+     * @param readStarts the fwd read start array of the selected mapping 
      * class
-     * @param readStartArrayRev the rev read start array of the selected mapping 
-     * class
-     * @param pos the currently investigated position
+     * @param refPos the currently investigated reference position coordinate
      */
     private void gatherDataAndDetect(int chromId, int chromLength, List<PersistentFeature> chromFeatures, 
-            int[] covArrayFwd, int[] covArrayRev, int[] readStartArrayFwd, int[] readStartArrayRev, int pos) {
+            Coverage coverage, Coverage readStarts, int refPos) {
+        int[] covArrayFwd = coverage.getFwdCov();
+        int[] covArrayRev = coverage.getRevCov();
+        int[] readStartArrayFwd = readStarts.getFwdCov();
+        int[] readStartArrayRev = readStarts.getRevCov();
+        int pos = coverage.getInternalPos(refPos);
         int fwdCov1;
         int revCov1;
         int fwdCov2;
@@ -295,7 +294,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
             this.covIncPercentDistribution.increaseDistribution(percentIncRev);
         }
 
-        this.detectStart(pos, chromId, chromLength, chromFeatures, readStartsFwd, readStartsRev, increaseFwd, increaseRev, percentIncFwd, percentIncRev);
+        this.detectStart(refPos, chromId, chromLength, chromFeatures, readStartsFwd, readStartsRev, increaseFwd, increaseRev, percentIncFwd, percentIncRev);
     }
     
     /**

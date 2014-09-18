@@ -226,7 +226,7 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
                 /* calc gene/mRNA length/ sum of exon length for gene/mRNA for prokaryotes or
                  * gene where no exons are given and all other features */
                 if (geneExonLength <= 0) {
-                    geneExonLength = (feature.getStop() - feature.getStart()); //feature length in bp
+                    geneExonLength = feature.getLength();
                     noFeatureReads = this.featureReadCount.get(id).getReadCount();
                 }
 
@@ -253,7 +253,7 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
             public void visit(Node node) {
                 PersistentFeature subFeature = (PersistentFeature) node;
                 if (subFeature.getType() == type) {
-                    geneExonLength += subFeature.getStop() - subFeature.getStart();
+                    geneExonLength += subFeature.getLength();
                     try {
                         noFeatureReads += featureReadCount.get(subFeature.getId()).getReadCount();
                     } catch (NullPointerException e) {

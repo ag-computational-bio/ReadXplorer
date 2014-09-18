@@ -266,10 +266,26 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     }
 
     /**
+     * Updates the painting area info of this viewer according to the currently
+     * available heigth and width.
+     */
+    protected void adjustPaintingAreaInfo() {
+        this.adjustPaintingAreaInfo(this.getSize().height);
+    }
+    
+    /**
+     * Updates the painting area info of this viewer according to the preferred 
+     * available heigth and width.
+     */
+    protected void adjustPaintingAreaInfoPrefSize() {
+        this.adjustPaintingAreaInfo(this.getPreferredSize().height);
+    }
+    
+    /**
      * Updates the painting area info of this viewer according to the available
      * heigth and width.
      */
-    private void adjustPaintingAreaInfo() {
+    private void adjustPaintingAreaInfo(int height) {
         if (this.getHeight() > 0 && this.getWidth() > 0) {
             pAInfoIsAvailable = true;
             paintingAreaInfo.setForwardHigh(verticalMargin);
@@ -280,8 +296,8 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
             // if existent, leave space for sequence bar
             if (this.seqBar != null) {
                 if (centerSeqBar) {
-                    int y1 = this.getSize().height / 2 - seqBar.getSize().height / 2;
-                    int y2 = this.getSize().height / 2 + seqBar.getSize().height / 2;
+                    int y1 = height / 2 - seqBar.getSize().height / 2;
+                    int y2 = height / 2 + seqBar.getSize().height / 2;
                     seqBar.setBounds(0, y1, paintingAreaInfo.getPhyRight(), seqBar.getSize().height);
                     paintingAreaInfo.setForwardLow(y1 - 1);
                     paintingAreaInfo.setReverseLow(y2 + 1);
@@ -292,8 +308,8 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
                 }
 
             } else {
-                paintingAreaInfo.setForwardLow(this.getSize().height / 2 - 1);
-                paintingAreaInfo.setReverseLow(this.getSize().height / 2 + 1);
+                paintingAreaInfo.setForwardLow(height / 2 - 1);
+                paintingAreaInfo.setReverseLow(height / 2 + 1);
             }
         } else {
             pAInfoIsAvailable = false;
@@ -614,8 +630,12 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         }
 
         if (this.scrollPane != null && this.centerScrollBar) {
-            JScrollBar verticalBar = this.scrollPane.getVerticalScrollBar();
-            verticalBar.setValue(verticalBar.getMaximum() / 2 - this.getParent().getHeight() / 2);
+            try {
+                JScrollBar verticalBar = this.scrollPane.getVerticalScrollBar();
+                verticalBar.setValue(verticalBar.getMaximum() / 2 - this.getParent().getHeight() / 2);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                //ignore this problem, TODO: identify source of ArrayIndexOutOfBoundsException
+            }
         }
     }
     
@@ -976,6 +996,10 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      */
     public void setScrollPane(JScrollPane scrollPane) {
         this.scrollPane = scrollPane;
+    }
+    
+    public JScrollPane getScrollPane() {
+        return this.scrollPane;
     }
     
     /**

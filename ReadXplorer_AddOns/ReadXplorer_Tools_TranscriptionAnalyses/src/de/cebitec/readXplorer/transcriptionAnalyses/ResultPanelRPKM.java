@@ -241,9 +241,9 @@ public class ResultPanelRPKM extends ResultTablePanel {
                 rowData[i++] = this.rpkmCalcResult.getTrackEntry(rpkm.getTrackId(), false);
                 rowData[i++] = rpkmCalcResultNew.getChromosomeMap().get(feat.getChromId());
                 rowData[i++] = feat.isFwdStrandString();
-                rowData[i++] = feat.isFwdStrand() ? feat.getStart() : feat.getStop();
-                rowData[i++] = feat.isFwdStrand() ? feat.getStop() : feat.getStart();
-                rowData[i++] = feat.getStop() - feat.getStart();
+                rowData[i++] = feat.getStartOnStrand();
+                rowData[i++] = feat.getStopOnStrand();
+                rowData[i++] = feat.getLength();
                 rowData[i++] = rpkm.getRPKM();
                 rowData[i++] = rpkm.getReadCount();
 

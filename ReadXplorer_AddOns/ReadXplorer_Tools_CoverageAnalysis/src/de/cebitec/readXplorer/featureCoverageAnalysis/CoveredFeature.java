@@ -28,9 +28,10 @@ import de.cebitec.readXplorer.databackend.dataObjects.TrackResultEntry;
 public class CoveredFeature extends TrackResultEntry {
     
     private PersistentFeature coveredFeature;
-    private int annoLength;
+    private int featLength;
     private int noCoveredBases;
     private int percentCovered;
+    private int meanCoverage = 0;
 
     /**
      * Data structure for storing an feature (gene), which is detected as 
@@ -41,7 +42,7 @@ public class CoveredFeature extends TrackResultEntry {
     public CoveredFeature(PersistentFeature coveredFeature, int trackId) {
         super(trackId);
         this.coveredFeature = coveredFeature;
-        this.annoLength = Math.abs(coveredFeature.getStop() - coveredFeature.getStart());
+        this.featLength = coveredFeature.getLength();
     }
 
     /**
@@ -50,7 +51,7 @@ public class CoveredFeature extends TrackResultEntry {
      */
     public void setNoCoveredBases(int noCoveredBases) {
         this.noCoveredBases = noCoveredBases;
-        this.percentCovered = (int) ((float) this.noCoveredBases / this.annoLength * 100);
+        this.percentCovered = (int) ((float) this.noCoveredBases / this.featLength * 100);
     }
 
     /**
@@ -72,5 +73,19 @@ public class CoveredFeature extends TrackResultEntry {
      */
     public int getPercentCovered() {
         return this.percentCovered;
+    }
+
+    /**
+     * @return The mean coverage of this feature.
+     */
+    public int getMeanCoverage() {
+        return this.meanCoverage;
+    }
+
+    /**
+     * @param meanCoverage The mean coverage of this feature.
+     */
+    public void setMeanCoverage(int meanCoverage) {
+        this.meanCoverage = meanCoverage;
     }
 }

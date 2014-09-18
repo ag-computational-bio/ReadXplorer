@@ -251,8 +251,8 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
             tssRow.add(feature.getLocus());
             tssRow.add(feature.getEcNumber());
             tssRow.add(feature.getProduct());
-            tssRow.add(feature.isFwdStrand() ? feature.getStart() : feature.getStop());
-            tssRow.add(feature.isFwdStrand() ? feature.getStop() : feature.getStart());
+            tssRow.add(feature.getStartOnStrand());
+            tssRow.add(feature.getStopOnStrand());
             if (addDistance) {
                 tssRow.add(Math.abs(tss.getPos() - (tss.isFwdStrand() ? feature.getStart() : feature.getStop())));
             }

@@ -270,7 +270,7 @@ public class CoverageThread extends RequestThread {
                     
                     this.makeThreadSleep(10); //ensures that no newer request is already in the list = better performance
                     IntervalRequest nextRequest = requestQueue.peek();
-                    boolean newRequestArrived = nextRequest != null && request != nextRequest;
+                    boolean newRequestArrived = nextRequest != null && currentCov.getRequest() != null && request != nextRequest;
                     
                     if (!newRequestArrived && (!currentCov.getCovManager().coversBounds(request.getFrom(), request.getTo())
                             || (!currentCov.getRequest().isDiffsAndGapsNeeded() && request.isDiffsAndGapsNeeded())
