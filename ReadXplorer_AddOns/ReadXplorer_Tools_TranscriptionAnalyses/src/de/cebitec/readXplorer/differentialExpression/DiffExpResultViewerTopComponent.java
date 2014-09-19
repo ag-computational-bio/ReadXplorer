@@ -183,10 +183,11 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
                 trs.setSortKeys(sortKeys);
                 trs.sort();
             }
-
-            createGraphicsButton.setEnabled(true);
+            if (usedTool != DeAnalysisHandler.Tool.ExportCountTable) {
+                createGraphicsButton.setEnabled(true);
+                showLogButton.setEnabled(true);
+            }
             saveTableButton.setEnabled(true);
-            showLogButton.setEnabled(true);
             resultComboBox.setEnabled(true);
             topCountsTable.setEnabled(true);
             jLabel1.setEnabled(true);
