@@ -88,7 +88,7 @@
                   <Image iconType="3" name="/de/cebitec/readXplorer/differentialExpression/plot/i.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="de/cebitec/readXplorer/differentialExpression/plot/Bundle.properties" key="DeSeqGraphicsTopComponent.iSymbol.text_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="de/cebitec/readXplorer/differentialExpression/plot/Bundle.properties" key="DeSeq2GraphicsTopComponent.iSymbol.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
               </Properties>
             </Component>
@@ -124,7 +124,7 @@
             <Component class="javax.swing.JButton" name="saveButton">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="de/cebitec/readXplorer/differentialExpression/plot/Bundle.properties" key="DeSeqGraphicsTopComponent.saveButton.text_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="de/cebitec/readXplorer/differentialExpression/plot/Bundle.properties" key="DeSeq2GraphicsTopComponent.saveButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
                 <Property name="enabled" type="boolean" value="false"/>
               </Properties>
@@ -135,7 +135,7 @@
             <Component class="javax.swing.JButton" name="plotButton">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="de/cebitec/readXplorer/differentialExpression/plot/Bundle.properties" key="DeSeqGraphicsTopComponent.plotButton.text_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="de/cebitec/readXplorer/differentialExpression/plot/Bundle.properties" key="DeSeq2GraphicsTopComponent.plotButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
               </Properties>
               <Events>
@@ -155,7 +155,7 @@
             <Component class="javax.swing.JLabel" name="jLabel1">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="de/cebitec/readXplorer/differentialExpression/plot/Bundle.properties" key="DeSeqGraphicsTopComponent.jLabel1.text_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="de/cebitec/readXplorer/differentialExpression/plot/Bundle.properties" key="DeSeq2GraphicsTopComponent.jLabel1.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
               </Properties>
             </Component>

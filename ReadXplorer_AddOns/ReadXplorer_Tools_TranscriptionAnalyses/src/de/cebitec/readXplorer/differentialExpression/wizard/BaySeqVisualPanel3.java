@@ -140,6 +140,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
         infoText.setEditable(false);
         infoText.setText(org.openide.util.NbBundle.getMessage(BaySeqVisualPanel3.class, "BaySeqVisualPanel3.infoText.text")); // NOI18N
         infoText.setBorder(null);
+        infoText.setPreferredSize(new java.awt.Dimension(490, 58));
         jScrollPane4.setViewportView(infoText);
         infoText.getAccessibleContext().setAccessibleDescription(org.openide.util.NbBundle.getMessage(BaySeqVisualPanel3.class, "BaySeqVisualPanel3.infoText.AccessibleContext.accessibleDescription")); // NOI18N
 
@@ -157,11 +158,11 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(58, 58, 58))
-                    .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane4)
                         .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(58, 470, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)

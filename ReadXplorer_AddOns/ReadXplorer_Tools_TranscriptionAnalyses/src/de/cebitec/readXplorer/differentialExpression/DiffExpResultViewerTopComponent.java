@@ -26,6 +26,7 @@ import static de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler.To
 import static de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler.Tool.DeSeq;
 import static de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler.Tool.ExpressTest;
 import de.cebitec.readXplorer.differentialExpression.plot.BaySeqGraphicsTopComponent;
+import de.cebitec.readXplorer.differentialExpression.plot.DeSeq2GraphicsTopComponent;
 import de.cebitec.readXplorer.differentialExpression.plot.DeSeqGraphicsTopComponent;
 import de.cebitec.readXplorer.differentialExpression.plot.ExpressTestGraphicsTopComponent;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
@@ -134,7 +135,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
         for (ViewController tmpVCon : viewControllers) {
             BoundsInfoManager bm = tmpVCon.getBoundsManager();
             if (bm != null && analysisHandler.getRefGenomeID() == tmpVCon.getCurrentRefGen().getId()) {
-                
+
                 TableUtils.showPosition(topCountsTable, posIdx, chromIdx, bm);
             }
         }
@@ -155,7 +156,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
                 Vector<Vector> tableContents;
                 switch (usedTool) {
                     case ExportCountTable:
-                        //fallthrough, since handling is same as for DESeq2
+                    //fallthrough, since handling is same as for DESeq2
                     case DeSeq2:
                         colNames.add(0, "Feature");
                         tableContents = currentResult.getTableContentsContainingRowNames();
@@ -178,7 +179,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
             topCountsTable.setRowSorter(trs);
             if (usedTool == ExpressTest) {
                 List<RowSorter.SortKey> sortKeys = new ArrayList<>();
-                sortKeys.add(new RowSorter.SortKey(8, SortOrder.DESCENDING));
+                sortKeys.add(new RowSorter.SortKey(7, SortOrder.DESCENDING));
                 trs.setSortKeys(sortKeys);
                 trs.sort();
             }
@@ -302,11 +303,17 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
                 ptc.open();
                 ptc.requestActive();
                 break;
+            case DeSeq2:
+                graphicsTopComponent = new DeSeq2GraphicsTopComponent(analysisHandler);
+                analysisHandler.registerObserver((DeSeq2GraphicsTopComponent) graphicsTopComponent);
+                graphicsTopComponent.open();
+                graphicsTopComponent.requestActive();
+                break;
         }
     }//GEN-LAST:event_createGraphicsButtonActionPerformed
 
     private void saveTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTableButtonActionPerformed
-        TableExportFileChooser fileChooser = new TableExportFileChooser(TableExportFileChooser.getTableFileExtensions(), 
+        TableExportFileChooser fileChooser = new TableExportFileChooser(TableExportFileChooser.getTableFileExtensions(),
                 new TableToExcel(resultComboBox.getSelectedItem().toString(), (UneditableTableModel) topCountsTable.getModel()));
     }//GEN-LAST:event_saveTableButtonActionPerformed
 

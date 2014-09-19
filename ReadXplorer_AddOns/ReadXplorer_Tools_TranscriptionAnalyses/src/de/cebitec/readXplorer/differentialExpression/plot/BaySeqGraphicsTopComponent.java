@@ -401,7 +401,7 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended imple
             } else {
                 chartPanel = CreatePlots.createInfPlot(
                         ConvertData.createMAvalues(result, DeAnalysisHandler.Tool.BaySeq, sampleA.toArray(new Integer[sampleA.size()]),
-                        sampleB.toArray(new Integer[sampleB.size()])), "A", "M", new ToolTip());
+                        sampleB.toArray(new Integer[sampleB.size()])), "A ((log(baseMeanA)/log(2)) + (log(baseMeanB)/log(2)))/2", "M (log(baseMeanA)/log(2)) - (log(baseMeanB)/log(2))", new ToolTip());
                 if (SVGCanvasActive) {
                     jPanel1.remove(svgCanvas);
                     SVGCanvasActive = false;

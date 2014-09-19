@@ -41,10 +41,8 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
 
     public static enum Plot {
 
-        DispEsts("Per gene estimates against normalized mean expression"),
-        DE("Log2 fold change against base means"),
-        HIST("Histogram of p values"),
-        MAplot("MA Plot");
+        DispEsts("Per gene estimates against normalized mean expression"),        
+        HIST("Histogram of p values");
         String representation;
 
         Plot(String representation) {
@@ -56,12 +54,8 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
             return representation;
         }
 
-        public static Plot[] getValues(boolean moreThanTwoConditions) {
-            if (moreThanTwoConditions) {
-                return new Plot[]{DispEsts};
-            } else {
-                return new Plot[]{DispEsts, DE, HIST, MAplot};
-            }
+        public static Plot[] getValues() {
+                return new Plot[]{DispEsts, HIST};          
         }
     }
 
@@ -99,9 +93,6 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
     public File plot(Plot plot) throws IOException, IllegalStateException, PackageNotLoadableException {
         File file = File.createTempFile("ReadXplorer_Plot_", ".svg");
         file.deleteOnExit();
-        if (plot == Plot.DE) {
-            deSeq2.plotDE(file);
-        }
         if (plot == Plot.DispEsts) {
             deSeq2.plotDispEsts(file);
         }

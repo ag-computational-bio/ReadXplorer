@@ -17,7 +17,7 @@
 package de.cebitec.readXplorer.differentialExpression.plot;
 
 import de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler;
-import de.cebitec.readXplorer.differentialExpression.DeSeqAnalysisHandler;
+import de.cebitec.readXplorer.differentialExpression.DeSeq2AnalysisHandler;
 import de.cebitec.readXplorer.differentialExpression.GnuR;
 import de.cebitec.readXplorer.differentialExpression.ResultDeAnalysis;
 import de.cebitec.readXplorer.plotting.ChartExporter;
@@ -63,24 +63,25 @@ import org.openide.windows.TopComponent;
  * TopComponent, which displays all graphics available for a DESeq analysis.
  */
 @ConvertAsProperties(
-        dtd = "-//de.cebitec.readXplorer.differentialExpression//DeSeqGraphics//EN",
+        dtd = "-//de.cebitec.readXplorer.differentialExpression//DeSeq2Graphics//EN",
         autostore = false)
 @TopComponent.Description(
-        preferredID = "DeSeqGraphicsTopComponent",
+        preferredID = "DeSeq2GraphicsTopComponent",
         //iconBase="SET/PATH/TO/ICON/HERE",
         persistenceType = TopComponent.PERSISTENCE_NEVER)
 @TopComponent.Registration(mode = "bottomSlidingSide", openAtStartup = false)
-@ActionID(category = "Window", id = "de.cebitec.readXplorer.differentialExpression.DeSeqGraphicsTopComponent")
+@ActionID(category = "Window", id = "de.cebitec.readXplorer.differentialExpression.DeSeq2GraphicsTopComponent")
 @ActionReference(path = "Menu/Window" /*, position = 333 */)
 @TopComponent.OpenActionRegistration(
-        displayName = "#CTL_DeSeqGraphicsAction",
-        preferredID = "DeSeqGraphicsTopComponent")
+        displayName = "#CTL_DeSeq2GraphicsAction",
+        preferredID = "DeSeq2GraphicsTopComponent")
 @Messages({
-    "CTL_DeSeqGraphicsAction=DeSeqGraphics",
-    "CTL_DeSeqGraphicsTopComponent=DESeq Graphics",
-    "HINT_DeSeqGraphicsTopComponent=This is a DESeq graphics window"
+    "CTL_DeSeq2GraphicsAction=DeSeq2Graphics",
+    "CTL_DeSeq2GraphicsTopComponent=DESeq2 Graphics",
+    "HINT_DeSeq2GraphicsTopComponent=This is a DESeq2 graphics window"
 })
-public final class DeSeqGraphicsTopComponent extends TopComponentExtended implements Observer, ItemListener {
+public final class DeSeq2GraphicsTopComponent extends TopComponentExtended implements Observer, ItemListener {
+
     private static final long serialVersionUID = 1L;
 
     private DeAnalysisHandler analysisHandler;
@@ -90,29 +91,30 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
     private File currentlyDisplayed;
     private ResultDeAnalysis result;
     private boolean SVGCanvasActive;
-    private ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Creating plot");
+    private final ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Creating plot");
     private ProgressHandle svgExportProgressHandle;
 
     /**
      * TopComponent, which displays all graphics available for a DESeq analysis.
      */
-    public DeSeqGraphicsTopComponent() {
+    public DeSeq2GraphicsTopComponent() {
     }
 
     /**
      * TopComponent, which displays all graphics available for a DESeq analysis.
+     *
      * @param analysisHandler The analysis handler containing the results
-     * @param usedTool The tool used for the analysis (has to be DESeq in this 
+     * @param usedTool The tool used for the analysis (has to be DESeq in this
      * case)
      */
-    public DeSeqGraphicsTopComponent(DeAnalysisHandler handler, boolean moreThanTwoConditions) {
+    public DeSeq2GraphicsTopComponent(DeAnalysisHandler handler) {
         analysisHandler = handler;
         this.result = handler.getResults().get(0);
-        cbm = new DefaultComboBoxModel(DeSeqAnalysisHandler.Plot.getValues(moreThanTwoConditions));
+        cbm = new DefaultComboBoxModel(DeSeq2AnalysisHandler.Plot.getValues());
         initComponents();
         setupGraphics();
         iSymbol.setVisible(false);
-        iSymbol.setToolTipText(org.openide.util.NbBundle.getMessage(DeSeqGraphicsTopComponent.class, "GraphicsTopComponent.iSymbol.toolTipText"));
+        iSymbol.setToolTipText(org.openide.util.NbBundle.getMessage(DeSeq2GraphicsTopComponent.class, "GraphicsTopComponent.iSymbol.toolTipText"));
     }
 
     /**
@@ -138,7 +140,7 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
 
         iSymbol.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         iSymbol.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cebitec/readXplorer/differentialExpression/plot/i.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(iSymbol, org.openide.util.NbBundle.getMessage(DeSeqGraphicsTopComponent.class, "DeSeqGraphicsTopComponent.iSymbol.text_1")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(iSymbol, org.openide.util.NbBundle.getMessage(DeSeq2GraphicsTopComponent.class, "DeSeq2GraphicsTopComponent.iSymbol.text")); // NOI18N
 
         jScrollPane1.setBorder(null);
 
@@ -151,7 +153,7 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
         messages.setBorder(null);
         jScrollPane1.setViewportView(messages);
 
-        org.openide.awt.Mnemonics.setLocalizedText(saveButton, org.openide.util.NbBundle.getMessage(DeSeqGraphicsTopComponent.class, "DeSeqGraphicsTopComponent.saveButton.text_1")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(saveButton, org.openide.util.NbBundle.getMessage(DeSeq2GraphicsTopComponent.class, "DeSeq2GraphicsTopComponent.saveButton.text")); // NOI18N
         saveButton.setEnabled(false);
         saveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -159,7 +161,7 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(plotButton, org.openide.util.NbBundle.getMessage(DeSeqGraphicsTopComponent.class, "DeSeqGraphicsTopComponent.plotButton.text_1")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(plotButton, org.openide.util.NbBundle.getMessage(DeSeq2GraphicsTopComponent.class, "DeSeq2GraphicsTopComponent.plotButton.text")); // NOI18N
         plotButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 plotButtonActionPerformed(evt);
@@ -169,7 +171,7 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
         plotType.setModel(cbm);
         plotType.addItemListener(this);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(DeSeqGraphicsTopComponent.class, "DeSeqGraphicsTopComponent.jLabel1.text_1")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(DeSeq2GraphicsTopComponent.class, "DeSeq2GraphicsTopComponent.jLabel1.text")); // NOI18N
 
         javax.swing.GroupLayout optionsPanelLayout = new javax.swing.GroupLayout(optionsPanel);
         optionsPanel.setLayout(optionsPanelLayout);
@@ -246,37 +248,19 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
             messages.setText("");
             plotButton.setEnabled(false);
             saveButton.setEnabled(false);
-            DeSeqAnalysisHandler.Plot selectedPlot = (DeSeqAnalysisHandler.Plot) plotType.getSelectedItem();
-            if (selectedPlot == DeSeqAnalysisHandler.Plot.MAplot) {
-                progressHandle.start();
-                progressHandle.switchToIndeterminate();
-                chartPanel = CreatePlots.createInfPlot(ConvertData.createMAvalues(result, DeAnalysisHandler.Tool.DeSeq, null, null), "A ((log(baseMeanA)/log(2)) + (log(baseMeanB)/log(2)))/2", "M (log(baseMeanA)/log(2)) - (log(baseMeanB)/log(2))", new ToolTip());
-                if (SVGCanvasActive) {
-                    plotPanel.remove(svgCanvas);
-                    SVGCanvasActive = false;
-                }
-//                plotDescriptionArea.setText("A (normalized mean expression (0.5 * log2 (baseMeanA * baseMeanB))) against M (log2 fold change)");
-                plotDescriptionArea.setVisible(false);
-                plotPanel.add(chartPanel, BorderLayout.CENTER);
-                plotPanel.repaint();
+            DeSeq2AnalysisHandler.Plot selectedPlot = (DeSeq2AnalysisHandler.Plot) plotType.getSelectedItem();
+            plotDescriptionArea.setVisible(true);
+            if (!SVGCanvasActive) {
+                plotPanel.remove(chartPanel);
+                plotPanel.add(svgCanvas, BorderLayout.CENTER);
                 plotPanel.updateUI();
-                plotButton.setEnabled(true);
-                saveButton.setEnabled(true);
-                progressHandle.switchToDeterminate(100);
-                progressHandle.finish();
-            } else {
-                plotDescriptionArea.setVisible(true);
-                if (!SVGCanvasActive) {
-                    plotPanel.remove(chartPanel);
-                    plotPanel.add(svgCanvas, BorderLayout.CENTER);
-                    plotPanel.updateUI();
-                    SVGCanvasActive = true;
-                }
-                currentlyDisplayed = ((DeSeqAnalysisHandler) analysisHandler).plot(selectedPlot);
-                svgCanvas.setURI(currentlyDisplayed.toURI().toString());
-                svgCanvas.setVisible(true);
-                svgCanvas.repaint();
+                SVGCanvasActive = true;
             }
+            currentlyDisplayed = ((DeSeq2AnalysisHandler) analysisHandler).plot(selectedPlot);
+            svgCanvas.setURI(currentlyDisplayed.toURI().toString());
+            svgCanvas.setVisible(true);
+            svgCanvas.repaint();
+
             plotDescriptionArea.repaint();
         } catch (IOException ex) {
             Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
@@ -297,23 +281,20 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
             public void save(String fileLocation) {
                 ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Save plot to svg file: " + fileLocation);
                 Path to = FileSystems.getDefault().getPath(fileLocation, "");
-                DeSeqAnalysisHandler.Plot selectedPlot = (DeSeqAnalysisHandler.Plot) plotType.getSelectedItem();
-                if (selectedPlot == DeSeqAnalysisHandler.Plot.MAplot) {
-                    saveToSVG(fileLocation);
-                } else {
-                    Path from = currentlyDisplayed.toPath();
-                    try {
-                        Path outputFile = Files.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
-                        messages.setText("SVG image saved to " + outputFile.toString());
-                    } catch (IOException ex) {
-                        Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
-                        JOptionPane.showMessageDialog(null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE);
-                    } finally {
-                        progressHandle.switchToDeterminate(100);
-                        progressHandle.finish();
-                    }
+                DeSeq2AnalysisHandler.Plot selectedPlot = (DeSeq2AnalysisHandler.Plot) plotType.getSelectedItem();
+                Path from = currentlyDisplayed.toPath();
+                try {
+                    Path outputFile = Files.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
+                    messages.setText("SVG image saved to " + outputFile.toString());
+                } catch (IOException ex) {
+                    Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                    Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
+                    JOptionPane.showMessageDialog(null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE);
+                } finally {
+                    progressHandle.switchToDeterminate(100);
+                    progressHandle.finish();
                 }
+
             }
 
             @Override
@@ -378,18 +359,12 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
                 progressHandle.finish();
                 saveButton.setEnabled(true);
                 plotButton.setEnabled(true);
-//                DispEsts("Per gene estimates against normalized mean expression"),
-//        DE("Log2 fold change against base means"),
-//        HIST("Histogram of p values"),
                 String description = "";
-                switch ((DeSeqAnalysisHandler.Plot) plotType.getSelectedItem()) {
-                    case DispEsts : 
+                switch ((DeSeq2AnalysisHandler.Plot) plotType.getSelectedItem()) {
+                    case DispEsts:
                         description = "DESeq's dispersion estimates plot: Empirical (black dots) per gene and fitted (red line) dispersion values (Y) plotted against mean expression strength (X) (doubly logarithmic)";
                         break;
-                    case DE : 
-                        description = "Normalized mean expression (A) against log2 fold change (M) = MA plot";
-                        break;
-                    case HIST :
+                    case HIST:
                         description = "p-value histogram: Probability of genes not to be differentially expressed against its frequency in the experiment";
                         break;
                     default:
@@ -451,12 +426,13 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
     }
 
     @Override
-    public void itemStateChanged(ItemEvent e) {
-        DeSeqAnalysisHandler.Plot plotType = (DeSeqAnalysisHandler.Plot) e.getItem();
-        if (plotType == DeSeqAnalysisHandler.Plot.MAplot) {
-            iSymbol.setVisible(true);
-        } else {
-            iSymbol.setVisible(false);
-        }
+    public void itemStateChanged(ItemEvent e) {      
+//          If an interactive Plot should be integrated in the future this function is needed
+//        DeSeq2AnalysisHandler.Plot plotType = (DeSeq2AnalysisHandler.Plot) e.getItem();
+//        if (plotType == DeSeq2AnalysisHandler.Plot.MAplot) {
+//            iSymbol.setVisible(true);
+//        } else {
+//            iSymbol.setVisible(false);
+//        }
     }
 }

@@ -168,22 +168,22 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended 
         messages = new javax.swing.JTextArea();
         plotPanel = new javax.swing.JPanel();
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(ExpressTestGraphicsTopComponent.class, "ExpressTestGraphicsTopComponent.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(ExpressTestGraphicsTopComponent.class, "ExpressTestGraphicsTopComponent.jLabel1.text_1")); // NOI18N
 
         dataSetComboBox.setModel(cbmDataSet);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(ExpressTestGraphicsTopComponent.class, "ExpressTestGraphicsTopComponent.jLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(ExpressTestGraphicsTopComponent.class, "ExpressTestGraphicsTopComponent.jLabel2.text_1")); // NOI18N
 
         plotTypeComboBox.setModel(cbmPlotType);
 
-        org.openide.awt.Mnemonics.setLocalizedText(createPlotButton, org.openide.util.NbBundle.getMessage(ExpressTestGraphicsTopComponent.class, "ExpressTestGraphicsTopComponent.createPlotButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(createPlotButton, org.openide.util.NbBundle.getMessage(ExpressTestGraphicsTopComponent.class, "ExpressTestGraphicsTopComponent.createPlotButton.text_1")); // NOI18N
         createPlotButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 createPlotButtonActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(saveButton, org.openide.util.NbBundle.getMessage(ExpressTestGraphicsTopComponent.class, "ExpressTestGraphicsTopComponent.saveButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(saveButton, org.openide.util.NbBundle.getMessage(ExpressTestGraphicsTopComponent.class, "ExpressTestGraphicsTopComponent.saveButton.text_1")); // NOI18N
         saveButton.setEnabled(false);
         saveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -193,7 +193,7 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended 
 
         iSymbol.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         iSymbol.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cebitec/readXplorer/differentialExpression/plot/i.png"))); // NOI18N
-        org.openide.awt.Mnemonics.setLocalizedText(iSymbol, org.openide.util.NbBundle.getMessage(ExpressTestGraphicsTopComponent.class, "ExpressTestGraphicsTopComponent.iSymbol.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(iSymbol, org.openide.util.NbBundle.getMessage(ExpressTestGraphicsTopComponent.class, "ExpressTestGraphicsTopComponent.iSymbol.text_1")); // NOI18N
 
         jScrollPane1.setBorder(null);
 
@@ -210,20 +210,23 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended 
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(iSymbol, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(plotTypeComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(createPlotButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(saveButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(14, Short.MAX_VALUE)
-                .addComponent(iSymbol, javax.swing.GroupLayout.PREFERRED_SIZE, 91, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 331, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(saveButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(createPlotButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(plotTypeComboBox, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addContainerGap())))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -238,7 +241,7 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended 
                 .addComponent(saveButton)
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 249, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 241, Short.MAX_VALUE)
                 .addComponent(iSymbol)
                 .addContainerGap())
         );
@@ -260,7 +263,7 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended 
                     .addComponent(jSplitPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
-                        .addContainerGap(879, Short.MAX_VALUE))
+                        .addContainerGap(1088, Short.MAX_VALUE))
                     .addComponent(dataSetComboBox, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
@@ -285,7 +288,7 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended 
         final ResultDeAnalysis result = results.get(index);
         switch (type) {
             case MA_Plot:
-                chartPanel = CreatePlots.createInfPlot(ConvertData.createMAvalues(result, usedTool, null, null), "A (normalized mean expression)", "M (log2 fold change)", new ToolTip());
+                chartPanel = CreatePlots.createInfPlot(ConvertData.createMAvalues(result, usedTool, null, null), "A ((log(baseMeanA)/log(2)) + (log(baseMeanB)/log(2)))/2", "M (log(baseMeanA)/log(2)) - (log(baseMeanB)/log(2))", new ToolTip());
                 plotPanel.add(chartPanel);
                 plotPanel.updateUI();
                 break;

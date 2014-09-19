@@ -85,7 +85,7 @@ public final class DiffExpLogTopComponent extends TopComponentExtended implement
         jScrollPane1 = new javax.swing.JScrollPane();
         logTextField = new javax.swing.JTextArea();
 
-        org.openide.awt.Mnemonics.setLocalizedText(saveLogButton, org.openide.util.NbBundle.getMessage(DiffExpLogTopComponent.class, "DiffExpLogTopComponent.saveLogButton.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(saveLogButton, org.openide.util.NbBundle.getMessage(DiffExpLogTopComponent.class, "DiffExpLogTopComponent.saveLogButton.text_1")); // NOI18N
         saveLogButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveLogButtonActionPerformed(evt);
