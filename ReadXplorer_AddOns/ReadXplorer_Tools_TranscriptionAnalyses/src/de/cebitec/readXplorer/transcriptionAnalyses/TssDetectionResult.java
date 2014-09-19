@@ -94,28 +94,30 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         dataColumnDescriptions.add("Coverage Increase");
         dataColumnDescriptions.add("Coverage Increase %");
         dataColumnDescriptions.add("Correct Start Feature");
+        dataColumnDescriptions.add("Correct Start Locus");
+        dataColumnDescriptions.add("Correct Start EC-Number");
+        dataColumnDescriptions.add("Correct Start Product");
         dataColumnDescriptions.add("Correct Start Feature Start");
         dataColumnDescriptions.add("Correct Start Feature Stop");
         dataColumnDescriptions.add("Next Upstream Feature");
+        dataColumnDescriptions.add("Next Upstream Locus");
+        dataColumnDescriptions.add("Next Upstream EC-Number");
+        dataColumnDescriptions.add("Next Upstream Product");
         dataColumnDescriptions.add("Next Upstream Feature Start");
         dataColumnDescriptions.add("Next Upstream Feature Stop");
         dataColumnDescriptions.add("Distance Upstream Feature");
         dataColumnDescriptions.add("Next Downstream Feature");
+        dataColumnDescriptions.add("Next Downstream Locus");
+        dataColumnDescriptions.add("Next Downstream EC-Number");
+        dataColumnDescriptions.add("Next Downstream Product");
         dataColumnDescriptions.add("Next Downstream Feature Start");
         dataColumnDescriptions.add("Next Downstream Feature Stop");
         dataColumnDescriptions.add("Distance Downstream Feature");
         dataColumnDescriptions.add("Novel Transcript");
         dataColumnDescriptions.add("Transcript Stop");
         dataColumnDescriptions.add("70bp Upstream of Start");
-        dataColumnDescriptions.add("Correct Start Locus");
-        dataColumnDescriptions.add("Correct Start EC-Number");
-        dataColumnDescriptions.add("Correct Start Product");
-        dataColumnDescriptions.add("Next Upstream Locus");
-        dataColumnDescriptions.add("Next Upstream EC-Number");
-        dataColumnDescriptions.add("Next Upstream Product");
-        dataColumnDescriptions.add("Next Downstream Locus");
-        dataColumnDescriptions.add("Next Downstream EC-Number");
-        dataColumnDescriptions.add("Next Downstream Product");
+        
+        
         
         allSheetDescriptions.add(dataColumnDescriptions);
 
@@ -136,8 +138,6 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
     public List<List<List<Object>>> dataToExcelExportList() {
         List<List<List<Object>>> tSSExport = new ArrayList<>();
         List<List<Object>> tSSResults = new ArrayList<>();
-        
-        PersistentFeature feature;
         
         for (int i = 0; i < results.size(); ++i) {      
             TranscriptionStart tss = results.get(i);
@@ -260,6 +260,9 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
             tssRow.add("-");
             tssRow.add("-");
             tssRow.add("-");
+            tssRow.add("-");
+            tssRow.add("");
+            tssRow.add("");
             if (addDistance) { tssRow.add(""); }
         }
     }

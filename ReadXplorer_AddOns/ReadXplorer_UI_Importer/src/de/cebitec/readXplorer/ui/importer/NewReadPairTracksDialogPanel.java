@@ -28,8 +28,6 @@ import java.awt.Component;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
@@ -371,14 +369,14 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel implement
         this.setOrientation("rf");
     }//GEN-LAST:event_orientation2ButtonActionPerformed
 
+    @NbBundle.Messages({"TrackNumberInfo.Title=Track 2 Removal",
+        "TrackNumberInfo=Only one track allowed, when already imported is chosen!"})
     private void alreadyImportedBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alreadyImportedBoxActionPerformed
         this.setIsAlreadyImported(this.alreadyImportedBox.isSelected());
         if (this.isAlreadyImported()) {
             this.chooseButton2.setEnabled(false);
             if (!this.mappingFiles2.isEmpty()) {
-                String title = NbBundle.getMessage(NewReadPairTracksDialogPanel.class, "MSG_NewSeqPairTracksDialogPanel.TrackNumberInfo.Title");
-                String msg = NbBundle.getMessage(NewReadPairTracksDialogPanel.class, "MSG_NewSeqPairTracksDialogPanel.TrackNumberInfo");
-                JOptionPane.showMessageDialog(this, msg, title, JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, Bundle.TrackNumberInfo(), Bundle.TrackNumberInfo_Title(), JOptionPane.INFORMATION_MESSAGE);
                 this.mappingFiles2.clear();
                 this.mappingFile2Field.setText("");
                 DefaultListModel<String> model = new DefaultListModel<>();
@@ -443,6 +441,8 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel implement
             /**
              * Adds a single file to the list of mapping files.
              */
+            @NbBundle.Messages({"ErrorTitle=Open File Error",
+                "ErrorMsg=Could not open the given file! (Are the permissions set correctly?)"})
             private void addFile(File file) {
                 if (file.canRead()) {
                     if (isFstFile) {
@@ -457,7 +457,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel implement
                         }
                     }
                 } else {
-                    Logger.getLogger(NewTrackDialogPanel.class.getName()).log(Level.WARNING, "Couldn't read file");
+                    JOptionPane.showMessageDialog(this, Bundle.ErrorMsg(), Bundle.ErrorTitle(), JOptionPane.ERROR_MESSAGE);
                 }
             }
         };

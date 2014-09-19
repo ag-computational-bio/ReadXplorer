@@ -19,14 +19,14 @@ package de.cebitec.readXplorer.view.dialogMenus;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import org.openide.util.NbBundle;
 
 /**
  * A standard JPanel with functionality to handle multiple files, a list of 
@@ -53,6 +53,8 @@ public class FileSelectionPanel extends JPanel {
      * @param file the file to add to the list
      * @param mappingFileField the field, which should display the file name
      */
+    @NbBundle.Messages({"ErrorTitle=Open File Error",
+        "ErrorMsg=Could not open the given file! (Are the permissions set correctly?)"})
     public void addFile(File file, JTextField mappingFileField) {
         if (file.canRead()) {
             addMappingFile(file);
@@ -66,7 +68,7 @@ public class FileSelectionPanel extends JPanel {
             } */ 
             mappingFileField.setText(file.getAbsolutePath());
         } else {
-            Logger.getLogger(FileSelectionPanel.class.getName()).log(Level.WARNING, "Couldn't read file");
+            JOptionPane.showMessageDialog(this, Bundle.ErrorMsg(), Bundle.ErrorTitle(), JOptionPane.ERROR_MESSAGE);
         }
     }
     

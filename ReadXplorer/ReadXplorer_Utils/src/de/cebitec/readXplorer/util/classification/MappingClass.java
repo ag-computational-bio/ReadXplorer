@@ -24,11 +24,24 @@ package de.cebitec.readXplorer.util.classification;
 public enum MappingClass implements Classification {
     
     /**
+     * Single Perfect Match classification = MappingClass for read mappings
+     * whose read only has a single perfect mapping (without differences to the
+     * reference). Other Common Match mappings are allowed to exist for the
+     * read.
+     */
+    SINGLE_PERFECT_MATCH(MappingClass.SINGLE_PERFECT_MATCH_BYTE, MappingClass.SINGLE_PERFECT_MATCH_STRING),
+    /**
      * Perfect Match classification = Classification for all mappings of a read
      * without differences to the reference.
      */
     PERFECT_MATCH(MappingClass.PERFECT_MATCH_BYTE, MappingClass.PERFECT_MATCH_STRING),
-    
+    /**
+     * Single Best Match classification = MappingClass for read mappings whose
+     * read only has a single best mapping (with the least number of differences
+     * to the reference). Other Common Match mappings are allowed to exist for
+     * the read.
+     */
+    SINGLE_BEST_MATCH(MappingClass.SINGLE_BEST_MATCH_BYTE, MappingClass.SINGLE_BEST_MATCH_STRING),
     /**
      * Best Match classification = MappingClass for all best mappings (least
      * differences to the reference) of a read.
@@ -38,21 +51,7 @@ public enum MappingClass implements Classification {
      * Common Match classification = MappingClass for read mappings having at
      * least one other, better mapping (with less differences to the reference).
      */
-    COMMON_MATCH(MappingClass.COMMON_MATCH_BYTE, MappingClass.COMMON_MATCH_STRING),
-    /**
-     * Single Perfect Match classification = MappingClass for read mappings
-     * whose read only has a single perfect mapping (without differences to the
-     * reference). Other Common Match mappings are allowed to exist for the
-     * read.
-     */
-    SINGLE_PERFECT_MATCH(MappingClass.SINGLE_PERFECT_MATCH_BYTE, MappingClass.SINGLE_PERFECT_MATCH_STRING),
-    /**
-     * Single Best Match classification = MappingClass for read mappings whose
-     * read only has a single best mapping (with the least number of differences
-     * to the reference). Other Common Match mappings are allowed to exist for
-     * the read.
-     */
-    SINGLE_BEST_MATCH(MappingClass.SINGLE_BEST_MATCH_BYTE, MappingClass.SINGLE_BEST_MATCH_STRING);
+    COMMON_MATCH(MappingClass.COMMON_MATCH_BYTE, MappingClass.COMMON_MATCH_STRING);
     
     private static final byte PERFECT_MATCH_BYTE = 1;
     private static final byte BEST_MATCH_BYTE = 2;

@@ -34,6 +34,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.openide.util.NbBundle;
 
@@ -247,6 +248,8 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
         }
 }//GEN-LAST:event_filetypeBoxActionPerformed
 
+    @NbBundle.Messages({"ErrorTitle=Open File Error",
+        "ErrorMsg=Could not open the given file! (Are the permissions set correctly?)"})
     private void fileChooserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileChooserButtonActionPerformed
         ReferenceParserI usedParser = currentParser instanceof BioJavaGff3Parser || 
                                       currentParser instanceof BioJavaGff2Parser ? new FastaReferenceParser() : currentParser;
@@ -276,7 +279,7 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
                         Logger.getLogger(NewReferenceDialogPanel.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 } else {
-                    Logger.getLogger(NewReferenceDialogPanel.class.getName()).log(Level.WARNING, "Could not read file");
+                    JOptionPane.showMessageDialog(this, Bundle.ErrorMsg(), Bundle.ErrorTitle(), JOptionPane.ERROR_MESSAGE);
                 }
             }
         };

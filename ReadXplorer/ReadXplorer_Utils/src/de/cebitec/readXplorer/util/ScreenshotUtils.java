@@ -156,8 +156,9 @@ public class ScreenshotUtils {
                 if (comp instanceof JScrollPane) {
                     JScrollPane pane = (JScrollPane) comp;
                     Dimension scrollViewDim = pane.getViewport().getViewSize();
-                    if (currentDim.height < scrollViewDim.height) {
-                        currentDim.height = scrollViewDim.height + comp.getLocationOnScreen().y;
+                    int totalHeight = scrollViewDim.height + comp.getLocationOnScreen().y;
+                    if (currentDim.height < totalHeight) {
+                        currentDim.height = totalHeight;
                     }
                     if (currentDim.width < scrollViewDim.width) {
                         currentDim.width = scrollViewDim.width + comp.getLocationOnScreen().x;
