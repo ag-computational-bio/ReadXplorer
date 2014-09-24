@@ -23,7 +23,6 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readXplorer.parser.ReadPairJobContainer;
 import de.cebitec.readXplorer.parser.ReferenceJob;
 import de.cebitec.readXplorer.parser.TrackJob;
-import de.cebitec.readXplorer.parser.common.ParsedClassification;
 import de.cebitec.readXplorer.parser.common.ParsedReference;
 import de.cebitec.readXplorer.parser.common.ParsedTrack;
 import de.cebitec.readXplorer.parser.common.ParsingException;
@@ -242,7 +241,6 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
 
                         TrackJob trackJob1 = readPairJobContainer.getTrackJob1();
                         TrackJob trackJob2 = readPairJobContainer.getTrackJob2();
-                        Map<String, ParsedClassification> classificationMap;
                         this.setChromLengthMap(trackJob1);
                         File inputFile1 = trackJob1.getFile();
                         inputFile1.setReadOnly(); //prevents changes or deletion of original file!
@@ -390,7 +388,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
             inputFile.setReadOnly(); //prevents changes or deletion of original file!
             try {
                 //executes any conversion before other calculations, if the parser supports any
-                success = (boolean) trackJob.getParser().convert(trackJob, chromLengthMap);
+                success = trackJob.getParser().convert(trackJob, chromLengthMap);
                 File lastWorkFile = trackJob.getFile();
 
                 //generate classification data in file sorted by read sequence

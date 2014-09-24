@@ -100,7 +100,7 @@ public class DataAdminWizardSelectionPanel extends ChangeListeningFinishWizardPa
 
                 // register dependent tracks at genome and run
                 ReferenceJob gen = indexedRefs.get(dbTrack.getRefGenID());
-                gen.registerTrackWithoutRunJob(t);
+                gen.registerTrackWithoutRunJob(t); //TODO: check if track without run job is still needed
                 trackJobs.add(t);
             }
         

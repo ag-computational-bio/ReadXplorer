@@ -231,6 +231,13 @@ public class SQLStatements {
             + " WHERE "
             + FieldNames.STATISTICS_TRACK_ID + " = ? ";
     
+    public final static String DELETE_SPECIFIC_TRACK_STATISTIC =
+            "DELETE FROM "
+            + FieldNames.TABLE_STATISTICS
+            + " WHERE "
+            + FieldNames.STATISTICS_TRACK_ID + " = ? and " +
+              FieldNames.STATISTICS_KEY + " = ?";
+    
     public static final String DELETE_COUNT_DISTRIBUTIONS_FROM_TRACK = 
             "DELETE FROM "
             + FieldNames.TABLE_COUNT_DISTRIBUTION

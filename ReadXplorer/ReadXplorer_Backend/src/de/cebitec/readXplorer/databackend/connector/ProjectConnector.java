@@ -696,6 +696,29 @@ public class ProjectConnector extends Observable {
     }
     
     /**
+     * Stores the statistics for a track in the db.
+     * @param keys the list of statistics key whose values shall be deleted 
+     * for the given track
+     * @param trackID the track id whose data shall be stored
+     */
+    public void deleteSpecificTrackStatistics(List<String> keys, int trackID) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start deleting specific track statistics...");
+
+        for (String key : keys) {
+            try (PreparedStatement deleteStats = con.prepareStatement(SQLStatements.DELETE_SPECIFIC_TRACK_STATISTIC)) {
+                deleteStats.setLong(1, trackID);
+                deleteStats.setString(2, key);
+                deleteStats.execute();
+            
+            } catch (SQLException ex) {
+                this.rollbackOnError(this.getClass().getName(), ex);
+            }
+        }
+
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done deleting specific track statistics.");
+    }
+    
+    /**
      * Sets a count distribution
      * {@link DiscreteCountingDistribution} for this track.
      * @param distribution the count distribution to store

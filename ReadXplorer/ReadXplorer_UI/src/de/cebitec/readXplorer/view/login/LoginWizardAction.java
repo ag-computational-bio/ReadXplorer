@@ -46,7 +46,7 @@ import org.openide.windows.WindowManager;
  */
 @Messages({
     "# {0} - error message", 
-    "LoginWizardAction_ErrorMsg=An error occured during opening of the DB: {0}", 
+    "LoginWizardAction_ErrorMsg=An error occurred during opening of the DB: {0}", 
     "LoginWizardAction_ErrorHeader=Loading Error"})
 public final class LoginWizardAction implements ActionListener {
 
