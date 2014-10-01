@@ -22,7 +22,7 @@ import org.openide.windows.TopComponent;
 /**
  * A TopComponent, which returns its name when the <cc>toString()</cc> method is invoced.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class TopComponentExtended  extends TopComponent {
     private static final long serialVersionUID = 1L;

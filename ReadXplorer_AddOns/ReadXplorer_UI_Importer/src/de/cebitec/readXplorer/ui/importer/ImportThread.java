@@ -312,9 +312,9 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                                 this.noErrors = false;
                                 continue;
                             }
+                            ph.progress(workunits++);
                         } else { //else case with 2 already imported tracks is prohibited
                             //we have to calculate the stats
-                            ph.progress(workunits++);
                             SamBamReadPairStatsParser statsParser = new SamBamReadPairStatsParser(readPairJobContainer, chromLengthMap, null);
                             statsParser.setStatsContainer(statsContainer);
                             try {
@@ -330,9 +330,9 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                                 this.noErrors = false;
                                 continue;
                             }
+                            ph.progress(workunits++);
                         }
 
-                        ph.progress(workunits++);
                         //create general track stats
                         SamBamStatsParser statsParser = new SamBamStatsParser();
                         statsParser.setStatsContainer(statsContainer);
@@ -343,6 +343,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                         this.storeBamTrack(track); // store track entry in db
                         trackId1 = trackJob1.getID();
                         inputFile1.setWritable(true);
+                        ph.progress(workunits++);
 //                    }
 
                     //read pair ids have to be set in track entry
@@ -396,7 +397,6 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                 mappingParser.setStatsContainer(statsContainer);
                 mappingParser.parseInput(trackJob, chromLengthMap);
                 mappingParser.removeObserver(this);
-                ph.progress(workunits++);
                 noErrors = noErrors ? success : noErrors;
                 if (success) { GeneralUtils.deleteOldWorkFile(lastWorkFile); } //only when we reach this line without exceptions and conversion was successful
 
@@ -410,6 +410,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
                 this.noErrors = false;
                 return;
             }
+            ph.progress(workunits++);
             inputFile.setWritable(true);
             mappingParser.removeObserver(this);
         }
@@ -446,8 +447,8 @@ public class ImportThread extends SwingWorker<Object, Object> implements Observe
         //get system JVM info:
         Runtime rt = Runtime.getRuntime();
          
-        this.showMsg("Your current JVM config allows up to "+GeneralUtils.formatNumber(rt.maxMemory()/1000000)+" megabytes of memory to be allocated.");
-        this.showMsg("Currently the plattform is using "+GeneralUtils.formatNumber((rt.totalMemory() - rt.freeMemory())/1000000)+" megabytes of memory.");
+        this.showMsg("Your current JVM config allows up to "+GeneralUtils.formatNumber(rt.maxMemory() / 1000000)+" MB of memory to be allocated.");
+        this.showMsg("Currently the plattform is using "+GeneralUtils.formatNumber((rt.totalMemory() - rt.freeMemory()) / 1000000)+" MB of memory.");
         this.showMsg("Please be aware that you might need to change the -J-d64 and -J-Xmx value of your JVM to process large imports successfully.");
         this.showMsg("The value can be configured in the ../readXplorer/etc/readXplorer.conf file in the application folder."); 
         this.showMsg("");

@@ -39,7 +39,7 @@ import org.supercsv.prefs.CsvPreference;
 /**
  * A parser for parsing CSV files.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class CsvTableParser implements CsvParserI {
 

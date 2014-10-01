@@ -22,9 +22,9 @@ import de.cebitec.readXplorer.parser.common.ParsedFeature;
 import de.cebitec.readXplorer.parser.common.ParsedReference;
 import de.cebitec.readXplorer.parser.common.ParsingException;
 import de.cebitec.readXplorer.parser.reference.Filter.FeatureFilter;
-import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.SequenceUtils;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -47,7 +47,7 @@ import org.biojava.utils.ParserException;
  * ReferenceJob and the GFF2 annotations from the GFF2 file contained in the
  * ReferenceJob.
  *
- * @author marie-theres, @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author marie-theres, @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class BioJavaGff2Parser implements ReferenceParserI {
     

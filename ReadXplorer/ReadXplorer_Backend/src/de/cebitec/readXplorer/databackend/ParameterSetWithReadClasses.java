@@ -19,7 +19,7 @@ package de.cebitec.readXplorer.databackend;
 /**
  * A parameter set which contains read classification parameters.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class ParameterSetWithReadClasses {
     private ParametersReadClasses readClassParams;

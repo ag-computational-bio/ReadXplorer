@@ -200,6 +200,10 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
                     if (!record.getReadUnmappedFlag() && chromLengthMap.containsKey(record.getReferenceName())) {
                         
                         readName = record.getReadName();
+                        if (record.getReadPairedFlag()) {
+                            if (record.getFirstOfPairFlag()) { readName += "/1"; }
+                            if (record.getSecondOfPairFlag()) { readName += "/2"; }
+                        }
                         //store data and clear data structure, if new read name is reached - file needs to be sorted by read name
                         if (!lastReadName.equals(readName)) {
                             CommonsMappingParser.writeSamRecord(diffMap, classificationData, bamWriter);
@@ -236,6 +240,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
                     finish = System.currentTimeMillis();
                     this.notifyObservers(Benchmark.calculateDuration(startTime, finish, lineno + " mappings processed in "));
                 }
+                System.err.flush();
             }
             
             CommonsMappingParser.writeSamRecord(diffMap, classificationData, bamWriter);

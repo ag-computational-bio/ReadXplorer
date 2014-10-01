@@ -23,7 +23,7 @@ import org.openide.util.NbBundle;
 /**
  * Create a dialog window for the OccurrenceFilter.
  * 
- * @author Margarita Steinhauer, Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Margarita Steinhauer, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class OccurrenceSelectionPanel extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;

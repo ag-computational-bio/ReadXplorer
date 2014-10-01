@@ -64,7 +64,7 @@ import org.openide.util.Exceptions;
  * methods for these values. Tooltips in this viewer are initially shown for 
  * 20 seconds.
  * 
- * @author ddoppmeier, rhilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author ddoppmeier, rhilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public abstract class AbstractViewer extends JPanel implements LogicalBoundsListener, MousePositionListener {
 

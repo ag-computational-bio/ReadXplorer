@@ -23,7 +23,7 @@ import org.openide.nodes.Node;
  * A standard item to use for explorers. It knows, whether this item is 
  * selected.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class StandardItem implements ItemI {
 

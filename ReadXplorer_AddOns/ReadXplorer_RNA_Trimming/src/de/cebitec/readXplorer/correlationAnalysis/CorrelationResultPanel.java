@@ -19,7 +19,10 @@ package de.cebitec.readXplorer.correlationAnalysis;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.SequenceUtils;
+import de.cebitec.readXplorer.util.UneditableTableModel;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.readXplorer.view.tableVisualization.TableUtils;
+import de.cebitec.readXplorer.view.tableVisualization.tableFilter.TableRightClickFilter;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JPanel;
 import javax.swing.event.ListSelectionEvent;
@@ -29,24 +32,30 @@ import javax.swing.table.TableRowSorter;
 
 /**
  * The Panel that shows results for a correlation analysis of two tracks in a table
- * @author Evgeny Anisiforov
+ * @author Evgeny Anisiforov, rhilker
  */
 //@TopComponent.Registration(mode = "output", openAtStartup = false)
 public class CorrelationResultPanel extends JPanel {
     private static final long serialVersionUID = 1L;
     private BoundsInfoManager bim;
+    private TableRightClickFilter<UneditableTableModel> tableFilter;
 
     /**
      * Creates new form CorrelationResultPanel
      */
     public CorrelationResultPanel() {
         initComponents();
+        final int posColumn = 2;
+        final int trackColumn = 2;
+        final int chromColumn = 3;
+        tableFilter = new TableRightClickFilter<>(UneditableTableModel.class, posColumn, trackColumn);
+        this.correlationTable.getTableHeader().addMouseListener(tableFilter);
         DefaultListSelectionModel model = (DefaultListSelectionModel) correlationTable.getSelectionModel();
         model.addListSelectionListener(new ListSelectionListener() {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                showItemPosition();
+                TableUtils.showPosition(correlationTable, posColumn, chromColumn, bim);
             }
         });
     }
@@ -160,22 +169,6 @@ public class CorrelationResultPanel extends JPanel {
             TableExportFileChooser fileChooser = new TableExportFileChooser(TableExportFileChooser.getTableFileExtensions(), this.getAnalysisResult());
         }
     }//GEN-LAST:event_exportButtonActionPerformed
-
-    /**
-     * Centers the position of the selected correlation fragment in the bounds information manager.
-     * This leads to an update of all viewers, sharing this bim.
-     */
-    private void showItemPosition() {
-        DefaultListSelectionModel model = (DefaultListSelectionModel) correlationTable.getSelectionModel();
-        int selectedView = model.getLeadSelectionIndex();
-        int selectedModel = correlationTable.convertRowIndexToModel(selectedView);
-        if (selectedModel>=0) {
-            Integer pos = (Integer) correlationTable.getModel().getValueAt(selectedModel, 1);
-            bim.navigatorBarUpdated(pos);
-        }
-
-        
-    }
         
     public void setBoundsInfoManager(BoundsInfoManager boundsInformationManager) {
         this.bim = boundsInformationManager;

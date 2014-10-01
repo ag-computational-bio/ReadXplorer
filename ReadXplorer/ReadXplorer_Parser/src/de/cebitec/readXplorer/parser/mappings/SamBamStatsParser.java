@@ -201,6 +201,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
                     finish = System.currentTimeMillis();
                     this.notifyObservers(Benchmark.calculateDuration(startTime, finish, lineno + " mappings processed in "));
                 }
+                System.err.flush();
             }
             if (errorLimit.getSkippedCount() > 0) {
                 this.notifyObservers( "... " + (errorLimit.getSkippedCount()) + " more errors occurred");

@@ -23,7 +23,7 @@ import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 /**
  * Data storage for all parameters associated with the coverage analysis.
  *
- * @author Tobias Zimmermann, Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Tobias Zimmermann, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class ParameterSetCoverageAnalysis extends ParameterSetWithReadClasses implements ParameterSetI<ParameterSetCoverageAnalysis> {
 

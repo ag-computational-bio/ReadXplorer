@@ -37,7 +37,7 @@ import org.openide.windows.TopComponent;
  * Action for storing a screenshot of any of the TopComponents, which are
  * currently open in ReadXplorer.
  * 
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 @ActionID(
         category = "Visualisation",

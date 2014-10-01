@@ -20,7 +20,7 @@ package de.cebitec.readXplorer.databackend.dataObjects;
  * Depicts a difference in a mapping to the reference genome. Therefore, it contains
  * base, position, number of replicates and strand information.
  *
- * @author ddoppmeier, Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author ddoppmeier, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 class BasicDiff {
     

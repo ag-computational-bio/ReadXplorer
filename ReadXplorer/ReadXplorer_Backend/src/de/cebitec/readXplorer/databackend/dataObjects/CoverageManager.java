@@ -31,7 +31,7 @@ import java.util.Map;
  * <code>incArraysToIntervalSize()</code>. Otherwise the arrays all have length
  * 0.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class CoverageManager implements Serializable {
     

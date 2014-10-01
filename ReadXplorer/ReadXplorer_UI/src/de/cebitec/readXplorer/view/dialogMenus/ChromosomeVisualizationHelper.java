@@ -31,7 +31,7 @@ import javax.swing.JComboBox;
  * Class containing helper methods for visualizing and switching between 
  * chromosomes.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class ChromosomeVisualizationHelper {
 

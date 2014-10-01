@@ -24,7 +24,7 @@ import org.openide.windows.TopComponent;
  * Visual panel displaying options to store a screenshot of any TopComponent or
  * the whole application.
  * 
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public final class ScreenshotVisualPanel extends JPanel {
     private static final long serialVersionUID = 1L;

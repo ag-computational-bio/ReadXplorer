@@ -27,7 +27,7 @@ import org.openide.nodes.Node;
  * A StandardNode for use in the explorer. It allows to add any StandardItems
  * and StandardItemChildren to the node and can return its item.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class StandardNode extends BeanNode<StandardItem> {
 

@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Carries out the logic behind the covered or uncovered interval analysis.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class AnalysisCoverage implements Observer, AnalysisI<CoverageIntervalContainer> {
 

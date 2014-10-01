@@ -40,7 +40,7 @@ import org.openide.util.RequestProcessor;
  * An action to update the read classification data from older RX versions to
  * the most recent classification.
  * 
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 @ActionID(
         category = "File",

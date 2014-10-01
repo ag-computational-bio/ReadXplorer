@@ -255,6 +255,9 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
                     numberColumnHigherItem.setEnabled(false);
                     stringColumnItem.setEnabled(true);
                 }
+                Object trackValue = lastTable.getModel().getValueAt(0, trackColumn);
+                boolean isValidTrackColumn = trackValue instanceof PersistentTrack;
+                occurrenceFilter.setEnabled(isValidTrackColumn);
                 popup.show(e.getComponent(), e.getX(), e.getY());
             }
         }

@@ -32,7 +32,7 @@ import org.openide.util.Exceptions;
 /**
  * Parser for Xls table files using the jxl package.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class XlsTableParser implements TableParserI {
 

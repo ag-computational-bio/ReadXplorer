@@ -19,7 +19,7 @@ package de.cebitec.readXplorer.util;
 /**
  * An interface for classes, which are capable of sending messages.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public interface MessageSenderI {
     

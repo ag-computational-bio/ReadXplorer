@@ -20,7 +20,7 @@ package de.cebitec.readXplorer.parser.tables;
  * Enumeration of all available table models in ReadXplorer. All tables, which
  * can be generated with ReadXplorer are listed here.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public enum TableType {
     

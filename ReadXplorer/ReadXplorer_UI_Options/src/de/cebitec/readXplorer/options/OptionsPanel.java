@@ -21,7 +21,7 @@ import javax.swing.JPanel;
 /**
  * An interface for option panels to load and store data.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public abstract class OptionsPanel extends JPanel {
     private static final long serialVersionUID = 1L;

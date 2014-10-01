@@ -23,7 +23,7 @@ import org.openide.WizardDescriptor;
 /**
  * A WizardPanel for opening tracks.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class OpenTracksWizardPanel extends ChangeListeningWizardPanel {
 

@@ -25,7 +25,7 @@ import java.util.Collection;
 /**
  * A utility class providing methods for visualizing tables.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class TableVisualizationHelper {
     

@@ -20,7 +20,7 @@ package de.cebitec.readXplorer.util.classification;
  * A general interface for classification enumerations, like read mapping
  * classes or genomic feature types.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public interface Classification {
     

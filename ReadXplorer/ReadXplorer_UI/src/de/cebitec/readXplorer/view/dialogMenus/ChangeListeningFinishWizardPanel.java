@@ -22,7 +22,7 @@ import org.openide.WizardDescriptor;
  * A Change listening wizard panel, which can control enabling and disabling
  * of the finish button.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public abstract class ChangeListeningFinishWizardPanel extends ChangeListeningWizardPanel implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
 

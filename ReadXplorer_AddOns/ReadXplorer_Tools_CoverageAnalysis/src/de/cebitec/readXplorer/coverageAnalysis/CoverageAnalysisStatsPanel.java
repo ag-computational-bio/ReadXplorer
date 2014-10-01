@@ -22,7 +22,7 @@ import org.openide.util.NbBundle;
 /**
  * Statistics panel of the coverage analysis.
  *
- * @author Tobias Zimmermann, Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Tobias Zimmermann, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class CoverageAnalysisStatsPanel extends javax.swing.JPanel {
     

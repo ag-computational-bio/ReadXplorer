@@ -25,7 +25,7 @@ import org.openide.util.NbPreferences;
 /**
  * Panel for configuring the options of viewers.
  * 
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public final class ViewerPanel extends OptionsPanel {
     private static final long serialVersionUID = 1L;

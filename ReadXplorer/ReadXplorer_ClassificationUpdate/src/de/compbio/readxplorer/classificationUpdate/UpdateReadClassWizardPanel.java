@@ -24,7 +24,7 @@ import org.openide.WizardDescriptor;
  * A wizard panel displaying a message to decide, if the read classification
  * for a DB shall be updated.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 class UpdateReadClassWizardPanel extends ChangeListeningFinishWizardPanel {
 

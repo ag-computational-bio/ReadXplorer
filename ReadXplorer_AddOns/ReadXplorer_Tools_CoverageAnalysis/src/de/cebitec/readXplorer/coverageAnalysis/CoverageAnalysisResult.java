@@ -30,7 +30,7 @@ import java.util.Map;
  * a all data into the format readable for the ExcelExporter. Generates all
  * three, the sheet names, headers and data to write.
  *
- * @author Tobias Zimmermann, Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Tobias Zimmermann, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCoverageAnalysis> implements ExportDataI {
 

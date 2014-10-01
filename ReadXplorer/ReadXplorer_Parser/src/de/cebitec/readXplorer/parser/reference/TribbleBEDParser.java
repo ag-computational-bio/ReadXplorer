@@ -43,7 +43,7 @@ import org.broad.tribble.readers.LineIterator;
  * Parses the sequence from a fasta file contained in the ReferenceJob and the
  * BED annotations from the BED file contained in the ReferenceJob.
  * 
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class TribbleBEDParser implements ReferenceParserI {
 

@@ -45,7 +45,7 @@ import org.openide.util.RequestProcessor;
 /**
  * Action for importing data into ReadXplorer.
  * 
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 @ActionID(
         category = "File",

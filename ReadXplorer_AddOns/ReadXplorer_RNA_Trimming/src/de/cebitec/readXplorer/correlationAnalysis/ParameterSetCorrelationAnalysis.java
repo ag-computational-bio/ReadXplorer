@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Data storage for all parameters associated with a correlation analysis.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class ParameterSetCorrelationAnalysis extends ParameterSetWithReadClasses implements ParameterSetI<ParameterSetCorrelationAnalysis> {
     private final CorrelationCoefficient correlationCoefficient;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * Copyright (C) 2014 Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ import de.cebitec.readXplorer.util.classification.Classification;
  * Container for the coverage of a certain classification type of a given
  * interval.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class Coverage {
     

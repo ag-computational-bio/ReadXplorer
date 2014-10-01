@@ -41,7 +41,7 @@ import org.openide.DialogDisplayer;
 /**
  * Contains some utils for fasta files.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class FastaUtils implements Observable {
 

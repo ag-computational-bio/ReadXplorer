@@ -6,7 +6,7 @@ import org.openide.WizardDescriptor;
 /**
  * The wizard panel for importing VCF files.
  *
- * @author marend, vetz, Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author marend, vetz, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 class VcfImportWizardPanel extends ChangeListeningFinishWizardPanel {
 

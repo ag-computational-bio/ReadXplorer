@@ -31,7 +31,7 @@ import org.openide.util.NbBundle;
 /**
  * A file chooser for storing any kind of ExportDataI data in a table file.
  * 
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class TableExportFileChooser extends ReadXplorerFileChooser {
     

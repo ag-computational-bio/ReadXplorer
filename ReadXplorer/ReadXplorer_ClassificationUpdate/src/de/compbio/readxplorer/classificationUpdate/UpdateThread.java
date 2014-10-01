@@ -49,7 +49,7 @@ import org.openide.windows.InputOutput;
  * A thread for updating the read mapping classification of ReadXplorer to
  * version 1.9.5 or later.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class UpdateThread extends SwingWorker<Object, Object> implements Observer {
 
@@ -163,7 +163,11 @@ public class UpdateThread extends SwingWorker<Object, Object> implements Observe
                     Exceptions.printStackTrace(ex);
                     noErrors = false;
                 }
-                io.getOut().println("Re-calculation of classification for track " + trackJob.getName() + " finished successfully!");
+                if (noErrors) {
+                    io.getOut().println("Re-calculation of classification for track " + trackJob.getName() + " finished successfully!");
+                } else {
+                    io.getOut().println("Re-calculation of classification for track " + trackJob.getName() + " failed!");
+                }
                 ph.progress("Re-calculate classification of track " + trackJob.getName(), ++workunits);
             }
         }

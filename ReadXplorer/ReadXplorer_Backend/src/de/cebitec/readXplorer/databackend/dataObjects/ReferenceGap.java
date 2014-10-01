@@ -21,7 +21,7 @@ import java.io.Serializable;
 /**
  * Creates a new comparable gap in the reference sequence.
  *
- * @author ddoppmeier, Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author ddoppmeier, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class ReferenceGap extends BasicDiff implements Comparable<ReferenceGap>, Serializable {
     

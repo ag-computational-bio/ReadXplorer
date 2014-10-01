@@ -19,7 +19,7 @@ package de.cebitec.readXplorer.util.classification;
 /**
  * Enumeration of read mapping classes in ReadXplorer.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public enum MappingClass implements Classification {
     

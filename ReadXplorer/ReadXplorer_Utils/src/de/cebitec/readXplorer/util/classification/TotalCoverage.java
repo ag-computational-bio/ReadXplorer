@@ -19,7 +19,7 @@ package de.cebitec.readXplorer.util.classification;
 /**
  * Enumeration for the total coverage in ReadXplorer.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public enum TotalCoverage implements Classification {
 

@@ -51,7 +51,7 @@ import org.openide.windows.WindowManager;
  * Action for opening the coverage analysis. It opens the wizard and runs the
  * analysis after successfully finishing the wizard.
  *
- * @author Tobias Zimmermann, Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Tobias Zimmermann, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 
 @ActionID(

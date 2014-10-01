@@ -37,7 +37,7 @@ import org.supercsv.prefs.CsvPreference;
  * Creates a panel for displaying the selection of different table parsers and
  * their options.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public final class ImportTableVisualPanel extends JobPanel {
 

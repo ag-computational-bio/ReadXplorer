@@ -132,7 +132,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer, 
      * @throws OutOfMemoryError
      */
     @Override
-    public Object preprocessData(TrackJob trackJob) throws ParsingException, OutOfMemoryError {
+    public Boolean preprocessData(TrackJob trackJob) throws ParsingException, OutOfMemoryError {
         SamBamSorter sorter = new SamBamSorter();
         sorter.registerObserver(this);
         boolean success = sorter.sortSamBam(trackJob, SAMFileHeader.SortOrder.queryname, SamUtils.SORT_READNAME_STRING);
@@ -149,11 +149,18 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer, 
      * @throws ParsingException  
      */
     @Override
-    @NbBundle.Messages({"Classifier.Classification.Start=Starting read pair classification...", "Classifier.Classification.Finish=Finished read pair classification. ", "Classifier.Error=An error occured during the read pair classification: {0}"})
+    @NbBundle.Messages({"Classifier.Classification.Start=Starting read pair classification...", 
+        "Classifier.Classification.Finish=Finished read pair classification. ", 
+        "Classifier.Error=An error occured during the read pair classification: {0}"})
     public ParsedReadPairContainer classifyReadPairs() throws ParsingException, OutOfMemoryError {
 
         this.refSeqFetcher = new RefSeqFetcher(trackJob.getRefGen().getFile(), this);
-        this.preprocessData(trackJob);
+        boolean success = this.preprocessData(trackJob);
+        if (!success) {
+            throw new ParsingException("Sorting of the input file by read name was not successful, please try again and make sure to have enough "
+                    + "free space in your systems temp directory to store intermediate files for sorting (e.g. on Windows 7 the hard disk containing: "
+                    + "C:\\Users\\UserName\\AppData\\Local\\Temp needs to have enough free space).");
+        }
         File oldWorkFile = trackJob.getFile();
 
         try {
@@ -245,6 +252,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer, 
                     finish = System.currentTimeMillis();
                     this.notifyObservers(Benchmark.calculateDuration(startTime, finish, lineno + " mappings processed in "));
                 }
+                System.err.flush();
             }
             
             if (!diffMap1.isEmpty() || !diffMap2.isEmpty()) {

@@ -28,7 +28,7 @@ import javax.swing.event.ListSelectionListener;
  * Creates a new position table panel. A position table starts with a column
  * containing the position.
  * 
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class PosTablePanel extends TablePanel {
     private static final long serialVersionUID = 1L;

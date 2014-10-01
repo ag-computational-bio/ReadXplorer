@@ -23,7 +23,7 @@ import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
 /**
  * Visual panel of the coverage analysis wizard.
  *
- * @author Tobias Zimmermann, Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Tobias Zimmermann, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public final class CoverageAnalysisVisualPanel extends JobPanel {
     private static final long serialVersionUID = 1L;

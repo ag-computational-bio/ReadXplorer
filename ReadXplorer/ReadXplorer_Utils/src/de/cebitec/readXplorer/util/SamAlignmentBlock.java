@@ -19,7 +19,7 @@ package de.cebitec.readXplorer.util;
 /**
  * A block representing a part of a sam alignment.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class SamAlignmentBlock {
     

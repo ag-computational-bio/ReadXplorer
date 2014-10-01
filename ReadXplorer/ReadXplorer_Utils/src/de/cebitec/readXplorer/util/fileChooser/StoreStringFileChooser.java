@@ -32,7 +32,7 @@ import org.openide.util.NbBundle.Messages;
  * ReadXplorer's String file chooser. Contains the save method storing an
  * arbitrary string.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class StoreStringFileChooser extends ReadXplorerFileChooser {
     private static final long serialVersionUID = 1L;

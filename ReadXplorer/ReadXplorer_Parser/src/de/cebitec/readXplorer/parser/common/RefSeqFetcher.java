@@ -33,7 +33,7 @@ import org.openide.util.Exceptions;
  * A fetcher for any part of a referenc sequence stored in an indexed fasta 
  * file.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class RefSeqFetcher implements Observable {
     

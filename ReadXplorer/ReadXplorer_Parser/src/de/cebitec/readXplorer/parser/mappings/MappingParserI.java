@@ -26,7 +26,7 @@ import java.util.Map;
 /**
  * Interface to be implemented for all mapping parsers.
  *
- * @author ddoppmeier, Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author ddoppmeier, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public interface MappingParserI extends ParserI, Observable, PreprocessorI {
 

@@ -23,7 +23,7 @@ import java.io.Serializable;
  * Therefore, it contains base, position, number of replicates and strand
  * information.
  *
- * @author ddoppmeier, Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author ddoppmeier, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class Difference extends BasicDiff implements Comparable<Difference>, Serializable {
     

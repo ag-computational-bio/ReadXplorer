@@ -29,7 +29,7 @@ import org.openide.windows.TopComponent;
  * TopComponent of the coverage analysis. It displays all results of all carried 
  * out coverage analyses.
  *
- * @author Tobias Zimmermann, Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Tobias Zimmermann, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 @ConvertAsProperties(
         dtd = "-//CoverageAnalysis//CoverageAnalysisTopComponent//EN",
