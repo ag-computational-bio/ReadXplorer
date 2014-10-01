@@ -623,7 +623,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             pb.redirectInput(ProcessBuilder.Redirect.from(new File("NUL")));
             Process start = pb.start();
             start.waitFor();
-            messages.setText("Setup conpleted. Please restart ReadXplorer!");
+            messages.setText("Setup completed. Please restart ReadXplorer!");
             jProgressBar1.setIndeterminate(false);
             jProgressBar1.setValue(100);
         } catch (IOException | InterruptedException ex) {
@@ -653,7 +653,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                         public void run() {
                             jProgressBar1.setIndeterminate(false);
                             jProgressBar1.setValue(100);
-                            messages.setText("Download finihed.");
+                            messages.setText("Download finished.");
                         }
                     });
                     downloader.removeObserver(this);
