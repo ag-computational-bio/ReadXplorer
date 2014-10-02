@@ -46,6 +46,7 @@ import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
 
 final class GnuRPanel extends OptionsPanel implements Observer {
+
     private static final long serialVersionUID = 1L;
 
     private final GnuROptionsPanelController controller;
@@ -672,32 +673,37 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         }
 
         if (args instanceof Unzip.Status) {
-            Unzip.Status status = (Unzip.Status) args;
-            switch (status) {
-                case FAILED:
-                    messages.setText("Can not unzip R archive, please try again.");
-                    jProgressBar1.setIndeterminate(false);
-                    jProgressBar1.setValue(0);
-                    break;
-                case FILE_NOT_FOUND:
-                    messages.setText("The user directory does not exist.");
-                    jProgressBar1.setIndeterminate(false);
-                    jProgressBar1.setValue(0);
-                    break;
-                case FINISHED:
-                    setPath();
-                    JOptionPane.showMessageDialog(null, "Changes will only take effect after you restart the application");
-                    break;
-                case NO_RIGHTS:
-                    messages.setText("Can not write to user dir. Please check permissions.");
-                    jProgressBar1.setIndeterminate(false);
-                    jProgressBar1.setValue(0);
-                    break;
-                case RUNNING:
-                    messages.setText("Extracting GNU R from archive.");
-                    jProgressBar1.setIndeterminate(true);
-                    break;
-            }
+            final Unzip.Status status = (Unzip.Status) args;
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    switch (status) {
+                        case FAILED:
+                            messages.setText("Can not unzip R archive, please try again.");
+                            jProgressBar1.setIndeterminate(false);
+                            jProgressBar1.setValue(0);
+                            break;
+                        case FILE_NOT_FOUND:
+                            messages.setText("The user directory does not exist.");
+                            jProgressBar1.setIndeterminate(false);
+                            jProgressBar1.setValue(0);
+                            break;
+                        case FINISHED:
+                            setPath();
+                            JOptionPane.showMessageDialog(null, "Changes will only take effect after you restart the application");
+                            break;
+                        case NO_RIGHTS:
+                            messages.setText("Can not write to user dir. Please check permissions.");
+                            jProgressBar1.setIndeterminate(false);
+                            jProgressBar1.setValue(0);
+                            break;
+                        case RUNNING:
+                            messages.setText("Extracting GNU R from archive.");
+                            jProgressBar1.setIndeterminate(true);
+                            break;
+                    }
+                }
+            });
         }
 
     }

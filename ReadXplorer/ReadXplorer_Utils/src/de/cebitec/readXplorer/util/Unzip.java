@@ -85,7 +85,7 @@ public class Unzip implements Runnable, Observable {
                         if (nextEntry.isDirectory()) {
                             currentNewFile.mkdirs();
                         } else {
-                            
+                            currentNewFile.getParentFile().mkdirs();
                             try (FileOutputStream fos = new FileOutputStream(currentNewFile)) {
                                 int length;
                                 while ((length = zis.read(buffer)) > 0) {
