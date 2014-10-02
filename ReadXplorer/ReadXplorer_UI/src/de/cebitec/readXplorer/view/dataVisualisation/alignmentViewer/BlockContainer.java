@@ -26,31 +26,33 @@ import java.util.TreeSet;
  * A container for blocks. The blocks are added in a sorted fashion.
  */
 public class BlockContainer {
-    
+
     private TreeMap<Integer, TreeSet<BlockI>> sortedMappings;
 
-    public BlockContainer(){
-        sortedMappings = new TreeMap<Integer, TreeSet<BlockI>>();
+    public BlockContainer() {
+        sortedMappings = new TreeMap<>();
     }
 
     /**
-     * Adds a block to the container. The block order is sorted according to start position.
+     * Adds a block to the container. The block order is sorted according to
+     * start position.
+     *
      * @param block block to add
      */
-    public void addBlock(BlockI block){
+    public void addBlock(BlockI block) {
         int start = block.getAbsStart();
-        if(!sortedMappings.containsKey(start)){
+        if (!sortedMappings.containsKey(start)) {
             sortedMappings.put(start, new TreeSet<BlockI>(new BlockComparator()));
         }
         sortedMappings.get(start).add(block);
     }
 
-    public BlockI getNextByPositionAndRemove(int pos){
+    public BlockI getNextByPositionAndRemove(int pos) {
         Integer key = sortedMappings.ceilingKey(pos);
-        if(key != null){
+        if (key != null) {
             TreeSet<BlockI> set = sortedMappings.get(key);
             BlockI b = set.pollFirst();
-            if(set.isEmpty()){
+            if (set.isEmpty()) {
                 sortedMappings.remove(key);
             }
             return b;
@@ -59,31 +61,31 @@ public class BlockContainer {
         }
     }
 
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         return sortedMappings.isEmpty();
     }
 
-    private class BlockComparator implements Comparator<BlockI>{
+    private class BlockComparator implements Comparator<BlockI> {
 
         @Override
         public int compare(BlockI o1, BlockI o2) {
             // order by start of block
-            if(o1.getAbsStart() < o2.getAbsStart()){
+            if (o1.getAbsStart() < o2.getAbsStart()) {
                 return -1;
-            } else if(o1.getAbsStart() > o2.getAbsStart()){
+            } else if (o1.getAbsStart() > o2.getAbsStart()) {
                 return 1;
             } else {
                 // if blocks start at identical position use stop position
-                if(o1.getAbsStop() < o2.getAbsStop()){
+                if (o1.getAbsStop() < o2.getAbsStop()) {
                     return -1;
-                } else if (o1.getAbsStop() > o2.getAbsStop()){
+                } else if (o1.getAbsStop() > o2.getAbsStop()) {
                     return 1;
                 } else {
                     // stop position are identical, too
                     // use mapping id to distinguish and order
-                    if(o1.getPersistantObject().getId() < o2.getPersistantObject().getId()){
+                    if (o1.getObjectWithId().getId() < o2.getObjectWithId().getId()) {
                         return -1;
-                    } else if(o1.getPersistantObject().getId() > o2.getPersistantObject().getId()){
+                    } else if (o1.getObjectWithId().getId() > o2.getObjectWithId().getId()) {
                         return 1;
                     } else {
                         return 0;

@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.ui.visualisation.reference.FeatureTableModel;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ public final class ExpressTestVisualPanelNormalization extends JPanel {
     private ButtonGroup bg = new ButtonGroup();
     private FeatureTableModel tm;
     private DefaultTableModel emptyTm = new DefaultTableModel();
-    private List<PersistantFeature> features;
+    private List<PersistentFeature> features;
     private TableRowSorter trs;
 
     /**
@@ -69,9 +69,9 @@ public final class ExpressTestVisualPanelNormalization extends JPanel {
         return "Select Normalization";
     }
 
-    public void setFeatureList(List<PersistantFeature> features) {
+    public void setFeatureList(List<PersistentFeature> features) {
         this.features = features;
-        tm = new FeatureTableModel(features.toArray(new PersistantFeature[features.size()]));
+        tm = new FeatureTableModel(features.toArray(new PersistentFeature[features.size()]));
         trs = new TableRowSorter<>(tm);
         featureTable.setRowSorter(trs);
         updateFilter();
@@ -161,21 +161,15 @@ public final class ExpressTestVisualPanelNormalization extends JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(searchField)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(searchLable)
-                                .addGap(0, 0, Short.MAX_VALUE)))
-                        .addGap(224, 224, 224))
+                    .addComponent(searchField)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 490, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(searchLable)
                             .addComponent(calculateButton)
                             .addComponent(useHKGButton))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -189,7 +183,7 @@ public final class ExpressTestVisualPanelNormalization extends JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(searchField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(11, 11, 11)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 150, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 270, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents

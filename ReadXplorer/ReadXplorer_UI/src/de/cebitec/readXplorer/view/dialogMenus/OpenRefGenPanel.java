@@ -17,7 +17,7 @@
 package de.cebitec.readXplorer.view.dialogMenus;
 
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 
 /**
  * Panel for selecting and opening reference genomes.
@@ -55,13 +55,13 @@ public class OpenRefGenPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JList<PersistantReference> refGenList;
+    private javax.swing.JList<PersistentReference> refGenList;
     // End of variables declaration//GEN-END:variables
 
     /**
-     * @return The selected persistant reference
+     * @return The selected persistent reference
      */
-    public PersistantReference getSelectedReference() {
+    public PersistentReference getSelectedReference() {
         return refGenList.getSelectedValue();
     }
 

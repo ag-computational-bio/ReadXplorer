@@ -18,8 +18,8 @@ package de.cebitec.readXplorer.differentialExpression.wizard;
 
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.DefaultListModel;
@@ -37,10 +37,10 @@ import javax.swing.event.ListSelectionListener;
 public final class SelectTrackVisualPanel extends JPanel implements ListSelectionListener {
     private static final long serialVersionUID = 1L;
 
-    private PersistantReference[] references;
+    private PersistentReference[] references;
     private int selectedIndex = -1;
-    private PersistantReference selectedRef;
-    private DefaultListModel<PersistantTrack> trackListModel = new DefaultListModel<>();
+    private PersistentReference selectedRef;
+    private DefaultListModel<PersistentTrack> trackListModel = new DefaultListModel<>();
 
     /**
      * Panel to first select a reference and then some tracks associated with
@@ -95,12 +95,12 @@ public final class SelectTrackVisualPanel extends JPanel implements ListSelectio
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1)
+                    .addComponent(jScrollPane2)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel2))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jScrollPane2))
+                        .addGap(0, 215, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -109,12 +109,12 @@ public final class SelectTrackVisualPanel extends JPanel implements ListSelectio
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -122,8 +122,8 @@ public final class SelectTrackVisualPanel extends JPanel implements ListSelectio
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JList<PersistantReference> referenceList;
-    private javax.swing.JList<PersistantTrack> trackList;
+    private javax.swing.JList<de.cebitec.readXplorer.databackend.dataObjects.PersistentReference> referenceList;
+    private javax.swing.JList<de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack> trackList;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -132,11 +132,11 @@ public final class SelectTrackVisualPanel extends JPanel implements ListSelectio
             selectedIndex = referenceList.getSelectedIndex();
             selectedRef = references[selectedIndex];
             ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector(selectedRef.getId());
-            List<PersistantTrack> tracks = refCon.getAssociatedTracks();
+            List<PersistentTrack> tracks = refCon.getAssociatedTracks();
             trackListModel.clear();
-            for (Iterator<PersistantTrack> it = tracks.iterator(); it.hasNext();) {
-                PersistantTrack persistantTrack = it.next();
-                trackListModel.addElement(persistantTrack);
+            for (Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext();) {
+                PersistentTrack persistentTrack = it.next();
+                trackListModel.addElement(persistentTrack);
             }
         }
     }
@@ -148,7 +148,7 @@ public final class SelectTrackVisualPanel extends JPanel implements ListSelectio
     /**
      * @return The list of selected tracks for the single selected reference.
      */
-    public List<PersistantTrack> getSelectedTracks() {
+    public List<PersistentTrack> getSelectedTracks() {
         return trackList.getSelectedValuesList();
     }
 
@@ -160,7 +160,7 @@ public final class SelectTrackVisualPanel extends JPanel implements ListSelectio
         if (trackList.isSelectionEmpty()) {
             return false;
         } else {
-            List<PersistantTrack> selectedTracks = trackList.getSelectedValuesList();
+            List<PersistentTrack> selectedTracks = trackList.getSelectedValuesList();
             if (selectedTracks.size() >= 2) {
                 return true;
             } else {

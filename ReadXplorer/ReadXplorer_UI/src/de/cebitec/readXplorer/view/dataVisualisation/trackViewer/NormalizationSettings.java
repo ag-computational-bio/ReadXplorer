@@ -18,19 +18,20 @@ package de.cebitec.readXplorer.view.dataVisualisation.trackViewer;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
- * @author jstraube
+ * @author jstraube, rhilker
  */
 public class NormalizationSettings {
 
     
-    public HashMap<Integer, Double[]> idToValue;
+    public Map<Integer, Double[]> idToValue;
 
     
     public NormalizationSettings(List<Integer> trackIDs, List<Boolean> isLogNormList, List<Double> factors, List<Boolean> hasNormFactor) {
-        idToValue = new HashMap<Integer, Double[]>();
+        idToValue = new HashMap<>();
         int j = 0;
         for (int i : trackIDs) {
             Double[] d = new Double[3];
@@ -43,12 +44,12 @@ public class NormalizationSettings {
     }
 
     
-    public HashMap<Integer, Double[]> getIdToValue() {
+    public Map<Integer, Double[]> getIdToValue() {
         return idToValue;
     }
 
     
-    public void setIdToValue(HashMap<Integer, Double[]> idToValue) {
+    public void setIdToValue(Map<Integer, Double[]> idToValue) {
         this.idToValue = idToValue;
     }
 
@@ -66,7 +67,7 @@ public class NormalizationSettings {
 
     
     public Boolean getIsLogNorm(int trackID) {
-        return idToValue.get(trackID)[0] == 1.0 ? true : false;
+        return idToValue.get(trackID)[0] == 1.0;
     }
 
     
@@ -78,7 +79,7 @@ public class NormalizationSettings {
 
     
     public Boolean getHasNormFac(int trackID) {
-        return idToValue.get(trackID)[2] == 1.0 ? true : false;
+        return idToValue.get(trackID)[2] == 1.0;
     }
 
     

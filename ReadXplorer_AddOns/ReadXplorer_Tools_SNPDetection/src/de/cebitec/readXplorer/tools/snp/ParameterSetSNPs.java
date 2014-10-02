@@ -17,9 +17,9 @@
 package de.cebitec.readXplorer.tools.snp;
 
 import de.cebitec.readXplorer.databackend.ParameterSetI;
-import de.cebitec.readXplorer.databackend.ParametersFeatureTypes;
+import de.cebitec.readXplorer.databackend.ParametersFeatureTypesAndReadClasses;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.util.Set;
 
 /**
@@ -27,38 +27,40 @@ import java.util.Set;
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-class ParameterSetSNPs extends ParametersFeatureTypes implements ParameterSetI<ParameterSetSNPs> {
+class ParameterSetSNPs extends ParametersFeatureTypesAndReadClasses implements ParameterSetI<ParameterSetSNPs> {
     private int minMismatchBases;
     private int minPercentage;
     private final boolean useMainBase;
-    private ParametersReadClasses readClassParams;
     private final byte minBaseQuality;
     private final byte minAverageBaseQual;
     private final int minAverageMappingQual;
 
     /**
      * Data storage for all parameters associated with a SNP and DIP detection.
-     * @param minMismatchBases the minimum number of mismatches at a SNP position 
-     * @param minPercentage the minimum percentage of mismatches at a SNP position
-     * @param useMainBase <cc>true</cc>, if the minVaryingBases count corresponds to the count of
-     * the most frequent base at the current position. <cc>false</cc>, if the 
-     * minVaryingBases count corresponds to the overall mismatch count at the
-     * current position.
-     * @param selFeatureTypes list of seletect feature types to use for the 
-     * snp translation.
-     * @param readClassParams only include mappings in the analysis, which 
+     * @param minMismatchBases the minimum number of mismatches at a SNP
+     * position
+     * @param minPercentage the minimum percentage of mismatches at a SNP
+     * position
+     * @param useMainBase <code>true</code>, if the minVaryingBases count
+     * corresponds to the count of the most frequent base at the current
+     * position. <code>false</code>, if the minVaryingBases count corresponds to
+     * the overall mismatch count at the current position.
+     * @param selFeatureTypes list of seletect feature types to use for the snp
+     * translation.
+     * @param readClassParams only include mappings in the analysis, which
      * belong to the selected mapping classes.
      * @param minBaseQuality Minimum phred scaled base quality or -1 if unknown.
-     * @param minAverageBaseQual Minimum average phred scaled base quality or -1 if unknown.
-     * @param minAverageMappingQual Minimum average phred scaled mapping quality or -1 if unknown.
+     * @param minAverageBaseQual Minimum average phred scaled base quality or -1
+     * if unknown.
+     * @param minAverageMappingQual Minimum average phred scaled mapping quality
+     * or -1 if unknown.
      */
     public ParameterSetSNPs(int minMismatchBases, int minPercentage, boolean useMainBase, Set<FeatureType> selFeatureTypes, ParametersReadClasses readClassParams,
             byte minBaseQuality, byte minAverageBaseQual, int minAverageMappingQual) {
-        super(selFeatureTypes);
+        super(selFeatureTypes, readClassParams);
         this.minMismatchBases = minMismatchBases;
         this.minPercentage = minPercentage;
         this.useMainBase = useMainBase;
-        this.readClassParams = readClassParams;
         this.minBaseQuality = minBaseQuality;
         this.minAverageBaseQual = minAverageBaseQual;
         this.minAverageMappingQual = minAverageMappingQual;
@@ -87,20 +89,8 @@ class ParameterSetSNPs extends ParametersFeatureTypes implements ParameterSetI<P
     }
 
     /**
-     * @return only include mappings in the analysis, which 
-     * belong to the selected mapping classes.
-     */
-    public ParametersReadClasses getReadClassParams() {
-        return readClassParams;
-    }
-
-    public void setReadClassParams(ParametersReadClasses readClassParams) {
-        this.readClassParams = readClassParams;
-    }
-
-    /**
-     * @return <cc>true</cc>, if the minVaryingBases count corresponds to the count of
-     * the most frequent base at the current position. <cc>false</cc>, if the 
+     * @return <code>true</code>, if the minVaryingBases count corresponds to the count of
+     * the most frequent base at the current position. <code>false</code>, if the 
      * minVaryingBases count corresponds to the overall mismatch count at the
      * current position.
      */

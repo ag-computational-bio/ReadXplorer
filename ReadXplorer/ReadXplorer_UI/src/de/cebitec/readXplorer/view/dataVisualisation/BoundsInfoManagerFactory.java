@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import java.util.HashMap;
 
 /**
@@ -34,7 +34,7 @@ public class BoundsInfoManagerFactory {
         this.data = new HashMap<>();
     }
     
-    public BoundsInfoManager get(PersistantReference genome) {
+    public BoundsInfoManager get(PersistentReference genome) {
         if (data.containsKey(genome.getId())) { 
             return data.get(genome.getId());
         } else {

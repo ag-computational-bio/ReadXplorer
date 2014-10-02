@@ -22,7 +22,7 @@ import de.cebitec.readXplorer.util.SequenceUtils;
 /**
  * A coverage interval container.
  * 
- * @author Tobias Zimmermann, Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Tobias Zimmermann, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class CoverageInterval {
 

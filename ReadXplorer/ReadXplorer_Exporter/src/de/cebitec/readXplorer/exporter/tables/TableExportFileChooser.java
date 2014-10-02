@@ -31,7 +31,7 @@ import org.openide.util.NbBundle;
 /**
  * A file chooser for storing any kind of ExportDataI data in a table file.
  * 
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class TableExportFileChooser extends ReadXplorerFileChooser {
     
@@ -72,10 +72,10 @@ public class TableExportFileChooser extends ReadXplorerFileChooser {
 
     @Override
     @NbBundle.Messages({
-        "IoExceptionMsg=An error occured while reading the specified file",
+        "IoExceptionMsg=An error occurred while reading the specified file",
         "FailHeader=Failure", 
         "ProgressName=Table export progress", 
-        "FailMsg=A write error occured during saving progress!", 
+        "FailMsg=A write error occurred during saving progress!", 
         "OomMsg=Out of Memory: Data too large for table export."})
     public void save(final String fileLocation) {
 

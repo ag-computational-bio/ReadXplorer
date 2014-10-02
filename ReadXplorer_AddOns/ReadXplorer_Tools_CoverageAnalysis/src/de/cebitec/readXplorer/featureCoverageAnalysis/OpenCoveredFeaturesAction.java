@@ -22,10 +22,11 @@ import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.VisualisationUtils;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.readXplorer.view.dialogMenus.OpenTracksVisualPanel;
 import de.cebitec.readXplorer.view.dialogMenus.OpenTracksWizardPanel;
@@ -73,15 +74,15 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
     private static final String PROP_WIZARD_NAME = "FeatureCoverageWiz";
     
     private final ReferenceViewer context;
-    private int referenceId;
-    private List<PersistantTrack> tracks;
+    private PersistentReference reference;
+    private List<PersistentTrack> tracks;
     private CoveredFeaturesAnalysisTopComponent coveredAnnoAnalysisTopComp;
     private Map<Integer, AnalysisCoveredFeatures> trackToAnalysisMap;
     private int finishedCovAnalyses = 0;
     private ResultPanelCoveredFeatures coveredFeaturesResultPanel;
     ParameterSetCoveredFeatures parameters;
     private boolean combineTracks;
-    private Map<Integer, PersistantTrack> trackMap;
+    private Map<Integer, PersistentTrack> trackMap;
     private OpenTracksWizardPanel openTracksWizPanel;
     private SelectReadClassWizardPanel readClassWizPanel;
     private SelectFeatureTypeWizardPanel featTypeWizPanel; 
@@ -92,7 +93,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
      */
     public OpenCoveredFeaturesAction(ReferenceViewer context) {
         this.context = context;
-        this.referenceId = this.context.getReference().getId();
+        this.reference = this.context.getReference();
         this.trackToAnalysisMap = new HashMap<>();
     }
 
@@ -115,10 +116,9 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
 
         @SuppressWarnings("unchecked")
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
-        this.openTracksWizPanel = new OpenTracksWizardPanel(PROP_WIZARD_NAME, referenceId);
+        this.openTracksWizPanel = new OpenTracksWizardPanel(PROP_WIZARD_NAME, reference.getId());
         this.readClassWizPanel = new SelectReadClassWizardPanel(PROP_WIZARD_NAME, true);
         this.featTypeWizPanel = new SelectFeatureTypeWizardPanel(PROP_WIZARD_NAME);
-        this.openTracksWizPanel.setReadClassVisualPanel(readClassWizPanel.getComponent());
         panels.add(openTracksWizPanel);
         panels.add(new CoveredFeaturesWizardPanel());
         panels.add(readClassWizPanel);
@@ -172,7 +172,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
 
         TrackConnector connector;
         if (!combineTracks) {
-            for (PersistantTrack track : this.tracks) {
+            for (PersistentTrack track : this.tracks) {
                 try {
                     connector = (new SaveFileFetcherForGUI()).getTrackConnector(track);
                 } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
@@ -231,7 +231,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
 
                 AnalysisCoveredFeatures analysisCoveredFeatures = trackToAnalysisMap.get(trackId);
                 final CoveredFeatureResult result = new CoveredFeatureResult(analysisCoveredFeatures.getResults(), 
-                        trackMap, referenceId, combineTracks, 1, 0);
+                        trackMap, reference, combineTracks, 1, 0);
                 result.setParameters(parameters);
                 Map<String, Integer> statsMap = new HashMap<>();
                 statsMap.put(ResultPanelCoveredFeatures.FEATURES_TOTAL, analysisCoveredFeatures.getNoGenomeFeatures());
@@ -252,7 +252,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
                             //get track name(s) for tab descriptions
                             String trackNames = "";
                             if (tracks != null && !tracks.isEmpty()) {
-                                for (PersistantTrack track : tracks) {
+                                for (PersistentTrack track : tracks) {
                                     trackNames = trackNames.concat(track.getDescription()).concat(" and ");
                                 }
                                 trackNames = trackNames.substring(0, trackNames.length() - 5);

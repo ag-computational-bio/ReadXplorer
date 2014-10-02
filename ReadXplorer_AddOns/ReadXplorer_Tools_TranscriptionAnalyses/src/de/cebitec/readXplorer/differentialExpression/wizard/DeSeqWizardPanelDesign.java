@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -38,7 +38,7 @@ public class DeSeqWizardPanelDesign implements WizardDescriptor.ValidatingPanel<
      * component from this class, just use getComponent().
      */
     private DeSeqVisualPanelDesign component;
-    private List<PersistantTrack> tracks = null;
+    private List<PersistentTrack> tracks = null;
     private Map<String, String[]> design;
 
     // Get the visual component for the panel. In this template, the component
@@ -81,14 +81,14 @@ public class DeSeqWizardPanelDesign implements WizardDescriptor.ValidatingPanel<
 
     @Override
     public void readSettings(WizardDescriptor wiz) {
-        List<PersistantTrack> tmpTracks = (List<PersistantTrack>) wiz.getProperty("tracks");
+        List<PersistentTrack> tmpTracks = (List<PersistentTrack>) wiz.getProperty("tracks");
         boolean newTracks = false;
         if (tracks == null) {
             newTracks = true;
         } else {
-            for (Iterator<PersistantTrack> it = tmpTracks.iterator(); it.hasNext();) {
-                PersistantTrack persistantTrack = it.next();
-                if (!tracks.contains(persistantTrack)) {
+            for (Iterator<PersistentTrack> it = tmpTracks.iterator(); it.hasNext();) {
+                PersistentTrack persistentTrack = it.next();
+                if (!tracks.contains(persistentTrack)) {
                     newTracks = true;
                     break;
                 }

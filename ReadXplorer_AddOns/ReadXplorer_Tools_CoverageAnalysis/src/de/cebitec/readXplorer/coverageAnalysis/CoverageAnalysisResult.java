@@ -17,7 +17,8 @@
 package de.cebitec.readXplorer.coverageAnalysis;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.exporter.tables.ExportDataI;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import java.util.ArrayList;
@@ -29,15 +30,15 @@ import java.util.Map;
  * a all data into the format readable for the ExcelExporter. Generates all
  * three, the sheet names, headers and data to write.
  *
- * @author Tobias Zimmermann, Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Tobias Zimmermann, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCoverageAnalysis> implements ExportDataI {
 
     private CoverageIntervalContainer results;
 
-    public CoverageAnalysisResult(CoverageIntervalContainer results, Map<Integer, PersistantTrack> trackMap, 
-            int referenceId, boolean combineTracks) {
-        super(trackMap, referenceId, combineTracks, 0, 3);
+    public CoverageAnalysisResult(CoverageIntervalContainer results, Map<Integer, PersistentTrack> trackMap, 
+            PersistentReference reference, boolean combineTracks) {
+        super(reference, trackMap, combineTracks, 0, 3);
         this.results = results;
     }
 

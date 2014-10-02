@@ -18,8 +18,8 @@ package de.cebitec.readXplorer.view.dialogMenus;
 
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
 import java.awt.event.ActionEvent;
@@ -31,7 +31,7 @@ import javax.swing.JComboBox;
  * Class containing helper methods for visualizing and switching between 
  * chromosomes.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class ChromosomeVisualizationHelper {
 
@@ -50,10 +50,10 @@ public class ChromosomeVisualizationHelper {
      * @param refGenome the reference whose chromosomes shall be handled in the 
      * selection box from now on.
      */
-    public void updateChromBoxContent(JComboBox<PersistantChromosome> chromSelectionBox, 
-                PersistantReference refGenome) {
+    public void updateChromBoxContent(JComboBox<PersistentChromosome> chromSelectionBox, 
+                PersistentReference refGenome) {
         ReferenceConnector connector = ProjectConnector.getInstance().getRefGenomeConnector(refGenome.getId());
-        PersistantChromosome[] chroms = new PersistantChromosome[0];
+        PersistentChromosome[] chroms = new PersistentChromosome[0];
         chroms = connector.getChromosomesForGenome().values().toArray(chroms);
         chromSelectionBox.setModel(new DefaultComboBoxModel<>(chroms));
         chromSelectionBox.setSelectedItem(refGenome.getActiveChromosome());
@@ -72,8 +72,8 @@ public class ChromosomeVisualizationHelper {
      * @return A new JComboBox with the list of chromosomes belonging to the
      * given reference, which allows selection of the active chromosome.
      */
-    public ChromComboObserver createChromBoxWithObserver(JComboBox<PersistantChromosome> chromSelectionBox,
-                PersistantReference refGenome) {
+    public ChromComboObserver createChromBoxWithObserver(JComboBox<PersistentChromosome> chromSelectionBox,
+                PersistentReference refGenome) {
         this.updateChromBoxContent(chromSelectionBox, refGenome);
         ChromComboObserver chromComboObserver = new ChromComboObserver(chromSelectionBox, refGenome);
         refGenome.registerObserver(chromComboObserver);
@@ -86,7 +86,7 @@ public class ChromosomeVisualizationHelper {
      */
     public class ChromosomeListener implements ActionListener {
 
-        private JComboBox<PersistantChromosome> chromSelectionBox;
+        private JComboBox<PersistentChromosome> chromSelectionBox;
         private AbstractViewer viewer;
 
         /**
@@ -97,7 +97,7 @@ public class ChromosomeVisualizationHelper {
          * @param viewer the viewer, which shall be updated with the new active
          * chromosome.
          */
-        public ChromosomeListener(final JComboBox<PersistantChromosome> chromSelectionBox, final AbstractViewer viewer) {
+        public ChromosomeListener(final JComboBox<PersistentChromosome> chromSelectionBox, final AbstractViewer viewer) {
             this.chromSelectionBox = chromSelectionBox;
             this.chromSelectionBox.addActionListener(this);
             this.viewer = viewer;
@@ -105,7 +105,7 @@ public class ChromosomeVisualizationHelper {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            PersistantChromosome activeChrom = (PersistantChromosome) chromSelectionBox.getSelectedItem();
+            PersistentChromosome activeChrom = (PersistentChromosome) chromSelectionBox.getSelectedItem();
             viewer.getBoundsInformationManager().chromosomeChanged(activeChrom.getId());
         }
 
@@ -125,8 +125,8 @@ public class ChromosomeVisualizationHelper {
      */
     public class ChromComboObserver implements Observer {
         
-        private JComboBox<PersistantChromosome> chromSelectionBox;
-        private PersistantReference refGenome;
+        private JComboBox<PersistentChromosome> chromSelectionBox;
+        private PersistentReference refGenome;
 
         /**
          * An observer, which updates a given combo box with chromosomes, in
@@ -135,7 +135,7 @@ public class ChromosomeVisualizationHelper {
          * connected
          * @param refGenome The reference genome, to which the observer is added
          */
-        public ChromComboObserver(final JComboBox<PersistantChromosome> chromSelectionBox, final PersistantReference refGenome) {
+        public ChromComboObserver(final JComboBox<PersistentChromosome> chromSelectionBox, final PersistentReference refGenome) {
             this.chromSelectionBox = chromSelectionBox;
             this.refGenome = refGenome;
         }
@@ -150,7 +150,7 @@ public class ChromosomeVisualizationHelper {
          * @param refGenome Sets the reference genome, for which the connected
          * JComboBox is updated.
          */
-        public void setRefGenome(PersistantReference refGenome) {
+        public void setRefGenome(PersistentReference refGenome) {
             this.refGenome = refGenome;
         }
     }

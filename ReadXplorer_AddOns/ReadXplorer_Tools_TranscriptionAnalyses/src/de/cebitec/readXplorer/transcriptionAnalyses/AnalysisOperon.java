@@ -20,10 +20,10 @@ import de.cebitec.readXplorer.api.objects.AnalysisI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistant;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
+import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
+import de.cebitec.readXplorer.databackend.dataObjects.MappingResult;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.Operon;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.OperonAdjacency;
 import de.cebitec.readXplorer.util.Observer;
@@ -86,9 +86,9 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
         averageReadPairLength = statsMap.get(StatsContainer.AVERAGE_READ_PAIR_SIZE);
         refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackConnector.getRefGenome().getId());
 
-        for (PersistantChromosome chrom : refConnector.getChromosomesForGenome().values()) {
+        for (PersistentChromosome chrom : refConnector.getChromosomesForGenome().values()) {
             int chromLength = chrom.getLength();
-            List<PersistantFeature> chromFeatures = refConnector.getFeaturesForClosedInterval(0, chromLength, chrom.getId());
+            List<PersistentFeature> chromFeatures = refConnector.getFeaturesForClosedInterval(0, chromLength, chrom.getId());
 
             ////////////////////////////////////////////////////////////////////////////
             // detecting all neighboring features which are not overlapping more than 20bp and
@@ -97,7 +97,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
 
             for (int i = 0; i < chromFeatures.size() - 1; i++) {
 
-                PersistantFeature feature1 = chromFeatures.get(i);
+                PersistentFeature feature1 = chromFeatures.get(i);
                 boolean reachedEnd = false;
 
                 if (operonDetParameters.getSelFeatureTypes().contains(feature1.getType())) {
@@ -114,7 +114,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
                     }
 
                     if (!reachedEnd) {
-                        PersistantFeature feature2 = chromFeatures.get(featureIndex);
+                        PersistentFeature feature2 = chromFeatures.get(featureIndex);
 
                         if (feature2.getStart() + 20 > feature1.getStop() && //features may overlap at the ends, happens quite often
                                 feature2.getStart() - feature1.getStop() < 1000) { //TODO: parameter for this
@@ -133,10 +133,10 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
     @Override
     public void update(Object data) {
         //the mappings are sorted by their start position!
-        MappingResultPersistant mappingResult = new MappingResultPersistant(null, null);
+        MappingResult mappingResult = new MappingResult(null, null);
         if (data.getClass() == mappingResult.getClass()) {
 
-            MappingResultPersistant mappings = ((MappingResultPersistant) data);
+            MappingResult mappings = ((MappingResult) data);
             this.sumReadCounts(mappings);
         }
         if (data instanceof Byte && ((Byte) data) == 2) {
@@ -158,21 +158,21 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
      * Sums up the read counts for the features the mappings are located in.
      * @param mappingResult the result containing the mappings to be investigated
      */
-    public void sumReadCounts(MappingResultPersistant mappingResult) {
+    public void sumReadCounts(MappingResult mappingResult) {
 
-        List<PersistantMapping> mappings = mappingResult.getMappings();
-        PersistantFeature feature1;
-        PersistantFeature feature2;
+        List<Mapping> mappings = mappingResult.getMappings();
+        PersistentFeature feature1;
+        PersistentFeature feature2;
         boolean fstFittingMapping;
-        PersistantMapping mapping;
+        Mapping mapping;
         OperonAdjacency putativeOperon;
-        PersistantChromosome chrom = refConnector.getChromosomeForGenome(mappingResult.getRequest().getChromId());
+        PersistentChromosome chrom = refConnector.getChromosomeForGenome(mappingResult.getRequest().getChromId());
         int chromLength = chrom.getLength();
         boolean isStrandBothOption = operonDetParameters.getReadClassParams().isStrandBothOption();
         boolean isFeatureStrand = operonDetParameters.getReadClassParams().isStrandFeatureOption();
         boolean analysisStrand;
 
-        List<PersistantFeature> chromFeatures = refConnector.getFeaturesForClosedInterval(0, chromLength, chrom.getId());
+        List<PersistentFeature> chromFeatures = refConnector.getFeaturesForClosedInterval(0, chromLength, chrom.getId());
         for (int i = 0; i < chromFeatures.size(); ++i) {
             feature1 = chromFeatures.get(i);
             int id1 = feature1.getId();
@@ -203,13 +203,13 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
 
                     //mappings identified between both features
                     if (mapping.getStart() <= feature1Stop && mapping.getStop() > feature1Stop && mapping.getStop() < feature2Start) {
-                        readsFeature1 += mapping.getNbReplicates();
+                        ++readsFeature1;
                     } else if (mapping.getStart() > feature1Stop && mapping.getStart() < feature2Start && mapping.getStop() >= feature2Start) {
-                        readsFeature2 += mapping.getNbReplicates();
+                        ++readsFeature2;
                     } else if (mapping.getStart() <= feature1Stop && mapping.getStop() >= feature2Start) {
-                        spanningReads += mapping.getNbReplicates();
+                        ++spanningReads;
                     } else if (mapping.getStart() > feature1Stop && mapping.getStop() < feature2Start) {
-                        internalReads += mapping.getNbReplicates();
+                        ++internalReads;
                     }
 
                     if (fstFittingMapping) { //TODO: either add to each if clause above or add surrounding if clause!
@@ -255,8 +255,8 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
 
         int count = 0;
         int lastAnnoId = 0;
-        PersistantFeature feature1;
-        PersistantFeature feature2;
+        PersistentFeature feature1;
+        PersistentFeature feature2;
         Operon operon;
         for (Object featureId : featureIds) {
             putativeOperon = featureToPutativeOperonMap.get((Integer) featureId);

@@ -18,7 +18,8 @@ package de.cebitec.readXplorer.differentialExpression.wizard;
 
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler.Tool;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
@@ -31,6 +32,7 @@ public class SelectTrackWizardPanel implements WizardDescriptor.ValidatingPanel<
      * component from this class, just use getComponent().
      */
     private SelectTrackVisualPanel component;
+    private Tool tool;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -72,13 +74,13 @@ public class SelectTrackWizardPanel implements WizardDescriptor.ValidatingPanel<
 
     @Override
     public void readSettings(WizardDescriptor wiz) {
-        // use wiz.getProperty to retrieve previous panel state
+        tool = (Tool) wiz.getProperty("tool");
     }
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
-        if (getComponent().selectionFinished()) {
+        if (getComponent().selectionFinished() || tool == Tool.ExportCountTable) {
             wiz.putProperty("genomeID", getComponent().getSelectedReferenceGenomeID());
             wiz.putProperty("tracks", getComponent().getSelectedTracks());
         }
@@ -86,7 +88,7 @@ public class SelectTrackWizardPanel implements WizardDescriptor.ValidatingPanel<
 
     @Override
     public void validate() throws WizardValidationException {
-        if (!getComponent().selectionFinished()) {
+        if (!getComponent().selectionFinished() && tool != Tool.ExportCountTable) {
             throw new WizardValidationException(null, "Please select a reference genome and at least two tracks.", null);
         } else {
             ReferenceConnector referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(getComponent().getSelectedReferenceGenomeID());

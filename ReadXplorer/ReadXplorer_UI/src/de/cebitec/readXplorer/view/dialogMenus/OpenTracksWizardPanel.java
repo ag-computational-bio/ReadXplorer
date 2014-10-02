@@ -16,14 +16,14 @@
  */
 package de.cebitec.readXplorer.view.dialogMenus;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.util.List;
 import org.openide.WizardDescriptor;
 
 /**
  * A WizardPanel for opening tracks.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class OpenTracksWizardPanel extends ChangeListeningWizardPanel {
 
@@ -33,7 +33,6 @@ public class OpenTracksWizardPanel extends ChangeListeningWizardPanel {
     private OpenTracksVisualPanel component;
     private String wizardName;
     private final int referenceId;
-    private SelectReadClassVisualPanel readClassVisualPanel;
     
     /**
      * A WizardPanel for opening tracks.
@@ -60,7 +59,7 @@ public class OpenTracksWizardPanel extends ChangeListeningWizardPanel {
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         if (isValid()) {
-            List<PersistantTrack> tracks = this.component.getSelectedTracks();
+            List<PersistentTrack> tracks = this.component.getSelectedTracks();
             wiz.putProperty(getPropSelectedTracks(), tracks);
             wiz.putProperty(getPropCombineTracks(), this.component.isCombineTracks());
         }
@@ -80,14 +79,5 @@ public class OpenTracksWizardPanel extends ChangeListeningWizardPanel {
      */
     public String getPropCombineTracks() {
         return this.wizardName + PROP_COMBINE_TRACKS;
-    }
-    
-    /**
-     * @param readClassVisualPanel A ReadClassVisualPanel, which shall be 
-     * informed, if a track completely stored in the DB is used in the current
-     * track selection.
-     */
-    public void setReadClassVisualPanel(SelectReadClassVisualPanel readClassVisualPanel) {
-        this.readClassVisualPanel = readClassVisualPanel;
     }
 }

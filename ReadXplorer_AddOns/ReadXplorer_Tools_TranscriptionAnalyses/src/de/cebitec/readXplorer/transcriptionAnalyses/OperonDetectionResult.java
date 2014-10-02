@@ -17,8 +17,9 @@
 package de.cebitec.readXplorer.transcriptionAnalyses;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.Operon;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.OperonAdjacency;
 import de.cebitec.readXplorer.util.GeneralUtils;
@@ -35,9 +36,9 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetOpero
     //sdfsdf
     private final List<Operon> detectedOperons;
 
-    public OperonDetectionResult(Map<Integer, PersistantTrack> trackList, List<Operon> detectedOperons, 
-            int referenceId, boolean combineTracks, int trackColumn, int filterColumn) {
-        super(trackList, referenceId, combineTracks, trackColumn, filterColumn);
+    public OperonDetectionResult(Map<Integer, PersistentTrack> trackList, List<Operon> detectedOperons, 
+            PersistentReference reference, boolean combineTracks, int trackColumn, int filterColumn) {
+        super(reference, trackList, combineTracks, trackColumn, filterColumn);
         this.detectedOperons = detectedOperons;
     }
 
@@ -79,7 +80,7 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetOpero
         List<List<Object>> operonResults = new ArrayList<>();
 
         for (Operon operon : this.detectedOperons) {
-            PersistantFeature feat1 = operon.getOperonAdjacencies().get(0).getFeature1();
+            PersistentFeature feat1 = operon.getOperonAdjacencies().get(0).getFeature1();
             String annoName1 = "";
             String annoName2 = "";
             String strand = feat1.isFwdStrandString() + "\n";

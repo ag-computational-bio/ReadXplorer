@@ -17,7 +17,8 @@
 package de.cebitec.readXplorer.correlationAnalysis;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,15 +41,15 @@ public class CorrelationResult extends ResultTrackAnalysis<CorrelationResult> {
     /**
      * New CorrelationResult data object.
      * @param correlationsList list of found correlations
-     * @param trackMap hashmap of track ids to tracks used in the analysis
-     * @param referenceId id of the reference genome, for which this result was
+     * @param reference id of the reference genome, for which this result was
      * generated
+     * @param trackMap hashmap of track ids to tracks used in the analysis
      * @param combineTracks <cc>true</cc>, if the tracks in the list are
      * combined, <cc>false</cc> otherwise
      */
-    public CorrelationResult(List<CorrelatedInterval> correlationsList, Map<Integer, PersistantTrack> trackMap, 
-            int referenceId, boolean combineTracks, int trackColumn, int filterColumn) {
-        super(trackMap, referenceId, combineTracks, trackColumn, filterColumn);
+    public CorrelationResult(List<CorrelatedInterval> correlationsList, Map<Integer, PersistentTrack> trackMap, 
+            PersistentReference reference, boolean combineTracks, int trackColumn, int filterColumn) {
+        super(reference, trackMap, combineTracks, trackColumn, filterColumn);
         this.correlationsList = correlationsList;
     }
     

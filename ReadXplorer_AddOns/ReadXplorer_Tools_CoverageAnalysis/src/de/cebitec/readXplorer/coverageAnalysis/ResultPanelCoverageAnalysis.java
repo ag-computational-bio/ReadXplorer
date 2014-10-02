@@ -16,8 +16,11 @@
  */
 package de.cebitec.readXplorer.coverageAnalysis;
 
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
+import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.util.UneditableTableModel;
+import de.cebitec.readXplorer.util.fileChooser.StoreStringFileChooser;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.tableVisualization.TableUtils;
 import de.cebitec.readXplorer.view.tableVisualization.tableFilter.TableRightClickFilter;
@@ -36,7 +39,7 @@ import javax.swing.table.TableRowSorter;
  * CoverageIntervalContainer panel for the coverage analysis. It displays the table with
  * all covered or uncovered intervals of the reference.
  * 
- * @author Tobias Zimmermann, Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Tobias Zimmermann, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
 
@@ -47,7 +50,7 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
     private BoundsInfoManager bim;
     private CoverageAnalysisResult coverageAnalysisResult;
     private final Map<String, Integer> coverageStatisticsMap;
-    private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
+    private TableRightClickFilter<UneditableTableModel> tableFilter;
 
     /**
      * CoverageIntervalContainer panel for the coverage analysis. It displays the table
@@ -55,6 +58,10 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
      */
     public ResultPanelCoverageAnalysis() {
         initComponents();
+        final int posColumnIdx = 0;
+        final int trackColumnIdx = 2;
+        final int chromColumnIdx = 3;
+        tableFilter = new TableRightClickFilter<>(UneditableTableModel.class, posColumnIdx, trackColumnIdx);
         this.coverageAnalysisTable.getTableHeader().addMouseListener(tableFilter);
         this.coverageStatisticsMap = new HashMap<>();
         this.coverageStatisticsMap.put(NUMBER_INTERVALS, 0);
@@ -65,8 +72,6 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
         model.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                int posColumnIdx = 0;
-                int chromColumnIdx = 3;
                 TableUtils.showPosition(coverageAnalysisTable, posColumnIdx, chromColumnIdx, bim);
             }
         });
@@ -86,6 +91,7 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
         exportButton = new javax.swing.JButton();
         statisticsButton = new javax.swing.JButton();
         parametersLabel = new javax.swing.JLabel();
+        exportSeqButton = new javax.swing.JButton();
 
         coverageAnalysisTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -137,15 +143,24 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(parametersLabel, org.openide.util.NbBundle.getMessage(ResultPanelCoverageAnalysis.class, "ResultPanelCoverageAnalysis.parametersLabel.text")); // NOI18N
 
+        org.openide.awt.Mnemonics.setLocalizedText(exportSeqButton, org.openide.util.NbBundle.getMessage(ResultPanelCoverageAnalysis.class, "ResultPanelCoverageAnalysis.exportSeqButton.text_1")); // NOI18N
+        exportSeqButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportSeqButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(coverageAnalysisPane, javax.swing.GroupLayout.DEFAULT_SIZE, 760, Short.MAX_VALUE)
+            .addComponent(coverageAnalysisPane, javax.swing.GroupLayout.DEFAULT_SIZE, 802, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(parametersLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(exportSeqButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(statisticsButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(exportButton)
@@ -159,7 +174,8 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(exportButton)
                     .addComponent(statisticsButton)
-                    .addComponent(parametersLabel))
+                    .addComponent(parametersLabel)
+                    .addComponent(exportSeqButton))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -171,10 +187,16 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
     private void statisticsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statisticsButtonActionPerformed
         JOptionPane.showMessageDialog(this, new CoverageAnalysisStatsPanel(coverageStatisticsMap), "Coverage Analysis Statistics", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_statisticsButtonActionPerformed
+
+    private void exportSeqButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportSeqButtonActionPerformed
+        this.exportSeqAsMultipleFasta();
+    }//GEN-LAST:event_exportSeqButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane coverageAnalysisPane;
     private javax.swing.JTable coverageAnalysisTable;
     private javax.swing.JButton exportButton;
+    private javax.swing.JButton exportSeqButton;
     private javax.swing.JLabel parametersLabel;
     private javax.swing.JButton statisticsButton;
     // End of variables declaration//GEN-END:variables
@@ -192,6 +214,8 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
      * @param coverageAnalysisResultNew the new result of intervals to add
      */
     public void addCoverageAnalysis(final CoverageAnalysisResult coverageAnalysisResultNew) {
+        
+        tableFilter.setTrackMap(coverageAnalysisResultNew.getTrackMap());
         
         if (this.coverageAnalysisResult == null) {
             this.coverageAnalysisResult = coverageAnalysisResultNew;
@@ -261,5 +285,48 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
      */
     public int getResultSize() {
         return  coverageStatisticsMap.get(NUMBER_INTERVALS);
+    }
+
+    /**
+     * Retrieves the reference sequence of each interval in the result shown
+     * in this panel. A header describing the reference, chromosome and
+     * position is created and the reference sequence is appended in fasta 
+     * format. Eventually, a StringFileChooser enables storing a file containing
+     * all interval sequences in mutliple fasta format.
+     */
+    private void exportSeqAsMultipleFasta() {
+        StringBuilder results = new StringBuilder(100);
+        List<CoverageInterval> coverageIntervals = coverageAnalysisResult.getResults().getCoverageIntervals();
+        coverageIntervals.addAll(coverageAnalysisResult.getResults().getCoverageIntervalsRev());
+        PersistentReference reference = coverageAnalysisResult.getReference();
+        int start;
+        int stop;
+        String seq;
+        for (CoverageInterval coverageInterval : coverageIntervals) {
+            int chromId = coverageInterval.getChromId();
+            if (coverageInterval.isFwdStrand()) {
+                start = coverageInterval.getStart();
+                stop = coverageInterval.getStop(); 
+                seq = reference.getChromSequence(chromId, start, stop);
+            } else {
+                start = coverageInterval.getStop();
+                stop = coverageInterval.getStart();
+                seq = SequenceUtils.getReverseComplement(reference.getChromSequence(chromId, stop, start));
+            }
+            results.append(">").
+                    append(reference.getName().replaceAll(" ", "_")).
+                    append("-").
+                    append(reference.getChromosome(chromId).getName()).
+                    append("-").
+                    append(coverageInterval.getStrandString()).
+                    append("-bases_").
+                    append(start).
+                    append("-").
+                    append(stop).
+                    append("\n").
+                    append(seq).
+                    append("\n");
+        }
+        new StoreStringFileChooser(new String[]{"fasta"}, "fasta", results.toString());
     }
 }

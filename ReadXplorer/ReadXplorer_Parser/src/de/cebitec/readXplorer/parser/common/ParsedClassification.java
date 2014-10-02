@@ -17,7 +17,9 @@
 package de.cebitec.readXplorer.parser.common;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import net.sf.samtools.SAMFileHeader;
 
 /**
@@ -30,7 +32,8 @@ public class ParsedClassification {
     private SAMFileHeader.SortOrder sortOrder;
     private int minMismatches;
     private List<Integer> readStarts;
-//    private List<String> refNames; //TODO: use this when multiple import is enabled
+    private Map<Integer, Integer> mismatchCountMap = new HashMap<>();
+    //    private List<String> refNames; //TODO: use this when multiple import is enabled
 
     /**
      * Class for the classification data of a read.
@@ -146,6 +149,25 @@ public class ParsedClassification {
      */
     public int getNumberOccurrences() {
         return this.readStarts.size();
+    }
+
+    /**
+     * @return The map of a number of mismatches to their count = how often
+     * has this number of mismatches been observed in total.
+     */
+    public Map<Integer, Integer> getMismatchCountMap() {
+        return mismatchCountMap;
+    }
+    
+    /**
+     * Increases the entry of the given noMismatches by one.
+     * @param noMismatches The number of mismatches entry to increase by one
+     */
+    public void updateMismatchCountMap(int noMismatches) {
+        if (!mismatchCountMap.containsKey(noMismatches)) {
+            mismatchCountMap.put(noMismatches, 0);
+        }
+        mismatchCountMap.put(noMismatches, mismatchCountMap.get(noMismatches) + 1);
     }
     
 }

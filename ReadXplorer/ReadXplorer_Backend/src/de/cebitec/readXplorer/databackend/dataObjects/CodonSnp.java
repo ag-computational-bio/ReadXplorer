@@ -31,7 +31,7 @@ public class CodonSnp {
     private final char aminoRef;
     private final char aminoSnp;
     private final SequenceComparison effect;
-    private final PersistantFeature feature;
+    private final PersistentFeature feature;
     
     
     /** 
@@ -45,7 +45,7 @@ public class CodonSnp {
      *             SequenceUtils.MATCH, SequenceUtils.DELETION, SequenceUtils.INSERTION
      * @param feature identifier of the gene to which the triplet belongs
      */
-    public CodonSnp(String tripletRef, String tripletSnp, char aminoRef, char aminoSnp, SequenceComparison effect, PersistantFeature feature){
+    public CodonSnp(String tripletRef, String tripletSnp, char aminoRef, char aminoSnp, SequenceComparison effect, PersistentFeature feature){
         this.tripletRef = tripletRef;
         this.tripletSnp = tripletSnp;
         this.feature = feature;    
@@ -72,7 +72,7 @@ public class CodonSnp {
     /**
      * @return The identifier of the gene or feature, this codon belongs to.
      */
-    public PersistantFeature getFeature() {
+    public PersistentFeature getFeature() {
         return feature;
     }
 

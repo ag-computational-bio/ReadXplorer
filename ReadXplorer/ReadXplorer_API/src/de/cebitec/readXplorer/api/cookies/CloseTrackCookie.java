@@ -21,7 +21,7 @@ package de.cebitec.readXplorer.api.cookies;
  *
  * @author joern
  */
-public interface CloseTrackCookie{
+public interface CloseTrackCookie {
 
     /**
      * Closes the track.

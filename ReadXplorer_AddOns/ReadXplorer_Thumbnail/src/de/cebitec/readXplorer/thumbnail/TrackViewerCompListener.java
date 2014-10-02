@@ -17,7 +17,7 @@
 package de.cebitec.readXplorer.thumbnail;
 
 import de.cebitec.readXplorer.databackend.IntervalRequest;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -28,10 +28,10 @@ import java.awt.event.ComponentEvent;
  */
 public class TrackViewerCompListener extends ComponentAdapter {
 
-    private PersistantFeature currentFeature;
+    private PersistentFeature currentFeature;
     private TrackViewer trackV;
 
-    public TrackViewerCompListener(PersistantFeature currentFeature, TrackViewer trackV) {
+    public TrackViewerCompListener(PersistentFeature currentFeature, TrackViewer trackV) {
         this.currentFeature = currentFeature;
         this.trackV = trackV;
     }

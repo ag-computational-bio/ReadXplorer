@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -25,10 +25,10 @@ import javax.swing.JPanel;
 
 public final class DeSeqVisualPanelConds extends JPanel {
 
-    private DefaultListModel<PersistantTrack> trackListModel = new DefaultListModel<>();
-    private DefaultListModel<PersistantTrack> conditionOneModel = new DefaultListModel<>();
-    private DefaultListModel<PersistantTrack> conditionTwoModel = new DefaultListModel<>();
-    private List<PersistantTrack> selectedTracks = new ArrayList<>();
+    private DefaultListModel<PersistentTrack> trackListModel = new DefaultListModel<>();
+    private DefaultListModel<PersistentTrack> conditionOneModel = new DefaultListModel<>();
+    private DefaultListModel<PersistentTrack> conditionTwoModel = new DefaultListModel<>();
+    private List<PersistentTrack> selectedTracks = new ArrayList<>();
     private String[] conds;
     private List<Integer> groupA = new ArrayList<>();
     private List<Integer> groupB = new ArrayList<>();
@@ -45,7 +45,7 @@ public final class DeSeqVisualPanelConds extends JPanel {
         return "Select conditions";
     }
 
-    public void updateTrackList(List<PersistantTrack> selectedTracks) {
+    public void updateTrackList(List<PersistentTrack> selectedTracks) {
         if (!this.selectedTracks.equals(selectedTracks)) {
             this.selectedTracks = selectedTracks;
             trackListModel.clear();
@@ -54,9 +54,9 @@ public final class DeSeqVisualPanelConds extends JPanel {
             groupA.clear();
             groupB.clear();
             conds = new String[selectedTracks.size()];
-            for (Iterator<PersistantTrack> it = selectedTracks.iterator(); it.hasNext();) {
-                PersistantTrack persistantTrack = it.next();
-                trackListModel.addElement(persistantTrack);
+            for (Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext();) {
+                PersistentTrack persistentTrack = it.next();
+                trackListModel.addElement(persistentTrack);
             }
         }
     }
@@ -112,43 +112,43 @@ public final class DeSeqVisualPanelConds extends JPanel {
         removeFromConditionOne = new javax.swing.JButton();
         removeFromConditionTwo = new javax.swing.JButton();
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.jLabel1.text_1")); // NOI18N
 
         trackList.setModel(trackListModel);
         jScrollPane1.setViewportView(trackList);
 
-        org.openide.awt.Mnemonics.setLocalizedText(addToConditionOne, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.addToConditionOne.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(addToConditionOne, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.addToConditionOne.text_1")); // NOI18N
         addToConditionOne.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addToConditionOneActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(addToConditionTwo, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.addToConditionTwo.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(addToConditionTwo, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.addToConditionTwo.text_1")); // NOI18N
         addToConditionTwo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addToConditionTwoActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.jLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.jLabel2.text_1")); // NOI18N
 
         conditionOneList.setModel(conditionOneModel);
         jScrollPane2.setViewportView(conditionOneList);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.jLabel3.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.jLabel3.text_1")); // NOI18N
 
         conditionTwoList.setModel(conditionTwoModel);
         jScrollPane3.setViewportView(conditionTwoList);
 
-        org.openide.awt.Mnemonics.setLocalizedText(removeFromConditionOne, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.removeFromConditionOne.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(removeFromConditionOne, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.removeFromConditionOne.text_1")); // NOI18N
         removeFromConditionOne.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 removeFromConditionOneActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(removeFromConditionTwo, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.removeFromConditionTwo.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(removeFromConditionTwo, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelConds.class, "DeSeqVisualPanelConds.removeFromConditionTwo.text_1")); // NOI18N
         removeFromConditionTwo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 removeFromConditionTwoActionPerformed(evt);
@@ -162,23 +162,20 @@ public final class DeSeqVisualPanelConds extends JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(27, 27, 27)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(addToConditionTwo, javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(addToConditionOne, javax.swing.GroupLayout.Alignment.TRAILING))
-                            .addComponent(removeFromConditionOne)
-                            .addComponent(removeFromConditionTwo))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
+                            .addComponent(removeFromConditionOne, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(addToConditionOne, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(addToConditionTwo, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(removeFromConditionTwo, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 199, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel2)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel3))))
                 .addContainerGap())
         );
@@ -191,13 +188,13 @@ public final class DeSeqVisualPanelConds extends JPanel {
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(26, 26, 26)
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 152, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1))
                 .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addGap(54, 54, 54)
@@ -208,63 +205,63 @@ public final class DeSeqVisualPanelConds extends JPanel {
                 .addComponent(addToConditionTwo)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(removeFromConditionTwo)
-                .addGap(50, 50, 50))
+                .addGap(47, 47, 47))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void addToConditionOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addToConditionOneActionPerformed
-        List<PersistantTrack> tracks = trackList.getSelectedValuesList();
-        for (Iterator<PersistantTrack> it = tracks.iterator(); it.hasNext();) {
-            PersistantTrack persistantTrack = it.next();
-            trackListModel.removeElement(persistantTrack);
-            conditionOneModel.addElement(persistantTrack);
-            conds[selectedTracks.indexOf(persistantTrack)] = "ONE";
+        List<PersistentTrack> tracks = trackList.getSelectedValuesList();
+        for (Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext();) {
+            PersistentTrack persistentTrack = it.next();
+            trackListModel.removeElement(persistentTrack);
+            conditionOneModel.addElement(persistentTrack);
+            conds[selectedTracks.indexOf(persistentTrack)] = "ONE";
             //Java indexing starts at 0 but these values will be passed directly to
             //Gnu R and should correspond to the columns of the count data. Therefore
             //you have to add one to the index used by Java.
-            groupA.add((Integer) (selectedTracks.indexOf(persistantTrack) + 1));
+            groupA.add((Integer) (selectedTracks.indexOf(persistentTrack) + 1));
         }
     }//GEN-LAST:event_addToConditionOneActionPerformed
 
     private void addToConditionTwoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addToConditionTwoActionPerformed
-        List<PersistantTrack> tracks = trackList.getSelectedValuesList();
-        for (Iterator<PersistantTrack> it = tracks.iterator(); it.hasNext();) {
-            PersistantTrack persistantTrack = it.next();
-            trackListModel.removeElement(persistantTrack);
-            conditionTwoModel.addElement(persistantTrack);
-            conds[selectedTracks.indexOf(persistantTrack)] = "TWO";
+        List<PersistentTrack> tracks = trackList.getSelectedValuesList();
+        for (Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext();) {
+            PersistentTrack persistentTrack = it.next();
+            trackListModel.removeElement(persistentTrack);
+            conditionTwoModel.addElement(persistentTrack);
+            conds[selectedTracks.indexOf(persistentTrack)] = "TWO";
             //Java indexing starts at 0 but these values will be passed directly to
             //Gnu R and should correspond to the columns of the count data. Therefore
             //you have to add one to the index used by Java.
-            groupB.add((Integer) (selectedTracks.indexOf(persistantTrack) + 1));
+            groupB.add((Integer) (selectedTracks.indexOf(persistentTrack) + 1));
         }
     }//GEN-LAST:event_addToConditionTwoActionPerformed
 
     private void removeFromConditionOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeFromConditionOneActionPerformed
-        List<PersistantTrack> tracks = conditionOneList.getSelectedValuesList();
-        for (Iterator<PersistantTrack> it = tracks.iterator(); it.hasNext();) {
-            PersistantTrack persistantTrack = it.next();
-            conditionOneModel.removeElement(persistantTrack);
-            trackListModel.addElement(persistantTrack);
-            conds[selectedTracks.indexOf(persistantTrack)] = null;
+        List<PersistentTrack> tracks = conditionOneList.getSelectedValuesList();
+        for (Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext();) {
+            PersistentTrack persistentTrack = it.next();
+            conditionOneModel.removeElement(persistentTrack);
+            trackListModel.addElement(persistentTrack);
+            conds[selectedTracks.indexOf(persistentTrack)] = null;
             //Java indexing starts at 0 but these values will be passed directly to
             //Gnu R and should correspond to the columns of the count data. Therefore
             //you have to add one to the index used by Java.
-            groupA.remove((Integer) (selectedTracks.indexOf(persistantTrack) + 1));
+            groupA.remove((Integer) (selectedTracks.indexOf(persistentTrack) + 1));
         }
     }//GEN-LAST:event_removeFromConditionOneActionPerformed
 
     private void removeFromConditionTwoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeFromConditionTwoActionPerformed
-        List<PersistantTrack> tracks = conditionTwoList.getSelectedValuesList();
-        for (Iterator<PersistantTrack> it = tracks.iterator(); it.hasNext();) {
-            PersistantTrack persistantTrack = it.next();
-            conditionTwoModel.removeElement(persistantTrack);
-            trackListModel.addElement(persistantTrack);
-            conds[selectedTracks.indexOf(persistantTrack)] = null;
+        List<PersistentTrack> tracks = conditionTwoList.getSelectedValuesList();
+        for (Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext();) {
+            PersistentTrack persistentTrack = it.next();
+            conditionTwoModel.removeElement(persistentTrack);
+            trackListModel.addElement(persistentTrack);
+            conds[selectedTracks.indexOf(persistentTrack)] = null;
             //Java indexing starts at 0 but these values will be passed directly to
             //Gnu R and should correspond to the columns of the count data. Therefore
             //you have to add one to the index used by Java.
-            groupB.remove((Integer) (selectedTracks.indexOf(persistantTrack) + 1));
+            groupB.remove((Integer) (selectedTracks.indexOf(persistentTrack) + 1));
         }
     }//GEN-LAST:event_removeFromConditionTwoActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables

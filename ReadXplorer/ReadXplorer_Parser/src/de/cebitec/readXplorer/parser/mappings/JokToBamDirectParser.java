@@ -17,7 +17,6 @@
 package de.cebitec.readXplorer.parser.mappings;
 
 import de.cebitec.readXplorer.parser.TrackJob;
-import de.cebitec.readXplorer.parser.common.DirectAccessDataContainer;
 import de.cebitec.readXplorer.parser.common.ParsingException;
 import de.cebitec.readXplorer.parser.output.JokToBamConverter;
 import de.cebitec.readXplorer.util.Observer;
@@ -63,22 +62,26 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
      * @throws OutOfMemoryError
      */
     @Override
-    public Object preprocessData(TrackJob trackJob) throws ParsingException, OutOfMemoryError {
+    public Boolean preprocessData(TrackJob trackJob) throws ParsingException, OutOfMemoryError {
         return true;
     }
     
     
     @Override
-    public Object parseInput(TrackJob trackJob, Map<String, Integer> chromLengthMap) throws ParsingException, OutOfMemoryError {
+    public Boolean parseInput(TrackJob trackJob, Map<String, Integer> chromLengthMap) throws ParsingException, OutOfMemoryError {
         
-        this.preprocessData(trackJob);
+        Boolean success = this.preprocessData(trackJob);
         
+        if (success) {
         //parse the newly converted bam file
-        bamParser.registerObserver(this);
-        DirectAccessDataContainer trackData = bamParser.parseInput(trackJob, chromLengthMap);
-        bamParser.removeObserver(this);
+            bamParser.registerObserver(this);
+            success = bamParser.parseInput(trackJob, chromLengthMap);
+            bamParser.removeObserver(this);
+        } else {
+            throw new ParsingException("Preprocessing of the data did not work.");
+        }
         
-        return trackData;
+        return success;
     }
     
     /**
@@ -92,7 +95,7 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
      * @throws OutOfMemoryError 
      */
     @Override
-    public Object convert(TrackJob trackJob, Map<String, Integer> chromLengthMap) throws ParsingException, OutOfMemoryError {
+    public Boolean convert(TrackJob trackJob, Map<String, Integer> chromLengthMap) throws ParsingException, OutOfMemoryError {
         Iterator<String> it = chromLengthMap.keySet().iterator();
         boolean success;
         if (it.hasNext()) {

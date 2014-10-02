@@ -16,9 +16,9 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.referenceViewer;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.util.ColorProperties;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.view.dialogMenus.MenuItemFactory;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -45,7 +45,7 @@ import org.openide.util.Utilities;
 public class JFeature extends JComponent {
 
     private static final long serialVersionUID = 347348234;
-    private PersistantFeature feature;
+    private PersistentFeature feature;
     private Dimension size;
     public static final int NORMAL_HEIGHT = 12;
     public static final int PARENT_FEATURE_HEIGHT = 8;
@@ -66,7 +66,7 @@ public class JFeature extends JComponent {
      * @param refViewer the reference viewer on which the feature is displayed
      * @param border value among JFeature.BORDER_NONE, JFeature.BORDER_LEFT, JFeature.BORDER_RIGHT, JFeature.BORDER_BOTH
      */
-    public JFeature(final PersistantFeature feature, double length, final ReferenceViewer refViewer, short border) {
+    public JFeature(final PersistentFeature feature, double length, final ReferenceViewer refViewer, short border) {
         super();
         this.feature = feature;
         this.height = NORMAL_HEIGHT;
@@ -80,7 +80,7 @@ public class JFeature extends JComponent {
         this.setToolTipText(createToolTipText());
     }
 
-    public PersistantFeature getPersistantFeature() {
+    public PersistentFeature getPersistentFeature() {
         return feature;
     }
 
@@ -193,7 +193,7 @@ public class JFeature extends JComponent {
      * @param feature the feature
      * @return the color for this feature
      */
-    private Color determineColor(PersistantFeature feature) {
+    private Color determineColor(PersistentFeature feature) {
         Color c;
         
         if (feature.getType() == FeatureType.CDS) {

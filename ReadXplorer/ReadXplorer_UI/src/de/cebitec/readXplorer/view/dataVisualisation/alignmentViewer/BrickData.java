@@ -22,7 +22,7 @@ import java.awt.Rectangle;
 /**
  * Contains all data for painting a Brick.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class BrickData {
     private final Brick brick;

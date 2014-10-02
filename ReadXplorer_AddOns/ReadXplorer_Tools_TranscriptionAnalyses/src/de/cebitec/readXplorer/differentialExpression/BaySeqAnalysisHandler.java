@@ -17,12 +17,12 @@
 package de.cebitec.readXplorer.differentialExpression;
 
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.differentialExpression.BaySeq.SamplesNotValidException;
 import de.cebitec.readXplorer.differentialExpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.readXplorer.differentialExpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readXplorer.differentialExpression.GnuR.UnknownGnuRException;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -57,7 +57,7 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
         }
     }
 
-    public BaySeqAnalysisHandler(List<PersistantTrack> selectedTracks, List<Group> groups, Integer refGenomeID, int[] replicateStructure,
+    public BaySeqAnalysisHandler(List<PersistentTrack> selectedTracks, List<Group> groups, Integer refGenomeID, int[] replicateStructure,
             File saveFile, Set<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams, UUID key) {
         super(selectedTracks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams);
         baySeq = new BaySeq();

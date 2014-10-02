@@ -24,37 +24,40 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="jSeparator2" max="32767" attributes="0"/>
-                  <Component id="descriptionRCScrollPane" max="32767" attributes="0"/>
-                  <Component id="descriptionStrandScrollPane" alignment="0" max="32767" attributes="0"/>
-                  <Group type="102" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="checkBoxBestMatch" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="checkBoxPerfect" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="checkBoxCommon" alignment="0" min="-2" max="-2" attributes="0"/>
-                              </Group>
+                          <Component id="checkBoxPerfect" min="-2" max="-2" attributes="0"/>
+                          <Component id="checkBoxSinglePerfect" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="checkBoxSingleBestMatch" min="-2" max="-2" attributes="0"/>
+                          <Component id="checkBoxBestMatch" min="-2" max="-2" attributes="0"/>
+                          <Component id="checkBoxCommon" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="jSeparator1" min="-2" pref="2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="minMappingQualityField" min="-2" pref="32" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="jSeparator1" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Group type="102" attributes="0">
-                                      <Component id="minMappingQualityField" min="-2" pref="32" max="-2" attributes="0"/>
-                                      <EmptySpace max="-2" attributes="0"/>
-                                      <Component id="minMappingQualLabel" min="-2" max="-2" attributes="0"/>
-                                  </Group>
-                                  <Component id="checkBoxUnique" alignment="0" min="-2" max="-2" attributes="0"/>
-                              </Group>
+                              <Component id="minMappingQualLabel" min="-2" max="-2" attributes="0"/>
                           </Group>
+                          <Component id="checkBoxUnique" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="0" pref="160" max="32767" attributes="0"/>
+                  </Group>
+                  <Component id="descriptionRCScrollPane" alignment="0" max="32767" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="strandLabel" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="strandFeatureRadioButton" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="strandOppositeRadioButton" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Component id="strandBothRadioButton" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace min="0" pref="3" max="32767" attributes="0"/>
+                      <EmptySpace min="-2" pref="154" max="-2" attributes="0"/>
                   </Group>
+                  <Component id="descriptionStrandScrollPane" alignment="0" max="32767" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="4" max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -62,17 +65,12 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="descriptionRCScrollPane" min="-2" pref="82" max="-2" attributes="0"/>
-              <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" attributes="0">
+              <Component id="descriptionRCScrollPane" min="-2" pref="92" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Group type="102" attributes="0">
-                              <Component id="checkBoxPerfect" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="checkBoxBestMatch" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <Group type="102" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
                               <Component id="checkBoxUnique" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="3" attributes="0">
@@ -80,11 +78,20 @@
                                   <Component id="minMappingQualLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="checkBoxSinglePerfect" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="checkBoxPerfect" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="checkBoxSingleBestMatch" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="checkBoxBestMatch" min="-2" max="-2" attributes="0"/>
+                          </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="checkBoxCommon" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="jSeparator1" min="-2" pref="75" max="-2" attributes="0"/>
+                  <Component id="jSeparator1" min="-2" pref="115" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jSeparator2" min="-2" pref="10" max="-2" attributes="0"/>
@@ -147,7 +154,6 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="checkBoxBestMatch">
       <Properties>
-        <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="de/cebitec/readXplorer/view/dialogMenus/Bundle.properties" key="SelectReadClassVisualPanel.checkBoxBestMatch.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
@@ -262,5 +268,27 @@
         </Component>
       </SubComponents>
     </Container>
+    <Component class="javax.swing.JCheckBox" name="checkBoxSinglePerfect">
+      <Properties>
+        <Property name="selected" type="boolean" value="true"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/readXplorer/view/dialogMenus/Bundle.properties" key="SelectReadClassVisualPanel.checkBoxSinglePerfect.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkBoxSinglePerfectActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="checkBoxSingleBestMatch">
+      <Properties>
+        <Property name="selected" type="boolean" value="true"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="de/cebitec/readXplorer/view/dialogMenus/Bundle.properties" key="SelectReadClassVisualPanel.checkBoxSingleBestMatch.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkBoxSingleBestMatchActionPerformed"/>
+      </Events>
+    </Component>
   </SubComponents>
 </Form>

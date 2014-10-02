@@ -35,7 +35,7 @@ import org.supercsv.prefs.CsvPreference;
  * multiple sheets is written to multiple files appended with a file number
  * and the sheet name.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class CsvExporter implements TableExporterI {
     

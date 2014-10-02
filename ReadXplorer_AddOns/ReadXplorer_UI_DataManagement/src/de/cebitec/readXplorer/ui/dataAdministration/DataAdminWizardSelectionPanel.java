@@ -17,8 +17,8 @@
 package de.cebitec.readXplorer.ui.dataAdministration;
 
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.parser.Job;
 import de.cebitec.readXplorer.parser.ReferenceJob;
 import de.cebitec.readXplorer.parser.TrackJob;
@@ -83,16 +83,16 @@ public class DataAdminWizardSelectionPanel extends ChangeListeningFinishWizardPa
         
         try {
 
-            List<PersistantReference> refs = ProjectConnector.getInstance().getGenomes();
-            for (PersistantReference ref : refs) {
+            List<PersistentReference> refs = ProjectConnector.getInstance().getGenomes();
+            for (PersistentReference ref : refs) {
                 // File and parser parameter meaningless in this context
                 ReferenceJob r = new ReferenceJob(ref.getId(), null, null, ref.getDescription(), ref.getName(), ref.getTimeStamp());
                 indexedRefs.put(r.getID(), r);
                 refJobs.add(r);
             }
 
-            List<PersistantTrack> dbTracks = ProjectConnector.getInstance().getTracks();
-            for (PersistantTrack dbTrack : dbTracks) {
+            List<PersistentTrack> dbTracks = ProjectConnector.getInstance().getTracks();
+            for (PersistentTrack dbTrack : dbTracks) {
                 // File and parser, refgenjob, runjob parameters meaningless in this context
                 TrackJob t = new TrackJob(dbTrack.getId(), new File(dbTrack.getFilePath()), 
                         dbTrack.getDescription(), indexedRefs.get(dbTrack.getRefGenID()),
@@ -100,7 +100,7 @@ public class DataAdminWizardSelectionPanel extends ChangeListeningFinishWizardPa
 
                 // register dependent tracks at genome and run
                 ReferenceJob gen = indexedRefs.get(dbTrack.getRefGenID());
-                gen.registerTrackWithoutRunJob(t);
+                gen.registerTrackWithoutRunJob(t); //TODO: check if track without run job is still needed
                 trackJobs.add(t);
             }
         

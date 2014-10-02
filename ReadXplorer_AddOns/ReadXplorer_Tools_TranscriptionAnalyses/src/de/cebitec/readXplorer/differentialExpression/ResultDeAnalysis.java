@@ -111,8 +111,8 @@ public class ResultDeAnalysis {
                 String[] currentStringValues = currentValues.asStringArray();
                 for (int j = 0; j < currentStringValues.length; j++) {
                     String name = currentStringValues[j];
-                    if (dEAdata.existsPersistantFeatureForGNURName(name)) {
-                        current.add(dEAdata.getPersistantFeatureByGNURName(name));
+                    if (dEAdata.existsPersistentFeatureForGNURName(name)) {
+                        current.add(dEAdata.getPersistentFeatureByGNURName(name));
                     } else {
                         current.add(name);
                     }
@@ -128,8 +128,8 @@ public class ResultDeAnalysis {
                 RFactor factor = currentValues.asFactor();
                 for (int j = 0; j < factor.size(); j++) {
                     String name = factor.at(j);
-                    if (dEAdata.existsPersistantFeatureForGNURName(name)) {
-                        current.add(dEAdata.getPersistantFeatureByGNURName(name));
+                    if (dEAdata.existsPersistentFeatureForGNURName(name)) {
+                        current.add(dEAdata.getPersistentFeatureByGNURName(name));
                     } else {
                         current.add(name);
                     }
@@ -161,13 +161,13 @@ public class ResultDeAnalysis {
             }
         }
 
-        // assign chromosomes to the column next to the PersistantFeature column
+        // assign chromosomes to the column next to the PersistentFeature column
         // TODO: This makes this converter methode to specific. It was 
         // intended to convert any GNU R table but the following code assumes
-        // that the first column always contains a PersistantFeature which is not
+        // that the first column always contains a PersistentFeature which is not
         // always true (e.g. DESeq2). I have to finde a better solution.
 //        for (int i = 0; i < current.size(); i++) {
-//            current.get(i).insertElementAt(chromMap.get(((PersistantFeature) current.get(i).get(0)).getChromId()), 1);
+//            current.get(i).insertElementAt(chromMap.get(((PersistentFeature) current.get(i).get(0)).getChromId()), 1);
 //        }
         return current;
     }

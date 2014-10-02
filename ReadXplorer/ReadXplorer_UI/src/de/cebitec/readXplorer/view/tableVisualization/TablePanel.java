@@ -23,7 +23,7 @@ import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
  * for creating any kind of table panels for various tables, which allow
  * updating the position of a reference viewer.
  * 
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public abstract class TablePanel extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;

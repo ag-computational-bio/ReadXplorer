@@ -140,9 +140,6 @@
           <Connection code=" new javax.swing.DefaultComboBoxModel(new TrimMethod[] {&#xa;    RegularExpressionTrimMethod.createNewInstance(RegularExpressionTrimMethod.Type.VARIABLE_RIGHT),&#xa;    RegularExpressionTrimMethod.createNewInstance(RegularExpressionTrimMethod.Type.VARIABLE_LEFT),&#xa;    RegularExpressionTrimMethod.createNewInstance(RegularExpressionTrimMethod.Type.VARIABLE_BOTH),&#xa;    RegularExpressionTrimMethod.createNewInstance(RegularExpressionTrimMethod.Type.FIXED_RIGHT),&#xa;    RegularExpressionTrimMethod.createNewInstance(RegularExpressionTrimMethod.Type.FIXED_LEFT),&#xa;    RegularExpressionTrimMethod.createNewInstance(RegularExpressionTrimMethod.Type.FIXED_BOTH)&#xa;})" type="code"/>
         </Property>
       </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="trimMethodComboActionPerformed"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="sourceFileLabel1">
       <Properties>

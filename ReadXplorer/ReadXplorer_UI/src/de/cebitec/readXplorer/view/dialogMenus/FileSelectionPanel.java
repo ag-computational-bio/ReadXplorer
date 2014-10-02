@@ -19,14 +19,14 @@ package de.cebitec.readXplorer.view.dialogMenus;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import org.openide.util.NbBundle;
 
 /**
  * A standard JPanel with functionality to handle multiple files, a list of 
@@ -53,12 +53,22 @@ public class FileSelectionPanel extends JPanel {
      * @param file the file to add to the list
      * @param mappingFileField the field, which should display the file name
      */
+    @NbBundle.Messages({"ErrorTitle=Open File Error",
+        "ErrorMsg=Could not open the given file! (Are the permissions set correctly?)"})
     public void addFile(File file, JTextField mappingFileField) {
         if (file.canRead()) {
             addMappingFile(file);
+            /*TODO: Read sam header & check against reference, show a mapping of references up to 100? entries. Show button to list more/all
+            //try (SAMFileReader samReader = new SAMFileReader(trackJob.getFile())) {
+            //samReader.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
+            //SAMFileHeader header = samReader.getFileHeader();
+            //} } catch (Exception e) {
+            this.notifyObservers(e.getMessage() != null ? e.getMessage() : e);
+            Exceptions.printStackTrace(e);
+            } */ 
             mappingFileField.setText(file.getAbsolutePath());
         } else {
-            Logger.getLogger(ImportTrackBasePanel.class.getName()).log(Level.WARNING, "Couldn't read file");
+            JOptionPane.showMessageDialog(this, Bundle.ErrorMsg(), Bundle.ErrorTitle(), JOptionPane.ERROR_MESSAGE);
         }
     }
     
@@ -145,19 +155,16 @@ public class FileSelectionPanel extends JPanel {
     public void updateGuiForMultipleFiles(boolean multiFileImportEnabled, JScrollPane multiTrackScrollPane, JList<String> multiTrackList,
             JLabel multiTrackListLabel, JTextField fileTextField) {
         this.setUseMultipleImport(multiFileImportEnabled);
+        multiTrackScrollPane.setVisible(this.useMultipleImport());
+        multiTrackList.setVisible(this.useMultipleImport());
+        multiTrackListLabel.setVisible(this.useMultipleImport());
         if (this.useMultipleImport()) {
-            multiTrackScrollPane.setVisible(true);
-            multiTrackList.setVisible(true);
-            multiTrackListLabel.setVisible(true);
             fileTextField.setText(getMappingFiles().size() + " tracks to import");
             DefaultListModel<String> model = new DefaultListModel<>();
             fillMultipleImportTable(model, getMappingFiles(), "Mapping file list:");
             multiTrackList.setModel(model);
             this.setSize(this.getPreferredSize());
         } else {
-            multiTrackScrollPane.setVisible(false);
-            multiTrackList.setVisible(false);
-            multiTrackListLabel.setVisible(false);
             fileTextField.setText(getMappingFile() != null ? getMappingFile().getAbsolutePath() : "");
             getMappingFiles().clear();
             multiTrackList.setModel(new DefaultListModel<String>());

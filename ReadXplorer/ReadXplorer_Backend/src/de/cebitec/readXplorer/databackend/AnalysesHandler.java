@@ -19,7 +19,7 @@ package de.cebitec.readXplorer.databackend;
 import de.cebitec.readXplorer.api.objects.JobI;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readXplorer.util.Benchmark;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Observer;
@@ -99,14 +99,14 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
         this.nbRequests = 0;
         this.progressHandle.start();
         this.start = System.currentTimeMillis();
-        Map<Integer, PersistantChromosome> chroms = trackConnector.getRefGenome().getChromosomes();
+        Map<Integer, PersistentChromosome> chroms = trackConnector.getRefGenome().getChromosomes();
 
         if (this.coverageNeeded) {
 
             //decide upon stepSize of a single request and analyse coverage of whole genome
             final int stepSize = 200000;
 
-            for (PersistantChromosome chrom : chroms.values()) {
+            for (PersistentChromosome chrom : chroms.values()) {
 
                 int chromLength = chrom.getLength();
                 int from = 1;
@@ -128,7 +128,7 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
         } else if (this.mappingsNeeded) {
 
             int stepSize = 150000;
-            for (PersistantChromosome chrom : chroms.values()) {
+            for (PersistentChromosome chrom : chroms.values()) {
 
                 int chromLength = chrom.getLength();
                 int from = 1;

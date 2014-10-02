@@ -18,12 +18,12 @@ package de.cebitec.readXplorer.databackend;
 
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistant;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReadPairGroup;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
-import de.cebitec.readXplorer.databackend.dataObjects.ReadPairResultPersistant;
+import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
+import de.cebitec.readXplorer.databackend.dataObjects.MappingResult;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.ReadPairGroup;
+import de.cebitec.readXplorer.databackend.dataObjects.ReadPairResultPersistent;
 import de.cebitec.readXplorer.util.Properties;
 import java.io.File;
 import java.sql.Timestamp;
@@ -47,18 +47,18 @@ import java.util.logging.Logger;
 public class MappingThread extends RequestThread {
 
     public static int FIXED_INTERVAL_LENGTH = 1000;
-    private List<PersistantTrack> tracks;
+    private List<PersistentTrack> tracks;
     ConcurrentLinkedQueue<IntervalRequest> requestQueue;
-    private List<PersistantMapping> currentMappings;
-    private Collection<PersistantReadPairGroup> currentReadPairs;
-    private PersistantReference refGenome;
+    private List<Mapping> currentMappings;
+    private Collection<ReadPairGroup> currentReadPairs;
+    private PersistentReference refGenome;
 
     /**
      * Creates a new mapping thread for carrying out mapping request either to a
      * database or a file.
      * @param tracks the track for which this mapping thread is created
      */
-    public MappingThread(List<PersistantTrack> tracks) {
+    public MappingThread(List<PersistentTrack> tracks) {
         super();
         // do general stuff
         this.requestQueue = new ConcurrentLinkedQueue<>();
@@ -85,16 +85,16 @@ public class MappingThread extends RequestThread {
      * interval
      * @return the collection of mappings for the given interval
      */
-    List<PersistantMapping> loadMappings(IntervalRequest request) {
-        List<PersistantMapping> mappingList = new ArrayList<>();
+    List<Mapping> loadMappings(IntervalRequest request) {
+        List<Mapping> mappingList = new ArrayList<>();
         if (request.getFrom() < request.getTo() && request.getFrom() > 0 && request.getTo() > 0) {
 
             Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Reading mapping data from file...", currentTimestamp);
 
-            for (PersistantTrack track : tracks) {
+            for (PersistentTrack track : tracks) {
                 SamBamFileReader externalDataReader = new SamBamFileReader(new File(track.getFilePath()), track.getId(), refGenome);
-                Collection<PersistantMapping> intermedRes = externalDataReader.getMappingsFromBam(request);
+                Collection<Mapping> intermedRes = externalDataReader.getMappingsFromBam(request);
                 externalDataReader.close();
                 mappingList.addAll(intermedRes);
             }
@@ -116,15 +116,15 @@ public class MappingThread extends RequestThread {
      * @param request the request to carry out
      * @return list of reduced mappings. Diffs and gaps are never included.
      */
-    public List<PersistantMapping> loadReducedMappings(IntervalRequest request) {
+    public List<Mapping> loadReducedMappings(IntervalRequest request) {
         
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Reading mapping data from file...", currentTimestamp);
 
-        List<PersistantMapping> mappings = new ArrayList<>();
-        for (PersistantTrack track : tracks) {
+        List<Mapping> mappings = new ArrayList<>();
+        for (PersistentTrack track : tracks) {
             SamBamFileReader externalDataReader = new SamBamFileReader(new File(track.getFilePath()), track.getId(), refGenome);
-            Collection<PersistantMapping> intermedRes = externalDataReader.getReducedMappingsFromBam(request);
+            Collection<Mapping> intermedRes = externalDataReader.getReducedMappingsFromBam(request);
             externalDataReader.close();
             mappings.addAll(intermedRes);
         }
@@ -144,15 +144,15 @@ public class MappingThread extends RequestThread {
      * @return the collection of read pair mappings for the given interval
      * and typeFlag
      */
-    public Collection<PersistantReadPairGroup> getReadPairMappings(IntervalRequest request) {
-        Collection<PersistantReadPairGroup> readPairs = new ArrayList<>();
+    public Collection<ReadPairGroup> getReadPairMappings(IntervalRequest request) {
+        Collection<ReadPairGroup> readPairs = new ArrayList<>();
         int from = request.getFrom();
         int to = request.getTo();
         
         if (from > 0 && to > 0 && from < to) {
-            for (PersistantTrack track : tracks) {
+            for (PersistentTrack track : tracks) {
                 SamBamFileReader reader = new SamBamFileReader(new File(track.getFilePath()), track.getId(), refGenome);
-                Collection<PersistantReadPairGroup> intermedRes = reader.getReadPairMappingsFromBam(request);
+                Collection<ReadPairGroup> intermedRes = reader.getReadPairMappingsFromBam(request);
                 readPairs.addAll(intermedRes);
             }
         }
@@ -179,9 +179,9 @@ public class MappingThread extends RequestThread {
                     }
                     //switch between ordinary mappings and read pairs
                     if (request.getDesiredData() != Properties.READ_PAIRS) {
-                        request.getSender().receiveData(new MappingResultPersistant(currentMappings, request));
+                        request.getSender().receiveData(new MappingResult(currentMappings, request));
                     } else {
-                        request.getSender().receiveData(new ReadPairResultPersistant(currentReadPairs, request));
+                        request.getSender().receiveData(new ReadPairResultPersistent(currentReadPairs, request));
                     }
                 }
 

@@ -27,7 +27,7 @@ import org.openide.nodes.Node;
  * A StandardNode for use in the explorer. It allows to add any StandardItems
  * and StandardItemChildren to the node and can return its item.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class StandardNode extends BeanNode<StandardItem> {
 
@@ -36,7 +36,7 @@ public class StandardNode extends BeanNode<StandardItem> {
      * StandardItems and StandardItemChildren to the node and can return its
      * item.
      * @param bean the StandardItems to associate with this node
-     * @param children the children of the given <cc>bean</cc>
+     * @param children the children of the given <code>bean</code>
      * @throws IntrospectionException
      */
     public StandardNode(StandardItem bean, StandardItemChildren children) throws IntrospectionException {
@@ -81,6 +81,19 @@ public class StandardNode extends BeanNode<StandardItem> {
             }
         }
         return selectedNodes;
+    }
+    
+    /**
+     * @param n the node to check
+     * @return The <code>StandardItem</code> for the given node, if it contains 
+     * a <code>StandardItem</code>, if not, <code>null</code> is returned
+     */
+    public static StandardItem getItemForNode(Node n) {
+        StandardItem item = null;
+        if (n instanceof StandardNode) {
+            item = ((StandardNode) n).getData();
+        }
+        return item;
     }
     
 }

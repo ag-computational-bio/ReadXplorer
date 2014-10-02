@@ -16,7 +16,11 @@
  */
 package de.cebitec.readXplorer.util;
 
+import de.cebitec.readXplorer.util.classification.Classification;
+import de.cebitec.readXplorer.util.classification.MappingClass;
+import de.cebitec.readXplorer.util.classification.TotalCoverage;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,41 +30,40 @@ import java.util.Map;
  */
 public class StatsContainer {
     
+    /** String to append to queries for covered bases of a mapping class. */
+    public static final String COVERAGE_STRING = " Coverage";
+    
+    //Mapping classes not present here, they are set by MappingClass.classtype!
+    //General
     public static final String NO_UNIQUE_SEQS = "Unique Sequences";
     public static final String NO_REPEATED_SEQ = "Repeated Sequences";
     public static final String NO_UNIQ_MAPPINGS = "Unique Mappings";
-    public static final String NO_UNIQ_BM_MAPPINGS = "Unique best Match Mappings";
-    public static final String NO_UNIQ_PERF_MAPPINGS = "Unique Perfect Mappings";
-    public static final String NO_PERFECT_MAPPINGS = "Perfect Mappings";
-    public static final String NO_BESTMATCH_MAPPINGS = "Best Match Mappings";
-    public static final String NO_COMMON_MAPPINGS = "Common Mappings";
+    public static final String NO_MAPPINGS = "Mappings";
     public static final String NO_READS = "Reads";
+    public static final String AVERAGE_READ_LENGTH = "Average Read Length";
     
-    public static final String NO_SEQ_PAIRS = "Seq. Pairs";
-    public static final String NO_PERF_PAIRS = "Perfect Seq. Pairs";
+    //Read pairs
+    public static final String NO_READ_PAIRS = "Read Pairs";
+    public static final String NO_PERF_PAIRS = "Perfect Read Pairs";
     public static final String NO_ORIENT_WRONG_PAIRS = "Wrong Oriented Pairs";
     public static final String NO_SMALL_DIST_PAIRS = "Smaller Pairs";
     public static final String NO_LARGE_DIST_PAIRS = "Larger Pairs";
     public static final String NO_LARGE_ORIENT_WRONG_PAIRS = "Wrong Orient. Larger Pairs";
     public static final String NO_SMALL_ORIENT_WRONG_PAIRS = "Wrong Orient. Smaller Pairs";
     public static final String NO_SINGLE_MAPPIGNS = "Single Mappings";
-    public static final String NO_UNIQUE_PAIRS = "Unique Seq. Pairs"; //TODO: can we calculate these?
-    public static final String NO_UNIQ_PERF_PAIRS = "Unique Perfect Seq. Pairs";
+    public static final String NO_UNIQUE_PAIRS = "Unique Read Pairs"; //TODO: can we calculate these?
+    public static final String NO_UNIQ_PERF_PAIRS = "Unique Perfect Read Pairs";
     public static final String NO_UNIQ_SMALL_PAIRS = "Unique Small Pairs";
     public static final String NO_UNIQ_LARGE_PAIRS = "Unique Larger Pairs";
     public static final String NO_UNIQ_ORIENT_WRONG_PAIRS = "Unique Orient Wrong Pairs";
     public static final String NO_UNIQ_WRNG_ORIENT_SMALL_PAIRS = "Unique Wrong Orient. Smaller Pairs";
     public static final String NO_UNIQ_WRNG_ORIENT_LARGE_PAIRS = "Unique Wrong Orient. Larger Pairs";
-    public static final String AVERAGE_READ_LENGTH = "Average Read Length";
-    public static final String AVERAGE_READ_PAIR_SIZE = "Average Seq. Pair Size";
-    public static final String COVERAGE_BM_GENOME = "Best Match Coverage";
-    public static final String COVERAGE_COMPLETE_GENOME = "Complete Coverage";
-    public static final String COVERAGE_PERFECT_GENOME = "Perfect Coverage";
+    public static final String AVERAGE_READ_PAIR_SIZE = "Average Read Pair Size";
     
     private Map<String, Integer> statsMap;
     private DiscreteCountingDistribution readLengthDistribution;
     private DiscreteCountingDistribution readPairSizeDistribution;
-    
+
     /**
      * Statistics container for a track and read pair track.
      */
@@ -111,44 +114,69 @@ public class StatsContainer {
     }
 
     /**
+     * Set the number of positions covered by mappings of the given mapping
+     * class when using the stats container during import of data. Later, the
+     * coverage has to be put into the statsMap!
+     * @param classToCoveredIntervalsMap Map of Mapping classes to the intervals
+     * covered by mappings of that classification
+     */
+    public void setCoveredPositionsImport(Map<Classification, List<Pair<Integer, Integer>>> classToCoveredIntervalsMap) {
+        for (Classification mappingClass : classToCoveredIntervalsMap.keySet()) {
+            List<Pair<Integer, Integer>> coveredIntervals = classToCoveredIntervalsMap.get(mappingClass);
+            this.statsMap.put(mappingClass.getTypeString() + COVERAGE_STRING, this.calcCoveredBases(coveredIntervals));
+        }
+    }
+
+    /**
+     * Counts all bases, which are covered by mappings in this data set.
+     * @param coveredIntervals the covered intervals of the data set
+     * @return the number of bases covered in the data set
+     */
+    private int calcCoveredBases(List<Pair<Integer, Integer>> coveredIntervals) {
+        int coveredBases = 0;
+        for (Pair<Integer, Integer> interval : coveredIntervals) {
+            coveredBases += interval.getSecond() - interval.getFirst();
+        }
+        return coveredBases;
+    }
+
+    /**
      * Fills the stats map with all available entries for a track.
      */
     public void prepareForTrack() {
-        statsMap.put(NO_UNIQUE_SEQS, 0);
-        statsMap.put(NO_REPEATED_SEQ, 0);
-        statsMap.put(NO_UNIQ_MAPPINGS, 0);
-        statsMap.put(NO_UNIQ_BM_MAPPINGS, 0);
-        statsMap.put(NO_UNIQ_PERF_MAPPINGS, 0);
-        statsMap.put(NO_PERFECT_MAPPINGS, 0);
-        statsMap.put(NO_BESTMATCH_MAPPINGS, 0);
-        statsMap.put(NO_COMMON_MAPPINGS, 0);
-        statsMap.put(NO_READS, 0);
-        statsMap.put(AVERAGE_READ_LENGTH, 0);
-        statsMap.put(COVERAGE_COMPLETE_GENOME, 0);
-        statsMap.put(COVERAGE_BM_GENOME, 0);
-        statsMap.put(COVERAGE_PERFECT_GENOME, 0);
+        for (MappingClass mappingClass : MappingClass.values()) {
+            this.statsMap.put(mappingClass.getTypeString(), 0);
+            this.statsMap.put(mappingClass.getTypeString() + StatsContainer.COVERAGE_STRING, 0); 
+        }
+        this.statsMap.put(TotalCoverage.TOTAL_COVERAGE.getTypeString() + StatsContainer.COVERAGE_STRING, 0);
+        this.statsMap.put(NO_MAPPINGS, 0);
+        this.statsMap.put(NO_UNIQUE_SEQS, 0);
+        this.statsMap.put(NO_REPEATED_SEQ, 0);
+        this.statsMap.put(NO_UNIQ_MAPPINGS, 0);
+        this.statsMap.put(NO_READS, 0);
+        this.statsMap.put(AVERAGE_READ_LENGTH, 0);
     }
     
     /**
      * Fills the stats map with all available entries for a read pair track.
      */
     public void prepareForReadPairTrack() {
-        statsMap.put(NO_SEQ_PAIRS, 0);
-        statsMap.put(NO_PERF_PAIRS, 0);
-        statsMap.put(NO_ORIENT_WRONG_PAIRS, 0);
-        statsMap.put(NO_SMALL_DIST_PAIRS, 0);
-        statsMap.put(NO_SMALL_ORIENT_WRONG_PAIRS, 0);
-        statsMap.put(NO_LARGE_DIST_PAIRS, 0);
-        statsMap.put(NO_LARGE_ORIENT_WRONG_PAIRS, 0);
-        statsMap.put(NO_SINGLE_MAPPIGNS, 0);
-        statsMap.put(NO_UNIQUE_PAIRS, 0);
-        statsMap.put(NO_UNIQ_PERF_PAIRS, 0);
-        statsMap.put(NO_UNIQ_SMALL_PAIRS, 0);
-        statsMap.put(NO_UNIQ_LARGE_PAIRS, 0);
-        statsMap.put(NO_UNIQ_ORIENT_WRONG_PAIRS, 0);
-        statsMap.put(NO_UNIQ_WRNG_ORIENT_SMALL_PAIRS, 0);
-        statsMap.put(NO_UNIQ_WRNG_ORIENT_LARGE_PAIRS, 0);
-        statsMap.put(AVERAGE_READ_PAIR_SIZE, 0);
+        this.statsMap.put(NO_READ_PAIRS, 0);
+        this.statsMap.put(NO_PERF_PAIRS, 0);
+        this.statsMap.put(NO_ORIENT_WRONG_PAIRS, 0);
+        this.statsMap.put(NO_SMALL_DIST_PAIRS, 0);
+        this.statsMap.put(NO_SMALL_ORIENT_WRONG_PAIRS, 0);
+        this.statsMap.put(NO_LARGE_DIST_PAIRS, 0);
+        this.statsMap.put(NO_LARGE_ORIENT_WRONG_PAIRS, 0);
+        this.statsMap.put(NO_SINGLE_MAPPIGNS, 0);
+        this.statsMap.put(NO_UNIQUE_PAIRS, 0);
+        this.statsMap.put(NO_UNIQ_PERF_PAIRS, 0);
+        this.statsMap.put(NO_UNIQ_SMALL_PAIRS, 0);
+        this.statsMap.put(NO_UNIQ_LARGE_PAIRS, 0);
+        this.statsMap.put(NO_UNIQ_ORIENT_WRONG_PAIRS, 0);
+        this.statsMap.put(NO_UNIQ_WRNG_ORIENT_SMALL_PAIRS, 0);
+        this.statsMap.put(NO_UNIQ_WRNG_ORIENT_LARGE_PAIRS, 0);
+        this.statsMap.put(AVERAGE_READ_PAIR_SIZE, 0);
     }
 
     /**
@@ -157,7 +185,7 @@ public class StatsContainer {
      * @param increaseValue the value to add to the old value of the key
      */
     public void increaseValue(String key, int increaseValue) {
-        statsMap.put(key, statsMap.get(key) + increaseValue);
+        this.statsMap.put(key, this.statsMap.get(key) + increaseValue);
     }
     
     /**
@@ -169,42 +197,42 @@ public class StatsContainer {
     public void incReadPairStats(ReadPairType type, int value) {
         
         if (type == ReadPairType.PERFECT_PAIR || type == ReadPairType.PERFECT_UNQ_PAIR) {
-            this.increaseValue(NO_SEQ_PAIRS, value);
+            this.increaseValue(NO_READ_PAIRS, value);
             this.increaseValue(NO_PERF_PAIRS, value);
             if (type == ReadPairType.PERFECT_UNQ_PAIR) {
                 this.increaseValue(NO_UNIQUE_PAIRS, value);
                 this.increaseValue(NO_UNIQ_PERF_PAIRS, value);
             }
         } else if (type == ReadPairType.DIST_SMALL_PAIR || type == ReadPairType.DIST_SMALL_UNQ_PAIR) {
-            this.increaseValue(NO_SEQ_PAIRS, value);
+            this.increaseValue(NO_READ_PAIRS, value);
             this.increaseValue(NO_SMALL_DIST_PAIRS, value);
             if (type == ReadPairType.DIST_SMALL_UNQ_PAIR) {
                 this.increaseValue(NO_UNIQUE_PAIRS, value);
                 this.increaseValue(NO_UNIQ_SMALL_PAIRS, value);
             }
         } else if (type == ReadPairType.DIST_LARGE_PAIR || type == ReadPairType.DIST_LARGE_UNQ_PAIR) {
-            this.increaseValue(NO_SEQ_PAIRS, value);
+            this.increaseValue(NO_READ_PAIRS, value);
             this.increaseValue(NO_LARGE_DIST_PAIRS, value);
             if (type == ReadPairType.DIST_LARGE_UNQ_PAIR) {
                 this.increaseValue(NO_UNIQUE_PAIRS, value);
                 this.increaseValue(NO_UNIQ_LARGE_PAIRS, value);
             }
         } else if (type == ReadPairType.ORIENT_WRONG_PAIR || type == ReadPairType.ORIENT_WRONG_UNQ_PAIR) {
-            this.increaseValue(NO_SEQ_PAIRS, value);
+            this.increaseValue(NO_READ_PAIRS, value);
             this.increaseValue(NO_ORIENT_WRONG_PAIRS, value);
             if (type == ReadPairType.ORIENT_WRONG_UNQ_PAIR) {
                 this.increaseValue(NO_UNIQUE_PAIRS, value);
                 this.increaseValue(NO_UNIQ_ORIENT_WRONG_PAIRS, value);
             }
         } else if (type == ReadPairType.OR_DIST_SMALL_PAIR || type == ReadPairType.OR_DIST_SMALL_UNQ_PAIR) {
-            this.increaseValue(NO_SEQ_PAIRS, value);
+            this.increaseValue(NO_READ_PAIRS, value);
             this.increaseValue(NO_SMALL_ORIENT_WRONG_PAIRS, value);
             if (type == ReadPairType.OR_DIST_SMALL_PAIR) {
                 this.increaseValue(NO_UNIQUE_PAIRS, value);
                 this.increaseValue(NO_UNIQ_WRNG_ORIENT_SMALL_PAIRS, value);
             }
         } else if (type == ReadPairType.OR_DIST_LARGE_PAIR || type == ReadPairType.OR_DIST_LARGE_UNQ_PAIR) {
-            this.increaseValue(NO_SEQ_PAIRS, value);
+            this.increaseValue(NO_READ_PAIRS, value);
             this.increaseValue(NO_LARGE_ORIENT_WRONG_PAIRS, value);
             if (type == ReadPairType.OR_DIST_LARGE_UNQ_PAIR) {
                 this.increaseValue(NO_UNIQUE_PAIRS, value);

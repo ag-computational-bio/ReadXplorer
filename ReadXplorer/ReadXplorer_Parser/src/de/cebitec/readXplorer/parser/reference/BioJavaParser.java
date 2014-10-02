@@ -27,10 +27,10 @@ import de.cebitec.readXplorer.parser.common.ParsingException;
 import de.cebitec.readXplorer.parser.reference.Filter.FeatureFilter;
 import de.cebitec.readXplorer.util.ErrorLimit;
 import de.cebitec.readXplorer.util.FastaUtils;
-import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.MessageSenderI;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.SequenceUtils;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -235,6 +235,10 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                                 }
                             }
                         }
+                        
+                        if (locusTag.equals("cg2826")) {
+                            System.out.println("here");
+                        }
 
                         /* 
                          * If the type of the feature is unknown to readXplorer (see below),
@@ -415,6 +419,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
             if (!added) { //if there is no parent feature for the sub feature it becomes an ordinary feature
                 mergedList.add(subFeature);
             }
+            added = false;
         }
         mergedList.addAll(features);
         Collections.sort(mergedList);

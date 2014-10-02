@@ -19,9 +19,9 @@ package de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer;
 import de.cebitec.readXplorer.databackend.IntervalRequest;
 import de.cebitec.readXplorer.databackend.ThreadListener;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistant;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
+import de.cebitec.readXplorer.databackend.dataObjects.MappingResult;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
@@ -35,8 +35,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
@@ -54,15 +54,13 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
     private LayoutI layout;
     private int blockHeight;
     private int layerHeight;
-    private int maxReplicates;
     private int fwdMappingsInInterval;
     private int revMappingsInInterval;
     private int maxCoverageInInterval;
     private int oldLogLeft;
     private int oldLogRight;
     private boolean showBaseQualities;
-    MappingResultPersistant mappingResult;
-    HashMap<Integer, Integer> completeCoverage;
+    MappingResult mappingResult;
 
     /**
      * Viewer to show alignments of reads to the reference.
@@ -71,19 +69,18 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
      * @param refGenome the reference genome
      * @param trackConnector connector of the track to show in this viewer
      */
-    public AlignmentViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGenome, TrackConnector trackConnector) {
+    public AlignmentViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistentReference refGenome, TrackConnector trackConnector) {
         super(boundsInfoManager, basePanel, refGenome);
         this.trackConnector = trackConnector;
         this.setInDrawingMode(true);
         this.showSequenceBar(true, true);
         blockHeight = 8;
         layerHeight = blockHeight + 2;
-        mappingResult = new MappingResultPersistant(new ArrayList<PersistantMapping>(), null);
-        completeCoverage = new HashMap<>();
+        mappingResult = new MappingResult(new ArrayList<Mapping>(), null);
         this.setHorizontalMargin(10);
         this.setActive(false);
         this.setAutomaticCentering(true);
-        this.handleBaseQualityOption();
+        this.addPreferenceListeners();
         setupComponents();
     }
     
@@ -91,7 +88,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
      * Initializes the base quality option boolean and creates a 
      * PreferenceChangeListener for the base quality option.
      */
-    private void handleBaseQualityOption() {
+    private void addPreferenceListeners() {
         final Preferences pref = NbPreferences.forModule(Object.class);
         this.showBaseQualities = pref.getBoolean(Properties.BASE_QUALITY_OPTION, true);
         pref.addPreferenceChangeListener(new PreferenceChangeListener() {
@@ -100,8 +97,8 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
             public void preferenceChange(PreferenceChangeEvent evt) {
                 if (evt.getKey().equals(Properties.BASE_QUALITY_OPTION)) {
                     showBaseQualities = pref.getBoolean(Properties.BASE_QUALITY_OPTION, true);
-                    showData();
                 }
+                showData();
             }
         });
     }
@@ -160,6 +157,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
         int logRight = this.getBoundsInfo().getLogRight();
         if (logLeft != this.oldLogLeft || logRight != this.oldLogRight || this.isNewDataRequestNeeded()) {
             
+            this.setNewDataRequestNeeded(false);
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
             this.trackConnector.addMappingRequest(new IntervalRequest(from, to, this.getReference().getActiveChromId(), this, true, this.getReadClassParams()));
             this.oldLogLeft = logLeft;
@@ -170,16 +168,16 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
     }
     
     /**
-     * Method called, when data is available. If the avialable data is a 
-     * MappingResultPersistant, then the viewer is updated with the new
-     * mapping data.
+     * Method called, when data is available. If the avialable data is a
+     * MappingResult, then the viewer is updated with the new mapping
+     * data.
      * @param data the new mapping data to show
      */
     @Override
     @SuppressWarnings("unchecked")
     public void receiveData(Object data) {
         if (data.getClass().equals(mappingResult.getClass())) {
-            this.mappingResult = ((MappingResultPersistant) data);
+            this.mappingResult = ((MappingResult) data);
             this.showData();
         }
     }
@@ -190,9 +188,9 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
     private void showData() {
 
             this.findMinAndMaxCount(mappingResult.getMappings()); //for currently shown mappingResult
-            this.findMaxCoverage(completeCoverage);
             this.setViewerHeight();
-            this.layout = new Layout(mappingResult.getRequest().getFrom(), mappingResult.getRequest().getTo(), mappingResult.getMappings(), getExcludedFeatureTypes());
+            this.adjustPaintingAreaInfoPrefSize();
+            this.layout = new Layout(mappingResult.getRequest().getFrom(), mappingResult.getRequest().getTo(), mappingResult.getMappings(), getExcludedClassifications());
 
             this.removeAll();
 
@@ -210,7 +208,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
             }
 
             getSequenceBar().setGenomeGapManager(layout.getGenomeGapManager());
-            this.addBlocks(layout);
+            this.addAllBlocks(layout);
             setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
             
             this.repaint();
@@ -221,19 +219,14 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
      * Minimum count is currently disabled as it was not needed.
      * @param mappingResult 
      */
-    private void findMinAndMaxCount(Collection<PersistantMapping> mappings) {
+    private void findMinAndMaxCount(Collection<Mapping> mappings) {
 //        this.minCountInInterval = Integer.MAX_VALUE; //uncomment all these lines to get min count
-        this.maxReplicates = Integer.MIN_VALUE;
         this.fwdMappingsInInterval = 0;
 
-        for (PersistantMapping m : mappings) {
-            int coverage = m.getNbReplicates();
+        for (Mapping m : mappings) {
 //            if(coverage < minCountInInterval) {
 //                minCountInInterval = coverage;
 //            }
-            if (coverage > maxReplicates) {
-                maxReplicates = coverage;
-            }
             if (m.isFwdStrand()) {
                 ++this.fwdMappingsInInterval;
             }
@@ -245,7 +238,7 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
      * Determines maximum coverage in the currently displayed interval.
      * @param coverage  coverage hashmap of positions for current interval
      */
-    private void findMaxCoverage(HashMap<Integer, Integer> coverage) {
+    private void findMaxCoverage(Map<Integer, Integer> coverage) {
         this.maxCoverageInInterval = 0;
 
         int coverageAtPos;
@@ -264,32 +257,33 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
      * Each block component depicts one mapping.
      * @param layout the layout containing all information about the mappingResult to paint
      */
-    private void addBlocks(LayoutI layout) {
+    private void addAllBlocks(LayoutI layout) {
 
         // forward strand
-        int layerCounter = 1;
         int countingStep = 1;
         Iterator<LayerI> it = layout.getForwardIterator();
-        while (it.hasNext()) {
-            LayerI b = it.next();
-            Iterator<BlockI> blockIt = b.getBlockIterator();
-            while (blockIt.hasNext()) {
-                BlockI block = blockIt.next();
-                this.createJBlock(block, layerCounter);
-            }
-
-            layerCounter += countingStep;
-        }
-
+        this.addBlocks(it, countingStep);
 
         // reverse strand
-        layerCounter = -1;
         countingStep = -1;
         Iterator<LayerI> itRev = layout.getReverseIterator();
-        while (itRev.hasNext()) {
-            LayerI b = itRev.next();
-            Iterator<BlockI> blockIt = b.getBlockIterator();
-            while (blockIt.hasNext()) {
+        this.addBlocks(itRev, countingStep);
+    }
+    
+    /**
+     * After creating a layout this method creates all visual components which
+     * represent the part of the layout stored in the given layer iterator.
+     * Thus, it creates all block components for each iterator entry. Each block
+     * component depicts one mapping.
+     * @param layerIt the layer iterator containing all information about the
+     * mappings to paint on the current layer
+     * @param countingStep define how to count each step (e.g. +1 or -1)
+     */
+    private void addBlocks(Iterator<LayerI> layerIt, final int countingStep) {
+        int layerCounter = countingStep;
+        while (layerIt.hasNext()) {
+            LayerI b = layerIt.next();
+            for (Iterator<BlockI> blockIt = b.getBlockIterator(); blockIt.hasNext();) {
                 BlockI block = blockIt.next();
                 this.createJBlock(block, layerCounter);
             }
@@ -319,19 +313,12 @@ public class AlignmentViewer extends AbstractViewer implements ThreadListener {
      * @param layerCounter determines in which layer the block should be painted
      */
     private void createJBlock(BlockI block, int layerCounter) {
-        BlockComponent jb = new BlockComponent(block, this, layout.getGenomeGapManager(), blockHeight, maxReplicates, showBaseQualities);
+        BlockComponent jb = new BlockComponent(block, this, layout.getGenomeGapManager(), blockHeight, showBaseQualities);
 
         // negative layer counter means reverse strand
         int lower = (layerCounter < 0 ? getPaintingAreaInfo().getReverseLow() : getPaintingAreaInfo().getForwardLow());
         int yPosition = lower - layerCounter * layerHeight;
-        if (layerCounter < 0) {
-            // reverse/negative layer
-            yPosition -= jb.getHeight() / 2;
-        } else {
-            // forward/positive layer
-            yPosition -= jb.getHeight() / 2;
-        }
-
+        yPosition -= jb.getHeight() / 2;
         jb.setBounds(jb.getPhyStart(), yPosition, jb.getPhyWidth(), jb.getHeight());
         this.add(jb);
     }

@@ -22,11 +22,12 @@ import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.VisualisationUtils;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.cebitec.readXplorer.view.dialogMenus.OpenTracksWizardPanel;
 import de.cebitec.readXplorer.view.dialogMenus.SelectFeatureTypeWizardPanel;
@@ -73,9 +74,9 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
     
     private final ReferenceViewer context;
     
-    private int referenceId;
-    private List<PersistantTrack> tracks;
-    private Map<Integer, PersistantTrack> trackMap;
+    private PersistentReference reference;
+    private List<PersistentTrack> tracks;
+    private Map<Integer, PersistentTrack> trackMap;
     private SNP_DetectionTopComponent snpDetectionTopComp;
     private OpenTracksWizardPanel openTracksPanel;
     private SelectReadClassWizardPanel readClassWizPanel;
@@ -95,7 +96,7 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
      */
     public OpenSnpDetectionAction(ReferenceViewer context) {
         this.context = context;
-        this.referenceId = this.context.getReference().getId();
+        this.reference = this.context.getReference();
     }
 
     /**
@@ -125,10 +126,9 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
         
         @SuppressWarnings("unchecked")
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
-        this.openTracksPanel = new OpenTracksWizardPanel(PROP_WIZARD_NAME, referenceId);
+        this.openTracksPanel = new OpenTracksWizardPanel(PROP_WIZARD_NAME, reference.getId());
         this.readClassWizPanel = new SelectReadClassWizardPanel(PROP_WIZARD_NAME, false);
         this.featureTypePanel = new SelectFeatureTypeWizardPanel(PROP_WIZARD_NAME);
-        this.openTracksPanel.setReadClassVisualPanel(readClassWizPanel.getComponent());
         panels.add(openTracksPanel);
         panels.add(new SNPWizardPanel());
         panels.add(readClassWizPanel);
@@ -141,11 +141,10 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
         
         //action to perform after successfully finishing the wizard
         boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
-        List<PersistantTrack> selectedTracks = openTracksPanel.getComponent().getSelectedTracks();
+        List<PersistentTrack> selectedTracks = openTracksPanel.getComponent().getSelectedTracks();
         if (!cancelled && !selectedTracks.isEmpty()) {
-            this.tracks = new ArrayList<>();
-            this.trackMap = ProjectConnector.getTrackMap(tracks);
             this.tracks = selectedTracks;
+            this.trackMap = ProjectConnector.getTrackMap(tracks);
 
             this.snpDetectionTopComp = (SNP_DetectionTopComponent) WindowManager.getDefault().findTopComponent("SNP_DetectionTopComponent");
             this.snpDetectionTopComp.setName(Bundle.TITLE_SNPDetectionTopComp());
@@ -175,7 +174,7 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
                 readClassParams, minBaseQuality, minAverageBaseQual, minAverageMapQual);
         TrackConnector connector;
         if (!combineTracks) {
-            for (PersistantTrack track : tracks) {
+            for (PersistentTrack track : tracks) {
                 try {
                     connector = (new SaveFileFetcherForGUI()).getTrackConnector(track);
                 } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
@@ -233,7 +232,7 @@ public final class OpenSnpDetectionAction implements ActionListener, DataVisuali
 
                 AnalysisSNPs analysisSNPs = trackToAnalysisMap.get(trackId);
                 final SnpDetectionResult result = new SnpDetectionResult(analysisSNPs.getResults(), 
-                        trackMap, referenceId, combineTracks, 2, 0);
+                        trackMap, reference, combineTracks, 2, 0);
                 result.setParameters(parametersSNPs);
 
                 SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread

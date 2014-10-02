@@ -17,7 +17,6 @@
 package de.cebitec.readXplorer.parser.mappings;
 
 import de.cebitec.readXplorer.parser.TrackJob;
-import de.cebitec.readXplorer.parser.common.CoverageContainer;
 import de.cebitec.readXplorer.parser.common.ParsedTrack;
 import de.cebitec.readXplorer.util.Benchmark;
 import de.cebitec.readXplorer.util.DiscreteCountingDistribution;
@@ -28,7 +27,11 @@ import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.StatsContainer;
+import de.cebitec.readXplorer.util.classification.Classification;
+import de.cebitec.readXplorer.util.classification.MappingClass;
+import de.cebitec.readXplorer.util.classification.TotalCoverage;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import net.sf.samtools.SAMFileReader;
@@ -49,7 +52,6 @@ import org.openide.util.NbBundle;
 public class SamBamStatsParser implements Observable, MessageSenderI {
 
     private List<Observer> observers;
-    private CoverageContainer coverageContainer;
     private StatsContainer statsContainer;
     private DiscreteCountingDistribution readLengthDistribution;
     private ErrorLimit errorLimit;
@@ -61,7 +63,6 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
      */
     public SamBamStatsParser() {
         this.observers = new ArrayList<>();
-        this.coverageContainer = new CoverageContainer();
         this.errorLimit = new ErrorLimit(100);
         this.readLengthDistribution = new DiscreteCountingDistribution(400);
         readLengthDistribution.setType(Properties.READ_LENGTH_DISTRIBUTION);
@@ -76,12 +77,14 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
      * @return  
      */
     @SuppressWarnings("fallthrough")
+    @NbBundle.Messages({"StatsParser.Finished=Finished creating track statistics for {0}. ", 
+                        "StatsParser.Start=Start creating track statistics for {0}"})
     public ParsedTrack createTrackStats(TrackJob trackJob, Map<String, Integer> chromLengthMap) {
         
         long startTime = System.currentTimeMillis();
         long finish;
         String fileName = trackJob.getFile().getName();
-        this.notifyObservers(NbBundle.getMessage(SamBamStatsParser.class, "StatsParser.Start", fileName));
+        this.notifyObservers(Bundle.StatsParser_Start(fileName));
 
 //        int noMappings = 0;
 //        long starti = System.currentTimeMillis();
@@ -95,15 +98,17 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
         String readName;
         String readSeq;
         String cigar;
-        int readClass;
+        MappingClass mappingClass;
         int mapCount;
-        List<Pair<Integer, Integer>> coveredCommonIntervals = new ArrayList<>();
-        List<Pair<Integer, Integer>> coveredBestMatchIntervals = new ArrayList<>();
-        List<Pair<Integer, Integer>> coveredPerfectIntervals = new ArrayList<>();
-        coveredCommonIntervals.add(new Pair<>(0, 0));
-        coveredBestMatchIntervals.add(new Pair<>(0, 0));
-        coveredPerfectIntervals.add(new Pair<>(0, 0));
-        Integer classification;
+        //Map with one covered interval list for each mapping class
+        Map<Classification, List<Pair<Integer, Integer>>> classToCoveredIntervalsMap = new HashMap<>();
+        for (MappingClass mapClass : MappingClass.values()) {
+            classToCoveredIntervalsMap.put(mapClass, new ArrayList<Pair<Integer, Integer>>());
+            classToCoveredIntervalsMap.get(mapClass).add(new Pair<>(0, 0));
+        }
+        classToCoveredIntervalsMap.put(TotalCoverage.TOTAL_COVERAGE, new ArrayList<Pair<Integer, Integer>>());
+        classToCoveredIntervalsMap.get(TotalCoverage.TOTAL_COVERAGE).add(new Pair<>(0, 0));
+        Byte classification;
         Integer mappingCount;
 //        HashMap<String, Object> readNameSet = new HashMap<>();
         
@@ -140,24 +145,16 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
                             mapCount = 0;
                         }
 
-                        classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
+                        if (mapCount == 1) {
+                            statsContainer.increaseValue(StatsContainer.NO_UNIQ_MAPPINGS, mapCount);
+                        }
+                        statsContainer.increaseValue(StatsContainer.NO_MAPPINGS, 1);
+                        
+                        classification = Byte.valueOf(record.getAttribute(Properties.TAG_READ_CLASS).toString());
                         if (classification != null) {
-                            readClass = classification;
-                            if (mapCount == 1) {
-                                switch (classification) { //fallthrough is necessary
-                                    case (int) Properties.PERFECT_COVERAGE: 
-                                        statsContainer.increaseValue(StatsContainer.NO_UNIQ_PERF_MAPPINGS, mapCount);
-                                    case (int) Properties.BEST_MATCH_COVERAGE:
-                                        statsContainer.increaseValue(StatsContainer.NO_UNIQ_BM_MAPPINGS, mapCount);
-                                    default:
-                                        statsContainer.increaseValue(StatsContainer.NO_UNIQ_MAPPINGS, mapCount);
-                                }
-                            }
+                            mappingClass = MappingClass.getFeatureType(classification);
                         } else {
-                            readClass = Properties.COMPLETE_COVERAGE;
-                            if (mapCount == 1) {
-                                statsContainer.increaseValue(StatsContainer.NO_UNIQ_MAPPINGS, mapCount);
-                            }
+                            mappingClass = MappingClass.COMMON_MATCH;
                         }
                         readLengthDistribution.increaseDistribution(readSeq.length());
                         
@@ -179,17 +176,9 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
                         ++seqCount;
                         lastReadSeq = readSeq;
 
-                        this.updateIntervals(coveredCommonIntervals, start, stop);
-                        if (readClass == Properties.PERFECT_COVERAGE) {
-                            this.updateIntervals(coveredPerfectIntervals, start, stop);
-                            this.updateIntervals(coveredBestMatchIntervals, start, stop);
-                            statsContainer.increaseValue(StatsContainer.NO_PERFECT_MAPPINGS, 1);
-                            statsContainer.increaseValue(StatsContainer.NO_BESTMATCH_MAPPINGS, 1);
-                        } else if (readClass == Properties.BEST_MATCH_COVERAGE) {
-                            this.updateIntervals(coveredBestMatchIntervals, start, stop);
-                            statsContainer.increaseValue(StatsContainer.NO_BESTMATCH_MAPPINGS, 1);
-                        }
-                        statsContainer.increaseValue(StatsContainer.NO_COMMON_MAPPINGS, 1);
+                        statsContainer.increaseValue(mappingClass.getTypeString(), mapCount);
+                        this.updateIntervals(classToCoveredIntervalsMap.get(mappingClass), start, stop);
+                        this.updateIntervals(classToCoveredIntervalsMap.get(TotalCoverage.TOTAL_COVERAGE), start, stop);
                         //saruman starts genome at 0 other algorithms like bwa start genome at 1
                         
 //                        //can be used for debugging performance
@@ -212,6 +201,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
                     finish = System.currentTimeMillis();
                     this.notifyObservers(Benchmark.calculateDuration(startTime, finish, lineno + " mappings processed in "));
                 }
+                System.err.flush();
             }
             if (errorLimit.getSkippedCount() > 0) {
                 this.notifyObservers( "... " + (errorLimit.getSkippedCount()) + " more errors occurred");
@@ -225,17 +215,14 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
         }
         
         //finish statistics and return the track with the statistics data in the end
-        coverageContainer.setCoveredCommonMatchPositions(this.getCoveredBases(coveredCommonIntervals));
-        coverageContainer.setCoveredBestMatchPositions(this.getCoveredBases(coveredBestMatchIntervals));
-        coverageContainer.setCoveredPerfectPositions(this.getCoveredBases(coveredPerfectIntervals));
+        statsContainer.setCoveredPositionsImport(classToCoveredIntervalsMap);
 
-        ParsedTrack track = new ParsedTrack(trackJob, coverageContainer);
+        ParsedTrack track = new ParsedTrack(trackJob);
         statsContainer.setReadLengthDistribution(readLengthDistribution);
         track.setStatsContainer(statsContainer);
-        this.coverageContainer = new CoverageContainer();
         
         finish = System.currentTimeMillis();
-        String msg = NbBundle.getMessage(SamBamStatsParser.class, "StatsParser.Finished", fileName);
+        String msg = Bundle.StatsParser_Finished(fileName);
         this.notifyObservers(Benchmark.calculateDuration(startTime, finish, msg));
         
         return track;
@@ -263,19 +250,6 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
         if (this.errorLimit.allowOutput()) {
             this.notifyObservers(msg);
         }
-    }
-    
-    /**
-     * Counts all  bases, which are covered by reads in this data set
-     * @param coveredIntervals the covered intervals of the data set
-     * @return the number of bases covered in the data set
-     */
-    private int getCoveredBases(List<Pair<Integer, Integer>> coveredIntervals) {
-        int coveredBases = 0;
-        for (Pair<Integer, Integer> interval : coveredIntervals) {
-            coveredBases += interval.getSecond() - interval.getFirst();
-        }
-        return coveredBases;
     }
     
     /**

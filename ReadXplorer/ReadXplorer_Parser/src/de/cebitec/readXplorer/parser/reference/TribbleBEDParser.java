@@ -22,7 +22,7 @@ import de.cebitec.readXplorer.parser.common.ParsedFeature;
 import de.cebitec.readXplorer.parser.common.ParsedReference;
 import de.cebitec.readXplorer.parser.common.ParsingException;
 import de.cebitec.readXplorer.parser.reference.Filter.FeatureFilter;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ import org.broad.tribble.readers.LineIterator;
  * Parses the sequence from a fasta file contained in the ReferenceJob and the
  * BED annotations from the BED file contained in the ReferenceJob.
  * 
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class TribbleBEDParser implements ReferenceParserI {
 

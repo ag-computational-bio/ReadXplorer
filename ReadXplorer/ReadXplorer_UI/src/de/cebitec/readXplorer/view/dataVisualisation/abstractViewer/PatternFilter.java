@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import java.util.ArrayList;
@@ -39,12 +39,12 @@ public class PatternFilter implements RegionFilterI {
     private List<Region> matchedPatterns;
     private int absStart;
     private int absStop;
-    private PersistantReference refGen;
+    private PersistentReference refGen;
     private String sequence;
     private Pattern pattern;
 //    private Pattern patternRev;
 
-    public PatternFilter(int absStart, int absStop, PersistantReference refGen) {
+    public PatternFilter(int absStart, int absStop, PersistentReference refGen) {
         this.matchedPatterns = new ArrayList<>();
         this.absStart = absStart;
         this.absStop = absStop;

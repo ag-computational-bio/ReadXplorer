@@ -19,13 +19,14 @@ package de.cebitec.readXplorer.dashboard;
 import de.cebitec.readXplorer.controller.ViewController;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference; 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference; 
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readXplorer.view.TopComponentExtended;
 import de.cebitec.readXplorer.view.dialogMenus.explorer.CustomOutlineCellRenderer;
 import de.cebitec.readXplorer.view.dialogMenus.explorer.StandardItem;
+import de.cebitec.readXplorer.view.dialogMenus.explorer.StandardNode;
 import de.cebitec.readXplorer.view.login.LoginWizardAction;
 import java.awt.EventQueue;
 import java.awt.event.MouseAdapter;
@@ -156,18 +157,18 @@ public final class DashboardWindowTopComponent extends TopComponentExtended impl
             openButton.setVisible(true);
             openDBButton.setText(Bundle.DashboardWindowTopComponent_openDBButton_loggedIn());
             try {
-                final Map<PersistantReference, List<PersistantTrack>> genomesAndTracks =
+                final Map<PersistentReference, List<PersistentTrack>> genomesAndTracks =
                         ProjectConnector.getInstance().getGenomesAndTracks();
 
-                Node rootNode = new AbstractNode(new Children.Keys<PersistantReference>() {
+                Node rootNode = new AbstractNode(new Children.Keys<PersistentReference>() {
                     @Override
-                    protected Node[] createNodes(PersistantReference genome) {
+                    protected Node[] createNodes(PersistentReference genome) {
                         try {
-                            List<PersistantTrack> tracks = genomesAndTracks.get(genome);
+                            List<PersistentTrack> tracks = genomesAndTracks.get(genome);
 
                             if (tracks != null) {
                                 List<DBItem> trackItems = new ArrayList<>();
-                                for (PersistantTrack track : tracks) {
+                                for (PersistentTrack track : tracks) {
                                     trackItems.add(new DBItem(track));
                                 }
                                 return new Node[]{new DBItemNode(new DBItem(genome), new DBItemChildren(trackItems))};
@@ -243,12 +244,10 @@ public final class DashboardWindowTopComponent extends TopComponentExtended impl
      */
     private DBItem getItemForNode(Node n) {
         DBItem item = null;
-        if (n instanceof DBItemNode) {
-            StandardItem standardItem = ((DBItemNode) n).getData();
-            if (standardItem instanceof DBItem) {
+            StandardItem standardItem = StandardNode.getItemForNode(n);
+            if (standardItem != null && standardItem instanceof DBItem) {
                 item = (DBItem) standardItem;
             }
-        }
         return item;
     }
     
@@ -478,13 +477,13 @@ public final class DashboardWindowTopComponent extends TopComponentExtended impl
         
         this.updateOpenList();
         
-        Map<PersistantReference, List<PersistantTrack>> genomesAndTracks = ProjectConnector.getInstance().getGenomesAndTracks();
+        Map<PersistentReference, List<PersistentTrack>> genomesAndTracks = ProjectConnector.getInstance().getGenomesAndTracks();
         
         for (Long genomeId : genomesAndTracksToOpen.keySet()) {
             Set<Long> trackIds = genomesAndTracksToOpen.get(genomeId);
             
             ReferenceConnector rc = ProjectConnector.getInstance().getRefGenomeConnector(genomeId.intValue());
-            PersistantReference genome = rc.getRefGenome();
+            PersistentReference genome = rc.getRefGenome();
             
             //open reference genome now
             AppPanelTopComponent appPanelTopComponent = new AppPanelTopComponent();
@@ -495,9 +494,9 @@ public final class DashboardWindowTopComponent extends TopComponentExtended impl
              
             
             //open tracks for this genome now
-            List<PersistantTrack> allTracksForThisGenome = genomesAndTracks.get(genome);
-            List<PersistantTrack> tracksToShow = new ArrayList<>();
-            for (PersistantTrack track : allTracksForThisGenome) {
+            List<PersistentTrack> allTracksForThisGenome = genomesAndTracks.get(genome);
+            List<PersistentTrack> tracksToShow = new ArrayList<>();
+            for (PersistentTrack track : allTracksForThisGenome) {
                 if (trackIds.contains(new Long(track.getId()))) {
                     tracksToShow.add(track);
                 }
@@ -521,28 +520,12 @@ public final class DashboardWindowTopComponent extends TopComponentExtended impl
     }//GEN-LAST:event_createDBButtonActionPerformed
 
     private void selectAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectAllButtonActionPerformed
-        setSelectionOfAllNodes(em.getRootContext().getChildren().getNodes(), true);
+        StandardItem.setSelectionOfAllItems(ov, em.getRootContext().getChildren().getNodes(), true);
     }//GEN-LAST:event_selectAllButtonActionPerformed
 
     private void deselectAllButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deselectAllButtonActionPerformed
-        setSelectionOfAllNodes(em.getRootContext().getChildren().getNodes(), false);
+        StandardItem.setSelectionOfAllItems(ov, em.getRootContext().getChildren().getNodes(), false);
     }//GEN-LAST:event_deselectAllButtonActionPerformed
-
-    /**
-     * Selects or deselects all nodes in the explorer, depending on the given
-     * parameter.
-     * @param selected true, if all nodes shall be selected, false otherwise
-     */
-    private void setSelectionOfAllNodes(Node[] nodes, boolean selected) {
-        for (int i = 0; i < nodes.length; ++i) {
-            DBItem dbItem = getItemForNode(nodes[i]);
-            if (dbItem != null) {
-                dbItem.setSelected(selected);
-            }
-            this.setSelectionOfAllNodes(nodes[i].getChildren().getNodes(), selected);
-        }
-        ov.repaint();
-    }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel buttonPanel;
@@ -565,19 +548,19 @@ public final class DashboardWindowTopComponent extends TopComponentExtended impl
 
     @Override
     public void componentClosed() {
-        // TODO add custom code on component closing
+        // add custom code on component closing
     }
 
     void writeProperties(java.util.Properties p) {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
         p.setProperty("version", "1.0");
-        // TODO store your settings
+        // store your settings
     }
 
     void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
-        // TODO read your settings according to their version
+        // read your settings according to their version
     }
     
     /**

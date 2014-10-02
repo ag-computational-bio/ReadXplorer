@@ -16,8 +16,8 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfo;
@@ -55,7 +55,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
     private static final long serialVersionUID = 23446398;
     private int height = 50;
     private AbstractViewer parentViewer;
-    private PersistantReference refGen;
+    private PersistentReference refGen;
     private Font font;
     private FontMetrics metrics;
     private boolean printSeq;
@@ -393,7 +393,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
         if (this.parentViewer instanceof ReferenceViewer) {
             ReferenceViewer refViewer = (ReferenceViewer) this.parentViewer;
             if (refViewer.getCurrentlySelectedFeature() != null) {
-                frameCurrFeature = (byte) PersistantFeature.Utils.determineFrame(refViewer.getCurrentlySelectedFeature().getPersistantFeature());
+                frameCurrFeature = (byte) PersistentFeature.Utils.determineFrame(refViewer.getCurrentlySelectedFeature().getPersistentFeature());
             }
         }
         return frameCurrFeature;
@@ -569,10 +569,10 @@ public class SequenceBar extends JComponent implements HighlightableI {
     }
 
     /**
-     * Returns the persistant reference used for this sequence bar.
-     * @return the persistant reference used for this sequence bar
+     * Returns the persistent reference used for this sequence bar.
+     * @return the persistent reference used for this sequence bar
      */
-    public PersistantReference getPersistantReference() {
+    public PersistentReference getPersistentReference() {
         return this.refGen;
     }
 

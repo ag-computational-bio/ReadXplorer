@@ -20,7 +20,7 @@ package de.cebitec.readXplorer.parser.tables;
  * Enumeration of all available table models in ReadXplorer. All tables, which
  * can be generated with ReadXplorer are listed here.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public enum TableType {
     
@@ -36,10 +36,20 @@ public enum TableType {
     SNP_DETECTION("SNP Detection Table"),
     /** TSS detection table. */
     TSS_DETECTION("TSS Detection Table"),
+    /** Operon detection table JR. */
+    OPERON_DETECTION_JR("Operon Detection Table JR"),
+    /** RPKM analysis table JR. */
+    RPKM_ANALYSIS_JR("RPKM Analysis Table JR"),
+    /** Novel transcript detection table JR. */
+    NOVEL_TRANSCRIPT_DETECTION_JR("Novel Transcript Detection Table JR"),
+    /** TSS detection table JR. */
+    TSS_DETECTION_JR("TSS Detection Table JR"),
     /** Arbitrary table starting with a position column. */
     DIFF_GENE_EXPRESSION("Differential Gene Expression Table"),
     /** Arbitrary table starting with a position column. */
     POS_TABLE("Any table starting with position column"),
+    /** A statistics table. */
+    STATS_TABLE("A statistics table"),
     /** Any arbitrary table with no synchronization in the viewers. */
     ANY_TABLE("Any other table");
 

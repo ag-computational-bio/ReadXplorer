@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.util.List;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
@@ -72,7 +72,7 @@ public class BaySeqWizardPanel3 implements WizardDescriptor.ValidatingPanel<Wiza
     @Override
     public void readSettings(WizardDescriptor wiz) {
         // use wiz.getProperty to retrieve previous panel state
-        List<PersistantTrack> selectedTracks = (List<PersistantTrack>) wiz.getProperty("tracks");
+        List<PersistentTrack> selectedTracks = (List<PersistentTrack>) wiz.getProperty("tracks");
         getComponent().updateTrackList(selectedTracks);
     }
 

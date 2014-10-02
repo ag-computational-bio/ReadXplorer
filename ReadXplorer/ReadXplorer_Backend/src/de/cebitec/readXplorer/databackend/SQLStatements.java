@@ -24,24 +24,15 @@ package de.cebitec.readXplorer.databackend;
 public class SQLStatements {
 
     /**
-     * For retrieving "NUM" result from result set of a db request.
-     */
-    public static final String GET_NUM = "NUM";
-    
-    public static String DELETE_OBJECTFROMCACHE = "DELETE FROM "
-    + FieldNames.TABLE_OBJECTCACHE + " WHERE "
-    + FieldNames.OBJECTCACHE_FAMILY + " = ? AND " + FieldNames.OBJECTCACHE_KEY + " = ? ";
-    
-    public static String DELETE_OBJECTFAMILYFROMCACHE = "DELETE FROM "
-    + FieldNames.TABLE_OBJECTCACHE + " WHERE "
-    + FieldNames.OBJECTCACHE_FAMILY+ " = ? ";
-
-    /**
      * Private constructor so this utility class can not be instantiated.
      */
     private SQLStatements() {
     }
     
+    /**
+     * For retrieving "NUM" result from result set of a db request.
+     */
+    public static final String GET_NUM = "NUM";
     
     //////////////////  statements for table creation  /////////////////////////
     
@@ -56,46 +47,8 @@ public class SQLStatements {
             + "( "
             + FieldNames.STATISTICS_ID + " BIGINT UNSIGNED PRIMARY KEY, "
             + FieldNames.STATISTICS_TRACK_ID + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.STATISTICS_NUMBER_OF_MAPPINGS + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.STATISTICS_NUMBER_OF_PERFECT_MAPPINGS + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.STATISTICS_NUMBER_OF_BM_MAPPINGS + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.STATISTICS_NUMBER_UNIQUE_MAPPINGS + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.STATISTICS_NUMBER_UNIQUE_BM_MAPPINGS + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.STATISTICS_NUMBER_UNIQUE_PERFECT_MAPPINGS + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.STATISTICS_PERFECT_COVERAGE_OF_GENOME + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.STATISTICS_BM_COVERAGE_OF_GENOME + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.STATISTICS_COMPLETE_COVERAGE_OF_GENOME + " BIGINT UNSIGNED NOT NULL, "
-            + FieldNames.STATISTICS_NUMBER_OF_UNIQUE_SEQ + " BIGINT UNSIGNED  NOT NULL, "
-            + FieldNames.STATISTICS_NUMBER_OF_REPEATED_SEQ + " BIGINT UNSIGNED  NOT NULL, "
-            + FieldNames.STATISTICS_NUMBER_READS + " BIGINT UNSIGNED NOT NULL,  "
-            + FieldNames.STATISTICS_NUM_SEQUENCE_PAIRS + " BIGINT UNSIGNED, "
-            + FieldNames.STATISTICS_NUM_UNIQUE_SEQUENCE_PAIRS + " BIGINT UNSIGNED, "
-            + FieldNames.STATISTICS_NUM_PERFECT_SEQUENCE_PAIRS + " BIGINT UNSIGNED, "
-            + FieldNames.STATISTICS_NUM_UNIQUE_PERFECT_SEQUENCE_PAIRS + " BIGINT UNSIGNED, "
-            + FieldNames.STATISTICS_NUM_SMALL_DIST_PAIRS + " BIGINT UNSIGNED, "
-            + FieldNames.STATISTICS_NUM_UNIQ_SMALL_PAIRS + " BIGINT UNSIGNED, "
-            + FieldNames.STATISTICS_NUM_LARGE_DIST_PAIRS + " BIGINT UNSIGNED, "
-            + FieldNames.STATISTICS_NUM_UNIQ_LARGE_PAIRS + " BIGINT UNSIGNED, "
-            + FieldNames.STATISTICS_NUM_ORIENT_WRONG_PAIRS + " BIGINT UNSIGNED, "
-            + FieldNames.STATISTICS_NUM_UNIQ_ORIENT_WRNG_PAIRS + " BIGINT UNSIGNED, "
-            + FieldNames.STATISTICS_NUM_SMALL_ORIENT_WRONG_PAIRS + " BIGINT UNSIGNED, "
-            + FieldNames.STATISTICS_NUM_UNIQ_SMALL_ORIENT_WRNG_PAIRS + " BIGINT UNSIGNED, "
-            + FieldNames.STATISTICS_NUM_LARGE_ORIENT_WRONG_PAIRS + " BIGINT UNSIGNED, "
-            + FieldNames.STATISTICS_NUM_UNIQ_LARGE_ORIENT_WRNG_PAIRS + " BIGINT UNSIGNED, "
-            + FieldNames.STATISTICS_NUM_SINGLE_MAPPINGS + " BIGINT UNSIGNED, "
-            + FieldNames.STATISTICS_AVERAGE_SEQ_PAIR_LENGTH + " BIGINT UNSIGNED, "
-            + FieldNames.STATISTICS_AVERAGE_READ_LENGTH + " INT UNSIGNED "
-            + ") ";
-    
-    /**
-     *
-     */
-    public final static String SETUP_OBJECTCACHE = 
-            "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_OBJECTCACHE
-            + " ( "
-            + FieldNames.OBJECTCACHE_FAMILY + " VARCHAR(255), "
-            + FieldNames.OBJECTCACHE_KEY + " VARCHAR(255), "
-            + FieldNames.OBJECTCACHE_DATA + " BLOB "
+            + FieldNames.STATISTICS_KEY + " VARCHAR(100) NOT NULL, "
+            + FieldNames.STATISTICS_VALUE + " BIGINT UNSIGNED NOT NULL "
             + ") ";
     
     public static final String SETUP_DB_VERSION_TABLE = 
@@ -106,8 +59,8 @@ public class SQLStatements {
     
     
    /**
-    * Only needed as long as older databases are floating around and did not
-    * already drop this table which was replaced by STATISTICS.
+    * Only needed for backward compatibility as long as older databases are 
+    * floating around with unnecessary or changed tables.
     */
     public static final String DROP_TABLE = "DROP TABLE IF EXISTS ";
          
@@ -125,17 +78,7 @@ public class SQLStatements {
 //            + FieldNames.PROJECT_FOLDER_PATH
 //            + ") "
 //            + " VALUES (?); ";
-    
-    
-    static String INSERT_OBJECTINTOCACHE = "INSERT INTO " + FieldNames.TABLE_OBJECTCACHE + " "
-            + "("
-            + FieldNames.OBJECTCACHE_FAMILY + ", "
-            + FieldNames.OBJECTCACHE_KEY + ", "
-            + FieldNames.OBJECTCACHE_DATA
-            + ") "
-            + "VALUES (?,?,?)"
-            ;
-    
+       
     
     public final static String INSERT_REFGENOME =
             "INSERT INTO " + FieldNames.TABLE_REFERENCE + " "
@@ -220,37 +163,9 @@ public class SQLStatements {
             + "("
             + FieldNames.STATISTICS_ID + ", "
             + FieldNames.STATISTICS_TRACK_ID + ", "
-            + FieldNames.STATISTICS_NUMBER_OF_MAPPINGS + ", "
-            + FieldNames.STATISTICS_NUMBER_OF_PERFECT_MAPPINGS + ", "
-            + FieldNames.STATISTICS_NUMBER_OF_BM_MAPPINGS + ", "
-            + FieldNames.STATISTICS_NUMBER_UNIQUE_MAPPINGS + ", "
-            + FieldNames.STATISTICS_NUMBER_UNIQUE_BM_MAPPINGS + ", "
-            + FieldNames.STATISTICS_NUMBER_UNIQUE_PERFECT_MAPPINGS + ", "
-            + FieldNames.STATISTICS_PERFECT_COVERAGE_OF_GENOME + ", "
-            + FieldNames.STATISTICS_BM_COVERAGE_OF_GENOME + ", "
-            + FieldNames.STATISTICS_COMPLETE_COVERAGE_OF_GENOME + ", "
-            + FieldNames.STATISTICS_NUMBER_OF_UNIQUE_SEQ + ", "
-            + FieldNames.STATISTICS_NUMBER_OF_REPEATED_SEQ + ", "
-            + FieldNames.STATISTICS_NUMBER_READS + ", "
-            + FieldNames.STATISTICS_AVERAGE_READ_LENGTH
-            + " ) "
-            + "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-    
-    
-    public static final String UPDATE_STATISTICS =
-            "UPDATE " + FieldNames.TABLE_STATISTICS + " "
-            + "SET "
-            + FieldNames.STATISTICS_NUMBER_OF_MAPPINGS + "= ?, "
-            + FieldNames.STATISTICS_NUMBER_OF_PERFECT_MAPPINGS + " = ?, "
-            + FieldNames.STATISTICS_NUMBER_OF_BM_MAPPINGS + " = ?, "
-            + FieldNames.STATISTICS_NUMBER_UNIQUE_MAPPINGS + " = ?, "
-            + FieldNames.STATISTICS_PERFECT_COVERAGE_OF_GENOME + " = ?, "
-            + FieldNames.STATISTICS_BM_COVERAGE_OF_GENOME + " = ?, "
-            + FieldNames.STATISTICS_COMPLETE_COVERAGE_OF_GENOME + " = ?, "
-            + FieldNames.STATISTICS_NUMBER_OF_UNIQUE_SEQ + " = ?, "
-            + FieldNames.STATISTICS_NUMBER_READS + " = ? "
-            + " WHERE  "
-            + FieldNames.STATISTICS_TRACK_ID + " = ? ";
+            + FieldNames.STATISTICS_KEY + ", "
+            + FieldNames.STATISTICS_VALUE + " ) "
+            + "VALUES (?,?,?,?)";
     
     /**
      * Update exisiting row of track statistics with sequence pair statistics
@@ -315,6 +230,13 @@ public class SQLStatements {
             + FieldNames.TABLE_STATISTICS
             + " WHERE "
             + FieldNames.STATISTICS_TRACK_ID + " = ? ";
+    
+    public final static String DELETE_SPECIFIC_TRACK_STATISTIC =
+            "DELETE FROM "
+            + FieldNames.TABLE_STATISTICS
+            + " WHERE "
+            + FieldNames.STATISTICS_TRACK_ID + " = ? and " +
+              FieldNames.STATISTICS_KEY + " = ?";
     
     public static final String DELETE_COUNT_DISTRIBUTIONS_FROM_TRACK = 
             "DELETE FROM "
@@ -566,14 +488,7 @@ public class SQLStatements {
             + "MAX(" + FieldNames.STATISTICS_ID + ") AS LATEST_ID "
             + "FROM "
             + FieldNames.TABLE_STATISTICS;
-    
-    
-    public final static String FETCH_OBJECTFROMCACHE = 
-            "SELECT " + FieldNames.OBJECTCACHE_DATA 
-            + " FROM " + FieldNames.TABLE_OBJECTCACHE
-            + " WHERE " + FieldNames.OBJECTCACHE_FAMILY + " = ? "
-            + " AND " + FieldNames.OBJECTCACHE_KEY + " = ? ";
-    
+        
     
     /////////////////// statistics calculations and queries //////////////////////////
     

@@ -58,7 +58,7 @@ public class IntervalRequest {
      * @param desiredData Can be any byte value representing a filter flag for
      * the results e.g. Properties.READ_STARTS.
      * @param whichTrackNeeded A byte value representing one of the two flags
-     * PersistantCoverage.TRACK1 or PersistantCoverage.TRACK2 if this is a
+     * PersistentCoverage.TRACK1 or PersistentCoverage.TRACK2 if this is a
      * double track request or ParameterSetMapping.NORMAL, if this is an
      * ordinary track request.
      * @param readClassParams A parameter set which contains all parameters
@@ -97,14 +97,17 @@ public class IntervalRequest {
      * the result, false otherwise
      * @param desiredData Can be any byte value representing a filter flag for
      * the results. Can be a byte value representing one of the two flags
-     * PersistantCoverage.TRACK1 or PersistantCoverage.TRACK2 if this is a
+     * PersistentCoverage.TRACK1 or PersistentCoverage.TRACK2 if this is a
      * double track request or Properties.NORMAL, if this is an ordinary
      * track request.
-     * @param trackNeeded  
+     * @param whichTrackNeeded A byte value representing one of the two flags
+     * PersistentCoverage.TRACK1 or PersistentCoverage.TRACK2 if this is a
+     * double track request or ParameterSetMapping.NORMAL, if this is an
+     * ordinary track request. 
      */
     public IntervalRequest(int from, int to, int totalFrom, int totalTo, int chromId, ThreadListener sender, 
-            boolean diffsAndGapsNeeded, byte desiredData, byte trackNeeded) {
-        this(from, to, totalFrom, totalTo, chromId, sender, diffsAndGapsNeeded, desiredData, trackNeeded, new ParametersReadClasses());
+            boolean diffsAndGapsNeeded, byte desiredData, byte whichTrackNeeded) {
+        this(from, to, totalFrom, totalTo, chromId, sender, diffsAndGapsNeeded, desiredData, whichTrackNeeded, new ParametersReadClasses());
     }
     
     /**
@@ -278,7 +281,7 @@ public class IntervalRequest {
 
     /**
      * @return A byte value representing one of the two flags
-     * PersistantCoverage.TRACK1 or PersistantCoverage.TRACK2 if this is a
+     * PersistentCoverage.TRACK1 or PersistentCoverage.TRACK2 if this is a
      * double track request or Properties.NORMAL, if this is a ordinary track
      * request.
      */

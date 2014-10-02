@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.AdjustmentPanelListenerI;
 import java.awt.Dimension;
@@ -32,7 +32,7 @@ public class BoundsInfoManager implements AdjustmentPanelListenerI {
 
     private int currentHorizontalPosition;
     private int zoomfactor;
-    private PersistantReference refGenome;
+    private PersistentReference refGenome;
     private List<LogicalBoundsListener> boundListeners;
     private List<SynchronousNavigator> syncedNavigators;
 
@@ -40,7 +40,7 @@ public class BoundsInfoManager implements AdjustmentPanelListenerI {
      * Manages the bounds information for a reference sequence.
      * @param refGenome The reference genome whose bounds are handled.
      */
-    public BoundsInfoManager(PersistantReference refGenome) {
+    public BoundsInfoManager(PersistentReference refGenome) {
         this.refGenome = refGenome;
         this.boundListeners = new ArrayList<>();
         this.syncedNavigators = new ArrayList<>();

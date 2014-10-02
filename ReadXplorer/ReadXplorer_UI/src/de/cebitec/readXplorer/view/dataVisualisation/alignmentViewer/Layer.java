@@ -24,14 +24,14 @@ import java.util.Iterator;
  *
  * @author ddoppmei
  */
-public class Layer implements LayerI{
+public class Layer implements LayerI {
 
     private ArrayList<BlockI> blocks;
     private int absStart;
     private int absStop;
     private GenomeGapManager gapManager;
 
-    public Layer(int absStart, int absStop, GenomeGapManager gapManager){
+    public Layer(int absStart, int absStop, GenomeGapManager gapManager) {
         this.absStart = absStart;
         this.absStop = absStop;
         this.gapManager = gapManager;
@@ -44,7 +44,7 @@ public class Layer implements LayerI{
     }
 
     @Override
-    public String toString(){
+    public String toString() {
 
         StringBuilder sb = new StringBuilder();
         int from = absStart;

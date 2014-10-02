@@ -16,14 +16,14 @@
  */
 package de.cebitec.readXplorer.parser.common;
 
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.polyTree.Node;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Contains all available information about a persistant feature.
+ * Contains all available information about a persistent feature.
  *  
  * @author ddoppmeier, rhilker
  */
@@ -42,7 +42,7 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
     private long id;
 
     /**
-     * Contains all available information about a persistant feature.
+     * Contains all available information about a persistent feature.
      * @param type FeatureType.CDS, FeatureType.REPEAT_UNIT, FeatureType.R_RNA, FeatureType.SOURCE,
                    FeatureType.T_RNA, FeatureType.MISC_RNA, FeatureType.MI_RNA, FeatureType.GENE,
                    FeatureType.M_RNA (mandatory)
@@ -71,7 +71,7 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
     }
     
     /**
-     * Contains all available information about a persistant feature.
+     * Contains all available information about a persistent feature.
      * @param type FeatureType.CDS, FeatureType.REPEAT_UNIT, FeatureType.R_RNA,
      * FeatureType.SOURCE, FeatureType.T_RNA, FeatureType.MISC_RNA,
      * FeatureType.MI_RNA, FeatureType.GENE, FeatureType.M_RNA (mandatory)

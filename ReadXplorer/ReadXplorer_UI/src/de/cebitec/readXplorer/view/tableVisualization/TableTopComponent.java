@@ -87,7 +87,7 @@ public class TableTopComponent extends TopComponentExtended {
     // End of variables declaration//GEN-END:variables
     @Override
     public void componentOpened() {
-        // TODO add custom code on component opening
+        // add custom code on component opening
     }
 
     @Override
@@ -99,12 +99,12 @@ public class TableTopComponent extends TopComponentExtended {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
         p.setProperty("version", "1.0");
-        // TODO store your settings
+        // store your settings
     }
 
     protected void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
-        // TODO read your settings according to their version
+        // read your settings according to their version
     }
     
     /**

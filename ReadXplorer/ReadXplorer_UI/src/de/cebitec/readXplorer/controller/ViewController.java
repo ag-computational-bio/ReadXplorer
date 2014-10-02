@@ -18,8 +18,8 @@ package de.cebitec.readXplorer.controller;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readXplorer.api.ApplicationFrameI;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManagerFactory;
@@ -47,12 +47,11 @@ import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
-import org.openide.util.Utilities;
 
 /**
  * Controls the view for one <code>ApplicationFrameI</code>.
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class ViewController implements MousePositionListener {
 
@@ -60,9 +59,9 @@ public class ViewController implements MousePositionListener {
     private BoundsInfoManager boundsManager;
     private BasePanelFactory basePanelFac;
 
-    private PersistantReference currentRefGen;
+    private PersistentReference currentRefGen;
     private BasePanel genomeViewer;
-    private Map<PersistantTrack, BasePanel> trackToPanel;
+    private Map<PersistentTrack, BasePanel> trackToPanel;
     private List<BasePanel> currentTracks= new ArrayList<>();
     
     private BoundsInfoManagerFactory boundsInfoManagerFactory;
@@ -96,7 +95,7 @@ public class ViewController implements MousePositionListener {
      * Opens a reference viewer for the given reference genome.
      * @param genome the genome for which a viewer shall be opened.
      */
-    public void openGenome(PersistantReference genome) {
+    public void openGenome(PersistentReference genome) {
         currentRefGen = genome;
         
         boundsManager = this.boundsInfoManagerFactory.get(currentRefGen);
@@ -146,8 +145,8 @@ public class ViewController implements MousePositionListener {
      * opens the given track on the current genome
      * @param tracks the tracks belonging to the current reference genome
      */
-    public void openTracksOnCurrentGenome(Collection<PersistantTrack> tracks) {
-        for (PersistantTrack track : tracks) {
+    public void openTracksOnCurrentGenome(Collection<PersistentTrack> tracks) {
+        for (PersistentTrack track : tracks) {
             // create basepanel
             final BasePanel trackPanel = basePanelFac.getTrackBasePanel(track, currentRefGen);
             if (trackPanel != null) {
@@ -157,29 +156,7 @@ public class ViewController implements MousePositionListener {
                 // show the panel and the track
                 getApp().showTrackPanel(trackPanel);
                 
-                trackPanel.addPrefListener(new PreferenceChangeListener() {
-
-                    @Override
-                    public void preferenceChange(final PreferenceChangeEvent evt) {
-                        AbstractViewer viewer = trackPanel.getViewer();
-                        if (evt.getKey().equals(Properties.VIEWER_HEIGHT)) {
-
-                            int height = Integer.parseInt(evt.getNewValue());
-                            trackPanel.setSize(trackPanel.getSize().width, height);
-                            trackPanel.setPreferredSize(new Dimension(trackPanel.getPreferredSize().width, height));
-                            trackPanel.setMaximumSize(new Dimension(trackPanel.getMaximumSize().width, height));
-                            Component comp = (Component) getApp();
-                            comp.paintAll(comp.getGraphics());
-                            viewer.updatePhysicalBounds();
-                            viewer.setNewDataRequestNeeded(true);
-                            viewer.boundsChangedHook();
-                        } else if (evt.getKey().equals(Properties.VIEWER_AUTO_SCALING)) {
-                            if (viewer instanceof TrackViewer) {
-                                ((TrackViewer) viewer).setAutomaticScaling(evt.getNewValue().equals("true"));
-                            }
-                        }
-                    }
-                });
+                trackPanel.addPrefListener(this.getPrefChangeListener(trackPanel));
             }
         }
     }
@@ -196,8 +173,7 @@ public class ViewController implements MousePositionListener {
 
         if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && !otp.getSelectedTracks().isEmpty()) {
             if (otp.isCombineTracks()) {
-                ViewController viewCon = Utilities.actionsGlobalContext().lookup(ViewController.class);
-                BasePanelFactory factory = viewCon.getBasePanelFac();
+                BasePanelFactory factory = this.getBasePanelFac();
                 factory.getMultipleTracksBasePanel(otp.getSelectedTracks(), currentRefGen, otp.isCombineTracks());
             } else {
                 this.openTracksOnCurrentGenome(otp.getSelectedTracks());
@@ -237,8 +213,42 @@ public class ViewController implements MousePositionListener {
         }
         if (okSelected) {
             BasePanelFactory factory = this.getBasePanelFac();
-            factory.getMultipleTracksBasePanel(otp.getSelectedTracks(), currentRefGen, false);
+            BasePanel tracksPanel = factory.getMultipleTracksBasePanel(otp.getSelectedTracks(), currentRefGen, false);
+            tracksPanel.addPrefListener(this.getPrefChangeListener(tracksPanel));
         }
+    }
+    
+    /**
+     * Creates a PreferenceChangeListener for updating the viewer when options
+     * have been changed. 
+     * @param trackPanel The BasePanel with the viewer
+     * @return The PreferenceChangeListener for updating the viewer when options
+     * have been changed. 
+     */
+    private PreferenceChangeListener getPrefChangeListener(final BasePanel trackPanel) {
+        return new PreferenceChangeListener() {
+
+            @Override
+            public void preferenceChange(final PreferenceChangeEvent evt) {
+                AbstractViewer viewer = trackPanel.getViewer();
+                if (evt.getKey().equals(Properties.VIEWER_HEIGHT)) {
+
+                    int height = Integer.parseInt(evt.getNewValue());
+                    trackPanel.setSize(trackPanel.getSize().width, height);
+                    trackPanel.setPreferredSize(new Dimension(trackPanel.getPreferredSize().width, height));
+                    trackPanel.setMaximumSize(new Dimension(trackPanel.getMaximumSize().width, height));
+                    Component comp = (Component) getApp();
+                    comp.paintAll(comp.getGraphics());
+                    viewer.updatePhysicalBounds();
+                    viewer.setNewDataRequestNeeded(true);
+                    viewer.boundsChangedHook();
+                } else if (evt.getKey().equals(Properties.VIEWER_AUTO_SCALING)) {
+                    if (viewer instanceof TrackViewer) {
+                        ((TrackViewer) viewer).setAutomaticScaling(evt.getNewValue().equals("true"));
+                    }
+                }
+            }
+        };
     }
 
     /**
@@ -250,7 +260,7 @@ public class ViewController implements MousePositionListener {
 
     /**
      * Replacement for <code>closeTrack</code> so the application does not need
-     * to know <code>PersistantTrack</code> or <code>BasePanel</code>.
+     * to know <code>PersistentTrack</code> or <code>BasePanel</code>.
      * @param trackPanel The base panel to close
      */
     public void closeTrackPanel(JPanel trackPanel) {
@@ -301,7 +311,7 @@ public class ViewController implements MousePositionListener {
     /**
      * @return The reference genome associated with this view controller.
      */
-    public PersistantReference getCurrentRefGen() {
+    public PersistentReference getCurrentRefGen() {
         return currentRefGen;
     }
 

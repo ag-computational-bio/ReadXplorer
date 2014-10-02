@@ -17,9 +17,9 @@
 package de.cebitec.readXplorer.transcriptionAnalyses;
 
 import de.cebitec.readXplorer.databackend.ParameterSetI;
-import de.cebitec.readXplorer.databackend.ParametersFeatureTypes;
+import de.cebitec.readXplorer.databackend.ParametersFeatureTypesAndReadClasses;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.util.Set;
 
 /**
@@ -28,12 +28,11 @@ import java.util.Set;
  * 
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class ParameterSetRPKM extends ParametersFeatureTypes implements ParameterSetI<ParameterSetRPKM> {
+public class ParameterSetRPKM extends ParametersFeatureTypesAndReadClasses implements ParameterSetI<ParameterSetRPKM> {
     
     private boolean performRPKMAnalysis;
     private int minReadCount;
     private int maxReadCount;
-    private final ParametersReadClasses readClassParams;
     
     /**
      * Data storage for all parameters associated with an RPKM and read count
@@ -46,11 +45,10 @@ public class ParameterSetRPKM extends ParametersFeatureTypes implements Paramete
      */
     public ParameterSetRPKM(boolean performRPKMAnalysis, int minReadCount, int maxReadCount, Set<FeatureType> selFeatureTypes, ParametersReadClasses readClassParams) {
         
-        super(selFeatureTypes);
+        super(selFeatureTypes, readClassParams);
         this.performRPKMAnalysis = performRPKMAnalysis;
         this.minReadCount = minReadCount;
         this.maxReadCount = maxReadCount;
-        this.readClassParams = readClassParams;
     }
 
     /**
@@ -88,8 +86,4 @@ public class ParameterSetRPKM extends ParametersFeatureTypes implements Paramete
         this.maxReadCount = maxRPKM;
     }    
 
-    public ParametersReadClasses getReadClassParams() {
-        return readClassParams;
-    }
-    
 }

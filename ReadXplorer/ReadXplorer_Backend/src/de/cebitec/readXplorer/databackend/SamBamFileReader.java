@@ -16,14 +16,14 @@
  */
 package de.cebitec.readXplorer.databackend;
 
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistant;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantCoverage;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantDiff;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantDiffAndGapResult;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReadPairGroup;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReferenceGap;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResult;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
+import de.cebitec.readXplorer.databackend.dataObjects.DiffAndGapResult;
+import de.cebitec.readXplorer.databackend.dataObjects.Difference;
+import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.ReadPairGroup;
+import de.cebitec.readXplorer.databackend.dataObjects.ReferenceGap;
 import de.cebitec.readXplorer.parser.mappings.CommonsMappingParser;
 import de.cebitec.readXplorer.util.IndexFileNotificationPanel;
 import de.cebitec.readXplorer.util.Observable;
@@ -33,6 +33,8 @@ import de.cebitec.readXplorer.util.ReadPairType;
 import de.cebitec.readXplorer.util.SamAlignmentBlock;
 import de.cebitec.readXplorer.util.SamUtils;
 import de.cebitec.readXplorer.util.SequenceUtils;
+import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readXplorer.util.classification.MappingClass;
 import java.awt.Dialog;
 import java.io.File;
 import java.nio.BufferUnderflowException;
@@ -76,11 +78,13 @@ public class SamBamFileReader implements Observable {
     public static final String cigarRegex = "[MIDNSPXH=]+";
     private final File dataFile;
     private final int trackId;
-    private final PersistantReference reference;
+    private final PersistentReference reference;
     private SamUtils samUtils;
     private SAMFileReader samFileReader;
     private String header;
     private List<Observer> observers;
+//    long startTime;
+//    long finish;
 
     /**
      * A SamBamFileReader has different methods to read data from a bam or sam
@@ -92,7 +96,7 @@ public class SamBamFileReader implements Observable {
      * @param reference reference genome used in the bam file
      * @throws RuntimeIOException
      */
-    public SamBamFileReader(File dataFile, int trackId, PersistantReference reference) throws RuntimeIOException {
+    public SamBamFileReader(File dataFile, int trackId, PersistentReference reference) throws RuntimeIOException {
         this.observers = new ArrayList<>();
         this.dataFile = dataFile;
         this.trackId = trackId;
@@ -150,9 +154,10 @@ public class SamBamFileReader implements Observable {
      * @param request the request to carry out
      * @return the mappings for the given interval
      */
-    public Collection<PersistantMapping> getMappingsFromBam(IntervalRequest request) {
+    public Collection<Mapping> getMappingsFromBam(IntervalRequest request) {
 
-        Collection<PersistantMapping> mappings = new ArrayList<>();
+        Collection<Mapping> mappings = new ArrayList<>();
+        ParametersReadClasses readClassParams = request.getReadClassParams();
 
         try {
             this.checkIndex();
@@ -166,9 +171,10 @@ public class SamBamFileReader implements Observable {
             int start;
             int stop;
             boolean isFwdStrand;
-            Integer classification;
+            Byte classification;
+            MappingClass mappingClass;
             Integer numMappingsForRead;
-            PersistantMapping mapping;
+            Mapping mapping;
             int numReplicates = 1;
             int mappingQuality;
 
@@ -181,19 +187,20 @@ public class SamBamFileReader implements Observable {
 //            start = start < 0 ? 0 : start;
 //            stop = stop >= refSeq.length() ? refSeq.length() : stop;
                     isFwdStrand = !record.getReadNegativeStrandFlag();
-                    classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
+                    classification = Byte.valueOf(record.getAttribute(Properties.TAG_READ_CLASS).toString());
+                    mappingClass = MappingClass.getFeatureType(classification);
                     numMappingsForRead = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
                     mappingQuality = record.getMappingQuality();
 
                     //only add mappings, which are valid according to the read classification parameters
-                    if (this.isIncludedMapping(classification, numMappingsForRead, mappingQuality, request)) {
+                    if (this.isIncludedMapping(mappingClass, numMappingsForRead, mappingQuality, readClassParams)) {
                         
-                        mapping = this.getMappingForValues(classification, numMappingsForRead, numReplicates, id++,
+                        mapping = this.getMappingForValues(mappingClass, numMappingsForRead, id++,
                                 start, stop, isFwdStrand, mappingQuality, record.getBaseQualities());
                         mapping.setAlignmentBlocks(samUtils.getAlignmentBlocks(record.getCigar(), start));
-                        // We must alway check for Diffs and Gaps even if "classification != Properties.PERFECT_COVERAGE"
+                        // We must alway check for Diffs and Gaps even if "classification != MappingClass.PERFECT_MATCH"
                         // because there might still be a split read.
-                        if (request.isDiffsAndGapsNeeded() && classification != Properties.PERFECT_COVERAGE) {
+                        if (this.hasNeededDiffs(request, mappingClass)) {
 
                             //find check alignment via cigar string and add diffs to mapping
                             cigar = record.getCigarString();
@@ -202,7 +209,7 @@ public class SamBamFileReader implements Observable {
                             } else {
                                 refSubSeq = null;
                             }
-                            this.createDiffsAndGaps(record, numReplicates, refSubSeq, mapping);
+                            this.createDiffsAndGaps(record, refSubSeq, mapping);
                         }
 
                         //stuff for trimmed reads
@@ -238,6 +245,19 @@ public class SamBamFileReader implements Observable {
     }
 
     /**
+     * Checks if diffs and gaps are needed and if the mapping contains some.
+     * @param request
+     * @param type
+     * @return true, if diffs and gaps are needed and the mapping contains some,
+     * false otherwise
+     */
+    private boolean hasNeededDiffs(IntervalRequest request, MappingClass type) {
+        return request.isDiffsAndGapsNeeded() 
+                && type != MappingClass.SINGLE_PERFECT_MATCH
+                && type != MappingClass.PERFECT_MATCH;
+    }
+
+    /**
      * Retrieves the reduced mappings from the given interval from the sam or
      * bam file set for this data reader and the reference sequence with the
      * given name. Diffs and gaps are never included.
@@ -246,10 +266,11 @@ public class SamBamFileReader implements Observable {
      * @return the reduced mappings for the given interval. Diffs and gaps are
      * never included.
      */
-    public Collection<PersistantMapping> getReducedMappingsFromBam(IntervalRequest request) {
+    public Collection<Mapping> getReducedMappingsFromBam(IntervalRequest request) {
         int from = request.getTotalFrom();
         int to = request.getTotalTo();
-        Collection<PersistantMapping> mappings = new ArrayList<>();
+        ParametersReadClasses readClassParams = request.getReadClassParams();
+        Collection<Mapping> mappings = new ArrayList<>();
 
         try {
             this.checkIndex();
@@ -258,26 +279,28 @@ public class SamBamFileReader implements Observable {
             SAMRecord record;
             int start;
             int stop;
-            Integer classification;
+            Byte classification;
             Integer numMappingsForRead;
             boolean isFwdStrand;
-            PersistantMapping mapping;
+            Mapping mapping;
+            MappingClass mappingClass;
             int mappingQuality;
 
             while (samRecordIterator.hasNext()) {
                 record = samRecordIterator.next();
                 if (!record.getReadUnmappedFlag()) {
-                    classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
+                    classification = Byte.valueOf(record.getAttribute(Properties.TAG_READ_CLASS).toString());
+                    mappingClass = MappingClass.getFeatureType(classification);
                     numMappingsForRead = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
                     mappingQuality = record.getMappingQuality();
 
                     //only add mappings, which are valid according to the read classification paramters
-                    if (this.isIncludedMapping(classification, numMappingsForRead, mappingQuality, request)) {
+                    if (this.isIncludedMapping(mappingClass, numMappingsForRead, mappingQuality, readClassParams)) {
 
                         start = record.getAlignmentStart();
                         stop = record.getAlignmentEnd();
                         isFwdStrand = !record.getReadNegativeStrandFlag();
-                        mapping = new PersistantMapping(start, stop, isFwdStrand, 1);
+                        mapping = new Mapping(start, stop, isFwdStrand);
                         mappings.add(mapping);
                     }
                 }
@@ -301,12 +324,13 @@ public class SamBamFileReader implements Observable {
      * @param request request to carry out
      * @return the coverage for the given interval
      */
-    public Collection<PersistantReadPairGroup> getReadPairMappingsFromBam(IntervalRequest request) {
-        Map<Long, PersistantReadPairGroup> readPairs = new HashMap<>();
-        Collection<PersistantReadPairGroup> readPairGroups = new ArrayList<>();
+    public Collection<ReadPairGroup> getReadPairMappingsFromBam(IntervalRequest request) {
+        Map<Long, ReadPairGroup> readPairs = new HashMap<>();
+        Collection<ReadPairGroup> readPairGroups = new ArrayList<>();
 
         int from = request.getTotalFrom();
         int to = request.getTotalTo();
+        ParametersReadClasses readClassParams = request.getReadClassParams();
 
         try {
             this.checkIndex();
@@ -319,7 +343,8 @@ public class SamBamFileReader implements Observable {
             int startPos; //in the genome, to get the index: -1
             int stop;
             boolean isFwdStrand;
-            Integer classification;
+            Byte classification;
+            MappingClass mappingClass;
             Integer numMappingsForRead;
             Integer pairId;
             Integer pairType;
@@ -328,52 +353,52 @@ public class SamBamFileReader implements Observable {
             int mateStart;
             int mateStop;
             boolean bothVisible;
-            PersistantMapping mapping;
-            PersistantMapping mate;
-            PersistantReadPairGroup newGroup;
-            int numReplicates = 1;
+            Mapping mapping;
+            Mapping mate;
+            ReadPairGroup newGroup;
             int mappingQuality;
 
             while (samRecordIterator.hasNext()) {
                 record = samRecordIterator.next();
 
                 if (!record.getReadUnmappedFlag()) {
-                    classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
+                    classification = Byte.valueOf(record.getAttribute(Properties.TAG_READ_CLASS).toString());
+                    mappingClass = MappingClass.getFeatureType(classification);
                     numMappingsForRead = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
                     mappingQuality = record.getMappingQuality();
 
-                    if (this.isIncludedMapping(classification, numMappingsForRead, mappingQuality, request)) {
+                    if (this.isIncludedMapping(mappingClass, numMappingsForRead, mappingQuality, readClassParams)) {
 
                         startPos = record.getAlignmentStart();
                         stop = record.getAlignmentEnd();
-//            start = start < 0 ? 0 : start;
-//            stop = stop >= refSeq.length() ? refSeq.length() : stop;
+          //            start = start < 0 ? 0 : start;
+          //            stop = stop >= refSeq.length() ? refSeq.length() : stop;
                         isFwdStrand = !record.getReadNegativeStrandFlag();
                         pairId = (Integer) record.getAttribute(Properties.TAG_READ_PAIR_ID);
                         pairType = (Integer) record.getAttribute(Properties.TAG_READ_PAIR_TYPE);
                         mateStart = record.getMateAlignmentStart();
                         bothVisible = mateStart > from && mateStart < to;
 
-                        mapping = this.getMappingForValues(classification, numMappingsForRead, numReplicates, id++,
+                        mapping = this.getMappingForValues(mappingClass, numMappingsForRead, id++,
                                 startPos, stop, isFwdStrand, mappingQuality, record.getBaseQualities());
                         if (pairId != null && pairType != null) { //since both data fields are always written together
-//                // add new readPair if not exists
+                            // add new readPair if not exists
                             readPairId = pairId;
                             readPairType = ReadPairType.getReadPairType(pairType);
                             if (!readPairs.containsKey(readPairId)) {
-                                newGroup = new PersistantReadPairGroup();
+                                newGroup = new ReadPairGroup();
                                 newGroup.setReadPairId(pairId);
                                 readPairs.put(readPairId, newGroup);
                             } //TODO: check where ids are needed
                             try {
-                                mate = this.getMappingForValues(-1, -1, numReplicates, -1, mateStart, -1, !record.getMateNegativeStrandFlag(), new Byte("0"), new byte[0]);
+                                mate = this.getMappingForValues(MappingClass.COMMON_MATCH, -1, -1, mateStart, -1, !record.getMateNegativeStrandFlag(), new Byte("0"), new byte[0]);
                             } catch (IllegalStateException e) {
-                                mate = this.getMappingForValues(-1, -1, numReplicates, -1, mateStart, -1, true, new Byte("0"), new byte[0]);
+                                mate = this.getMappingForValues(MappingClass.COMMON_MATCH, -1, -1, mateStart, -1, true, new Byte("0"), new byte[0]);
                             } //TODO: get mate data from querried records later
-                            readPairs.get(readPairId).addPersistantDirectAccessMapping(mapping, mate, readPairType, bothVisible);
+                            readPairs.get(readPairId).addPersistentDirectAccessMapping(mapping, mate, readPairType, bothVisible);
                         }
 
-                        if (request.isDiffsAndGapsNeeded() && classification != Properties.PERFECT_COVERAGE) {
+                        if (this.hasNeededDiffs(request, mappingClass)) {
 
                             //check alignment via cigar string and add diffs to mapping
                             cigar = record.getCigarString();
@@ -382,7 +407,7 @@ public class SamBamFileReader implements Observable {
                             } else {
                                 refSubSeq = null;
                             }
-                            this.createDiffsAndGaps(record, numReplicates, refSubSeq, mapping);
+                            this.createDiffsAndGaps(record, refSubSeq, mapping);
                         }
                     }
                 }
@@ -403,7 +428,6 @@ public class SamBamFileReader implements Observable {
      * Creates a mapping for the given classification and mapping data.
      *
      * @param classification the classification data
-     * @param numReplicates number of replicates of the mapping
      * @param id unique id of the mapping
      * @param startPos start position of the mapping
      * @param stop stop position of the mapping
@@ -411,13 +435,12 @@ public class SamBamFileReader implements Observable {
      * @return A new mapping with classification information, if classification
      * is not null. Otherwise isBestMapping is currently always true.
      */
-    private PersistantMapping getMappingForValues(Integer classification, Integer numMappingsForRead, int numReplicates, int id,
+    private Mapping getMappingForValues(MappingClass classification, Integer numMappingsForRead, int id,
             int startPos, int stop, boolean isFwdStrand, int mappingQuality, byte[] baseQualities) {
+        
         int mappingsForRead = numMappingsForRead != null ? numMappingsForRead : -1;
-        boolean isBestMapping = classification != null && (classification == Properties.PERFECT_COVERAGE
-                || (classification == Properties.BEST_MATCH_COVERAGE));
-        return new PersistantMapping(id, startPos, stop, trackId, isFwdStrand, numReplicates, 0, 0,
-                isBestMapping, mappingQuality, baseQualities, mappingsForRead);
+        return new Mapping(id, startPos, stop, trackId, isFwdStrand, 0, 0,
+                classification, mappingQuality, baseQualities, mappingsForRead);
     }
 
     /**
@@ -427,30 +450,27 @@ public class SamBamFileReader implements Observable {
      * @param request the request to carry out
      * @return the coverage for the given interval
      */
-    public CoverageAndDiffResultPersistant getReadStartsFromBam(IntervalRequest request) {
+    public CoverageAndDiffResult getReadStartsFromBam(IntervalRequest request) {
 
-        byte trackNeeded = request.getWhichTrackNeeded();
         int from = request.getTotalFrom();
         int to = request.getTotalTo();
+        ParametersReadClasses readClassParams = request.getReadClassParams();
 
-        PersistantCoverage coverage = new PersistantCoverage(from, to);
-        if (trackNeeded == 0) {
-            coverage.incArraysToIntervalSize();
-        } else if (trackNeeded == PersistantCoverage.TRACK1 || trackNeeded == PersistantCoverage.TRACK2) {
-            coverage.incDoubleTrackArraysToIntervalSize();
-        }
+        CoverageManager coverage = new CoverageManager(from, to);
+        coverage.incArraysToIntervalSize();
 
-        List<PersistantDiff> diffs = new ArrayList<>(); //both empty for read starts
-        List<PersistantReferenceGap> gaps = new ArrayList<>();
+        List<Difference> diffs = new ArrayList<>(); //both empty for read starts
+        List<ReferenceGap> gaps = new ArrayList<>();
 
-        CoverageAndDiffResultPersistant result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, request);
+        CoverageAndDiffResult result = new CoverageAndDiffResult(coverage, diffs, gaps, request);
         try {
             this.checkIndex();
             SAMRecordIterator samRecordIterator = samFileReader.query(reference.getChromosome(request.getChromId()).getName(), from, to, false);
 
             SAMRecord record;
             boolean isFwdStrand;
-            Integer classification;
+            Byte classification;
+            MappingClass mappingClass;
             Integer numMappingsForRead;
             int startPos; //in the genome, to get the index: -1
             int mappingQuality;
@@ -458,26 +478,27 @@ public class SamBamFileReader implements Observable {
                 record = samRecordIterator.next();
 
                 if (!record.getReadUnmappedFlag()) {
-                    classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
+                    classification = Byte.valueOf(record.getAttribute(Properties.TAG_READ_CLASS).toString());
+                    mappingClass = MappingClass.getFeatureType(classification);
                     numMappingsForRead = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
                     mappingQuality = record.getMappingQuality();
 
-                    if (this.isIncludedMapping(classification, numMappingsForRead, mappingQuality, request)) {
+                    if (this.isIncludedMapping(mappingClass, numMappingsForRead, mappingQuality, readClassParams)) {
 
-                        if (request.getReadClassParams().isStrandBothOption()) {
-                            isFwdStrand = request.getReadClassParams().isStrandBothFwdOption();
+                        if (readClassParams.isStrandBothOption()) {
+                            isFwdStrand = readClassParams.isStrandBothFwdOption();
                         } else {
                             isFwdStrand = !record.getReadNegativeStrandFlag();
                         }
                         startPos = isFwdStrand ? record.getAlignmentStart() : record.getAlignmentEnd();
 
-                            this.increaseCoverage(request, classification,
-                                    trackNeeded, isFwdStrand, startPos, startPos, coverage);
+                            this.increaseCoverage(mappingClass, isFwdStrand, 
+                                    startPos, startPos, coverage);
                         }
                     }
                 }
             samRecordIterator.close();
-            result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, request);
+            result = new CoverageAndDiffResult(coverage, diffs, gaps, request);
 
         } catch (NullPointerException | IllegalArgumentException | SAMException | ArrayIndexOutOfBoundsException e) {
             this.notifyObservers(e);
@@ -495,27 +516,23 @@ public class SamBamFileReader implements Observable {
      * @param request the request to carry out
      * @return the coverage for the given interval
      */
-    public CoverageAndDiffResultPersistant getCoverageAndReadStartsFromBam(IntervalRequest request) {
+    public CoverageAndDiffResult getCoverageAndReadStartsFromBam(IntervalRequest request) {
 
         byte trackNeeded = request.getWhichTrackNeeded();
         int from = request.getTotalFrom();
         int to = request.getTotalTo();
+        ParametersReadClasses readClassParams = request.getReadClassParams();
+        
+        CoverageManager coverage = new CoverageManager(from, to);
+        CoverageManager readStarts = new CoverageManager(from, to);
+        coverage.incArraysToIntervalSize();
+        readStarts.incArraysToIntervalSize();
 
-        PersistantCoverage coverage = new PersistantCoverage(from, to);
-        PersistantCoverage readStarts = new PersistantCoverage(from, to);
-        if (trackNeeded == 0) {
-            coverage.incArraysToIntervalSize();
-            readStarts.incArraysToIntervalSize();
-        } else if (trackNeeded == PersistantCoverage.TRACK1 || trackNeeded == PersistantCoverage.TRACK2) {
-            coverage.incDoubleTrackArraysToIntervalSize();
-            readStarts.incDoubleTrackArraysToIntervalSize();
-        }
+        List<Difference> diffs = new ArrayList<>();
+        List<ReferenceGap> gaps = new ArrayList<>();
+        DiffAndGapResult diffsAndGaps;
 
-        List<PersistantDiff> diffs = new ArrayList<>();
-        List<PersistantReferenceGap> gaps = new ArrayList<>();
-        PersistantDiffAndGapResult diffsAndGaps;
-
-        CoverageAndDiffResultPersistant result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, request);
+        CoverageAndDiffResult result = new CoverageAndDiffResult(coverage, diffs, gaps, request);
         try {
             this.checkIndex();
 
@@ -523,7 +540,8 @@ public class SamBamFileReader implements Observable {
 
             SAMRecord record;
             boolean isFwdStrand;
-            Integer classification;
+            Byte classification;
+            MappingClass mappingClass;
             Integer numMappingsForRead;
             int startPos; //in the genome, to get the index: -1
             int stop;
@@ -532,16 +550,17 @@ public class SamBamFileReader implements Observable {
                 record = samRecordIterator.next();
 
                 if (!record.getReadUnmappedFlag()) {
-                    classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
+                    classification = Byte.valueOf(record.getAttribute(Properties.TAG_READ_CLASS).toString());
+                    mappingClass = MappingClass.getFeatureType(classification);
                     numMappingsForRead = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
                     mappingQuality = record.getMappingQuality();
 
-                    if (this.isIncludedMapping(classification, numMappingsForRead, mappingQuality, request)) {
+                    if (this.isIncludedMapping(mappingClass, numMappingsForRead, mappingQuality, readClassParams)) {
 
-                        if (request.getReadClassParams().isStrandBothOption()) {
-                            isFwdStrand = request.getReadClassParams().isStrandBothFwdOption();
+                        if (readClassParams.isStrandBothOption()) {
+                            isFwdStrand = readClassParams.isStrandBothFwdOption();
                         } else {
-                            if (request.getReadClassParams().isStrandOppositeOption()) {
+                            if (readClassParams.isStrandOppositeOption()) {
                                 isFwdStrand = record.getReadNegativeStrandFlag();
                             } else {
                                 isFwdStrand = !record.getReadNegativeStrandFlag();
@@ -550,27 +569,27 @@ public class SamBamFileReader implements Observable {
 
                         // add read start
                         startPos = isFwdStrand ? record.getAlignmentStart() : record.getAlignmentEnd();
-                        if (request.getReadClassParams().isStrandBothOption()) {
-                            isFwdStrand = request.getReadClassParams().isStrandBothFwdOption();
+                        if (readClassParams.isStrandBothOption()) {
+                            isFwdStrand = readClassParams.isStrandBothFwdOption();
                         } else {
                             isFwdStrand = !record.getReadNegativeStrandFlag();
                         }
-                        this.increaseCoverage(request, classification,
-                                trackNeeded, isFwdStrand, startPos, startPos, readStarts);
+                        
+                        this.increaseCoverage(mappingClass, isFwdStrand, 
+                                startPos, startPos, readStarts);
                         
                         //This enables us to handle split reads correctly.
                         startPos = record.getAlignmentStart();
                         isFwdStrand = !record.getReadNegativeStrandFlag();
                         List<SamAlignmentBlock> alignmentBlocks = samUtils.getAlignmentBlocks(record.getCigar(), startPos);
                         for (SamAlignmentBlock block : alignmentBlocks) {
-                            this.increaseCoverage(request, classification, trackNeeded,
-                                    isFwdStrand, block.getRefStart(), block.getRefStop(), coverage);
+                            this.increaseCoverage(mappingClass, isFwdStrand,
+                                    block.getRefStart(), block.getRefStop(), coverage);
                         }
 
-                        if (request.isDiffsAndGapsNeeded() && classification != Properties.PERFECT_COVERAGE
-                                && request.getReadClassParams().isClassificationAllowed(classification)) {
+                        if (this.hasNeededDiffs(request, mappingClass)) {
                             stop = record.getAlignmentEnd();
-                            diffsAndGaps = this.createDiffsAndGaps(record, 1,
+                            diffsAndGaps = this.createDiffsAndGaps(record,
                                     reference.getChromSequence(request.getChromId(), startPos, stop), null);
                             diffs.addAll(diffsAndGaps.getDiffs());
                             gaps.addAll(diffsAndGaps.getGaps());
@@ -579,7 +598,7 @@ public class SamBamFileReader implements Observable {
                 }
             }
             samRecordIterator.close();
-            result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, request);
+            result = new CoverageAndDiffResult(coverage, diffs, gaps, request);
             result.setReadStarts(readStarts);
 
         } catch (NullPointerException | NumberFormatException | SAMException | ArrayIndexOutOfBoundsException e) {
@@ -598,24 +617,20 @@ public class SamBamFileReader implements Observable {
      * @param request the request to carry out
      * @return the coverage for the given interval
      */
-    public CoverageAndDiffResultPersistant getCoverageFromBam(IntervalRequest request) {
-
-        byte trackNeeded = request.getWhichTrackNeeded();
+    public CoverageAndDiffResult getCoverageFromBam(IntervalRequest request) {
+//        startTime = System.currentTimeMillis();
         int from = request.getTotalFrom();
         int to = request.getTotalTo();
+        ParametersReadClasses readClassParams = request.getReadClassParams();
 
-        PersistantCoverage coverage = new PersistantCoverage(from, to);
-        if (trackNeeded == 0) {
-            coverage.incArraysToIntervalSize();
-        } else if (trackNeeded == PersistantCoverage.TRACK1 || trackNeeded == PersistantCoverage.TRACK2) {
-            coverage.incDoubleTrackArraysToIntervalSize();
-        }
+        CoverageManager coverage = new CoverageManager(from, to);
+        coverage.incArraysToIntervalSize();
 
-        List<PersistantDiff> diffs = new ArrayList<>();
-        List<PersistantReferenceGap> gaps = new ArrayList<>();
-        PersistantDiffAndGapResult diffsAndGaps;
+        List<Difference> diffs = new ArrayList<>();
+        List<ReferenceGap> gaps = new ArrayList<>();
+        DiffAndGapResult diffsAndGaps;
 
-        CoverageAndDiffResultPersistant result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, request);
+        CoverageAndDiffResult result = new CoverageAndDiffResult(coverage, diffs, gaps, request);
         try {
             this.checkIndex();
 
@@ -623,7 +638,8 @@ public class SamBamFileReader implements Observable {
 
             SAMRecord record;
             boolean isFwdStrand;
-            Integer classification;
+            Byte classification;
+            MappingClass mappingClass;
             Integer numMappingsForRead;
             int startPos; //in the genome, to get the index: -1
             int stop;
@@ -632,23 +648,24 @@ public class SamBamFileReader implements Observable {
                 record = samRecordIterator.next();
 
                 if (!record.getReadUnmappedFlag()) {
-                    classification = (Integer) record.getAttribute(Properties.TAG_READ_CLASS);
+                    classification = Byte.valueOf(record.getAttribute(Properties.TAG_READ_CLASS).toString());
+                    mappingClass = MappingClass.getFeatureType(classification);
                     numMappingsForRead = (Integer) record.getAttribute(Properties.TAG_MAP_COUNT);
                     mappingQuality = record.getMappingQuality();
 
-                    if (this.isIncludedMapping(classification, numMappingsForRead, mappingQuality, request)) {
+                    if (this.isIncludedMapping(mappingClass, numMappingsForRead, mappingQuality, readClassParams)) {
                         isFwdStrand = !record.getReadNegativeStrandFlag();
                         //This enables us to handle split reads correctly.
                         startPos = record.getAlignmentStart();
                         List<SamAlignmentBlock> alignmentBlocks = samUtils.getAlignmentBlocks(record.getCigar(), startPos);
                         for (SamAlignmentBlock block : alignmentBlocks) {
-                            this.increaseCoverage(request, classification, trackNeeded,
-                                    isFwdStrand, block.getRefStart(), block.getRefStop(), coverage);
+                            this.increaseCoverage(mappingClass, isFwdStrand, 
+                                    block.getRefStart(), block.getRefStop(), coverage);
                         }
 
-                        if (request.isDiffsAndGapsNeeded() && classification != Properties.PERFECT_COVERAGE) {
+                        if (this.hasNeededDiffs(request, mappingClass)) {
                             stop = record.getAlignmentEnd();
-                            diffsAndGaps = this.createDiffsAndGaps(record, 1,
+                            diffsAndGaps = this.createDiffsAndGaps(record,
                                     reference.getChromSequence(request.getChromId(), startPos, stop), null);
                             diffs.addAll(diffsAndGaps.getDiffs());
                             gaps.addAll(diffsAndGaps.getGaps());
@@ -657,91 +674,36 @@ public class SamBamFileReader implements Observable {
                 }
             }
             samRecordIterator.close();
-            result = new CoverageAndDiffResultPersistant(coverage, diffs, gaps, request);
+            result = new CoverageAndDiffResult(coverage, diffs, gaps, request);
 
         } catch (NullPointerException | NumberFormatException | SAMException | ArrayIndexOutOfBoundsException e) {
             this.notifyObservers(e);
         } catch (BufferUnderflowException e) {
             //do nothing
         }
+//        finish = System.currentTimeMillis(); //for performance testing
+//        System.out.println(Benchmark.calculateDuration(startTime, finish, "get coverage "));
+//        System.out.println("start: " + request.getTotalFrom() + ", stop: " + request.getTotalTo());
+//        startTime = System.currentTimeMillis();
 
         return result;
     }
 
     /**
-     * Increases the coverage between the given start and stop position for all
-     * mappings, that fulfill the wanted parameters and adds the coverage to the
-     * needed arrays (indicated by the "trackNeeded" parameter).
-     *
-     * @param request
-     * @param numMappingsForRead
-     * @param classification
-     * @param trackNeeded
-     * @param isFwdStrand
-     * @param startPos
-     * @param stopPos
+     * Increases the coverage between the given start and stop position in the
+     * given coverageManager for the given mapping class and strand.
+     * @param mappingClass mapping class of the current mapping
+     * @param isFwdStrand true, if the mapping is on the fwd strand, false
+     * otherwise
+     * @param startPos start position of the mapping
+     * @param stopPos stop position of the mapping
+     * @param covManager The coverage manager containing the coverage to increase
      */
-    private void increaseCoverage(IntervalRequest request, Integer classification,
-            byte trackNeeded, boolean isFwdStrand, int startPos, int stopPos, PersistantCoverage coverage) {
+    private void increaseCoverage(MappingClass mappingClass, boolean isFwdStrand, 
+            int startPos, int stopPos, CoverageManager covManager) {
 
-        List<int[]> coverageArrays = new ArrayList<>();
-
-        if (trackNeeded == 0) {
-            //only the arrays, which are allowed to be updated are added to the coverage array list
-
-            if (classification != null) {
-                if (classification == Properties.PERFECT_COVERAGE) {
-
-                    if (isFwdStrand) {
-                        if (request.getReadClassParams().isPerfectMatchUsed()) {
-                            coverageArrays.add(coverage.getPerfectFwd());
-                        }
-                        if (request.getReadClassParams().isBestMatchUsed()) {
-                            coverageArrays.add(coverage.getBestMatchFwd());
-                        }
-                    } else {
-                        if (request.getReadClassParams().isPerfectMatchUsed()) {
-                            coverageArrays.add(coverage.getPerfectRev());
-                        }
-                        if (request.getReadClassParams().isBestMatchUsed()) {
-                            coverageArrays.add(coverage.getBestMatchRev());
-                        }
-                    }
-                }
-
-                if ((classification == Properties.BEST_MATCH_COVERAGE)
-                        && request.getReadClassParams().isBestMatchUsed()) {
-
-                    if (isFwdStrand) {
-                        coverageArrays.add(coverage.getBestMatchFwd());
-                    } else {
-                        coverageArrays.add(coverage.getBestMatchRev());
-                    }
-                }
-            }
-
-            if (request.getReadClassParams().isCommonMatchUsed()) {
-                if (isFwdStrand) {
-                    coverageArrays.add(coverage.getCommonFwd());
-                } else {
-                    coverageArrays.add(coverage.getCommonRev());
-                }
-            }
-
-        } else if (trackNeeded == PersistantCoverage.TRACK1) {
-            if (isFwdStrand) {
-                coverageArrays.add(coverage.getCommonFwdCovTrack1());
-            } else {
-                coverageArrays.add(coverage.getCommonRevCovTrack1());
-            }
-        } else if (trackNeeded == PersistantCoverage.TRACK2) {
-            if (isFwdStrand) {
-                coverageArrays.add(coverage.getCommonFwdCovTrack2());
-            } else {
-                coverageArrays.add(coverage.getCommonRevCovTrack2());
-            }
-        }
-        coverage.increaseCoverage(startPos, stopPos, coverageArrays);
+        int[] coverageArray = covManager.getCoverage(mappingClass).getCoverage(isFwdStrand);
+        covManager.increaseCoverage(startPos, stopPos, coverageArray);
     }
 
     /**
@@ -750,7 +712,6 @@ public class SamBamFileReader implements Observable {
      * in the cigar, then the reference sequence can be null (it is not used in
      * this case). If the mapping is also handed over to the method, the diffs
      * and gaps are stored directly in the mapping.
-     *
      * @param cigar the cigar string containing the alignment operations
      * @param start the start position of the alignment on the chromosome
      * @param readSeq the read sequence belonging to the cigar and without gaps
@@ -759,15 +720,15 @@ public class SamBamFileReader implements Observable {
      * @param mapping if a mapping is handed over to the method it adds the
      * diffs and gaps directly to the mapping and updates it's number of
      * differences to the reference. If null is passed, only the
-     * PersistantDiffAndGapResult contains all the diff and gap data.
-     * @return PersistantDiffAndGapResult containing all the diffs and gaps
+     * DiffAndGapResult contains all the diff and gap data.
+     * @return DiffAndGapResult containing all the diffs and gaps
      */
-    private PersistantDiffAndGapResult createDiffsAndGaps(SAMRecord record, int nbReplicates,
-            String refSeq, PersistantMapping mapping) throws NumberFormatException {
+    private DiffAndGapResult createDiffsAndGaps(SAMRecord record, String refSeq, 
+            Mapping mapping) throws NumberFormatException {
 
         Map<Integer, Integer> gapOrderIndex = new HashMap<>();
-        List<PersistantDiff> diffs = new ArrayList<>();
-        List<PersistantReferenceGap> gaps = new ArrayList<>();
+        List<Difference> diffs = new ArrayList<>();
+        List<ReferenceGap> gaps = new ArrayList<>();
         int differences = 0;
         String cigar = record.getCigarString();
         String readSeq = record.getReadString();
@@ -802,7 +763,7 @@ public class SamBamFileReader implements Observable {
                                 base = SequenceUtils.getDnaComplement(base);
                             }
                             baseQuality = baseQualities.length == 0 ? -1 : baseQualities[j];
-                            PersistantDiff d = new PersistantDiff(refPos + j + start, base, isFwdStrand, nbReplicates, baseQuality, mappingQuality);
+                            Difference d = new Difference(refPos + j + start, base, isFwdStrand, 1, baseQuality, mappingQuality);
                             this.addDiff(mapping, diffs, d);
                         }
                     }
@@ -823,7 +784,7 @@ public class SamBamFileReader implements Observable {
                             base = SequenceUtils.getDnaComplement(base);
                         }
                         baseQuality = baseQualities.length == 0 ? -1 : baseQualities[j];
-                        PersistantDiff d = new PersistantDiff(refPos + j + start, base, isFwdStrand, nbReplicates, baseQuality, mappingQuality);
+                        Difference d = new Difference(refPos + j + start, base, isFwdStrand, 1, baseQuality, mappingQuality);
                         this.addDiff(mapping, diffs, d);
 
                     }
@@ -835,7 +796,7 @@ public class SamBamFileReader implements Observable {
                     differences += currentCount;
                     for (int j = 0; j < currentCount; ++j) {
                         baseQuality = baseQualities.length == 0 ? -1 : baseQualities[j];
-                        PersistantDiff d = new PersistantDiff(refPos + j + start, '_', isFwdStrand, nbReplicates, baseQuality, mappingQuality);
+                        Difference d = new Difference(refPos + j + start, '-', isFwdStrand, 1, baseQuality, mappingQuality);
                         this.addDiff(mapping, diffs, d);
                     }
                     refPos += currentCount;
@@ -850,9 +811,9 @@ public class SamBamFileReader implements Observable {
                             base = SequenceUtils.getDnaComplement(base);
                         }
                         baseQuality = baseQualities.length == 0 ? -1 : baseQualities[j];
-                        PersistantReferenceGap gap = new PersistantReferenceGap(refPos + start, base,
+                        ReferenceGap gap = new ReferenceGap(refPos + start, base,
                                 CommonsMappingParser.getOrderForGap(refPos + start, gapOrderIndex),
-                                isFwdStrand, nbReplicates, baseQuality, mappingQuality);
+                                isFwdStrand, 1, baseQuality, mappingQuality);
                         if (mapping != null) {
                             mapping.addGenomeGap(gap);
                         } else {
@@ -881,7 +842,7 @@ public class SamBamFileReader implements Observable {
             mapping.setDifferences(differences);
         }
 
-        return new PersistantDiffAndGapResult(diffs, gaps, gapOrderIndex, differences);
+        return new DiffAndGapResult(diffs, gaps, gapOrderIndex, differences);
     }
 
     /**
@@ -892,7 +853,7 @@ public class SamBamFileReader implements Observable {
      * @param diffs the diffs list to which the diff shall be added.
      * @param diff the diff to add
      */
-    private void addDiff(PersistantMapping mapping, List<PersistantDiff> diffs, PersistantDiff diff) {
+    private void addDiff(Mapping mapping, List<Difference> diffs, Difference diff) {
         if (mapping != null) {
             mapping.addDiff(diff);
         } else {
@@ -928,16 +889,18 @@ public class SamBamFileReader implements Observable {
      * Checks if the classification is valid according to the read class
      * parameters contained in the interval request.
      * @param classification the classification to check
-     * @param request the request whose parameters are used
+     * @param readClassParams the request whose parameters are used
      * @return true, if the mapping can be included in further steps, false
      * otherwise
      */
-    private boolean isIncludedMapping(Integer classification, Integer numMappingsForRead, int mappingQuality, IntervalRequest request) {
-        return (!request.getReadClassParams().isOnlyUniqueReads()
-                || request.getReadClassParams().isOnlyUniqueReads() && numMappingsForRead != null && numMappingsForRead == 1)
+    private boolean isIncludedMapping(MappingClass mappingClass, Integer numMappingsForRead, int mappingQuality, ParametersReadClasses readClassParams) {
+        boolean isIncludedMapping = (readClassParams.isClassificationAllowed(FeatureType.MULTIPLE_MAPPED_READ)
+                || !readClassParams.isClassificationAllowed(FeatureType.MULTIPLE_MAPPED_READ) && numMappingsForRead != null && numMappingsForRead == 1)
                 && (mappingQuality == UNKNOWN_MAP_QUAL
-                || mappingQuality > request.getReadClassParams().getMinMappingQual())
-                && (classification != null && request.getReadClassParams().isClassificationAllowed(classification)
-                || classification == null && request.getReadClassParams().isCommonMatchUsed());
+                || mappingQuality >= readClassParams.getMinMappingQual());
+        if (isIncludedMapping) {
+                isIncludedMapping = readClassParams.isClassificationAllowed(mappingClass);
+        }
+        return isIncludedMapping;
     }
 }

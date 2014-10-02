@@ -323,16 +323,7 @@ public class GeneralUtils {
      * @param number
      * @return a good readable string representation of the given number
      */
-    public static String formatNumber(Integer number) {
-        return NumberFormat.getInstance().format( number );
-    }
-    
-    /**
-     * format a number to show it to the user
-     * @param number
-     * @return a good readable string representation of the given number
-     */
-    public static String formatNumber(Long number) {
+    public static String formatNumber(Number number) {
         return NumberFormat.getInstance().format( number );
     }
     

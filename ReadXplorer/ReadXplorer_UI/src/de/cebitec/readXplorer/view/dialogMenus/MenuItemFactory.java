@@ -17,10 +17,10 @@
 package de.cebitec.readXplorer.view.dialogMenus;
 
 import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.parser.output.OutputParser;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.parser.output.OutputWriter;
 import de.cebitec.readXplorer.util.CodonUtilities;
-import de.cebitec.readXplorer.util.fileChooser.FastaFileChooser;
+import de.cebitec.readXplorer.util.fileChooser.StoreStringFileChooser;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.Region;
 import java.awt.Toolkit;
@@ -123,7 +123,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
      *                it contains the header information, but not the sequence
      * @return The JMenuItem for storing a sequence in fasta format
      */
-    public JMenuItem getStoreFastaItem(final String sequence, final String refName, final PersistantFeature feature){
+    public JMenuItem getStoreFastaItem(final String sequence, final String refName, final PersistentFeature feature){
         String title = NbBundle.getMessage(MenuItemFactory.class, "MenuItem.StoreFasta");
         return this.initStoreFastaItem(title, sequence, refName, feature, -1, -1);
 
@@ -139,7 +139,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
      * @return The JMenuItem for storing the translation of a DNA sequence of a
      * reference feature in fasta format.
      */
-    public JMenuItem getStoreTranslatedFeatureFastaItem(final String dnaSeqToTranslateAndStore,final String refName, final PersistantFeature feature){
+    public JMenuItem getStoreTranslatedFeatureFastaItem(final String dnaSeqToTranslateAndStore,final String refName, final PersistentFeature feature){
          GeneticCode code = CodonUtilities.getGeneticCode();
          String translatedSequence = code.getTranslationForString(dnaSeqToTranslateAndStore);
          String title = NbBundle.getMessage(MenuItemFactory.class, "MenuItem.StoreTranslatedFasta");
@@ -193,7 +193,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
      * @param seqEnd the endpoint of the sequence (-1 if feature is used!)
      * @return a menu item capable of storing a sequence in fasta format
      */
-    private JMenuItem initStoreFastaItem(String title,final String sequence, final String refName, final PersistantFeature feature,
+    private JMenuItem initStoreFastaItem(String title,final String sequence, final String refName, final PersistentFeature feature,
             final int seqStart, final int seqEnd) {
         
         JMenuItem storeFastaItem = new JMenuItem(title);
@@ -206,9 +206,9 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
                     output = this.generateFastaFromFeature();
                 } else {
                     String header = "Copied sequence from: " + refName + " position " + seqStart + " to " + seqEnd;
-                    output = OutputParser.generateFasta(sequence, header);
+                    output = OutputWriter.generateFasta(sequence, header);
                 }
-                new FastaFileChooser(new String[]{"fasta"}, "fasta", output);
+                new StoreStringFileChooser(new String[]{"fasta"}, "fasta", output);
             }
 
             /**
@@ -219,7 +219,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
                 String locus = feature.getLocus() != null ? feature.getLocus() : "no locus";
                 String product = feature.getProduct() != null ? feature.getProduct() : "no product";
 
-                return OutputParser.generateFasta(sequence, ecNumber, locus, product);
+                return OutputWriter.generateFasta(sequence, ecNumber, locus, product);
             }
         });
         
@@ -251,9 +251,9 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
                             + " to " + regions.get(i).getStop()
                             + ", Length: " + length 
                             + "bp, Amino Acids: " + length / 3;
-                    output += OutputParser.generateFasta(sequencesToStore.get(i), header);
+                    output += OutputWriter.generateFasta(sequencesToStore.get(i), header);
                 }
-                new FastaFileChooser(new String[]{"fasta"}, "fasta", output);
+                new StoreStringFileChooser(new String[]{"fasta"}, "fasta", output);
             }
         });
         return storeFastaCdsItem;

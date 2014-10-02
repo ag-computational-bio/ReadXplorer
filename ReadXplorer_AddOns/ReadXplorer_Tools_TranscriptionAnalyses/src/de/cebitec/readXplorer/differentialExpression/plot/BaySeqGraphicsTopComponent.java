@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression.plot;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.differentialExpression.BaySeq;
 import de.cebitec.readXplorer.differentialExpression.BaySeqAnalysisHandler;
 import de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler;
@@ -89,8 +89,8 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended imple
     private BaySeqAnalysisHandler baySeqAnalysisHandler;
     private JSVGCanvas svgCanvas;
     private ComboBoxModel<BaySeqAnalysisHandler.Plot> cbm;
-    private DefaultListModel<PersistantTrack> samplesA = new DefaultListModel<>();
-    private DefaultListModel<PersistantTrack> samplesB = new DefaultListModel<>();
+    private DefaultListModel<PersistentTrack> samplesA = new DefaultListModel<>();
+    private DefaultListModel<PersistentTrack> samplesB = new DefaultListModel<>();
     private File currentlyDisplayed;
     private ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Creating plot");
     private ResultDeAnalysis result;
@@ -152,11 +152,11 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended imple
     private void addResults() {
         List<Group> groups = baySeqAnalysisHandler.getGroups();
         groupComboBox.setModel(new DefaultComboBoxModel(groups.toArray()));
-        List<PersistantTrack> tracks = baySeqAnalysisHandler.getSelectedTracks();
-        for (Iterator<PersistantTrack> it = tracks.iterator(); it.hasNext();) {
-            PersistantTrack persistantTrack = it.next();
-            samplesA.addElement(persistantTrack);
-            samplesB.addElement(persistantTrack);
+        List<PersistentTrack> tracks = baySeqAnalysisHandler.getSelectedTracks();
+        for (Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext();) {
+            PersistentTrack persistentTrack = it.next();
+            samplesA.addElement(persistentTrack);
+            samplesB.addElement(persistentTrack);
         }
     }
 
@@ -401,7 +401,7 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended imple
             } else {
                 chartPanel = CreatePlots.createInfPlot(
                         ConvertData.createMAvalues(result, DeAnalysisHandler.Tool.BaySeq, sampleA.toArray(new Integer[sampleA.size()]),
-                        sampleB.toArray(new Integer[sampleB.size()])), "A", "M", new ToolTip());
+                        sampleB.toArray(new Integer[sampleB.size()])), "A ((log(baseMeanA)/log(2)) + (log(baseMeanB)/log(2)))/2", "M (log(baseMeanA)/log(2)) - (log(baseMeanB)/log(2))", new ToolTip());
                 if (SVGCanvasActive) {
                     jPanel1.remove(svgCanvas);
                     SVGCanvasActive = false;
@@ -538,7 +538,6 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended imple
             samplesBList.setEnabled(false);
             samplesBLabel.setEnabled(false);
             groupComboBox.setEnabled(true);
-            iSymbol.setVisible(true);
         }
         if (item == BaySeqAnalysisHandler.Plot.Posteriors) {
             samplesAList.setEnabled(true);
@@ -546,8 +545,8 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended imple
             samplesBList.setEnabled(true);
             samplesBLabel.setEnabled(true);
             groupComboBox.setEnabled(true);
-            iSymbol.setVisible(false);
         }
+        iSymbol.setVisible(item == BaySeqAnalysisHandler.Plot.MACD);
     }
 }
 

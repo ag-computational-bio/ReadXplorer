@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.util.polyTree;
 
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.util.ArrayList;
 import java.util.List;
 

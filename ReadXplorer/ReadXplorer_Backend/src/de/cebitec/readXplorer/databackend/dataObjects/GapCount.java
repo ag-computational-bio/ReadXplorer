@@ -68,7 +68,7 @@ public class GapCount {
      * the gap is of course taken into consideration.
      * @param gap the gap whose base count shall be added
      */
-    public void incCountFor(PersistantReferenceGap gap) {
+    public void incCountFor(ReferenceGap gap) {
         while (gapOrderCount.size() <= gap.getOrder()) {
             gapOrderCount.add(new int[NO_BASES][NO_VALUES]);
         }

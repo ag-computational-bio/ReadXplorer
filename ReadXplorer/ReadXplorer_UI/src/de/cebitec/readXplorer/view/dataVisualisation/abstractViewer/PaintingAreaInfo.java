@@ -16,13 +16,11 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
 
-import java.awt.geom.Point2D;
-
 /**
  * Contains useful info about a painting area, such as heights, widths,
  * left and right end positions.
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class PaintingAreaInfo {
 
@@ -40,49 +38,86 @@ public class PaintingAreaInfo {
 
     private int completeHeight;
 
+    /**
+     * Contains useful info about a painting area, such as heights, widths, left
+     * and right end positions.
+     */
+    public PaintingAreaInfo() {
 
-    public PaintingAreaInfo(){
-        
     }
 
-    @Override
-    public String toString(){
-        StringBuilder sb = new StringBuilder();
-        sb.append("left: ").append(phyLeft).append("\n");
-        sb.append("right: ").append(phyRight).append("\n");
-        sb.append("width: ").append(phyWidth).append("\n");
-        sb.append("fwHigh: ").append(forwardHigh).append("\n");
-        sb.append("fwLow: ").append(forwardLow).append("\n");
-        sb.append("fwHght: ").append(availableForwardHeight).append("\n");
-        sb.append("rvLow: ").append(reverseLow).append("\n");
-        sb.append("rvHigh: ").append(reverseHigh).append("\n");
-        sb.append("rvHght: ").append(availableReverseHeight).append("\n");
-        sb.append("compl. Hght: ").append(completeHeight);
-
-        return sb.toString();
-    }
-
+    /**
+     * @return Highest pixel on the y-axis available for painting
+     * something belonging to the forward strand.
+     */
     public int getForwardHigh() {
         return forwardHigh;
     }
 
+    /**
+     * @param forwardHigh Highest pixel on the y-axis available for painting
+     * something belonging to the forward strand.
+     */
     public void setForwardHigh(int forwardHigh) {
         this.forwardHigh = forwardHigh;
         updateAvailableForwardHeight();
         updateCompleteHeight();
     }
 
-    private void updateCompleteHeight(){
-        completeHeight = reverseHigh - forwardHigh +1;
-    }
-
+    /**
+     * @return Lowest pixel on the y-axis available for painting something
+     * belonging to the fwd strand.
+     */
     public int getForwardLow() {
         return forwardLow;
     }
 
+    /**
+     * @param forwardLow The lowest pixel on the y-axis available for painting
+     * something belonging to the fwd strand.
+     */
     public void setForwardLow(int forwardLow) {
         this.forwardLow = forwardLow;
         updateAvailableForwardHeight();
+    }
+    
+    /**
+     * @return Lowest pixel on the y-axis available for painting something
+     * belonging to the reverse strand.
+     */
+    public int getReverseLow() {
+        return reverseLow;
+    }
+
+    /**
+     * @param reverseLow The lowest pixel on the y-axis available for painting
+     * something belonging to the reverse strand.
+     */
+    public void setReverseLow(int reverseLow) {
+        this.reverseLow = reverseLow;
+        updateAvailableReverseHeight();
+    }
+
+    /**
+     * @return Highest pixel on the y-axis available for painting something
+     * belonging to the reverse strand.
+     */
+    public int getReverseHigh() {
+        return reverseHigh;
+    }
+
+    /**
+     * @param reverseHigh Highest pixel on the y-axis available for painting
+     * something belonging to the reverse strand.
+     */
+    public void setReverseHigh(int reverseHigh) {
+        this.reverseHigh = reverseHigh;
+        updateAvailableReverseHeight();
+        updateCompleteHeight();
+    }
+
+    private void updateCompleteHeight() {
+        completeHeight = reverseHigh - forwardHigh + 1;
     }
 
     /**
@@ -93,8 +128,8 @@ public class PaintingAreaInfo {
     }
 
     /**
-     * Sets the left physical boundary (pixel) in the painting area and recalculates
-     * the width.
+     * Sets the left physical boundary (pixel) in the painting area and
+     * recalculates the width.
      * @param phyLeft left physical boundary (pixel) of the painting area
      */
     public void setPhyLeft(int phyLeft) {
@@ -110,8 +145,8 @@ public class PaintingAreaInfo {
     }
 
     /**
-     * Sets the right physical boundary (pixel) of the painting area and recalculates
-     * the width.
+     * Sets the right physical boundary (pixel) of the painting area and
+     * recalculates the width.
      * @param phyRight right physical boundary (pixel) of the painting area
      */
     public void setPhyRight(int phyRight) {
@@ -126,90 +161,105 @@ public class PaintingAreaInfo {
         return phyWidth;
     }
 
-    public int getReverseLow() {
-        return reverseLow;
-    }
-
-    public void setReverseLow(int reverseLow) {
-        this.reverseLow = reverseLow;
-        updateAvailableReverseHeight();
-    }
-
-    public int getReverseHigh() {
-        return reverseHigh;
-    }
-
-    public void setReverseHigh(int reverseHigh) {
-        this.reverseHigh = reverseHigh;
-        updateAvailableReverseHeight();
-        updateCompleteHeight();
-    }
-
     /**
      * Recalculates the physical width (pixel) of the painting area
      */
-    private void recalcWidth(){
-        this.phyWidth = phyRight - phyLeft +1;
+    private void recalcWidth() {
+        this.phyWidth = phyRight - phyLeft + 1;
     }
 
-    private void updateAvailableForwardHeight(){
-        availableForwardHeight = forwardLow - forwardHigh +1;
-    }
-    
-    private void updateAvailableReverseHeight(){
-        availableReverseHeight = reverseHigh - reverseLow +1;
+    private void updateAvailableForwardHeight() {
+        availableForwardHeight = forwardLow - forwardHigh + 1;
     }
 
+    private void updateAvailableReverseHeight() {
+        availableReverseHeight = reverseHigh - reverseLow + 1;
+    }
+
+    /**
+     * @return The total height available for painting on the forward strand in
+     * pixels.
+     */
     public int getAvailableForwardHeight() {
         return availableForwardHeight;
     }
 
+    /**
+     * @return The total height available for painting on the reverse strand in 
+     * pixels.
+     */
     public int getAvailableReverseHeight() {
         return availableReverseHeight;
     }
 
+    /**
+     * @param isFwdStrand true, if the value is needed for the fwd strand, false
+     * if the reverse strand is needed
+     * @return The total height available for painting on the given strand in 
+     * pixels.
+     */
+    public double getAvailableHeight(boolean isFwdStrand) {
+        if (isFwdStrand) {
+            return this.getAvailableForwardHeight();
+        } else {
+            return this.getAvailableReverseHeight();
+        }
+    }
+
+    /**
+     * @return The total height available for painting in pixels.
+     */
     public int getCompleteHeight() {
         return completeHeight;
     }
-
-    public boolean fitsIntoArea(Point2D p){
-        boolean fitsX = false;
-        if(p.getX() >= phyLeft && p.getX() <= phyRight){
-            fitsX = true;
-        }
-        boolean fitsY = false;
-        if(p.getY() >= forwardHigh && p.getY() <= reverseHigh){
-            fitsY = true;
-        }
-
-        if(fitsX && fitsY){
-            return true;
+    
+    /**
+     * @param yValue The y-value of a pixel to check
+     * @param isFwdStrand true, if the value is needed for the fwd strand, false
+     * if the reverse strand is needed
+     * @return true, if the y-value of the pixel fits into the available 
+     * painting area.
+     */
+    public boolean fitsIntoAvailableSpace(double yValue, boolean isFwdStrand) {
+        if (isFwdStrand) {
+            return yValue <= availableForwardHeight;
         } else {
-            return false;
+            return yValue <= availableReverseHeight;
         }
     }
 
-    public boolean fitsIntoAreaY(int yValue){
-        if(yValue >= forwardHigh && yValue <= reverseHigh){
-            return true;
-        } else {
-            return false;
-        }
+    /**
+     * @param yValue The y-value of a pixel to check
+     * @return true, if the y-value of the pixel fits into the available
+     * painting area.
+     */
+    public boolean fitsIntoAvailableForwardSpace(double yValue) {
+        return yValue <= availableForwardHeight;
     }
 
-    public boolean fitsIntoAvailableForwardSpace(double yValue){
-        if(yValue <= availableForwardHeight){
-            return true;
-        } else {
-            return false;
-        }
+    /**
+     * @param yValue The y-value of a pixel to check
+     * @return true, if the y-value of the pixel fits into the available
+     * painting area.
+     */
+    public boolean fitsIntoAvailableReverseSpace(double yValue) {
+        return yValue <= availableReverseHeight;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(20);
+        sb.append("left: ").append(phyLeft).append("\n");
+        sb.append("right: ").append(phyRight).append("\n");
+        sb.append("width: ").append(phyWidth).append("\n");
+        sb.append("fwHigh: ").append(forwardHigh).append("\n");
+        sb.append("fwLow: ").append(forwardLow).append("\n");
+        sb.append("fwHght: ").append(availableForwardHeight).append("\n");
+        sb.append("rvLow: ").append(reverseLow).append("\n");
+        sb.append("rvHigh: ").append(reverseHigh).append("\n");
+        sb.append("rvHght: ").append(availableReverseHeight).append("\n");
+        sb.append("compl. Hght: ").append(completeHeight);
 
-    public boolean fitsIntoAvailableReverseSpace(double yValue){
-        if(yValue <= availableReverseHeight){
-            return true;
-        } else {
-            return false;
-        }
+        return sb.toString();
     }
 }

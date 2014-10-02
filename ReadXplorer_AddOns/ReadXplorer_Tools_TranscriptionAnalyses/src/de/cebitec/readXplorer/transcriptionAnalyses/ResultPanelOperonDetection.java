@@ -22,7 +22,7 @@ package de.cebitec.readXplorer.transcriptionAnalyses;
  * Created on 27.01.2012, 14:31:03
  */
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.Operon;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.OperonAdjacency;
@@ -59,7 +59,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
 
     private OperonDetectionResult operonResult;
     private HashMap<String, Integer> operonDetStats;
-    private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
+    private TableRightClickFilter<UneditableTableModel> tableFilter;
 
     /**
      * This panel is capable of showing a table with detected operons and
@@ -68,6 +68,10 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
      */
     public ResultPanelOperonDetection(ParameterSetOperonDet operonDetParameters) {
         initComponents();
+        final int posColumnIdx = 5;
+        final int trackColumnIdx = 2;
+        final int chromColumnIdx = 3;
+        tableFilter = new TableRightClickFilter<>(UneditableTableModel.class, posColumnIdx, trackColumnIdx);
         this.operonDetectionTable.getTableHeader().addMouseListener(tableFilter);
         this.initStatsMap();        
 
@@ -76,8 +80,6 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                int posColumnIdx = 5;
-                int chromColumnIdx = 3;
                 TableUtils.showPosition(operonDetectionTable, posColumnIdx, chromColumnIdx, getBoundsInfoManager());
             }
         });
@@ -208,6 +210,9 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
      */
     @Override
     public void addResult(ResultTrackAnalysis newResult) {
+        
+        tableFilter.setTrackMap(newResult.getTrackMap());
+        
         if (newResult instanceof OperonDetectionResult) {
             OperonDetectionResult operonResultNew = (OperonDetectionResult) newResult;
             final int nbColumns = 11;
@@ -235,7 +240,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
             int operonsWithInternal = 0;
             boolean hasOverlappingReads;
             boolean hasInternalReads;
-            PersistantFeature feat1;
+            PersistentFeature feat1;
 
             for (Operon operon : operons) {
                 feat1 = operon.getOperonAdjacencies().get(0).getFeature1();

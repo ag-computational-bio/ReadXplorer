@@ -22,12 +22,13 @@ import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator;
-import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -69,15 +70,15 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
 
     private TranscriptionAnalysesTopComponent transcAnalysesTopComp;
     private final ReferenceViewer refViewer;
-    private int referenceId;
-    private List<PersistantTrack> tracks;
+    private PersistentReference reference;
+    private List<PersistentTrack> tracks;
     private int finishedCovAnalyses = 0;
     private int finishedMappingAnalyses = 0;
     private ParameterSetTSS parametersTss;
     private ParameterSetOperonDet parametersOperonDet;
     private ParameterSetRPKM parametersRPKM;
     private boolean combineTracks;
-    private Map<Integer, PersistantTrack> trackMap;
+    private Map<Integer, PersistentTrack> trackMap;
     private Map<Integer, AnalysisContainer> trackToAnalysisMap;
     private ResultPanelTranscriptionStart transcriptionStartResultPanel;
     private ResultPanelOperonDetection operonResultPanel;
@@ -115,7 +116,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
      */
     public OpenTranscriptionAnalysesAction(ReferenceViewer context) {
         this.refViewer = context;
-        this.referenceId = this.refViewer.getReference().getId();
+        this.reference = this.refViewer.getReference();
         this.transcAnalysesTopComp = (TranscriptionAnalysesTopComponent) WindowManager.getDefault().findTopComponent("TranscriptionAnalysesTopComponent");
         this.trackToAnalysisMap = new HashMap<>();
     }
@@ -137,7 +138,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
      */
     private void runWizardAndTranscriptionAnalysis() {
         @SuppressWarnings("unchecked")
-        TranscriptionAnalysesWizardIterator transWizardIterator = new TranscriptionAnalysesWizardIterator(referenceId);
+        TranscriptionAnalysesWizardIterator transWizardIterator = new TranscriptionAnalysesWizardIterator(reference.getId());
         this.readClassPropString = transWizardIterator.getReadClassPropForWiz();
         this.selOperonFeatureTypesPropString = transWizardIterator.getPropSelectedOperonFeatTypes();
         this.selRPKMFeatureTypesPropString = transWizardIterator.getPropSelectedRPKMFeatTypes();
@@ -150,7 +151,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
 
         //action to perform after successfully finishing the wizard
         boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
-        List<PersistantTrack> selectedTracks = transWizardIterator.getSelectedTracks();
+        List<PersistentTrack> selectedTracks = transWizardIterator.getSelectedTracks();
         if (!cancelled && !selectedTracks.isEmpty()) {
             this.tracks = selectedTracks;
             this.trackMap = ProjectConnector.getTrackMap(tracks);
@@ -216,7 +217,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
 
         TrackConnector connector;
         if (!combineTracks) {
-            for (PersistantTrack track : this.tracks) {
+            for (PersistentTrack track : this.tracks) {
 
                 try {
                     connector = (new SaveFileFetcherForGUI()).getTrackConnector(track);
@@ -320,7 +321,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                             transcriptionStartResultPanel.setReferenceViewer(refViewer);
                         }
 
-                        TssDetectionResult tssResult = new TssDetectionResult(analysisTSS.getResults(), trackMap, referenceId, combineTracks, 1, 0);
+                        TssDetectionResult tssResult = new TssDetectionResult(analysisTSS.getResults(), trackMap, reference, combineTracks, 1, 0);
                         tssResult.setParameters(parametersTss);
                         transcriptionStartResultPanel.addResult(tssResult);
 
@@ -340,7 +341,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                                 operonResultPanel.setBoundsInfoManager(refViewer.getBoundsInformationManager());
                             }
                             OperonDetectionResult operonDetectionResult = new OperonDetectionResult(trackMap,
-                                    trackToAnalysisMap.get(trackId).getAnalysisOperon().getResults(), referenceId, combineTracks, 2, 0);
+                                    trackToAnalysisMap.get(trackId).getAnalysisOperon().getResults(), reference, combineTracks, 2, 0);
                             operonDetectionResult.setParameters(parametersOperonDet);
                             operonResultPanel.addResult(operonDetectionResult);
 
@@ -358,7 +359,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                                 rpkmResultPanel.setBoundsInfoManager(refViewer.getBoundsInformationManager());
                             }
                             RPKMAnalysisResult rpkmAnalysisResult = new RPKMAnalysisResult(trackMap,
-                                    trackToAnalysisMap.get(trackId).getAnalysisRPKM().getResults(), referenceId, combineTracks, 1, 0    );
+                                    trackToAnalysisMap.get(trackId).getAnalysisRPKM().getResults(), reference, combineTracks, 1, 0    );
                             rpkmAnalysisResult.setParameters(parametersRPKM);
                             rpkmAnalysisResult.setNoGenomeFeatures(rpkmAnalysis.getNoGenomeFeatures());
                             rpkmResultPanel.addResult(rpkmAnalysisResult);

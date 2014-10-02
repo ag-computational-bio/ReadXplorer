@@ -17,8 +17,8 @@
 package de.cebitec.readXplorer.differentialExpression;
 
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,7 +35,7 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
     private DeAnalysisData data;
     private List<ResultDeAnalysis> results;
 
-    public ExportOnlyAnalysisHandler(List<PersistantTrack> selectedTracks, int refGenomeID, File saveFile, Set<FeatureType> selectedFeatureTypes, int startOffset, int stopOffset, ParametersReadClasses readClassParams) {
+    public ExportOnlyAnalysisHandler(List<PersistentTrack> selectedTracks, int refGenomeID, File saveFile, Set<FeatureType> selectedFeatureTypes, int startOffset, int stopOffset, ParametersReadClasses readClassParams) {
         super(selectedTracks, refGenomeID, saveFile, selectedFeatureTypes, startOffset, stopOffset, readClassParams);
         data = new DeAnalysisData(selectedTracks.size());
         data.setSelectedTracks(selectedTracks);

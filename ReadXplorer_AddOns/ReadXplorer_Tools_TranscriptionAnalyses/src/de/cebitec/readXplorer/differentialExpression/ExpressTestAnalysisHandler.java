@@ -17,8 +17,8 @@
 package de.cebitec.readXplorer.differentialExpression;
 
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.differentialExpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.readXplorer.differentialExpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readXplorer.differentialExpression.GnuR.UnknownGnuRException;
@@ -26,7 +26,7 @@ import de.cebitec.readXplorer.differentialExpression.expressTest.ExpressTest;
 import de.cebitec.readXplorer.differentialExpression.expressTest.ExpressTestI;
 import de.cebitec.readXplorer.differentialExpression.expressTest.ExpressTestObserver;
 import de.cebitec.readXplorer.differentialExpression.expressTest.ExpressTestStatus;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +58,7 @@ public class ExpressTestAnalysisHandler extends DeAnalysisHandler implements Exp
         }
     }
 
-    public ExpressTestAnalysisHandler(List<PersistantTrack> selectedTracks,
+    public ExpressTestAnalysisHandler(List<PersistentTrack> selectedTracks,
             int[] groupA, int[] groupB, Integer refGenomeID, boolean workingWithoutReplicates,
             File saveFile, Set<FeatureType> selectedFeatures, int startOffset, int stopOffset, 
             ParametersReadClasses readClassParams, List<Integer> normalizationFeatures) {
@@ -77,7 +77,7 @@ public class ExpressTestAnalysisHandler extends DeAnalysisHandler implements Exp
 
 
         et.addObserver(this);
-        PersistantFeature[] regionNames = expressTestAnalysisData.getFeatures();
+        PersistentFeature[] regionNames = expressTestAnalysisData.getFeatures();
         int[] start = expressTestAnalysisData.getStart();
         int[] stop = expressTestAnalysisData.getStop();
         int[] indexA = expressTestAnalysisData.getGroupA();

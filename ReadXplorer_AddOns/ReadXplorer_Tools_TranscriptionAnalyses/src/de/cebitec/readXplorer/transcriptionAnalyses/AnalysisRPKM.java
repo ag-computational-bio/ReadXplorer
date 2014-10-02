@@ -20,13 +20,13 @@ import de.cebitec.readXplorer.api.objects.AnalysisI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.MappingResultPersistant;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
+import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
+import de.cebitec.readXplorer.databackend.dataObjects.MappingResult;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.RPKMvalue;
-import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.Observer;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.polyTree.Node;
 import de.cebitec.readXplorer.util.polyTree.NodeVisitor;
 import java.util.ArrayList;
@@ -43,7 +43,7 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
     
     private TrackConnector trackConnector;
     private List<RPKMvalue> rpkmValues;
-    private List<PersistantFeature> genomeFeatures;
+    private List<PersistentFeature> genomeFeatures;
     private HashMap<Integer, RPKMvalue> featureReadCount;
     private double totalMappedReads = 0;
     
@@ -76,14 +76,14 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
     private void initDatastructures() {
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackConnector.getRefGenome().getId());
         
-        for (PersistantChromosome chrom : refConnector.getChromosomesForGenome().values()) {
+        for (PersistentChromosome chrom : refConnector.getChromosomesForGenome().values()) {
             int chromLength = chrom.getLength();
 //            this.modifySelFeatureTypes();
-            List<PersistantFeature> chromFeatures = refConnector.getFeaturesForRegionInclParents(0, chromLength, parametersRPKM.getSelFeatureTypes(), chrom.getId());
+            List<PersistentFeature> chromFeatures = refConnector.getFeaturesForRegionInclParents(0, chromLength, parametersRPKM.getSelFeatureTypes(), chrom.getId());
 
 //        this.featureCountMap = this.fillInFeatureTypes();
 
-            for (PersistantFeature feature : chromFeatures) {
+            for (PersistentFeature feature : chromFeatures) {
                 this.featureReadCount.put(feature.getId(), new RPKMvalue(feature, 0, 0, trackConnector.getTrackID()));
                 this.genomeFeatures.add(feature);
 //                featureCountMap.put(feature.getType(), featureCountMap.get(feature.getType()) + 1);
@@ -94,10 +94,10 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
     
     @Override
     public void update(Object data) {
-         MappingResultPersistant mappingResult = new MappingResultPersistant(null, null);
+         MappingResult mappingResult = new MappingResult(null, null);
         
         if (data.getClass() == mappingResult.getClass()) {
-            MappingResultPersistant mappings = (MappingResultPersistant) data;
+            MappingResult mappings = (MappingResult) data;
             this.updateReadCountForFeatures(mappings);
         } else
         if (data instanceof Byte && ((Byte) data) == 2) { //2 means mapping analysis is finished
@@ -118,9 +118,9 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
      * all mappings in the mappings list.
      * @param mappingResult the result containing all mappings to add to the feature count
      */
-    public void updateReadCountForFeatures(MappingResultPersistant mappingResult) {
-        List<PersistantMapping> mappings = mappingResult.getMappings();
-        PersistantFeature feature;
+    public void updateReadCountForFeatures(MappingResult mappingResult) {
+        List<Mapping> mappings = mappingResult.getMappings();
+        PersistentFeature feature;
         boolean fstFittingMapping;
         int currentChromId = mappingResult.getRequest().getChromId();
         boolean isStrandBothOption = parametersRPKM.getReadClassParams().isStrandBothOption();
@@ -137,7 +137,7 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
                 fstFittingMapping = true;
 
                 for (int j = this.lastMappingIdx; j < mappings.size(); ++j) {
-                    PersistantMapping mapping = mappings.get(j);
+                    Mapping mapping = mappings.get(j);
 
                     //mappings identified within a feature
                     if (mapping.getStop() > featStart && mapping.getStart() < featStop) {
@@ -147,7 +147,7 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
                             fstFittingMapping = false;
                         }
                         if (isStrandBothOption || analysisStrand == mapping.isFwdStrand()) {
-                            this.currentCount += mapping.getNbReplicates();
+                            ++this.currentCount;
                         }
 
                         //still mappings left, but need next feature
@@ -195,7 +195,7 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
          * tRNA and rRNA are same level than mRNA
          */
         Set<FeatureType> selFeatureTypes = parametersRPKM.getSelFeatureTypes();
-        PersistantFeature feature;
+        PersistentFeature feature;
         double rpkm;
         int readCount;
         for (Integer id : this.featureReadCount.keySet()) {
@@ -226,7 +226,7 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
                 /* calc gene/mRNA length/ sum of exon length for gene/mRNA for prokaryotes or
                  * gene where no exons are given and all other features */
                 if (geneExonLength <= 0) {
-                    geneExonLength = (feature.getStop() - feature.getStart()); //feature length in bp
+                    geneExonLength = feature.getLength();
                     noFeatureReads = this.featureReadCount.get(id).getReadCount();
                 }
 
@@ -246,14 +246,14 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
      * @param type the feature type for which the length sum and total read count
      * is needed
      */
-    private void calcFeatureData(PersistantFeature feature, final FeatureType type) {
+    private void calcFeatureData(PersistentFeature feature, final FeatureType type) {
         //calc length of all exons of the mRNA and number of reads mapped to exon regions
         feature.topDown(new NodeVisitor() {
             @Override
             public void visit(Node node) {
-                PersistantFeature subFeature = (PersistantFeature) node;
+                PersistentFeature subFeature = (PersistentFeature) node;
                 if (subFeature.getType() == type) {
-                    geneExonLength += subFeature.getStop() - subFeature.getStart();
+                    geneExonLength += subFeature.getLength();
                     try {
                         noFeatureReads += featureReadCount.get(subFeature.getId()).getReadCount();
                     } catch (NullPointerException e) {

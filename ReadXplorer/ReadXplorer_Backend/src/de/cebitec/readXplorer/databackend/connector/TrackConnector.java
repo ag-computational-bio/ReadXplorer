@@ -27,8 +27,8 @@ import de.cebitec.readXplorer.databackend.MappingThreadAnalyses;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.databackend.SQLStatements;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.DiscreteCountingDistribution;
 import de.cebitec.readXplorer.util.StatsContainer;
 import java.io.File;
@@ -49,7 +49,7 @@ import java.util.logging.Logger;
  */
 public class TrackConnector {
 
-    private List<PersistantTrack> associatedTracks;
+    private List<PersistentTrack> associatedTracks;
     private int trackID;
     private CoverageThread coverageThread;
     private MappingThread mappingThread;
@@ -57,14 +57,14 @@ public class TrackConnector {
     private MappingThreadAnalyses mappingThreadAnalyses; 
     private Connection con;
     public static int FIXED_INTERVAL_LENGTH = 1000;
-    private PersistantReference refGenome;
+    private PersistentReference refGenome;
 
     /**
      * A track connector for a single track. It handles all data requests for this track.
      * @param track the track for which this connector is created
      * @throws FileNotFoundException  
      */
-    protected TrackConnector(PersistantTrack track) throws FileNotFoundException {
+    protected TrackConnector(PersistentTrack track) throws FileNotFoundException {
         this.associatedTracks = new ArrayList<>();
         this.associatedTracks.add(track);
         this.initTrackConnector(track.getId(), false);
@@ -78,7 +78,7 @@ public class TrackConnector {
      *      it should be kept separated
      * @throws FileNotFoundException  
      */
-    protected TrackConnector(int id, List<PersistantTrack> tracks, boolean combineTracks) throws FileNotFoundException {
+    protected TrackConnector(int id, List<PersistentTrack> tracks, boolean combineTracks) throws FileNotFoundException {
         if (tracks.size() > 2 && !combineTracks) {
             throw new UnsupportedOperationException("More than two tracks not supported yet.");
         }
@@ -93,7 +93,7 @@ public class TrackConnector {
      * false if it should be kept separated
      */
     private void initTrackConnector(int trackId, boolean combineTracks) throws FileNotFoundException {
-        for (PersistantTrack track : associatedTracks) {
+        for (PersistentTrack track : associatedTracks) {
             if (!new File(track.getFilePath()).exists()) {
                 throw new FileNotFoundException(track.getFilePath());
             }
@@ -214,33 +214,9 @@ public class TrackConnector {
             fetch.setInt(1, wantedTrackId);
             ResultSet rs = fetch.executeQuery();
             while (rs.next()) {
-                statsContainer.increaseValue(StatsContainer.NO_BESTMATCH_MAPPINGS, rs.getInt(FieldNames.STATISTICS_NUMBER_OF_BM_MAPPINGS));
-                statsContainer.increaseValue(StatsContainer.NO_COMMON_MAPPINGS, rs.getInt(FieldNames.STATISTICS_NUMBER_OF_MAPPINGS));
-                statsContainer.increaseValue(StatsContainer.NO_LARGE_DIST_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_LARGE_DIST_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_LARGE_ORIENT_WRONG_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_LARGE_ORIENT_WRONG_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_ORIENT_WRONG_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_ORIENT_WRONG_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_PERFECT_MAPPINGS, rs.getInt(FieldNames.STATISTICS_NUMBER_OF_PERFECT_MAPPINGS));
-                statsContainer.increaseValue(StatsContainer.NO_PERF_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_PERFECT_SEQUENCE_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_READS, rs.getInt(FieldNames.STATISTICS_NUMBER_READS));
-                statsContainer.increaseValue(StatsContainer.NO_REPEATED_SEQ, rs.getInt(FieldNames.STATISTICS_NUMBER_OF_REPEATED_SEQ));
-                statsContainer.increaseValue(StatsContainer.NO_SEQ_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_SEQUENCE_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_SINGLE_MAPPIGNS, rs.getInt(FieldNames.STATISTICS_NUM_SINGLE_MAPPINGS));
-                statsContainer.increaseValue(StatsContainer.NO_SMALL_DIST_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_SMALL_DIST_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_SMALL_ORIENT_WRONG_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_SMALL_ORIENT_WRONG_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_UNIQUE_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_UNIQUE_SEQUENCE_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_UNIQUE_SEQS, rs.getInt(FieldNames.STATISTICS_NUMBER_OF_UNIQUE_SEQ));
-                statsContainer.increaseValue(StatsContainer.NO_UNIQ_LARGE_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_UNIQ_LARGE_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_UNIQ_MAPPINGS, rs.getInt(FieldNames.STATISTICS_NUMBER_UNIQUE_MAPPINGS));
-                statsContainer.increaseValue(StatsContainer.NO_UNIQ_ORIENT_WRONG_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_UNIQ_ORIENT_WRNG_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_UNIQ_PERF_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_UNIQUE_PERFECT_SEQUENCE_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_UNIQ_SMALL_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_UNIQ_SMALL_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_UNIQ_WRNG_ORIENT_LARGE_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_UNIQ_LARGE_ORIENT_WRNG_PAIRS));
-                statsContainer.increaseValue(StatsContainer.NO_UNIQ_WRNG_ORIENT_SMALL_PAIRS, rs.getInt(FieldNames.STATISTICS_NUM_UNIQ_SMALL_ORIENT_WRNG_PAIRS));
-                statsContainer.increaseValue(StatsContainer.AVERAGE_READ_LENGTH, rs.getInt(FieldNames.STATISTICS_AVERAGE_READ_LENGTH));
-                statsContainer.increaseValue(StatsContainer.AVERAGE_READ_PAIR_SIZE, rs.getInt(FieldNames.STATISTICS_AVERAGE_SEQ_PAIR_LENGTH));
-                statsContainer.increaseValue(StatsContainer.COVERAGE_BM_GENOME, rs.getInt(FieldNames.STATISTICS_BM_COVERAGE_OF_GENOME));
-                statsContainer.increaseValue(StatsContainer.COVERAGE_COMPLETE_GENOME, rs.getInt(FieldNames.STATISTICS_COMPLETE_COVERAGE_OF_GENOME));
-                statsContainer.increaseValue(StatsContainer.COVERAGE_PERFECT_GENOME, rs.getInt(FieldNames.STATISTICS_PERFECT_COVERAGE_OF_GENOME));
+                String statsKey = rs.getString(FieldNames.STATISTICS_KEY);
+                int statsValue = rs.getInt(FieldNames.STATISTICS_VALUE);
+                statsContainer.increaseValue(statsKey, statsValue);
             }
             rs.close();
 
@@ -250,26 +226,38 @@ public class TrackConnector {
         return statsContainer;
     }
     
+    /**
+     * @return The unique database id of the track.
+     */
     public int getTrackID() {
         return trackID;
     }    
     
-
+    /**
+     * @return The description of the first track stored in this connector.
+     */
     public String getAssociatedTrackName() {
         return associatedTracks.get(0).getDescription();
     }
 
+    /**
+     * @return The list of descriptions of all tracks stored in this connector.
+     */
     public List<String> getAssociatedTrackNames() {
         List<String> trackNames = new ArrayList<>();
-        for (PersistantTrack track : this.associatedTracks) {
+        for (PersistentTrack track : this.associatedTracks) {
             trackNames.add(track.getDescription());
         }
         return trackNames;
     }
 
+    /**
+     * @return The list of unique database ids assigned to the tracks stored in 
+     * this connector.
+     */
     public List<Integer> getTrackIds() {
         List<Integer> trackIds = new ArrayList<>();
-        for (PersistantTrack track : this.associatedTracks) {
+        for (PersistentTrack track : this.associatedTracks) {
             trackIds.add(track.getId());
         }
         return trackIds;
@@ -316,7 +304,7 @@ public class TrackConnector {
     }
 
     /**
-     * @return True, if this is a sequence pair track, false otherwise.
+     * @return True, if this is a read pair track, false otherwise.
      */
     public boolean isReadPairTrack() {
         return this.getReadPairToTrackID() != 0;
@@ -379,7 +367,7 @@ public class TrackConnector {
     /**
      * @return the reference genome associated to this connector
      */
-    public PersistantReference getRefGenome() {
+    public PersistentReference getRefGenome() {
         return this.refGenome;
     }
 

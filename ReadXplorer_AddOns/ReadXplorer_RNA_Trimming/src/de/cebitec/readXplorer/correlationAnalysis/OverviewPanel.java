@@ -17,7 +17,7 @@
 package de.cebitec.readXplorer.correlationAnalysis;
 
 import de.cebitec.readXplorer.correlationAnalysis.CorrelationAnalysisAction.CorrelationCoefficient;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.awt.Component;
 import java.util.List;
 import javax.swing.event.ChangeListener;
@@ -78,7 +78,7 @@ public class OverviewPanel implements WizardDescriptor.Panel<WizardDescriptor> {
     public void readSettings(WizardDescriptor settings) {
         component.showGenereateOverview(
                 (CorrelationCoefficient) settings.getProperty(CorrelationAnalysisAction.PROP_CORRELATIONCOEFFICIENT),
-                (List<PersistantTrack>) settings.getProperty(CorrelationAnalysisAction.PROP_SELECTED_TRACKS),
+                (List<PersistentTrack>) settings.getProperty(CorrelationAnalysisAction.PROP_SELECTED_TRACKS),
                 settings.getProperty(CorrelationAnalysisAction.PROP_INTERVALLENGTH).toString(),
                 settings.getProperty(CorrelationAnalysisAction.PROP_MINCORRELATION).toString(),
                 settings.getProperty(CorrelationAnalysisAction.PROP_MINPEAKCOVERAGE).toString()

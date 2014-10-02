@@ -17,8 +17,9 @@
 package de.cebitec.readXplorer.transcriptionAnalyses;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.DetectedFeatures;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.TransStartUnannotated;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.TranscriptionStart;
@@ -44,14 +45,13 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
      * result.
      * @param results the results of the TSS detection
      * @param trackList the list of tracks, for which the TSS detection was carried out
-     * @param referenceId id of the reference genome, for which this result was
-     * generated
+     * @param reference reference genome, for which this result was generated
      * @param combineTracks <cc>true</cc>, if the tracks in the list are
      * combined, <cc>false</cc> otherwise
      */
-    public TssDetectionResult(List<TranscriptionStart> results, Map<Integer, PersistantTrack> trackList, 
-            int referenceId, boolean combineTracks, int trackColumn, int filterColumn) {
-        super(trackList, referenceId, combineTracks, trackColumn, filterColumn);
+    public TssDetectionResult(List<TranscriptionStart> results, Map<Integer, PersistentTrack> trackList, 
+            PersistentReference reference, boolean combineTracks, int trackColumn, int filterColumn) {
+        super(reference, trackList, combineTracks, trackColumn, filterColumn);
         this.results = results;
     }
 
@@ -94,28 +94,30 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         dataColumnDescriptions.add("Coverage Increase");
         dataColumnDescriptions.add("Coverage Increase %");
         dataColumnDescriptions.add("Correct Start Feature");
+        dataColumnDescriptions.add("Correct Start Locus");
+        dataColumnDescriptions.add("Correct Start EC-Number");
+        dataColumnDescriptions.add("Correct Start Product");
         dataColumnDescriptions.add("Correct Start Feature Start");
         dataColumnDescriptions.add("Correct Start Feature Stop");
         dataColumnDescriptions.add("Next Upstream Feature");
+        dataColumnDescriptions.add("Next Upstream Locus");
+        dataColumnDescriptions.add("Next Upstream EC-Number");
+        dataColumnDescriptions.add("Next Upstream Product");
         dataColumnDescriptions.add("Next Upstream Feature Start");
         dataColumnDescriptions.add("Next Upstream Feature Stop");
         dataColumnDescriptions.add("Distance Upstream Feature");
         dataColumnDescriptions.add("Next Downstream Feature");
+        dataColumnDescriptions.add("Next Downstream Locus");
+        dataColumnDescriptions.add("Next Downstream EC-Number");
+        dataColumnDescriptions.add("Next Downstream Product");
         dataColumnDescriptions.add("Next Downstream Feature Start");
         dataColumnDescriptions.add("Next Downstream Feature Stop");
         dataColumnDescriptions.add("Distance Downstream Feature");
         dataColumnDescriptions.add("Novel Transcript");
         dataColumnDescriptions.add("Transcript Stop");
         dataColumnDescriptions.add("70bp Upstream of Start");
-        dataColumnDescriptions.add("Correct Start Locus");
-        dataColumnDescriptions.add("Correct Start EC-Number");
-        dataColumnDescriptions.add("Correct Start Product");
-        dataColumnDescriptions.add("Next Upstream Locus");
-        dataColumnDescriptions.add("Next Upstream EC-Number");
-        dataColumnDescriptions.add("Next Upstream Product");
-        dataColumnDescriptions.add("Next Downstream Locus");
-        dataColumnDescriptions.add("Next Downstream EC-Number");
-        dataColumnDescriptions.add("Next Downstream Product");
+        
+        
         
         allSheetDescriptions.add(dataColumnDescriptions);
 
@@ -136,8 +138,6 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
     public List<List<List<Object>>> dataToExcelExportList() {
         List<List<List<Object>>> tSSExport = new ArrayList<>();
         List<List<Object>> tSSResults = new ArrayList<>();
-        
-        PersistantFeature feature;
         
         for (int i = 0; i < results.size(); ++i) {      
             TranscriptionStart tss = results.get(i);
@@ -245,14 +245,14 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
      * @param addDistance true, if the distance from the feature start to the
      * current TSS shall be printed, too
      */
-    private void addFeatureRows(PersistantFeature feature, List<Object> tssRow, TranscriptionStart tss, boolean addDistance) {
+    private void addFeatureRows(PersistentFeature feature, List<Object> tssRow, TranscriptionStart tss, boolean addDistance) {
         if (feature != null) {
             tssRow.add(feature.toString());
             tssRow.add(feature.getLocus());
             tssRow.add(feature.getEcNumber());
             tssRow.add(feature.getProduct());
-            tssRow.add(feature.isFwdStrand() ? feature.getStart() : feature.getStop());
-            tssRow.add(feature.isFwdStrand() ? feature.getStop() : feature.getStart());
+            tssRow.add(feature.getStartOnStrand());
+            tssRow.add(feature.getStopOnStrand());
             if (addDistance) {
                 tssRow.add(Math.abs(tss.getPos() - (tss.isFwdStrand() ? feature.getStart() : feature.getStop())));
             }
@@ -260,6 +260,9 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
             tssRow.add("-");
             tssRow.add("-");
             tssRow.add("-");
+            tssRow.add("-");
+            tssRow.add("");
+            tssRow.add("");
             if (addDistance) { tssRow.add(""); }
         }
     }

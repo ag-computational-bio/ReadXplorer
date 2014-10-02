@@ -33,7 +33,7 @@ import org.openide.windows.WindowManager;
  * a searchable list of all features, a "Jump to position" dialog and a dialog
  * for filtering regular expressions within the reference.
  * 
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.readXplorer.ui.visualisation.reference//ReferenceNavigator//EN", autostore = false)
 public final class ReferenceNavigatorTopComp extends TopComponentExtended implements LookupListener{

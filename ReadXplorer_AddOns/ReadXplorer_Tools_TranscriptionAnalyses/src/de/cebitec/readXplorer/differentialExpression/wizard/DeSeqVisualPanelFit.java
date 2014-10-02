@@ -106,28 +106,28 @@ public final class DeSeqVisualPanelFit extends JPanel {
         conditionGroupsList.setModel(allConditionGroupsModel);
         jScrollPane1.setViewportView(conditionGroupsList);
 
-        org.openide.awt.Mnemonics.setLocalizedText(addToFittingOne, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelFit.class, "DeSeqVisualPanelFit.addToFittingOne.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(addToFittingOne, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelFit.class, "DeSeqVisualPanelFit.addToFittingOne.text_1")); // NOI18N
         addToFittingOne.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addToFittingOneActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(removeFromFittingOne, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelFit.class, "DeSeqVisualPanelFit.removeFromFittingOne.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(removeFromFittingOne, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelFit.class, "DeSeqVisualPanelFit.removeFromFittingOne.text_1")); // NOI18N
         removeFromFittingOne.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 removeFromFittingOneActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(addToFittingTwo, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelFit.class, "DeSeqVisualPanelFit.addToFittingTwo.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(addToFittingTwo, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelFit.class, "DeSeqVisualPanelFit.addToFittingTwo.text_1")); // NOI18N
         addToFittingTwo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 addToFittingTwoActionPerformed(evt);
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(removeFromFittingTwo, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelFit.class, "DeSeqVisualPanelFit.removeFromFittingTwo.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(removeFromFittingTwo, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelFit.class, "DeSeqVisualPanelFit.removeFromFittingTwo.text_1")); // NOI18N
         removeFromFittingTwo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 removeFromFittingTwoActionPerformed(evt);
@@ -140,11 +140,11 @@ public final class DeSeqVisualPanelFit extends JPanel {
         fittingOneList.setModel(fittingOneModel);
         jScrollPane2.setViewportView(fittingOneList);
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelFit.class, "DeSeqVisualPanelFit.jLabel3.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelFit.class, "DeSeqVisualPanelFit.jLabel3.text_1")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelFit.class, "DeSeqVisualPanelFit.jLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelFit.class, "DeSeqVisualPanelFit.jLabel2.text_1")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelFit.class, "DeSeqVisualPanelFit.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelFit.class, "DeSeqVisualPanelFit.jLabel1.text_1")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(infoLabel, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelFit.class, "DeSeqVisualPanelFit.infoLabel.text")); // NOI18N
 
@@ -156,25 +156,24 @@ public final class DeSeqVisualPanelFit extends JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(addToFittingTwo, javax.swing.GroupLayout.Alignment.TRAILING)
-                                .addComponent(addToFittingOne, javax.swing.GroupLayout.Alignment.TRAILING))
-                            .addComponent(removeFromFittingOne)
-                            .addComponent(removeFromFittingTwo))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
-                            .addComponent(jLabel2)
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                            .addComponent(jLabel3)))
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(infoLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
+                            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addComponent(infoLabel))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                            .addComponent(removeFromFittingOne)
+                            .addComponent(addToFittingOne)
+                            .addComponent(addToFittingTwo)
+                            .addComponent(removeFromFittingTwo))
+                        .addGap(18, 18, Short.MAX_VALUE)))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jLabel3)
+                    .addComponent(jLabel2)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -187,17 +186,17 @@ public final class DeSeqVisualPanelFit extends JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jScrollPane2)
                         .addGap(18, 18, 18)
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 323, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(infoLabel)
                 .addContainerGap())
             .addGroup(layout.createSequentialGroup()
-                .addGap(54, 54, 54)
+                .addGap(66, 66, 66)
                 .addComponent(addToFittingOne)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(removeFromFittingOne)
@@ -205,7 +204,7 @@ public final class DeSeqVisualPanelFit extends JPanel {
                 .addComponent(addToFittingTwo)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(removeFromFittingTwo)
-                .addGap(69, 69, 69))
+                .addGap(91, 91, 91))
         );
     }// </editor-fold>//GEN-END:initComponents
 

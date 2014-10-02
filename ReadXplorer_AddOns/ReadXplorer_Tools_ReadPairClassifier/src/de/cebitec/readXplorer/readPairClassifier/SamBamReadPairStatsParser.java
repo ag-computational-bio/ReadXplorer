@@ -134,6 +134,7 @@ public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
                     finish = System.currentTimeMillis();
                     this.notifyObservers(Benchmark.calculateDuration(start, finish, lineNo + " mappings processed in "));
                 }
+                System.err.flush();
             }
 
             samItor.close();

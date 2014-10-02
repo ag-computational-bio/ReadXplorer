@@ -18,16 +18,26 @@ package de.cebitec.readXplorer.options;
 
 import de.cebitec.readXplorer.util.Properties;
 import java.util.prefs.Preferences;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import org.openide.util.NbPreferences;
 
-final class ViewerPanel extends OptionsPanel {
+/**
+ * Panel for configuring the options of viewers.
+ * 
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ */
+public final class ViewerPanel extends OptionsPanel {
     private static final long serialVersionUID = 1L;
 
     private final ViewerOptionsPanelController controller;
     private final Preferences pref;
     
-
-    ViewerPanel(ViewerOptionsPanelController controller) {
+    /**
+     * Panel for configuring the options of viewers.
+     * @param controller The controller of the panel
+     */
+    public ViewerPanel(ViewerOptionsPanelController controller) {
         this.controller = controller;
         this.pref = NbPreferences.forModule(Object.class);
         initComponents();
@@ -42,25 +52,23 @@ final class ViewerPanel extends OptionsPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        heightButtonGroup = new javax.swing.ButtonGroup();
         descriptionLabel = new javax.swing.JLabel();
-        heightTinyRadioButton = new javax.swing.JRadioButton();
-        heightMediumRadioButton = new javax.swing.JRadioButton();
-        heightMaxRadioButton = new javax.swing.JRadioButton();
         autoScalingBox = new javax.swing.JCheckBox();
+        viewerSizeSlider = new javax.swing.JSlider();
 
         org.openide.awt.Mnemonics.setLocalizedText(descriptionLabel, org.openide.util.NbBundle.getMessage(ViewerPanel.class, "ViewerPanel.descriptionLabel.text")); // NOI18N
 
-        heightButtonGroup.add(heightTinyRadioButton);
-        org.openide.awt.Mnemonics.setLocalizedText(heightTinyRadioButton, org.openide.util.NbBundle.getMessage(ViewerPanel.class, "ViewerPanel.heightTinyRadioButton.text")); // NOI18N
-
-        heightButtonGroup.add(heightMediumRadioButton);
-        org.openide.awt.Mnemonics.setLocalizedText(heightMediumRadioButton, org.openide.util.NbBundle.getMessage(ViewerPanel.class, "ViewerPanel.heightMediumRadioButton.text")); // NOI18N
-
-        heightButtonGroup.add(heightMaxRadioButton);
-        org.openide.awt.Mnemonics.setLocalizedText(heightMaxRadioButton, org.openide.util.NbBundle.getMessage(ViewerPanel.class, "ViewerPanel.heightMaxRadioButton.text")); // NOI18N
-
         org.openide.awt.Mnemonics.setLocalizedText(autoScalingBox, org.openide.util.NbBundle.getMessage(ViewerPanel.class, "ViewerPanel.autoScalingBox.text")); // NOI18N
+
+        viewerSizeSlider.setMajorTickSpacing(30);
+        viewerSizeSlider.setMaximum(Properties.MAX_HEIGHT);
+        viewerSizeSlider.setMinimum(Properties.MIN_HEIGHT);
+        viewerSizeSlider.setMinorTickSpacing(5);
+        viewerSizeSlider.setPaintLabels(true);
+        viewerSizeSlider.setPaintTicks(true);
+        viewerSizeSlider.setSnapToTicks(true);
+        viewerSizeSlider.setToolTipText(org.openide.util.NbBundle.getMessage(ViewerPanel.class, "ViewerPanel.viewerSizeSlider.toolTipText")); // NOI18N
+        viewerSizeSlider.setValue(200);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -69,12 +77,14 @@ final class ViewerPanel extends OptionsPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(autoScalingBox)
-                    .addComponent(heightMaxRadioButton)
-                    .addComponent(heightMediumRadioButton)
-                    .addComponent(heightTinyRadioButton)
-                    .addComponent(descriptionLabel))
-                .addGap(0, 38, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(descriptionLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(2, 2, 2))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(viewerSizeSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(autoScalingBox))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -82,12 +92,8 @@ final class ViewerPanel extends OptionsPanel {
                 .addContainerGap()
                 .addComponent(descriptionLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(heightTinyRadioButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(heightMediumRadioButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(heightMaxRadioButton)
-                .addGap(18, 18, 18)
+                .addComponent(viewerSizeSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(autoScalingBox)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -95,38 +101,33 @@ final class ViewerPanel extends OptionsPanel {
 
     @Override
     void load() {
-        int height = pref.getInt(Properties.VIEWER_HEIGHT, Properties.DEFAULT_HEIGHT);
-        switch (height) {
-            case Properties.MAX_HEIGHT :    
-                heightMaxRadioButton.setSelected(true);     break;
-            case Properties.SMALL_HEIGHT :  
-                heightTinyRadioButton.setSelected(true);    break;
-            default :            
-                heightMediumRadioButton.setSelected(true);  break;
-        }
+        this.viewerSizeSlider.setValue(pref.getInt(Properties.VIEWER_HEIGHT, Properties.DEFAULT_HEIGHT));
         this.autoScalingBox.setSelected(pref.getBoolean(Properties.VIEWER_AUTO_SCALING, false));
     }
 
     @Override
     void store() {
-        int height;
-        if (heightMaxRadioButton.isSelected()) {
-            height = Properties.MAX_HEIGHT;
-        } else if (heightMediumRadioButton.isSelected()) {
-            height = Properties.DEFAULT_HEIGHT;
-        } else {
-            height = Properties.SMALL_HEIGHT;
-        }
-        pref.putInt(Properties.VIEWER_HEIGHT, height);
+        pref.putInt(Properties.VIEWER_HEIGHT, this.viewerSizeSlider.getValue());
         pref.putBoolean(Properties.VIEWER_AUTO_SCALING, this.autoScalingBox.isSelected());
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox autoScalingBox;
     private javax.swing.JLabel descriptionLabel;
-    private javax.swing.ButtonGroup heightButtonGroup;
-    private javax.swing.JRadioButton heightMaxRadioButton;
-    private javax.swing.JRadioButton heightMediumRadioButton;
-    private javax.swing.JRadioButton heightTinyRadioButton;
+    private javax.swing.JSlider viewerSizeSlider;
     // End of variables declaration//GEN-END:variables
+
+    private HyperlinkListener getHyperlinkListener() {
+        return new HyperlinkListener() {
+            @Override
+            public void hyperlinkUpdate(HyperlinkEvent e) {
+                if (HyperlinkEvent.EventType.ACTIVATED.equals(e.getEventType())) {
+//                    HelpCtx.setHelpIDString(jEditorPane1, e.getURL().toString());
+//                    HelpCtx help = new HelpCtx(e.getURL().toString());
+//                    help.display();
+                }
+            }
+        };
+    }
+
 }

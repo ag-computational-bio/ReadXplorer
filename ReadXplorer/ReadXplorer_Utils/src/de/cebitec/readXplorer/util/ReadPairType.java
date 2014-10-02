@@ -23,31 +23,31 @@ package de.cebitec.readXplorer.util;
  */
 public enum ReadPairType {
     
-    /** 0 = perfect sequence pair (distance and orientation correct). */
+    /** 0 = perfect read pair (distance and orientation correct). */
     PERFECT_PAIR(ReadPairType.PERFECT_PAIR_INT, ReadPairType.PERFECT_PAIR_STRING),
-    /** 1 = distance too large sequence pair. */
+    /** 1 = distance too large read pair. */
     DIST_LARGE_PAIR(ReadPairType.DIST_LARGE_PAIR_INT, ReadPairType.DIST_LARGE_PAIR_STRING),
-    /** 2 = distance too small sequence pair. */
+    /** 2 = distance too small read pair. */
     DIST_SMALL_PAIR(ReadPairType.DIST_SMALL_PAIR_INT, ReadPairType.DIST_SMALL_PAIR_STRING),
-    /** 3 = orientation wrong sequence pair (distance is correct). */
+    /** 3 = orientation wrong read pair (distance is correct). */
     ORIENT_WRONG_PAIR(ReadPairType.ORIENT_WRONG_PAIR_INT, ReadPairType.ORIENT_WRONG_PAIR_STRING),
-    /** 4 = distance too large and orientation wrong sequence pair. */
+    /** 4 = distance too large and orientation wrong read pair. */
     OR_DIST_LARGE_PAIR(ReadPairType.OR_DIST_LARGE_PAIR_INT, ReadPairType.OR_DIST_LARGE_PAIR_STRING),
-    /** 5 = distance too small and orientation wrong sequence pair. */
+    /** 5 = distance too small and orientation wrong read pair. */
     OR_DIST_SMALL_PAIR(ReadPairType.OR_DIST_SMALL_PAIR_INT, ReadPairType.OR_DIST_SMALL_PAIR_STRING),
-    /** 6 = a single mapping whose partner did not map on the reference. */
+    /** 6 = a single mapping whose partner did not map on the reference or where a pair assignment fails due to too many unambiguous mappings of both reads. */
     UNPAIRED_PAIR(ReadPairType.UNPAIRED_PAIR_INT, ReadPairType.UNPAIRED_PAIR_STRING),
-    /** 7 = unique perfect sequence pair (distance and orientation correct, both reads only mapped once). */
+    /** 7 = unique perfect read pair (distance and orientation correct, both reads only mapped once). */
     PERFECT_UNQ_PAIR(ReadPairType.PERFECT_UNQ_PAIR_INT, ReadPairType.PERFECT_UNQ_PAIR_STRING),
-    /** 8 = unique distance too large sequence pair. */
+    /** 8 = unique distance too large read pair. */
     DIST_LARGE_UNQ_PAIR(ReadPairType.DIST_LARGE_UNQ_PAIR_INT, ReadPairType.DIST_LARGE_UNQ_PAIR_STRING),
-    /** 9 = unique distance too small sequence pair. */
+    /** 9 = unique distance too small read pair. */
     DIST_SMALL_UNQ_PAIR(ReadPairType.DIST_SMALL_UNQ_PAIR_INT, ReadPairType.DIST_SMALL_UNQ_PAIR_STRING),
-    /** 10 = unique orientation wrong sequence pair (distance is correct). */
+    /** 10 = unique orientation wrong read pair (distance is correct). */
     ORIENT_WRONG_UNQ_PAIR(ReadPairType.ORIENT_WRONG_UNQ_PAIR_INT, ReadPairType.ORIENT_WRONG_UNQ_PAIR_STRING),
-    /** 11 = unique distance too large and orientation wrong sequence pair. */
+    /** 11 = unique distance too large and orientation wrong read pair. */
     OR_DIST_LARGE_UNQ_PAIR(ReadPairType.OR_DIST_LARGE_UNQ_PAIR_INT, ReadPairType.OR_DIST_LARGE_UNQ_PAIR_STRING),
-    /** 12 = unique distance too small and orientation wrong sequence pair. */
+    /** 12 = unique distance too small and orientation wrong read pair. */
     OR_DIST_SMALL_UNQ_PAIR(ReadPairType.OR_DIST_SMALL_UNQ_PAIR_INT, ReadPairType.OR_DIST_SMALL_UNQ_PAIR_STRING);
     
     

@@ -20,16 +20,17 @@ import de.cebitec.readXplorer.api.objects.AnalysisI;
 import de.cebitec.readXplorer.databackend.IntervalRequest;
 import de.cebitec.readXplorer.databackend.SamBamFileReader;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistant;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResult;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
+import de.cebitec.readXplorer.databackend.dataObjects.Difference;
 import de.cebitec.readXplorer.databackend.dataObjects.GapCount;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantCoverage;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantDiff;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReferenceGap;
+import de.cebitec.readXplorer.databackend.dataObjects.ReferenceGap;
 import de.cebitec.readXplorer.databackend.dataObjects.Snp;
 import de.cebitec.readXplorer.databackend.dataObjects.SnpI;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.SequenceComparison;
 import de.cebitec.readXplorer.util.SequenceUtils;
+import de.cebitec.readXplorer.util.classification.Classification;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -52,6 +53,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
     
     private TrackConnector trackConnector;
     private ParameterSetSNPs analysisParams;
+    private List<Classification> excludedClasses;
     private List<SnpI> snps;
     private boolean hasBaseQualities = true;
     private boolean hasMappingQualities = true;
@@ -77,20 +79,21 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
     public AnalysisSNPs(TrackConnector trackConnector, ParameterSetSNPs analysisParams) {
         this.trackConnector = trackConnector;
         this.analysisParams = analysisParams;
+        this.excludedClasses = analysisParams.getReadClassParams().getExcludedClasses();
         this.snps = new ArrayList<>();
     }
     
     /**
      * Updates the SNP and DIP results with the new coverage result.
-     * @param data the data to handle: A CoverageAndDiffResultPersistant object
+     * @param data the data to handle: A CoverageAndDiffResultPersistent object
      * containing coverage an diff information for the SNP and DIP analysis
      */
     @Override
     public void update(Object data) {
-        CoverageAndDiffResultPersistant covAndDiffs = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0), null, null, null);
+        CoverageAndDiffResult covAndDiffs = new CoverageAndDiffResult(new CoverageManager(0, 0), null, null, null);
 
         if (data.getClass() == covAndDiffs.getClass()) {
-            covAndDiffs = (CoverageAndDiffResultPersistant) data;
+            covAndDiffs = (CoverageAndDiffResult) data;
             this.updateSnpResults(covAndDiffs);
         }
     }
@@ -154,7 +157,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
             case BASE_G : base = 'G'; break;
             case BASE_T : base = 'T'; break;
             case BASE_N : base = 'N';  break;
-            case BASE_GAP : base = '_'; break;
+            case BASE_GAP : base = '-'; break;
             default : 
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown snp type");
         }
@@ -175,7 +178,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
             case 'G': baseInt = BASE_G; break;
             case 'T': baseInt = BASE_T; break;
             case 'N': baseInt = BASE_N; break;
-            case '_': baseInt = BASE_GAP; break;
+            case '-': baseInt = BASE_GAP; break;
         }
 
         return baseInt;
@@ -187,20 +190,20 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
      * then stored in the SNP result.
      * @param covAndDiffs the coverage and diff result to handle here
      */
-    private void updateSnpResults(CoverageAndDiffResultPersistant covAndDiffs) {
-        PersistantCoverage coverage = covAndDiffs.getCoverage();
-        List<PersistantDiff> diffs = covAndDiffs.getDiffs();
-        List<PersistantReferenceGap> gaps = covAndDiffs.getGaps();
+    private void updateSnpResults(CoverageAndDiffResult covAndDiffs) {
+        CoverageManager coverage = covAndDiffs.getCovManager();
+        List<Difference> diffs = covAndDiffs.getDiffs();
+        List<ReferenceGap> gaps = covAndDiffs.getGaps();
         
         
         //in base array the first index is the relative position. The second aindex is the base index, the third contains count (0) and average base quality (1)
         int[][][] baseArray = new int[coverage.getRightBound() - coverage.getLeftBound() + 1][NO_BASES][NO_VALUES]; //+1 because sequence starts at 1 not 0
-        GapCount[] gapCounts = new GapCount[coverage.getRightBound() - coverage.getLeftBound() + 1]; //right bound is excluded in PersistantCoverage
+        GapCount[] gapCounts = new GapCount[coverage.getRightBound() - coverage.getLeftBound() + 1]; //right bound is excluded in CoverageManager
         
         char base;
         int maxBaseIdx;
         int pos;
-        for (PersistantDiff diff : diffs) {
+        for (Difference diff : diffs) {
             if (diff.getPosition() >= coverage.getLeftBound() && diff.getPosition() < coverage.getRightBound() && 
                     (diff.getBaseQuality() > analysisParams.getMinBaseQuality() || diff.getBaseQuality() == -1)) {
                 base = diff.isForwardStrand() ? diff.getBase() : SequenceUtils.getDnaComplement(diff.getBase());
@@ -222,7 +225,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
         }
         
         int relativeGapPos;
-        for (PersistantReferenceGap gap : gaps) {
+        for (ReferenceGap gap : gaps) {
             if (gap.getPosition() >= coverage.getLeftBound() && gap.getPosition() < coverage.getRightBound() &&
                     (gap.getBaseQuality() == -1 || gap.getBaseQuality() > analysisParams.getMinBaseQuality())) {
                 relativeGapPos = gap.getPosition() - coverage.getLeftBound();
@@ -286,7 +289,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                        && (!this.hasMappingQualities || averageMappingQual >= analysisParams.getMinAverageMappingQual())
                             ) {
                         
-                        cov = coverage.getBestMatchFwd(absPos) + coverage.getBestMatchRev(absPos);
+                        cov = coverage.getTotalCoverage(excludedClasses, absPos, true) + coverage.getTotalCoverage(excludedClasses, absPos, false);
                         if (cov == 0) {
                             ++cov;
                             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found uncovered position in diffs: {0}", absPos);
@@ -294,7 +297,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                         frequency = (diffCount * 100) / cov;
 
                         if (frequency >= analysisParams.getMinPercentage()) {
-                            refBase = refSubSeq.charAt(i); //TODO:SEQ: Test if base is correct base
+                            refBase = refSubSeq.charAt(i);
                             refBaseIdx = getBaseInt(refBase);
                             //determine SNP type, can still be match, if match coverage is largest
                             baseCounts[refBaseIdx][COUNT_IDX] = cov - diffCount;
@@ -364,7 +367,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                                 && (!this.hasMappingQualities || averageMappingQual >= analysisParams.getMinAverageMappingQual())
                             ) {
 
-                                cov = coverage.getBestMatchFwd(absPos) + coverage.getBestMatchRev(absPos);
+                                cov = coverage.getTotalCoverage(excludedClasses, absPos, true) + coverage.getTotalCoverage(excludedClasses, absPos, false);
                                 if (cov == 0) {
                                     ++cov;
                                     Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found uncovered position in gaps: {0}", absPos);
@@ -379,7 +382,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                                             trackConnector.getTrackID(),
                                             covAndDiffs.getRequest().getChromId(),
                                             base,
-                                            '_',
+                                            '-',
                                             gapCountArray[BASE_A][COUNT_IDX],
                                             gapCountArray[BASE_C][COUNT_IDX],
                                             gapCountArray[BASE_G][COUNT_IDX],
@@ -406,16 +409,16 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
         }
     }
 
-//    private int getNeighboringCov(int absPos, PersistantCoverage coverage) {
+//    private int getNeighboringCov(int absPos, CoverageManager coverage) {
 //        int cov1 = 0;
 //        int cov2 = 0;
 //        
-//        cov1 = coverage.getBestMatchFwd(absPos) + coverage.getBestMatchRev(absPos);
+//        cov1 = coverage.getCoverage(MappingClass.BEST_MATCH).getFwdCov(absPos) + coverage.getCoverage(MappingClass.BEST_MATCH).getRevCov(absPos);
 //        if (cov1 == 0) {
 //            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found uncovered position in gaps: {0}", absPos);
 //        }
 //
-//        cov2 = coverage.getBestMatchFwd(absPos + 1) + coverage.getBestMatchRev(absPos + 1);
+//        cov2 = coverage.getCoverage(MappingClass.BEST_MATCH).getFwdCov(absPos + 1) + coverage.getCoverage(MappingClass.BEST_MATCH).getRevCov(absPos + 1);
 //
 //        int cov = (cov1 + cov2) / 2;
 //        return cov == 0 ? 1 : cov;

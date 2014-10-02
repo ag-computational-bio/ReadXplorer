@@ -18,7 +18,7 @@ package de.cebitec.readXplorer.differentialExpression.wizard;
 
 import de.cebitec.readXplorer.api.cookies.LoginCookie;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.differentialExpression.BaySeqAnalysisHandler;
 import de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler;
 import de.cebitec.readXplorer.differentialExpression.DeSeq2AnalysisHandler;
@@ -29,7 +29,7 @@ import de.cebitec.readXplorer.differentialExpression.ExpressTestAnalysisHandler;
 import de.cebitec.readXplorer.differentialExpression.GnuR;
 import de.cebitec.readXplorer.differentialExpression.Group;
 import de.cebitec.readXplorer.differentialExpression.ProcessingLog;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.view.dialogMenus.SelectReadClassWizardPanel;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -98,7 +98,7 @@ public final class WizardIterator implements WizardDescriptor.Iterator<WizardDes
         if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
             ParametersReadClasses readClassParams = (ParametersReadClasses) wiz.getProperty(this.readClassPanel.getPropReadClassParams());
             List<Group> createdGroups = (List<Group>) wiz.getProperty("createdGroups");
-            List<PersistantTrack> selectedTracks = (List<PersistantTrack>) wiz.getProperty("tracks");
+            List<PersistentTrack> selectedTracks = (List<PersistentTrack>) wiz.getProperty("tracks");
             Integer genomeID = (Integer) wiz.getProperty("genomeID");
             int[] replicateStructure = (int[]) wiz.getProperty("replicateStructure");
             File saveFile = (File) wiz.getProperty("saveFile");

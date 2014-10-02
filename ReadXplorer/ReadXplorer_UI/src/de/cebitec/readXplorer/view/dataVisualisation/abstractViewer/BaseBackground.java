@@ -25,7 +25,7 @@ import javax.swing.JComponent;
  * Creates a colored rectangle as background for a DNA base in a base specific
  * color.
  *
- * @author jstraube, Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author jstraube, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class BaseBackground extends JComponent{
 

@@ -17,11 +17,11 @@
 package de.cebitec.readXplorer.differentialExpression;
 
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.differentialExpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.readXplorer.differentialExpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readXplorer.differentialExpression.GnuR.UnknownGnuRException;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -41,10 +41,8 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
 
     public static enum Plot {
 
-        DispEsts("Per gene estimates against normalized mean expression"),
-        DE("Log2 fold change against base means"),
-        HIST("Histogram of p values"),
-        MAplot("MA Plot");
+        DispEsts("Per gene estimates against normalized mean expression"),        
+        HIST("Histogram of p values");
         String representation;
 
         Plot(String representation) {
@@ -56,16 +54,12 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
             return representation;
         }
 
-        public static Plot[] getValues(boolean moreThanTwoConditions) {
-            if (moreThanTwoConditions) {
-                return new Plot[]{DispEsts};
-            } else {
-                return new Plot[]{DispEsts, DE, HIST, MAplot};
-            }
+        public static Plot[] getValues() {
+                return new Plot[]{DispEsts, HIST};          
         }
     }
 
-    public DeSeq2AnalysisHandler(List<PersistantTrack> selectedTracks, Map<String, String[]> design, 
+    public DeSeq2AnalysisHandler(List<PersistentTrack> selectedTracks, Map<String, String[]> design, 
             List<String> fittingGroupOne, List<String> fittingGroupTwo, Integer refGenomeID, boolean workingWithoutReplicates,
             File saveFile, Set<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams, UUID key) {
         super(selectedTracks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams);
@@ -99,9 +93,6 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
     public File plot(Plot plot) throws IOException, IllegalStateException, PackageNotLoadableException {
         File file = File.createTempFile("ReadXplorer_Plot_", ".svg");
         file.deleteOnExit();
-        if (plot == Plot.DE) {
-            deSeq2.plotDE(file);
-        }
         if (plot == Plot.DispEsts) {
             deSeq2.plotDispEsts(file);
         }

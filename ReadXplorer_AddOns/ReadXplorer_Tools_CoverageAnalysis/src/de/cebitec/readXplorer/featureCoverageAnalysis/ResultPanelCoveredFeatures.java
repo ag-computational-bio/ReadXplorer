@@ -16,8 +16,7 @@
  */
 package de.cebitec.readXplorer.featureCoverageAnalysis;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.readXplorer.util.UneditableTableModel;
@@ -52,9 +51,8 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
     private BoundsInfoManager bim;
     private CoveredFeatureResult coveredFeaturesResult;
     private Map<String, Integer> coveredStatisticsMap;
-    private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
+    private TableRightClickFilter<UneditableTableModel> tableFilter;
     private ReferenceFeatureTopComp refFeatureComp;
-    private PersistantReference refGenome;
     
     
     /**
@@ -64,6 +62,10 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
      */
     public ResultPanelCoveredFeatures() {
         initComponents();
+        final int posColumnIdx = 0;
+        final int trackColumnIdx = 1;
+        final int chromColumnIdx = 2;
+        tableFilter = new TableRightClickFilter<>(UneditableTableModel.class, posColumnIdx, trackColumnIdx);
         this.coveredFeaturesTable.getTableHeader().addMouseListener(tableFilter);
         this.coveredStatisticsMap = new HashMap<>();
         this.refFeatureComp = ReferenceFeatureTopComp.findInstance();
@@ -73,8 +75,6 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                int posColumnIdx = 0;
-                int chromColumnIdx = 2;
                 TableUtils.showPosition(coveredFeaturesTable, posColumnIdx, chromColumnIdx, bim);
                 refFeatureComp.showTableFeature(coveredFeaturesTable, 0);
             }
@@ -101,14 +101,14 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
 
             },
             new String [] {
-                "Feature", "Track", "Chromosome", "Strand", "Start", "Stop", "Length", "Covered Percent", "Covered Bases"
+                "Feature", "Track", "Chromosome", "Strand", "Start", "Stop", "Length", "Mean Coverage", "Covered Percent", "Covered Bases"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
+                java.lang.Object.class, java.lang.Object.class, java.lang.Object.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -120,15 +120,18 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
             }
         });
         coveredFeaturesPane.setViewportView(coveredFeaturesTable);
-        coveredFeaturesTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title0")); // NOI18N
-        coveredFeaturesTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title7_1_1")); // NOI18N
-        coveredFeaturesTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title8_1")); // NOI18N
-        coveredFeaturesTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title7_2")); // NOI18N
-        coveredFeaturesTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title8_2")); // NOI18N
-        coveredFeaturesTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title9_2")); // NOI18N
-        coveredFeaturesTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title10_1")); // NOI18N
-        coveredFeaturesTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title11_1")); // NOI18N
-        coveredFeaturesTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title12_1")); // NOI18N
+        if (coveredFeaturesTable.getColumnModel().getColumnCount() > 0) {
+            coveredFeaturesTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title0")); // NOI18N
+            coveredFeaturesTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title7_1_1")); // NOI18N
+            coveredFeaturesTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title8_1")); // NOI18N
+            coveredFeaturesTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title7_2")); // NOI18N
+            coveredFeaturesTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title8_2")); // NOI18N
+            coveredFeaturesTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title9_2")); // NOI18N
+            coveredFeaturesTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title10_1")); // NOI18N
+            coveredFeaturesTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title9")); // NOI18N
+            coveredFeaturesTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title11_1")); // NOI18N
+            coveredFeaturesTable.getColumnModel().getColumn(9).setHeaderValue(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.coveredFeaturesTable.columnModel.title12_1")); // NOI18N
+        }
 
         exportButton.setText(org.openide.util.NbBundle.getMessage(ResultPanelCoveredFeatures.class, "ResultPanelCoveredFeatures.exportButton.text")); // NOI18N
         exportButton.addActionListener(new java.awt.event.ActionListener() {
@@ -196,7 +199,9 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
      * @param coveredFeaturesResultNew 
      */
     public void addCoveredFeatures(final CoveredFeatureResult coveredFeaturesResultNew) {
-        final int nbColumns = 9;
+        tableFilter.setTrackMap(coveredFeaturesResultNew.getTrackMap());
+        
+        final int nbColumns = 10;
         final List<CoveredFeature> features = new ArrayList<>(coveredFeaturesResultNew.getResults());
         
         if (this.coveredFeaturesResult == null) {
@@ -209,7 +214,7 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
         
         DefaultTableModel model = (DefaultTableModel) coveredFeaturesTable.getModel();
 
-        PersistantFeature feature;
+        PersistentFeature feature;
         for (CoveredFeature coveredFeature : features) {
 
             Object[] rowData = new Object[nbColumns];
@@ -219,9 +224,10 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
             rowData[i++] = coveredFeaturesResultNew.getTrackEntry(coveredFeature.getTrackId(), false);
             rowData[i++] = coveredFeaturesResultNew.getChromosomeMap().get(feature.getChromId());
             rowData[i++] = feature.isFwdStrandString();
-            rowData[i++] = feature.isFwdStrand() ? feature.getStart() : feature.getStop();
-            rowData[i++] = feature.isFwdStrand() ? feature.getStop() : feature.getStart();
-            rowData[i++] = feature.getStop() - feature.getStart();
+            rowData[i++] = feature.getStartOnStrand();
+            rowData[i++] = feature.getStopOnStrand();
+            rowData[i++] = feature.getLength();
+            rowData[i++] = coveredFeature.getMeanCoverage();
             rowData[i++] = coveredFeature.getPercentCovered();
             rowData[i++] = coveredFeature.getNoCoveredBases();
 
@@ -249,9 +255,5 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
      */
     public int getResultSize() {
         return this.coveredFeaturesResult.getResults().size();
-    }
-    
-    public void setReferenceGenome(PersistantReference refGenome) {
-        this.refGenome = refGenome;
     }
 }

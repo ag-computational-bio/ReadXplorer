@@ -20,6 +20,8 @@ import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.DetectedFeatures;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.TransStartUnannotated;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.TranscriptionStart;
+import de.cebitec.readXplorer.util.classification.Classification;
+import java.util.List;
 
 /**
  * Starts the TSS analysis including the detection of unannotated transcripts.
@@ -64,24 +66,20 @@ public class AnalysisUnannotatedTransStart extends AnalysisTranscriptionStart {
     protected void addDetectStart(TranscriptionStart tss) {
         DetectedFeatures features = tss.getDetFeatures();
         int currentPos = tss.getPos();
+        List<Classification> excludedClasses = this.getParametersTSS().getReadClassParams().getExcludedClasses();
         
         //only if no feature is available, detect the length of the unannotated new transcript
         if (    features.getCorrectStartFeature() == null && 
                 features.getDownstreamFeature() == null &&
                 features.getUpstreamFeature() == null) {
-            
-            if (tss.isFwdStrand()) {
-                while (currentCoverage.getBestMatchFwd(currentPos) > this.getParametersTSS().getMinTranscriptExtensionCov()) {
-                    ++currentPos;
-                }
-                --currentPos;
-            } else {
-                while (currentCoverage.getBestMatchRev(currentPos) > this.getParametersTSS().getMinTranscriptExtensionCov()) { // TODO: && currentPos < referenceLength > 0
-                    --currentPos;
-                }
-                ++currentPos;
+
+            int increment = tss.isFwdStrand() ? 1 : -1;
+            while (currentCoverage.getTotalCoverage(excludedClasses, currentPos, tss.isFwdStrand())
+                    > this.getParametersTSS().getMinTranscriptExtensionCov()) {
+                currentPos += increment;
             }
-            
+            currentPos -= increment;
+
             // instead of an ordinary TranscriptStart we add the TranscriptStart with unannotated transcript information
             detectedStarts.add(new TransStartUnannotated(tss.getPos(), tss.isFwdStrand(), tss.getReadStartsAtPos(), tss.getPercentIncrease(), 
                     tss.getCoverageIncrease(), tss.getDetFeatures(), currentPos, trackCon.getTrackID(), tss.getChromId()));

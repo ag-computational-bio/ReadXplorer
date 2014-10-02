@@ -17,8 +17,9 @@
 package de.cebitec.readXplorer.featureCoverageAnalysis;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.exporter.tables.ExportDataI;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import java.util.ArrayList;
@@ -45,9 +46,9 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
      * feature detection was carried out
      * @param currentTrack the track on which this analysis result was generated
      */
-    public CoveredFeatureResult(List<CoveredFeature> results, Map<Integer, PersistantTrack> trackMap, int referenceId, 
+    public CoveredFeatureResult(List<CoveredFeature> results, Map<Integer, PersistentTrack> trackMap, PersistentReference reference, 
             boolean combineTracks, int trackColumn, int filterColumn) {
-        super(trackMap, referenceId, combineTracks, trackColumn, filterColumn);
+        super(reference, trackMap, combineTracks, trackColumn, filterColumn);
         this.results = results;
         
     }
@@ -85,6 +86,7 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
         resultDescriptions.add("Start");
         resultDescriptions.add("Stop");
         resultDescriptions.add("Length");
+        resultDescriptions.add("Mean Coverage");
         resultDescriptions.add("Covered Percent");
         resultDescriptions.add("Covered Bases Count");
         resultDescriptions.add("Locus");
@@ -107,7 +109,7 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
         List<List<List<Object>>> coveredFeaturesExport = new ArrayList<>();
         List<List<Object>> coveredFeaturesResultList = new ArrayList<>();
 
-        PersistantFeature feature;
+        PersistentFeature feature;
         for (CoveredFeature coveredFeature : this.results) {
             List<Object> coveredFeatureRow = new ArrayList<>();
             feature = coveredFeature.getCoveredFeature();
@@ -115,9 +117,10 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
             coveredFeatureRow.add(this.getTrackEntry(coveredFeature.getTrackId(), true));
             coveredFeatureRow.add(this.getChromosomeMap().get(feature.getChromId()));
             coveredFeatureRow.add(feature.isFwdStrandString());
-            coveredFeatureRow.add(feature.isFwdStrand() ? feature.getStart() : feature.getStop());
-            coveredFeatureRow.add(feature.isFwdStrand() ? feature.getStop() : feature.getStart());
-            coveredFeatureRow.add(feature.getStop() - feature.getStart());
+            coveredFeatureRow.add(feature.getStartOnStrand());
+            coveredFeatureRow.add(feature.getStopOnStrand());
+            coveredFeatureRow.add(feature.getLength());
+            coveredFeatureRow.add(coveredFeature.getMeanCoverage());
             coveredFeatureRow.add(coveredFeature.getPercentCovered());
             coveredFeatureRow.add(coveredFeature.getNoCoveredBases());
             coveredFeatureRow.add(feature.getLocus());

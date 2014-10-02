@@ -27,12 +27,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import net.sf.picard.PicardException;
 import net.sf.picard.reference.IndexedFastaSequenceFile;
+import org.openide.util.Exceptions;
 
 /**
  * A fetcher for any part of a referenc sequence stored in an indexed fasta 
  * file.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class RefSeqFetcher implements Observable {
     
@@ -71,7 +72,16 @@ public class RefSeqFetcher implements Observable {
      * the reference file stored in this object.
      */
     public String getSubSequence(String refName, int start, int stop) {
-        return new String(refFile.getSubsequenceAt(refName, start, stop).getBases(), Charset.forName("UTF-8")).toUpperCase();
+        String refSeq = "";
+        try {
+            refSeq = new String(refFile.getSubsequenceAt(refName, start, stop).getBases(), Charset.forName("UTF-8")).toUpperCase();
+        } catch (PicardException e) {
+            String msg = "Mapping and reference data are out of sync for reference " + refName + ". One of the queried positions is out of reach!"
+                    + "Reimport the correct reference or fix the mapping data!";
+            JOptionPane.showMessageDialog(new JPanel(), msg, "Reference sequence error", JOptionPane.ERROR_MESSAGE);
+            Exceptions.printStackTrace(e);
+        }
+        return refSeq;
     }
 
     @Override

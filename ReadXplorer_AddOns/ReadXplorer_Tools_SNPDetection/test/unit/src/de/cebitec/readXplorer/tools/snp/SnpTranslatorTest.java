@@ -17,13 +17,12 @@
 package de.cebitec.readXplorer.tools.snp;
 
 import de.cebitec.readXplorer.databackend.dataObjects.CodonSnp;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantSubFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.databackend.dataObjects.Snp;
-import de.cebitec.readXplorer.util.FeatureType;
 import de.cebitec.readXplorer.util.SequenceComparison;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -88,31 +87,31 @@ public class SnpTranslatorTest {
     @Test
     public void testCalcSnpList() {
         System.out.println("CalcSnpListTest");
-        PersistantFeature feat1 = new PersistantFeature(1, 1, "0", "ec1", "locus1", "product1", 1, 205, true, FeatureType.CDS, "name1");
-        PersistantFeature feat2 = new PersistantFeature(2, 2, "0", "ec2", "locus2", "product2", 2, 320, false, FeatureType.CDS, "name2");
-        PersistantFeature feat3 = new PersistantFeature(3, 3, "0", "ec3", "locus3", "product3", 430, 650, false, FeatureType.CDS, "name3");
-        PersistantFeature feat4 = new PersistantFeature(4, 4, "0", "ec4", "locus4", "product4", 570, 810, true, FeatureType.CDS, "name4");
-        PersistantFeature feat5 = new PersistantFeature(5, 5, "0", "ec5", "miRnaL5", "miRnaP5", 1000, 1100, true, FeatureType.MIRNA, "miRnaN5");
-        PersistantFeature feat6 = new PersistantFeature(6, 6, "0", "ec6", "locus6", "product6", 11000, 11130, true, FeatureType.CDS, "name6");
-        PersistantFeature feat7 = new PersistantFeature(7, 7, "0", "ec7", "locus7", "product7", 10800, 11129, false, FeatureType.CDS, "name7");
-        PersistantSubFeature subfeat1 = new PersistantSubFeature(1, 1, 7, FeatureType.EXON); //ttt aaa g
-        PersistantSubFeature subfeat2 = new PersistantSubFeature(1, 10, 100, FeatureType.EXON); //ac cgg cga ttc tag tga aat cga acg ggc agg tca att tcc aac cag cga tga cgt aat aga tag ata caa gga agt cat ttt tct ttt aa
-        PersistantSubFeature subfeat3 = new PersistantSubFeature(2, 2, 100, FeatureType.EXON); //current snp base is not incorporated in snp calculation a att tct ctg gcc gct aag atc act tta gct tgc ccg tcc agt taa agg ttg gtc gct act gca tta tct atc tat gtt cct tca gta aaa aga aaa tt
-        PersistantSubFeature subfeat4 = new PersistantSubFeature(2, 200, 260, FeatureType.EXON); //t ctt ggc cac agc tcc gac aaa gga agg act cgc ttc gga ccc cta ctt gct cta cca ata
-        PersistantSubFeature subfeat5 = new PersistantSubFeature(3, 499, 530, FeatureType.EXON); //cc gtc gtc acg cac cta gaa gag gcg cta ctc
-        PersistantSubFeature subfeat6 = new PersistantSubFeature(3, 550, 560, FeatureType.EXON); //tgt gga cct ag
-        PersistantSubFeature subfeat7 = new PersistantSubFeature(3, 580, 620, FeatureType.EXON); //g gct tcc gct gct taa cgc aca cat acg tgg gtt ggc aaa g
-        PersistantSubFeature subfeat7b = new PersistantSubFeature(3, 625, 630, FeatureType.EXON); //ag cta a
-        PersistantSubFeature subfeat8 = new PersistantSubFeature(3, 640, 650, FeatureType.EXON); //tc ttt atg gag
-        PersistantSubFeature subfeat9 = new PersistantSubFeature(4, 570, 590, FeatureType.EXON); //cag gtc gaa gcc gaa ggc gac
-        PersistantSubFeature subfeat10 = new PersistantSubFeature(4, 600, 621, FeatureType.EXON); //gtg tat gca ccc aac cgt ttc g
-        PersistantSubFeature subfeat11 = new PersistantSubFeature(4, 751, 810, FeatureType.EXON); //tc gtc cca tcg cag acc cac gtg gct ccc ccg cct ccg gtt gct ccg ccg ccg gcg cca g
-        PersistantSubFeature subfeat12 = new PersistantSubFeature(5, 1000, 1020, FeatureType.EXON); //tga agc aca cca gct atc tca
-        PersistantSubFeature subfeat13 = new PersistantSubFeature(5, 1070, 1100, FeatureType.EXON); //ggc ccg cgc cgc cgc ctg gca ggt ggc gga c
-        PersistantSubFeature subfeat14 = new PersistantSubFeature(6, 11000, 11050, FeatureType.EXON); //cta cca ggt cca ggt cga gct gct tct cga tga gga tgc gca gca cgc cca
-        PersistantSubFeature subfeat15 = new PersistantSubFeature(6, 11100, 11130, FeatureType.EXON); //gcc gat gcc gaa gat acc gac cag ggt atc g
-        PersistantSubFeature subfeat16 = new PersistantSubFeature(7, 10800, 11000, FeatureType.EXON); //gacctgccggacatgcgcgaccagcttcaggtcgccgctcgaaccgaactcgcgcgcgtggctgaccatgtgccggtgcaggtgcggaagcaggagcatcgcgcgcgcgtccgccagcttgtgcttcaggtcgtggacgagccggtccggccgccggaactggaacagcggcataacgagctgccgccgcaactggcg ccg
-        PersistantSubFeature subfeat17 = new PersistantSubFeature(7, 11100, 11129, FeatureType.EXON); //cgg cta cgg ctt cta tgg ctg gtc cca tag
+        PersistentFeature feat1 = new PersistentFeature(1, 1, "0", "ec1", "locus1", "product1", 1, 205, true, FeatureType.CDS, "name1");
+        PersistentFeature feat2 = new PersistentFeature(2, 2, "0", "ec2", "locus2", "product2", 2, 320, false, FeatureType.CDS, "name2");
+        PersistentFeature feat3 = new PersistentFeature(3, 3, "0", "ec3", "locus3", "product3", 430, 650, false, FeatureType.CDS, "name3");
+        PersistentFeature feat4 = new PersistentFeature(4, 4, "0", "ec4", "locus4", "product4", 570, 810, true, FeatureType.CDS, "name4");
+        PersistentFeature feat5 = new PersistentFeature(5, 5, "0", "ec5", "miRnaL5", "miRnaP5", 1000, 1100, true, FeatureType.MIRNA, "miRnaN5");
+        PersistentFeature feat6 = new PersistentFeature(6, 6, "0", "ec6", "locus6", "product6", 11000, 11130, true, FeatureType.CDS, "name6");
+        PersistentFeature feat7 = new PersistentFeature(7, 7, "0", "ec7", "locus7", "product7", 10800, 11129, false, FeatureType.CDS, "name7");
+//        PersistentSubFeature subfeat1 = new PersistentSubFeature(1, 1, 7, FeatureType.EXON); //ttt aaa g
+//        PersistentSubFeature subfeat2 = new PersistentSubFeature(1, 10, 100, FeatureType.EXON); //ac cgg cga ttc tag tga aat cga acg ggc agg tca att tcc aac cag cga tga cgt aat aga tag ata caa gga agt cat ttt tct ttt aa
+//        PersistentSubFeature subfeat3 = new PersistentSubFeature(2, 2, 100, FeatureType.EXON); //current snp base is not incorporated in snp calculation a att tct ctg gcc gct aag atc act tta gct tgc ccg tcc agt taa agg ttg gtc gct act gca tta tct atc tat gtt cct tca gta aaa aga aaa tt
+//        PersistentSubFeature subfeat4 = new PersistentSubFeature(2, 200, 260, FeatureType.EXON); //t ctt ggc cac agc tcc gac aaa gga agg act cgc ttc gga ccc cta ctt gct cta cca ata
+//        PersistentSubFeature subfeat5 = new PersistentSubFeature(3, 499, 530, FeatureType.EXON); //cc gtc gtc acg cac cta gaa gag gcg cta ctc
+//        PersistentSubFeature subfeat6 = new PersistentSubFeature(3, 550, 560, FeatureType.EXON); //tgt gga cct ag
+//        PersistentSubFeature subfeat7 = new PersistentSubFeature(3, 580, 620, FeatureType.EXON); //g gct tcc gct gct taa cgc aca cat acg tgg gtt ggc aaa g
+//        PersistentSubFeature subfeat7b = new PersistentSubFeature(3, 625, 630, FeatureType.EXON); //ag cta a
+//        PersistentSubFeature subfeat8 = new PersistentSubFeature(3, 640, 650, FeatureType.EXON); //tc ttt atg gag
+//        PersistentSubFeature subfeat9 = new PersistentSubFeature(4, 570, 590, FeatureType.EXON); //cag gtc gaa gcc gaa ggc gac
+//        PersistentSubFeature subfeat10 = new PersistentSubFeature(4, 600, 621, FeatureType.EXON); //gtg tat gca ccc aac cgt ttc g
+//        PersistentSubFeature subfeat11 = new PersistentSubFeature(4, 751, 810, FeatureType.EXON); //tc gtc cca tcg cag acc cac gtg gct ccc ccg cct ccg gtt gct ccg ccg ccg gcg cca g
+//        PersistentSubFeature subfeat12 = new PersistentSubFeature(5, 1000, 1020, FeatureType.EXON); //tga agc aca cca gct atc tca
+//        PersistentSubFeature subfeat13 = new PersistentSubFeature(5, 1070, 1100, FeatureType.EXON); //ggc ccg cgc cgc cgc ctg gca ggt ggc gga c
+//        PersistentSubFeature subfeat14 = new PersistentSubFeature(6, 11000, 11050, FeatureType.EXON); //cta cca ggt cca ggt cga gct gct tct cga tga gga tgc gca gca cgc cca
+//        PersistentSubFeature subfeat15 = new PersistentSubFeature(6, 11100, 11130, FeatureType.EXON); //gcc gat gcc gaa gat acc gac cag ggt atc g
+//        PersistentSubFeature subfeat16 = new PersistentSubFeature(7, 10800, 11000, FeatureType.EXON); //gacctgccggacatgcgcgaccagcttcaggtcgccgctcgaaccgaactcgcgcgcgtggctgaccatgtgccggtgcaggtgcggaagcaggagcatcgcgcgcgcgtccgccagcttgtgcttcaggtcgtggacgagccggtccggccgccggaactggaacagcggcataacgagctgccgccgcaactggcg ccg
+//        PersistentSubFeature subfeat17 = new PersistentSubFeature(7, 11100, 11129, FeatureType.EXON); //cgg cta cgg ctt cta tgg ctg gtc cca tag
 //        feat1.addSubFeature(subfeat1);
 //        feat1.addSubFeature(subfeat2);
 //        feat2.addSubFeature(subfeat3);
@@ -131,7 +130,7 @@ public class SnpTranslatorTest {
 //        feat6.addSubFeature(subfeat15);
 //        feat7.addSubFeature(subfeat16);
 //        feat7.addSubFeature(subfeat17);
-        List<PersistantFeature> featuresFound = new ArrayList<>();
+        List<PersistentFeature> featuresFound = new ArrayList<>();
         featuresFound.add(feat1);
         featuresFound.add(feat2);
         featuresFound.add(feat3);
@@ -160,7 +159,7 @@ public class SnpTranslatorTest {
         Snp snp17 = new Snp(11127, 1, 1, 'T', 'A', 5, 0, 0, 20, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION, 37, 37);
         Snp snp18 = new Snp(11128, 1, 1, 'N', 'T', 0, 0, 0, 5, 20, 0, 25, 80, SequenceComparison.SUBSTITUTION, 37, 37); //contains an N
         Snp snp19 = new Snp(11129, 1, 1, 'G', 'C', 0, 0, 20, 5, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION, 37, 37); 
-        Snp snp20 = new Snp(11130, 1, 1, '_', 'G', 20, 0, 5, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION, 37, 37); //contains a _
+        Snp snp20 = new Snp(11130, 1, 1, '-', 'G', 20, 0, 5, 0, 0, 0, 25, 80, SequenceComparison.SUBSTITUTION, 37, 37); //contains a _
         
         List<Snp> snps = new ArrayList<>();
         snps.add(snp1);
@@ -191,8 +190,8 @@ public class SnpTranslatorTest {
 //        featureTypes.add(FeatureType.EXON);
 //        featureTypes.add(FeatureType.MIRNA);
         SnpTranslator snpTranslator = new SnpTranslator(featuresFound, 
-                new PersistantChromosome(1, 1, 1, "genome", 1), 
-                new PersistantReference(1, "test", "test", null, new File("")));
+                new PersistentChromosome(1, 1, 1, "genome", 1), 
+                new PersistentReference(1, "test", "test", null, new File("")));
         for (Snp snp : snps){
             snpTranslator.checkForFeature(snp);
         }

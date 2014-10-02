@@ -22,7 +22,7 @@ import java.awt.Rectangle;
 /**
  * Utility class for common methods to aid painting of data.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class PaintUtilities {
 

@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.featureCoverageAnalysis;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.TrackResultEntry;
 
 /**
@@ -27,10 +27,11 @@ import de.cebitec.readXplorer.databackend.dataObjects.TrackResultEntry;
  */
 public class CoveredFeature extends TrackResultEntry {
     
-    private PersistantFeature coveredFeature;
-    private int annoLength;
+    private PersistentFeature coveredFeature;
+    private int featLength;
     private int noCoveredBases;
     private int percentCovered;
+    private int meanCoverage = 0;
 
     /**
      * Data structure for storing an feature (gene), which is detected as 
@@ -38,10 +39,10 @@ public class CoveredFeature extends TrackResultEntry {
      * @param coveredFeature the feature which is detected as covered
      * @param noCoveredBases the number of covered bases of this feature
      */
-    public CoveredFeature(PersistantFeature coveredFeature, int trackId) {
+    public CoveredFeature(PersistentFeature coveredFeature, int trackId) {
         super(trackId);
         this.coveredFeature = coveredFeature;
-        this.annoLength = Math.abs(coveredFeature.getStop() - coveredFeature.getStart());
+        this.featLength = coveredFeature.getLength();
     }
 
     /**
@@ -50,13 +51,13 @@ public class CoveredFeature extends TrackResultEntry {
      */
     public void setNoCoveredBases(int noCoveredBases) {
         this.noCoveredBases = noCoveredBases;
-        this.percentCovered = (int) ((float) this.noCoveredBases / this.annoLength * 100);
+        this.percentCovered = (int) ((float) this.noCoveredBases / this.featLength * 100);
     }
 
     /**
      * @return the feature which is detected as covered
      */
-    public PersistantFeature getCoveredFeature() {
+    public PersistentFeature getCoveredFeature() {
         return this.coveredFeature;
     }
 
@@ -72,5 +73,19 @@ public class CoveredFeature extends TrackResultEntry {
      */
     public int getPercentCovered() {
         return this.percentCovered;
+    }
+
+    /**
+     * @return The mean coverage of this feature.
+     */
+    public int getMeanCoverage() {
+        return this.meanCoverage;
+    }
+
+    /**
+     * @param meanCoverage The mean coverage of this feature.
+     */
+    public void setMeanCoverage(int meanCoverage) {
+        this.meanCoverage = meanCoverage;
     }
 }

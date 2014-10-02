@@ -264,16 +264,16 @@ public class SamUtils implements Observable {
                 case S : break; //soft clipped read bases
                 case D : stop += e.getLength(); break; //dels
                 case I : break; //insertions
-                case N : 
+                case N : //skipped reference bases are excluded
                     if (!fstElement) {
                         alignmentBlocks.add(new SamAlignmentBlock(start, stop));
                     }
                     stop += e.getLength(); 
                     start = stop + 1;
-                    break;  //skipped reference bases are excluded
-                case M : 
+                    break;  
+                case M : //match or mismatch
                 case EQ :
-                case X :
+                case X : //mismatch
                     stop += e.getLength();
                     fstElement = false;
                     break;

@@ -17,8 +17,8 @@
 package de.cebitec.readXplorer.transcriptionAnalyses;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.DetectedFeatures;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.TransStartUnannotated;
@@ -67,7 +67,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
     private ReferenceViewer referenceViewer;
     private TssDetectionResult tssResult;
     private HashMap<String, Integer> statisticsMap;
-    private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
+    private TableRightClickFilter<UneditableTableModel> tableFilter;
     
     
     /**
@@ -76,6 +76,10 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
      */
     public ResultPanelTranscriptionStart() {
         this.initComponents();
+        final int posColumnIdx = 0;
+        final int trackColumnIdx = 1;
+        final int chroColumnIdx = 2;
+        tableFilter = new TableRightClickFilter<>(UneditableTableModel.class, posColumnIdx, trackColumnIdx);
         this.tSSTable.getTableHeader().addMouseListener(tableFilter);
         this.initStatsMap();
        
@@ -84,8 +88,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                int posColumnIdx = 0;
-                int chroColumnIdx = 2;
                 TableUtils.showPosition(tSSTable, posColumnIdx, chroColumnIdx, getBoundsInfoManager());
             }
         });
@@ -229,6 +231,8 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
     @NbBundle.Messages("ResultPanelTranscriptionStart.parametersLabel.text_1=Parameters: min no read starts:  {0},  min coverage increase percent: {1}%,  max leaderless dist.: {2},  init. low cov. read start max:  {3},  min low cov. read starts: {4},  detect novel transcripts: {5},  transcript extension cov.: {6}")
     public void addResult(final ResultTrackAnalysis newResult) {
 
+        tableFilter.setTrackMap(newResult.getTrackMap());
+        
         if (newResult instanceof TssDetectionResult) {
             final TssDetectionResult tssResultNew = (TssDetectionResult) newResult;
             final List<TranscriptionStart> tsss = new ArrayList<>(tssResultNew.getResults());
@@ -259,7 +263,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                     String strand;
                     int distance;
                     DetectedFeatures detFeatures;
-                    PersistantFeature feature;
+                    PersistentFeature feature;
                     TransStartUnannotated tSSU;
 
                     for (TranscriptionStart tss : tsss) {
@@ -341,7 +345,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                     TableRowSorter<TableModel> sorter = new TableRowSorter<>();
                     tSSTable.setRowSorter(sorter);
                     sorter.setModel(model);
-                    TableComparatorProvider.setPersistantTrackComparator(sorter, 1);
+                    TableComparatorProvider.setPersistentTrackComparator(sorter, 1);
 
                     String unannotatedTranscriptDet = tssParameters.isPerformUnannotatedTranscriptDet() ? "yes" : "no";
                     parametersLabel.setText(Bundle.ResultPanelTranscriptionStart_parametersLabel_text_1(tssParameters.getMinNoReadStarts(), tssParameters.getMinPercentIncrease(),
@@ -381,7 +385,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
         this.promotorRegions = new ArrayList<>();
         
         //get reference sequence for promotor regions
-        PersistantReference ref = this.referenceViewer.getReference();
+        PersistentReference ref = this.referenceViewer.getReference();
         String promotor;
         
         //get the promotor region for each TSS

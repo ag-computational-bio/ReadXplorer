@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.view.tableVisualization;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.parser.tables.TableType;
 import de.cebitec.readXplorer.util.UneditableTableModel;
 import de.cebitec.readXplorer.view.tableVisualization.tableFilter.TableRightClickFilter;
@@ -28,31 +28,54 @@ import javax.swing.event.ListSelectionListener;
  * Creates a new position table panel. A position table starts with a column
  * containing the position.
  * 
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class PosTablePanel extends TablePanel {
     private static final long serialVersionUID = 1L;
     private final UneditableTableModel tableData;
-    private PersistantReference reference;
-    private TableType tableType;
-    private TableRightClickFilter<UneditableTableModel> filterListener = new TableRightClickFilter<>(UneditableTableModel.class);
+    private PersistentReference reference;
+    private TableRightClickFilter<UneditableTableModel> filterListener;
 
     /**
      * Creates a new position table panel. A position table starts with a column
      * containing the position.
      * @param tableData The data to display in this panel's table.
+     * @param tableType The type of data table.
      */
-    public PosTablePanel(UneditableTableModel tableData) {
+    public PosTablePanel(UneditableTableModel tableData, TableType tableType) {
         this.tableData = tableData;
+        final int posColumn = 0;
+        final int trackColumn;
+        final int chromColumn;
+        switch (tableType) {
+            case COVERAGE_ANALYSIS: //fallthrough
+            case RPKM_ANALYSIS: //fallthrough
+            case SNP_DETECTION: //fallthrough
+            case OPERON_DETECTION:
+                trackColumn = 2;
+                chromColumn = 3;
+                break;
+            case DIFF_GENE_EXPRESSION:
+                chromColumn = 1;
+                trackColumn = 2;
+                break;
+            case FEATURE_COVERAGE_ANALYSIS: //fallthrough
+            case TSS_DETECTION: //fallthrough
+            default:
+                trackColumn = 1;
+                chromColumn = 2;
+                break; //for all other tables
+        }
         this.initComponents();
-        this.initAdditionalComponents();
+        this.initAdditionalComponents(posColumn, chromColumn);
+        filterListener = new TableRightClickFilter<>(UneditableTableModel.class, posColumn, trackColumn);
         this.dataTable.getTableHeader().addMouseListener(filterListener);
     }
 
     /**
      * Initializes additionals stuff for this panel.
      */
-    private void initAdditionalComponents() {
+    private void initAdditionalComponents(final int posColumn, final int chromColumn) {
         this.dataTable.setModel(this.tableData);
         
         DefaultListSelectionModel model = (DefaultListSelectionModel) dataTable.getSelectionModel();
@@ -60,20 +83,8 @@ public class PosTablePanel extends TablePanel {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                
-            final int posColumn = 0;
-            final int chromColumn;
-            switch (tableType) {
-                case COVERAGE_ANALYSIS          : //fallthrough
-                case RPKM_ANALYSIS              : //fallthrough
-                case SNP_DETECTION              : //fallthrough
-                case OPERON_DETECTION           : chromColumn = 3; break;
-                case DIFF_GENE_EXPRESSION       : chromColumn = 1; break;
-                case FEATURE_COVERAGE_ANALYSIS  : //fallthrough
-                case TSS_DETECTION              : //fallthrough
-                default                         : chromColumn = 2; break; //for all other tables
-            }//TODO: feature position - map mit features im ram halten
-            //TODO: after closing of ref and reopening, it does not react anymore
+                //TODO: feature position - map mit features im ram halten
+                //TODO: after closing of ref and reopening, it does not react anymore
                 TableUtils.showPosition(dataTable, posColumn, chromColumn, getBoundsInfoManager(), reference);
             }
         });
@@ -137,18 +148,15 @@ public class PosTablePanel extends TablePanel {
     /**
      * @param reference The reference genome, for which this table was imported.
      */
-    public void setReferenceGenome(PersistantReference reference) {
+    public void setReferenceGenome(PersistentReference reference) {
         this.reference = reference;
     }
     
     /**
      * @return The reference genome, for which this table was imported.
      */
-    public PersistantReference getReferenceGenome() {
+    public PersistentReference getReferenceGenome() {
         return this.reference;
     }
 
-    public void setTableType(TableType tableType) {
-        this.tableType = tableType;
-    }
 }

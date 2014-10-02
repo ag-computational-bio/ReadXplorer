@@ -21,7 +21,7 @@ import org.netbeans.spi.options.OptionsPanelController;
 /**
  * Controller for genetic code options.
  * 
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 @OptionsPanelController.TopLevelRegistration(categoryName = "#OptionsCategory_Name_GeneticCode",
 iconBase = "de/cebitec/readXplorer/options/geneticCode.png",

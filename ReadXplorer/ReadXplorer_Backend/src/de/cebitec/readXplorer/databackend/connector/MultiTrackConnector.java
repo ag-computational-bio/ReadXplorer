@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.databackend.connector;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.io.FileNotFoundException;
 import java.util.List;
 
@@ -27,11 +27,11 @@ import java.util.List;
  */
 public class MultiTrackConnector extends TrackConnector {
 
-    MultiTrackConnector(PersistantTrack track) throws FileNotFoundException {
+    MultiTrackConnector(PersistentTrack track) throws FileNotFoundException {
         super(track);
     }
 
-    MultiTrackConnector(List<PersistantTrack> tracks) throws FileNotFoundException {
+    MultiTrackConnector(List<PersistentTrack> tracks) throws FileNotFoundException {
         super(9999, tracks, false);
     }
 }

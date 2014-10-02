@@ -36,7 +36,7 @@ import org.openide.util.NbBundle;
 /**
  * A provider for panels containing generally available options.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class LegendAndOptionsProvider {
     

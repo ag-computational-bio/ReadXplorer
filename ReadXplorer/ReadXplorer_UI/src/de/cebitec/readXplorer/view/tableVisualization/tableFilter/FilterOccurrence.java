@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.view.tableVisualization.tableFilter;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -36,24 +36,24 @@ class FilterOccurrence<E extends DefaultTableModel> {
     
 
     private final String selectedButton;
-    private final int occurrenceNumber;
+    private final int occurrenceCount;
     private int sortedTable;
     private E sortedTableModel;
     private final TableRightClickFilter<E> tableRightClickFilter;
     private E tableModel;
     private Class<E> classType;
-    private int tableColumnPosition;
-    private int tableColumnTrack;
+    private int posColumn;
+    private int trackColumn;
 
-    public FilterOccurrence(String selectedButton, int occurrenceNumber, TableRightClickFilter<E> tableRightClickFilter, 
-            int track, int position) {
+    public FilterOccurrence(String selectedButton, int occurrenceCount, TableRightClickFilter<E> tableRightClickFilter, 
+            int trackColumn, int posColumn) {
         this.selectedButton = selectedButton;
-        this.occurrenceNumber = occurrenceNumber;
+        this.occurrenceCount = occurrenceCount;
         this.tableRightClickFilter = tableRightClickFilter;
         classType = tableRightClickFilter.getClassType();
         tableModel = (E) tableRightClickFilter.getLastTable().getModel();
-        tableColumnPosition = position;
-        tableColumnTrack = track;
+        this.posColumn = posColumn;
+        this.trackColumn = trackColumn;
     }
 
     public void filterTable() {
@@ -81,7 +81,7 @@ class FilterOccurrence<E extends DefaultTableModel> {
              */
             @Override
             public int compare(Vector o1, Vector o2) {
-                return ((Integer) o1.get(tableColumnPosition)).compareTo(((Integer) o2.get(tableColumnPosition)));
+                return ((Integer) o1.get(posColumn)).compareTo(((Integer) o2.get(posColumn)));
             }
         });
 
@@ -104,8 +104,8 @@ class FilterOccurrence<E extends DefaultTableModel> {
         Set<String> matchingPositions = new HashSet<>();
 
         for (Entry<String, Set<Integer>> positionInTracks : uniqueTracksPerPosition.entrySet()) {
-            if ((selectedButton.equals("max") && positionInTracks.getValue().size() <= occurrenceNumber)
-                    || (selectedButton.equals("min") && positionInTracks.getValue().size() >= occurrenceNumber)
+            if ((selectedButton.equals("max") && positionInTracks.getValue().size() <= occurrenceCount)
+                    || (selectedButton.equals("min") && positionInTracks.getValue().size() >= occurrenceCount)
                     || (selectedButton.equals("all") && tableRightClickFilter.getTrackMap().size() == 
                     positionInTracks.getValue().size())) {
                 matchingPositions.add(positionInTracks.getKey());
@@ -114,7 +114,7 @@ class FilterOccurrence<E extends DefaultTableModel> {
 
         for (Object dataRowObject : dataRows) {
             Vector dataRow = (Vector) dataRowObject;
-            if (matchingPositions.contains(String.valueOf(dataRow.get(tableColumnPosition)))) {
+            if (matchingPositions.contains(String.valueOf(dataRow.get(posColumn)))) {
                 comparedTableModel.addRow(dataRow);
             }
 
@@ -136,11 +136,11 @@ class FilterOccurrence<E extends DefaultTableModel> {
         Map<String, Set<Integer>> uniqueTracksPerPosition = new HashMap<>();
 
         for (Vector currentRow : dataRows) {
-            String currentPosition = String.valueOf(currentRow.get(tableColumnPosition));
+            String currentPosition = String.valueOf(currentRow.get(posColumn));
             if (!uniqueTracksPerPosition.containsKey(currentPosition)) {
                 uniqueTracksPerPosition.put(currentPosition, new HashSet<Integer>());
             }
-            Integer currentTrack = ((PersistantTrack) currentRow.get(tableColumnTrack)).getId();
+            Integer currentTrack = ((PersistentTrack) currentRow.get(trackColumn)).getId();
             uniqueTracksPerPosition.get(currentPosition).add(currentTrack);
         }
 

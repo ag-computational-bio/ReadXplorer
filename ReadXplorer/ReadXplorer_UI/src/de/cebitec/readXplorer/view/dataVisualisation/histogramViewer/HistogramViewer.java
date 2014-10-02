@@ -20,11 +20,12 @@ import de.cebitec.readXplorer.databackend.IntervalRequest;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.databackend.ThreadListener;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistant;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantCoverage;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantDiff;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReferenceGap;
+import de.cebitec.readXplorer.databackend.dataObjects.Coverage;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResult;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
+import de.cebitec.readXplorer.databackend.dataObjects.Difference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.ReferenceGap;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
@@ -62,15 +63,15 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
 //    private InputOutput io;
     private static int height = 200;
     private TrackConnector trackConnector;
-    private PersistantReference refGen;
+    private PersistentReference refGen;
     private GenomeGapManager gapManager;
     private int lowerBound;
     private int upperBound;
     private int width;
-    private List<PersistantReferenceGap> gaps;
-    private List<PersistantDiff> diffs;
+    private List<ReferenceGap> gaps;
+    private List<Difference> diffs;
     private LogoDataManager logoData;
-    private PersistantCoverage cov;
+    private CoverageManager cov;
     private boolean dataLoaded;
     private boolean isColored = false;
     private boolean diffsLoaded;
@@ -96,7 +97,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
      * @param refGen the reference sequence object
      * @param trackConnector the track connector
      */
-    public HistogramViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistantReference refGen, TrackConnector trackConnector) {
+    public HistogramViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistentReference refGen, TrackConnector trackConnector) {
         super(boundsInfoManager, basePanel, refGen);
 //        this.io = IOProvider.getDefault().getIO(NbBundle.getMessage(HistogramViewer.class, "HistogramViewer.output.name"), false);
         this.refGen = refGen;
@@ -111,7 +112,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         gapManager = new GenomeGapManager(lowerBound, upperBound);
         gaps = new ArrayList<>();
         diffs = new ArrayList<>();
-        cov = new PersistantCoverage(lowerBound, lowerBound);
+        cov = new CoverageManager(lowerBound, lowerBound);
         this.showSequenceBar(true, true);
     }
 
@@ -137,26 +138,27 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
                     relPos += gapManager.getNumOfGapsAt(logPos);
                 }
             }
-
-            int complete = cov.getCommonFwd(logPos);
-            if (complete != 0) {
-                appendStatsTable(sb, complete, relPos, true, "Forward strand", false);
+            
+            Coverage totalCov = cov.getTotalCoverage(this.getExcludedClassifications());
+            int coverage = totalCov.getFwdCov(logPos);
+            if (coverage != 0) {
+                appendStatsTable(sb, coverage, relPos, true, "Forward strand", false);
             }
 
-            complete = cov.getCommonRev(logPos);
-            if (complete != 0) {
-                appendStatsTable(sb, complete, relPos, false, "Reverse strand", false);
+            coverage = totalCov.getRevCov(logPos);
+            if (coverage != 0) {
+                appendStatsTable(sb, coverage, relPos, false, "Reverse strand", false);
             }
 
             if (gapManager != null && gapManager.hasGapAt(logPos)) {
                 int tmp = logPos + gapManager.getNumOfGapsSmaller(logPos);
                 for (int i = 0; i < gapManager.getNumOfGapsAt(logPos); ++i) {
                     sb.append("<tr><td align=\"left\"><b>Gap position ").append(logPos).append("_").append(i+1).append("</b></td></tr>");
-                    complete = cov.getCommonFwd(logPos);
-                    appendStatsTable(sb, complete, tmp, true, "Genome gaps forward", true);
+                    coverage = totalCov.getFwdCov(logPos);
+                    appendStatsTable(sb, coverage, tmp, true, "Genome gaps forward", true);
 
-                    complete = cov.getCommonFwd(logPos);
-                    appendStatsTable(sb, complete, tmp, false, "Genome gaps reverse", true);
+                    coverage = totalCov.getRevCov(logPos);
+                    appendStatsTable(sb, coverage, tmp, false, "Genome gaps reverse", true);
                     ++tmp;
                 }
             }
@@ -240,6 +242,7 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
                 this.setupData();
             }
         } else {
+            this.setNewDataRequestNeeded(false);
             setCursor(new Cursor(Cursor.WAIT_CURSOR));
             this.coverageLoaded = false;
             this.diffsLoaded = false;
@@ -250,14 +253,14 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
 
     @Override
     public synchronized void receiveData(Object data) {
-        if (data instanceof CoverageAndDiffResultPersistant) {
-            final CoverageAndDiffResultPersistant result = (CoverageAndDiffResultPersistant) data;
+        if (data instanceof CoverageAndDiffResult) {
+            final CoverageAndDiffResult result = (CoverageAndDiffResult) data;
             SwingUtilities.invokeLater(new Runnable() {
 
                 @Override
                 public void run() {
-                    if (!coverageLoaded && result.getCoverage().getRightBound() != 0 && result.getRequest().getTotalFrom() <= lowerBound && result.getRequest().getTotalTo() >= upperBound) {
-                        cov = result.getCoverage();
+                    if (!coverageLoaded && result.getCovManager().getRightBound() != 0 && result.getRequest().getTotalFrom() <= lowerBound && result.getRequest().getTotalTo() >= upperBound) {
+                        cov = result.getCovManager();
                         coverageLoaded = true;
                     }
                     if (result.getRequest().isDiffsAndGapsNeeded() && !diffsLoaded && result.getRequest().getTotalFrom() <= lowerBound && result.getRequest().getTotalTo() >= upperBound) {
@@ -557,11 +560,11 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
      */
     private void fillGapManager() {
         HashMap<Integer, Integer> positionToNum = new HashMap<>();
-        PersistantReferenceGap gap;
+        ReferenceGap gap;
         int gapPosition;
         int gapOrder;
         int oldValue;
-        for (Iterator<PersistantReferenceGap> it = gaps.iterator(); it.hasNext();) {
+        for (Iterator<ReferenceGap> it = gaps.iterator(); it.hasNext();) {
             gap = it.next();
             gapPosition = gap.getPosition();
             gapOrder = gap.getOrder() + 1;
@@ -596,20 +599,19 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
         int relPos;
         for (int i = lowerBound; i <= upperBound; i++) {
             relPos = i + gapManager.getNumOfGapsAt(i) + gapManager.getNumOfGapsSmaller(i);
-            logoData.setCoverageAt(relPos, cov.getCommonFwd(i), true);
-            logoData.setCoverageAt(relPos, cov.getCommonRev(i), false);
-
+            logoData.setCoverageAt(relPos, cov.getTotalCoverage(getExcludedClassifications(), i, true), true);
+            logoData.setCoverageAt(relPos, cov.getTotalCoverage(getExcludedClassifications(), i, false), false);
         }
 
         // store diff information from the reference genome in logo data
-        PersistantDiff d;
+        Difference d;
         int position;
-        for (Iterator<PersistantDiff> it = diffs.iterator(); it.hasNext();) {
+        for (Iterator<Difference> it = diffs.iterator(); it.hasNext();) {
             d = it.next();
             position = d.getPosition();
             if (position > lowerBound && position < upperBound) {
                 relPos = position + gapManager.getNumOfGapsAt(d.getPosition()) + gapManager.getNumOfGapsSmaller(d.getPosition());
-                logoData.addExtendedPersistantDiff(d, relPos);
+                logoData.addExtendedPersistentDiff(d, relPos);
             } else if (position > upperBound) {
                 break;
             }

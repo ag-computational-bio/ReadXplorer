@@ -16,8 +16,8 @@
  */
 package de.cebitec.readXplorer.ui.visualisation.reference;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.polyTree.Node;
 import de.cebitec.readXplorer.view.TopComponentExtended;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.JFeature;
@@ -270,7 +270,7 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended implemen
     private javax.swing.JTextField locusField;
     private javax.swing.JLabel locusLabel;
     private javax.swing.JLabel parentLabel;
-    private javax.swing.JList<PersistantFeature> parentList;
+    private javax.swing.JList<PersistentFeature> parentList;
     private javax.swing.JLabel productLabel;
     private javax.swing.JTextArea productText;
     private javax.swing.JTextField startField;
@@ -280,7 +280,7 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended implemen
     private javax.swing.JLabel strandLabel;
     private javax.swing.JTextField strandText;
     private javax.swing.JLabel subfeatureLabel;
-    private javax.swing.JList<PersistantFeature> subfeatureList;
+    private javax.swing.JList<PersistentFeature> subfeatureList;
     private javax.swing.JLabel typeLabel;
     private javax.swing.JTextField typeText;
     // End of variables declaration//GEN-END:variables
@@ -333,14 +333,14 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended implemen
     public void resultChanged(LookupEvent ev) {
         for (ReferenceViewer refViewer : result.allInstances()) {
             JFeature feature = refViewer.getCurrentlySelectedFeature();
-            this.showFeatureDetails(feature != null ? feature.getPersistantFeature() : null);
+            this.showFeatureDetails(feature != null ? feature.getPersistentFeature() : null);
 
             refViewer.addPropertyChangeListener(ReferenceViewer.PROP_FEATURE_SELECTED, new PropertyChangeListener() {
 
                 @Override
                 public void propertyChange(PropertyChangeEvent evt) {
                     JFeature feature = (JFeature) evt.getNewValue();
-                    showFeatureDetails(feature.getPersistantFeature());
+                    showFeatureDetails(feature.getPersistentFeature());
                 }
             });
         }
@@ -380,12 +380,12 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended implemen
      * Displays the feature details in their belonging visual components.
      * @param feat the feature whose details should be shown
      */
-    public void showFeatureDetails(PersistantFeature feat) {
+    public void showFeatureDetails(PersistentFeature feat) {
         
         String strand = "";
         if (feat != null) {
-            Vector<PersistantFeature> parentVect = this.getFeatureVector(feat.getParents(), "Root feature");
-            Vector<PersistantFeature> childrenVect = this.getFeatureVector(feat.getNodeChildren(), "No children");
+            Vector<PersistentFeature> parentVect = this.getFeatureVector(feat.getParents(), "Root feature");
+            Vector<PersistentFeature> childrenVect = this.getFeatureVector(feat.getNodeChildren(), "No children");
             
             this.ecNumField.setText(feat.getEcNumber());
             this.startField.setText(String.valueOf(feat.getStart()));
@@ -414,23 +414,23 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended implemen
     }
     
     /**
-     * Transforms the given node list into a vector of persistant features.
+     * Transforms the given node list into a vector of persistent features.
      * The vector only contains elements, if the nodes are instances of 
-     * <tt>PersistantFeature</tt>.
+     * <tt>PersistentFeature</tt>.
      * @param featureList The list of features to convert
      * @param replacement The replacement string in case the list is empty
      * @return The vector of features
      */
-    private Vector<PersistantFeature> getFeatureVector(List<Node> featureList, String replacement) {
-       Vector<PersistantFeature> featureVect = new Vector<>();
+    private Vector<PersistentFeature> getFeatureVector(List<Node> featureList, String replacement) {
+       Vector<PersistentFeature> featureVect = new Vector<>();
        for (Node parentNode : featureList) {
-           if (parentNode instanceof PersistantFeature) {
-               PersistantFeature feature = (PersistantFeature) parentNode;
+           if (parentNode instanceof PersistentFeature) {
+               PersistentFeature feature = (PersistentFeature) parentNode;
                featureVect.add(feature);
            }
        }
        if (featureVect.isEmpty()) {
-           featureVect.add(new PersistantFeature(0, 0, "", "", replacement, "", 0, 0, true, FeatureType.UNDEFINED, ""));
+           featureVect.add(new PersistentFeature(0, 0, "", "", replacement, "", 0, 0, true, FeatureType.UNDEFINED, ""));
        }
        return featureVect;
    }
@@ -446,8 +446,8 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended implemen
         if (selectedModelRow > -1) {
             Object value = table.getModel().getValueAt(selectedModelRow, featureColumnIndex);
 
-            if (value instanceof PersistantFeature) {
-                this.showFeatureDetails((PersistantFeature) value);
+            if (value instanceof PersistentFeature) {
+                this.showFeatureDetails((PersistentFeature) value);
             }
         }
     }

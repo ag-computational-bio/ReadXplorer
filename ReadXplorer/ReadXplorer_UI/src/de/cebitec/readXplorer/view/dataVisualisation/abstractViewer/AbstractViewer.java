@@ -17,9 +17,9 @@
 package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
 
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.ColorProperties;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.Classification;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfo;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.LogicalBoundsListener;
@@ -64,7 +64,7 @@ import org.openide.util.Exceptions;
  * methods for these values. Tooltips in this viewer are initially shown for 
  * 20 seconds.
  * 
- * @author ddoppmeier, rhilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author ddoppmeier, rhilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public abstract class AbstractViewer extends JPanel implements LogicalBoundsListener, MousePositionListener {
 
@@ -96,7 +96,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     private SequenceBar seqBar;
     private boolean centerSeqBar;
     private PaintingAreaInfo paintingAreaInfo;
-    private PersistantReference reference;
+    private PersistentReference reference;
     private boolean isInMaxZoomLevel;
     private boolean inDrawingMode;
     private boolean isActive;
@@ -108,7 +108,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     private boolean hasOptions;
     private JPanel chromSelectionPanel;
     private boolean hasChromSelection;
-    private List<FeatureType> excludedFeatureTypes;
+    private List<Classification> excludedClassifications;
     private byte minMappingQuality = 0;
     private boolean pAInfoIsAvailable = false;
     public static final String PROP_MOUSEPOSITION_CHANGED = "mousePos changed";
@@ -132,7 +132,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      * @param basePanel the base panel to paint data on
      * @param reference the associated reference genome
      */
-    public AbstractViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference reference) {
+    public AbstractViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistentReference reference) {
         super();
         
         //read loadingIndicator icon from package resources
@@ -143,7 +143,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
             Exceptions.printStackTrace(ex);
         }
         
-        this.excludedFeatureTypes = new ArrayList<>();
+        this.excludedClassifications = new ArrayList<>();
         this.setLayout(null);
         this.setBackground(AbstractViewer.backgroundColor);
         this.boundsManager = boundsManager;
@@ -266,10 +266,26 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     }
 
     /**
+     * Updates the painting area info of this viewer according to the currently
+     * available heigth and width.
+     */
+    protected void adjustPaintingAreaInfo() {
+        this.adjustPaintingAreaInfo(this.getSize().height);
+    }
+    
+    /**
+     * Updates the painting area info of this viewer according to the preferred 
+     * available heigth and width.
+     */
+    protected void adjustPaintingAreaInfoPrefSize() {
+        this.adjustPaintingAreaInfo(this.getPreferredSize().height);
+    }
+    
+    /**
      * Updates the painting area info of this viewer according to the available
      * heigth and width.
      */
-    private void adjustPaintingAreaInfo() {
+    private void adjustPaintingAreaInfo(int height) {
         if (this.getHeight() > 0 && this.getWidth() > 0) {
             pAInfoIsAvailable = true;
             paintingAreaInfo.setForwardHigh(verticalMargin);
@@ -280,8 +296,8 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
             // if existent, leave space for sequence bar
             if (this.seqBar != null) {
                 if (centerSeqBar) {
-                    int y1 = this.getSize().height / 2 - seqBar.getSize().height / 2;
-                    int y2 = this.getSize().height / 2 + seqBar.getSize().height / 2;
+                    int y1 = height / 2 - seqBar.getSize().height / 2;
+                    int y2 = height / 2 + seqBar.getSize().height / 2;
                     seqBar.setBounds(0, y1, paintingAreaInfo.getPhyRight(), seqBar.getSize().height);
                     paintingAreaInfo.setForwardLow(y1 - 1);
                     paintingAreaInfo.setReverseLow(y2 + 1);
@@ -292,8 +308,8 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
                 }
 
             } else {
-                paintingAreaInfo.setForwardLow(this.getSize().height / 2 - 1);
-                paintingAreaInfo.setReverseLow(this.getSize().height / 2 + 1);
+                paintingAreaInfo.setForwardLow(height / 2 - 1);
+                paintingAreaInfo.setReverseLow(height / 2 + 1);
             }
         } else {
             pAInfoIsAvailable = false;
@@ -597,7 +613,6 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     @Override
     public void updateLogicalBounds(BoundsInfo bounds) {
         if (this.isActive() && !this.bounds.equals(bounds)) {
-            this.newDataRequestNeeded = true;
             this.bounds = bounds;
             this.calcBaseWidth();
             this.recalcCorrelationFactor();
@@ -615,8 +630,12 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         }
 
         if (this.scrollPane != null && this.centerScrollBar) {
-            JScrollBar verticalBar = this.scrollPane.getVerticalScrollBar();
-            verticalBar.setValue(verticalBar.getMaximum() / 2 - this.getParent().getHeight() / 2);
+            try {
+                JScrollBar verticalBar = this.scrollPane.getVerticalScrollBar();
+                verticalBar.setValue(verticalBar.getMaximum() / 2 - this.getParent().getHeight() / 2);
+            } catch (ArrayIndexOutOfBoundsException e) {
+                //ignore this problem, TODO: identify source of ArrayIndexOutOfBoundsException
+            }
         }
     }
     
@@ -838,7 +857,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     /**
      * @return The reference genome associated with this ReferenceViewer instance.
      */
-    public PersistantReference getReference() {
+    public PersistentReference getReference() {
         return this.reference;
     }
 
@@ -902,8 +921,12 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
         return this.chromSelectionPanel;
     }
 
-    public List<FeatureType> getExcludedFeatureTypes() {
-        return this.excludedFeatureTypes;
+    /**
+     * @return The list of classification types, which are currently
+     * excluded from the view/calculations by the user.
+     */
+    public List<Classification> getExcludedClassifications() {
+        return this.excludedClassifications;
     }
     
     /**
@@ -928,11 +951,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      * parameter selection and converts them to a ParametersReadClasses object.
      */
     public ParametersReadClasses getReadClassParams() {
-        boolean perfectCovWanted = !this.getExcludedFeatureTypes().contains(FeatureType.PERFECT_COVERAGE);
-        boolean bestMatchCovWanted = !this.getExcludedFeatureTypes().contains(FeatureType.BEST_MATCH_COVERAGE);
-        boolean commonCovWanted = !this.getExcludedFeatureTypes().contains(FeatureType.COMMON_COVERAGE);
-        boolean multipleMappedReadsWanted = this.getExcludedFeatureTypes().contains(FeatureType.MULTIPLE_MAPPED_READ);
-        return new ParametersReadClasses(perfectCovWanted, bestMatchCovWanted, commonCovWanted, multipleMappedReadsWanted, this.getMinMappingQuality());
+        return new ParametersReadClasses(this.getExcludedClassifications(), this.getMinMappingQuality());
     }
 
     public boolean isMouseOverPaintingRequested() {
@@ -977,6 +996,10 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      */
     public void setScrollPane(JScrollPane scrollPane) {
         this.scrollPane = scrollPane;
+    }
+    
+    public JScrollPane getScrollPane() {
+        return this.scrollPane;
     }
     
     /**

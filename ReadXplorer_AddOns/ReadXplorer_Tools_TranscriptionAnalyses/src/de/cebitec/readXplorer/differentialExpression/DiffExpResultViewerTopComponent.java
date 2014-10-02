@@ -26,6 +26,7 @@ import static de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler.To
 import static de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler.Tool.DeSeq;
 import static de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler.Tool.ExpressTest;
 import de.cebitec.readXplorer.differentialExpression.plot.BaySeqGraphicsTopComponent;
+import de.cebitec.readXplorer.differentialExpression.plot.DeSeq2GraphicsTopComponent;
 import de.cebitec.readXplorer.differentialExpression.plot.DeSeqGraphicsTopComponent;
 import de.cebitec.readXplorer.differentialExpression.plot.ExpressTestGraphicsTopComponent;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
@@ -87,6 +88,9 @@ import org.openide.windows.TopComponent;
 public final class DiffExpResultViewerTopComponent extends TopComponentExtended implements Observer, ItemListener {
 
     private static final long serialVersionUID = 1L;
+    private static final int posIdx = 0;
+    private static final int trackIdx = 2;
+    private static final int chromIdx = 1;
     private TableModel tm;
     private ComboBoxModel<Object> cbm;
     private final ArrayList<DefaultTableModel> tableModels = new ArrayList<>();
@@ -96,7 +100,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
     private DeAnalysisHandler analysisHandler;
     private DeAnalysisHandler.Tool usedTool;
     private final ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Differential Gene Expression Analysis");
-    private final TableRightClickFilter<UneditableTableModel> rktm = new TableRightClickFilter<>(UneditableTableModel.class);
+    private final TableRightClickFilter<UneditableTableModel> rktm = new TableRightClickFilter<>(UneditableTableModel.class, posIdx, trackIdx);
     private ReferenceFeatureTopComp refComp;
 
     public DiffExpResultViewerTopComponent() {
@@ -127,15 +131,11 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
      * reference position of the currently selected genomic feature.
      */
     private void showPosition() {
-        Collection<ViewController> viewControllers
-                = (Collection<ViewController>) CentralLookup.getDefault().lookupAll(ViewController.class);
-        analysisHandler.getRefGenomeID();
-        for (Iterator<ViewController> it = viewControllers.iterator(); it.hasNext();) {
-            ViewController tmpVCon = it.next();
+        Collection<? extends ViewController> viewControllers = CentralLookup.getDefault().lookupAll(ViewController.class);
+        for (ViewController tmpVCon : viewControllers) {
             BoundsInfoManager bm = tmpVCon.getBoundsManager();
             if (bm != null && analysisHandler.getRefGenomeID() == tmpVCon.getCurrentRefGen().getId()) {
-                int posIdx = 0;
-                int chromIdx = 1;
+
                 TableUtils.showPosition(topCountsTable, posIdx, chromIdx, bm);
             }
         }
@@ -156,7 +156,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
                 Vector<Vector> tableContents;
                 switch (usedTool) {
                     case ExportCountTable:
-                        //fallthrough, since handling is same as for DESeq2
+                    //fallthrough, since handling is same as for DESeq2
                     case DeSeq2:
                         colNames.add(0, "Feature");
                         tableContents = currentResult.getTableContentsContainingRowNames();
@@ -179,14 +179,15 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
             topCountsTable.setRowSorter(trs);
             if (usedTool == ExpressTest) {
                 List<RowSorter.SortKey> sortKeys = new ArrayList<>();
-                sortKeys.add(new RowSorter.SortKey(8, SortOrder.DESCENDING));
+                sortKeys.add(new RowSorter.SortKey(7, SortOrder.DESCENDING));
                 trs.setSortKeys(sortKeys);
                 trs.sort();
             }
-
-            createGraphicsButton.setEnabled(true);
+            if (usedTool != DeAnalysisHandler.Tool.ExportCountTable) {
+                createGraphicsButton.setEnabled(true);
+                showLogButton.setEnabled(true);
+            }
             saveTableButton.setEnabled(true);
-            showLogButton.setEnabled(true);
             resultComboBox.setEnabled(true);
             topCountsTable.setEnabled(true);
             jLabel1.setEnabled(true);
@@ -303,11 +304,17 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended 
                 ptc.open();
                 ptc.requestActive();
                 break;
+            case DeSeq2:
+                graphicsTopComponent = new DeSeq2GraphicsTopComponent(analysisHandler);
+                analysisHandler.registerObserver((DeSeq2GraphicsTopComponent) graphicsTopComponent);
+                graphicsTopComponent.open();
+                graphicsTopComponent.requestActive();
+                break;
         }
     }//GEN-LAST:event_createGraphicsButtonActionPerformed
 
     private void saveTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTableButtonActionPerformed
-        TableExportFileChooser fileChooser = new TableExportFileChooser(TableExportFileChooser.getTableFileExtensions(), 
+        TableExportFileChooser fileChooser = new TableExportFileChooser(TableExportFileChooser.getTableFileExtensions(),
                 new TableToExcel(resultComboBox.getSelectedItem().toString(), (UneditableTableModel) topCountsTable.getModel()));
     }//GEN-LAST:event_saveTableButtonActionPerformed
 

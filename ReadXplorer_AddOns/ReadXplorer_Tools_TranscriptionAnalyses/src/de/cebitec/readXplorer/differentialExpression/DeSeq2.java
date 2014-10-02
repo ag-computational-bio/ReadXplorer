@@ -156,19 +156,7 @@ public class DeSeq2 {
         String path = file.getAbsolutePath();
         path = path.replace("\\", "\\\\");
         gnuR.eval("svg(filename=\"" + path + "\")");
-        gnuR.eval("plotDispEsts(cD)");
-        gnuR.eval("dev.off()");
-    }
-
-    public void plotDE(File file) throws IllegalStateException, PackageNotLoadableException {
-        if (gnuR == null) {
-            throw new IllegalStateException("Shutdown was already called!");
-        }
-        gnuR.loadPackage("grDevices");
-        String path = file.getAbsolutePath();
-        path = path.replace("\\", "\\\\");
-        gnuR.eval("svg(filename=\"" + path + "\")");
-        gnuR.eval("plotDE(res)");
+        gnuR.eval("plotDispEsts(dds)");
         gnuR.eval("dev.off()");
     }
 

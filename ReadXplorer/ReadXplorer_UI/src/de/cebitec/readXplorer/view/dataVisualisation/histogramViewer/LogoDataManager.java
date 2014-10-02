@@ -16,8 +16,8 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.histogramViewer;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantDiff;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReferenceGap;
+import de.cebitec.readXplorer.databackend.dataObjects.Difference;
+import de.cebitec.readXplorer.databackend.dataObjects.ReferenceGap;
 import de.cebitec.readXplorer.view.dataVisualisation.GenomeGapManager;
 import java.util.Collection;
 import java.util.logging.Level;
@@ -141,7 +141,7 @@ public class LogoDataManager {
      * @param position relative position at which the diff occurs, taking into
      * account previous gaps and insertions
      */
-    public void addExtendedPersistantDiff(PersistantDiff diff, int position) {
+    public void addExtendedPersistentDiff(Difference diff, int position) {
         char base = diff.getBase();
         int row = 0;
         switch (base) {
@@ -150,7 +150,7 @@ public class LogoDataManager {
             case 'G': row = G; break;
             case 'T': row = T; break;
             case 'N': row = N; break;
-            case '_': row = READGAP; break;
+            case '-': row = READGAP; break;
             default:
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown base {0}", base);
         }
@@ -193,8 +193,8 @@ public class LogoDataManager {
      * @param gaps the collection of gaps to add
      * @param gapManager the genome gap manager for the given gaps
      */
-    public void addGaps(Collection<PersistantReferenceGap> gaps, GenomeGapManager gapManager) {
-        for (PersistantReferenceGap gap : gaps) {
+    public void addGaps(Collection<ReferenceGap> gaps, GenomeGapManager gapManager) {
+        for (ReferenceGap gap : gaps) {
             int origPos = gap.getPosition();
             
             if (origPos > this.absStart && origPos < this.stop) {

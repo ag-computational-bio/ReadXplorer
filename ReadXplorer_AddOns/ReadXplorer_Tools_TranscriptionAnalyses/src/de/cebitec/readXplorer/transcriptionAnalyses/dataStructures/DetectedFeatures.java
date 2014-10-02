@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.transcriptionAnalyses.dataStructures;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 
 /**
  * Data structure for storing the features belonging to a certain position. E.g.
@@ -29,9 +29,9 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
  */
 public class DetectedFeatures {
     
-    private PersistantFeature upstreamFeature;
-    private PersistantFeature correctStartFeature;
-    private PersistantFeature downstreamFeature;
+    private PersistentFeature upstreamFeature;
+    private PersistentFeature correctStartFeature;
+    private PersistentFeature downstreamFeature;
 
     /**
      * Data structure for storing the features belonging to a certain
@@ -44,27 +44,27 @@ public class DetectedFeatures {
     public DetectedFeatures() {
     }
     
-    public PersistantFeature getDownstreamFeature() {
+    public PersistentFeature getDownstreamFeature() {
         return this.downstreamFeature;
     }
 
-    public void setDownstreamFeature(PersistantFeature downstreamFeature) {
+    public void setDownstreamFeature(PersistentFeature downstreamFeature) {
         this.downstreamFeature = downstreamFeature;
     }
 
-    public PersistantFeature getCorrectStartFeature() {
+    public PersistentFeature getCorrectStartFeature() {
         return this.correctStartFeature;
     }
 
-    public void setCorrectStartFeature(PersistantFeature correctStartFeature) {
+    public void setCorrectStartFeature(PersistentFeature correctStartFeature) {
         this.correctStartFeature = correctStartFeature;
     }
 
-    public PersistantFeature getUpstreamFeature() {
+    public PersistentFeature getUpstreamFeature() {
         return this.upstreamFeature;
     }
 
-    public void setUpstreamFeature(PersistantFeature upstreamFeature) {
+    public void setUpstreamFeature(PersistentFeature upstreamFeature) {
         this.upstreamFeature = upstreamFeature;
     }
     

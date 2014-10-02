@@ -18,10 +18,10 @@ package de.cebitec.readXplorer.ui.visualisation.reference;
 
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
@@ -64,7 +64,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
     private final static long serialVersionUID = 247246234;
     private int jumpPosition;
     private String searchPattern;
-    private PersistantReference refGenome;
+    private PersistentReference refGenome;
     private ReferenceConnector refGenCon;
     private BoundsInfoManager boundsManager;
     private ReferenceViewer curRefViewer;
@@ -437,7 +437,7 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JCheckBox chromCheckBox;
-    private javax.swing.JComboBox<PersistantChromosome> chromComboBox;
+    private javax.swing.JComboBox<PersistentChromosome> chromComboBox;
     private javax.swing.JPanel featureGroundPanel;
     private javax.swing.JTable featureTable;
     private javax.swing.JLabel filterForLabel;
@@ -463,36 +463,38 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
      * @param viewer The viewer to navigate
      */
     public void setViewer(AbstractViewer viewer) {
-        boolean firstCall = this.viewer == null || this.chromObserver == null;
-        this.updateFeatTableObserver(this.refGenome, viewer, firstCall);
-        this.viewer = viewer;
-        this.refGenome = viewer.getReference();
-        this.boundsManager = viewer.getBoundsInformationManager();
-        refGenCon = ProjectConnector.getInstance().getRefGenomeConnector(refGenome.getId());
-        
-        if (refGenome.getNoChromosomes() > 1) {
+        if (viewer != this.viewer) {
+            boolean firstCall = this.viewer == null || this.chromObserver == null;
+            this.updateFeatTableObserver(this.refGenome, viewer, firstCall);
+            this.viewer = viewer;
+            this.refGenome = viewer.getReference();
+            this.boundsManager = viewer.getBoundsInformationManager();
+            refGenCon = ProjectConnector.getInstance().getRefGenomeConnector(refGenome.getId());
 
-            ChromosomeVisualizationHelper chromHelper = new ChromosomeVisualizationHelper();
-            if (firstCall) {
-                //Update the observer for changes to the chromosome selection anywhere else
-                this.chromObserver = chromHelper.createChromBoxWithObserver(chromComboBox, refGenome);
+            if (refGenome.getNoChromosomes() > 1) {
 
-                //Update the listener for changes to the chromosome selection in this box
-                chromListener = chromHelper.new ChromosomeListener(chromComboBox, viewer);
+                ChromosomeVisualizationHelper chromHelper = new ChromosomeVisualizationHelper();
+                if (firstCall) {
+                    //Update the observer for changes to the chromosome selection anywhere else
+                    this.chromObserver = chromHelper.createChromBoxWithObserver(chromComboBox, refGenome);
+
+                    //Update the listener for changes to the chromosome selection in this box
+                    chromListener = chromHelper.new ChromosomeListener(chromComboBox, viewer);
+                } else {
+                    this.chromObserver.setRefGenome(refGenome);
+                    this.chromListener.setViewer(viewer);
+                    chromHelper.updateChromBoxContent(chromComboBox, refGenome);
+                }
+
+                this.chromComboBox.setVisible(true);
+                this.chromCheckBox.setVisible(true);
+                this.chromComboBox.repaint();
             } else {
-                this.chromObserver.setRefGenome(refGenome);
-                this.chromListener.setViewer(viewer);
-                chromHelper.updateChromBoxContent(chromComboBox, refGenome);
+                this.chromComboBox.setVisible(false);
+                this.chromCheckBox.setVisible(false);
             }
-
-            this.chromComboBox.setVisible(true);
-            this.chromCheckBox.setVisible(true);
-            this.chromComboBox.repaint();
-        } else {
-            this.chromComboBox.setVisible(false);
-            this.chromCheckBox.setVisible(false);
+            this.fillFeatureList();
         }
-        this.fillFeatureList();
     }
     
     /**
@@ -505,7 +507,7 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
      * @param firstCall true, if the object variables are not set yet, false,
      * if the JumpPanel had already displayed content for another reference.
      */
-    private void updateFeatTableObserver(PersistantReference refGenome, AbstractViewer viewer, boolean firstCall) {
+    private void updateFeatTableObserver(PersistentReference refGenome, AbstractViewer viewer, boolean firstCall) {
         if (!firstCall) {
             refGenome.removeObserver(this.featTableObserver);
         }
@@ -530,9 +532,9 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
      * and displays the list in the featureTable.
      */
     private void fillFeatureList() {
-        List<PersistantFeature> features = new ArrayList<>();
+        List<PersistentFeature> features = new ArrayList<>();
         if (this.chromCheckBox.isSelected()) { //TODO: improve performance or add waiting symbol somewhere
-            for (PersistantChromosome chrom: refGenome.getChromosomes().values()) {
+            for (PersistentChromosome chrom: refGenome.getChromosomes().values()) {
                 features.addAll(refGenCon.getFeaturesForRegion(0, chrom.getLength(),
                         FeatureType.ANY, chrom.getId()));
             }
@@ -541,7 +543,8 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
                     FeatureType.ANY, refGenome.getActiveChromId());
         }
         Collections.sort(features, new FeatureNameSorter());
-        PersistantFeature[] featureData = features.toArray(new PersistantFeature[features.size()]);
+        PersistentFeature.Utils.addParentFeatures(features);
+        PersistentFeature[] featureData = features.toArray(new PersistentFeature[features.size()]);
 
         //Create new Model for Table
         featureTable.setModel(new FeatureTableModel(featureData));
@@ -596,10 +599,10 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
         this.filterTextfield.addMouseListener(new StandardMenuEvent());
     }
 
-    private class FeatureNameSorter implements Comparator<PersistantFeature> {
+    private class FeatureNameSorter implements Comparator<PersistentFeature> {
 
         @Override
-        public int compare(PersistantFeature o1, PersistantFeature o2) {
+        public int compare(PersistentFeature o1, PersistentFeature o2) {
             String name1 = o1.getLocus();
             String name2 = o2.getLocus();
 

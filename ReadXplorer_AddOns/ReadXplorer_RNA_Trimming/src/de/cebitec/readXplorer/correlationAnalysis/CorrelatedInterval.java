@@ -24,7 +24,7 @@ import de.cebitec.readXplorer.databackend.dataObjects.TrackChromResultEntry;
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 public class CorrelatedInterval extends TrackChromResultEntry {
-    private CorrelationAnalysisProcessor.StrandDirection direction;
+    private byte strand;
     
     private int from; 
     private int to;
@@ -35,7 +35,7 @@ public class CorrelatedInterval extends TrackChromResultEntry {
     /**
      * CorrelatedInterval is a data class, that saves the data about a
      * correlation between the data of two tracks in a defined interval.
-     * @param direction
+     * @param strand
      * @param track1Id
      * @param chromId
      * @param from
@@ -43,10 +43,10 @@ public class CorrelatedInterval extends TrackChromResultEntry {
      * @param correlation
      * @param minPeakCoverage 
      */
-    public CorrelatedInterval(CorrelationAnalysisProcessor.StrandDirection direction,
+    public CorrelatedInterval(byte strand,
             int track1Id, int track2Id, int chromId, int from, int to, double correlation, double minPeakCoverage) {
         super(track1Id, chromId);
-        this.direction = direction;
+        this.strand = strand;
         this.from = from;
         this.to = to;
         this.correlation = correlation;
@@ -54,17 +54,17 @@ public class CorrelatedInterval extends TrackChromResultEntry {
     }
 
     /**
-     * @return the direction
+     * @return the strand
      */
-    public CorrelationAnalysisProcessor.StrandDirection getDirection() {
-        return direction;
+    public byte getDirection() {
+        return strand;
     }
 
     /**
-     * @param direction the direction to set
+     * @param strand the strand to set
      */
-    public void setDirection(CorrelationAnalysisProcessor.StrandDirection direction) {
-        this.direction = direction;
+    public void setDirection(byte strand) {
+        this.strand = strand;
     }
 
     /**

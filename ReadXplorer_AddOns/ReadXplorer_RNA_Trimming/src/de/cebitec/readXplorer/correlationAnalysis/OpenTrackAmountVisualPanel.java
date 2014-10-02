@@ -20,8 +20,10 @@ import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
 import de.cebitec.readXplorer.view.dialogMenus.OpenTracksVisualPanel;
 
 /**
+ * A track selection panel requiring the selection of a certain amount of tracks 
+ * to proceed.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class OpenTrackAmountVisualPanel extends OpenTracksVisualPanel {
     private static final long serialVersionUID = 1L;
@@ -29,6 +31,12 @@ public class OpenTrackAmountVisualPanel extends OpenTracksVisualPanel {
     private Integer selectedAmount;
     private final TrackListPanel parent;
 
+    /**
+     * A track selection panel requiring the selection of a certain amount of
+     * tracks to proceed.
+     * @param referenceID id of the reference genome
+     * @param parent the parent track list panel
+     */
     public OpenTrackAmountVisualPanel(int referenceID, TrackListPanel parent) {
         super(referenceID);
         this.parent = parent;
@@ -37,7 +45,7 @@ public class OpenTrackAmountVisualPanel extends OpenTracksVisualPanel {
     
     @Override
     public boolean isRequiredInfoSet() {
-        boolean isRequiredInfoSet = this.getSelectAmount() > -1 && 
+        boolean isRequiredInfoSet = super.isRequiredInfoSet() && this.getSelectAmount() > -1 && 
                                     this.getSelectAmount() == this.getSelectedTracks().size();
         if (!isRequiredInfoSet) {
             this.parent.setErrorMsg("Please select " + this.getSelectAmount() + " tracks! (You selected "

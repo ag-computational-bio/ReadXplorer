@@ -18,7 +18,7 @@ package de.cebitec.readXplorer.plotting;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readXplorer.controller.ViewController;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import java.awt.Point;
@@ -65,7 +65,7 @@ public class MouseActions implements ChartMouseListener {
     public void chartMouseMoved(ChartMouseEvent cme) {
     }
 
-    private void showPosition(PersistantFeature feature) {
+    private void showPosition(PersistentFeature feature) {
         if (feature != null) {
             int pos = feature.getStart();
             Collection<ViewController> viewControllers = (Collection<ViewController>) CentralLookup.getDefault().lookupAll(ViewController.class);

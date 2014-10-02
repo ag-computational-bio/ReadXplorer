@@ -20,6 +20,11 @@ import de.cebitec.readXplorer.api.objects.JobPanel;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readXplorer.util.classification.Classification;
+import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readXplorer.util.classification.MappingClass;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.prefs.Preferences;
 import javax.swing.ToolTipManager;
 import org.openide.util.NbPreferences;
@@ -33,7 +38,6 @@ import org.openide.util.NbPreferences;
 public class SelectReadClassVisualPanel extends JobPanel {
     
     private static final long serialVersionUID = 1L;
-    private boolean usingADBTrack;
     private final String wizardName;
     private byte minMappingQual;
 
@@ -48,7 +52,6 @@ public class SelectReadClassVisualPanel extends JobPanel {
      */
     public SelectReadClassVisualPanel(String wizardName, boolean isFeatureAnalysis) {
         this.wizardName = wizardName;
-        this.usingADBTrack = false;
         this.initComponents();
         this.updateStrandOptionLabels(isFeatureAnalysis);
 
@@ -100,6 +103,8 @@ public class SelectReadClassVisualPanel extends JobPanel {
         strandOppositeRadioButton = new javax.swing.JRadioButton();
         descriptionRCScrollPane = new javax.swing.JScrollPane();
         decriptionRCTextArea = new javax.swing.JTextArea();
+        checkBoxSinglePerfect = new javax.swing.JCheckBox();
+        checkBoxSingleBestMatch = new javax.swing.JCheckBox();
 
         decriptionStrandTextArea.setEditable(false);
         decriptionStrandTextArea.setBackground(new java.awt.Color(240, 240, 240));
@@ -121,7 +126,6 @@ public class SelectReadClassVisualPanel extends JobPanel {
             }
         });
 
-        checkBoxBestMatch.setSelected(true);
         org.openide.awt.Mnemonics.setLocalizedText(checkBoxBestMatch, org.openide.util.NbBundle.getMessage(SelectReadClassVisualPanel.class, "SelectReadClassVisualPanel.checkBoxBestMatch.text")); // NOI18N
         checkBoxBestMatch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -171,6 +175,22 @@ public class SelectReadClassVisualPanel extends JobPanel {
         decriptionRCTextArea.setWrapStyleWord(true);
         descriptionRCScrollPane.setViewportView(decriptionRCTextArea);
 
+        checkBoxSinglePerfect.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(checkBoxSinglePerfect, org.openide.util.NbBundle.getMessage(SelectReadClassVisualPanel.class, "SelectReadClassVisualPanel.checkBoxSinglePerfect.text")); // NOI18N
+        checkBoxSinglePerfect.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkBoxSinglePerfectActionPerformed(evt);
+            }
+        });
+
+        checkBoxSingleBestMatch.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(checkBoxSingleBestMatch, org.openide.util.NbBundle.getMessage(SelectReadClassVisualPanel.class, "SelectReadClassVisualPanel.checkBoxSingleBestMatch.text")); // NOI18N
+        checkBoxSingleBestMatch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkBoxSingleBestMatchActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -179,53 +199,60 @@ public class SelectReadClassVisualPanel extends JobPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jSeparator2)
-                    .addComponent(descriptionRCScrollPane)
-                    .addComponent(descriptionStrandScrollPane)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(checkBoxPerfect)
+                            .addComponent(checkBoxSinglePerfect)
+                            .addComponent(checkBoxSingleBestMatch)
+                            .addComponent(checkBoxBestMatch)
+                            .addComponent(checkBoxCommon))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(checkBoxBestMatch)
-                                    .addComponent(checkBoxPerfect)
-                                    .addComponent(checkBoxCommon))
+                                .addComponent(minMappingQualityField, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(minMappingQualityField, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(minMappingQualLabel))
-                                    .addComponent(checkBoxUnique)))
+                                .addComponent(minMappingQualLabel))
+                            .addComponent(checkBoxUnique))
+                        .addGap(0, 160, Short.MAX_VALUE))
+                    .addComponent(descriptionRCScrollPane)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(strandLabel)
                             .addComponent(strandFeatureRadioButton)
                             .addComponent(strandOppositeRadioButton)
                             .addComponent(strandBothRadioButton))
-                        .addGap(0, 3, Short.MAX_VALUE)))
-                .addContainerGap())
+                        .addGap(154, 154, 154))
+                    .addComponent(descriptionStrandScrollPane))
+                .addGap(4, 4, 4))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(descriptionRCScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 82, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(12, 12, 12)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addComponent(descriptionRCScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(checkBoxPerfect)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(checkBoxBestMatch))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(checkBoxUnique)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                     .addComponent(minMappingQualityField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(minMappingQualLabel))))
+                                    .addComponent(minMappingQualLabel)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(checkBoxSinglePerfect)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(checkBoxPerfect)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(checkBoxSingleBestMatch)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(checkBoxBestMatch)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(checkBoxCommon))
-                    .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -243,33 +270,38 @@ public class SelectReadClassVisualPanel extends JobPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void checkBoxCommonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxCommonActionPerformed
-        if (this.checkBoxCommon.isSelected()) {
-            this.checkBoxUnique.setSelected(false);
-        }
-        this.checkBoxUnique.setEnabled(!this.checkBoxCommon.isSelected() && !this.usingADBTrack);
-        this.isRequiredInfoSet();
+        this.updateUniqueBox();
     }//GEN-LAST:event_checkBoxCommonActionPerformed
 
     private void checkBoxUniqueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxUniqueActionPerformed
-        if (this.checkBoxUnique.isSelected()) {
-            this.checkBoxCommon.setSelected(false);
-        }
+        this.checkBoxPerfect.setEnabled(!this.checkBoxUnique.isSelected());
+        this.checkBoxBestMatch.setEnabled(!this.checkBoxUnique.isSelected());
         this.checkBoxCommon.setEnabled(!this.checkBoxUnique.isSelected());
         this.isRequiredInfoSet();
     }//GEN-LAST:event_checkBoxUniqueActionPerformed
 
     private void checkBoxPerfectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxPerfectActionPerformed
-        this.isRequiredInfoSet();
+        this.updateUniqueBox();
     }//GEN-LAST:event_checkBoxPerfectActionPerformed
 
     private void checkBoxBestMatchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxBestMatchActionPerformed
-        this.isRequiredInfoSet();
+        this.updateUniqueBox();
     }//GEN-LAST:event_checkBoxBestMatchActionPerformed
+
+    private void checkBoxSinglePerfectActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxSinglePerfectActionPerformed
+        this.isRequiredInfoSet();
+    }//GEN-LAST:event_checkBoxSinglePerfectActionPerformed
+
+    private void checkBoxSingleBestMatchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBoxSingleBestMatchActionPerformed
+        this.isRequiredInfoSet();
+    }//GEN-LAST:event_checkBoxSingleBestMatchActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox checkBoxBestMatch;
     private javax.swing.JCheckBox checkBoxCommon;
     private javax.swing.JCheckBox checkBoxPerfect;
+    private javax.swing.JCheckBox checkBoxSingleBestMatch;
+    private javax.swing.JCheckBox checkBoxSinglePerfect;
     private javax.swing.JCheckBox checkBoxUnique;
     private javax.swing.JTextArea decriptionRCTextArea;
     private javax.swing.JTextArea decriptionStrandTextArea;
@@ -286,6 +318,11 @@ public class SelectReadClassVisualPanel extends JobPanel {
     private javax.swing.JRadioButton strandOppositeRadioButton;
     // End of variables declaration//GEN-END:variables
 
+    private void updateUniqueBox() {
+        this.checkBoxUnique.setEnabled(!checkBoxPerfect.isSelected() && !checkBoxBestMatch.isSelected() && !checkBoxCommon.isSelected());
+        this.isRequiredInfoSet();
+    }
+    
     /**
      * @return <code>true</code>, if at least one read class is selected, 
      * <code>false</code> otherwise
@@ -295,7 +332,9 @@ public class SelectReadClassVisualPanel extends JobPanel {
         boolean isValidated = 
                    this.checkBoxPerfect.isSelected()
                 || this.checkBoxBestMatch.isSelected()
-                || this.checkBoxCommon.isSelected();
+                || this.checkBoxCommon.isSelected()
+                || this.checkBoxSinglePerfect.isSelected()
+                || this.checkBoxSingleBestMatch.isSelected();
         
         if (GeneralUtils.isValidByteInput(minMappingQualityField.getText())) {
             this.minMappingQual = Byte.parseByte(minMappingQualityField.getText());
@@ -311,13 +350,14 @@ public class SelectReadClassVisualPanel extends JobPanel {
      * scaled mapping quality and the selected strand option.
      */
     public ParametersReadClasses getReadClassParams() {
-        return new ParametersReadClasses(
-                this.checkBoxPerfect.isSelected(), 
-                this.checkBoxBestMatch.isSelected(), 
-                this.checkBoxCommon.isSelected(), 
-                this.checkBoxUnique.isSelected(), 
-                this.minMappingQual,
-                this.getSelectedStrandOption());
+        List<Classification> excludedClasses = new ArrayList<>();
+        if (!checkBoxPerfect.isSelected())          { excludedClasses.add(MappingClass.PERFECT_MATCH); }
+        if (!checkBoxBestMatch.isSelected())        { excludedClasses.add(MappingClass.BEST_MATCH); }
+        if (!checkBoxCommon.isSelected())           { excludedClasses.add(MappingClass.COMMON_MATCH); }
+        if (!checkBoxUnique.isSelected())           { excludedClasses.add(FeatureType.MULTIPLE_MAPPED_READ); }
+        if (!checkBoxSinglePerfect.isSelected())    { excludedClasses.add(MappingClass.SINGLE_PERFECT_MATCH); }
+        if (!checkBoxSingleBestMatch.isSelected())  { excludedClasses.add(MappingClass.SINGLE_BEST_MATCH); }
+        return new ParametersReadClasses(excludedClasses, this.minMappingQual, this.getSelectedStrandOption());
     }
 
     /**
@@ -346,15 +386,19 @@ public class SelectReadClassVisualPanel extends JobPanel {
      */
     private void loadLastParameterSelection() {
         Preferences pref = NbPreferences.forModule(Object.class);
-        boolean isPerfectSelected = pref.get(wizardName + SelectReadClassWizardPanel.PROP_PERFECT_SELECTED, "1").equals("1");
-        boolean isBestMatchSelected = pref.get(wizardName + SelectReadClassWizardPanel.PROP_BEST_MATCH_SELECTED, "1").equals("1");
+        boolean isPerfectSelected = pref.get(wizardName + SelectReadClassWizardPanel.PROP_PERFECT_SELECTED, "0").equals("1");
+        boolean isBestMatchSelected = pref.get(wizardName + SelectReadClassWizardPanel.PROP_BEST_MATCH_SELECTED, "0").equals("1");
         boolean isCommonMatchSelected = pref.get(wizardName + SelectReadClassWizardPanel.PROP_COMMON_MATCH_SELECTED, "0").equals("1");
+        boolean isSinglePerfectSelected = pref.get(wizardName + SelectReadClassWizardPanel.PROP_SINGLE_PERFECT_SELECTED, "1").equals("1");
+        boolean isSingleBestMatchSelected = pref.get(wizardName + SelectReadClassWizardPanel.PROP_SINGLE_BEST_MATCH_SELECTED, "1").equals("1");
         boolean isUniqueSelected = pref.get(wizardName + SelectReadClassWizardPanel.PROP_UNIQUE_SELECTED, "0").equals("1");
         String strandOption = pref.get(wizardName + SelectReadClassWizardPanel.PROP_STRAND_OPTION, String.valueOf(Properties.STRAND_FEATURE));
         
         this.checkBoxPerfect.setSelected(isPerfectSelected);
         this.checkBoxBestMatch.setSelected(isBestMatchSelected);
         this.checkBoxCommon.setSelected(isCommonMatchSelected);
+        this.checkBoxSinglePerfect.setSelected(isSinglePerfectSelected);
+        this.checkBoxSingleBestMatch.setSelected(isSingleBestMatchSelected);
         this.checkBoxUnique.setSelected(isUniqueSelected);
         this.minMappingQualityField.setText(pref.get(wizardName + SelectReadClassWizardPanel.PROP_MIN_MAPPING_QUAL, "0"));
         this.strandFeatureRadioButton.setSelected(strandOption.equals(Properties.STRAND_FEATURE_STRING));

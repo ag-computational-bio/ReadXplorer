@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.coverageAnalysis;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantResult;
+import de.cebitec.readXplorer.databackend.dataObjects.AnalysisResult;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,9 +25,9 @@ import java.util.List;
  * a all data into the format readable for the ExcelExporter. Generates all
  * three, the sheet names, headers and data to write.
  *
- * @author Tobias Zimmermann, Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Tobias Zimmermann, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
-public class CoverageIntervalContainer extends PersistantResult {
+public class CoverageIntervalContainer extends AnalysisResult {
     private static final long serialVersionUID = 1L;
 
     private List<CoverageInterval> coverageInfo;

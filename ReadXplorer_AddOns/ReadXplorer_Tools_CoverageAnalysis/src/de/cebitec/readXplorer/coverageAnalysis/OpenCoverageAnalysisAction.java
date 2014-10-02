@@ -22,7 +22,8 @@ import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
@@ -50,7 +51,7 @@ import org.openide.windows.WindowManager;
  * Action for opening the coverage analysis. It opens the wizard and runs the
  * analysis after successfully finishing the wizard.
  *
- * @author Tobias Zimmermann, Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Tobias Zimmermann, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 
 @ActionID(
@@ -68,15 +69,15 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
 
     private static final String PROP_WIZARD_NAME = "CoverageAnalysisWiz";
     private final ReferenceViewer context;
-    private int referenceId;
-    private List<PersistantTrack> tracks;
+    private PersistentReference reference;
+    private List<PersistentTrack> tracks;
     private Map<Integer, AnalysisCoverage> trackToAnalysisMap;
     private ParameterSetCoverageAnalysis parameters;
     private boolean combineTracks;
     private SelectReadClassWizardPanel readClassWizPanel;
     private OpenTracksWizardPanel openTracksPanel;
     private CoverageAnalysisTopComponent coveredAnnoAnalysisTopComp;
-    private Map<Integer, PersistantTrack> trackMap;
+    private Map<Integer, PersistentTrack> trackMap;
     private int finishedCovAnalyses = 0;
     private ResultPanelCoverageAnalysis coverageAnalysisResultPanel;
 
@@ -87,7 +88,7 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
      */
     public OpenCoverageAnalysisAction(ReferenceViewer context) {
         this.context = context;
-        this.referenceId = this.context.getReference().getId();
+        this.reference = this.context.getReference();
         this.trackToAnalysisMap = new HashMap<>();
     }
 
@@ -109,9 +110,8 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
     private void runWizarAndCoverageAnnoAnalysis() {
 
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
-        this.openTracksPanel = new OpenTracksWizardPanel(PROP_WIZARD_NAME, referenceId);
+        this.openTracksPanel = new OpenTracksWizardPanel(PROP_WIZARD_NAME, reference.getId());
         this.readClassWizPanel = new SelectReadClassWizardPanel(PROP_WIZARD_NAME, false);
-        this.openTracksPanel.setReadClassVisualPanel(readClassWizPanel.getComponent());
         panels.add(openTracksPanel);
         panels.add(new CoverageAnalysisWizardPanel());
         panels.add(readClassWizPanel);
@@ -122,7 +122,7 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
 
         //action to perform after successfully finishing the wizard
         boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
-        List<PersistantTrack> selectedTracks = openTracksPanel.getComponent().getSelectedTracks();
+        List<PersistentTrack> selectedTracks = openTracksPanel.getComponent().getSelectedTracks();
         if (!cancelled && !selectedTracks.isEmpty()) {
             this.tracks = selectedTracks;
             this.trackMap = ProjectConnector.getTrackMap(tracks);
@@ -154,7 +154,7 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
 
         TrackConnector connector;
         if (!combineTracks) {
-            for (PersistantTrack track : this.tracks) {
+            for (PersistentTrack track : this.tracks) {
                 try {
                     connector = (new SaveFileFetcherForGUI()).getTrackConnector(track);
                 } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
@@ -211,7 +211,7 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
 
                 AnalysisCoverage analysisCoverage = trackToAnalysisMap.get(trackId);
                 analysisCoverage.finishAnalysis();
-                final CoverageAnalysisResult result = new CoverageAnalysisResult(analysisCoverage.getResults(), trackMap, referenceId, combineTracks);
+                final CoverageAnalysisResult result = new CoverageAnalysisResult(analysisCoverage.getResults(), trackMap, reference, combineTracks);
            
                 result.setParameters(parameters);
                 
@@ -230,7 +230,7 @@ public final class OpenCoverageAnalysisAction implements ActionListener, DataVis
                             //get track name(s) for tab descriptions
                             String trackNames = "";
                             if (tracks != null && !tracks.isEmpty()) {
-                                for (PersistantTrack track : tracks) {
+                                for (PersistentTrack track : tracks) {
                                     trackNames = trackNames.concat(track.getDescription()).concat(" and ");
                                 }
                                 trackNames = trackNames.substring(0, trackNames.length() - 5);

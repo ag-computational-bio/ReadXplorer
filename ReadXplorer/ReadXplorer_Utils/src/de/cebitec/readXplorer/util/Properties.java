@@ -47,7 +47,7 @@ public class Properties {
     public static final String PROP_REF_AND_TRACK_VIEWERS = "RefAndTrackViewersActive";
     public static final String PROP_HISTOGRAM_VIEWER = "HistogramViewerActive";
     public static final String PROP_ALIGNMENT_VIEWER = "AlignmentViewerActive";
-    public static final String PROP_SEQ_PAIR_VIEWER = "SeqPairViewerActive";
+    public static final String PROP_READ_PAIR_VIEWER = "ReadPairViewerActive";
     
     public static final byte NONE = -1;
     public static final byte BOTH = 0;
@@ -56,12 +56,7 @@ public class Properties {
     
     /** Standard value, if all data is needed (0).*/
     public static final byte NORMAL = 0;
-    /** Perfect coverage value (1).*/
-    public static final byte PERFECT_COVERAGE = 1;
-    /** Best match coverage value (2). */
-    public static final byte BEST_MATCH_COVERAGE = 2;
-    /** Common match coverage value (3). */
-    public static final byte COMPLETE_COVERAGE = 3;
+    
     /** Value for diffs (5). */
     public static final byte DIFFS = 5;
     /** Value for mappings sorted by id (6). */
@@ -127,11 +122,7 @@ public class Properties {
     
     /** The CRAN Mirror used by Gnu R to load missing packages */
     public static final String CRAN_MIRROR = "CRAN_MIRROR";
-    
-    /* cache every track automatically when opened? */
-    public static final String OBJECTCACHE_AUTOSTART = "OBJECTCACHE_AUTOSTART";
-    public static final String OBJECTCACHE_ACTIVE = "OBJECTCACHE_ACTIVE";
-    
+        
     public static final String MAPPER_PATH = "MAPPER_PATH";
     
     /** Extension to use for bam index files (".bai"). */
@@ -143,9 +134,9 @@ public class Properties {
     
     /** Property for the height of data viewers. */
     public static final String VIEWER_HEIGHT = "VIEWER_HEIGHT";
-    /** Small viewer height = "120" pixels. */
-    public static final int SMALL_HEIGHT = 120;
-    /** Medium viewer height = "200" pixels. */
+    /** Minimum viewer height = "120" pixels. */
+    public static final int MIN_HEIGHT = 120;
+    /** Medium/default viewer height = "200" pixels. */
     public static final int DEFAULT_HEIGHT = 200;
     /** Large viewer height = "250" pixels. */
     public static final int MAX_HEIGHT = 250;

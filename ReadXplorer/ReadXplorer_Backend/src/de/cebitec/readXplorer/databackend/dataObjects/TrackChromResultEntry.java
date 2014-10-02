@@ -20,7 +20,7 @@ package de.cebitec.readXplorer.databackend.dataObjects;
  * Base class for result entries for any kind of analyses carried out on a
  * specific track data set, which need to also store their chromosome id.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class TrackChromResultEntry extends TrackResultEntry {
     

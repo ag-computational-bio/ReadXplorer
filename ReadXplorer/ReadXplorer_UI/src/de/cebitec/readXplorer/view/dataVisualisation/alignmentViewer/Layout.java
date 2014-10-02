@@ -16,8 +16,8 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
+import de.cebitec.readXplorer.util.classification.Classification;
 import de.cebitec.readXplorer.view.dataVisualisation.GenomeGapManager;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,10 +25,10 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * @author ddoppmeier, rhilker
- * 
  * A Layout holds all information to display for an alignment in different, non
  * overlapping layers. It also know which data is on the exclusion list and should not be displayed.
+ * 
+ * @author ddoppmeier, rhilker
  */
 public class Layout implements LayoutI {
 
@@ -39,9 +39,16 @@ public class Layout implements LayoutI {
     private ArrayList<LayerI> reverseLayers;
     private BlockContainer forwardBlockContainer;
     private BlockContainer reverseBlockContainer;
-    private List<FeatureType> exclusionList;
-
-    public Layout(int absStart, int absStop, Collection<PersistantMapping> mappings, List<FeatureType> exclusionList) {
+    private List<Classification> exclusionList;
+    
+    /**
+     * Creates a new layout for read mappings.
+     * @param absStart start of the interval
+     * @param absStop end of the interval
+     * @param mappings all read mappings to add to the layout
+     * @param exclusionList list of excluded feature types
+     */
+    public Layout(int absStart, int absStop, Collection<Mapping> mappings, List<Classification> exclusionList) {
         this.absStart = absStart;
         this.absStop = absStop;
         this.forwardLayers = new ArrayList<>();
@@ -61,12 +68,12 @@ public class Layout implements LayoutI {
      * type classes in the exclusion list.
      * @param mappings mappings covering current part of the genome
      */
-    private void storeGaps(Collection<PersistantMapping> mappings) {
+    private void storeGaps(Collection<Mapping> mappings) {
         gapManager = new GenomeGapManager(absStart, absStop);
-        Iterator<PersistantMapping> it = mappings.iterator();
+        Iterator<Mapping> it = mappings.iterator();
         while (it.hasNext()) {
-            PersistantMapping mapping = it.next();
-            if (!this.inExclusionList(mapping)) {
+            Mapping mapping = it.next();
+            if (!exclusionList.contains(mapping.getMappingClass())) {
                 gapManager.addGapsFromMapping(mapping.getGenomeGaps());
             }
         }
@@ -93,30 +100,30 @@ public class Layout implements LayoutI {
      * Each mapping gets one block, if it is not in a type class in the exclusion list.
      * @param mappings mappings in current interval
      */
-    private void createBlocks(Collection<PersistantMapping> mappings) {
-        Iterator<PersistantMapping> mappingIt = mappings.iterator();
+    private void createBlocks(Collection<Mapping> mappings) {
+        Iterator<Mapping> mappingIt = mappings.iterator();
         while (mappingIt.hasNext()) {
-            PersistantMapping mapping = mappingIt.next();
-            if (!this.inExclusionList(mapping)) {
+            Mapping mapping = mappingIt.next();
+            if (!exclusionList.contains(mapping.getMappingClass())) {
 
                 int start = mapping.getStart();
                 int stop = mapping.getStop();
-                
-                if (mapping.getTrimmedFromLeft()>0) {
+
+                if (mapping.getTrimmedFromLeft() > 0) {
                     if (mapping.isFwdStrand()) {
                         start -= mapping.getTrimmedFromLeft();
                     } else {
                         stop += mapping.getTrimmedFromLeft();
                     }
                 }
-                if (mapping.getTrimmedFromRight()>0) {
+                if (mapping.getTrimmedFromRight() > 0) {
                     if (mapping.isFwdStrand()) {
                         stop += mapping.getTrimmedFromRight();
                     } else {
                         start -= mapping.getTrimmedFromRight();
                     }
                 }
-                
+
                 if (start < this.absStart) {
                     start = this.absStart;
                 }
@@ -179,23 +186,6 @@ public class Layout implements LayoutI {
     @Override
     public GenomeGapManager getGenomeGapManager() {
         return gapManager;
-    }
-
-    /**
-     * Returns true if the type of the current mapping is in the exclusion list.
-     * This means it should not be displayed.
-     * @param m the mapping to test, if it should be displayed
-     * @return true, if the mapping should be excluded from being displayed, false otherwise
-     */
-    private boolean inExclusionList(PersistantMapping m) {
-        if ((m.getDifferences() == 0 && this.exclusionList.contains(FeatureType.PERFECT_COVERAGE))
-                || (m.getDifferences() > 0 && m.isBestMatch() && this.exclusionList.contains(FeatureType.BEST_MATCH_COVERAGE)) 
-                || (!m.isUnique() && this.exclusionList.contains(FeatureType.MULTIPLE_MAPPED_READ))
-                || (m.getDifferences() > 0 && !m.isBestMatch() && this.exclusionList.contains(FeatureType.COMMON_COVERAGE))){
-            return true;
-        } else {
-            return false;
-        }
     }
 
 }

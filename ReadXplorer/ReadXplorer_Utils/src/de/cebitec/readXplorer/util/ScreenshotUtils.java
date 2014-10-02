@@ -28,12 +28,14 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import org.apache.batik.dom.GenericDOMImplementation;
 import org.apache.batik.svggen.SVGGraphics2D;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
+import org.openide.awt.NotificationDisplayer;
 import org.openide.util.NbBundle;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
@@ -41,7 +43,7 @@ import org.w3c.dom.Document;
 /**
  * Class containing all methods for readxplorer, which involve screenshots.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class ScreenshotUtils {
     
@@ -57,6 +59,8 @@ public class ScreenshotUtils {
      * @param container the <code>Container</code>, for which a screenshot shall be 
      * stored
      */
+    @NbBundle.Messages({"ScreenshotUtils.SuccessMsg=Successfully saved the screenshot in ", 
+                        "ScreenshotUtils.SuccessHeader=Screenshot saved"})
     public static void saveScreenshot(final Container container) {
         try {
             if (container.isShowing()) {
@@ -100,9 +104,8 @@ public class ScreenshotUtils {
 
                                 progressHandle.finish();
 
-                                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(),
-                                        NbBundle.getMessage(ScreenshotUtils.class, "ScreenshotUtils.SuccessMsg"),
-                                        NbBundle.getMessage(ScreenshotUtils.class, "ScreenshotUtils.SuccessHeader"), JOptionPane.INFORMATION_MESSAGE);
+                                NotificationDisplayer.getDefault().notify(Bundle.ScreenshotUtils_SuccessHeader(), 
+                                        new ImageIcon(), Bundle.ScreenshotUtils_SuccessMsg() + fileLocation, null);
 
                                 Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished writing Excel file!");
                             }
@@ -153,8 +156,9 @@ public class ScreenshotUtils {
                 if (comp instanceof JScrollPane) {
                     JScrollPane pane = (JScrollPane) comp;
                     Dimension scrollViewDim = pane.getViewport().getViewSize();
-                    if (currentDim.height < scrollViewDim.height) {
-                        currentDim.height = scrollViewDim.height + comp.getLocationOnScreen().y;
+                    int totalHeight = scrollViewDim.height + comp.getLocationOnScreen().y;
+                    if (currentDim.height < totalHeight) {
+                        currentDim.height = totalHeight;
                     }
                     if (currentDim.width < scrollViewDim.width) {
                         currentDim.width = scrollViewDim.width + comp.getLocationOnScreen().x;

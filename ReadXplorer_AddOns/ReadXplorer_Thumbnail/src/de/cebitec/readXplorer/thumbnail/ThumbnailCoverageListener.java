@@ -17,8 +17,8 @@
 package de.cebitec.readXplorer.thumbnail;
 
 import de.cebitec.readXplorer.databackend.ThreadListener;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistant;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantCoverage;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResult;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfo;
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.TrackViewer;
 
@@ -35,10 +35,10 @@ class ThumbnailCoverageListener implements ThreadListener {
 
    @Override
     public void receiveData(Object resultData) {
-       if (resultData instanceof CoverageAndDiffResultPersistant) {
+       if (resultData instanceof CoverageAndDiffResult) {
            //Grenzen neu malen
-           CoverageAndDiffResultPersistant coverageResult = (CoverageAndDiffResultPersistant) resultData;
-           PersistantCoverage coverage = coverageResult.getCoverage();
+           CoverageAndDiffResult coverageResult = (CoverageAndDiffResult) resultData;
+           CoverageManager coverage = coverageResult.getCovManager();
            int middle = coverage.getLeftBound() + ((coverage.getRightBound() - coverage.getLeftBound()) / 2);
            int width = coverage.getRightBound() - coverage.getLeftBound();
            trackViewer.updateLogicalBounds(new BoundsInfo(coverage.getLeftBound(), 

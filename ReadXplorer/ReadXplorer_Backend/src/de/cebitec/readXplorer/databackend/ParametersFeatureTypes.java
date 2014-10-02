@@ -16,14 +16,14 @@
  */
 package de.cebitec.readXplorer.databackend;
 
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.util.Set;
 
 /**
  * Creates a parameters set which contains all parameters concerning the usage
  * of ReadXplorer's feature types.
  * 
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class ParametersFeatureTypes {
     private Set<FeatureType> selFeatureTypes;

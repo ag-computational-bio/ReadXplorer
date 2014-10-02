@@ -17,7 +17,7 @@
 package de.cebitec.readXplorer.transcriptionAnalyses;
 
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.RPKMvalue;
 import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
@@ -50,9 +50,9 @@ public class ResultPanelRPKM extends ResultTablePanel {
 
     private RPKMAnalysisResult rpkmCalcResult;
     private HashMap<String, Integer> filterStatisticsMap;
-    private PersistantFeature feature;
+    private PersistentFeature feature;
     private boolean statistics = false;
-    private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
+    private TableRightClickFilter<UneditableTableModel> tableFilter;
     private ReferenceFeatureTopComp refComp;
     
     /**
@@ -61,6 +61,10 @@ public class ResultPanelRPKM extends ResultTablePanel {
      */
     public ResultPanelRPKM() {
         initComponents();
+        final int posIdx = 0;
+        final int trackIdx = 2;
+        final int chromIdx = 3;
+        tableFilter = new TableRightClickFilter<>(UneditableTableModel.class, posIdx, trackIdx);
         this.rpkmTable.getTableHeader().addMouseListener(tableFilter);
         this.filterStatisticsMap = new HashMap<>();
         this.filterStatisticsMap.put(RETURNED_FEATURES, 0);
@@ -71,8 +75,6 @@ public class ResultPanelRPKM extends ResultTablePanel {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                int posIdx = 0;
-                int chromIdx = 3;
                 TableUtils.showPosition(rpkmTable, posIdx, chromIdx, getBoundsInfoManager());
                 refComp.showTableFeature(rpkmTable, 0);
             }
@@ -214,6 +216,8 @@ public class ResultPanelRPKM extends ResultTablePanel {
     @Override
     public void addResult(ResultTrackAnalysis newResult) {
 
+        tableFilter.setTrackMap(newResult.getTrackMap());
+        
         if (newResult instanceof RPKMAnalysisResult) {
             RPKMAnalysisResult rpkmCalcResultNew = (RPKMAnalysisResult) newResult;
 //            boolean moreThanOneChrom = rpkmCalcResultNew.getChromosomeMap().size() > 1;
@@ -227,7 +231,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
             }
             DefaultTableModel model = (DefaultTableModel) this.rpkmTable.getModel();
 
-            PersistantFeature feat;
+            PersistentFeature feat;
             for (RPKMvalue rpkm : rpkmCalcResult.getResults()) {
                 feat = rpkm.getFeature();
                 Object[] rowData = new Object[nbColumns];
@@ -237,9 +241,9 @@ public class ResultPanelRPKM extends ResultTablePanel {
                 rowData[i++] = this.rpkmCalcResult.getTrackEntry(rpkm.getTrackId(), false);
                 rowData[i++] = rpkmCalcResultNew.getChromosomeMap().get(feat.getChromId());
                 rowData[i++] = feat.isFwdStrandString();
-                rowData[i++] = feat.isFwdStrand() ? feat.getStart() : feat.getStop();
-                rowData[i++] = feat.isFwdStrand() ? feat.getStop() : feat.getStart();
-                rowData[i++] = feat.getStop() - feat.getStart();
+                rowData[i++] = feat.getStartOnStrand();
+                rowData[i++] = feat.getStopOnStrand();
+                rowData[i++] = feat.getLength();
                 rowData[i++] = rpkm.getRPKM();
                 rowData[i++] = rpkm.getReadCount();
 

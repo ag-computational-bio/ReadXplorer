@@ -16,9 +16,10 @@
  */
 package de.cebitec.readXplorer.databackend;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantCoverage;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReference;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readXplorer.util.classification.MappingClass;
 import java.io.File;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -58,8 +59,8 @@ public class SamBamFileReaderTest {
     @Test
     public void testGetMappingsFromBam() {
 //        System.out.println("getMappingsFromBam");
-//        PersistantReference refGenome = new PersistantReference(1, "PAO1", "PAO1", null, new File(""));
-//        PersistantChromosome chrom = new PersistantChromosome(0, 1, 1, "gi|292657124|ref|NC_013968.1|", 7000000);
+//        PersistentReference refGenome = new PersistentReference(1, "PAO1", "PAO1", null, new File(""));
+//        PersistentChromosome chrom = new PersistentChromosome(0, 1, 1, "gi|292657124|ref|NC_013968.1|", 7000000);
 //        int from = 2000;
 //        int to = 3000;
 //        boolean diffsAndGapsNeeded = true;
@@ -76,26 +77,26 @@ public class SamBamFileReaderTest {
     @Test
     public void testGetCoverageFromBam() {
         System.out.println("getCoverageFromBam");
-        PersistantReference refGenome = new PersistantReference(1, "PAO1", "PAO1", null, new File(""));
+        PersistentReference refGenome = new PersistentReference(1, "PAO1", "PAO1", null, new File(""));
         int from = 10000;
         int to = 21100;
         boolean diffsAndGapsNeeded = false;
         byte trackNeeded = 0;
         IntervalRequest request = new IntervalRequest(from, to, from, to, 1, null, diffsAndGapsNeeded, Properties.NORMAL, trackNeeded, new ParametersReadClasses());
         SamBamFileReader samBamFileReader = new SamBamFileReader(new File("D:\\Programmieren & Studieren\\Pseudomonas aeruginosa Projekt\\SequenceData\\NG-5516_2_2_read_1-F469-with-PAO1.jok_sort.bam"), 1, refGenome);
-        PersistantCoverage coverage = samBamFileReader.getCoverageFromBam(request).getCoverage();
-        assertTrue(coverage.getPerfectFwd(10000) == 129);
-        assertTrue(coverage.getPerfectFwd(15000) == 178);
-        assertTrue(coverage.getPerfectFwd(15001) == 179);
-        assertTrue(coverage.getPerfectFwd(15002) == 178);
-        assertTrue(coverage.getPerfectFwd(15003) == 178);
-        assertTrue(coverage.getPerfectFwd(21100) == 208);
+        CoverageManager coverage = samBamFileReader.getCoverageFromBam(request).getCovManager();
+        assertTrue(coverage.getCoverage(MappingClass.PERFECT_MATCH).getFwdCov(10000) == 129);
+        assertTrue(coverage.getCoverage(MappingClass.PERFECT_MATCH).getFwdCov(15000) == 178);
+        assertTrue(coverage.getCoverage(MappingClass.PERFECT_MATCH).getFwdCov(15001) == 179);
+        assertTrue(coverage.getCoverage(MappingClass.PERFECT_MATCH).getFwdCov(15002) == 178);
+        assertTrue(coverage.getCoverage(MappingClass.PERFECT_MATCH).getFwdCov(15003) == 178);
+        assertTrue(coverage.getCoverage(MappingClass.PERFECT_MATCH).getFwdCov(21100) == 208);
         
-        assertTrue(coverage.getPerfectRev(10000) == 152);
-        assertTrue(coverage.getPerfectRev(15000) == 65);
-        assertTrue(coverage.getPerfectRev(15001) == 65);
-        assertTrue(coverage.getPerfectRev(15002) == 63);
-        assertTrue(coverage.getPerfectRev(15003) == 59);
-        assertTrue(coverage.getPerfectRev(21100) == 168);
+        assertTrue(coverage.getCoverage(MappingClass.PERFECT_MATCH).getRevCov(10000) == 152);
+        assertTrue(coverage.getCoverage(MappingClass.PERFECT_MATCH).getRevCov(15000) == 65);
+        assertTrue(coverage.getCoverage(MappingClass.PERFECT_MATCH).getRevCov(15001) == 65);
+        assertTrue(coverage.getCoverage(MappingClass.PERFECT_MATCH).getRevCov(15002) == 63);
+        assertTrue(coverage.getCoverage(MappingClass.PERFECT_MATCH).getRevCov(15003) == 59);
+        assertTrue(coverage.getCoverage(MappingClass.PERFECT_MATCH).getRevCov(21100) == 168);
     }
 }

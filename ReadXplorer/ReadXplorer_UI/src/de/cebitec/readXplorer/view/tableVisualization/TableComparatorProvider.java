@@ -29,12 +29,12 @@ public class TableComparatorProvider {
     
     
     /**
-     * Creates and adds a PersistantTrack comparator to the given sorter and the
+     * Creates and adds a PersistentTrack comparator to the given sorter and the
      * given table column.
      * @param sorter the table row sorter to which the comparator should be added
      * @param tableColumn the table column for which the comparator should be added
      */
-    public static void setPersistantTrackComparator(TableRowSorter<TableModel> sorter, int tableColumn) {
+    public static void setPersistentTrackComparator(TableRowSorter<TableModel> sorter, int tableColumn) {
         sorter.setComparator(tableColumn, new Comparator<Object>() {
             @Override
             public int compare(Object a, Object b) {

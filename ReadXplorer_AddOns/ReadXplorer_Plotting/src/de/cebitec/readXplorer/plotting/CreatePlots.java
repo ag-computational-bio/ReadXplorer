@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.plotting;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.util.Pair;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
@@ -48,11 +48,14 @@ import org.jfree.ui.TextAnchor;
  */
 public class CreatePlots {
 
-    public synchronized static ChartPanel createPlot(Map<PersistantFeature, Pair<Double, Double>> data, String xName, String yName, XYToolTipGenerator toolTip) {
+    private CreatePlots() {
+    }
+    
+    public synchronized static ChartPanel createPlot(Map<PersistentFeature, Pair<Double, Double>> data, String xName, String yName, XYToolTipGenerator toolTip) {
         XYSeriesCollection normal = new XYSeriesCollection();
         XYSeries nor = new XYSeries("Normal");
-        for (Iterator<PersistantFeature> it = data.keySet().iterator(); it.hasNext();) {
-            PersistantFeature key = it.next();
+        for (Iterator<PersistentFeature> it = data.keySet().iterator(); it.hasNext();) {
+            PersistentFeature key = it.next();
             Pair<Double, Double> pair = data.get(key);
             Double X = pair.getFirst();
             Double Y = pair.getSecond();
@@ -80,15 +83,15 @@ public class CreatePlots {
         return panel;
     }
 
-    public synchronized static ChartPanel createInfPlot(Map<PersistantFeature, Pair<Double, Double>> data, String xName, String yName, XYToolTipGenerator toolTip) {
+    public synchronized static ChartPanel createInfPlot(Map<PersistentFeature, Pair<Double, Double>> data, String xName, String yName, XYToolTipGenerator toolTip) {
         XYSeriesCollection normal = new XYSeriesCollection();
         XYSeriesCollection posInf = new XYSeriesCollection();
         XYSeriesCollection negInf = new XYSeriesCollection();
         XYSeries nor = new XYSeries("Normal");
-        XYSeries pos = new XYSeries("Positiv Infinit");
-        XYSeries neg = new XYSeries("Negativ Infinit");
-        for (Iterator<PersistantFeature> it = data.keySet().iterator(); it.hasNext();) {
-            PersistantFeature key = it.next();
+        XYSeries pos = new XYSeries("Positive Infinite");
+        XYSeries neg = new XYSeries("Negative Infinite");
+        for (Iterator<PersistentFeature> it = data.keySet().iterator(); it.hasNext();) {
+            PersistentFeature key = it.next();
             Pair<Double, Double> pair = data.get(key);
             Double X = pair.getFirst();
             Double Y = pair.getSecond();

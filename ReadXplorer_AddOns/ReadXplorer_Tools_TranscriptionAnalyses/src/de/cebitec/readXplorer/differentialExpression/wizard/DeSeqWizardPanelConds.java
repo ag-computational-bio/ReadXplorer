@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +73,7 @@ public class DeSeqWizardPanelConds implements WizardDescriptor.ValidatingPanel<W
 
     @Override
     public void readSettings(WizardDescriptor wiz) {
-        List<PersistantTrack> selectedTracks = (List<PersistantTrack>) wiz.getProperty("tracks");
+        List<PersistentTrack> selectedTracks = (List<PersistentTrack>) wiz.getProperty("tracks");
         getComponent().updateTrackList(selectedTracks);
     }
 

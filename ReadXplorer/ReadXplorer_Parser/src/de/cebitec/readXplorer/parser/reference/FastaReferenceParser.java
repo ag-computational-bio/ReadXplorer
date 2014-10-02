@@ -40,7 +40,7 @@ import java.util.logging.Logger;
  * now indexed fasta file.
  * Attention: there will be no features in this file just the sequence.
  *
- * @author Rolf Hilker <rhilker at mikrobio.med.uni-giessen.de>
+ * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class FastaReferenceParser implements ReferenceParserI {
 

@@ -16,6 +16,10 @@
  */
 package de.cebitec.readXplorer.databackend;
 
+import de.cebitec.readXplorer.util.classification.Classification;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Abstract class to use in thread context. Provides methods for handling genome
  * requests in connection with a thread.
@@ -72,13 +76,9 @@ public abstract class RequestThread extends Thread {
      * otherwise.
      */
     public boolean readClassParamsFulfilled(IntervalRequest request) {
-        ParametersReadClasses lastParams = lastRequest.getReadClassParams();
-        ParametersReadClasses params = request.getReadClassParams();
-        return  lastParams.isPerfectMatchUsed() == params.isPerfectMatchUsed() &&
-                lastParams.isBestMatchUsed()    == params.isBestMatchUsed()    &&
-                lastParams.isCommonMatchUsed()  == params.isCommonMatchUsed()  &&
-                lastParams.isOnlyUniqueReads()  == params.isOnlyUniqueReads()  &&
-                lastParams.getMinMappingQual()  == params.getMinMappingQual();
+        List<Classification> lastExcludedClasses = lastRequest.getReadClassParams().getExcludedClasses();
+        List<Classification> excludedClasses = new ArrayList<>(request.getReadClassParams().getExcludedClasses());
+        return excludedClasses.containsAll(lastExcludedClasses) && lastExcludedClasses.containsAll(excludedClasses);
     }
 
     /**

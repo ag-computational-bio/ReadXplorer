@@ -17,11 +17,11 @@
 package de.cebitec.readXplorer.differentialExpression;
 
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantTrack;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.differentialExpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.readXplorer.differentialExpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readXplorer.differentialExpression.GnuR.UnknownGnuRException;
-import de.cebitec.readXplorer.util.FeatureType;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -41,9 +41,9 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
 
     public static enum Plot {
 
-        DispEsts("Per gene estimates against normalized mean expression"),
-        DE("Log2 fold change against base means"),
-        HIST("Histogram of p values"),
+        DispEsts("Gene dispersion vs. normalized mean expression"),
+        DE("Log2 fold change vs. base means"),
+        HIST("Histogram of p-values"),
         MAplot("MA Plot");
         String representation;
 
@@ -65,7 +65,7 @@ public class DeSeqAnalysisHandler extends DeAnalysisHandler {
         }
     }
 
-    public DeSeqAnalysisHandler(List<PersistantTrack> selectedTracks, Map<String, String[]> design, boolean moreThanTwoConditions,
+    public DeSeqAnalysisHandler(List<PersistentTrack> selectedTracks, Map<String, String[]> design, boolean moreThanTwoConditions,
             List<String> fittingGroupOne, List<String> fittingGroupTwo, Integer refGenomeID, boolean workingWithoutReplicates,
             File saveFile, Set<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams, UUID key) {
         super(selectedTracks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams);

@@ -16,9 +16,9 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.readPairViewer;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantMapping;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReadPair;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantReadPairGroup;
+import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
+import de.cebitec.readXplorer.databackend.dataObjects.ReadPair;
+import de.cebitec.readXplorer.databackend.dataObjects.ReadPairGroup;
 import de.cebitec.readXplorer.util.ReadPairType;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
 import java.awt.Color;
@@ -80,7 +80,7 @@ public class ReadPairPopup extends JPopupMenu {
                         "Replicates=Replicates:",
                         "Distance=Distance:"})
     private void initDataAndComponents() {
-        PersistantReadPairGroup readPairData = this.getReadPairInfo(); //TODO: get infos from elswhere
+        ReadPairGroup readPairData = this.getReadPairInfo(); //TODO: get infos from elswhere
         
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
@@ -91,10 +91,10 @@ public class ReadPairPopup extends JPopupMenu {
         this.add(contentScrollpane);
 
         //handle read pair data
-        List<PersistantReadPair> readPairs = readPairData.getReadPairs();
-        List<PersistantMapping> singleMappings = readPairData.getSingleMappings();
-        PersistantReadPair readPair;
-        PersistantMapping mapping;
+        List<ReadPair> readPairs = readPairData.getReadPairs();
+        List<Mapping> singleMappings = readPairData.getSingleMappings();
+        ReadPair readPair;
+        Mapping mapping;
         JPanel readPairMappingInfoPanel = null;
 
         for (int i = 0; i < readPairs.size(); ++i) {
@@ -107,7 +107,7 @@ public class ReadPairPopup extends JPopupMenu {
             
             readPair = readPairs.get(i);
             ReadPairType type = readPair.getReadPairType();
-            String hex = Integer.toHexString(PersistantReadPair.determineReadPairColor(type).getRGB());
+            String hex = Integer.toHexString(ReadPair.determineReadPairColor(type).getRGB());
             hex = hex.substring(2, hex.length());
             
             long distance = Math.abs(readPair.getStop() - readPair.getStart());
@@ -233,10 +233,10 @@ public class ReadPairPopup extends JPopupMenu {
      * to show in the popup. If the parent viewer ist not a ReadPairViewer
      * <code>null</code> is returned.
      */
-    private PersistantReadPairGroup getReadPairInfo() {
-        PersistantReadPairGroup readPairGroup = null;
+    private ReadPairGroup getReadPairInfo() {
+        ReadPairGroup readPairGroup = null;
         if (parentViewer instanceof ReadPairViewer) {
-            readPairGroup = (PersistantReadPairGroup) this.block.getPersistantObject();
+            readPairGroup = (ReadPairGroup) this.block.getObjectWithId();
         }
         return readPairGroup;
     }
@@ -249,7 +249,7 @@ public class ReadPairPopup extends JPopupMenu {
      * @param mapping pair mapping itself for start and stop positions
      * @return correctly formatted String.
      */
-    private String getPairMappingString(String bundleString, PersistantMapping mapping){
+    private String getPairMappingString(String bundleString, Mapping mapping){
         return NbBundle.getMessage(BlockComponentPair.class, bundleString).concat("   - ").
                     concat(this.getMappingInfos(mapping));
     }
@@ -261,40 +261,24 @@ public class ReadPairPopup extends JPopupMenu {
      * @param mapping single mapping itself for start and stop positions
      * @return correctly formatted String.
      */
-    private String getSingleMappingString(String bundleString, int count, PersistantMapping mapping){
+    private String getSingleMappingString(String bundleString, int count, Mapping mapping){
         return NbBundle.getMessage(BlockComponentPair.class, bundleString).concat(" ").
                     concat(String.valueOf(count)).concat(",   ").
                     concat(this.getMappingInfos(mapping));
     }
     
-    private String getMappingInfos(PersistantMapping mapping){
+    private String getMappingInfos(Mapping mapping){
         String strand = mapping.isFwdStrand() ? 
                     NbBundle.getMessage(BlockComponentPair.class, "Fwd") : 
                     NbBundle.getMessage(BlockComponentPair.class, "Rev");
         return NbBundle.getMessage(BlockComponentPair.class, "Type").concat(" ").
-                    concat(this.getMappingTypeString(mapping)).
+                    concat(mapping.getMappingClass().getTypeString()).
                     concat(NbBundle.getMessage(BlockComponentPair.class, "Start")).concat(" ").
                     concat(String.valueOf(mapping.getStart())).
                     concat(NbBundle.getMessage(BlockComponentPair.class, "Stop")).concat(" ").
                     concat(String.valueOf(mapping.getStop())).
                     concat(NbBundle.getMessage(BlockComponentPair.class, "Orientation")).concat(" ").
                     concat(strand);
-    }
-    
-    /**
-     * @param mapping whose type should be determined
-     * @return the type of the mapping (Perfect Match, Best Match or Common Match)
-     */
-    private String getMappingTypeString(PersistantMapping mapping) {
-        String mappingType;
-        if (mapping.getDifferences() == 0) {
-            mappingType = "Perfect Match";
-        } else if (mapping.isBestMatch()) {
-            mappingType = "Best Match";
-        } else {
-            mappingType = "Common Match";
-        }
-        return mappingType;
     }
     
     /**

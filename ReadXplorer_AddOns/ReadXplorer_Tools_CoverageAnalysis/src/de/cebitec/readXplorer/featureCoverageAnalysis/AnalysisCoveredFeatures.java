@@ -18,15 +18,15 @@ package de.cebitec.readXplorer.featureCoverageAnalysis;
 
 import de.cebitec.readXplorer.api.objects.AnalysisI;
 import de.cebitec.readXplorer.databackend.AnalysesHandler;
-import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResultPersistant;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantCoverage;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResult;
+import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.util.Observer;
+import de.cebitec.readXplorer.util.classification.Classification;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,9 +40,10 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
 
     private TrackConnector trackConnector;
     private ParameterSetCoveredFeatures analysisParams;
-    private List<PersistantFeature> genomeFeatures;
+    private List<PersistentFeature> genomeFeatures;
     private HashMap<Integer, CoveredFeature> coveredFeatureCount; //feature id to count of covered positions for feature
     private List<CoveredFeature> detectedFeatures;
+    private int summedCov = 0;
     
     private int lastFeatureIdx;
 
@@ -77,12 +78,12 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
      */
     private void initDatastructures() {
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackConnector.getRefGenome().getId());
-        for (PersistantChromosome chrom : refConnector.getChromosomesForGenome().values()) {
+        for (PersistentChromosome chrom : refConnector.getChromosomesForGenome().values()) {
             this.genomeFeatures.addAll(refConnector.getFeaturesForRegionInclParents(0, chrom.getLength(), 
                     analysisParams.getSelFeatureTypes(), chrom.getId()));
         }
 
-        PersistantFeature feature;
+        PersistentFeature feature;
         for (int i = 0; i < this.genomeFeatures.size(); ++i) {
             feature = this.genomeFeatures.get(i);
             this.coveredFeatureCount.put(feature.getId(), new CoveredFeature(feature, trackConnector.getTrackID()));
@@ -95,10 +96,10 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
      */
     @Override
     public void update(Object data) {
-        CoverageAndDiffResultPersistant coverageAndDiffResult = new CoverageAndDiffResultPersistant(new PersistantCoverage(0, 0), null, null, null);
+        CoverageAndDiffResult coverageAndDiffResult = new CoverageAndDiffResult(new CoverageManager(0, 0), null, null, null);
         
         if (data.getClass() == coverageAndDiffResult.getClass()) {
-            coverageAndDiffResult = (CoverageAndDiffResultPersistant) data;
+            coverageAndDiffResult = (CoverageAndDiffResult) data;
             this.updateCoverageCountForFeatures(coverageAndDiffResult);
         } else
         if (data instanceof Byte && ((byte) data) == AnalysesHandler.COVERAGE_QUERRIES_FINISHED) { //1 means coverage analysis is finished
@@ -110,24 +111,26 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
      * Updates the coverage count for the features with the coverage positions.
      * @param coverageAndDiffResult the coverage and diff result
      */
-    public void updateCoverageCountForFeatures(CoverageAndDiffResultPersistant coverageAndDiffResult) {
+    public void updateCoverageCountForFeatures(CoverageAndDiffResult coverageAndDiffResult) {
 
-        PersistantCoverage coverage = coverageAndDiffResult.getCoverage();
-        int rightBound = coverage.getRightBound();
+        CoverageManager covManager = coverageAndDiffResult.getCovManager();
+        int rightBound = covManager.getRightBound();
         boolean isStrandBothOption = analysisParams.getReadClassParams().isStrandBothOption();
         boolean isFeatureStrand = analysisParams.getReadClassParams().isStrandFeatureOption();
         boolean analysisStrand;
 
-        PersistantFeature feature;
+        PersistentFeature feature;
         int noCoveredBases;
         int featureStart;
         int featureStop;
         int coveredBases;
+        int meanCov = 0;
 
         //coverage identified within an feature
         for (int i = 0; i < this.genomeFeatures.size(); ++i) {
             noCoveredBases = 0;
             feature = this.genomeFeatures.get(i);
+            summedCov = 0;
             
             if (feature.getChromId() == coverageAndDiffResult.getRequest().getChromId()) {
                 featureStart = feature.getStart();
@@ -140,22 +143,33 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
 
                     if (isStrandBothOption) {
                         for (int j = featureStart; j <= featureStop; ++j) {
-                            if (this.checkCanIncreaseBothStrands(coverage, j)) {
+                            if (this.checkCanIncreaseAndSumBothStrands(covManager, j)) {
                                 ++noCoveredBases;
                             }
                         }
                     } else {
                         analysisStrand = isFeatureStrand ? feature.isFwdStrand() : !feature.isFwdStrand(); //only use this if Properties.STRAND_BOTH is not selected
                         for (int j = featureStart; j <= featureStop; ++j) {
-                            if (this.checkCanIncreaseOneStrand(coverage, j, analysisStrand)) {
+                            if (this.checkCanIncreaseAndSumOneStrand(covManager, j, analysisStrand)) {
                                 ++noCoveredBases;
                             }
                         }
                     }
 
                     //store covered features
+                    CoveredFeature coveredFeature = coveredFeatureCount.get(feature.getId());
                     coveredBases = this.coveredFeatureCount.get(feature.getId()).getNoCoveredBases();
-                    this.coveredFeatureCount.get(feature.getId()).setNoCoveredBases(coveredBases + noCoveredBases);
+                    if (coveredFeature.getPercentCovered() > 90) {
+                        System.out.println("");
+                    }
+                    if (noCoveredBases > 0) {
+                        meanCov = (coveredFeature.getMeanCoverage() + (summedCov / noCoveredBases));
+                        if (coveredFeature.getMeanCoverage() > 0) {
+                            meanCov /= 2;
+                        }
+                        coveredFeature.setMeanCoverage(meanCov);
+                    }
+                    coveredFeature.setNoCoveredBases(coveredBases + noCoveredBases);
                 } else {
                     break;
                 }
@@ -201,20 +215,11 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
      * @param j the position to check
      * @return true, if the position can be increased, false otherwise
      */
-    private boolean checkCanIncreaseBothStrands(PersistantCoverage coverage, int j) {
-        boolean canIncrease = false;
-        ParametersReadClasses readClassParams = analysisParams.getReadClassParams();
-        if (readClassParams.isCommonMatchUsed() &&
-            coverage.getCommonFwd(j) + coverage.getCommonRev(j) >= analysisParams.getMinCoverageCount()) {
-                canIncrease = true;
-        } else if (readClassParams.isBestMatchUsed() &&
-            coverage.getBestMatchFwd(j) + coverage.getBestMatchRev(j) >= analysisParams.getMinCoverageCount()) {
-                canIncrease = true;
-        } else if (readClassParams.isPerfectMatchUsed() &&
-            coverage.getPerfectFwd(j) + coverage.getPerfectRev(j) >= analysisParams.getMinCoverageCount()) {
-                canIncrease = true;
-        }
-        return canIncrease;
+    private boolean checkCanIncreaseAndSumBothStrands(CoverageManager coverage, int j) {
+        List<Classification> excludedClasses = analysisParams.getReadClassParams().getExcludedClasses();
+        int cov = coverage.getTotalCoverage(excludedClasses, j, true) + 
+                  coverage.getTotalCoverage(excludedClasses, j, false);
+        return this.increaseSumIfCanIncrease(cov);
     }
     
     /**
@@ -223,23 +228,21 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
      * @param j the position to check
      * @return true, if the position can be increased, false otherwise
      */
-    private boolean checkCanIncreaseOneStrand(PersistantCoverage coverage, int j, boolean isFwdStrand) {
-        boolean canIncrease = false;
-        ParametersReadClasses readClassParams = analysisParams.getReadClassParams();
-        if (readClassParams.isCommonMatchUsed() &&
-            (isFwdStrand && coverage.getCommonFwd(j) >= analysisParams.getMinCoverageCount()
-                || !isFwdStrand && coverage.getCommonRev(j) >= analysisParams.getMinCoverageCount())) {
-                canIncrease = true;
-                
-        } else if (readClassParams.isBestMatchUsed() &&
-            (isFwdStrand && coverage.getBestMatchFwd(j) >= analysisParams.getMinCoverageCount()
-                || !isFwdStrand && coverage.getBestMatchRev(j) >= analysisParams.getMinCoverageCount())) {
-                canIncrease = true;
-                
-        } else if (readClassParams.isPerfectMatchUsed() &&
-            (isFwdStrand && coverage.getPerfectFwd(j) >= analysisParams.getMinCoverageCount()
-                || !isFwdStrand && coverage.getPerfectRev(j) >= analysisParams.getMinCoverageCount())) {
-                canIncrease = true;
+    private boolean checkCanIncreaseAndSumOneStrand(CoverageManager coverage, int j, boolean isFwdStrand) {
+        List<Classification> excludedClasses = analysisParams.getReadClassParams().getExcludedClasses();
+        return  this.increaseSumIfCanIncrease(coverage.getTotalCoverage(excludedClasses, j, isFwdStrand));
+    }
+    
+    /**
+     * Checks if the coverage can be increased for the given position and if so,
+     * increases the summed coverage for the current feature.
+     * @param cov The coverage value
+     * @return true, if the position can be increased, false otherwise
+     */
+    private boolean increaseSumIfCanIncrease(int cov) {
+        boolean canIncrease = cov >= analysisParams.getMinCoverageCount();
+        if (canIncrease) {
+            this.summedCov += cov;
         }
         return canIncrease;
     }

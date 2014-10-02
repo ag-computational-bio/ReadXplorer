@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression.expressTest;
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistantFeature;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.differentialExpression.ProcessingLog;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -50,7 +50,7 @@ public class ExpressTest implements ExpressTestI {
     }
 
     @Override
-    public void performAnalysis(PersistantFeature[] regionNames, int[] start, int[] stop, int[][] groupA,
+    public void performAnalysis(PersistentFeature[] regionNames, int[] start, int[] stop, int[][] groupA,
             int[][] groupB, double cutOff) throws IllegalArgumentException {
 
         notifyObservers(ExpressTestStatus.RUNNING);
@@ -132,7 +132,7 @@ public class ExpressTest implements ExpressTestI {
         Double[] meanANormalized = meanVarGroupA.getMeanNormalized();
         Double[] meanBNormalized = meanVarGroupB.getMeanNormalized();
 
-        List<PersistantFeature> regionNamesList = new LinkedList<>();
+        List<PersistentFeature> regionNamesList = new LinkedList<>();
 
         results = new Vector<>();
         resultsNormalized = new Vector<>();
