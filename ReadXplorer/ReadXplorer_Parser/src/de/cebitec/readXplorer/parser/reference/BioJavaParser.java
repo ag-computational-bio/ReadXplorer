@@ -235,6 +235,10 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                                 }
                             }
                         }
+                        
+                        if (locusTag.equals("cg2826")) {
+                            System.out.println("here");
+                        }
 
                         /* 
                          * If the type of the feature is unknown to readXplorer (see below),
@@ -415,6 +419,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
             if (!added) { //if there is no parent feature for the sub feature it becomes an ordinary feature
                 mergedList.add(subFeature);
             }
+            added = false;
         }
         mergedList.addAll(features);
         Collections.sort(mergedList);
