@@ -33,10 +33,11 @@ import org.openide.util.NbPreferences;
 /**
  * ReadXplorers file chooser. Contains all options and values of how to open a
  * specific file chooser for saving or opening different files.
- * 
+ *
  * @author Rolf Hilker
  */
-public abstract class ReadXplorerFileChooser  extends JFileChooser {
+public abstract class ReadXplorerFileChooser extends JFileChooser {
+
     private static final long serialVersionUID = 1L;
 
     protected Object data;
@@ -48,16 +49,20 @@ public abstract class ReadXplorerFileChooser  extends JFileChooser {
 
     /**
      * Creates a new readXplorer file chooser.
-     * @param fileExtensions the file extensions to use. If the first entry is the empty string, no file filter is set
+     *
+     * @param fileExtensions the file extensions to use. If the first entry is
+     * the empty string, no file filter is set
      * @param fileDescription description for the files in the file filter
      */
-    public ReadXplorerFileChooser(final String[] fileExtensions, String fileDescription){
+    public ReadXplorerFileChooser(final String[] fileExtensions, String fileDescription) {
         this(fileExtensions, fileDescription, null);
     }
 
     /**
      * Creates a new readXplorer file chooser.
-     * @param fileExtensions the file extensions to use. If the first entry is the empty string, no file filter is set
+     *
+     * @param fileExtensions the file extensions to use. If the first entry is
+     * the empty string, no file filter is set
      * @param fileDescription description for the files in the file filter
      * @param data the data which might be used for file choosers storing data
      */
@@ -74,8 +79,9 @@ public abstract class ReadXplorerFileChooser  extends JFileChooser {
 
     /**
      * Opens a file chooser for input or output file selection/creation.
-     * @param option the option: readXplorerFileChooser.OPEN_DIALOG for file selection and
-     * readXplorerFileChooser.SAVE_DIALOG for storing a file.
+     *
+     * @param option the option: readXplorerFileChooser.OPEN_DIALOG for file
+     * selection and readXplorerFileChooser.SAVE_DIALOG for storing a file.
      */
     public void openFileChooser(final int option) {
 
@@ -83,7 +89,7 @@ public abstract class ReadXplorerFileChooser  extends JFileChooser {
         if (currentDirectory == null || currentDirectory.isEmpty()) {
             currentDirectory = this.pref.get(directoryProperty, ".");
         }
-        if (currentDirectory.isEmpty()){
+        if (currentDirectory.isEmpty()) {
             currentDirectory = ".";
         }
         try {
@@ -95,7 +101,11 @@ public abstract class ReadXplorerFileChooser  extends JFileChooser {
         if (option == ReadXplorerFileChooser.OPEN_DIALOG) {
             result = this.showOpenDialog(this.getParent());
         } else {
-            result = this.showSaveDialog(null);
+            if (option == ReadXplorerFileChooser.CUSTOM_DIALOG) {
+                result = this.showDialog(this.getParent(), "Select");
+            } else {
+                result = this.showSaveDialog(null);
+            }
         }
         ///////////////// store directory ////////////////////////////////////
         try {
@@ -117,20 +127,27 @@ public abstract class ReadXplorerFileChooser  extends JFileChooser {
 
         if (option == ReadXplorerFileChooser.OPEN_DIALOG) {
             this.open(fileLocation);
-        } else
-        if (option == ReadXplorerFileChooser.SAVE_DIALOG) {
+        } else if (option == ReadXplorerFileChooser.SAVE_DIALOG) {
             fileLocation = ReadXplorerFileChooser.getSelectedFileWithExtension(this).getAbsolutePath();
             boolean done = this.checkFileExists(fileLocation, this);
             if (!done) {
                 this.save(fileLocation);
             }
         }
+        if (option == ReadXplorerFileChooser.CUSTOM_DIALOG) {
+            File file = new File(fileLocation);
+            if (file.exists()) {
+                this.open(fileLocation);
+            } else{
+                this.save(fileLocation);
+            }
+        }
     }
-
 
     /**
      * When a file should be saved this method checks if the file already exists
      * and prompts for replacement. If it doesn't exist yet, it is created.
+     *
      * @param fileLocation the file location to store the file
      * @param this the JFileChooser
      */
@@ -138,8 +155,8 @@ public abstract class ReadXplorerFileChooser  extends JFileChooser {
         File file = new File(fileLocation);
         if (file.exists()) {
             final int overwriteFile = JOptionPane.showConfirmDialog(jfc, NbBundle.getMessage(ReadXplorerFileChooser.class,
-                        "readXplorerFileChooser.FileExists"), NbBundle.getMessage(ReadXplorerFileChooser.class,
-                        "readXplorerFileChooser.Dialog"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    "readXplorerFileChooser.FileExists"), NbBundle.getMessage(ReadXplorerFileChooser.class,
+                            "readXplorerFileChooser.Dialog"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (overwriteFile == JOptionPane.YES_OPTION) {
                 this.save(fileLocation);
             } else {
@@ -149,44 +166,47 @@ public abstract class ReadXplorerFileChooser  extends JFileChooser {
         }
         return false;
     }
-    
-    
+
     /**
-     * Saves the data into a file whose file extension is determined
-     * by the fileExtensions variable.
+     * Saves the data into a file whose file extension is determined by the
+     * fileExtensions variable.
+     *
      * @param fileLocation the location and name of the file to create
      */
     public abstract void save(String fileLocation);
 
-
     /**
      * Opens a file from the current fileLocation and takes care of the file
      * specific handling.
+     *
      * @param fileLocation the location and name of the file to create
      */
     public abstract void open(String fileLocation);
 
     /**
-     * Set the directory property which shall be used to store the directory
-     * of the selected file/s.
-     * @param directoryProperty 
+     * Set the directory property which shall be used to store the directory of
+     * the selected file/s.
+     *
+     * @param directoryProperty
      */
     public void setDirectoryProperty(String directoryProperty) {
         this.directoryProperty = directoryProperty;
     }
-    
+
     /**
      * Sets the directory to use as starting directory for this file chooser.
-     * @param directory the directory to use as starting directory for this 
-     * file chooser
+     *
+     * @param directory the directory to use as starting directory for this file
+     * chooser
      */
     public void setDirectory(String directory) {
         this.currentDirectory = directory;
     }
-    
+
     /**
      * Returns the selected file from a JFileChooser, including the extension
      * from the file filter.
+     *
      * @param chooser the chooser whose file is needed with its extension
      * @return The file including its extension.
      */
