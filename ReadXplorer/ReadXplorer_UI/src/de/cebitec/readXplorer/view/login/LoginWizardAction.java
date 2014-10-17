@@ -67,7 +67,9 @@ public final class LoginWizardAction implements ActionListener {
         }
         
         if (panels == null) {
-            this.loginPanel = new LoginWizardPanel();
+            if (this.loginPanel == null) {
+                this.loginPanel = new LoginWizardPanel();
+            }
             panels = new ArrayList<>();
             panels.add(loginPanel);
         }
