@@ -222,13 +222,13 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer, 
                         if (pairTag == Properties.EXT_A1) {
                             record.setReadPairedFlag(true);
                             record.setFirstOfPairFlag(true);
-                            classified = CommonsMappingParser.classifyRead(record, this, chromLengthMap, outputFile, lineno, refSeqFetcher, diffMap1, class1);
+                            classified = CommonsMappingParser.classifyRead(record, this, chromLengthMap, outputFile.getName(), lineno, refSeqFetcher, diffMap1, class1);
                         } else if (pairTag == Properties.EXT_A2) {
                             record.setReadPairedFlag(true);
                             record.setSecondOfPairFlag(true);
-                            classified = CommonsMappingParser.classifyRead(record, this, chromLengthMap, outputFile, lineno, refSeqFetcher, diffMap2, class2);
+                            classified = CommonsMappingParser.classifyRead(record, this, chromLengthMap, outputFile.getName(), lineno, refSeqFetcher, diffMap2, class2);
                         } else { //since only reads without pair tag can have the same read name as the current one without pair tag its okay to add them to 1's data
-                            classified = CommonsMappingParser.classifyRead(record, this, chromLengthMap, outputFile, lineno, refSeqFetcher, diffMap1, class1);
+                            classified = CommonsMappingParser.classifyRead(record, this, chromLengthMap, outputFile.getName(), lineno, refSeqFetcher, diffMap1, class1);
                         }
 
                         if (!classified) {

@@ -13,6 +13,7 @@ import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Transcription
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.AnalysisStatus;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Observable;
+import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.classification.Classification;
@@ -21,7 +22,6 @@ import de.cebitec.readXplorer.util.classification.MappingClass;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.netbeans.api.progress.ProgressHandle;
@@ -53,7 +53,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
     /**
      * Key: featureID , Value: PersistentFeature
      */
-    private HashMap<Integer, PersistentFeature> allRegionsInHash;
+    private Map<Integer, PersistentFeature> allRegionsInHash;
 
     /**
      * Constructor for FiveEnrichedDataAnalysesHandler.
@@ -96,7 +96,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
         this.progressHandleParsingFeatures.finish();
 
         // geting mappings and calculate statistics
-        this.stats = new StatisticsOnMappingData(trackConnector.getRefGenome(), parameters.getFraction(), this.featureParser.getForwardCDSs(), this.featureParser.getRevFeatures(), this.allRegionsInHash, this.featureParser.getRegion2Exclude());
+        this.stats = new StatisticsOnMappingData(trackConnector, parameters.getFraction(), this.featureParser.getForwardCDSs(), this.featureParser.getRevFeatures(), this.allRegionsInHash, this.featureParser.getPositions2Exclude());
         List<Classification> excludedClasses = new ArrayList<>();
         excludedClasses.add(MappingClass.COMMON_MATCH);
         excludedClasses.add(FeatureType.MULTIPLE_MAPPED_READ);
@@ -130,9 +130,8 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements Observabl
 
     @Override
     public void notifyObservers(Object data) {
-        List<de.cebitec.readXplorer.util.Observer> tmpObserver = new ArrayList<>(observer);
-        for (Iterator<de.cebitec.readXplorer.util.Observer> it = tmpObserver.iterator(); it.hasNext();) {
-            de.cebitec.readXplorer.util.Observer currentObserver = it.next();
+        List<Observer> tmpObserver = new ArrayList<>(observer);
+        for (Observer currentObserver : tmpObserver) {
             currentObserver.update(data);
         }
     }

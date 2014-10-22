@@ -53,11 +53,11 @@ import org.openide.awt.ActionRegistration;
 @ActionID(category = "Tools", id = "de.cebitec.readXplorer.differentialExpression.DiffExpWizardAction")
 @ActionRegistration(displayName = "Differential Gene Expression Analysis")
 @ActionReference(path = "Menu/Tools", position = 10)
-public final class WizardIterator implements WizardDescriptor.Iterator<WizardDescriptor>, ActionListener {
+public final class DiffExpressionWizardIterator implements WizardDescriptor.Iterator<WizardDescriptor>, ActionListener {
 
     private final LoginCookie context;
 
-    public WizardIterator(LoginCookie context) {
+    public DiffExpressionWizardIterator(LoginCookie context) {
         this.context = context;
     }
     private int index;

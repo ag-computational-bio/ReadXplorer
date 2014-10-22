@@ -1132,7 +1132,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                     statisticsMap.put(TSS_ASSIGNED_TO_STABLE_RNA, (Integer) statisticsMap.get(TSS_ASSIGNED_TO_STABLE_RNA) + noOfTssAssignedToStableRna);
                     statisticsMap.put(TSS_NO_PUTATIVE_CDS_SHIFTS, (Integer) statisticsMap.get(TSS_NO_PUTATIVE_CDS_SHIFTS) + noPutCdsShifts);
                     statisticsMap.put(MAPPINGS_COUNT, (Double) statisticsMap.get(MAPPINGS_COUNT) + tssResultNew.getStats().getMappingCount());
-                    statisticsMap.put(AVERAGE_MAPPINGS_LENGTH, (Double) statisticsMap.get(AVERAGE_MAPPINGS_LENGTH) + tssResultNew.getStats().getMeanMappingLength());
+                    statisticsMap.put(AVERAGE_MAPPINGS_LENGTH, (Double) statisticsMap.get(AVERAGE_MAPPINGS_LENGTH) + tssResultNew.getStats().getAverageReadLength());
                     statisticsMap.put(MAPPINGS_MILLION, (Double) statisticsMap.get(MAPPINGS_MILLION) + tssResultNew.getStats().getMappingsPerMillion());
                     statisticsMap.put(BACKGROUND_THRESHOLD_MIN_STACKSIZE, (Double) statisticsMap.get(BACKGROUND_THRESHOLD_MIN_STACKSIZE) + tssResultNew.getStats().getBgThreshold());
 

@@ -16,7 +16,7 @@
  */
 package de.cebitec.readXplorer.transcriptionAnalyses;
 
-import java.util.HashMap;
+import java.util.Map;
 import org.openide.util.NbBundle;
 
 /**
@@ -27,13 +27,13 @@ import org.openide.util.NbBundle;
 public class TssDetectionStatsPanel extends javax.swing.JPanel {
     
     private static final long serialVersionUID = 1L;
-    private HashMap<String, Integer> tssStatisticsMap;
+    private Map<String, Integer> tssStatisticsMap;
 
     /**
      * Panel for showing the the statistics of a TSS detection result.
      * @param tssStatisticsMap the snp results statistics to display
      */
-    public TssDetectionStatsPanel(HashMap<String, Integer> tssStatisticsMap) {
+    public TssDetectionStatsPanel(Map<String, Integer> tssStatisticsMap) {
         this.tssStatisticsMap = tssStatisticsMap;
         initComponents();
         this.initAdditionalComponents();
@@ -104,19 +104,19 @@ public class TssDetectionStatsPanel extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
     private void initAdditionalComponents() {
-        int noUnannotatedTrans = this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_NOVEL);
+        int noUnannotatedTrans = this.tssStatisticsMap.get(TssDetectionResult.TSS_NOVEL);
         String unannotatedTransValue = noUnannotatedTrans == 
-                ResultPanelTranscriptionStart.UNUSED_STATISTICS_VALUE ? "-" : String.valueOf(noUnannotatedTrans);
+                TssDetectionResult.UNUSED_STATISTICS_VALUE ? "-" : String.valueOf(noUnannotatedTrans);
         tssDetectionStatsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {ResultPanelTranscriptionStart.TSS_TOTAL, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_TOTAL))},
-                {ResultPanelTranscriptionStart.TSS_CORRECT, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_CORRECT))},
-                {ResultPanelTranscriptionStart.TSS_UPSTREAM, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_UPSTREAM))},
-                {ResultPanelTranscriptionStart.TSS_DOWNSTREAM, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_DOWNSTREAM))},
-                {ResultPanelTranscriptionStart.TSS_LEADERLESS, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_LEADERLESS))},
-                {ResultPanelTranscriptionStart.TSS_FWD, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_FWD))},
-                {ResultPanelTranscriptionStart.TSS_REV, String.valueOf(this.tssStatisticsMap.get(ResultPanelTranscriptionStart.TSS_REV))},
-                {ResultPanelTranscriptionStart.TSS_NOVEL, unannotatedTransValue}
+                {TssDetectionResult.TSS_TOTAL, String.valueOf(this.tssStatisticsMap.get(TssDetectionResult.TSS_TOTAL))},
+                {TssDetectionResult.TSS_CORRECT, String.valueOf(this.tssStatisticsMap.get(TssDetectionResult.TSS_CORRECT))},
+                {TssDetectionResult.TSS_UPSTREAM, String.valueOf(this.tssStatisticsMap.get(TssDetectionResult.TSS_UPSTREAM))},
+                {TssDetectionResult.TSS_DOWNSTREAM, String.valueOf(this.tssStatisticsMap.get(TssDetectionResult.TSS_DOWNSTREAM))},
+                {TssDetectionResult.TSS_LEADERLESS, String.valueOf(this.tssStatisticsMap.get(TssDetectionResult.TSS_LEADERLESS))},
+                {TssDetectionResult.TSS_FWD, String.valueOf(this.tssStatisticsMap.get(TssDetectionResult.TSS_FWD))},
+                {TssDetectionResult.TSS_REV, String.valueOf(this.tssStatisticsMap.get(TssDetectionResult.TSS_REV))},
+                {TssDetectionResult.TSS_NOVEL, unannotatedTransValue}
             },
             new String [] {
                 NbBundle.getMessage(TssDetectionStatsPanel.class, "TssDetectionStatsPanel.tssDetectionStatsTable.columnModel.title0_1"), 

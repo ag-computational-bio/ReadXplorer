@@ -115,7 +115,7 @@ public class ExcelExporter implements TableExporterI {
 
         WritableWorkbook workbook = Workbook.createWorkbook(file, wbSettings);
         WritableSheet sheet = null;
-        int currentPage = 0;
+        int currentPage;
         int totalPage = 0;
         boolean dataLeft;
         String sheetName;

@@ -13,10 +13,10 @@ import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  *
@@ -371,7 +371,7 @@ public class TSSDetectionResults extends ResultTrackAnalysis<ParameterSetFiveEnr
         return result;
     }
 
-    private String getExcludedFeatureTypesAsString(HashSet<FeatureType> fadeOutTypes) {
+    private String getExcludedFeatureTypesAsString(Set<FeatureType> fadeOutTypes) {
         String result = "";
 
         if (fadeOutTypes == null) {

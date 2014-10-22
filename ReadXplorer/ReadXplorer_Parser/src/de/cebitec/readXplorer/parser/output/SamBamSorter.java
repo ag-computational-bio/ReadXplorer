@@ -62,8 +62,11 @@ public class SamBamSorter implements Observable {
      * @return true, if the sorting was successful, false otherwise
      */
     @NbBundle.Messages({
+        "# {0} - sort order",
         "MSG_SamBamSorter.sort.Start=Start sorting file by {0}...", 
-        "MSG_SamBamSorter.sort.Finish=Finished sorting file by {0}. ", 
+        "# {0} - sort order",
+        "MSG_SamBamSorter.sort.Finish=Finished sorting file by {0}. ",
+        "# {0} - track file",
         "MSG_SamBamSorter.sort.Failed=Failed sorting file {0}, therefore the file cannot be imported."})
     public boolean sortSamBam(TrackJob trackJob, SAMFileHeader.SortOrder sortOrder, String sortOrderMsg) {
         boolean success = true;

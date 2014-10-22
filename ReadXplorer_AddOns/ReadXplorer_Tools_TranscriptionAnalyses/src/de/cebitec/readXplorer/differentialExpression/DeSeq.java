@@ -270,38 +270,14 @@ public class DeSeq {
     }
 
     public void plotDispEsts(File file) throws IllegalStateException, PackageNotLoadableException {
-        if (gnuR == null) {
-            throw new IllegalStateException("Shutdown was already called!");
-        }
-        gnuR.loadPackage("grDevices");
-        String path = file.getAbsolutePath();
-        path = path.replace("\\", "\\\\");
-        gnuR.eval("svg(filename=\"" + path + "\")");
-        gnuR.eval("plotDispEsts(cD)");
-        gnuR.eval("dev.off()");
+        gnuR.storePlot(file, "plotDispEsts(cD)");
     }
 
     public void plotDE(File file) throws IllegalStateException, PackageNotLoadableException {
-        if (gnuR == null) {
-            throw new IllegalStateException("Shutdown was already called!");
-        }
-        gnuR.loadPackage("grDevices");
-        String path = file.getAbsolutePath();
-        path = path.replace("\\", "\\\\");
-        gnuR.eval("svg(filename=\"" + path + "\")");
-        gnuR.eval("plotDE(res)");
-        gnuR.eval("dev.off()");
+        gnuR.storePlot(file, "plotDE(res)");
     }
 
     public void plotHist(File file) throws IllegalStateException, PackageNotLoadableException {
-        if (gnuR == null) {
-            throw new IllegalStateException("Shutdown was already called!");
-        }
-        gnuR.loadPackage("grDevices");
-        String path = file.getAbsolutePath();
-        path = path.replace("\\", "\\\\");
-        gnuR.eval("svg(filename=\"" + path + "\")");
-        gnuR.eval("hist(res$pval, breaks=100, col=\"skyblue\", border=\"slateblue\", main=\"\")");
-        gnuR.eval("dev.off()");
+        gnuR.storePlot(file, "hist(res$pval, breaks=100, col=\"skyblue\", border=\"slateblue\", main=\"\")");
     }
 }

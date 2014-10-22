@@ -135,19 +135,18 @@ public abstract class ImportTrackBasePanel extends FileSelectionPanel {
     }
 
     /**
-     * @return true, if this direct access track was already imported in another
-     * readXplorer db. In that case the sam/bam file does not have to be extended
-     * anymore, because all needed data is already stored in the file.
+     * @return true, if this track was already imported in another readXplorer
+     * db. In that case the sam/bam file does not have to be extended anymore,
+     * because all needed data is already stored in the file.
      */
     public boolean isAlreadyImported() {
         return isAlreadyImported;
     }
 
     /**
-     * @param isAlreadyImported true, if this direct access track was already
-     * imported in another readXplorer db. In that case the sam/bam file does not have
-     * to be extended anymore, because all needed data is already stored in the
-     * file.
+     * @param isAlreadyImported true, if this track was already imported in
+     * another readXplorer db. In that case the sam/bam file does not have to be
+     * extended anymore, because all needed data is already stored in the file.
      */
     protected void setIsAlreadyImported(boolean isAlreadyImported) {
         this.isAlreadyImported = isAlreadyImported;

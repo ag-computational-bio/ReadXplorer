@@ -39,8 +39,8 @@ public class TranscriptionStart extends TrackChromResultEntry {
      * @param pos The position at which the gene start was detected
      * @param isFwdStrand true, if the transcript start was detected on the fwd strand, false otherwise.
      * @param readStarts The number of read starts at the detected tss position
-     * @param percentIncrease The coverage at the detected gene start position
-     * (getPos()).
+     * @param percentIncrease The coverage increase in percent from the position
+     * before the TSS to the detected TSS position
      * @param coverageIncrease the coverage increase from the position before
      * the TSS to the detected TSS position
      * @param detFeatures object containing the features associated to this predicted gene start
@@ -85,8 +85,8 @@ public class TranscriptionStart extends TrackChromResultEntry {
     }
 
     /**
-     * @return The coverage at the detected gene start position
-     * (getPos()).
+     * @return The coverage increase in percent from the position before the TSS
+     * to the detected TSS position
      */
     public int getPercentIncrease() {
         return this.percentIncrease;

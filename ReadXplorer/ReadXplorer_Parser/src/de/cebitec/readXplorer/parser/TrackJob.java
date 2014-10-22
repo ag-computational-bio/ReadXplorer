@@ -42,8 +42,8 @@ public class TrackJob implements Job {
      * @param description the description of the track
      * @param refGen the ReferenceJob with all information about the reference
      * @param parser the parser to use for parsing
-     * @param isAlreadyImported true, if this direct access track was already 
-     * imported in another readXplorer db.
+     * @param isAlreadyImported true, if this track was already imported in
+     * another readXplorer db.
      * @param timestamp the timestamp when it was created
      */
     public TrackJob(int trackID, File file, String description, ReferenceJob refGen, 
@@ -81,7 +81,7 @@ public class TrackJob implements Job {
 
     /**
      * @return the file, which contains the track data and which should be
-     * parsed and stored into the db / as direct access track.
+     * parsed and stored as track.
      */
     @Override
     public File getFile() {
@@ -90,7 +90,7 @@ public class TrackJob implements Job {
 
     /**
      * @param file the file, which contains the track data and which should be
-     * parsed and stored into the db / as direct access track.
+     * parsed and stored as track.
      */
     public void setFile(File file) {
         this.file = file;
@@ -136,8 +136,8 @@ public class TrackJob implements Job {
     }
 
     /**
-     * @return true, if this direct access track was already imported in another
-     * readXplorer db, false otherwise.
+     * @return true, if this track was already imported in another readXplorer
+     * db, false otherwise.
      */
     public boolean isAlreadyImported() {
         return this.isAlreadyImported;

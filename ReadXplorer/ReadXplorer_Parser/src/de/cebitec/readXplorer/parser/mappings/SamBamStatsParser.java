@@ -25,6 +25,7 @@ import de.cebitec.readXplorer.util.MessageSenderI;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Pair;
+import de.cebitec.readXplorer.util.PositionUtils;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.StatsContainer;
 import de.cebitec.readXplorer.util.classification.Classification;
@@ -77,8 +78,11 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
      * @return  
      */
     @SuppressWarnings("fallthrough")
-    @NbBundle.Messages({"StatsParser.Finished=Finished creating track statistics for {0}. ", 
-                        "StatsParser.Start=Start creating track statistics for {0}"})
+    @NbBundle.Messages({
+            "# {0} - track file path",
+            "StatsParser.Finished=Finished creating track statistics for {0}. ", 
+            "# {0} - track file path",
+            "StatsParser.Start=Start creating track statistics for {0}"})
     public ParsedTrack createTrackStats(TrackJob trackJob, Map<String, Integer> chromLengthMap) {
         
         long startTime = System.currentTimeMillis();
@@ -95,19 +99,24 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
         int seqCount = 0;
         int start;
         int stop;
+        String refName;
         String readName;
         String readSeq;
         String cigar;
         MappingClass mappingClass;
         int mapCount;
         //Map with one covered interval list for each mapping class
-        Map<Classification, List<Pair<Integer, Integer>>> classToCoveredIntervalsMap = new HashMap<>();
-        for (MappingClass mapClass : MappingClass.values()) {
-            classToCoveredIntervalsMap.put(mapClass, new ArrayList<Pair<Integer, Integer>>());
-            classToCoveredIntervalsMap.get(mapClass).add(new Pair<>(0, 0));
+        Map<String, Map<Classification, List<Pair<Integer, Integer>>>> classToCoveredIntervalsMap = new HashMap<>();
+        for (String chromName : chromLengthMap.keySet()) {
+            Map<Classification, List<Pair<Integer, Integer>>> mapClassMap = new HashMap<>();
+            for (MappingClass mapClass : MappingClass.values()) {
+                mapClassMap.put(mapClass, new ArrayList<Pair<Integer, Integer>>());
+                mapClassMap.get(mapClass).add(new Pair<>(0, 0));
+            }
+            mapClassMap.put(TotalCoverage.TOTAL_COVERAGE, new ArrayList<Pair<Integer, Integer>>());
+            mapClassMap.get(TotalCoverage.TOTAL_COVERAGE).add(new Pair<>(0, 0));
+            classToCoveredIntervalsMap.put(chromName, mapClassMap);
         }
-        classToCoveredIntervalsMap.put(TotalCoverage.TOTAL_COVERAGE, new ArrayList<Pair<Integer, Integer>>());
-        classToCoveredIntervalsMap.get(TotalCoverage.TOTAL_COVERAGE).add(new Pair<>(0, 0));
         Byte classification;
         Integer mappingCount;
 //        HashMap<String, Object> readNameSet = new HashMap<>();
@@ -126,14 +135,15 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
 
                     record = samItor.next();
                     readName = record.getReadName();
-                    if (!record.getReadUnmappedFlag() && chromLengthMap.containsKey(record.getReferenceName())) {
+                    refName = record.getReferenceName();
+                    if (!record.getReadUnmappedFlag() && chromLengthMap.containsKey(refName)) {
 
                         cigar = record.getCigarString();
                         start = record.getAlignmentStart();
                         stop = record.getAlignmentEnd();
                         readSeq = record.getReadString();
 
-                        if (!CommonsMappingParser.checkReadSam(this, readSeq, chromLengthMap.get(record.getReferenceName()), cigar, start, stop, fileName, lineno)) {
+                        if (!CommonsMappingParser.checkReadSam(this, readSeq, chromLengthMap.get(refName), cigar, start, stop, fileName, lineno)) {
                             continue; //continue, and ignore read, if it contains inconsistent information
                         }
 
@@ -177,8 +187,8 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
                         lastReadSeq = readSeq;
 
                         statsContainer.increaseValue(mappingClass.getTypeString(), mapCount);
-                        this.updateIntervals(classToCoveredIntervalsMap.get(mappingClass), start, stop);
-                        this.updateIntervals(classToCoveredIntervalsMap.get(TotalCoverage.TOTAL_COVERAGE), start, stop);
+                        PositionUtils.updateIntervals(classToCoveredIntervalsMap.get(refName).get(mappingClass), start, stop);
+                        PositionUtils.updateIntervals(classToCoveredIntervalsMap.get(refName).get(TotalCoverage.TOTAL_COVERAGE), start, stop);
                         //saruman starts genome at 0 other algorithms like bwa start genome at 1
                         
 //                        //can be used for debugging performance
@@ -215,7 +225,8 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
         }
         
         //finish statistics and return the track with the statistics data in the end
-        statsContainer.setCoveredPositionsImport(classToCoveredIntervalsMap);
+        //TODO: claculate separately for all chromosomes for extended stats panel
+        statsContainer.setCoveredPositionsImport(classToCoveredIntervalsMap); 
 
         ParsedTrack track = new ParsedTrack(trackJob);
         statsContainer.setReadLengthDistribution(readLengthDistribution);
@@ -250,25 +261,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
         if (this.errorLimit.allowOutput()) {
             this.notifyObservers(msg);
         }
-    }
-    
-    /**
-     * Update the last interval of the given list or create a new interval in 
-     * the given list, if the new boundaries are beyond the boundaries of the 
-     * last interval in the list.
-     * @param coveredIntervals list of covered intervals
-     * @param start start pos of new interval to add
-     * @param stop stop pos of new interval to add
-     */
-    private void updateIntervals(List<Pair<Integer, Integer>> coveredIntervals, int start, int stop) {
-        //store coverage statistic
-        int lastIndex = coveredIntervals.size() - 1;
-        if (coveredIntervals.get(lastIndex).getSecond() < start) { //add new pair
-            coveredIntervals.add(new Pair<>(start, stop));
-        } else { //increase length of first pair (start remains, stop is enlarged)
-            coveredIntervals.get(lastIndex).setSecond(stop);
-        }
-    }   
+    }  
     
     /**
      * Sets the statistics container for handling statistics for the extended track.

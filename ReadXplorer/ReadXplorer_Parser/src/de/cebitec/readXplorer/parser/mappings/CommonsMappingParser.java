@@ -25,7 +25,6 @@ import de.cebitec.readXplorer.util.MessageSenderI;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.util.classification.MappingClass;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -781,7 +780,7 @@ public final class CommonsMappingParser {
      * @param record record to classify
      * @param messageSender Sender who should be updated, if errors occur
      * @param chromLengthMap chromosome length map
-     * @param file mapping file from which the record originates
+     * @param fileName mapping file name from which the record originates
      * @param lineno the line number of the current record in the file
      * @param refSeqFetcher a fetcher for the reference sequence
      * @param diffMap map of sam records to the number of differences to the
@@ -791,7 +790,7 @@ public final class CommonsMappingParser {
      * @return <code>true</code>, if the mapping data is consistent, 
      * <code>false</code> otherwise
      */
-    public static boolean classifyRead(SAMRecord record, MessageSenderI messageSender, Map<String, Integer> chromLengthMap, File file, int lineno,
+    public static boolean classifyRead(SAMRecord record, MessageSenderI messageSender, Map<String, Integer> chromLengthMap, String fileName, int lineno,
             RefSeqFetcher refSeqFetcher, Map<SAMRecord, Integer> diffMap, ParsedClassification classificationData) {
         String cigar = record.getCigarString();
         String readSeq = record.getReadString();
@@ -799,7 +798,7 @@ public final class CommonsMappingParser {
         int stop = record.getAlignmentEnd();
 
         boolean isConsistent = CommonsMappingParser.checkReadSam(messageSender, readSeq, chromLengthMap.get(record.getReferenceName()), 
-                cigar, start, stop, file.getName(), lineno);
+                cigar, start, stop, fileName, lineno);
 //            ++noSkippedReads;
 //            continue; //continue, and ignore read, if it contains inconsistent information
 

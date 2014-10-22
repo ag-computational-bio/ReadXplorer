@@ -519,7 +519,7 @@ public class NovelRegionResultPanel extends ResultTablePanel {
                     statisticsMap.put(NOVELREGION_DETECTION_NO_OF_CISANTISENSE, (Integer) statisticsMap.get(NOVELREGION_DETECTION_NO_OF_CISANTISENSE) + noCisAntisense);
                     statisticsMap.put(NOVELREGION_DETECTION_NO_OF_TRANSGENIC, (Integer) statisticsMap.get(NOVELREGION_DETECTION_NO_OF_TRANSGENIC) + noTransgene);
                     statisticsMap.put(ResultPanelTranscriptionStart.MAPPINGS_COUNT, (Double) statisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT) + novelRegResults.getStats().getMappingCount());
-                    statisticsMap.put(ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH, (Double) statisticsMap.get(ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH) + novelRegResults.getStats().getMeanMappingLength());
+                    statisticsMap.put(ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH, (Double) statisticsMap.get(ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH) + novelRegResults.getStats().getAverageReadLength());
                     statisticsMap.put(ResultPanelTranscriptionStart.MAPPINGS_MILLION, (Double) statisticsMap.get(ResultPanelTranscriptionStart.MAPPINGS_MILLION) + novelRegResults.getStats().getMappingsPerMillion());
                     statisticsMap.put(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_STACKSIZE, (Double) statisticsMap.get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_STACKSIZE) + novelRegResults.getStats().getBgThreshold());
 

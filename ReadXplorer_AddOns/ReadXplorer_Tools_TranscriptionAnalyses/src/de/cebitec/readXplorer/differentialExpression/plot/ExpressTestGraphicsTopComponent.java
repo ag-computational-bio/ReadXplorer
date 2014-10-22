@@ -20,31 +20,21 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler;
 import de.cebitec.readXplorer.differentialExpression.ResultDeAnalysis;
 import de.cebitec.readXplorer.plotting.ChartExporter;
-import static de.cebitec.readXplorer.plotting.ChartExporter.ChartExportStatus.FAILED;
-import static de.cebitec.readXplorer.plotting.ChartExporter.ChartExportStatus.FINISHED;
-import static de.cebitec.readXplorer.plotting.ChartExporter.ChartExportStatus.RUNNING;
 import de.cebitec.readXplorer.plotting.CreatePlots;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readXplorer.view.TopComponentExtended;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.SwingUtilities;
 import org.jfree.chart.ChartPanel;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
@@ -374,31 +364,7 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended 
     @Override
     public void update(Object args) {
         if (args instanceof ChartExporter.ChartExportStatus) {
-            final ChartExporter.ChartExportStatus status = (ChartExporter.ChartExportStatus) args;
-            try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {                
-                        switch (status) {
-                            case RUNNING:
-                                saveButton.setEnabled(false);
-                                svgExportProgressHandle.start();
-                                svgExportProgressHandle.switchToIndeterminate();
-                                break;
-                            case FAILED:
-                                messages.setText("The export of the plot failed.");
-                            case FINISHED:
-                                messages.setText("SVG image saved.");
-                                svgExportProgressHandle.switchToDeterminate(100);
-                                svgExportProgressHandle.finish();
-                                break;
-                        }
-                    }
-                });
-            } catch (InterruptedException | InvocationTargetException ex) {
-                        Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                        Logger.getLogger(this.getClass().getName()).log(Level.WARNING, ex.getMessage(), currentTimestamp);
-            }
+            DgeExportUtilities.updateExportStatus(svgExportProgressHandle, (ChartExporter.ChartExportStatus) args, saveButton);
         }
     }
 

@@ -65,7 +65,6 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
     private boolean isStrandBothOption;
     private boolean isBothFwdDirection;
     private boolean isFeatureStrand;
-    private boolean isFeatureStrandAnalysis; //TODO: is this still needed?
     protected List<TranscriptionStart> detectedStarts;
     private DiscreteCountingDistribution readStartDistribution;
     private DiscreteCountingDistribution covIncPercentDistribution;
@@ -95,7 +94,6 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      * switched, e.g. inc = 50, max = 10, inc2 = 100, then all coverage increases above 100 
      * with an initial read count of 0-10 are detected as transcription start sites, but for all positions
      * with an initial read count > 10 an increase of 50 read counts is enough to be detected.
-     * 
      * @param trackConnector the track viewer for which the analyses should be carried out
      * @param parametersTSS the parameter set for this TSS analysis
      */
@@ -123,7 +121,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
 
         this.readStartDistribution = trackConnector.getCountDistribution(Properties.READ_START_DISTRIBUTION);
         this.covIncPercentDistribution = trackConnector.getCountDistribution(Properties.COVERAGE_INC_PERCENT_DISTRIBUTION);
-        this.calcCoverageDistributions = this.readStartDistribution.isEmpty();
+        this.calcCoverageDistributions = this.readStartDistribution.isEmpty() || this.covIncPercentDistribution.isEmpty();
 
         if (this.parametersTSS.isAutoTssParamEstimation()) {
             this.parametersTSS.setMaxLowCovInitCount(0); //set these values as default for the transcription start site automatic
@@ -135,8 +133,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                 parametersTSS.setMinNoReadStarts(this.estimateCutoff(genomeLength, readStartDistribution, 0)); //+ 0,05%
                 parametersTSS.setMinPercentIncrease(this.estimateCutoff(genomeLength, covIncPercentDistribution, 0));// (int) (this.genomeSize / 1000)); //0,1%
             } else {
-                this.parametersTSS.setMinNoReadStarts(10); //lowest default values for new data sets without an inital distribution
-                this.parametersTSS.setMinPercentIncrease(30); //in the database
+                this.parametersTSS.setMinNoReadStarts(10); //lowest default values for new data sets without an inital distribution in the database
             }
         }
 
@@ -164,7 +161,6 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      * corrects the results for automatic mode.
      */
     public void finish() {
-        //when the last request is finished signalize the parent to collect the data
         this.storeDistributions();
         if (parametersTSS.isAutoTssParamEstimation()) {
             this.correctResult();
@@ -187,7 +183,6 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         isStrandBothOption = parametersTSS.getReadClassParams().isStrandBothOption();
         isBothFwdDirection = parametersTSS.getReadClassParams().isStrandBothFwdOption();
         isFeatureStrand = parametersTSS.getReadClassParams().isStrandFeatureOption();
-        isFeatureStrandAnalysis = isFeatureStrand || isStrandBothOption && isBothFwdDirection;
         
         int leftBound = coverage.getLeftBound();
         int fixedLeftBound = leftBound <= 0 ? 0 : leftBound - 1;
@@ -241,52 +236,45 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         int readStartsRev;
         int percentIncFwd;
         int percentIncRev;
-        int readStartIntermd;
         
         fwdCov1 = covArrayFwd[pos];
         revCov1 = covArrayRev[pos];
         fwdCov2 = covArrayFwd[pos + 1];
         revCov2 = covArrayRev[pos + 1];
-        if (!isFeatureStrand && !isStrandBothOption) {
-            readStartsFwd = readStartArrayFwd[pos];
-            readStartsRev = readStartArrayRev[pos + 1];
-        } else {
-            readStartsFwd = readStartArrayFwd[pos + 1];
-            readStartsRev = readStartArrayRev[pos];
-        }
-        
-        if (isStrandBothOption) {
-                if (isBothFwdDirection) {
-                    increaseFwd = fwdCov2 - fwdCov1 + revCov2 - revCov1;
-                    increaseRev = 0;
-                    percentIncFwd = GeneralUtils.calculatePercentageIncrease(fwdCov1 + revCov1, fwdCov2 + revCov2);
-                    percentIncRev = GeneralUtils.calculatePercentageIncrease(0, 0);
-                } else {
-                    increaseFwd = 0;
-                    increaseRev = revCov1 - revCov2 + fwdCov1 - fwdCov2;
-                    percentIncFwd = GeneralUtils.calculatePercentageIncrease(0, 0);
-                    percentIncRev = GeneralUtils.calculatePercentageIncrease(revCov2 + fwdCov2, revCov1 + fwdCov1);
-                }
-            } else {
-                //default increases for correctly stranded libraries
-                if (isFeatureStrand) {
-                    increaseFwd = fwdCov2 - fwdCov1;
-                    increaseRev = revCov1 - revCov2;
-                    percentIncFwd = GeneralUtils.calculatePercentageIncrease(fwdCov1, fwdCov2);
-                    percentIncRev = GeneralUtils.calculatePercentageIncrease(revCov2, revCov1);
-
-                //extra increases for invertedly stranded libraries
-                } else {
-                    increaseRev = fwdCov1 - fwdCov2;
-                    increaseFwd = revCov2 - revCov1;
-                    percentIncRev = GeneralUtils.calculatePercentageIncrease(fwdCov2, fwdCov1);
-                    percentIncFwd = GeneralUtils.calculatePercentageIncrease(revCov1, revCov2);
-                    readStartIntermd = readStartsFwd;
-                    readStartsFwd = readStartsRev;
-                    readStartsRev = readStartIntermd;
-                }
+        if (!isStrandBothOption) { //calc values based on analysis strand selection (4 possibilities)
+            if (isFeatureStrand) { //default increases for correctly stranded libraries
+                increaseFwd = fwdCov2 - fwdCov1;
+                increaseRev = revCov1 - revCov2;
+                percentIncFwd = GeneralUtils.calculatePercentageIncrease(fwdCov1, fwdCov2);
+                percentIncRev = GeneralUtils.calculatePercentageIncrease(revCov2, revCov1);
+                readStartsFwd = readStartArrayFwd[pos + 1];
+                readStartsRev = readStartArrayRev[pos];
+            } else { //extra increases for invertedly stranded libraries
+                increaseRev = fwdCov1 - fwdCov2;
+                increaseFwd = revCov2 - revCov1;
+                percentIncRev = GeneralUtils.calculatePercentageIncrease(fwdCov2, fwdCov1);
+                percentIncFwd = GeneralUtils.calculatePercentageIncrease(revCov1, revCov2);
+                readStartsFwd = readStartArrayRev[pos];
+                readStartsRev = readStartArrayFwd[pos + 1];
             }
-        
+        } else {
+            if (isBothFwdDirection) { //TODO: Strand options disrupt distributions! calculate one for each strand option!
+                increaseFwd = fwdCov2 - fwdCov1 + revCov2 - revCov1;
+                increaseRev = 0;
+                percentIncFwd = GeneralUtils.calculatePercentageIncrease(fwdCov1 + revCov1, fwdCov2 + revCov2);
+                percentIncRev = GeneralUtils.calculatePercentageIncrease(0, 0);
+                readStartsFwd = readStartArrayFwd[pos + 1] + readStartArrayRev[pos + 1];
+                readStartsRev = 0;
+            } else {
+                increaseFwd = 0;
+                increaseRev = revCov1 - revCov2 + fwdCov1 - fwdCov2;
+                percentIncFwd = GeneralUtils.calculatePercentageIncrease(0, 0);
+                percentIncRev = GeneralUtils.calculatePercentageIncrease(revCov2 + fwdCov2, revCov1 + fwdCov1);
+                readStartsFwd = 0;
+                readStartsRev = readStartArrayFwd[pos] + readStartArrayRev[pos];
+            }
+        }
+
         if (this.calcCoverageDistributions) {
             this.readStartDistribution.increaseDistribution(readStartsFwd);
             this.readStartDistribution.increaseDistribution(readStartsRev);
@@ -313,7 +301,6 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      */
     private void detectStart(int pos, int chromId, int chromLength, List<PersistentFeature> chromFeatures, int readStartsFwd, 
                     int readStartsRev, int increaseFwd, int increaseRev, int percentIncreaseFwd, int percentIncreaseRev) {
-        
         
         if ( ((readStartsFwd <= parametersTSS.getMaxLowCovReadStarts() && readStartsFwd >= parametersTSS.getMinLowCovReadStarts())
             || readStartsFwd >  parametersTSS.getMaxLowCovReadStarts() && readStartsFwd >= parametersTSS.getMinNoReadStarts())
@@ -355,9 +342,9 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      * given transcription start site and strand.
      */
     private DetectedFeatures findNextFeatures(int tssPos, int chromLength, List<PersistentFeature> chromFeatures, boolean isFwdStrand) {
-        final int maxDeviation = 1000;
-        int minStartPos = tssPos - maxDeviation < 0 ? 0 : tssPos - maxDeviation;
-        int maxStartPos = tssPos + maxDeviation > chromLength ? chromLength : tssPos + maxDeviation;
+        final int maxFeatureDist = parametersTSS.getMaxFeatureDistance();
+        int minStartPos = tssPos - maxFeatureDist < 0 ? 0 : tssPos - maxFeatureDist;
+        int maxStartPos = tssPos + maxFeatureDist > chromLength ? chromLength : tssPos + maxFeatureDist;
         PersistentFeature feature;
         DetectedFeatures detectedFeatures = new DetectedFeatures();
         int start;
@@ -524,6 +511,12 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
             if (lastDetectedStart.getPos() + 1 >= tss.getPos() && lastDetectedStart.isFwdStrand() == tss.isFwdStrand()) {
                 int noReadStartsLastStart = lastDetectedStart.getReadStartsAtPos();
                 int noReadStartsTSS = tss.getReadStartsAtPos();
+//                int coverageIncreaseLast = lastDetectedStart.getPercentIncrease();
+//                int coverageIncrease = tss.getPercentIncrease();
+                /* TODO: this causes some TSS to be removed when the distributions are calculated for the first time! 
+                 * Alternatively all TSS can be stored first and then a second run checking neighboring TSS and merging/removing them
+                 * can be performed. -> This leads to "merging of neighboring TSS" Feature, which shall be implemented at some point...
+                 */
                 
                 if (noReadStartsLastStart < noReadStartsTSS) {
                     this.detectedStarts.remove(index);
@@ -571,13 +564,13 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         int[] distributionValues = distribution.getDiscreteCountingDistribution();
         
         int nbTSSs = 0;
-        int selectedIndex = 0;
+        int selectedIndex = 1;
         for (int i = distributionValues.length - 1; i > 0; --i) {
             // we use the index which first exceeds maxEstimatedNbOfActiveGenes
             if (nbTSSs < maxEstimatedNbOfActiveGenes) {
                 nbTSSs += distributionValues[i];
-                selectedIndex = i;
             } else {
+                selectedIndex = i;
                 break;
             }
         }
@@ -587,7 +580,6 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
          * I. B. Rogozin, et al., “Congruent evolution of different classes of non-coding DNA in prokaryotic genomes,” 
          * Nucleic Acids Res, vol. 30, no. 19, pp. 4264–4271, Oct. 2002.
          */
-        
         return distribution.getMinValueForIndex(selectedIndex - 1);
     }
 
@@ -614,8 +606,10 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
      */
     private void storeDistributions() {
         if (this.calcCoverageDistributions) { //if it was calculated, also store it
-            ProjectConnector.getInstance().insertCountDistribution(readStartDistribution, this.trackConnector.getTrackID());
-            ProjectConnector.getInstance().insertCountDistribution(covIncPercentDistribution, this.trackConnector.getTrackID());
+            if (this.trackConnector.getAssociatedTrackNames().size() == 1) {
+                ProjectConnector.getInstance().insertCountDistribution(readStartDistribution, this.trackConnector.getTrackID());
+                ProjectConnector.getInstance().insertCountDistribution(covIncPercentDistribution, this.trackConnector.getTrackID());
+            }
             if (this.parametersTSS.isAutoTssParamEstimation()) {
                 for (PersistentChromosome chrom : chromosomes.values()) {
                     parametersTSS.setMinNoReadStarts(parametersTSS.getMinNoReadStarts()
@@ -638,8 +632,8 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
         TranscriptionStart tss;
         for (int i = 0; i < this.detectedStarts.size(); ++i) {
             tss = this.detectedStarts.get(i);
-            if (tss.getReadStartsAtPos() < parametersTSS.getMinNoReadStarts()
-                    || tss.getPercentIncrease() < parametersTSS.getMinPercentIncrease()) {
+            if (    tss.getReadStartsAtPos() < parametersTSS.getMinNoReadStarts() ||
+                    tss.getPercentIncrease() < parametersTSS.getMinPercentIncrease()) {
                 this.detectedStarts.remove(tss);
             }
         }

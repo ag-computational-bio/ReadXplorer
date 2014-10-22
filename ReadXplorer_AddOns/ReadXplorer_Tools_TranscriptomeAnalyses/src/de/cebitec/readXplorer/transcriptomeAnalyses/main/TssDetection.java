@@ -6,14 +6,15 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.StartCodon;
-import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.SequenceUtils;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Provides a method for detecting and classification of Transcription start
@@ -25,11 +26,11 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
 
     private final List<TranscriptionStart> detectedTSS;
     private final int trackid;
-    private final HashMap<Integer, Boolean> canonicalFwdTss, revTss;
+    private final Map<Integer, Boolean> canonicalFwdTss, revTss;
     /**
      * Key: Feature ID, Value: Locus
      */
-    private final HashMap<Integer, String> fwdFeaturesIds, revFeaturesIds;
+    private final Map<Integer, String> fwdFeaturesIds, revFeaturesIds;
     private final List<Integer[]> fwdOffsets, revOffsets;
 
     /**
@@ -68,7 +69,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
             HashMap<Integer, List<Integer>> fwdFeatures, HashMap<Integer, List<Integer>> revFeatures,
             HashMap<Integer, PersistentFeature> allFeatures, ParameterSetFiveEnrichedAnalyses parameters) {
         List<TranscriptionStart> postProcessedTssList = new ArrayList<>();
-        HashSet<FeatureType> fadeOutFeatureTypes = parameters.getExcludeFeatureTypes();
+        Set<FeatureType> fadeOutFeatureTypes = parameters.getExcludeFeatureTypes();
         // settings for checking CDS-shift 
         Map<String, StartCodon> validCodons = parameters.getValidStartCodons();
         double relPercentage = (parameters.getCdsShiftPercentage() / 100.0);
@@ -91,8 +92,8 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                 int pos = tss.getStartPosition();
                 int offset = 0;
                 int end = 0;
-                int dist2start = 0;
-                int dist2stop = 0;
+                int dist2start;
+                int dist2stop;
                 boolean cdsShift = false;
                 int offsetToNextDownstreamFeature = 0;
 
@@ -363,7 +364,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
                 int offset = 0;
                 int end = 0;
                 int dist2start = 0;
-                int dist2stop = 0;
+                int dist2stop;
                 boolean cdsShift = false;
                 int offsetToNextDownstreamFeature = 0;
 
@@ -652,8 +653,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
         }
 
         // running additional 5'-UTR Antisense detection
-        for (int i = 0; i < fwdOffsets.size(); i++) {
-            Integer[] offset = fwdOffsets.get(i);
+        for (Integer[] offset : fwdOffsets) {
             int j = offset[0];
             int k = offset[1];
             for (; j < k; j++) {
@@ -663,8 +663,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
             }
         }
 
-        for (int i = 0; i < revOffsets.size(); i++) {
-            Integer[] offset = revOffsets.get(i);
+        for (Integer[] offset : revOffsets) {
             int j = offset[0];
             int k = offset[1];
             for (; j < k; j++) {
@@ -777,7 +776,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
      * @param chromLength Chromosome length.
      * @return the current persistent feature
      */
-    private PersistentFeature getCorrespondingFeature(HashMap<Integer, List<Integer>> fwdFeatures, int pos, int offset, int end, HashMap<Integer, PersistentFeature> allFeatures, HashSet<FeatureType> fadeOutFeatureTypes, int chromLength) {
+    private PersistentFeature getCorrespondingFeature(Map<Integer, List<Integer>> fwdFeatures, int pos, int offset, int end, Map<Integer, PersistentFeature> allFeatures, Set<FeatureType> fadeOutFeatureTypes, int chromLength) {
         // getting the PersistentFeature
         PersistentFeature feature = null;
 
@@ -905,15 +904,15 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
      * @param distanceForExcludingTss number restricting the distance between
      * TSS and detected gene.
      */
-    public void runningTSSDetection(PersistentReference ref, HashMap<Integer, List<Integer>> fwdFeatures, HashMap<Integer, List<Integer>> revFeatures,
-            HashMap<Integer, PersistentFeature> allFeatures, StatisticsOnMappingData statistics, int chromId, ParameterSetFiveEnrichedAnalyses parameters) {
+    public void runningTSSDetection(PersistentReference ref, Map<Integer, List<Integer>> fwdFeatures, Map<Integer, List<Integer>> revFeatures,
+            Map<Integer, PersistentFeature> allFeatures, StatisticsOnMappingData statistics, int chromId, ParameterSetFiveEnrichedAnalyses parameters) {
 
         PersistentChromosome chromosome = ref.getChromosome(chromId);
         int chromosomeLength = chromosome.getLength();
         int chromNo = chromosome.getChromNumber();
         
         int ratio = parameters.getRatio();
-        HashSet<FeatureType> fadeOutFeatureTypes = parameters.getExcludeFeatureTypes();
+        Set<FeatureType> fadeOutFeatureTypes = parameters.getExcludeFeatureTypes();
         int leaderlessRange = parameters.getLeaderlessLimit();
         Integer distanceForExcludingTss = parameters.getExclusionOfTSSDistance();
 
@@ -1552,8 +1551,8 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
     private boolean checkLeaderlessCdsShift(int dist2start, PersistentReference ref, int chromId, boolean isFwd, int tss, Map<String, StartCodon> validCodons) {
         // check for cdsShift, when offset > and offset+1 mod 3 == 0
         boolean cdsShift = false;
-        String startAtTSS = "";
         if (dist2start > 0 && (dist2start % 3) == 0) {
+            String startAtTSS;
             if (isFwd) {
                 startAtTSS = getSubSeq(ref, chromId, isFwd, tss, tss + 2);
             } else {
@@ -1653,11 +1652,10 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
     /**
      * Determines the biggest Feature id in a map of PersistentFeatures, whereby
      * the Key is the featureID.
-     *
      * @param features HashMap: Key => FeatureID, Value => PersistentFeatures
      * @return biggest FeatureID
      */
-    private int determineBiggestId(HashMap<Integer, PersistentFeature> features) {
+    private int determineBiggestId(Map<Integer, PersistentFeature> features) {
         int result = 0;
 
         for (PersistentFeature persistentFeature : features.values()) {
@@ -1675,7 +1673,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
      * @param features Map: Key => FeatureID, Value => PersistentFeature.
      * @return smallest FeatureID
      */
-    private int determineSmallestId(HashMap<Integer, PersistentFeature> features) {
+    private int determineSmallestId(Map<Integer, PersistentFeature> features) {
         int result = 0;
         for (PersistentFeature persistentFeature : features.values()) {
             result = persistentFeature.getId();
@@ -1700,7 +1698,7 @@ public class TssDetection implements Observer, AnalysisI<List<TranscriptionStart
      * @param currentPos current position in chromosome.
      * @return the offset to next upstream feature.
      */
-    private int[] determineOffsetInFwdDirection(int chromLength, HashMap<Integer, List<Integer>> fwdFeatures, int currentPos) {
+    private int[] determineOffsetInFwdDirection(int chromLength, Map<Integer, List<Integer>> fwdFeatures, int currentPos) {
         int offset = 0;
         int end = 0;
         int[] result = new int[2];

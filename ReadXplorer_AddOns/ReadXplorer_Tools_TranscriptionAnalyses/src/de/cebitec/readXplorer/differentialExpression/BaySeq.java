@@ -174,23 +174,15 @@ public class BaySeq {
      */
     public void plotMACD(File file, int[] samplesA, int[] samplesB) throws SamplesNotValidException,
             IllegalStateException, PackageNotLoadableException {
-        if (gnuR == null) {
-            throw new IllegalStateException("Shutdown was already called!");
-        }
         if (!validateSamples(samplesA, samplesB)) {
             throw new SamplesNotValidException();
         }
-        gnuR.loadPackage("grDevices");
         StringBuilder samplesABuilder = new StringBuilder();
         samplesABuilder.append((samplesA[0] + 1)).append(":").append((samplesA[samplesA.length - 1] + 1));
         StringBuilder samplesBBuilder = new StringBuilder();
         samplesBBuilder.append((samplesB[0] + 1)).append(":").append((samplesB[samplesB.length - 1] + 1));
-        String path = file.getAbsolutePath();
-        path = path.replace("\\", "\\\\");
-        gnuR.eval("svg(filename=\"" + path + "\")");
-        gnuR.eval("plotMA.CD(cD, samplesA = " + samplesABuilder.toString() + ", "
+        gnuR.storePlot(file, "plotMA.CD(cD, samplesA = " + samplesABuilder.toString() + ", "
                 + "samplesB = " + samplesBBuilder.toString() + ")");
-        gnuR.eval("dev.off()");
     }
 
     /**
@@ -210,26 +202,18 @@ public class BaySeq {
      */
     public void plotPosteriors(File file, Group group, int[] samplesA, int[] samplesB) throws SamplesNotValidException,
             IllegalStateException, PackageNotLoadableException {
-        if (gnuR == null) {
-            throw new IllegalStateException("Shutdown was already called!");
-        }
         if (!validateSamples(samplesA, samplesB)) {
             throw new SamplesNotValidException();
         }
-        gnuR.loadPackage("grDevices");
         StringBuilder samplesABuilder = new StringBuilder();
         samplesABuilder.append((samplesA[0] + 1)).append(":").append((samplesA[samplesA.length - 1] + 1));
         StringBuilder samplesBBuilder = new StringBuilder();
         samplesBBuilder.append((samplesB[0] + 1)).append(":").append((samplesB[samplesB.length - 1] + 1));
-        String path = file.getAbsolutePath();
-        path = path.replace("\\", "\\\\");
-        gnuR.eval("svg(filename=\"" + path + "\")");
-        gnuR.eval("plotPosteriors(cD, group = " + group.getGnuRID()
+        gnuR.storePlot(file, "plotPosteriors(cD, group = " + group.getGnuRID()
                 + ", samplesA = " + samplesABuilder.toString()
                 + ", samplesB = " + samplesBBuilder.toString()
                 + ", col = c(rep(\"blue\", 100), rep(\"black\", 900))"
                 + ")");
-        gnuR.eval("dev.off()");
     }
 
     /**
@@ -243,15 +227,7 @@ public class BaySeq {
      * @param group the underlying group for the plot.
      */
     public void plotPriors(File file, Group group) throws IllegalStateException, PackageNotLoadableException {
-        if (gnuR == null) {
-            throw new IllegalStateException("Shutdown was already called!");
-        }
-        gnuR.loadPackage("grDevices");
-        String path = file.getAbsolutePath();
-        path = path.replace("\\", "\\\\");
-        gnuR.eval("svg(filename=\"" + path + "\")");
-        gnuR.eval("plotPriors(cD, group = " + group.getGnuRID() + ")");
-        gnuR.eval("dev.off()");
+        gnuR.storePlot(file, "plotPriors(cD, group = " + group.getGnuRID() + ")");
     }
 
     public void saveResultsAsCSV(int index, File saveFile) {

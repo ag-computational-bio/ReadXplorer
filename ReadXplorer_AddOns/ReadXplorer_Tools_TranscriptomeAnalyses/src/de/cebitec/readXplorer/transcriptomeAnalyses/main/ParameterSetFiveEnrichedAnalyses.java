@@ -6,6 +6,7 @@ import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Data storage for all parameters associated with a 5'-ends enriched RNA-seq
@@ -22,7 +23,7 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
     private Integer threeUtrLimitAntisenseDetection;
     private final Integer leaderlessLimit, exclusionOfTSSDistance, keepingIntragenicTssDistanceLimit;
     private final boolean exclusionOfAllIntragenicTSS, keepAllIntragenicTss, includeBestMatchedReads;
-    private final HashSet<FeatureType> excludeFeatureTypes;
+    private final Set<FeatureType> excludeFeatureTypes;
     private Map<String, StartCodon> validStartCodons;
     private boolean keepOnlyAssignedIntragenicTss;
     private boolean thresholdManuallySet;
@@ -62,7 +63,7 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
             boolean excludeAllInternalTSS, Integer distanceForExcludionOfTss,
             Integer leaderlessLimit, int keepInternalDistance, boolean keepInragenicTss, boolean keepOnlyAssignedIntragenicTss,
             int cdsShiftPercentage, boolean includeBestMatchedReads, int maxDistantaseFor3UtrAntisenseDetection,
-            Map<String, StartCodon> validStartCodons, HashSet<FeatureType> fadeOutFeatureTypes) {
+            Map<String, StartCodon> validStartCodons, Set<FeatureType> fadeOutFeatureTypes) {
         this.fraction = fraction;
         this.ratio = ratio;
         this.leaderlessLimit = leaderlessLimit;
@@ -89,7 +90,6 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
 
     /**
      * Get Map of valid start codons for analysis.
-     *
      * @return Map<String, StartCodon>
      */
     public Map<String, StartCodon> getValidStartCodons() {
@@ -98,7 +98,6 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
 
     /**
      * Get valid start codons as a string representation.
-     *
      * @return string representation of valid start codons
      */
     public String getValidStartCodonsAsString() {
@@ -111,16 +110,14 @@ public class ParameterSetFiveEnrichedAnalyses implements ParameterSetI<Parameter
 
     /**
      * Get the Hash of feature types, that schould be excluded from analysis.
-     *
      * @return HashSet<FeatureType>
      */
-    public HashSet<FeatureType> getExcludeFeatureTypes() {
+    public Set<FeatureType> getExcludeFeatureTypes() {
         return excludeFeatureTypes;
     }
 
     /**
      * Set Hash of valid start codons.
-     *
      * @param validStartCodons
      */
     public void setValidStartCodons(HashMap<String, StartCodon> validStartCodons) {

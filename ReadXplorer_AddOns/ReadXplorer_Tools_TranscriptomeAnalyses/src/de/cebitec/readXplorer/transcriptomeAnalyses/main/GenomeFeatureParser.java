@@ -6,31 +6,34 @@ import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readXplorer.util.Pair;
+import de.cebitec.readXplorer.util.PositionUtils;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.netbeans.api.progress.ProgressHandle;
 
 /**
- * Genome-feature parser. Produces different needed data structures for further
- * analyses.
+ * Genome-feature parser. Produces different genomic data structures needed for 
+ * further analyses.
  *
- * @author jritter
+ * @author jritter, rhilker
  */
 public class GenomeFeatureParser {
 
     private final TrackConnector trackConnector;
-    private final List<int[]> region2Exclude;
-    private final HashMap<Integer, List<Integer>> fwdFeatures;
-    private final HashMap<Integer, List<Integer>> revFeatures;
-    private HashMap<Integer, PersistentFeature> allFeatures;
+    /** A list of intervals (inner list) for each chromosome (outer list). */
+    private final List<List<Pair<Integer, Integer>>> regions2Exclude; 
+    private List<Set<Integer>> excludedGenomePos;
+    private final Map<Integer, List<Integer>> fwdFeatures;
+    private final Map<Integer, List<Integer>> revFeatures;
     private final ReferenceConnector refConnector;
     private final List<PersistentFeature> genomeFeatures;
     private final ProgressHandle progressHandle;
-    private HashMap<Integer, List<Integer>> allFwdFeatures;
-    private HashMap<Integer, List<Integer>> allRevFeatures;
     private Integer referenceLength;
     private final PersistentReference refGenome;
     private final int noOfChromosomes;
@@ -38,7 +41,6 @@ public class GenomeFeatureParser {
     /**
      * Genome-feature parser, parses the needed information from all Features in
      * a Genome. Produces different needed data structures for further analyses.
-     *
      * @param trackConnector TrackConnector.
      * @param progressHandle current ProgressHandle, shows the progress for the
      * running analysis.
@@ -52,34 +54,53 @@ public class GenomeFeatureParser {
         this.referenceLength = 0;
         this.refGenome = trackConnector.getRefGenome();
         this.noOfChromosomes = refGenome.getNoChromosomes();
-        this.region2Exclude = new ArrayList<>(this.noOfChromosomes);
+        this.regions2Exclude = new ArrayList<>(this.noOfChromosomes);
         this.refConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenome.getId());
         Map<Integer, PersistentChromosome> chroms = refConnector.getChromosomesForGenome();
         for (PersistentChromosome chrom : chroms.values()) {
             this.genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
                     0, chrom.getLength(), chrom.getId()));
             int chromNo = refGenome.getChromosome(chrom.getId()).getChromNumber();
-            this.region2Exclude.add(chromNo - 1, new int[chrom.getLength()]);
+            List<Pair<Integer, Integer>> intervals = new ArrayList<>(1);
+            intervals.add(new Pair<>(0, 0));
+            this.regions2Exclude.add(chromNo - 1, intervals);
             this.referenceLength += chrom.getLength();
         }
+        this.excludedGenomePos = this.convertRegions2Exclude(this.regions2Exclude);
     }
 
     /**
-     * Returns an array with rigions to exclude.
-     *
-     * @return int array, 1 at position means that this region does not have to
-     * be used in further analyses.
+     * Converts the regions to exclude to a set of positions for each
+     * chromosome to exclude.
+     * @param regions2Exclude The list of regions to exclude for each chromosome
+     * @return a set of positions for each chromosome to exclude
      */
-    public List<int[]> getRegion2Exclude() {
-        return region2Exclude;
+    private List<Set<Integer>> convertRegions2Exclude(List<List<Pair<Integer, Integer>>> regions2Exclude) {
+        List<Set<Integer>> excludedPosGenome = new ArrayList<>(regions2Exclude.size());
+        for (List<Pair<Integer, Integer>> regions2ExcludeChrom : regions2Exclude) {
+            Set<Integer> excludedPos = new HashSet<>();
+            for (Pair<Integer, Integer> region2Exclude : regions2ExcludeChrom) {
+                for (int i = region2Exclude.getFirst(); i < region2Exclude.getSecond(); ++i) {
+                    excludedPos.add(i);
+                }
+            }
+            excludedPosGenome.add(excludedPos);
+        }
+        return excludedPosGenome;
+    }
+
+    /**
+     * @return A set of positions for each chromosome to exclude.
+     */
+    public List<Set<Integer>> getPositions2Exclude() {
+        return excludedGenomePos;
     }
 
     /**
      * Returns CDS information of forward features.
-     *
-     * @return HashMap<Position in Genome, List<FeatureID>>
+     * @return Map<Position in Genome, List<FeatureID>>
      */
-    public HashMap<Integer, List<Integer>> getForwardCDSs() {
+    public Map<Integer, List<Integer>> getForwardCDSs() {
         return fwdFeatures;
     }
 
@@ -88,17 +109,8 @@ public class GenomeFeatureParser {
      *
      * @return HashMap<Position in Genome, List<FeatureID>>
      */
-    public HashMap<Integer, List<Integer>> getRevFeatures() {
+    public Map<Integer, List<Integer>> getRevFeatures() {
         return revFeatures;
-    }
-
-    /**
-     * Returns a HashMap with all genome features.
-     *
-     * @return HashMap<FeatureID, Feature>
-     */
-    public HashMap<Integer, PersistentFeature> getAllFeatures() {
-        return allFeatures;
     }
 
     /**
@@ -143,7 +155,7 @@ public class GenomeFeatureParser {
             // tRNA and rRNA regions are entered into the "mask array"
             if (type.equals(FeatureType.RRNA) || type.equals(FeatureType.TRNA)) {
                 int chromNo = refGenome.getChromosome(feature.getChromId()).getChromNumber();
-                maskingRegions(this.region2Exclude.get(chromNo - 1), type, isFwd, start, stop);
+                maskingRegions(this.regions2Exclude.get(chromNo - 1), type, isFwd, start, stop);
             }
 
             if (!type.equals(FeatureType.SOURCE)) {
@@ -164,13 +176,12 @@ public class GenomeFeatureParser {
      * ids corresponding to that Position. Each list can contain max. three
      * different feature ids because of the three reading frames for the forward
      * and reverse direction.
-     *
      * @param featureID Persistent feature id.
      * @param start Start position of feature.
      * @param stop Stop position of feature.
      * @param isFwd Feature direction is forward if true, otherwise false.
      */
-    private void createCDSsStrandInformation(HashMap<Integer, List<Integer>> list, int featureID, int start, int stop) {
+    private void createCDSsStrandInformation(Map<Integer, List<Integer>> list, int featureID, int start, int stop) {
 
         for (int i = start; i <= stop; i++) {
             if (list.get(i) == null) {
@@ -189,48 +200,39 @@ public class GenomeFeatureParser {
      * tRNA type, 21 field upstream, the fields from start to stop and 20 fields
      * downstream from stop position of this feature are marked with a 1. This
      * regions are going to be excluded in further analysis. analyses.
-     *
      * @param feature Persistent Feature list.
      * @param startFeature Startposition of feature.
      * @param stopFeature Stortposition of feature.
      * @param isFwdDirection Direction of feature is forward if true, false
      * otherwise.
      */
-    private void maskingRegions(int[] region2Exclude, FeatureType type, boolean isFwd, int startFeature, int stopFeature) {
+    private void maskingRegions(List<Pair<Integer, Integer>> regions2Exclude, FeatureType type, boolean isFwd, int startFeature, int stopFeature) {
 
         if (type.equals(FeatureType.TRNA)) {
             if (isFwd) {
-                for (startFeature -= 21; startFeature < (stopFeature + 20); startFeature++) {
-                    region2Exclude[startFeature] = 1;
-                }
-            } else {
-                for (startFeature -= 20; startFeature < (stopFeature + 21); startFeature++) {
-                    region2Exclude[startFeature] = 1;
-                }
+                startFeature -= 21;
+                stopFeature += 21;
             }
         } else if (type.equals(FeatureType.RRNA)) {
-
             if (isFwd) {
-                for (startFeature -= 520; startFeature > (stopFeature + 5); startFeature++) {
-                    region2Exclude[startFeature] = 1;
-                }
+                startFeature -= 520;
+                stopFeature += 5;
             } else {
-                for (startFeature -= 5; startFeature > (stopFeature + 520); startFeature++) {
-                    region2Exclude[startFeature] = 1;
-                }
+                startFeature -= 5;
+                stopFeature += 520;
             }
         }
+        PositionUtils.updateIntervals(regions2Exclude, startFeature, stopFeature);
     }
 
     /**
      * Fetch all genome features and load them in a HashMap<FeatureID, Feature>.
-     *
      * @param genomeFeatures List of Persistent Features.
      * @return a HashMap<FeatureID, Feature> with all genome features.
      */
-    public HashMap<Integer, PersistentFeature> getGenomeFeaturesInHash(List<PersistentFeature> genomeFeatures) {
+    public Map<Integer, PersistentFeature> getGenomeFeaturesInHash(List<PersistentFeature> genomeFeatures) {
         this.progressHandle.progress("Hashing of Features", 10);
-        HashMap<Integer, PersistentFeature> regions = new HashMap<>();
+        Map<Integer, PersistentFeature> regions = new HashMap<>();
 
         for (PersistentFeature gf : genomeFeatures) {
             regions.put(gf.getId(), gf);
@@ -240,31 +242,7 @@ public class GenomeFeatureParser {
     }
 
     /**
-     * Running trough all features in genome and divided by direction in which
-     * strand the features are located and creates two hash structures.
-     */
-    public void generateAllFeatureStrandInformation(List<PersistentFeature> genomeFeatures) {
-        this.allFwdFeatures = new HashMap<>();
-        this.allRevFeatures = new HashMap<>();
-
-        for (PersistentFeature feature : genomeFeatures) {
-
-            int start = feature.getStart();
-            int stop = feature.getStop();
-            boolean isFwd = feature.isFwdStrand();
-            int id = feature.getId();
-            // store the regions in arrays of arrays (allows for overlapping regions)
-            if (isFwd) {
-                createCDSsStrandInformation(this.allFwdFeatures, id, start, stop);
-            } else {
-                createCDSsStrandInformation(this.allRevFeatures, id, start, stop);
-            }
-        }
-    }
-
-    /**
      * Returns the TrackConnector.
-     *
      * @return TrackConnector
      */
     public TrackConnector getTrackConnector() {
@@ -273,7 +251,6 @@ public class GenomeFeatureParser {
 
     /**
      * Returns the ReferenceConnector.
-     *
      * @return ReferenceConnector
      */
     public ReferenceConnector getRefConnector() {
@@ -282,39 +259,14 @@ public class GenomeFeatureParser {
 
     /**
      * Returns a list with persistent features.
-     *
      * @return List with persistent features
      */
     public List<PersistentFeature> getGenomeFeatures() {
         return genomeFeatures;
     }
 
-    public HashMap<Integer, List<Integer>> getAllFwdFeatures() {
-        return allFwdFeatures;
-    }
-
-    public void setAllFwdFeatures(HashMap<Integer, List<Integer>> allFwdFeatures) {
-        this.allFwdFeatures = allFwdFeatures;
-    }
-
-    /**
-     * Get the hash structure filled with all reverse feature elements.
-     *
-     * @return HashMap<StartPosition, List<FeatureID>> which contains start
-     * position as the KEY and a list filled with features ids, that starts at
-     * this position.
-     */
-    public HashMap<Integer, List<Integer>> getAllRevFeatures() {
-        return allRevFeatures;
-    }
-
-    public void setAllRevFeatures(HashMap<Integer, List<Integer>> allRevFeatures) {
-        this.allRevFeatures = allRevFeatures;
-    }
-
     /**
      * Returns the whole length of all Chromosomes lenght summed up.
-     *
      * @return Reference length.
      */
     public Integer getReferenceLength() {

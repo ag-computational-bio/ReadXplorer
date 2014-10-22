@@ -104,10 +104,10 @@ public class PlotGenerator {
                     int x;
                     if (tSS.getDist2start() > 0 && tSS.getDist2start() <= leaderlessRange) {
                         x = tSS.getDist2start();
-                        collectionArrayDownstream[x] = collectionArrayDownstream[x] + 1;
+                        collectionArrayDownstream[x] += 1;
                     } else {
                         x = tSS.getOffset();
-                        collectionArrayUpstream[x] = collectionArrayUpstream[x] + 1;
+                        collectionArrayUpstream[x] += 1;
                     }
 
                     locus = tSS.getAssignedFeature().getLocus();

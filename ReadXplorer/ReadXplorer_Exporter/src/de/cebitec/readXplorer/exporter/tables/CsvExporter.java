@@ -23,9 +23,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
+import javax.swing.ImageIcon;
 import jxl.write.WriteException;
 import org.netbeans.api.progress.ProgressHandle;
+import org.openide.awt.NotificationDisplayer;
 import org.openide.util.NbBundle;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
@@ -119,8 +120,7 @@ public class CsvExporter implements TableExporterI {
             }
         }
 
-        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), Bundle.CsvExporterSuccessMsg() + file.getName(),
-                Bundle.CsvExporterSuccessHeader(), JOptionPane.INFORMATION_MESSAGE);
+        NotificationDisplayer.getDefault().notify(Bundle.SuccessHeader(), new ImageIcon(), Bundle.SuccessMsg() + sheetNames.get(0), null);
 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished writing csv file!");
 

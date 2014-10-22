@@ -4,15 +4,14 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.ChartsGenerationSelectChatTypeWizardPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.PlotGenerator;
 import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.SouthPanel;
-import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ChartType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
+import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ChartType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ElementsOfInterest;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.PurposeEnum;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.ParameterSetFiveEnrichedAnalyses;
 import de.cebitec.readXplorer.transcriptomeAnalyses.main.TSSDetectionResults;
 import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.MultiPurposeTopComponent;
 import de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch.RbsAnalysisWizardIterator;
-import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import de.erichseifert.gral.data.DataTable;
 import de.erichseifert.gral.ui.InteractivePanel;
 import java.awt.BorderLayout;
@@ -59,17 +58,12 @@ public class VisualizationListener implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
         if (command.equals(ChartType.WIZARD.toString())) {
-            boolean takeAllElements = false;
-            boolean takeOnlyLeaderless = false;
-            boolean takeOnlyAntisense = false;
-            boolean takeOnlyRealTss = false;
-            boolean takeOnlySelectedElements = false;
 
-            takeAllElements = (boolean) wiz.getProperty(ElementsOfInterest.ALL.toString());
-            takeOnlyLeaderless = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_LEADERLESS_TRANSCRIPTS.toString());
-            takeOnlyAntisense = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_ANTISENSE_TSS.toString());
-            takeOnlyRealTss = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_TSS_WITH_UTR_EXCEPT_AS_LEADERLESS.toString());
-            takeOnlySelectedElements = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_SELECTED_FOR_UPSTREAM_ANALYSES.toString());
+            boolean takeAllElements = (boolean) wiz.getProperty(ElementsOfInterest.ALL.toString());
+            boolean takeOnlyLeaderless = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_LEADERLESS_TRANSCRIPTS.toString());
+            boolean takeOnlyAntisense = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_ANTISENSE_TSS.toString());
+            boolean takeOnlyRealTss = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_TSS_WITH_UTR_EXCEPT_AS_LEADERLESS.toString());
+            boolean takeOnlySelectedElements = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_SELECTED_FOR_UPSTREAM_ANALYSES.toString());
 
             isAbsoluteFrequencyPlot = (boolean) wiz.getProperty(ChartType.ABSOLUTE_FREQUENCY_OF_5_PRIME_UTRs.toString());
             isBaseDistributionPlot = (boolean) wiz.getProperty(ChartType.BASE_DISTRIBUTION.toString());

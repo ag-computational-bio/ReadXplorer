@@ -84,25 +84,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
     private ResultPanelOperonDetection operonResultPanel;
     private ResultPanelRPKM rpkmResultPanel;
     
-    private boolean performTSSAnalysis;
-    private boolean performOperonAnalysis;
-    private boolean performRPKMAnalysis;
-    private boolean autoTssParamEstimation = false;
-    private int minTotalIncrease = 0;
-    private int minPercentIncrease = 0;
-    private int maxLowCovInitCount = 0;
-    private int minLowCovIncrease = 0;
-    private boolean performUnannotatedTranscriptDet = false;
-    private int minTranscriptExtensionCov = 0;
-    private int maxLeaderlessDistance = 0;
-    private boolean isFwdAnalysisDirection = true;
-    private int minNumberReads = 0;
-    private int maxNumberReads = 0;
-    private boolean autoOperonParamEstimation = false;
-    private int minSpanningReads = 0;
     private String readClassPropString;
-    private Set<FeatureType> selRPKMFeatureTypes = new HashSet<>();
-    private Set<FeatureType> selOperonFeatureTypes = new HashSet<>();
     private String selRPKMFeatureTypesPropString;
     private String selOperonFeatureTypesPropString;
     private String combineTracksPropString;
@@ -174,11 +156,27 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
      */
     @SuppressWarnings("unchecked")
     private void startTransciptionAnalyses(WizardDescriptor wiz) {
+        boolean autoTssParamEstimation = false;
+        int minTotalIncrease = 0;
+        int minPercentIncrease = 0;
+        int maxLowCovInitCount = 0;
+        int minLowCovIncrease = 0;
+        boolean performUnannotatedTranscriptDet = false;
+        int minTranscriptExtensionCov = 0;
+        int maxLeaderlessDistance = 0;
+        int maxFeatureDistance = 0;
+        boolean isFwdAnalysisDirection = true;
+        int minNumberReads = 0;
+        int maxNumberReads = 0;
+        boolean autoOperonParamEstimation = false;
+        int minSpanningReads = 0;
+        Set<FeatureType> selRPKMFeatureTypes = new HashSet<>();
+        Set<FeatureType> selOperonFeatureTypes = new HashSet<>();
 
         //obtain all analysis parameters
-        performTSSAnalysis = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_TSS_ANALYSIS);
-        performOperonAnalysis = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_OPERON_ANALYSIS);
-        performRPKMAnalysis = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_RPKM_ANALYSIS);
+        boolean performTSSAnalysis = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_TSS_ANALYSIS);
+        boolean performOperonAnalysis = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_OPERON_ANALYSIS);
+        boolean performRPKMAnalysis = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_RPKM_ANALYSIS);
         
         ParametersReadClasses readClassParams = (ParametersReadClasses) wiz.getProperty(readClassPropString);
         this.combineTracks = (boolean) wiz.getProperty(combineTracksPropString);
@@ -192,6 +190,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
             performUnannotatedTranscriptDet = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_UNANNOTATED_TRANSCRIPT_DET);
             minTranscriptExtensionCov = (int) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_MIN_TRANSCRIPT_EXTENSION_COV);
             maxLeaderlessDistance = (int) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_MAX_LEADERLESS_DISTANCE);
+            maxFeatureDistance = (int) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_MAX_FEATURE_DISTANCE);
             isFwdAnalysisDirection = (boolean) wiz.getProperty(TranscriptionAnalysesWizardIterator.PROP_ANALYSIS_DIRECTION);
             if (readClassParams.isStrandBothOption()) {
                 readClassParams.setStrandOption(isFwdAnalysisDirection ? Properties.STRAND_BOTH_FWD : Properties.STRAND_BOTH_REV);
@@ -210,7 +209,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
         //create parameter set for each analysis
         parametersTss = new ParameterSetTSS(performTSSAnalysis, autoTssParamEstimation, performUnannotatedTranscriptDet,
                 minTotalIncrease, minPercentIncrease, maxLowCovInitCount, minLowCovIncrease, minTranscriptExtensionCov, 
-                maxLeaderlessDistance, readClassParams);
+                maxLeaderlessDistance, maxFeatureDistance, readClassParams);
         parametersOperonDet = new ParameterSetOperonDet(performOperonAnalysis, minSpanningReads, autoOperonParamEstimation, selOperonFeatureTypes, readClassParams);
         parametersRPKM = new ParameterSetRPKM(performRPKMAnalysis, minNumberReads, maxNumberReads, selRPKMFeatureTypes, readClassParams);
 
@@ -321,8 +320,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener, Da
                             transcriptionStartResultPanel.setReferenceViewer(refViewer);
                         }
 
-                        TssDetectionResult tssResult = new TssDetectionResult(analysisTSS.getResults(), trackMap, reference, combineTracks, 1, 0);
-                        tssResult.setParameters(parametersTss);
+                        TssDetectionResult tssResult = new TssDetectionResult(analysisTSS.getResults(), parametersTss, trackMap, reference, combineTracks, 1, 0);
                         transcriptionStartResultPanel.addResult(tssResult);
 
                         if (finishedCovAnalyses >= tracks.size() || combineTracks) {

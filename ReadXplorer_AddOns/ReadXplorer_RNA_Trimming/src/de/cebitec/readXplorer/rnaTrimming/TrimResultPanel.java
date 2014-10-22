@@ -140,7 +140,7 @@ public class TrimResultPanel extends JPanel implements Observer {
 
     
     public void ready() {
-        if (this.plattformIsSupported) {
+        if (this.platformIsSupported) {
             Platform.runLater(new Runnable() {
             @Override
             public void run() {
@@ -190,13 +190,13 @@ public class TrimResultPanel extends JPanel implements Observer {
     XYChart.Data<String, Number> trimmed_unmapped_data;
     StackedBarChart<String, Number> chart;
     
-    private boolean plattformIsSupported = true;
+    private boolean platformIsSupported = true;
     private ProgressBar progress;
     
     private javafx.scene.control.Label progressLabel;
     
     public void createStatisticsWindow() throws InterruptedException {       
-        if (this.plattformIsSupported) {
+        if (this.platformIsSupported) {
             // SunOS is not supported by JavaFX
             // in this case an exception will be trown. it is safe to ignore it
             // and continue without showing stats window to the user
@@ -279,13 +279,13 @@ public class TrimResultPanel extends JPanel implements Observer {
                 }});
             } catch(UnsupportedOperationException e) {
                 this.showMsg("Could not intialize statistics window: "+e.getLocalizedMessage());
-                this.plattformIsSupported = false;
+                this.platformIsSupported = false;
             }
         }
     } 
     
     private void updateChartData() {
-        if (this.plattformIsSupported) {
+        if (this.platformIsSupported) {
             //the changes have to be run on the javafx thread 
             Platform.runLater(new Runnable() {
             @Override

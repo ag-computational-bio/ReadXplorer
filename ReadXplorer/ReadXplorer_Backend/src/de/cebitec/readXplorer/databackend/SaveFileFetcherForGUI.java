@@ -203,9 +203,9 @@ public class SaveFileFetcherForGUI {
     }
 
     /**
-     * In case a direct access track was moved to another place and cannot be
-     * found this method opens a dialog for resetting the file path to the
-     * current location of the file.
+     * In case a track was moved to another place and cannot be found this
+     * method opens a dialog for resetting the file path to the current location
+     * of the file.
      * @param track the track whose path has to be resetted
      * @param connector the connector
      * @return the track connector for the updated track or null, if it did not

@@ -31,7 +31,6 @@ import de.cebitec.readXplorer.view.tableVisualization.TableComparatorProvider;
 import de.cebitec.readXplorer.view.tableVisualization.TableUtils;
 import de.cebitec.readXplorer.view.tableVisualization.tableFilter.TableRightClickFilter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JOptionPane;
@@ -52,21 +51,10 @@ import org.openide.util.NbBundle;
 public class ResultPanelTranscriptionStart extends ResultTablePanel {
     
     private static final long serialVersionUID = 1L;
-
-    public static final String TSS_TOTAL = "Total number of detected TSSs";
-    public static final String TSS_CORRECT = "Correct TSS";
-    public static final String TSS_UPSTREAM = "TSS with upstream feature";
-    public static final String TSS_DOWNSTREAM = "TSS with downstream feature";
-    public static final String TSS_LEADERLESS = "Leaderless TSS";
-    public static final String TSS_FWD = "TSS on fwd strand";
-    public static final String TSS_REV = "TSS on rev strand";
-    public static final String TSS_NOVEL = "Novel Transcripts";
-    public static final int UNUSED_STATISTICS_VALUE = -1;
     
     private List<String> promotorRegions;
     private ReferenceViewer referenceViewer;
     private TssDetectionResult tssResult;
-    private HashMap<String, Integer> statisticsMap;
     private TableRightClickFilter<UneditableTableModel> tableFilter;
     
     
@@ -81,7 +69,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
         final int chroColumnIdx = 2;
         tableFilter = new TableRightClickFilter<>(UneditableTableModel.class, posColumnIdx, trackColumnIdx);
         this.tSSTable.getTableHeader().addMouseListener(tableFilter);
-        this.initStatsMap();
        
         DefaultListSelectionModel model = (DefaultListSelectionModel) this.tSSTable.getSelectionModel();
         model.addListSelectionListener(new ListSelectionListener() {
@@ -91,21 +78,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                 TableUtils.showPosition(tSSTable, posColumnIdx, chroColumnIdx, getBoundsInfoManager());
             }
         });
-    }
-
-    /**
-     * Initializes the statistics map.
-     */
-    private void initStatsMap() {
-        statisticsMap = new HashMap<>();
-        statisticsMap.put(TSS_TOTAL, 0);
-        statisticsMap.put(TSS_CORRECT, 0);
-        statisticsMap.put(TSS_UPSTREAM, 0);
-        statisticsMap.put(TSS_DOWNSTREAM, 0);
-        statisticsMap.put(TSS_LEADERLESS, 0);
-        statisticsMap.put(TSS_FWD, 0);
-        statisticsMap.put(TSS_REV, 0);
-        statisticsMap.put(TSS_NOVEL, 0);
     }
 
     /** This method is called from within the constructor to
@@ -212,7 +184,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
     }//GEN-LAST:event_exportButtonActionPerformed
 
     private void statisticsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statisticsButtonActionPerformed
-        JOptionPane.showMessageDialog(this, new TssDetectionStatsPanel(statisticsMap), "TSS Detection Statistics", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, new TssDetectionStatsPanel(tssResult.getStatsMap()), "TSS Detection Statistics", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_statisticsButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -241,23 +213,16 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                 tssResult = tssResultNew;
             } else {
                 tssResult.getResults().addAll(tssResultNew.getResults());
+                tssResult.updateStatsMap(tssResultNew.getStatsMap());
             }
             final ParameterSetTSS tssParameters = (ParameterSetTSS) tssResult.getParameters();
             
             SwingUtilities.invokeLater(new Runnable() {
-//because it is not called from the swing dispatch thread
+            //because it is not called from the swing dispatch thread
                 @Override
                 public void run() {
 
                     final int nbColumns = 14;
-
-                    int noCorrectStarts = 0;
-                    int noUpstreamFeature = 0;
-                    int noDownstreamFeature = 0;
-                    int noFwdFeatures = 0;
-                    int noRevFeatures = 0;
-                    int noUnannotatedTranscripts = 0;
-                    int noLeaderlessTranscripts = 0;
 
                     DefaultTableModel model = (DefaultTableModel) tSSTable.getModel();
                     String strand;
@@ -270,16 +235,14 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
 
                         if (tss.isFwdStrand()) {
                             strand = SequenceUtils.STRAND_FWD_STRING;
-                            ++noFwdFeatures;
                         } else {
                             strand = SequenceUtils.STRAND_REV_STRING;
-                            ++noRevFeatures;
                         }
 
                         Object[] rowData = new Object[nbColumns];
                         int i = 0;
                         rowData[i++] = tss.getPos();
-                        rowData[i++] = tssResultNew.getTrackMap().get(tss.getTrackId());
+                        rowData[i++] = tssResult.getTrackMap().get(tss.getTrackId());
                         rowData[i++] = tssResult.getChromosomeMap().get(tss.getChromId());
                         rowData[i++] = strand;
                         rowData[i++] = tss.getReadStartsAtPos();
@@ -290,7 +253,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                         feature = detFeatures.getCorrectStartFeature();
                         if (feature != null) {
                             rowData[i++] = feature.toString();
-                            ++noCorrectStarts;
                         } else {
                             rowData[i++] = "-";
                         }
@@ -298,7 +260,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                         if (feature != null) {
                             rowData[i++] = feature.toString();
                             rowData[i++] = Math.abs(tss.getPos() - (tss.isFwdStrand() ? feature.getStart() : feature.getStop()));
-                            ++noUpstreamFeature;
                         } else {
                             rowData[i++] = "-";
                             rowData[i++] = "";
@@ -308,10 +269,6 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                             rowData[i++] = feature.toString();
                             distance = Math.abs(tss.getPos() - (tss.isFwdStrand() ? feature.getStart() : feature.getStop()));
                             rowData[i++] = distance;
-                            if (distance <= tssParameters.getMaxLeaderlessDistance()) {
-                                ++noLeaderlessTranscripts;
-                            }
-                            ++noDownstreamFeature;
                         } else {
                             rowData[i++] = "-";
                             rowData[i++] = "";
@@ -321,26 +278,9 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                             tSSU = (TransStartUnannotated) tss;
                             rowData[i++] = true;
                             rowData[i++] = tSSU.getDetectedStop();
-                            ++noUnannotatedTranscripts;
-                        } else {
                         }
                         model.addRow(rowData);
                     }
-
-                    //create statistics
-                    statisticsMap.put(TSS_TOTAL, statisticsMap.get(TSS_TOTAL) + tsss.size());
-                    statisticsMap.put(TSS_CORRECT, statisticsMap.get(TSS_CORRECT) + noCorrectStarts);
-                    statisticsMap.put(TSS_UPSTREAM, statisticsMap.get(TSS_UPSTREAM) + noUpstreamFeature);
-                    statisticsMap.put(TSS_DOWNSTREAM, statisticsMap.get(TSS_DOWNSTREAM) + noDownstreamFeature);
-                    statisticsMap.put(TSS_LEADERLESS, statisticsMap.get(TSS_LEADERLESS) + noLeaderlessTranscripts + noCorrectStarts);
-                    statisticsMap.put(TSS_FWD, statisticsMap.get(TSS_FWD) + noFwdFeatures);
-                    statisticsMap.put(TSS_REV, statisticsMap.get(TSS_REV) + noRevFeatures);
-                    if (tssParameters.isPerformUnannotatedTranscriptDet()) {
-                        statisticsMap.put(TSS_NOVEL, statisticsMap.get(TSS_NOVEL) + noUnannotatedTranscripts);
-                    } else {
-                        statisticsMap.put(TSS_NOVEL, ResultPanelTranscriptionStart.UNUSED_STATISTICS_VALUE);
-                    }
-                    tssResultNew.setStatsMap(statisticsMap);
 
                     TableRowSorter<TableModel> sorter = new TableRowSorter<>();
                     tSSTable.setRowSorter(sorter);

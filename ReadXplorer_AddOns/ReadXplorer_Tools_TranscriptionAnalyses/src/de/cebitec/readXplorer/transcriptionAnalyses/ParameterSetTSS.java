@@ -35,6 +35,7 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
     private int minLowCovIncrease;
     private int minTranscriptExtensionCov;
     private int maxLeaderlessDistance;
+    private int maxFeatureDistance;
     private ParametersReadClasses readClassParams;
 
     
@@ -52,7 +53,7 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
      */
     ParameterSetTSS(boolean performTSSAnalysis, boolean autoTssParamEstimation, boolean performUnannotatedTranscriptDet, 
             int minNoReadStarts, int minPercentIncrease, int maxLowCovInitCount, int minLowCovIncrease, 
-            int minTranscriptExtensionCov, int maxLeaderlessDistance, ParametersReadClasses readClassParams) {
+            int minTranscriptExtensionCov, int maxLeaderlessDistance, int maxFeatureDistance, ParametersReadClasses readClassParams) {
         this.performTSSAnalysis = performTSSAnalysis;
         this.autoTssParamEstimation = autoTssParamEstimation;
         this.performUnannotatedTranscriptDet = performUnannotatedTranscriptDet;
@@ -62,6 +63,7 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
         this.minLowCovIncrease = minLowCovIncrease;
         this.minTranscriptExtensionCov = minTranscriptExtensionCov;
         this.maxLeaderlessDistance = maxLeaderlessDistance;
+        this.maxFeatureDistance = maxFeatureDistance;
         this.readClassParams = readClassParams;
         
     }
@@ -102,6 +104,10 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
         return this.maxLeaderlessDistance;
     }
 
+    public int getMaxFeatureDistance() {
+        return this.maxFeatureDistance;
+    }
+
     public ParametersReadClasses getReadClassParams() {
         return readClassParams;
     }
@@ -140,6 +146,10 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
 
     public void setMaxLeaderlessDistance(int maxLeaderlessDistance) {
         this.maxLeaderlessDistance = maxLeaderlessDistance;
+    }
+
+    public void setMaxFeatureDistance(int maxFeatureDistance) {
+        this.maxFeatureDistance = maxFeatureDistance;
     }
 
     public void setReadClassParams(ParametersReadClasses readClassParams) {

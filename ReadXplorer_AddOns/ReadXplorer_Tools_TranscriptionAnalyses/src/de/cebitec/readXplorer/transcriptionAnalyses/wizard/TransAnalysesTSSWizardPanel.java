@@ -18,6 +18,7 @@ package de.cebitec.readXplorer.transcriptionAnalyses.wizard;
 
 import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_ANALYSIS_DIRECTION;
 import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_AUTO_TSS_PARAMS;
+import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MAX_FEATURE_DISTANCE;
 import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MAX_LEADERLESS_DISTANCE;
 import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MAX_LOW_COV_INIT_COUNT;
 import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_LOW_COV_INC;
@@ -71,7 +72,7 @@ public class TransAnalysesTSSWizardPanel extends ChangeListeningWizardPanel {
     public void readSettings(final WizardDescriptor wiz) {        
         super.readSettings(wiz);
         byte strandOption = Byte.valueOf(NbPreferences.forModule(Object.class).get(
-                TranscriptionAnalysesWizardIterator.PROP_WIZARD_NAME + PROP_STRAND_OPTION, "1"));
+                PROP_WIZARD_NAME + PROP_STRAND_OPTION, "1"));
         boolean isBothStrandOption = strandOption == Properties.STRAND_BOTH;
         this.getComponent().setDirectionOptionsVisible(isBothStrandOption);
     }
@@ -87,6 +88,7 @@ public class TransAnalysesTSSWizardPanel extends ChangeListeningWizardPanel {
             wiz.putProperty(PROP_UNANNOTATED_TRANSCRIPT_DET, this.component.getDetectUnannotatedTranscripts());
             wiz.putProperty(PROP_MIN_TRANSCRIPT_EXTENSION_COV, this.component.getMinTranscriptExtensionCov());
             wiz.putProperty(PROP_MAX_LEADERLESS_DISTANCE, this.component.getMaxLeaderlessDistance());
+            wiz.putProperty(PROP_MAX_FEATURE_DISTANCE, this.component.getMaxFeatureDistance());
             wiz.putProperty(PROP_ANALYSIS_DIRECTION, this.component.isFwdDirectionSelected());
             this.storePrefs();
         }
@@ -106,6 +108,7 @@ public class TransAnalysesTSSWizardPanel extends ChangeListeningWizardPanel {
         pref.put(PROP_WIZARD_NAME + PROP_UNANNOTATED_TRANSCRIPT_DET, component.getDetectUnannotatedTranscripts() ? "1" : "0");
         pref.put(PROP_WIZARD_NAME + PROP_MIN_TRANSCRIPT_EXTENSION_COV, String.valueOf(component.getMinTranscriptExtensionCov()));
         pref.put(PROP_WIZARD_NAME + PROP_MAX_LEADERLESS_DISTANCE, String.valueOf(component.getMaxLeaderlessDistance()));
+        pref.put(PROP_WIZARD_NAME + PROP_MAX_FEATURE_DISTANCE, String.valueOf(component.getMaxFeatureDistance()));
         pref.put(PROP_WIZARD_NAME + PROP_ANALYSIS_DIRECTION, component.isFwdDirectionSelected() ? "1" : "0");
     }
 }

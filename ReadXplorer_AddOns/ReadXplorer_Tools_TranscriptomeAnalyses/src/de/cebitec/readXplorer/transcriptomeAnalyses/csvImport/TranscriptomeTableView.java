@@ -7,8 +7,10 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.csvImport;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readXplorer.controller.ViewController;
+import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
+import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
@@ -45,6 +47,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import org.openide.util.lookup.ServiceProvider;
@@ -53,15 +56,50 @@ import org.openide.windows.WindowManager;
 
 /**
  *
- * @author jritter
+ * @author jritter, rhilker
  */
 @ServiceProvider(service = TranscriptomeTableViewI.class)
 public class TranscriptomeTableView implements TranscriptomeTableViewI {
 
     private static final String TABLE_TYPE = "Table Type";
     private TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
+    
+    private PersistentTrack track;
+    private ReferenceConnector refConnector;
+    private TrackConnector trackConnector;
+    private Map<Integer, PersistentTrack> trackMap;
+    private Map<String, PersistentFeature> featureMap;
 
     public TranscriptomeTableView() {
+    }
+    
+    private void initConnectors(int chromId, int trackID) {
+        track = ProjectConnector.getInstance().getTrack(trackID);
+        trackMap = new HashMap<>();
+        trackMap.put(track.getId(), track);
+
+        trackConnector = null;
+        SaveFileFetcherForGUI saveFileFetcherForGUI = new SaveFileFetcherForGUI();
+        try {
+            trackConnector = saveFileFetcherForGUI.getTrackConnector(track);
+        } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+            SaveFileFetcherForGUI.showPathSelectionErrorMsg();
+        }
+
+        refConnector = ProjectConnector.getInstance().getRefGenomeConnector(chromId);
+    }
+
+    private void initFeatureData() {
+        List<PersistentFeature> genomeFeatures = new ArrayList<>();
+        Map<Integer, PersistentChromosome> chroms = refConnector.getChromosomesForGenome();
+        for (PersistentChromosome chrom : chroms.values()) {
+            genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
+                    0, chrom.getLength(), chrom.getId()));
+        }
+        featureMap = new HashMap<>();
+        for (PersistentFeature persistantFeature : genomeFeatures) {
+            featureMap.put(persistantFeature.getLocus(), persistantFeature);
+        }
     }
 
     @Override
@@ -98,26 +136,13 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
         int trackID = (Integer) fstSheet.get(1).get(fstSheet.get(0).size() - 1);
         int chromId = (Integer) fstSheet.get(1).get(fstSheet.get(0).size() - 3);
 
-        PersistentTrack track = ProjectConnector.getInstance().getTrack(trackID);
-        Map<Integer, PersistentTrack> trackMap = new HashMap<>();
-
-        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(chromId);
+        this.initConnectors(chromId, trackID);
         if (refConnector != null) {
             try {
-                trackMap.put(track.getId(), track);
-                List<PersistentFeature> genomeFeatures = new ArrayList<>();
-                Map<Integer, PersistentChromosome> chroms = refConnector.getChromosomesForGenome();
-                for (PersistentChromosome chrom : chroms.values()) {
-                    genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
-                            0, chrom.getLength(), chrom.getId()));
-                }
-                HashMap<String, PersistentFeature> featureMap = new HashMap<>();
-                for (PersistentFeature persistantFeature : genomeFeatures) {
-                    featureMap.put(persistantFeature.getLocus(), persistantFeature);
-                }
+                this.initFeatureData();
 
-                String tmp = "";
-                String replaced = "";
+                String tmp;
+                String replaced;
                 double mappingCount = 0;
                 double mappingMeanLength = 0;
                 double mappingsPerMillion = 0;
@@ -161,11 +186,11 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
 
                 ParameterSetWholeTranscriptAnalyses params = new ParameterSetWholeTranscriptAnalyses(true, false, true, false, null, fraction, 0, false, 0, includeBestMatchedReads_OP, false, false);
                 params.setThresholdManuallySet(isThresholdSettedManually);
-                StatisticsOnMappingData stats = new StatisticsOnMappingData(refConnector.getRefGenome(), mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
+                StatisticsOnMappingData stats = new StatisticsOnMappingData(trackConnector, mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
 
                 List<Operon> operons = new ArrayList<>();
                 List<OperonAdjacency> adjacencies;
-                Operon operon = null;
+                Operon operon;
 
                 for (int row = 1; row < fstSheet.size(); row++) {
                     adjacencies = new ArrayList<>();
@@ -225,29 +250,13 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
 
         int trackID = (Integer) fstSheet.get(1).get(fstSheet.get(1).size() - 1);
         int chromId = (Integer) fstSheet.get(1).get(fstSheet.get(1).size() - 3);
-        Map<Integer, PersistentTrack> trackMap = new HashMap<>();
-
-        PersistentTrack track = ProjectConnector.getInstance().getTrack(trackID);
-
-        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(chromId);
-        List<PersistentFeature> genomeFeatures = new ArrayList<>();
+        this.initConnectors(chromId, trackID);
 
         if (refConnector != null) {
-
             try {
-                trackMap.put(track.getId(), track);
+                this.initFeatureData();
 
-                Map<Integer, PersistentChromosome> chroms = refConnector.getChromosomesForGenome();
-                for (PersistentChromosome chrom : chroms.values()) {
-                    genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
-                            0, chrom.getLength(), chrom.getId()));
-                }
-                HashMap<String, PersistentFeature> featureMap = new HashMap<>();
-                for (PersistentFeature persistantFeature : genomeFeatures) {
-                    featureMap.put(persistantFeature.getLocus(), persistantFeature);
-                }
-
-                String tmp = "";
+                String tmp;
                 boolean includeBestMatchedReads_RPKM = false;
 
                 if (sndSheet != null) {
@@ -304,30 +313,16 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
         novelRegionsResultsPanel.setPersistentReference(reference);
         checkAndOpenRefViewer(reference, novelRegionsResultsPanel);
 
-        int refID = (Integer) fstSheet.get(1).get(fstSheet.get(0).size() - 1);
+        int trackID = (Integer) fstSheet.get(1).get(fstSheet.get(0).size() - 1);
         int chromId = (Integer) fstSheet.get(1).get(fstSheet.get(0).size() - 3);
+        this.initConnectors(chromId, trackID);
 
-        PersistentTrack track = ProjectConnector.getInstance().getTrack(refID);
-        Map<Integer, PersistentTrack> trackMap = new HashMap<>();
-        trackMap.put(track.getId(), track);
-
-        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(chromId);
         if (refConnector != null) {
-
             try {
-                List<PersistentFeature> genomeFeatures = new ArrayList<>();
-                Map<Integer, PersistentChromosome> chroms = refConnector.getChromosomesForGenome();
-                for (PersistentChromosome chrom : chroms.values()) {
-                    genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
-                            0, chrom.getLength(), chrom.getId()));
-                }
-                HashMap<String, PersistentFeature> featureMap = new HashMap<>();
-                for (PersistentFeature persistantFeature : genomeFeatures) {
-                    featureMap.put(persistantFeature.getLocus(), persistantFeature);
-                }
+                this.initFeatureData();
 
-                String tmp = "";
-                String replaced = "";
+                String tmp;
+                String replaced;
                 double mappingCount = 0;
                 boolean includeBestMatchedReads = false;
                 boolean includeRatioValue = false;
@@ -386,12 +381,12 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                 }
                 ParameterSetWholeTranscriptAnalyses params = new ParameterSetWholeTranscriptAnalyses(true, false, true, false, null, fraction, minBoundary, includeRatioValue, ratio, false, false, includeBestMatchedReads);
                 params.setThresholdManuallySet(isThresholdSettedManually);
-                StatisticsOnMappingData stats = new StatisticsOnMappingData(refConnector.getRefGenome(), mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
+                StatisticsOnMappingData stats = new StatisticsOnMappingData(trackConnector, mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
 
                 List<NovelTranscript> novelRegions = new ArrayList<>();
                 NovelRegionResult novelRegionResults = new NovelRegionResult(refConnector.getRefGenome(), stats, trackMap, novelRegions, false);
                 novelRegionResults.setParameters(params);
-                NovelTranscript novelRegion = null;
+                NovelTranscript novelRegion;
                 for (int row = 1; row < fstSheet.size(); row++) {
 
                      int novelRegStartPos = (Integer) fstSheet.get(row).get(0);
@@ -405,7 +400,7 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                     int length = (Integer) fstSheet.get(row).get(7);
 
                     novelRegion = new NovelTranscript(isFwd, novelRegStartPos, dropOff, (String) fstSheet.get(row).get(5),
-                            length, (String) fstSheet.get(row).get(8), isFP, isSelectedForBlast, refID, chromId);
+                            length, (String) fstSheet.get(row).get(8), isFP, isSelectedForBlast, trackID, chromId);
                     novelRegion.setIsConsidered(isFinished);
                     novelRegions.add(novelRegion);
                 }
@@ -437,32 +432,15 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
         checkAndOpenRefViewer(ref, tssResultsPanel);
         tssResultsPanel.setPersistentReference(ref);
 
-        int refID = (Integer) fstSheet.get(1).get(fstSheet.get(0).size() - 1);
+        int trackID = (Integer) fstSheet.get(1).get(fstSheet.get(0).size() - 1);
         int chromId = (Integer) fstSheet.get(1).get(fstSheet.get(0).size() - 2);
-        // needed once!
-        HashMap<Integer, PersistentTrack> trackMap = new HashMap<>();
-
-        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(chromId);
+        this.initConnectors(chromId, trackID);
         if (refConnector != null) {
-            PersistentTrack track = ProjectConnector.getInstance().getTrack(refID);
             try {
-                trackMap.put(track.getId(), track);
+                this.initFeatureData();
 
-                List<PersistentFeature> genomeFeatures = new ArrayList<>();
-                int genomeId = refConnector.getRefGenome().getId();
-                Map<Integer, PersistentChromosome> chroms = refConnector.getChromosomesForGenome();
-                for (PersistentChromosome chrom : chroms.values()) {
-                    genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
-                            0, chrom.getLength(), chrom.getId()));
-                }
-
-                HashMap<String, PersistentFeature> featureMap = new HashMap<>();
-                for (PersistentFeature persistantFeature : genomeFeatures) {
-                    featureMap.put(persistantFeature.getLocus(), persistantFeature);
-                }
-
-                String replaced = "";
-                String tmp = "";
+                String replaced;
+                String tmp;
                 double mappingCount = 0;
                 double mappingMeanLength = 0;
                 double mappingsPerMillion = 0;
@@ -555,7 +533,7 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                             } else if (columns.get(0).equals(WizardPropertyStrings.PROP_VALID_START_CODONS)) {
                                 tmp = (String) columns.get(1);
 
-                                if (!tmp.equals("")) {
+                                if (!tmp.isEmpty()) {
                                     String[] startCodons = tmp.split(";");
 
                                     for (String string : startCodons) {
@@ -579,7 +557,7 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                                 tmp = (String) columns.get(1);
                                 List<FeatureType> types = new ArrayList<>();
 
-                                if (!tmp.equals("")) {
+                                if (!tmp.isEmpty()) {
                                     String[] typeStings = tmp.split(";");
 
                                     for (String type : typeStings) {
@@ -604,12 +582,12 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                         fraction, ratio, isInternalExclusion,
                         rangeForKeepingTSS, rangeForLeaderlessDetection, keepingInternalRange, isKeepingAllIntragenicTSS, isKeepingOnlyAssignedIntragenicTSS, cdsPercentageValue, includeBestMatchedReads, maxDistantaseFor3UtrAntisenseDetection, validStartCodons, featTypes);
                 params.setThresholdManuallySet(isThresholdSettedManually);
-                StatisticsOnMappingData stats = new StatisticsOnMappingData(refConnector.getRefGenome(), mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
+                StatisticsOnMappingData stats = new StatisticsOnMappingData(trackConnector, mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
 
                 List<TranscriptionStart> tss = new ArrayList<>();
                 TSSDetectionResults tssResult = new TSSDetectionResults(stats, tss, trackMap, refConnector.getRefGenome());
                 tssResult.setParameters(params);
-                TranscriptionStart ts = null;
+                TranscriptionStart ts;
 
                 fstSheet.remove(0);
                 for (List<?> list : fstSheet) {
@@ -657,7 +635,7 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                             detectedGene, offset,
                             dist2Start, dist2Stop,
                             downstreamNextGene, offset, isLeaderless, isCdsShift,
-                            isInternalTSS, isPutAntisense, chromId, refID);
+                            isInternalTSS, isPutAntisense, chromId, trackID);
                     ts.setComment(comment);
                     ts.setAssignedToStableRNA(isAssignedToStableRna);
                     ts.setIs5PrimeUtrAntisense(is5PrimeAntisense);
@@ -671,7 +649,7 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                 }
                 tssResult.setResults(tss);
                 tssResultsPanel.addResult(tssResult);
-                transcAnalysesTopComp.openAnalysisTab("TSS detection results for: " + refConnector.getAssociatedTrackNames().get(refID) + " Hits: " + tss.size(), tssResultsPanel);
+                transcAnalysesTopComp.openAnalysisTab("TSS detection results for: " + refConnector.getAssociatedTrackNames().get(trackID) + " Hits: " + tss.size(), tssResultsPanel);
 
                 JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successful!",
                         "Import was successful!", JOptionPane.INFORMATION_MESSAGE);
@@ -741,28 +719,13 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
         tssResultsPanel.setPersistentReference(reference);
 
         String trackId = (String) model.getValueAt(1, model.getColumnCount() - 1);
-        int refID = Integer.valueOf(trackId);
+        int trackID = Integer.valueOf(trackId);
         String chromID = (String) model.getValueAt(1, model.getColumnCount() - 2);
         int chromId = Integer.valueOf(chromID);
-        HashMap<Integer, PersistentTrack> trackMap = new HashMap<>();
-
-        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(chromId);
+        this.initConnectors(chromId, trackID);
         if (refConnector != null) {
-            PersistentTrack track = ProjectConnector.getInstance().getTrack(refID);
             try {
-                trackMap.put(track.getId(), track);
-
-                List<PersistentFeature> genomeFeatures = new ArrayList<>();
-                Map<Integer, PersistentChromosome> chroms = refConnector.getChromosomesForGenome();
-                for (PersistentChromosome chrom : chroms.values()) {
-                    genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
-                            0, chrom.getLength(), chrom.getId()));
-                }
-
-                HashMap<String, PersistentFeature> featureMap = new HashMap<>();
-                for (PersistentFeature persistantFeature : genomeFeatures) {
-                    featureMap.put(persistantFeature.getLocus(), persistantFeature);
-                }
+                this.initFeatureData();
 
                 String tmp = secondSheetMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT);
                 String replaced = tmp.replaceAll(",", ".");
@@ -837,8 +800,8 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                 int maxDistantaseFor3UtrAntisenseDetection = Integer.valueOf(tmp);
 
                 tmp = secondSheetMap.get(WizardPropertyStrings.PROP_VALID_START_CODONS);
-                HashMap<String, StartCodon> validStartCodons = new HashMap<>();
-                if (!tmp.equals("")) {
+                Map<String, StartCodon> validStartCodons = new HashMap<>();
+                if (!tmp.isEmpty()) {
                     String[] startCodons = tmp.split(";");
 
                     for (String string : startCodons) {
@@ -860,8 +823,8 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                 }
                 tmp = secondSheetMap.get(FivePrimeEnrichedTracksVisualPanel.PROP_SELECTED_FEAT_TYPES_FADE_OUT);
                 List<FeatureType> types = new ArrayList<>();
-                HashSet<FeatureType> featTypes = null;
-                if (!tmp.equals("")) {
+                Set<FeatureType> featTypes = null;
+                if (!tmp.isEmpty()) {
                     String[] typeStings = tmp.split(";");
 
                     for (String type : typeStings) {
@@ -884,12 +847,12 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                         fraction, ratio, isInternalExclusion,
                         rangeForKeepingTSS, rangeForLeaderlessDetection, keepingInternalRange, isKeepingAllIntragenicTSS, isKeepingOnlyAssignedIntragenicTSS, cdsPercentageValue, includeBestMatchedReads, maxDistantaseFor3UtrAntisenseDetection, validStartCodons, featTypes);
                 params.setThresholdManuallySet(isThresholdSettedManually);
-                StatisticsOnMappingData stats = new StatisticsOnMappingData(refConnector.getRefGenome(), mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
+                StatisticsOnMappingData stats = new StatisticsOnMappingData(trackConnector, mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
 
                 TSSDetectionResults tssResult = new TSSDetectionResults(stats, null, trackMap, refConnector.getRefGenome());
                 tssResult.setParameters(params);
                 List<TranscriptionStart> tss = new ArrayList<>();
-                TranscriptionStart ts = null;
+                TranscriptionStart ts;
 //                progressHandle.progress("Initialize table ... ", 20);
 
                 for (int row = 1; row < model.getRowCount(); row++) {
@@ -1009,7 +972,7 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                             detectedGene, offset,
                             dist2Start, dist2Stop,
                             downstreamNextGene, offset, isLeaderless, isCdsShift,
-                            isInternalTSS, isPutAntisense, chromId, refID);
+                            isInternalTSS, isPutAntisense, chromId, trackID);
                     ts.setComment(comment);
                     ts.setAssignedToStableRNA(isAssignedToStableRna);
                     ts.setIs5PrimeUtrAntisense(is5PrimeAntisense);
@@ -1023,7 +986,7 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                 }
                 tssResult.setResults(tss);
                 tssResultsPanel.addResult(tssResult);
-                transcAnalysesTopComp.openAnalysisTab("TSS detection results for: " + refConnector.getAssociatedTrackNames().get(refID) + " Hits: " + tss.size(), tssResultsPanel);
+                transcAnalysesTopComp.openAnalysisTab("TSS detection results for: " + refConnector.getAssociatedTrackNames().get(trackID) + " Hits: " + tss.size(), tssResultsPanel);
 
                 JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Import was successful!",
                         "Import was successful!", JOptionPane.INFORMATION_MESSAGE);
@@ -1043,30 +1006,10 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
         int trackID = Integer.valueOf(trackId);
         String chromID = (String) model.getValueAt(1, model.getColumnCount() - 3);
         int chromId = Integer.valueOf(chromID);
-        Map<Integer, PersistentTrack> trackMap = new HashMap<>();
-
-        PersistentTrack track = ProjectConnector.getInstance().getTrack(trackID);
-
-        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(chromId);
-        List<PersistentFeature> genomeFeatures = new ArrayList<>();
+        this.initConnectors(chromId, trackID);
 
         if (refConnector != null) {
-
-//            try {
-            trackMap.put(track.getId(), track);
-
-            Map<Integer, PersistentChromosome> chroms = refConnector.getChromosomesForGenome();
-            for (PersistentChromosome chrom : chroms.values()) {
-                genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
-                        0, chrom.getLength(), chrom.getId()));
-            }
-            HashMap<String, PersistentFeature> featureMap = new HashMap<>();
-            for (PersistentFeature persistantFeature : genomeFeatures) {
-                featureMap.put(persistantFeature.getLocus(), persistantFeature);
-            }
-//        }catch (Exception e) {
-//                JOptionPane.showMessageDialog(null, "Something went wrong, please check the track id. The database should contain the track id.", "Something went wrong!", JOptionPane.CANCEL_OPTION);
-//            }
+            this.initFeatureData();
 
             boolean includeBestMatchedReads_RPKM;
             String tmp = secondSheetMap.get(WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_RPKM);
@@ -1074,7 +1017,7 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
 
             ParameterSetWholeTranscriptAnalyses params = new ParameterSetWholeTranscriptAnalyses(true, false, false, true, null, 0, 0, false, 0, false, includeBestMatchedReads_RPKM, false);
             List<RPKMvalue> rpkms = new ArrayList<>();
-            RPKMvalue rpkm = null;
+            RPKMvalue rpkm;
             for (int row = 1; row < model.getRowCount(); row++) {
 
                 String featureLocus = (String) model.getValueAt(row, 0);
@@ -1117,23 +1060,10 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
         int trackID = Integer.valueOf(trackId);
         String chromID = (String) model.getValueAt(1, model.getColumnCount() - 3);
         int chromId = Integer.valueOf(chromID);
-        PersistentTrack track = ProjectConnector.getInstance().getTrack(trackID);
-        Map<Integer, PersistentTrack> trackMap = new HashMap<>();
-
-        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(chromId);
+        this.initConnectors(chromId, trackID);
         if (refConnector != null) {
             try {
-                trackMap.put(track.getId(), track);
-                List<PersistentFeature> genomeFeatures = new ArrayList<>();
-                Map<Integer, PersistentChromosome> chroms = refConnector.getChromosomesForGenome();
-                for (PersistentChromosome chrom : chroms.values()) {
-                    genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
-                            0, chrom.getLength(), chrom.getId()));
-                }
-                HashMap<String, PersistentFeature> featureMap = new HashMap<>();
-                for (PersistentFeature persistantFeature : genomeFeatures) {
-                    featureMap.put(persistantFeature.getLocus(), persistantFeature);
-                }
+                this.initFeatureData();
 
                 String tmp = secondSheetMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT);
                 String replaced = tmp.replaceAll(",", ".");
@@ -1165,11 +1095,11 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
 
                 ParameterSetWholeTranscriptAnalyses params = new ParameterSetWholeTranscriptAnalyses(true, false, true, false, null, fraction, 0, false, 0, includeBestMatchedReads_OP, false, false);
                 params.setThresholdManuallySet(isThresholdSettedManually);
-                StatisticsOnMappingData stats = new StatisticsOnMappingData(refConnector.getRefGenome(), mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
+                StatisticsOnMappingData stats = new StatisticsOnMappingData(trackConnector, mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
 
                 List<Operon> operons = new ArrayList<>();
                 List<OperonAdjacency> adjacencies;
-                Operon operon = null;
+                Operon operon;
                 for (int row = 1; row < model.getRowCount(); row++) {
                     adjacencies = new ArrayList<>();
                     operon = new Operon(trackID);
@@ -1193,30 +1123,15 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                         adjacencies.add(adj);
                     }
 
-                    boolean isFwd;
                     String direction = (String) model.getValueAt(row, 3);
                     String withoutNewLine = direction.substring(0, direction.length() - 1);
-                    if (withoutNewLine.equals("Fwd")) {
-                        isFwd = true;
-                    } else {
-                        isFwd = false;
-                    }
+                    boolean isFwd = withoutNewLine.equals("Fwd");
 
-                    boolean isFalsPositive;
                     String falsePositiveString = (String) model.getValueAt(row, 6);
-                    if (falsePositiveString.equals("false")) {
-                        isFalsPositive = false;
-                    } else {
-                        isFalsPositive = true;
-                    }
+                    boolean isFalsPositive = !falsePositiveString.equals("false");
 
-                    boolean isConsidered;
                     String consideration = (String) model.getValueAt(row, 7);
-                    if (consideration.equals("false")) {
-                        isConsidered = false;
-                    } else {
-                        isConsidered = true;
-                    }
+                    boolean isConsidered = !consideration.equals("false");
 
                     operon.addAllOperonAdjacencies(adjacencies);
                     operon.setIsConsidered(isConsidered);
@@ -1247,31 +1162,13 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
 //        novelRegionsResultsPanel.setReferenceViewer(reference);
 
         String trackId = (String) model.getValueAt(1, model.getColumnCount() - 1);
-        int refID = Integer.valueOf(trackId);
+        int trackID = Integer.valueOf(trackId);
         String chromID = (String) model.getValueAt(1, model.getColumnCount() - 3);
         int chromId = Integer.valueOf(chromID);
-        PersistentTrack track = ProjectConnector.getInstance().getTrack(refID);
-        Map<Integer, PersistentTrack> trackMap = new HashMap<>();
-        trackMap.put(track.getId(), track);
+        this.initConnectors(chromId, trackID);
 
-        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(chromId);
         if (refConnector != null) {
-
-//            try {
-            List<PersistentFeature> genomeFeatures = new ArrayList<>();
-            Map<Integer, PersistentChromosome> chroms = refConnector.getChromosomesForGenome();
-            for (PersistentChromosome chrom : chroms.values()) {
-                genomeFeatures.addAll(refConnector.getFeaturesForClosedInterval(
-                        0, chrom.getLength(), chrom.getId()));
-            }
-
-            HashMap<String, PersistentFeature> featureMap = new HashMap<>();
-            for (PersistentFeature persistantFeature : genomeFeatures) {
-                featureMap.put(persistantFeature.getLocus(), persistantFeature);
-            }
-//            } catch (Exception e) {
-//                JOptionPane.showMessageDialog(null, "Something went wrong, please check the track id. The database should contain the track id.", "Something went wrong!", JOptionPane.CANCEL_OPTION);
-//            }
+           this.initFeatureData();
 
             String tmp = secondSheetMap.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT);
             String replaced = tmp.replaceAll(",", ".");
@@ -1315,59 +1212,37 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
 
             ParameterSetWholeTranscriptAnalyses params = new ParameterSetWholeTranscriptAnalyses(true, false, true, false, null, fraction, minBoundary, includeRatioValue, ratio, false, false, includeBestMatchedReads);
             params.setThresholdManuallySet(isThresholdSettedManually);
-            StatisticsOnMappingData stats = new StatisticsOnMappingData(refConnector.getRefGenome(), mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
+            StatisticsOnMappingData stats = new StatisticsOnMappingData(trackConnector, mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold);
 
             NovelRegionResult novelRegionResults = new NovelRegionResult(refConnector.getRefGenome(), stats, trackMap, null, false);
             novelRegionResults.setParameters(params);
             List<NovelTranscript> novelRegions = new ArrayList<>();
-            NovelTranscript novelRegion = null;
+            NovelTranscript novelRegion;
             for (int row = 1; row < model.getRowCount(); row++) {
 
                 String position = (String) model.getValueAt(row, 0);
                 int novelRegStartPos = Integer.valueOf(position);
 
-                boolean isFwd;
                 String strand = (String) model.getValueAt(row, 1);
-                if (strand.equals("Fwd")) {
-                    isFwd = true;
-                } else {
-                    isFwd = false;
-                }
+                boolean isFwd = strand.equals("Fwd");
 
-                boolean isFP;
                 String falsePositive = (String) model.getValueAt(row, 2);
-                if (falsePositive.equals("false")) {
-                    isFP = false;
-                } else {
-                    isFP = true;
-                }
+                boolean isFP = !falsePositive.equals("false");
 
-                boolean isSelectedForBlast;
                 String selected = (String) model.getValueAt(row, 3);
-                if (falsePositive.equals("false")) {
-                    isSelectedForBlast = false;
-                } else {
-                    isSelectedForBlast = true;
-                }
+                boolean isSelectedForBlast = !falsePositive.equals("false");
 
-                boolean isFinished;
                 String finishedSring = (String) model.getValueAt(row, 4);
-                if (finishedSring.equals("false")) {
-                    isFinished = false;
-                } else {
-                    isFinished = true;
-                }
+                boolean isFinished = !finishedSring.equals("false");
 
-                int dropOff;
                 String dropOffString = (String) model.getValueAt(row, 6);
-                dropOff = Integer.valueOf(dropOffString);
+                int dropOff = Integer.valueOf(dropOffString);
 
-                int length;
                 String lengthString = (String) model.getValueAt(row, 7);
-                length = Integer.valueOf(lengthString);
+                int length = Integer.valueOf(lengthString);
 
                 novelRegion = new NovelTranscript(isFwd, novelRegStartPos, dropOff, (String) model.getValueAt(row, 5),
-                        length, (String) model.getValueAt(row, 8), isFP, isSelectedForBlast, refID, chromId);
+                        length, (String) model.getValueAt(row, 8), isFP, isSelectedForBlast, trackID, chromId);
                 novelRegion.setIsConsidered(isFinished);
                 novelRegions.add(novelRegion);
             }
@@ -1379,7 +1254,7 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                     "Import was successful!", JOptionPane.INFORMATION_MESSAGE);
 
         } else {
-            JOptionPane.showMessageDialog(null, "Something went wrong, please check the chrosome id. The reference should contain the chromosome id. Check also the database.", "Something went wrong!", JOptionPane.CANCEL_OPTION);
+            JOptionPane.showMessageDialog(null, "Something went wrong, please check the chromosome id. The reference should contain the chromosome id. Check also the database.", "Something went wrong!", JOptionPane.CANCEL_OPTION);
         }
     }
 

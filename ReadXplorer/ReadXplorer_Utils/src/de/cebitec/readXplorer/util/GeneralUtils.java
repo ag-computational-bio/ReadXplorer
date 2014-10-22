@@ -29,6 +29,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import javax.swing.JOptionPane;
 import org.apache.commons.lang3.StringEscapeUtils;
@@ -325,6 +326,18 @@ public class GeneralUtils {
      */
     public static String formatNumber(Number number) {
         return NumberFormat.getInstance().format( number );
+    }
+    
+    /**
+     * @param number A number to convert into a percent value
+     * @return The percent representation of the given value in the format of
+     * the Java virtual machine's Locale.
+     */
+    public static String formatNumberAsPercent(Number number) {
+        Locale locale = Locale.getDefault();
+        NumberFormat percentFormatter = NumberFormat.getPercentInstance(locale);
+        percentFormatter.setMaximumFractionDigits(2);
+        return percentFormatter.format(number);
     }
     
     /**

@@ -344,21 +344,30 @@ public class TrackConnector {
         DiscreteCountingDistribution countDistribution = new DiscreteCountingDistribution();
         countDistribution.setType(type);
 
-        try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COUNT_DISTRIBUTION)) {
-            
-            fetch.setInt(1, this.trackID);
-            fetch.setByte(2, type);
+        for (PersistentTrack track : associatedTracks) {
+            try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_COUNT_DISTRIBUTION)) {
 
-            ResultSet rs = fetch.executeQuery();
-            while (rs.next()) {
-                int coverageIntervalId = rs.getInt(FieldNames.COUNT_DISTRIBUTION_COV_INTERVAL_ID);
-                int count = rs.getInt(FieldNames.COUNT_DISTRIBUTION_BIN_COUNT);
-                countDistribution.setCountForIndex(coverageIntervalId, count);
+                fetch.setInt(1, track.getId());
+                fetch.setByte(2, type);
+
+                ResultSet rs = fetch.executeQuery();
+                while (rs.next()) {
+                    int intervalId = rs.getInt(FieldNames.COUNT_DISTRIBUTION_COV_INTERVAL_ID);
+                    int count = rs.getInt(FieldNames.COUNT_DISTRIBUTION_BIN_COUNT);
+                    countDistribution.setCountForIndex(intervalId, countDistribution.getDiscreteCountingDistribution()[intervalId] + count);
+                }
+                rs.close();
+
+            } catch (SQLException ex) {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
             }
-            rs.close();
-
-        } catch (SQLException ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        if (this.associatedTracks.size() > 1) {
+            int[] distribution = countDistribution.getDiscreteCountingDistribution();
+            for (int i = 0; i < distribution.length; ++i) {
+                distribution[i] = (int) Math.ceil((double) distribution[i] / associatedTracks.size());
+            }
         }
 
         return countDistribution;

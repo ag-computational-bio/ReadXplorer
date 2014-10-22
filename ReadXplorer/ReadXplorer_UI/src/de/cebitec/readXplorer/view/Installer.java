@@ -49,7 +49,7 @@ public class Installer extends ModuleInstall {
         System.setProperty("netbeans.buildnumber", ReadXplorer_VERSION);
         
 
-        // redirect systemouts to internal netbeans plattform outputwindow
+        // redirect systemouts to internal netbeans platform outputwindow
 //        redirectSystemStreams();
         
         //The TopComponent we're interested in isn't immediately available.

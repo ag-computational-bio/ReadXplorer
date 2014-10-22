@@ -117,13 +117,16 @@ public class StatsContainer {
      * Set the number of positions covered by mappings of the given mapping
      * class when using the stats container during import of data. Later, the
      * coverage has to be put into the statsMap!
-     * @param classToCoveredIntervalsMap Map of Mapping classes to the intervals
-     * covered by mappings of that classification
+     * @param classToCoveredIntervalsMap Map of Chromosomes to mapping classes 
+     * to the intervals covered by mappings of that classification
      */
-    public void setCoveredPositionsImport(Map<Classification, List<Pair<Integer, Integer>>> classToCoveredIntervalsMap) {
-        for (Classification mappingClass : classToCoveredIntervalsMap.keySet()) {
-            List<Pair<Integer, Integer>> coveredIntervals = classToCoveredIntervalsMap.get(mappingClass);
-            this.statsMap.put(mappingClass.getTypeString() + COVERAGE_STRING, this.calcCoveredBases(coveredIntervals));
+    public void setCoveredPositionsImport(Map<String, Map<Classification, List<Pair<Integer, Integer>>>> classToCoveredIntervalsMap) {
+        for (Map<Classification, List<Pair<Integer, Integer>>> chromMap : classToCoveredIntervalsMap.values()) {
+            for (Classification mappingClass : chromMap.keySet()) {
+                List<Pair<Integer, Integer>> coveredIntervals = chromMap.get(mappingClass);
+                String coverageId = mappingClass.getTypeString() + COVERAGE_STRING;
+                statsMap.put(coverageId, statsMap.get(coverageId) + this.calcCoveredBases(coveredIntervals));
+            }
         }
     }
 

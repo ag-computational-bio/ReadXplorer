@@ -21,10 +21,10 @@ import de.cebitec.readXplorer.util.classification.MappingClass;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.Exceptions;
@@ -41,8 +41,8 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
     private final PersistentReference reference;
     private final double fraction;
     private final List<de.cebitec.readXplorer.util.Observer> observer = new ArrayList<>();
-    private List<int[]> region2Exclude;
-    protected HashMap<Integer, List<Integer>> forwardCDSs, reverseCDSs;
+    private List<Set<Integer>> region2Exclude;
+    protected Map<Integer, List<Integer>> forwardCDSs, reverseCDSs;
     private StatisticsOnMappingData stats;
     private double backgroundCutoff;
     private final ParameterSetWholeTranscriptAnalyses parameters;
@@ -57,7 +57,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
     /**
      * Key: featureID , Value: PersistentFeature
      */
-    private HashMap<Integer, PersistentFeature> allRegionsInHash;
+    private Map<Integer, PersistentFeature> allRegionsInHash;
     private ResultPanelRPKM rpkmResultPanel;
     private NovelRegionResultPanel novelRegionResult;
     private ResultPanelOperonDetection operonResultPanel;
@@ -104,7 +104,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
         this.allRegionsInHash = this.featureParser.getGenomeFeaturesInHash(this.featureParser.getGenomeFeatures());
 
         this.featureParser.parseFeatureInformation(this.featureParser.getGenomeFeatures());
-        this.region2Exclude = this.featureParser.getRegion2Exclude();
+        this.region2Exclude = this.featureParser.getPositions2Exclude();
         this.forwardCDSs = this.featureParser.getForwardCDSs();
         this.reverseCDSs = this.featureParser.getRevFeatures();
         this.progressHandle.progress(120);
@@ -113,7 +113,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements Observ
         // geting Mappings and calculate statistics on mappings.
         try {
             trackConnector = (new SaveFileFetcherForGUI()).getTrackConnector(this.selectedTrack);
-            this.stats = new StatisticsOnMappingData(this.reference, this.fraction, this.forwardCDSs, this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
+            this.stats = new StatisticsOnMappingData(trackConnector, this.fraction, this.forwardCDSs, this.reverseCDSs, this.allRegionsInHash, this.region2Exclude);
             boolean bestMatchesSelected = false;
             if (parameters.isPerformNovelRegionDetection()) {
                 if (parameters.isIncludeBestMatchedReadsNr()) {

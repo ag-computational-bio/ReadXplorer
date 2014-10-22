@@ -9,6 +9,7 @@ import de.cebitec.readXplorer.util.Observer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -28,21 +29,20 @@ public class NovelTranscriptDetection implements Observer, AnalysisI<List<NovelT
 
     /**
      * Performs the novel transcript detection.
-     *
      * @param forwardCDSs
      * @param reverseCDSs
      * @param allRegionsInHash
      * @param stats
      * @param params
      */
-    public void runningNewRegionsDetection(HashMap<Integer, List<Integer>> forwardCDSs,
-            HashMap<Integer, List<Integer>> reverseCDSs, HashMap<Integer, PersistentFeature> allRegionsInHash,
+    public void runningNewRegionsDetection(Map<Integer, List<Integer>> forwardCDSs,
+            Map<Integer, List<Integer>> reverseCDSs, Map<Integer, PersistentFeature> allRegionsInHash,
             StatisticsOnMappingData stats, ParameterSetWholeTranscriptAnalyses params) {
 
         // Key is flag and Value the count of this flag
         HashMap<Integer, Integer> dropdownsFwd = new HashMap<>();
         HashMap<Integer, Integer> dropdownsRev = new HashMap<>();
-        NovelTranscript newRegion = null;
+        NovelTranscript newRegion;
         int[][] forward = stats.getForwardReadStarts(); // Array with startsite count information for forward mapping positions.
         int[][] reverse = stats.getReverseReadStarts(); // Array with startsite count information for reverse mapping positions.
         int[][] fwdCov = stats.getFwdCov(); // Array with coverage counts of mappings in forward direction.
@@ -55,7 +55,7 @@ public class NovelTranscriptDetection implements Observer, AnalysisI<List<NovelT
             int chromNo = chrom.getChromNumber();
             int chromLength = chrom.getLength();
             int ratio = 0;
-            int rev_i = 0;
+            int rev_i;
             boolean isInclusionOfRatio = params.isRatioInclusion();
             if (isInclusionOfRatio) {
                 ratio = params.getIncreaseRatioValue();

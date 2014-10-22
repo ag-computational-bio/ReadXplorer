@@ -19,6 +19,7 @@ package de.cebitec.readXplorer.transcriptionAnalyses.wizard;
 import de.cebitec.readXplorer.api.objects.JobPanel;
 import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_ANALYSIS_DIRECTION;
 import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_AUTO_TSS_PARAMS;
+import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MAX_FEATURE_DISTANCE;
 import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MAX_LEADERLESS_DISTANCE;
 import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MAX_LOW_COV_INIT_COUNT;
 import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_LOW_COV_INC;
@@ -48,6 +49,7 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
     private int minLowCovIncrease;
     private int minTranscriptExtensionCov;
     private int maxLeaderlessDistance;
+    private int maxFeatureDistance;
     private boolean detectUnannotatedTranscripts = true;
     private boolean tssAutomatic = false;
 
@@ -94,6 +96,8 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         dirFwdRadioButton = new javax.swing.JRadioButton();
         dirRevRadioButton = new javax.swing.JRadioButton();
         analysisDirectionSeparator = new javax.swing.JSeparator();
+        maxFeatureDistField = new javax.swing.JTextField();
+        maxFeatureDistLabel = new javax.swing.JLabel();
 
         org.openide.awt.Mnemonics.setLocalizedText(transcriptionStartAutomaticBox, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.transcriptionStartAutomaticBox.text")); // NOI18N
         transcriptionStartAutomaticBox.addActionListener(new java.awt.event.ActionListener() {
@@ -187,6 +191,10 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         buttonGroup1.add(dirRevRadioButton);
         org.openide.awt.Mnemonics.setLocalizedText(dirRevRadioButton, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.dirRevRadioButton.text")); // NOI18N
 
+        maxFeatureDistField.setText(org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.maxFeatureDistField.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(maxFeatureDistLabel, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.maxFeatureDistLabel.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -197,6 +205,16 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
                     .addComponent(analysisDirectionSeparator)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(transcriptionStartAutomaticBox)
+                            .addComponent(analysisDirectionLabel)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(dirFwdRadioButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(dirRevRadioButton))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(maxFeatureDistField, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(maxFeatureDistLabel))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(transcriptExtensionField, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -210,18 +228,12 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(minTotalIncreaseLabel))
                             .addComponent(unannotatedTranscriptsBox)
-                            .addComponent(transcriptionStartAutomaticBox)
                             .addComponent(additionalOptionPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(maxLeaderlessDistanceField, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(transcriptExtensionLabel1))
-                            .addComponent(analysisDirectionLabel)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(dirFwdRadioButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(dirRevRadioButton)))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                                .addComponent(transcriptExtensionLabel1)))
+                        .addGap(0, 20, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -237,7 +249,11 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
                 .addComponent(analysisDirectionSeparator, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(5, 5, 5)
                 .addComponent(transcriptionStartAutomaticBox)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(maxFeatureDistField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(maxFeatureDistLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(minTotalIncreaseField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(minTotalIncreaseLabel))
@@ -257,7 +273,7 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(maxLeaderlessDistanceField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(transcriptExtensionLabel1))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(127, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -298,6 +314,8 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JRadioButton dirFwdRadioButton;
     private javax.swing.JRadioButton dirRevRadioButton;
+    private javax.swing.JTextField maxFeatureDistField;
+    private javax.swing.JLabel maxFeatureDistLabel;
     private javax.swing.JTextField maxInitialCountField;
     private javax.swing.JLabel maxInitialCountLabel;
     private javax.swing.JTextField maxLeaderlessDistanceField;
@@ -326,6 +344,7 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         this.minLowCovIncrease = Integer.parseInt(this.minLowCovCountField.getText());
         this.minTranscriptExtensionCov = Integer.parseInt(this.transcriptExtensionField.getText());
         this.maxLeaderlessDistance = Integer.parseInt(this.maxLeaderlessDistanceField.getText());
+        this.maxFeatureDistance = Integer.parseInt(this.maxFeatureDistField.getText());
         
         this.minTotalIncreaseField.getDocument().addDocumentListener(this.createDocumentListener());
         this.minPercentIncreaseField.getDocument().addDocumentListener(this.createDocumentListener());
@@ -333,6 +352,7 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         this.minLowCovCountField.getDocument().addDocumentListener(this.createDocumentListener());
         this.transcriptExtensionField.getDocument().addDocumentListener(this.createDocumentListener());
         this.maxLeaderlessDistanceField.getDocument().addDocumentListener(this.createDocumentListener());
+        this.maxFeatureDistField.getDocument().addDocumentListener(this.createDocumentListener());
         
         this.loadLastParameterSelection();
     }
@@ -350,6 +370,7 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         detectUnannotatedTranscripts = pref.get(PROP_WIZARD_NAME + PROP_UNANNOTATED_TRANSCRIPT_DET, "1").equals("1");
         String minExtensionCov = pref.get(PROP_WIZARD_NAME + PROP_MIN_TRANSCRIPT_EXTENSION_COV, transcriptExtensionField.getText());
         String maxLeaderlessDist = pref.get(PROP_WIZARD_NAME + PROP_MAX_LEADERLESS_DISTANCE, maxLeaderlessDistanceField.getText());
+        String maxFeatureDist = pref.get(PROP_WIZARD_NAME + PROP_MAX_FEATURE_DISTANCE, maxFeatureDistField.getText());
         boolean fwdAnalysisDirection = pref.get(PROP_WIZARD_NAME + PROP_ANALYSIS_DIRECTION, "1").equals("1");
         
         transcriptionStartAutomaticBox.setSelected(tssAutomatic);
@@ -362,6 +383,7 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         minLowCovCountField.setText(minInitialLowCov);
         transcriptExtensionField.setText(minExtensionCov);
         maxLeaderlessDistanceField.setText(maxLeaderlessDist);
+        maxFeatureDistField.setText(maxFeatureDist);
         
         this.performTssAutoBoxAction();
     }
@@ -400,7 +422,12 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
             this.maxLeaderlessDistance = Integer.parseInt(maxLeaderlessDistanceField.getText());
         } else {
             isValidated = false;
-        }        
+        }   
+        if (GeneralUtils.isValidPositiveNumberInput(maxFeatureDistField.getText())) {
+            this.maxFeatureDistance = Integer.parseInt(maxFeatureDistField.getText());
+        } else {
+            isValidated = false;
+        }
         
         firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated);
         return isValidated;
@@ -428,6 +455,10 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
 
     public int getMaxLeaderlessDistance() {
         return maxLeaderlessDistance;
+    }
+
+    public int getMaxFeatureDistance() {
+        return maxFeatureDistance;
     }
 
     /**

@@ -28,7 +28,7 @@ public class RPKMValuesCalculation {
     /**
      * Key: featureID , Value: PersistentFeature
      */
-    private final HashMap<Integer, PersistentFeature> allRegionsInHash;
+    private final Map<Integer, PersistentFeature> allRegionsInHash;
     private final StatisticsOnMappingData stats;
     private final int[][] forwardStarts, reverseStarts;
     private final double mm, mc;
@@ -41,7 +41,7 @@ public class RPKMValuesCalculation {
      * @param stats StatisticsOnMappingData instance.
      * @param trackId Currently used Track id.
      */
-    public RPKMValuesCalculation(HashMap<Integer, PersistentFeature> persFeatures, StatisticsOnMappingData stats, int trackId) {
+    public RPKMValuesCalculation(Map<Integer, PersistentFeature> persFeatures, StatisticsOnMappingData stats, int trackId) {
         this.allRegionsInHash = persFeatures;
         this.rpkmValues = new ArrayList<>();
         this.stats = stats;
@@ -91,7 +91,7 @@ public class RPKMValuesCalculation {
             int chromId = feature.getChromId();
             int chromNo = chromosomes.get(chromId).getChromNumber();
 
-            RPKMvalue rpkm = null;
+            RPKMvalue rpkm;
 
             if (isFwd) {
 //                System.out.println("Feature fwd: " + feature.getLocus());
@@ -135,7 +135,7 @@ public class RPKMValuesCalculation {
         int length = stop - start;
         length++;
         List<Double> logdata = new ArrayList<>();
-        double rpkm = 0;
+        double rpkm;
         double logRpkm = 0;
         double sumLog = 0;
 
@@ -194,8 +194,8 @@ public class RPKMValuesCalculation {
      */
     private double mean(List<Double> m) {
         double sum = 0;
-        for (int i = 0; i < m.size(); i++) {
-            sum += m.get(i);
+        for (Double m1 : m) {
+            sum += m1;
         }
         return sum / m.size();
     }
@@ -211,7 +211,7 @@ public class RPKMValuesCalculation {
         try (BufferedReader br = new BufferedReader(new FileReader(referenceFile))) {
             String line = br.readLine();
 
-            while (line != null && !line.equals("") && !line.startsWith("#")) {
+            while (line != null && !line.isEmpty() && !line.startsWith("#")) {
                 // skip header line !
                 String[] split = line.split("\t");
                 Integer[] startStop = new Integer[3];

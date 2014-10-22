@@ -77,7 +77,7 @@ public class UpdateThread extends SwingWorker<Object, Object> implements Observe
         Runtime rt = Runtime.getRuntime();
          
         this.showMsg("Notification: Your current JVM config allows up to "+GeneralUtils.formatNumber(rt.maxMemory() / 1000000)+" MB of memory to be allocated.");
-        this.showMsg("Currently the plattform is using "+GeneralUtils.formatNumber((rt.totalMemory() - rt.freeMemory()) / 1000000)+" MB of memory.");
+        this.showMsg("Currently the platform is using "+GeneralUtils.formatNumber((rt.totalMemory() - rt.freeMemory()) / 1000000)+" MB of memory.");
         this.showMsg("Please be aware that you might need to change the -J-d64 and -J-Xmx value of your JVM to process large updates successfully.");
         this.showMsg("The value can be configured in the ../readXplorer/etc/readXplorer.conf file in the application folder."); 
         this.showMsg("");
@@ -169,6 +169,7 @@ public class UpdateThread extends SwingWorker<Object, Object> implements Observe
                     io.getOut().println("Re-calculation of classification for track " + trackJob.getName() + " failed!");
                 }
                 ph.progress("Re-calculate classification of track " + trackJob.getName(), ++workunits);
+                noErrors = true;
             }
         }
     }

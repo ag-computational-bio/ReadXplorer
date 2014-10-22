@@ -230,6 +230,26 @@ public class GnuR extends Rengine {
         ProcessingLog.getInstance().logGNURoutput("> assign: \"" + sb.toString() + "\" to variable \"" + string + "\"\n");
         return super.assign(string, strings);
     }
+    
+    /**
+     * Store an SVG file of a given plot using this GnuR instance.
+     * @param file File to store the plot in
+     * @param plotIdentifier String identifying the data to plot
+     * @throws
+     * de.cebitec.readXplorer.differentialExpression.GnuR.PackageNotLoadableException
+     * @throws IllegalStateException
+     */
+    public void storePlot(File file, String plotIdentifier) throws PackageNotLoadableException, IllegalStateException {
+        if (this == null) {
+            throw new IllegalStateException("Shutdown was already called!");
+        }
+        this.loadPackage("grDevices");
+        String path = file.getAbsolutePath();
+        path = path.replace("\\", "\\\\");
+        this.eval("svg(filename=\"" + path + "\")");
+        this.eval(plotIdentifier);
+        this.eval("dev.off()");
+    }
 
     private static class Callback implements RMainLoopCallbacks {
 
@@ -318,11 +338,7 @@ public class GnuR extends Rengine {
          * @return true if the GNU R instance is available, else false.
          */
         public static boolean isGnuRInstanceFree() {
-            if (KEY == null) {
-                return true;
-            } else {
-                return false;
-            }
+            return KEY == null;
         }
     }
 }

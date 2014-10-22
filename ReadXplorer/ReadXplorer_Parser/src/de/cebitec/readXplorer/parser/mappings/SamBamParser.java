@@ -31,6 +31,7 @@ import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.SamUtils;
 import de.cebitec.readXplorer.util.StatsContainer;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -212,7 +213,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
                         }
                         
                         boolean classified = CommonsMappingParser.classifyRead(record, this, chromLengthMap, 
-                                fileSortedByReadName, lineno, refSeqFetcher, diffMap, classificationData);
+                                fileSortedByReadName.getName(), lineno, refSeqFetcher, diffMap, classificationData);
                         if (!classified) { 
                             ++noSkippedReads;
                             continue; //continue, and ignore read, if it contains inconsistent information
@@ -253,12 +254,6 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
             this.notifyObservers("Writing extended bam file...");
             samItor.close();
             bamWriter.close();
-            samReader.close();
-            
-            //delete the sorted/preprocessed file
-            if (deleteSortedFile) {
-                GeneralUtils.deleteOldWorkFile(fileSortedByReadName);
-            }
             
             try (SAMFileReader samReaderNew = new SAMFileReader(outputFile)) {
                 samReaderNew.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
@@ -271,6 +266,16 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
         } catch (Exception e) {
             this.notifyObservers(e.getMessage() != null ? e.getMessage() : e);
             Exceptions.printStackTrace(e);
+        }
+
+        //delete the sorted/preprocessed file
+        if (deleteSortedFile) {
+            try {
+                GeneralUtils.deleteOldWorkFile(fileSortedByReadName);
+            } catch (IOException e) {
+                this.notifyObservers(e.getMessage() != null ? e.getMessage() : e);
+                Exceptions.printStackTrace(e);
+            }
         }
 
         this.notifyObservers("Reads skipped during parsing due to inconsistent data: " + noSkippedReads);

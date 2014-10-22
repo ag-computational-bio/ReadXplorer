@@ -149,26 +149,10 @@ public class DeSeq2 {
     }
 
     public void plotDispEsts(File file) throws IllegalStateException, PackageNotLoadableException {
-        if (gnuR == null) {
-            throw new IllegalStateException("Shutdown was already called!");
-        }
-        gnuR.loadPackage("grDevices");
-        String path = file.getAbsolutePath();
-        path = path.replace("\\", "\\\\");
-        gnuR.eval("svg(filename=\"" + path + "\")");
-        gnuR.eval("plotDispEsts(dds)");
-        gnuR.eval("dev.off()");
+        gnuR.storePlot(file, "plotDispEsts(dds)");
     }
 
     public void plotHist(File file) throws IllegalStateException, PackageNotLoadableException {
-        if (gnuR == null) {
-            throw new IllegalStateException("Shutdown was already called!");
-        }
-        gnuR.loadPackage("grDevices");
-        String path = file.getAbsolutePath();
-        path = path.replace("\\", "\\\\");
-        gnuR.eval("svg(filename=\"" + path + "\")");
-        gnuR.eval("hist(res$pval, breaks=100, col=\"skyblue\", border=\"slateblue\", main=\"\")");
-        gnuR.eval("dev.off()");
+        gnuR.storePlot(file, "hist(res$pval, breaks=100, col=\"skyblue\", border=\"slateblue\", main=\"\")");
     }
 }

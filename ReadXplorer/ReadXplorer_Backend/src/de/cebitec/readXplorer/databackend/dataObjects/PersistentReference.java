@@ -45,7 +45,7 @@ public class PersistentReference implements Observable {
     private int activeChromID;
     private String name;
     private String description;
-//    private int refLength;
+    private int genomeLength = 0;
     private Map<Integer, PersistentChromosome> chromosomes;
     private Timestamp timestamp;
     private int noChromosomes;
@@ -210,6 +210,21 @@ public class PersistentReference implements Observable {
      */
     public Map<Integer, PersistentChromosome> getChromosomes() {
         return this.chromosomes;
+    }
+    
+    /**
+     * Calculates & returns the genome length = Sum of the length of all
+     * chromosomes belonging to this reference. Calculation is only carried out
+     * the first time this method is called on this reference.
+     * @return Genome length
+     */
+    public int getGenomeLength() {
+        if (genomeLength == 0) {
+            for (PersistentChromosome chrom : chromosomes.values()) {
+                genomeLength += chrom.getLength();
+            }
+        }
+        return genomeLength;
     }
 
     /**

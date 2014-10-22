@@ -16,8 +16,14 @@
  */
 package de.cebitec.readXplorer.transcriptionAnalyses.wizard;
 
+import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_OPERON_ANALYSIS;
+import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_RPKM_ANALYSIS;
+import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_TSS_ANALYSIS;
+import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_WIZARD_NAME;
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
+import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
+import org.openide.util.NbPreferences;
 
 /**
  * Wizard panel allowing for selection of the transcription analyses, which
@@ -54,16 +60,40 @@ public class TransAnalysesSelectionWizardPanel extends ChangeListeningWizardPane
         }
         return component;
     }
+    
+    @Override
+    public void readSettings(final WizardDescriptor wiz) {
+        super.readSettings(wiz);
+        Preferences pref = NbPreferences.forModule(Object.class);
+        byte tssSelected = Byte.valueOf(pref.get(PROP_WIZARD_NAME + PROP_TSS_ANALYSIS, "0"));
+        byte operonSelected = Byte.valueOf(pref.get(PROP_WIZARD_NAME + PROP_OPERON_ANALYSIS, "0"));
+        byte rpkmSelected = Byte.valueOf(pref.get(PROP_WIZARD_NAME + PROP_RPKM_ANALYSIS, "0"));
+        boolean isTssSelected = tssSelected == 1;
+        boolean isOperonSelected = operonSelected == 1;
+        boolean isRpkmSelected = rpkmSelected == 1;
+        
+        this.getComponent().updateAnalysisSelection(isTssSelected, isOperonSelected, isRpkmSelected);
+    }
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         // use wiz.putProperty to remember current panel state
         if (this.isValid()) {
-            wiz.putProperty(TranscriptionAnalysesWizardIterator.PROP_TSS_ANALYSIS, this.component.isTSSAnalysisSelected());
-            wiz.putProperty(TranscriptionAnalysesWizardIterator.PROP_OPERON_ANALYSIS, this.component.isOperonAnalysisSelected());
-            wiz.putProperty(TranscriptionAnalysesWizardIterator.PROP_RPKM_ANALYSIS, this.component.isRPKMAnalysisSelected());
-            //changeSupport.fireChange();
-            this.readSettings(wiz);
+            wiz.putProperty(PROP_TSS_ANALYSIS, this.component.isTSSAnalysisSelected());
+            wiz.putProperty(PROP_OPERON_ANALYSIS, this.component.isOperonAnalysisSelected());
+            wiz.putProperty(PROP_RPKM_ANALYSIS, this.component.isRPKMAnalysisSelected());
+            this.storePrefs();
         }
+    }
+    
+    /**
+     * Stores the chosen TSS parameters for this wizard for later use, also
+     * after restarting the software.
+     */
+    private void storePrefs() {
+        Preferences pref = NbPreferences.forModule(Object.class);
+        pref.put(PROP_WIZARD_NAME + PROP_TSS_ANALYSIS, this.component.isTSSAnalysisSelected() ? "1" : "0");
+        pref.put(PROP_WIZARD_NAME + PROP_OPERON_ANALYSIS, this.component.isOperonAnalysisSelected() ? "1" : "0");
+        pref.put(PROP_WIZARD_NAME + PROP_RPKM_ANALYSIS, this.component.isRPKMAnalysisSelected() ? "1" : "0");
     }
 }

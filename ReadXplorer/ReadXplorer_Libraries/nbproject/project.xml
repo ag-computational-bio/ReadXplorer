@@ -196,11 +196,9 @@
                 <package>de.cebitec.common.parser.fasta</package>
                 <package>de.cebitec.common.parser.genbank.data</package>
                 <package>de.cebitec.common.parser.genbank.parsers</package>
-                <package>de.cebitec.common.sequencetools.features</package>
                 <package>de.cebitec.common.sequencetools.geneticcode</package>
-                <package>de.cebitec.common.sequencetools.intervals</package>
-                <package>de.cebitec.common.sequencetools.sequences</package>
                 <package>de.cebitec.common.utilities.parser</package>
+                <package>de.cebitec.readXplorer.libs</package>
                 <package>de.erichseifert.gral.data</package>
                 <package>de.erichseifert.gral.data.comparators</package>
                 <package>de.erichseifert.gral.data.filters</package>
@@ -788,10 +786,6 @@
                 <binary-origin>release/modules/ext/batik-svggen.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/SequenceTools.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/SequenceTools.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
                 <runtime-relative-path>ext/parser.embl-0.1.0-SNAPSHOT.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/parser.embl-0.1.0-SNAPSHOT.jar</binary-origin>
             </class-path-extension>
@@ -878,6 +872,10 @@
             <class-path-extension>
                 <runtime-relative-path>ext/commons-math3-3.1.1.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/commons-math3-3.1.1.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/geneticcodes-1.0.1.jar</runtime-relative-path>
+                <binary-origin>D:\Programmieren &amp; Studieren\NetbeansProjects\ReadXplorer_Repo\ReadXplorer\ReadXplorer_Libraries\release\modules\ext\geneticcodes-1.0.1.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/batik-ext.jar</runtime-relative-path>

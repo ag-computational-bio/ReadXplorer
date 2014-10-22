@@ -585,7 +585,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel implements Obse
                     operonDetStats.put(OPERONS_TWO_GENES, (Integer) operonDetStats.get(OPERONS_TWO_GENES) + numberOfTwoGenesOperons);
                     operonDetStats.put(OPERONS_BIGGEST, (Integer) operonDetStats.get(OPERONS_BIGGEST) + biggestOperon);
                     operonDetStats.put(ResultPanelTranscriptionStart.MAPPINGS_COUNT, (Double) operonDetStats.get(ResultPanelTranscriptionStart.MAPPINGS_COUNT) + operonResult.getStats().getMappingCount());
-                    operonDetStats.put(ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH, (Double) operonDetStats.get(ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH) + operonResult.getStats().getMeanMappingLength());
+                    operonDetStats.put(ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH, (Double) operonDetStats.get(ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH) + operonResult.getStats().getAverageReadLength());
                     operonDetStats.put(ResultPanelTranscriptionStart.MAPPINGS_MILLION, (Double) operonDetStats.get(ResultPanelTranscriptionStart.MAPPINGS_MILLION) + operonResult.getStats().getMappingsPerMillion());
                     operonDetStats.put(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_OVERSPANNING_READS, (Double) operonDetStats.get(ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_OVERSPANNING_READS) + operonResult.getStats().getBgThreshold());
 

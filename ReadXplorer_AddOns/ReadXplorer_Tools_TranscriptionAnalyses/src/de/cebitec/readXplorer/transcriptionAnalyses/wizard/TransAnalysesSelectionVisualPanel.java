@@ -205,4 +205,21 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
                || this.operonDetectionBox.isSelected()
                 || this.rpkmValuesBox.isSelected();
     }
+    
+    /**
+     * Updates the components for all offered analyses depending on the 
+     * selection.
+     * @param isTssSelected true, if the TSS analysis shall be selected, 
+     * false otherwise
+     * @param isOperonSelected true, if the operon analysis shall be selected,
+     * false otherwise
+     * @param isRpkmSelected true, if the RPKM analysis shall be selected, false
+     * otherwise
+     */
+    protected void updateAnalysisSelection(boolean isTssSelected, boolean isOperonSelected, boolean isRpkmSelected) {
+        this.transcriptionStartBox.setSelected(isTssSelected);
+        this.operonDetectionBox.setSelected(isOperonSelected);
+        this.rpkmValuesBox.setSelected(isRpkmSelected);
+        firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet());
+    }
 }

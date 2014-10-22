@@ -16,6 +16,8 @@
  */
 package de.cebitec.readXplorer.util;
 
+import java.util.List;
+
 /**
  * Designed for methods handling any kind of position specific functionality.
  *
@@ -59,5 +61,22 @@ public class PositionUtils {
      */
     public static int determineRevFrame(int position) {
         return (position - 1) % 3 - 3;
+    }
+    
+    /**
+     * Update the last interval of the given list or create a new interval in
+     * the given list, if the new boundaries are beyond the boundaries of the
+     * last interval in the list. The passed list has to be sorted by position.
+     * @param intervals list of current intervals
+     * @param start start pos of new interval to add
+     * @param stop stop pos of new interval to add
+     */
+    public static void updateIntervals(List<Pair<Integer, Integer>> intervals, int start, int stop) {
+        int lastIndex = intervals.size() - 1;
+        if (intervals.get(lastIndex).getSecond() < start) { //add new pair
+            intervals.add(new Pair<>(start, stop));
+        } else { //increase length of first pair (start remains, stop is enlarged)
+            intervals.get(lastIndex).setSecond(stop);
+        }
     }
 }

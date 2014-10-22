@@ -24,9 +24,6 @@ import de.cebitec.readXplorer.differentialExpression.GnuR;
 import de.cebitec.readXplorer.differentialExpression.Group;
 import de.cebitec.readXplorer.differentialExpression.ResultDeAnalysis;
 import de.cebitec.readXplorer.plotting.ChartExporter;
-import static de.cebitec.readXplorer.plotting.ChartExporter.ChartExportStatus.FAILED;
-import static de.cebitec.readXplorer.plotting.ChartExporter.ChartExportStatus.FINISHED;
-import static de.cebitec.readXplorer.plotting.ChartExporter.ChartExportStatus.RUNNING;
 import de.cebitec.readXplorer.plotting.CreatePlots;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
@@ -36,7 +33,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -52,8 +48,8 @@ import java.util.logging.Logger;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
 import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.swing.svg.SVGDocumentLoaderEvent;
 import org.apache.batik.swing.svg.SVGDocumentLoaderListener;
@@ -63,6 +59,8 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
+import org.openide.awt.NotificationDisplayer;
+import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 
@@ -333,6 +331,8 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended imple
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    @NbBundle.Messages({"BaySeqSuccessMsg=SVG image saved to ",
+        "BaySeqSuccessHeader=Success"})
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
         ReadXplorerFileChooser fc = new ReadXplorerFileChooser(new String[]{"svg"}, "svg") {
             private static final long serialVersionUID = 1L;
@@ -347,7 +347,7 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended imple
                     Path from = currentlyDisplayed.toPath();
                     try {
                         Path outputFile = Files.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
-                        messages.setText("SVG image saved to " + outputFile.toString());
+                        NotificationDisplayer.getDefault().notify(Bundle.BaySeqSuccessHeader(), new ImageIcon(), Bundle.BaySeqSuccessMsg() + outputFile.toString(), null);
                     } catch (IOException ex) {
                         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
                         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
@@ -498,31 +498,7 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended imple
     @Override
     public void update(Object args) {
         if (args instanceof ChartExporter.ChartExportStatus) {
-            final ChartExporter.ChartExportStatus status = (ChartExporter.ChartExportStatus) args;
-            try {
-                SwingUtilities.invokeAndWait(new Runnable() {
-                    @Override
-                    public void run() {
-                        switch (status) {
-                            case RUNNING:
-                                saveButton.setEnabled(false);
-                                svgExportProgressHandle.start();
-                                svgExportProgressHandle.switchToIndeterminate();
-                                break;
-                            case FAILED:
-                                messages.setText("The export of the plot failed.");
-                            case FINISHED:
-                                messages.setText("SVG image saved.");
-                                svgExportProgressHandle.switchToDeterminate(100);
-                                svgExportProgressHandle.finish();
-                                break;
-                        }
-                    }
-                });
-            } catch (InterruptedException | InvocationTargetException ex) {
-                Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                Logger.getLogger(this.getClass().getName()).log(Level.WARNING, ex.getMessage(), currentTimestamp);
-            }
+            DgeExportUtilities.updateExportStatus(svgExportProgressHandle, (ChartExporter.ChartExportStatus) args, saveButton);
         } else {
             addResults();
         }

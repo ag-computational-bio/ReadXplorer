@@ -28,7 +28,6 @@ import java.util.Map;
 
 /**
  * Data container for a result of an analysis for a list of tracks.
- *
  * @param <T> class type of the parameter set
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
@@ -130,8 +129,8 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
      * combined tracks, false, if shortened concated names shall be returned for
      * combined tracks. For single tracks, this option does not have an
      * influence.
-     * @return Either a Track entry for a single track or a String of
- the track names or ids for a combined list of tracks
+     * @return Either a Track entry for a single track or a String of the track
+     * names or ids for a combined list of tracks
      */
     public Object getTrackEntry(int trackId, boolean getFullengthName) {
         Object trackEntry;
@@ -186,7 +185,6 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
 
     /**
      * Sets the parameter set which was used for the analysis
-     *
      * @param parameters the parameter set which was used for the analysis
      */
     public void setParameters(ParameterSetI<T> parameters) {
@@ -210,7 +208,6 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
 
     /**
      * Sets the statistics map associated with this analysis.
-     *
      * @param statsMap the statistics map associated with this analysis
      */
     public void setStatsMap(Map<String, Integer> statsMap) {
@@ -219,17 +216,33 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
 
     /**
      * Adds a key value pair to the stats map.
-     *
      * @param key the key of the pair
      * @param value the value of the pair
      */
     public void addStatsToMap(String key, int value) {
         this.statsMap.put(key, value);
     }
+    
+    /**
+     * Update the stats map of this track analysis result with the given data.
+     * @param newStatsMap A new stats map, whose content shall be merged /
+     * summed with the content of the stats map contained in this result object.
+     */
+    public void updateStatsMap(Map<String, Integer> newStatsMap) {
+        Map<String, Integer> internalStatsMap = this.getStatsMap();
+        for (Map.Entry<String, Integer> entrySet : newStatsMap.entrySet()) {
+            String key = entrySet.getKey();
+            Integer value = entrySet.getValue();
+            if (internalStatsMap.containsKey(key)) {
+                internalStatsMap.put(key, internalStatsMap.get(key) + value);
+            } else {
+                internalStatsMap.put(key, value);
+            }
+        }
+    }
 
     /**
      * Creates a table row for statistic entries by the given identifier
-     *
      * @param identifier the identifier of the statistic value
      * @return the list containing the identifier and its statistic value
      */
@@ -245,7 +258,6 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
     /**
      * Adds the complete content of the internal statistics map to the given
      * table content (list of object list)
-     *
      * @param statisticsExportData the table content, to which the content of
      * the internal statistics map shall be added
      */
@@ -257,8 +269,7 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
 
     /**
      * Creates a table row (= object list) with two elemets.
-     * @param content  entries to add to the table row
-     *
+     * @param content entries to add to the table row
      * @return the new table row (= object list)
      */
     public static List<Object> createTableRow(Object... content) {

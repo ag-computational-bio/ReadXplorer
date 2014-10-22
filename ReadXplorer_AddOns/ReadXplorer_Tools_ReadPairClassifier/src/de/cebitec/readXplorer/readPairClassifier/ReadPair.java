@@ -20,9 +20,9 @@ import de.cebitec.readXplorer.util.ReadPairType;
 import net.sf.samtools.SAMRecord;
 
 /**
- * A read pair of a direct access track containing two sam records. the id, 
- * the classification and the distance of the pair.
- * 
+ * A read pair of a track containing two sam records. the id, the classification
+ * and the distance of the pair.
+ *
  * @author -Rolf Hilker-
  */
 public class ReadPair {
@@ -34,7 +34,7 @@ public class ReadPair {
     private int distance;
     
     /**
-     * A read pair of a direct access track.
+     * A read pair of a track.
      * @param record1 first sam record of the pair
      * @param record2 second sam record of the pair
      * @param readPairId the read pair id of this pair
