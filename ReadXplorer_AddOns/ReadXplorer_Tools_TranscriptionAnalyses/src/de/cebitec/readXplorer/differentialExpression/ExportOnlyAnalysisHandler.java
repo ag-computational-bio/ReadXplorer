@@ -17,6 +17,7 @@
 package de.cebitec.readXplorer.differentialExpression;
 
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
+import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.io.File;
@@ -46,10 +47,10 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
         prepareFeatures(data);
         prepareCountData(data, getAllCountData());
         results = new ArrayList<>();
-        String[] featureNames = data.getFeatureNames();
+        PersistentFeature[] feature = data.getFeatures();
         String[] trackDescriptions = data.getTrackDescriptions();
         int[][] countData = new int[data.getSelectedTracks().size()][];
-        List<String> regionNamesList = new ArrayList<>();
+        List<PersistentFeature> regionNamesList = new ArrayList<>();
         int i = 0;
         while (data.hasCountData()) {
             countData[i++] = data.pollFirstCountData();
@@ -57,9 +58,12 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
         Vector<Vector> tableContents = new Vector<>();
         for (i = 0; i < data.getFeatures().length; i++) {
             boolean allZero = true;
-            Integer[] tmp = new Integer[data.getSelectedTracks().size()];
-            for (int j = 0; j < data.getSelectedTracks().size(); j++) {
-                int value = countData[j][i];
+            Integer[] tmp = new Integer[data.getSelectedTracks().size()+3];
+            tmp[0] = feature[i].getChromId();
+            tmp[1] = feature[i].getStart();
+            tmp[2] = feature[i].getStop();
+            for (int j = 3; j < data.getSelectedTracks().size()+3; j++) {
+                int value = countData[j-3][i];
                 if (value != 0) {
                     allZero = false;
                 }
@@ -67,10 +71,14 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
             }
             if (!allZero) {
                 tableContents.add(new Vector(Arrays.asList(tmp)));
-                regionNamesList.add(featureNames[i]);
+                regionNamesList.add(feature[i]);
             }
         }
-        Vector colNames = new Vector(Arrays.asList(trackDescriptions));
+        Vector colNames = new Vector();
+        colNames.add("Chromosome");
+        colNames.add("Start");
+        colNames.add("Stop");
+        colNames.addAll(Arrays.asList(trackDescriptions));
         Vector rowNames = new Vector(regionNamesList);
 
         results.add(new ResultDeAnalysis(tableContents, colNames, rowNames, "Count Data Table"));
