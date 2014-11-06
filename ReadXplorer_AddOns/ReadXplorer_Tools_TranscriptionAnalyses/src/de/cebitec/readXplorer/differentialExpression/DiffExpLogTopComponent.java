@@ -16,7 +16,6 @@
  */
 package de.cebitec.readXplorer.differentialExpression;
 
-import de.cebitec.readXplorer.differentialExpression.Bundle;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readXplorer.view.TopComponentExtended;

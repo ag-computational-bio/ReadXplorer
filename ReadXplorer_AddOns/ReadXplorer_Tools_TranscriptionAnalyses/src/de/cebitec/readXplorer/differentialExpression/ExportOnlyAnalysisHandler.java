@@ -26,6 +26,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 
 /**
  *
@@ -46,6 +48,8 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
     protected List<ResultDeAnalysis> processWithTool() throws GnuR.PackageNotLoadableException, GnuR.JRILibraryNotInPathException, IllegalStateException, GnuR.UnknownGnuRException {
         prepareFeatures(data);
         prepareCountData(data, getAllCountData());
+        ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Creating Count Data Table");
+        progressHandle.start(data.getFeatures().length);
         results = new ArrayList<>();
         PersistentFeature[] feature = data.getFeatures();
         String[] trackDescriptions = data.getTrackDescriptions();
@@ -54,7 +58,7 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
         int i = 0;
         while (data.hasCountData()) {
             countData[i++] = data.pollFirstCountData();
-        }
+        }       
         Vector<Vector> tableContents = new Vector<>();
         for (i = 0; i < data.getFeatures().length; i++) {
             boolean allZero = true;
@@ -73,6 +77,7 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
                 tableContents.add(new Vector(Arrays.asList(tmp)));
                 regionNamesList.add(feature[i]);
             }
+            progressHandle.progress(i);
         }
         Vector colNames = new Vector();
         colNames.add("Chromosome");
@@ -82,6 +87,7 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
         Vector rowNames = new Vector(regionNamesList);
 
         results.add(new ResultDeAnalysis(tableContents, colNames, rowNames, "Count Data Table"));
+        progressHandle.finish();
         return results;
     }
 
