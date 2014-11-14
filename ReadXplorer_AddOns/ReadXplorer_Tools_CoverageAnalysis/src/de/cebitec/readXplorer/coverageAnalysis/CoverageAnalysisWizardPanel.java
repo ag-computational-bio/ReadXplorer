@@ -17,7 +17,9 @@
 package de.cebitec.readXplorer.coverageAnalysis;
 
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
+import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
+import org.openide.util.NbPreferences;
 
 /**
  * Panel for showing and handling all available options for the coverage
@@ -59,9 +61,21 @@ public class CoverageAnalysisWizardPanel extends ChangeListeningWizardPanel {
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         if (isValid()) {
-            wiz.putProperty(CoverageAnalysisWizardPanel.MIN_COVERAGE_COUNT, this.component.getMinCoverageCount());
-            wiz.putProperty(CoverageAnalysisWizardPanel.SUM_COVERAGE, this.component.isSumCoverageOfBothStrands());
-            wiz.putProperty(CoverageAnalysisWizardPanel.COVERED_INTERVALS, this.component.isDetectCoveredIntervals());
+            wiz.putProperty(MIN_COVERAGE_COUNT, this.component.getMinCoverageCount());
+            wiz.putProperty(SUM_COVERAGE, this.component.isSumCoverageOfBothStrands());
+            wiz.putProperty(COVERED_INTERVALS, this.component.isDetectCoveredIntervals());
+            this.storePrefs();
         }
+    }
+    
+    /**
+     * Stores the selected parameters for this specific wizard page for later 
+     * use, also after restarting the software.
+     */
+    private void storePrefs() {
+        Preferences pref = NbPreferences.forModule(Object.class);
+        pref.put(MIN_COVERAGE_COUNT, String.valueOf(this.component.getMinCoverageCount()));
+        pref.put(SUM_COVERAGE, this.component.isSumCoverageOfBothStrands() ? "1" : "0");
+        pref.put(COVERED_INTERVALS, this.component.isDetectCoveredIntervals() ? "1" : "0");
     }
 }

@@ -19,6 +19,8 @@ package de.cebitec.readXplorer.coverageAnalysis;
 import de.cebitec.readXplorer.api.objects.JobPanel;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
+import java.util.prefs.Preferences;
+import org.openide.util.NbPreferences;
 
 /**
  * Visual panel of the coverage analysis wizard.
@@ -138,6 +140,7 @@ public final class CoverageAnalysisVisualPanel extends JobPanel {
      * startup.
      */
     private void initAdditionalComponents() {
+        this.loadLastParameterSelection();
         this.minCoverageCount = Integer.parseInt(this.minCoverageCountField.getText());
         this.minCoverageCountField.getDocument().addDocumentListener(this.createDocumentListener());
     }
@@ -180,5 +183,18 @@ public final class CoverageAnalysisVisualPanel extends JobPanel {
         return !this.uncoveredCheckBox.isSelected();
     }
     
+    /**
+     * Updates the parameters for this panel with the globally stored settings
+     * for this wizard panel. If no settings were stored, the default
+     * configuration is chosen.
+     */
+    private void loadLastParameterSelection() {
+        Preferences pref = NbPreferences.forModule(Object.class);
+        minCoverageCountField.setText(pref.get(CoverageAnalysisWizardPanel.MIN_COVERAGE_COUNT, "5"));
+        String sumCov = pref.get(CoverageAnalysisWizardPanel.SUM_COVERAGE, "0");
+        countStrandsSeparatelyButton.setSelected(sumCov.equals("0"));
+        sumCoverageButton.setSelected(sumCov.equals("1"));
+        uncoveredCheckBox.setSelected(pref.get(CoverageAnalysisWizardPanel.COVERED_INTERVALS, "0").equals("0"));
+    }
 }
 

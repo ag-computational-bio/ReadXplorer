@@ -148,8 +148,8 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended imple
     }
 
     private void addResults() {
-        List<Group> groups = baySeqAnalysisHandler.getGroups();
-        groupComboBox.setModel(new DefaultComboBoxModel(groups.toArray()));
+        List<Group> resultGroups = baySeqAnalysisHandler.getGroups();
+        groupComboBox.setModel(new DefaultComboBoxModel(resultGroups.toArray()));
         List<PersistentTrack> tracks = baySeqAnalysisHandler.getSelectedTracks();
         for (Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext();) {
             PersistentTrack persistentTrack = it.next();
@@ -375,11 +375,11 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended imple
             List<Integer> sampleB = new ArrayList<>();
             Group selectedGroup = groups.get(groupComboBox.getSelectedIndex());
             Integer[] integerRep = selectedGroup.getIntegerRepresentation();
-            Integer integerGroupA = integerRep[0];
+            int integerGroupA = integerRep[0];
             Integer integerGroupB = null;
             sampleA.add(0);
             for (int i = 1; i < integerRep.length; i++) {
-                Integer currentInteger = integerRep[i];
+                int currentInteger = integerRep[i];
                 if (currentInteger == integerGroupA) {
                     sampleA.add(i);
                 } else {

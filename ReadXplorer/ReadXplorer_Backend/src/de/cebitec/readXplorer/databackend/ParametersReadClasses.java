@@ -123,11 +123,12 @@ public class ParametersReadClasses {
         statisticsExportData.add(ResultTrackAnalysis.createTableRow("Minimum mapping quality:", this.getMinMappingQual()));
         List<Classification> classList = new ArrayList<>();
         classList.addAll(Arrays.asList(MappingClass.values()));
-        classList.add(FeatureType.MULTIPLE_MAPPED_READ);
         for (Classification classType : classList) {
             String isAllowed = isClassificationAllowed(classType) ? "yes" : "no";
             statisticsExportData.add(ResultTrackAnalysis.createTableRow(classType.getTypeString() + " included:", isAllowed));
         }
+        String isAllowed = isClassificationAllowed(FeatureType.MULTIPLE_MAPPED_READ) ? "no" : "yes"; //here it's opposite
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow(FeatureType.MULTIPLE_MAPPED_READ.getTypeString()+ ":", isAllowed));
         statisticsExportData.add(ResultTrackAnalysis.createTableRow("Mapping strand selection:", this.getStrandOptionString()));
     }
     

@@ -17,7 +17,9 @@
 package de.cebitec.readXplorer.featureCoverageAnalysis;
 
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
+import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
+import org.openide.util.NbPreferences;
 
 /**
  * Panel for showing and handling all available options for the covered
@@ -62,9 +64,21 @@ public class CoveredFeaturesWizardPanel extends ChangeListeningWizardPanel {
     @Override
     public void storeSettings(WizardDescriptor wiz) {
         if (isValid()) {
-            wiz.putProperty(CoveredFeaturesWizardPanel.PROP_GET_COVERED_FEATURES, this.component.getGetCoveredFeatures());
-            wiz.putProperty(CoveredFeaturesWizardPanel.PROP_MIN_COVERED_PERCENT, this.component.getMinCoveredPercent());
-            wiz.putProperty(CoveredFeaturesWizardPanel.PROP_MIN_COVERAGE_COUNT, this.component.getMinCoverageCount());
+            wiz.putProperty(PROP_GET_COVERED_FEATURES, this.component.isGetCoveredFeatures());
+            wiz.putProperty(PROP_MIN_COVERED_PERCENT, this.component.getMinCoveredPercent());
+            wiz.putProperty(PROP_MIN_COVERAGE_COUNT, this.component.getMinCoverageCount());
+            this.storePrefs();
         }
+    }
+
+    /**
+     * Stores the selected parameters for this specific wizard page for later
+     * use, also after restarting the software.
+     */
+    private void storePrefs() {
+        Preferences pref = NbPreferences.forModule(Object.class);
+        pref.put(PROP_GET_COVERED_FEATURES, this.component.isGetCoveredFeatures() ? "1" : "0");
+        pref.put(PROP_MIN_COVERED_PERCENT, String.valueOf(this.component.getMinCoveredPercent()));
+        pref.put(PROP_MIN_COVERAGE_COUNT, String.valueOf(this.component.getMinCoverageCount()));
     }
 }

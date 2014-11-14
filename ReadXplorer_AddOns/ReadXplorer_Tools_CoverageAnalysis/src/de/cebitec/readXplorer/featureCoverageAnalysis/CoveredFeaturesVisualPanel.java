@@ -19,6 +19,8 @@ package de.cebitec.readXplorer.featureCoverageAnalysis;
 import de.cebitec.readXplorer.api.objects.JobPanel;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
+import java.util.prefs.Preferences;
+import org.openide.util.NbPreferences;
 
 public final class CoveredFeaturesVisualPanel extends JobPanel {
     
@@ -129,6 +131,7 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
      * startup.
      */
     private void initAdditionalComponents() {
+        this.loadLastParameterSelection();
         this.minCoveragePercent = Integer.parseInt(this.minCoveragePercentField.getText());
         this.minCoverageCount = Integer.parseInt(this.minCoverageCountField.getText());
 
@@ -162,7 +165,7 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
      * @return <code>true</code> if the covered features should be returned, 
      * <code>false</code> if the uncovered features should be returned
      */
-    public boolean getGetCoveredFeatures() {
+    public boolean isGetCoveredFeatures() {
         return !this.detectUncoveredBox.isSelected();
     }
 
@@ -180,5 +183,17 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
      */
     public int getMinCoverageCount() {
         return minCoverageCount;
+    }
+    
+    /**
+     * Updates the parameters for this panel with the globally stored settings
+     * for this wizard panel. If no settings were stored, the default
+     * configuration is chosen.
+     */
+    private void loadLastParameterSelection() {
+        Preferences pref = NbPreferences.forModule(Object.class);
+        minCoverageCountField.setText(pref.get(CoveredFeaturesWizardPanel.PROP_MIN_COVERAGE_COUNT, "10"));
+        minCoveragePercentField.setText(pref.get(CoveredFeaturesWizardPanel.PROP_MIN_COVERED_PERCENT, "90"));
+        detectUncoveredBox.setSelected(pref.get(CoveredFeaturesWizardPanel.PROP_GET_COVERED_FEATURES, "1").equals("0"));
     }
 }

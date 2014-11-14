@@ -87,7 +87,7 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended imple
     private ComboBoxModel cbm;
     private File currentlyDisplayed;
     private ResultDeAnalysis result;
-    private boolean SVGCanvasActive;
+    private boolean svgCanvasActive;
     private final ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Creating plot");
     private ProgressHandle svgExportProgressHandle;
 
@@ -100,9 +100,7 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended imple
     /**
      * TopComponent, which displays all graphics available for a DESeq analysis.
      *
-     * @param analysisHandler The analysis handler containing the results
-     * @param usedTool The tool used for the analysis (has to be DESeq in this
-     * case)
+     * @param handler The analysis handler containing the results
      */
     public DeSeq2GraphicsTopComponent(DeAnalysisHandler handler) {
         analysisHandler = handler;
@@ -247,11 +245,11 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended imple
             saveButton.setEnabled(false);
             DeSeq2AnalysisHandler.Plot selectedPlot = (DeSeq2AnalysisHandler.Plot) plotType.getSelectedItem();
             plotDescriptionArea.setVisible(true);
-            if (!SVGCanvasActive) {
+            if (!svgCanvasActive) {
                 plotPanel.remove(chartPanel);
                 plotPanel.add(svgCanvas, BorderLayout.CENTER);
                 plotPanel.updateUI();
-                SVGCanvasActive = true;
+                svgCanvasActive = true;
             }
             currentlyDisplayed = ((DeSeq2AnalysisHandler) analysisHandler).plot(selectedPlot);
             svgCanvas.setURI(currentlyDisplayed.toURI().toString());
@@ -278,7 +276,7 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended imple
 
             @Override
             public void save(String fileLocation) {
-                ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Save plot to svg file: " + fileLocation);
+                ProgressHandle plotProgressHandle = ProgressHandleFactory.createHandle("Save plot to svg file: " + fileLocation);
                 Path to = FileSystems.getDefault().getPath(fileLocation, "");
                 DeSeq2AnalysisHandler.Plot selectedPlot = (DeSeq2AnalysisHandler.Plot) plotType.getSelectedItem();
                 Path from = currentlyDisplayed.toPath();
@@ -290,8 +288,8 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended imple
                     Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
                     JOptionPane.showMessageDialog(null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE);
                 } finally {
-                    progressHandle.switchToDeterminate(100);
-                    progressHandle.finish();
+                    plotProgressHandle.switchToDeterminate(100);
+                    plotProgressHandle.finish();
                 }
 
             }
@@ -335,7 +333,7 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended imple
     }
 
     void readProperties(java.util.Properties p) {
-        String version = p.getProperty("version");
+//        String version = p.getProperty("version");
         // TODO read your settings according to their version
     }
 
@@ -344,7 +342,7 @@ public final class DeSeq2GraphicsTopComponent extends TopComponentExtended imple
         setToolTipText(Bundle.HINT_DeSeqGraphicsTopComponent());
         svgCanvas = new JSVGCanvas();
         plotPanel.add(svgCanvas, BorderLayout.CENTER);
-        SVGCanvasActive = true;
+        svgCanvasActive = true;
         svgCanvas.addSVGDocumentLoaderListener(new SVGDocumentLoaderListener() {
             @Override
             public void documentLoadingStarted(SVGDocumentLoaderEvent e) {

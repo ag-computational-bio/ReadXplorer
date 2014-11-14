@@ -159,9 +159,6 @@ public class AnalysisCoveredFeatures implements Observer, AnalysisI<List<Covered
                     //store covered features
                     CoveredFeature coveredFeature = coveredFeatureCount.get(feature.getId());
                     coveredBases = this.coveredFeatureCount.get(feature.getId()).getNoCoveredBases();
-                    if (coveredFeature.getPercentCovered() > 90) {
-                        System.out.println("");
-                    }
                     if (noCoveredBases > 0) {
                         meanCov = (coveredFeature.getMeanCoverage() + (summedCov / noCoveredBases));
                         if (coveredFeature.getMeanCoverage() > 0) {

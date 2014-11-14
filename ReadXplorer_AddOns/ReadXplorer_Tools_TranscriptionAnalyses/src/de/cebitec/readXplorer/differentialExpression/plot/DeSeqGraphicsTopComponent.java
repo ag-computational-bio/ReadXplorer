@@ -295,7 +295,7 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
 
             @Override
             public void save(String fileLocation) {
-                ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Save plot to svg file: " + fileLocation);
+                ProgressHandle storeProgressHandle = ProgressHandleFactory.createHandle("Save plot to svg file: " + fileLocation);
                 Path to = FileSystems.getDefault().getPath(fileLocation, "");
                 DeSeqAnalysisHandler.Plot selectedPlot = (DeSeqAnalysisHandler.Plot) plotType.getSelectedItem();
                 if (selectedPlot == DeSeqAnalysisHandler.Plot.MAplot) {
@@ -310,8 +310,8 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
                         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
                         JOptionPane.showMessageDialog(null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE);
                     } finally {
-                        progressHandle.switchToDeterminate(100);
-                        progressHandle.finish();
+                        storeProgressHandle.switchToDeterminate(100);
+                        storeProgressHandle.finish();
                     }
                 }
             }
@@ -355,7 +355,7 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
     }
 
     void readProperties(java.util.Properties p) {
-        String version = p.getProperty("version");
+//        String version = p.getProperty("version");
         // TODO read your settings according to their version
     }
 
@@ -428,8 +428,8 @@ public final class DeSeqGraphicsTopComponent extends TopComponentExtended implem
 
     @Override
     public void itemStateChanged(ItemEvent e) {
-        DeSeqAnalysisHandler.Plot plotType = (DeSeqAnalysisHandler.Plot) e.getItem();
-        if (plotType == DeSeqAnalysisHandler.Plot.MAplot) {
+        DeSeqAnalysisHandler.Plot currentPlotType = (DeSeqAnalysisHandler.Plot) e.getItem();
+        if (currentPlotType == DeSeqAnalysisHandler.Plot.MAplot) {
             iSymbol.setVisible(true);
         } else {
             iSymbol.setVisible(false);

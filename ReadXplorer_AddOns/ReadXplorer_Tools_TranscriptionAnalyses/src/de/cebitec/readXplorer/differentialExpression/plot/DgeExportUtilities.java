@@ -60,6 +60,7 @@ public class DgeExportUtilities {
                             break;
                         case FAILED:
                             NotificationDisplayer.getDefault().notify("Storage Error", new ImageIcon(), "The export of the plot failed.", null);
+                            break;
                         case FINISHED:
                             NotificationDisplayer.getDefault().notify("Success", new ImageIcon(), "SVG image saved.", null);
                             svgExportProgressHandle.switchToDeterminate(100);
