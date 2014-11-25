@@ -1,0 +1,73 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Import Data</title>
+        <link rel="stylesheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <p style="text-align: center;">&nbsp;<span style="font-size: 14pt;"><strong>Import Data:</strong></span></p>
+        <ol>
+            <li style="text-align: justify;">Either choose the respective toolbar icon (see <i><a href="nbdocs://de.cebitec.readXplorer.view/de/cebitec/readXplorer/view/docs/view-about.html">Main Window a)</a></i>) or go to "<span style="text-decoration: underline;">File -&gt; Import data</span>".</li>
+            <li style="text-align: justify;">Choose the tab of the data type you want to import. Note that at first a reference has to be imported and then tracks can be imported on that reference.</li>
+            <li style="text-align: justify;">If a reference or track, which has been added to the import list, shall not be imported, just select in the list and click "<span style="text-decoration: underline;">Remove</span>" in the respective tab.</li>
+        </ol>
+        <p style="text-align: justify;"><span style="text-decoration: underline;"><strong>Import a reference sequence/genome:</strong></span></p>
+        <ol>
+            <li style="text-align: justify;">Select the "References" tab and click "<span style="text-decoration: underline;">Add</span>".</li>
+            <li style="text-align: justify;">Select the file type to import: Genbank, EMBL, GFF3, GFF2 or plain FASTA</li>
+            <li style="text-align: justify;">Choose a file of the selected file type</li>
+            <li style="text-align: justify;">Choose a name for the reference. <strong>Take care to choose the same name, which was used during the mapping process of the tracks, which shall be imported afterwards.</strong><br /></li>
+            <li style="text-align: justify;">Enter a description of the reference, by default, it is the file name.</li>
+            <li style="text-align: justify;">Click "<span><span style="text-decoration: underline;">OK</span></span>" to add the reference to the import list.</li>
+        </ol>
+        <p style="text-align: justify;"><strong><span style="text-decoration: underline;"><span lang="EN-US">Import mapping data sets:</span></span></strong></p>
+        <p style="text-align: justify;" >When we talk about "importing" track data (= read mapping data set) here, it means that ReadXplorer reads the corresponding SAM/BAM or SARUMAN (JOK) input file and adds read classification information (see <i><a href="nbdocs://de.cebitec.readXplorer.view/de/cebitec/readXplorer/view/docs/classification-about.html">Read Classification</a></i> and <i><a href="nbdocs://de.cebitec.readXplorer.view/de/cebitec/readXplorer/view/docs/classification-about.html">Read Pair Classification</a></i>) into a new "copy" of the original input file. The copy contains all original information plus the read classification, carried out by ReadXplorer. <span style="text-decoration: underline;">During the import process your original SAM/BAM file is never altered.</span> ReadXplorer creates intermediate files during the import process next to the original SAM/BAM file. At the end an extended version of the original file is created in the same directory. Besides the mapping, an index file is created for quicker access of the data. 
+            <br />When a track is opened, all data is read directly from the corresponding extended mapping file. If this file is moved, then ReadXplorer asks for the new path to that mapping file. If the index file should be missing, ReadXplorer creates a new index file.</p>
+        <p style="text-align: justify;"><strong><span style="text-decoration: underline;">Import one or more single end track(s):</span></strong></p>
+        <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readXplorer.ui.importer/de/cebitec/readXplorer/ui/importer/docs/import-singleendtrack.jpg" alt="TrackImport" /></p>
+        <ol>
+            <li style="text-align: justify;">Select the "<span style="text-decoration: underline;">Tracks</span>" tab and click "<span style="text-decoration: underline;">Add</span>".<br /></li>
+            <li style="text-align: justify;">Select the reference genome, for which the single end track shall be imported.</li>
+            <li style="text-align: justify;">Select the mapping parser to use: For SAM/BAM files use the "<span style="text-decoration: underline;">SAM/BAM Direct Access Parser</span>" and for SARUMAN mapping output (JOK) use the "<span style="text-decoration: underline;">Jok to BAM Direct Access Parser</span>".</li>
+            <li style="text-align: justify;">Decide whether to import multiple tracks or only one using the check box "<span style="text-decoration: underline;">Import multiple tracks with same parameters at once</span>".</li>
+            <li style="text-align: justify;">Click "<span style="text-decoration: underline;">Open</span>" to select the mapping file(s) to import. When importing multiple files, they have to be contained in the same directory. Chosen multiple files are then listed in the "<span style="text-decoration: underline;">Import track list</span>".</li>
+            <li style="text-align: justify;">Change the description for a single track import.</li>
+            <li style="text-align: justify;">If the specified track(s) have already been used in another ReadXplorer DB, check the box "<span style="text-decoration: underline;">Was already imported in another ReadXplorer DB</span>".In this case the read classification is already stored in the bam file and does not need to be recalculated. This speeds up the import process.</li>
+            <li style="text-align: justify;">Click "<span style="text-decoration: underline;">OK</span>" to add the track(s) to the import list.</li>
+            <li style="text-align: justify;">If more tracks from another directory shall be imported, start with 1. again.</li>
+        </ol>
+        <p style="text-align: justify;"><strong><span style="text-decoration: underline;">Import one or more paired end or mate pair track(s):</span></strong>
+            <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readXplorer.ui.importer/de/cebitec/readXplorer/ui/importer/docs/import-readpairs.jpg" alt="import-readpairs" /></p>
+        <ol>
+            <li style="text-align: justify;">Select the "<span style="text-decoration: underline;">Read Pair Tracks</span>" tab and click "<span style="text-decoration: underline;">Add</span>".<br style="clear: none;" /> </li>
+            <li style="text-align: justify;">Select the mapping parser to use: For SAM/BAM files use the "<span style="text-decoration: underline;">SAM/BAM Direct Access Parser</span>" and for SARUMAN mapping output (JOK) use the "<span style="text-decoration: underline;">Jok to BAM Direct Access Parser</span>".</li>
+            <li style="text-align: justify;">Decide whether to import multiple tracks or only one using the check box "<span style="text-decoration: underline;">Import multiple tracks with same parameters at once</span>".</li>
+            <li style="text-align: justify;">Click "<span style="text-decoration: underline;">Open</span>" to select the mapping file(s) to import. Since read pair mappings are sometimes contained in two separate files (for read 1 and read 2), it is possible to add two mapping files. But only the "<span style="text-decoration: underline;">Mapping file read 1</span>" has to be selected. The "<span style="text-decoration: underline;">Mapping file read 2</span>" can be blank if all reads are contained in one file. When importing multiple files, they have to be contained in the same directory. The multiple files are then listed in the "<span style="text-decoration: underline;">Import track list</span>". <strong>Multiple files for read 1 and read 2 have to be in the same alphabetical order in order to be combined.</strong> </li>
+            <li style="text-align: justify;">Change the description for a single read pair track import.</li>
+            <li style="text-align: justify;">Select the "<span style="text-decoration: underline;">Complete distance</span>", which is the expected distance from the start of a read pair to the end of the pair (e.g. read 1 (100-150), read 2 (300-350) has distance 250) of the read pairs.</li>
+            <li style="text-align: justify;">Select the maximum allowed "<span style="text-decoration: underline;">% deviation</span>" from the "<span style="text-decoration: underline;">Complete distance</span>" to classify a read pair as perfect.</li>
+            <li style="text-align: justify;">Select the direction of the read pairs: forward-reverse (fr) for paired-end, reverse-forward (rf) for mate pair or forward-forward/reverse-reverse (ff/rr) for other libraries.</li>
+            <li style="text-align: justify;">Select the reference genome, for which the read pair track shall be imported.</li>
+            <li style="text-align: justify;">If the specified read pair track(s) have already been used in another ReadXplorer DB as read pair tracks, check the box "<span style="text-decoration: underline;">Already imported as READ PAIR track into another ReadXplorer DB</span>".</li>
+            <li style="text-align: justify;">Click "<span style="text-decoration: underline;">OK</span>" to add the track(s) to the import list.</li>
+            <li style="text-align: justify;">If more read pair tracks from another directory shall be imported, start with 1. again.<br /></li>
+        </ol>
+
+    </body>
+</html>
+<!--
+Tip: to create a link which will open in an external web browser, try:
+<object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+    <param name="content" value="http://www.netbeans.org/">
+    <param name="text" value="<html><u>http://www.netbeans.org/</u></html>">
+    <param name="textFontSize" value="medium">
+    <param name="textColor" value="blue">
+</object>
+To create a link to a help set from another module, you need to know the code name base and path, e.g.:
+<a href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/configure/configure_options.html">Using the Options Window</a>
+(This link will behave sanely if that module is disabled or missing.)
+-->

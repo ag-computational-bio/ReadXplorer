@@ -1,0 +1,132 @@
+<?xml version="1.0"?>
+<configuration>
+ <category id="0" key="animation">
+  <value id="0" key="loop" trueLabel="on" falseLabel="off">
+   <boolean>false</boolean>
+  </value>
+  <value id="2" key="interpolate"  trueLabel="on" falseLabel="off">
+   <boolean>true</boolean>
+  </value>
+  <value id="1" key="animationSpeed">
+   <object class="javax.swing.DefaultBoundedRangeModel">
+    <int>1000</int>
+    <int>0</int>
+    <int>0</int>
+    <int>1887</int>
+   </object>
+  </value>
+ </category>
+ <category id="1" key="structure">
+  <value id="101" key="showBackbone" trueLabel="enabled" falseLabel="disabled">
+   <boolean>true</boolean>
+  </value>
+  <value id="102" key="backboneColor">
+   <object class="java.awt.Color">
+    <int>0</int>
+    <int>153</int>
+    <int>0</int>
+   </object>
+  </value>
+  <value id="103" key="showBonds" trueLabel="enabled" falseLabel="disabled">
+   <boolean>true</boolean>
+  </value>
+  <value id="104" key="bondColor">
+   <object class="java.awt.Color">
+    <int>255</int>
+    <int>51</int>
+    <int>0</int>
+   </object>
+  </value>
+  <value id="105" key="background">
+   <object class="java.awt.Color">
+    <int>255</int>
+    <int>255</int>
+    <int>255</int>
+   </object>
+  </value>
+  <value id="106" key="textColor">
+   <object class="java.awt.Color">
+    <int>0</int>
+    <int>0</int>
+    <int>0</int> 
+   </object>
+  </value>
+ </category>
+ <category id="2" key="pseudoknots">
+  <value id="201" key="showPseudoknots" trueLabel="enabled" falseLabel="disabled">
+   <boolean>true</boolean>
+  </value>
+  <value id="202" key="pseudoknotColor">
+   <object class="java.awt.Color">
+    <int>255</int>
+    <int>0</int>
+    <int>0</int>
+   </object>
+  </value>
+ </category>
+ <category id="3" key="labels">
+  <value id="301" key="showNumberLabels" trueLabel="enabled" falseLabel="disabled">
+   <boolean>true</boolean>
+  </value>
+  <value id="302" key="show5End" trueLabel="enabled" falseLabel="disabled">
+   <boolean>false</boolean>
+  </value>
+  <value id="303" key="show3End" trueLabel="enabled" falseLabel="disabled">
+   <boolean>false</boolean>
+  </value>
+  <value id="304" key="labelColor">
+   <object class="java.awt.Color">
+    <int>153</int>
+    <int>153</int>
+    <int>153</int>
+   </object>
+  </value>
+  <value id="305" key="distance">
+   <object class="javax.swing.DefaultBoundedRangeModel">
+    <int>25</int>
+    <int>0</int>
+    <int>1</int>
+    <int>100</int>
+   </object>
+  </value>
+	<value id="306"  key="period">
+   <int>10</int>
+  </value>
+ </category>
+ <category id="4" key="bases">
+  <value id="401" key="showBases" trueLabel="enabled" falseLabel="disabled">
+   <boolean>true</boolean>
+  </value>
+  <value id="402" key="baseColors" trueLabel="distinct" falseLabel="uniform">
+    <boolean>true</boolean>
+  </value>
+  <value id="403" key="aColor">
+   <object class="java.awt.Color">
+    <int>255</int>
+    <int>0</int>
+    <int>0</int>
+   </object>
+  </value>
+  <value id="404" key="cColor">
+   <object class="java.awt.Color">
+    <int>0</int>
+    <int>0</int>
+    <int>255</int>
+   </object>
+  </value>
+  <value id="405" key="gColor">
+   <object class="java.awt.Color">
+    <int>0</int>
+    <int>0</int>
+    <int>0</int>
+   </object>
+  </value>
+  <value id="406" key="uColor">
+   <object class="java.awt.Color">
+    <int>0</int>
+    <int>255</int>
+    <int>0</int>
+   </object>
+  </value>
+ </category>
+</configuration>

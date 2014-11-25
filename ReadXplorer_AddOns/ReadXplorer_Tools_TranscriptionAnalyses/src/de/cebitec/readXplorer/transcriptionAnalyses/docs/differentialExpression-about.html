@@ -1,0 +1,55 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Differential Gene Expression Analysis</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <p style="text-align: center;"><span style="font-size: 14pt;"><strong>Differential Gene Expression Analysis:</strong></span></p>
+        <p style="text-align: justify;">The Differential Gene Expression Analysis enables you to automatically collect all necessary count data for an experiment and run a differential gene expression analysis tool of your choice. ReadXplorer offers <a href="http://www.bioconductor.org/packages/release/bioc/html/DESeq.html">DESeq</a>, <a href="http://www.bioconductor.org/packages/release/bioc/html/baySeq.html">baySeq</a> and the Express Test. Exemplary results are shown in the screenshots below.</p>
+        <ol>
+            <li style="text-align: justify;">Choose "<span style="text-decoration: underline;">Tools -&gt; Differential Gene Expression Analysis</span>".</li>
+            <li style="text-align: justify;">Select the tool for the analysis (DESeq, baySeq or Express Test).</li>
+            <li style="text-align: justify;">Setup the analysis design. The different steps are briefly explained on each wizard page and in detail in the corresponding list below.</li>
+            <li style="text-align: justify;">General setup:
+                <ul>
+                    <li style="text-align: justify;">Select the genomic feature types, to take into consideration for the analysis. The other features types are ignored. </li>
+                    <li style="text-align: justify;">Set the offset for the start and stop positions of each genomic feature. Very useful to include otherwise ignored reads for genomic features whose annotation starts further downstream of the actual start position observed in the RNA-Seq data. <br /></li>
+                    <li style="text-align: justify;">Decide, if the read orientation is taken into account (only reads on the feature strand are taken into consideration), or if all reads from both strands within range of a genomic feature are used.<br /></li>
+                    <li style="text-align: justify;">Only for DESeq and baySeq: Decide, if you want to store the parameters and results generated from the used R tool for further processing.</li>
+                </ul>
+            </li>
+            <li style="text-align: justify;">Select the mapping classes (see <i><a href="nbdocs://de.cebitec.readXplorer.view/de/cebitec/readXplorer/view/docs/classification-about.html">Read Classification</a></i>) to include in the analysis.</li>
+            <li style="text-align: justify;">Click "<span style="text-decoration: underline;">Finish</span>" to start the differential gene expression analysis.</li>
+        </ol>
+        <p style="text-align: justify;"><span style="text-decoration: underline;">Wizard steps DESeq (two condition design)</span>:</p>
+        <ol>
+            <li style="text-align: justify;">Define the experiment design: standard two condition design or multifactor design (for further information see DESeq manual).</li>
+            <li style="text-align: justify;">First select the reference to use in the upper field and afterwards all tracks to include in the analysis in the second field.</li>
+            <li style="text-align: justify;">Assign each track to one of the two conditions by using the arrows next to the two condition fields.</li>
+            <li style="text-align: justify;">Continue at "4. General setup" in the general instruction list above.</li>
+        </ol>
+        <p style="text-align: justify;"><span style="text-decoration: underline;">Wizard steps baySeq</span>:</p>
+        <ol>
+            <li style="text-align: justify;">First select the reference to use in the upper field and afterwards all tracks to include in the analysis in the second field.</li>
+            <li style="text-align: justify;">Define replicate structure: At first select all tracks, which are replicates of the first condition. Then click "<span style="text-decoration: underline;">Add as replicates</span>". Continue with the next conditions in the same way until all tracks are assigned into the replicate structure. If only one track is available per condition, just select one per condition.</li>
+            <li style="text-align: justify;">Create baySeq models (for further details see baySeq manual): Similarly to step 2, first select all tracks belonging to your first experimental model, then click the arrow button and continue with all other tracks in the same way until all tracks are assigned. Then click "<span style="text-decoration: underline;">Add group</span>". Now you can create another model. A group containing all tracks is created automatically.</li>
+            <li style="text-align: justify;">Continue at "4. General setup" in the general instruction list above.</li>
+        </ol>
+        <p style="text-align: justify;"><span style="text-decoration: underline;">Wizard steps Express Test</span>:</p>
+        <ol>
+            <li style="text-align: justify;">First select the reference to use in the upper field and afterwards all tracks to include in the analysis in the second field.</li>
+            <li style="text-align: justify;">Assign each track to one of the two conditions by using the arrows next to the two condition fields.</li>
+            <li style="text-align: justify;">First continue at "4. General setup" in the general instruction list above. Afterwards continue here.</li>
+            <li style="text-align: justify;">Select normalization of the read count values: The normalized read count can be calculated automatically across all genes or house keeping genes can be selected for normalization (hold CTRL while clicking a gene).</li>
+            <li style="text-align: justify;">Continue at step 5 in the general instruction list above.</li>
+        </ol>
+        <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readXplorer.transcriptionAnalyses/de/cebitec/readXplorer/transcriptionAnalyses/docs/DifferentialExpressionAnalysis-DESeq-Plot.jpg"/></p>
+        <p style="text-align: justify;">This example shows a differential gene expression result using DESeq. The result table shows all values calculated by DESeq for all genomic features of interest. The table can be sorted by the most significantly differential, up- or downregulated genes. The "<span style="text-decoration: underline;">Save Table</span>" button stores the table as an Excel sheet. The "<span style="text-decoration: underline;">Show processing log</span>" button opens another tab with the log of the DESeq run. The&nbsp;"<span style="text-decoration: underline;">Create Graphics</span>" button opens the graphics tab, which allows to generate, view and store different plots, depening on the selected analysis tool. Here, an interactive (denoted by the "i"-icon at the bottom left) M/A plot of the results is shown. All interactive plots allow to center a gene of interest in all synchronized viewers by simply clicking on it. This function enables direct close inspection of the actual underlying data. Each plot can also be saved for further use by clicking "<span style="text-decoration: underline;">Save...</span>".</p>
+
+    </body>
+</html>

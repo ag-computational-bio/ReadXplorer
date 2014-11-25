@@ -1,0 +1,59 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Correlation analysis</title>
+        <link rel="stylesheet" href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/ide.css" type="text/css">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <style type="text/css">
+            .mono {
+                font-family: monospace;
+            }
+        </style>
+    </head>
+    <body>       
+        <h2>Correlation analysis</h2>
+        <p> 
+            The correlation analysis allows to compare two tracks and find 
+            biologically relevant positions with similar coverage curve progression.
+        </p>
+        <h3>Available parameters</h3>
+        <p><b>Correlation method:</b> choose between PEARSON and SPEARMAN.
+          PEARSON stands for the Pearson product-moment correlation coefficient
+          and should be used if the coverage data could be linearly correlated. 
+         SPEARMAN stands for the Spearman's rank correlation coefficient and can
+         be used if the data dependancy is not linear.
+        </p>
+        <p>
+            <b>Minimum percent of correlation:</b>
+            a correlated interval will appear in the result list only if the chosen
+            minimum correlation is reached.
+        </p>
+        <p>
+            <b>Minimum peak coverage for both tracks:</b>
+            for each correlated interval the software will determine the peak coverage
+            for both tracks under examination. The minimum of these two values 
+            will be compared with the value selected in this setting. If it is less,
+            than the selected value, the interval will not appear in the result list. 
+        </p>
+        <p>
+            <b>Interval length:</b>
+            choose the interval length according to the used read length.
+        </p>
+        
+    </body>
+</html>
+<!--
+Tip: to create a link which will open in an external web browser, try:
+<object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+    <param name="content" value="http://www.netbeans.org/">
+    <param name="text" value="<html><u>http://www.netbeans.org/</u></html>">
+    <param name="textFontSize" value="medium">
+    <param name="textColor" value="blue">
+</object>
+To create a link to a help set from another module, you need to know the code name base and path, e.g.:
+<a href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/configure/configure_options.html">Using the Options Window</a>
+(This link will behave sanely if that module is disabled or missing.)
+-->

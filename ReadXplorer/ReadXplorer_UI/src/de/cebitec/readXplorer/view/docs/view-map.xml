@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE map PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp Map Version 2.0//EN" "http://java.sun.com/products/javahelp/map_2_0.dtd">
+<map version="2.0">
+    <mapID target="de.cebitec.readXplorer.view.about" url="view-about.html"/>
+    <mapID target="de.cebitec.readXplorer.view.openDataSets-about" url="openDataSets-about.html"/>
+    <mapID target="de.cebitec.readXplorer.view.openDB-about" url="openDB-about.html"/>
+    <mapID target="de.cebitec.readXplorer.view.navigation-about" url="navigation-about.html"/>
+    <mapID target="de.cebitec.readXplorer.view.classification-about" url="classification-about.html"/>
+    <mapID target="de.cebitec.readXplorer.view.doubleTrack-about" url="doubleTrack-about.html"/>
+    <mapID target="de.cebitec.readXplorer.view.multiTrack-about" url="multiTrack-about.html"/>
+    <mapID target="de.cebitec.readXplorer.view.analysis-about" url="analysis-about.html"/>
+    
+</map>
