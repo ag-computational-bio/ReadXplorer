@@ -14,6 +14,7 @@ public class ParsedSeqPairMapping {
     private long mappingId2;
     private byte type;
     private int nbReplicates;
+    private int distance;
     
     
     /**
@@ -25,12 +26,14 @@ public class ParsedSeqPairMapping {
      *      orient wrong and dist too small, orient wrong and dist too large)
      * @param mappingId1 id of fst mapping of the pair
      * @param mappingId2 id of scnd mapping of the pair
+     * @param distance the sequence pair distance
      */
-    public ParsedSeqPairMapping(long mappingId1, long mappingId2, long seqPairID, byte type){
+    public ParsedSeqPairMapping(long mappingId1, long mappingId2, long seqPairID, byte type, int distance){
         this.mappingId1 = mappingId1;
         this.mappingId2 = mappingId2;
         this.seqPairID = seqPairID;
         this.type = type;
+        this.distance = distance;
         this.nbReplicates = 1;
     }
     
@@ -65,7 +68,13 @@ public class ParsedSeqPairMapping {
     }
 
     /**
-     * @return <code>true</code> if distance and orientation between sequences is perfect
+     * @return      PERFECT_PAIR = 0,
+     *              DISTANCE_TOO_LARGE_PAIR = 1,
+     *              DISTANCE_TOO_SMALL_PAIR = 2,
+     *              ORIENTATION_WRONG_PAIR = 3,
+     *              ORIENTATION_AND_DIST_TOO_LARGE_PAIR = 4,
+     *              ORIENTATION_AND_DIST_TOO_SMALL_PAIR = 5,
+     *              UNPAIRED_PAIR = 6
      */
     public byte getType(){
         return this.type;
@@ -99,6 +108,10 @@ public class ParsedSeqPairMapping {
     public int getReplicates(){
         return this.nbReplicates;
     }
+
+    public int getDistance() {
+        return distance;
+    }    
 
     @Override
     public String toString(){

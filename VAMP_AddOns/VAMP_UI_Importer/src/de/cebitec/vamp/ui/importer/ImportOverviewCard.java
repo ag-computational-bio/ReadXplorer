@@ -1,6 +1,7 @@
 package de.cebitec.vamp.ui.importer;
 
 import de.cebitec.vamp.parser.ReferenceJob;
+import de.cebitec.vamp.parser.SeqPairJobContainer;
 import de.cebitec.vamp.parser.TrackJob;
 import java.util.Iterator;
 import java.util.List;
@@ -19,7 +20,8 @@ public class ImportOverviewCard extends javax.swing.JPanel {
         initComponents();
     }
 
-    public void showOverview(List<ReferenceJob> refGenJobList, List<TrackJob> trackJobList) {
+    public void showOverview(List<ReferenceJob> refGenJobList, List<TrackJob> trackJobList, 
+            List<SeqPairJobContainer> seqPairJobList, List<TrackJob> positionTableJobList) {
         overviewTextArea.setText("");
 
         if(!refGenJobList.isEmpty()){
@@ -33,13 +35,33 @@ public class ImportOverviewCard extends javax.swing.JPanel {
             overviewTextArea.append("\n");
         }
 
-
         if(!trackJobList.isEmpty()){
             overviewTextArea.append(NbBundle.getMessage(ImportOverviewCard.class, "MSG_ImportOverviewCard.text.tracks") + ":\n");
             for(Iterator<TrackJob> it = trackJobList.iterator(); it.hasNext(); ){
                 TrackJob r = it.next();
                 overviewTextArea.append(r.getFile().getAbsolutePath()+"\n");
                 overviewTextArea.append("\t"+r.getDescription()+"\n");
+            }
+        }
+        
+        if(!seqPairJobList.isEmpty()){
+            overviewTextArea.append(NbBundle.getMessage(ImportOverviewCard.class, "MSG_ImportOverviewCard.text.seqPairs") + ":\n");
+            for(Iterator<SeqPairJobContainer> it = seqPairJobList.iterator(); it.hasNext(); ){
+                SeqPairJobContainer seqPairCont = it.next();
+                String file2Name = seqPairCont.getTrackJob2() != null ? seqPairCont.getTrackJob2().getFile().getAbsolutePath() : "-";
+                overviewTextArea.append(seqPairCont.getTrackJob1().getFile().getAbsolutePath()+"\n");
+                overviewTextArea.append("\t"+seqPairCont.getTrackJob1().getDescription()+"\n");
+                overviewTextArea.append(file2Name + "\n");
+                String description2 = seqPairCont.getTrackJob2() != null ? seqPairCont.getTrackJob2().getDescription() : "-";
+                overviewTextArea.append("\t"+description2+"\n");
+            }
+        }
+        
+        if (!positionTableJobList.isEmpty()) {
+            overviewTextArea.append(NbBundle.getMessage(ImportOverviewCard.class, "MSG_ImportOverviewCard.text.posTable") + ":\n");
+            for (Iterator<TrackJob> it = positionTableJobList.iterator(); it.hasNext();) {
+                TrackJob trackJob = it.next();
+                overviewTextArea.append(trackJob.getDescription() + "\n");
             }
         }
     }

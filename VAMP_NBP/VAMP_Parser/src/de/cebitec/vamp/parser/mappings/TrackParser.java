@@ -3,53 +3,67 @@ package de.cebitec.vamp.parser.mappings;
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.CoverageContainer;
 import de.cebitec.vamp.parser.common.ParsedMappingContainer;
-import de.cebitec.vamp.parser.common.ParsedRun;
 import de.cebitec.vamp.parser.common.ParsedTrack;
 import de.cebitec.vamp.parser.common.ParsingException;
+import de.cebitec.vamp.util.Benchmark;
 import de.cebitec.vamp.util.Observer;
-//import java.util.HashMap;
+import org.openide.util.NbBundle;
 
 /**
- * The parser to use for parsing a track.
+ * The parser to use for parsing a track to store in the DB.
  *
  * @author ddoppmeier
  */
 public class TrackParser implements TrackParserI {
+ 
+    CoverageContainer coverageContainer ;
 
-    // All parts commented out belong to the RUN domain, which is excluded now!
-    // They are left here to provide an easy restore possibility.
-
+    /**
+     * Parses the mappings of a track to store in the DB.
+     * @param trackJob
+     * @param sequenceString
+     * @param observer
+     * @param covContainer
+     * @return
+     * @throws ParsingException
+     * @throws OutOfMemoryError 
+     */
     @Override
-//    public ParsedTrack parseMappings(TrackJob trackJob, HashMap<String, Integer> readnameToSequenceID,
-//            String sequenceString, Observer observer) throws ParsingException {
-    public ParsedTrack parseMappings(TrackJob trackJob, String sequenceString, Observer observer) throws ParsingException {
+    public ParsedTrack parseMappings(TrackJob trackJob, String sequenceString, Observer observer, 
+                    CoverageContainer covContainer) throws ParsingException, OutOfMemoryError {
+        long start = System.currentTimeMillis();
+        
         // parse mapping files and store them in appropriate source objects
-        MappingParserI mappingp = trackJob.getParser();
-        mappingp.registerObserver(observer);
-//        ParsedMappingContainer mappings = mappingp.parseInput(trackJob, readnameToSequenceID, sequenceString);
-        ParsedMappingContainer mappings = null;
-        mappings = mappingp.parseInput(trackJob, sequenceString);
+        ParsedTrack track = null;
+        MappingParserI mappingParser = trackJob.getParser();
+        mappingParser.registerObserver(observer);
+        Object parsedData = mappingParser.parseInput(trackJob, sequenceString);
+        if (parsedData instanceof ParsedMappingContainer) {
+            ParsedMappingContainer mappings = (ParsedMappingContainer) parsedData;
 
-        // release resources
-//        readnameToSequenceID = null;
-//        mappingp = null; //TODO: woanders leeren
+            // compute the coverage for all mappings
+            if (!trackJob.isStepwise() || trackJob.isFirstJob()) {
+                this.coverageContainer = new CoverageContainer();
+            } else {
+                this.coverageContainer = covContainer;
+            }
+            this.coverageContainer.computeCoverage(mappings);
 
-        // compute the coverage for all mappings
-        CoverageContainer coverageContainer = new CoverageContainer(mappings);
+            track = new ParsedTrack(trackJob, mappings, coverageContainer);
+            track.setReadnameToSeqIdMap1(mappingParser.getSeqPairProcessor().getReadNameToSeqIDMap1());
+            track.setReadnameToSeqIdMap2(mappingParser.getSeqPairProcessor().getReadNameToSeqIDMap2());
 
-        ParsedTrack track = new ParsedTrack(trackJob.getDescription(), mappings, coverageContainer);
-        track.setTimestamp(trackJob.getTimestamp());
-
-        mappings = null;
+            mappings = null;
+        } 
+        
+        mappingParser.removeObserver(observer);
+        mappingParser = null;
         System.gc();
+        
+        long finish = System.currentTimeMillis();
+        String msg = NbBundle.getMessage(SamBamDirectParser.class, "Parser.Parsing.Successfully", trackJob.getFile().getName());
+        observer.update(Benchmark.calculateDuration(start, finish, msg));
 
         return track;
-    }
-
-    @Override
-    public ParsedRun parseMappingforReadData(TrackJob trackJob) throws ParsingException {
-        MappingParserI mappingp = trackJob.getParser();
-        ParsedRun run = mappingp.parseInputForReadData(trackJob);
-        return run;
     }
 }

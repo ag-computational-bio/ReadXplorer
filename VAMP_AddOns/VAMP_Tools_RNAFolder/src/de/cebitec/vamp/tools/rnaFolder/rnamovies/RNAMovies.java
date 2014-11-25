@@ -509,7 +509,7 @@ public class RNAMovies extends JPanel implements ActionContainer {
 //                    System.exit(1);
 //                }
 //            } else {
-//                /*export movie as XXX*/
+//                /*export movie as XX*/
 //                try {
 //                    int steps = 10;
 //                    if (params.containsKey("steps")) {

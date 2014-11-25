@@ -63,6 +63,38 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>net.sf.samtools</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>1.0</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.netbeans.api.progress</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>1</release-version>
+                        <specification-version>1.26.1</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.netbeans.modules.autoupdate.services</code-name-base>
+                    <run-dependency>
+                        <specification-version>1.33.2</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.netbeans.modules.javahelp</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>1</release-version>
+                        <specification-version>2.24.1</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>org.netbeans.modules.settings</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -145,9 +177,11 @@
                 <package>de.cebitec.vamp.view.dataVisualisation.basePanel</package>
                 <package>de.cebitec.vamp.view.dataVisualisation.histogramViewer</package>
                 <package>de.cebitec.vamp.view.dataVisualisation.referenceViewer</package>
+                <package>de.cebitec.vamp.view.dataVisualisation.seqPairViewer</package>
                 <package>de.cebitec.vamp.view.dataVisualisation.trackViewer</package>
                 <package>de.cebitec.vamp.view.dialogMenus</package>
                 <package>de.cebitec.vamp.view.login</package>
+                <package>de.cebitec.vamp.view.tableVisualization</package>
             </public-packages>
         </data>
     </configuration>

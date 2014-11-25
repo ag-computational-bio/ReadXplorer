@@ -1,40 +1,39 @@
 package de.cebitec.vamp.view.dataVisualisation.alignmentViewer;
 
-import de.cebitec.vamp.util.ColorProperties;
-//import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
+import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
+import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
-import java.awt.event.ActionEvent;
+import de.cebitec.vamp.view.dialogMenus.MenuItemFactory;
+import de.cebitec.vamp.view.dialogMenus.RNAFolderI;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Point;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.HashMap;
 import java.util.Iterator;
-//import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.JTextField;
+import org.openide.util.Lookup;
 
 /**
  *
  * @author ddoppmeier
  */
-public class BlockComponent extends JComponent implements ActionListener {
+public class BlockComponent extends JComponent {
 
     private static final long serialVersionUID = 1324672345;
-    private BlockI b;
+    private BlockI block;
     private int length;
     private int height;
-    private AlignmentViewer parentViewer;
+    private AbstractViewer parentViewer;
     private GenomeGapManager gapManager;
     private int absLogBlockStart;
     private int absLogBlockStop;
@@ -42,19 +41,13 @@ public class BlockComponent extends JComponent implements ActionListener {
     private int phyRight;
     private float percentSandBPerCovUnit;
     private float minSaturationAndBrightness;
-//    private String nameofRead = "";
-//    private static String COPY_READNAME = "Copy readname"; //no readnames are stored anymore: RUN domain excluded
-    private static String COPY_SEQUENCE = "Copy sequence";
-    private static String EXIT_POPUP = "Exit popup menu";
-    private JPopupMenu p = new JPopupMenu();
-    private Point mousePoint = new Point();
 
-    public BlockComponent(BlockI b, final AlignmentViewer parentViewer, GenomeGapManager gapManager, int height, float minSaturationAndBrightness, float percentSandBPerCovUnit) {
-        this.b = b;
+    public BlockComponent(BlockI block, final AbstractViewer parentViewer, GenomeGapManager gapManager, int height, float minSaturationAndBrightness, float percentSandBPerCovUnit) {
+        this.block = block;
         this.height = height;
         this.parentViewer = parentViewer;
-        this.absLogBlockStart = b.getAbsStart();
-        this.absLogBlockStop = b.getAbsStop();
+        this.absLogBlockStart = block.getAbsStart();
+        this.absLogBlockStop = block.getAbsStop();
         this.minSaturationAndBrightness = minSaturationAndBrightness;
         this.percentSandBPerCovUnit = percentSandBPerCovUnit;
         this.gapManager = gapManager;
@@ -64,7 +57,6 @@ public class BlockComponent extends JComponent implements ActionListener {
         // if there is a gap at the end of this block, phyRight shows the right bound of the gap (in viewer)
         // thus forgetting about every following matches, diffs, gaps whatever....
         this.phyRight = (int) parentViewer.getPhysBoundariesForLogPos(absLogBlockStop).getRightPhysBound();
-        setPopupMenu();
         int numOfGaps = this.gapManager.getNumOfGapsAt(absLogBlockStop);
         int offset = (int) (numOfGaps * bounds.getPhysWidth());
         phyRight += offset;
@@ -76,10 +68,40 @@ public class BlockComponent extends JComponent implements ActionListener {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-               mousePoint = e.getLocationOnScreen();
-               p.setLocation(mousePoint);
-               p.setVisible(true);
+                if (e.getButton() == MouseEvent.BUTTON3) {
+                    JPopupMenu popUp = new JPopupMenu();
+                    MenuItemFactory menuItemFactory = new MenuItemFactory();
 
+                    final String mappingSequence = getSequence();
+                    //add copy option
+                    popUp.add(menuItemFactory.getCopyItem(mappingSequence));
+                    //add copy position option
+                    popUp.add(menuItemFactory.getCopyPositionItem(parentViewer.getCurrentMousePos()));
+                    //add center current position option
+                    popUp.add(menuItemFactory.getJumpToPosItem(parentViewer.getBoundsInformationManager(), parentViewer.getCurrentMousePos()));
+                    //add calculate secondary structure option
+                    final RNAFolderI rnaFolderControl = Lookup.getDefault().lookup(RNAFolderI.class);
+                    if (rnaFolderControl != null) {
+                        popUp.add(menuItemFactory.getRNAFoldItem(rnaFolderControl, mappingSequence, this.getHeader()));
+                    }
+
+                    popUp.show((JComponent) e.getComponent(), e.getX(), e.getY());
+                }
+            }
+            
+            /**
+             * Creates the header for the highlighted sequence.
+             * @return the header for the sequence
+             */
+            private String getHeader() {
+                PersistantMapping mapping = (PersistantMapping) BlockComponent.this.block.getPersistantObject();
+                final String strand = mapping.isFwdStrand() ? ">>" : "<<";
+                HashMap<Integer, String> trackNames = ProjectConnector.getInstance().getOpenedTrackNames();
+                String name = "Reference seq from ";
+                if (trackNames.containsKey(mapping.getTrackId())) {
+                    name += trackNames.get(mapping.getTrackId());
+                }
+                return name + " " + strand + " from " + absLogBlockStart + "-" + absLogBlockStop;
             }
 
             @Override
@@ -105,85 +127,50 @@ public class BlockComponent extends JComponent implements ActionListener {
 
     }
 
-//    public void setReadname() { //no readnames are stored anymore: RUN domain excluded
-//        List<String> names = ProjectConnector.getInstance().getReadNamesForSequenceID(b.getMapping().getSequenceID());
-//        JTextField j = new JTextField();
-//        for (String name : names) {
-//            nameofRead = name;
-//        }
-//        j.setText(nameofRead);
-//        j.selectAll();
-//        j.copy();
-//    }
-
-    public void setSequence() {
-        JTextField j = new JTextField();
-        int start = b.getMapping().getStart();
-        int stop = b.getMapping().getStop();
+    public String getSequence() {
+        int start = ((PersistantMapping) block.getPersistantObject()).getStart();
+        int stop = ((PersistantMapping) block.getPersistantObject()).getStop();
         //string first pos is zero
-        String readSequence = parentViewer.getRefGen().getSequence().substring(start-1, stop);
-        j.setText(readSequence);
-        j.selectAll();
-        j.copy();
+        String readSequence = parentViewer.getReference().getSequence().substring(start-1, stop);
+        return readSequence;
     }
 
     private String getText() {
-        StringBuilder sb = new StringBuilder();
-        PersistantMapping mapping = b.getMapping();
+        StringBuilder sb = new StringBuilder(150);
+        PersistantMapping mapping = ((PersistantMapping) block.getPersistantObject());
 
         sb.append("<html>");
         sb.append("<table>");
 
         sb.append(createTableRow("Start", String.valueOf(mapping.getStart())));
         sb.append(createTableRow("Stop", String.valueOf(mapping.getStop())));
-        sb.append(createTableRow("Replicates", String.valueOf(mapping.getCoverage())));
+        sb.append(createTableRow("Replicates", String.valueOf(mapping.getNbReplicates())));
 //        this.appendReadnames(mapping, sb); //no readnames are stored anymore: RUN domain excluded
-        sb.append(createTableRow("Mismatches", String.valueOf(mapping.getErrors())));
+        sb.append(createTableRow("Mismatches", String.valueOf(mapping.getDifferences())));
         this.appendDiffs(mapping, sb);
         this.appendGaps(mapping, sb);
-
+        
+        if (mapping.isUnique()) {
+            sb.append(createTableRow("Unique", "yes"));
+        } else {
+            sb.append(createTableRow("Unique", "no"));
+        }
+        sb.append(createTableRow("Number of mappings for read", mapping.getNumMappingsForRead() + ""));
+        if (mapping.getOriginalSequence() != null) {
+            sb.append(createTableRow("Original (full) sequence", mapping.getOriginalSequence()));
+        }
+        if (mapping.getTrimmedFromLeft() > 0) {
+            sb.append(createTableRow("Trimmed chars from left", mapping.getTrimmedFromLeft() + ""));
+        }
+        if (mapping.getTrimmedFromRight() > 0) {
+            sb.append(createTableRow("Trimmed chars from right", mapping.getTrimmedFromRight() + ""));
+        }
 
         sb.append("</table>");
         sb.append("</html>");
 
         return sb.toString();
     }
-
-    private void setPopupMenu() {
-//        JMenuItem copyName = new JMenuItem(); //no readnames are stored anymore: RUN domain excluded
-//        copyName.addActionListener(this);
-//        copyName.setActionCommand(COPY_READNAME);
-//        copyName.setText("Copy readname");
-
-        JMenuItem copySequence = new JMenuItem();
-        copySequence.addActionListener(this);
-        copySequence.setActionCommand(COPY_SEQUENCE);
-        copySequence.setText("Copy sequence");
-        copySequence.setToolTipText("Attention! You copy the genome sequence");
-        
-        JMenuItem exit = new JMenuItem();
-        exit.addActionListener(this);
-        exit.setActionCommand(EXIT_POPUP);
-        exit.setText("Exit");
-        
- //       p.add(copyName); //no readnames are stored anymore: RUN domain excluded
-        p.add(copySequence);
-        p.add(exit);
-    }
-
-    //no readnames are stored anymore: RUN domain excluded
-//    private void appendReadnames(PersistantMapping mapping, StringBuilder sb) {
-//        List<String> names = ProjectConnector.getInstance().getReadNamesForSequenceID(mapping.getSequenceID());
-//        boolean printLabel = true;
-//        for (String name : names) {
-//            String key = "";
-//            if (printLabel) {
-//                key = "Reads";
-//                printLabel = false;
-//            }
-//            sb.append(createTableRow(key, name));
-//        }
-//    }
 
     private void appendDiffs(PersistantMapping mapping, StringBuilder sb) {
         boolean printLabel = true;
@@ -233,7 +220,7 @@ public class BlockComponent extends JComponent implements ActionListener {
         graphics.setColor(determineBlockColor());
         graphics.fillRect(0, 0, length, height);
 
-        Iterator<Brick> it = b.getBrickIterator();
+        Iterator<Brick> it = block.getBrickIterator();
         // only count Bricks, that are no genome gaps.
         //Used for determining location of brick in viewer
         int brickCount = 0;
@@ -288,10 +275,14 @@ public class BlockComponent extends JComponent implements ActionListener {
         }
     }
 
+    /**
+     * Determines the color, brithness and saturation of a block.
+     * @return 
+     */
     private Color determineBlockColor() {
-        PersistantMapping m = b.getMapping();
+        PersistantMapping m = ((PersistantMapping) block.getPersistantObject());
         Color tmp;
-        if (m.getErrors() == 0) {
+        if (m.getDifferences() == 0) {
             tmp = ColorProperties.BLOCK_MATCH;
         } else if (m.isBestMatch()) {
             tmp = ColorProperties.BLOCK_BEST_MATCH;
@@ -300,83 +291,80 @@ public class BlockComponent extends JComponent implements ActionListener {
         }
 
         float[] values = Color.RGBtoHSB(tmp.getRed(), tmp.getGreen(), tmp.getBlue(), null);
-        float sAndB = minSaturationAndBrightness + m.getCoverage() * percentSandBPerCovUnit;
+        float sAndB = minSaturationAndBrightness + m.getNbReplicates() * percentSandBPerCovUnit;
         tmp = Color.getHSBColor(values[0], sAndB, sAndB);
 
         return tmp;
     }
 
+    /**
+     * Determines the label of a brick. This means the character representing
+     * the base, the given brick stands for.
+     * @param brick the brick whose label is needed
+     * @return the character string representing the base of this brick
+     */
     private String determineBrickLabel(Brick brick) {
-        String label = " ";
+        String label;
         int type = brick.getType();
-        if (type == Brick.BASE_A) {
-            label = "A";
-        } else if (type == Brick.BASE_C) {
-            label = "C";
-        } else if (type == Brick.BASE_G) {
-            label = "G";
-        } else if (type == Brick.BASE_T) {
-            label = "T";
-        } else if (type == Brick.BASE_N) {
-            label = "N";
-        } else if (type == Brick.FOREIGN_GENOMEGAP) {
-            label = "";
-        } else if (type == Brick.MATCH) {
-            label = "";
-        } else if (type == Brick.UNDEF) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", type);
-            return "@";
-        } else if (type == Brick.GENOME_GAP_A) {
-            return "A";
-        } else if (type == Brick.GENOME_GAP_C) {
-            return "C";
-        } else if (type == Brick.GENOME_GAP_G) {
-            return "G";
-        } else if (type == Brick.GENOME_GAP_T) {
-            return "T";
-        } else if (type == Brick.GENOME_GAP_N) {
-            return "N";
-        } else if (type == Brick.READGAP) {
-            label = "-";
+        switch (type) {
+            case Brick.MATCH : label = ""; break;
+            case Brick.BASE_A : label = "A"; break;
+            case Brick.BASE_C : label = "C"; break;
+            case Brick.BASE_G : label = "G"; break;
+            case Brick.BASE_T : label = "T"; break;
+            case Brick.BASE_N : label = "N"; break;
+            case Brick.FOREIGN_GENOMEGAP : label = ""; break;
+            case Brick.READGAP : label = "-"; break;
+            case Brick.GENOME_GAP_A : label = "A"; break;
+            case Brick.GENOME_GAP_C : label = "C"; break;
+            case Brick.GENOME_GAP_G : label = "G"; break;
+            case Brick.GENOME_GAP_T : label = "T"; break;
+            case Brick.GENOME_GAP_N : label = "N"; break;
+            case Brick.SKIPPED : label = "."; break;
+            case Brick.TRIMMED : label = "⌿"; break;
+            case Brick.UNDEF : label = "@"; 
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", type);
+                break;
+            default:
+                label = "@";
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", type);
         }
 
         return label;
     }
 
-    private Color determineBrickColor(Brick b) {
-        Color c = Color.black;
-        int type = b.getType();
-        if (type == Brick.BASE_A) {
-            c = ColorProperties.ALIGNMENT_A;
-        } else if (type == Brick.BASE_C) {
-            c = ColorProperties.ALIGNMENT_C;
-        } else if (type == Brick.BASE_G) {
-            c = ColorProperties.ALIGNMENT_G;
-        } else if (type == Brick.BASE_T) {
-            c = ColorProperties.ALIGNMENT_T;
-        } else if (type == Brick.BASE_N) {
-            c = ColorProperties.ALIGNMENT_N;
-        } else if (type == Brick.FOREIGN_GENOMEGAP) {
-            c = ColorProperties.ALIGNMENT_FOREIGN_GENOMEGAP;
-        } else if (type == Brick.UNDEF) {
-            c = ColorProperties.ALIGNMENT_BASE_UNDEF;
-        } else if (type == Brick.GENOME_GAP_A) {
-            c = ColorProperties.ALIGNMENT_A;
-        } else if (type == Brick.GENOME_GAP_C) {
-            c = ColorProperties.ALIGNMENT_C;
-        } else if (type == Brick.GENOME_GAP_G) {
-            c = ColorProperties.ALIGNMENT_G;
-        } else if (type == Brick.GENOME_GAP_T) {
-            c = ColorProperties.ALIGNMENT_T;
-        } else if (type == Brick.GENOME_GAP_N) {
-            c = ColorProperties.ALIGNMENT_N;
-        } else if (type == Brick.READGAP) {
-            c = ColorProperties.ALIGNMENT_BASE_READGAP;
-        } else {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown type of brick {0}", b.getType());
-            c = ColorProperties.ALIGNMENT_BASE_UNDEF;
+    /**
+     * Determines the color of a brick, if it deviates from the reference.
+     * Matches are not taken into account in this method.
+     * @param block the non-matching block whose color is needed
+     * @return the color of the non-matching block
+     */
+    private Color determineBrickColor(Brick block) {
+        Color c;
+        int type = block.getType();
+        switch (type) {
+            case Brick.BASE_A : c = ColorProperties.ALIGNMENT_A; break;
+            case Brick.BASE_C : c = ColorProperties.ALIGNMENT_G; break;
+            case Brick.BASE_G : c = ColorProperties.ALIGNMENT_C; break;
+            case Brick.BASE_T : c = ColorProperties.ALIGNMENT_T; break;
+            case Brick.BASE_N : c = ColorProperties.ALIGNMENT_N; break;
+            case Brick.FOREIGN_GENOMEGAP : c = ColorProperties.ALIGNMENT_FOREIGN_GENOMEGAP; break;
+            case Brick.READGAP : c = ColorProperties.ALIGNMENT_BASE_READGAP; break;
+            case Brick.GENOME_GAP_A : c = ColorProperties.ALIGNMENT_A; break;
+            case Brick.GENOME_GAP_C : c = ColorProperties.ALIGNMENT_C; break;
+            case Brick.GENOME_GAP_G : c = ColorProperties.ALIGNMENT_G; break;
+            case Brick.GENOME_GAP_T : c = ColorProperties.ALIGNMENT_T; break;
+            case Brick.GENOME_GAP_N : c = ColorProperties.ALIGNMENT_N; break;
+            case Brick.SKIPPED : c = ColorProperties.SKIPPED; break;
+            case Brick.TRIMMED : c = ColorProperties.TRIMMED; break;
+            case Brick.UNDEF : c = ColorProperties.ALIGNMENT_BASE_UNDEF;
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", type);
+                break;
+            default:
+                c = ColorProperties.ALIGNMENT_BASE_UNDEF;
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", type);
         }
-
+        
         return c;
     }
 
@@ -391,21 +379,6 @@ public class BlockComponent extends JComponent implements ActionListener {
     @Override
     public int getHeight() {
         return height;
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-//        if (e.getActionCommand().equals(COPY_READNAME)) {
-//            this.setReadname();
-//            p.setVisible(false);
-//        } //no readnames are stored anymore: RUN domain excluded
-        if (e.getActionCommand().equals(COPY_SEQUENCE)) {
-            this.setSequence();
-            p.setVisible(false);
-        }
-        if(e.getActionCommand().equals(EXIT_POPUP)){
-            p.setVisible(false);
-        }
     }
     
 }

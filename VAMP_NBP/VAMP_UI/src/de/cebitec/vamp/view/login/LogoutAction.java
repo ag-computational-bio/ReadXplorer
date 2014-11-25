@@ -3,9 +3,8 @@ package de.cebitec.vamp.view.login;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.api.cookies.LoginCookie;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
-import de.cebitec.vamp.view.Installer;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.JFrame;
 import javax.swing.SwingWorker;
 import org.openide.DialogDisplayer;
@@ -27,25 +26,36 @@ public final class LogoutAction implements ActionListener {
         if (CentralLookup.getDefault().lookup(SwingWorker.class) != null){
             NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(LogoutAction.class, "MSG_LogoutAction.warning.busy"), NotifyDescriptor.WARNING_MESSAGE);
             DialogDisplayer.getDefault().notify(nd);
-            return;
-        }
-        else {
+        
+        } else {
+            
+            //do not close the dashboard window, if opened!
+            TopComponent dashboard = WindowManager.getDefault().findTopComponent("DashboardWindowTopComponent");
             for (TopComponent tc : WindowManager.getDefault().getRegistry().getOpened()) {
-                tc.close();
+                if (tc != dashboard) { tc.close(); }
 //                TopComponent tc1 = WindowManager.getDefault().findTopComponent("RNAFolderTopComponent");
 //                if (tc1 != null){ //useful if rna viewer should be openend after closing DB connection
 //                    tc.close();
 //                }
                 //ViewController viewCon - listener auf schließen des zugehörigen top components
             }
+            //sometimes the window remains in the same state -> needs a repaint
+            //dashboard.repaint();
+            
 
             if (ProjectConnector.getInstance().isConnected()){
                 ProjectConnector.getInstance().disconnect();
             }
             //reset main window title
             JFrame mainFrame = (JFrame) WindowManager.getDefault().getMainWindow();
-            mainFrame.setTitle(mainFrame.getTitle().substring(0, mainFrame.getTitle().indexOf('-')-1));
-            CentralLookup.getDefault().remove(context);
+            int index = mainFrame.getTitle().indexOf('-');
+            if (index > -1) {
+                mainFrame.setTitle(mainFrame.getTitle().substring(0, index - 1));
+            }
+            
+            if (context != null) {
+                CentralLookup.getDefault().remove(context);
+            }
         }
     }
 }

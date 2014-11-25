@@ -3,16 +3,16 @@ package de.cebitec.vamp.view.dataVisualisation.abstractViewer;
 import java.awt.geom.Point2D;
 
 /**
- * Contains useful info about a painting area, such heights and widhts,
+ * Contains useful info about a painting area, such heights and widths,
  * left and right end positions.
  *
  * @author ddoppmeier
  */
 public class PaintingAreaInfo {
 
-    private int phyLeft;
-    private int phyRight;
-    private int phyWidth;
+    private int phyLeft;  // left physical boundary (pixel) of the painting area
+    private int phyRight; // right physical boundary (pixel) of the painting area
+    private int phyWidth; // physical width (pixel) of the painting area
 
     private int forwardLow;
     private int forwardHigh;
@@ -69,24 +69,43 @@ public class PaintingAreaInfo {
         updateAvailableForwardHeight();
     }
 
+    /**
+     * @return left physical boundary (pixel) of the painting area
+     */
     public int getPhyLeft() {
         return phyLeft;
     }
 
+    /**
+     * Sets the left physical boundary (pixel) in the painting area and recalculates
+     * the width.
+     * @param phyLeft left physical boundary (pixel) of the painting area
+     */
     public void setPhyLeft(int phyLeft) {
         this.phyLeft = phyLeft;
         recalcWidth();
     }
 
+    /**
+     * @return right physical boundary (pixel) of the painting area
+     */
     public int getPhyRight() {
         return phyRight;
     }
 
+    /**
+     * Sets the right physical boundary (pixel) of the painting area and recalculates
+     * the width.
+     * @param phyRight right physical boundary (pixel) of the painting area
+     */
     public void setPhyRight(int phyRight) {
         this.phyRight = phyRight;
         recalcWidth();
     }
 
+    /**
+     * @return the physical width (pixel) of the painting area
+     */
     public int getPhyWidth() {
         return phyWidth;
     }
@@ -110,6 +129,9 @@ public class PaintingAreaInfo {
         updateCompleteHeight();
     }
 
+    /**
+     * Recalculates the physical width (pixel) of the painting area
+     */
     private void recalcWidth(){
         this.phyWidth = phyRight - phyLeft +1;
     }
@@ -159,7 +181,7 @@ public class PaintingAreaInfo {
         }
     }
 
-    public boolean fitsIntoAvailableForwardSpace(int yValue){
+    public boolean fitsIntoAvailableForwardSpace(double yValue){
         if(yValue <= availableForwardHeight){
             return true;
         } else {
@@ -167,7 +189,7 @@ public class PaintingAreaInfo {
         }
     }
 
-    public boolean fitsIntoAvailableReverseSpace(int yValue){
+    public boolean fitsIntoAvailableReverseSpace(double yValue){
         if(yValue <= availableReverseHeight){
             return true;
         } else {

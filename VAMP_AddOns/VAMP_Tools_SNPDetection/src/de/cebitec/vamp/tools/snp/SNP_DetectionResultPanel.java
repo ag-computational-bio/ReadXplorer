@@ -3,38 +3,81 @@
  *
  * Created on 24-Feb-2011, 09:51:49
  */
-
 package de.cebitec.vamp.tools.snp;
 
-import de.cebitec.vamp.api.objects.Snp;
+import de.cebitec.common.sequencetools.AminoAcidProperties;
+import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.databackend.connector.ReferenceConnector;
+import de.cebitec.vamp.databackend.dataObjects.CodonSnp;
+import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
+import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.databackend.dataObjects.Snp;
+import de.cebitec.vamp.databackend.dataObjects.SnpI;
+import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
+import de.cebitec.vamp.util.LineWrapCellRenderer;
+import de.cebitec.vamp.util.SequenceComparison;
+import de.cebitec.vamp.util.TableRightClickFilter;
+import de.cebitec.vamp.util.UneditableTableModel;
+import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
-import java.util.ArrayList;
+import de.cebitec.vamp.view.tableVisualization.TableComparatorProvider;
+import de.cebitec.vamp.view.tableVisualization.TableUtils;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.DefaultListSelectionModel;
+import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+import org.openide.util.NbPreferences;
 
 /**
- *
- * @author joern
+ * Panel showing a SNP detection result.
+ * 
+ * @author joern, rhilker
  */
 public class SNP_DetectionResultPanel extends javax.swing.JPanel {
 
+    public static final String SNPS_TOTAL = "Total number of SNPs";
+    public static final String SNPS_INTERGENEIC = "Intergenic SNPs";
+    public static final String SNPS_SYNONYMOUS = "Synonymous SNPs";
+    public static final String SNPS_CHEMIC_NEUTRAL = "Chemically neutral SNPs";
+    public static final String SNPS_MISSSENSE = "Missense SNPs";
+    public static final String SNPS_AA_INSERTIONS = "AA Insertions";
+    public static final String SNPS_AA_DELETIONS = "AA Deletions";
+    public static final String SNPS_SUBSTITUTIONS = "Substitutions";
+    public static final String SNPS_INSERTIONS = "Insertions";
+    public static final String SNPS_DELETIONS = "Deletions";
+    
     private static final long serialVersionUID = 1L;
     private BoundsInfoManager bim;
-    private List<Snp> snps;
+    private SnpDetectionResult snpData;
+    private PersistantReference reference;
+    private TableRightClickFilter<UneditableTableModel> tableFilter = new TableRightClickFilter<>(UneditableTableModel.class);
+    
 
     /** Creates new form SNP_DetectionResultPanel */
     public SNP_DetectionResultPanel() {
         initComponents();
-        snps = new ArrayList<Snp>();
-        DefaultListSelectionModel model = (DefaultListSelectionModel) jTable1.getSelectionModel();
+        this.snpTable.getTableHeader().addMouseListener(tableFilter);
+        
+        //ensures number of lines will adapt to number of translations (features) for each snp
+        LineWrapCellRenderer cellRenderer = new LineWrapCellRenderer();
+        this.snpTable.getColumnModel().getColumn(13).setCellRenderer(cellRenderer);
+        this.snpTable.getColumnModel().getColumn(14).setCellRenderer(cellRenderer);
+        this.snpTable.getColumnModel().getColumn(15).setCellRenderer(cellRenderer);
+        this.snpTable.getColumnModel().getColumn(16).setCellRenderer(cellRenderer);
+        
+        DefaultListSelectionModel model = (DefaultListSelectionModel) snpTable.getSelectionModel();
         model.addListSelectionListener(new ListSelectionListener() {
 
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                showSnpPosition();
+                TableUtils.showPosition(snpTable, 0, bim);
             }
         });
     }
@@ -49,24 +92,27 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
-        jProgressBar1 = new javax.swing.JProgressBar();
+        snpTable = new javax.swing.JTable();
         exportButton = new javax.swing.JButton();
+        alignmentButton = new javax.swing.JButton();
+        alignmentButton1 = new javax.swing.JButton();
+        parametersLabel = new javax.swing.JLabel();
+        statisticsButton = new javax.swing.JButton();
 
-        jTable1.setAutoCreateRowSorter(true);
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        snpTable.setAutoCreateRowSorter(true);
+        snpTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Position", "Base", "Count", "%", "% Variation  at Position"
+                "Pos", "Track", "Base", "Ref", "A", "C", "G", "T", "N", "_", "Ref Cov", "Freq", "Type", "Amino SNP", "Amino Ref", "Effect on AA", "Feature"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class
+                java.lang.String.class, java.lang.Object.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -77,14 +123,26 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
-        jTable1.setColumnSelectionAllowed(true);
-        jScrollPane1.setViewportView(jTable1);
-        jTable1.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        jTable1.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title0")); // NOI18N
-        jTable1.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title1")); // NOI18N
-        jTable1.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title2")); // NOI18N
-        jTable1.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title3")); // NOI18N
-        jTable1.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title4")); // NOI18N
+        snpTable.setColumnSelectionAllowed(true);
+        jScrollPane1.setViewportView(snpTable);
+        snpTable.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        snpTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title0")); // NOI18N
+        snpTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title2_1")); // NOI18N
+        snpTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title1")); // NOI18N
+        snpTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title5")); // NOI18N
+        snpTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title6")); // NOI18N
+        snpTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title7")); // NOI18N
+        snpTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title8")); // NOI18N
+        snpTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title9")); // NOI18N
+        snpTable.getColumnModel().getColumn(8).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title10")); // NOI18N
+        snpTable.getColumnModel().getColumn(9).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title11")); // NOI18N
+        snpTable.getColumnModel().getColumn(10).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title3")); // NOI18N
+        snpTable.getColumnModel().getColumn(11).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.jTable1.columnModel.title4")); // NOI18N
+        snpTable.getColumnModel().getColumn(12).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title12")); // NOI18N
+        snpTable.getColumnModel().getColumn(13).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title13")); // NOI18N
+        snpTable.getColumnModel().getColumn(14).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title14")); // NOI18N
+        snpTable.getColumnModel().getColumn(15).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title15")); // NOI18N
+        snpTable.getColumnModel().getColumn(16).setHeaderValue(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.snpTable.columnModel.title16")); // NOI18N
 
         exportButton.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.exportButton.text")); // NOI18N
         exportButton.setActionCommand(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.exportButton.actionCommand")); // NOI18N
@@ -94,69 +152,295 @@ public class SNP_DetectionResultPanel extends javax.swing.JPanel {
             }
         });
 
+        alignmentButton.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.alignmentButton.text")); // NOI18N
+        alignmentButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                alignmentButtonActionPerformed(evt);
+            }
+        });
+
+        alignmentButton1.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.alignmentButton1.text")); // NOI18N
+        alignmentButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                alignmentButton1ActionPerformed(evt);
+            }
+        });
+
+        parametersLabel.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.parametersLabel.text")); // NOI18N
+
+        statisticsButton.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, "SNP_DetectionResultPanel.statisticsButton.text")); // NOI18N
+        statisticsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                statisticsButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 503, Short.MAX_VALUE)
-                    .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 503, Short.MAX_VALUE)
-                    .addComponent(exportButton, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addComponent(parametersLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 335, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(statisticsButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(alignmentButton1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(alignmentButton)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(exportButton)
                 .addContainerGap())
+            .addComponent(jScrollPane1)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 224, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 359, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jProgressBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(exportButton)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(exportButton)
+                    .addComponent(alignmentButton)
+                    .addComponent(alignmentButton1)
+                    .addComponent(parametersLabel)
+                    .addComponent(statisticsButton))
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
-        NewExportDialog ed = new NewExportDialog(null, true);
-        ed.setSnps(snps);
-        ed.setVisible(true);
+        ExcelExportFileChooser fileChooser = new ExcelExportFileChooser(new String[]{"xls"}, "xls", snpData);
 }//GEN-LAST:event_exportButtonActionPerformed
+
+    private void alignmentButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alignmentButtonActionPerformed
+        SNP_Phylogeny sp = new SNP_Phylogeny(snpData);
+    }//GEN-LAST:event_alignmentButtonActionPerformed
+
+    private void alignmentButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alignmentButton1ActionPerformed
+        this.setFdnamlPath();
+    }//GEN-LAST:event_alignmentButton1ActionPerformed
+
+    private void statisticsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statisticsButtonActionPerformed
+        JOptionPane.showMessageDialog(this, new SnpStatisticsPanel(this.snpData.getStatsMap()), "SNP Statistics", JOptionPane.INFORMATION_MESSAGE);
+    }//GEN-LAST:event_statisticsButtonActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton alignmentButton;
+    private javax.swing.JButton alignmentButton1;
     private javax.swing.JButton exportButton;
-    private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JLabel parametersLabel;
+    private javax.swing.JTable snpTable;
+    private javax.swing.JButton statisticsButton;
     // End of variables declaration//GEN-END:variables
 
-    public void addSNPs(List<Snp> snps) {
-        this.snps = snps;
-        for (Snp snp : snps) {
-            DefaultTableModel model = (DefaultTableModel) jTable1.getModel();
-            Object[] rowData = new Object[5];
+    /**
+     * Adds the SNPs to show to this panel. Amino acids are calculated and the
+     * SNP result table is generated
+     * @param snpData the snps to show
+     */
+    public void addSNPs(SnpDetectionResult snpData) {
+        
+        //snp effect statistics
+        int noIntergenicSnps = 0;
+        int noSynonymousSnps = 0;
+        int noMissenseSnps = 0;
+        int noChemicallyNeutralSnps = 0;
+        int noAAInsertions = 0;
+        int noAADeletions = 0;
+        
+        //snp type statistics
+        int noSubstitutions = 0;
+        int noInsertions = 0;
+        int noDeletions = 0;
+        
+
+        final int snpDataSize = 17;
+        this.snpData = snpData;
+        List<SnpI> snps = this.snpData.getSnpList();
+        Map<Integer, PersistantTrack> trackNames = this.snpData.getTrackMap();
+        DefaultTableModel model = (DefaultTableModel) snpTable.getModel();        
+
+        //get all features from the reference to determine amino acid 
+        ReferenceConnector refGenCon = ProjectConnector.getInstance().getRefGenomeConnector(this.reference.getId());
+        List<PersistantFeature> featuresSorted = refGenCon.getFeaturesForClosedInterval(0, reference.getRefLength());
+        
+        SnpTranslator snpTranslator = new SnpTranslator(featuresSorted, reference);
+        
+        Snp snp;
+        Object[] rowData;
+        String aminosSnp;
+        String aminosRef;
+        String effect;
+        String ids;
+        char aminoAcid;
+        List<PersistantFeature> featuresFound;
+        SequenceComparison type;
+        
+        for (SnpI snpi : snps) {
+            
+            
+            snp = (Snp) snpi;
+            type = snp.getType();
+            
+            rowData = new Object[snpDataSize];
             rowData[0] = snp.getPosition();
-            rowData[1] = snp.getBase();
-            rowData[2] = snp.getCount();
-            rowData[3] = snp.getPercentage();
-            rowData[4] = snp.getVariationPercentag();
+            rowData[1] = trackNames.get(snp.getTrackId());
+            rowData[2] = snp.getBase().toUpperCase();
+            rowData[3] = snp.getRefBase().toUpperCase();
+            rowData[4] = snp.getARate();
+            rowData[5] = snp.getCRate();
+            rowData[6] = snp.getGRate();
+            rowData[7] = snp.getTRate();
+            rowData[8] = snp.getNRate();
+            rowData[9] = snp.getGapRate();
+            rowData[10] = snp.getCoverage();
+            rowData[11] = snp.getFrequency();
+            rowData[12] = type.toString();
+
+            //determine amino acid substitutions among snp substitutions
+            if (type.equals(SequenceComparison.SUBSTITUTION)) {
+                ++noSubstitutions;
+                       
+                aminosSnp = "";
+                aminosRef = "";
+                effect = "";
+                ids = "";
+                
+                snpTranslator.checkForFeature(snp);
+                List<CodonSnp> codons = snp.getCodons();
+                
+                for (CodonSnp codon : codons) {
+                    
+                    aminoAcid = codon.getAminoSnp();
+                    aminosSnp += aminoAcid + " (" + AminoAcidProperties.getPropertyForAA(aminoAcid) + ")\n";
+                    aminoAcid = codon.getAminoRef();
+                    aminosRef += aminoAcid + " (" + AminoAcidProperties.getPropertyForAA(aminoAcid) + ")\n";
+                    effect += codon.getEffect().getType() + "\n";
+                    ids += codon.getGeneId() + "\n";
+                }
+
+                if (codons.isEmpty()) {
+                    aminosRef = "No gene";
+                    aminosSnp = "No gene";
+                    effect = "-";
+                    ids = "-";
+                    
+                    ++noIntergenicSnps;
+
+                } else if (effect.contains("E")) {
+                    ++noMissenseSnps;
+                } else if (effect.contains("N")) {
+                    ++noChemicallyNeutralSnps;
+                } else if (effect.contains("M")) {
+                    ++noSynonymousSnps;
+                }
+                
+                rowData[13] = aminosSnp;
+                rowData[14] = aminosRef;
+                rowData[15] = effect;
+                rowData[16] = ids;
+
+            } else {
+                featuresFound = snpTranslator.checkCoveredByFeature(snp.getPosition());
+                ids = "";
+                if (!featuresFound.isEmpty()) { // insertion or deletion
+                    if (type.equals(SequenceComparison.INSERTION)) {
+                        ++noAAInsertions;
+                        ++noInsertions;
+                        
+                    } else if (type.equals(SequenceComparison.DELETION)) {
+                        ++noAADeletions;
+                        ++noDeletions;
+                        
+                    } else {
+                        type = SequenceComparison.UNKNOWN;
+                    }
+                    
+                    for (PersistantFeature feature : featuresFound){
+                        ids += feature.toString() + "\n";
+                        snp.addCodon(new CodonSnp("", "", ' ', ' ', type, ids));
+                    }
+                    rowData[13] = "-";
+                    rowData[14] = "-";
+                    rowData[15] = String.valueOf(type.getType());
+                    rowData[16] = ids;
+                    
+                } else { //intergenic
+                    rowData[13] = "No gene";
+                    rowData[14] = "No gene";
+                    rowData[15] = "-";
+                    rowData[16] = "-";
+                    ++noIntergenicSnps;
+                    if (type.equals(SequenceComparison.INSERTION)) {
+                        ++noInsertions;
+                    } else if (type == SequenceComparison.DELETION) {
+                        ++noDeletions;
+                    }
+                }
+            }
+            
             model.addRow(rowData);
         }
+
+        TableRowSorter<TableModel> sorter = new TableRowSorter<>();
+        this.snpTable.setRowSorter(sorter);
+        sorter.setModel(model);
+        TableComparatorProvider.setPositionComparator(sorter, 0);
+        TableComparatorProvider.setPersistantTrackComparator(sorter, 1);
+        
+        Map<String, Integer> snpStatsMap = new HashMap<>();
+        
+        snpStatsMap.put(SNPS_TOTAL, this.snpData.getSnpList().size());
+        snpStatsMap.put(SNPS_INTERGENEIC, noIntergenicSnps);
+        snpStatsMap.put(SNPS_SYNONYMOUS, noSynonymousSnps);
+        snpStatsMap.put(SNPS_CHEMIC_NEUTRAL, noChemicallyNeutralSnps);
+        snpStatsMap.put(SNPS_MISSSENSE, noMissenseSnps);
+        snpStatsMap.put(SNPS_AA_INSERTIONS, noAAInsertions);
+        snpStatsMap.put(SNPS_AA_DELETIONS, noAADeletions);
+        snpStatsMap.put(SNPS_SUBSTITUTIONS, noSubstitutions);
+        snpStatsMap.put(SNPS_INSERTIONS, noInsertions);
+        snpStatsMap.put(SNPS_DELETIONS, noDeletions);
+        
+        this.snpData.setStatsMap(snpStatsMap);
+        
+        this.parametersLabel.setText(org.openide.util.NbBundle.getMessage(SNP_DetectionResultPanel.class, 
+                "SNP_DetectionResultPanel.parametersLabel.text", snpData.getMinPercentDeviation(), snpData.getMinNoDeviatingCoverage()));
+        
     }
 
     public void setBoundsInfoManager(BoundsInfoManager boundsInformationManager) {
         this.bim = boundsInformationManager;
     }
-
-    private void showSnpPosition() {
-        DefaultListSelectionModel model = (DefaultListSelectionModel) jTable1.getSelectionModel();
-        int selectedView = model.getLeadSelectionIndex();
-        int selectedModel = jTable1.convertRowIndexToModel(selectedView);
-        int position = (Integer) jTable1.getModel().getValueAt(selectedModel, 0);
-        bim.navigatorBarUpdated(position);
+    
+    public void setReferenceGenome(PersistantReference reference){
+        this.reference = reference;
     }
 
+    /**
+     * Allows to set the path to the fdnaml executable to be used for tree reconstructions.
+     */
+    private void setFdnamlPath() {
+        VampFileChooser fc = new VampFileChooser(new String[1], "") {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public void save(String fileLocation) {
+                throw new UnsupportedOperationException("Operation not supported!");
+            }
+
+            @Override
+            public void open(String fileLocation) {
+                NbPreferences.forModule(SNP_DetectionResultPanel.class).put(SNP_Phylogeny.FDNAML_PATH, fileLocation);
+            }
+        };
+        fc.openFileChooser(VampFileChooser.OPEN_DIALOG);
+    }
+    
+    /**
+     * @return The size of the SNP data.
+     */
+    public int getSnpDataSize() {
+        return this.snpData.getSnpList().size();
+    }
 }

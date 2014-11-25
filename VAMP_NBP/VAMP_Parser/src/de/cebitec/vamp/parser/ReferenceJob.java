@@ -7,20 +7,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
- * @author ddoppmeier
+ * A reference job containing all information about the import of a reference sequence.
+ * 
+ * @author ddoppmeier, rhilker
  */
-public class ReferenceJob implements Job{
+public class ReferenceJob implements Job {
 
-    private Long id;
+    private Integer id;
     private String name;
     private File file;
+    private File gffFile;
     private ReferenceParserI parser;
     private String description;
     private Timestamp timestamp;
     private List<TrackJob> trackswithoutRunjob;
 
-    public ReferenceJob(Long id, File file, ReferenceParserI parser, String description, String name, Timestamp timestamp){
+    /**
+     * A reference job containing all information about the import of a reference sequence.
+     * @param id reference id, if already available
+     * @param file the file in which the reference is stored, if needed
+     * @param parser the parser for parsing the reference, if needed
+     * @param description the description of the reference
+     * @param name the name of the reference
+     * @param timestamp the timestamp of the import
+     */
+    public ReferenceJob(Integer id, File file, ReferenceParserI parser, String description, String name, Timestamp timestamp){
         this.id = id;
         this.name = name;
         this.file = file;
@@ -28,7 +39,24 @@ public class ReferenceJob implements Job{
         this.description = description;
         this.timestamp = timestamp;
    
-        trackswithoutRunjob = new ArrayList<TrackJob>();
+        trackswithoutRunjob = new ArrayList<>();
+    }
+    
+    /**
+     * A reference job containing all information about the import of a
+     * reference sequence. Use this constructor for importing GFF references,
+     * which require an additional sequence file in fasta format.
+     * @param id reference id, if already available
+     * @param fastaFile the file in which the reference sequence is stored, if needed
+     * @param gffFile the file in which the reference features are stored, if needed
+     * @param parser the parser for parsing the reference, if needed
+     * @param description the description of the reference
+     * @param name the name of the reference
+     * @param timestamp the timestamp of the import
+     */
+    public ReferenceJob(Integer id, File fastaFile, File gffFile, ReferenceParserI parser, String description, String name, Timestamp timestamp) {
+        this(id, fastaFile, parser, description, name, timestamp);
+        this.gffFile = gffFile;
     }
 
     public void registerTrackWithoutRunJob(TrackJob t){
@@ -42,11 +70,7 @@ public class ReferenceJob implements Job{
     }
 
     public boolean hasRegisteredTrackswithoutrRunJob() {
-        if (trackswithoutRunjob.size() > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return trackswithoutRunjob.size() > 0;
     }
 
     public List<TrackJob> getDependentTrackswithoutRunjob() {
@@ -58,9 +82,20 @@ public class ReferenceJob implements Job{
         return name;
     }
 
+    /**
+     * @return the file, in which the reference is stored
+     */
     @Override
     public File getFile() {
         return file;
+    }
+
+    /**
+     * @return the file in which the reference features are stored, if this is an
+     * import of a GFF reference.
+     */
+    public File getGffFile() {
+        return gffFile;
     }
 
     public ReferenceParserI getParser(){
@@ -72,34 +107,33 @@ public class ReferenceJob implements Job{
         return description;
     }
 
+    /**
+     * @return the timestamp of the import
+     */
     @Override
     public Timestamp getTimestamp(){
         return timestamp;
     }
 
-    public boolean isPersistant(){
-        if(id == null){
-            return false;
-        } else {
-            return true;
-        }
+    public boolean isPersistant() {
+        return id != null;
     }
 
-    public void setPersistant(Long id){
+    public void setPersistant(int id){
         this.id = id;
     }
 
     @Override
-    public Long getID(){
+    public int getID(){
         return id;
     }
 
     @Override
-    public String toString(){
-        if(isPersistant()){
-            return " db: "+name+" "+timestamp;
+    public String toString() {
+        if (isPersistant()) {
+            return " db: " + name + " " + timestamp;
         } else {
-            return "new: "+name+" "+timestamp;
+            return "new: " + name + " " + timestamp;
         }
     }
 

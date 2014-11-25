@@ -21,4 +21,9 @@ public interface LogicalBoundsListener {
      */
     public Dimension getPaintingAreaDimension();
 
+        /**
+     *
+     * @return if the PaintingArea has coords to calculate bounds
+     */
+    public boolean isPaintingAreaAviable();
 }

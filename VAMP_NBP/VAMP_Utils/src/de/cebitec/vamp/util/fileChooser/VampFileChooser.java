@@ -1,78 +1,91 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package de.cebitec.vamp.util.fileChooser;
 
+import de.cebitec.vamp.util.Properties;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
-import de.cebitec.vamp.util.Properties;
 
 /**
  * Vamps file chooser. Contains all options and values of how to open a specific
- * file chooser for saving or opening different files
- *
+ * file chooser for saving or opening different files.
+ * 
  * @author Rolf Hilker
  */
 public abstract class VampFileChooser  extends JFileChooser {
 
-    /** Number representing the open file chooser event. */
-    public static final int OPEN = 0;
-    /** Number representing the save fasta event. */
-    public static final int SAVE = 1;
     protected Object data;
-    protected String fileExtension;
-    protected Preferences pref;
+    private String[] fileExtensions;
+    private String fileDescription;
+    private Preferences pref;
+    private String directoryProperty;
+    private String currentDirectory;
 
-    public VampFileChooser(final int option, final String fileExtension){
-        this(option, fileExtension, null);
+    /**
+     * Creates a new vamp file chooser.
+     * @param fileExtensions the file extensions to use. If the first entry is the empty string, no file filter is set
+     * @param fileDescription description for the files in the file filter
+     */
+    public VampFileChooser(final String[] fileExtensions, String fileDescription){
+        this(fileExtensions, fileDescription, null);
     }
 
-    public VampFileChooser(final int option, final String fileExtension, final Object data) {
+    /**
+     * Creates a new vamp file chooser.
+     * @param fileExtensions the file extensions to use. If the first entry is the empty string, no file filter is set
+     * @param fileDescription description for the files in the file filter
+     * @param data the data which might be used for file choosers storing data
+     */
+    public VampFileChooser(final String[] fileExtensions, String fileDescription, final Object data) {
         this.data = data;
-        this.fileExtension = fileExtension.toLowerCase();
+        this.fileExtensions = fileExtensions;
+        this.fileDescription = fileDescription;
+        if (fileExtensions[0] != null && !fileExtensions[0].isEmpty()) {
+            this.setFileFilter(new FileNameExtensionFilter(fileDescription, fileExtensions));
+        }
         this.pref = NbPreferences.forModule(Object.class);
-        this.openFileChooser(option);
+        directoryProperty = Properties.VAMP_FILECHOOSER_DIRECTORY;
     }
 
     /**
      * Opens a file chooser for input or output file selection/creation.
-     * @param option the option: VampFileChooser.OPEN for file selection and
-     * VampFileChooser.SAVE for storing a file.
+     * @param option the option: VampFileChooser.OPEN_DIALOG for file selection and
+     * VampFileChooser.SAVE_DIALOG for storing a file.
      */
-    private void openFileChooser(final int option) {
+    public void openFileChooser(final int option) {
 
         ////////////// open file chooser /////////////////////////
-        final JFileChooser jfc = new JFileChooser();
-        String currentDirectory = this.pref.get(Properties.VAMP_FILECHOOSER_DIRECTORY, ".");
+        if (currentDirectory == null || currentDirectory.isEmpty()) {
+            currentDirectory = this.pref.get(directoryProperty, ".");
+        }
         if (currentDirectory.isEmpty()){
             currentDirectory = ".";
         }
         try {
-            jfc.setCurrentDirectory(new File(new File(currentDirectory).getCanonicalPath()));
+            this.setCurrentDirectory(new File(new File(currentDirectory).getCanonicalPath()));
         } catch (final IOException exception) {
-            jfc.setCurrentDirectory(null);
+            this.setCurrentDirectory(null);
         }
         int result;
-        if (option == VampFileChooser.OPEN) {
-            result = jfc.showOpenDialog(this.getParent());
+        if (option == VampFileChooser.OPEN_DIALOG) {
+            result = this.showOpenDialog(this.getParent());
         } else {
-            if (option == VampFileChooser.SAVE) {
-                jfc.setFileFilter(new FileNameExtensionFilter(this.fileExtension, this.fileExtension));
-            }
-            result = jfc.showSaveDialog(null);
+            result = this.showSaveDialog(null);
         }
         ///////////////// store directory ////////////////////////////////////
         try {
-            currentDirectory = jfc.getCurrentDirectory().getCanonicalPath();
-            NbPreferences.forModule(Object.class).put(Properties.VAMP_FILECHOOSER_DIRECTORY, currentDirectory);
+            currentDirectory = this.getCurrentDirectory().getCanonicalPath();
+            this.pref.put(directoryProperty, currentDirectory);
+            this.pref.flush();
+        } catch (BackingStoreException e) {
+            Logger.getLogger(VampFileChooser.class.getName()).log(Level.SEVERE, null, e);
         } catch (IOException ex) {
             // do nothing, path is not stored in properties...
         }
@@ -80,19 +93,20 @@ public abstract class VampFileChooser  extends JFileChooser {
         if (result == JFileChooser.CANCEL_OPTION) {
             return;
         }
-        String fileLocation = jfc.getSelectedFile().getAbsolutePath();
-        if (result == JFileChooser.APPROVE_OPTION) {
-            if (!fileLocation.endsWith(".".concat(this.fileExtension)) && !fileLocation.endsWith(".".concat(this.fileExtension.toUpperCase()))){
-        	fileLocation = fileLocation.concat(".".concat(this.fileExtension));
-            }
-        }
+        String fileLocation = this.getSelectedFile().getAbsolutePath();
+//        if (result == JFileChooser.APPROVE_OPTION) {
+//        }
 
-        if (option == VampFileChooser.OPEN) {
+        if (option == VampFileChooser.OPEN_DIALOG) {
             this.open(fileLocation);
         } else
-        if (option == VampFileChooser.SAVE) {
-            boolean done = this.checkFileExists(fileLocation, jfc);
-            if (!done){
+        if (option == VampFileChooser.SAVE_DIALOG) {
+            if (!fileExtensions[0].isEmpty() && !fileLocation.endsWith(".".concat(fileExtensions[0]))
+                    && !fileLocation.endsWith(".".concat(fileExtensions[0].toUpperCase()))) {
+                fileLocation = fileLocation.concat(".".concat(fileExtensions[0]));
+            }
+            boolean done = this.checkFileExists(fileLocation, this);
+            if (!done) {
                 this.save(fileLocation);
             }
         }
@@ -103,7 +117,7 @@ public abstract class VampFileChooser  extends JFileChooser {
      * When a file should be saved this method checks if the file already exists
      * and prompts for replacement. If it doesn't exist yet, it is created.
      * @param fileLocation the file location to store the file
-     * @param jfc the JFileChooser
+     * @param this the JFileChooser
      */
     private boolean checkFileExists(final String fileLocation, final JFileChooser jfc) {
         File file = new File(fileLocation);
@@ -114,7 +128,7 @@ public abstract class VampFileChooser  extends JFileChooser {
             if (overwriteFile == JOptionPane.YES_OPTION) {
                 this.save(fileLocation);
             } else {
-                this.openFileChooser(VampFileChooser.SAVE);
+                this.openFileChooser(VampFileChooser.SAVE_DIALOG);
             }
             return true;
         }
@@ -124,7 +138,7 @@ public abstract class VampFileChooser  extends JFileChooser {
     
     /**
      * Saves the data into a file whose file extension is determined
-     * by the fileExtension variable.
+     * by the fileExtensions variable.
      * @param fileLocation the location and name of the file to create
      */
     public abstract void save(String fileLocation);
@@ -137,5 +151,21 @@ public abstract class VampFileChooser  extends JFileChooser {
      */
     public abstract void open(String fileLocation);
 
-
+    /**
+     * Set the directory property which shall be used to store the directory
+     * of the selected file/s.
+     * @param directoryProperty 
+     */
+    public void setDirectoryProperty(String directoryProperty) {
+        this.directoryProperty = directoryProperty;
+    }
+    
+    /**
+     * Sets the directory to use as starting directory for this file chooser.
+     * @param directory the directory to use as starting directory for this 
+     * file chooser
+     */
+    public void setDirectory(String directory) {
+        this.currentDirectory = directory;
+    }
 }

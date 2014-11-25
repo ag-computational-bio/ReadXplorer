@@ -1,33 +1,32 @@
 package de.cebitec.vamp.ui.visualisation.track;
 
-import de.cebitec.vamp.databackend.connector.ITrackConnector;
-//import de.cebitec.vamp.databackend.connector.ProjectConnector;
-//import de.cebitec.vamp.databackend.connector.RunConnector;
+import de.cebitec.vamp.databackend.connector.TrackConnector;
+import de.cebitec.vamp.util.StatsContainer;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 /**
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class TrackStatisticsPanel extends javax.swing.JPanel {
 
     private final static long serialVersionUID = 1239345;
-
-    private ITrackConnector trackCon;
-
+    private TrackConnector trackCon;
+    private int trackID = -1;
     /** Creates new form TrackNavigator */
     public TrackStatisticsPanel() {
         initComponents();
 //        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Do not use empty Constructor for this object! Standard constructor is only meant for GUI builder means");
     }
 
-    public TrackStatisticsPanel(ITrackConnector trackCon){
+    public TrackStatisticsPanel(TrackConnector trackCon) {
         this.trackCon = trackCon;
         this.initComponents();
         this.hideSeqPairLabels();
-        this.computeStats();
+      //  this.computeStats();
     }
 
     /**
@@ -35,14 +34,15 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
      * Use this method when switching to another track.
      * @param trackCon new track connector
      */
-    public void setTrackConnector(ITrackConnector trackCon){
+    public void setTrackConnector(TrackConnector trackCon) {
         this.trackCon = trackCon;
-        this.computeStats();
+        if (trackCon != null && trackCon.getTrackID() != trackID) {
+            trackID = trackCon.getTrackID();
+            nameLabel.setText(trackCon.getAssociatedTrackName());
+            this.computeStats();
+        }
     }
 
-    public void setTrackName(String name){
-        nameLabel.setText(name);
-    }
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -54,9 +54,9 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         progressbar = new javax.swing.JProgressBar();
-        allReadsLabel = new javax.swing.JLabel();
+        singletonMappingsLabel = new javax.swing.JLabel();
         uniqueSequencesLabel = new javax.swing.JLabel();
-        numUniqueMappingsAbsLabel = new javax.swing.JLabel();
+        singletonMappingsAbsLabel = new javax.swing.JLabel();
         perfectMappingsLabel = new javax.swing.JLabel();
         bestMatchMappingsLabel = new javax.swing.JLabel();
         numMappingsLabel = new javax.swing.JLabel();
@@ -74,24 +74,27 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
         nameLabel = new javax.swing.JLabel();
         numberReadsLabel = new javax.swing.JLabel();
         numberReadsAbsLabel = new javax.swing.JLabel();
+        seqPairPanel = new javax.swing.JPanel();
         numSeqPairsLabel = new javax.swing.JLabel();
         numSeqPairsAbsLabel = new javax.swing.JLabel();
         numPerfSeqPairsLabel = new javax.swing.JLabel();
         numPerfSeqPairsAbsLabel = new javax.swing.JLabel();
-        numUniqSeqPairsLabel = new javax.swing.JLabel();
-        numUniqSeqPairsAbsLabel = new javax.swing.JLabel();
-        numPerfUniqSeqPairsLabel = new javax.swing.JLabel();
-        numPerfUniqSeqPairsAbsLabel = new javax.swing.JLabel();
+        numSmallerPairsLabel = new javax.swing.JLabel();
+        nummallerPairsAbsLabel = new javax.swing.JLabel();
+        numLargerPairsLabel = new javax.swing.JLabel();
+        numLargerPairsAbsLabel = new javax.swing.JLabel();
+        singleMappings = new javax.swing.JLabel();
+        singleMappingsLabel = new javax.swing.JLabel();
 
         setBorder(javax.swing.BorderFactory.createTitledBorder("Global Track Statistics"));
         setPreferredSize(new java.awt.Dimension(200, 400));
 
-        allReadsLabel.setText("Unique Mappings:");
+        singletonMappingsLabel.setText("Singleton Mappings:");
 
         uniqueSequencesLabel.setText("Unique Seq:");
 
-        numUniqueMappingsAbsLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        numUniqueMappingsAbsLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        singletonMappingsAbsLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        singletonMappingsAbsLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
         perfectMappingsLabel.setText("Perfect:");
 
@@ -136,6 +139,8 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
         numberReadsAbsLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         numberReadsAbsLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
+        seqPairPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Sequence Pair Statistics"));
+
         numSeqPairsLabel.setText("Sequence Pairs:");
 
         numSeqPairsAbsLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
@@ -146,114 +151,153 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
         numPerfSeqPairsAbsLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         numPerfSeqPairsAbsLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
-        numUniqSeqPairsLabel.setText("Unique Seq. Pairs:");
+        numSmallerPairsLabel.setText("Smaller Seq. Pairs:");
 
-        numUniqSeqPairsAbsLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        numUniqSeqPairsAbsLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        nummallerPairsAbsLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        nummallerPairsAbsLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
 
-        numPerfUniqSeqPairsLabel.setText("Perf. Uniq. Seq. Pairs:");
+        numLargerPairsLabel.setText("Larger Seq. Pairs:");
 
-        numPerfUniqSeqPairsAbsLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        numPerfUniqSeqPairsAbsLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+        numLargerPairsAbsLabel.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        numLargerPairsAbsLabel.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+
+        singleMappings.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
+        singleMappings.setHorizontalTextPosition(javax.swing.SwingConstants.LEFT);
+
+        singleMappingsLabel.setText("Single Mappings:");
+
+        javax.swing.GroupLayout seqPairPanelLayout = new javax.swing.GroupLayout(seqPairPanel);
+        seqPairPanel.setLayout(seqPairPanelLayout);
+        seqPairPanelLayout.setHorizontalGroup(
+            seqPairPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(seqPairPanelLayout.createSequentialGroup()
+                .addGap(12, 12, 12)
+                .addGroup(seqPairPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(singleMappingsLabel)
+                    .addComponent(numPerfSeqPairsLabel)
+                    .addComponent(numSeqPairsLabel)
+                    .addComponent(numSmallerPairsLabel)
+                    .addComponent(numLargerPairsLabel))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(seqPairPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(nummallerPairsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 58, Short.MAX_VALUE)
+                    .addComponent(numLargerPairsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 58, Short.MAX_VALUE)
+                    .addComponent(singleMappings, javax.swing.GroupLayout.DEFAULT_SIZE, 58, Short.MAX_VALUE)
+                    .addComponent(numSeqPairsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 58, Short.MAX_VALUE)
+                    .addComponent(numPerfSeqPairsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 58, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        seqPairPanelLayout.setVerticalGroup(
+            seqPairPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, seqPairPanelLayout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(seqPairPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(numSeqPairsLabel)
+                    .addComponent(numSeqPairsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(seqPairPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(numPerfSeqPairsLabel)
+                    .addComponent(numPerfSeqPairsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(seqPairPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(numSmallerPairsLabel)
+                    .addComponent(nummallerPairsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(seqPairPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(numLargerPairsLabel)
+                    .addComponent(numLargerPairsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(seqPairPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(singleMappings, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(singleMappingsLabel))
+                .addGap(23, 23, 23))
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(progressbar, javax.swing.GroupLayout.DEFAULT_SIZE, 168, Short.MAX_VALUE)
-                .addGap(20, 20, 20))
+            .addComponent(seqPairPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(progressbar, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(perfPercentageLabel)
-                    .addComponent(numSeqPairsLabel)
-                    .addComponent(labelNameLabel)
-                    .addComponent(numMappingsLabel)
-                    .addComponent(uniqueSequencesLabel)
-                    .addComponent(allReadsLabel)
-                    .addComponent(numberReadsLabel)
-                    .addComponent(numPerfSeqPairsLabel)
-                    .addComponent(numUniqSeqPairsLabel)
-                    .addComponent(numPerfUniqSeqPairsLabel)
-                    .addComponent(compPercentageLabel)
-                    .addComponent(perfectMappingsLabel)
-                    .addComponent(bestMatchMappingsLabel)
-                    .addComponent(bmPercentageLabel))
-                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(numberReadsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)
-                    .addComponent(numMappingsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)
-                    .addComponent(numUniqueMappingsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)
-                    .addComponent(uniqueSequencesAbsLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)
-                    .addComponent(nameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)
-                    .addComponent(numSeqPairsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)
-                    .addComponent(numPerfSeqPairsAbsLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)
-                    .addComponent(numUniqSeqPairsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)
-                    .addComponent(numPerfUniqSeqPairsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)
-                    .addComponent(bestMatchMappingsAbsLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)
-                    .addComponent(perfectMappingsAbsLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)
-                    .addComponent(perfectPercentage, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)
-                    .addComponent(bmPercentage, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE)
-                    .addComponent(compPercentage, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 43, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGap(11, 11, 11)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(perfectMappingsLabel)
+                                    .addComponent(bestMatchMappingsLabel)
+                                    .addComponent(numberReadsLabel)
+                                    .addComponent(uniqueSequencesLabel)
+                                    .addComponent(singletonMappingsLabel))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(bestMatchMappingsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
+                                    .addComponent(perfectMappingsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGap(8, 8, 8)
+                                .addComponent(compPercentageLabel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(compPercentage, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(bmPercentageLabel)
+                                    .addComponent(perfPercentageLabel))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(perfectPercentage, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
+                                    .addComponent(bmPercentage, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(68, 68, 68)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(labelNameLabel)
+                            .addComponent(numMappingsLabel))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(numMappingsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
+                            .addComponent(nameLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
+                            .addComponent(singletonMappingsAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
+                            .addComponent(uniqueSequencesAbsLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE)
+                            .addComponent(numberReadsAbsLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 55, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(labelNameLabel)
-                        .addGap(10, 10, 10)
-                        .addComponent(numMappingsLabel)
-                        .addGap(9, 9, 9)
-                        .addComponent(allReadsLabel)
-                        .addGap(9, 9, 9)
-                        .addComponent(uniqueSequencesLabel)
-                        .addGap(9, 9, 9)
-                        .addComponent(numberReadsLabel))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(nameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(numMappingsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(numUniqueMappingsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(uniqueSequencesAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(numberReadsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(numSeqPairsLabel)
-                    .addComponent(numSeqPairsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(numPerfSeqPairsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(numPerfSeqPairsLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(numUniqSeqPairsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(numUniqSeqPairsLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(numPerfUniqSeqPairsLabel)
-                    .addComponent(numPerfUniqSeqPairsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(bestMatchMappingsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(bestMatchMappingsLabel))
+                    .addComponent(labelNameLabel)
+                    .addComponent(nameLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(9, 9, 9)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(numMappingsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(numMappingsLabel))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(perfectMappingsAbsLabel, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(perfectMappingsLabel, javax.swing.GroupLayout.Alignment.TRAILING))
+                    .addComponent(singletonMappingsLabel)
+                    .addComponent(singletonMappingsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(perfectPercentage, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(5, 5, 5)
-                        .addComponent(perfPercentageLabel)))
+                    .addComponent(uniqueSequencesLabel)
+                    .addComponent(uniqueSequencesAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(numberReadsLabel)
+                    .addComponent(numberReadsAbsLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(bestMatchMappingsLabel, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(bestMatchMappingsAbsLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(perfectMappingsLabel, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(perfectMappingsAbsLabel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(perfPercentageLabel)
+                    .addComponent(perfectPercentage, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(bmPercentage, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -262,15 +306,14 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(compPercentage, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(compPercentageLabel))
-                .addGap(15, 15, 15)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(seqPairPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addComponent(progressbar, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(100, 100, 100))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel allReadsLabel;
     private javax.swing.JLabel bestMatchMappingsAbsLabel;
     private javax.swing.JLabel bestMatchMappingsLabel;
     private javax.swing.JLabel bmPercentage;
@@ -279,166 +322,203 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
     private javax.swing.JLabel compPercentageLabel;
     private javax.swing.JLabel labelNameLabel;
     private javax.swing.JLabel nameLabel;
+    private javax.swing.JLabel numLargerPairsAbsLabel;
+    private javax.swing.JLabel numLargerPairsLabel;
     private javax.swing.JLabel numMappingsAbsLabel;
     private javax.swing.JLabel numMappingsLabel;
     private javax.swing.JLabel numPerfSeqPairsAbsLabel;
     private javax.swing.JLabel numPerfSeqPairsLabel;
-    private javax.swing.JLabel numPerfUniqSeqPairsAbsLabel;
-    private javax.swing.JLabel numPerfUniqSeqPairsLabel;
     private javax.swing.JLabel numSeqPairsAbsLabel;
     private javax.swing.JLabel numSeqPairsLabel;
-    private javax.swing.JLabel numUniqSeqPairsAbsLabel;
-    private javax.swing.JLabel numUniqSeqPairsLabel;
-    private javax.swing.JLabel numUniqueMappingsAbsLabel;
+    private javax.swing.JLabel numSmallerPairsLabel;
     private javax.swing.JLabel numberReadsAbsLabel;
     private javax.swing.JLabel numberReadsLabel;
+    private javax.swing.JLabel nummallerPairsAbsLabel;
     private javax.swing.JLabel perfPercentageLabel;
     private javax.swing.JLabel perfectMappingsAbsLabel;
     private javax.swing.JLabel perfectMappingsLabel;
     private javax.swing.JLabel perfectPercentage;
     private javax.swing.JProgressBar progressbar;
+    private javax.swing.JPanel seqPairPanel;
+    private javax.swing.JLabel singleMappings;
+    private javax.swing.JLabel singleMappingsLabel;
+    private javax.swing.JLabel singletonMappingsAbsLabel;
+    private javax.swing.JLabel singletonMappingsLabel;
     private javax.swing.JLabel uniqueSequencesAbsLabel;
     private javax.swing.JLabel uniqueSequencesLabel;
     // End of variables declaration//GEN-END:variables
 
-    private void computeStats(){
+    private void computeStats() {
         Thread t = new Thread(new Runnable() {
 
             @Override
             public void run() {
-                //RunConnector runC = ProjectConnector.getInstance().getRunConnector(trackCon.getRunId(),trackCon.getTrackID());
                 boolean recalculated = false;
+                boolean recalcSeqPair = false;
+                boolean isSeqPairTrack = trackCon.isSeqPairTrack();
                 
-                int numSeqPairs = trackCon.getNumOfSeqPairs();
-                if(numSeqPairs == 0){
-                    numSeqPairs = 0;//trackCon.getNumOfSeqPairsCalculate();
-                    if (numSeqPairs <= 0){ //seq pair information is only displayed for seq pair tracks
+                seqPairPanel.setVisible(isSeqPairTrack);
+                numSeqPairsLabel.setVisible(isSeqPairTrack);
+                numSeqPairsAbsLabel.setVisible(isSeqPairTrack);
+                numPerfSeqPairsLabel.setVisible(isSeqPairTrack);
+                numPerfSeqPairsAbsLabel.setVisible(isSeqPairTrack);
+                numSmallerPairsLabel.setVisible(isSeqPairTrack);
+                nummallerPairsAbsLabel.setVisible(isSeqPairTrack);
+                numLargerPairsLabel.setVisible(isSeqPairTrack);
+                numLargerPairsAbsLabel.setVisible(isSeqPairTrack);
+                singleMappingsLabel.setVisible(isSeqPairTrack);
+                singleMappings.setVisible(isSeqPairTrack);
+                
+                int refLength = trackCon.getRefSequenceLength();
+                StatsContainer statsContainer = trackCon.getTrackStats();
+                Map<String, Integer> statsMap = statsContainer.getStatsMap();
+
+                //sequence pair stuff
+                int numSeqPairs = statsMap.get(StatsContainer.NO_SEQ_PAIRS);
+                if (numSeqPairs == -1) {
 //                        TrackStatisticsPanel.this.remove(numSeqPairsLabel);
 //                        TrackStatisticsPanel.this.remove(numSeqPairsAbsLabel);
-                        numSeqPairsLabel.setVisible(false);
-                        numSeqPairsAbsLabel.setVisible(false);
-                    } else {
-                        numSeqPairsLabel.setVisible(true);
-                        numSeqPairsAbsLabel.setVisible(true);
-                        recalculated = true;
+                    numSeqPairsLabel.setVisible(false);
+                    numSeqPairsAbsLabel.setVisible(false);
+                } else {
+                    if (numSeqPairs == -2) {
+                        numSeqPairs = trackCon.getNumOfSeqPairsCalculate();
+                        recalcSeqPair = true;
                     }
-                }
-                
-                int numPerfectSeqPairs = trackCon.getNumOfPerfectSeqPairs();
-                if (numPerfectSeqPairs == 0) {
-                    numPerfectSeqPairs = 0;//trackCon.getNumOfPerfectSeqPairsCalculate();
-                    if (numPerfectSeqPairs <= 0) {
-//                        TrackStatisticsPanel.this.remove(numPerfSeqPairsLabel);
-//                        TrackStatisticsPanel.this.remove(numPerfSeqPairsAbsLabel);
-                        numPerfSeqPairsLabel.setVisible(false);
-                        numPerfSeqPairsAbsLabel.setVisible(false);
-                    } else {
-                        numPerfSeqPairsLabel.setVisible(true);
-                        numPerfSeqPairsAbsLabel.setVisible(true);
-                        recalculated = true;
-                    }
+                    numSeqPairsAbsLabel.setText(String.valueOf(numSeqPairs));
                 }
 
-                int numUniqueSeqPairs = trackCon.getNumOfUniqueSeqPairs();
-                if (numUniqueSeqPairs == 0) {
-                    numUniqueSeqPairs = 0;//trackCon.getNumOfUniqueSeqPairsCalculate();
-                    if (numUniqueSeqPairs <= 0) {
-//                        TrackStatisticsPanel.this.remove(numUniqSeqPairsLabel);
-//                        TrackStatisticsPanel.this.remove(numUniqSeqPairsAbsLabel);
-                        numUniqSeqPairsLabel.setVisible(false);
-                        numUniqSeqPairsAbsLabel.setVisible(false);
-                    } else {
-                        numUniqSeqPairsLabel.setVisible(true);
-                        numUniqSeqPairsAbsLabel.setVisible(true);
-                        recalculated = true;
+                int numPerfectSeqPairs = statsMap.get(StatsContainer.NO_PERF_PAIRS);
+                if (numPerfectSeqPairs == -1) {
+//                        TrackStatisticsPanel.this.remove(numPerfectSeqPairsLabel);
+//                        TrackStatisticsPanel.this.remove(numPerfectSeqPairsAbsLabel);
+                    numPerfSeqPairsLabel.setVisible(false);
+                    numPerfSeqPairsAbsLabel.setVisible(false);
+                } else {
+                    if (numPerfectSeqPairs == -2) {
+                        numPerfectSeqPairs = trackCon.getNumOfPerfectSeqPairsCalculate();
+                        recalcSeqPair = true;
                     }
+                    numPerfSeqPairsAbsLabel.setText(String.valueOf(numPerfectSeqPairs));
                 }
 
-                int numUniquePerfectSeqPairs = trackCon.getNumOfUniquePerfectSeqPairs();
-                if (numUniquePerfectSeqPairs == 0) {
-                    numUniquePerfectSeqPairs = 0;//trackCon.getNumOfUniquePerfectSeqPairsCalculate();
-                    if (numUniquePerfectSeqPairs <= 0) {
+                int numSmallerSeqPairs = statsMap.get(StatsContainer.NO_SMALL_DIST_PAIRS);
+                numSmallerSeqPairs += statsMap.get(StatsContainer.NO_SMALL_ORIENT_WRONG_PAIRS);
+                if (numSmallerSeqPairs == -1) {
+//                        TrackStatisticsPanel.this.remove(numPerfectSeqPairsLabel);
+//                        TrackStatisticsPanel.this.remove(numPerfectSeqPairsAbsLabel);
+                    numSmallerPairsLabel.setVisible(false);
+                    nummallerPairsAbsLabel.setVisible(false);
+                } else {
+//                    if (numSmallerSeqPairs == -2) {
+//                        numSmallerSeqPairs = trackCon.getNumOfSmallerSeqPairsCalculate();
+//                        recalcSeqPair = true;
+//                    }
+                    nummallerPairsAbsLabel.setText(String.valueOf(numSmallerSeqPairs));
+                }
+
+                int numLargerSeqPairs = statsMap.get(StatsContainer.NO_LARGE_DIST_PAIRS);
+                numLargerSeqPairs += statsMap.get(StatsContainer.NO_LARGE_ORIENT_WRONG_PAIRS);
+                if (numLargerSeqPairs == -1) {
+//                        TrackStatisticsPanel.this.remove(numPerfectSeqPairsLabel);
+//                        TrackStatisticsPanel.this.remove(numPerfectSeqPairsAbsLabel);
+                    numLargerPairsLabel.setVisible(false);
+                    numLargerPairsAbsLabel.setVisible(false);
+                } else {
+//                    if (numLargerSeqPairs == -2) {
+//                        numLargerSeqPairs = trackCon.getNumOfLargerSeqPairsCalculate();
+//                        recalcSeqPair = true;
+//                    }
+                    numLargerPairsAbsLabel.setText(String.valueOf(numLargerSeqPairs));
+                }
+
+                //single mapping stuff
+                int numSingleMappings = statsMap.get(StatsContainer.NO_SINGLE_MAPPIGNS);
+                if (numSingleMappings == -1) {
 //                        TrackStatisticsPanel.this.remove(numPerfUniqSeqPairsLabel);
 //                        TrackStatisticsPanel.this.remove(numPerfUniqSeqPairsAbsLabel);
-                        numPerfUniqSeqPairsLabel.setVisible(false);
-                        numPerfUniqSeqPairsAbsLabel.setVisible(false);
-                    } else {
-                        numPerfUniqSeqPairsLabel.setVisible(true);
-                        numPerfUniqSeqPairsAbsLabel.setVisible(true);
-                        recalculated = true;
+                    singleMappingsLabel.setVisible(false);
+                    singleMappings.setVisible(false);
+                } else {
+                    if (numSingleMappings == -2) {
+                        numSingleMappings = trackCon.getNumOfSingleMappingsCalculate();
+                        recalcSeqPair = true;
                     }
+                    singleMappings.setText(String.valueOf(numSingleMappings));
                 }
-                
-                int numOfMappings = trackCon.getNumOfMappings();
-                if(numOfMappings == 0){
-                   numOfMappings = trackCon.getNumOfMappingsCalculate();
-                   Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Updating statistic information");
-                   recalculated = true;
+
+                int numOfMappings = statsMap.get(StatsContainer.NO_COMMON_MAPPINGS);
+                if (numOfMappings == -1) {
+                    numOfMappings = trackCon.getNumOfMappingsCalculate();
+                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Updating statistic information");
+                    recalculated = true;
                 }
                 numMappingsAbsLabel.setText(String.valueOf(numOfMappings));
 
-                int numUniqueMappings = trackCon.getNumOfUniqueMappings();
-                if (numUniqueMappings == 0) {
+                int numUniqueMappings = statsMap.get(StatsContainer.NO_UNIQ_MAPPINGS);
+                if (numUniqueMappings == -1) {
                     numUniqueMappings = trackCon.getNumOfUniqueMappingsCalculate();
                     recalculated = true;
                 }
-                numUniqueMappingsAbsLabel.setText(String.valueOf(numUniqueMappings));
+                singletonMappingsAbsLabel.setText(String.valueOf(numUniqueMappings));
 
-                int numUniqueSequences = trackCon.getNumOfUniqueSequences();
-                if (numUniqueSequences == 0) {
+                int numUniqueSequences = statsMap.get(StatsContainer.NO_UNIQUE_SEQS);
+                if (numUniqueSequences == -1) {
                     numUniqueSequences = trackCon.getNumOfUniqueSequencesCalculate();
                     recalculated = true;
                 }
                 uniqueSequencesAbsLabel.setText(String.valueOf(numUniqueSequences));
-                        
+
                 numberReadsAbsLabel.setVisible(false);
                 numberReadsLabel.setVisible(false);
-                int numReads = trackCon.getNumOfReads();
-                if (numReads == 0) {
-                    numberReadsAbsLabel.setText("Not available"); //TODO: num of reads only for sam & bam parsers
+                int numReads = statsMap.get(StatsContainer.NO_READS);
+                if (numReads == -1) {
+                    numberReadsAbsLabel.setText("Not available"); 
                 } else {
                     numberReadsAbsLabel.setText(String.valueOf(numReads));
                 }
-                
-                int numOfPerfectMappings = trackCon.getNumOfPerfectUniqueMappings();
-                if(numOfPerfectMappings == 0){
-                    numOfPerfectMappings = trackCon.getNumOfPerfectUniqueMappingsCalculate();//TODO: decide whether unique or not!
+
+                int numOfPerfectMappings = statsMap.get(StatsContainer.NO_PERFECT_MAPPINGS);
+                if (numOfPerfectMappings == -1) {
+                    numOfPerfectMappings = trackCon.getNumOfPerfectUniqueMappingsCalculate();
                     recalculated = true;
                 }
                 perfectMappingsAbsLabel.setText(String.valueOf(numOfPerfectMappings));
 
-                int numOfBestMatchMappings = trackCon.getNumOfUniqueBmMappings();
-                if(numOfBestMatchMappings == 0){
+                int numOfBestMatchMappings = statsMap.get(StatsContainer.NO_BESTMATCH_MAPPINGS);
+                if (numOfBestMatchMappings == -1) {
                     numOfBestMatchMappings = trackCon.getNumOfUniqueBmMappingsCalculate();
                     recalculated = true;
                 }
                 bestMatchMappingsAbsLabel.setText(String.valueOf(numOfBestMatchMappings));
 
-                double percentagePerfectCovered = trackCon.getPercentRefGenPerfectCovered();
-                if(percentagePerfectCovered ==0){
+                double percentagePerfectCovered = (double) statsMap.get(StatsContainer.COVERAGE_PERFECT_GENOME) / refLength * 100;
+                if (percentagePerfectCovered == -1) {
                     percentagePerfectCovered = trackCon.getPercentRefGenPerfectCoveredCalculate();
                     recalculated = true;
                 }
-                
-                double percentageBMCovered = trackCon.getPercentRefGenBmCovered();
-                if(percentageBMCovered == 0){
+
+                double percentageBMCovered = (double) statsMap.get(StatsContainer.COVERAGE_BM_GENOME) / refLength * 100;
+                if (percentageBMCovered == -1) {
                     percentageBMCovered = trackCon.getPercentRefGenBmCoveredCalculate();
                     recalculated = true;
                 }
-                
-                double percentageNErrorCovered = trackCon.getPercentRefGenNErrorCovered();
-                if(percentageNErrorCovered == 0){
+
+                double percentageNErrorCovered = (double) statsMap.get(StatsContainer.COVERAGE_COMPLETE_GENOME) / refLength * 100;;
+                if (percentageNErrorCovered == -1) {
                     percentageNErrorCovered = trackCon.getPercentRefGenNErrorCoveredCalculate();
                     recalculated = true;
                 }
-                
-                
-                if (recalculated){
-                    trackCon.setStatistics(numOfMappings, numUniqueMappings, numUniqueSequences, 
-                        numOfPerfectMappings, numOfBestMatchMappings, percentagePerfectCovered, 
-                        percentageBMCovered, percentageNErrorCovered, numReads, numSeqPairs, numPerfectSeqPairs,
-                        numUniqueSeqPairs, numUniquePerfectSeqPairs);
-                }
+
+//                if (recalculated) {
+//                    trackCon.setStatistics(numOfMappings, numUniqueMappings, numUniqueSequences,
+//                            numOfPerfectMappings, numOfBestMatchMappings, percentagePerfectCovered,
+//                            percentageBMCovered, percentageNErrorCovered, numReads);
+//                }
+//                if (recalcSeqPair) {
+//                    trackCon.addSeqPairStatistics(numSeqPairs, numPerfectSeqPairs, numSmallerSeqPairs,
+//                            numLargerSeqPairs, numSingleMappings);
+//                }
 
                 String perfectCov = String.format("%.2f%%", percentagePerfectCovered);
                 String bmCov = String.format("%.2f%%", percentageBMCovered);
@@ -449,7 +529,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
                 compPercentage.setText(nErrorCov);
                 statsFinished();
             }
-        }){
+        }) {
         };
         progressbar.setIndeterminate(true);
 
@@ -457,7 +537,7 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
         t.start();
     }
 
-    private void statsFinished(){
+    private void statsFinished() {
         SwingUtilities.invokeLater(new Runnable() {
 
             @Override
@@ -479,15 +559,14 @@ public class TrackStatisticsPanel extends javax.swing.JPanel {
     private void hideSeqPairLabels() {
         this.numberReadsLabel.setVisible(false);
         this.numberReadsAbsLabel.setVisible(false);
-        
+
         this.numSeqPairsLabel.setVisible(false);
         this.numSeqPairsAbsLabel.setVisible(false);
         this.numPerfSeqPairsLabel.setVisible(false);
         this.numPerfSeqPairsAbsLabel.setVisible(false);
-        this.numUniqSeqPairsLabel.setVisible(false);
-        this.numUniqSeqPairsAbsLabel.setVisible(false);
-        this.numPerfUniqSeqPairsLabel.setVisible(false);
-        this.numPerfUniqSeqPairsAbsLabel.setVisible(false);
+        this.numSmallerPairsLabel.setVisible(false);
+        this.nummallerPairsAbsLabel.setVisible(false);
+        this.numLargerPairsLabel.setVisible(false);
+        this.numLargerPairsAbsLabel.setVisible(false);
     }
-
 }

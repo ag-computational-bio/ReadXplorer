@@ -1,8 +1,5 @@
 package de.cebitec.vamp.exporter.excel;
 
-import de.cebitec.vamp.exporter.ExporterI;
-import de.cebitec.vamp.api.objects.Snp;
-import jxl.write.Label;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -10,65 +7,210 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import jxl.Workbook;
 import jxl.WorkbookSettings;
-import jxl.write.NumberFormats;
+import jxl.write.Label;
 import jxl.write.Number;
+import jxl.write.NumberFormats;
 import jxl.write.WritableCellFormat;
 import jxl.write.WritableFont;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
+import jxl.write.biff.RowsExceededException;
+import org.netbeans.api.progress.ProgressHandle;
+import org.openide.util.NbBundle;
+
 
 /**
+ * General excel exporter. It supports even multiple sheets in one document.
  *
- * @author jstraube
+ * @author -Rolf Hilker-
  */
-public class ExcelExporter implements ExporterI {
+public class ExcelExporter {
+    
 
-    private List<Snp> snps;
+    private ProgressHandle progressHandle;
+    private List<String> sheetNames; //contains all sheet names
+    private List<List<String>> headers; //contains all headers
+    /** Inner list contains data of one row, middle list contains all rows, 
+     * outer list is the list of sheets. */
+    private List<List<List<Object>>> exportData; 
+    private int rowNumberGlobal;
+    
+    /**
+     * General excel exporter. It supports even multiple sheets in one document.
+     * All 3 data fields have to be set in order to start a successful export.
+     * @param progressHandle the progress handle which should display the progress
+     *      of the ExcelExporter
+     */
+    public ExcelExporter(ProgressHandle progressHandle) {
+        this.progressHandle = progressHandle;
+        this.rowNumberGlobal = 0;
+    } 
+    
+    /**
+     * @param dataSheetNames the sheet name list the sheets which should be 
+     * exported to the excel file. Must be set!
+     */
+    public void setSheetNames(List<String> dataSheetNames) {
+        this.sheetNames = dataSheetNames;
+    } 
 
-    @Override
-    public boolean readyToExport() {
-        if (snps.isEmpty()) {
-            return false;
-        } else {
-            return true;
-        }
+    /**
+     * @param headers the header list for the tables which should be exported to
+     * the excel file. Must be set!
+     */
+    public void setHeaders(List<List<String>> headers) {
+        this.headers = headers;
     }
 
-    @Override
-    public File writeFile(File tempDir, String name) throws FileNotFoundException, IOException {
-        File tempFile = File.createTempFile(name, ".xls", tempDir);
+    /**
+     * @param exportData The list of data which should be exported to excel.
+     * Must be set!
+     */
+    public void setExportData(List<List<List<Object>>> exportData) {
+        this.exportData = exportData;
+    }
+    
+    /**
+     * Carries out the whole export process to an excel file.
+     * @param file the file in which to write the data.
+     * @return the file in which the data was written.
+     * @throws FileNotFoundException
+     * @throws IOException
+     * @throws WriteException
+     * @throws OutOfMemoryError  
+     */
+    public File writeFile(File file) throws FileNotFoundException, IOException, WriteException, OutOfMemoryError {
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting to write Excel file...{0}", tempFile.getAbsolutePath());
-
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting to write Excel file...{0}", file.getAbsolutePath());
+ 
         WorkbookSettings wbSettings = new WorkbookSettings();
         wbSettings.setLocale(new Locale("en", "EN"));
-        WritableWorkbook workbook = Workbook.createWorkbook(tempFile, wbSettings);
 
-        WritableSheet snpSheet = null;
+        WritableWorkbook workbook = Workbook.createWorkbook(file, wbSettings);
+        WritableSheet sheet = null;
         int currentPage = 0;
-        if (!snps.isEmpty()) {
-            snpSheet = workbook.createSheet("SNPs", currentPage++);
-        }
-        try {
-            if (snpSheet != null) {
-                fillSheet(snpSheet, snps);
+        int totalPage = 0;
+        boolean dataLeft;
+        String sheetName;
+        List<List<Object>> sheetData;
+        List<String> headerRow;
+        
+        for (int i = 0; i < exportData.size(); ++i) {
+            sheetName = sheetNames.get(i);
+            sheetData = exportData.get(i);
+            headerRow = headers.get(i);
+            dataLeft = true;
+            currentPage = 0;
+            while (dataLeft) { //only 65536 rows allowed per sheet in xls format
+                if (!sheetData.isEmpty()) {
+                    if (currentPage++ > 0) {
+                        sheetName += "I";
+                    }
+                    sheet = workbook.createSheet(sheetName, totalPage++);
+                }
+
+                if (sheet != null) {
+                    dataLeft = this.fillSheet(sheet, sheetData, headerRow);
+                }
             }
-            workbook.write();
-            workbook.close();
-
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished writing Excel file!");
-        } catch (WriteException ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error writing file{0}", ex.getMessage());
         }
+        workbook.write();
+        workbook.close();
 
-        return tempFile;
+        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), NbBundle.getMessage(
+                ExcelExporter.class, "ExcelExporter.SuccessMsg") + sheetNames.get(0),
+                NbBundle.getMessage(ExcelExporter.class, "ExcelExporter.SuccessHeader"), JOptionPane.INFORMATION_MESSAGE);
+
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished writing Excel file!");
+
+        return file;
+    }
+  
+    /**
+     * This method actually fills the given excel sheet with the data handed over to
+     * this ExcelExporter.
+     * @param sheet the sheet to write the data to
+     * @param sheetData the data to write in this sheet
+     * @param headerRow the header to use for this sheet
+     * @return dataLeft: false, if the sheet could store all data, true, if there is too
+     * much data for one sheet
+     * @throws OutOfMemoryError 
+     * @throws WriteException 
+     */
+    public boolean fillSheet(WritableSheet sheet, List<List<Object>> sheetData, List<String> headerRow) throws OutOfMemoryError, WriteException {
+
+        boolean dataLeft = false;
+        int row = 0;
+        int column = 0;
+
+        for (String header : headerRow) {
+            this.addColumn(sheet, "LABEL", header, column++, row);
+        }
+        ++row;
+        this.progressHandle.progress("Storing line", this.rowNumberGlobal++);
+
+        String objectType;
+        for (List<Object> exportRow : sheetData) {
+
+            column = 0;
+            for (Object entry : exportRow) {
+                objectType = this.getObjectType(entry);
+                try {
+                    this.addColumn(sheet, objectType, entry, column++, row);
+                } catch (RowsExceededException e) {
+                    dataLeft = true;
+                    break;
+                }
+            }
+            if (dataLeft) { break; }
+            if (this.rowNumberGlobal++ % 10 == 0) {
+                this.progressHandle.progress("Storing line", this.rowNumberGlobal);
+            }
+            ++row;
+        }
+        
+        if (dataLeft) {
+            for (int i = 0; i < row; ++i) {
+                exportData.remove(0);
+            }
+        }
+        
+        return dataLeft;
     }
 
-    @Override
-    public void addColumn(WritableSheet sheet, String celltype, Object cellvalue, int column, int row) throws WriteException {
+    /**
+     * @param entry the entry whose object type needs to be checked
+     * @return The string representing the object type of the entry. Currently
+     * only "INTEGER", "STRING, or "UNKNOWN".
+     */
+    private String getObjectType(Object entry) {
+        if (entry instanceof Integer || entry instanceof Byte || entry instanceof Long) {
+            return "INTEGER";
+        } else if (entry instanceof String || entry instanceof Character
+                || entry instanceof CharSequence || entry instanceof Double) {
+            return "STRING";
+        } else if (entry instanceof Float) {
+            return "FLOAT";
+        } else {
+            return "UNKNOWN";
+        }
+    }
+    
+    /**
+     * Writes a single column in a given excel sheet.
+     * @param sheet the sheet to write to
+     * @param celltype the celltype of the cell to write
+     * @param cellvalue the value to be written in the column
+     * @param column column number
+     * @param row row number
+     * @throws WriteException
+     * @throws OutOfMemoryError 
+     */
+    public void addColumn(WritableSheet sheet, String celltype, Object cellvalue, int column, int row) throws WriteException, OutOfMemoryError {
         WritableFont arialbold = new WritableFont(WritableFont.ARIAL, 10, WritableFont.BOLD);
         WritableFont arial = new WritableFont(WritableFont.ARIAL, 10);
         if (cellvalue == null) {
@@ -79,6 +221,9 @@ public class ExcelExporter implements ExporterI {
             Label label = new Label(column, row, (String) cellvalue, header);
             sheet.addCell(label);
         } else if (celltype.equals("STRING")) {
+            cellvalue = cellvalue instanceof Character ? String.valueOf(cellvalue) : cellvalue;
+            cellvalue = cellvalue instanceof CharSequence ? String.valueOf(cellvalue) : cellvalue;
+            cellvalue = cellvalue instanceof Double ? cellvalue.toString() : cellvalue;
             WritableCellFormat string = new WritableCellFormat(arial);
             Label label = new Label(column, row, (String) cellvalue, string);
             sheet.addCell(label);
@@ -87,30 +232,25 @@ public class ExcelExporter implements ExporterI {
             Double value = Double.parseDouble(cellvalue.toString());
             Number number = new Number(column, row, value, integerFormat);
             sheet.addCell(number);
+        } else if (celltype.equals("FLOAT")) {
+            WritableCellFormat integerFormat = new WritableCellFormat(NumberFormats.FLOAT);
+            Float value = Float.parseFloat(cellvalue.toString());
+            Number number = new Number(column, row, value, integerFormat);
+            sheet.addCell(number);
+        } else if (celltype.equals("UNKNOWN")) {
+            WritableCellFormat string = new WritableCellFormat(arial);
+            Label label = new Label(column, row, cellvalue.toString(), string);
+            sheet.addCell(label);
         }
     }
-
-    public void fillSheet(WritableSheet sheet, List<Snp> snps) throws WriteException {
-        int row = 0;
-
-        addColumn(sheet, "LABEL", "Position", 0, row);
-        addColumn(sheet, "LABEL", "Base", 1, row);
-        addColumn(sheet, "LABEL", "Count", 2, row);
-        addColumn(sheet, "LABEL", "%", 3, row);
-        addColumn(sheet, "LABEL", "% variation at position", 4, row);
-        row++;
-
-        for (Snp snp : snps) {
-            addColumn(sheet, "INTEGER", snp.getPosition(), 0, row);
-            addColumn(sheet, "STRING", snp.getBase(), 1, row);
-            addColumn(sheet, "INTEGER", snp.getCount(), 2, row);
-            addColumn(sheet, "INTEGER", snp.getPercentage(), 3, row);
-            addColumn(sheet, "INTEGER", snp.getVariationPercentag(), 4, row);
-            row++;
-        }
-    }
-
-    public void setSNPs(List<Snp> snps) {
-        this.snps = snps;
+    
+    /**
+     * @return true, if the complete export process can be started by calling
+     *      {@link writeFile()}.
+     */
+    public boolean readyToExport() {
+        return this.exportData != null && !this.exportData.isEmpty() 
+                && this.headers != null && !this.headers.isEmpty()
+                && this.sheetNames != null && !this.sheetNames.isEmpty();
     }
 }

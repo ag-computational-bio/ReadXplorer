@@ -8,9 +8,22 @@ package de.cebitec.vamp.util;
  */
 public interface Observable {
 
+    /**
+     * Registers the given observer for this observable.
+     * @param observer the observer to register
+     */
     public void registerObserver(Observer observer);
 
+    /**
+     * Removes the given observer from the observable.
+     * @param observer the observer to remove
+     */
     public void removeObserver(Observer observer);
 
-    public void notifyObservers();
+    /**
+     * Notifies all observers currently observing the observable.
+     * @param data object for which the notification is created. It is often
+     * passed on to the observers.
+     */
+    public void notifyObservers(Object data);
 }

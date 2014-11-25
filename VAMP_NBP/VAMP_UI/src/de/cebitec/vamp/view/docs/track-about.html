@@ -1,0 +1,63 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>About VAMP's Track Viewer and Statistics</title>
+        <link rel="stylesheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <h2>General Viewer Navigation</h2>
+        <p style="font-size:0.9em">
+            First of all: All viewers are synchronized across all opened tracks, for easy navigation and comparison of data.
+            Each viewer allows to jump to any position, by drawing the horizontal scrollbar on top of each viewer. Besides that, panning can be
+            used to scroll through the vincinity of the current position. 
+            <br>Each viewer, which also has a slider beneath the horizontal scrollbar also allows zooming in and out. Another way of zooming is 
+            to move the mouse wheel while hovering the viewer. In this case, when zoomed in, the view centers around the currently hovered position.
+            <br>Each viewer also always allows copying the current mouse position via right click.
+        </p>
+        <br>
+        <h2>About VAMP's Reference Viewer</h2>
+        <p style="font-size:0.9em">
+            The reference viewer, which has to be opened before a track can be viewed, visualizes the reference sequence (genome, chromosome...)
+            with its features (if they are available -> fasta files don't inculde features) in all 6 reading frames.
+            <br>The features can be selected via left click and their additional menu can be opened via right click. If an features was clicked
+            it can be added to the thumbnail view, and it's sequence can be copied or stored.
+            <br>The legend panel in the top left corner allows to browse the supported feature types and also allows to show or hide each feature
+            type.
+        </p>
+        <br>
+        <h2>About VAMP's Track Viewer</h2>
+        <p style="font-size:0.9em">
+            The track viewer displays the coverage of it's reference sequence in the current dataset. The coverage is divided into three different
+            classes: 
+            <br>1. Perfect coverage: Depicts all mapped reads that perfectly fit to the reference at their mapping position (0 sequence deviations)
+            <br>2. Best match coverage: Depicts all mapped reads, that fit to this mapping position best (with least possible sequence deviation rate)
+            <br>3. Common Coverage: Depicts all mapped reads, that still fit to this mapping position with the maximal allowed error rate during 
+            the mapping process, but there is another position in the reference, where they fit with less sequence deviations.
+            <br>The legend panel in the top left corner allows to browse the coloring of these three classes and also enables the you to show or hide each class.
+            <br>The options panel next to the legend panel contains two functionalities currently:
+            <br>1. Enable or Disable automatic scaling of the coverage. If enabled, the coverage will never exceed the visible area of the viewer
+            <br>2. Coverage normalization either by log2 or by a factor of your own choice (between 0 and 10)
+        </p>
+        <br>
+        <h2>About VAMP's Track Statistics</h2>
+        <p>
+            TODO: The meaning of the track statistic values will be described here.
+        </p>
+    </body>
+</html>
+<!--
+Tip: to create a link which will open in an external web browser, try:
+<object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+    <param name="content" value="http://www.netbeans.org/">
+    <param name="text" value="<html><u>http://www.netbeans.org/</u></html>">
+    <param name="textFontSize" value="medium">
+    <param name="textColor" value="blue">
+</object>
+To create a link to a help set from another module, you need to know the code name base and path, e.g.:
+<a href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/configure/configure_options.html">Using the Options Window</a>
+(This link will behave sanely if that module is disabled or missing.)
+-->

@@ -1,10 +1,9 @@
-/*
- * This Module can display all Tracks for a given List of Features in a Thumbnail-like View.
- */
 package de.cebitec.vamp.thumbnail;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.controller.ViewController;
+import de.cebitec.vamp.databackend.IntervalRequest;
+import de.cebitec.vamp.databackend.connector.MultiTrackConnector;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
@@ -14,7 +13,7 @@ import de.cebitec.vamp.thumbnail.Actions.OpenThumbCookie;
 import de.cebitec.vamp.thumbnail.Actions.RemoveCookie;
 import de.cebitec.vamp.thumbnail.Actions.SyncSliderCookie;
 import de.cebitec.vamp.ui.visualisation.AppPanelTopComponent;
-import de.cebitec.vamp.ui.visualisation.reference.ReferenceFeatureTopComponent;
+import de.cebitec.vamp.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
@@ -65,7 +64,9 @@ import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
 /**
- * ServiceProvider for IThumbnailView
+ * ServiceProvider for IThumbnailView.
+ * This Module can display all Tracks for a given List of Features in a Thumbnail-like View.
+ *
  * @author denis
  */
 @ServiceProvider(service = IThumbnailView.class)
@@ -77,7 +78,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     private ReferenceViewer activeViewer;
     //Gives access to all Features which are displayed for a referenceViewer
     private HashMap<ReferenceViewer, List<PersistantFeature>> selectedFeatures;
-    //Gives access to all BasePanels for feature
+    //Gives access to all BasePanels for Feature
     private HashMap<PersistantFeature, List<BasePanel>> featureToTrackpanelList;
     //Gives access to PersistantTrack from BasePanel
     private HashMap<BasePanel, PersistantTrack> trackPanelToTrack;
@@ -92,11 +93,11 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     private boolean autoSlider = true;
 
     public ThumbnailController() {
-        this.refThumbTopComponents = new HashMap<ReferenceViewer, ThumbNailViewTopComponent>();
-        this.selectedFeatures = new HashMap<ReferenceViewer, List<PersistantFeature>>();
-        this.featureToTrackpanelList = new HashMap<PersistantFeature, List<BasePanel>>();
-        this.trackPanelToTrack = new HashMap<BasePanel, PersistantTrack>();
-        this.featureToLayoutWidget = new HashMap<PersistantFeature, Widget>();
+        this.refThumbTopComponents = new HashMap<>();
+        this.selectedFeatures = new HashMap<>();
+        this.featureToTrackpanelList = new HashMap<>();
+        this.trackPanelToTrack = new HashMap<>();
+        this.featureToLayoutWidget = new HashMap<>();
 
         content = new InstanceContent();
         controllerLookup = new ThumbControllerLookup(content);
@@ -132,7 +133,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             drawScene();
             //Cookie Stuff
             removeThumbSpecificCookies();
-            addSynchCookieToLookup();
+            addSyncCookieToLookup();
         }
     }
 
@@ -165,7 +166,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             drawScene();
             removeThumbSpecificCookies();
             //Activate Synchronize-Action for ZoomSliders
-            addSynchCookieToLookup();
+            addSyncCookieToLookup();
         }
 
     }
@@ -173,7 +174,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     /**
      * Activates synchronize-Sliders Action in Menu.
      */
-    private void addSynchCookieToLookup() {
+    private void addSyncCookieToLookup() {
         getLookup().add(new SyncSliderCookie() {
 
             @Override
@@ -196,16 +197,16 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             public void async() {
                 sliderSynchronisation(false);
                 getLookup().removeAll(ASyncSliderCookie.class);
-                addSynchCookieToLookup();
+                addSyncCookieToLookup();
             }
         });
     }
 
     /**
-     * Sets all Sliders based on synch-Value
-     * @param synch Is Set through Cookie-Actions to specify if VerticalSliders should be synchronized.
+     * Sets all Sliders based on sync-Value
+     * @param sync Is Set through Cookie-Actions to specify if VerticalSliders should be synchronized.
      */
-    private void sliderSynchronisation(boolean synch) {
+    private void sliderSynchronisation(boolean sync) {
         //synchronize all Sliders for all RefrenceViewer's ThumbnailViewTopComponents
         for (ReferenceViewer oneViewer : refThumbTopComponents.keySet()) {
             if (selectedFeatures.containsKey(oneViewer)) {
@@ -216,7 +217,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
                             JPanel panel = (JPanel) bp.getComponent(0);
                             if (panel != null) {
                                 CoverageZoomSlider slider = (CoverageZoomSlider) panel.getComponent(1);
-                                if (synch) {
+                                if (sync) {
                                     slider.addChangeListener(zoomChangeListener);
                                     zoomChangeListener.addMapValue((TrackViewer) panel.getComponent(0), slider);
                                 } else {
@@ -236,7 +237,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     }
 
 
-    /*
+    /**
      * Draws all Thumbnail-Widgets for all features
      */
     private void drawScene() {
@@ -244,7 +245,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector(controller.getCurrentRefGen().getId());
         if (activeViewer != null && selectedFeatures.containsKey(activeViewer)) {
             for (PersistantFeature feature : selectedFeatures.get(activeViewer)) {
-                addFeatureToView(feature, refCon);
+                this.addFeatureToView(feature, refCon);
             }
             if (!(WindowManager.getDefault().getRegistry().getActivated() == activeTopComp)) {
                 activeTopComp.requestAttention(true);
@@ -257,7 +258,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         }
     }
 
-    /*
+    /**
      * Creates BasePanel for one Track with TrackViewer and ZoomSlider for wrapping into ComponentWidget.
      */
     private BasePanel createTrackPanel(PersistantTrack track, ViewController controller, CheckBoxActionListener cbListener) {
@@ -267,18 +268,18 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         controller.addMousePositionListener(b);
 
         // create track viewer
-        MultiTrackConnector tc = new MultiTrackConnector(track);
+        MultiTrackConnector tc = ProjectConnector.getInstance().getMultiTrackConnector(track);
 
-        final TrackViewer trackV = new TrackViewer(boundsManager, b, controller.getCurrentRefGen(), tc);
-        int featureWidth = (currentFeature.getStop() - currentFeature.getStart()) / 2;
-        trackV.getTrackCon().getThread().setCoveredWidth(featureWidth);
+        final TrackViewer trackV = new TrackViewer(boundsManager, b, controller.getCurrentRefGen(), tc, false);
+        int featureCenter = (currentFeature.getStop() - currentFeature.getStart()) / 2;
+        trackV.getTrackCon().getCoverageThread().setCoveredWidth(featureCenter);
 
         trackV.setName(track.getDescription());
 
         CoverageInfoLabel cil = new CoverageInfoLabel();
         trackV.setTrackInfoPanel(cil);
 
-        //eigener ComponentListener für TrackV
+        //own ComponentListener for TrackViewer
         trackV.addComponentListener(new TrackViewerCompListener(currentFeature, trackV));
 
 
@@ -287,7 +288,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
 
         //Set initial Slider-value based on Coverage if autoSlider is true
         if (autoSlider) {
-            HashMap<Integer, Integer> cov = tc.getCoverageInfosOfTrack(currentFeature.getStart(), currentFeature.getStop());
+            HashMap<Integer, Integer> cov = tc.getCoverageInfosOfTrack(new IntervalRequest(currentFeature.getStart(), currentFeature.getStop(), null));
             int max = 0;
             int cnt = 0;
             int avg = 0;
@@ -311,6 +312,12 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         //Größe ändern
         b.setMinimumSize(new Dimension(200, 150));
         b.setPreferredSize(new Dimension(200, 150));
+        
+        //show data in viewer
+//        trackV.updateLogicalBounds(new BoundsInfo(currentFeature.getStart(), currentFeature.getStop(), 
+//                currentFeature.getStart() + featureCenter, 1, featureCenter * 2));
+        trackV.boundsChangedHook();
+        
         return b;
     }
 
@@ -325,12 +332,12 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         controller.addMousePositionListener(b);
 
         // get double track connector
-        MultiTrackConnector trackCon = new MultiTrackConnector(tracks);
-        MultipleTrackViewer trackV = new MultipleTrackViewer(boundsManager, b, controller.getCurrentRefGen(), trackCon);
+        MultiTrackConnector trackCon = ProjectConnector.getInstance().getMultiTrackConnector(tracks);
+        MultipleTrackViewer trackV = new MultipleTrackViewer(boundsManager, b, controller.getCurrentRefGen(), trackCon, false);
 
         int featureWidth = (feature.getStop() - feature.getStart()) / 2;
-        trackV.getTrackCon().getThread().setCoveredWidth(featureWidth);
-
+        trackV.getTrackCon().getCoverageThread().setCoveredWidth(featureWidth);
+ 
         //eigener ComponentListener für TrackV
         trackV.addComponentListener(new TrackViewerCompListener(feature, trackV));
 
@@ -340,7 +347,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         cil.renameFields();
         trackV.setTrackInfoPanel(cil);
 
-        // create zoom slider and set its value based on other slider's values for this feature
+        // create zoom slider and set its value based on other slider's values for this Feature
         CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
         BasePanel p = featureToTrackpanelList.get(feature).get(0);
         try {
@@ -384,11 +391,11 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
 
     @Override
     public void removeAllFeatures(ReferenceViewer refViewer) {
-        //could be used as a function to delete all features
+        //could be used as a function to delete all Features
     }
 
     @Override
-    public void removeCertainFeatures(PersistantFeature f) {
+    public void removeCertainFeature(PersistantFeature f) {
         selectedFeatures.get(activeViewer).remove(f);
         //If all Features for activeViewer have been removed it is also removed as key from the list
         if (selectedFeatures.get(activeViewer).isEmpty()) {
@@ -399,14 +406,14 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     @Override
     public void addFeatureToList(PersistantFeature feature, final ReferenceViewer refViewer) {
         if (!selectedFeatures.containsKey(refViewer)) {
-            ArrayList<PersistantFeature> list = new ArrayList<PersistantFeature>();
+            ArrayList<PersistantFeature> list = new ArrayList<>();
             list.add(feature);
             selectedFeatures.put(refViewer, list);
         } else {
             selectedFeatures.get(refViewer).add(feature);
         }
         activeTopComp = refThumbTopComponents.get(refViewer);
-        //adds feature directly to Scene if ThumbnailTopComponent for this RefViewer is open
+        //adds Feature directly to Scene if ThumbnailTopComponent for this RefViewer is open
         if (WindowManager.getDefault().getRegistry().getOpened().contains(activeTopComp)) {
             ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector(controller.getCurrentRefGen().getId());
             addFeatureToView(feature, refCon);
@@ -432,14 +439,14 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
                     if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION)) {
                         for (Object f : rfp.getSelectedValues()) {
                             PersistantFeature feat = (PersistantFeature) f;
-                            removeCertainFeatures(feat);
+                            removeCertainFeature(feat);
                             if (featureToLayoutWidget.containsKey(feat) && featureToTrackpanelList.containsKey(feat)) {
                                 activeTopComp.getScene().removeChild(featureToLayoutWidget.get(feat));
 
                                 for (BasePanel p : featureToTrackpanelList.get(feat)) {
                                     trackPanelToTrack.remove(p);
                                     //Stop CoverageThread
-                                    ((MultiTrackConnector) ((TrackViewer) p.getViewer()).getTrackCon()).getThread().stop();
+                                    ((MultiTrackConnector) ((TrackViewer) p.getViewer()).getTrackCon()).getCoverageThread().stop();
                                 }
                                 featureToTrackpanelList.remove(feat);
                                 featureToLayoutWidget.remove(feat);
@@ -492,13 +499,13 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     }
 
     /**
-     * MouseAdapter, for updating feature information
+     * MouseAdapter, for updating Feature information
      */
     @Override
     public void mousePressed(MouseEvent e) {
         BasePanel p = (BasePanel) e.getSource();
         if (p != null) {
-            updateCurrentFeature(p);
+            this.updateCurrentFeature(p);
         }
     }
 
@@ -513,11 +520,11 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     }
 
     /**
-     * Updates the ReferenceFeatureComponent to the currently selected feature and sets currentFeature value.
+     * Updates the ReferenceFeatureComponent to the currently selected Feature and sets currentFeature value.
      * @param bp BasePanel where user has clicked
      */
     private void updateCurrentFeature(BasePanel bp) {
-        ReferenceFeatureTopComponent comp = (ReferenceFeatureTopComponent) WindowManager.getDefault().findTopComponent("ReferenceFeatureTopComponent");
+        ReferenceFeatureTopComp comp = (ReferenceFeatureTopComp) WindowManager.getDefault().findTopComponent("ReferenceFeatureTopComp");
         if (comp != null) {
             for (PersistantFeature feature : featureToTrackpanelList.keySet()) {
                 if (featureToTrackpanelList.get(feature).contains(bp)) {
@@ -653,7 +660,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         featureToLayoutWidget.put(feature, layoutWidg);
 
         //Save all BasePanels for feature in List to put into HashMap
-        List<BasePanel> bps = new ArrayList<BasePanel>();
+        List<BasePanel> bps = new ArrayList<>();
         CheckBoxActionListener cbListener = new CheckBoxActionListener();
         for (PersistantTrack track : refCon.getAssociatedTracks()) {
             BasePanel trackPanel = createTrackPanel(track, controller, cbListener);
@@ -699,7 +706,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         void startCompare(ActionEvent e) {
             try {
                 BasePanel secondTrackBP = (BasePanel) ((JPanel) ((JCheckBox) e.getSource()).getParent()).getParent();
-                ArrayList<PersistantTrack> trackList = new ArrayList<PersistantTrack>();
+                ArrayList<PersistantTrack> trackList = new ArrayList<>();
                 trackList.add(trackPanelToTrack.get(firstTrackPanelToCompare));
                 trackList.add(trackPanelToTrack.get(secondTrackBP));
                 compareTwoTracks(trackList, currentFeature);

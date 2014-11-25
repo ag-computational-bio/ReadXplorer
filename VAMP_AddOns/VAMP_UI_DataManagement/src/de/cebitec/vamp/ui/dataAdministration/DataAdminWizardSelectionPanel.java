@@ -7,16 +7,12 @@ import de.cebitec.vamp.parser.Job;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.ui.dataAdministration.actions.DataAdminWizardAction;
+import de.cebitec.vamp.util.VisualisationUtils;
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.File;
+import java.util.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
@@ -30,7 +26,7 @@ public class DataAdminWizardSelectionPanel implements WizardDescriptor.Finishabl
      */
     private SelectionCard component;
     private boolean isValid;
-    private final Set<ChangeListener> listeners = new HashSet<ChangeListener>(1); // or can use ChangeSupport in NB 6.0
+    private final Set<ChangeListener> listeners = new HashSet<>(1); // or can use ChangeSupport in NB 6.0
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -79,7 +75,7 @@ public class DataAdminWizardSelectionPanel implements WizardDescriptor.Finishabl
     protected final void fireChangeEvent() {
         Iterator<ChangeListener> it;
         synchronized (listeners) {
-            it = new HashSet<ChangeListener>(listeners).iterator();
+            it = new HashSet<>(listeners).iterator();
         }
         ChangeEvent ev = new ChangeEvent(this);
         while (it.hasNext()) {
@@ -88,36 +84,43 @@ public class DataAdminWizardSelectionPanel implements WizardDescriptor.Finishabl
     }
 
     private Map<String, List<? extends Job>> getDeletableReferencesAndTracks(){
-        List<ReferenceJob> refJobs = new ArrayList<ReferenceJob>();
-        List<TrackJob> trackJobs = new ArrayList<TrackJob>();
-        HashMap<Long, ReferenceJob> indexedGens = new HashMap<Long, ReferenceJob>();
+        List<ReferenceJob> refJobs = new ArrayList<>();
+        List<TrackJob> trackJobs = new ArrayList<>();
+        HashMap<Integer, ReferenceJob> indexedRefs = new HashMap<>();
+        
+        try {
 
-        List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
-        for(Iterator<PersistantReference> it = dbGens.iterator(); it.hasNext(); ){
-            PersistantReference dbGen = it.next();
-            // File and parser parameter meaningles in this context
-            ReferenceJob r = new ReferenceJob(dbGen.getId(), null, null, dbGen.getDescription(), dbGen.getName(), dbGen.getTimeStamp());
-            indexedGens.put(r.getID(), r);
-            refJobs.add(r);
-        }
+            List<PersistantReference> dbGens = ProjectConnector.getInstance().getGenomes();
+            for (Iterator<PersistantReference> it = dbGens.iterator(); it.hasNext();) {
+                PersistantReference dbGen = it.next();
+                // File and parser parameter meaningless in this context
+                ReferenceJob r = new ReferenceJob(dbGen.getId(), null, null, dbGen.getDescription(), dbGen.getName(), dbGen.getTimeStamp());
+                indexedRefs.put(r.getID(), r);
+                refJobs.add(r);
+            }
 
-        List<PersistantTrack> dbTracks = ProjectConnector.getInstance().getTracks();
-        for(Iterator<PersistantTrack> it = dbTracks.iterator(); it.hasNext(); ){
-            PersistantTrack dbTrack = it.next();
+            List<PersistantTrack> dbTracks = ProjectConnector.getInstance().getTracks();
+            for (Iterator<PersistantTrack> it = dbTracks.iterator(); it.hasNext();) {
+                PersistantTrack dbTrack = it.next();
 
-            // File and parser, refgenjob, runjob parameters meaningles in this context
-            TrackJob t = new TrackJob(dbTrack.getId(), null, dbTrack.getDescription(),
-                    indexedGens.get(dbTrack.getRefGenID()),
-                    null, dbTrack.getTimestamp());
+                // File and parser, refgenjob, runjob parameters meaningless in this context
+                boolean isDbUsed = dbTrack.getFilePath().isEmpty();
+                TrackJob t = new TrackJob(dbTrack.getId(), isDbUsed, new File(dbTrack.getFilePath()), 
+                        dbTrack.getDescription(), indexedRefs.get(dbTrack.getRefGenID()),
+                        null, false, dbTrack.getTimestamp());
 
-            // register dependent tracks at genome and run
-            ReferenceJob gen = indexedGens.get(dbTrack.getRefGenID());
-            gen.registerTrackWithoutRunJob(t);
-            trackJobs.add(t);
+                // register dependent tracks at genome and run
+                ReferenceJob gen = indexedRefs.get(dbTrack.getRefGenID());
+                gen.registerTrackWithoutRunJob(t);
+                trackJobs.add(t);
+            }
+        
+        } catch (OutOfMemoryError e) {
+            VisualisationUtils.displayOutOfMemoryError(this.component);
         }
 
         // fill result map
-        Map<String, List<? extends Job>> deletableStuff = new HashMap<String, List<? extends Job>>();
+        Map<String, List<? extends Job>> deletableStuff = new HashMap<>();
         deletableStuff.put("references", refJobs);
         deletableStuff.put("tracks", trackJobs);
         return deletableStuff;

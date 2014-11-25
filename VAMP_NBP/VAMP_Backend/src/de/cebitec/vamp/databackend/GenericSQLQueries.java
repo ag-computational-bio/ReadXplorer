@@ -1,6 +1,5 @@
 package de.cebitec.vamp.databackend;
 
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,17 +28,17 @@ public class GenericSQLQueries {
      * @return the value calculated for the given sqlStatement
      */
     public static int getIntegerFromDB(String sqlStatement, String identifier, Connection con, long trackID){
-        int num = 0;
-        try {
-            PreparedStatement fetch = con.prepareStatement(sqlStatement);
+        int num = -1;
+        try (PreparedStatement fetch = con.prepareStatement(sqlStatement)) {
             fetch.setLong(1, trackID);
 
             ResultSet rs = fetch.executeQuery();
             if (rs.next()) {
                 num = rs.getInt(identifier);
             }
+            rs.close();
         } catch (SQLException ex) {
-            Logger.getLogger(SQLStatements.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GenericSQLQueries.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return num;
@@ -53,16 +52,15 @@ public class GenericSQLQueries {
      */
     public static long getLatestIDFromDB(String sqlStatement, Connection con) {
         long id = 0;
-        try {
-            PreparedStatement latestID = con.prepareStatement(sqlStatement);
+        try (PreparedStatement latestID = con.prepareStatement(sqlStatement)) {
 
             ResultSet rs = latestID.executeQuery();
             if (rs.next()) {
                 id = rs.getLong("LATEST_ID");
             }
-            latestID.close();
+            rs.close();
         } catch (SQLException ex) {
-            ProjectConnector.getInstance().rollbackOnError(ProjectConnector.getInstance().getClass().getName(), ex);
+            Logger.getLogger(GenericSQLQueries.class.getName()).log(Level.SEVERE, null, ex);
         }
         return ++id;
     }
@@ -80,29 +78,31 @@ public class GenericSQLQueries {
                 + " END";
     }
     
+
     /**
-     * Adds a new column with an Integer value to the table
+     * Adds a new column to the table.
      * @param table table
      * @param column column to add
+     * @param type the type of the column
      * @return SQL command
      */
-    public static String genAddColumnString2(String table, String column) {
+    public static String genAddColumnString(String table, String column, String type) {
         return "ALTER TABLE "
                 + table
-                + " ADD COLUMN "
-                + column + " BIGINT UNSIGNED ";
+                + " ADD COLUMN IF NOT EXISTS "
+                + column + " " + type;
     }
     
     /**
-     * Adds a new column with a varchar 20 value to the table.
+     * Adds a new column to the table.
      * @param table table
      * @param column column to add
      * @return SQL command
      */
-    public static String genAddColumnString3(String table, String column) {
+    public static String genRemoveColumnString(String table, String column) {
         return "ALTER TABLE "
                 + table
-                + " ADD COLUMN "
-                + column + " VARCHAR(20) ";
+                + " DROP COLUMN IF EXISTS " 
+                + column;
     }
 }

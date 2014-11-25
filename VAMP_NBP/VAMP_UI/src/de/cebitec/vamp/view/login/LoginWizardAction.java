@@ -18,9 +18,12 @@ import org.openide.WizardDescriptor;
 import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
 
-// An example action demonstrating how the wizard could be called from within
-// your code. You can copy-paste the code below wherever you need.
-public final class LoginWizardAction implements ActionListener{
+/**
+ * Action for opening the login wizard.
+ * 
+ * @author ddoppmeier, Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
+ */
+public final class LoginWizardAction implements ActionListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -32,7 +35,7 @@ public final class LoginWizardAction implements ActionListener{
         // check if user is already logged in
         Boolean loggedIn = cl.lookup(LoginCookie.class) != null ? Boolean.TRUE : Boolean.FALSE;
 
-        if (loggedIn){
+        if (loggedIn){ //logout from other db
             LogoutAction logoutAction = new LogoutAction(cl.lookup(LoginCookie.class));
             logoutAction.actionPerformed(new ActionEvent(this, 1, "close"));
         }
@@ -55,7 +58,12 @@ public final class LoginWizardAction implements ActionListener{
             
             Map<String, Object> loginProps = wizardDescriptor.getProperties();
             try {
-                ProjectConnector.getInstance().connect((String) loginProps.get(LoginWizardPanel.PROP_ADAPTER), (String) loginProps.get(LoginWizardPanel.PROP_HOST), (String) loginProps.get(LoginWizardPanel.PROP_DATABASE), (String) loginProps.get(LoginWizardPanel.PROP_USER), (String) loginProps.get(LoginWizardPanel.PROP_PASSWORD));
+                ProjectConnector.getInstance().connect(
+                        (String) loginProps.get(LoginWizardPanel.PROP_ADAPTER), 
+                        (String) loginProps.get(LoginWizardPanel.PROP_DATABASE), 
+                        (String) loginProps.get(LoginWizardPanel.PROP_HOST), 
+                        (String) loginProps.get(LoginWizardPanel.PROP_USER), 
+                        (String) loginProps.get(LoginWizardPanel.PROP_PASSWORD));
                 cl.add(new LoginCookie() {
 
                     @Override
@@ -68,7 +76,7 @@ public final class LoginWizardAction implements ActionListener{
                 mainFrame.setTitle(mainFrame.getTitle() + " - " + (String) loginProps.get(LoginWizardPanel.PROP_DATABASE));
             } catch (SQLException ex) {
                 NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
-                nd.setTitle(NbBundle.getBundle(LoginWizardAction.class).getString("MSG_LoginWizardAction.sqlError"));
+                nd.setTitle(NbBundle.getMessage(LoginWizardAction.class, "MSG_LoginWizardAction.sqlError"));
                 DialogDisplayer.getDefault().notify(nd);
             }
         }

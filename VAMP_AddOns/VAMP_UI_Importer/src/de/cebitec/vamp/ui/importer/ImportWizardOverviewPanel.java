@@ -1,6 +1,7 @@
 package de.cebitec.vamp.ui.importer;
 
 import de.cebitec.vamp.parser.ReferenceJob;
+import de.cebitec.vamp.parser.SeqPairJobContainer;
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.ui.importer.actions.ImportWizardAction;
 import java.awt.Component;
@@ -15,7 +16,7 @@ public class ImportWizardOverviewPanel implements WizardDescriptor.Panel<WizardD
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
-    private ImportOverviewCard component;
+    private ImportOverviewCard importOverviewCard;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -23,10 +24,10 @@ public class ImportWizardOverviewPanel implements WizardDescriptor.Panel<WizardD
     // create only those which really need to be visible.
     @Override
     public Component getComponent() {
-        if (component == null) {
-            component = new ImportOverviewCard();
+        if (importOverviewCard == null) {
+            importOverviewCard = new ImportOverviewCard();
         }
-        return component;
+        return importOverviewCard;
     }
 
     @Override
@@ -60,8 +61,10 @@ public class ImportWizardOverviewPanel implements WizardDescriptor.Panel<WizardD
         // load jobs to be imported
         List<ReferenceJob> refJobs = (List<ReferenceJob>) settings.getProperty(ImportWizardAction.PROP_REFJOBLIST);
         List<TrackJob> trackJobs = (List<TrackJob>) settings.getProperty(ImportWizardAction.PROP_TRACKJOBLIST);
-
-        component.showOverview(refJobs, trackJobs);
+        List<SeqPairJobContainer> seqPairJobs = (List<SeqPairJobContainer>) settings.getProperty(ImportWizardAction.PROP_SEQPAIRJOBLIST);
+        List<TrackJob> positionTableJobs = (List<TrackJob>) settings.getProperty(ImportWizardAction.PROP_POSITIONTABLELIST);
+        
+        importOverviewCard.showOverview(refJobs, trackJobs, seqPairJobs, positionTableJobs);
     }
 
     @Override

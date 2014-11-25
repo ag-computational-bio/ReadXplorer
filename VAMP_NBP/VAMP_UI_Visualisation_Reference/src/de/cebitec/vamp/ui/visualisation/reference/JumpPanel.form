@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8" ?>
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <Form version="1.3" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <NonVisualComponents>
@@ -37,8 +37,8 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jumpTextfield" pref="210" max="32767" attributes="1"/>
-                  <Component id="searchPatternField" alignment="0" pref="210" max="32767" attributes="1"/>
+                  <Component id="jumpTextfield" pref="206" max="32767" attributes="1"/>
+                  <Component id="searchPatternField" alignment="0" max="32767" attributes="1"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -69,6 +69,9 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jumpTextfieldActionPerformed"/>
         <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="jumpTextfieldKeyTyped"/>
       </Events>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTextFieldPasteable()"/>
+      </AuxValues>
     </Component>
     <Component class="javax.swing.JButton" name="jumpButton">
       <Properties>
@@ -90,8 +93,8 @@
       <Layout>
         <DimensionLayout dim="0">
           <Group type="103" groupAlignment="0" attributes="0">
-              <Component id="filterProperties" alignment="0" min="0" pref="327" max="32767" attributes="1"/>
-              <Component id="tableScrollPane" alignment="0" pref="327" max="32767" attributes="1"/>
+              <Component id="filterProperties" alignment="0" min="0" pref="174" max="32767" attributes="1"/>
+              <Component id="tableScrollPane" alignment="0" pref="0" max="32767" attributes="1"/>
           </Group>
         </DimensionLayout>
         <DimensionLayout dim="1">
@@ -99,7 +102,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <Component id="filterProperties" min="-2" max="-2" attributes="0"/>
                   <EmptySpace max="-2" attributes="0"/>
-                  <Component id="tableScrollPane" pref="326" max="32767" attributes="0"/>
+                  <Component id="tableScrollPane" pref="330" max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -117,23 +120,25 @@
           <Layout>
             <DimensionLayout dim="0">
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Group type="102" alignment="0" attributes="0">
-                      <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="jumpFilterLabel" min="-2" max="-2" attributes="0"/>
-                          <Component id="filterForLabel" alignment="1" min="-2" max="-2" attributes="0"/>
-                      </Group>
-                      <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+                  <Group type="102" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" attributes="0">
+                              <Component id="jumpFilterLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="10" max="-2" attributes="0"/>
+                              <Component id="filterTextfield" max="32767" attributes="1"/>
+                          </Group>
+                          <Group type="102" attributes="0">
+                              <Component id="filterForLabel" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="radioFeatureButton" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Component id="radioGene" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="radioProduct" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="radioEC" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="radioGene" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                           </Group>
-                          <Component id="filterTextfield" pref="256" max="32767" attributes="1"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -146,7 +151,7 @@
                           <Component id="jumpFilterLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="filterTextfield" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace max="-2" attributes="0"/>
+                      <EmptySpace pref="6" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="filterForLabel" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="radioProduct" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -154,7 +159,7 @@
                           <Component id="radioFeatureButton" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="radioGene" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -162,7 +167,7 @@
           <SubComponents>
             <Component class="javax.swing.JLabel" name="jumpFilterLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Filter:"/>
+                <Property name="text" type="java.lang.String" value="RegEx Filter:"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JTextField" name="filterTextfield">
@@ -171,10 +176,13 @@
                   <Connection component="jumpTextfield" name="preferredSize" type="property"/>
                 </Property>
               </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTextFieldPasteable()"/>
+              </AuxValues>
             </Component>
             <Component class="javax.swing.JLabel" name="filterForLabel">
               <Properties>
-                <Property name="text" type="java.lang.String" value="Filter for:"/>
+                <Property name="text" type="java.lang.String" value="Column:"/>
               </Properties>
             </Component>
             <Component class="javax.swing.JRadioButton" name="radioProduct">
@@ -194,7 +202,7 @@
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
                   <ComponentRef name="buttonGroup1"/>
                 </Property>
-                <Property name="text" type="java.lang.String" value="EC-Number"/>
+                <Property name="text" type="java.lang.String" value="EC-Num"/>
                 <Property name="actionCommand" type="java.lang.String" value="ec"/>
               </Properties>
               <Events>
@@ -247,6 +255,9 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="searchPatternFieldActionPerformed"/>
         <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="searchPatternFieldKeyTyped"/>
       </Events>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new JTextFieldPasteable()"/>
+      </AuxValues>
     </Component>
     <Component class="javax.swing.JButton" name="searchPatternButton">
       <Properties>

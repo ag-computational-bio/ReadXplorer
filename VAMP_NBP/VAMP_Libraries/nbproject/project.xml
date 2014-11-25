@@ -27,6 +27,178 @@
                 <package>com.mysql.jdbc.log</package>
                 <package>com.mysql.jdbc.profiler</package>
                 <package>com.mysql.jdbc.util</package>
+                <package>com.sun.browser.plugin</package>
+                <package>com.sun.deploy.uitoolkit.impl.fx</package>
+                <package>com.sun.deploy.uitoolkit.impl.fx.ui</package>
+                <package>com.sun.deploy.uitoolkit.impl.fx.ui.resources</package>
+                <package>com.sun.glass.events</package>
+                <package>com.sun.glass.ui</package>
+                <package>com.sun.glass.ui.delegate</package>
+                <package>com.sun.glass.ui.gtk</package>
+                <package>com.sun.glass.ui.mac</package>
+                <package>com.sun.glass.ui.win</package>
+                <package>com.sun.glass.ui.x11</package>
+                <package>com.sun.glass.utils</package>
+                <package>com.sun.javafx</package>
+                <package>com.sun.javafx.animation</package>
+                <package>com.sun.javafx.animation.transition</package>
+                <package>com.sun.javafx.applet</package>
+                <package>com.sun.javafx.application</package>
+                <package>com.sun.javafx.beans</package>
+                <package>com.sun.javafx.beans.annotations</package>
+                <package>com.sun.javafx.beans.event</package>
+                <package>com.sun.javafx.binding</package>
+                <package>com.sun.javafx.charts</package>
+                <package>com.sun.javafx.collections</package>
+                <package>com.sun.javafx.collections.annotations</package>
+                <package>com.sun.javafx.collections.transformation</package>
+                <package>com.sun.javafx.css</package>
+                <package>com.sun.javafx.css.converters</package>
+                <package>com.sun.javafx.css.parser</package>
+                <package>com.sun.javafx.cursor</package>
+                <package>com.sun.javafx.effect</package>
+                <package>com.sun.javafx.embed</package>
+                <package>com.sun.javafx.event</package>
+                <package>com.sun.javafx.font</package>
+                <package>com.sun.javafx.fxml</package>
+                <package>com.sun.javafx.fxml.builder</package>
+                <package>com.sun.javafx.fxml.expression</package>
+                <package>com.sun.javafx.geom</package>
+                <package>com.sun.javafx.geom.transform</package>
+                <package>com.sun.javafx.iio</package>
+                <package>com.sun.javafx.iio.bmp</package>
+                <package>com.sun.javafx.iio.common</package>
+                <package>com.sun.javafx.iio.gif</package>
+                <package>com.sun.javafx.iio.jpeg</package>
+                <package>com.sun.javafx.iio.png</package>
+                <package>com.sun.javafx.image</package>
+                <package>com.sun.javafx.image.impl</package>
+                <package>com.sun.javafx.jmx</package>
+                <package>com.sun.javafx.logging</package>
+                <package>com.sun.javafx.menu</package>
+                <package>com.sun.javafx.perf</package>
+                <package>com.sun.javafx.property</package>
+                <package>com.sun.javafx.property.adapter</package>
+                <package>com.sun.javafx.robot</package>
+                <package>com.sun.javafx.robot.impl</package>
+                <package>com.sun.javafx.runtime</package>
+                <package>com.sun.javafx.runtime.async</package>
+                <package>com.sun.javafx.runtime.eula</package>
+                <package>com.sun.javafx.scene</package>
+                <package>com.sun.javafx.scene.control</package>
+                <package>com.sun.javafx.scene.control.behavior</package>
+                <package>com.sun.javafx.scene.control.skin</package>
+                <package>com.sun.javafx.scene.control.skin.resources</package>
+                <package>com.sun.javafx.scene.input</package>
+                <package>com.sun.javafx.scene.layout.region</package>
+                <package>com.sun.javafx.scene.paint</package>
+                <package>com.sun.javafx.scene.shape</package>
+                <package>com.sun.javafx.scene.text</package>
+                <package>com.sun.javafx.scene.transform</package>
+                <package>com.sun.javafx.scene.traversal</package>
+                <package>com.sun.javafx.scene.web</package>
+                <package>com.sun.javafx.scene.web.behavior</package>
+                <package>com.sun.javafx.scene.web.skin</package>
+                <package>com.sun.javafx.sg</package>
+                <package>com.sun.javafx.sg.prism</package>
+                <package>com.sun.javafx.stage</package>
+                <package>com.sun.javafx.tk</package>
+                <package>com.sun.javafx.tk.desktop</package>
+                <package>com.sun.javafx.tk.quantum</package>
+                <package>com.sun.javafx.util</package>
+                <package>com.sun.media.jfxmedia</package>
+                <package>com.sun.media.jfxmedia.control</package>
+                <package>com.sun.media.jfxmedia.effects</package>
+                <package>com.sun.media.jfxmedia.events</package>
+                <package>com.sun.media.jfxmedia.locator</package>
+                <package>com.sun.media.jfxmedia.logging</package>
+                <package>com.sun.media.jfxmedia.track</package>
+                <package>com.sun.media.jfxmediaimpl</package>
+                <package>com.sun.media.jfxmediaimpl.platform</package>
+                <package>com.sun.media.jfxmediaimpl.platform.gstreamer</package>
+                <package>com.sun.media.jfxmediaimpl.platform.java</package>
+                <package>com.sun.media.jfxmediaimpl.platform.osx</package>
+                <package>com.sun.openpisces</package>
+                <package>com.sun.prism</package>
+                <package>com.sun.prism.camera</package>
+                <package>com.sun.prism.image</package>
+                <package>com.sun.prism.impl</package>
+                <package>com.sun.prism.impl.packrect</package>
+                <package>com.sun.prism.impl.paint</package>
+                <package>com.sun.prism.impl.ps</package>
+                <package>com.sun.prism.impl.shape</package>
+                <package>com.sun.prism.j2d</package>
+                <package>com.sun.prism.j2d.paint</package>
+                <package>com.sun.prism.paint</package>
+                <package>com.sun.prism.ps</package>
+                <package>com.sun.prism.render</package>
+                <package>com.sun.prism.shader</package>
+                <package>com.sun.prism.shape</package>
+                <package>com.sun.prism.tkal</package>
+                <package>com.sun.prism.util.tess</package>
+                <package>com.sun.prism.util.tess.impl.tess</package>
+                <package>com.sun.scenario</package>
+                <package>com.sun.scenario.animation</package>
+                <package>com.sun.scenario.animation.shared</package>
+                <package>com.sun.scenario.effect</package>
+                <package>com.sun.scenario.effect.impl</package>
+                <package>com.sun.scenario.effect.impl.hw</package>
+                <package>com.sun.scenario.effect.impl.prism</package>
+                <package>com.sun.scenario.effect.impl.prism.ps</package>
+                <package>com.sun.scenario.effect.impl.prism.sw</package>
+                <package>com.sun.scenario.effect.impl.state</package>
+                <package>com.sun.scenario.effect.impl.sw</package>
+                <package>com.sun.scenario.effect.impl.sw.java</package>
+                <package>com.sun.scenario.effect.impl.sw.sse</package>
+                <package>com.sun.scenario.effect.light</package>
+                <package>com.sun.t2k</package>
+                <package>com.sun.webpane.perf</package>
+                <package>com.sun.webpane.platform</package>
+                <package>com.sun.webpane.platform.event</package>
+                <package>com.sun.webpane.platform.graphics</package>
+                <package>com.sun.webpane.sg</package>
+                <package>com.sun.webpane.sg.prism</package>
+                <package>com.sun.webpane.sg.prism.theme</package>
+                <package>com.sun.webpane.sg.theme</package>
+                <package>com.sun.webpane.webkit</package>
+                <package>com.sun.webpane.webkit.dom</package>
+                <package>com.sun.webpane.webkit.network</package>
+                <package>com.sun.webpane.webkit.network.about</package>
+                <package>com.sun.webpane.webkit.network.data</package>
+                <package>com.sun.webpane.webkit.unicode</package>
+                <package>de.cebitec.common.sequencetools</package>
+                <package>javafx.animation</package>
+                <package>javafx.application</package>
+                <package>javafx.beans</package>
+                <package>javafx.beans.binding</package>
+                <package>javafx.beans.property</package>
+                <package>javafx.beans.property.adapter</package>
+                <package>javafx.beans.value</package>
+                <package>javafx.collections</package>
+                <package>javafx.concurrent</package>
+                <package>javafx.embed.swing</package>
+                <package>javafx.embed.swt</package>
+                <package>javafx.event</package>
+                <package>javafx.fxml</package>
+                <package>javafx.geometry</package>
+                <package>javafx.scene</package>
+                <package>javafx.scene.canvas</package>
+                <package>javafx.scene.chart</package>
+                <package>javafx.scene.control</package>
+                <package>javafx.scene.control.cell</package>
+                <package>javafx.scene.effect</package>
+                <package>javafx.scene.image</package>
+                <package>javafx.scene.input</package>
+                <package>javafx.scene.layout</package>
+                <package>javafx.scene.media</package>
+                <package>javafx.scene.paint</package>
+                <package>javafx.scene.shape</package>
+                <package>javafx.scene.text</package>
+                <package>javafx.scene.transform</package>
+                <package>javafx.scene.web</package>
+                <package>javafx.stage</package>
+                <package>javafx.util</package>
+                <package>javafx.util.converter</package>
                 <package>javax.wsdl</package>
                 <package>javax.wsdl.extensions</package>
                 <package>javax.wsdl.extensions.http</package>
@@ -37,6 +209,7 @@
                 <package>javax.wsdl.xml</package>
                 <package>javax.xml.messaging</package>
                 <package>javax.xml.namespace</package>
+                <package>javax.xml.parsers</package>
                 <package>javax.xml.rpc</package>
                 <package>javax.xml.rpc.encoding</package>
                 <package>javax.xml.rpc.handler</package>
@@ -44,6 +217,14 @@
                 <package>javax.xml.rpc.holders</package>
                 <package>javax.xml.rpc.server</package>
                 <package>javax.xml.rpc.soap</package>
+                <package>javax.xml.transform</package>
+                <package>javax.xml.transform.dom</package>
+                <package>javax.xml.transform.sax</package>
+                <package>javax.xml.transform.stream</package>
+                <package>junit.extensions</package>
+                <package>junit.framework</package>
+                <package>junit.runner</package>
+                <package>junit.textui</package>
                 <package>jxl</package>
                 <package>jxl.biff</package>
                 <package>jxl.biff.drawing</package>
@@ -55,10 +236,10 @@
                 <package>jxl.read.biff</package>
                 <package>jxl.write</package>
                 <package>jxl.write.biff</package>
-                <package>net.sf.samtools</package>
-                <package>net.sf.samtools.apps</package>
-                <package>net.sf.samtools.example</package>
-                <package>net.sf.samtools.util</package>
+                <package>org.apache.avalon.framework</package>
+                <package>org.apache.avalon.framework.activity</package>
+                <package>org.apache.avalon.framework.configuration</package>
+                <package>org.apache.avalon.framework.container</package>
                 <package>org.apache.axis</package>
                 <package>org.apache.axis.attachments</package>
                 <package>org.apache.axis.client</package>
@@ -114,6 +295,65 @@
                 <package>org.apache.axis.wsdl.gen</package>
                 <package>org.apache.axis.wsdl.symbolTable</package>
                 <package>org.apache.axis.wsdl.toJava</package>
+                <package>org.apache.batik</package>
+                <package>org.apache.batik.anim</package>
+                <package>org.apache.batik.anim.timing</package>
+                <package>org.apache.batik.anim.values</package>
+                <package>org.apache.batik.bridge</package>
+                <package>org.apache.batik.bridge.svg12</package>
+                <package>org.apache.batik.css.dom</package>
+                <package>org.apache.batik.css.engine</package>
+                <package>org.apache.batik.css.engine.sac</package>
+                <package>org.apache.batik.css.engine.value</package>
+                <package>org.apache.batik.css.engine.value.css2</package>
+                <package>org.apache.batik.css.engine.value.svg</package>
+                <package>org.apache.batik.css.engine.value.svg12</package>
+                <package>org.apache.batik.css.parser</package>
+                <package>org.apache.batik.dom</package>
+                <package>org.apache.batik.dom.anim</package>
+                <package>org.apache.batik.dom.events</package>
+                <package>org.apache.batik.dom.svg</package>
+                <package>org.apache.batik.dom.svg12</package>
+                <package>org.apache.batik.dom.traversal</package>
+                <package>org.apache.batik.dom.util</package>
+                <package>org.apache.batik.dom.xbl</package>
+                <package>org.apache.batik.ext.awt</package>
+                <package>org.apache.batik.ext.awt.color</package>
+                <package>org.apache.batik.ext.awt.font</package>
+                <package>org.apache.batik.ext.awt.g2d</package>
+                <package>org.apache.batik.ext.awt.geom</package>
+                <package>org.apache.batik.ext.awt.image</package>
+                <package>org.apache.batik.ext.awt.image.codec.imageio</package>
+                <package>org.apache.batik.ext.awt.image.codec.jpeg</package>
+                <package>org.apache.batik.ext.awt.image.codec.png</package>
+                <package>org.apache.batik.ext.awt.image.codec.tiff</package>
+                <package>org.apache.batik.ext.awt.image.codec.util</package>
+                <package>org.apache.batik.ext.awt.image.renderable</package>
+                <package>org.apache.batik.ext.awt.image.rendered</package>
+                <package>org.apache.batik.ext.awt.image.spi</package>
+                <package>org.apache.batik.ext.swing</package>
+                <package>org.apache.batik.extension</package>
+                <package>org.apache.batik.extension.svg</package>
+                <package>org.apache.batik.gvt</package>
+                <package>org.apache.batik.gvt.event</package>
+                <package>org.apache.batik.gvt.filter</package>
+                <package>org.apache.batik.gvt.flow</package>
+                <package>org.apache.batik.gvt.font</package>
+                <package>org.apache.batik.gvt.renderer</package>
+                <package>org.apache.batik.gvt.svg12</package>
+                <package>org.apache.batik.gvt.text</package>
+                <package>org.apache.batik.i18n</package>
+                <package>org.apache.batik.parser</package>
+                <package>org.apache.batik.script</package>
+                <package>org.apache.batik.script.rhino</package>
+                <package>org.apache.batik.script.rhino.svg12</package>
+                <package>org.apache.batik.svggen</package>
+                <package>org.apache.batik.svggen.font</package>
+                <package>org.apache.batik.svggen.font.table</package>
+                <package>org.apache.batik.swing</package>
+                <package>org.apache.batik.swing.gvt</package>
+                <package>org.apache.batik.swing.svg</package>
+                <package>org.apache.batik.transcoder</package>
                 <package>org.apache.commons.discovery</package>
                 <package>org.apache.commons.discovery.ant</package>
                 <package>org.apache.commons.discovery.jdk</package>
@@ -128,23 +368,13 @@
                 <package>org.biojava.bio</package>
                 <package>org.biojava.bio.alignment</package>
                 <package>org.biojava.bio.annodb</package>
-                <package>org.biojava.bio.chromatogram</package>
-                <package>org.biojava.bio.chromatogram.graphic</package>
                 <package>org.biojava.bio.dist</package>
                 <package>org.biojava.bio.dp</package>
                 <package>org.biojava.bio.dp.onehead</package>
                 <package>org.biojava.bio.dp.twohead</package>
-                <package>org.biojava.bio.gui</package>
-                <package>org.biojava.bio.gui.glyph</package>
-                <package>org.biojava.bio.gui.sequence</package>
-                <package>org.biojava.bio.gui.sequence.tracklayout</package>
                 <package>org.biojava.bio.molbio</package>
                 <package>org.biojava.bio.program</package>
-                <package>org.biojava.bio.program.abi</package>
                 <package>org.biojava.bio.program.blast2html</package>
-                <package>org.biojava.bio.program.das</package>
-                <package>org.biojava.bio.program.das.dasalignment</package>
-                <package>org.biojava.bio.program.das.dasstructure</package>
                 <package>org.biojava.bio.program.formats</package>
                 <package>org.biojava.bio.program.gff</package>
                 <package>org.biojava.bio.program.gff3</package>
@@ -152,9 +382,6 @@
                 <package>org.biojava.bio.program.homologene</package>
                 <package>org.biojava.bio.program.indexdb</package>
                 <package>org.biojava.bio.program.phred</package>
-                <package>org.biojava.bio.program.sax</package>
-                <package>org.biojava.bio.program.sax.blastxml</package>
-                <package>org.biojava.bio.program.scf</package>
                 <package>org.biojava.bio.program.ssaha</package>
                 <package>org.biojava.bio.program.ssbind</package>
                 <package>org.biojava.bio.program.tagvalue</package>
@@ -167,7 +394,6 @@
                 <package>org.biojava.bio.seq</package>
                 <package>org.biojava.bio.seq.db</package>
                 <package>org.biojava.bio.seq.db.biofetch</package>
-                <package>org.biojava.bio.seq.db.biosql</package>
                 <package>org.biojava.bio.seq.db.emblcd</package>
                 <package>org.biojava.bio.seq.db.flat</package>
                 <package>org.biojava.bio.seq.distributed</package>
@@ -180,19 +406,6 @@
                 <package>org.biojava.bio.seq.io.game</package>
                 <package>org.biojava.bio.seq.io.game12</package>
                 <package>org.biojava.bio.seq.projection</package>
-                <package>org.biojava.bio.structure</package>
-                <package>org.biojava.bio.structure.align</package>
-                <package>org.biojava.bio.structure.align.helper</package>
-                <package>org.biojava.bio.structure.align.pairwise</package>
-                <package>org.biojava.bio.structure.gui</package>
-                <package>org.biojava.bio.structure.gui.events</package>
-                <package>org.biojava.bio.structure.gui.util</package>
-                <package>org.biojava.bio.structure.io</package>
-                <package>org.biojava.bio.structure.io.mmcif</package>
-                <package>org.biojava.bio.structure.io.mmcif.chem</package>
-                <package>org.biojava.bio.structure.io.mmcif.model</package>
-                <package>org.biojava.bio.structure.jama</package>
-                <package>org.biojava.bio.structure.server</package>
                 <package>org.biojava.bio.symbol</package>
                 <package>org.biojava.bio.taxa</package>
                 <package>org.biojava.directory</package>
@@ -218,12 +431,10 @@
                 <package>org.biojava.utils.xml</package>
                 <package>org.biojavax</package>
                 <package>org.biojavax.bio</package>
+                <package>org.biojavax.bio.alignment</package>
+                <package>org.biojavax.bio.alignment.blast</package>
                 <package>org.biojavax.bio.db</package>
-                <package>org.biojavax.bio.db.biosql</package>
                 <package>org.biojavax.bio.db.ncbi</package>
-                <package>org.biojavax.bio.phylo</package>
-                <package>org.biojavax.bio.phylo.io.nexus</package>
-                <package>org.biojavax.bio.phylo.io.phylip</package>
                 <package>org.biojavax.bio.seq</package>
                 <package>org.biojavax.bio.seq.io</package>
                 <package>org.biojavax.bio.taxa</package>
@@ -249,12 +460,9 @@
                 <package>org.h2.expression</package>
                 <package>org.h2.fulltext</package>
                 <package>org.h2.index</package>
-                <package>org.h2.java</package>
-                <package>org.h2.java.io</package>
-                <package>org.h2.java.lang</package>
-                <package>org.h2.java.util</package>
                 <package>org.h2.jdbc</package>
                 <package>org.h2.jdbcx</package>
+                <package>org.h2.jmx</package>
                 <package>org.h2.message</package>
                 <package>org.h2.result</package>
                 <package>org.h2.schema</package>
@@ -269,10 +477,208 @@
                 <package>org.h2.upgrade</package>
                 <package>org.h2.util</package>
                 <package>org.h2.value</package>
+                <package>org.japura.controller</package>
+                <package>org.japura.controller.modals</package>
+                <package>org.japura.debug</package>
+                <package>org.japura.exception</package>
+                <package>org.japura.gui</package>
+                <package>org.japura.gui.calendar</package>
+                <package>org.japura.gui.calendar.components</package>
+                <package>org.japura.gui.dnd</package>
+                <package>org.japura.gui.event</package>
+                <package>org.japura.gui.model</package>
+                <package>org.japura.gui.renderer</package>
+                <package>org.japura.i18n</package>
+                <package>org.japura.modal</package>
+                <package>org.japura.task</package>
+                <package>org.japura.task.listener</package>
+                <package>org.japura.util</package>
+                <package>org.japura.util.date</package>
+                <package>org.jfree</package>
+                <package>org.jfree.base</package>
+                <package>org.jfree.base.config</package>
+                <package>org.jfree.base.log</package>
+                <package>org.jfree.base.modules</package>
+                <package>org.jfree.chart</package>
+                <package>org.jfree.chart.annotations</package>
+                <package>org.jfree.chart.axis</package>
+                <package>org.jfree.chart.block</package>
+                <package>org.jfree.chart.demo</package>
+                <package>org.jfree.chart.editor</package>
+                <package>org.jfree.chart.encoders</package>
+                <package>org.jfree.chart.entity</package>
+                <package>org.jfree.chart.event</package>
+                <package>org.jfree.chart.imagemap</package>
+                <package>org.jfree.chart.labels</package>
+                <package>org.jfree.chart.needle</package>
+                <package>org.jfree.chart.panel</package>
+                <package>org.jfree.chart.plot</package>
+                <package>org.jfree.chart.plot.dial</package>
+                <package>org.jfree.chart.renderer</package>
+                <package>org.jfree.chart.renderer.category</package>
+                <package>org.jfree.chart.renderer.xy</package>
+                <package>org.jfree.chart.resources</package>
+                <package>org.jfree.chart.servlet</package>
+                <package>org.jfree.chart.title</package>
+                <package>org.jfree.chart.urls</package>
+                <package>org.jfree.chart.util</package>
+                <package>org.jfree.data</package>
+                <package>org.jfree.data.category</package>
+                <package>org.jfree.data.contour</package>
+                <package>org.jfree.data.function</package>
+                <package>org.jfree.data.gantt</package>
+                <package>org.jfree.data.general</package>
+                <package>org.jfree.data.io</package>
+                <package>org.jfree.data.jdbc</package>
+                <package>org.jfree.data.resources</package>
+                <package>org.jfree.data.statistics</package>
+                <package>org.jfree.data.time</package>
+                <package>org.jfree.data.time.ohlc</package>
+                <package>org.jfree.data.xml</package>
+                <package>org.jfree.data.xy</package>
+                <package>org.jfree.date</package>
+                <package>org.jfree.experimental.chart.demo</package>
+                <package>org.jfree.experimental.chart.plot</package>
+                <package>org.jfree.experimental.chart.renderer.xy</package>
+                <package>org.jfree.experimental.chart.swt</package>
+                <package>org.jfree.experimental.chart.swt.demo</package>
+                <package>org.jfree.experimental.chart.swt.editor</package>
+                <package>org.jfree.experimental.swt</package>
+                <package>org.jfree.io</package>
+                <package>org.jfree.layout</package>
+                <package>org.jfree.resources</package>
+                <package>org.jfree.text</package>
+                <package>org.jfree.threads</package>
+                <package>org.jfree.ui</package>
+                <package>org.jfree.ui.about</package>
+                <package>org.jfree.ui.about.resources</package>
+                <package>org.jfree.ui.action</package>
+                <package>org.jfree.ui.tabbedui</package>
+                <package>org.jfree.util</package>
+                <package>org.junit</package>
+                <package>org.junit.experimental</package>
+                <package>org.junit.experimental.categories</package>
+                <package>org.junit.experimental.results</package>
+                <package>org.junit.experimental.runners</package>
+                <package>org.junit.experimental.theories</package>
+                <package>org.junit.experimental.theories.internal</package>
+                <package>org.junit.experimental.theories.suppliers</package>
+                <package>org.junit.internal</package>
+                <package>org.junit.internal.matchers</package>
+                <package>org.junit.internal.requests</package>
+                <package>org.junit.internal.runners</package>
+                <package>org.junit.internal.runners.model</package>
+                <package>org.junit.internal.runners.rules</package>
+                <package>org.junit.internal.runners.statements</package>
+                <package>org.junit.matchers</package>
+                <package>org.junit.rules</package>
+                <package>org.junit.runner</package>
+                <package>org.junit.runner.manipulation</package>
+                <package>org.junit.runner.notification</package>
+                <package>org.junit.runners.model</package>
+                <package>org.rosuda.JRI</package>
+                <package>org.rosuda.REngine</package>
+                <package>org.rosuda.REngine.JRI</package>
             </public-packages>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-transcoder.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-transcoder.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/xerces_2_5_0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/xerces_2_5_0.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-css.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-css.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/jaxrpc.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jaxrpc.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/xml-apis-ext.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/xml-apis-ext.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/SequenceTools-1.0-SNAPSHOT.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/SequenceTools-1.0-SNAPSHOT.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-svggen.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-svggen.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/mysql-connector-java-5.1.7-bin.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/mysql-connector-java-5.1.7-bin.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/pdf-transcoder.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/pdf-transcoder.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-swing.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-swing.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-script.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-script.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-gvt.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-gvt.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/jfreechart-1.0.14-swt.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jfreechart-1.0.14-swt.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/xalan-2.6.0.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/xalan-2.6.0.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/jcommon-1.0.17.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jcommon-1.0.17.jar</binary-origin>
+            </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/wsdl4j-1.5.1.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/wsdl4j-1.5.1.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/xml-apis.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/xml-apis.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/jfreechart-1.0.14-experimental.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jfreechart-1.0.14-experimental.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/JRIEngine.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/JRIEngine.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/JRI.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/JRI.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-xml.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-xml.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/REngine.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/REngine.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-util.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-util.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/biojava-core-1.8.1.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/biojava-core-1.8.1.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/jfreechart-1.0.14.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jfreechart-1.0.14.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/jxl.jar</runtime-relative-path>
@@ -283,36 +689,96 @@
                 <binary-origin>release/modules/ext/commons-logging-1.0.4.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/jaxrpc.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/jaxrpc.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/h2-1.2.141.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/h2-1.2.141.jar</binary-origin>
+                <runtime-relative-path>ext/biojava-1.8.1.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/biojava-1.8.1.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/axis.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/axis.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/sam-1.27.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/sam-1.27.jar</binary-origin>
+                <runtime-relative-path>ext/jfxrt.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/jfxrt.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-gui-util.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-gui-util.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-codec.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-codec.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-dom.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-dom.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/commons-discovery-0.2.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/commons-discovery-0.2.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/mysql-connector-java-5.1.7-bin.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/mysql-connector-java-5.1.7-bin.jar</binary-origin>
+                <runtime-relative-path>ext/h2-1.3.170.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/h2-1.3.170.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/biojava.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/biojava.jar</binary-origin>
+                <runtime-relative-path>ext/gnujaxp.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/gnujaxp.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/bytecode.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/bytecode.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-ext.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-ext.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-parser.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-parser.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/japura-1.14.3.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/japura-1.14.3.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/swtgraphics2d.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/swtgraphics2d.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/js.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/js.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-extension.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-extension.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/iText-2.1.5.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/iText-2.1.5.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/junit-4.10.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/junit-4.10.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-awt-util.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-awt-util.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-svg-dom.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-svg-dom.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/servlet.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/servlet.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-bridge.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-bridge.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/batik-anim.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/batik-anim.jar</binary-origin>
             </class-path-extension>
         </data>
     </configuration>

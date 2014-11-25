@@ -1,8 +1,8 @@
 package de.cebitec.vamp.ui.visualisation.actions;
 
 import de.cebitec.vamp.api.cookies.OpenRefGenCookie;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 @Deprecated
 public final class OpenRefGenDialogAction implements ActionListener {

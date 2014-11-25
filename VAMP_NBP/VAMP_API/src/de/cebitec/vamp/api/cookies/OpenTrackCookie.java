@@ -5,7 +5,7 @@ package de.cebitec.vamp.api.cookies;
  *
  * @author joern
  */
-public interface OpenTrackCookie{
+public interface OpenTrackCookie {
 
     /**
      * Opens the corresponding track.

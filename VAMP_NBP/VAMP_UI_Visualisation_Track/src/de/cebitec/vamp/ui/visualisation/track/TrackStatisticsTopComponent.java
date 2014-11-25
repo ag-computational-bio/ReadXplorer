@@ -5,15 +5,14 @@ import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.logging.Logger;
-import org.openide.util.LookupEvent;
-import org.openide.util.NbBundle;
-import org.openide.windows.TopComponent;
-import org.openide.windows.WindowManager;
-//import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.Lookup.Result;
+import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
+import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
+import org.openide.windows.TopComponent;
+import org.openide.windows.WindowManager;
 
 /**
  * Top component which displays something.
@@ -63,6 +62,7 @@ public final class TrackStatisticsTopComponent extends TopComponent implements L
      * Gets default instance. Do not use directly: reserved for *.settings files only,
      * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
      * To obtain the singleton instance, use {@link #findInstance}.
+     * @return the track statistics top component
      */
     public static synchronized TrackStatisticsTopComponent getDefault() {
         if (instance == null) {
@@ -73,6 +73,7 @@ public final class TrackStatisticsTopComponent extends TopComponent implements L
 
     /**
      * Obtain the TrackStatisticsTopComponent instance. Never call {@link #getDefault} directly!
+     * @return the track statistics top component
      */
     public static synchronized TrackStatisticsTopComponent findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
@@ -106,19 +107,16 @@ public final class TrackStatisticsTopComponent extends TopComponent implements L
     public void resultChanged(LookupEvent ev) {
         if (result.allInstances().isEmpty() && !Utilities.actionsGlobalContext().lookupAll(ReferenceViewer.class).isEmpty()){
             setVisible(false);
-        }
-        else{
+        }  else{
             if (!isVisible()){ setVisible(true); }
             for (TrackViewer trackViewer : result.allInstances()) {
                 trackStatisticsPanel.setTrackConnector(trackViewer.getTrackCon());
-                trackStatisticsPanel.setTrackName(trackViewer.getTrackCon().getAssociatedTrackName());
 
                 trackViewer.addMouseListener(new MouseListener() {
 
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        trackStatisticsPanel.setTrackName(((TrackViewer) e.getSource()).getTrackCon().getAssociatedTrackName());
-                            trackStatisticsPanel.setTrackConnector(((TrackViewer) e.getSource()).getTrackCon());
+                       trackStatisticsPanel.setTrackConnector( ((TrackViewer) e.getSource()).getTrackCon());
                     }
 
                     @Override

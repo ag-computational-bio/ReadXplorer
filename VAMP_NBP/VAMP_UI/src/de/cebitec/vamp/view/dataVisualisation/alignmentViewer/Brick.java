@@ -4,8 +4,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
- * @author ddoppmeier
+ * A brick represents one base or gap of a DNA sequence and stores its type.
+ * 
+ * @author ddoppmeier, rhilker
  */
 public class Brick {
 
@@ -23,59 +24,48 @@ public class Brick {
     public final static int GENOME_GAP_C = 13;
     public final static int GENOME_GAP_T = 14;
     public final static int UNDEF = 15;
+    public final static int SKIPPED = 16;
+    public final static int TRIMMED = 17;
 
     private int type;
-    private char causeForGenomeGap;
 
+    /**
+     * A brick represents one base or gap of a dna sequence and stores its type.
+     * @param type type of the base or gap
+     */
     public Brick(int type){
         this.type = type;
     }
 
+    /**
+     * @return the integer type of this brick, which represents a certain base.
+     */
     public int getType(){
         return type;
     }
 
-    public void setCauseForGenomeGap(char c){
-        causeForGenomeGap = c;
-    }
-
-    public char getCauseForGenomeGap(){
-        return causeForGenomeGap;
-    }
-
     @Override
     public String toString(){
-        if(type == Brick.BASE_A){
-            return "A";
-        } else if(type == Brick.BASE_C){
-            return "C";
-        } else if(type == Brick.BASE_G){
-            return "G";
-        } else if(type == Brick.BASE_T){
-            return "T";
-        } else if(type == Brick.BASE_N){
-            return "N";
-        } else if(type == Brick.FOREIGN_GENOMEGAP){
-            return "-";
-        } else if(type == Brick.MATCH){
-            return "#";
-        } else if(type == Brick.UNDEF){
-            return "@";
-        } else if(type == Brick.GENOME_GAP_A){
-            return "A";
-        } else if(type == Brick.GENOME_GAP_C){
-            return "C";
-        } else if(type == Brick.GENOME_GAP_G){
-            return "G";
-        } else if(type == Brick.GENOME_GAP_T){
-            return "T";
-        } else if(type == Brick.GENOME_GAP_N){
-            return "N";
-        } else if(type == Brick.READGAP){
-            return "-";
-        } else {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", type);
-            return "@";
+        switch (type) {
+            case Brick.MATCH : return "#";
+            case Brick.BASE_A : return "A";
+            case Brick.BASE_C : return "C";    
+            case Brick.BASE_G : return "G";
+            case Brick.BASE_T : return "T";
+            case Brick.BASE_N : return "N";
+            case Brick.FOREIGN_GENOMEGAP : return "-";
+            case Brick.GENOME_GAP_A : return "A";
+            case Brick.GENOME_GAP_C : return "C";
+            case Brick.GENOME_GAP_G : return "G";
+            case Brick.GENOME_GAP_T : return "T";
+            case Brick.GENOME_GAP_N : return "N";  
+            case Brick.READGAP : return "-";
+            case Brick.UNDEF : return "@";
+            case Brick.SKIPPED : return ".";
+            case Brick.TRIMMED : return "|";
+            default:
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown brick type {0}", type);
+                return "@";
         }
     }
 

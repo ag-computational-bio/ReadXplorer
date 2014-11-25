@@ -1,21 +1,24 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package de.cebitec.vamp.util;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
- *
+ * Contains all global accessible sequence util methods.
+ * 
  * @author Rolf Hilker
- *
- * Contains all global accessible util methods.
  */
 public final class SequenceUtils {
 
+    /** Indicates that something is located on the forward strand (1). */
+    public static final byte STRAND_FWD = 1;
+    /** Indicates that something is located on the reverse strand (-1). */
+    public static final byte STRAND_REV = -1;
+    /** Indicates that something is located on the forward strand (Fwd). */
+    public static final String STRAND_FWD_STRING = "Fwd";
+    /** Indicates that something is located on the reverse strand (Rev). */
+    public static final String STRAND_REV_STRING = "Rev";
+    
+    /** String for tagging positions or anything else as not having a gene with "No gene".*/
+    public static final String NO_GENE = "No gene";
+    
     private SequenceUtils(){
         //do not instantiate
     }
@@ -25,99 +28,91 @@ public final class SequenceUtils {
      * @param string the string to reverse
      * @return the reversed string
      */
-    public static String reverseString(final String string){
-        StringBuilder revString = new StringBuilder();
-        for (int i=string.length()-1; i>=0; --i){
-            revString = revString.append(string.charAt(i));
-        }
+    public static String reverseString(final String string) {
+        StringBuilder revString = new StringBuilder(string);
+        revString.reverse();
         return revString.toString();
     }
 
     /**
-     * Complements a sequence String. Requires only lower case characters!
+     * Complements a sequence String. Bases not present in the DNA or RNA
+     * alphabet are not replaced and RNA sequences are translated in DNA
+     * sequences. A = T / a = t U = A / u = a G = C / g = c all other characters
+     * are returned as they were.
      * @param sequence the string to complement
      * @return the complemented string
      */
     public static String complementDNA(final String sequence){
-        String complement = "";
+        StringBuilder complement = new StringBuilder(sequence.length());
         char currChar;
         for (int i = 0; i < sequence.length(); i++) {
             currChar = sequence.charAt(i);
 
             switch (currChar){
-                case 'c': complement = complement.concat("g"); break;
-                case 'g': complement = complement.concat("c"); break;
-                case 't': complement = complement.concat("a"); break;
-                case 'a': complement = complement.concat("t"); break;
-                default : complement = complement.concat(String.valueOf(currChar));
+                case 'c': complement.append('g'); break;
+                case 'g': complement.append('c'); break;
+                case 't': complement.append('a'); break;
+                case 'a': complement.append('t'); break;
+                case 'u': complement.append('a'); break;
+                case 'C': complement.append('G'); break;
+                case 'G': complement.append('C'); break;
+                case 'T': complement.append('A'); break;
+                case 'A': complement.append('T'); break;
+                case 'U': complement.append('A'); break; 
+                default : complement.append(currChar);
             }
         }
-        return complement;
-    }
-
-    /**
-     * Complements a single DNA base. Needs upper case values.
-     * @param base base to complement
-     * @return the complemented base or a whitespace, if it encounters a value other than A,C,G,T,N,_.
-     */
-    public static Character complementDNA(final char base){
-
-        switch (base){
-            case 'A': return 'T';
-            case 'C': return 'G';
-            case 'T': return 'A';
-            case 'G': return 'C';
-            case 'N': return base;
-            case '_': return base;
-            default : return ' ';
-        }
+        return complement.toString();
     }
 
 
     /**
-     * Produces the reverse complement of a sequence.
-     * @param sequence the sequence to reverse and complement
-     * @return the reversed and complemented sequence
+     * Produces the reverse complement of a dna sequence.
+     * @param sequence the dna sequence to reverse and complement
+     * @return the reversed and complemented dna sequence
      */
     public static String getReverseComplement(String sequence) {
-        StringBuilder revCompSeq = new StringBuilder();
-        for (int i=sequence.length()-1; i>=0; --i) {
-            char base = sequence.charAt(i);
-            base = SequenceUtils.getComplement(base, sequence);
-            revCompSeq.append(base);
-        }
-        return revCompSeq.toString();
+        String revCompSeq = SequenceUtils.complementDNA(SequenceUtils.reverseString(sequence));
+        return revCompSeq;
     }
 
 
-
-
     /**
-     * Produces the complement of a single base. For error handling
-     * also the whole sequence has to be passed. Returns only upper
-     * case values.
-     * A = T
-     * G = C
-     * N = N
-     * _ = _
+     * Produces the complement of a single base. Bases not present in the DNA or
+     * RNA alphabet are not replaced and RNA sequences are translated in DNA
+     * sequences.
+     * A = T / a = t
+     * U = A / u = a
+     * G = C / g = c
+     * all other characters are returned as they were
      * @param base the base to complement
-     * @param sequence the sequence the base originates from
      * @return the complemented base
      */
-    public static char getComplement(char base, String sequence) {
-        base = Character.toUpperCase(base);
-        char comp = ' ';
-        switch (base){
+    public static char getDnaComplement(char base) {
+        char comp;
+        switch (base) {
                 case 'C': comp = 'G'; break;
                 case 'G': comp = 'C'; break;
                 case 'T': comp = 'A'; break;
                 case 'A': comp = 'T'; break;
-                case 'N': comp = 'N'; break;
-                case '_': comp = '_'; break;
-                default : Logger.getLogger(SequenceUtils.class.getName()).log(Level.SEVERE, 
-                        "Found unknown char {0}!Sequence: {1}", new Object[]{base, sequence});
+                case 'U': comp = 'A'; break;
+                case 'c': comp = 'g'; break;
+                case 'g': comp = 'c'; break;
+                case 't': comp = 'a'; break;
+                case 'a': comp = 't'; break;
+                case 'u': comp = 'a'; break;
+                default : comp = base;
             }
 
         return comp;
+    }
+    
+    /**
+     * Checks if the input sequence is a valid DNA string (!not RNA!).
+     * @param sequence input sequence to check
+     * @return <code>true</code> if it is a valid DNA string, <code>false</code> otherwise
+     */
+    public static boolean isValidDnaString(String sequence) {
+        return sequence.matches("[acgtnACGTN]+");
     }
 }

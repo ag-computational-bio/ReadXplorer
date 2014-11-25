@@ -10,7 +10,7 @@ package de.cebitec.vamp.api.objects;
  */
 @Deprecated
 public class Read {
-    private String readname; //TODO: maybe change to readID?
+    private String readname; //maybe change to readID?
     private int position;
     private int errors;
     private int isBestMapping;

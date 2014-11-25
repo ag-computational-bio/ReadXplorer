@@ -16,30 +16,30 @@ public class FeatureFilter {
     // e.g. o FilterRuleCDS added to the blacklist means, that a CDS Type feature is not accepted
     private ArrayList<FilterRuleI> blacklist;
 
-    public FeatureFilter(){
-        whitelist = new ArrayList<FilterRuleI>();
-        blacklist = new ArrayList<FilterRuleI>();
+    public FeatureFilter() {
+        whitelist = new ArrayList<>();
+        blacklist = new ArrayList<>();
     }
 
-    public void addBlacklistRule(FilterRuleI rule){
+    public void addBlacklistRule(FilterRuleI rule) {
         blacklist.add(rule);
     }
 
-    public void addWhitelistRule(FilterRuleI rule){
+    public void addWhitelistRule(FilterRuleI rule) {
         whitelist.add(rule);
     }
 
-    public boolean isValidFeature(ParsedFeature feature){
+    public boolean isValidFeature(ParsedFeature feature) {
 
         boolean whitelistAccepted = false;
         boolean blacklistAccepted = true;
 
-        if(!whitelist.isEmpty()){
+        if (!whitelist.isEmpty()) {
             // valid if one of the rules applies
             Iterator<FilterRuleI> it = whitelist.iterator();
-            while(it.hasNext()){
+            while (it.hasNext()) {
                 FilterRuleI rule = it.next();
-                if(rule.appliesRule(feature)){
+                if (rule.appliesRule(feature)) {
                     whitelistAccepted = true;
                     break;
                 }
@@ -49,12 +49,12 @@ public class FeatureFilter {
             whitelistAccepted = true;
         }
 
-        if(!blacklist.isEmpty()){
+        if (!blacklist.isEmpty()) {
             // valid if no rule applies
             Iterator<FilterRuleI> it = blacklist.iterator();
-            while(it.hasNext()){
+            while (it.hasNext()) {
                 FilterRuleI rule = it.next();
-                if(rule.appliesRule(feature)){
+                if (rule.appliesRule(feature)) {
                     blacklistAccepted = false;
                     break;
                 }
@@ -64,7 +64,7 @@ public class FeatureFilter {
             blacklistAccepted = true;
         }
 
-        if(blacklistAccepted && whitelistAccepted){
+        if (blacklistAccepted && whitelistAccepted) {
             return true;
         } else {
             return false;

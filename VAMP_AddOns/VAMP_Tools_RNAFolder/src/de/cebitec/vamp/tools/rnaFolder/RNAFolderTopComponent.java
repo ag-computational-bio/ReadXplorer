@@ -33,6 +33,7 @@ public final class RNAFolderTopComponent extends TopComponent {
         this.rnaTabbedPane.
         setName(NbBundle.getMessage(RNAFolderTopComponent.class, "CTL_RNAFolderTopComponent"));
         setToolTipText(NbBundle.getMessage(RNAFolderTopComponent.class, "HINT_RNAFolderTopComponent"));
+        //this.openAtTabPosition(this.get);
 //        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
 
     }
@@ -139,7 +140,7 @@ public final class RNAFolderTopComponent extends TopComponent {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
         p.setProperty("version", "1.0");
-        // TODO store your settings
+        // store your settings here
     }
 
     Object readProperties(java.util.Properties p) {
@@ -152,7 +153,7 @@ public final class RNAFolderTopComponent extends TopComponent {
 
     private void readPropertiesImpl(java.util.Properties p) {
         String version = p.getProperty("version");
-        // TODO read your settings according to their version
+        // read your settings according to their version
     }
 
     @Override

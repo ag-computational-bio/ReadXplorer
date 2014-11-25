@@ -146,7 +146,7 @@ public final class ThumbNailViewTopComponent extends TopComponent implements Mou
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
         p.setProperty("version", "1.0");
-        // TODO store your settings
+        // store your settings
     }
 
     Object readProperties(java.util.Properties p) {
@@ -159,7 +159,7 @@ public final class ThumbNailViewTopComponent extends TopComponent implements Mou
 
     private void readPropertiesImpl(java.util.Properties p) {
         String version = p.getProperty("version");
-        // TODO read your settings according to their version
+        // read your settings according to their version here
     }
 
     @Override

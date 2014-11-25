@@ -3,22 +3,20 @@
  *
  * Created on 31.01.2011, 14:43:58
  */
-
 package de.cebitec.vamp.view.dialogMenus;
 
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
+import de.cebitec.vamp.util.VisualisationUtils;
 import java.util.List;
 
 /**
  *
- * @author jwinneba
+ * @author jwinneba, rhilker
  */
 public class OpenRefGenPanel extends javax.swing.JPanel {
 
     public static final long serialVersionUID = 792723463;
-
-    private PersistantReference selectedReference;
 
     /** Creates new form OpenRefGenPanel */
     public OpenRefGenPanel() {
@@ -29,12 +27,14 @@ public class OpenRefGenPanel extends javax.swing.JPanel {
      * Get a list of available genomes from the database.
      * @return Array of genomes WITHOUT actual sequence
      */
-    private PersistantReference[] fillList(){
-        List<PersistantReference> gens = ProjectConnector.getInstance().getGenomes();
-
-        PersistantReference[] genArray = new PersistantReference[gens.size()];
-        for( int i = 0; i< gens.size() ; i++ ){
-            genArray[i] = gens.get(i);
+    private PersistantReference[] fillList() {
+        PersistantReference[] genArray = new PersistantReference[0];
+        try {
+            List<PersistantReference> gens = ProjectConnector.getInstance().getGenomes();
+            genArray = new PersistantReference[gens.size()];
+            genArray = gens.toArray(genArray);
+        } catch (OutOfMemoryError e) {
+            VisualisationUtils.displayOutOfMemoryError(this);
         }
 
         return genArray;
@@ -50,7 +50,7 @@ public class OpenRefGenPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        refGenList = new javax.swing.JList(this.fillList());
+        refGenList = new javax.swing.JList<>(this.fillList());
 
         setLayout(new java.awt.BorderLayout());
 
@@ -62,11 +62,14 @@ public class OpenRefGenPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JList refGenList;
+    private javax.swing.JList<PersistantReference> refGenList;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     * @return The selected persistant reference
+     */
     public PersistantReference getSelectedReference() {
-        return (PersistantReference) refGenList.getSelectedValue();
+        return refGenList.getSelectedValue();
     }
 
 }

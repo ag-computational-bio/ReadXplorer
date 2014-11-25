@@ -1,0 +1,119 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>About VAMP Import</title>
+        <link rel="stylesheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <h2>About VAMP Import</h2>
+        <p></p>
+        <h2>Reference genome import</h2>
+        <p style="font-size:0.9em">Four formats are available for import:</p>
+        <UL>
+            <li style="font-size:0.9em">Fasta format: Which does not contain any features</li>
+            <li style="font-size:0.9em">Genbank format: Can include a vast number of different features</li>
+            <li style="font-size:0.9em">EMBL format: Can include a vast number of different features</li>
+            <li style="font-size:0.9em">GFF3 format: A gff3 file containing the features with an accompanying fasta file containing the sequence.</li>
+        </UL>
+        <p style="font-size:0.9em">
+            <strong>Note for Direct File Access (BAM files):</strong><br>
+        </p>
+        <p style="font-size:0.9em">Note, that for "Direct File Access" with BAM files you need to set the "Name" field to the name of the 
+        reference from the BAM file. Otherwise, the track will not show any data!</p>
+        <p style="font-size:0.9em">
+            <strong>Notes Genbank format:</strong><br>
+        </p>
+        <p></p>
+        <h2>Track import</h2>
+        <p style="font-size:0.9em">Also three formats are available for importing a track:</p>
+        <UL>
+            <li style="font-size:0.9em">Jok: Output of the short read mapper saruman</li>
+            <li style="font-size:0.9em">BAM format: Defined in 
+                <object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+                    <param name="content" value="http://samtools.sourceforge.net/SAM1.pdf">
+                    <param name="text" value="<html><u>http://samtools.sourceforge.net/SAM1.pdf</u></html>">
+                    <param name="textColor" value="blue">
+                </object></li>
+            <li style="font-size:0.9em">SAM format: Also defined in 
+                 <object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+                    <param name="content" value="http://samtools.sourceforge.net/SAM1.pdf">
+                    <param name="text" value="<html><u>http://samtools.sourceforge.net/SAM1.pdf</u></html>">
+                    <param name="textColor" value="blue">
+                </object></li>
+        </UL>
+        <h2>SAM/BAM Direct Access Import</h2>
+        <p style="font-size:0.9em">
+            This is the recommended parser for all SAM/BAM files. It works much faster than importing the whole data sets
+            into the DB. Also the visualization will me much more efficient, when using the direct access import.<br>
+            Your original SAM/BAM file is never altered. VAMP creates intermediate files during the import process
+            next to the original SAM/BAM file. At the end an extended version of the original file is created in
+            the same directory. In this extended bam file VAMP stores all neccessary classification information
+            and of course the complete mapping data. Besides the mapping, an index file is created for quicker access of the data.<br>
+            When a direct access track is opened, all data is read directly from the corresponding extended mapping file.
+            If this file is moved, then VAMP asks for the new path to that mapping file. If the index file should be missing,
+            VAMP creates a new index file.
+        </p>
+        <p></p>
+        <p></p>
+        <h2>Sequence pair import</h2>
+        <p style="font-size:0.9em">
+            VAMP also allows to import Sequence pair data, such as mate pair or paired end data.<br>
+            Requirements: <u>Two mapping files</u> with either all first reads or all second reads of 
+            the sequence pair.<br>
+            OR<br>
+            <u>One mapping file</u> with all reads of both pairs in arbitrary sorting order.<br>
+            Distance: Choose the estimated distance from the start of a sequence pair to the end of the pair 
+            (e.g. read 1 (100-150), read 2 (300-350) has distance 250).<br>
+            Direction: The two character code abbreviates the orientation of read 1 and read 2, where "f" means 
+            forward and "r" means reverse.<br>
+            Deviaton: Must be given in percent, e.g. "70" for small pairs whith high deviation or "30" for 
+            larger mate pairs. <br>
+            For choosing resonable values it is recommended to analyze the data for these
+            parameters before importing.
+        </p>
+        <p></p>
+        <h2>SAM/BAM Stepwise Parser</h2>
+        <p style="font-size:0.9em">
+            This parser is useable for SAM or BAM files. If they are already sorted by read sequence, everything is fine.
+            Otherwise deselect the checkbox "File is sorted by readseq" and VAMP will sort and import the file for you, when
+            clicking "OK".<br>
+            The step size is the size of a single chunk imported at once in the database. Thus, it should be 
+            adapted to the machine the import runs on. For example, a laptop might require a smaller
+            step size. On the other hand, don't choose a too large value for the step size. The import is faster
+            with a medium step size, because the data structures will not grow too large, which means the access to 
+            them remains faster.
+        </p>
+        <p></p>
+        <h2>Position table for track import</h2>
+        <p style="font-size:0.9em">
+            This feature was developed for useres with older databases. 
+            <br><u>!!! Caution: YOU DO NOT NEED THIS FEATURE WHEN IMPORTING COMPLETE NEW TRACKS !!!</u><br>
+            Instead of reimporting the whole data in a new database, it can directly be imported 
+            "on top" of the old database. Only make sure, that you import the same track data, 
+            as stored in the database.
+        </p>
+<!--        <p>
+            <strong>Additional notes:</strong><br>
+        </p>-->
+        
+        
+        <!-- TODO describe your module, add more pages... -->
+
+    </body>
+</html>
+<!--
+Tip: to create a link which will open in an external web browser, try:
+<object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+    <param name="content" value="http://www.netbeans.org/">
+    <param name="text" value="<html><u>http://www.netbeans.org/</u></html>">
+    <param name="textFontSize" value="medium">
+    <param name="textColor" value="blue">
+</object>
+To create a link to a help set from another module, you need to know the code name base and path, e.g.:
+<a href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/configure/configure_options.html">Using the Options Window</a>
+(This link will behave sanely if that module is disabled or missing.)
+-->

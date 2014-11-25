@@ -1,35 +1,27 @@
 package de.cebitec.vamp.view.dataVisualisation.abstractViewer;
 
-import de.cebitec.vamp.util.ColorProperties;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
-import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
-import de.cebitec.vamp.view.dataVisualisation.GenomeGapManager;
+import de.cebitec.vamp.util.ColorProperties;
+import de.cebitec.vamp.util.SequenceUtils;
+import de.cebitec.vamp.view.dataVisualisation.*;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.vamp.util.Properties;
-import de.cebitec.vamp.view.dataVisualisation.HighlightAreaListener;
-import de.cebitec.vamp.view.dataVisualisation.HighlightableI;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
+import de.cebitec.vamp.view.dialogMenus.MenuItemFactory;
+import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.prefs.PreferenceChangeEvent;
-import java.util.prefs.PreferenceChangeListener;
-import java.util.prefs.Preferences;
 import javax.swing.JComponent;
-import org.openide.util.NbPreferences;
+import javax.swing.JPopupMenu;
 
 /**
- *
  * @author ddoppmeier, rhilker
+ * 
+ * A sequence bar is used to display the sequence of a reference genome within another
+ * AbstractViewer. Further, it contains several options for highlighting areas,
+ * start or stop codons and patterns.
  */
 public class SequenceBar extends JComponent implements HighlightableI {
 
@@ -44,8 +36,6 @@ public class SequenceBar extends JComponent implements HighlightableI {
     private int offsetY;
     private Rectangle highlightRect;
     private GenomeGapManager gapManager;
-    private List<Region> codonHitsToHighlight;
-    private List<Region> patternHitsToHighlight;
     // the width in bases (logical positions), that is used for marking
     // a value of 100 means every 100th base is marked by a large and every 50th
     // base is marked by a small bar
@@ -53,16 +43,16 @@ public class SequenceBar extends JComponent implements HighlightableI {
     private int halfMarkingWidth;
     private int largeBar;
     private int smallBar;
-    private StartCodonFilter codonFilter;
-    private PatternFilter patternFilter;
-    private Preferences pref;
     private HighlightAreaListener highlightListener;
-    private int frameCurrFeature;
+    private RegionManager regionManager;
+    private byte frameCurrFeature;
 
     /**
-     * Creates a new sequence bar instance.
+     * A sequence bar is used to display the sequence of a reference genome
+     * within another AbstractViewer. Further, it contains several options for
+     * highlighting areas, start or stop codons and patterns.
      * @param parentViewer the viewer containing the sequence bar
-     * @param refGen
+     * @param refGen the reference genome object
      */
     public SequenceBar(AbstractViewer parentViewer, PersistantReference refGen) {
         super();
@@ -76,31 +66,9 @@ public class SequenceBar extends JComponent implements HighlightableI {
         this.smallBar = 7;
         this.markingWidth = 10;
         this.halfMarkingWidth = markingWidth / 2;
-        this.codonHitsToHighlight = new ArrayList<Region>();
-        this.patternHitsToHighlight = new ArrayList<Region>();
-        this.codonFilter = new StartCodonFilter(parentViewer.getBoundsInfo().getLogLeft(), parentViewer.getBoundsInfo().getLogRight(), refGen);
-        this.patternFilter = new PatternFilter(parentViewer.getBoundsInfo().getLogLeft(), parentViewer.getBoundsInfo().getLogRight(), refGen);
-        this.initPrefListener();
-        this.initHighlightListener();
-    }
-
-    /**
-     * Updates the sequence bar according to the genetic code chosen.
-     * After changing the genetic code, no start codons are be selected
-     * anymore.
-     */
-    private void initPrefListener() {
-        this.pref = NbPreferences.forModule(Object.class);
-        this.pref.addPreferenceChangeListener(new PreferenceChangeListener() {
-
-            @Override
-            public void preferenceChange(PreferenceChangeEvent evt) {
-                if (evt.getKey().equals(Properties.SEL_GENETIC_CODE)) {
-                    SequenceBar.this.codonFilter.resetStartCodons();
-                    SequenceBar.this.findCodons();
-                }
-            }
-        });
+        this.initMouseListener(); //this order has to be obeyed, otherwise the highlight listener
+        this.initHighlightListener(); //will not be shown in the highlighted area!
+        this.regionManager = new RegionManager(this, parentViewer, refGen, highlightListener);
     }
 
     /**
@@ -108,9 +76,45 @@ public class SequenceBar extends JComponent implements HighlightableI {
      * sequence, currently displayed on the screen.
      */
     private void initHighlightListener() {
-        highlightListener = new HighlightAreaListener(this, this.baseLineY, this.offsetY);
+        highlightListener = new HighlightAreaListener(this, baseLineY, offsetY);
         this.addMouseListener(highlightListener);
         this.addMouseMotionListener(highlightListener);
+    }
+    
+    
+    private void initMouseListener() {
+        this.addMouseListener(new MouseListener() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON3) {
+                    JPopupMenu popUp = new JPopupMenu();
+                    MenuItemFactory menuItemFactory = new MenuItemFactory();
+
+                    //add copy mouse position option
+                    popUp.add(menuItemFactory.getCopyPositionItem(parentViewer.getCurrentMousePos()));
+                    //add center current position option
+                    popUp.add(menuItemFactory.getJumpToPosItem(parentViewer.getBoundsInformationManager(), parentViewer.getCurrentMousePos()));
+                    popUp.show((JComponent) e.getComponent(), e.getX(), e.getY());
+                }
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
+        });
     }
 
     public void setGenomeGapManager(GenomeGapManager gapManager) {
@@ -123,8 +127,9 @@ public class SequenceBar extends JComponent implements HighlightableI {
      */
     public void boundsChanged() {
         this.adjustMarkingInterval();
-        this.findCodons();
-        this.findPattern();
+        this.regionManager.findCodons();
+        this.regionManager.findPattern();
+        this.regionManager.showCdsRegions();
         this.highlightListener.boundsChangedHook();
     }
 
@@ -155,9 +160,9 @@ public class SequenceBar extends JComponent implements HighlightableI {
 
         //paint the hightlight rectangle if there is currently one
         if (this.highlightRect != null) {
-            g.setColor(new Color(51, 153, 255));
+            g.setColor(ColorProperties.HIGHLIGHT_BORDER);
             g.draw(this.highlightRect);
-            g.setColor(new Color(168, 202, 236, 75));
+            g.setColor(ColorProperties.HIGHLIGHT_FILL);
             g.fill(this.highlightRect);
         }
     }
@@ -167,12 +172,14 @@ public class SequenceBar extends JComponent implements HighlightableI {
      * @param g Graphics2D object to print on
      */
     private void drawSequence(Graphics2D g) {
-        // get the font metrics
-        g.setFont(font);
-        metrics = g.getFontMetrics(font);
 
         // print sequence if sufficient space
         if (printSeq) {
+            
+            // get the font metrics
+            g.setFont(font);
+            metrics = g.getFontMetrics(font);
+            
             BoundsInfo bounds = parentViewer.getBoundsInfo();
             int logleft = bounds.getLogLeft();
             if (logleft < 1) { //might happen for very short reference sequences
@@ -189,7 +196,8 @@ public class SequenceBar extends JComponent implements HighlightableI {
     /**
      * Draw base of the sequence.
      * @param g Graphics2D object to paint on
-     * @param pos position of the base in the reference genome
+     * @param pos position of the base in the reference genome starting with 1 (not 0!).
+     *      To get the correct base 1 is substracted from pos within this method.
      */
     private void drawChar(Graphics2D g, int pos) {
         // pos depents on slider value and cannot be smaller 1
@@ -241,7 +249,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
             physX += numOfGaps * bounds.getPhysWidth();
         }
         String base = refGen.getSequence().substring(basePosition, basePosition + 1);
-        String revBase = reverseBase(base);
+        String revBase = SequenceUtils.complementDNA(base);
         int offset = metrics.stringWidth(revBase) / 2;
         g.drawString(revBase,
                 (float) physX - offset,
@@ -350,100 +358,54 @@ public class SequenceBar extends JComponent implements HighlightableI {
     }
 
     /**
-     * Identifies the start codons according to the currently selected codons to show.
-     */
-    public void findCodons() {
-        this.removeAll(JRegion.START_CODON);
-        this.codonFilter.setInterval(this.parentViewer.getBoundsInfo().getLogLeft(), this.parentViewer.getBoundsInfo().getLogRight());
-        this.determineFrame();
-
-        this.codonFilter.setCurrFeatureData(frameCurrFeature);
-        this.codonHitsToHighlight = this.codonFilter.findRegions();
-        for (Region r : this.codonHitsToHighlight) {
-
-            BoundsInfo bounds = this.parentViewer.getBoundsInfo();
-            int from = this.getStart(bounds, r);
-            int to = this.getStop(bounds, r);
-            
-            int length = to - from + 1;
-            // make sure it is visible when using high zoom levels
-            if (length < 3) {
-                length = 3;
-            }
-            JRegion jreg = new JRegion(length, 10);
-
-
-            if (r.isForwardStrand()) {
-                jreg.setBounds(from, baseLineY - jreg.getSize().height - 6, jreg.getSize().width, jreg.getSize().height);
-            } else {
-                jreg.setBounds(from, baseLineY + 4, jreg.getSize().width, jreg.getSize().height);
-            }
-            this.add(jreg);
-        }
-        this.repaint();
-    }
-    
-    /**
-     * Identifies the currently in this object stored pattern in the genome sequence.
-     * @return position of the next occurence of the pattern from the current position on.
-     */
-    public int findPattern() {
-        this.removeAll(JRegion.PATTERN);
-        this.patternFilter.setInterval(this.parentViewer.getBoundsInfo().getLogLeft(), this.parentViewer.getBoundsInfo().getLogRight());
-        //this.determineFrame();
-
-        //this.patternFilter.setCurrFeatureData(frameCurrFeature);
-        this.patternHitsToHighlight = this.patternFilter.findRegions();
-        BoundsInfo bounds = this.parentViewer.getBoundsInfo();
-        
-        for (Region r : this.patternHitsToHighlight) {
-
-            int from = this.getStart(bounds, r);
-            int to = this.getStop(bounds, r);
-
-            int length = to - from + 1;
-            // make sure it is visible when using high zoom levels
-            if (length < 3) {
-                length = 3;
-            }
-            JRegion jreg = new JRegion(length, 10, JRegion.PATTERN, ColorProperties.PATTERN);
-
-
-            if (r.isForwardStrand()) {
-                jreg.setBounds(from, baseLineY - jreg.getSize().height - 6, jreg.getSize().width, jreg.getSize().height);
-            } else {
-                jreg.setBounds(from, baseLineY + 4, jreg.getSize().width, jreg.getSize().height);
-            }
-            this.add(jreg);
-        }
-        this.repaint();
-        
-        if (this.patternHitsToHighlight.isEmpty()){
-            return this.patternFilter.findNextOccurrence();
-        } else {
-            return -2;
-        }
-    }
-    
-    public int findNextPatternOccurrence(){
-        return this.patternFilter.findNextOccurrence();
-    }
-
-    /**
      * Determines the frame of the currently selected feature. if there is none it
      * is set to 10.
+     * @return the correct reading frame (-3 to 3 excluding 0)
      */
-    private void determineFrame() {
+    public byte determineFeatureFrame() {
         this.frameCurrFeature = StartCodonFilter.INIT;//if it is 10 later, no selected feature exists yet!
         if (this.parentViewer instanceof ReferenceViewer) {
             ReferenceViewer refViewer = (ReferenceViewer) this.parentViewer;
             if (refViewer.getCurrentlySelectedFeature() != null) {
-                frameCurrFeature = refViewer.determineFrame(refViewer.getCurrentlySelectedFeature().getPersistantFeature());
+                frameCurrFeature = (byte) refViewer.determineFrame(refViewer.getCurrentlySelectedFeature().getPersistantFeature());
             }
         }
+        return frameCurrFeature;
     }
     
+    /**
+     * Transforms a region object into a JRegion object for visualization in this
+     * sequence bar.
+     * @param region the region object to transform for this sequence bar
+     * @return the corresponding JRegion object for visualization in this sequence bar
+     */
+    public JRegion transformRegionToJRegion(Region region) {
+        BoundsInfo bounds = this.parentViewer.getBoundsInfo();
+        int from = this.getStart(bounds, region);
+        int to = this.getStop(bounds, region);
 
+        int length = to - from + 1;
+        // make sure it is visible when using high zoom levels
+        if (length < 3) {
+            length = 3;
+        }
+        JRegion jreg = new JRegion(length, 10, region.getType(), region.getStart(), region.getStop());
+        if (region.isForwardStrand()) {
+            jreg.setBounds(from, baseLineY - jreg.getSize().height - 6, jreg.getSize().width, jreg.getSize().height);
+        } else {
+            jreg.setBounds(from, baseLineY + 4, jreg.getSize().width, jreg.getSize().height);
+        }
+        
+        return jreg;
+    }
+    
+    /**
+     * Calculates the position of the first pixel of the region handed over to the method.
+     * Gaps do not play a role here, because they are not extended to the left.
+     * @param bounds the bounds info object of the context of the region
+     * @param r the region, whose start is to be calculated
+     * @return the correct position of the first pixel of the region handed over to the method.
+     */
     private int getStart(BoundsInfo bounds, Region r) {
         int start = r.getStart();
         if (start < bounds.getLogLeft()) {
@@ -452,29 +414,43 @@ public class SequenceBar extends JComponent implements HighlightableI {
         return (int) parentViewer.getPhysBoundariesForLogPos(start).getLeftPhysBound();
     }
     
-    
-    private int getStop(BoundsInfo bounds, Region r){
-            int stop = r.getStop();
-            if (stop > bounds.getLogRight()) {
-                stop = bounds.getLogRight();
-            }
-            PhysicalBaseBounds stopBounds = parentViewer.getPhysBoundariesForLogPos(stop);
-            int to = (int) stopBounds.getRightPhysBound();
+    /**
+     * Calculates the position of the last pixel of the region handed over to the method.
+     * This includes gaps that might occur in the reference.
+     * @param bounds the bounds info object of the context of the region
+     * @param r the region, whose end is to be calculated
+     * @return the correct position of the last pixel of the region handed over to the method.
+     */
+    private int getStop(BoundsInfo bounds, Region r) {
+        int stop = r.getStop();
+        if (stop > bounds.getLogRight()) {
+            stop = bounds.getLogRight();
+        }
+        PhysicalBaseBounds stopBounds = parentViewer.getPhysBoundariesForLogPos(stop);
+        int to = (int) stopBounds.getRightPhysBound();
 
-            if (gapManager != null && gapManager.hasGapAt(stop)) {
-                to = (int) (gapManager.getNumOfGapsAt(stop) * stopBounds.getPhysWidth());
-            }
-            return to;
+        if (gapManager != null && gapManager.hasGapAt(stop)) {
+            to = (int) (gapManager.getNumOfGapsAt(stop) * stopBounds.getPhysWidth());
+        }
+        return to;
     }
 
     /**
-     * Calculates which codons should be highlighted and updates the gui.
+     * Calculates which start codons should be highlighted and updates the gui.
      * @param i the index of the codon to update
      * @param isSelected true, if the codon should be selected
      */
-    public void showCodons(final int i, final boolean isSelected) {
-        this.codonFilter.setCodonSelected(i, isSelected);
-        this.findCodons();
+    public void showStartCodons(final int i, final boolean isSelected) {
+        this.regionManager.showStartCodons(i, isSelected);
+    }
+    
+    /**
+     * Calculates which stop codons should be highlighted and updates the gui.
+     * @param i the index of the codon to update
+     * @param isSelected true, if the codon should be selected
+     */
+    public void showStopCodons(final int i, final boolean isSelected) {
+        this.regionManager.showStopCodons(i, isSelected);
     }
 
     /**
@@ -482,17 +458,49 @@ public class SequenceBar extends JComponent implements HighlightableI {
      * @param i the index of the codon
      * @return true, if the codon with the index i is currently selected
      */
-    public boolean isCodonShown(final int i) {
-        return this.codonFilter.isCodonSelected(i);
+    public boolean isStartCodonShown(final int i) {
+        return this.regionManager.isStartCodonShown(i);
     }
 
     /**
-     * 
+     * Detects the occurences of the given pattern in the currently shown
+     * interval or the next occurence of the pattern in the genome.
      * @param pattern Pattern to search for
+     * @return the next (closest) occurrence of the pattern
      */
-    public int setPattern(String pattern) {
-        this.patternFilter.setPattern(pattern);
-        return this.findPattern();
+    public int showPattern(String pattern) {
+        return this.regionManager.showPattern(pattern);
+    }    
+
+    /**
+     * Identifies the codons according to the currently selected codons to show
+     * and adds JRegions for highlighting into the sequence bar.
+     */
+    public void findCodons() {
+        this.regionManager.findCodons();
+    }
+    
+    /**
+     * Identifies the currently in this object stored pattern in the genome sequence.
+     */
+    public void findPattern() {
+        this.regionManager.findPattern();
+    }
+    
+    /**
+     * Identifies next (closest) occurrence from either forward or reverse
+     * strand of a pattern in the current reference genome.
+     * @return the position of the next occurrence of the pattern
+     */
+    public int findNextPatternOccurrence() {
+        return this.regionManager.findNextPatternOccurrence();
+    }
+    
+    /**
+     * @return The frame of the current feature
+     */
+    public byte getFrameCurrFeature() {
+        return this.frameCurrFeature;
     }
 
     /**
@@ -521,31 +529,11 @@ public class SequenceBar extends JComponent implements HighlightableI {
                 BaseBackground b = new BaseBackground(12, 12, base);
                 b.setBounds((int) physX - offset, baseLineY - 18, b.getSize().width, b.getSize().height);
                 this.add(b);
-                BaseBackground brev = new BaseBackground(12, 12, reverseBase(base));
+                BaseBackground brev = new BaseBackground(12, 12, SequenceUtils.complementDNA(base));
                 brev.setBounds((int) physX - offset, baseLineY + 2, b.getSize().width, b.getSize().height);
                 this.add(brev);
             }
         }
-    }
-
-    public String reverseBase(String base) {
-        String revBase;
-        if (base.equals("a")) {
-            revBase = "t";
-        } else if (base.equals("t")) {
-            revBase = "a";
-        } else if (base.equals("g")) {
-            revBase = "c";
-        } else if (base.equals("c")) {
-            revBase = "g";
-        } else if (base.equals("n")) {
-            revBase = "n";
-        } else if (base.equals("-")) {
-            revBase = "-";
-        } else {
-            revBase = base;
-        }
-        return revBase;
     }
 
     /**
@@ -586,6 +574,32 @@ public class SequenceBar extends JComponent implements HighlightableI {
     public int getViewerHorizontalMargin() {
         return this.parentViewer.getHorizontalMargin();
     }
+    
+    public int getCurrentMousePosition() {
+        return this.parentViewer.getCurrentMousePos();
+    }
+    
+    /**
+     * @param pixelPos physical position (pixel) in the sequence bar sequence
+     * @return the physical pixel position converted into the logical sequence position.
+     */
+    public int getLogicalPosForPixel(int pixelPos) {
+        return parentViewer.getLogicalPosForPixel(pixelPos);
+    }
+
+    /**
+     * @return the y baseline of this sequence bar.
+     */
+    public int getBaseLineY() {
+        return this.baseLineY;
+    }
+    
+    /**
+     * @return The bounds information manager of the parent abstract viewer.
+     */
+    public BoundsInfoManager getBoundsInfoManager() {
+        return this.parentViewer.getBoundsInformationManager();
+    }
 
     /**
      * This method is to be called, when a mouse listener associated to this component
@@ -600,22 +614,41 @@ public class SequenceBar extends JComponent implements HighlightableI {
     }
 
     /**
-     * @return The frame of the current feature
+     * Removes all JRegions from this component of all the given types.
+     * Removed by Properties.START, Properties.STOP, Properties.PATTERN, Properties.CDS and
+     * Properties.ALL
+     * @param typeList list of types of components to remove
      */
-    public int getFrameCurrFeature() {
-        return this.frameCurrFeature;
-    }
-
-    /**
-     * Removes all JRegions from this component of a given type.
-     * Currently JRegion supports 1 = Start codon and 2 = pattern types.
-     * @param type type of components to remove
-     */
-    private void removeAll(int type) {
-        for (Component comp : this.getComponents()){
-            if (comp instanceof JRegion && ((JRegion) comp).getType() == type){
-                this.remove(comp);
+    protected void removeAll(List<Byte> typeList) {
+        for (Component comp : this.getComponents()) {
+            for (int type : typeList) {
+                if (comp instanceof JRegion && ((JRegion) comp).getType() == type) {
+                    this.remove(comp);
+                    break;
+                }
             }
         }
     }
+    
+    /**
+     * Removes all JRegions from this component of a given type.
+     * Removed by Properties.START, Properties.STOP, Properties.PATTERN, Properties.CDS and
+     * Properties.ALL
+     * @param type the type of components to remove
+     */
+    protected void removeAll(Byte type) {
+        List<Byte> typeList = new ArrayList<>();
+        typeList.add(type);
+        this.removeAll(typeList);
+    }
+
+    /**
+     * Sets a list of cds regions for the sequence bar and replaces the list stored in this
+     * variable until now.
+     * @param cdsRegions the cdsRegions to set
+     */
+    public void setCdsRegions(List<Region> cdsRegions) {
+        this.regionManager.setCdsRegions(cdsRegions);
+    }
+
 }

@@ -23,7 +23,7 @@ import org.openide.windows.WindowManager;
  */
 public class Installer extends ModuleInstall {
     
-    public static final String VAMP_VERSION = "1.5.2.2";
+    public static final String VAMP_VERSION = "1.7.5.5";
     private static final long serialVersionUID = 1L;
 //    private static final Logger logger = Logger.getLogger(Installer.class.getName(), Installer.class.getPackage().getName() + ".Log");
 
@@ -89,8 +89,9 @@ public class Installer extends ModuleInstall {
             logoutAction.actionPerformed(new ActionEvent(this, 1, "close"));
 
             // close remaining windows
-            for(TopComponent tc : WindowManager.getDefault().getRegistry().getOpened()){
-                    tc.close();
+            TopComponent dashboard = WindowManager.getDefault().findTopComponent("DashboardWindowTopComponent");
+            for (TopComponent tc : WindowManager.getDefault().getRegistry().getOpened()) {
+                    if (tc != dashboard) { tc.close(); }
             }
             // log out before exitting
             ProjectConnector pc = ProjectConnector.getInstance();

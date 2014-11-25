@@ -1,9 +1,4 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * RemoveTrackListPanel.java
  *
  * Created on 29.03.2011, 22:33:32
@@ -12,10 +7,7 @@
 package de.cebitec.vamp.thumbnail;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import javax.swing.JList;
 
 /**
  *

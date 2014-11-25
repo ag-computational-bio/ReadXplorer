@@ -1,17 +1,19 @@
 package de.cebitec.vamp.view.dataVisualisation.basePanel;
 
 import de.cebitec.vamp.view.dataVisualisation.SynchronousNavigator;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JSlider;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+//import javax.swing.event.ChangeEvent;
+//import javax.swing.event.ChangeListener;
 
 /**
  *
  * @author ddoppmeier
  */
-public class ExtendedSlider extends JSlider implements SynchronousNavigator{
+public class ExtendedSlider extends JSlider implements SynchronousNavigator {
 
     private final static long serialVersionUID = 2347624;
 
@@ -23,17 +25,45 @@ public class ExtendedSlider extends JSlider implements SynchronousNavigator{
         super(JSlider.HORIZONTAL, min, max, init);
         this.current = init;
         listeners = new ArrayList<AdjustmentPanelListenerI>();
-        this.addChangeListener(new ChangeListener() {
+        this.addMouseListener(new MouseListener() {
 
             @Override
-            public void stateChanged(ChangeEvent e) {
+            public void mouseClicked(MouseEvent e) {
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
                 int newValue = ExtendedSlider.this.getValue();
                 if(newValue != current){
                     current = newValue;
                     updateListeners();
                 }
             }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            }
         });
+        
+//        this.addChangeListener(new ChangeListener() {
+//
+//            @Override
+//            public void stateChanged(ChangeEvent e) {
+//                int newValue = ExtendedSlider.this.getValue();
+//                if(newValue != current){
+//                    current = newValue;
+//                    updateListeners();
+//                }
+//            }
+//        });
     }
 
     public void addAdjustmentPanelListener(AdjustmentPanelListenerI listener){

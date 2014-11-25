@@ -1,15 +1,22 @@
 package de.cebitec.vamp.ui.visualisation.reference;
 
+import de.cebitec.common.sequencetools.GeneticCode;
+import de.cebitec.common.sequencetools.GeneticCodeFactory;
+import de.cebitec.vamp.util.CodonUtilities;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.GridLayout;
+import java.io.IOException;
 import java.util.prefs.PreferenceChangeEvent;
-import java.util.prefs.Preferences;
-import org.openide.util.NbPreferences;
-import de.cebitec.vamp.util.GeneticCodesStore;
 import java.util.prefs.PreferenceChangeListener;
-import javax.swing.GroupLayout.ParallelGroup;
-import javax.swing.GroupLayout.SequentialGroup;
+import java.util.prefs.Preferences;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import org.openide.util.NbPreferences;
 
 /**
  *
@@ -21,27 +28,35 @@ public class CodonSelector extends javax.swing.JPanel {
 
     private ReferenceViewer viewer;
     private Preferences pref;
+    
+    private int nbGeneticCodes;
+    
 
     /** Creates new form CodonSelector */
     public CodonSelector() {
+        try {
+            GeneticCodeFactory.initGeneticCodes();
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        this.nbGeneticCodes = GeneticCodeFactory.getGeneticCodes().size();
+        
         this.initComponents();
         this.initListener();
-        this.updateComponents();
+        this.createPanels();
+        
     }
 
     public void setGenomeViewer(ReferenceViewer viewer){
         this.viewer = viewer;
-        this.checkBoxes();
+        for (Component comp : this.getComponents()) {
+            if (comp instanceof CodonFamilyPanel) {
+                ((CodonFamilyPanel) comp).checkBoxes();
+            }
+        }
     }
 
-    /**
-     * Used to check for boxes that are checked when a new viewer was selected.
-     */
-    private void checkBoxes(){
-        //atgCheckbox.setSelected(this.viewer.getSequenceBar().isATGCodonShown());
-        //this.viewer.getSequenceBar().whichCodonsSelected();
-        //TODO: muss checken ob das hier noch gebraucht wird
-    }
+    
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -95,150 +110,129 @@ public class CodonSelector extends javax.swing.JPanel {
             @Override
             public void preferenceChange(PreferenceChangeEvent evt) {
                 if (evt.getKey().equals(Properties.SEL_GENETIC_CODE)) {
-                    CodonSelector.this.updateComponents();
+                    createPanels();
                 }
             }
         });
     }
 
     /**
-     * Updates the components of this codon selector. When another genetic code
-     * was chosen all old start codon checkboxes are removed and new checkboxes
-     * are created.
+     * Creates the panels, which contain the check boxes for the start and stop codons.
      */
-    private void updateComponents() {
-
-        String[] startCodons;
-        int codeIndex = Integer.valueOf(this.pref.get(Properties.GENETIC_CODE_INDEX, "0"));
-        if (codeIndex < GeneticCodesStore.getGeneticCodesStoreSize()){
-            startCodons = GeneticCodesStore.getGeneticCode(this.pref.get(Properties.SEL_GENETIC_CODE, Properties.STANDARD))[0];
+    private void createPanels() {
+        
+        this.removeAll();
+        this.setLayout(new BorderLayout());
+        
+        String[] startCodons = new String[0];
+        String[] stopCodons = new String[0];
+        int codeIndex = Integer.valueOf(pref.get(Properties.GENETIC_CODE_INDEX, "0"));
+        if (codeIndex < nbGeneticCodes) {
+            GeneticCode code = GeneticCodeFactory.getGeneticCodeById(Integer.valueOf(pref.get(Properties.SEL_GENETIC_CODE, "1")));
+            startCodons = code.getStartCodons().toArray(startCodons);
+            stopCodons = code.getStopCodons().toArray(stopCodons);
         } else {
-            startCodons = GeneticCodesStore.parseCustomCodons(codeIndex, this.pref.get(Properties.CUSTOM_GENETIC_CODES, Properties.STANDARD));
+            startCodons = CodonUtilities.parseCustomCodons(codeIndex, pref.get(Properties.CUSTOM_GENETIC_CODES, "1"));
         }
         
-        
-        JCheckBox[] newBoxes = new JCheckBox[startCodons.length];
-        for (int i = 0; i < startCodons.length; ++i) {
-
-            //create as many checkboxes as needed and add them to this component
-            final int index = i; //needs to be final for listener
-            final JCheckBox newBox = new JCheckBox(startCodons[i]);//should be upper case already
-            newBox.addActionListener(new java.awt.event.ActionListener() {
-
-                @Override
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    viewer.getSequenceBar().showCodons(index, newBox.isSelected());
-                }
-            });
-            newBoxes[i] = newBox;
-        }
-        this.addBoxesToPanel(newBoxes);
+        CodonFamilyPanel startPanel = new CodonFamilyPanel("Starts:", startCodons);
+        CodonFamilyPanel stopPanel = new CodonFamilyPanel("Stops:", stopCodons);
+        this.add(startPanel, BorderLayout.NORTH);
+        this.add(stopPanel, BorderLayout.SOUTH);
     }
 
+    
     /**
-     * Adds the given array of JCheckboxes to this CodonSelectorPanel.
-     * @param boxesToAdd the array of checkboxes to add to this component
+     * A panel for the check boxes of all codons of the same type (start or stop).
+     * They are added dynamically in the panel, surrounded by a titled border, titled
+     * with the familyId.
      */
-    private void addBoxesToPanel(final JCheckBox[] boxesToAdd) {
+    private class CodonFamilyPanel extends JPanel {
+        
+        private String familyId;
+        
+        /**
+         * A panel for the check boxes of all codons of the same type (start or
+         * stop). They are added dynamically in the panel, surrounded by a
+         * titled border, titled with the familyId.
+         * @param familyId the id of the codon family, which should be displayed
+         *      on the titled border.
+         * @param the list of codons, for which check boxes should be created.
+         */
+        public CodonFamilyPanel(String familyId, String[] codons) {
+            this.familyId = familyId;
+            this.updateComponents(codons);
+        }
+        
+        /**
+         * Updates the components of this codon selector. When another genetic
+         * code was chosen all old start codon checkboxes are removed and new
+         * checkboxes are created.
+         */
+        private void updateComponents(String[] codons) {            
+                        
+            JComponent[] newComps = new JComponent[codons.length];
+            for (int i = 0; i < codons.length; ++i) {
 
-        this.removeAll();
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
+                //create as many checkboxes as needed and add them to this component
+                final int index = i; //needs to be final for listener
+                final JCheckBox newBox = new JCheckBox(codons[i]);//should be upper case already
+                newBox.addActionListener(new java.awt.event.ActionListener() {
 
-        if (boxesToAdd.length < 4){ //layout if less than 4 start codons
-            SequentialGroup seqGroup = layout.createSequentialGroup();
-            ParallelGroup parGroup = layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE);
+                    @Override
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        if (familyId.contains("Start")) {
+                            viewer.getSequenceBar().showStartCodons(index, newBox.isSelected());
+                        } else { // means: familyId.contains("Stop")
+                            viewer.getSequenceBar().showStopCodons(index, newBox.isSelected());
+                        }
 
-            for (int i = 0; i < boxesToAdd.length; ++i) {
-                seqGroup.addComponent(boxesToAdd[i]);
-                parGroup.addComponent(boxesToAdd[i]);
+                    }
+                });
+                newComps[i] = newBox;
             }
-
-            layout.setHorizontalGroup(layout.createParallelGroup(
-                    javax.swing.GroupLayout.Alignment.LEADING).addGroup(seqGroup));
-            layout.setVerticalGroup(layout.createParallelGroup(
-                    javax.swing.GroupLayout.Alignment.LEADING).addGroup(parGroup));
-        } else
-        if (boxesToAdd.length < 7){ //layout if less than 7 start codons
-            ParallelGroup parGroup = layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING);
-            ParallelGroup parGroup2 = layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING);
-            ParallelGroup parGroup3 = layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING);
-            ParallelGroup parGroup4 = layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE);
-            ParallelGroup parGroup5 = layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE);
-
-            int mod = 0;
-            for (int i = 0; i < boxesToAdd.length; ++i) {
-                mod = i%3; //group creation for horizontal groups
-                if (mod == 0){
-                    parGroup.addComponent(boxesToAdd[i]);
-                } else
-                if (mod == 1){
-                    parGroup2.addComponent(boxesToAdd[i]);
-                } else
-                if (mod == 2){
-                    parGroup3.addComponent(boxesToAdd[i]);
-                }
-
-                if (i < 3){ //group creation for vertical groups
-                    parGroup4.addComponent(boxesToAdd[i]);
-                } else {
-                    parGroup5.addComponent(boxesToAdd[i]);
-                }
-            }
-
-            layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addGroup(parGroup)
-                    .addGroup(parGroup2)
-                    .addGroup(parGroup3))
-            );
-            layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addGroup(parGroup4)
-                    .addGroup(parGroup5))
-            );
-        } else { //layout if less than 10 start codons, for more start codons implement something new
-            SequentialGroup seqGroup = layout.createSequentialGroup();
-            SequentialGroup seqGroup2 = layout.createSequentialGroup();
-            SequentialGroup seqGroup3 = layout.createSequentialGroup();
-            ParallelGroup parGroup = layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE);
-            ParallelGroup parGroup2 = layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE);
-            ParallelGroup parGroup3 = layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE);
-
-            for (int i = 0; i < boxesToAdd.length; ++i) {
-                if (i < 3){ //group creation for vertical groups
-                    seqGroup.addComponent(boxesToAdd[i]);
-                    parGroup.addComponent(boxesToAdd[i]);
-                } else
-                if (i < 6) {
-                    seqGroup2.addComponent(boxesToAdd[i]);
-                    parGroup2.addComponent(boxesToAdd[i]);
-                } else {
-                    seqGroup3.addComponent(boxesToAdd[i]);
-                    parGroup3.addComponent(boxesToAdd[i]);
-                }
-            }
-
-            layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(seqGroup)
-                        .addGroup(seqGroup2)
-                        .addGroup(seqGroup3)))
-            );
-            layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(layout.createSequentialGroup()
-                    .addGroup(parGroup)
-                    .addGroup(parGroup2)
-                    .addGroup(parGroup3))
-            );
+            this.addCompsToPanel(newComps, familyId);
         }
 
-        //TODO: wenn schmaler als 3 boxen und neuer genetic code: parent size anpassen
+        /**
+         * Adds the given array of JCheckboxes to this CodonSelectorPanel.
+         *
+         * @param compsToAdd the array of checkboxes to add to this component
+         */
+        private void addCompsToPanel(final JComponent[] compsToAdd, String familyId) {
+
+            this.removeAll();
+            this.setBorder(javax.swing.BorderFactory.createTitledBorder(familyId));
+            int nbRows = 1 + (compsToAdd.length - 1) / 3;
+            int nbColumns = 3;
+
+            GridLayout layout = new GridLayout(nbRows, nbColumns);
+            this.setLayout(layout);
+
+            for (int i = 0; i < compsToAdd.length; ++i) {
+                this.add(compsToAdd[i]);
+            }
+        }
+        
+        /**
+         * Used to check for boxes that are checked when a new viewer was
+         * selected.
+         */
+        private void checkBoxes() {
+            JCheckBox currentBox;
+            Component comp;
+            for (int i = 0; i < this.getComponentCount(); ++i) {
+                comp = this.getComponent(i);
+                if (comp instanceof JCheckBox) {
+                    currentBox = (JCheckBox) this.getComponent(i); //order needs to be correct
+                    if (familyId.contains("Start")) {
+                        viewer.getSequenceBar().showStartCodons(i, currentBox.isSelected());
+                    } else { // means: familyId.contains("Stop")
+                        viewer.getSequenceBar().showStopCodons(i, currentBox.isSelected());
+                    }
+                }
+            }
+        }
     }
 
 //    /**

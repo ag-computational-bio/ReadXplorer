@@ -1,6 +1,7 @@
 package de.cebitec.vamp.thumbnail;
 
-import de.cebitec.vamp.databackend.CoverageThreadListener;
+import de.cebitec.vamp.databackend.ThreadListener;
+import de.cebitec.vamp.databackend.dataObjects.CoverageAndDiffResultPersistant;
 import de.cebitec.vamp.databackend.dataObjects.PersistantCoverage;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfo;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
@@ -9,7 +10,7 @@ import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
  * Listens for coverage answer from CoverageThread.
  * @author denis
  */
-class ThumbnailCoverageListener implements CoverageThreadListener{
+class ThumbnailCoverageListener implements ThreadListener{
     private TrackViewer trackViewer;
 
     public ThumbnailCoverageListener(TrackViewer trackViewer){
@@ -17,12 +18,22 @@ class ThumbnailCoverageListener implements CoverageThreadListener{
     }
 
    @Override
-    public void receiveCoverage(PersistantCoverage coverage) {
-        //Grenzen neu malen
-        int middle = coverage.getLeftBound() + ((coverage.getRightBound() - coverage.getLeftBound()) / 2);
-        int width = coverage.getRightBound() - coverage.getLeftBound();
-        trackViewer.receiveCoverage(coverage);
-        trackViewer.updateLogicalBounds(new BoundsInfo(coverage.getLeftBound(), coverage.getRightBound(), middle, 1, width));
+    public void receiveData(Object resultData) {
+       if (resultData instanceof CoverageAndDiffResultPersistant) {
+           //Grenzen neu malen
+           CoverageAndDiffResultPersistant coverageResult = (CoverageAndDiffResultPersistant) resultData;
+           PersistantCoverage coverage = coverageResult.getCoverage();
+           int middle = coverage.getLeftBound() + ((coverage.getRightBound() - coverage.getLeftBound()) / 2);
+           int width = coverage.getRightBound() - coverage.getLeftBound();
+           trackViewer.receiveData(coverage);
+           trackViewer.updateLogicalBounds(new BoundsInfo(coverage.getLeftBound(), coverage.getRightBound(), middle, 1, width));
+       }
+    }
+
+    @Override
+    public void notifySkipped() {
+        //do nothing 
+        //throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

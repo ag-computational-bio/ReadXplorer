@@ -44,8 +44,8 @@
 
 package de.cebitec.centrallookup;
 
-import org.openide.util.Lookup;
 import org.openide.util.ContextGlobalProvider;
+import org.openide.util.Lookup;
 import org.openide.util.lookup.ProxyLookup;
 import org.openide.windows.TopComponent;
 
@@ -90,14 +90,14 @@ implements ContextGlobalProvider, Lookup.Provider, java.beans.PropertyChangeList
 
     /** Requests refresh of our lookup everytime component is chagned.
      */
-	@Override
+	   @Override
     public void propertyChange(java.beans.PropertyChangeEvent evt) {
-        if (TopComponent.Registry.PROP_ACTIVATED.equals (evt.getPropertyName())) {
-			org.openide.util.Utilities.actionsGlobalContext ().lookup (javax.swing.ActionMap.class);
+        if (TopComponent.Registry.PROP_ACTIVATED.equals(evt.getPropertyName())) {
+            org.openide.util.Utilities.actionsGlobalContext().lookup(javax.swing.ActionMap.class);
         }
-		if (TopComponent.Registry.PROP_TC_CLOSED.equals(evt.getPropertyName())) {
-			org.openide.util.Utilities.actionsGlobalContext ().lookup (javax.swing.ActionMap.class);
-		}
+        if (TopComponent.Registry.PROP_TC_CLOSED.equals(evt.getPropertyName())) {
+            org.openide.util.Utilities.actionsGlobalContext().lookup(javax.swing.ActionMap.class);
+        }
     }
 
 }

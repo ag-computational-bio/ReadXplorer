@@ -1,13 +1,8 @@
 package de.cebitec.vamp.parser.mappings;
 
+import de.cebitec.vamp.util.StatsContainer;
 import de.cebitec.vamp.parser.TrackJob;
-import de.cebitec.vamp.parser.common.DiffAndGapResult;
-import de.cebitec.vamp.parser.common.ParsedDiff;
-import de.cebitec.vamp.parser.common.ParsedMapping;
-import de.cebitec.vamp.parser.common.ParsedMappingContainer;
-import de.cebitec.vamp.parser.common.ParsedReferenceGap;
-import de.cebitec.vamp.parser.common.ParsedRun;
-import de.cebitec.vamp.parser.common.ParsingException;
+import de.cebitec.vamp.parser.common.*;
 import de.cebitec.vamp.util.Observer;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -26,28 +21,71 @@ import java.util.logging.Logger;
  * number of equal sequences found during the filtering step.
  * @author ddoppmeier
  */
-public class UniqueJokParser implements MappingParserI, Observer {
+public class UniqueJokParser implements MappingParserI {
 
     private static String name = "Unique Reads Jok Output Parser";
     private static String[] fileExtension = new String[]{"out"};
     private static String fileDescription = "Jok Output";
-    private HashMap<Integer, Integer> gapOrderIndex;
+    
+    private SeqPairProcessorI seqPairProcessor;
     private ArrayList<Observer> observers;
     private String errorMsg;
     private int noUniqueMappings;
     private HashMap<String, Integer> seqToIDMap;
 
     public UniqueJokParser() {
-        this.gapOrderIndex = new HashMap<Integer, Integer>();
-        this.observers = new ArrayList<Observer>();
+        this.observers = new ArrayList<>();
+        this.seqPairProcessor = new SeqPairProcessorDummy();
+    }
+    
+    /**
+     * Parser for parsing jok data files for vamp in a slightly different
+     * version of the JokParser. In contrast to the JokParser, this parser
+     * expects filtered mapping results, such that each duplicate read was
+     * filtered BEFORE the mapping and the abundance of this read is encoded in
+     * the readname by adding #x to the readname, with x being the number of
+     * equal sequences found during the filtering step.. Use this constructor
+     * for parsing sequence pair data along with the ordinary track data.
+     * @param seqPairProcessor the specific sequence pair processor for handling
+     *      sequence pair data
+     */
+    public UniqueJokParser(SeqPairProcessorI seqPairProcessor) {
+        this();
+        this.seqPairProcessor = seqPairProcessor;
+    }
+    
+    /**
+     * Does nothing, as the unique jok parser currently does not need any
+     * conversions.
+     * @param trackJob
+     * @param referenceSequence
+     * @return true
+     * @throws ParsingException
+     * @throws OutOfMemoryError
+     */
+    @Override
+    public Object convert(TrackJob trackJob, String referenceSequence) throws ParsingException, OutOfMemoryError {
+        return true;
+    }
+
+    /**
+     * Not implemented for this parser implementation, as currently no
+     * preprocessing is needed.
+     * @param trackJob the trackjob to preprocess
+     * @return true, if the method succeeded
+     * @throws ParsingException
+     * @throws OutOfMemoryError
+     */
+    @Override
+    public Object preprocessData(TrackJob trackJob) throws ParsingException, OutOfMemoryError {
+        return true;
     }
 
     @Override
 //    public ParsedMappingContainer parseInput(TrackJob trackJob, HashMap<String, Integer> readnameToSequenceID, String sequenceString) throws ParsingException {
     public ParsedMappingContainer parseInput(TrackJob trackJob, String sequenceString) throws ParsingException {
         ParsedMappingContainer mappingContainer = new ParsedMappingContainer();
-        mappingContainer.registerObserver(this);
-        this.seqToIDMap = new HashMap<String, Integer>();
+        this.seqToIDMap = new HashMap<>();
 
         try {
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing mappings from file \"{0}\"", trackJob.getFile().getAbsolutePath());
@@ -55,10 +93,10 @@ public class UniqueJokParser implements MappingParserI, Observer {
             int lineno = 0;
             int start;
             int stop;
-            int errors;
+            int differences;
             this.noUniqueMappings = 0;
             int noUniqueSeq = 0;
-            String line = null;
+            String line;
             while ((line = br.readLine()) != null) { //reads the input file line per line
                 lineno++;
 
@@ -68,8 +106,6 @@ public class UniqueJokParser implements MappingParserI, Observer {
 
                     // cast tokens
                     String readname = tokens[0];
-                    start = -2;
-                    stop = -1;
                     try {
                         start = Integer.parseInt(tokens[1]);
                         stop = Integer.parseInt(tokens[2]);
@@ -96,9 +132,8 @@ public class UniqueJokParser implements MappingParserI, Observer {
                     }
                     String readSeq = tokens[4];
                     String refSeq = tokens[5];
-                    errors = 0;
                     try {
-                        errors = Integer.parseInt(tokens[6]);
+                        differences = Integer.parseInt(tokens[6]);
                     } catch (NumberFormatException e){
                         this.sendErrorMsg("Value for errors in "
                                 + trackJob.getFile().getAbsolutePath() + " line " + lineno + " is not a number. "
@@ -147,12 +182,6 @@ public class UniqueJokParser implements MappingParserI, Observer {
                                 + "Found read sequence: " + readSeq + ", reference sequence: " + refSeq);
                         continue;
                     }
-                    if (errors < 0 || errors > readSeq.length()) {
-                        this.sendErrorMsg("Error number has invalid value " + errors
-                                + " in " + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
-                                + "Must be bigger or equal to zero and smaller than alignment length.");
-                        continue;
-                    }
 //                    if (!readnameToSequenceID.containsKey(readname)) {
 //                        this.sendErrorMsg("Could not find sequence id mapping for read " + readname
 //                                + " in " + trackJob.getFile().getAbsolutePath() + "line " + lineno + ". "
@@ -161,11 +190,24 @@ public class UniqueJokParser implements MappingParserI, Observer {
 //                    }
 
                     // Reads with an error already skip this part because of "continue" statements
-                    DiffAndGapResult result = this.createDiffsAndGaps(readSeq, refSeq, start, direction);
+                    DiffAndGapResult result = ParserCommonMethods.createDiffsAndGaps(readSeq, refSeq, start, direction);
                     List<ParsedDiff> diffs = result.getDiffs();
                     List<ParsedReferenceGap> gaps = result.getGaps();
+                    if (differences != result.getDifferences()) {
+                        this.sendErrorMsg("Value for current differences in "
+                                + trackJob.getFile().getName() + " line " + lineno + " is differing from newly calculated number of differences."
+                                + "Found differences: " + differences + " versus: " + result.getDifferences());
+                        continue;
+                    }
+                    
+                    if (differences < 0 || differences > readSeq.length()) {
+                        this.sendErrorMsg("Error number has invalid value " + differences
+                                + " in " + trackJob.getFile().getAbsolutePath() + " line " + lineno + ". "
+                                + "Must be bigger or equal to zero and smaller than alignment length.");
+                        continue;
+                    }
 
-                    ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, errors);
+                    ParsedMapping mapping = new ParsedMapping(start, stop, direction, diffs, gaps, differences);
                     mapping.setCount(count);
 
                     int seqID;
@@ -176,14 +218,12 @@ public class UniqueJokParser implements MappingParserI, Observer {
                         this.seqToIDMap.put(readSeq, seqID);
                     }
                     mappingContainer.addParsedMapping(mapping, seqID);
-                    this.processReadname(seqID, readname);
+                    this.seqPairProcessor.processReadname(seqID, readname);
                 } else {
                     this.sendErrorMsg("The current read in line " + lineno + "is missing some data: ".concat(line));
                 }
             }
 
-            mappingContainer.setNumberOfUniqueMappings(noUniqueMappings);
-            mappingContainer.setNumberOfUniqueSeq(noUniqueSeq);
             br.close();
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parising mapping data from \"{0}\"", trackJob.getFile().getAbsolutePath());
 
@@ -195,129 +235,19 @@ public class UniqueJokParser implements MappingParserI, Observer {
         return mappingContainer;
     }
 
-    private int getOrderForGap(int gapPos) {
-        if (!gapOrderIndex.containsKey(gapPos)) {
-            gapOrderIndex.put(gapPos, 0);
-        }
-        int order = gapOrderIndex.get(gapPos);
-
-        // increase order for next request
-        gapOrderIndex.put(gapPos, order + 1);
-
-        return order;
-    }
-
-    private Character getReverseComplement(char base) {
-        Character rev = ' ';
-        if (base == 'A') {
-            rev = 'T';
-        } else if (base == 'C') {
-            rev = 'G';
-        } else if (base == 'G') {
-            rev = 'C';
-        } else if (base == 'T') {
-            rev = 'A';
-        } else if (base == 'N') {
-            rev = 'N';
-        } else if (base == '_') {
-            rev = '_';
-        } else {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Found unknown char {0}!", base);
-        }
-
-        return rev;
-    }
-
-    private DiffAndGapResult createDiffsAndGaps(String readSeq, String refSeq, int start, byte direction) {
-        List<ParsedDiff> diffs = new ArrayList<ParsedDiff>();
-        List<ParsedReferenceGap> gaps = new ArrayList<ParsedReferenceGap>();
-
-        int absPos;
-        gapOrderIndex.clear();
-
-        for (int i = 0, basecounter = 0; i < readSeq.length(); i++) {
-            if (readSeq.charAt(i) != refSeq.charAt(i)) {
-                absPos = start + basecounter;
-                if (refSeq.charAt(i) == '_') {
-                    // store a lower case char, if this is a gap in genome
-                    Character base = readSeq.charAt(i);
-                    base = Character.toUpperCase(base);
-                    if (direction == -1) {
-                        base = getReverseComplement(base);
-                    }
-
-                    ParsedReferenceGap gap = new ParsedReferenceGap(absPos, base, this.getOrderForGap(absPos));
-                    gaps.add(gap);
-                    // note: do not increase position. that means that next base of read is mapped
-                    // to the same position as this gap. two subsequent gaps map to the same position!
-                } else {
-                    // store the upper case char from input file, if this is a modification in the read
-                    char c = readSeq.charAt(i);
-                    c = Character.toUpperCase(c);
-                    if (direction == -1) {
-                        c = getReverseComplement(c);
-                    }
-                    ParsedDiff d = new ParsedDiff(absPos, c);
-                    diffs.add(d);
-                    basecounter++;
-                }
-            } else {
-                basecounter++;
-            }
-        }
-
-        return new DiffAndGapResult(diffs, gaps);
-    }
-
     @Override
     public String getInputFileDescription() {
         return fileDescription;
     }
 
     @Override
-    public String getParserName() {
+    public String getName() {
         return name;
     }
 
     @Override
     public String[] getFileExtensions() {
         return fileExtension;
-    }
-
-    @Override
-    public ParsedRun parseInputForReadData(TrackJob trackJob) throws ParsingException {
-        ParsedRun run = new ParsedRun(fileDescription);
-        try {
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Start parsing read data from mappings from file \"{0}\"", trackJob.getFile().getAbsolutePath());
-            BufferedReader br = new BufferedReader(new FileReader(trackJob.getFile()));
-
-            int lineno = 0;
-            String line = null;
-
-            while ((line = br.readLine()) != null) {
-                lineno++;
-                // tokenize input line
-                String[] tokens = line.split("\\t", 8);
-
-                // cast tokens
-                String readname = tokens[0];
-                String readSeq = tokens[4];
-                String editReadSeq = readSeq;
-                if (editReadSeq.contains("_")) {
-                    editReadSeq = editReadSeq.replaceAll("_", "");
-                }
-                editReadSeq = editReadSeq.toLowerCase();
-                run.addReadData(editReadSeq, readname);
-            }
-            br.close();
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished parsing read data from mapping data from \"{0}\"", trackJob.getFile().getAbsolutePath());
-
-        } catch (IOException ex) {
-            throw new ParsingException(ex);
-        }
-        run.setTimestamp(trackJob.getTimestamp());
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read data successfully parsed");
-        return run;
     }
 
     @Override
@@ -331,16 +261,9 @@ public class UniqueJokParser implements MappingParserI, Observer {
     }
 
     @Override
-    public void notifyObservers() {
+    public void notifyObservers(Object data) {
         for (Observer observer : this.observers){
             observer.update(this.errorMsg);
-        }
-    }
-
-    @Override
-    public void update(Object args) {
-        if (args instanceof Boolean && (Boolean) args == true) {
-            ++this.noUniqueMappings;
         }
     }
 
@@ -350,11 +273,16 @@ public class UniqueJokParser implements MappingParserI, Observer {
      */
     private void sendErrorMsg(final String errorMsg) {
         this.errorMsg = errorMsg;
-        this.notifyObservers();
+        this.notifyObservers(null);
     }
 
     @Override
-    public void processReadname(int seqID, String readName) {
-        //nothing to do here
+    public SeqPairProcessorI getSeqPairProcessor() {
+        return this.seqPairProcessor;
+    }
+
+    @Override
+    public void setStatsContainer(StatsContainer statsContainer) {
+        //do nothing right now
     }
 }
