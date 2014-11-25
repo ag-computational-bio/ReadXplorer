@@ -27,6 +27,7 @@ public class FieldNames {
     public final static String TABLE_STATISTICS = "STATISTICS";  
     public final static String TABLE_COUNT_DISTRIBUTION = "COUNT_DISTRIBUTION";
     public final static String TABLE_OBJECTCACHE = "OBJECT_CACHE"; 
+    public final static String TABLE_DB_VERSION = "DB_VERSION"; 
     
     
     ////////////////////////  tables fields  //////////////////////////////// 
@@ -199,4 +200,5 @@ public class FieldNames {
     public static final String COUNT_DISTRIBUTION_COV_INTERVAL_ID = "BIN_INDEX";
     public static final String COUNT_DISTRIBUTION_BIN_COUNT = "BIN_COUNT";
     
+    public static final String DB_VERSION_DB_VERSION_NO = "DB_VERSION_NO";
 }

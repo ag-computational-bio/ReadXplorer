@@ -4,6 +4,7 @@
  */
 package de.cebitec.vamp.rnaTrimming;
 
+import de.cebitec.vamp.mapping.api.MappingApi;
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -17,8 +18,8 @@ import org.openide.WizardDescriptor.Panel;
 import org.openide.util.HelpCtx;
 
 /**
- *
- * @author jeff
+ * This panel displays the card to select parameters for rna trimming process.
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 class RNATrimSelectionPanel implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
@@ -98,7 +99,7 @@ class RNATrimSelectionPanel implements WizardDescriptor.FinishablePanel<WizardDe
 
     @Override
     public void readSettings(WizardDescriptor data) {
-        
+        component.setMappingParam(MappingApi.getLastMappingParams());
     }
 
     @Override
@@ -107,6 +108,7 @@ class RNATrimSelectionPanel implements WizardDescriptor.FinishablePanel<WizardDe
         settings.putProperty(RNATrimAction.PROP_TRIMMAXIMUM, component.getTrimMaximum());
         settings.putProperty(RNATrimAction.PROP_SOURCEPATH, component.getSourcePath());
         settings.putProperty(RNATrimAction.PROP_REFERENCEPATH, component.getReferencePath());
+        settings.putProperty(RNATrimAction.PROP_MAPPINGPARAM, component.getMappingParam());
     }
 
 }

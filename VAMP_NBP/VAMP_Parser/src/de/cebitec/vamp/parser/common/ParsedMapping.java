@@ -42,10 +42,20 @@ public class ParsedMapping {
         this.numOfReplicates = 1;
     }
 
-    public void setIsBestMapping(boolean b){
-        this.bestMapping = b;
+    /**
+     * Sets if this is the best mapping for the given read in the complete 
+     * reference.
+     * @param isBestMapping <cc>true</cc> if this is the best mapping for the
+     * read, <cc>false</cc> otherwise
+     */
+    public void setIsBestMapping(boolean isBestMapping){
+        this.bestMapping = isBestMapping;
     }
 
+    /**
+     * @return <cc>true</cc> if this is the best mapping for the read, 
+     * <cc>false</cc> otherwise
+     */
     public boolean isBestMapping(){
         return this.bestMapping;
     }

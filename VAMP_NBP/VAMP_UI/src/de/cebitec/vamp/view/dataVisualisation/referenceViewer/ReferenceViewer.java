@@ -104,7 +104,6 @@ public class ReferenceViewer extends AbstractViewer {
 
     @Override
     public void boundsChangedHook() {
-        // TODO compute this outside of EDT if too timeconsuming
         this.createFeatures();
 
 //        firePropertyChange(PROP_INTERVAL_CHANGED, null, getBoundsInfo());

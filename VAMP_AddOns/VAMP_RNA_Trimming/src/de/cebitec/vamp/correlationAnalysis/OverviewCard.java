@@ -1,15 +1,15 @@
 package de.cebitec.vamp.correlationAnalysis;
 
+import de.cebitec.vamp.correlationAnalysis.CorrelationAnalysisAction.CorrelationCoefficient;
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.rnaTrimming.*;
-import java.util.Iterator;
 import java.util.List;
 import org.openide.util.NbBundle;
 
 /**
- *
- * @author evgeny
+ * This card displays an overview of chosen params as part of the correlation
+ * analysis wizard.
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 public class OverviewCard extends javax.swing.JPanel {
     
@@ -58,13 +58,12 @@ public class OverviewCard extends javax.swing.JPanel {
     private javax.swing.JTextArea overviewTextArea;
     // End of variables declaration//GEN-END:variables
 
-    void showGenereateOverview(String intervallength, String mincorrelation) {
-        
 
-    }
-
-    void showGenereateOverview(List<PersistantTrack> list, String intervallength, 
+    void showGenereateOverview(CorrelationCoefficient cc, List<PersistantTrack> list, String intervallength, 
             String mincorrelation, String minpeakcoverage) {
+        overviewTextArea.setText("Correlation coefficient:\n");
+        overviewTextArea.append(cc+"\n");
+        
         overviewTextArea.setText("Reference:\n");
         overviewTextArea.append(ProjectConnector.getInstance().getRefGenomeConnector(
                 list.get(0).getRefGenID()).getRefGenome().getName()+"\n"

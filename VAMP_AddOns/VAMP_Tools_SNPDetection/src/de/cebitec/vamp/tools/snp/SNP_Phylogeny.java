@@ -43,8 +43,8 @@ public class SNP_Phylogeny {
     private void createAlignment(SnpDetectionResult snpData) {
 
         int numberOfTracks;
-        HashMap<Long, HashMap<Integer, String>> bases = new HashMap<>();
-        HashMap<Long, String> refBases = new HashMap<>();
+        HashMap<Integer, HashMap<Integer, String>> bases = new HashMap<>();
+        HashMap<Integer, String> refBases = new HashMap<>();
         List<SnpI> snps = snpData.getSnpList();
         Map<Integer, PersistantTrack> trackNames = snpData.getTrackMap();
         List<Integer> trackIdsWithSnps = new ArrayList<>();
@@ -57,20 +57,12 @@ public class SNP_Phylogeny {
             if (!trackIdsWithSnps.contains(snp.getTrackId())) {
                 trackIdsWithSnps.add(snp.getTrackId());
             }
-//            if (snp.getTrackId() > numberOfTracks) {
-//                numberOfTracks = snp.getTrackId();
-//            }
 
-            String positionString = snp.getPosition();
-            if (positionString.contains("_")) {
-                positionString = positionString.substring(0, positionString.length() - 2);
-            }
-
-            Long position = Long.parseLong(positionString);
+            int position = snp.getPosition();
 
             // save reference base
             if (!refBases.containsKey(position)) {
-                refBases.put(position, snp.getRefBase().toUpperCase());
+                refBases.put(position, snp.getRefBase());
             }
 
             // save bases per track in a hashmap again hashed to their position
@@ -86,10 +78,10 @@ public class SNP_Phylogeny {
 
 
         // add reference base to all position maps, where it is missing for at least one track
-        Iterator<Entry<Long, HashMap<Integer, String>>> positionIterator = bases.entrySet().iterator();
+        Iterator<Entry<Integer, HashMap<Integer, String>>> positionIterator = bases.entrySet().iterator();
         while (positionIterator.hasNext()) {
 
-            Map.Entry<Long, HashMap<Integer, String>> posToBaseMap = positionIterator.next();
+            Map.Entry<Integer, HashMap<Integer, String>> posToBaseMap = positionIterator.next();
             HashMap<Integer, String> positionEntry = posToBaseMap.getValue();
             // fill positions without snpData with reference base
 
@@ -102,7 +94,7 @@ public class SNP_Phylogeny {
 
         HashMap<Integer, Integer> trackIdToIndex = this.getTrackIdToIndexMap(trackIdsWithSnps);
         String[] alignment = new String[numberOfTracks + 1];
-        for (Long l : new TreeSet<>(bases.keySet())) {
+        for (Integer l : new TreeSet<>(bases.keySet())) {
             HashMap<Integer, String> snpsAtPosMap = bases.get(l);
             for (Integer trackId : new TreeSet<>(snpsAtPosMap.keySet())) {
                 if (alignment[trackIdToIndex.get(trackId)] == null) {

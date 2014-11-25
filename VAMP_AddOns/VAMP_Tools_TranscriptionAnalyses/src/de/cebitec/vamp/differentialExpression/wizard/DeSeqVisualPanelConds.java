@@ -12,7 +12,7 @@ public final class DeSeqVisualPanelConds extends JPanel {
     private DefaultListModel<PersistantTrack> trackListModel = new DefaultListModel<>();
     private DefaultListModel<PersistantTrack> conditionOneModel = new DefaultListModel<>();
     private DefaultListModel<PersistantTrack> conditionTwoModel = new DefaultListModel<>();
-    private List<PersistantTrack> selectedTraks = null;
+    private List<PersistantTrack> selectedTraks = new ArrayList<>();
     private String[] conds;
     private List<Integer> groupA = new ArrayList<>();
     private List<Integer> groupB = new ArrayList<>();
@@ -30,10 +30,14 @@ public final class DeSeqVisualPanelConds extends JPanel {
     }
 
     public void updateTrackList(List<PersistantTrack> selectedTraks) {
-        if (this.selectedTraks == null) {
+        if (!this.selectedTraks.equals(selectedTraks)) {
             this.selectedTraks = selectedTraks;
-            conds = new String[selectedTraks.size()];
             trackListModel.clear();
+            conditionOneModel.clear();
+            conditionTwoModel.clear();
+            groupA.clear();
+            groupB.clear();
+            conds = new String[selectedTraks.size()];
             for (Iterator<PersistantTrack> it = selectedTraks.iterator(); it.hasNext();) {
                 PersistantTrack persistantTrack = it.next();
                 trackListModel.addElement(persistantTrack);

@@ -1,8 +1,10 @@
 package de.cebitec.vamp.databackend;
 
 import de.cebitec.vamp.databackend.dataObjects.MappingResultPersistant;
+import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.util.Properties;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -18,11 +20,10 @@ public class MappingThreadAnalyses extends MappingThread {
     /**
      * Creates a new mapping thread for carrying out mapping request either to a
      * database or a file.
-     *
-     * @param track the track for which this mapping thread is created
+     * @param tracks the list of tracks for which this mapping thread is created
      */
-    public MappingThreadAnalyses(PersistantTrack track) {
-        super(track);
+    public MappingThreadAnalyses(List<PersistantTrack> tracks) {
+        super(tracks);
     }
 
     @Override
@@ -31,20 +32,16 @@ public class MappingThreadAnalyses extends MappingThread {
         while (!interrupted()) {
 
             IntervalRequest request = requestQueue.poll();
+            List<PersistantMapping> currentMappings;
             if (request != null) {
-                if (request.getDesiredData() == Properties.MAPPINGS_W_DIFFS) {
-                    this.currentMappings = this.loadMappingsWithDiffs(request);
-                } else if (request.getDesiredData() == Properties.MAPPINGS_WO_DIFFS) {
-                    this.currentMappings = this.loadMappingsWithoutDiffs(request);
+                if (request.getDesiredData() == Properties.MAPPINGS_DB_BY_ID) {
+                    currentMappings = this.loadMappingsById(request);
+                } else if (request.getDesiredData() == Properties.REDUCED_MAPPINGS) {
+                    currentMappings = this.loadReducedMappings(request);
                 } else {
-                    if (request.getDesiredData() == Properties.REDUCED_MAPPINGS) {
-                        this.currentMappings = this.loadReducedMappings(request);
-                    } else {
-                        this.currentMappings = this.loadMappingsById(request);
-                    }
+                    currentMappings = this.loadMappings(request);
                 }
                 request.getSender().receiveData(new MappingResultPersistant(currentMappings, request.getFrom(), request.getTo()));
-                currentMappings = null;
 
             } else {
                 try {

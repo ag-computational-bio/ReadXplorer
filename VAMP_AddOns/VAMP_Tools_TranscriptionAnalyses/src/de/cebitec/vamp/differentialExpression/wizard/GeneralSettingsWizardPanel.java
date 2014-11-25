@@ -2,6 +2,7 @@ package de.cebitec.vamp.differentialExpression.wizard;
 
 import de.cebitec.vamp.databackend.connector.ProjectConnector;
 import de.cebitec.vamp.databackend.connector.ReferenceConnector;
+import de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool;
 import de.cebitec.vamp.util.FeatureType;
 import java.io.File;
 import java.util.ArrayList;
@@ -19,6 +20,7 @@ public class GeneralSettingsWizardPanel implements WizardDescriptor.ValidatingPa
      */
     private GeneralSettingsVisualPanel component;
     private Integer genomeID;
+    private Tool tool;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -61,6 +63,12 @@ public class GeneralSettingsWizardPanel implements WizardDescriptor.ValidatingPa
     @Override
     public void readSettings(WizardDescriptor wiz) {
         genomeID = (Integer) wiz.getProperty("genomeID");
+        tool = (Tool) wiz.getProperty("tool");
+        if (tool == Tool.SimpleTest) {
+            getComponent().enableSaveOptions(false);
+        } else {
+            getComponent().enableSaveOptions(true);
+        }
     }
 
     @Override
@@ -69,15 +77,16 @@ public class GeneralSettingsWizardPanel implements WizardDescriptor.ValidatingPa
         if (getComponent().verifyInput()) {
             wiz.putProperty("startOffset", getComponent().getStartOffset());
             wiz.putProperty("stopOffset", getComponent().getStopOffset());
+            wiz.putProperty("regardReadOrientation", getComponent().regaredReadOrientation());
         }
-        if (getComponent().isCheckBoxchecked()) {
+        if (getComponent().isSaveBoxChecked()) {
             //TODO: Input validation
             String path = getComponent().getSavePath();
             File file = new File(path);
             wiz.putProperty("saveFile", file);
         }
 
-        List<FeatureType> usedFeatures = getComponent().getFeatureType();
+        List<FeatureType> usedFeatures = getComponent().getSelectedFeatureTypes();
         //If all possible features are selected, we use the ANY feature type
         if (usedFeatures.size() == FeatureType.SELECTABLE_FEATURE_TYPES.length) {
             usedFeatures = new ArrayList<>();
@@ -91,7 +100,7 @@ public class GeneralSettingsWizardPanel implements WizardDescriptor.ValidatingPa
         if (!getComponent().verifyInput()) {
             throw new WizardValidationException(null, "Please enter a number greater or equal to zero as start/stop offset.", null);
         }
-        List<FeatureType> usedFeatures = getComponent().getFeatureType();
+        List<FeatureType> usedFeatures = getComponent().getSelectedFeatureTypes();
         if (usedFeatures.isEmpty()) {
             throw new WizardValidationException(null, "Please select at least one type of annotation.", null);
         } else {

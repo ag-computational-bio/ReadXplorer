@@ -74,6 +74,7 @@ public class SnpStatisticsPanel extends javax.swing.JPanel {
                 {null},
                 {null},
                 {null},
+                {null},
                 {null}
             },
             new String [] {
@@ -108,7 +109,7 @@ public class SnpStatisticsPanel extends javax.swing.JPanel {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(snpEffectScrollpane, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(snpEffectScrollpane, javax.swing.GroupLayout.PREFERRED_SIZE, 159, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(snpTypeScrollpane, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
@@ -127,7 +128,8 @@ public class SnpStatisticsPanel extends javax.swing.JPanel {
                 {SNP_DetectionResultPanel.SNPS_INTERGENEIC, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_INTERGENEIC))},
                 {SNP_DetectionResultPanel.SNPS_SYNONYMOUS, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_SYNONYMOUS))},
                 {SNP_DetectionResultPanel.SNPS_CHEMIC_NEUTRAL, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_CHEMIC_NEUTRAL))},
-                {SNP_DetectionResultPanel.SNPS_MISSSENSE, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_MISSSENSE))},
+                {SNP_DetectionResultPanel.SNPS_CHEMIC_DIFF, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_CHEMIC_DIFF))},
+                {SNP_DetectionResultPanel.SNPS_STOPS, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_STOPS))},
                 {SNP_DetectionResultPanel.SNPS_AA_INSERTIONS, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_AA_INSERTIONS))},
                 {SNP_DetectionResultPanel.SNPS_AA_DELETIONS, String.valueOf(this.snpStatsMap.get(SNP_DetectionResultPanel.SNPS_AA_DELETIONS))}
             },

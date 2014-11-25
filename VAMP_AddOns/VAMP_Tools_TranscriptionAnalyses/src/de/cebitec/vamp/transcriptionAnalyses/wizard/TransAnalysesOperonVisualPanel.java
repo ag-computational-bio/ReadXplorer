@@ -2,6 +2,7 @@ package de.cebitec.vamp.transcriptionAnalyses.wizard;
 
 import de.cebitec.vamp.api.objects.JobPanel;
 import de.cebitec.vamp.util.GeneralUtils;
+import de.cebitec.vamp.view.dialogMenus.ChangeListeningWizardPanel;
 
 /**
  * Panel for showing all available options for the operon detection.
@@ -111,7 +112,7 @@ public final class TransAnalysesOperonVisualPanel extends JobPanel {
             isValidated = false;
         }
 
-        firePropertyChange(TranscriptionAnalysesWizardIterator.PROP_VALIDATE, null, isValidated);
+        firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated);
         return isValidated;
     }
 

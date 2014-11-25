@@ -1,7 +1,6 @@
 package de.cebitec.vamp.differentialExpression.wizard;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +76,7 @@ public class DeSeqWizardPanelConds implements WizardDescriptor.ValidatingPanel<W
     @Override
     public void validate() throws WizardValidationException {
         if (!getComponent().conditionsComplete()) {
-            throw  new WizardValidationException(null, "Please assigne every track to a condition.", null);
+            throw  new WizardValidationException(null, "Please assign every track to a condition.", null);
         }
     }
 }

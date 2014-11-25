@@ -28,7 +28,7 @@ public class PatternFilter implements RegionFilterI {
 //    private Pattern patternRev;
 
     public PatternFilter(int absStart, int absStop, PersistantReference refGen) {
-        this.matchedPatterns = new ArrayList<Region>();
+        this.matchedPatterns = new ArrayList<>();
         this.absStart = absStart;
         this.absStop = absStop;
         this.refGen = refGen;
@@ -57,7 +57,7 @@ public class PatternFilter implements RegionFilterI {
 
             this.sequence = this.refGen.getSequence().substring(start, stop);
             this.matchPattern(this.sequence, this.pattern, true, offset);
-            this.sequence = SequenceUtils.getReverseComplement(this.sequence).toLowerCase();
+            this.sequence = SequenceUtils.getReverseComplement(this.sequence);
             this.matchPattern(this.sequence, this.pattern, false, offset);
         }
         return this.matchedPatterns;
@@ -136,7 +136,7 @@ public class PatternFilter implements RegionFilterI {
                 ++start; //because we had fst pos of stop, then +2 and when exiting while loop -1. by +1 we move to last pos of stop
             } else { //reverse complement dna and start with the stop pos of current codon
                 String seq = genomeSeq.substring(0, this.absStart); //sequence we start with
-                String seqRev = SequenceUtils.getReverseComplement(seq).toLowerCase();
+                String seqRev = SequenceUtils.getReverseComplement(seq);
                 int nextStart = 0;
                 int fromRev = 0;
                 while (nextStart < this.absStart && fromRev != -1 && !isCorrectFrame) {

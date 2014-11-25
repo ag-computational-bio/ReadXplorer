@@ -59,8 +59,10 @@ public final class DeSeqVisualPanel1 extends JPanel {
         jTextArea1.setBackground(new java.awt.Color(240, 240, 240));
         jTextArea1.setColumns(20);
         jTextArea1.setFont(jTextArea1.getFont());
+        jTextArea1.setLineWrap(true);
         jTextArea1.setRows(5);
         jTextArea1.setText(org.openide.util.NbBundle.getMessage(DeSeqVisualPanel1.class, "DeSeqVisualPanel1.jTextArea1.text")); // NOI18N
+        jTextArea1.setWrapStyleWord(true);
         jTextArea1.setBorder(null);
         jScrollPane1.setViewportView(jTextArea1);
 
@@ -74,7 +76,7 @@ public final class DeSeqVisualPanel1 extends JPanel {
                     .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(twoConditionsRB)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 112, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 98, Short.MAX_VALUE)
                         .addComponent(moreConditionsRB)))
                 .addContainerGap())
         );
@@ -90,6 +92,7 @@ public final class DeSeqVisualPanel1 extends JPanel {
                 .addGap(91, 91, 91))
         );
     }// </editor-fold>//GEN-END:initComponents
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;

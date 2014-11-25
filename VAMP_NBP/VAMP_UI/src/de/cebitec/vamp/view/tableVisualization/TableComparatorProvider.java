@@ -1,6 +1,5 @@
 package de.cebitec.vamp.view.tableVisualization;
 
-import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import java.util.Comparator;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -20,9 +19,9 @@ public class TableComparatorProvider {
      * @param tableColumn the table column for which the comparator should be added
      */
     public static void setPersistantTrackComparator(TableRowSorter<TableModel> sorter, int tableColumn) {
-        sorter.setComparator(tableColumn, new Comparator<PersistantTrack>() {
+        sorter.setComparator(tableColumn, new Comparator<Object>() {
             @Override
-            public int compare(PersistantTrack a, PersistantTrack b) {
+            public int compare(Object a, Object b) {
                 return a.toString().compareToIgnoreCase(b.toString());
             }
         });

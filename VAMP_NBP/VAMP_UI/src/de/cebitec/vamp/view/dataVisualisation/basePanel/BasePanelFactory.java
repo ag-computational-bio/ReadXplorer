@@ -14,7 +14,7 @@ import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.AlignmentOptionsPa
 import de.cebitec.vamp.view.dataVisualisation.alignmentViewer.AlignmentViewer;
 import de.cebitec.vamp.view.dataVisualisation.histogramViewer.HistogramViewer;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.vamp.view.dataVisualisation.seqPairViewer.SequencePairViewer;
+import de.cebitec.vamp.view.dataVisualisation.readPairViewer.ReadPairViewer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.*;
 import de.cebitec.vamp.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
 import java.awt.*;
@@ -27,7 +27,7 @@ import javax.swing.*;
 /**
  * Factory used to initialize all different kinds of base panels.
  *
- * @author ddoppmeier
+ * @author ddoppmeier, rhilker
  */
 public class BasePanelFactory {
 
@@ -68,46 +68,54 @@ public class BasePanelFactory {
         viewController.addMousePositionListener(basePanel);
 
         // create track viewer
-        TrackConnector tc = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);       
-        TrackViewer trackV = new TrackViewer(boundsManager, basePanel, refGen, tc, false);
-        trackV.setName(track.getDescription());
+        TrackConnector tc;
+        try {
+            tc = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
+        } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+            JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+            return null;
+        }
+        if (tc != null) {
+            TrackViewer trackV = new TrackViewer(boundsManager, basePanel, refGen, tc, false);
+            trackV.setName(track.getDescription());
 
-        // create and set up legend
-        JPanel trackPanelLegend = this.getTrackPanelLegend(trackV);
-        MenuLabel legendLabel = new MenuLabel(trackPanelLegend, MenuLabel.TITLE_LEGEND);
-        trackV.setupLegend(legendLabel, trackPanelLegend);
+            // create and set up legend
+            JPanel trackPanelLegend = this.getTrackPanelLegend(trackV);
+            MenuLabel legendLabel = new MenuLabel(trackPanelLegend, MenuLabel.TITLE_LEGEND);
+            trackV.setupLegend(legendLabel, trackPanelLegend);
 
-        // create and set up options (currently normalization)
-        JPanel trackPanelOptions = this.getTrackPanelOptions(trackV);
-        MenuLabel optionsLabel = new MenuLabel(trackPanelOptions, MenuLabel.TITLE_OPTIONS);
-        trackV.setupOptions(optionsLabel, trackPanelOptions);
+            // create and set up options (currently normalization)
+            JPanel trackPanelOptions = this.getTrackPanelOptions(trackV);
+            MenuLabel optionsLabel = new MenuLabel(trackPanelOptions, MenuLabel.TITLE_OPTIONS);
+            trackV.setupOptions(optionsLabel, trackPanelOptions);
 
-        //assign observers to handle visualization correctly
-        legendLabel.registerObserver(optionsLabel);
-        optionsLabel.registerObserver(legendLabel);
+            //assign observers to handle visualization correctly
+            legendLabel.registerObserver(optionsLabel);
+            optionsLabel.registerObserver(legendLabel);
 
-        // create info label
-        CoverageInfoLabel cil = new CoverageInfoLabel();
-        trackV.setTrackInfoPanel(cil);
+            // create info label
+            CoverageInfoLabel cil = new CoverageInfoLabel();
+            trackV.setTrackInfoPanel(cil);
 
-        // create zoom slider
-        CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
+            // create zoom slider
+            CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
 
-        // add panels to basepanel
-        int maxSliderValue = 500;
-        basePanel.setTopInfoPanel(cil);
-        basePanel.setViewer(trackV, slider);
-        basePanel.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true, maxSliderValue));
-        basePanel.setTitlePanel(this.getTitlePanel(track.getDescription()));
+            // add panels to basepanel
+            int maxSliderValue = 500;
+            basePanel.setTopInfoPanel(cil);
+            basePanel.setViewer(trackV, slider);
+            basePanel.setHorizontalAdjustmentPanel(this.createAdjustmentPanel(true, true, maxSliderValue));
+            basePanel.setTitlePanel(this.getTitlePanel(track.getDescription()));
 
-        return basePanel;
+            return basePanel;
+        } else {
+            return null;
+        }
     }
 
     /**
-     * Method to get one
-     * <code>BasePanel</code> for multiple tracks. Only 2 tracks at once are
-     * currently supported.
-     *
+     * Method to get one <code>BasePanel</code> for multiple tracks. Only 2 
+     * tracks at once are currently supported for the double track viewer.
      * @param tracks to visualize on this <code>BasePanel</code>.
      * @param refGen reference the tracks belong to.
      * @param combineTracks true, if the coverage of two or more tracks should
@@ -121,8 +129,14 @@ public class BasePanelFactory {
             BasePanel basePanel = new BasePanel(boundsManager, viewController);
             viewController.addMousePositionListener(basePanel);
 
-            // get double track connector
-            TrackConnector trackCon = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(tracks, combineTracks);
+            // get double track connector           
+            TrackConnector trackCon;
+            try {
+                trackCon = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(tracks, combineTracks);
+            } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+                JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+                return null;
+            }
 
             MultipleTrackViewer trackV = new MultipleTrackViewer(boundsManager, basePanel, refGen, trackCon, combineTracks);
 
@@ -223,12 +237,12 @@ public class BasePanelFactory {
      * tracks
      * @return A viewer for sequence pair data
      */
-    public BasePanel getSeqPairBasePanel(TrackConnector connector) {
+    public BasePanel getReadPairBasePanel(TrackConnector connector) {
         BasePanel b = new BasePanel(boundsManager, viewController);
         viewController.addMousePositionListener(b);
 
         // create a sequence pair viewer
-        SequencePairViewer viewer = new SequencePairViewer(boundsManager, b, refGenome, connector);
+        ReadPairViewer viewer = new ReadPairViewer(boundsManager, b, refGenome, connector);
 
         // create a legend
         JPanel seqPairPanelLegend = this.getSeqPairViewerLegend(viewer);
@@ -481,7 +495,6 @@ public class BasePanelFactory {
          * with it to to/from the excluded feature list of its associated
          * viewer. Needs an AbstractButton as source, in order to determine if
          * the button was selected or not.
-         *
          * @param featureType the feature type handled by this listener
          * @param viewer the viewer whose excluded feature list should be
          * updated

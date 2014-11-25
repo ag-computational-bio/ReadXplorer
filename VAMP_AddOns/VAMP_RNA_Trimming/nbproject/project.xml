@@ -31,6 +31,14 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>de.cebitec.vamp.exporter</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>1.0</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>de.cebitec.vamp.libs</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -89,6 +97,15 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
+                    <code-name-base>org.netbeans.modules.javahelp</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <release-version>1</release-version>
+                        <specification-version>2.30.1</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
                     <code-name-base>org.netbeans.modules.settings</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
@@ -111,6 +128,14 @@
                     <compile-dependency/>
                     <run-dependency>
                         <specification-version>7.25.1</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>org.openide.explorer</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>6.50.3</specification-version>
                     </run-dependency>
                 </dependency>
                 <dependency>
@@ -155,14 +180,6 @@
                 </dependency>
             </module-dependencies>
             <public-packages/>
-            <class-path-extension>
-                <runtime-relative-path>ext/jfxrt.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/jfxrt.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
-                <runtime-relative-path>ext/commons-math3-3.1.1.jar</runtime-relative-path>
-                <binary-origin>release/modules/ext/commons-math3-3.1.1.jar</binary-origin>
-            </class-path-extension>
         </data>
     </configuration>
 </project>

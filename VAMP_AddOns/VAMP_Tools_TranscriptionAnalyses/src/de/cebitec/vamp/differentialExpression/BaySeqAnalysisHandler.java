@@ -1,5 +1,6 @@
 package de.cebitec.vamp.differentialExpression;
 
+import de.cebitec.vamp.databackend.ParametersReadClasses;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.differentialExpression.BaySeq.SamplesNotValidException;
 import de.cebitec.vamp.differentialExpression.GnuR.JRILibraryNotInPathException;
@@ -9,6 +10,7 @@ import de.cebitec.vamp.util.FeatureType;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 /**
  *
@@ -19,6 +21,7 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
     private List<Group> groups;
     private BaySeq baySeq = new BaySeq();
     private BaySeqAnalysisData baySeqAnalysisData;
+    private UUID key;
 
     public static enum Plot {
 
@@ -37,16 +40,17 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
         }
     }
 
-    public BaySeqAnalysisHandler(List<PersistantTrack> selectedTraks, List<Group> groups,
-            Integer refGenomeID, int[] replicateStructure, File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset) {
-        super(selectedTraks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset);
+    public BaySeqAnalysisHandler(List<PersistantTrack> selectedTraks, List<Group> groups, Integer refGenomeID, int[] replicateStructure,
+            File saveFile, List<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams, boolean regardReadOrientation, UUID key) {
+        super(selectedTraks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams, regardReadOrientation);
         baySeqAnalysisData = new BaySeqAnalysisData(getSelectedTracks().size(), groups, replicateStructure);
         this.groups=groups;
+        this.key = key;
     }
 
     @Override
     public void endAnalysis() {
-        baySeq.shutdown();
+        baySeq.shutdown(key);
         baySeq = null;
     }
 
@@ -54,13 +58,13 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
     protected List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException, JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
         prepareFeatures(baySeqAnalysisData);
         prepareCountData(baySeqAnalysisData, getAllCountData());
-        List<ResultDeAnalysis> results = baySeq.process(baySeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile());
+        List<ResultDeAnalysis> results = baySeq.process(baySeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile(), key);
         return results;
     }
 
     public File plot(Plot plot, Group group, int[] samplesA, int[] samplesB) throws IOException, SamplesNotValidException,
             IllegalStateException, PackageNotLoadableException {
-        File file = File.createTempFile("VAMP_Plot_", ".svg");
+        File file = File.createTempFile("ReadXplorer_Plot_", ".svg");
         file.deleteOnExit();
         if (plot == Plot.MACD) {
             baySeq.plotMACD(file, samplesA, samplesB);
@@ -72,12 +76,6 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
             baySeq.plotPriors(file, group);
         }
         return file;
-    }
-
-    @Override
-    public void saveResultsAsCSV(int selectedIndex, String path) {
-        File saveFile = new File(path);
-        baySeq.saveResultsAsCSV(selectedIndex, saveFile);
     }
 
     public List<Group> getGroups() {

@@ -5,6 +5,12 @@ import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
 
+/**
+ * MappingOverviewPanel displays a simple overview of chosen parameters 
+ * before the actual start of the mapping process.
+ * 
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
+ */
 public class MappingOverviewPanel implements WizardDescriptor.Panel<WizardDescriptor> {
 
     /**
@@ -55,7 +61,8 @@ public class MappingOverviewPanel implements WizardDescriptor.Panel<WizardDescri
     public void readSettings(WizardDescriptor settings) {
         component.showGenereateOverview(
                 settings.getProperty(MappingAction.PROP_REFERENCEPATH).toString(),
-                settings.getProperty(MappingAction.PROP_SOURCEPATH).toString()
+                settings.getProperty(MappingAction.PROP_SOURCEPATH).toString(),
+                settings.getProperty(MappingAction.PROP_MAPPINGPARAM).toString()
                 );
     }
 

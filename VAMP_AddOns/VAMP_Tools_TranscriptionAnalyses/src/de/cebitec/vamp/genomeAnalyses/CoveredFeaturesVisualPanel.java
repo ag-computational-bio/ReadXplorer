@@ -1,8 +1,8 @@
 package de.cebitec.vamp.genomeAnalyses;
 
 import de.cebitec.vamp.api.objects.JobPanel;
-import de.cebitec.vamp.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator;
 import de.cebitec.vamp.util.GeneralUtils;
+import de.cebitec.vamp.view.dialogMenus.ChangeListeningWizardPanel;
 
 public final class CoveredFeaturesVisualPanel extends JobPanel {
     
@@ -21,7 +21,7 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
 
     @Override
     public String getName() {
-        return "Covered Feature Detection Parameters";
+        return "Feature Coverage Analysis Parameters";
     }
 
     /**
@@ -87,9 +87,9 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(minCoveragePercentField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(minCoveragePercentLabel))
@@ -100,7 +100,8 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(strandCheckBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(detectUncoveredBox))
+                .addComponent(detectUncoveredBox)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -145,7 +146,7 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
             isValidated = false;
         }
 
-        firePropertyChange(TranscriptionAnalysesWizardIterator.PROP_VALIDATE, null, isValidated);
+        firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated);
         return isValidated;
     }
     

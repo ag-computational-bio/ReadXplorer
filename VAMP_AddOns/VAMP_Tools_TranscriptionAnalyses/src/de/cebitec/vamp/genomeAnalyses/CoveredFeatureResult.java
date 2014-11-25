@@ -19,7 +19,6 @@ import java.util.List;
 public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCoveredFeatures> implements ExcelExportDataI {
     
     private List<CoveredFeature> results;
-    private int featureListSize;
 
     /**
      * Container for all data belonging to a covered feature detection result.
@@ -30,18 +29,10 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
      * feature detection was carried out
      * @param currentTrack the track on which this analysis result was generated
      */
-    public CoveredFeatureResult(List<CoveredFeature> results, HashMap<Integer, PersistantTrack> trackMap) {
-        super(trackMap);
+    public CoveredFeatureResult(List<CoveredFeature> results, HashMap<Integer, PersistantTrack> trackMap, boolean combineTracks) {
+        super(trackMap, combineTracks);
         this.results = results;
         
-    }
-    
-    public void setFeatureListSize(int size) {
-        this.featureListSize = size;
-    }
-    
-    public int getFeatureListSize() {
-        return featureListSize;
     }
 
     /**
@@ -100,7 +91,7 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
             List<Object> coveredFeatureRow = new ArrayList<>();
             feature = coveredFeature.getCoveredFeature();
             coveredFeatureRow.add(feature.toString());
-            coveredFeatureRow.add(this.getTrackMap().get(coveredFeature.getTrackId()));
+            coveredFeatureRow.add(this.getTrackEntry(coveredFeature.getTrackId(), true));
             coveredFeatureRow.add(feature.isFwdStrandString());
             coveredFeatureRow.add(feature.isFwdStrand() ? feature.getStart() : feature.getStop());
             coveredFeatureRow.add(feature.isFwdStrand() ? feature.getStop() : feature.getStart());
@@ -136,11 +127,11 @@ public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCovere
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between parameters and statistics
         
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow(coveredString + " feature statistics:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Total number of covered features", coveredFeaturesResultList.size()));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Total number of reference features", featureListSize));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(ResultPanelCoveredFeatures.FEATURES_COVERED, coveredFeaturesResultList.size()));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow(
+                ResultPanelCoveredFeatures.FEATURES_TOTAL, this.getStatsMap().get(ResultPanelCoveredFeatures.FEATURES_TOTAL)));
 
         coveredFeaturesExport.add(statisticsExportData);
-
 
         return coveredFeaturesExport;
     }

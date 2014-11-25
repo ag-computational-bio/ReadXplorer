@@ -3,8 +3,9 @@ package de.cebitec.vamp.databackend.dataObjects;
 import de.cebitec.vamp.util.FeatureType;
 
 /**
- *
- * @author rhilker
+ * Interface for all persistant features.
+ * 
+ * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public interface PersistantFeatureI {
         

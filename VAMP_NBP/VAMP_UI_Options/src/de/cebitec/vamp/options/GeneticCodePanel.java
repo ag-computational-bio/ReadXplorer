@@ -1,38 +1,33 @@
 package de.cebitec.vamp.options;
 
-import de.cebitec.common.sequencetools.GeneticCode;
-import de.cebitec.common.sequencetools.GeneticCodeFactory;
+import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
+import de.cebitec.common.sequencetools.geneticcode.GeneticCodeFactory;
 import de.cebitec.vamp.util.Properties;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 import javax.swing.AbstractListModel;
-import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import org.openide.util.NbPreferences;
 
 /**
- * @author Rolf Hilker
- *
  * Panel for choosing the genetic code to use. Meaning which start and stop codons
  * should be used.
+ * 
+ * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 final class GeneticCodePanel extends javax.swing.JPanel {
+    private static final long serialVersionUID = 1L;
 
     private final GeneticCodeOptionsPanelController controller;
     private Preferences pref;
     List<GeneticCode> genCodes;
 
     GeneticCodePanel(GeneticCodeOptionsPanelController controller) {
-        try {
-            GeneticCodeFactory.initGeneticCodes();
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-        genCodes = GeneticCodeFactory.getGeneticCodes();
+        GeneticCodeFactory genCodeFactory = GeneticCodeFactory.getDefault();
+        genCodes = genCodeFactory.getGeneticCodes();
         this.controller = controller;
         this.pref = NbPreferences.forModule(Object.class);
         this.initComponents();
@@ -190,12 +185,12 @@ final class GeneticCodePanel extends javax.swing.JPanel {
         this.geneticCodeList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         
-        final ArrayList<String> geneticCodesData = new ArrayList<String>();
+        final ArrayList<String> geneticCodesData = new ArrayList<>();
         
         //get standard codes and add to tableD
         String codonsConcat;
         for (GeneticCode genCode : genCodes){
-            codonsConcat = "<html><b>(Starts: ";
+            codonsConcat = "<html>ID " + genCode.getId() + ": <b>(Starts: ";
             for (String codon : genCode.getStartCodons()){
                 codonsConcat = codonsConcat.concat(codon).concat(", ");
             }
@@ -212,8 +207,8 @@ final class GeneticCodePanel extends javax.swing.JPanel {
         //TODO: add stop codons, too
         String storedCustomCodes = this.pref.get(Properties.CUSTOM_GENETIC_CODES, "");
         while (storedCustomCodes.contains("\n")){
-            this.addGeneticCodeToTable(storedCustomCodes.substring(0, storedCustomCodes.indexOf("\n")));
-            storedCustomCodes = storedCustomCodes.substring(storedCustomCodes.indexOf("\n")+1);
+            this.addGeneticCodeToTable(storedCustomCodes.substring(0, storedCustomCodes.indexOf('\n')));
+            storedCustomCodes = storedCustomCodes.substring(storedCustomCodes.indexOf('\n')+1);
         }
         if (storedCustomCodes.length() > 0){
             this.addGeneticCodeToTable(storedCustomCodes.substring(0, storedCustomCodes.length()));
@@ -285,8 +280,8 @@ final class GeneticCodePanel extends javax.swing.JPanel {
      * @param newGeneticCode string containing the custom genetic code to add
      */
     private void addGeneticCodeToTable(String newGeneticCode) {
-        String codons = "<html><b>" + newGeneticCode.substring(0, newGeneticCode.indexOf(")") + 1) + "</b>";
-        String identifier = "<i>" + newGeneticCode.substring(newGeneticCode.indexOf(")") + 1, newGeneticCode.length()) + "</i></html>";
+        String codons = "<html><b>" + newGeneticCode.substring(0, newGeneticCode.indexOf(')') + 1) + "</b>";
+        String identifier = "<i>" + newGeneticCode.substring(newGeneticCode.indexOf(')') + 1, newGeneticCode.length()) + "</i></html>";
         ((GeneticCodeListModel) this.geneticCodeList.getModel()).addElement(codons + identifier);
     }
 
@@ -301,7 +296,7 @@ final class GeneticCodePanel extends javax.swing.JPanel {
         int codeIndex;
         int index;
         int endIndex = 0;
-        int lineBreakIndex = 0;
+        int lineBreakIndex;
         
         //remove from storage
         if ( (codeIndex = this.geneticCodeList.getSelectedIndex()) >= (index = genCodes.size()) ){
@@ -313,12 +308,12 @@ final class GeneticCodePanel extends javax.swing.JPanel {
             }
             
             while (index++ < codeIndex) {
-                lineBreakIndex = customCodes.indexOf("\n");
+                lineBreakIndex = customCodes.indexOf('\n');
                 endIndex += lineBreakIndex+1;
                 customCodes = customCodes.substring(lineBreakIndex + 1, customCodes.length());
             }
-            if (customCodes.indexOf("\n") > -1){
-                customCodes = customCodes.substring(customCodes.indexOf("\n"));
+            if (customCodes.indexOf('\n') > -1){
+                customCodes = customCodes.substring(customCodes.indexOf('\n'));
             } else {
                 customCodes = "";
             }
@@ -338,6 +333,7 @@ final class GeneticCodePanel extends javax.swing.JPanel {
      * Implements all methods needed for handling some geneticCodesData.
      */
     private class GeneticCodeListModel extends AbstractListModel {
+        private static final long serialVersionUID = 1L;
         
         private ArrayList<String> geneticCodesDataModel;
         

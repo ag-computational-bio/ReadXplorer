@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.rosuda.JRI.REXP;
@@ -26,7 +27,7 @@ public class BaySeq {
      * from using insanely mutch cores on big machines in the CeBiTec Grid
      * infrastructure.
      */
-    private static final int MAX_PROCESSORS = 8;
+    private static final int MAX_PROCESSORS = 6;
 
     public BaySeq() {
     }
@@ -52,10 +53,10 @@ public class BaySeq {
      * not normalised results and then all the normalised ones.
      */
     public List<ResultDeAnalysis> process(BaySeqAnalysisData bseqData,
-            int numberOfFeatures, int numberOfTracks, File saveFile)
+            int numberOfFeatures, int numberOfTracks, File saveFile, UUID key)
             throws JRILibraryNotInPathException, PackageNotLoadableException,
             IllegalStateException, UnknownGnuRException {
-        gnuR = GnuR.SecureGnuRInitiliser.getGnuRinstance();
+        gnuR = GnuR.SecureGnuRInitiliser.getGnuRinstance(key);
         int numberofGroups;
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: GNU R is processing data.", currentTimestamp);
@@ -121,7 +122,7 @@ public class BaySeq {
                 RVector rvec = result.asVector();
                 REXP colNames = gnuR.eval("colnames(tCounts" + resultIndex + ")");
                 REXP rowNames = gnuR.eval("rownames(tCounts" + resultIndex + ")");
-                results.add(new ResultDeAnalysis(rvec, colNames, rowNames, "Result of group " + j,bseqData));
+                results.add(new ResultDeAnalysis(rvec, colNames, rowNames, "Result of model " + j, bseqData));
                 resultIndex++;
             }
             for (int j = 1; j <= numberofGroups; j++) {
@@ -130,14 +131,13 @@ public class BaySeq {
                 RVector rvec = result.asVector();
                 REXP colNames = gnuR.eval("colnames(tCounts" + resultIndex + ")");
                 REXP rowNames = gnuR.eval("rownames(tCounts" + resultIndex + ")");
-                results.add(new ResultDeAnalysis(rvec, colNames, rowNames, "Normalized result of group " + j,bseqData));
+                results.add(new ResultDeAnalysis(rvec, colNames, rowNames, "Normalized result of model " + j, bseqData));
                 resultIndex++;
             }
             if (saveFile != null) {
                 gnuR.saveDataToFile(saveFile);
             }
-        }
-        //We don't know what errors Gnu R might cause, so we have to catch all.
+        } //We don't know what errors Gnu R might cause, so we have to catch all.
         //The new generated exception can than be caught an handelt by the DeAnalysisHandler
         catch (Exception e) {
             throw new UnknownGnuRException(e);
@@ -161,8 +161,8 @@ public class BaySeq {
      * should be plotted. SamplesA and samplesB must not be the same!
      * @throws SamplesNotValidException if SamplesA and samplesB are the same
      */
-    public void plotMACD(File file, int[] samplesA, int[] samplesB) throws SamplesNotValidException, 
-                                                IllegalStateException, PackageNotLoadableException {
+    public void plotMACD(File file, int[] samplesA, int[] samplesB) throws SamplesNotValidException,
+            IllegalStateException, PackageNotLoadableException {
         if (gnuR == null) {
             throw new IllegalStateException("Shutdown was already called!");
         }
@@ -197,8 +197,8 @@ public class BaySeq {
      * should be plotted. SamplesA and samplesB must not be the same!
      * @throws SamplesNotValidException if SamplesA and samplesB are the same
      */
-    public void plotPosteriors(File file, Group group, int[] samplesA, int[] samplesB) throws SamplesNotValidException, 
-                                                                    IllegalStateException, PackageNotLoadableException {
+    public void plotPosteriors(File file, Group group, int[] samplesA, int[] samplesB) throws SamplesNotValidException,
+            IllegalStateException, PackageNotLoadableException {
         if (gnuR == null) {
             throw new IllegalStateException("Shutdown was already called!");
         }
@@ -275,9 +275,11 @@ public class BaySeq {
     /**
      * Releases the Gnu R instance and removes the reference to it.
      */
-    public void shutdown() {
-        gnuR.releaseGnuRInstance();
-        gnuR = null;
+    public void shutdown(UUID key) {
+        if (gnuR != null) {
+            gnuR.releaseGnuRInstance(key);
+            gnuR = null;
+        }
     }
 
     /**

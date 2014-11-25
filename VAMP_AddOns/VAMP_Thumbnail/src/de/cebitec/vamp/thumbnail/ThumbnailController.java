@@ -15,6 +15,7 @@ import de.cebitec.vamp.thumbnail.Actions.SyncSliderCookie;
 import de.cebitec.vamp.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.vamp.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.vamp.util.ColorProperties;
+import de.cebitec.vamp.view.TopComponentHelper;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.IThumbnailView;
@@ -23,6 +24,9 @@ import de.cebitec.vamp.view.dataVisualisation.trackViewer.CoverageInfoLabel;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.CoverageZoomSlider;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.MultipleTrackViewer;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
+import de.cebitec.vamp.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
+import de.cebitec.vamp.view.dialogMenus.SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException;
+import java.awt.Color;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -32,21 +36,20 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import org.netbeans.api.visual.action.ActionFactory;
 import org.netbeans.api.visual.action.ResizeProvider.ControlPoint;
 import org.netbeans.api.visual.action.ResizeStrategy;
+import org.netbeans.api.visual.border.BorderFactory;
 import org.netbeans.api.visual.layout.LayoutFactory;
 import org.netbeans.api.visual.widget.ComponentWidget;
 import org.netbeans.api.visual.widget.Scene;
@@ -60,14 +63,13 @@ import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
 import org.openide.util.lookup.InstanceContent;
 import org.openide.util.lookup.ServiceProvider;
-import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
 /**
  * ServiceProvider for IThumbnailView.
  * This Module can display all Tracks for a given List of Features in a Thumbnail-like View.
  *
- * @author denis
+ * @author denis, rhilker
  */
 @ServiceProvider(service = IThumbnailView.class)
 public class ThumbnailController extends MouseAdapter implements IThumbnailView, Lookup.Provider {
@@ -263,18 +265,25 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
      */
     private BasePanel createTrackPanel(PersistantTrack track, ViewController controller, CheckBoxActionListener cbListener) {
         BoundsInfoManager boundsManager = new BoundsInfoManager(controller.getCurrentRefGen());
-        BasePanel b = new BasePanel(boundsManager, controller);
-        b.setName(track.getDescription());
-        controller.addMousePositionListener(b);
+        BasePanel basePanel = new BasePanel(boundsManager, controller);
+        basePanel.setName(track.getDescription());
+        controller.addMousePositionListener(basePanel);
 
         // create track viewer
-        MultiTrackConnector tc = ProjectConnector.getInstance().getMultiTrackConnector(track);
+        MultiTrackConnector tc;
+        SaveTrackConnectorFetcherForGUI fetcher = new SaveTrackConnectorFetcherForGUI();
+        try {
+            tc = fetcher.getMultiTrackConnector(track);
+        } catch (UserCanceledTrackPathUpdateException ex) {
+            JOptionPane.showMessageDialog(null, "The path of one of the selected tracks could not be resolved. The analysis will be canceled now.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+            return null;
+        }
 
-        final TrackViewer trackV = new TrackViewer(boundsManager, b, controller.getCurrentRefGen(), tc, false);
-        int featureCenter = (currentFeature.getStop() - currentFeature.getStart()) / 2;
-        trackV.getTrackCon().getCoverageThread().setCoveredWidth(featureCenter);
-
+        final TrackViewer trackV = new TrackViewer(boundsManager, basePanel, controller.getCurrentRefGen(), tc, false);
         trackV.setName(track.getDescription());
+        trackV.setUseMinimalIntervalLength(false);
+        trackV.setIsPanModeOn(false);
+        trackV.setCanZoom(false);
 
         CoverageInfoLabel cil = new CoverageInfoLabel();
         trackV.setTrackInfoPanel(cil);
@@ -282,43 +291,20 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         //own ComponentListener for TrackViewer
         trackV.addComponentListener(new TrackViewerCompListener(currentFeature, trackV));
 
-
         // create zoom slider
         CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
 
         //Set initial Slider-value based on Coverage if autoSlider is true
-        if (autoSlider) {
-            HashMap<Integer, Integer> cov = tc.getCoverageInfosOfTrack(new IntervalRequest(currentFeature.getStart(), currentFeature.getStop(), null));
-            int max = 0;
-            int cnt = 0;
-            int avg = 0;
-            for (Integer object : cov.values()) {
-                cnt++;
-                max += object;
-            }
-            if (cnt > 0) {
-                avg = max / cnt;
-            }
-            if (avg > 1000) {
-                slider.setValue(avg / 100);
-            } else {
-                slider.setValue(avg / 30);
-            }
-        }
+        trackV.setAutomaticScaling(autoSlider);
 
-        b.setViewer(trackV, slider);
-        b.setTitlePanel(this.getTitlePanel(track.getDescription(), cbListener));
+        basePanel.setViewer(trackV, slider);
+        basePanel.setTitlePanel(this.getTitlePanel(track.getDescription(), cbListener));
 
-        //Größe ändern
-        b.setMinimumSize(new Dimension(200, 150));
-        b.setPreferredSize(new Dimension(200, 150));
+        //adapt size
+        basePanel.setMinimumSize(new Dimension(200, 150));
+        basePanel.setPreferredSize(new Dimension(200, 150));
         
-        //show data in viewer
-//        trackV.updateLogicalBounds(new BoundsInfo(currentFeature.getStart(), currentFeature.getStop(), 
-//                currentFeature.getStart() + featureCenter, 1, featureCenter * 2));
-        trackV.boundsChangedHook();
-        
-        return b;
+        return basePanel;
     }
 
     /**
@@ -332,15 +318,21 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         controller.addMousePositionListener(b);
 
         // get double track connector
-        MultiTrackConnector trackCon = ProjectConnector.getInstance().getMultiTrackConnector(tracks);
+        MultiTrackConnector trackCon;
+        SaveTrackConnectorFetcherForGUI fetcher = new SaveTrackConnectorFetcherForGUI();
+        try {
+            trackCon = fetcher.getMultiTrackConnector(tracks);
+        } catch (UserCanceledTrackPathUpdateException ex) {
+            JOptionPane.showMessageDialog(null, "The path of one of the selected tracks could not be resolved. The analysis will be canceled now.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+            return null; //cannot occur, since both tracks are already open in the thumbnail viewer
+        }
         MultipleTrackViewer trackV = new MultipleTrackViewer(boundsManager, b, controller.getCurrentRefGen(), trackCon, false);
-
-        int featureWidth = (feature.getStop() - feature.getStart()) / 2;
-        trackV.getTrackCon().getCoverageThread().setCoveredWidth(featureWidth);
+        trackV.setUseMinimalIntervalLength(false);
+        trackV.setIsPanModeOn(false);
+        trackV.setCanZoom(false);
  
         //eigener ComponentListener für TrackV
         trackV.addComponentListener(new TrackViewerCompListener(feature, trackV));
-
 
         // create info panel
         CoverageInfoLabel cil = new CoverageInfoLabel();
@@ -480,7 +472,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
             sliderSynchronisation(true);
         }
         ComponentWidget compWidg = new ComponentWidget(activeTopComp.getScene(), bp);
-        compWidg.setBorder(BorderFactory.createRaisedBevelBorder());
+        compWidg.setBorder(BorderFactory.createResizeBorder(6, Color.GRAY, false));
         compWidg.getActions().addAction(ActionFactory.createResizeAction(new ResizeStrategy() {
 
             @Override
@@ -588,16 +580,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                //Get all open Components and filter for AppPanelTopComponent
-                Set<TopComponent> topComps = WindowManager.getDefault().getRegistry().getOpened();
-                AppPanelTopComponent appComp = null;
-                for (Iterator<TopComponent> it = topComps.iterator(); it.hasNext();) {
-                    TopComponent topComponent = it.next();
-                    if (topComponent instanceof AppPanelTopComponent) {
-                        appComp = (AppPanelTopComponent) topComponent;
-                        break;
-                    }
-                }
+                AppPanelTopComponent appComp = TopComponentHelper.getActiveTopComp(AppPanelTopComponent.class);
                 if (appComp != null) {
                     //Get ViewController from AppPanelTopComponent-Lookup
                     ViewController co = appComp.getLookup().lookup(ViewController.class);
@@ -664,27 +647,28 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         CheckBoxActionListener cbListener = new CheckBoxActionListener();
         for (PersistantTrack track : refCon.getAssociatedTracks()) {
             BasePanel trackPanel = createTrackPanel(track, controller, cbListener);
-            bps.add(trackPanel);
-            this.trackPanelToTrack.put(trackPanel, track);
-            trackPanel.addMouseListener(this);
-            trackPanel.getViewer().addMouseMotionListener(this);
-            //Put TrackPanel into ComponentWidget for Scene
-            ComponentWidget compWidg = new ComponentWidget(activeTopComp.getScene(), trackPanel);
-            compWidg.setBorder(BorderFactory.createRaisedBevelBorder());
-            compWidg.getActions().addAction(ActionFactory.createResizeAction(new ResizeStrategy() {
-
-                @Override
-                public Rectangle boundsSuggested(Widget widget, Rectangle originalBounds, Rectangle suggestedBounds, ControlPoint controlPoint) {
-                    Widget layout = widget.getParentWidget();
-                    for (Widget child : layout.getChildren()) {
-                        child.setPreferredBounds(suggestedBounds);
+            if (trackPanel != null) {
+                bps.add(trackPanel);
+                this.trackPanelToTrack.put(trackPanel, track);
+                trackPanel.addMouseListener(this);
+                trackPanel.getViewer().addMouseMotionListener(this);
+                //Put TrackPanel into ComponentWidget for Scene
+                ComponentWidget compWidg = new ComponentWidget(activeTopComp.getScene(), trackPanel);
+                compWidg.setBorder(BorderFactory.createResizeBorder(6, Color.GRAY, false));
+                compWidg.getActions().addAction(ActionFactory.createResizeAction(new ResizeStrategy() {
+                    @Override
+                    public Rectangle boundsSuggested(Widget widget, Rectangle originalBounds, Rectangle suggestedBounds, ControlPoint controlPoint) {
+                        Widget layout = widget.getParentWidget();
+                        for (Widget child : layout.getChildren()) {
+                            child.setPreferredBounds(suggestedBounds);
+                        }
+                        return suggestedBounds;
                     }
-                    return suggestedBounds;
-                }
-            }, ActionFactory.createDefaultResizeProvider()));
+                }, ActionFactory.createDefaultResizeProvider()));
 
-            layoutWidg.addChild(compWidg);
-            layoutWidg.setBorder(BorderFactory.createTitledBorder("Tracks for feature:" + currentFeature.toString()));
+                layoutWidg.addChild(compWidg);
+                layoutWidg.setBorder(javax.swing.BorderFactory.createTitledBorder("Tracks for feature:" + currentFeature.toString()));
+            }
         }
         this.featureToTrackpanelList.put(currentFeature, bps);
         activeTopComp.getScene().addChild(layoutWidg);

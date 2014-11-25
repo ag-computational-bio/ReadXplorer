@@ -1,6 +1,7 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
 import de.cebitec.vamp.util.TabWithCloseX;
+import de.cebitec.vamp.view.TopComponentExtended;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import javax.swing.JPanel;
@@ -36,7 +37,7 @@ preferredID = "TranscriptionAnalysesTopComponent")
     "CTL_TranscriptionAnalysesTopComponent=TranscriptionAnalyses Window",
     "HINT_TranscriptionAnalysesTopComponent=This is a TranscriptionAnalyses window"
 })
-public final class TranscriptionAnalysesTopComponent extends TopComponent {
+public final class TranscriptionAnalysesTopComponent extends TopComponentExtended {
     
     private static final long serialVersionUID = 1L;
     public static final String PREFERRED_ID = "TranscriptionAnalysesTopComponent";
@@ -136,5 +137,13 @@ public final class TranscriptionAnalysesTopComponent extends TopComponent {
                 analysesTabbedPane.setSelectedIndex(analysesTabbedPane.getTabCount() - 1);
             }
         });
+    }
+    
+    /**
+     * @return true, if this component already contains other components, false
+     * otherwise.
+     */
+    public boolean hasComponents() {
+        return this.analysesTabbedPane.getComponentCount() > 0;
     }
 }

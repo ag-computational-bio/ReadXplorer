@@ -3,10 +3,10 @@ package de.cebitec.vamp.databackend.dataObjects;
 import de.cebitec.vamp.util.SequenceComparison;
 
 /**
- * @author rhilker
- * 
  * Contains the two amino acid triplets for the reference and the mapped genome
  * plus the identifier for the gene to which the triplet belongs to.
+ * 
+ * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class CodonSnp {
     
@@ -15,7 +15,7 @@ public class CodonSnp {
     private final char aminoRef;
     private final char aminoSnp;
     private final SequenceComparison effect;
-    private final String geneId;
+    private final PersistantFeature feature;
     
     
     /** 
@@ -27,12 +27,12 @@ public class CodonSnp {
      * @param aminoSnp amino acid of the mapped genome for the same position
      * @param effect the effect type of a snp on the amino acid sequence among SequenceUtils.SUBSTITUTION, 
      *             SequenceUtils.MATCH, SequenceUtils.DELETION, SequenceUtils.INSERTION
-     * @param geneId identifier of the gene to which the triplet belongs
+     * @param feature identifier of the gene to which the triplet belongs
      */
-    public CodonSnp(String tripletRef, String tripletSnp, char aminoRef, char aminoSnp, SequenceComparison effect, String geneId){
+    public CodonSnp(String tripletRef, String tripletSnp, char aminoRef, char aminoSnp, SequenceComparison effect, PersistantFeature feature){
         this.tripletRef = tripletRef;
         this.tripletSnp = tripletSnp;
-        this.geneId = geneId;    
+        this.feature = feature;    
         this.aminoRef = aminoRef;
         this.aminoSnp = aminoSnp;
         this.effect = effect;
@@ -56,8 +56,8 @@ public class CodonSnp {
     /**
      * @return The identifier of the gene or feature, this codon belongs to.
      */
-    public String getGeneId() {
-        return geneId;
+    public PersistantFeature getFeature() {
+        return feature;
     }
 
     /**

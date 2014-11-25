@@ -11,6 +11,8 @@ import java.io.Serializable;
  */
 public class PersistantCoverage implements Serializable {
     
+    private static final long serialVersionUID = 1L;
+    
     //2 for fwd (mult = all & num = without duplicates), and 2 rev
     
     private int leftBound;
@@ -32,19 +34,6 @@ public class PersistantCoverage implements Serializable {
     private int[] commonRevNumCov;
     
     private int internalPos = 0;
-    
-//    private HashMap<Integer, Integer> perfectFwdMult;
-//    private HashMap<Integer, Integer> perfectFwdNum;
-//    private HashMap<Integer, Integer> perfectRevMult;
-//    private HashMap<Integer, Integer> perfectRevNum;
-//    private HashMap<Integer, Integer> bestMatchFwdMult;
-//    private HashMap<Integer, Integer> bestMatchFwdNum;
-//    private HashMap<Integer, Integer> bestMatchRevMult;
-//    private HashMap<Integer, Integer> bestMatchRevNum;
-//    private HashMap<Integer, Integer> commonFwdMult;
-//    private HashMap<Integer, Integer> commonFwdNum;
-//    private HashMap<Integer, Integer> commonRevMult;
-//    private HashMap<Integer, Integer> commonRevNum;
     
     private int highestCoverage;
     
@@ -140,6 +129,10 @@ public class PersistantCoverage implements Serializable {
         return leftBound;
     }
 
+    /**
+     * @return The right bound of the stored coverage interval. The borders are
+     * inclusive in the data structures.
+     */
     public int getRightBound() {
         return rightBound;
     }
@@ -343,7 +336,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getBestMatchFwdMult(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.bestMatchFwdMultCov.length && this.internalPos > 0) {
+        if (this.internalPos < this.bestMatchFwdMultCov.length && this.internalPos >= 0) {
             return bestMatchFwdMultCov[this.internalPos];
         } else {
             return 0;
@@ -356,7 +349,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getBestMatchFwdNum(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.bestMatchFwdNumCov.length && this.internalPos > 0) {
+        if (this.internalPos < this.bestMatchFwdNumCov.length && this.internalPos >= 0) {
             return bestMatchFwdNumCov[this.internalPos];
         } else {
             return 0;
@@ -369,7 +362,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getBestMatchRevMult(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.bestMatchRevMultCov.length && this.internalPos > 0) {
+        if (this.internalPos < this.bestMatchRevMultCov.length && this.internalPos >= 0) {
             return bestMatchRevMultCov[this.internalPos];
         } else {
             return 0;
@@ -382,7 +375,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getBestMatchRevNum(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.bestMatchRevNumCov.length && this.internalPos > 0) {
+        if (this.internalPos < this.bestMatchRevNumCov.length && this.internalPos >= 0) {
             return bestMatchRevNumCov[this.internalPos];
         } else {
             return 0;
@@ -395,7 +388,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getCommonFwdMult(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.commonFwdMultCov.length && this.internalPos > 0) {
+        if (this.internalPos < this.commonFwdMultCov.length && this.internalPos >= 0) {
             return commonFwdMultCov[this.internalPos];
         } else {
             return 0;
@@ -408,7 +401,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getCommonFwdNum(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.commonFwdNumCov.length && this.internalPos > 0) {
+        if (this.internalPos < this.commonFwdNumCov.length && this.internalPos >= 0) {
             return commonFwdNumCov[this.internalPos];
         } else {
             return 0;
@@ -421,7 +414,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getCommonRevMult(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.commonRevMultCov.length && this.internalPos > 0) {
+        if (this.internalPos < this.commonRevMultCov.length && this.internalPos >= 0) {
             return commonRevMultCov[this.internalPos];
         } else {
             return 0;
@@ -434,7 +427,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getCommonRevNum(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.commonRevNumCov.length && this.internalPos > 0) {
+        if (this.internalPos < this.commonRevNumCov.length && this.internalPos >= 0) {
             return commonRevNumCov[this.internalPos];
         } else {
             return 0;
@@ -448,7 +441,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getPerfectFwdMult(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.perfectFwdMultCov.length && this.internalPos > 0) {
+        if (this.internalPos < this.perfectFwdMultCov.length && this.internalPos >= 0) {
             return perfectFwdMultCov[this.internalPos];
         } else {
             return 0;
@@ -461,7 +454,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getPerfectFwdNum(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.perfectFwdNumCov.length && this.internalPos > 0) {
+        if (this.internalPos < this.perfectFwdNumCov.length && this.internalPos >= 0) {
             return perfectFwdNumCov[this.internalPos];
         } else {
             return 0;
@@ -474,7 +467,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getPerfectRevMult(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.perfectRevMultCov.length && this.internalPos > 0) {
+        if (this.internalPos < this.perfectRevMultCov.length && this.internalPos >= 0) {
             return perfectRevMultCov[this.internalPos];
         } else {
             return 0;
@@ -487,7 +480,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getPerfectRevNum(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.perfectRevNumCov.length && this.internalPos > 0) {
+        if (this.internalPos < this.perfectRevNumCov.length && this.internalPos >= 0) {
             return perfectRevNumCov[this.internalPos];
         } else {
             return 0;
@@ -501,7 +494,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getCommonFwdMultTrack1(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.commonFwdMultCovTrack1.length && this.internalPos > 0) {
+        if (this.internalPos < this.commonFwdMultCovTrack1.length && this.internalPos >= 0) {
             return commonFwdMultCovTrack1[this.internalPos];
         } else {
             return 0;
@@ -515,7 +508,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getCommonRevMultTrack1(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.commonRevMultCovTrack1.length && this.internalPos > 0) {
+        if (this.internalPos < this.commonRevMultCovTrack1.length && this.internalPos >= 0) {
             return commonRevMultCovTrack1[this.internalPos];
         } else {
             return 0;
@@ -529,7 +522,7 @@ public class PersistantCoverage implements Serializable {
      */
     public int getCommonFwdMultTrack2(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.commonFwdMultCovTrack2.length && this.internalPos > 0) {
+        if (this.internalPos < this.commonFwdMultCovTrack2.length && this.internalPos >= 0) {
             return commonFwdMultCovTrack2[this.internalPos];
         } else {
             return 0;
@@ -543,11 +536,42 @@ public class PersistantCoverage implements Serializable {
      */
     public int getCommonRevMultTrack2(int logPos) {
         this.internalPos = logPos - this.leftBound;
-        if (this.internalPos < this.commonRevMultCovTrack2.length && this.internalPos > 0) {
+        if (this.internalPos < this.commonRevMultCovTrack2.length && this.internalPos >= 0) {
             return commonRevMultCovTrack2[this.internalPos];
         } else {
             return 0;
         }
+    }
+    /**
+     * @return Get whole best match fwd mult coverage array for the given
+     * interval.
+     */
+    public int[] getPerfectFwdMult() {
+        return this.perfectFwdMultCov;
+    }
+    
+    /**
+     * @return Get whole best match fwd mult coverage array for the given
+     * interval.
+     */
+    public int[] getPerfectFwdNum() {
+        return this.perfectFwdNumCov;
+    }
+    
+    /**
+     * @return Get whole best match fwd mult coverage array for the given
+     * interval.
+     */
+    public int[] getPerfectRevMult() {
+        return this.perfectRevMultCov;
+    }
+    
+    /**
+     * @return Get whole best match fwd mult coverage array for the given
+     * interval.
+     */
+    public int[] getPerfectRevNum() {
+        return this.perfectRevNumCov;
     }
     
     /**
@@ -578,6 +602,38 @@ public class PersistantCoverage implements Serializable {
      */   
     public int[] getBestMatchRevNum() {
         return this.bestMatchRevNumCov;
+    }
+    
+     /**
+     * @return Get whole best match rev coverage array without replicates for 
+     * the given interval.
+     */   
+    public int[] getCommonFwdMult() {
+        return this.commonFwdMultCov;
+    }
+    
+     /**
+     * @return Get whole best match rev coverage array without replicates for 
+     * the given interval.
+     */   
+    public int[] getCommonFwdNum() {
+        return this.commonFwdNumCov;
+    }
+    
+     /**
+     * @return Get whole best match rev coverage array without replicates for 
+     * the given interval.
+     */   
+    public int[] getCommonRevMult() {
+        return this.commonRevMultCov;
+    }
+    
+     /**
+     * @return Get whole best match rev coverage array without replicates for 
+     * the given interval.
+     */   
+    public int[] getCommonRevNum() {
+        return this.commonRevNumCov;
     }
     
     /**
@@ -620,7 +676,7 @@ public class PersistantCoverage implements Serializable {
      * and false otherwise
      */
     public boolean isInBounds(int posToCheck) {
-        if (posToCheck < leftBound || posToCheck > rightBound && this.internalPos > 0) {
+        if (posToCheck < leftBound || posToCheck > rightBound && this.internalPos >= 0) {
             return false;
         } else {
             return true;
@@ -645,6 +701,7 @@ public class PersistantCoverage implements Serializable {
 
     /**
      * Getter for the highest coverage for automatic scaling.
+     * @return The highest coverage value in this coverage object
      */
     public int getHighestCoverage() {
         return highestCoverage;
@@ -652,6 +709,7 @@ public class PersistantCoverage implements Serializable {
 
     /**
      * Setter for the highest coverage for automatic scaling.
+     * @param highestCoverage the highest coverage value in this coverage object
      */
     public void setHighestCoverage(int highestCoverage) {
         this.highestCoverage = highestCoverage;
@@ -765,7 +823,7 @@ public class PersistantCoverage implements Serializable {
      * already stored in this coverage object.
      */
     public void incDoubleTrackArraysToIntervalSize() {
-        int size = this.rightBound - this.leftBound + 1;
+        int size = this.rightBound > this.leftBound ? this.rightBound - this.leftBound + 1 : 0;
         if (this.commonFwdMultCovTrack1.length == 0) {
             commonFwdMultCovTrack1 = new int[size];
         }

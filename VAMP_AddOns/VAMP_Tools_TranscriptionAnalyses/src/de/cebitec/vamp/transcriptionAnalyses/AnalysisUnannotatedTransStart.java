@@ -24,25 +24,17 @@ import de.cebitec.vamp.transcriptionAnalyses.dataStructures.TranscriptionStart;
  */
 public class AnalysisUnannotatedTransStart extends AnalysisTranscriptionStart {
     
-    private int minCoverage;
     private final TrackConnector trackCon;
 
     /**
      * Analysis for a TSS detection including detection of unannotated transcripts.
-     * @param trackConnector
-     * @param increaseReadCount
-     * @param increaseReadPercent
-     * @param maxInitialReadCount
-     * @param increaseReadCount2
-     * @param tssAutomatic
-     * @param minCoverage
+     * @param trackConnector the track connector for which the detection is carried out
+     * @param paramsTSS the tss detection paramter set
      */
-    public AnalysisUnannotatedTransStart(TrackConnector trackConnector, int increaseReadCount, int increaseReadPercent, 
-            int maxInitialReadCount, int increaseReadCount2, boolean tssAutomatic, int minCoverage) {
+    public AnalysisUnannotatedTransStart(TrackConnector trackConnector, ParameterSetTSS paramsTSS) {
            
-        super(trackConnector, increaseReadCount, increaseReadPercent, maxInitialReadCount, increaseReadCount2, tssAutomatic);
+        super(trackConnector, paramsTSS);
         this.trackCon = trackConnector;
-        this.minCoverage = minCoverage;
     }
     
     /**
@@ -63,20 +55,20 @@ public class AnalysisUnannotatedTransStart extends AnalysisTranscriptionStart {
                 features.getUpstreamFeature() == null) {
             
             if (tss.isFwdStrand()) {
-                while (currentCoverage.getBestMatchFwdMult(currentPos) > minCoverage) {
+                while (currentCoverage.getBestMatchFwdMult(currentPos) > this.getParametersTSS().getMinTranscriptExtensionCov()) {
                     ++currentPos;
                 }
                 --currentPos;
             } else {
-                while (currentCoverage.getBestMatchRevMult(currentPos) > minCoverage) { // TODO: && currentPos < referenceLength > 0
+                while (currentCoverage.getBestMatchRevMult(currentPos) > this.getParametersTSS().getMinTranscriptExtensionCov()) { // TODO: && currentPos < referenceLength > 0
                     --currentPos;
                 }
                 ++currentPos;
             }
             
             // instead of an ordinary TranscriptStart we add the TranscriptStart with unannotated transcript information
-            detectedStarts.add(new TransStartUnannotated(tss.getPos(), tss.isFwdStrand(), tss.getInitialCoverage(), 
-                    tss.getStartCoverage(), tss.getDetFeatures(), currentPos, trackCon.getTrackID()));
+            detectedStarts.add(new TransStartUnannotated(tss.getPos(), tss.isFwdStrand(), tss.getReadStartsAtPos(), 
+                    tss.getPercentIncrease(), tss.getCoverageIncrease(), tss.getDetFeatures(), currentPos, trackCon.getTrackID()));
             
         } else {
             detectedStarts.add(tss);

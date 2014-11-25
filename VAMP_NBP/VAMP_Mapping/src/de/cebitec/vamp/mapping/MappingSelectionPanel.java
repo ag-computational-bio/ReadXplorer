@@ -4,6 +4,7 @@
  */
 package de.cebitec.vamp.mapping;
 
+import de.cebitec.vamp.mapping.api.MappingApi;
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -16,8 +17,9 @@ import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
 
 /**
- *
- * @author jeff
+ * This is the gui part of the card for the selection of parameters of the mapping process.
+ * 
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 class MappingSelectionPanel implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
@@ -97,13 +99,14 @@ class MappingSelectionPanel implements WizardDescriptor.FinishablePanel<WizardDe
 
     @Override
     public void readSettings(WizardDescriptor data) {
-        
+        component.setMappingParam(MappingApi.getLastMappingParams());
     }
 
     @Override
     public void storeSettings(WizardDescriptor settings) {
         settings.putProperty(MappingAction.PROP_SOURCEPATH, component.getSourcePath());
         settings.putProperty(MappingAction.PROP_REFERENCEPATH, component.getReferencePath());
+        settings.putProperty(MappingAction.PROP_MAPPINGPARAM, component.getMappingParam());
     }
 
 }

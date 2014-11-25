@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  */
 public class FastaReferenceParser implements ReferenceParserI {
 
-    private static String parsername = "Fasta Reference Parser";
+    private static String parsername = "Fasta file";
     private static String[] fileExtension = new String[]{"fas", "fasta", "fna", "fa"};
     private static String fileDescription = "Fasta File";
     private ArrayList<Observer> observers = new ArrayList<>();
@@ -42,15 +42,22 @@ public class FastaReferenceParser implements ReferenceParserI {
             refGenome.setName(referenceJob.getName());
             refGenome.setTimestamp(referenceJob.getTimestamp());
             String line;
+            boolean parseData = false;
+            boolean finished = false;
 
             while ((line = in.readLine()) != null) {
-                if (!line.startsWith(">")) {
+                if (line.startsWith(">" + refGenome.getName())) {
+                    parseData = true;
+                    finished = false;
+                } else if (line.startsWith(">")) {
+                    finished = true;
+                } else if (parseData && !finished) {
                     sBuilder.append(line);
                 }
             }
             in.close();
 
-            refGenome.setSequence(sBuilder.substring(0).toLowerCase());
+            refGenome.setSequence(sBuilder.substring(0).toUpperCase());
 
         } catch (Exception ex) {
             this.sendErrorMsg(ex.getMessage());

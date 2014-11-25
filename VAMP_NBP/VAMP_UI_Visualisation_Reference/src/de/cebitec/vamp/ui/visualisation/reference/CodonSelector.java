@@ -1,20 +1,18 @@
 package de.cebitec.vamp.ui.visualisation.reference;
 
-import de.cebitec.common.sequencetools.GeneticCode;
-import de.cebitec.common.sequencetools.GeneticCodeFactory;
+import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
+import de.cebitec.common.sequencetools.geneticcode.GeneticCodeFactory;
 import de.cebitec.vamp.util.CodonUtilities;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridLayout;
-import java.io.IOException;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.openide.util.NbPreferences;
 
@@ -30,16 +28,13 @@ public class CodonSelector extends javax.swing.JPanel {
     private Preferences pref;
     
     private int nbGeneticCodes;
+    private final GeneticCodeFactory genCodeFactory;
     
 
     /** Creates new form CodonSelector */
     public CodonSelector() {
-        try {
-            GeneticCodeFactory.initGeneticCodes();
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-        this.nbGeneticCodes = GeneticCodeFactory.getGeneticCodes().size();
+        this.genCodeFactory = GeneticCodeFactory.getDefault();
+        this.nbGeneticCodes = genCodeFactory.getGeneticCodes().size();
         
         this.initComponents();
         this.initListener();
@@ -128,7 +123,7 @@ public class CodonSelector extends javax.swing.JPanel {
         String[] stopCodons = new String[0];
         int codeIndex = Integer.valueOf(pref.get(Properties.GENETIC_CODE_INDEX, "0"));
         if (codeIndex < nbGeneticCodes) {
-            GeneticCode code = GeneticCodeFactory.getGeneticCodeById(Integer.valueOf(pref.get(Properties.SEL_GENETIC_CODE, "1")));
+            GeneticCode code = genCodeFactory.getGeneticCodeById(Integer.valueOf(pref.get(Properties.SEL_GENETIC_CODE, "1")));
             startCodons = code.getStartCodons().toArray(startCodons);
             stopCodons = code.getStopCodons().toArray(stopCodons);
         } else {
@@ -148,6 +143,7 @@ public class CodonSelector extends javax.swing.JPanel {
      * with the familyId.
      */
     private class CodonFamilyPanel extends JPanel {
+        private static final long serialVersionUID = 1L;
         
         private String familyId;
         

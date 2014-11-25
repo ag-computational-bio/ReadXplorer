@@ -2,24 +2,28 @@ package de.cebitec.vamp.differentialExpression;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.controller.ViewController;
-import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.differentialExpression.DeAnalysisHandler.AnalysisStatus;
+import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.AnalysisStatus.ERROR;
+import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.AnalysisStatus.FINISHED;
+import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.AnalysisStatus.RUNNING;
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.BaySeq;
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.DeSeq;
 import static de.cebitec.vamp.differentialExpression.DeAnalysisHandler.Tool.SimpleTest;
+import de.cebitec.vamp.differentialExpression.plot.BaySeqGraphicsTopComponent;
+import de.cebitec.vamp.differentialExpression.plot.DeSeqGraphicsTopComponent;
+import de.cebitec.vamp.differentialExpression.plot.SimpleTestGraphicsTopComponent;
 import de.cebitec.vamp.exporter.excel.ExcelExportFileChooser;
 import de.cebitec.vamp.exporter.excel.TableToExcel;
 import de.cebitec.vamp.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.vamp.util.GenerateRowSorter;
 import de.cebitec.vamp.util.Observer;
-import de.cebitec.vamp.util.TableRightClickFilter;
 import de.cebitec.vamp.util.UneditableTableModel;
+import de.cebitec.vamp.view.TopComponentExtended;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.vamp.view.tableVisualization.TableUtils;
+import de.cebitec.vamp.view.tableVisualization.tableFilter.TableRightClickFilter;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -27,10 +31,11 @@ import java.util.List;
 import java.util.Vector;
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -49,7 +54,7 @@ import org.openide.windows.TopComponent;
         autostore = false)
 @TopComponent.Description(preferredID = "DiffExpResultViewerTopComponent",
         //iconBase="SET/PATH/TO/ICON/HERE", 
-        persistenceType = TopComponent.PERSISTENCE_ALWAYS)
+        persistenceType = TopComponent.PERSISTENCE_NEVER)
 @TopComponent.Registration(mode = "bottomSlidingSide", openAtStartup = false)
 @ActionID(category = "Window", id = "de.cebitec.vamp.differentialExpression.DiffExpResultViewerTopComponent")
 @ActionReference(path = "Menu/Window" /*
@@ -59,20 +64,21 @@ import org.openide.windows.TopComponent;
         preferredID = "DiffExpResultViewerTopComponent")
 @Messages({
     "CTL_DiffExpResultViewerAction=DiffExpResultViewer",
-    "CTL_DiffExpResultViewerTopComponent=Differential expression analysis - results",
-    "HINT_DiffExpResultViewerTopComponent=This is a DiffExpResultViewer window"
+    "CTL_DiffExpResultViewerTopComponent=Differential Gene Expression Analysis - results",
+    "HINT_DiffExpResultViewerTopComponent=This is a Differential Gene Expression Result Window"
 })
-public final class DiffExpResultViewerTopComponent extends TopComponent implements Observer, ItemListener {
+public final class DiffExpResultViewerTopComponent extends TopComponentExtended implements Observer, ItemListener {
 
     private static final long serialVersionUID = 1L;
     private TableModel tm;
     private ComboBoxModel<Object> cbm;
     private ArrayList<DefaultTableModel> tableModels = new ArrayList<>();
-    private TopComponent GraficsTopComponent;
+    private TopComponent graphicsTopComponent;
+    private SimpleTestGraphicsTopComponent ptc;
     private TopComponent LogTopComponent;
     private DeAnalysisHandler analysisHandler;
     private DeAnalysisHandler.Tool usedTool;
-    private ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Differential Expression Analysis");
+    private ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Differential Gene Expression Analysis");
     private TableRightClickFilter<UneditableTableModel> rktm = new TableRightClickFilter<>(UneditableTableModel.class);
     private ReferenceFeatureTopComp refComp;
 
@@ -91,105 +97,76 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
         setName(Bundle.CTL_DiffExpResultViewerTopComponent());
         setToolTipText(Bundle.HINT_DiffExpResultViewerTopComponent());
         topCountsTable.getTableHeader().addMouseListener(rktm);
-        topCountsTable.addMouseListener(new MouseListener() {
+        topCountsTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                if (SwingUtilities.isLeftMouseButton(e)) {
-                    showPosition();
-                }
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
+            public void valueChanged(ListSelectionEvent e) {
+                showPosition();
             }
         });
     }
 
+    /**
+     * Updates the position in all available bounds info managers to the 
+     * reference position of the currently selected genomic feature.
+     */
     private void showPosition() {
-        PersistantFeature feature = getFeatureFromTable();
-        if (feature != null) {
-            int pos = feature.getStart();
-            Collection<ViewController> viewControllers;
-            viewControllers = (Collection<ViewController>) CentralLookup.getDefault().lookupAll(ViewController.class);
-            for (Iterator<ViewController> it = viewControllers.iterator(); it.hasNext();) {
-                ViewController tmpVCon = it.next();
-                BoundsInfoManager bm = tmpVCon.getBoundsManager();
-                if (bm != null) {
-                    bm.navigatorBarUpdated(pos);
-                }
+        Collection<ViewController> viewControllers =
+                (Collection<ViewController>) CentralLookup.getDefault().lookupAll(ViewController.class);
+        /*
+         * TODO: can lead to error, if references have different length and pos is out of bounds in one.
+         * Come up with global concept for position update in all opened references. But after multichromosome
+         * support is implemented - it may change some requirements...
+         */
+        for (Iterator<ViewController> it = viewControllers.iterator(); it.hasNext();) {
+            ViewController tmpVCon = it.next();
+            BoundsInfoManager bm = tmpVCon.getBoundsManager(); 
+            if (bm != null) {
+                TableUtils.showPosition(topCountsTable, 0, bm);
             }
-            refComp.showFeatureDetails(feature);
         }
+        refComp.showTableFeature(topCountsTable, 0);
     }
 
-    private PersistantFeature getFeatureFromTable() {
-        PersistantFeature feature = null;
-        DefaultListSelectionModel model = (DefaultListSelectionModel) topCountsTable.getSelectionModel();
-        int selectedView = model.getLeadSelectionIndex();
-        int selectedModel = topCountsTable.convertRowIndexToModel(selectedView);
-        switch (usedTool) {
-            case DeSeq:
-                feature = (PersistantFeature) topCountsTable.getModel().getValueAt(selectedModel, 1);
-                break;
-            case BaySeq:
-                feature = (PersistantFeature) topCountsTable.getModel().getValueAt(selectedModel, 1);
-                break;
-            case SimpleTest:
-                feature = (PersistantFeature) topCountsTable.getModel().getValueAt(selectedModel, 0);
-                break;
-        }
-        return feature;
-    }
-
+    /**
+     * Adds the results of a finished diff. gene expr. analysis to the table of
+     * this top component.
+     */
     private void addResults() {
-        List<ResultDeAnalysis> results = analysisHandler.getResults();
-        List<String> descriptions = new ArrayList<>();
-        for (Iterator<ResultDeAnalysis> it = results.iterator(); it.hasNext();) {
-            ResultDeAnalysis currentResult = it.next();
-            Vector colNames = new Vector(currentResult.getColnames());
-            Vector<Vector> tableContents;
-            if (usedTool != SimpleTest) {
-                colNames.add(0, " ");
-                tableContents = currentResult.getTableContentsContainingRowNames();
-            } else {
+        if (analysisHandler.getResults() != null) {
+            List<ResultDeAnalysis> results = analysisHandler.getResults();
+            List<String> descriptions = new ArrayList<>();
+            for (Iterator<ResultDeAnalysis> it = results.iterator(); it.hasNext();) {
+                ResultDeAnalysis currentResult = it.next();
+                Vector colNames = new Vector(currentResult.getColnames());
+                Vector<Vector> tableContents;
+                colNames.remove(0);
+                colNames.add(0, "Feature");
                 tableContents = currentResult.getTableContents();
+
+                DefaultTableModel tmpTableModel = new UneditableTableModel(tableContents, colNames);
+                descriptions.add(currentResult.getDescription());
+                tableModels.add(tmpTableModel);
             }
 
-            DefaultTableModel tmpTableModel = new UneditableTableModel(tableContents, colNames);
-            descriptions.add(currentResult.getDescription());
-            tableModels.add(tmpTableModel);
-        }
+            resultComboBox.setModel(new DefaultComboBoxModel<>(descriptions.toArray()));
+            DefaultTableModel dtm = tableModels.get(0);
+            topCountsTable.setModel(dtm);
+            TableRowSorter<DefaultTableModel> trs = GenerateRowSorter.createRowSorter(dtm);
+            topCountsTable.setRowSorter(trs);
+            if (usedTool == SimpleTest) {
+                List<RowSorter.SortKey> sortKeys = new ArrayList<>();
+                sortKeys.add(new RowSorter.SortKey(7, SortOrder.DESCENDING));
+                trs.setSortKeys(sortKeys);
+                trs.sort();
+            }
 
-        resultComboBox.setModel(new DefaultComboBoxModel<>(descriptions.toArray()));
-        DefaultTableModel dtm = tableModels.get(0);
-        topCountsTable.setModel(dtm);
-        TableRowSorter<DefaultTableModel> trs = GenerateRowSorter.createRowSorter(dtm);
-        topCountsTable.setRowSorter(trs);
-        if (usedTool == SimpleTest) {
-            List<RowSorter.SortKey> sortKeys = new ArrayList<>();
-            sortKeys.add(new RowSorter.SortKey(7, SortOrder.DESCENDING));
-            trs.setSortKeys(sortKeys);
-            trs.sort();
+            createGraphicsButton.setEnabled(true);
+            saveTableButton.setEnabled(true);
+            showLogButton.setEnabled(true);
+            resultComboBox.setEnabled(true);
+            topCountsTable.setEnabled(true);
+            jLabel1.setEnabled(true);
         }
-
-        createGraphicsButton.setEnabled(true);
-        saveTableButton.setEnabled(true);
-        showLogButton.setEnabled(true);
-        resultComboBox.setEnabled(true);
-        topCountsTable.setEnabled(true);
-        jLabel1.setEnabled(true);
     }
 
     /**
@@ -284,29 +261,25 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
     private void createGraphicsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_createGraphicsButtonActionPerformed
         switch (usedTool) {
             case DeSeq:
-                GraficsTopComponent = new DeSeqGraficsTopComponent(analysisHandler,
-                        ((DeSeqAnalysisHandler) analysisHandler).moreThanTwoCondsForDeSeq(), usedTool);
-                analysisHandler.registerObserver((DeSeqGraficsTopComponent) GraficsTopComponent);
-                GraficsTopComponent.open();
-                GraficsTopComponent.requestActive();
+                graphicsTopComponent = new DeSeqGraphicsTopComponent(analysisHandler,
+                        ((DeSeqAnalysisHandler) analysisHandler).moreThanTwoCondsForDeSeq());
+                analysisHandler.registerObserver((DeSeqGraphicsTopComponent) graphicsTopComponent);
+                graphicsTopComponent.open();
+                graphicsTopComponent.requestActive();
                 break;
             case BaySeq:
-                GraficsTopComponent = new DiffExpGraficsTopComponent(analysisHandler);
-                analysisHandler.registerObserver((DiffExpGraficsTopComponent) GraficsTopComponent);
-                GraficsTopComponent.open();
-                GraficsTopComponent.requestActive();
+                graphicsTopComponent = new BaySeqGraphicsTopComponent(analysisHandler);
+                analysisHandler.registerObserver((BaySeqGraphicsTopComponent) graphicsTopComponent);
+                graphicsTopComponent.open();
+                graphicsTopComponent.requestActive();
                 break;
             case SimpleTest:
-                GraficsTopComponent = new DeSeqGraficsTopComponent(analysisHandler, usedTool);
-                analysisHandler.registerObserver((DeSeqGraficsTopComponent) GraficsTopComponent);
-                GraficsTopComponent.open();
-                GraficsTopComponent.requestActive();
+                ptc = new SimpleTestGraphicsTopComponent(analysisHandler, usedTool);
+                analysisHandler.registerObserver(ptc);
+                ptc.open();
+                ptc.requestActive();
                 break;
         }
-//        PlotTopComponent plotTop = new PlotTopComponent(analysisHandler);
-//        analysisHandler.registerObserver(plotTop);
-//        plotTop.open();
-//        plotTop.requestActive();
     }//GEN-LAST:event_createGraphicsButtonActionPerformed
 
     private void saveTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTableButtonActionPerformed
@@ -354,37 +327,33 @@ public final class DiffExpResultViewerTopComponent extends TopComponent implemen
 
     @Override
     public void update(Object args) {
-        try {
-            final AnalysisStatus status = (AnalysisStatus) args;
-            final DiffExpResultViewerTopComponent cmp = this;
-            SwingUtilities.invokeAndWait(new Runnable() {
-                @Override
-                public void run() {
-                    switch (status) {
-                        case RUNNING:
-                            progressHandle.start();
-                            progressHandle.switchToIndeterminate();
-                            break;
-                        case FINISHED:
-                            addResults();
-                            progressHandle.switchToDeterminate(100);
-                            progressHandle.finish();
-                            break;
-                        case ERROR:
-                            progressHandle.switchToDeterminate(0);
-                            progressHandle.finish();
-                            LogTopComponent = new DiffExpLogTopComponent();
-                            LogTopComponent.open();
-                            LogTopComponent.requestActive();
-                            cmp.close();
-                            break;
-                    }
+        final AnalysisStatus status = (AnalysisStatus) args;
+        final DiffExpResultViewerTopComponent cmp = this;
+        //Might be called from outside of the EDT, so using swing utils
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                switch (status) {
+                    case RUNNING:
+                        progressHandle.start();
+                        progressHandle.switchToIndeterminate();
+                        break;
+                    case FINISHED:
+                        addResults();
+                        progressHandle.switchToDeterminate(100);
+                        progressHandle.finish();
+                        break;
+                    case ERROR:
+                        progressHandle.switchToDeterminate(0);
+                        progressHandle.finish();
+                        LogTopComponent = new DiffExpLogTopComponent();
+                        LogTopComponent.open();
+                        LogTopComponent.requestActive();
+                        cmp.close();
+                        break;
                 }
-            });
-        } catch (InterruptedException | InvocationTargetException ex) {
-            //Exception will occure when the TopComponent Window is closed but
-            //this is not a problem.
-        }
+            }
+        });
     }
 
     @Override

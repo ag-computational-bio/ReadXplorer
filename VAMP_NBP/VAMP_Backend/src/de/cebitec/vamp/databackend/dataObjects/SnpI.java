@@ -1,12 +1,12 @@
 package de.cebitec.vamp.databackend.dataObjects;
 
 /**
- * @author rhilker
+ * Interface to use for different SNP implementations. Provides three essential
+ * methods.
  * 
- * Interface to use for different SNP implementations.
- * Provides three essential methods.
+ * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public interface SnpI {
+public interface SnpI extends Comparable<SnpI> {
     
     /**
      * @return The base of this snp which deviates from the reference sequence.
@@ -21,6 +21,6 @@ public interface SnpI {
     /**
      * @return The position of this snp.
      */
-    public String getPosition();
+    public int getPosition();
     
 }

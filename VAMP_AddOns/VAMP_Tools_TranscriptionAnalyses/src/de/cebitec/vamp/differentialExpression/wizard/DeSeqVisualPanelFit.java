@@ -1,6 +1,7 @@
 package de.cebitec.vamp.differentialExpression.wizard;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -10,23 +11,39 @@ import javax.swing.JPanel;
 public final class DeSeqVisualPanelFit extends JPanel {
 
     private DefaultListModel<String> allConditionGroupsModel = new DefaultListModel<>();
-    private DefaultListModel<String> FittingOneModel = new DefaultListModel<>();
-    private DefaultListModel<String> FittingTwoModel = new DefaultListModel<>();
+    private DefaultListModel<String> fittingOneModel = new DefaultListModel<>();
+    private DefaultListModel<String> fittingTwoModel = new DefaultListModel<>();
     private List<String> fittingGroupOne = new ArrayList<>();
     private List<String> fittingGroupTwo = new ArrayList<>();
+    private Set<String> assignedGroups = new HashSet<>();
 
     /**
      * Creates new form DeSeqVisualPanelFit
      */
     public DeSeqVisualPanelFit() {
         initComponents();
+        infoLabel.setText("");
     }
 
     public void updateConditionGroupsList(Set<String> conditionGroups) {
-        allConditionGroupsModel.clear();
+        boolean newDataSet = false;
         for (Iterator<String> it = conditionGroups.iterator(); it.hasNext();) {
             String currentGroup = it.next();
-            allConditionGroupsModel.addElement(currentGroup);
+            if (!allConditionGroupsModel.contains(currentGroup)
+                    && !fittingOneModel.contains(currentGroup)
+                    && !fittingTwoModel.contains(currentGroup)) {
+                newDataSet = true;
+                break;
+            }
+        }
+        if (newDataSet) {
+            allConditionGroupsModel.clear();
+            fittingOneModel.clear();
+            fittingTwoModel.clear();
+            for (Iterator<String> it = conditionGroups.iterator(); it.hasNext();) {
+                String currentGroup = it.next();
+                allConditionGroupsModel.addElement(currentGroup);
+            }
         }
     }
 
@@ -39,7 +56,7 @@ public final class DeSeqVisualPanelFit extends JPanel {
     }
 
     public boolean allConditionGroupsAssigned() {
-        return allConditionGroupsModel.isEmpty();
+        return (allConditionGroupsModel.getSize() == assignedGroups.size());
     }
 
     @Override
@@ -68,6 +85,7 @@ public final class DeSeqVisualPanelFit extends JPanel {
         jLabel3 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
+        infoLabel = new javax.swing.JLabel();
 
         conditionGroupsList.setModel(allConditionGroupsModel);
         jScrollPane1.setViewportView(conditionGroupsList);
@@ -100,10 +118,10 @@ public final class DeSeqVisualPanelFit extends JPanel {
             }
         });
 
-        fittingTwoList.setModel(FittingTwoModel);
+        fittingTwoList.setModel(fittingTwoModel);
         jScrollPane3.setViewportView(fittingTwoList);
 
-        fittingOneList.setModel(FittingOneModel);
+        fittingOneList.setModel(fittingOneModel);
         jScrollPane2.setViewportView(fittingOneList);
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel3, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelFit.class, "DeSeqVisualPanelFit.jLabel3.text")); // NOI18N
@@ -112,6 +130,8 @@ public final class DeSeqVisualPanelFit extends JPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelFit.class, "DeSeqVisualPanelFit.jLabel1.text")); // NOI18N
 
+        org.openide.awt.Mnemonics.setLocalizedText(infoLabel, org.openide.util.NbBundle.getMessage(DeSeqVisualPanelFit.class, "DeSeqVisualPanelFit.infoLabel.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -119,9 +139,6 @@ public final class DeSeqVisualPanelFit extends JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 139, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -136,7 +153,12 @@ public final class DeSeqVisualPanelFit extends JPanel {
                             .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
                             .addComponent(jLabel2)
                             .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                            .addComponent(jLabel3))))
+                            .addComponent(jLabel3)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(infoLabel))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -147,14 +169,16 @@ public final class DeSeqVisualPanelFit extends JPanel {
                     .addComponent(jLabel1)
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 102, Short.MAX_VALUE)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 89, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 108, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
+                .addComponent(infoLabel)
                 .addContainerGap())
             .addGroup(layout.createSequentialGroup()
                 .addGap(54, 54, 54)
@@ -165,7 +189,7 @@ public final class DeSeqVisualPanelFit extends JPanel {
                 .addComponent(addToFittingTwo)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(removeFromFittingTwo)
-                .addGap(50, 50, 50))
+                .addGap(69, 69, 69))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -173,9 +197,14 @@ public final class DeSeqVisualPanelFit extends JPanel {
         List<String> tracks = conditionGroupsList.getSelectedValuesList();
         for (Iterator<String> it = tracks.iterator(); it.hasNext();) {
             String currentGroup = it.next();
-            allConditionGroupsModel.removeElement(currentGroup);
-            FittingOneModel.addElement(currentGroup);
-            fittingGroupOne.add(currentGroup);
+            if (!fittingOneModel.contains(currentGroup)) {
+                fittingOneModel.addElement(currentGroup);
+                fittingGroupOne.add(currentGroup);
+                assignedGroups.add(currentGroup);
+                infoLabel.setText("");
+            } else{
+                infoLabel.setText("Each group can just be added once to a fitting group.");
+            }
         }
     }//GEN-LAST:event_addToFittingOneActionPerformed
 
@@ -183,9 +212,10 @@ public final class DeSeqVisualPanelFit extends JPanel {
         List<String> tracks = fittingOneList.getSelectedValuesList();
         for (Iterator<String> it = tracks.iterator(); it.hasNext();) {
             String currentGroup = it.next();
-            FittingOneModel.removeElement(currentGroup);
-            allConditionGroupsModel.addElement(currentGroup);
+            fittingOneModel.removeElement(currentGroup);
             fittingGroupOne.remove(currentGroup);
+            assignedGroups.remove(currentGroup);
+            infoLabel.setText("");
         }
     }//GEN-LAST:event_removeFromFittingOneActionPerformed
 
@@ -193,9 +223,14 @@ public final class DeSeqVisualPanelFit extends JPanel {
         List<String> tracks = conditionGroupsList.getSelectedValuesList();
         for (Iterator<String> it = tracks.iterator(); it.hasNext();) {
             String currentGroup = it.next();
-            allConditionGroupsModel.removeElement(currentGroup);
-            FittingTwoModel.addElement(currentGroup);
-            fittingGroupTwo.add(currentGroup);
+            if (!fittingTwoModel.contains(currentGroup)) {
+                fittingTwoModel.addElement(currentGroup);
+                fittingGroupTwo.add(currentGroup);
+                assignedGroups.add(currentGroup);
+                infoLabel.setText("");
+            } else{
+                infoLabel.setText("Each group can just be added once to a fitting group.");
+            }
         }
     }//GEN-LAST:event_addToFittingTwoActionPerformed
 
@@ -203,9 +238,10 @@ public final class DeSeqVisualPanelFit extends JPanel {
         List<String> tracks = fittingTwoList.getSelectedValuesList();
         for (Iterator<String> it = tracks.iterator(); it.hasNext();) {
             String currentGroup = it.next();
-            FittingTwoModel.removeElement(currentGroup);
-            allConditionGroupsModel.addElement(currentGroup);
+            fittingTwoModel.removeElement(currentGroup);
             fittingGroupTwo.remove(currentGroup);
+            assignedGroups.remove(currentGroup);
+            infoLabel.setText("");
         }
     }//GEN-LAST:event_removeFromFittingTwoActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -214,6 +250,7 @@ public final class DeSeqVisualPanelFit extends JPanel {
     private javax.swing.JList conditionGroupsList;
     private javax.swing.JList fittingOneList;
     private javax.swing.JList fittingTwoList;
+    private javax.swing.JLabel infoLabel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

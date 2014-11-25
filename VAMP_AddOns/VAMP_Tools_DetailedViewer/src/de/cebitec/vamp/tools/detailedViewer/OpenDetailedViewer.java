@@ -1,9 +1,14 @@
 package de.cebitec.vamp.tools.detailedViewer;
 
-import de.cebitec.vamp.databackend.connector.TrackConnector;
+import de.cebitec.vamp.controller.ViewController;
+import de.cebitec.vamp.ui.visualisation.AppPanelTopComponent;
+import de.cebitec.vamp.view.TopComponentHelper;
+import de.cebitec.vamp.view.dataVisualisation.abstractViewer.AbstractViewer;
+import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JList;
 import org.openide.DialogDescriptor;
@@ -20,24 +25,40 @@ public final class OpenDetailedViewer implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent ev) {
-        TrackViewer currentTrackViewer = null;
-        if (context.size() > 1){
-            JList trackList = new JList(context.toArray());
-            DialogDescriptor.Confirmation dd = new DialogDescriptor.Confirmation(trackList, NbBundle.getMessage(OpenDetailedViewer.class, "CTL_OpenDetailedViewer"));
-            dd.setOptionType(DialogDescriptor.OK_CANCEL_OPTION);
-            DialogDisplayer.getDefault().notify(dd);
-            if (dd.getValue().equals(DialogDescriptor.OK_OPTION) && !trackList.isSelectionEmpty()){
-                currentTrackViewer = (TrackViewer) trackList.getSelectedValue();
-            } else {
-                return;
-            }
-        } else {
-            // context cannot be emtpy, so no check here
-            currentTrackViewer = context.get(0);
-        }
+        AppPanelTopComponent parentAppPanel = TopComponentHelper.getActiveTopComp(AppPanelTopComponent.class);
+        if (parentAppPanel != null) {
+            TrackViewer currentTrackViewer;
+            //Get ViewController from AppPanelTopComponent-Lookup
+            ViewController viewCon = parentAppPanel.getLookup().lookup(ViewController.class);
+            List<BasePanel> trackPanels = viewCon.getOpenTracks();
+            List<AbstractViewer> openTrackViewers = this.getTrackViewerList(viewCon.getOpenTracks());
 
-        DetailedViewerTopComponent detailedViewer = new DetailedViewerTopComponent();
-        detailedViewer.setTrackConnector((TrackConnector) currentTrackViewer.getTrackCon());
-        detailedViewer.open();
+            if (trackPanels.size() > 1) {
+                JList trackList = new JList(openTrackViewers.toArray());
+                DialogDescriptor.Confirmation dd = new DialogDescriptor.Confirmation(trackList, NbBundle.getMessage(OpenDetailedViewer.class, "CTL_OpenDetailedViewer"));
+                dd.setOptionType(DialogDescriptor.OK_CANCEL_OPTION);
+                DialogDisplayer.getDefault().notify(dd);
+                if (dd.getValue().equals(DialogDescriptor.OK_OPTION) && !trackList.isSelectionEmpty()) {
+                    currentTrackViewer = (TrackViewer) trackList.getSelectedValue();
+                } else {
+                    return;
+                }
+            } else {
+                // context cannot be emtpy, so no check here
+                currentTrackViewer = (TrackViewer) trackPanels.get(0).getViewer();
+            }
+
+            DetailedViewerTopComponent detailedViewer = new DetailedViewerTopComponent(viewCon);
+            detailedViewer.setTrackConnector(currentTrackViewer.getTrackCon());
+            detailedViewer.open();
+        }
+    }
+
+    private List<AbstractViewer> getTrackViewerList(List<BasePanel> openTracks) {
+        List<AbstractViewer> viewerList = new ArrayList<>();
+        for (BasePanel basePanel : openTracks) {
+            viewerList.add(basePanel.getViewer());
+        }
+        return viewerList;
     }
 }

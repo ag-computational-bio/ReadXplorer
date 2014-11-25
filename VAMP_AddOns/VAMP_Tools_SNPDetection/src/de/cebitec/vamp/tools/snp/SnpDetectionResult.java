@@ -1,6 +1,6 @@
 package de.cebitec.vamp.tools.snp;
 
-import de.cebitec.common.sequencetools.AminoAcidProperties;
+import de.cebitec.common.sequencetools.geneticcode.AminoAcidProperties;
 import de.cebitec.vamp.databackend.ResultTrackAnalysis;
 import de.cebitec.vamp.databackend.dataObjects.CodonSnp;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
@@ -19,11 +19,9 @@ import java.util.Map;
  * 
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> {
+public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
     
     private List<SnpI> snpList;
-    private int num;
-    private int percent;
 
     
     /**
@@ -31,8 +29,8 @@ public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> 
      * @param snpList list of snps of the analysis
      * @param trackNames hashmap of track ids to track names used in the analysis
      */
-    public SnpDetectionResult(List<SnpI> snpList, Map<Integer, PersistantTrack> trackNames) {//, PersistantTrack currentTrack) {
-        super(trackNames);
+    public SnpDetectionResult(List<SnpI> snpList, Map<Integer, PersistantTrack> trackNames, boolean combineTracks) {
+        super(trackNames, combineTracks);
         this.snpList = snpList;
     }
     
@@ -60,6 +58,8 @@ public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> 
         List<CodonSnp> codons;
         char aminoSnp;
         char aminoRef;
+        String codonsSNP;
+        String codonsRef;
         String ids;
         
         for (SnpI snpi : this.snpList) {
@@ -67,9 +67,10 @@ public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> 
             snp = (Snp) snpi; 
             
             snpExport.add(snp.getPosition());
-            snpExport.add(this.getTrackMap().get(snp.getTrackId()));
-            snpExport.add(snp.getBase().toUpperCase());
-            snpExport.add(snp.getRefBase().toUpperCase());
+            snpExport.add(snp.getGapOrderIndex());
+            snpExport.add(this.getTrackEntry(snp.getTrackId(), true));
+            snpExport.add(snp.getBase());
+            snpExport.add(snp.getRefBase());
             snpExport.add(snp.getARate());
             snpExport.add(snp.getCRate());
             snpExport.add(snp.getGRate());
@@ -82,8 +83,10 @@ public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> 
             
             
             noGene = "No gene";
-            aminoAcidsSnp = "";
             aminoAcidsRef = "";
+            aminoAcidsSnp = "";
+            codonsRef = "";
+            codonsSNP = "";
             effect = "";
             geneId = "";
             //determine amino acid substitutions among snp substitutions
@@ -97,12 +100,14 @@ public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> 
                 }
                
                 for (CodonSnp codon : codons) {
-                    aminoSnp = codon.getAminoSnp();
                     aminoRef = codon.getAminoRef();
-                    aminoAcidsSnp += aminoSnp + " (" + AminoAcidProperties.getPropertyForAA(aminoSnp) + ")\n";
+                    aminoSnp = codon.getAminoSnp();
+                    codonsRef += codon.getTripletRef() + "\n";
+                    codonsSNP += codon.getTripletSnp() + "\n";
                     aminoAcidsRef += aminoRef + " (" + AminoAcidProperties.getPropertyForAA(aminoRef) + ")\n";
+                    aminoAcidsSnp += aminoSnp + " (" + AminoAcidProperties.getPropertyForAA(aminoSnp) + ")\n";
                     effect += codon.getEffect().getType() + "\n";
-                    geneId += codon.getGeneId() + "\n";
+                    geneId += codon.getFeature() + "\n";
                 }
             } else {
                 codons = snp.getCodons();
@@ -119,21 +124,27 @@ public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> 
                     }
 
                     for (CodonSnp codon : codons) {
-                        ids += codon.getGeneId() + "\n";
+                        ids += codon.getFeature() + "\n";
                     }
                     geneId = ids;
-                    aminoAcidsSnp = "-";
+                    codonsRef = "-";
+                    codonsSNP = "-";
                     aminoAcidsRef = "-";
+                    aminoAcidsSnp = "-";
                 } else {
-                    aminoAcidsSnp = "No gene";
+                    codonsRef = "-";
+                    codonsSNP = "-";
                     aminoAcidsRef = "No gene";
+                    aminoAcidsSnp = "No gene";
                     effect = "";
                     geneId = "";
                 }
             }
 
-            snpExport.add(aminoAcidsSnp);
             snpExport.add(aminoAcidsRef);
+            snpExport.add(aminoAcidsSnp);
+            snpExport.add(codonsRef);
+            snpExport.add(codonsSNP);
             snpExport.add(effect);
             snpExport.add(geneId);
             
@@ -143,8 +154,9 @@ public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> 
         allData.add(snpExportData);
         
         //create statistics sheet
+        ParameterSetSNPs params = (ParameterSetSNPs) this.getParameters();
+        
         List<List<Object>> statisticsExportData = new ArrayList<>();
-        List<Object> statisticsExport;
         
         statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("SNP detection for tracks:", 
                 GeneralUtils.generateConcatenatedString(this.getTrackNameList(), 0)));
@@ -152,8 +164,9 @@ public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> 
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between title and parameters
         
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("SNP detection parameters:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Minimum percentage of variation:", percent));
-        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Minimum number of varying bases:", num));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Minimum percentage of variation:", params.getMinPercentage()));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Minimum number of varying bases:", params.getMinMismatchingBases()));
+        statisticsExportData.add(ResultTrackAnalysis.createTwoElementTableRow("Count only most frequent base:", params.isUseMainBase() ? "yes" : "no"));
         
         statisticsExportData.add(ResultTrackAnalysis.createSingleElementTableRow("")); //placeholder between parameters and statistics
         
@@ -162,7 +175,8 @@ public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> 
         statisticsExportData.add(this.createStatisticTableRow(SNP_DetectionResultPanel.SNPS_INTERGENEIC));
         statisticsExportData.add(this.createStatisticTableRow(SNP_DetectionResultPanel.SNPS_SYNONYMOUS));
         statisticsExportData.add(this.createStatisticTableRow(SNP_DetectionResultPanel.SNPS_CHEMIC_NEUTRAL));
-        statisticsExportData.add(this.createStatisticTableRow(SNP_DetectionResultPanel.SNPS_MISSSENSE));
+        statisticsExportData.add(this.createStatisticTableRow(SNP_DetectionResultPanel.SNPS_CHEMIC_DIFF));
+        statisticsExportData.add(this.createStatisticTableRow(SNP_DetectionResultPanel.SNPS_STOPS));
         statisticsExportData.add(this.createStatisticTableRow(SNP_DetectionResultPanel.SNPS_AA_INSERTIONS));
         statisticsExportData.add(this.createStatisticTableRow(SNP_DetectionResultPanel.SNPS_AA_DELETIONS));
         
@@ -188,6 +202,7 @@ public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> 
         
         List<String> dataColumnDescriptions = new ArrayList<>();
         dataColumnDescriptions.add("Position");
+        dataColumnDescriptions.add("Gap Index");
         dataColumnDescriptions.add("Track");
         dataColumnDescriptions.add("Base");
         dataColumnDescriptions.add("Reference");
@@ -200,8 +215,10 @@ public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> 
         dataColumnDescriptions.add("Coverage");
         dataColumnDescriptions.add("Frequency");
         dataColumnDescriptions.add("Type");
-        dataColumnDescriptions.add("Amino Snp");
-        dataColumnDescriptions.add("Amino Ref");
+        dataColumnDescriptions.add("AA Ref");
+        dataColumnDescriptions.add("AA SNP");
+        dataColumnDescriptions.add("Codon Ref");
+        dataColumnDescriptions.add("Codon SNP");
         dataColumnDescriptions.add("Effect on AA");
         dataColumnDescriptions.add("Features");
         
@@ -225,36 +242,5 @@ public class SnpDetectionResult extends ResultTrackAnalysis<SnpDetectionResult> 
         sheetNames.add("SNP Table");
         sheetNames.add("SNP Statistics");
         return sheetNames;
-    }
-    
-
-    /**
-     * Sets the SNP dection parameters to have them connected with the search
-     * results.
-     * @param percent minimum deviation in percent at a position used for this
-     * snp detection
-     * @param num minimum number of deviating coverage at a position used for
-     * this snp detection
-     */
-    public void setSearchParameters(int percent, int num) {
-        this.percent = percent;
-        this.num = num;
-    }
-
-    /**
-     * @return get minimum number of deviating coverage at a position used for
-     * this snp detection
-     */
-    public int getMinNoDeviatingCoverage() {
-        return this.num;
-    }
-
-    /**
-     * @return get the minimum deviation in percent at a position used for this
-     * snp detection
-     */
-    public int getMinPercentDeviation() {
-        return this.percent;
-    }
-    
+    }    
 }

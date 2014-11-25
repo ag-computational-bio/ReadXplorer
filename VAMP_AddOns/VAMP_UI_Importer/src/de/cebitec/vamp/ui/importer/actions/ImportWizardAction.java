@@ -7,7 +7,7 @@ import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.ui.importer.ImportThread;
 import de.cebitec.vamp.ui.importer.ImportWizardSetupPanel;
 import de.cebitec.vamp.ui.importer.ImportWizardOverviewPanel;
-import de.cebitec.vamp.parser.SeqPairJobContainer;
+import de.cebitec.vamp.parser.ReadPairJobContainer;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.event.ActionListener;
@@ -30,9 +30,9 @@ public final class ImportWizardAction implements ActionListener {
     public static final String PROP_CAN_IMPORT = "canImport";
     public static final String PROP_REFJOBLIST = "referenceJob";
     public static final String PROP_TRACKJOBLIST = "trackJobList";
-    public static final String PROP_SEQPAIRJOBLIST = "seqPairJobList";
-    public static final String PROP_SEQPAIRDIST = "seqPairDistance";
-    public static final String PROP_SEQPAIRDEVIATION = "seqPairDeviation";
+    public static final String PROP_READPAIRJOBLIST = "readPairJobList";
+    public static final String PROP_READPAIRDIST = "readPairDistance";
+    public static final String PROP_READPAIRDEVIATION = "readPairDeviation";
     public static final String PROP_POSITIONTABLELIST = "positionTableList";
 
     public ImportWizardAction(LoginCookie context) {
@@ -60,10 +60,9 @@ public final class ImportWizardAction implements ActionListener {
             List<ReferenceJob> refJobs = (List<ReferenceJob>) wizardDescriptor.getProperty(PROP_REFJOBLIST);
             List<TrackJob> trackJobs = (List<TrackJob>) wizardDescriptor.getProperty(PROP_TRACKJOBLIST);
              //since sequence pair jobs have their own parser it can be distinguished later
-            List<SeqPairJobContainer> seqPairJobs = (List<SeqPairJobContainer>) wizardDescriptor.getProperty(PROP_SEQPAIRJOBLIST);
-            List<TrackJob> positionTableJobs = (List<TrackJob>) wizardDescriptor.getProperty(PROP_POSITIONTABLELIST);
+            List<ReadPairJobContainer> seqPairJobs = (List<ReadPairJobContainer>) wizardDescriptor.getProperty(PROP_READPAIRJOBLIST);
 
-            ImportThread i = new ImportThread(refJobs, trackJobs, seqPairJobs, positionTableJobs);
+            ImportThread i = new ImportThread(refJobs, trackJobs, seqPairJobs);
             RequestProcessor rp = new RequestProcessor("Import Threads", 2);
             rp.post(i);
         }

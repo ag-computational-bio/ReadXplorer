@@ -4,7 +4,7 @@ and open the template in the editor.
 -->
 <html>
     <head>
-        <title>About VAMP's Track Viewer and Statistics</title>
+        <title>About Reference Viewer, Track Viewer and Track Statistics</title>
         <link rel="stylesheet" href="nbdocs:/org/netbeans/modules/usersguide/ide.css" type="text/css">
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     </head>
@@ -13,13 +13,13 @@ and open the template in the editor.
         <p style="font-size:0.9em">
             First of all: All viewers are synchronized across all opened tracks, for easy navigation and comparison of data.
             Each viewer allows to jump to any position, by drawing the horizontal scrollbar on top of each viewer. Besides that, panning can be
-            used to scroll through the vincinity of the current position. 
+            used to scroll through the vicinity of the current position. 
             <br>Each viewer, which also has a slider beneath the horizontal scrollbar also allows zooming in and out. Another way of zooming is 
             to move the mouse wheel while hovering the viewer. In this case, when zoomed in, the view centers around the currently hovered position.
             <br>Each viewer also always allows copying the current mouse position via right click.
         </p>
         <br>
-        <h2>About VAMP's Reference Viewer</h2>
+        <h2>About Reference Viewer</h2>
         <p style="font-size:0.9em">
             The reference viewer, which has to be opened before a track can be viewed, visualizes the reference sequence (genome, chromosome...)
             with its features (if they are available -> fasta files don't inculde features) in all 6 reading frames.
@@ -29,7 +29,7 @@ and open the template in the editor.
             type.
         </p>
         <br>
-        <h2>About VAMP's Track Viewer</h2>
+        <h2>About Track Viewer</h2>
         <p style="font-size:0.9em">
             The track viewer displays the coverage of it's reference sequence in the current dataset. The coverage is divided into three different
             classes: 
@@ -43,10 +43,24 @@ and open the template in the editor.
             <br>2. Coverage normalization either by log2 or by a factor of your own choice (between 0 and 10)
         </p>
         <br>
-        <h2>About VAMP's Track Statistics</h2>
-        <p>
-            TODO: The meaning of the track statistic values will be described here.
-        </p>
+        <h2>About Track Statistics</h2>
+    <ol style="font-size:0.95em">
+	<li><span>Mappings: The total number of mappings in the whole data set, which were mapped to this reference.</span></li>
+	<li><span>Unique mappings: The total number of mappings among the number of "Mappings", which where only mapped once to the reference.</span></li>
+	<li><span>Best match mappings: The total number of mappings belonging to the best match class in the whole track data set.</span></li>
+	<li><span>Perfect mappings: The total number of mappings belonging to the perfect match class in the whole track data set.</span></li>
+	<li><span>Perfect coverage: The percentage of the reference sequence, covered with at least one mapping of the perfect match mapping class.</span></li>
+	<li><span>Best match coverage: The percentage of the reference sequence, covered with at least one mapping of the best match mapping class.</span></li>
+	<li><span>Common coverage: The percentage of the reference sequence, covered with at least one mapping of the common match mapping class.</span></li>
+    </ol>
+        <p style="font-size:0.9em; text-align: justify;">If the currently viewed track is a sequence pair (paired-end or mate pair) data set, the sequence pair statistic is displayed:</p>
+        <ol style="font-size:0.95em">
+	<li><span>Sequence Pairs: The total number of sequence pairs successfully (= at least one read of the pair) mapped to the reference sequence in the whole track data set.</span></li>
+	<li><span>Perfect sequence pairs: The number of perfect sequence pairs, whose distance is within a given range and whose orientation is as expected.</span></li>
+	<li><span>Smaller sequence pairs: The number of sequence pairs whose distance is smaller than the minimum allowed distance of a perfect pair.</span></li>
+	<li><span>Larger sequence pairs: The number of sequence pairs whose distance is larger than the maximum allowed distance of a perfect pair.</span></li>
+	<li><span>Single mappings: The number of mappings whose partner either did not map to the reference at all, or is already contained in a perfect or smaller distance pair with the read of this mapping and its partner. The latter can occur, when e.g. one read of a sequence pair maps to two or more positions in the reference, but in one position it can form a perfect or smaller distance pair with its partner. Then all other mappings of the multi mapped read are classified as single mappings.</span></li>
+        </ol>
     </body>
 </html>
 <!--

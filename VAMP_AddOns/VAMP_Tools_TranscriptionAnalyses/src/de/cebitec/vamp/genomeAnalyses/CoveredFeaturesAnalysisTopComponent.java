@@ -1,6 +1,7 @@
 package de.cebitec.vamp.genomeAnalyses;
 
 import de.cebitec.vamp.util.TabWithCloseX;
+import de.cebitec.vamp.view.TopComponentExtended;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import javax.swing.JPanel;
@@ -12,8 +13,8 @@ import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
 /**
- * TopComponent for displaying all gui elements belonging to the covered feature
- * detection.
+ * TopComponent for displaying all gui elements belonging to the feature coverage 
+ * analysis.
  * 
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
@@ -29,20 +30,20 @@ persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @ActionReference(path = "Menu/Window" /*, position = 333 */)
 @TopComponent.OpenActionRegistration(
     displayName = "#CTL_CoveredFeaturesAnalysisAction",
-preferredID = "CoveredFeaturesAnalysisTopComponent")
+preferredID = "FeatureCoverageAnalysisTopComponent")
 @Messages({
-    "CTL_CoveredFeaturesAnalysisAction=CoveredFeaturesAnalysis",
-    "CTL_CoveredFeaturesAnalysisTopComponent=Covered Features Analysis Window",
-    "HINT_CoveredFeaturesAnalysisTopComponent=This is a Covered Features Analysis window"
+    "CTL_CoveredFeaturesAnalysisAction=FeatureCoverageAnalysis",
+    "CTL_CoveredFeaturesAnalysisTopComponent=Feature Coverage Analysis Window",
+    "HINT_CoveredFeaturesAnalysisTopComponent=This is a Feature Coverage Analysis window"
 })
-public final class CoveredFeaturesAnalysisTopComponent extends TopComponent {
+public final class CoveredFeaturesAnalysisTopComponent extends TopComponentExtended {
     
-    public static final String PREFERRED_ID = "CoveredFeaturesAnalysisTopComponent";
+    public static final String PREFERRED_ID = "FeatureCoverageAnalysisTopComponent";
     private static final long serialVersionUID = 1L;
 
     /**
-     * TopComponent for displaying all gui elements belonging to the covered
-     * feature detection.
+     * TopComponent for displaying all gui elements belonging to the feature 
+     * coverage analysis.
      */
     public CoveredFeaturesAnalysisTopComponent() {
         initComponents();
@@ -59,7 +60,10 @@ public final class CoveredFeaturesAnalysisTopComponent extends TopComponent {
             @Override
             public void componentRemoved(ContainerEvent e) {
                 if (coveredFeaturesTabbedPane.getTabCount() == 0) {
-                    WindowManager.getDefault().findTopComponent(PREFERRED_ID).close();
+                    TopComponent topComp = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
+                    if (topComp != null) {
+                        topComp.close();
+                    }
                 }
             }
         });
@@ -124,5 +128,12 @@ public final class CoveredFeaturesAnalysisTopComponent extends TopComponent {
         this.coveredFeaturesTabbedPane.add(panelName, resultPanel);
         this.coveredFeaturesTabbedPane.setTabComponentAt(this.coveredFeaturesTabbedPane.getTabCount() - 1, new TabWithCloseX(this.coveredFeaturesTabbedPane));
         this.coveredFeaturesTabbedPane.setSelectedIndex(this.coveredFeaturesTabbedPane.getTabCount() - 1);
+    }
+    
+    /**
+     * @return true, if this component already contains other components, false otherwise.
+     */
+    public boolean hasComponents() {
+        return this.coveredFeaturesTabbedPane.getComponentCount() > 0;
     }
 }

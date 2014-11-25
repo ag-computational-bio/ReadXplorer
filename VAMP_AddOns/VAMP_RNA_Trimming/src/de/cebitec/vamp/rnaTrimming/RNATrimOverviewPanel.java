@@ -1,11 +1,14 @@
 package de.cebitec.vamp.rnaTrimming;
 
 import java.awt.Component;
-import java.util.List;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
 
+/**
+ * This is the panel that displays the OverviewCard.
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
+ */
 public class RNATrimOverviewPanel implements WizardDescriptor.Panel<WizardDescriptor> {
 
     /**
@@ -59,8 +62,7 @@ public class RNATrimOverviewPanel implements WizardDescriptor.Panel<WizardDescri
                 settings.getProperty(RNATrimAction.PROP_SOURCEPATH).toString(),
                 settings.getProperty(RNATrimAction.PROP_TRIMMETHOD).toString(), 
                 settings.getProperty(RNATrimAction.PROP_TRIMMAXIMUM).toString()
-                
-                );
+        );
     }
 
     @Override

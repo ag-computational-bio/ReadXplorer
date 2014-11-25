@@ -2,6 +2,7 @@ package de.cebitec.vamp.tools.readSearch;
 
 import de.cebitec.vamp.api.objects.Read;
 import de.cebitec.vamp.util.TabWithCloseX;
+import de.cebitec.vamp.view.TopComponentExtended;
 import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.CardLayout;
 import java.awt.event.ContainerEvent;
@@ -21,7 +22,7 @@ import org.netbeans.api.settings.ConvertAsProperties;
  * Top component which displays read searches.
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.tools.readSearch//ReadSearch//EN", autostore = false)
-public final class ReadSearchTopComponent extends TopComponent {
+public final class ReadSearchTopComponent extends TopComponentExtended {
 
     private static ReadSearchTopComponent instance;
     private static final long serialVersionUID = 1L;

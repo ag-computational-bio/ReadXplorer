@@ -3,14 +3,15 @@ package de.cebitec.vamp.tools.rnaFolder;
 import de.cebitec.vamp.tools.rnaFolder.rnamovies.MoviePane;
 import de.cebitec.vamp.tools.rnaFolder.rnamovies.actions.Export;
 import de.cebitec.vamp.util.TabWithCloseX;
+import de.cebitec.vamp.view.TopComponentExtended;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.swing.JTabbedPane;
+import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
-import org.netbeans.api.settings.ConvertAsProperties;
 
 /**
  * Top component displaying a tabbed pane for visualizing folded RNAs (with the
@@ -18,20 +19,20 @@ import org.netbeans.api.settings.ConvertAsProperties;
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.tools.rnaFolder//RNAFolder//EN",
 autostore = false)
-public final class RNAFolderTopComponent extends TopComponent {
+public final class RNAFolderTopComponent extends TopComponentExtended {
 
     private static RNAFolderTopComponent instance;
     /** path to the icon used by the component and its open action */
 //    static final String ICON_PATH = "SET/PATH/TO/ICON/HERE";
     private static final String PREFERRED_ID = "RNAFolderTopComponent";
+    private static final long serialVersionUID = 1L;
     
-    List<MoviePane> rnaMovieList = new ArrayList<MoviePane>();
+    List<MoviePane> rnaMovieList = new ArrayList<>();
 
     public RNAFolderTopComponent() {
         initComponents();
-        this.setName(NbBundle.getBundle(RNAFolderController.class).getString("RNAFolderViewer.Name"));
-        this.rnaTabbedPane.
-        setName(NbBundle.getMessage(RNAFolderTopComponent.class, "CTL_RNAFolderTopComponent"));
+        this.setName(NbBundle.getMessage(RNAFolderController.class, "RNAFolderViewer.Name"));
+        this.rnaTabbedPane.setName(NbBundle.getMessage(RNAFolderTopComponent.class, "CTL_RNAFolderTopComponent"));
         setToolTipText(NbBundle.getMessage(RNAFolderTopComponent.class, "HINT_RNAFolderTopComponent"));
         //this.openAtTabPosition(this.get);
 //        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
@@ -170,9 +171,6 @@ public final class RNAFolderTopComponent extends TopComponent {
         this.rnaTabbedPane.addTab(tabHeader, rnaMovie);
         this.rnaTabbedPane.setTabComponentAt(this.rnaTabbedPane.getTabCount()-1, new TabWithCloseX(this.rnaTabbedPane));
         this.rnaTabbedPane.setSelectedIndex(this.rnaTabbedPane.getTabCount()-1);
-        this.open();
-        this.requestActive();
-        this.validate();
         rnaMovie.zoomFit();
         this.updateExportButton();
     }
@@ -193,6 +191,7 @@ public final class RNAFolderTopComponent extends TopComponent {
      * it also removes the corresponding movie from the movie list.
      */
     private class JTabbedPaneWithNewRemoveAction extends JTabbedPane {
+        private static final long serialVersionUID = 1L;
         
         /**
          * Removes the tab and component which corresponds to the specified index.

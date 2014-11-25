@@ -10,7 +10,7 @@ import org.openide.util.ChangeSupport;
 import org.openide.util.HelpCtx;
 
 /**
- * The wizard panel representing the options for file conversion in VAMP.
+ * The wizard panel representing the options for file conversion in ReadXplorer.
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */

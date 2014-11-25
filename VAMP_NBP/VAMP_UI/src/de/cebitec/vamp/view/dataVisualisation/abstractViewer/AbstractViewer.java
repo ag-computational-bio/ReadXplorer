@@ -17,9 +17,14 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import org.openide.util.Exceptions;
 
 /**
  * AbstractViewer ist a superclass for displaying genome related information.
@@ -38,12 +43,14 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     // logical coordinates for genome interval
     private BoundsInfo bounds;
     private boolean isPanning = false;
+    private boolean canPan = true;
     // correlation factor to compute physical position from logical position
     private double correlationFactor;
     // gap at the sides of panel
     private int horizontalMargin;
     private int verticalMargin;
     private int zoom = 1;
+    private boolean canZoom = true;
     private double basewidth;
     private BoundsInfoManager boundsManager;
     private int oldLogMousePos;
@@ -65,15 +72,25 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     private JPanel options;
     private boolean hasOptions;
     private List<FeatureType> excludedFeatureTypes;
-    private boolean pAInfoIsAviable = false;
+    private boolean pAInfoIsAvailable = false;
     public static final String PROP_MOUSEPOSITION_CHANGED = "mousePos changed";
     public static final String PROP_MOUSEOVER_REQUESTED = "mouseOver requested";
     public static final Color backgroundColor = new Color(240, 240, 240); //to prevent wrong color on mac
     private JScrollBar scrollBar; /* Scrollbar, which should adapt, when component is repainted. */
     private boolean centerScrollBar = false;
+    private BufferedImage loadingIndicator;
 
     public AbstractViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference reference) {
         super();
+        
+        //read loadingIndicator icon from package resources
+        try {
+            InputStream stream = AbstractViewer.class.getResourceAsStream("loading.png");
+            this.loadingIndicator = ImageIO.read(stream);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        
         this.excludedFeatureTypes = new ArrayList<>();
         this.setLayout(null);
         this.setBackground(AbstractViewer.backgroundColor);
@@ -171,7 +188,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
     private void adjustPaintingAreaInfo() {
         if (this.getHeight() > 0 && this.getWidth() > 0) {
-            pAInfoIsAviable = true;
+            pAInfoIsAvailable = true;
             paintingAreaInfo.setForwardHigh(verticalMargin);
             paintingAreaInfo.setReverseHigh(this.getHeight() - 1 - verticalMargin);
             paintingAreaInfo.setPhyLeft(horizontalMargin);
@@ -196,7 +213,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
                 paintingAreaInfo.setReverseLow(this.getSize().height / 2 + 1);
             }
         } else {
-            pAInfoIsAviable = false;
+            pAInfoIsAvailable = false;
         }
     }
 
@@ -231,7 +248,8 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
 
-                if ((zoom <= 500 && zoom > 0 && e.getUnitsToScroll() > 0) || (zoom <= 500 && zoom > 0 && e.getUnitsToScroll() < 0)) {
+                if (canZoom && ((zoom <= 500 && zoom > 0 && e.getUnitsToScroll() > 0) 
+                            || (zoom <= 500 && zoom > 0 && e.getUnitsToScroll() < 0))) {
                     int oldZoom = zoom;
                     zoom += e.getUnitsToScroll();
                     if (zoom > 500) {
@@ -252,7 +270,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
             @Override
             public void mouseDragged(MouseEvent e) {
-                setPanMode(e.getX());
+                setPanPosition(e.getX());
             }
 
             @Override
@@ -281,8 +299,10 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
             public void mousePressed(MouseEvent e) {
 
                 if (SwingUtilities.isLeftMouseButton(e)) {
-                    isPanning = true;
-                    AbstractViewer.this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    if (canPan) {
+                        isPanning = true;
+                        AbstractViewer.this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                    }
                 }
                 if (SwingUtilities.isRightMouseButton(e)) {
                     JPopupMenu popUp = new JPopupMenu();
@@ -317,12 +337,47 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
 
     }
 
-    private void setPanMode(int position) {
-        if (isPanning) {
+    /**
+     * Sets the current mouse position as the navigator bar center position, if
+     * panning is allowed and panning is currently active
+     * @param position 
+     */
+    private void setPanPosition(int position) {
+        if (isPanning && canPan) {
             int logi = transformToLogicalCoordForPannig(position);
             //       Logger.getLogger(this.getClass().getName()).log(Level.INFO, "pos "+position+" logi "+logi);
             boundsManager.navigatorBarUpdated(logi);
         }
+    }
+    
+    /**
+     * @return true, if panning is allowed, false otherwise
+     */
+    public boolean isPanModeOn() {
+        return canPan;
+    }
+
+    /**
+     * @param canPan true, if panning is allowed, false otherwise
+     */
+    public void setIsPanModeOn(boolean canPan) {
+        this.canPan = canPan;
+    }
+
+    /**
+     * @return <cc>true</cc> if this viewer is allowed to zoom via the mouse
+     * wheel, <cc>false</cc> otherwise.
+     */
+    public boolean isCanZoom() {
+        return canZoom;
+    }
+
+    /**
+     * @param canZoom <cc>true</cc> if this viewer is allowed to zoom via the 
+     * mouse wheel, <cc>false</cc> otherwise.
+     */
+    public void setCanZoom(boolean canZoom) {
+        this.canZoom = canZoom;
     }
 
     public abstract void changeToolTipText(int logPos);
@@ -331,7 +386,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      * Compute the space that is currently assigned for one base of the genome
      */
     private void calcBaseWidth() {
-        if (pAInfoIsAviable) {
+        if (pAInfoIsAvailable) {
             basewidth = (double) paintingAreaInfo.getPhyWidth() / bounds.getLogWidth();
         }
     }
@@ -423,7 +478,7 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
      * current width of this panel
      */
     private void recalcCorrelationFactor() {
-        if (pAInfoIsAviable) {
+        if (pAInfoIsAvailable) {
             correlationFactor = (double) paintingAreaInfo.getPhyWidth() / bounds.getLogWidth();
         }
     }
@@ -586,17 +641,22 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     }
 
     /**
-     * @return the current dimension of this panel
+     * @return The size of the area, that is used for drawing. Logical bounds
+     * depend on the available size of each listener.
      */
     @Override
     public Dimension getPaintingAreaDimension() {
-        return pAInfoIsAviable ? new Dimension(paintingAreaInfo.getPhyWidth(), paintingAreaInfo.getCompleteHeight()) : null;
+        return pAInfoIsAvailable ? new Dimension(paintingAreaInfo.getPhyWidth(), paintingAreaInfo.getCompleteHeight()) : null;
 
     }
 
+    /**
+     * @return true, if the PaintingArea has coordinates to calculate bounds,
+     * false otherwise.
+     */
     @Override
-    public boolean isPaintingAreaAviable() {
-        return pAInfoIsAviable;
+    public boolean isPaintingAreaAvailable() {
+        return pAInfoIsAvailable;
     }
 
     public PaintingAreaInfo getPaintingAreaInfo() {
@@ -745,4 +805,12 @@ public abstract class AbstractViewer extends JPanel implements LogicalBoundsList
     public void setAutomaticCentering(boolean centerScrollBar) {
         this.centerScrollBar = centerScrollBar;
     }
+
+    /**
+     * @return The image to display, if the viewer waits for something.
+     */
+    public BufferedImage getLoadingIndicator() {
+        return loadingIndicator;
+    }
+    
 }

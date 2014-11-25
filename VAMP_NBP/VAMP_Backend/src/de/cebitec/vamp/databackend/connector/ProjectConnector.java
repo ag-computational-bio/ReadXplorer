@@ -3,24 +3,17 @@ package de.cebitec.vamp.databackend.connector;
 import de.cebitec.vamp.databackend.*;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.databackend.dataObjects.Snp;
-import de.cebitec.vamp.databackend.dataObjects.SnpI;
 import de.cebitec.vamp.parser.common.*;
 import de.cebitec.vamp.util.DiscreteCountingDistribution;
-import de.cebitec.vamp.util.Pair;
-import de.cebitec.vamp.util.PositionUtils;
 import de.cebitec.vamp.util.Properties;
-import de.cebitec.vamp.util.SequenceComparison;
 import de.cebitec.vamp.util.StatsContainer;
 import java.io.FileNotFoundException;
 import java.sql.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 import org.h2.jdbc.JdbcSQLException;
 import org.openide.util.Exceptions;
-import org.openide.util.NbBundle;
 
 /**
  * Responsible for the connection between user interface and data base.
@@ -31,39 +24,23 @@ import org.openide.util.NbBundle;
 public class ProjectConnector extends Observable {
 
     private static ProjectConnector dbConnector;
+    private static final int DB_VERSION_NO = 1;
     private Connection con;
     private String url;
     private String user;
     private String password;
     private String adapter;
     private HashMap<Integer, TrackConnector> trackConnectors;
-//    private HashMap<Integer, MultiTrackConnector> multiTrackConnectors;
-    private List<MultiTrackConnector> multiTrackConnectors;
+    private HashMap<Integer, MultiTrackConnector> multiTrackConnectors;
+//    private List<MultiTrackConnector> multiTrackConnectors;
     private HashMap<Integer, ReferenceConnector> refConnectors;
     private static final int BATCH_SIZE = 100000; //TODO: test larger batch sizes
     private final static int FEATURE_BATCH_SIZE = BATCH_SIZE;
-    private final static int COVERAGE_BATCH_SIZE = BATCH_SIZE * 3;
-    private final static int MAPPING_BATCH_SIZE = BATCH_SIZE;
-    private static final int SEQPAIR_BATCH_SIZE = BATCH_SIZE;
-    private static final int SEQPAIR_PIVOT_BATCH_SIZE = BATCH_SIZE + 25000;
-    private final static int DIFF_BATCH_SIZE = BATCH_SIZE;
     private final static String BIGINT_UNSIGNED = "BIGINT UNSIGNED";
     private final static String INT_UNSIGNED = "INT UNSIGNED";
     private static final String VARCHAR400 = "VARCHAR(400)";
     private static final String VARCHAR1000 = "VARCHAR(1000)";
     
-    private static final int BASE_A = 0;
-    private static final int BASE_C = 1;
-    private static final int BASE_G = 2;
-    private static final int BASE_T = 3;
-    private static final int BASE_N = 4;
-    private static final int BASE_GAP = 5;
-    private static final int GAP_A = 6;
-    private static final int GAP_C = 7;
-    private static final int GAP_G = 8;
-    private static final int GAP_T = 9;
-    private static final int GAP_N = 10;
-    private static final int DIFFS = 11;
     private int numReads = 0;
     private int noUniqueSeq = 0;
     private int noRepeatedSeq = 0;
@@ -85,8 +62,8 @@ public class ProjectConnector extends Observable {
      */
     private ProjectConnector() {
         trackConnectors = new HashMap<>();
-//        multiTrackConnectors = new HashMap<Integer, MultiTrackConnector>();
-        multiTrackConnectors = new ArrayList<>();
+        multiTrackConnectors = new HashMap<>();
+//        multiTrackConnectors = new ArrayList<>();
         refConnectors = new HashMap<>();
     }
 
@@ -94,6 +71,7 @@ public class ProjectConnector extends Observable {
      * Clears all track an reference connector lists of this ProjectConnector.
      */
     private void cleanUp() {
+        Iterator<Integer> trackConIt = trackConnectors.keySet().iterator();
         trackConnectors.clear();
         refConnectors.clear();
     }
@@ -210,7 +188,7 @@ public class ProjectConnector extends Observable {
 
     /**
      * Makes sure that an H2 DB is in a correct up-to-date state.
-     * Either creates all tables necessary for a VAMP DB or updates them, if
+     * Either creates all tables necessary for a ReadXplorer DB or updates them, if
      * anything is missing/different. If no changes are necessary nothing is 
      * altered.
      */
@@ -269,6 +247,8 @@ public class ProjectConnector extends Observable {
             
             con.prepareStatement(SQLStatements.SETUP_OBJECTCACHE).executeUpdate();
             con.prepareStatement(H2SQLStatements.INDEX_OBJECTCACHE).executeUpdate();
+            
+            con.prepareStatement(SQLStatements.SETUP_DB_VERSION_TABLE).executeUpdate();
 
             this.checkDBStructure();
 
@@ -283,7 +263,7 @@ public class ProjectConnector extends Observable {
 
     /**
      * Makes sure that a MySql DB is in a correct up-to-date state. Either
-     * creates all tables necessary for a VAMP DB or updates them, if anything
+     * creates all tables necessary for a ReadXplorer DB or updates them, if anything
      * is missing/different. If no changes are necessary nothing is altered.
      */
     private void setupMySQLDatabase() {
@@ -320,7 +300,7 @@ public class ProjectConnector extends Observable {
 
     /**
      * Any additional columns which were added to existing tables in newer 
-     * VAMP versions should be checked by this method to ensure correct database 
+     * ReadXplorer versions should be checked by this method to ensure correct database 
      * structure and avoiding errors when SQL statements request one of these
      * columns, which are not existent in older databases.
      */
@@ -368,7 +348,7 @@ public class ProjectConnector extends Observable {
                     FieldNames.STATISTICS_NUM_SMALL_DIST_PAIRS, BIGINT_UNSIGNED));
         
         this.runSqlStatement(GenericSQLQueries.genAddColumnString(FieldNames.TABLE_STATISTICS,
-                FieldNames.STATISTICS_NUM_UNIQ_SMALL_PAIRS, BIGINT_UNSIGNED));
+                    FieldNames.STATISTICS_NUM_UNIQ_SMALL_PAIRS, BIGINT_UNSIGNED));
         
         this.runSqlStatement(GenericSQLQueries.genAddColumnString(FieldNames.TABLE_STATISTICS, 
                     FieldNames.STATISTICS_NUM_SMALL_ORIENT_WRONG_PAIRS, BIGINT_UNSIGNED));
@@ -424,6 +404,11 @@ public class ProjectConnector extends Observable {
         //Drop old PARENT_ID column
         this.runSqlStatement(GenericSQLQueries.genRemoveColumnString(
                 FieldNames.TABLE_FEATURES, "PARENT_ID"));
+        
+        //Drop unneeded indexes
+        this.runSqlStatement(SQLStatements.DROP_INDEX_INDEXPOS);
+        
+        this.checkDBVersion();
         
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished checking DB structure.");
         
@@ -550,30 +535,6 @@ public class ProjectConnector extends Observable {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done enabling reference data domain indexing");
     }
     
-//    /**
-//     * Stores the project folder location in the database.
-//     * @param projectFolder the path to the project folder associated to this database
-//     */
-//    public boolean storeProjectFolder(String projectFolder) {
-//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing project folder...");
-//        
-//        try (PreparedStatement insertProjectFolder = con.prepareStatement(SQLStatements.INSERT_PROJECT_FOLDER)) {
-//
-//            // store project folder
-//            insertProjectFolder.setString(1, projectFolder);
-//            insertProjectFolder.execute();
-//
-//            con.commit();
-//
-//        } catch (SQLException ex) {
-//            this.rollbackOnError(this.getClass().getName(), ex);
-//            return false;
-//        }
-//
-//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done inserting project folder"); 
-//        return true;        
-//    }
-    
     /**
      * Adds all data belonging to a reference genome to the database.
      * @param reference the reference to store
@@ -698,165 +659,7 @@ public class ProjectConnector extends Observable {
     private void lockReferenceDomainTables() {
         this.lockDomainTables(MySQLStatements.LOCK_TABLE_REFERENCE_DOMAIN, "reference");
     }
-
     
-    private void storeCoverage(ParsedTrack track) {
-        if (!track.isStepwise() | isLastTrack) {
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing coverage information...");
-            try (PreparedStatement insertCoverage = con.prepareStatement(SQLStatements.INSERT_COVERAGE)) {
-                // get the latest used coverage id
-                int id = (int) GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_COVERAGE_ID, con);
-
-                // insert coverage for track
-                int batchCounter = 1;
-                int coveredPerfectPos = 0;
-                int coveredBestMatchPos = 0;
-                int coveredCommonMatchPos = 0;
-                CoverageContainer cov = track.getCoverageContainer();
-                Iterator<Integer> covsIt = cov.getCoveredPositions().iterator();
-                while (covsIt.hasNext()) {
-                    batchCounter++;
-                    int pos = covsIt.next();
-               
-                        insertCoverage.setLong(1, id++);
-                        insertCoverage.setLong(2, track.getID());
-                        insertCoverage.setInt(3, pos);
-                        insertCoverage.setInt(4, cov.getBestMappingForwardCoverage(pos));
-                        insertCoverage.setInt(5, cov.getNumberOfBestMappingsForward(pos));
-                        insertCoverage.setInt(6, cov.getBestMappingReverseCoverage(pos));
-                        insertCoverage.setInt(7, cov.getNumberOfBestMappingsReverse(pos));
-                        insertCoverage.setInt(8, cov.getZeroErrorMappingsForwardCoverage(pos));
-                        insertCoverage.setInt(9, cov.getNumberOfZeroErrorMappingsForward(pos));
-                        insertCoverage.setInt(10, cov.getZeroErrorMappingsReverseCoverage(pos));
-                        insertCoverage.setInt(11, cov.getNumberOfZeroErrorMappingsReverse(pos));
-                        insertCoverage.setInt(12, cov.getNErrorMappingsForwardCoverage(pos));
-                        insertCoverage.setInt(13, cov.getNumberOfNErrorMappingsForward(pos));
-                        insertCoverage.setInt(14, cov.getNErrorMappingsReverseCoverage(pos));
-                        insertCoverage.setInt(15, cov.getNumberOfNErrorMappingsReverse(pos));
-                        insertCoverage.addBatch();
-                        if (batchCounter == COVERAGE_BATCH_SIZE) {
-                            batchCounter = 0;
-                            insertCoverage.executeBatch();
-                        }
-                        if (cov.getNErrorMappingsForwardCoverage(pos) > 0) {
-                            ++coveredCommonMatchPos;
-                            if (cov.getBestMappingForwardCoverage(pos) > 0) {
-                                ++coveredBestMatchPos;
-                                if (cov.getZeroErrorMappingsForwardCoverage(pos) > 0) {
-                                    ++coveredPerfectPos;
-                                }
-                            }
-                        }
-                        if (cov.getNErrorMappingsReverseCoverage(pos) > 0) {
-                            ++coveredCommonMatchPos;
-                            if (cov.getBestMappingReverseCoverage(pos) > 0) {
-                                ++coveredBestMatchPos;
-                                if (cov.getZeroErrorMappingsReverseCoverage(pos) > 0) {
-                                    ++coveredPerfectPos;
-                                }
-                            }
-                        }
-                }
-                insertCoverage.executeBatch();
-                
-                //here we get the calculations for free, so we store it in this step
-                cov.setCoveredPerfectPositions(coveredPerfectPos);
-                cov.setCoveredBestMatchPositions(coveredBestMatchPos);
-                cov.setCoveredCommonMatchPositions(coveredCommonMatchPos);
-                
-            } catch (SQLException ex) {
-                this.rollbackOnError(this.getClass().getName(), ex);
-            }
-            
-            // notify observers about the change of the database
-            this.notifyObserversAbout("storeCoverage");
-            
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing coverage information");
-        }
-    }
-
-    /**
-     * Adds all track data to the database which should be stored. Only used 
-     * for database import.
-     * @param track track to add
-     * @param seqPairs true, if this is a sequence pair track, false otherwise
-     * @param onlyPosTable true, if only the position table is to be stored,
-     * false in the ordinary "import track" scenario
-     * @return the track id used in the database
-     * @throws StorageException
-     */
-    public int addTrack(ParsedTrack track, boolean seqPairs, boolean onlyPosTable) throws StorageException {
-
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Preparing statements for storing track data");
-
-        if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
-            this.lockTrackDomainTables();
-            this.disableTrackDomainIndices();
-        }
-        isLastTrack = track.getParsedMappingContainer().isLastMappingContainer();
-        if (!onlyPosTable) {
-            this.storeTrack(track);
-            if (track.isDbUsed()) {
-                this.storeCoverage(track);
-                this.storeMappings(track);
-                this.storeDiffs(track);
-            }
-            this.storeTrackStatistics(track); //needs to be called after storeCoverage
-        }
-        this.storePositionTable(track);
-
-        if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
-            this.enableTrackDomainIndices();
-            this.enableReferenceIndices();
-            this.enableSeqPairDomainIndices();
-            this.unlockTables();
-        }
-
-        if (!seqPairs && isLastTrack) {
-            track.clear();
-        }
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Track \"{0}\" has been stored successfully", track.getDescription());
-
-        // notify observers about the change of the database
-        this.notifyObserversAbout("addTrack");
-
-        //ensure, that there is no cache for this track
-        ObjectCache.getInstance().deleteFamily("loadCoverage." + track.getID());
-        ObjectCache.getInstance().delete(ObjectCache.getTrackCacherFieldFamily(), "Track." + track.getID());
-
-        return track.getID();
-    }
-
-    /**
-     * Method explicitly storing a track in the database. This means all basic
-     * information of a track, which is stored in the track table of the db.
-     * @param track the track whose data is to be stored
-     */
-    private void storeTrack(ParsedTrack track) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing track data...");
-        if (track.isFirstTrack() || !track.isStepwise()) {
-            try (PreparedStatement insertTrack = con.prepareStatement(SQLStatements.INSERT_TRACK)) {
-                insertTrack.setLong(1, track.getID());
-                insertTrack.setLong(2, track.getRefId());
-                insertTrack.setString(3, track.getDescription());
-                insertTrack.setTimestamp(4, track.getTimestamp());
-                if (!track.isDbUsed()) {
-                    insertTrack.setString(5, track.getFile().getAbsolutePath());
-                } else {
-                    insertTrack.setString(5, "");
-                }
-                insertTrack.execute();
-            } catch (SQLException ex) {
-                this.rollbackOnError(this.getClass().getName(), ex);
-            }
-        }
-
-        // notify observers about the change of the database
-        this.notifyObserversAbout("storeTrack");
-
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing track data");
-    }
-
     /**
      * Adds a track to the database with its file path. This means, it is stored
      * as a track for direct file access and adds the persistant track id to the 
@@ -877,6 +680,9 @@ public class ProjectConnector extends Observable {
         } catch (SQLException ex) {
             this.rollbackOnError(this.getClass().getName(), ex);
         }
+
+        // notify observers about the change of the database
+        this.notifyObserversAbout("storeTrack");
         
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing direct access track data");        
     }
@@ -910,8 +716,8 @@ public class ProjectConnector extends Observable {
 
         try {
             if (!track.isStepwise() || this.isLastTrack) {
-            // get latest id for track
-            long id = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_STATISTICS_ID, con);
+            // get latest id for statistic
+            long latestID = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_STATISTICS_ID, con);
 
                 CoverageContainer cov = track.getCoverageContainer();
                 if (cov.getCoveredPerfectPositions() > 0) {
@@ -938,7 +744,7 @@ public class ProjectConnector extends Observable {
                 //calculate average read length
                 int averageReadLength = this.containerCount > 0 ? this.averageReadLengthPart / this.containerCount : 0;
                 try (PreparedStatement insertStatistics = con.prepareStatement(SQLStatements.INSERT_STATISTICS)) {
-                    insertStatistics.setLong(1, id);
+                    insertStatistics.setLong(1, latestID);
                     insertStatistics.setLong(2, trackID);
                     insertStatistics.setInt(3, this.numMappings);
                     insertStatistics.setInt(4, this.numPerfectMappings);
@@ -1005,169 +811,6 @@ public class ProjectConnector extends Observable {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
         }
     }
-
-    /**
-     * Stores all mappings for a track in the db.
-     * @param track the track whose diffs shall be stored
-     */
-    private void storeMappings(ParsedTrack track) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing mapping data...");
-        try (PreparedStatement insertMapping = con.prepareStatement(SQLStatements.INSERT_MAPPING)) {
-            
-            long mappingID = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_MAPPING_ID, con);
-            //TODO: test cache or increase cache temporarily to improve performance: 
-            //SELECT * FROM INFORMATION_SCHEMA.SETTINGS WHERE NAME = 'info.CACHE_MAX_SIZE'
-            //jdbc:h2:~/test;CACHE_SIZE=65536;
-            
-            // start storing the mappings
-            int batchCounter = 1;
-            //sequence ids can be the same in different tracks, track id has to be checked then
-            Iterator<Integer> sequenceIDIterator = track.getParsedMappingContainer().getMappedSequenceIDs().iterator();
-            while (sequenceIDIterator.hasNext()) { //sequence ids aller unterschiedlichen readsequenzen = unique reads
-                int sequenceID = sequenceIDIterator.next();
-                List<ParsedMapping> c = track.getParsedMappingContainer().getParsedMappingGroupBySeqID(sequenceID).getMappings();
-                Iterator<ParsedMapping> mappingsIt = c.iterator(); //eine mapping group, alle gleiche seq id, untersch. pos
-                while (mappingsIt.hasNext()) {
-                    ParsedMapping m = mappingsIt.next(); //einzelnes mapping
-                    m.setID(mappingID); //from now on id is set and can be used for sequence pairs for example!
-
-                    insertMapping.setLong(1, mappingID); //einzigartig
-                    insertMapping.setInt(2, m.getStart()); //einzigartig im zusammenhang
-                    insertMapping.setInt(3, m.getStop()); //einzigartig im zusammenhang
-                    insertMapping.setInt(4, (m.isBestMapping() ? 1 : 0));
-                    insertMapping.setInt(5, m.getNumReplicates()); //count der gleichen seq (seq id) in reads
-                    insertMapping.setByte(6, m.getDirection());
-                    insertMapping.setInt(7, m.getErrors());
-                    insertMapping.setInt(8, sequenceID); // mappings der gleichen seq an anderer stelle enthalten sie auch +
-                    insertMapping.setLong(9, track.getID()); //gleichen count
-
-                    insertMapping.addBatch();
-
-                    if (batchCounter == MAPPING_BATCH_SIZE) {
-                        insertMapping.executeBatch();
-                        batchCounter = 0;
-                    }
-
-                    mappingID++;
-                    batchCounter++;
-                }
-            }
-            insertMapping.executeBatch();
-
-        } catch (SQLException ex) {
-            this.rollbackOnError(this.getClass().getName(), ex);
-        }
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing mapping data");
-    }
-
-    /**
-     * Stores all diffs for a track in the db.
-     * @param track the track whose diffs shall be stored
-     */
-    private void storeDiffs(ParsedTrack track) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start inserting diff data...");
-
-        try (PreparedStatement insertDiff = con.prepareStatement(SQLStatements.INSERT_DIFF);
-             PreparedStatement insertGap = con.prepareStatement(SQLStatements.INSERT_GAP)) {
-            
-            long diffID = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_DIFF_ID, con);
-            
-            // byte flags for diffs
-            byte gap = 0;
-            byte diff = 1;
-
-            // insert data
-            int batchCounter = 0;
-            Iterator<Integer> sequenceIDIterator = track.getParsedMappingContainer().getMappedSequenceIDs().iterator();
-            while (sequenceIDIterator.hasNext()) {
-                int sequenceID = sequenceIDIterator.next();
-                List<ParsedMapping> c = track.getParsedMappingContainer().getParsedMappingGroupBySeqID(sequenceID).getMappings();
-                Iterator<ParsedMapping> mappingsIt = c.iterator();
-
-                // iterate mappings
-                while (mappingsIt.hasNext()) {
-                    ParsedMapping m = mappingsIt.next();
-
-                    // iterate diffs (non-gap variation)
-                    Iterator<ParsedDiff> diffsIt = m.getDiffs().iterator();
-                    while (diffsIt.hasNext()) {
-
-                        batchCounter++;
-
-                        ParsedDiff d = diffsIt.next();
-                        insertDiff.setLong(1, diffID++);
-                        insertDiff.setLong(2, m.getID());
-                        insertDiff.setString(3, Character.toString(d.getBase()));
-                        insertDiff.setLong(4, d.getPosition());
-                        insertDiff.setByte(5, diff);
-
-                        insertDiff.addBatch();
-
-                        if (batchCounter == DIFF_BATCH_SIZE) {
-                            insertDiff.executeBatch();
-                            batchCounter = 0;
-                        }
-                    }
-
-                    // iterate gaps
-                    Iterator<ParsedReferenceGap> gapIt = m.getGenomeGaps().iterator();
-                    while (gapIt.hasNext()) {
-                        batchCounter++;
-
-                        ParsedReferenceGap g = gapIt.next();
-                        insertGap.setLong(1, diffID++);
-                        insertGap.setLong(2, m.getID());
-                        insertGap.setString(3, Character.toString(g.getBase()));
-                        insertGap.setLong(4, g.getAbsPos());
-                        insertGap.setByte(5, gap);
-                        insertGap.setInt(6, g.getOrder());
-
-                        insertGap.addBatch();
-
-                        if (batchCounter == DIFF_BATCH_SIZE) {
-                            insertGap.executeBatch();
-                            batchCounter = 0;
-                        }
-                    }
-                }
-            }
-
-            insertDiff.executeBatch();
-            insertGap.executeBatch();
-            
-        } catch (SQLException ex) {
-            this.rollbackOnError(this.getClass().getName(), ex);
-        }
-
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done inserting diff data");
-    }
-
-    /**
-     * Adds the sequence pair data and statistics to the database.
-     * @param seqPairData sequence pair data container holding the data to store
-     */
-    public void addSeqPairData(ParsedSeqPairContainer seqPairData) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Preparing statements for storing sequence pair data for track data");
-
-        if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
-            this.lockSeqPairDomainTables();
-            this.disableSeqPairDomainIndices();
-            this.disableTrackDomainIndices();
-        }
-
-        this.storeSeqPairTrackStatistics(seqPairData.getStatsContainer(), seqPairData.getTrackId1());
-        this.storeSeqPairTrackStatistics(seqPairData.getStatsContainer(), seqPairData.getTrackId2());
-        this.storeSeqPairData(seqPairData);
-
-        if (adapter.equalsIgnoreCase(Properties.ADAPTER_MYSQL)) {
-            this.enableSeqPairDomainIndices();
-            this.unlockTables();
-        }
-
-        seqPairData.clear();
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Sequence pair data for tracks \"{0}\" has been stored successfully");
-
-    }
     
     /**
      * Stores sequence pair statistics
@@ -1196,7 +839,7 @@ public class ProjectConnector extends Observable {
             long numLargeOrientUniqPairs = statsMap.get(StatsContainer.NO_UNIQ_WRNG_ORIENT_LARGE_PAIRS);
             long numSingleMappings = statsMap.get(StatsContainer.NO_SINGLE_MAPPIGNS);
 
-            try (PreparedStatement addStatistics = con.prepareStatement(SQLStatements.ADD_SEQPAIR_STATISTICS)) {
+            try (PreparedStatement addStatistics = con.prepareStatement(SQLStatements.INSERT_SEQPAIR_STATISTICS)) {
 
                 // store track stats in table
                 addStatistics.setLong(1, numSeqPairs);
@@ -1230,109 +873,6 @@ public class ProjectConnector extends Observable {
     }
 
     /**
-     * Helper method for storing the sequence pair data to the database.
-     * @param seqPairData sequence pair data container holding the data to store
-     */
-    private void storeSeqPairData(ParsedSeqPairContainer seqPairData) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing sequence pair data...");
-
-        try (PreparedStatement insertSeqPair = con.prepareStatement(SQLStatements.INSERT_SEQ_PAIR);
-                PreparedStatement insertReplicate = con.prepareStatement(SQLStatements.INSERT_SEQ_PAIR_REPLICATE);
-                PreparedStatement insertSeqPairPivot = con.prepareStatement(SQLStatements.INSERT_SEQ_PAIR_PIVOT)) {
-
-            long id = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_SEQUENCE_PAIR_ID, con);
-            long seqPairId = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_SEQUENCE_PAIR_PAIR_ID, con);
-            long interimPairId;
-
-            // start storing the sequence pair data
-            int batchCounter = 1;
-            int replicateCounter = 1;
-            HashMap<Long, Integer> replicateMap = new HashMap<>();
-            HashMap<Pair<Long, Long>, ParsedSeqPairMapping> seqPairMap = seqPairData.getParsedSeqPairs();
-            Iterator<Pair<Long, Long>> seqPairIterator = seqPairMap.keySet().iterator();
-            while (seqPairIterator.hasNext()) {
-                ParsedSeqPairMapping seqPair = seqPairMap.get(seqPairIterator.next());
-                interimPairId = seqPair.getSequencePairID();
-                seqPair.setSequencePairID(interimPairId + seqPairId);
-                //if seq pairs are needed later on we have to set:
-                //seqPair.setID(id);
-
-                insertSeqPair.setLong(1, id++); //table index, unique for pos of seq pair
-                insertSeqPair.setLong(2, seqPair.getSequencePairID()); //same for all positions of this sequence pair
-                insertSeqPair.setLong(3, seqPair.getMappingId1()); //id of fst mapping
-                insertSeqPair.setLong(4, seqPair.getMappingId2()); // id of scnd mapping
-                insertSeqPair.setByte(5, seqPair.getType()); //type of the sequence pair
-
-                insertSeqPair.addBatch();
-
-                if (batchCounter == SEQPAIR_BATCH_SIZE) {
-                    insertSeqPair.executeBatch();
-                    batchCounter = 0;
-                }
-                batchCounter++;
-
-                //insert replicates in map
-                if (seqPair.getReplicates() > 1
-                        && !replicateMap.containsKey(seqPair.getSequencePairID())) {
-                    replicateMap.put(seqPair.getSequencePairID(), seqPair.getReplicates());
-                }
-
-            }
-
-            //store replicates in db
-            Iterator<Long> idIter = replicateMap.keySet().iterator();
-            while (idIter.hasNext()) {
-                seqPairId = idIter.next();
-
-                insertReplicate.setLong(1, seqPairId);
-                insertReplicate.setLong(2, replicateMap.get(seqPairId));
-                insertReplicate.addBatch();
-
-                if (replicateCounter++ == SEQPAIR_BATCH_SIZE) {
-                    insertReplicate.executeBatch();
-                    replicateCounter = 0;
-                }
-            }
-
-            insertSeqPair.executeBatch();
-            insertReplicate.executeBatch();
-
-
-            //storing mapping to pair id data
-            batchCounter = 1;
-            long correctSeqPairId;
-            List<Pair<Long, Long>> mappingToPairIdList = seqPairData.getMappingToPairIdList();
-            Iterator<Pair<Long, Long>> mappingToPairIdIterator = mappingToPairIdList.iterator();
-
-            while (mappingToPairIdIterator.hasNext()) {
-                Pair<Long, Long> pair = mappingToPairIdIterator.next();
-                interimPairId = pair.getSecond();
-                correctSeqPairId = interimPairId + seqPairId;
-
-                insertSeqPairPivot.setLong(1, pair.getFirst()); //mapping id
-                insertSeqPairPivot.setLong(2, correctSeqPairId); //sequence pair id
-
-                insertSeqPairPivot.addBatch();
-
-                if (batchCounter == SEQPAIR_PIVOT_BATCH_SIZE) {
-                    insertSeqPairPivot.executeBatch();
-                    batchCounter = 0;
-                }
-                batchCounter++;
-            }
-            insertSeqPairPivot.executeBatch();
-
-        } catch (SQLException ex) {
-            this.rollbackOnError(this.getClass().getName(), ex);
-        }
-
-        // notify observers about the change of the database
-        this.notifyObserversAbout("storeSeqPairData");
-
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done storing sequence pair data");
-    }
-
-    /**
      * Sets the sequence pair id for both tracks belonging to one sequence pair.
      *
      * @param track1Id track id of first track of the pair
@@ -1341,16 +881,9 @@ public class ProjectConnector extends Observable {
     public void setSeqPairIdsForTrackIds(long track1Id, long track2Id) {
 
         try {
-            Integer seqPairId = 1; //not 0, because 0 is the value when a track is not a sequence pair track!
-            PreparedStatement getLatestSeqPairId = con.prepareStatement(SQLStatements.GET_LATEST_TRACK_SEQUENCE_PAIR_ID);
+            //not 0, because 0 is the value when a track is not a sequence pair track!
+            int seqPairId = (int) GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_TRACK_SEQUENCE_PAIR_ID, con);
 
-            ResultSet rs = getLatestSeqPairId.executeQuery();
-            if (rs.next()) {
-                seqPairId = rs.getInt("LATEST_ID");
-                if (seqPairId == null || seqPairId == 0) {
-                    seqPairId = 1;
-                }
-            }
             try (PreparedStatement setSeqPairIds = con.prepareStatement(SQLStatements.INSERT_TRACK_SEQ_PAIR_ID)) {
                 setSeqPairIds.setInt(1, seqPairId);
                 setSeqPairIds.setLong(2, track1Id);
@@ -1494,31 +1027,24 @@ public class ProjectConnector extends Observable {
     }
     
 
-    public MultiTrackConnector getMultiTrackConnector(PersistantTrack track) {
+    public MultiTrackConnector getMultiTrackConnector(PersistantTrack track) throws FileNotFoundException {
         // only return new object, if no suitable connector was created before
-//        int trackID = track.getId();
-//        if (!multiTrackConnectors.containsKey(trackID)) { //old solution, which does not work anymore
-//            multiTrackConnectors.put(trackID, new MultiTrackConnector(track, adapter));
-//        }
-//        return multiTrackConnectors.get(trackID);
-        MultiTrackConnector mtc = null;
-        try {
-            mtc = new MultiTrackConnector(track, adapter);
-        } catch (FileNotFoundException ex) {
-            Exceptions.printStackTrace(ex);
+        int trackID = track.getId();
+        if (!multiTrackConnectors.containsKey(trackID)) { //old solution, which does not work anymore
+            multiTrackConnectors.put(trackID, new MultiTrackConnector(track, adapter));
         }
-        return mtc;
+        return multiTrackConnectors.get(trackID);
     }
     
     
-    public MultiTrackConnector getMultiTrackConnector(List<PersistantTrack> tracks) {
+    public MultiTrackConnector getMultiTrackConnector(List<PersistantTrack> tracks) throws FileNotFoundException {
         // makes sure the track id is not already used
         int id = 9999;
         for (PersistantTrack track : tracks) {
             id += track.getId();
         }
         // only return new object, if no suitable connector was created before
-//        multiTrackConnectors.put(id, new MultiTrackConnector(tracks, adapter));
+        multiTrackConnectors.put(id, new MultiTrackConnector(tracks, adapter));
         return multiTrackConnectors.get(id);
     }
     
@@ -1532,22 +1058,14 @@ public class ProjectConnector extends Observable {
         }
     }
     
-//    /**
-//     * Removes the multi track connector for the given trackId.
-//     * @param trackId track id of the multi track connector to remove
-//     */
-//    public void removeMultiTrackConnector(int trackId){
-//        if (multiTrackConnectors.containsKey(trackId)){
-//            multiTrackConnectors.remove(trackId);
-//        }
-//    }
-    
     /**
      * Removes the multi track connector for the given trackId.
-     * @param trackCon track connector of the multi track connector to remove
+     * @param trackId track id of the multi track connector to remove
      */
-    public void removeMultiTrackConnector(MultiTrackConnector trackCon) {
-        multiTrackConnectors.remove(trackCon);
+    public void removeMultiTrackConnector(int trackId) {
+        if (multiTrackConnectors.containsKey(trackId)) {
+            multiTrackConnectors.remove(trackId);
+        }
     }
 
     /**
@@ -1570,6 +1088,30 @@ public class ProjectConnector extends Observable {
     public Connection getConnection() {
         return con;
     }
+    
+//    /**
+//     * Stores the project folder location in the database.
+//     * @param projectFolder the path to the project folder associated to this database
+//     */
+//    public boolean storeProjectFolder(String projectFolder) {
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing project folder...");
+//        
+//        try (PreparedStatement insertProjectFolder = con.prepareStatement(SQLStatements.INSERT_PROJECT_FOLDER)) {
+//
+//            // store project folder
+//            insertProjectFolder.setString(1, projectFolder);
+//            insertProjectFolder.execute();
+//
+//            con.commit();
+//
+//        } catch (SQLException ex) {
+//            this.rollbackOnError(this.getClass().getName(), ex);
+//            return false;
+//        }
+//
+//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done inserting project folder"); 
+//        return true;        
+//    }
     
 //    /**
 //     * Fetches the project folder associated to this project. Not every project
@@ -1835,347 +1377,6 @@ public class ProjectConnector extends Observable {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished deletion of reference genome with id \"{0}\"", refGenID);
     }
 
-    //TODO: delete seqpairs
-                
-    /**
-     * Since Coverage container only stores the data, here we have to calculate which base is the
-     * one with the most occurrences at a certain position. Afterwards the positions
-     * are stored in the db, if they are not larger than the batchStop position 
-     * of the given track (This prevents storing positions twice). 
-     * @param track 
-     */
-    public void storePositionTable(ParsedTrack track) {
-
-        if (!track.isStepwise() || isLastTrack) {
-
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start inserting snp data...");
-            try (PreparedStatement insertPosition = con.prepareStatement(SQLStatements.INSERT_POSITION)) {
-                // get latest snpID used
-                long snpID = GenericSQLQueries.getLatestIDFromDB(SQLStatements.GET_LATEST_SNP_ID, con);
-                //get reference sequence
-                String refSeq = this.getRefGenomeConnector(track.getRefId()).getRefGenome().getSequence();
-
-                int batchCounter = 0;
-                int counterUncoveredDiffs = 0;
-                int counterUncoveredGaps = 0;
-
-                // go through positionTable
-                CoverageContainer coverageContainer = track.getCoverageContainer();
-                HashMap<String, Integer[]> positionTable = coverageContainer.getPositionTable();
-                Iterator<String> positionIterator = positionTable.keySet().iterator();
-
-                //all parameters needed in while loop (efficiency)
-                String posString;
-                Integer[] coverageValues;
-                int maxCount;
-                int typeInt;
-                int position;
-                double cov;
-                double coverage;
-                double forwCov;
-                double revCov;
-                double frequency;
-                char type;
-                char base;
-                String refBase;
-                int baseInt;
-                
-                double forwCov1;
-                double revCov1;
-                double forwCov2;
-                double revCov2;
-                String absPosition;
-                
-                int errorCount = 0;
-                int maxErrorCount = 20;
-                
-                while (positionIterator.hasNext()) {
-
-                    posString = positionIterator.next();
-                    coverageValues = positionTable.get(posString);
-
-                    // i=0..5 is ACGTN_GAP (DIFFS) ...
-                    maxCount = 0;
-                    typeInt = 0;
-                    for (int i = 0; i <= BASE_GAP; i++) {
-                        if (maxCount < coverageValues[i]) {
-                            maxCount = coverageValues[i];
-                            typeInt = i;
-                        }
-                    }
-                    
-                    if (maxCount != 0) {
-
-                        position = PositionUtils.convertPosition(posString);
-                        // get coverage
-                        if (position <= track.getBatchPos() && coverageContainer.positionCovered(position)) {
-                            forwCov = coverageContainer.getBestMappingForwardCoverage(position);
-                            revCov = coverageContainer.getBestMappingReverseCoverage(position);
-                            cov = forwCov + revCov;
-                            cov = cov == 0 ? 1 : cov;
-
-                            // get consensus base
-                            refBase = String.valueOf(refSeq.charAt(position - 1)).toUpperCase();
-                            baseInt = this.getBaseInt(refBase);
-                            coverageValues[baseInt] = (int) cov - coverageValues[DIFFS];
-                            coverageValues[baseInt] = coverageValues[baseInt] < 0 ? 0 : coverageValues[baseInt]; //check if negative
-                            if (maxCount < coverageValues[baseInt]) {
-                                type = SequenceComparison.MATCH.getType();
-                                base = refBase.charAt(0);
-                                frequency = coverageValues[baseInt] / cov * 100;
-                            } else {
-                                type = this.getType(typeInt);
-                                base = this.getBase(typeInt);
-                                frequency = coverageValues[DIFFS] / cov * 100;
-                            }
-                            if (!refBase.equals("N")) {
-                                frequency = frequency > 100 ? 100 : frequency; //Todo: correct freq calculation
-
-                                insertPosition.setLong(1, snpID);
-                                insertPosition.setLong(2, track.getID());
-                                insertPosition.setString(3, posString);
-                                insertPosition.setString(4, String.valueOf(base));
-                                insertPosition.setString(5, String.valueOf(refBase));
-                                insertPosition.setInt(6, coverageValues[BASE_A]);
-                                insertPosition.setInt(7, coverageValues[BASE_C]);
-                                insertPosition.setInt(8, coverageValues[BASE_G]);
-                                insertPosition.setInt(9, coverageValues[BASE_T]);
-                                insertPosition.setInt(10, coverageValues[BASE_N]);
-                                insertPosition.setInt(11, coverageValues[BASE_GAP]);
-                                insertPosition.setInt(12, (int) cov);
-                                insertPosition.setInt(13, (int) frequency);
-                                insertPosition.setString(14, String.valueOf(type));
-
-                                insertPosition.addBatch();
-
-                                // save SnpID for position for insert in diff table
-                                //tmpSnpID.put(position, snpID);
-
-                                batchCounter++;
-                                snpID++;
-                            }
-                        } else {
-                            //skip error messages, if too many occur to prevent bug in the output panel
-                            errorCount++;
-                            if (errorCount<=maxErrorCount) {
-                                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found " + ++counterUncoveredDiffs + " uncovered position in diffs {0}", position);
-                            }    
-                        }
-                    }
-                    if (errorCount>maxErrorCount) {
-                        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "... "+(errorCount-maxErrorCount)+" more errors occured");
-                    }
-
-                    // ... i=6..10 is ACGTN (GAP); i=11 #diffs
-                    maxCount = 0;
-                    typeInt = 0;
-                    for (int i = GAP_A; i <= GAP_N; i++) {
-                        if (maxCount < coverageValues[i]) {
-                            maxCount = coverageValues[i];
-                            typeInt = i;
-                        }
-                    }
-
-                    if (maxCount != 0) {
-
-                        absPosition = posString.substring(0, posString.length() - 2);
-                        position = Integer.parseInt(absPosition);
-                        
-                        if (position <= track.getBatchPos())  {
-
-                            // get coverage from adjacent positions
-                            forwCov1 = 0;
-                            revCov1 = 0;
-                            forwCov2 = 0;
-                            revCov2 = 0;
-                            if (coverageContainer.positionCovered(position)) {
-                                forwCov1 = coverageContainer.getBestMappingForwardCoverage(position);
-                                revCov1 = coverageContainer.getBestMappingReverseCoverage(position);
-                            } else {
-                                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found " + ++counterUncoveredGaps + " uncovered position in gaps: {0}", position);
-                            }
-
-                            if (coverageContainer.positionCovered(position + 1)) {
-                                forwCov2 = coverageContainer.getBestMappingForwardCoverage(position + 1);
-                                revCov2 = coverageContainer.getBestMappingReverseCoverage(position + 1);
-                            }
-
-                            forwCov = (forwCov1 + forwCov2) / 2;
-                            revCov = (revCov1 + revCov2) / 2;
-                            cov = forwCov + revCov;
-                            coverage = forwCov1 + revCov1;
-                            coverage = coverage == 0 ? 1 : coverage;
-
-                            frequency = coverageValues[DIFFS] / coverage * 100;
-                            frequency = frequency > 100 ? 100 : frequency; //Todo: correct freq calculation
-
-                            insertPosition.setLong(1, snpID);
-                            insertPosition.setLong(2, track.getID());
-                            insertPosition.setString(3, posString);
-                            insertPosition.setString(4, String.valueOf(getBase(typeInt)));
-                            insertPosition.setString(5, String.valueOf('_'));
-                            insertPosition.setInt(6, coverageValues[GAP_A]);
-                            insertPosition.setInt(7, coverageValues[GAP_C]);
-                            insertPosition.setInt(8, coverageValues[GAP_G]);
-                            insertPosition.setInt(9, coverageValues[GAP_T]);
-                            insertPosition.setInt(10, coverageValues[GAP_N]);
-                            insertPosition.setInt(11, 0);
-                            insertPosition.setInt(12, (int) cov);
-                            insertPosition.setInt(13, (int) frequency);
-                            insertPosition.setString(14, String.valueOf(SequenceComparison.INSERTION.getType()));
-
-                            insertPosition.addBatch();
-
-                            batchCounter++;
-                            snpID++;
-                        }
-                    }
-
-
-                    if (batchCounter == DIFF_BATCH_SIZE) {
-                        insertPosition.executeBatch();
-                        batchCounter = 0;
-                    }
-
-                }
-
-                insertPosition.executeBatch();
-                insertPosition.close();
-                
-                if (adapter.equalsIgnoreCase("mysql")) {
-                    this.unlockTables();
-                }
-
-            } catch (SQLException ex) {
-                this.rollbackOnError(this.getClass().getName(), ex);
-            }
-            
-            // notify observers about the change of the database
-            this.notifyObserversAbout("storeSeqPairData");
-
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done inserting snp data");
-        }
-    }
-
-    /**
-     * @param typeInt value between 0 and 4
-     * @return the type of a sequence deviation (only subs and del) as character
-     */
-    private char getType(int typeInt) {
-
-        char type = ' ';
-
-        if (typeInt >= 0 && typeInt < 5) {
-            type = SequenceComparison.SUBSTITUTION.getType();
-        } else if (typeInt == 5) {
-            type = SequenceComparison.DELETION.getType();
-        } else {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown diff type");
-        }
-
-        return type;
-
-    }
-
-    private char getBase(int index) {
-
-        char base = ' ';
-
-        if (index == BASE_A || index == GAP_A) {
-            base = 'A';
-        } else if (index == BASE_C || index == GAP_C) {
-            base = 'C';
-        } else if (index == BASE_G || index == GAP_G) {
-            base = 'G';
-        } else if (index == BASE_T || index == GAP_T) {
-            base = 'T';
-        } else if (index == BASE_N || index == GAP_N) {
-            base = 'N';
-        } else if (index == BASE_GAP) {
-            base = '_';
-        } else {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "found unknown snp type");
-        }
-
-        return base;
-
-    }
-
-    /**
-     * @param base the base whose integer value is needed
-     * @return the integer value for the given base type
-     */
-    private int getBaseInt(String base) {
-
-        int baseInt = 0;
-        switch (base.toUpperCase()) {
-            case "A": baseInt = BASE_A; break;
-            case "C": baseInt = BASE_C; break;
-            case "G": baseInt = BASE_G; break;
-            case "T": baseInt = BASE_T; break;
-            case "N": baseInt = BASE_N; break;
-            case "_": baseInt = BASE_GAP; break;
-        }
-
-        return baseInt;
-
-    }
-
-    /**
-     * Identifies SNPs with given criteria in all opened trackConnectors.
-     * @param percentageThreshold minimum percentage of deviation from the reference base
-     * @param absThreshold minimum number of total deviating bases from the reference base
-     * @param trackIds the list of track ids for which the snp detection should be carried out
-     * @return list of snps found in the opened tracks for the given criteria
-     */
-    public List<SnpI> findSNPs(int percentageThreshold, int absThreshold, List<Integer> trackIds) {
-        List<SnpI> snps = new ArrayList<>();
-        if (trackIds.isEmpty()){
-            String msg = NbBundle.getMessage(ProjectConnector.class, "ProjectConnector.NoTracksMsg", 
-                        "When no track are opened/chosen, no result can be returned!");
-            String header = NbBundle.getMessage(ProjectConnector.class, "ProjectConnector.NoTracksHeader", 
-                        "Missing Information");
-            JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), msg, header, JOptionPane.ERROR_MESSAGE);
-            return snps;
-        }
-        // currently opened tracks
-        try {
-            PreparedStatement fetchSNP = con.prepareStatement(SQLStatements.FETCH_SNPS);
-//            fetchSNP.setInt(1, trackIds.get(0));
-            fetchSNP.setInt(1, percentageThreshold);
-            fetchSNP.setInt(2, absThreshold);
-            fetchSNP.setInt(3, absThreshold);
-            fetchSNP.setInt(4, absThreshold);
-            fetchSNP.setInt(5, absThreshold);
-            fetchSNP.setInt(6, absThreshold);
-            
-            ResultSet rs = fetchSNP.executeQuery();
-            while (rs.next()) {
-                String position = rs.getString(FieldNames.POSITIONS_POSITION);
-                int trackId = rs.getInt(FieldNames.POSITIONS_TRACK_ID);
-                char base = rs.getString(FieldNames.POSITIONS_BASE).charAt(0);
-                char refBase = rs.getString(FieldNames.POSITIONS_REFERENCE_BASE).charAt(0);
-                int aRate = rs.getInt(FieldNames.POSITIONS_A);
-                int cRate = rs.getInt(FieldNames.POSITIONS_C);
-                int gRate = rs.getInt(FieldNames.POSITIONS_G);
-                int tRate = rs.getInt(FieldNames.POSITIONS_T);
-                int nRate = rs.getInt(FieldNames.POSITIONS_N);
-                int gapRate = rs.getInt(FieldNames.POSITIONS_GAP);
-                int coverage = rs.getInt(FieldNames.POSITIONS_COVERAGE);
-                int frequency = rs.getInt(FieldNames.POSITIONS_FREQUENCY);
-                SequenceComparison type = SequenceComparison.getSequenceComparison(rs.getString(FieldNames.POSITIONS_TYPE).charAt(0));
-                if (trackIds.contains(trackId)) {
-                    snps.add(new Snp(position, trackId, base, refBase, aRate, cRate, gRate,
-                            tRate, nRate, gapRate, coverage, frequency, type));
-                }
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        return snps;
-    }
-    
     /**
      * @return The database adapter string for this project
      */
@@ -2185,8 +1386,9 @@ public class ProjectConnector extends Observable {
 
     /**
      * Resets the file path of a direct access track.
+     *
      * @param track track whose file path has to be resetted.
-     * @throws StorageException 
+     * @throws StorageException
      */
     public void resetTrackPath(PersistantTrack track) throws StorageException {
 
@@ -2196,11 +1398,11 @@ public class ProjectConnector extends Observable {
             this.lockTrackDomainTables();
             this.disableTrackDomainIndices();
         }
-        
-        try (PreparedStatement resetTrackPath = con.prepareStatement(SQLStatements.RESET_TRACK)) {
-                resetTrackPath.setString(1, track.getFilePath());
-                resetTrackPath.setLong(2, track.getId());
-                resetTrackPath.execute();
+
+        try (PreparedStatement resetTrackPath = con.prepareStatement(SQLStatements.RESET_TRACK_PATH)) {
+            resetTrackPath.setString(1, track.getFilePath());
+            resetTrackPath.setLong(2, track.getId());
+            resetTrackPath.execute();
         } catch (SQLException ex) {
             this.rollbackOnError(this.getClass().getName(), ex);
         }
@@ -2209,7 +1411,7 @@ public class ProjectConnector extends Observable {
             this.enableTrackDomainIndices();
             this.unlockTables();
         }
-        
+
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Track \"{0}\" has been updated successfully", track.getDescription());
     }
 
@@ -2217,5 +1419,53 @@ public class ProjectConnector extends Observable {
         this.setChanged();
         this.notifyObservers(message);
     }
-    
+
+    /**
+     * Checks the DB version and executes appropriate handling according to the
+     * given version number. If an update was performed, the current DB version
+     * number will be set after a successful update.
+     */
+    private void checkDBVersion() {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Checking DB version...");
+        
+        try (PreparedStatement fetchDBVersion = con.prepareStatement(SQLStatements.FETCH_DB_VERSION)) {
+            ResultSet rs = fetchDBVersion.executeQuery();
+            if (rs.next()) {
+                int dbVersion = rs.getInt(FieldNames.DB_VERSION_DB_VERSION_NO);
+                if (dbVersion < 1) {
+                    this.refsToUpperCase();
+                    PreparedStatement setDBVersion = con.prepareStatement(SQLStatements.INSERT_DB_VERSION_NO);
+                    setDBVersion.setInt(1, DB_VERSION_NO);
+                    setDBVersion.executeUpdate();
+                }
+            } else {
+                //update DB = switch all references to upper case
+                this.refsToUpperCase();
+                PreparedStatement setDBVersion = con.prepareStatement(SQLStatements.INSERT_DB_VERSION_NO);
+                setDBVersion.setInt(1, DB_VERSION_NO);
+                setDBVersion.executeUpdate();
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Done checking DB version and updated to latest version");
+    }
+
+    /**
+     * Transforms all reference sequences to upper case and stores the new sequences in the db.
+     */
+    private void refsToUpperCase() {
+        List<PersistantReference> refList = this.getGenomes();
+        for (PersistantReference ref : refList) {
+            String refseq = ref.getSequence().toUpperCase();
+            
+            try (PreparedStatement updateRefGenome = con.prepareStatement(SQLStatements.UPDATE_REF_GENOME)) {
+                updateRefGenome.setString(1, refseq);
+                updateRefGenome.setInt(2, ref.getId());
+                updateRefGenome.executeUpdate();
+            } catch (SQLException ex) {
+                Logger.getLogger(TrackConnector.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
 }

@@ -1,7 +1,6 @@
 
 package de.cebitec.vamp.parser.common;
 
-import de.cebitec.vamp.util.Pair;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,7 +12,7 @@ import java.util.Map;
 public class DirectAccessDataContainer {
     
     private CoverageContainer coverageContainer;
-    private Map<String, Pair<Integer, Integer>> classificationMap;
+    private Map<String, ParsedClassification> classificationMap;
     
     /**
      * Creates an empty container for all data collected by a direct access
@@ -35,7 +34,7 @@ public class DirectAccessDataContainer {
      * of read name to the number of occurences of the read and the lowest
      * number of differences seen for this read.
      */
-    public DirectAccessDataContainer(CoverageContainer coverageContainer, Map<String, Pair<Integer, Integer>> classificationMap) {
+    public DirectAccessDataContainer(CoverageContainer coverageContainer, Map<String, ParsedClassification> classificationMap) {
         this.coverageContainer = coverageContainer;
         this.classificationMap = classificationMap;
     }
@@ -58,21 +57,19 @@ public class DirectAccessDataContainer {
     }
 
     /**
-     * @return the classification map, which stores the mapping of read name to 
-     * the number of occurences of the read and the lowest number of differences
-     * seen for this read.
+     * @return The classification map, which stores the mapping of read name to 
+     * the read classification data.
      */
-    public Map<String, Pair<Integer, Integer>> getClassificationMap() {
+    public Map<String, ParsedClassification> getClassificationMap() {
         return this.classificationMap;
     }
 
     /**
      * Sets the classification map, which stores the mapping of read name to the
-     * number of occurences of the read and the lowest number of differences
-     * seen for this read.
-     * @param classificationMap 
+     * read classification data
+     * @param classificationMap the classification map to set 
      */
-    public void setClassificationMap(Map<String, Pair<Integer, Integer>> classificationMap) {
+    public void setClassificationMap(Map<String, ParsedClassification> classificationMap) {
         this.classificationMap = classificationMap;
     }
     

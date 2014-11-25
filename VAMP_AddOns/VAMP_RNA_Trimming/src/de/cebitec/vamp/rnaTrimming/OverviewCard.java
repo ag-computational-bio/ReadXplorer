@@ -1,12 +1,13 @@
 package de.cebitec.vamp.rnaTrimming;
 
+import de.cebitec.vamp.mapping.api.MappingApi;
 import java.util.Iterator;
 import java.util.List;
 import org.openide.util.NbBundle;
 
 /**
- *
- * @author evgeny
+ * Displayes an overview of selected trimming parameters.
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 public class OverviewCard extends javax.swing.JPanel {
     
@@ -56,7 +57,10 @@ public class OverviewCard extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
     void showGenereateOverview(String reference, String source, String method, String maximum) {
-        overviewTextArea.setText("Reference file:\n");
+        overviewTextArea.setText("Mapping script:\n");
+        overviewTextArea.append(MappingApi.getMapperPath()+"\n"+"\n");
+        
+        overviewTextArea.append("Reference file:\n");
         overviewTextArea.append(reference+"\n"+"\n");
         
         overviewTextArea.append("Source file:\n");

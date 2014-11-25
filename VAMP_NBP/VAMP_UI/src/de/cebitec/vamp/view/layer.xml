@@ -21,13 +21,6 @@
                 <attr name="type" stringvalue="de.cebitec.vamp.api.cookies.LoginCookie"/>
             </file>
         </folder>
-        <folder name="Window">
-            <file name="de-cebitec-vamp-view-dataVisualisation-seqPairViewer-SeqPairDetailsTopComponent.instance">
-                <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
-                <attr name="preferredID" stringvalue="SeqPairDetailsTopComponentTopComponent"/>
-            </file>
-            <file name="de-cebitec-vamp-view-dataVisualisation-seqPairViewer-SeqPairDetailsTopComponentTopComponent.instance_hidden"/>
-        </folder>
     </folder>
     <folder name="Menu">
         <folder name="File">
@@ -60,11 +53,6 @@
                 <attr name="instanceCreate" methodvalue="org.netbeans.modules.autoupdate.updateprovider.AutoupdateCatalogFactory.createUpdateProvider"/>
                 <attr name="instanceOf" stringvalue="org.netbeans.spi.autoupdate.UpdateProvider"/>
                 <attr name="url" bundlevalue="de.cebitec.vamp.view.Bundle#de_cebitec_vamp_view_update_center"/>
-            </file>
-        </folder>
-        <folder name="JavaHelp">
-            <file name="view-helpset.xml" url="view-helpset.xml">
-                <attr name="position" intvalue="3324"/>
             </file>
         </folder>
     </folder>

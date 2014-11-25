@@ -2,6 +2,7 @@ package de.cebitec.vamp.tools.detailedViewer;
 
 import de.cebitec.vamp.controller.ViewController;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
+import de.cebitec.vamp.view.TopComponentExtended;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
 import de.cebitec.vamp.view.dataVisualisation.histogramViewer.HistogramViewer;
@@ -21,7 +22,7 @@ import org.openide.windows.WindowManager;
  * Top component which displays something.
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.tools.detailedViewer//DetailedViewer//EN", autostore = false)
-public final class DetailedViewerTopComponent extends TopComponent {
+public final class DetailedViewerTopComponent extends TopComponentExtended {
 
     private static DetailedViewerTopComponent instance;
     private static final long serialVersionUID = 1L;
@@ -32,20 +33,28 @@ public final class DetailedViewerTopComponent extends TopComponent {
     private TrackConnector trackConnector;
     private BasePanel alignmentBasePanel;
     private BasePanel histogramBasePanel;
-    private BasePanel seqPairBasePanel;
+    private BasePanel readPairBasePanel;
     private CardLayout cards;
 
     private static String HISTOGRAMCARD = "histo";
     private static String ALIGNMENTCARD = "alignment";
-    private static String SEQPAIRCARD = "sequencePair";
+    private static String READPAIRCARD = "readPair";
     
     private String selectedViewer;
+    private ViewController viewCon;
 
     public DetailedViewerTopComponent() {
         initComponents();
         setName(NbBundle.getMessage(DetailedViewerTopComponent.class, "CTL_DetailedViewerTopComponent"));
         setToolTipText(NbBundle.getMessage(DetailedViewerTopComponent.class, "HINT_DetailedViewerTopComponent"));
         setIcon(ImageUtilities.loadImage(ICON_PATH, true));
+        this.viewCon = Utilities.actionsGlobalContext().lookup(ViewController.class);
+    }
+    
+    public DetailedViewerTopComponent(ViewController viewCon) {
+        this();
+        this.viewCon = viewCon;
+        
     }
 
     /** This method is called from within the constructor to
@@ -60,7 +69,7 @@ public final class DetailedViewerTopComponent extends TopComponent {
         histogramButton = new javax.swing.JButton();
         alignmentButton = new javax.swing.JButton();
         colorHistogramBox = new javax.swing.JCheckBox();
-        sequencePairButton = new javax.swing.JButton();
+        readPairButton = new javax.swing.JButton();
         viewerPanel = new javax.swing.JPanel();
         cardPanel = new javax.swing.JPanel();
 
@@ -80,7 +89,7 @@ public final class DetailedViewerTopComponent extends TopComponent {
             }
         });
 
-        colorHistogramBox.setFont(new java.awt.Font("Dialog", 1, 10));
+        colorHistogramBox.setFont(new java.awt.Font("Dialog", 1, 10)); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(colorHistogramBox, org.openide.util.NbBundle.getMessage(DetailedViewerTopComponent.class, "DetailedViewerTopComponent.colorHistogramBox.text")); // NOI18N
         colorHistogramBox.setMinimumSize(new java.awt.Dimension(50, 22));
         colorHistogramBox.setPreferredSize(new java.awt.Dimension(100, 22));
@@ -90,10 +99,10 @@ public final class DetailedViewerTopComponent extends TopComponent {
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(sequencePairButton, org.openide.util.NbBundle.getMessage(DetailedViewerTopComponent.class, "DetailedViewerTopComponent.sequencePairButton.text")); // NOI18N
-        sequencePairButton.addActionListener(new java.awt.event.ActionListener() {
+        org.openide.awt.Mnemonics.setLocalizedText(readPairButton, org.openide.util.NbBundle.getMessage(DetailedViewerTopComponent.class, "DetailedViewerTopComponent.readPairButton.text")); // NOI18N
+        readPairButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                sequencePairButtonActionPerformed(evt);
+                readPairButtonActionPerformed(evt);
             }
         });
 
@@ -106,10 +115,10 @@ public final class DetailedViewerTopComponent extends TopComponent {
                 .addGroup(switchPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addComponent(histogramButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(alignmentButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(sequencePairButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(54, Short.MAX_VALUE))
+                    .addComponent(readPairButton, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(74, Short.MAX_VALUE))
             .addGroup(switchPanelLayout.createSequentialGroup()
-                .addComponent(colorHistogramBox, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE)
+                .addComponent(colorHistogramBox, javax.swing.GroupLayout.DEFAULT_SIZE, 121, Short.MAX_VALUE)
                 .addGap(46, 46, 46))
         );
         switchPanelLayout.setVerticalGroup(
@@ -120,7 +129,7 @@ public final class DetailedViewerTopComponent extends TopComponent {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(alignmentButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(sequencePairButton)
+                .addComponent(readPairButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(colorHistogramBox, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(171, Short.MAX_VALUE))
@@ -142,7 +151,7 @@ public final class DetailedViewerTopComponent extends TopComponent {
         this.selectedViewer = HISTOGRAMCARD;
         this.changeViewerStatus(this.selectedViewer, true);
         this.changeViewerStatus(ALIGNMENTCARD, false);
-        this.changeViewerStatus(SEQPAIRCARD, false);
+        this.changeViewerStatus(READPAIRCARD, false);
         cards.show(cardPanel, HISTOGRAMCARD);
 }//GEN-LAST:event_histogramButtonActionPerformed
 
@@ -150,7 +159,7 @@ public final class DetailedViewerTopComponent extends TopComponent {
         this.selectedViewer = ALIGNMENTCARD;
         this.changeViewerStatus(HISTOGRAMCARD, false);
         this.changeViewerStatus(this.selectedViewer, true);
-        this.changeViewerStatus(SEQPAIRCARD, false);
+        this.changeViewerStatus(READPAIRCARD, false);
         //alignmentBasePanel.getViewer().setActive(true); //to ensure size calculation is performed correctly
         cards.show(cardPanel, ALIGNMENTCARD);
 }//GEN-LAST:event_alignmentButtonActionPerformed
@@ -162,20 +171,20 @@ public final class DetailedViewerTopComponent extends TopComponent {
         histViewer.repaint();
 }//GEN-LAST:event_colorHistogramBoxActionPerformed
 
-private void sequencePairButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sequencePairButtonActionPerformed
-        this.selectedViewer = SEQPAIRCARD;
+private void readPairButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_readPairButtonActionPerformed
+        this.selectedViewer = READPAIRCARD;
         this.changeViewerStatus(HISTOGRAMCARD, false);
         this.changeViewerStatus(ALIGNMENTCARD, false);
         this.changeViewerStatus(this.selectedViewer, true);
-        this.cards.show(cardPanel, SEQPAIRCARD);
-}//GEN-LAST:event_sequencePairButtonActionPerformed
+        this.cards.show(cardPanel, READPAIRCARD);
+}//GEN-LAST:event_readPairButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton alignmentButton;
     private javax.swing.JPanel cardPanel;
     private javax.swing.JCheckBox colorHistogramBox;
     private javax.swing.JButton histogramButton;
-    private javax.swing.JButton sequencePairButton;
+    private javax.swing.JButton readPairButton;
     private javax.swing.JPanel switchPanel;
     private javax.swing.JPanel viewerPanel;
     // End of variables declaration//GEN-END:variables
@@ -219,15 +228,14 @@ private void sequencePairButtonActionPerformed(java.awt.event.ActionEvent evt) {
 
     @Override
     public void componentOpened() {
-        ViewController viewCon = Utilities.actionsGlobalContext().lookup(ViewController.class);
         BasePanelFactory factory = viewCon.getBasePanelFac();
 
-        if (this.trackConnector.isSeqPairTrack()) {
-            this.seqPairBasePanel = factory.getSeqPairBasePanel(this.trackConnector);
-            this.changeViewerStatus(SEQPAIRCARD, false);
-            this.cardPanel.add(this.seqPairBasePanel, SEQPAIRCARD);
+        if (this.trackConnector.isReadPairTrack()) {
+            this.readPairBasePanel = factory.getReadPairBasePanel(this.trackConnector);
+            this.changeViewerStatus(READPAIRCARD, false);
+            this.cardPanel.add(this.readPairBasePanel, READPAIRCARD);
         } else {
-            this.sequencePairButton.setEnabled(false);
+            this.readPairButton.setEnabled(false);
         }
 
         this.histogramBasePanel = factory.getHistogrammViewerBasePanel(this.trackConnector);
@@ -251,9 +259,9 @@ private void sequencePairButtonActionPerformed(java.awt.event.ActionEvent evt) {
         this.histogramBasePanel.close();
         this.alignmentBasePanel = null;
         this.histogramBasePanel = null;
-        if (this.seqPairBasePanel != null){
-            this.seqPairBasePanel.close();
-            this.seqPairBasePanel = null;
+        if (this.readPairBasePanel != null){
+            this.readPairBasePanel.close();
+            this.readPairBasePanel = null;
         }
     }
 
@@ -282,8 +290,13 @@ private void sequencePairButtonActionPerformed(java.awt.event.ActionEvent evt) {
         return PREFERRED_ID;
     }
 
+    /**
+     * Sets the corresponding track connector for this detailed viewer.
+     * @param trackConnector the corresponding track connector for this detailed viewer
+     */
     public void setTrackConnector(TrackConnector trackConnector){
         this.trackConnector = trackConnector;
+        setName(NbBundle.getMessage(DetailedViewerTopComponent.class, "CTL_DetailedViewerTopComponent") + trackConnector.getAssociatedTrackName());
     }
     
     
@@ -323,9 +336,9 @@ private void sequencePairButtonActionPerformed(java.awt.event.ActionEvent evt) {
             this.alignmentBasePanel.getViewer().setActive(activated);
 //            this.alignmentButton.setEnabled(!activated);
         }
-        if (this.seqPairBasePanel != null && selectedViewer.equals(SEQPAIRCARD)) {
-//            this.sequencePairButton.setEnabled(!activated);
-            this.seqPairBasePanel.getViewer().setActive(activated);
+        if (this.readPairBasePanel != null && selectedViewer.equals(READPAIRCARD)) {
+//            this.readPairButton.setEnabled(!activated);
+            this.readPairBasePanel.getViewer().setActive(activated);
         }
     }
 }

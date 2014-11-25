@@ -66,24 +66,16 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="de.cebitec.vamp.ui.importer.SeqPairJobView" name="seqPairTrackJobsView">
+        <Component class="de.cebitec.vamp.ui.importer.ReadPairJobView" name="readPairTrackJobsView">
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="}"/>
-            <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="final de.cebitec.vamp.parser.mappings.SeqPairClassifierI seqPairCalculator = Lookup.getDefault().lookup(de.cebitec.vamp.parser.mappings.SeqPairClassifierI.class);&#xa;if (seqPairCalculator != null) {"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new de.cebitec.vamp.ui.importer.ReadPairJobView()"/>
+            <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="final ReadPairClassifierI readPairCalculator = Lookup.getDefault().lookup(ReadPairClassifierI.class);&#xa;if (readPairCalculator != null) {"/>
           </AuxValues>
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Sequence Pair Tracks">
-                <Property name="tabTitle" type="java.lang.String" value="Sequence Pair Tracks"/>
-              </JTabbedPaneConstraints>
-            </Constraint>
-          </Constraints>
-        </Component>
-        <Component class="de.cebitec.vamp.ui.importer.PositionTableJobView" name="positionTableJobView">
-          <Constraints>
-            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
-              <JTabbedPaneConstraints tabName="Position Table for Track">
-                <Property name="tabTitle" type="java.lang.String" value="Position Table for Track"/>
+              <JTabbedPaneConstraints tabName="Read Pair Tracks">
+                <Property name="tabTitle" type="java.lang.String" value="Read Pair Tracks"/>
               </JTabbedPaneConstraints>
             </Constraint>
           </Constraints>

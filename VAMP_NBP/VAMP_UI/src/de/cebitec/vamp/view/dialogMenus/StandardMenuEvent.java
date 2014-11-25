@@ -8,10 +8,10 @@ import javax.swing.SwingConstants;
 import javax.swing.text.JTextComponent;
 
 /**
- * @author -Rolf Hilker-
- * 
  * Class handling the mouse event for opening the basic copy, paste, cut, 
  * select all right-click menu for JTextComponents.
+ *
+ * @author -Rolf Hilker-
  */
 public class StandardMenuEvent extends MouseAdapter {
 

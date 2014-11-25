@@ -105,4 +105,25 @@ public class FileUtils {
         return null;
     }
     
+    /**
+     * check that the given path exists
+     * @param filePathString
+     * @return boolean true if the file exists
+     */
+    public static boolean fileExists(String filePathString) {
+        File f = new File(filePathString);
+        boolean result = f.exists();
+        return result;
+    }
+    
+    /**
+     * check that the given path exists, is readable and can be executed
+     * @param filePathString
+     * @return boolean true if the file can be executed
+     */
+    public static boolean fileExistsAndIsExecutable(String filePathString) {
+        File f = new File(filePathString);
+        boolean result = f.exists() && f.canRead() && f.canExecute();
+        return result;
+    }
 }

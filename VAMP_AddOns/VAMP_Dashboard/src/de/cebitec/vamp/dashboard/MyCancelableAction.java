@@ -1,40 +1,34 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.vamp.dashboard;
 
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
-import org.openide.awt.ActionID;
-import org.openide.awt.ActionReference;
 import org.openide.util.Cancellable;
-import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 import org.openide.util.Task;
 import org.openide.util.TaskListener;
-import org.openide.windows.TopComponent;
 
 
 /**
+ * An action, which can be canceled.
  *
  * @author jeff
  */
-
-
 public final class MyCancelableAction implements ActionListener {
 
     private final static RequestProcessor RP = new RequestProcessor("interruptible tasks", 1, true);
     private final static Logger LOG = Logger.getLogger(MyCancelableAction.class.getName());
     private RequestProcessor.Task theTask = null;
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         final ProgressHandle ph = ProgressHandleFactory.createHandle("task thats shows progress", new Cancellable() {
 
+            @Override
             public boolean cancel() {
                 return handleCancel();
             }
@@ -44,6 +38,7 @@ public final class MyCancelableAction implements ActionListener {
 
             private final int NUM = 60000;
 
+            @Override
             public void run() {
                 try {
                     ph.start(); //we must start the PH before we swith to determinate
@@ -56,20 +51,19 @@ public final class MyCancelableAction implements ActionListener {
 
                 } catch (InterruptedException ex) {
                     LOG.info("the task was CANCELLED");
-                    return;
                 } 
 
             }
 
             private void doSomething(int i) {
-                LOG.info("doSomething with " + i);                
-                return;
+                LOG.log(Level.INFO, "doSomething with {0}", i);                
             }
         };
 
         theTask = RP.create(runnable); //the task is not started yet
 
         theTask.addTaskListener(new TaskListener() {
+            @Override
             public void taskFinished(Task task) {
                 ph.finish();
             }

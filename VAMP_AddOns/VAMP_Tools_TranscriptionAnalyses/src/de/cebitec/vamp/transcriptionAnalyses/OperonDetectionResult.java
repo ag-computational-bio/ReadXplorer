@@ -18,14 +18,15 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetOpero
     
     private final List<Operon> detectedOperons;
 
-    public OperonDetectionResult(Map<Integer, PersistantTrack> trackList, List<Operon> detectedOperons) {//, PersistantTrack currentTrack) {
-        super(trackList);
+    public OperonDetectionResult(Map<Integer, PersistantTrack> trackList, List<Operon> detectedOperons, boolean combineTracks) {//, PersistantTrack currentTrack) {
+        super(trackList, combineTracks);
         this.detectedOperons = detectedOperons;
     }
 
     public List<Operon> getResults() {
         return detectedOperons;
     }
+    
     @Override
     public List<List<String>> dataColumnDescriptions() {
         List<List<String>> allSheetDescriptions = new ArrayList<>();
@@ -33,6 +34,7 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetOpero
 
         dataColumnDescriptions.add("Feature 1");
         dataColumnDescriptions.add("Feature 2");
+        dataColumnDescriptions.add("Track");
         dataColumnDescriptions.add("Strand");
         dataColumnDescriptions.add("Start Anno 1");
         dataColumnDescriptions.add("Start Anno 2");
@@ -82,6 +84,7 @@ public class OperonDetectionResult extends ResultTrackAnalysis<ParameterSetOpero
             List<Object> operonsRow = new ArrayList<>();
             operonsRow.add(annoName1);
             operonsRow.add(annoName2);
+            operonsRow.add(this.getTrackEntry(operon.getTrackId(), true));
             operonsRow.add(strand);
             operonsRow.add(startAnno1);
             operonsRow.add(startAnno2);

@@ -5,18 +5,21 @@ import de.cebitec.vamp.api.ApplicationFrameI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
+import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManagerFactory;
 import de.cebitec.vamp.view.dataVisualisation.MousePositionListener;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.vamp.view.dataVisualisation.basePanel.BasePanelFactory;
 import de.cebitec.vamp.view.dialogMenus.OpenRefGenPanel;
-import de.cebitec.vamp.view.dialogMenus.OpenTrackPanelList;
+import de.cebitec.vamp.view.dialogMenus.OpenTracksVisualPanel;
 import java.awt.Dialog;
 import java.util.*;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import org.openide.DialogDescriptor;
 import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
+import org.openide.util.Utilities;
 
 /**
  * Controls the view for one <code>ApplicationFrameI</code>
@@ -43,15 +46,19 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
 
         trackToPanel = new HashMap<>();
         registerInLookup();
+        this.boundsinfomanagerfactory = new BoundsInfoManagerFactory();
     }
     
     private void registerInLookup(){
         CentralLookup.getDefault().add(this);
     }
     
+    private BoundsInfoManagerFactory boundsinfomanagerfactory;
+    
     public void openGenome(PersistantReference genome) {
         currentRefGen = genome;
-        boundsManager = new BoundsInfoManager(currentRefGen);
+        
+        boundsManager = this.boundsinfomanagerfactory.get(currentRefGen);
         basePanelFac = new BasePanelFactory(boundsManager, this);
         genomeViewer = basePanelFac.getGenomeViewerBasePanel(currentRefGen);
         getApp().showRefGenPanel(genomeViewer);
@@ -117,13 +124,19 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
      * After selecting a track, the associated track viewer is opened.
      */
     public void openTrack() {
-        OpenTrackPanelList otp = new OpenTrackPanelList(currentRefGen.getId());
+        OpenTracksVisualPanel otp = new OpenTracksVisualPanel(currentRefGen.getId());
         DialogDescriptor dialogDescriptor = new DialogDescriptor(otp, "Open Track");
         Dialog openTrackDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
         openTrackDialog.setVisible(true);
 
         if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && !otp.getSelectedTracks().isEmpty()) {
-           this.openTracksOnCurrentGenome(otp.getSelectedTracks());
+            if (otp.isCombineTracks()) {
+                ViewController viewCon = Utilities.actionsGlobalContext().lookup(ViewController.class);
+                BasePanelFactory factory = viewCon.getBasePanelFac();
+                factory.getMultipleTracksBasePanel(otp.getSelectedTracks(), currentRefGen, otp.isCombineTracks());
+            } else {
+                this.openTracksOnCurrentGenome(otp.getSelectedTracks());
+            }
         } else if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && otp.getSelectedTracks().isEmpty()) {
             String msg = NbBundle.getMessage(ViewController.class, "CTL_OpenTrackInfo",
                     "No track selected. To open a track, at least one track has to be selected.");
@@ -132,6 +145,38 @@ public class ViewController implements de.cebitec.vamp.view.dataVisualisation.Mo
         }
     }
     
+    /**
+     * Opens a dialog with all available tracks for the current reference
+     * genome. After selecting exactly two tracks, the associated double track
+     * viewer is opened.
+     */
+    public void openDoubleTrack() {        
+        OpenTracksVisualPanel otp = new OpenTracksVisualPanel(currentRefGen.getId());       
+        otp.setCombineTracksEnabled(false);
+
+        DialogDescriptor dialogDescriptor = new DialogDescriptor(otp, "Open Double Track Viewer");
+        Dialog openRefGenDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
+        openRefGenDialog.setVisible(true);
+
+        // check if two tracks were selected
+        boolean okSelected = false;
+        if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && otp.getSelectedTracks().size() == 2) {
+            okSelected = true;
+        } else if (!(dialogDescriptor.getValue().equals(DialogDescriptor.CANCEL_OPTION)
+                || dialogDescriptor.getValue().equals(DialogDescriptor.CLOSED_OPTION))) {
+            DialogDisplayer.getDefault().notify(new NotifyDescriptor.Message("Please select exactly TWO tracks in standard mode or at least two track in combined mode!",
+                    NotifyDescriptor.INFORMATION_MESSAGE));
+            this.openDoubleTrack();
+        }
+        if (okSelected) {
+            BasePanelFactory factory = this.getBasePanelFac();
+            factory.getMultipleTracksBasePanel(otp.getSelectedTracks(), currentRefGen, false);
+        }
+    }
+
+    /**
+     * @return The list of currently opened track base panels.
+     */
     public List<BasePanel> getOpenTracks(){
         return currentTracks ;
     }

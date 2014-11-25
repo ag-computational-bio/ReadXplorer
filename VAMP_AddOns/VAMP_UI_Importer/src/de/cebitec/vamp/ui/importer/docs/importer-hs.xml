@@ -5,7 +5,7 @@ and open the template in the editor.
 -->
 <!DOCTYPE helpset PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp HelpSet Version 2.0//EN" "http://java.sun.com/products/javahelp/helpset_2_0.dtd">
 <helpset version="2.0">
-    <title>VAMP_UI_Importer Help</title>
+    <title>ReadXplorer Importer Help</title>
     <maps>
         <homeID>de.cebitec.vamp.ui.importer.about</homeID>
         <mapref location="importer-map.xml"/>

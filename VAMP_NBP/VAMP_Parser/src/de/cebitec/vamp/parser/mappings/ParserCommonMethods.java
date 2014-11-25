@@ -1,6 +1,7 @@
 package de.cebitec.vamp.parser.mappings;
 
 import de.cebitec.vamp.parser.common.DiffAndGapResult;
+import de.cebitec.vamp.parser.common.ParsedClassification;
 import de.cebitec.vamp.parser.common.ParsedDiff;
 import de.cebitec.vamp.parser.common.ParsedReferenceGap;
 import de.cebitec.vamp.util.Observable;
@@ -13,6 +14,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sf.samtools.SAMRecord;
+import net.sf.samtools.SAMTag;
 import org.openide.util.NbBundle;
 
 /**
@@ -60,56 +62,52 @@ public final class ParserCommonMethods {
         String[] charCigar = cigar.split("\\d+");
         String op;
         String bases; //bases of the read interval under investigation
+        String refBases; //bases of the reference corresponding to the read interval under investigation
         int currentCount;
         int refPos = 0;
         int readPos = 0;
-        int diffPos;
-        if (!refSeq.isEmpty()) {
-            readSeq = readSeq.toUpperCase();
-            refSeq = refSeq.toUpperCase();
-        }
 
-        for (int i = 0; i < charCigar.length; ++i) {
+        for (int i = 1; i < charCigar.length; ++i) {
             op = charCigar[i];
+            currentCount = Integer.valueOf(num[i - 1]);
 
-            if (op.equals("=")) { //increase position for matches, skipped regions (N) and padded regions (P)
-                currentCount = Integer.valueOf(num[i - 1]);
-                refPos += currentCount;
-                readPos += currentCount;
-
-            } else if (op.equals("N") || op.equals("P")) {
-                refPos += Integer.valueOf(num[i - 1]);
-                
-            } else if (op.equals("X")) { //count and create diffs for mismatches
-                currentCount = Integer.valueOf(num[i - 1]);
-                differences += currentCount;
-                refPos += currentCount;
-                readPos += currentCount;
-
-            } else if (op.equals("D")) { // count and add diff gaps for deletions in read
-                currentCount = Integer.valueOf(num[i - 1]);
-                differences += currentCount;
-                refPos += currentCount;
-
-            } else if (op.equals("I")) { // count and add reference gaps for insertions
-                currentCount = Integer.valueOf(num[i - 1]);
-                differences += currentCount;
-                readPos += currentCount;
-                // refPos remains the same
-
-            } else if (op.equals("M")) { //check, count and add diffs for deviating Ms
-                currentCount = Integer.valueOf(num[i - 1]);
-                bases = readSeq.substring(readPos, readPos + currentCount);
+            if (op.equals("M")) { //check, count and add diffs for deviating Ms
+                bases = readSeq.substring(readPos, readPos + currentCount).toUpperCase();
+                refBases = refSeq.substring(refPos, refPos + currentCount);
                 for (int j = 0; j < bases.length(); ++j) {
-                    diffPos = refPos + j;
-                    if (bases.charAt(j) != refSeq.charAt(diffPos)) {
+                    if (bases.charAt(j) != refBases.charAt(j)) {
                         ++differences;
                     }
                 }
                 refPos += currentCount;
                 readPos += currentCount;
 
-            } //H and S = hard and soft clipped bases are not present in the read string and pos in record, so don't inc. absPos
+            } else if (op.equals("=")) { //increase position for matches, skipped regions (N) and padded regions (P)
+                refPos += currentCount;
+                readPos += currentCount;
+ 
+            } else if (op.equals("X")) { //count and create diffs for mismatches
+                differences += currentCount;
+                refPos += currentCount;
+                readPos += currentCount;
+
+            } else if (op.equals("D")) { // count and add diff gaps for deletions in read
+                differences += currentCount;
+                refPos += currentCount;
+
+            } else if (op.equals("I")) { // count and add reference gaps for insertions
+                differences += currentCount;
+                readPos += currentCount;
+                // refPos remains the same
+
+            } else if (op.equals("N") || op.equals("P")) {
+                refPos += currentCount;
+                //readPos remains the same
+               
+            } else if (op.equals("S")) {
+                readPos += currentCount;
+                //refPos remains the same
+            }//H = hard bases are not present in the read string and pos in record, so don't inc. absPos
         }
 
         return differences;
@@ -142,30 +140,26 @@ public final class ParserCommonMethods {
         String[] charCigar = cigar.split("\\d+");
         String op;
         String bases; //bases of the read interval under investigation
+        String refBases; //bases of the reference belonging to the read interval under investigation
         int currentCount;
         int refPos = 0;
         int readPos = 0;
-        int diffPos;
         char base;
-        if (!refSeq.isEmpty()) {
-            readSeq = readSeq.toUpperCase();
-            refSeq = refSeq.toUpperCase();
-        }
         
         for (int i = 1; i < charCigar.length; ++i) {
             op = charCigar[i];
             currentCount = Integer.valueOf(num[i - 1]);
             if (op.equals("M")) { //check, count and add diffs for deviating Ms
-                bases = readSeq.substring(readPos, readPos + currentCount);
+                bases = readSeq.substring(readPos, readPos + currentCount).toUpperCase();
+                refBases = refSeq.substring(refPos, refPos + currentCount);
                 for (int j = 0; j < bases.length(); ++j) {
-                    diffPos = refPos + j;
                     base = bases.charAt(j);
-                    if (base != refSeq.charAt(diffPos)) {
+                    if (base != refBases.charAt(j)) {
                         ++differences;
                         if (isRevStrand) {
                             base = SequenceUtils.getDnaComplement(base);
                         }
-                        diffs.add(new ParsedDiff(diffPos + start, base));
+                        diffs.add(new ParsedDiff(refPos + j + start, base));
                     }
                 }
                 refPos += currentCount;
@@ -178,12 +172,11 @@ public final class ParserCommonMethods {
             } else if (op.equals("X")) { //count and create diffs for mismatches
                 differences += currentCount;
                 for (int j = 0; j < currentCount; ++j) {
-                    diffPos = readPos + j;
-                    base = readSeq.charAt(diffPos);
+                    base = readSeq.charAt(readPos + j);
                     if (isRevStrand) {
                         base = SequenceUtils.getDnaComplement(base);
                     }
-                    diffs.add(new ParsedDiff(diffPos + start, base));
+                    diffs.add(new ParsedDiff(refPos + j + start, base));
                 }
                 refPos += currentCount;
                 readPos += currentCount;
@@ -208,14 +201,14 @@ public final class ParserCommonMethods {
                 //refPos remains the same
                 readPos += currentCount;
 
-            } else if (op.equals("N")) {
+            } else if (op.equals("N") || op.equals("P")) { //increase position for padded and skipped reference bases
                 refPos += currentCount;
                 //readPos remains the same
 
-            } else if (op.equals("S")) {
+            } else if (op.equals("S")) { //increase read position for soft clipped bases which are present in the read
                 //refPos remains the same
                 readPos += currentCount;
-            } //P, S and H = padding, soft and hard clipping do not contribute to differences
+            } //H = hard clipping does not contribute to differences
         }
 
         return new DiffAndGapResult(diffs, gaps, differences);
@@ -277,7 +270,7 @@ public final class ParserCommonMethods {
      * @param gapPos position of the gap
      * @param gapOrderIndex the gap order index for the current gap (larger the more gaps
      *      in a row
-     * @return the new gap order index for the gap
+     * @return the new gap order index for the gap (starting with 0)
      */
     public static int getOrderForGap(int gapPos, Map<Integer, Integer> gapOrderIndex) {
         if (!gapOrderIndex.containsKey(gapPos)) {
@@ -551,6 +544,79 @@ public final class ParserCommonMethods {
         stopPosition = startPosition + readLength - 1 + numberofDeletion - numberofInsertion - numberofSoftclipped;
         return stopPosition;
     }
+
+    /**
+     * Returns the read name without the pair tag.
+     * @param readNameFull The read name whose pair tag shall be removed
+     * @return The read name without its pair tag
+     */
+    public static String getReadNameWithoutPairTag(String readNameFull) {
+        String readName;
+        String[] nameParts = readNameFull.split(" ");
+        if (nameParts.length == 2 && (nameParts[1].startsWith("1") || nameParts[1].startsWith("2"))) {
+            readName = nameParts[0];
+        } else {
+            readName = readNameFull.substring(0, readNameFull.length() - 2);
+        }
+
+        return readName;
+    }
+    
+    /**
+     * Calculates the pair tag for a given sam record. It checks the ending of
+     * the read name, the ReadPairedFlag of the sam record and the casava > 1.8
+     * format for an appropriate pair flag until it is found. If no paired read
+     * tag can be found, the pair tag returns a neutral pairTag for single
+     * end mapped reads.
+     * @param record the record to check for a pair tag
+     * @return Either '1' for first read of pair, '2' for second read of pair
+     * or '0' for a single end mapping
+     */
+    public static char getReadPairTag(SAMRecord record) {
+        String readName = record.getReadName();
+        char pairTag = '0';
+        char lastChar = readName.charAt(readName.length() - 1);
+        
+        if (lastChar == Properties.EXT_A1 || lastChar == Properties.EXT_B1) {
+            pairTag = '1';
+        
+        } else if (lastChar == Properties.EXT_A2 || lastChar == Properties.EXT_B2) {
+            pairTag = '2';
+            
+        } else if (lastChar != Properties.EXT_A1 && lastChar != Properties.EXT_B1
+                && lastChar != Properties.EXT_A2 && lastChar != Properties.EXT_B2) {
+            
+            //check for casava > 1.8 paired read
+            String[] nameParts = readName.split(" ");
+            if (nameParts.length == 2) {
+                if (nameParts[1].startsWith("1")) {
+                    pairTag = '1';
+                } else if (nameParts[1].startsWith("2")) {
+                    pairTag = '2';
+                }
+            }
+            
+            //if tag is not set yet, but paired read flag is set, we can use it
+            if (pairTag == 0 && record.getReadPairedFlag()) { 
+                pairTag = record.getFirstOfPairFlag() ? '1' : '2';
+            }
+        }
+        return pairTag;
+    }
+    
+    /**
+     * Checks if a read name is written in the casava format > 1.8, in which
+     * the pair tag appears after a blank in the read name.
+     * @param readName read name to check
+     * @return true, if the read is in the casava format > 1.8, false otherwise
+     */
+    public static boolean isCasavaLarger1Dot8Format(String readName) {
+        String[] nameParts = readName.split(" ");
+        if (nameParts.length == 2 && (nameParts[1].startsWith("1") || nameParts[1].startsWith("2"))) {
+            return true;
+        }
+        return false;
+    }
     
     /**
      * Adds a "1" or "2" at the end of the given records read name, if it is a
@@ -564,7 +630,8 @@ public final class ParserCommonMethods {
         String readName = record.getReadName();
         char pairTag = readName.charAt(readName.length() - 1);
         if (record.getReadPairedFlag() && pairTag != Properties.EXT_A1 && pairTag != Properties.EXT_B1
-                                       && pairTag != Properties.EXT_A2 && pairTag != Properties.EXT_B2) {
+                                       && pairTag != Properties.EXT_A2 && pairTag != Properties.EXT_B2
+                                       && !isCasavaLarger1Dot8Format(readName)) {
             readName = readName.concat(record.getFirstOfPairFlag() ? "1" : "2");
         }
         return readName;
@@ -590,6 +657,53 @@ public final class ParserCommonMethods {
             }
         }
         return isMapped;
+    }
+    /**
+     * Adds the classification data (type and number of mapped positions) to the
+     * sam record. Use this method, if the number of differences is already
+     * known. No data is added to reads, which do not occur in the 
+     * classification map.
+     * @param readName the complete read name
+     * @param record the sam record to update
+     * @param differences the number of differences the record has to the
+     * reference
+     * @param classificationMap the classification map from which the 
+     * classification data has to be retrieved
+     * @throws AssertionError
+     */
+    public static void addClassificationData(SAMRecord record, int differences,
+            Map<String, ParsedClassification> classificationMap) throws AssertionError {
+        
+        String readName = ParserCommonMethods.elongatePairedReadName(record);
+        ParsedClassification classification;
+        int nextMappingPos;
+        if (classificationMap.get(readName) != null) {
+            classification = classificationMap.get(readName);
+            int lowestDiffRate = classification.getMinMismatches();
+
+            nextMappingPos = classification.getNextMappingStart(record.getAlignmentStart());
+
+            if (nextMappingPos > 0) {
+                record.setAttribute(SAMTag.CP.name(), nextMappingPos);
+                record.setAttribute(SAMTag.CC.name(), "=");
+            }
+
+            if (differences == 0) { //perfect mapping
+                record.setAttribute(Properties.TAG_READ_CLASS, Properties.PERFECT_COVERAGE);
+
+            } else if (differences == lowestDiffRate) { //best match mapping
+                record.setAttribute(Properties.TAG_READ_CLASS, Properties.BEST_MATCH_COVERAGE);
+
+            } else if (differences > lowestDiffRate) { //common mapping
+                record.setAttribute(Properties.TAG_READ_CLASS, Properties.COMPLETE_COVERAGE);
+
+            } else { //meaning: differences < lowestDiffRate
+                throw new AssertionError("Cannot contain less than the lowest diff rate number of errors!");
+            }
+            record.setAttribute(Properties.TAG_MAP_COUNT, classification.getNumberOccurrences());
+        } else {
+            //currently no data is added to reads with errors, since they are not contained in the classification map
+        }
     }
     
 //    /**

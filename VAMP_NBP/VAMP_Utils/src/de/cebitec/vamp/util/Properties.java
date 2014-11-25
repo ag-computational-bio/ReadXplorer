@@ -19,37 +19,9 @@ public class Properties {
     public static final String GENETIC_CODE_INDEX = "geneticCodeIndex";
     public static final String CUSTOM_GENETIC_CODES = "customGeneticCode";
 
-    // VAMP file chooser properties
+    // ReadXplorer file chooser properties
     public static final String VAMP_FILECHOOSER_DIRECTORY = "VampFileChooser.Directory";
     public static final String VAMP_DATABASE_DIRECTORY = "Vamp.Database.Directory";
-    
-    // Sequence pair properties
-    /** 0 = perfect sequence pair (distance and orientation correct). */
-    public static final byte TYPE_PERFECT_PAIR = 0;
-    /** 1 = distance too large sequence pair. */
-    public static final byte TYPE_DIST_LARGE_PAIR = 1;
-    /** 2 = distance too small sequence pair. */
-    public static final byte TYPE_DIST_SMALL_PAIR = 2;
-    /** 3 = orientation wrong sequence pair (distance is correct). */
-    public static final byte TYPE_ORIENT_WRONG_PAIR = 3;
-    /** 4 = distance too large and orientation wrong sequence pair. */
-    public static final byte TYPE_OR_DIST_LARGE_PAIR = 4;
-    /** 5 = distance too small and orientation wrong sequence pair. */
-    public static final byte TYPE_OR_DIST_SMALL_PAIR = 5;
-    /** 6 = a single mapping whose partner did not map on the reference. */
-    public static final byte TYPE_UNPAIRED_PAIR = 6;
-    /** 7 = unique perfect sequence pair (distance and orientation correct, both reads only mapped once). */
-    public static final byte TYPE_PERFECT_UNQ_PAIR = 7;
-    /** 8 = unique distance too large sequence pair. */
-    public static final byte TYPE_DIST_LARGE_UNQ_PAIR = 8;
-    /** 9 = unique distance too small sequence pair. */
-    public static final byte TYPE_DIST_SMALL_UNQ_PAIR = 9;
-    /** 10 = unique orientation wrong sequence pair (distance is correct). */
-    public static final byte TYPE_ORIENT_WRONG_UNQ_PAIR = 10;
-    /** 11 = unique distance too large and orientation wrong sequence pair. */
-    public static final byte TYPE_OR_DIST_LARGE_UNQ_PAIR = 11;
-    /** 12 = unique distance too small and orientation wrong sequence pair. */
-    public static final byte TYPE_OR_DIST_SMALL_UNQ_PAIR = 12;
     
     //Properties to set different viewers active
     public static final String PROP_REF_AND_TRACK_VIEWERS = "RefAndTrackViewersActive";
@@ -59,34 +31,36 @@ public class Properties {
     
     public static final byte NONE = -1;
     public static final byte BOTH = 0;
-    public static final byte SEQ_PAIRS = 1;
+    public static final byte READ_PAIRS = 1;
     public static final byte SINGLE_MAPPINGS = 2;
     
+    /** Standard value, if all data is needed (0).*/
+    public static final byte NORMAL = 0;
     /** Perfect coverage value (1).*/
     public static final byte PERFECT_COVERAGE = 1;
     /** Best match coverage value (2). */
     public static final byte BEST_MATCH_COVERAGE = 2;
     /** Common match coverage value (3). */
     public static final byte COMPLETE_COVERAGE = 3;
-    /** Value for count data (4). */
-    public static final byte COUNT_DATA = 4;
     /** Value for diffs (5). */
     public static final byte DIFFS = 5;
-    /** Value for mappings with diffs (6). */
-    public static final byte MAPPINGS_W_DIFFS = 6;
+    /** Value for mappings sorted by id (6). */
+    public static final byte MAPPINGS_DB_BY_ID = 6;
     /** Value for mappings without diffs (7). */
     public static final byte MAPPINGS_WO_DIFFS = 7;
-    /**kasterm: Value for all reduced mappings*/
+    /** kasterm: Value for all reduced mappings*/
     public static final byte REDUCED_MAPPINGS  = 8;
+    /** Value for obtaining read starts instead of coverage. */
+    public static byte READ_STARTS = 9;
     
-    /** Value for coverage increase distribution = 1. */
-    public static final byte COVERAGE_INCREASE_DISTRIBUTION = 1;
-    /** Value for coverage increase in percent distribution = 2. */
-    public static final byte COVERAGE_INC_PERCENT_DISTRIBUTION = 2;
+    /** Value for read start distribution = 5. */
+    public static final byte READ_START_DISTRIBUTION = 5;
+    /** Value for coverage increase in percent distribution = 6. */
+    public static final byte COVERAGE_INC_PERCENT_DISTRIBUTION = 6;
     /** Value for read length distribution = 3. */
     public static final byte READ_LENGTH_DISTRIBUTION = 3;
     /** Value for seq pair size distribution = 4. */
-    public static final byte SEQ_PAIR_SIZE_DISTRIBUTION = 4;    
+    public static final byte READ_PAIR_SIZE_DISTRIBUTION = 4;    
     
     /** Type value identifying an object as belonging to a "Start".*/
     public static final byte START = 1;
@@ -132,4 +106,5 @@ public class Properties {
     
     /** '-1' For reference features, which do not have a parent. */
     public static final String NO_PARENT_STRING = "-1";
+    public static String MAPPER_PARAMS = "MAPPER_PARAMS";
 }

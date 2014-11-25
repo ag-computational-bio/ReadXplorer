@@ -19,15 +19,19 @@ public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
     private List<String> trackNameList;
     private ParameterSetI<T> parameters;
     private Map<String, Integer> statsMap;
+    private final boolean combineTracks;
 
     /**
      * A result of an analysis for a list of tracks.
      * @param trackMap the list of tracks for which the analysis was carried out
+     * @param combineTracks <cc>true</cc>, if the tracks in the list are 
+     * combined, <cc>false</cc> otherwise
      */
-    public ResultTrackAnalysis(Map<Integer, PersistantTrack> trackMap) {//, PersistantTrack currentTrack) {
+    public ResultTrackAnalysis(Map<Integer, PersistantTrack> trackMap, boolean combineTracks) {//, PersistantTrack currentTrack) {
         this.trackMap = trackMap;
         this.trackNameList = PersistantTrack.generateTrackDescriptionList(trackMap.values());
         this.statsMap = new HashMap<>();
+        this.combineTracks = combineTracks;
     }
 
     /**
@@ -36,6 +40,57 @@ public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
      */
     public Map<Integer, PersistantTrack> getTrackMap() {
         return trackMap;
+    }
+
+    public boolean isCombineTracks() {
+        return combineTracks;
+    }
+    
+    private String getCombinedTrackNames(boolean fullLength) {
+        String concatTrackNames = "";
+        String description;
+        for (PersistantTrack track : trackMap.values()) {
+            if (fullLength || track.getDescription().length() <= 20) {
+                description = track.getDescription();
+            } else {
+                description = track.getDescription().substring(0, 20) + "...";
+            }
+            concatTrackNames += description + ", ";
+        }
+        if (!concatTrackNames.isEmpty()) {
+            concatTrackNames = concatTrackNames.substring(0, concatTrackNames.length() - 2);
+        }
+        return concatTrackNames; 
+    }
+    
+//    private String getCombinedTrackIds() {
+//        String concatTrackIds = "";
+//        for (PersistantTrack track : trackMap.values()) {
+//            concatTrackIds += track.getId() + ", ";
+//        }
+//        if (!concatTrackIds.isEmpty()) {
+//            concatTrackIds = concatTrackIds.substring(0, concatTrackIds.length() - 2);
+//        }
+//        return concatTrackIds;
+//    }
+
+    /**
+     * @param trackId the track id of the track whose entry is needed
+     * @param getFullengthName true, if the concated names shall be returned for 
+     * combined tracks, false, if shortened concated names shall be returned for
+     * combined tracks. For single tracks, this option does not have an 
+     * influence.
+     * @return Either a PersistantTrack entry for a single track or a String
+     * of the track names or ids for a combined list of tracks
+     */
+    public Object getTrackEntry(int trackId, boolean getFullengthName) {
+        Object trackEntry;
+        if (this.isCombineTracks()) {
+            trackEntry = this.getCombinedTrackNames(getFullengthName);
+        } else {
+            trackEntry = this.getTrackMap().get(trackId);
+        }
+        return trackEntry;
     }
 
     /**
@@ -87,6 +142,15 @@ public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
     }
     
     /**
+     * Adds a key value pair to the stats map.
+     * @param key the key of the pair
+     * @param value the value of the pair
+     */
+    public void addStatsToMap(String key, int value) {
+        this.statsMap.put(key, value);
+    }
+    
+    /**
      * Creates a table row for statistic entries by the given identifier
      * @param identifier the identifier of the statistic value
      * @return the list containing the identifier and its statistic value
@@ -98,6 +162,18 @@ public abstract class ResultTrackAnalysis<T>  implements ExcelExportDataI {
             row.add(this.getStatsMap().get(identifier));
         }
         return row;
+    }
+
+    /**
+     * Adds the complete content of the internal statistics map to the given
+     * table content (list of object list)
+     * @param statisticsExportData the table content, to which the content of 
+     * the internal statistics map shall be added
+     */
+    public void createStatisticTableRows(List<List<Object>> statisticsExportData) {
+        for (String id : statsMap.keySet()) {
+            statisticsExportData.add(this.createStatisticTableRow(id));
+        }
     }
     
     /**

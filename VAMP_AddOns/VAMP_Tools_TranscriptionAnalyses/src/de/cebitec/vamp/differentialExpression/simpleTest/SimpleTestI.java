@@ -1,6 +1,7 @@
 package de.cebitec.vamp.differentialExpression.simpleTest;
 
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -64,4 +65,11 @@ public interface SimpleTestI {
      * @return columnNames for the current analysis run.
      */
     public Vector getRowNames();
+
+    /**
+     * Sets features that should be used for normalization, if the user selected
+     * some.
+     * @param normalizationFeatures features for normalization
+     */
+    public void setNormalizationFeatures(List<Integer> normalizationFeatures);
 }

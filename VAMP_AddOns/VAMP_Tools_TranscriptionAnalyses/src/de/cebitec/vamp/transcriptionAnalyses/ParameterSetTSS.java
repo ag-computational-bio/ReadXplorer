@@ -1,6 +1,7 @@
 package de.cebitec.vamp.transcriptionAnalyses;
 
 import de.cebitec.vamp.databackend.ParameterSetI;
+import de.cebitec.vamp.databackend.ParametersReadClasses;
 
 /**
  * Data storage for all parameters associated with a transcription analysis.
@@ -12,27 +13,37 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
     private boolean performTSSAnalysis;
     private boolean autoTssParamEstimation;
     private boolean performUnannotatedTranscriptDet;
-    private int minTotalIncrease;
+    private int minNoReadStarts;
     private int minPercentIncrease;
     private int maxLowCovInitCount;
     private int minLowCovIncrease;
     private int minTranscriptExtensionCov;
+    private ParametersReadClasses readClassParams;
 
     
     /**
      * Data storage for all parameters associated with a transcription analysis.
+     * @param performTSSAnalysis
+     * @param autoTssParamEstimation
+     * @param performUnannotatedTranscriptDet
+     * @param minNoReadStarts
+     * @param minPercentIncrease
+     * @param maxLowCovInitCount
+     * @param minLowCovIncrease
+     * @param minTranscriptExtensionCov 
      */
     ParameterSetTSS(boolean performTSSAnalysis, boolean autoTssParamEstimation, boolean performUnannotatedTranscriptDet, 
-            int minTotalIncrease, int minPercentIncrease, int maxLowCovInitCount, int minLowCovIncrease, 
-            int minTranscriptExtensionCov) {
+            int minNoReadStarts, int minPercentIncrease, int maxLowCovInitCount, int minLowCovIncrease, 
+            int minTranscriptExtensionCov, ParametersReadClasses readClassParams) {
         this.performTSSAnalysis = performTSSAnalysis;
         this.autoTssParamEstimation = autoTssParamEstimation;
         this.performUnannotatedTranscriptDet = performUnannotatedTranscriptDet;
-        this.minTotalIncrease = minTotalIncrease;
+        this.minNoReadStarts = minNoReadStarts;
         this.minPercentIncrease = minPercentIncrease;
         this.maxLowCovInitCount = maxLowCovInitCount;
         this.minLowCovIncrease = minLowCovIncrease;
         this.minTranscriptExtensionCov = minTranscriptExtensionCov;
+        this.readClassParams = readClassParams;
         
     }
 
@@ -48,24 +59,28 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
         return performUnannotatedTranscriptDet;
     }
 
-    public int getMinTotalIncrease() {
-        return minTotalIncrease;
+    public int getMinNoReadStarts() {
+        return minNoReadStarts;
     }
 
     public int getMinPercentIncrease() {
         return minPercentIncrease;
     }
 
-    public int getMaxLowCovInitCount() {
+    public int getMaxLowCovReadStarts() {
         return maxLowCovInitCount;
     }
 
-    public int getMinLowCovIncrease() {
+    public int getMinLowCovReadStarts() {
         return minLowCovIncrease;
     }
 
     public int getMinTranscriptExtensionCov() {
         return minTranscriptExtensionCov;
+    }
+
+    public ParametersReadClasses getReadClassParams() {
+        return readClassParams;
     }
 
     public void setPerformTSSAnalysis(boolean performTSSAnalysis) {
@@ -80,8 +95,8 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
         this.performUnannotatedTranscriptDet = performUnannotatedTranscriptDet;
     }
 
-    public void setMinTotalIncrease(int minTotalIncrease) {
-        this.minTotalIncrease = minTotalIncrease;
+    public void setMinNoReadStarts(int minNoReadStarts) {
+        this.minNoReadStarts = minNoReadStarts;
     }
 
     public void setMinPercentIncrease(int minPercentIncrease) {
@@ -98,5 +113,10 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
 
     public void setMinTranscriptExtensionCov(int minTranscriptExtensionCov) {
         this.minTranscriptExtensionCov = minTranscriptExtensionCov;
-    }    
+    }  
+
+    public void setReadClassParams(ParametersReadClasses readClassParams) {
+        this.readClassParams = readClassParams;
+    }
+    
 }

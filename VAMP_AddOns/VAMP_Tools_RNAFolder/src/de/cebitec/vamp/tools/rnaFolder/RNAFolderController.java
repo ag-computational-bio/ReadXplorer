@@ -3,8 +3,11 @@ package de.cebitec.vamp.tools.rnaFolder;
 import de.cebitec.vamp.tools.rnaFolder.rnamovies.MoviePane;
 import de.cebitec.vamp.tools.rnaFolder.rnamovies.RNAMovies;
 import de.cebitec.vamp.view.dialogMenus.RNAFolderI;
+import org.netbeans.api.progress.ProgressHandle;
+import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
+import org.openide.util.NbBundle;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.windows.WindowManager;
 
@@ -26,24 +29,38 @@ public class RNAFolderController implements RNAFolderI {
     @Override
     public void showRNAFolderView(final String sequenceToFold, final String header) {
 
-        try { //new header because RNA movies cannot cope with spaces
-            String rnaMoviesHeader = header.replace(" ", "_");
-            String foldedSequence = RNAFoldCaller.callRNAFolder(sequenceToFold, rnaMoviesHeader);
-            //for testing purposes in offline mode:
+        rnaFolderTopComp = (RNAFolderTopComponent) WindowManager.getDefault().findTopComponent("RNAFolderTopComponent");
+        rnaFolderTopComp.open();
+        rnaFolderTopComp.requestActive();
+        
+        Thread rnaFoldThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try { //new header because RNA movies cannot cope with spaces
+                    ProgressHandle progressHandle = ProgressHandleFactory.createHandle(NbBundle.getMessage(RNAFolderController.class, "RNA_Folder-Progress"));
+                    progressHandle.start();
+                    String rnaMoviesHeader = header.replace(" ", "_");
+                    String foldedSequence = RNAFoldCaller.callRNAFolder(sequenceToFold, rnaMoviesHeader);
+                    //for testing purposes in offline mode:
 //            String foldedSequence = ">tRNA-like structure from turnip yellow mosaic virus\n"+
 //"UUAGCUCGCCAGUUAGCGAGGUCUGUCCCCACACGACAGAUAAUCGGGUGCAACUCCCGCCCCUUUUCCGAGGGUCAUCGGAACCA\n"+
 //"....(((((......)))))(((((((.......)))))))....(((.((.......)))))..((((((......))))))... (-27.80)";
-            //String foldingEnergy = foldedSequence.substring(foldedSequence.indexOf(" ")+1);
-            foldedSequence = foldedSequence.substring(0, foldedSequence.lastIndexOf("(")-1);
-            RNAMovies rnaMovies = new RNAMovies();
-            rnaMovies.setData(foldedSequence);
-            MoviePane rnaMovie = (MoviePane) rnaMovies.getMovie();
+                    //String foldingEnergy = foldedSequence.substring(foldedSequence.indexOf(" ")+1);
+                    foldedSequence = foldedSequence.substring(0, foldedSequence.lastIndexOf('(') - 1);
+                    RNAMovies rnaMovies = new RNAMovies();
+                    rnaMovies.setData(foldedSequence);
+                    MoviePane rnaMovie = (MoviePane) rnaMovies.getMovie();
 
-            this.rnaFolderTopComp = (RNAFolderTopComponent) WindowManager.getDefault().findTopComponent("RNAFolderTopComponent");
-            this.rnaFolderTopComp.openRNAMovie(rnaMovie, header);
-        } catch (RNAFoldException ex) {
-            NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
-            DialogDisplayer.getDefault().notify(nd);
-        }
+                    rnaFolderTopComp.openRNAMovie(rnaMovie, header);
+                    progressHandle.finish();
+
+                } catch (RNAFoldException ex) {
+                    NotifyDescriptor nd = new NotifyDescriptor.Message(ex.getMessage(), NotifyDescriptor.ERROR_MESSAGE);
+                    DialogDisplayer.getDefault().notify(nd);
+                }
+            }
+        });
+        rnaFoldThread.start();
+
     }
 }

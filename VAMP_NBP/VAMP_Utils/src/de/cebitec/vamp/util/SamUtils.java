@@ -54,7 +54,6 @@ public class SamUtils implements Observable {
      * Generates a BAM index file from an input BAM file.
      * @param reader SAMFileReader for input BAM file
      * @param output  File for output index file
-     *
      * @return true, if the index creation succeeded, false otherwise
      * @author Martha Borkan, rhilker
      */
@@ -180,7 +179,7 @@ public class SamUtils implements Observable {
     }
 
     /**
-     * Removes a file ending used by VAMP from the end of a file name. Note:
+     * Removes a file ending used by ReadXplorer from the end of a file name. Note:
      * This is not the file extension!
      * @param fileEnding the file ending to remove
      * @param filePath the file path to chech for the ending

@@ -5,9 +5,11 @@ import de.cebitec.vamp.databackend.connector.ReferenceConnector;
 import de.cebitec.vamp.databackend.dataObjects.MappingResultPersistant;
 import de.cebitec.vamp.databackend.dataObjects.PersistantDiff;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
+import de.cebitec.vamp.databackend.dataObjects.PersistantReadPairGroup;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReferenceGap;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
+import de.cebitec.vamp.databackend.dataObjects.ReadPairResultPersistant;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceUtils;
 import java.io.File;
@@ -19,13 +21,15 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 /**
  * This mapping thread should be used for analyses, but not for visualizing
@@ -37,31 +41,36 @@ import java.util.logging.Logger;
 public class MappingThread extends RequestThread {
 
     public static int FIXED_INTERVAL_LENGTH = 1000;
+    private List<PersistantTrack> tracks;
     private int trackId;
     private Connection con;
     ConcurrentLinkedQueue<IntervalRequest> requestQueue;
-    List<PersistantMapping> currentMappings;
+    private List<PersistantMapping> currentMappings;
+    private Collection<PersistantReadPairGroup> currentReadPairs;
     private boolean isDbUsed;
-    private final PersistantReference refGenome;
-    private SamBamFileReader externalDataReader;
+    private PersistantReference refGenome;
 
     /**
      * Creates a new mapping thread for carrying out mapping request either to a
      * database or a file.
-     *
-     * @param track the track for which this mapping thread is created
+     * @param tracks the track for which this mapping thread is created
      */
-    public MappingThread(PersistantTrack track) {
+    public MappingThread(List<PersistantTrack> tracks) {
         super();
         // do general stuff
-        ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(track.getRefGenID());
-        this.refGenome = refConnector.getRefGenome();
         this.requestQueue = new ConcurrentLinkedQueue<>();
         this.con = ProjectConnector.getInstance().getConnection();
-        this.trackId = track.getId();
-        this.isDbUsed = track.isDbUsed();
-        if (!this.isDbUsed) {
-            this.externalDataReader = new SamBamFileReader(new File(track.getFilePath()), this.trackId);
+        this.tracks = tracks;
+        if (this.canQueryData()) {
+            ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(tracks.get(0).getRefGenID());
+            this.refGenome = refConnector.getRefGenome();
+            for (PersistantTrack track : this.tracks) {
+                if (track.isDbUsed()) {
+                    this.isDbUsed = true;
+                    break;
+                }
+            }
+            this.trackId = this.tracks.get(0).getId();
         }
     }
 
@@ -70,89 +79,132 @@ public class MappingThread extends RequestThread {
         this.setLatestRequest(request);
         this.requestQueue.add(request);
     }
+    
+    /**
+     * Collects all mappings of the associated tracks for the interval described
+     * by the request parameters. Mappings for DB tracks can only be obtained 
+     * for one track.
+     * @param request the interval request containing the requested reference
+     * interval
+     * @return the collection of mappings for the given interval
+     */
+    List<PersistantMapping> loadMappings(IntervalRequest request) {
+        List<PersistantMapping> mappingList = new ArrayList<>();
+        if (request.getFrom() < request.getTo() && request.getFrom() > 0 && request.getTo() > 0) {
+            if (this.isDbUsed) {
+                if (request.isDiffsAndGapsNeeded()) {
+                    mappingList = this.loadMappingsWithDiffsFromDB(request);
+                } else {
+                    mappingList = this.loadMappingsWithoutDiffsFromDB(request);
+                }
+            }
+
+            Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Reading mapping data from file...", currentTimestamp);
+
+            for (int i = 0; i < this.tracks.size(); ++i) {
+                if (!this.tracks.get(i).isDbUsed()) {
+                    SamBamFileReader externalDataReader = new SamBamFileReader(new File(tracks.get(i).getFilePath()), tracks.get(i).getId());
+                    Collection<PersistantMapping> intermedRes = externalDataReader.getMappingsFromBam(refGenome, request, true);
+                    externalDataReader.close();
+                    mappingList.addAll(intermedRes);
+                }
+            }
+            if (tracks.size() > 1) {
+                Collections.sort(mappingList);
+            }
+
+            currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Done reading mapping data from file...", currentTimestamp);
+
+        }
+        return mappingList;
+    }
 
     /**
      * Loads all mappings (without diffs) from the DB with start positions
      * within the given interval of the reference genome.
-     *
      * @param request the genome request containing the requested genome
      * interval
      * @return the list of mappings belonging to the given interval
      */
-    List<PersistantMapping> loadMappingsWithoutDiffs(IntervalRequest request) {
+    List<PersistantMapping> loadMappingsWithoutDiffsFromDB(IntervalRequest request) {
 
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Reading mapping data from database...", currentTimestamp);
 
         List<PersistantMapping> mappings = new ArrayList<>();
         int from = request.getFrom();
         int to = request.getTo();
+        ParametersReadClasses readClassParams = request.getReadClassParams();
+        
+        //Note: uniqueness of mappings cannot be querried from db!!!
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Reading mapping data from database...", currentTimestamp);
+        try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_WITHOUT_DIFFS)) {
+            fetch.setLong(1, from);
+            fetch.setLong(2, to);
+            fetch.setLong(3, trackId);
 
-        if (this.isDbUsed) {
-            try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_WITHOUT_DIFFS)) {
-                fetch.setLong(1, from);
-                fetch.setLong(2, to);
-                fetch.setLong(3, trackId);
+            ResultSet rs = fetch.executeQuery();
+            //  int counter = 0;
+            while (rs.next()) {
+                int currentTrackId = rs.getInt(FieldNames.MAPPING_TRACK);
+                if (currentTrackId == trackId) {
 
-                ResultSet rs = fetch.executeQuery();
-                //  int counter = 0;
-                while (rs.next()) {
-                    int currentTrackId = rs.getInt(FieldNames.MAPPING_TRACK);
-                    if (currentTrackId == this.trackId) {
+                    int mismatches = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
+                    boolean isBestMapping = rs.getBoolean(FieldNames.MAPPING_IS_BEST_MAPPING);
+
+                    //only add desired mappings to mappings
+                    if (readClassParams.isPerfectMatchUsed() && mismatches == 0
+                            || readClassParams.isBestMatchUsed() && isBestMapping
+                            || readClassParams.isCommonMatchUsed() && !isBestMapping) {
 
                         int id = rs.getInt(FieldNames.MAPPING_ID);
                         int start = rs.getInt(FieldNames.MAPPING_START);
                         int stop = rs.getInt(FieldNames.MAPPING_STOP);
                         boolean isFwdStrand = rs.getByte(FieldNames.MAPPING_DIRECTION) == SequenceUtils.STRAND_FWD;
                         int count = rs.getInt(FieldNames.MAPPING_NUM_OF_REPLICATES);
-                        int errors = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
                         int seqId = rs.getInt(FieldNames.MAPPING_SEQUENCE_ID);
-                        boolean isBestMapping = rs.getBoolean(FieldNames.MAPPING_IS_BEST_MAPPING);
 
-
-                        PersistantMapping mapping = new PersistantMapping(id, start, stop, this.trackId,
-                                isFwdStrand, count, errors, seqId, isBestMapping);
+                        PersistantMapping mapping = new PersistantMapping(id, start, stop, trackId,
+                                isFwdStrand, count, mismatches, seqId, isBestMapping);
                         mappings.add(mapping);
                     }
-
-
                 }
-                rs.close();
-
-            } catch (SQLException ex) {
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
             }
-        } else { //handle retrieving of data from other source than a DB
-            mappings = new ArrayList<>(externalDataReader.getMappingsFromBam(this.refGenome, from, to, false));
-        }
+            rs.close();
 
-        currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Done reading mapping data from database...", currentTimestamp);
+            currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Done reading mapping data from database...", currentTimestamp);
+
+        } catch (SQLException ex) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
+        }
 
         return mappings;
     }
 
     /**
-     * Collects all mappings of the associated track for the interval described
-     * by the request parameters. Mappings can only be obtained for one track
-     * currently.
-     *
-     * @param request the genome request containing the requested genome
+     * Collects all mappings of the associated track from the DB for the 
+     * interval described by the request parameters. Mappings can only be
+     * obtained for one track currently. Diffs and gaps are included.
+     * @param request the interval request containing the requested reference
      * interval
-     * @return the collection of mappings for the given interval
+     * @return the collection of DB mappings for the given interval
      */
-    List<PersistantMapping> loadMappingsWithDiffs(IntervalRequest request) {
+    List<PersistantMapping> loadMappingsWithDiffsFromDB(IntervalRequest request) {
         HashMap<Long, PersistantMapping> mappings = new HashMap<>();
 
         int from = request.getFrom();
         int to = request.getTo();
+        ParametersReadClasses readClassParams = request.getReadClassParams();
+        Collection<PersistantMapping> mappingList = new ArrayList<>();
 
         if (from < to && from > 0 && to > 0) {
-            if (this.isDbUsed) {
-                try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK)) {
+            try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_FROM_INTERVAL_FOR_TRACK)) {
 
-                    //determine readlength
-                    //TODO: ensure this is only calculated when track id or db changed!
+                //determine readlength
+                //TODO: ensure this is only calculated when track id or db changed!
+                //TODO: fetch largest read length from db
 //                    PreparedStatement fetchReadlength = con.prepareStatement(SQLStatements.GET_CURRENT_READLENGTH);
 //                    fetchReadlength.setLong(1, trackID);
 //                    ResultSet rsReadlength = fetchReadlength.executeQuery();
@@ -167,19 +219,27 @@ public class MappingThread extends RequestThread {
 //                    fetchReadlength.close();
 
 
-                    //mapping processing
-                    
-                    fetch.setLong(1, from - FIXED_INTERVAL_LENGTH);
-                    fetch.setLong(2, to);
-                    fetch.setLong(3, from);
-                    fetch.setLong(4, to + FIXED_INTERVAL_LENGTH);
-                    fetch.setLong(5, trackId);
-                    fetch.setLong(6, from);
-                    fetch.setLong(7, to);
+                //mapping processing
 
-                    ResultSet rs = fetch.executeQuery();
-                    while (rs.next()) {
-                        // mapping data
+                fetch.setLong(1, from - FIXED_INTERVAL_LENGTH);
+                fetch.setLong(2, to);
+                fetch.setLong(3, from);
+                fetch.setLong(4, to + FIXED_INTERVAL_LENGTH);
+                fetch.setLong(5, trackId);
+                fetch.setLong(6, from);
+                fetch.setLong(7, to);
+
+                ResultSet rs = fetch.executeQuery();
+                while (rs.next()) {
+                    // mapping data
+                    int mismatches = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
+                    boolean isBestMapping = rs.getBoolean(FieldNames.MAPPING_IS_BEST_MAPPING);
+
+                    //only add desired mappings to mappings
+                    if (readClassParams.isPerfectMatchUsed() && mismatches == 0
+                            || readClassParams.isBestMatchUsed() && isBestMapping
+                            || readClassParams.isCommonMatchUsed() && !isBestMapping) {
+
                         int mappingID = rs.getInt(FieldNames.MAPPING_ID);
                         int sequenceID = rs.getInt(FieldNames.MAPPING_SEQUENCE_ID);
                         int mappingTrack = rs.getInt(FieldNames.MAPPING_TRACK);
@@ -188,10 +248,7 @@ public class MappingThread extends RequestThread {
                         byte direction = rs.getByte(FieldNames.MAPPING_DIRECTION);
                         boolean isForwardStrand = (direction == SequenceUtils.STRAND_FWD);
                         int count = rs.getInt(FieldNames.MAPPING_NUM_OF_REPLICATES);
-                        int errors = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
-                        int bestMapping = rs.getInt(FieldNames.MAPPING_IS_BEST_MAPPING);
-                        boolean isBestMapping = (bestMapping == 1);
-                        PersistantMapping m = new PersistantMapping(mappingID, start, stop, mappingTrack, isForwardStrand, count, errors, sequenceID, isBestMapping);
+                        PersistantMapping m = new PersistantMapping(mappingID, start, stop, mappingTrack, isForwardStrand, count, mismatches, sequenceID, isBestMapping);
 
                         // add new mapping if not exists
                         if (!mappings.containsKey(m.getId())) {
@@ -218,28 +275,22 @@ public class MappingThread extends RequestThread {
                             }
                         }
                     }
-                    rs.close();
-
-                } catch (SQLException ex) {
-                    Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex.getStackTrace());
                 }
-            } else { //handle retrieving of data from other source than a DB
+                rs.close();
 
-                Collection<PersistantMapping> mappingList = externalDataReader.getMappingsFromBam(this.refGenome, from, to, true);
-                Iterator<PersistantMapping> it = mappingList.iterator();
-                while (it.hasNext()) {
-                    PersistantMapping next = it.next();
-                    mappings.put(next.getId(), next); //TODO: optimize, remove while loop
-                }
+            } catch (SQLException ex) {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex.getStackTrace());
             }
+
+            mappingList = mappings.values();
         }
-        return new ArrayList<>(mappings.values());
+        
+        return new ArrayList<>(mappingList);
     }
 
     /**
      * Loads all mappings (without diffs) from the DB with ids within the given
      * interval of the reference genome.
-     *
      * @param request the genome request containing the requested mapping id
      * interval
      * @return the list of mappings belonging to the given mapping id interval
@@ -253,6 +304,7 @@ public class MappingThread extends RequestThread {
         List<PersistantMapping> mappings = new ArrayList<>();
         int from = request.getFrom();
         int to = request.getTo();
+        ParametersReadClasses readClassParams = request.getReadClassParams();
 
         try (PreparedStatement fetch = con.prepareStatement(SQLStatements.FETCH_MAPPINGS_BY_ID_WITHOUT_DIFFS)) {
             fetch.setLong(1, from);
@@ -264,19 +316,25 @@ public class MappingThread extends RequestThread {
                 int currentTrackId = rs.getInt(FieldNames.MAPPING_TRACK);
                 if (currentTrackId == this.trackId) {
 
-                    int id = rs.getInt(FieldNames.MAPPING_ID);
-                    int start = rs.getInt(FieldNames.MAPPING_START);
-                    int stop = rs.getInt(FieldNames.MAPPING_STOP);
-                    boolean isFwdStrand = rs.getByte(FieldNames.MAPPING_DIRECTION) == SequenceUtils.STRAND_FWD;
-                    int count = rs.getInt(FieldNames.MAPPING_NUM_OF_REPLICATES);
-                    int errors = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
-                    int seqId = rs.getInt(FieldNames.MAPPING_SEQUENCE_ID);
+                    int mismatches = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
                     boolean isBestMapping = rs.getBoolean(FieldNames.MAPPING_IS_BEST_MAPPING);
+                    
+                    //only add desired mappings to mappings
+                    if (readClassParams.isPerfectMatchUsed() && mismatches == 0
+                            || readClassParams.isBestMatchUsed() && isBestMapping
+                            || readClassParams.isCommonMatchUsed() && !isBestMapping) {
+                        
+                        int id = rs.getInt(FieldNames.MAPPING_ID);
+                        int start = rs.getInt(FieldNames.MAPPING_START);
+                        int stop = rs.getInt(FieldNames.MAPPING_STOP);
+                        boolean isFwdStrand = rs.getByte(FieldNames.MAPPING_DIRECTION) == SequenceUtils.STRAND_FWD;
+                        int count = rs.getInt(FieldNames.MAPPING_NUM_OF_REPLICATES);
+                        int seqId = rs.getInt(FieldNames.MAPPING_SEQUENCE_ID);
 
-
-                    PersistantMapping mapping = new PersistantMapping(id, start, stop, this.trackId,
-                            isFwdStrand, count, errors, seqId, isBestMapping);
-                    mappings.add(mapping);
+                        PersistantMapping mapping = new PersistantMapping(id, start, stop, this.trackId,
+                                isFwdStrand, count, mismatches, seqId, isBestMapping);
+                        mappings.add(mapping);
+                    }
                 }
 
 
@@ -294,48 +352,102 @@ public class MappingThread extends RequestThread {
     }
 
     /**
-     * Receives all the mappings belonging to the given trackID. In order to
-     * save space only Start, Stop and Direction are received by this method. 
-     *
-     * @param trackID the ID of the track the received mappings should be from
-     * @return list of mappings
+     * Receives all reduced mappings belonging to the associated tracks. In 
+     * order to save memory only Start, Stop and Direction are received by this
+     * method. Diffs and gaps are never included.
+     * @param request the request to carry out
+     * @return list of reduced mappings. Diffs and gaps are never included.
      */
     public List<PersistantMapping> loadReducedMappings(IntervalRequest request) {
 
         Connection connection = ProjectConnector.getInstance().getConnection();
         Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Reading mapping data from database...", currentTimestamp);
 
         List<PersistantMapping> mappings = new ArrayList<>();
+        ParametersReadClasses readClassParams = request.getReadClassParams();
         if (this.isDbUsed) {
-            try (PreparedStatement fetch = connection.prepareStatement(SQLStatements.LOAD_REDUCED_MAPPINGS_BY_TRACK_ID_AND_INTERVAL)) {
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Reading mapping data from database...", currentTimestamp);
+            try (PreparedStatement fetch = connection.prepareStatement(SQLStatements.FETCH_REDUCED_MAPPINGS_BY_TRACK_ID_AND_MAP_ID_INTERVAL)) {
                 fetch.setLong(1, trackId);
                 fetch.setLong(2, request.getFrom());
                 fetch.setLong(3, request.getTo());
 
                 ResultSet rs = fetch.executeQuery();
                 while (rs.next()) {
-                    int start = rs.getInt(FieldNames.MAPPING_START);
-                    int stop = rs.getInt(FieldNames.MAPPING_STOP);
-                    boolean isFwdStrand = rs.getByte(FieldNames.MAPPING_DIRECTION) == SequenceUtils.STRAND_FWD;
-                    int numReplicates = rs.getInt(FieldNames.MAPPING_NUM_OF_REPLICATES);
+                    
+                    int mismatches = rs.getInt(FieldNames.MAPPING_NUM_OF_ERRORS);
+                    boolean isBestMapping = rs.getBoolean(FieldNames.MAPPING_IS_BEST_MAPPING);
 
+                    //only add desired mappings to mappings
+                    if (readClassParams.isPerfectMatchUsed() && mismatches == 0
+                            || readClassParams.isBestMatchUsed() && isBestMapping
+                            || readClassParams.isCommonMatchUsed() && !isBestMapping) {
+                        
+                        int start = rs.getInt(FieldNames.MAPPING_START);
+                        int stop = rs.getInt(FieldNames.MAPPING_STOP);
+                        boolean isFwdStrand = rs.getByte(FieldNames.MAPPING_DIRECTION) == SequenceUtils.STRAND_FWD;
+                        int numReplicates = rs.getInt(FieldNames.MAPPING_NUM_OF_REPLICATES);
 
-                    PersistantMapping mapping = new PersistantMapping(start, stop, isFwdStrand, numReplicates);
-                    mappings.add(mapping);
+                        PersistantMapping mapping = new PersistantMapping(start, stop, isFwdStrand, numReplicates);
+                        mappings.add(mapping);
+                    }
                 }
                 rs.close();
+                
+                currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Done reading mapping data from database...", currentTimestamp);
 
             } catch (SQLException ex) {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ex);
             }
         } else { //handle retrieving of data from other source than a DB
-            mappings = new ArrayList<>(externalDataReader.getReducedMappingsFromBam(this.refGenome,request.getFrom(),request.getTo()));
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Reading mapping data from file...", currentTimestamp);
+            
+            for (int i = 0; i < this.tracks.size(); ++i) {
+                if (!this.tracks.get(i).isDbUsed()) {
+                    SamBamFileReader externalDataReader = new SamBamFileReader(new File(tracks.get(i).getFilePath()), tracks.get(i).getId());
+                    Collection<PersistantMapping> intermedRes = externalDataReader.getReducedMappingsFromBam(refGenome, request);
+                    externalDataReader.close();
+                    mappings.addAll(intermedRes);
+                }
+            }
+            if (tracks.size() > 1) {
+                Collections.sort(mappings);
+            }
+            
+            currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Done reading mapping data from file...", currentTimestamp);
         }
-        currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Done reading mapping data from database...", currentTimestamp);
 
         return mappings;
+    }
+    
+    /**
+     * Fetches all read pair mappings for the given interval and typeFlag.
+     * @param request The request for which the data shall be gathered
+     * @return the collection of read pair mappings for the given interval
+     * and typeFlag
+     */
+    public Collection<PersistantReadPairGroup> getReadPairMappings(IntervalRequest request) {
+        Collection<PersistantReadPairGroup> readPairs = new ArrayList<>();
+        int from = request.getFrom();
+        int to = request.getTo();
+        if (from > 0 && to > 0 && from < to) {
+
+            if (this.isDbUsed) {
+                JOptionPane.showMessageDialog(new JPanel(), "Read Pair Viewer not available anymore for DB-tracks. Please reimport the data sets!", 
+                        "Function not available!", JOptionPane.ERROR_MESSAGE);
+            } else {
+                for (int i = 0; i < this.tracks.size(); ++i) {
+                    if (!this.tracks.get(i).isDbUsed()) {
+                        SamBamFileReader reader = new SamBamFileReader(new File(tracks.get(i).getFilePath()), tracks.get(i).getId());
+                        Collection<PersistantReadPairGroup> intermedRes = reader.getSeqPairMappingsFromBam(refGenome, request, true);
+                        readPairs.addAll(intermedRes);
+                    }
+                }
+            }
+        }
+        return readPairs;
     }
 
     @Override
@@ -345,15 +457,22 @@ public class MappingThread extends RequestThread {
 
             IntervalRequest request = requestQueue.poll();
             if (request != null) {
-                if (matchesLatestRequestBounds(request)) {
-                    if (request.getDesiredData() == Properties.MAPPINGS_W_DIFFS) {
-                        this.currentMappings = this.loadMappingsWithDiffs(request);
-                    } else if (request.getDesiredData() == Properties.MAPPINGS_WO_DIFFS) {
-                        this.currentMappings = this.loadMappingsWithoutDiffs(request);
+                if (doesNotMatchLatestRequestBounds(request)) {
+                    if (request.getDesiredData() == Properties.READ_PAIRS) {
+                        this.currentReadPairs = this.getReadPairMappings(request);
+                    } else if (request.getDesiredData() == Properties.MAPPINGS_DB_BY_ID) {
+                        currentMappings = this.loadMappingsById(request);
+                    } else if (request.getDesiredData() == Properties.REDUCED_MAPPINGS) {
+                        currentMappings = this.loadReducedMappings(request);
                     } else {
-                        this.currentMappings = this.loadMappingsById(request);
+                        currentMappings = this.loadMappings(request);
                     }
-                    request.getSender().receiveData(new MappingResultPersistant(currentMappings, request.getFrom(), request.getTo()));
+                    //switch between ordinary mappings and read pairs
+                    if (request.getDesiredData() != Properties.READ_PAIRS) {
+                        request.getSender().receiveData(new MappingResultPersistant(currentMappings, request.getFrom(), request.getTo()));
+                    } else {
+                        request.getSender().receiveData(new ReadPairResultPersistant(currentReadPairs, request.getFrom(), request.getTo()));
+                    }
                 }
 
             } else {
@@ -367,7 +486,10 @@ public class MappingThread extends RequestThread {
         }
     }
 
-    public int getTrackId() {
-        return trackId;
-    }
+    /**
+     * @return true, if the tracklist is not null or empty, false otherwise
+     */
+    protected boolean canQueryData() {
+        return this.tracks != null && !this.tracks.isEmpty();
+    }   
 }

@@ -2,6 +2,7 @@ package de.cebitec.vamp.transcriptionAnalyses.wizard;
 
 import de.cebitec.vamp.api.objects.JobPanel;
 import de.cebitec.vamp.util.GeneralUtils;
+import de.cebitec.vamp.view.dialogMenus.ChangeListeningWizardPanel;
 
 /**
  * Panel for showing all available options for the transcription start site 
@@ -18,7 +19,7 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
     private int maxLowCovInitialCount;
     private int minLowCovIncrease;
     private int minTranscriptExtensionCov;
-    private boolean detectUnannotatedTranscripts = false;
+    private boolean detectUnannotatedTranscripts = true;
     private boolean tssAutomatic = false;
 
     /**
@@ -80,6 +81,11 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         org.openide.awt.Mnemonics.setLocalizedText(maxInitialCountLabel, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.maxInitialCountLabel.text")); // NOI18N
 
         minLowCovCountField.setText(org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.minLowCovCountField.text")); // NOI18N
+        minLowCovCountField.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                minLowCovCountFieldActionPerformed(evt);
+            }
+        });
 
         org.openide.awt.Mnemonics.setLocalizedText(minLowCovCountLabel, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.minLowCovCountLabel.text")); // NOI18N
 
@@ -119,6 +125,7 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
                 .addGap(7, 7, 7))
         );
 
+        unannotatedTranscriptsBox.setSelected(true);
         org.openide.awt.Mnemonics.setLocalizedText(unannotatedTranscriptsBox, org.openide.util.NbBundle.getMessage(TransAnalysesTSSVisualPanel.class, "TransAnalysesTSSVisualPanel.unannotatedTranscriptsBox.text")); // NOI18N
         unannotatedTranscriptsBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -203,6 +210,10 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         }
     }//GEN-LAST:event_unannotatedTranscriptsBoxActionPerformed
 
+    private void minLowCovCountFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_minLowCovCountFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_minLowCovCountFieldActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel addRestrictionLabel;
     private javax.swing.JPanel additionalOptionPanel;
@@ -271,7 +282,7 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
             isValidated = false;
         }
         
-        firePropertyChange(TranscriptionAnalysesWizardIterator.PROP_VALIDATE, null, isValidated);
+        firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated);
         return isValidated;
     }
 

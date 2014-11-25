@@ -1,7 +1,7 @@
 package de.cebitec.vamp.view.dataVisualisation;
 
-import de.cebitec.common.sequencetools.GeneticCode;
-import de.cebitec.common.sequencetools.GeneticCodeFactory;
+import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
+import de.cebitec.common.sequencetools.geneticcode.GeneticCodeFactory;
 import de.cebitec.vamp.databackend.dataObjects.PersistantReference;
 import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.SequenceUtils;
@@ -42,7 +42,8 @@ public class HighlightAreaListener extends MouseAdapter {
     private boolean isFwdStrand;
     private int seqStart;
     private int seqEnd;
-
+    private String refName;
+    
     /**
      * @param parentComponent the component the listener is associated to
      * @param baseLineY the baseline of the vie
@@ -51,13 +52,15 @@ public class HighlightAreaListener extends MouseAdapter {
      */
     public HighlightAreaListener(final SequenceBar parentComponent, final int baseLineY, final int offsetY) {
         this.parentComponent = parentComponent;
+        this.refName = parentComponent.getPersistantReference().getName();
         this.baseLineY = baseLineY;
         this.offsetY = offsetY;
         this.startX = -1;
         this.keepPainted = false;
         this.freezeRect = false;
         this.isFwdStrand = true;
-        this.specialRegionList = new HashMap<Integer, List<JRegion>>();
+        this.specialRegionList = new HashMap<>();
+       // this.feature = parentComponent.getPersistantReference()
     }
 
     @Override
@@ -161,18 +164,21 @@ public class HighlightAreaListener extends MouseAdapter {
             final String header = this.getHeader();
             //add copy option
             popUp.add(menuItemFactory.getCopyItem(selSequence));
+            //add translated copy option
+            popUp.add(menuItemFactory.getCopyTranslatedItem(selSequence));
             //add copy position option
             popUp.add(menuItemFactory.getCopyPositionItem(parentComponent.getCurrentMousePosition()));
             //add center current position option
             popUp.add(menuItemFactory.getJumpToPosItem(this.parentComponent.getBoundsInfoManager(), parentComponent.getCurrentMousePosition()));
             //add store as fasta file option
-            popUp.add(menuItemFactory.getStoreFastaItem(selSequence, seqStart, seqEnd));
+            popUp.add(menuItemFactory.getStoreFastaItem(selSequence, refName, seqStart, seqEnd));
+            //add store translated sequence as fasta file option
+            popUp.add(menuItemFactory.getStoreTranslatedFastaItem(selSequence, refName, seqStart, seqEnd));
             //add calculate secondary structure option
             final RNAFolderI rnaFolderControl = Lookup.getDefault().lookup(RNAFolderI.class);
             if (rnaFolderControl != null) {
                 popUp.add(menuItemFactory.getRNAFoldItem(rnaFolderControl, selSequence, header));
             }
-
 
             popUp.show((JComponent) e.getComponent(), e.getX(), e.getY());
         }
@@ -206,11 +212,15 @@ public class HighlightAreaListener extends MouseAdapter {
         logright = logright < 0 ? 0 : logright;
         logright = logright > refLength ? refLength : logright;
         String selSequence = seq.substring(logleft, logright);
-        if (!isFwdStrand) {
-            selSequence = SequenceUtils.getReverseComplement(selSequence);
-        }
         this.seqStart = logleft + 1;
         this.seqEnd = logright;
+        
+        if (!isFwdStrand) {
+            selSequence = SequenceUtils.getReverseComplement(selSequence);
+            this.seqStart = logright;
+            this.seqEnd = logleft + 1;
+        }
+        
         return selSequence;
     }
 
@@ -270,7 +280,6 @@ public class HighlightAreaListener extends MouseAdapter {
                 List<Region> cdsRegions = this.calcCdsRegions(xPos);
                 if (!cdsRegions.isEmpty()) {
                     this.parentComponent.setCdsRegions(cdsRegions); //pass regions to viewer for highlighting
-                    String refName = this.parentComponent.getPersistantReference().getName();
                     final List<String> cdsStrings = this.generateCdsString(cdsRegions);
                     popUp.add(menuItemFactory.getStoreFastaForCdsItem(cdsStrings, cdsRegions, refName));
                     
@@ -283,11 +292,14 @@ public class HighlightAreaListener extends MouseAdapter {
             if (this.highlightRect != null) {
                 final String selSequence = this.getMarkedSequence();
                 final String header = this.getHeader();
-                
+               
                 //add copy option
                 popUp.add(menuItemFactory.getCopyItem(selSequence));
+                popUp.add(menuItemFactory.getCopyTranslatedItem(selSequence));
                 //add store as fasta file option
-                popUp.add(menuItemFactory.getStoreFastaItem(selSequence, seqStart, seqEnd));
+                popUp.add(menuItemFactory.getStoreFastaItem(selSequence, refName, seqStart, seqEnd));
+                //add store translated sequence as fasta file option
+                popUp.add(menuItemFactory.getStoreTranslatedFastaItem(selSequence, refName, seqStart, seqEnd));
                 //add calculate secondary structure option
                 final RNAFolderI rnaFolderControl = Lookup.getDefault().lookup(RNAFolderI.class);
                 if (rnaFolderControl != null) {
@@ -307,7 +319,7 @@ public class HighlightAreaListener extends MouseAdapter {
     private List<Region> calcCdsRegions(int xPos) {
         List<JRegion> specialRegions = this.specialRegionList.get(xPos);
 
-        List<Region> cdsRegions = new ArrayList<Region>();
+        List<Region> cdsRegions = new ArrayList<>();
         for (JRegion specialRegion : specialRegions) {
 
             if (specialRegion.getType() == Properties.START) {
@@ -334,14 +346,15 @@ public class HighlightAreaListener extends MouseAdapter {
      */
     private Region findNextStopPos(int start, PersistantReference reference) {
         
-        GeneticCode code = GeneticCodeFactory.getGeneticCodeById(Integer.valueOf(NbPreferences.forModule(Object.class).get(Properties.SEL_GENETIC_CODE, "1")));
+        GeneticCodeFactory genCodeFactory = GeneticCodeFactory.getDefault();
+        GeneticCode code = genCodeFactory.getGeneticCodeById(Integer.valueOf(NbPreferences.forModule(Object.class).get(Properties.SEL_GENETIC_CODE, "1")));
         List<String> stopCodons = code.getStopCodons();
-        List<Integer> results = new ArrayList<Integer>();
+        List<Integer> results = new ArrayList<>();
         
         int searchStart = isFwdStrand ? start + 3 : start - 3;
         PatternFilter patternFilter = new PatternFilter(searchStart, reference.getRefLength(), reference);
         for (String stop : stopCodons) {
-            patternFilter.setPattern(stop.toLowerCase());
+            patternFilter.setPattern(stop.toUpperCase());
             int stopPos = patternFilter.findNextOccurrenceOnStrand(isFwdStrand);
             results.add(stopPos);
         }
@@ -362,7 +375,7 @@ public class HighlightAreaListener extends MouseAdapter {
     }
 
     private List<String> generateCdsString(List<Region> cdsRegions) {
-        List<String> cdsStrings = new ArrayList<String>();
+        List<String> cdsStrings = new ArrayList<>();
         String refSeq = parentComponent.getPersistantReference().getSequence();
         for (Region cds : cdsRegions) {
             String cdsSeq = refSeq.substring(cds.getStart() - 1, cds.getStop()).toUpperCase(); //-1 because its an index, not genome pos

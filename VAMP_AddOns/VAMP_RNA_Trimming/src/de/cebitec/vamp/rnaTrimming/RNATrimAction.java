@@ -6,14 +6,12 @@ package de.cebitec.vamp.rnaTrimming;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.api.cookies.LoginCookie;
-import de.cebitec.vamp.correlationAnalysis.CorrelationResultPanel;
-import de.cebitec.vamp.rnaTrimming.TrimMethod;
+import de.cebitec.vamp.mapping.api.MappingApi;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
-import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.SwingWorker;
 import org.openide.DialogDisplayer;
@@ -24,28 +22,28 @@ import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
-import org.openide.util.RequestProcessor;
 
 
-
+/**
+ * Creates a menu item for RNA Trimming
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
+ */
 @ActionID(
     category = "Tools",
 id = "de.cebitec.vamp.rnaTrimming.RNATrimAction")
 @ActionRegistration(
     displayName = "#CTL_RNATrimAction")
-@ActionReference(path = "Menu/Tools", position = 154)
+@ActionReference(path = "Menu/Tools", position = 155)
 @Messages("CTL_RNATrimAction=Trim upmapped RNA reads in a file")
 public final class RNATrimAction implements ActionListener {
     static String PROP_TRIMMETHOD = "PROP_TRIMMETHOD";
     static String PROP_TRIMMAXIMUM = "PROP_TRIMMAXIMUM";
     static String PROP_SOURCEPATH = "PROP_SOURCEPATH";
     static String PROP_REFERENCEPATH = "PROP_REFERENCEPATH";
-    
+    static String PROP_MAPPINGPARAM = "PROP_MAPPINGPARAM";    
     
     private final LoginCookie context;
     private WizardDescriptor.Panel<WizardDescriptor>[] panels;
-    
-    
     
     public RNATrimAction(LoginCookie context) {
         this.context = context;
@@ -53,37 +51,31 @@ public final class RNATrimAction implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent ev) {
-        if (CentralLookup.getDefault().lookup(SwingWorker.class) != null){
-            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(RNATrimAction.class, "MSG_BackgroundActivity"), NotifyDescriptor.WARNING_MESSAGE);
-            DialogDisplayer.getDefault().notify(nd);
-            return;
-        }
+        if (MappingApi.checkMapperConfig()) { 
+        
+            if (CentralLookup.getDefault().lookup(SwingWorker.class) != null){
+                NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(RNATrimAction.class, "MSG_BackgroundActivity"), NotifyDescriptor.WARNING_MESSAGE);
+                DialogDisplayer.getDefault().notify(nd);
+                return;
+            }
 
-        WizardDescriptor wizardDescriptor = new WizardDescriptor(getPanels());
-        // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
-        wizardDescriptor.setTitleFormat(new MessageFormat("{0}"));
-        wizardDescriptor.setTitle(NbBundle.getMessage(RNATrimAction.class, "TTL_RNATrimAction.title"));
-        Dialog dialog = DialogDisplayer.getDefault().createDialog(wizardDescriptor);
-        dialog.setVisible(true);
-        dialog.toFront();
-        boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
-        if (!cancelled) {
-            new RNATrimProcessor( (String) wizardDescriptor.getProperty(PROP_REFERENCEPATH), 
-                    (String) wizardDescriptor.getProperty(PROP_SOURCEPATH), 
-                    (Integer) wizardDescriptor.getProperty(PROP_TRIMMAXIMUM),
-                    (TrimMethod) wizardDescriptor.getProperty(PROP_TRIMMETHOD)
-                    );
-            
-             
-            
-            
-            
-            /*List<ReferenceJob> refs2del = (List<ReferenceJob>) wizardDescriptor.getProperty(DataAdminWizardAction.PROP_REFS2DEL);
-            List<TrackJob> tracks2del = (List<TrackJob>) wizardDescriptor.getProperty(DataAdminWizardAction.PROP_TRACK2DEL);
-
-            DeletionThread dt = new DeletionThread(refs2del, tracks2del);
-            RequestProcessor rp = new RequestProcessor("Deletion Threads", 2);
-            rp.post(dt);*/
+            WizardDescriptor wizardDescriptor = new WizardDescriptor(getPanels());
+            // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
+            wizardDescriptor.setTitleFormat(new MessageFormat("{0}"));
+            wizardDescriptor.setTitle(NbBundle.getMessage(RNATrimAction.class, "TTL_RNATrimAction.title"));
+            Dialog dialog = DialogDisplayer.getDefault().createDialog(wizardDescriptor);
+            dialog.setVisible(true);
+            dialog.toFront();
+            boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
+            if (!cancelled) {
+                //the actual trimming will be done in RNATrimProcessor 
+                new RNATrimProcessor( (String) wizardDescriptor.getProperty(PROP_REFERENCEPATH), 
+                        (String) wizardDescriptor.getProperty(PROP_SOURCEPATH), 
+                        (Integer) wizardDescriptor.getProperty(PROP_TRIMMAXIMUM),
+                        (TrimMethod) wizardDescriptor.getProperty(PROP_TRIMMETHOD),
+                        (String) wizardDescriptor.getProperty(PROP_MAPPINGPARAM)
+                        );
+            }
         }
     }
     

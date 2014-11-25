@@ -4,6 +4,7 @@ import java.util.Map;
 import org.openide.util.NbBundle;
 
 /**
+ * Statistics panel for the covered feature analysis.
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */

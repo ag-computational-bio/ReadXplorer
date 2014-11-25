@@ -6,7 +6,6 @@ package de.cebitec.vamp.util;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import org.openide.windows.InputOutput;
 
 /**
  * CommandLineUtils bundles tools for running external scripts on the command line
@@ -14,7 +13,7 @@ import org.openide.windows.InputOutput;
  */
 public class CommandLineUtils {
     
-    private InputOutput io;
+    private SimpleOutput out;
     
     /**
      * If any message should be printed to the console, this method is used.
@@ -23,11 +22,11 @@ public class CommandLineUtils {
      * @param msg the msg to print
      */
     private void showMsg(String msg) {
-        this.io.getOut().println(msg);
+        this.out.showMessage(msg);
     }
     
-    public CommandLineUtils(InputOutput io) {
-        this.io = io;
+    public CommandLineUtils(SimpleOutput output) {
+        this.out = output;
     }
     
     /** 

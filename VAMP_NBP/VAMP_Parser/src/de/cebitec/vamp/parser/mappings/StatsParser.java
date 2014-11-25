@@ -1,10 +1,10 @@
 package de.cebitec.vamp.parser.mappings;
 
-import de.cebitec.vamp.util.StatsContainer;
 import de.cebitec.vamp.parser.TrackJob;
 import de.cebitec.vamp.parser.common.ParsingException;
 import de.cebitec.vamp.util.ErrorLimit;
 import de.cebitec.vamp.util.Observer;
+import de.cebitec.vamp.util.StatsContainer;
 import java.util.ArrayList;
 import java.util.List;
 import net.sf.samtools.SAMFileReader;
@@ -73,11 +73,6 @@ public class StatsParser implements MappingParserI {
 
     @Override
     public Object convert(TrackJob trackJob, String referenceSequence) throws ParsingException, OutOfMemoryError {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public SeqPairProcessorI getSeqPairProcessor() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

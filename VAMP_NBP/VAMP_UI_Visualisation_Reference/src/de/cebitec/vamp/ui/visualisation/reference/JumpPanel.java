@@ -363,7 +363,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
 
     private void searchPatternButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchPatternButtonActionPerformed
 
-        String pattern = this.searchPatternField.getText().toLowerCase();
+        String pattern = this.searchPatternField.getText();
 //        if (SequenceUtils.isValidDnaString(pattern)) {
             int newPos;
 

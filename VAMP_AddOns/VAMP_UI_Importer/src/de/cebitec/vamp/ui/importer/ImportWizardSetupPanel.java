@@ -20,7 +20,7 @@ public class ImportWizardSetupPanel implements WizardDescriptor.FinishablePanel<
      */
     private ImportSetupCard component;
     private boolean isValid;
-    private final Set<ChangeListener> listeners = new HashSet<ChangeListener>(1); // or can use ChangeSupport in NB 6.0, but how?!?
+    private final Set<ChangeListener> listeners = new HashSet<>(1); // or can use ChangeSupport in NB 6.0, but how?!?
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -69,7 +69,7 @@ public class ImportWizardSetupPanel implements WizardDescriptor.FinishablePanel<
     protected final void fireChangeEvent() {
         Iterator<ChangeListener> it;
         synchronized (listeners) {
-            it = new HashSet<ChangeListener>(listeners).iterator();
+            it = new HashSet<>(listeners).iterator();
         }
         ChangeEvent ev = new ChangeEvent(this);
         while (it.hasNext()) {
@@ -98,7 +98,6 @@ public class ImportWizardSetupPanel implements WizardDescriptor.FinishablePanel<
         // store job to import
         settings.putProperty(ImportWizardAction.PROP_REFJOBLIST, component.getRefJobList());
         settings.putProperty(ImportWizardAction.PROP_TRACKJOBLIST, component.getTrackJobList());
-        settings.putProperty(ImportWizardAction.PROP_SEQPAIRJOBLIST, component.getSeqPairTrackJobList());
-        settings.putProperty(ImportWizardAction.PROP_POSITIONTABLELIST, component.getPositionTableJobs());
+        settings.putProperty(ImportWizardAction.PROP_READPAIRJOBLIST, component.getReadPairTrackJobList());
     }
 }

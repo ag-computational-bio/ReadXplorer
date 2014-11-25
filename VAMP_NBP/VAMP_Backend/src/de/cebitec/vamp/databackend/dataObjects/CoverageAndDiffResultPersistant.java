@@ -17,6 +17,7 @@ public class CoverageAndDiffResultPersistant extends PersistantResult implements
     public static final long serialVersionUID = 42L;
     
     private PersistantCoverage coverage;
+    private PersistantCoverage readStarts;
     private List<PersistantDiff> diffs;
     private List<PersistantReferenceGap> gaps;
     private boolean diffsAndGapsUsed;
@@ -24,19 +25,18 @@ public class CoverageAndDiffResultPersistant extends PersistantResult implements
     /**
      * Data storage for coverage, diffs and gaps.
      * @param coverage the coverage container to store. If it is not used, you can
-     *      add null or an empty coverage container.
+     *      add an empty coverage container.
      * @param diffs the list of diffs to store, if they are not used, you can add null
      *      or an empty list.
      * @param gaps the list of gaps to store, if they are not use, you can add null
      *      or an empty list
      * @param diffsAndGapsUsed true, if this is a result from querying also diffs and gaps
-     * @param lowerBound the lower bound of the requested interval
-     * @param upperBound the upper bound of the requested interval
      */
     public CoverageAndDiffResultPersistant(PersistantCoverage coverage, List<PersistantDiff> diffs, List<PersistantReferenceGap> gaps, 
-            boolean diffsAndGapsUsed, int lowerBound, int upperBound) {
-        super(lowerBound, upperBound);
+            boolean diffsAndGapsUsed) {
+        super(coverage.getLeftBound(), coverage.getRightBound());
         this.coverage = coverage;
+        this.readStarts = null;
         this.diffs = diffs;
         this.gaps = gaps;
         this.diffsAndGapsUsed = diffsAndGapsUsed;
@@ -77,6 +77,21 @@ public class CoverageAndDiffResultPersistant extends PersistantResult implements
             return new PersistantCoverage(0, 0);
         }
     }
+
+    /**
+     * @return the coverage object containing only the read start counts.
+     */
+    public PersistantCoverage getReadStarts() {
+        return readStarts;
+    }
+
+    /**
+     * @param readStarts The coverage object containing only the read start counts.
+     */
+    public void setReadStarts(PersistantCoverage readStarts) {
+        this.readStarts = readStarts;
+    }
+    
 
     /**
      * @return true, if diffs and gaps were querried, false, if not

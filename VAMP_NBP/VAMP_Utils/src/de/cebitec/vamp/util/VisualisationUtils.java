@@ -48,7 +48,7 @@ public class VisualisationUtils {
     @SuppressWarnings("unchecked")
     public static List<WizardDescriptor.Panel<WizardDescriptor>> getWizardPanels(List<WizardDescriptor.Panel<WizardDescriptor>> wizardPanels) {
 
-        String[] steps = new String[wizardPanels.size()];
+        String[] steps = new String[wizardPanels.size() + 1];
         for (int i = 0; i < wizardPanels.size(); i++) {
             Component c = wizardPanels.get(i).getComponent();
             // Default step name to component name of panel.
@@ -62,6 +62,7 @@ public class VisualisationUtils {
                 jc.putClientProperty(WizardDescriptor.PROP_CONTENT_NUMBERED, true);
             }
         }
+        steps[steps.length - 1] = "Press 'Finish' to start";
         return wizardPanels;
     }
     

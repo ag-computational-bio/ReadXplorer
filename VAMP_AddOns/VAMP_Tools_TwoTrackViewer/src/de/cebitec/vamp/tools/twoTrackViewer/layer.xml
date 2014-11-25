@@ -3,11 +3,11 @@
 <filesystem>
     <folder name="Actions">
         <folder name="Tools">
-            <file name="de-cebitec-vamp-tools-twoTrackViewer-OpenDoubleTrackAction.instance">
+            <file name="de-cebitec-vamp-tools-twoTrackViewer-OpenMultiTrackAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
-                <attr name="displayName" bundlevalue="de.cebitec.vamp.tools.twoTrackViewer.Bundle#CTL_OpenDoubleTrackAction"/>
+                <attr name="displayName" bundlevalue="de.cebitec.vamp.tools.twoTrackViewer.Bundle#CTL_OpenMultiTrackAction"/>
                 <attr name="iconBase" stringvalue="de/cebitec/vamp/tools/twoTrackViewer/doubleTrack.png"/>
-                <attr name="injectable" stringvalue="de.cebitec.vamp.tools.twoTrackViewer.OpenDoubleTrackAction"/>
+                <attr name="injectable" stringvalue="de.cebitec.vamp.tools.twoTrackViewer.OpenMultiTrackAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
@@ -17,20 +17,20 @@
     </folder>
     <folder name="Menu">
         <folder name="Tools">
-            <file name="de-cebitec-vamp-tools-twoTrackViewer-OpenDoubleTrackAction-separatorBefore.instance">
+            <file name="de-cebitec-vamp-tools-twoTrackViewer-OpenMultiTrackAction-separatorBefore.instance">
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                 <attr name="position" intvalue="161"/>
             </file>
-            <file name="de-cebitec-vamp-tools-twoTrackViewer-OpenDoubleTrackAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Tools/de-cebitec-vamp-tools-twoTrackViewer-OpenDoubleTrackAction.instance"/>
+            <file name="de-cebitec-vamp-tools-twoTrackViewer-OpenMultiTrackAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Tools/de-cebitec-vamp-tools-twoTrackViewer-OpenMultiTrackAction.instance"/>
                 <attr name="position" intvalue="162"/>
             </file>
         </folder>
     </folder>
     <folder name="Toolbars">
         <folder name="Tools">
-            <file name="de-cebitec-vamp-tools-twoTrackViewer-OpenDoubleTrackAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Tools/de-cebitec-vamp-tools-twoTrackViewer-OpenDoubleTrackAction.instance"/>
+            <file name="de-cebitec-vamp-tools-twoTrackViewer-OpenMultiTrackAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Tools/de-cebitec-vamp-tools-twoTrackViewer-OpenMultiTrackAction.instance"/>
                 <attr name="position" intvalue="287"/>
             </file>
         </folder>

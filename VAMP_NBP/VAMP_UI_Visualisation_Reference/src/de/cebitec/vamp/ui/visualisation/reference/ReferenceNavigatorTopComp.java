@@ -1,22 +1,22 @@
 package de.cebitec.vamp.ui.visualisation.reference;
 
+import de.cebitec.vamp.view.TopComponentExtended;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.util.logging.Logger;
-import org.openide.util.LookupEvent;
-import org.openide.util.NbBundle;
-import org.openide.windows.TopComponent;
-import org.openide.windows.WindowManager;
-//import org.openide.util.ImageUtilities;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.Lookup.Result;
+import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
+import org.openide.util.NbBundle;
 import org.openide.util.Utilities;
+import org.openide.windows.TopComponent;
+import org.openide.windows.WindowManager;
 
 /**
  * Top component which displays something.
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.ui.visualisation.reference//ReferenceNavigator//EN", autostore = false)
-public final class ReferenceNavigatorTopComp extends TopComponent implements LookupListener{
+public final class ReferenceNavigatorTopComp extends TopComponentExtended implements LookupListener{
 
     private static final long serialVersionUID = 1L;
 
@@ -64,6 +64,7 @@ public final class ReferenceNavigatorTopComp extends TopComponent implements Loo
      * Gets default instance. Do not use directly: reserved for *.settings files only,
      * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
      * To obtain the singleton instance, use {@link #findInstance}.
+     * @return The default istance
      */
     public static synchronized ReferenceNavigatorTopComp getDefault() {
         if (instance == null) {
@@ -74,6 +75,7 @@ public final class ReferenceNavigatorTopComp extends TopComponent implements Loo
 
     /**
      * Obtain the ReferenceNavigatorTopComp instance. Never call {@link #getDefault} directly!
+     * @return The default instance
      */
     public static synchronized ReferenceNavigatorTopComp findInstance() {
         TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);

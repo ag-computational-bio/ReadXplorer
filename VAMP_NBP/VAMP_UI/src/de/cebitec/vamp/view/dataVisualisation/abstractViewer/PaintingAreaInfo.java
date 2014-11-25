@@ -3,7 +3,7 @@ package de.cebitec.vamp.view.dataVisualisation.abstractViewer;
 import java.awt.geom.Point2D;
 
 /**
- * Contains useful info about a painting area, such heights and widths,
+ * Contains useful info about a painting area, such as heights, widths,
  * left and right end positions.
  *
  * @author ddoppmeier

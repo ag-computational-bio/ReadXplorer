@@ -1,11 +1,8 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.vamp.mapping;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.vamp.api.cookies.LoginCookie;
+import de.cebitec.vamp.mapping.api.MappingApi;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
@@ -23,17 +20,22 @@ import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 
 
-
+/**
+ * MappingAction adds a menu item to start the mapping of a sequencing data set.
+ * 
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
+ */
 @ActionID(
     category = "Tools",
 id = "de.cebitec.vamp.mapping.MappingAction")
 @ActionRegistration(
     displayName = "#CTL_MappingAction")
-@ActionReference(path = "Menu/Tools", position = 155)
+@ActionReference(path = "Menu/Tools", position = 154)
 @Messages("CTL_MappingAction=Map reads")
 public final class MappingAction implements ActionListener {
     static String PROP_SOURCEPATH = "PROP_SOURCEPATH";
     static String PROP_REFERENCEPATH = "PROP_REFERENCEPATH";
+    static String PROP_MAPPINGPARAM = "PROP_MAPPINGPARAM";
     
     
     private final LoginCookie context;
@@ -52,18 +54,21 @@ public final class MappingAction implements ActionListener {
             DialogDisplayer.getDefault().notify(nd);
             return;
         }
-        WizardDescriptor wizardDescriptor = new WizardDescriptor(getPanels());
-        // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
-        wizardDescriptor.setTitleFormat(new MessageFormat("{0}"));
-        wizardDescriptor.setTitle(NbBundle.getMessage(MappingAction.class, "CTL_MappingAction"));
-        Dialog dialog = DialogDisplayer.getDefault().createDialog(wizardDescriptor);
-        dialog.setVisible(true);
-        dialog.toFront();
-        boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
-        if (!cancelled) {
-            new MappingProcessor( (String) wizardDescriptor.getProperty(PROP_REFERENCEPATH), 
-                    (String) wizardDescriptor.getProperty(PROP_SOURCEPATH)
-                    );
+        if (MappingApi.checkMapperConfig()) { 
+            WizardDescriptor wizardDescriptor = new WizardDescriptor(getPanels());
+            // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
+            wizardDescriptor.setTitleFormat(new MessageFormat("{0}"));
+            wizardDescriptor.setTitle(NbBundle.getMessage(MappingAction.class, "CTL_MappingAction"));
+            Dialog dialog = DialogDisplayer.getDefault().createDialog(wizardDescriptor);
+            dialog.setVisible(true);
+            dialog.toFront();
+            boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
+            if (!cancelled) {
+                new MappingProcessor( (String) wizardDescriptor.getProperty(PROP_REFERENCEPATH), 
+                        (String) wizardDescriptor.getProperty(PROP_SOURCEPATH),
+                        (String) wizardDescriptor.getProperty(PROP_MAPPINGPARAM)
+                        );
+            }
         }
     }
     

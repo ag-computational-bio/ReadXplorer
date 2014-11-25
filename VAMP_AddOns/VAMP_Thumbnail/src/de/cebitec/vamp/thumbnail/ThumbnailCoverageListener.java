@@ -10,10 +10,10 @@ import de.cebitec.vamp.view.dataVisualisation.trackViewer.TrackViewer;
  * Listens for coverage answer from CoverageThread.
  * @author denis
  */
-class ThumbnailCoverageListener implements ThreadListener{
+class ThumbnailCoverageListener implements ThreadListener {
     private TrackViewer trackViewer;
 
-    public ThumbnailCoverageListener(TrackViewer trackViewer){
+    public ThumbnailCoverageListener(TrackViewer trackViewer) {
         this.trackViewer = trackViewer;
     }
 
@@ -25,15 +25,14 @@ class ThumbnailCoverageListener implements ThreadListener{
            PersistantCoverage coverage = coverageResult.getCoverage();
            int middle = coverage.getLeftBound() + ((coverage.getRightBound() - coverage.getLeftBound()) / 2);
            int width = coverage.getRightBound() - coverage.getLeftBound();
-           trackViewer.receiveData(coverage);
            trackViewer.updateLogicalBounds(new BoundsInfo(coverage.getLeftBound(), coverage.getRightBound(), middle, 1, width));
+           trackViewer.receiveData(coverageResult);
        }
     }
 
     @Override
     public void notifySkipped() {
         //do nothing 
-        //throw new UnsupportedOperationException("Not supported yet.");
     }
 
 }

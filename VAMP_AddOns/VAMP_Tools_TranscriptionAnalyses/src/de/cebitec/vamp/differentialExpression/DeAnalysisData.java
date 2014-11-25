@@ -19,8 +19,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class DeAnalysisData {
 
     /**
-     * Contains ID of the reference features as keys and corresponding start
-     * stop pair as values.
+     * Contains ID of the reference features as keys and corresponding feature as values.
      */
     private Map<String, PersistantFeature> featureData;
     /**

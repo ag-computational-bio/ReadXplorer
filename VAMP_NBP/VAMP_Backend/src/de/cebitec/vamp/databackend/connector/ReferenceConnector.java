@@ -79,7 +79,7 @@ public class ReferenceConnector {
      * @return Fetches the reference sequence of the reference associated with
      * this connector and adds it to the returned PersistantReference. If it was
      * called once, it is kept in memory and does not need to be fetched from
-     * the DB again.
+     * the DB again. The reference sequences stored in the DB are always uppercase.
      */
     public String getRefSequence() {
         String sequence = "";
@@ -182,7 +182,6 @@ public class ReferenceConnector {
     /**
      * Fetches all features which are completely located within a given region
      * of the reference.
-     *
      * @param left start position of the region of interest
      * @param right end position of the region of interest
      * @return the list of all features found in the interval of interest
@@ -265,12 +264,13 @@ public class ReferenceConnector {
     }
 
     public boolean hasFeatures(List<FeatureType> typeList) {
-        boolean ret = false;
         for (Iterator<FeatureType> it = typeList.iterator(); it.hasNext();) {
             FeatureType featureType = it.next();
-            ret = (ret || hasFeatures(featureType));
+            if(hasFeatures(featureType)){
+                return true;
+            }
         }
-        return ret;
+        return false;
     }
 
     public boolean hasFeatures(FeatureType type) {

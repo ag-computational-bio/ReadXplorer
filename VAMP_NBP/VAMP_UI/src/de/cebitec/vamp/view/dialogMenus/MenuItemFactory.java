@@ -1,7 +1,10 @@
 package de.cebitec.vamp.view.dialogMenus;
 
+import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
+import de.cebitec.common.sequencetools.geneticcode.GeneticCodeFactory;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.parser.output.OutputParser;
+import de.cebitec.vamp.util.Properties;
 import de.cebitec.vamp.util.fileChooser.FastaFileChooser;
 import de.cebitec.vamp.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.vamp.view.dataVisualisation.abstractViewer.Region;
@@ -16,11 +19,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.List;
+import java.util.prefs.Preferences;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.text.JTextComponent;
 import org.openide.util.NbBundle;
+import org.openide.util.NbPreferences;
 
 /**
  * Factory for different JMenuItems with predefined functionality.
@@ -28,13 +33,19 @@ import org.openide.util.NbBundle;
  * @author Rolf Hilker
  */
 public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
-    
+
     private static final long serialVersionUID = 1L;
     
+    private Preferences pref;
     private final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+    private final GeneticCodeFactory genCodeFactory;
     
+    /**
+     * Creates a Factory for different JMenuItems with predefined functionality.
+     */
     public MenuItemFactory() {
-        //nothing to do here
+        this.pref = NbPreferences.forModule(Object.class);
+        this.genCodeFactory = GeneticCodeFactory.getDefault();
     }
     
     /**
@@ -72,45 +83,111 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
         });
         return copyPositionItem;
     }
+    
+    /**
+     * Returns a JMenuItem for translating and copying a given DNA sequence.
+     * @param dnaSeqToTranslateAndCopy the dnaSequence to translate and copy
+     * @return The JMenuItem for translating and copying a given DNA sequence.
+     */
+    public JMenuItem getCopyTranslatedItem(final String dnaSeqToTranslateAndCopy){
 
+        JMenuItem translationItem = new JMenuItem(NbBundle.getMessage(MenuItemFactory.class, "MenuItem.Translation"));
+        translationItem.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                
+                 GeneticCode code = genCodeFactory.getGeneticCodeById(Integer.valueOf(pref.get(Properties.SEL_GENETIC_CODE, "1")));
+                 String translatedSequence = code.getTranslationForString(dnaSeqToTranslateAndCopy);
+                 clipboard.setContents(new StringSelection(translatedSequence), MenuItemFactory.this);
+            }
+        });
+        return translationItem;
+    }
+    
     /**
      * Returns a JMenuItem for storing a sequence in fasta format.
      * The sequence to store has to be known, when the method is called.
      * @param sequence the sequence to store as fasta
+     * @param refName name of the reference sequence
      * @param feature the feature whose sequence is to be converted to fasta
      *                it contains the header information, but not the sequence
-     * @return jmenuitem for storing a sequence in fasta format
+     * @return The JMenuItem for storing a sequence in fasta format
      */
-    public JMenuItem getStoreFastaItem(final String sequence, final PersistantFeature feature){
-        return this.initStoreFastaItem(sequence, feature, -1, -1);
+    public JMenuItem getStoreFastaItem(final String sequence, final String refName, final PersistantFeature feature){
+        String title = NbBundle.getMessage(MenuItemFactory.class, "MenuItem.StoreFasta");
+        return this.initStoreFastaItem(title, sequence, refName, feature, -1, -1);
 
+    }
+    
+    /**
+     * Returns a JMenuItem for storing the translation of a DNA sequence of a
+     * reference feature in fasta format. The sequence to translate has to be
+     * known, when the method is called.
+     * @param dnaSeqToTranslateAndStore the dna sequence to translate and store
+     * @param refName the name of the reference, of which the sequence originates
+     * @param feature the reference feature, for which the translation is stored
+     * @return The JMenuItem for storing the translation of a DNA sequence of a
+     * reference feature in fasta format.
+     */
+    public JMenuItem getStoreTranslatedFeatureFastaItem(final String dnaSeqToTranslateAndStore,final String refName, final PersistantFeature feature){
+         GeneticCode code = genCodeFactory.getGeneticCodeById(Integer.valueOf(pref.get(Properties.SEL_GENETIC_CODE, "1")));
+         String translatedSequence = code.getTranslationForString(dnaSeqToTranslateAndStore);
+         String title = NbBundle.getMessage(MenuItemFactory.class, "MenuItem.StoreTranslatedFasta");
+           
+         return this.initStoreFastaItem(title,translatedSequence, refName, feature, -1, -1);
     }
 
     /**
-     * Returns a JMenuItem for storing a sequence in fasta format.
-     * The sequence to store has to be known, when the method is called.
-     * @param sequence the sequence to store as fasta
+     * Returns a JMenuItem for storing a sequence in fasta format. The sequence
+     * to store has to be known, when the method is called.
+     * @param dnaSeqToTranslateAndStore the sequence to translate and store as
+     * fasta
+     * @param refName name of the reference sequence
      * @param seqStart the startpoint of the sequence
      * @param seqStop the endpoint of the sequence
-     * @return jmenuitem for storing a sequence in fasta format
+     * @return The JMenuItem  for storing a translated sequence in fasta format
      */
-    public JMenuItem getStoreFastaItem(final String sequence, final int seqStart, final int seqStop){
-        return this.initStoreFastaItem(sequence, null, seqStart, seqStop);
+    public JMenuItem getStoreTranslatedFastaItem(final String dnaSeqToTranslateAndStore, final String refName, final int seqStart, final int seqStop){
+        GeneticCode code = genCodeFactory.getGeneticCodeById(Integer.valueOf(pref.get(Properties.SEL_GENETIC_CODE, "1")));
+        String translatedSequence = code.getTranslationForString(dnaSeqToTranslateAndStore);
+        String title = NbBundle.getMessage(MenuItemFactory.class, "MenuItem.StoreTranslatedFasta");
+
+        return this.initStoreFastaItem(title, translatedSequence, refName, null, seqStart, seqStop);
+    }
+    
+    /**
+     * Returns a JMenuItem for storing a sequence in fasta format. The sequence
+     * to store has to be known, when the method is called.
+     * @param sequence the sequence to translate and store as
+     * fasta
+     * @param refName name of the reference sequence
+     * @param seqStart the startpoint of the sequence
+     * @param seqStop the endpoint of the sequence
+     * @return The JMenuItem for storing a translated sequence in fasta format
+     */
+    public JMenuItem getStoreFastaItem(final String sequence, final String refName, final int seqStart, final int seqStop){
+        //GeneticCode code = GeneticCodeFactory.getGeneticCodeById(Integer.valueOf(pref.get(Properties.SEL_GENETIC_CODE, "1")));
+        // String sequenceCopy= code.getTranslationForString(sequence);
+       String titel = NbBundle.getMessage(MenuItemFactory.class, "MenuItem.StoreFasta");
+        return this.initStoreFastaItem(titel, sequence, refName, null, seqStart, seqStop);
     }
 
     /**
      * Initializes a store fasta item either from an feature or with given start
      * and stop indices.
+     * @param title the title of the JMenuItem
      * @param sequence the sequence to store in fasta format
+     * @param refName name of the reference sequence
      * @param feature the feature containing the header information, <code>null</code> if not from an feature
      * @param seqStart the startpoint of the sequence (-1 if feature is used!)
      * @param seqEnd the endpoint of the sequence (-1 if feature is used!)
      * @return a menu item capable of storing a sequence in fasta format
      */
-    private JMenuItem initStoreFastaItem(final String sequence, final PersistantFeature feature,
+    private JMenuItem initStoreFastaItem(String title,final String sequence, final String refName, final PersistantFeature feature,
             final int seqStart, final int seqEnd) {
-
-        JMenuItem storeFastaItem = new JMenuItem(NbBundle.getMessage(MenuItemFactory.class, "MenuItem.StoreFasta"));
+        
+        JMenuItem storeFastaItem = new JMenuItem(title);
         storeFastaItem.addActionListener(new ActionListener() {
 
             @Override
@@ -119,7 +196,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
                 if (feature != null) {
                     output = this.generateFastaFromFeature();
                 } else {
-                    String header = "Copied sequence from:".concat(String.valueOf(seqStart)).concat(" to ").concat(String.valueOf(seqEnd));
+                    String header = "Copied sequence from: " + refName + " position " + seqStart + " to " + seqEnd;
                     output = OutputParser.generateFasta(sequence, header);
                 }
                 new FastaFileChooser(new String[]{"fasta"}, "fasta", output);
@@ -137,9 +214,9 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
             }
         });
         
-        return storeFastaItem;
+        return storeFastaItem; 
     }
-
+            
     /**
      * Returns a JMenuItem for copying one or more CDS sequences.
      * The text to copy has to be known, when the method is called.
@@ -151,7 +228,7 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
     public JMenuItem getStoreFastaForCdsItem(final List<String> sequencesToStore, final List<Region> regions,
             final String referenceName){
 
-        JMenuItem storeFastaCdsItem = new JMenuItem(NbBundle.getMessage(MenuItemFactory.class, "MenuItem.StoreFastaCDS"));
+        JMenuItem storeFastaCdsItem = new JMenuItem(NbBundle.getMessage(MenuItemFactory.class, "MenuItem.StoreFastaORF"));
         storeFastaCdsItem.addActionListener(new ActionListener() {
 
             @Override
@@ -346,7 +423,5 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
     public void lostOwnership(Clipboard clipboard, Transferable contents) {
         //do nothing
     }
-
-
 
 }

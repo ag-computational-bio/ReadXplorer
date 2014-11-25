@@ -1,17 +1,19 @@
 package de.cebitec.vamp.genomeAnalyses;
 
 import de.cebitec.vamp.databackend.AnalysesHandler;
-import de.cebitec.vamp.databackend.connector.ProjectConnector;
+import de.cebitec.vamp.databackend.ParametersReadClasses;
 import de.cebitec.vamp.databackend.connector.TrackConnector;
 import de.cebitec.vamp.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.vamp.databackend.dataObjects.PersistantTrack;
-import de.cebitec.vamp.transcriptionAnalyses.OpenTranscriptionAnalysesAction;
+import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.Pair;
 import de.cebitec.vamp.util.VisualisationUtils;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.vamp.view.dialogMenus.OpenTrackPanelList;
+import de.cebitec.vamp.view.dialogMenus.OpenTracksVisualPanel;
+import de.cebitec.vamp.view.dialogMenus.OpenTracksWizardPanel;
 import de.cebitec.vamp.view.dialogMenus.SaveTrackConnectorFetcherForGUI;
-import java.awt.Dialog;
+import de.cebitec.vamp.view.dialogMenus.SelectFeatureTypeWizardPanel;
+import de.cebitec.vamp.view.dialogMenus.SelectReadClassWizardPanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
@@ -19,8 +21,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.swing.JOptionPane;
-import org.openide.DialogDescriptor;
+import javax.swing.SwingUtilities;
 import org.openide.DialogDisplayer;
 import org.openide.WizardDescriptor;
 import org.openide.awt.ActionID;
@@ -31,74 +34,78 @@ import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
 
+/**
+ * Action for opening the feature coverage analysis. It opens the wizard and
+ * runs the analysis after successfully finishing the wizard.
+ * 
+ * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
+ */
 @ActionID(
-    category = "Tools",
-id = "de.cebitec.vamp.genomeAnalyses.OpenCoveredFeaturesAction")
+        category = "Tools",
+        id = "de.cebitec.vamp.genomeAnalyses.OpenCoveredFeaturesAction")
 @ActionRegistration(
-    iconBase = "de/cebitec/vamp/genomeAnalyses/coveredFeatures.png",
-displayName = "#CTL_OpenCoveredFeaturesAction")
+        iconBase = "de/cebitec/vamp/genomeAnalyses/coveredFeatures.png",
+        displayName = "#CTL_OpenCoveredFeaturesAction")
 @ActionReferences({
     @ActionReference(path = "Menu/Tools", position = 146),
     @ActionReference(path = "Toolbars/Tools", position = 231)
 })
-@Messages("CTL_OpenCoveredFeaturesAction=Covered Feature Analysis")
+@Messages("CTL_OpenCoveredFeaturesAction=Feature Coverage Analysis")
 public final class OpenCoveredFeaturesAction implements ActionListener, DataVisualisationI {
 
+    private static final String PROP_WIZARD_NAME = "FeatureCoverageWiz";
+    
     private final ReferenceViewer context;
-    private ProjectConnector proCon;
     private int referenceId;
     private List<PersistantTrack> tracks;
     private CoveredFeaturesAnalysisTopComponent coveredAnnoAnalysisTopComp;
-    private Map<Integer, AnalysisContainer> trackToAnalysisMap;
+    private Map<Integer, AnalysisCoveredFeatures> trackToAnalysisMap;
     private int finishedCovAnalyses = 0;
     private ResultPanelCoveredFeatures coveredFeaturesResultPanel;
     ParameterSetCoveredFeatures parameters;
+    private boolean combineTracks;
     private HashMap<Integer, PersistantTrack> trackMap;
+    private OpenTracksWizardPanel openTracksWizPanel;
+    private SelectReadClassWizardPanel readClassWizPanel;
+    private SelectFeatureTypeWizardPanel featTypeWizPanel; 
 
+    /**
+     * Action for opening the feature coverage analysis. It opens the wizard and
+     * runs the analysis after successfully finishing the wizard.
+     */
     public OpenCoveredFeaturesAction(ReferenceViewer context) {
         this.context = context;
-        this.proCon = ProjectConnector.getInstance();
         this.referenceId = this.context.getReference().getId();
         this.trackToAnalysisMap = new HashMap<>();
     }
 
     /**
-     * Carries out the logic behind the covered feature analysis action. This
+     * Carries out the logic behind the feature coverage analysis action. This
      * means, it opens a configuration wizard and starts the analysis after
      * successfully finishing the wizard.
      * @param ev the event, which is currently not used
      */
     @Override
     public void actionPerformed(ActionEvent ev) {
-        OpenTrackPanelList otp = new OpenTrackPanelList(referenceId);
-        DialogDescriptor dialogDescriptor = new DialogDescriptor(otp, NbBundle.getMessage(OpenTranscriptionAnalysesAction.class, "CTL_OpenTrackList"));
-        Dialog openRefGenDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
-        openRefGenDialog.setVisible(true);
-
-        if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && !otp.getSelectedTracks().isEmpty()) {
-            this.tracks = otp.getSelectedTracks();
-            this.trackMap = new HashMap<>();
-            for (PersistantTrack track : otp.getSelectedTracks()) {
-                this.trackMap.put(track.getId(), track);
-            }
-
-            this.coveredAnnoAnalysisTopComp = (CoveredFeaturesAnalysisTopComponent) WindowManager.getDefault().findTopComponent("CoveredFeaturesAnalysisTopComponent");
-            this.coveredAnnoAnalysisTopComp.open();
-            this.runWizarAndCoveredAnnoAnalsysis();
-            
-        } else if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION) && otp.getSelectedTracks().isEmpty()) {
-            String msg = NbBundle.getMessage(OpenCoveredFeaturesAction.class, "CTL_OpenCoveredFeaturesDetectionInfo",
-                    "No track selected. To start a covered feature detection at least one track has to be selected.");
-            String title = NbBundle.getMessage(OpenCoveredFeaturesAction.class, "CTL_OpenCoveredFeaturesDetectionInfoTitle", "Info");
-            JOptionPane.showMessageDialog(this.context, msg, title, JOptionPane.INFORMATION_MESSAGE);
-        }
+        this.runWizarAndCoveredAnnoAnalsysis();
     }
 
+    /**
+     * Runs the wizard and starts the feature coverage anaylsis, if the wizard
+     * finished successfully.
+     */
     private void runWizarAndCoveredAnnoAnalsysis() {
-        
+
         @SuppressWarnings("unchecked")
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
+        this.openTracksWizPanel = new OpenTracksWizardPanel(PROP_WIZARD_NAME, referenceId);
+        this.readClassWizPanel = new SelectReadClassWizardPanel(PROP_WIZARD_NAME);
+        this.featTypeWizPanel = new SelectFeatureTypeWizardPanel(PROP_WIZARD_NAME);
+        this.openTracksWizPanel.setReadClassVisualPanel(readClassWizPanel.getComponent());
+        panels.add(openTracksWizPanel);
         panels.add(new CoveredFeaturesWizardPanel());
+        panels.add(readClassWizPanel);
+        panels.add(featTypeWizPanel);
         WizardDescriptor wiz = new WizardDescriptor(new WizardDescriptor.ArrayIterator<>(VisualisationUtils.getWizardPanels(panels)));
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
         wiz.setTitleFormat(new MessageFormat("{0}"));
@@ -107,38 +114,96 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
         //action to perform after successfully finishing the wizard
         boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
         if (!cancelled) {
-            this.startCoveredFeaturesDetection(wiz);
-        } else {
-            this.coveredAnnoAnalysisTopComp.close();
+            OpenTracksVisualPanel tracksVisPanel = (OpenTracksVisualPanel) openTracksWizPanel.getComponent();
+            if (!tracksVisPanel.getAllMarkedNodes().isEmpty()) {
+                this.tracks = tracksVisPanel.getSelectedTracks();
+                this.trackMap = new HashMap<>();
+                this.trackToAnalysisMap = new HashMap<>();
+                this.finishedCovAnalyses = 0;
+                this.coveredFeaturesResultPanel = null;
+                for (PersistantTrack track : this.tracks) {
+                    this.trackMap.put(track.getId(), track);
+                }
+
+                if (this.coveredAnnoAnalysisTopComp == null) {
+                    this.coveredAnnoAnalysisTopComp = (CoveredFeaturesAnalysisTopComponent) WindowManager.getDefault().findTopComponent("CoveredFeaturesAnalysisTopComponent");
+                }
+                this.coveredAnnoAnalysisTopComp.open();
+                this.startCoveredFeaturesDetection(wiz);
+
+            } else {
+                String msg = NbBundle.getMessage(OpenCoveredFeaturesAction.class, "CTL_OpenCoveredFeaturesDetectionInfo",
+                        "No track selected. To start a feature coverage analysis at least one track has to be selected.");
+                String title = NbBundle.getMessage(OpenCoveredFeaturesAction.class, "CTL_OpenCoveredFeaturesDetectionInfoTitle", "Info");
+                JOptionPane.showMessageDialog(this.context, msg, title, JOptionPane.INFORMATION_MESSAGE);
+            }
         }
     }
 
     /**
-     * Starts the covered feature detection.
-     * @param wiz the wizard containing the covered feature detection parameters
+     * Starts the feature coverage analysis.
+     * @param wiz the wizard containing the feature coverage analysis parameters
      */
     private void startCoveredFeaturesDetection(WizardDescriptor wiz) {
+        //get parameters
         boolean getCoveredFeatures = (boolean) wiz.getProperty(CoveredFeaturesWizardPanel.PROP_GET_COVERED_FEATURES);
         int minCoveredPercent = (int) wiz.getProperty(CoveredFeaturesWizardPanel.PROP_MIN_COVERED_PERCENT);
         int minCoverageCount = (int) wiz.getProperty(CoveredFeaturesWizardPanel.PROP_MIN_COVERAGE_COUNT);
         boolean whateverStrand = (boolean) wiz.getProperty(CoveredFeaturesWizardPanel.PROP_WHATEVER_STRAND);
-        parameters = new ParameterSetCoveredFeatures(minCoveredPercent, minCoverageCount, whateverStrand, getCoveredFeatures);
-        
+        ParametersReadClasses readClassesParams = (ParametersReadClasses) wiz.getProperty(readClassWizPanel.getPropReadClassParams());
+        this.combineTracks = (boolean) wiz.getProperty(openTracksWizPanel.getPropCombineTracks());
+        @SuppressWarnings("unchecked")
+        Set<FeatureType> selFeatureTypes = (Set<FeatureType>) wiz.getProperty(featTypeWizPanel.getPropSelectedFeatTypes());
+        parameters = new ParameterSetCoveredFeatures(minCoveredPercent, minCoverageCount, 
+                whateverStrand, getCoveredFeatures, readClassesParams, selFeatureTypes);
+
         TrackConnector connector;
-        for (PersistantTrack track : this.tracks) {
+        if (!combineTracks) {
+            for (PersistantTrack track : this.tracks) {
+                try {
+                    connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
+                } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+                    JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+                    continue;
+                }
 
-            connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(track);
-            AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler(this, 
-                    NbBundle.getMessage(OpenCoveredFeaturesAction.class, "MSG_AnalysesWorker.progress.name")); //every track has its own analysis handlers
-            AnalysisCoveredFeatures analysisCoveredFeatures = new AnalysisCoveredFeatures(connector, getCoveredFeatures, minCoveredPercent, minCoverageCount, whateverStrand);
-            covAnalysisHandler.registerObserver(analysisCoveredFeatures);
-            covAnalysisHandler.setCoverageNeeded(true);
+                //every track has its own analysis handlers
+                this.createAnalysis(connector, readClassesParams);
+            }
+        } else {
+            try {
+                connector = (new SaveTrackConnectorFetcherForGUI()).getTrackConnector(tracks, combineTracks);
+                this.createAnalysis(connector, readClassesParams);  //every track has its own analysis handlers
 
-            trackToAnalysisMap.put(track.getId(), new AnalysisContainer(analysisCoveredFeatures));
-            covAnalysisHandler.startAnalysis();
+            } catch (SaveTrackConnectorFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+                JOptionPane.showMessageDialog(null, "You did not complete the track path selection. The track panel cannot be opened.", "Error resolving path to track", JOptionPane.INFORMATION_MESSAGE);
+            }
         }
     }
+    
+    /**
+     * Creates the analysis for a TrackConnector.
+     *
+     * @param connector the connector
+     * @param readClassesParams the read class parameters
+     */
+    private void createAnalysis(TrackConnector connector, ParametersReadClasses readClassesParams) {
+        AnalysesHandler covAnalysisHandler = connector.createAnalysisHandler(this,
+                NbBundle.getMessage(OpenCoveredFeaturesAction.class, "MSG_AnalysesWorker.progress.name"), readClassesParams); //every track has its own analysis handlers
+        AnalysisCoveredFeatures analysisCoveredFeatures = new AnalysisCoveredFeatures(connector, parameters);
+        covAnalysisHandler.registerObserver(analysisCoveredFeatures);
+        covAnalysisHandler.setCoverageNeeded(true);
 
+        trackToAnalysisMap.put(connector.getTrackID(), analysisCoveredFeatures);
+        covAnalysisHandler.startAnalysis();
+    }
+
+    /**
+     * Shows the results in the corresponding top component.
+     * @param dataTypeObject the pair describing the result data. It has to 
+     * consist of the track id as the first element and the data type string
+     * as the second element.
+     */
     @Override
     public void showData(Object dataTypeObject) {
         try {
@@ -148,65 +213,55 @@ public final class OpenCoveredFeaturesAction implements ActionListener, DataVisu
             String dataType = dataTypePair.getSecond();
 
             if (dataType.equals(AnalysesHandler.DATA_TYPE_COVERAGE)) {
-                //get track name(s) for tab descriptions
-                String trackNames = "";
-                if (tracks != null && !tracks.isEmpty()) {
-                    for (PersistantTrack track : tracks) {
-                        trackNames = trackNames.concat(track.getDescription()).concat(" and ");
-                    }
-                    trackNames = trackNames.substring(0, trackNames.length() - 5);
-                    if (trackNames.length() > 120) {
-                        trackNames = trackNames.substring(0, 120).concat("...");
-                    }
-                }
 
                 ++finishedCovAnalyses;
-                
-                AnalysisCoveredFeatures analysisCoveredFeatures = trackToAnalysisMap.get(trackId).getAnalysisCoveredFeatures();
-                CoveredFeatureResult result = new CoveredFeatureResult(analysisCoveredFeatures.getResults(), trackMap);
+
+                AnalysisCoveredFeatures analysisCoveredFeatures = trackToAnalysisMap.get(trackId);
+                final CoveredFeatureResult result = new CoveredFeatureResult(analysisCoveredFeatures.getResults(), trackMap, combineTracks);
                 result.setParameters(parameters);
-                result.setFeatureListSize(analysisCoveredFeatures.getNoGenomeFeatures());
+                Map<String, Integer> statsMap = new HashMap<>();
+                statsMap.put(ResultPanelCoveredFeatures.FEATURES_TOTAL, analysisCoveredFeatures.getNoGenomeFeatures());
+                result.setStatsMap(statsMap);
 
-                if (coveredFeaturesResultPanel == null) {
-                    coveredFeaturesResultPanel = new ResultPanelCoveredFeatures();
-                    coveredFeaturesResultPanel.setBoundsInfoManager(this.context.getBoundsInformationManager());
-                }
-                coveredFeaturesResultPanel.addCoveredFeatures(result);
+                SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
+                    @Override
+                    public void run() {
 
-                if (finishedCovAnalyses >= tracks.size()) {
-                    String title;
-                    if (this.parameters.isGetCoveredFeatures()) {
-                        title = "Detected covered features for ";
-                    } else {
-                        title = "Detected uncovered features for ";
+                        if (coveredFeaturesResultPanel == null) {
+                            coveredFeaturesResultPanel = new ResultPanelCoveredFeatures();
+                            coveredFeaturesResultPanel.setBoundsInfoManager(context.getBoundsInformationManager());
+                        }
+                        coveredFeaturesResultPanel.addCoveredFeatures(result);
+
+                        if (finishedCovAnalyses >= tracks.size() || combineTracks) {
+
+                            //get track name(s) for tab descriptions
+                            String trackNames = "";
+                            if (tracks != null && !tracks.isEmpty()) {
+                                for (PersistantTrack track : tracks) {
+                                    trackNames = trackNames.concat(track.getDescription()).concat(" and ");
+                                }
+                                trackNames = trackNames.substring(0, trackNames.length() - 5);
+                                if (trackNames.length() > 120) {
+                                    trackNames = trackNames.substring(0, 120).concat("...");
+                                }
+                            }
+
+                            String title;
+                            if (parameters.isGetCoveredFeatures()) {
+                                title = "Detected covered features for ";
+                            } else {
+                                title = "Detected uncovered features for ";
+                            }
+                            String panelName = title + trackNames + " (" + coveredFeaturesResultPanel.getResultSize() + " hits)";
+                            coveredAnnoAnalysisTopComp.openAnalysisTab(panelName, coveredFeaturesResultPanel);
+                        }
                     }
-                    String panelName = title + trackNames + " (" + coveredFeaturesResultPanel.getResultSize() + " hits)";
-                    this.coveredAnnoAnalysisTopComp.openAnalysisTab(panelName, coveredFeaturesResultPanel);
-                }
+                });
             }
-            
+
         } catch (ClassCastException e) {
             //do nothing, we dont handle other data in this class
-        }
-    }
-
-    private static class AnalysisContainer { //TODO:even if there is only one analysis here, we can abstract this better later
-
-        private final AnalysisCoveredFeatures analysisCoveredFeatures;
-
-        /**
-         * Container class for all available transcription analyses.
-         */
-        public AnalysisContainer(AnalysisCoveredFeatures analysisCoveredFeatures) {
-            this.analysisCoveredFeatures = analysisCoveredFeatures;
-        }
-
-        /**
-         * @return The transcription start site analysis stored in this
-         * container
-         */
-        public AnalysisCoveredFeatures getAnalysisCoveredFeatures() {
-            return analysisCoveredFeatures;
         }
     }
 }

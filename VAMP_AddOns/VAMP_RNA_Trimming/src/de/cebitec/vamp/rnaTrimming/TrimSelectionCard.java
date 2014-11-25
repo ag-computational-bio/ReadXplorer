@@ -12,8 +12,9 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.openide.util.NbBundle;
 
 /**
- *
- * @author jeff
+ * The card for the selection of parameters for a rna trimming process.
+ * 
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 public class TrimSelectionCard extends javax.swing.JPanel {
     private File sourceFile;
@@ -72,6 +73,8 @@ public class TrimSelectionCard extends javax.swing.JPanel {
         sourceFileLabel1 = new javax.swing.JLabel();
         referenceFileField = new javax.swing.JTextField();
         openReferenceButton = new javax.swing.JButton();
+        mappingParamLabel = new javax.swing.JLabel();
+        mappingParamField = new javax.swing.JTextField();
 
         org.openide.awt.Mnemonics.setLocalizedText(sourceFileLabel, org.openide.util.NbBundle.getMessage(TrimSelectionCard.class, "TrimSelectionCard.sourceFileLabel.text")); // NOI18N
 
@@ -88,11 +91,11 @@ public class TrimSelectionCard extends javax.swing.JPanel {
 
         trimMaximumSlider.setMajorTickSpacing(10);
         trimMaximumSlider.setMaximum(35);
-        trimMaximumSlider.setMinorTickSpacing(1);
+        trimMaximumSlider.setMinorTickSpacing(2);
         trimMaximumSlider.setPaintLabels(true);
         trimMaximumSlider.setPaintTicks(true);
         trimMaximumSlider.setSnapToTicks(true);
-        trimMaximumSlider.setValue(5);
+        trimMaximumSlider.setValue(8);
 
         org.openide.awt.Mnemonics.setLocalizedText(trimMethodLabel, org.openide.util.NbBundle.getMessage(TrimSelectionCard.class, "TrimSelectionCard.trimMethodLabel.text")); // NOI18N
 
@@ -121,6 +124,10 @@ public class TrimSelectionCard extends javax.swing.JPanel {
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(mappingParamLabel, org.openide.util.NbBundle.getMessage(TrimSelectionCard.class, "TrimSelectionCard.mappingParamLabel.text")); // NOI18N
+
+        mappingParamField.setText(org.openide.util.NbBundle.getMessage(TrimSelectionCard.class, "TrimSelectionCard.mappingParamField.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -128,28 +135,27 @@ public class TrimSelectionCard extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(sourceFileLabel)
+                        .addContainerGap(275, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(sourceFileField)
+                            .addComponent(referenceFileField))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(openReferenceButton, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(openSourceButton, javax.swing.GroupLayout.Alignment.TRAILING)))
+                    .addComponent(mappingParamField, javax.swing.GroupLayout.DEFAULT_SIZE, 406, Short.MAX_VALUE)
                     .addComponent(trimMaximumSlider, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(sourceFileLabel1)
+                            .addComponent(mappingParamLabel)
                             .addComponent(trimMaximumLabel)
                             .addComponent(trimMethodLabel)
-                            .addComponent(trimMethodCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(sourceFileLabel1))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(referenceFileField)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(openReferenceButton))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(sourceFileLabel)
-                                .addGap(0, 269, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(sourceFileField)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(openSourceButton)))
-                        .addContainerGap())))
+                            .addComponent(trimMethodCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -166,7 +172,11 @@ public class TrimSelectionCard extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(sourceFileField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(openSourceButton))
-                .addGap(11, 11, 11)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(mappingParamLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(mappingParamField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(trimMaximumLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(trimMaximumSlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -174,13 +184,13 @@ public class TrimSelectionCard extends javax.swing.JPanel {
                 .addComponent(trimMethodLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(trimMethodCombo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(111, Short.MAX_VALUE))
+                .addContainerGap(60, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     private void openSourceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openSourceButtonActionPerformed
         File file = FileUtils.showFileOpenDialogAndChangePrefs("TrimSelection.Filepath",
-                new FileNameExtensionFilter("SAM Sequence Mapping File", "sam"),
+                new FileNameExtensionFilter("SAM/BAM Sequence Mapping File", "sam", "bam"),
                 sourceFileField, TrimSelectionCard.class, this);
         if (file!=null) {
             sourceFile = file;
@@ -189,6 +199,10 @@ public class TrimSelectionCard extends javax.swing.JPanel {
     
     public String getSourcePath() {
         return this.sourceFileField.getText();
+    }
+    
+    public String getMappingParam() {
+        return this.mappingParamField.getText();
     }
     
     public String getReferencePath() {
@@ -201,6 +215,10 @@ public class TrimSelectionCard extends javax.swing.JPanel {
     
     public TrimMethod getTrimMethod() {
         return (TrimMethod) this.trimMethodCombo.getSelectedItem();
+    }
+    
+    public void setMappingParam(String lastMappingParams) {
+        this.mappingParamField.setText(lastMappingParams);
     }
     
     private void trimMethodComboActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_trimMethodComboActionPerformed
@@ -222,6 +240,8 @@ public class TrimSelectionCard extends javax.swing.JPanel {
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField mappingParamField;
+    private javax.swing.JLabel mappingParamLabel;
     private javax.swing.JButton openReferenceButton;
     private javax.swing.JButton openSourceButton;
     private javax.swing.JTextField referenceFileField;

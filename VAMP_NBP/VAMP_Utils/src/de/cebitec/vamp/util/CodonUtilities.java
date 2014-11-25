@@ -1,11 +1,12 @@
 package de.cebitec.vamp.util;
 
-import de.cebitec.common.sequencetools.GeneticCodeFactory;
+import de.cebitec.common.sequencetools.geneticcode.GeneticCodeFactory;
+
 
 /**
- * @author rhilker
- * 
  * Class for utility methods working on dna codons.
+ * 
+ * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class CodonUtilities {
     
@@ -19,9 +20,10 @@ public class CodonUtilities {
      * TODO: change format...
      */
     public static String[] parseCustomCodons(int wantedIndex, String customCodonString) {
-        int index = GeneticCodeFactory.getGeneticCodes().size()+1;
+        GeneticCodeFactory genCodeFactory = GeneticCodeFactory.getDefault();
+        int index = genCodeFactory.getGeneticCodes().size() + 1;
         while (index++ <= wantedIndex){
-            customCodonString = customCodonString.substring(customCodonString.indexOf("\n")+1, customCodonString.length());
+            customCodonString = customCodonString.substring(customCodonString.indexOf('\n')+1, customCodonString.length());
         }        
         int startIndex = customCodonString.startsWith("\n") ? 2 : 1;
         String codons = customCodonString.substring(startIndex, customCodonString.indexOf(')'));

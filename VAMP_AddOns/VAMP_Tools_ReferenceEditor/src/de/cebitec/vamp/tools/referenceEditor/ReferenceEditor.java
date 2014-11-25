@@ -246,7 +246,7 @@ public class ReferenceEditor extends javax.swing.JFrame {
             base = SequenceUtils.getDnaComplement(base);
             revBase += base;
         }
-        return revBase.toLowerCase();
+        return revBase;
     }
 
 

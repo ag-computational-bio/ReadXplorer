@@ -10,10 +10,13 @@ import de.cebitec.vamp.api.objects.NewJobDialogI;
 import de.cebitec.vamp.parser.ReferenceJob;
 import de.cebitec.vamp.parser.common.ParserI;
 import de.cebitec.vamp.parser.common.ParsingException;
+import de.cebitec.vamp.parser.reference.BioJavaGff2IdParser;
+import de.cebitec.vamp.parser.reference.BioJavaGff2Parser;
+import de.cebitec.vamp.parser.reference.BioJavaGff3IdParser;
 import de.cebitec.vamp.parser.reference.BioJavaGff3Parser;
-import de.cebitec.vamp.parser.reference.BioJavaGffIdParser;
 import de.cebitec.vamp.parser.reference.BioJavaParser;
 import de.cebitec.vamp.parser.reference.FastaReferenceParser;
+import de.cebitec.vamp.parser.reference.IdParserI;
 import de.cebitec.vamp.parser.reference.ReferenceParserI;
 import de.cebitec.vamp.util.fileChooser.VampFileChooser;
 import java.awt.Component;
@@ -34,7 +37,7 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.util.NbBundle;
 
 /**
- * Panel displaying the options for importing new references into VAMP.
+ * Panel displaying the options for importing new references into ReadXplorer.
  *
  * @author jwinneba, rhilker
  */
@@ -46,10 +49,10 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
     private String referenceName = null;
     private String[] refSeqIds;
     private ReferenceParserI[] availableParsers = new ReferenceParserI[]{new BioJavaParser(BioJavaParser.EMBL), 
-            new BioJavaParser(BioJavaParser.GENBANK), new BioJavaGff3Parser(), new FastaReferenceParser()};
+            new BioJavaParser(BioJavaParser.GENBANK), new BioJavaGff3Parser(), new BioJavaGff2Parser(), new FastaReferenceParser()};
     private ReferenceParserI currentParser;
 
-    /** Panel displaying the options for importing new references into VAMP. */
+    /** Panel displaying the options for importing new references into ReadXplorer. */
     public NewReferenceDialogPanel() {
         this.currentParser = this.availableParsers[0];
         this.initComponents();
@@ -165,7 +168,7 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
         fileGffField.setToolTipText(org.openide.util.NbBundle.getMessage(NewReferenceDialogPanel.class, "NewReferenceDialogPanel.fileGffField.toolTipText")); // NOI18N
 
         fileGffChooserButton.setText(org.openide.util.NbBundle.getMessage(NewReferenceDialogPanel.class, "NewReferenceDialogPanel.fileGffChooserButton.text")); // NOI18N
-        fileGffChooserButton.setToolTipText(org.openide.util.NbBundle.getMessage(NewReferenceDialogPanel.class, "NewReferenceDialogPanel.fileGffChooserButton.toolTipText")); // NOI18N
+        fileGffChooserButton.setToolTipText(org.openide.util.NbBundle.getMessage(NewReferenceDialogPanel.class, "NewReferenceDialogPanel.fileGffChooserButton.toolTipTextGff3")); // NOI18N
         fileGffChooserButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 fileGffChooserButtonActionPerformed(evt);
@@ -264,7 +267,8 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
 }//GEN-LAST:event_filetypeBoxActionPerformed
 
     private void fileChooserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileChooserButtonActionPerformed
-        ReferenceParserI usedParser = currentParser instanceof BioJavaGff3Parser ? new FastaReferenceParser() : currentParser;
+        ReferenceParserI usedParser = currentParser instanceof BioJavaGff3Parser || 
+                                      currentParser instanceof BioJavaGff2Parser ? new FastaReferenceParser() : currentParser;
         VampFileChooser fileChooser = new VampFileChooser(usedParser.getFileExtensions(), usedParser.getInputFileDescription()) {
             private static final long serialVersionUID = 1L;
 
@@ -335,6 +339,7 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
 
     private void referenceBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_referenceBoxActionPerformed
         this.referenceName = (String) this.referenceBox.getSelectedItem();
+        this.nameField.setText(this.referenceName);
     }//GEN-LAST:event_referenceBoxActionPerformed
 
     private void nameFieldPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_nameFieldPropertyChange
@@ -366,7 +371,7 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
      * Updates all components dependent on the chosen input file type.
      */
     private void updateExtraComponents() {
-        if (currentParser instanceof BioJavaGff3Parser) {
+        if (currentParser instanceof BioJavaGff3Parser || currentParser instanceof BioJavaGff2Parser) {
             this.fileGffChooserButton.setVisible(true);
             this.fileGffField.setVisible(true);
             this.fileGffLabel.setVisible(true);
@@ -375,6 +380,16 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
             this.nameField.setVisible(false);
             this.nameLabel.setVisible(false);
             this.fileLabel.setText("Fasta file:");
+
+            if (currentParser instanceof BioJavaGff2Parser) {
+                this.fileGffLabel.setText(NbBundle.getMessage(NewReferenceDialogPanel.class, "NewReferenceDialogPanel.fileGff2Label.text"));
+                this.fileGffChooserButton.setToolTipText(NbBundle.getMessage(NewReferenceDialogPanel.class,
+                        "NewReferenceDialogPanel.fileGffChooserButton.toolTipTextGFF2"));
+            } else if (currentParser instanceof BioJavaGff3Parser) {
+            this.fileGffLabel.setText(NbBundle.getMessage(NewReferenceDialogPanel.class, "NewReferenceDialogPanel.fileGff3Label.text"));
+            this.fileGffChooserButton.setToolTipText(NbBundle.getMessage(NewReferenceDialogPanel.class, 
+                    "NewReferenceDialogPanel.fileGffChooserButton.toolTipTextGff3"));
+            }
         } else {
             this.fileGffChooserButton.setVisible(false);
             this.fileGffField.setVisible(false);
@@ -388,7 +403,7 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
     }
 
     /**
-     * Fetches all sequence identifiers avaiable in the currently set GFF 3 file
+     * Fetches all sequence identifiers available in the currently set GFF 3 file
      * and adds them to the reference selection box.
      */
     private void retrieveSequenceIds() {
@@ -398,8 +413,15 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
 //        Thread thread = new Thread(new Runnable() {
 //            @Override
 //            public void run() {
-        BioJavaGffIdParser idParser = new BioJavaGffIdParser();
+        IdParserI idParser;
+         
         try {
+            if (currentParser instanceof BioJavaGff2Parser) {
+                idParser = new BioJavaGff2IdParser();
+            } else {
+                idParser = new BioJavaGff3IdParser();
+
+            }
             List<String> seqIds = idParser.getSequenceIds(refFeatureFile);
             String[] seqIdArray = new String[1];
             refSeqIds = seqIds.toArray(seqIdArray);
@@ -409,6 +431,7 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
 //                        public void run() {
             referenceBox.setModel(new DefaultComboBoxModel<>(refSeqIds));
             referenceName = referenceBox.getSelectedItem().toString();
+            this.nameField.setText(referenceName);
 //                        }
 //                    });
         } catch (ParsingException ex) {

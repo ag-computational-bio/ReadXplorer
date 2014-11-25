@@ -1,9 +1,6 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.cebitec.vamp.mapping;
 
+import de.cebitec.vamp.mapping.api.MappingApi;
 import de.cebitec.vamp.util.FileUtils;
 import de.cebitec.vamp.util.Properties;
 import java.io.File;
@@ -11,7 +8,16 @@ import java.util.prefs.Preferences;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.openide.util.NbPreferences;
 
+/**
+ * MapperPanel is the gui part of the options panel to select the mapping script. 
+ * The mapping script is a bash script that encapsulates the mapper 
+ * functionality (which is often divided into multiple commands) 
+ * into a single script.
+ * 
+ * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
+ */
 final class MapperPanel extends javax.swing.JPanel {
+    private static final long serialVersionUID = 1L;
 
     private final MapperOptionsPanelController controller;
     private Preferences pref;
@@ -55,12 +61,12 @@ final class MapperPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addGap(0, 1, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(mapperTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 431, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 17, Short.MAX_VALUE)
+                        .addComponent(mapperTextField)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(openButton)))
-                .addContainerGap(17, Short.MAX_VALUE))
+                .addGap(8, 8, 8))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -79,13 +85,10 @@ final class MapperPanel extends javax.swing.JPanel {
         File file = FileUtils.showFileOpenDialogAndChangePrefs(Properties.MAPPER_PATH,
                 new FileNameExtensionFilter("Mapper Script File", "sh"),
                 mapperTextField, MapperPanel.class, this);
-        /*if (file!=null) {
-            sourceFile = file;
-        }*/
     }//GEN-LAST:event_openButtonActionPerformed
 
     void load() {
-        mapperTextField.setText(pref.get(Properties.MAPPER_PATH, ""));
+        mapperTextField.setText(MappingApi.getMapperPath());
     }
     
     void store() {

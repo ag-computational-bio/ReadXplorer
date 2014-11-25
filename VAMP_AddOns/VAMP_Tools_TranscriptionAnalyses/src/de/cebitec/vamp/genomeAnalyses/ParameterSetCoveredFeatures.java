@@ -1,18 +1,23 @@
 package de.cebitec.vamp.genomeAnalyses;
 
 import de.cebitec.vamp.databackend.ParameterSetI;
+import de.cebitec.vamp.databackend.ParametersFeatureTypes;
+import de.cebitec.vamp.databackend.ParametersReadClasses;
+import de.cebitec.vamp.util.FeatureType;
+import java.util.Set;
 
 /**
- * Data storage for all parameters associated with filtering features.
+ * Data storage for all parameters associated with feature coverage analysis.
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class ParameterSetCoveredFeatures implements ParameterSetI<ParameterSetCoveredFeatures> {
+public class ParameterSetCoveredFeatures extends ParametersFeatureTypes implements ParameterSetI<ParameterSetCoveredFeatures> {
     
     private int minCoveredPercent;
     private int minCoverageCount;
     private boolean whateverStrand;
     private boolean getCoveredFeatures;
+    private ParametersReadClasses readClassesParams;
 
     /**
      * Data storage for all parameters associated with filtering features.
@@ -27,13 +32,19 @@ public class ParameterSetCoveredFeatures implements ParameterSetI<ParameterSetCo
      * @param getCoveredFeatures <code>true</code> if the covered features
      * should be returned, <code>false</code> if the uncovered features should
      * be returned
+     * @param readClassesParams The parameter set for the used read classes for
+     * this analysis instance
+     * @param selectedFeatureTypes The set of selected feature types to use for
+     * this analysis instance
      */
-    public ParameterSetCoveredFeatures(int minCoveredPercent, int minCoverageCount, 
-            boolean whateverStrand, boolean getCoveredFeatures) {
+    public ParameterSetCoveredFeatures(int minCoveredPercent, int minCoverageCount, boolean whateverStrand,
+            boolean getCoveredFeatures, ParametersReadClasses readClassesParams, Set<FeatureType> selectedFeatureTypes) {
+        super(selectedFeatureTypes);
         this.minCoveredPercent = minCoveredPercent;
         this.minCoverageCount = minCoverageCount;
         this.whateverStrand = whateverStrand;
         this.getCoveredFeatures = getCoveredFeatures;
+        this.readClassesParams = readClassesParams;
     }
 
     /**
@@ -102,6 +113,13 @@ public class ParameterSetCoveredFeatures implements ParameterSetI<ParameterSetCo
      */
     public void setGetCoveredFeatures(boolean getCoveredFeatures) {
         this.getCoveredFeatures = getCoveredFeatures;
-    }
+    }  
     
+    /**
+     * @return The parameter set for the used read classes for this analysis
+     * instance.
+     */
+    public ParametersReadClasses getReadClassesParams() {
+        return readClassesParams;
+    }
 }

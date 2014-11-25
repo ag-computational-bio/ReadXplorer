@@ -3,13 +3,16 @@ package de.cebitec.vamp.ui.visualisation.reference;
 import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.polyTree.Node;
+import de.cebitec.vamp.view.TopComponentExtended;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.JFeature;
 import de.cebitec.vamp.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import de.cebitec.vamp.view.tableVisualization.TableUtils;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 import java.util.Vector;
 import java.util.logging.Logger;
+import javax.swing.JTable;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.Lookup.Result;
 import org.openide.util.LookupEvent;
@@ -24,7 +27,7 @@ import org.openide.windows.WindowManager;
  * reference feature.
  */
 @ConvertAsProperties(dtd = "-//de.cebitec.vamp.ui.visualisation.reference//ReferenceFeature//EN", autostore = false)
-public final class ReferenceFeatureTopComp extends TopComponent implements LookupListener {
+public final class ReferenceFeatureTopComp extends TopComponentExtended implements LookupListener {
 
     private static ReferenceFeatureTopComp instance;
     private static final long serialVersionUID = 1L;
@@ -415,5 +418,22 @@ public final class ReferenceFeatureTopComp extends TopComponent implements Looku
        }
        return featureVect;
    }
+    
+    /**
+     * Displays the feature associated wit the currently selected table row in
+     * this feature window.
+     * @param table the table whose selected feature shall be shown
+     * @param featureColumnIndex the index of the feature column in the table
+     */
+    public void showTableFeature(JTable table, int featureColumnIndex) {
+        int selectedModelRow = TableUtils.getSelectedModelRow(table);
+        if (selectedModelRow > -1) {
+            Object value = table.getModel().getValueAt(selectedModelRow, featureColumnIndex);
+
+            if (value instanceof PersistantFeature) {
+                this.showFeatureDetails((PersistantFeature) value);
+            }
+        }
+    }
 
 }

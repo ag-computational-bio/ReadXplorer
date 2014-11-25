@@ -19,11 +19,11 @@ import org.openide.windows.WindowManager;
 
 /**
  * Manages a module's lifecycle.
- * Makes sure that VAMP is not closed while a task is still running
+ * Makes sure that ReadXplorer is not closed while a task is still running
  */
 public class Installer extends ModuleInstall {
     
-    public static final String VAMP_VERSION = "1.7.5.5";
+    public static final String VAMP_VERSION = "1.8";
     private static final long serialVersionUID = 1L;
 //    private static final Logger logger = Logger.getLogger(Installer.class.getName(), Installer.class.getPackage().getName() + ".Log");
 
@@ -80,7 +80,7 @@ public class Installer extends ModuleInstall {
     @Override
     public boolean closing() {
         if (CentralLookup.getDefault().lookup(SwingWorker.class) != null){
-            NotifyDescriptor nd = new NotifyDescriptor.Message("VAMP is performing a non-interruptible task and may only be closed after it has finished.", NotifyDescriptor.WARNING_MESSAGE);
+            NotifyDescriptor nd = new NotifyDescriptor.Message("ReadXplorer is performing a non-interruptible task and may only be closed after it has finished.", NotifyDescriptor.WARNING_MESSAGE);
             DialogDisplayer.getDefault().notify(nd);
             return Boolean.FALSE;
         }

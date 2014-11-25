@@ -175,7 +175,7 @@ public class ExcelExporter {
         
         if (dataLeft) {
             for (int i = 0; i < row; ++i) {
-                exportData.remove(0);
+                sheetData.remove(0);
             }
         }
         
@@ -191,8 +191,10 @@ public class ExcelExporter {
         if (entry instanceof Integer || entry instanceof Byte || entry instanceof Long) {
             return "INTEGER";
         } else if (entry instanceof String || entry instanceof Character
-                || entry instanceof CharSequence || entry instanceof Double) {
+                || entry instanceof CharSequence) {
             return "STRING";
+        } else if (entry instanceof Double) {
+            return "DOUBLE";
         } else if (entry instanceof Float) {
             return "FLOAT";
         } else {
@@ -229,10 +231,14 @@ public class ExcelExporter {
             sheet.addCell(label);
         } else if (celltype.equals("INTEGER")) {
             WritableCellFormat integerFormat = new WritableCellFormat(NumberFormats.INTEGER);
-            Double value = Double.parseDouble(cellvalue.toString());
+            Integer value = Integer.parseInt(cellvalue.toString());
             Number number = new Number(column, row, value, integerFormat);
             sheet.addCell(number);
-        } else if (celltype.equals("FLOAT")) {
+        } else if (celltype.equals("DOUBLE")) {
+            Double value = Double.parseDouble(cellvalue.toString());
+            Number number = new Number(column, row, value);
+            sheet.addCell(number);
+        }else if (celltype.equals("FLOAT")) {
             WritableCellFormat integerFormat = new WritableCellFormat(NumberFormats.FLOAT);
             Float value = Float.parseFloat(cellvalue.toString());
             Number number = new Number(column, row, value, integerFormat);

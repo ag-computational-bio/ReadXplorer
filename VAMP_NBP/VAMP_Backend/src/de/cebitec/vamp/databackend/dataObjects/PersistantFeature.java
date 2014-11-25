@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A persistant feature. Containing background information about a feature, such
@@ -27,7 +28,7 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
     private boolean isFwdStrand;
     private FeatureType type;
     private String featureName;
-    private List<PersistantSubFeature> subFeatures;
+//    private List<PersistantSubFeature> subFeatures;
     private List<Integer> parentIds;
     private int frame;
 
@@ -49,7 +50,7 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
     public PersistantFeature(int id, String parentIds, String ecnum, String locus, String product, 
                 int start, int stop, boolean isFwdStrand, FeatureType type, String featureName) {
         super(type, null);
-        this.subFeatures = new ArrayList<>();
+//        this.subFeatures = new ArrayList<>();
         this.id = id;
         this.parentIds = this.separateParentIds(parentIds);
         this.ecNumber = ecnum;
@@ -126,12 +127,17 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
         return product;
     }
 
-
+    /**
+     * @return start of the feature. Always the smaller value among start and stop.
+     */
     @Override
     public int getStart() {
         return start;
     }
 
+    /**
+     * @return stop of the feature. Always the larger value among start and stop.
+     */
     @Override
     public int getStop() {
         return stop;
@@ -213,21 +219,21 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
         return frame;
     }
 
-    /**
-     * @return the list of sub features (e.g. exons) of this feature
-     * or an empty list if there are no sub features.
-     */
-    public List<PersistantSubFeature> getSubFeatures() {
-        return subFeatures;
-    }
-
-    /**
-     * Adds a sub feature to the list of sub features (e.g. an exon to a gene).
-     * @param parsedSubFeature the sub feature to add.
-     */
-    public void addSubFeature(PersistantSubFeature parsedSubFeature) {
-        this.subFeatures.add(parsedSubFeature);
-    }
+//    /**
+//     * @return the list of sub features (e.g. exons) of this feature
+//     * or an empty list if there are no sub features.
+//     */
+//    public List<PersistantSubFeature> getSubFeatures() {
+//        return subFeatures;
+//    }
+//
+//    /**
+//     * Adds a sub feature to the list of sub features (e.g. an exon to a gene).
+//     * @param parsedSubFeature the sub feature to add.
+//     */
+//    public void addSubFeature(PersistantSubFeature parsedSubFeature) {
+//        this.subFeatures.add(parsedSubFeature);
+//    }
 
     /**
      * Compares two PersistantFeature based on their start position. '0' is returned for
@@ -268,25 +274,25 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
             return featureMap;
         }
 
-        /**
-         * Utility method for adding a list of sub features to their parent
-         * features list.
-         * @param features the list of features, to which the subfeatures are
-         * added
-         * @param subFeaturesSorted the sorted list of subfeatures by increasing
-         * start position
-         */
-        public static void addSubFeatures(Map<Integer, PersistantFeature> features,
-                List<PersistantSubFeature> subFeaturesSorted) {
-
-            int id;
-            for (PersistantSubFeature subFeature : subFeaturesSorted) {
-                id = subFeature.getParentId();
-                if (features.containsKey(id)) { //just to be on the save side; should not occur
-                    features.get(id).addSubFeature(subFeature);
-                }
-            }
-        }
+//        /**
+//         * Utility method for adding a list of sub features to their parent
+//         * features list.
+//         * @param features the list of features, to which the subfeatures are
+//         * added
+//         * @param subFeaturesSorted the sorted list of subfeatures by increasing
+//         * start position
+//         */
+//        public static void addSubFeatures(Map<Integer, PersistantFeature> features,
+//                List<PersistantSubFeature> subFeaturesSorted) {
+//
+//            int id;
+//            for (PersistantSubFeature subFeature : subFeaturesSorted) {
+//                id = subFeature.getParentId();
+//                if (features.containsKey(id)) { //just to be on the save side; should not occur
+//                    features.get(id).addSubFeature(subFeature);
+//                }
+//            }
+//        }
 
         /**
          * Creates a list of polytree structures from a list of features. In a
@@ -297,8 +303,7 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
          * @return the list of polytrees for the features
          */
         public static List<Polytree> createFeatureTrees(List<PersistantFeature> features) {
-            Map<Integer, PersistantFeature> featMap = PersistantFeature.Utils.getFeatureMap(features);
-            PersistantFeature.Utils.addParentFeatures(featMap, features);
+            PersistantFeature.Utils.addParentFeatures(features);
             List<Polytree> featTrees = new ArrayList<>();
             Polytree tree;
             List<Node> roots;
@@ -328,6 +333,18 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
             }
             return featTrees;
         }
+        
+        /**
+         * Utility method for creating a parent - children relationship for the
+         * given list of features. Wrapper for "getFeatureMap()" and 
+         * addParentFeature()" with a map and feature list parameters.
+         * @param featuresSorted the sorted list of features who shall be added
+         * in their correct hierarchy by increasing start position
+         */
+        public static void addParentFeatures(List<PersistantFeature> featuresSorted) {
+            Map<Integer, PersistantFeature> featMap = PersistantFeature.Utils.getFeatureMap(featuresSorted);
+            PersistantFeature.Utils.addParentFeatures(featMap, featuresSorted);
+        }
 
         /**
          * Utility method for adding a list of sub features to their parent
@@ -350,5 +367,25 @@ public class PersistantFeature extends Node implements PersistantFeatureI, Compa
                 }
             }
         }
+    }
+    
+    /**
+     * Creates a new array list of the genomic features, which are among the
+     * allowed feature types. All features, whose feature type is not in the
+     * <cc>selectedFeatureTypes</cc> list is dismissed.
+     * @param featuresToFilter the list of features to filter
+     * @param selectedFeatureTypes the set of feature types, which shall be
+     * contained in the returned list of features
+     * @return the filtered list of features. Only features of a type from the 
+     *  <cc>selectedFeatureTypes</cc> are returned
+     */
+    public static List<PersistantFeature> filterFeatureTypes(List<PersistantFeature> featuresToFilter, Set<FeatureType> selectedFeatureTypes) {
+        List<PersistantFeature> newFeatures = new ArrayList<>();
+        for (PersistantFeature feature : featuresToFilter) {
+            if (selectedFeatureTypes.contains(feature.getType())) {
+                newFeatures.add(feature);
+            }
+        }
+        return newFeatures;
     }
 }

@@ -9,10 +9,15 @@ import de.cebitec.vamp.databackend.dataObjects.PersistantFeature;
 import de.cebitec.vamp.databackend.dataObjects.PersistantMapping;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.Operon;
 import de.cebitec.vamp.transcriptionAnalyses.dataStructures.OperonAdjacency;
-import de.cebitec.vamp.util.FeatureType;
 import de.cebitec.vamp.util.Observer;
 import de.cebitec.vamp.util.StatsContainer;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -24,32 +29,29 @@ import java.util.logging.Logger;
 public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
 
     private TrackConnector trackConnector;
-    private int minNumberReads;
     private int genomeSize;
     private List<PersistantFeature> genomeFeatures;
     private List<Operon> operonList; //final result list of OperonAdjacencies
-    private boolean operonDetectionAutomatic;
     private HashMap<Integer, OperonAdjacency> featureToPutativeOperonMap; //feature id of mappings to count for features
     private List<OperonAdjacency> operonAdjacencies; 
     private int averageReadLength = 0;
-    private int averageSeqPairLength = 0;
+    private int averageReadPairLength = 0;
     private int lastMappingIdx;
     private int readsFeature1 = 0;
     private int spanningReads = 0;
     private int readsFeature2 = 0;
     private int internalReads = 0;
+    private final ParameterSetOperonDet operonDetParameters;
 
     /**
      * Carries out the analysis of a data set for operons.
      * @param trackConnector the trackConnector whose data is to be analyzed
-     * @param minNumberReads the minimal number of spanning reads between neighboring features
-     * @param operonDetectionAutomatic true, if the minimal number of spanning reads is not given and
-     *      should be calculated by the software
+     * @param operonDetParameters contains the parameters to use for the operon
+     * detection
      */
-    public AnalysisOperon(TrackConnector trackConnector, int minNumberReads, boolean operonDetectionAutomatic) {
+    public AnalysisOperon(TrackConnector trackConnector, ParameterSetOperonDet operonDetParameters) {
         this.trackConnector = trackConnector;
-        this.minNumberReads = minNumberReads;
-        this.operonDetectionAutomatic = operonDetectionAutomatic;
+        this.operonDetParameters = operonDetParameters;
         this.operonList = new ArrayList<>();
         this.featureToPutativeOperonMap = new HashMap<>();
         this.operonAdjacencies = new ArrayList<>();
@@ -58,46 +60,46 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
     }
         
     /**
-     * Initializes the initial data structures needed for an operon detection analysis.
-     * This includes the detection of all neighboring features before the actual analysis.
+     * Initializes the initial data structures needed for an operon detection
+     * analysis. This includes the detection of all neighboring features before
+     * the actual analysis.
      */
     private void initDatastructures() {
         Map<String, Integer> statsMap = trackConnector.getTrackStats().getStatsMap();
         averageReadLength = statsMap.get(StatsContainer.AVERAGE_READ_LENGTH);
-        averageSeqPairLength = statsMap.get(StatsContainer.AVERAGE_SEQ_PAIR_SIZE);
+        averageReadPairLength = statsMap.get(StatsContainer.AVERAGE_SEQ_PAIR_SIZE);
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(trackConnector.getRefGenome().getId());
         this.genomeSize = trackConnector.getRefSequenceLength();
         this.genomeFeatures = refConnector.getFeaturesForClosedInterval(0, genomeSize);
         
         ////////////////////////////////////////////////////////////////////////////
-        // detecting all neighboring features which are not overlapping more than 20bp as putative operons
+        // detecting all neighboring features which are not overlapping more than 20bp and
+        // have a distance smaller than 1000 bp from stop of 1 to start of 2 as putative operons
         ////////////////////////////////////////////////////////////////////////////
         
         for (int i = 0; i < this.genomeFeatures.size() - 1; i++) {
 
             PersistantFeature feature1 = this.genomeFeatures.get(i);
-            PersistantFeature feature2 = this.genomeFeatures.get(i + 1);
-            //we currently only exclude exons from the detection 
-            if (feature1.getType() != FeatureType.EXON) {
-                if (feature1.isFwdStrand() == feature2.isFwdStrand() && feature2.getType() != FeatureType.EXON) {
-                    if (feature2.getStart() + 20 <= feature1.getStop()) { //features may overlap at the ends, happens quite often
-                        //do nothing
+            boolean reachedEnd = false;
+            
+            if (operonDetParameters.getSelFeatureTypes().contains(feature1.getType())) {
+
+                int featureIndex = i + 1; //find feature 2
+                while (feature1.isFwdStrand() != genomeFeatures.get(featureIndex).isFwdStrand()
+                        || !feature1.getType().equals(genomeFeatures.get(featureIndex).getType())) {
+                    if (featureIndex < genomeFeatures.size() - 1) {
+                        ++featureIndex;
                     } else {
-                        this.featureToPutativeOperonMap.put(feature1.getId(), new OperonAdjacency(feature1, feature2));
+                        reachedEnd = true;
+                        break;
                     }
-                } else { // check next features until one on the same strand is found which is not an exon.
-                    /*
-                     * We keep all neighboring features on the same strand,
-                     * even if their distance is not larger than 1000bp.
-                     */
-                    int featureIndex = i + 2;
-                    while ((feature1.isFwdStrand() != feature2.isFwdStrand() || 
-                            feature2.getType() == FeatureType.EXON) && 
-                            featureIndex < this.genomeFeatures.size() - 1) {
-                        
-                        feature2 = this.genomeFeatures.get(featureIndex++);
-                    }
-                    if (feature1.isFwdStrand() == feature2.isFwdStrand() && feature2.getStart() - feature1.getStop() < 1000) {
+                }
+                
+                if (!reachedEnd) {
+                    PersistantFeature feature2 = genomeFeatures.get(featureIndex);
+
+                    if (feature2.getStart() + 20 > feature1.getStop() && //features may overlap at the ends, happens quite often
+                            feature2.getStart() - feature1.getStop() < 1000) { //only features with a max. distance of 1000 are treated as putative operons
                         this.featureToPutativeOperonMap.put(feature1.getId(), new OperonAdjacency(feature1, feature2));
                     }
                 }
@@ -219,7 +221,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
 //        } else if (operonDetectionAutomatic) {
 //            minimumSpanningReads = (numUniqueBmMappings * averageReadLength) / transcritomeLength;
 //        } else {
-            minimumSpanningReads = minNumberReads;
+            minimumSpanningReads = operonDetParameters.getMinSpanningReads();
 //        }
 //        System.out.println("Threshold: " + minimumSpanningReads + ", = uniqBMM = " + numUniqueBmMappings + ", avReadLength = "
 //                + averageReadLength + ", transcriptome length = " + transcritomeLength + "Result: " + numUniqueBmMappings * 280 / transcritomeLength);
@@ -254,8 +256,8 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
 
             // TODO: check if parameter ok or new parameter
             } else if (feature2.getStart() - feature1.getStop() > averageReadLength &&
-                    internalReads > minNumberReads) {
-                //create operon
+                    internalReads > operonDetParameters.getMinSpanningReads()) {
+                //TODO: think about creating an operon
                 System.out.println("found case " + ++count);
             }
         }

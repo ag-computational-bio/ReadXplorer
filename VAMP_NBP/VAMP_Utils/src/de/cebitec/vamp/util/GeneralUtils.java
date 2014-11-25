@@ -9,9 +9,13 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import javax.swing.JOptionPane;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.openide.util.NbBundle;
 
 /**
@@ -34,7 +38,7 @@ public class GeneralUtils {
             int absoluteDiff = value2 - value1;
             percentDiff = (int) (absoluteDiff * 1.5); //weight factor
         } else {
-            percentDiff = (int) (((double) value2 / (double) value1) * 100.0) - 100;
+            percentDiff = (int) Math.ceil(((double) value2 / (double) value1) * 100.0) - 100;
         }
         return percentDiff;
     }
@@ -205,6 +209,82 @@ public class GeneralUtils {
             asImplodedString = sb.toString();
         }
         return asImplodedString;
+    }
+    
+    /**
+    * Joins a map of elements in a String.
+    * @param valueDelim Delimiter between key and value of an element
+    * @param entryDelim Delimiter between each Entry element
+    * @param map a map of elements
+    * @return String
+    */
+    public static String implodeMap(String valueDelim, String entryDelim, Map map) {
+        String asImplodedString;
+        if ((map == null) || (map.isEmpty())) {
+            asImplodedString = "";
+        }
+        else {
+            StringBuilder sb = new StringBuilder();
+            Boolean firstLine = true;
+            for (Iterator it = map.entrySet().iterator(); it.hasNext();) {
+                if (!firstLine) { sb.append(entryDelim); }
+                Map.Entry line = (Map.Entry) it.next();
+                sb.append(line.getKey());
+                sb.append(valueDelim);
+                sb.append(line.getValue());
+                firstLine = false;
+            }
+            asImplodedString = sb.toString();
+        }
+        return asImplodedString;
+    }
+    
+    /**
+     * format a number to show it to the user
+     * @param number
+     * @return a good readable string representation of the given number
+     */
+    public static String formatNumber(Integer number) {
+        return NumberFormat.getInstance().format( number );
+    }
+    
+    /**
+     * format a number to show it to the user
+     * @param number
+     * @return a good readable string representation of the given number
+     */
+    public static String formatNumber(Long number) {
+        return NumberFormat.getInstance().format( number );
+    }
+    
+    /**
+     * Preliminary method for enshorting an Illumina based read name from single
+     * or paired end to a still unique name, which can save memory. 
+     * Use with care!
+     * @param readName the read name to enshorten
+     * @return the short read name, if it was possible to shorten it. Otherwise
+     * the original read name is returned
+     */
+    public static String enshortenReadName(String readName) {
+        String shortReadName = readName;
+        String[] nameArray;
+        if (readName.startsWith("@")) {
+            nameArray = readName.split(":");
+            if (nameArray.length == 5) {
+                shortReadName = nameArray[2] + nameArray[3] + nameArray[4];
+                if (shortReadName.contains("#")) {
+                    nameArray = shortReadName.split("#");
+                    shortReadName = nameArray[0] + nameArray[1].split("/")[1];
+                }
+            } else if (nameArray.length == 10) {
+                shortReadName = nameArray[4] + nameArray[5] + nameArray[6];
+            }
+        }
+        return shortReadName;
+    }
+    
+    public static String escapeHtml(String s) {
+        return StringEscapeUtils.escapeHtml3(s);
     }
     
 }

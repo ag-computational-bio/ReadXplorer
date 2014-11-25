@@ -18,8 +18,6 @@ import java.awt.*;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +26,7 @@ import java.util.logging.Logger;
 import java.util.prefs.PreferenceChangeEvent;
 import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
-import javax.imageio.ImageIO;
 import javax.swing.JSlider;
-import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
 
 /**
@@ -39,8 +35,10 @@ import org.openide.util.NbPreferences;
  */
 public class TrackViewer extends AbstractViewer implements ThreadListener {
 
-    private NormalizationSettings normSetting = null;
     private static final long serialVersionUID = 572406471;
+    private static final int MININTERVALLENGTH = 25000;
+    
+    private NormalizationSettings normSetting = null;
     private TrackConnector trackCon;
     private List<Integer> trackIDs ;
     private PersistantCoverage cov;
@@ -51,6 +49,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     private boolean colorChanges;
     private boolean hasNormalizationFactor = false;
     private boolean automaticScaling = false;
+    private boolean useMinimalIntervalLength = true;
     
     private JSlider verticalSlider = null;
  
@@ -73,7 +72,6 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
  //   public static final String PROP_TRACK_CLICKED = "track clicked";
   //  public static final String PROP_TRACK_ENTERED = "track entered";
     private boolean combineTracks;
-    private BufferedImage loadingIndicator;
 
     /**
      * Create a new panel to show coverage information
@@ -85,17 +83,8 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      *      track connector should be combined.
      */
     public TrackViewer(BoundsInfoManager boundsManager, BasePanel basePanel, PersistantReference refGen, 
-            TrackConnector trackCon, boolean combineTracks){
+            TrackConnector trackCon, boolean combineTracks) {
         super(boundsManager, basePanel, refGen);
-        
-        //read loadingIndicator icon from package resources
-        try { 
-            InputStream stream = TrackViewer.class
-            .getResourceAsStream( "loading.png" );
-            this.loadingIndicator = ImageIO.read( stream ); 
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-        }
         
         this.trackCon = trackCon;
         this.twoTracks = this.trackCon.getAssociatedTrackNames().size() > 1; 
@@ -229,8 +218,10 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         } else {
             Color fillcolor = ColorProperties.TITLE_BACKGROUND;
             g.setColor(fillcolor);
-            if (this.loadingIndicator!=null)
-            g.drawImage(this.loadingIndicator, this.getWidth()-60-loadingIndicator.getWidth(), 5, loadingIndicator.getWidth(), loadingIndicator.getHeight(), this);
+            BufferedImage loadingIndicator = this.getLoadingIndicator();
+            if (loadingIndicator != null) {
+                g.drawImage(loadingIndicator, this.getWidth() - 60 - loadingIndicator.getWidth(), 5, loadingIndicator.getWidth(), loadingIndicator.getHeight(), this);
+            }
             //g.fillRect(0, 0, this.getHeight()/4, this.getHeight()/4); //this.getWidth(), this.getHeight()/3);
         }
 
@@ -249,8 +240,14 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
         graphics.drawLine(info.getPhyLeft(), info.getReverseLow(), info.getPhyRight(), info.getReverseLow());
     }
 
-    
-    private double getCoverageValue(boolean isForwardStrand, int covType, int absPos) {
+    /**
+     * Returns the coverage value for the given strand, coverage type and position.
+     * @param isForwardStrand if -1, coverage is drawn from bottom to top, if 1 otherwise
+     * @param covType the mapping classification type of the coverage path handled here
+     * @param absPos the reference position for which the coverage should be obtained
+     * @return the coverage value for the given strand, coverage type and position.
+     */
+    private double getCoverageValue(boolean isForwardStrand, byte covType, int absPos) {
         double value = 0;
 
         if (!this.twoTracks || this.twoTracks && this.combineTracks) {
@@ -359,7 +356,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * @param covType the type of the coverage path handled here
      * @return GeneralPath representing the coverage of a certain type
      */
-    private GeneralPath getCoveragePath(boolean isForwardStrand, int covType) {
+    private GeneralPath getCoveragePath(boolean isForwardStrand, byte covType) {
         GeneralPath covPath = new GeneralPath();
         int orientation = (isForwardStrand ? -1 : 1);
 
@@ -417,8 +414,17 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     private void requestCoverage() {
         covLoaded = false;
         setCursor(new Cursor(Cursor.WAIT_CURSOR));
-        trackCon.addCoverageRequest(new IntervalRequest(getBoundsInfo().getLogLeft(),
-                getBoundsInfo().getLogRight(), this));
+        int totalFrom = getBoundsInfo().getLogLeft();
+        int totalTo = getBoundsInfo().getLogRight();
+        if (this.useMinimalIntervalLength) {
+            totalFrom -= MININTERVALLENGTH;
+            totalTo += MININTERVALLENGTH;
+        }
+        trackCon.addCoverageRequest(new IntervalRequest(
+                getBoundsInfo().getLogLeft(), 
+                getBoundsInfo().getLogRight(), 
+                totalFrom ,
+                totalTo , this, false));
     }
 
     @Override
@@ -428,7 +434,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             this.cov = covResult.getCoverage();
             this.cov.setHighestCoverage(0);
             this.trackInfo.setCoverage(this.cov);
-                   
+
             if (this.cov.isTwoTracks() && !this.combineTracks) {
                 this.createCoveragePathsDiffOfTwoTracks();
             } else {
@@ -733,12 +739,12 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     /**
      * Method to be called when the vertical zoom level of this track viewer was
      * changed, thus the coverage paths have to be recalculated according to the 
-     * new zoom level. 
+     * new zoom level. A scaleFactor of 1 means a 1:1 translation of coverage to 
+     * pixels. A value smaller than 1 is adjusted to 1.
      * @param value the new vertical zoom slider value
      */
     public void verticalZoomLevelUpdated(int value) {
-        this.scaleFactor = Math.round(Math.pow(value, 2) / 10);
-        this.scaleFactor = (this.scaleFactor < 1 ? 1 : this.scaleFactor);
+        this.scaleFactor = value < 1 ? 1 : Math.pow(value, 2);
  
         if (this.cov != null) {
             if (this.cov.isTwoTracks() && !this.combineTracks) {
@@ -767,6 +773,7 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * coverage values.
      */
     private void computeScaleStep() {
+        //A scaleFactor of 1 means a 1:1 translation of coverage to pixels.
         int visibleCoverage = (int) (this.getPaintingAreaInfo().getAvailableForwardHeight() * this.scaleFactor);
 
         if (visibleCoverage <= 10) {
@@ -793,8 +800,14 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
             this.scaleLineStep = 7500;
         } else if (visibleCoverage <= 65000) {
             this.scaleLineStep = 10000;
-        } else {
+        } else if (visibleCoverage <= 200000) {
             this.scaleLineStep = 20000;
+        } else if (visibleCoverage <= 500000) {
+            this.scaleLineStep = 50000;
+        } else if (visibleCoverage <= 1000000) {
+            this.scaleLineStep = 100000;
+        } else {
+            this.scaleLineStep = 300000;
         }
     }
     
@@ -802,17 +815,23 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
      * Automatically detects the most suitable scaling value to fit the coverage
      * to the track viewer.
      * This Method transforms highest coverage to slider value, where the slider 
-     * values range from 1-200.
+     * values range from 1-200. A scaleFactor of 1 means a 1:1 translation of 
+     * coverage to pixels. A larger scaleFactor means, that the coverage is
+     * shrinked to fit the available painting area.
      */
     private void computeAutomaticScaling() {
         if (this.automaticScaling && this.cov != null && this.verticalSlider != null) {
-            
-            this.scaleFactor = Math.round(this.cov.getHighestCoverage() / 140.0) + 1;
+            double oldScaleFactor = this.scaleFactor;
+            double availablePixels = this.getPaintingAreaInfo().getAvailableForwardHeight();
+            this.scaleFactor = Math.ceil(this.cov.getHighestCoverage() / availablePixels);
             this.scaleFactor = this.scaleFactor < 1 ? 1.0 : this.scaleFactor;
-            this.scaleFactor = this.scaleFactor > 140000.0 ? this.verticalSlider.getMaximum() : this.scaleFactor;
 
             //set the inverse of the value set in verticalZoomLevelUpdated
-            this.verticalSlider.setValue((int) Math.round(Math.sqrt(this.scaleFactor * 10)));
+            this.verticalSlider.setValue((int) (Math.ceil(Math.sqrt(this.scaleFactor))));
+            if (oldScaleFactor != this.scaleFactor) {
+                this.createCoveragePaths();
+                this.repaint();
+            }
         }
     }
 
@@ -973,6 +992,25 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     @Override
     public void notifySkipped() {
         //do nothing
+    }
+
+    /**
+     * @return <cc>true</cc> if the queried interval length should be extended
+     * to the <cc>MININTERVALLENGTH</cc>, <cc>false</cc> if the original 
+     * bounds should be used for the coverage queries.
+     */
+    public boolean isUseMinimalIntervalLength() {
+        return useMinimalIntervalLength;
+    }
+
+    /**
+     * @param useMinimalIntervalLength <cc>true</cc> if the queried interval
+     * length should be extended to the <cc>MININTERVALLENGTH</cc>,
+     * <cc>false</cc> if the original bounds should be used for the coverage 
+     * queries.
+     */
+    public void setUseMinimalIntervalLength(boolean useMinimalIntervalLength) {
+        this.useMinimalIntervalLength = useMinimalIntervalLength;
     }
 
 }
