@@ -874,12 +874,12 @@
                 <binary-origin>release/modules/ext/commons-math3-3.1.1.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
-                <runtime-relative-path>ext/geneticcodes-1.0.1.jar</runtime-relative-path>
-                <binary-origin>D:\Programmieren &amp; Studieren\NetbeansProjects\ReadXplorer_Repo\ReadXplorer\ReadXplorer_Libraries\release\modules\ext\geneticcodes-1.0.1.jar</binary-origin>
-            </class-path-extension>
-            <class-path-extension>
                 <runtime-relative-path>ext/batik-ext.jar</runtime-relative-path>
                 <binary-origin>release/modules/ext/batik-ext.jar</binary-origin>
+            </class-path-extension>
+            <class-path-extension>
+                <runtime-relative-path>ext/geneticcodes-1.0.1.jar</runtime-relative-path>
+                <binary-origin>release/modules/ext/geneticcodes-1.0.1.jar</binary-origin>
             </class-path-extension>
             <class-path-extension>
                 <runtime-relative-path>ext/swtgraphics2d.jar</runtime-relative-path>
