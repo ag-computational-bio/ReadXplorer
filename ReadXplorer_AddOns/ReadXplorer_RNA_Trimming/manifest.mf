@@ -1,5 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: de.cebitec.readXplorer.rnaTrimming
-OpenIDE-Module-Localizing-Bundle: de/cebitec/readXplorer/rnaTrimming/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.0
-OpenIDE-Module-Requires: org.openide.windows.IOProvider , org.openide.windows.WindowManager

@@ -1,7 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: de.cebitec.readXplorer.tools.snp454
-OpenIDE-Module-Layer: de/cebitec/readXplorer/tools/snp454/layer.xml
-OpenIDE-Module-Localizing-Bundle: de/cebitec/readXplorer/tools/snp454/Bundle.properties
-OpenIDE-Module-Requires: org.openide.windows.WindowManager
-OpenIDE-Module-Specification-Version: 1.0
-

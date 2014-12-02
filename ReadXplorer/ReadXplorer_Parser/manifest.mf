@@ -1,5 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: de.cebitec.readXplorer.parser
-OpenIDE-Module-Localizing-Bundle: de/cebitec/readXplorer/parser/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.0
-
