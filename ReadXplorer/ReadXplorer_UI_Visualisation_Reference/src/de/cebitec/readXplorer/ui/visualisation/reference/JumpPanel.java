@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,14 +16,15 @@
  */
 package de.cebitec.readXplorer.ui.visualisation.reference;
 
+
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Observer;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.IThumbnailView;
@@ -41,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import javax.swing.DefaultRowSorter;
 import javax.swing.JOptionPane;
 import javax.swing.RowFilter;
 import javax.swing.event.DocumentEvent;
@@ -53,6 +55,7 @@ import org.openide.util.Lookup;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
 import org.openide.util.Utilities;
+
 
 /**
  * Panel for navigating in the currently viewed chromosome sequence.
@@ -75,83 +78,95 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
     private ChromosomeListener chromListener;
     private ReferenceFeatureTopComp refComp;
 
-    
-    /** Creates new Panel for navigating in the currently viewed chromosome 
-     *  sequence.
+
+    /**
+     * Creates new Panel for navigating in the currently viewed chromosome
+     * sequence.
      */
     public JumpPanel() {
         this.initComponents();
         this.completeComponents();
-        this.setMinimumSize(new Dimension(50, 50));
-        this.setPreferredSize(new Dimension(288, 500));
-        this.setSize(new Dimension(288, 500));
+        this.setMinimumSize( new Dimension( 50, 50 ) );
+        this.setPreferredSize( new Dimension( 288, 500 ) );
+        this.setSize( new Dimension( 288, 500 ) );
         jumpPosition = 1;
         featTableObserver = new FeatureTableObserver();
-        filterTextfield.getDocument().addDocumentListener(new DocumentListener() {
+        filterTextfield.getDocument().addDocumentListener( new DocumentListener() {
 
             @Override
-            public void insertUpdate(DocumentEvent e) {
+            public void insertUpdate( DocumentEvent e ) {
                 updateFilter();
             }
 
+
             @Override
-            public void removeUpdate(DocumentEvent e) {
+            public void removeUpdate( DocumentEvent e ) {
                 updateFilter();
             }
 
+
             @Override
-            public void changedUpdate(DocumentEvent e) {
+            public void changedUpdate( DocumentEvent e ) {
                 updateFilter();
 
             }
-        });        
+
+
+        } );
 
         //Listener for TableSelect-Events
         this.refComp = ReferenceFeatureTopComp.findInstance();
-        featureTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+        featureTable.getSelectionModel().addListSelectionListener( new ListSelectionListener() {
 
             @Override
-            public void valueChanged(ListSelectionEvent e) {
-                TableUtils.showFeaturePosition(featureTable, 0, boundsManager);
-                refComp.showTableFeature(featureTable, 0);
+            public void valueChanged( ListSelectionEvent e ) {
+                TableUtils.showFeaturePosition( featureTable, 0, boundsManager );
+                refComp.showTableFeature( featureTable, 0 );
             }
-        });
 
-        featureTable.addMouseListener(new MouseAdapter() {
+
+        } );
+
+        featureTable.addMouseListener( new MouseAdapter() {
 
             @Override
-            public void mouseClicked(MouseEvent e) {
-                if ((e.getButton() == MouseEvent.BUTTON3) || (e.isPopupTrigger())) {
-                    final IThumbnailView thumb = Lookup.getDefault().lookup(IThumbnailView.class);
-                    if (thumb != null) {
-                        thumb.showTablePopUp(featureTable, curRefViewer, e);
+            public void mouseClicked( MouseEvent e ) {
+                if( (e.getButton() == MouseEvent.BUTTON3) || (e.isPopupTrigger()) ) {
+                    final IThumbnailView thumb = Lookup.getDefault().lookup( IThumbnailView.class );
+                    if( thumb != null ) {
+                        thumb.showTablePopUp( featureTable, curRefViewer, e );
                     }
                 }
             }
 
+
             @Override
-            public void mousePressed(MouseEvent e) {
-                if ((e.getButton() == MouseEvent.BUTTON3) || (e.isPopupTrigger())) {
-                    final IThumbnailView thumb = Lookup.getDefault().lookup(IThumbnailView.class);
-                    if (thumb != null) {
-                        thumb.showTablePopUp(featureTable, curRefViewer, e);
+            public void mousePressed( MouseEvent e ) {
+                if( (e.getButton() == MouseEvent.BUTTON3) || (e.isPopupTrigger()) ) {
+                    final IThumbnailView thumb = Lookup.getDefault().lookup( IThumbnailView.class );
+                    if( thumb != null ) {
+                        thumb.showTablePopUp( featureTable, curRefViewer, e );
                     }
                 }
             }
-        });
+
+
+        } );
 
         //PropertyChangeListener for RevViewer
-        res = Utilities.actionsGlobalContext().lookupResult(ReferenceViewer.class);
-        res.addLookupListener(this);
+        res = Utilities.actionsGlobalContext().lookupResult( ReferenceViewer.class );
+        res.addLookupListener( this );
 
     }
 
-    /** This method is called from within the constructor to
+
+    /**
+     * This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
      * always regenerated by the Form Editor.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -370,18 +385,19 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
 }//GEN-LAST:event_jumpTextfieldKeyTyped
 
     private void jumpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jumpButtonActionPerformed
-        if (GeneralUtils.isValidPositionInput(this.jumpTextfield.getText(), refGenome.getActiveChromLength())) {
-            this.jumpPosition = Integer.parseInt(this.jumpTextfield.getText().trim());
-            this.boundsManager.navigatorBarUpdated(this.jumpPosition);
-        } else {
-            JOptionPane.showMessageDialog(this, "Please enter a valid position! (1-"
-                    + refGenome.getActiveChromLength()
-                    + ")", "Invalid Position", JOptionPane.ERROR_MESSAGE);
+        if( GeneralUtils.isValidPositionInput( this.jumpTextfield.getText(), refGenome.getActiveChromLength() ) ) {
+            this.jumpPosition = Integer.parseInt( this.jumpTextfield.getText().trim() );
+            this.boundsManager.navigatorBarUpdated( this.jumpPosition );
+        }
+        else {
+            JOptionPane.showMessageDialog( this, "Please enter a valid position! (1-"
+                                                 + refGenome.getActiveChromLength()
+                                                 + ")", "Invalid Position", JOptionPane.ERROR_MESSAGE );
         }
 }//GEN-LAST:event_jumpButtonActionPerformed
 
     private void jumpTextfieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jumpTextfieldActionPerformed
-        this.jumpButtonActionPerformed(evt);
+        this.jumpButtonActionPerformed( evt );
     }//GEN-LAST:event_jumpTextfieldActionPerformed
 
     private void radioProductActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_radioProductActionPerformed
@@ -397,7 +413,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
     }//GEN-LAST:event_radioFeatureButtonActionPerformed
 
     private void searchPatternFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchPatternFieldActionPerformed
-        this.searchPatternButtonActionPerformed(evt);
+        this.searchPatternButtonActionPerformed( evt );
     }//GEN-LAST:event_searchPatternFieldActionPerformed
 
     private void searchPatternFieldKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchPatternFieldKeyTyped
@@ -408,18 +424,19 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
 
         String pattern = this.searchPatternField.getText();
 //        if (SequenceUtils.isValidDnaString(pattern)) {
-            int newPos;
+        int newPos;
 
-            if (this.searchPattern != null && this.searchPattern.equals(pattern)) {
-                newPos = this.viewer.getSequenceBar().findNextPatternOccurrence();
-            } else {
-                this.searchPattern = pattern;
-                newPos = this.viewer.getSequenceBar().showPattern(this.searchPattern);
-            }
+        if( this.searchPattern != null && this.searchPattern.equals( pattern ) ) {
+            newPos = this.viewer.getSequenceBar().findNextPatternOccurrence();
+        }
+        else {
+            this.searchPattern = pattern;
+            newPos = this.viewer.getSequenceBar().showPattern( this.searchPattern );
+        }
 
-            if (newPos > -1) {
-                this.boundsManager.navigatorBarUpdated(newPos);
-            }
+        if( newPos > -1 ) {
+            this.boundsManager.navigatorBarUpdated( newPos );
+        }
 
 //        } else {
 //            JOptionPane.showMessageDialog(this, "Please enter a valid DNA string!", "Invalid Input", JOptionPane.ERROR_MESSAGE);
@@ -455,77 +472,87 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     private javax.swing.JScrollPane tableScrollPane;
     // End of variables declaration//GEN-END:variables
 
+
     /**
-     * Set the viewer including the reference genome, for which the 
+     * Set the viewer including the reference genome, for which the
      * navigation is currently available in this panel. Also updates the bounds
-     * information manager to the current viewers manager and removes the old 
+     * information manager to the current viewers manager and removes the old
      * table feature observer for the last reference genome.
+     * <p>
      * @param viewer The viewer to navigate
      */
-    public void setViewer(AbstractViewer viewer) {
-        if (viewer != this.viewer) {
+    public void setViewer( AbstractViewer viewer ) {
+        if( viewer != this.viewer ) {
             boolean firstCall = this.viewer == null || this.chromObserver == null;
-            this.updateFeatTableObserver(this.refGenome, viewer, firstCall);
+            this.updateFeatTableObserver( this.refGenome, viewer, firstCall );
             this.viewer = viewer;
             this.refGenome = viewer.getReference();
             this.boundsManager = viewer.getBoundsInformationManager();
-            refGenCon = ProjectConnector.getInstance().getRefGenomeConnector(refGenome.getId());
+            refGenCon = ProjectConnector.getInstance().getRefGenomeConnector( refGenome.getId() );
 
-            if (refGenome.getNoChromosomes() > 1) {
+            if( refGenome.getNoChromosomes() > 1 ) {
 
                 ChromosomeVisualizationHelper chromHelper = new ChromosomeVisualizationHelper();
-                if (firstCall) {
+                if( firstCall ) {
                     //Update the observer for changes to the chromosome selection anywhere else
-                    this.chromObserver = chromHelper.createChromBoxWithObserver(chromComboBox, refGenome);
+                    this.chromObserver = chromHelper.createChromBoxWithObserver( chromComboBox, refGenome );
 
                     //Update the listener for changes to the chromosome selection in this box
-                    chromListener = chromHelper.new ChromosomeListener(chromComboBox, viewer);
-                } else {
-                    this.chromObserver.setRefGenome(refGenome);
-                    this.chromListener.setViewer(viewer);
-                    chromHelper.updateChromBoxContent(chromComboBox, refGenome);
+                    chromListener = chromHelper.new ChromosomeListener( chromComboBox, viewer );
+                }
+                else {
+                    this.chromObserver.setRefGenome( refGenome );
+                    this.chromListener.setViewer( viewer );
+                    chromHelper.updateChromBoxContent( chromComboBox, refGenome );
                 }
 
-                this.chromComboBox.setVisible(true);
-                this.chromCheckBox.setVisible(true);
+                this.chromComboBox.setVisible( true );
+                this.chromCheckBox.setVisible( true );
                 this.chromComboBox.repaint();
-            } else {
-                this.chromComboBox.setVisible(false);
-                this.chromCheckBox.setVisible(false);
+            }
+            else {
+                this.chromComboBox.setVisible( false );
+                this.chromCheckBox.setVisible( false );
             }
             this.fillFeatureList();
         }
     }
-    
+
+
     /**
      * Updates the feature table observer, which updates the feature table
      * depending on the chromosome.
+     * <p>
      * @param refGenome The OLD reference genome for which the navigation was
-     * handled until now.
-     * @param viewer The NEW viewer, for which the navigation will be handled
-     * from now on
+     *                  handled until now.
+     * @param viewer    The NEW viewer, for which the navigation will be handled
+     *                  from now on
      * @param firstCall true, if the object variables are not set yet, false,
-     * if the JumpPanel had already displayed content for another reference.
+     *                  if the JumpPanel had already displayed content for another reference.
      */
-    private void updateFeatTableObserver(PersistentReference refGenome, AbstractViewer viewer, boolean firstCall) {
-        if (!firstCall) {
-            refGenome.removeObserver(this.featTableObserver);
+    private void updateFeatTableObserver( PersistentReference refGenome, AbstractViewer viewer, boolean firstCall ) {
+        if( !firstCall ) {
+            refGenome.removeObserver( this.featTableObserver );
         }
         this.featTableObserver = new FeatureTableObserver();
-        viewer.getReference().registerObserver(this.featTableObserver);
+        viewer.getReference().registerObserver( this.featTableObserver );
     }
-    
+
+
     /**
-     * An Observer for changes in the chromosome selection, which updates the 
+     * An Observer for changes in the chromosome selection, which updates the
      * feature list of this JumpPanel.
      */
     private class FeatureTableObserver implements Observer {
 
         @Override
-        public void update(Object args) {
+        public void update( Object args ) {
             fillFeatureList();
         }
+
+
     }
+
 
     /**
      * Querries all features for the currently selected reference and chromosome
@@ -533,23 +560,24 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
      */
     private void fillFeatureList() {
         List<PersistentFeature> features = new ArrayList<>();
-        if (this.chromCheckBox.isSelected()) { //TODO: improve performance or add waiting symbol somewhere
-            for (PersistentChromosome chrom: refGenome.getChromosomes().values()) {
-                features.addAll(refGenCon.getFeaturesForRegion(0, chrom.getLength(),
-                        FeatureType.ANY, chrom.getId()));
+        if( this.chromCheckBox.isSelected() ) { //TODO: improve performance or add waiting symbol somewhere
+            for( PersistentChromosome chrom : refGenome.getChromosomes().values() ) {
+                features.addAll( refGenCon.getFeaturesForRegion( 0, chrom.getLength(),
+                                                                 FeatureType.ANY, chrom.getId() ) );
             }
-        } else {
-            features = refGenCon.getFeaturesForRegion(0, refGenome.getActiveChromLength(),
-                    FeatureType.ANY, refGenome.getActiveChromId());
         }
-        Collections.sort(features, new FeatureNameSorter());
-        PersistentFeature.Utils.addParentFeatures(features);
-        PersistentFeature[] featureData = features.toArray(new PersistentFeature[features.size()]);
+        else {
+            features = refGenCon.getFeaturesForRegion( 0, refGenome.getActiveChromLength(),
+                                                       FeatureType.ANY, refGenome.getActiveChromId() );
+        }
+        Collections.sort( features, new FeatureNameSorter() );
+        PersistentFeature.Utils.addParentFeatures( features );
+        PersistentFeature[] featureData = features.toArray( new PersistentFeature[features.size()] );
 
         //Create new Model for Table
-        featureTable.setModel(new FeatureTableModel(featureData));
-        featureTable.setRowSorter(new TableRowSorter<>(featureTable.getModel()));
-        featureTable.getColumnModel().getColumn(2).setPreferredWidth(150);
+        featureTable.setModel( new FeatureTableModel( featureData ) );
+        featureTable.setRowSorter( new TableRowSorter<>( featureTable.getModel() ) );
+        featureTable.getColumnModel().getColumn( 2 ).setPreferredWidth( 150 );
         updateFilter();
 
     }
@@ -557,66 +585,81 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     /*
      * Uses regular expression to filter all matching entries in Feature, Product- or EC-Column.
      */
+
     private void updateFilter() {
         RowFilter<TableModel, Object> rf = null;
         //If current expression doesn't parse, don't update.
         try {
-            if (radioFeatureButton.isSelected()) {
-                rf = RowFilter.regexFilter(filterTextfield.getText(), 0);
-            } else if (radioGene.isSelected()) {
-                rf = RowFilter.regexFilter(filterTextfield.getText(), 2);
-            } else if (radioProduct.isSelected()) {
-                rf = RowFilter.regexFilter(filterTextfield.getText(), 3);
-            } else if (radioEC.isSelected()){
-                rf = RowFilter.regexFilter(filterTextfield.getText(), 4);
+            if( radioFeatureButton.isSelected() ) {
+                rf = RowFilter.regexFilter( filterTextfield.getText(), 0 );
+            }
+            else if( radioGene.isSelected() ) {
+                rf = RowFilter.regexFilter( filterTextfield.getText(), 2 );
+            }
+            else if( radioProduct.isSelected() ) {
+                rf = RowFilter.regexFilter( filterTextfield.getText(), 3 );
+            }
+            else if( radioEC.isSelected() ) {
+                rf = RowFilter.regexFilter( filterTextfield.getText(), 4 );
             }
 
-        } catch (java.util.regex.PatternSyntaxException e) {
+        }
+        catch( java.util.regex.PatternSyntaxException e ) {
             return;
         }
-        ((TableRowSorter<TableModel>) featureTable.getRowSorter()).setRowFilter(rf);
+        ((DefaultRowSorter<TableModel, Integer>) featureTable.getRowSorter()).setRowFilter( rf );
     }
 
+
     @Override
-    public void resultChanged(LookupEvent le) {
-        for (ReferenceViewer refViewer : res.allInstances()) {
+    public void resultChanged( LookupEvent le ) {
+        for( ReferenceViewer refViewer : res.allInstances() ) {
             curRefViewer = refViewer;
         }
     }
 
+
     void clearFilter() {
-        this.filterTextfield.setText("");
+        this.filterTextfield.setText( "" );
         this.updateFilter();
     }
 
+
     /**
-     * Loads the copy, paste, cut, select all right click menus for all 
+     * Loads the copy, paste, cut, select all right click menus for all
      * text fields beloning to this panel.
      */
     private void completeComponents() {
-        this.jumpTextfield.addMouseListener(new StandardMenuEvent());
-        this.searchPatternField.addMouseListener(new StandardMenuEvent());
-        this.filterTextfield.addMouseListener(new StandardMenuEvent());
+        this.jumpTextfield.addMouseListener( new StandardMenuEvent() );
+        this.searchPatternField.addMouseListener( new StandardMenuEvent() );
+        this.filterTextfield.addMouseListener( new StandardMenuEvent() );
     }
+
 
     private class FeatureNameSorter implements Comparator<PersistentFeature> {
 
         @Override
-        public int compare(PersistentFeature o1, PersistentFeature o2) {
+        public int compare( PersistentFeature o1, PersistentFeature o2 ) {
             String name1 = o1.getLocus();
             String name2 = o2.getLocus();
 
             // null string is always "bigger" than anything else
-            if (name1 == null && name2 != null) {
+            if( name1 == null && name2 != null ) {
                 return 1;
-            } else if (name1 != null && name2 == null) {
+            }
+            else if( name1 != null && name2 == null ) {
                 return -1;
-            } else if (name1 == name2) { //== comparison desired here 4 nullcheck
+            }
+            else if( name1 == name2 ) { //== comparison desired here 4 nullcheck
                 // both are null
                 return 0;
-            } else {
-                return name1.compareTo(name2);
+            }
+            else {
+                return name1.compareTo( name2 );
             }
         }
+
+
     }
+
 }

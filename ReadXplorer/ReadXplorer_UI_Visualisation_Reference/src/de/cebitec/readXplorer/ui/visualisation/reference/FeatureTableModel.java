@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,31 +16,35 @@
  */
 package de.cebitec.readXplorer.ui.visualisation.reference;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import javax.swing.table.AbstractTableModel;
+
 
 /**
  *
  * @author dkramer
  */
 public class FeatureTableModel extends AbstractTableModel {
-    
+
     private static final long serialVersionUID = 1L;
 
     PersistentFeature[] featureData;
-    private String[] columnNames = {"Feature", "Type", "Gene", "Product", "EC-Number"};
+    private String[] columnNames = { "Feature", "Type", "Gene", "Product", "EC-Number" };
     private Object[][] data;
 
-    public FeatureTableModel(PersistentFeature[] featureData) {
+
+    public FeatureTableModel( PersistentFeature[] featureData ) {
         this.featureData = featureData;
         this.data = new Object[featureData.length][columnNames.length];
         fillData();
     }
 
+
     private void fillData() {
         int counter = -1;
         this.data = new Object[featureData.length][columnNames.length];
-        for (PersistentFeature feature : this.featureData) {
+        for( PersistentFeature feature : this.featureData ) {
             counter++;
             this.data[counter][0] = feature;
             this.data[counter][1] = feature.getType();
@@ -50,38 +54,46 @@ public class FeatureTableModel extends AbstractTableModel {
         }
     }
 
+
     @Override
     public int getRowCount() {
         return featureData.length;
     }
+
 
     @Override
     public int getColumnCount() {
         return columnNames.length;
     }
 
+
     @Override
-    public String getColumnName(int col) {
+    public String getColumnName( int col ) {
         return columnNames[col];
     }
 
+
     @Override
-    public Object getValueAt(int row, int col) {
-        if (this.data.length == 0){
+    public Object getValueAt( int row, int col ) {
+        if( this.data.length == 0 ) {
             return null;
         }
         return this.data[row][col];
     }
 
+
     @Override
-    public Class getColumnClass(int c) {
-        if (getValueAt(0, c) != null) {
-            if (c == 0) {
+    public Class<?> getColumnClass( int c ) {
+        if( getValueAt( 0, c ) != null ) {
+            if( c == 0 ) {
                 return PersistentFeature.class;
             }
-            return getValueAt(0, c).getClass();
-        } else {
+            return getValueAt( 0, c ).getClass();
+        }
+        else {
             return Object.class;
         }
     }
+
+
 }
