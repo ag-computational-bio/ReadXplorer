@@ -262,7 +262,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                             rowData[i++] = Math.abs(tss.getPos() - (tss.isFwdStrand() ? feature.getStart() : feature.getStop()));
                         } else {
                             rowData[i++] = "-";
-                            rowData[i++] = "";
+                            rowData[i++] = null;
                         }
                         feature = detFeatures.getDownstreamFeature();
                         if (feature != null) {
@@ -271,7 +271,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
                             rowData[i++] = distance;
                         } else {
                             rowData[i++] = "-";
-                            rowData[i++] = "";
+                            rowData[i++] = null;
                         }
 
                         if (tss instanceof TransStartUnannotated) {

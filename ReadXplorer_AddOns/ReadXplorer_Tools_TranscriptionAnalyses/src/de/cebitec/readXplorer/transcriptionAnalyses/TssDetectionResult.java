@@ -120,6 +120,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
         dataColumnDescriptions.add("No Read Starts");
         dataColumnDescriptions.add("Coverage Increase");
         dataColumnDescriptions.add("Coverage Increase %");
+        dataColumnDescriptions.add("Leaderless");
         dataColumnDescriptions.add("Correct Start Feature");
         dataColumnDescriptions.add("Correct Start Locus");
         dataColumnDescriptions.add("Correct Start EC-Number");
@@ -179,6 +180,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
             tssRow.add(tss.getPercentIncrease());
             
             DetectedFeatures detFeatures = tss.getDetFeatures();
+            tssRow.add(detFeatures.isLeaderless() ? "yes" : "");
             this.addFeatureRows(detFeatures.getCorrectStartFeature(), tssRow, tss, false);
             this.addFeatureRows(detFeatures.getUpstreamFeature(), tssRow, tss, true);
             this.addFeatureRows(detFeatures.getDownstreamFeature(), tssRow, tss, true);
@@ -223,6 +225,8 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
                 tssParameters.isPerformUnannotatedTranscriptDet() ? "yes" : "no"));
         statisticsExportData.add(ResultTrackAnalysis.createTableRow("Minimum transcript extension coverage:", 
                 tssParameters.getMinTranscriptExtensionCov()));
+        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Maximum distance to feature of leaderless transcripts:", 
+                tssParameters.getMaxFeatureDistance()));
         tssParameters.getReadClassParams().addReadClassParamsToStats(statisticsExportData);
         
         statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between parameters and statistics

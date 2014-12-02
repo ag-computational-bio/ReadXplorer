@@ -173,7 +173,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
         int noReads = 0;
         int noSkippedReads = 0;
 
-        try (SAMFileReader samReader = new SAMFileReader(trackJob.getFile())) {
+        try (SAMFileReader samReader = new SAMFileReader(fileSortedByReadName)) {
             samReader.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
             SAMFileHeader.SortOrder sortOrder = samReader.getFileHeader().getSortOrder();
             SAMRecordIterator samItor = samReader.iterator();
@@ -230,7 +230,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
                                     "Parser.Parsing.WrongReference", lineno, record.getSAMString()));
                         }
                     }
-                } catch (SAMFormatException e) {
+                } catch (SAMFormatException | StringIndexOutOfBoundsException e) {
                     if (!e.getMessage().contains("MAPQ should be 0")) {
                         this.sendMsgIfAllowed(NbBundle.getMessage(SamBamParser.class,
                                 "Parser.Parsing.CorruptData", lineno, e.toString()));

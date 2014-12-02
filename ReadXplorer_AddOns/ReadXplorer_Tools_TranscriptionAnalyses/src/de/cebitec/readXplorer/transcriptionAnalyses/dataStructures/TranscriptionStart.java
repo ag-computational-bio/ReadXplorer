@@ -44,6 +44,8 @@ public class TranscriptionStart extends TrackChromResultEntry {
      * @param coverageIncrease the coverage increase from the position before
      * the TSS to the detected TSS position
      * @param detFeatures object containing the features associated to this predicted gene start
+     * @param trackId id of the analyzed track
+     * @param chromId id of the analyzed chromosome
      */
     public TranscriptionStart(int pos, boolean isFwdStrand, int readStarts, int percentIncrease,
             int coverageIncrease, DetectedFeatures detFeatures, int trackId, int chromId) {

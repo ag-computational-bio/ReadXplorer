@@ -402,9 +402,11 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                                 feature.getStart() == chromFeatures.get(i+1).getStart() &&
                                 chromFeatures.get(i+1).getType() == FeatureType.GENE) {
                             detectedFeatures.setDownstreamFeature(chromFeatures.get(i+1));
+                            detectedFeatures.setIsLeaderless(isLeaderless(chromFeatures.get(i+1), tssPos));
 //                            System.out.println("Gene covers CDS with same annotated TSS Fwd");
                         } else {
                             detectedFeatures.setDownstreamFeature(feature);
+                            detectedFeatures.setIsLeaderless(isLeaderless(feature, tssPos));
                         }
                         
                         break;
@@ -450,6 +452,7 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
                         }
                         
                         detectedFeatures.setDownstreamFeature(feature);
+                        detectedFeatures.setIsLeaderless(isLeaderless(feature, tssPos));
                         
                     } else if (start == tssPos) {
                         //store correctly annotated transcription start site
@@ -482,6 +485,15 @@ public class AnalysisTranscriptionStart implements Observer, AnalysisI<List<Tran
             }
         }
         return detectedFeatures;
+    }
+    
+    /**
+     * @param feature feature to check
+     * @param tssPos tss position to check
+     * @return true, if the feature is a leaderless feature, false otherwise
+     */
+    private boolean isLeaderless(PersistentFeature feature, int tssPos) {
+        return Math.abs(feature.getStartOnStrand() - tssPos) <= parametersTSS.getMaxLeaderlessDistance();
     }
     
     /**

@@ -32,6 +32,7 @@ public class DetectedFeatures {
     private PersistentFeature upstreamFeature;
     private PersistentFeature correctStartFeature;
     private PersistentFeature downstreamFeature;
+    private boolean isLeaderless;
 
     /**
      * Data structure for storing the features belonging to a certain
@@ -67,8 +68,21 @@ public class DetectedFeatures {
     public void setUpstreamFeature(PersistentFeature upstreamFeature) {
         this.upstreamFeature = upstreamFeature;
     }
-    
-    
-    
+
+    /**
+     * @return true, if this start has a downstream feature and is classified as
+     * leaderless, false otherwise.
+     */
+    public boolean isLeaderless() {
+        return isLeaderless;
+    }
+
+    /**
+     * @param isLeaderless Set true, if this start has a downstream feature and
+     * is classified as leaderless, set false otherwise.
+     */
+    public void setIsLeaderless(boolean isLeaderless) {
+        this.isLeaderless = isLeaderless;
+    }
     
 }
