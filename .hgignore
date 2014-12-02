@@ -1,9 +1,0 @@
-/build$
-/dist$
-/private/private.xml$
-/nbproject/private/
-\.orig$
-\.orig\..*$
-\.chg\..*$
-\.rej$
-\.conflict\~$

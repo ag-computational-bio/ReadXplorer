@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: de.cebitec.readXplorer.ui.converter
+OpenIDE-Module-Localizing-Bundle: de/cebitec/readXplorer/ui/converter/Bundle.properties
+OpenIDE-Module-Specification-Version: 1.0.1
+

@@ -1,0 +1,40 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>General Options</title>
+        <link rel="stylesheet" href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/ide.css" type="text/css">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <p style="text-align: center;"><span style="font-size: 14pt;"><strong>General Options:</strong></span></p>
+        <p style="text-align: justify;" >Via "<span style="text-decoration: underline;">Tools -&gt; Options</span>" all available general options can be adjusted.</p>
+        <ul>
+            <li style="text-align: justify;">The "<span style="text-decoration: underline;">General</span>" tab allows setting a proxy.</li>
+            <li style="text-align: justify;">The "<span style="text-decoration: underline;">Keymap</span>" tab allows adjusting the keyboard shortcuts.</li>
+            <li style="text-align: justify;">The "<span style="text-decoration: underline;">Miscellaneous</span>" tab allows editing "File", "Output" and "Windows" settings.</li>
+            <li style="text-align: justify;">The "<span style="text-decoration: underline;">Mapper</span>" tab allows to set the path to an own script, calling a read mapping software (see <i><a href="nbdocs://de.cebitec.readXplorer.mapping/de/cebitec/readXplorer/mapping/docs/mapping-about.html">Mapping</a></i>). 
+                If you want to use the default script (starting bwa) supplied with ReadXplorer, do not change this setting.</li>
+            <li style="text-align: justify;">The "<span style="text-decoration: underline;">Colors</span>" tab allows changing the colors of the five mapping classes (see <i><a href="nbdocs://de.cebitec.readXplorer.view/de/cebitec/readXplorer/view/docs/classification-about.html">Read Classification</a></i>) and the Double Track Viewer.</li>
+            <li style="text-align: justify;">The "<span style="text-decoration: underline;">Genetic Code</span>" tab allows to select another genetic code for translations and highlighting of start and stop codons. If the required genetic code is not in the list, it can be added by the user (see screenshot below). Note: No translation table is available if a custom genetic code is selected. In this case the standard genetic code (index 1) is applied for translations (e.g. in SNP detection).</li>
+            <li style="text-align: justify;">The "<span style="text-decoration: underline;">Gnu R</span>" tab allows editing the CRAN mirror to use for installation of all necessary R packages for the differential gene expression (see <i><a href="nbdocs://de.cebitec.readXplorer.transcriptionAnalyses/de/cebitec/readXplorer/transcriptionAnalyses/docs/differentialExpression-about.html">Differential Gene Expression</a></i>) packages DESeq and baySeq. The standard URL leads to the repository of the Bielefeld University. It contains all necessary packages and the available versions have been tested with ReadXplorer and DESeq and baySeq. Therefore, it is highly recommended, to stick to the default CRAN mirror.</li>
+            <li style="text-align: justify;">The "<span style="text-decoration: underline;">Viewer</span>" tab allows changing general viewer options. Currently, the height of all (double/multiple) track viewers can be chosen and automatic scaling of the coverage in these viewers can be de/activated.</li>
+        </ul>
+        <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readXplorer.options/de/cebitec/readXplorer/options/docs/geneticCode.jpg" alt="geneticCodeSelection" />
+        <p style="text-align: justify;" >The figure shows how to add a <strong>custom genetic code</strong>. One custom code named "Other standard" has already been added to the list and a second one is prepared in the "Add custom genetic code:"-field. The format of a custom genetic code has to adhere to the example in the tooltip below the text field. Note that start and stop codons have to be separated by a ";".</p>
+    </body>
+</html>
+<!--
+Tip: to create a link which will open in an external web browser, try:
+<object classid="java:org.netbeans.modules.javahelp.BrowserDisplayer">
+    <param name="content" value="http://www.netbeans.org/">
+    <param name="text" value="<html><u>http://www.netbeans.org/</u></html>">
+    <param name="textFontSize" value="medium">
+    <param name="textColor" value="blue">
+</object>
+To create a link to a help set from another module, you need to know the code name base and path, e.g.:
+<a href="nbdocs://org.netbeans.modules.usersguide/org/netbeans/modules/usersguide/configure/configure_options.html">Using the Options Window</a>
+(This link will behave sanely if that module is disabled or missing.)
+-->

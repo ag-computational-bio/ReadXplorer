@@ -1,0 +1,44 @@
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Read (Pair) Classification</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <div><p style="text-align: center;"><span style="font-size: 14pt;"><strong>Read Classification:</strong></span></p>
+        <p style="text-align: justify;">Read mapping data has to be provided in SAM, BAM or SARUMAN (JOK) output format. 
+                Thus, the alignment has to be performed beforehand with a mapping tool of choice. 
+                ReadXplorer classifies the reads during the import process by mapping quality and read pair concordance. A 
+                read mapped to a certain reference position is called "mapping". <b>For each read, the number of mappings</b> 
+                on the reference is counted along with the <b>lowest number of mismatches</b> found among the various mappings 
+                of that read. <b>Uniquely mapped reads</b> or reads with a certain amount of mismatches can thus easily be queried.<br/>
+                Note that the same read can map to different reference positions with the same or a varying number of mismatches. 
+                This is important for the read mapping classification. <b>Mappings</b> are classified into five classes: 
+                <ol>
+                    
+                    <li style="text-align: justify;"><b>Single Perfect Match</b>: Contains all reads which have only one mapping without any mismatches (<b>green</b>). 
+                Other mappings with mismatches are allowed to exist for a mapping classified as Single Perfect Match.</li>
+                <li style="text-align: justify;"><b>Perfect Match</b>: Contains all reads which have more than one mapping without any mismatches (<b>light green</b>).</li>
+                <li style="text-align: justify;"><b>Single Best Match</b>: Analogue to the Single Perfect Match class. A mapping that maps nowhere else on the 
+                reference with fewer mismatches than at the current position is called co-optimal. All reads with only one co-optimal 
+                mapping belong to the Single Best Match class (<b>dark yellow</b>). Other mappings with more mismatches are allowed to exist 
+                for a mapping classified as Single Best Match.</li>
+                <li style="text-align: justify;"><b>Best Match</b>: Contains all reads with more than one co-optimal mappings (<b>bright yellow</b>). </li>
+                <li style="text-align: justify;"><b>Common Match</b>: All remaining mappings belong to the Common Match class (<b>red</b>). These are reads, which have a better 
+                mapping elsewhere in the genome than at the current position.<br></li>
+                </ol>
+                
+                Note, that Single Perfect and Single Best Match mappings do not need to be uniquely mapped. 
+                <br><b>Unique mappings</b> can easily be accessed by the 
+                <b>mapping count</b> stored in each mapping for each read. The 
+                mapping classes are displayed in the different data viewers (see <i><a href="nbdocs://de.cebitec.readXplorer.view/de/cebitec/readXplorer/view/docs/view-about.html">Main Window j)</a></i>) and can be selected explicitly for each analysis as shown in the screenshot below 
+                for the Transcription Analyses (see e.g. <i><a href="nbdocs://de.cebitec.readXplorer.transcriptionAnalyses/de/cebitec/readXplorer/transcriptionAnalyses/docs/transcriptionAnalyses-about.html">Transcription Analyses</a></i>). Additionally to the classification, reads can be filtered by minimum PHRED scaled mapping quality. The mapping quality is set by many mapping tools. If the mapping quality is not available, this parameter is dismissed.</p>
+        <p style="text-align: center;"><img style="display: block; margin-left: auto; margin-right: auto;" src="nbdocs://de.cebitec.readXplorer.view/de/cebitec/readXplorer/view/docs/readclass-selection.jpg" alt="ReadClassificationPic" /></p>
+        <p style="text-align: center;"><br /><span style="font-size: 14pt;"><strong>Read Pair Classification:</strong></span></p>
+        <p style="text-align: justify;" >For paired end or mate pair mappings a read pair classification algorithm takes into account all occurrences of each read during the import process. In the following we distinguish between <b>all mappings of the two reads of a read pair, which we call "mapping pair",</b> and <b>two mappings of a mapping pair classified as "read pair"</b>. In general, the algorithm classifies the mappings into three different classes: "Perfect" read pairs with correct orientation and a pair distance within a given range defined by the user (see <i><a href="nbdocs://de.cebitec.readXplorer.ui.importer/de/cebitec/readXplorer/ui/importer/docs/importer-about.html">Import one or more paired end or mate pair track(s)</a></i>), "Distorted" read pairs, whose distance deviates from the perfect distance interval and/or whose orientation is incorrect, and "Single Mappings", whose partner could not be mapped on the reference. A special case of Single Mappings occurs when one or both reads of a mapping pair also map to other regions of the reference, but they cannot be associated to a Perfect or Distorted read pair. There might be more than one Perfect read pair for the same mapping pair. Further, the mapping classes (Single) Perfect, (Single) Best Match and Common are considered in the read pair identification algorithm to improve the accuracy of correct predictions. For each mapping pair, Perfect mapping read pairs are preferred to Best Match and both are preferred to Common mapping read pairs. The read pairs are visualized in a special Read Pair Viewer (see <i><a href="nbdocs://de.cebitec.readXplorer.tools.detailedViewer/de/cebitec/readXplorer/tools/detailedViewer/docs/detailedViewer-about.html">Read Pair Viewer</a></i>). <br /></p></div>
+    </body>
+</html>
