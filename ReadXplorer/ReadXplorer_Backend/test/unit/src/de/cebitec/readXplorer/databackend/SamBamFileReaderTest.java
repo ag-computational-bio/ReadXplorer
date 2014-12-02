@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.databackend;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.Properties;
@@ -23,35 +24,42 @@ import de.cebitec.readXplorer.util.classification.MappingClass;
 import java.io.File;
 import org.junit.After;
 import org.junit.AfterClass;
-import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
+
 
 /**
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class SamBamFileReaderTest {
-    
+
     public SamBamFileReaderTest() {
     }
+
 
     @BeforeClass
     public static void setUpClass() throws Exception {
     }
 
+
     @AfterClass
     public static void tearDownClass() throws Exception {
     }
-    
+
+
     @Before
     public void setUp() {
     }
-    
+
+
     @After
     public void tearDown() {
     }
+
 
     /**
      * Test of getMappingsFromBam method, of class SamBamFileReader.
@@ -71,32 +79,35 @@ public class SamBamFileReaderTest {
 
     }
 
+
     /**
      * Test of getCoverageFromBam method, of class SamBamFileReader.
      */
     @Test
     public void testGetCoverageFromBam() {
-        System.out.println("getCoverageFromBam");
-        PersistentReference refGenome = new PersistentReference(1, "PAO1", "PAO1", null, new File(""));
+        System.out.println( "getCoverageFromBam" );
+        PersistentReference refGenome = new PersistentReference( 1, "PAO1", "PAO1", null, new File( "" ) );
         int from = 10000;
         int to = 21100;
         boolean diffsAndGapsNeeded = false;
         byte trackNeeded = 0;
-        IntervalRequest request = new IntervalRequest(from, to, from, to, 1, null, diffsAndGapsNeeded, Properties.NORMAL, trackNeeded, new ParametersReadClasses());
-        SamBamFileReader samBamFileReader = new SamBamFileReader(new File("D:\\Programmieren & Studieren\\Pseudomonas aeruginosa Projekt\\SequenceData\\NG-5516_2_2_read_1-F469-with-PAO1.jok_sort.bam"), 1, refGenome);
-        CoverageManager coverage = samBamFileReader.getCoverageFromBam(request).getCovManager();
-        assertTrue(coverage.getCoverage(MappingClass.PERFECT_MATCH).getFwdCov(10000) == 129);
-        assertTrue(coverage.getCoverage(MappingClass.PERFECT_MATCH).getFwdCov(15000) == 178);
-        assertTrue(coverage.getCoverage(MappingClass.PERFECT_MATCH).getFwdCov(15001) == 179);
-        assertTrue(coverage.getCoverage(MappingClass.PERFECT_MATCH).getFwdCov(15002) == 178);
-        assertTrue(coverage.getCoverage(MappingClass.PERFECT_MATCH).getFwdCov(15003) == 178);
-        assertTrue(coverage.getCoverage(MappingClass.PERFECT_MATCH).getFwdCov(21100) == 208);
-        
-        assertTrue(coverage.getCoverage(MappingClass.PERFECT_MATCH).getRevCov(10000) == 152);
-        assertTrue(coverage.getCoverage(MappingClass.PERFECT_MATCH).getRevCov(15000) == 65);
-        assertTrue(coverage.getCoverage(MappingClass.PERFECT_MATCH).getRevCov(15001) == 65);
-        assertTrue(coverage.getCoverage(MappingClass.PERFECT_MATCH).getRevCov(15002) == 63);
-        assertTrue(coverage.getCoverage(MappingClass.PERFECT_MATCH).getRevCov(15003) == 59);
-        assertTrue(coverage.getCoverage(MappingClass.PERFECT_MATCH).getRevCov(21100) == 168);
+        IntervalRequest request = new IntervalRequest( from, to, from, to, 1, null, diffsAndGapsNeeded, Properties.NORMAL, trackNeeded, new ParametersReadClasses() );
+        SamBamFileReader samBamFileReader = new SamBamFileReader( new File( "D:\\Programmieren & Studieren\\Pseudomonas aeruginosa Projekt\\SequenceData\\NG-5516_2_2_read_1-F469-with-PAO1.jok_sort.bam" ), 1, refGenome );
+        CoverageManager coverage = samBamFileReader.getCoverageFromBam( request ).getCovManager();
+        assertTrue( coverage.getCoverage( MappingClass.PERFECT_MATCH ).getFwdCov( 10000 ) == 129 );
+        assertTrue( coverage.getCoverage( MappingClass.PERFECT_MATCH ).getFwdCov( 15000 ) == 178 );
+        assertTrue( coverage.getCoverage( MappingClass.PERFECT_MATCH ).getFwdCov( 15001 ) == 179 );
+        assertTrue( coverage.getCoverage( MappingClass.PERFECT_MATCH ).getFwdCov( 15002 ) == 178 );
+        assertTrue( coverage.getCoverage( MappingClass.PERFECT_MATCH ).getFwdCov( 15003 ) == 178 );
+        assertTrue( coverage.getCoverage( MappingClass.PERFECT_MATCH ).getFwdCov( 21100 ) == 208 );
+
+        assertTrue( coverage.getCoverage( MappingClass.PERFECT_MATCH ).getRevCov( 10000 ) == 152 );
+        assertTrue( coverage.getCoverage( MappingClass.PERFECT_MATCH ).getRevCov( 15000 ) == 65 );
+        assertTrue( coverage.getCoverage( MappingClass.PERFECT_MATCH ).getRevCov( 15001 ) == 65 );
+        assertTrue( coverage.getCoverage( MappingClass.PERFECT_MATCH ).getRevCov( 15002 ) == 63 );
+        assertTrue( coverage.getCoverage( MappingClass.PERFECT_MATCH ).getRevCov( 15003 ) == 59 );
+        assertTrue( coverage.getCoverage( MappingClass.PERFECT_MATCH ).getRevCov( 21100 ) == 168 );
     }
+
+
 }

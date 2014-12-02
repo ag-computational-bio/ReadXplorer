@@ -14,48 +14,55 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package de.cebitec.readXplorer.databackend;
+
 
 import org.junit.After;
 import org.junit.AfterClass;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 
 /**
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class RequestThreadTest {
-    
+
     public RequestThreadTest() {
     }
-    
+
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
+
     @Before
     public void setUp() {
     }
-    
+
+
     @After
     public void tearDown() {
     }
+
 
     /**
      * Test of readClassParamsFulfilled method, of class RequestThread.
      */
     @Test
     public void testReadClassParamsFulfilled() {
-        System.out.println("readClassParamsFulfilled");
+        System.out.println( "readClassParamsFulfilled" );
         IntervalRequest request = null;
         IntervalRequest lastRequest = null; //TODO: finish test
         IntervalRequest request2 = null;
@@ -63,11 +70,12 @@ public class RequestThreadTest {
         RequestThread instance = new RequestThreadImpl();
         boolean expResult1 = true;
         boolean expResult2 = false;
-        boolean result = instance.readClassParamsFulfilled(request);
-        boolean result2 = instance.readClassParamsFulfilled(request2);
-        assertEquals(expResult1, result);
-        fail("The test case is a prototype.");
+        boolean result = instance.readClassParamsFulfilled( request );
+        boolean result2 = instance.readClassParamsFulfilled( request2 );
+        assertEquals( expResult1, result );
+        fail( "The test case is a prototype." );
     }
+
 
     /**
      * Test of doesNotMatchLatestRequestBounds method, of class RequestThread.
@@ -84,6 +92,7 @@ public class RequestThreadTest {
 //        fail("The test case is a prototype.");
     }
 
+
     /**
      * Test of calcCenterMiddle method, of class RequestThread.
      */
@@ -99,10 +108,13 @@ public class RequestThreadTest {
 //        fail("The test case is a prototype.");
     }
 
+
     public class RequestThreadImpl extends RequestThread {
 
-        public void addRequest(IntervalRequest request) {
+        public void addRequest( IntervalRequest request ) {
         }
+
+
     }
-    
+
 }

@@ -4,6 +4,7 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch;
 
+
 import java.util.prefs.Preferences;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
@@ -11,7 +12,9 @@ import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbPreferences;
 
-public class FivePrimeUTRPromotorSettingsWizardPanel implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
+
+public class FivePrimeUTRPromotorSettingsWizardPanel implements
+        WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     private final String wizardName;
     private int wholeLengthOfAnalysisRegion;
@@ -21,9 +24,11 @@ public class FivePrimeUTRPromotorSettingsWizardPanel implements WizardDescriptor
      */
     private FivePrimeUTRPromotorSettingsVisualPanel component;
 
-    public FivePrimeUTRPromotorSettingsWizardPanel(String wizardName) {
+
+    public FivePrimeUTRPromotorSettingsWizardPanel( String wizardName ) {
         this.wizardName = wizardName;
     }
+
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -31,11 +36,12 @@ public class FivePrimeUTRPromotorSettingsWizardPanel implements WizardDescriptor
     // create only those which really need to be visible.
     @Override
     public FivePrimeUTRPromotorSettingsVisualPanel getComponent() {
-        if (component == null) {
-            component = new FivePrimeUTRPromotorSettingsVisualPanel(this.wizardName);
+        if( component == null ) {
+            component = new FivePrimeUTRPromotorSettingsVisualPanel( this.wizardName );
         }
         return component;
     }
+
 
     @Override
     public HelpCtx getHelp() {
@@ -44,6 +50,7 @@ public class FivePrimeUTRPromotorSettingsWizardPanel implements WizardDescriptor
         // If you have context help:
         // return new HelpCtx("help.key.here");
     }
+
 
     @Override
     public boolean isValid() {
@@ -55,45 +62,51 @@ public class FivePrimeUTRPromotorSettingsWizardPanel implements WizardDescriptor
         // WizardDescriptor.ERROR/WARNING/INFORMATION_MESSAGE will also be useful.
     }
 
-    @Override
-    public void addChangeListener(ChangeListener l) {
-    }
 
     @Override
-    public void removeChangeListener(ChangeListener l) {
+    public void addChangeListener( ChangeListener l ) {
     }
 
+
     @Override
-    public void readSettings(WizardDescriptor wiz) {
+    public void removeChangeListener( ChangeListener l ) {
+    }
+
+
+    @Override
+    public void readSettings( WizardDescriptor wiz ) {
         // use wiz.getProperty to retrieve previous panel state
-        this.wholeLengthOfAnalysisRegion = (int) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS);
+        this.wholeLengthOfAnalysisRegion = (int) wiz.getProperty( PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS );
     }
 
+
     @Override
-    public void storeSettings(WizardDescriptor wiz) {
+    public void storeSettings( WizardDescriptor wiz ) {
         // use wiz.putProperty to remember current panel state
-        wiz.putProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER1_LENGTH, component.getSpacer1Length());
-        wiz.putProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER2_LENGTH, component.getSpacer2Length());
-        wiz.putProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_PUTATIVE_10_REGION, component.getPutativeMinusTenLength());
-        wiz.putProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_PUTATIVE_35_REGION, component.getPutativeMinusThirtyFiveLength());
-        wiz.putProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_MINUS10_MOTIF_LENGTH, component.getMinus10MotifWidth());
-        wiz.putProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_MINUS35_MOTIF_LENGTH, component.getMinus35MotifWidth());
-        wiz.putProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_NUMBER_OF_TRYING, component.getNoTrying());
-        wiz.putProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_ALTERNATIVE_SPACER, component.getAlternativeSpacer());
+        wiz.putProperty( PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER1_LENGTH, component.getSpacer1Length() );
+        wiz.putProperty( PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER2_LENGTH, component.getSpacer2Length() );
+        wiz.putProperty( PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_PUTATIVE_10_REGION, component.getPutativeMinusTenLength() );
+        wiz.putProperty( PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_PUTATIVE_35_REGION, component.getPutativeMinusThirtyFiveLength() );
+        wiz.putProperty( PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_MINUS10_MOTIF_LENGTH, component.getMinus10MotifWidth() );
+        wiz.putProperty( PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_MINUS35_MOTIF_LENGTH, component.getMinus35MotifWidth() );
+        wiz.putProperty( PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_NUMBER_OF_TRYING, component.getNoTrying() );
+        wiz.putProperty( PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_ALTERNATIVE_SPACER, component.getAlternativeSpacer() );
         storePrefs();
     }
 
+
     private void storePrefs() {
-        Preferences pref = NbPreferences.forModule(Object.class);
-        pref.putInt(wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER1_LENGTH, component.getSpacer1Length());
-        pref.putInt(wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER2_LENGTH, component.getSpacer2Length());
-        pref.putInt(wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_PUTATIVE_10_REGION, component.getPutativeMinusTenLength());
-        pref.putInt(wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_PUTATIVE_35_REGION, component.getPutativeMinusThirtyFiveLength());
-        pref.putInt(wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_MINUS10_MOTIF_LENGTH, component.getMinus10MotifWidth());
-        pref.putInt(wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_MINUS35_MOTIF_LENGTH, component.getMinus35MotifWidth());
-        pref.putInt(wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_NUMBER_OF_TRYING, component.getNoTrying());
-        pref.putInt(wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_ALTERNATIVE_SPACER, component.getAlternativeSpacer());
+        Preferences pref = NbPreferences.forModule( Object.class );
+        pref.putInt( wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER1_LENGTH, component.getSpacer1Length() );
+        pref.putInt( wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER2_LENGTH, component.getSpacer2Length() );
+        pref.putInt( wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_PUTATIVE_10_REGION, component.getPutativeMinusTenLength() );
+        pref.putInt( wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_PUTATIVE_35_REGION, component.getPutativeMinusThirtyFiveLength() );
+        pref.putInt( wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_MINUS10_MOTIF_LENGTH, component.getMinus10MotifWidth() );
+        pref.putInt( wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_MINUS35_MOTIF_LENGTH, component.getMinus35MotifWidth() );
+        pref.putInt( wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_NUMBER_OF_TRYING, component.getNoTrying() );
+        pref.putInt( wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_ALTERNATIVE_SPACER, component.getAlternativeSpacer() );
     }
+
 
     @Override
     public void validate() throws WizardValidationException {
@@ -105,20 +118,22 @@ public class FivePrimeUTRPromotorSettingsWizardPanel implements WizardDescriptor
         int minus35MotifWidth = component.getMinus35MotifWidth();
         int alternativeSpacer = component.getAlternativeSpacer();
 
-        if (this.wholeLengthOfAnalysisRegion < (fstMinSpacer + sndMinSpacer + lengtOfMinus10Region + lengthOfMinus35Region)) {
-            throw new WizardValidationException(null, "Please check your Parameters for promotor analysis.", null);
+        if( this.wholeLengthOfAnalysisRegion < (fstMinSpacer + sndMinSpacer + lengtOfMinus10Region + lengthOfMinus35Region) ) {
+            throw new WizardValidationException( null, "Please check your Parameters for promotor analysis.", null );
         }
 
-        if (lengtOfMinus10Region < minus10MotifWidth) {
-            throw new WizardValidationException(null, "Please check on motif-width for -10 region, beacause it is bigger than the region of interest.", null);
+        if( lengtOfMinus10Region < minus10MotifWidth ) {
+            throw new WizardValidationException( null, "Please check on motif-width for -10 region, beacause it is bigger than the region of interest.", null );
         }
 
-        if (lengthOfMinus35Region < minus35MotifWidth) {
-            throw new WizardValidationException(null, "Please check on motif-width for -35 region, because it is bigger than the region of interest.", null);
+        if( lengthOfMinus35Region < minus35MotifWidth ) {
+            throw new WizardValidationException( null, "Please check on motif-width for -35 region, because it is bigger than the region of interest.", null );
         }
-        
-        if (alternativeSpacer < 0) {
-            throw new WizardValidationException(null, "Alternative Spacer should be bigger than 0.", null);
+
+        if( alternativeSpacer < 0 ) {
+            throw new WizardValidationException( null, "Alternative Spacer should be bigger than 0.", null );
         }
     }
+
+
 }

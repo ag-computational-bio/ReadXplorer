@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,13 +16,15 @@
  */
 package de.cebitec.readXplorer.options;
 
+
 import org.netbeans.spi.options.OptionsPanelController;
 
-@OptionsPanelController.TopLevelRegistration(categoryName = "#OptionsCategory_Name_Colours",
-iconBase = "de/cebitec/readXplorer/options/colorOptions.png",
-keywords = "#OptionsCategory_Keywords_Colours",
-keywordsCategory = "Colours",
-position = 900)
+
+@OptionsPanelController.TopLevelRegistration( categoryName = "#OptionsCategory_Name_Colours",
+                                              iconBase = "de/cebitec/readXplorer/options/colorOptions.png",
+                                              keywords = "#OptionsCategory_Keywords_Colours",
+                                              keywordsCategory = "Colours",
+                                              position = 900 )
 public final class ColorsOptionsPanelController extends ChangeListeningOptionsPanelController {
 
     private ColorsPanel panel;
@@ -30,9 +32,11 @@ public final class ColorsOptionsPanelController extends ChangeListeningOptionsPa
 
     @Override
     protected OptionsPanel getPanel() {
-        if (panel == null) {
-            panel = new ColorsPanel(this);
+        if( panel == null ) {
+            panel = new ColorsPanel( this );
         }
         return panel;
     }
+
+
 }

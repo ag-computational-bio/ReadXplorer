@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,10 @@
  */
 package de.cebitec.readXplorer.parser;
 
+
 import java.io.File;
 import java.sql.Timestamp;
+
 
 /**
  * Interface for any kind of jobs, which involve handling a file and can be
@@ -32,24 +34,29 @@ public interface Job {
      */
     public String getName();
 
+
     /**
      * @return The file belonging to the job
      */
     public File getFile();
+
 
     /**
      * @return The description of the job
      */
     public String getDescription();
 
+
     /**
      * @return The timestamp of the creation of the job
      */
     public Timestamp getTimestamp();
 
+
     /**
      * @return The id of the job
      */
     public int getID();
+
 
 }

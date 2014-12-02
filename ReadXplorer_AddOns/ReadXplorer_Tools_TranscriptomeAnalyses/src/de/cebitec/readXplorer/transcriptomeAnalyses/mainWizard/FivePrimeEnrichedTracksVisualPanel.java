@@ -1,5 +1,6 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard;
 
+
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.StartCodon;
 import de.cebitec.readXplorer.transcriptomeAnalyses.verifier.DoubleVerifier;
 import de.cebitec.readXplorer.transcriptomeAnalyses.verifier.IntegerVerifier;
@@ -13,15 +14,16 @@ import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 import org.openide.util.NbPreferences;
 
+
 public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
 
     private final String tssDetectionText = "<html><p align='justify'>For the determination of TSS for each a position i, the number of"
-            + " read starts on that strand are considered. A putative TSS is displayed, if the read starts"
-            + " at this position exceeded the background threshold (parameter: <b>fraction</b>) and the <b>ratio</b> xi/xi-1 at"
-            + " this position exceeds the threshold (parameter: ratio). Although the default values are based"
-            + " on experience, it is recommend to try different combinations of parameters to find out which"
-            + "deliver the best results. Additionally, it is crucial to understand the difference between"
-            + "coverage and read starts as latter one are used for calculation.</p></html>";
+                                            + " read starts on that strand are considered. A putative TSS is displayed, if the read starts"
+                                            + " at this position exceeded the background threshold (parameter: <b>fraction</b>) and the <b>ratio</b> xi/xi-1 at"
+                                            + " this position exceeds the threshold (parameter: ratio). Although the default values are based"
+                                            + " on experience, it is recommend to try different combinations of parameters to find out which"
+                                            + "deliver the best results. Additionally, it is crucial to understand the difference between"
+                                            + "coverage and read starts as latter one are used for calculation.</p></html>";
     private final String fractionText = "<html><b>Fraction</b> (used for background threshold calculation, #FP)</html>";
     private final String ratioText = "<html><b>Ratio</b></html>";
     private final String excludeTssWithDistanceText = "<html>Exclude TSS with putative <b>5'-UTR length</b> of</html>";
@@ -34,154 +36,174 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
     private final String keepOnlyIntragenicTssAndAssigneToFeat = "<html>\t TSS will be assigned to the <b>next feature</b>.</html>";
     private final String featureTypeExclusionFormAnalysisTextPart1 = "<html><p align='justify'>Exclude feature types from analysis</p></html>";
     private final String featureTypeExclusionFormAnalysisTextPart2 = "<html><p align='justify'>**TSS of the excluded feature types will be assigned to\n"
-            + "the next feature if all criteria such as maximal distance are met.</p></html>";
+                                                                     + "the next feature if all criteria such as maximal distance are met.</p></html>";
     private final String wizardName;
     private final HashMap<String, StartCodon> validStartCodons;
     private final HashSet<FeatureType> excludedFeatreTypes;
 
     public static final String PROP_SELECTED_FEAT_TYPES_FADE_OUT = "Exclude feature types from analysis";
 
+
     /**
      * Creates new form FivePrimeEnrichedTracksVisualPanel
      */
-    public FivePrimeEnrichedTracksVisualPanel(String wizardName) {
+    public FivePrimeEnrichedTracksVisualPanel( String wizardName ) {
         initComponents();
         setInputVerifier();
         updateFields();
-        this.manuallyMinStackSizeTF.setEnabled(false);
+        this.manuallyMinStackSizeTF.setEnabled( false );
         this.wizardName = wizardName;
 
-        this.leaderlessDetectionPanel.setBorder(BorderFactory.createTitledBorder(null, "<html>Detection of <b>leaderless</b> transcripts</html>", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, Color.BLACK));
-        this.leaderlessDetectionLabel.setText(leaderlessDetectionText);
-        this.tlsShiftPanel.setBorder(BorderFactory.createTitledBorder(null, "<html>Detection of <b>TLS shifts</b></html>", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, Color.BLACK));
+        this.leaderlessDetectionPanel.setBorder( BorderFactory.createTitledBorder( null, "<html>Detection of <b>leaderless</b> transcripts</html>", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, Color.BLACK ) );
+        this.leaderlessDetectionLabel.setText( leaderlessDetectionText );
+        this.tlsShiftPanel.setBorder( BorderFactory.createTitledBorder( null, "<html>Detection of <b>TLS shifts</b></html>", TitledBorder.DEFAULT_JUSTIFICATION, TitledBorder.DEFAULT_POSITION, null, Color.BLACK ) );
 
-        this.ratioLabel.setText(ratioText);
-        this.fractionLabel.setText(fractionText);
+        this.ratioLabel.setText( ratioText );
+        this.fractionLabel.setText( fractionText );
 
         // in context of excluding/including intragenic tss
-        this.exclusionOfAllIntragenicTssCB.setText(excludeInragenicTxt);
-        this.keepAllIntragenicTssCB.setText(keepAllIntragenicTxt);
-        this.keepOnlyIntragenicNextFeatCB.setText(keepOnlyIntragenicTxt);
+        this.exclusionOfAllIntragenicTssCB.setText( excludeInragenicTxt );
+        this.keepAllIntragenicTssCB.setText( keepAllIntragenicTxt );
+        this.keepOnlyIntragenicNextFeatCB.setText( keepOnlyIntragenicTxt );
 
-        this.excludeTssWithDistanceLabel.setText(excludeTssWithDistanceText);
+        this.excludeTssWithDistanceLabel.setText( excludeTssWithDistanceText );
 
-        this.antisense3UtrLabel.setText(antisense3UtrText);
+        this.antisense3UtrLabel.setText( antisense3UtrText );
 
-        this.includeBestMatchedReads.setText(includeBestMatchText);
+        this.includeBestMatchedReads.setText( includeBestMatchText );
 
-        this.additionalTextToKeepOnlyIntragenicLabel.setText(keepOnlyIntragenicTssAndAssigneToFeat);
+        this.additionalTextToKeepOnlyIntragenicLabel.setText( keepOnlyIntragenicTssAndAssigneToFeat );
 
         this.excludedFeatreTypes = new HashSet<>();
-        this.excludingFeatureTypesLabelPart1.setText(featureTypeExclusionFormAnalysisTextPart1);
+        this.excludingFeatureTypesLabelPart1.setText( featureTypeExclusionFormAnalysisTextPart1 );
 
         this.validStartCodons = new HashMap<>();
     }
 
+
     private void setInputVerifier() {
-        this.fractionTF.setInputVerifier(new DoubleVerifier(this.fractionTF));
-        this.limitationForUtrLengthTF.setInputVerifier(new IntegerVerifier(this.limitationForUtrLengthTF));
-        this.keepOnlyIntragenicNextFeatDistLimitTF.setInputVerifier(new IntegerVerifier(this.keepOnlyIntragenicNextFeatDistLimitTF));
-        this.keepAllIntragenicTssDistLimitTF.setInputVerifier(new IntegerVerifier(this.keepAllIntragenicTssDistLimitTF));
-        this.keepAllIntragenicTssDistLimitTF.setEnabled(false);
-        this.leaderlessDistanceLimitTF.setInputVerifier(new IntegerVerifier(this.leaderlessDistanceLimitTF));
-        this.threeUtrAntisenseDistanceLimit.setInputVerifier(new IntegerVerifier(this.threeUtrAntisenseDistanceLimit));
-        this.ratioTF.setInputVerifier(new IntegerVerifier(this.ratioTF));
-        this.manuallyMinStackSizeTF.setInputVerifier(new IntegerVerifier(manuallyMinStackSizeTF));
+        this.fractionTF.setInputVerifier( new DoubleVerifier( this.fractionTF ) );
+        this.limitationForUtrLengthTF.setInputVerifier( new IntegerVerifier( this.limitationForUtrLengthTF ) );
+        this.keepOnlyIntragenicNextFeatDistLimitTF.setInputVerifier( new IntegerVerifier( this.keepOnlyIntragenicNextFeatDistLimitTF ) );
+        this.keepAllIntragenicTssDistLimitTF.setInputVerifier( new IntegerVerifier( this.keepAllIntragenicTssDistLimitTF ) );
+        this.keepAllIntragenicTssDistLimitTF.setEnabled( false );
+        this.leaderlessDistanceLimitTF.setInputVerifier( new IntegerVerifier( this.leaderlessDistanceLimitTF ) );
+        this.threeUtrAntisenseDistanceLimit.setInputVerifier( new IntegerVerifier( this.threeUtrAntisenseDistanceLimit ) );
+        this.ratioTF.setInputVerifier( new IntegerVerifier( this.ratioTF ) );
+        this.manuallyMinStackSizeTF.setInputVerifier( new IntegerVerifier( manuallyMinStackSizeTF ) );
     }
+
 
     @Override
     public String getName() {
         return "Identification of transcription start sites using 5′-end data";
     }
 
+
     public Double getFraction() {
-        return Double.valueOf(fractionTF.getText()) / 100;
+        return Double.valueOf( fractionTF.getText() ) / 100;
     }
 
+
     public Integer getRatio() {
-        return Integer.valueOf(ratioTF.getText());
+        return Integer.valueOf( ratioTF.getText() );
     }
+
 
     /**
      *
      * @return <true> if checkbox for exclusion of all intragenic tss is
-     * selected else <false>
+     *         selected else <false>
      */
     public boolean isExclusionOfAllIntragenicTss() {
         return exclusionOfAllIntragenicTssCB.isSelected();
     }
+
 
     /**
      *
      * @return the maximum allowable distance for a 5'-UTR
      */
     public Integer getUtrLimitationDistance() {
-        return Integer.valueOf(limitationForUtrLengthTF.getText());
+        return Integer.valueOf( limitationForUtrLengthTF.getText() );
     }
+
 
     public Integer getKeepingInternalTssDistance() {
-        return Integer.valueOf(keepOnlyIntragenicNextFeatDistLimitTF.getText());
+        return Integer.valueOf( keepOnlyIntragenicNextFeatDistLimitTF.getText() );
     }
+
 
     public Integer getKeepingAllInragenicTssDistance() {
-        return Integer.valueOf(keepAllIntragenicTssDistLimitTF.getText());
+        return Integer.valueOf( keepAllIntragenicTssDistLimitTF.getText() );
     }
+
 
     public Integer getLeaderlessDistance() {
-        return Integer.valueOf(this.leaderlessDistanceLimitTF.getText());
+        return Integer.valueOf( this.leaderlessDistanceLimitTF.getText() );
     }
 
+
     public Integer getPercentageForCdsShiftAnalysis() {
-        return Integer.valueOf(this.percentageTF.getText());
+        return Integer.valueOf( this.percentageTF.getText() );
     }
+
 
     public boolean isKeepAllIntragenicTss() {
         return this.keepAllIntragenicTssCB.isSelected();
     }
 
+
     public boolean isKeepOnlyIntragenicTssAssignedToFeature() {
         return this.keepOnlyIntragenicNextFeatCB.isSelected();
     }
+
 
     public boolean isIncludingBestMathcedReads() {
         return this.includeBestMatchedReads.isSelected();
     }
 
+
     public Integer getMaxDistFor3PrimeUtrAntisenseDetection() {
-        return Integer.valueOf(this.threeUtrAntisenseDistanceLimit.getText());
+        return Integer.valueOf( this.threeUtrAntisenseDistanceLimit.getText() );
     }
+
 
     public boolean isIncludeTrRnaIntoAnalysis() {
         return this.featureTypSourceCB.isSelected();
     }
 
+
     public HashMap<String, StartCodon> getValidStartCodonSet() {
-        if (codonATG.isSelected()) {
-            this.validStartCodons.put("ATG", StartCodon.ATG);
+        if( codonATG.isSelected() ) {
+            this.validStartCodons.put( "ATG", StartCodon.ATG );
         }
 
-        if (codonCTG.isSelected()) {
-            this.validStartCodons.put("CTG", StartCodon.CTG);
+        if( codonCTG.isSelected() ) {
+            this.validStartCodons.put( "CTG", StartCodon.CTG );
         }
 
-        if (codonGTG.isSelected()) {
-            this.validStartCodons.put("GTG", StartCodon.GTG);
+        if( codonGTG.isSelected() ) {
+            this.validStartCodons.put( "GTG", StartCodon.GTG );
         }
 
-        if (codonTTG.isSelected()) {
-            this.validStartCodons.put("TTG", StartCodon.TTG);
+        if( codonTTG.isSelected() ) {
+            this.validStartCodons.put( "TTG", StartCodon.TTG );
         }
 
         return this.validStartCodons;
     }
 
+
     public boolean isMinStackSizeSetManually() {
         return manuallyMinStackSizeCB.isSelected();
     }
 
+
     public Integer getMinStackSizeSetManually() {
-        return Integer.parseInt(this.manuallyMinStackSizeTF.getText());
+        return Integer.parseInt( this.manuallyMinStackSizeTF.getText() );
     }
+
 
     /**
      * Updates the checkboxes for the read classes with the globally stored
@@ -189,30 +211,33 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
      * configuration is chosen.
      */
     private void updateFields() {
-        Preferences pref = NbPreferences.forModule(Object.class);
-        String fractionValue = pref.get(wizardName + WizardPropertyStrings.PROP_Fraction, "5");
+        Preferences pref = NbPreferences.forModule( Object.class );
+        String fractionValue = pref.get( wizardName + WizardPropertyStrings.PROP_Fraction, "5" );
         int fraction;
-        if (fractionValue.equals("5")) {
+        if( fractionValue.equals( "5" ) ) {
             fraction = 5;
-        } else {
-            double i = Double.valueOf(fractionValue);
+        }
+        else {
+            double i = Double.valueOf( fractionValue );
             fraction = (int) (i * 100);
         }
 
-        this.fractionTF.setText("" + fraction);
-        this.ratioTF.setText(pref.get(wizardName + WizardPropertyStrings.PROP_RATIO, "5"));
-        this.limitationForUtrLengthTF.setText(pref.get(wizardName + WizardPropertyStrings.PROP_UTR_LIMIT, "500"));
-        this.keepOnlyIntragenicNextFeatDistLimitTF.setText(pref.get(wizardName + WizardPropertyStrings.PROP_UTR_LIMIT, "100"));
-        this.percentageTF.setText(pref.get(wizardName + WizardPropertyStrings.PROP_PERCENTAGE_FOR_CDS_ANALYSIS, "10"));
-        this.leaderlessDistanceLimitTF.setText(pref.get(wizardName + WizardPropertyStrings.PROP_LEADERLESS_LIMIT, "0"));
-        this.threeUtrAntisenseDistanceLimit.setText(pref.get(wizardName + WizardPropertyStrings.PROP_MAX_DIST_FOR_3_UTR_ANTISENSE_DETECTION, "100"));
-        this.codonATG.setSelected(true);
-        this.codonGTG.setSelected(true);
+        this.fractionTF.setText( "" + fraction );
+        this.ratioTF.setText( pref.get( wizardName + WizardPropertyStrings.PROP_RATIO, "5" ) );
+        this.limitationForUtrLengthTF.setText( pref.get( wizardName + WizardPropertyStrings.PROP_UTR_LIMIT, "500" ) );
+        this.keepOnlyIntragenicNextFeatDistLimitTF.setText( pref.get( wizardName + WizardPropertyStrings.PROP_UTR_LIMIT, "100" ) );
+        this.percentageTF.setText( pref.get( wizardName + WizardPropertyStrings.PROP_PERCENTAGE_FOR_CDS_ANALYSIS, "10" ) );
+        this.leaderlessDistanceLimitTF.setText( pref.get( wizardName + WizardPropertyStrings.PROP_LEADERLESS_LIMIT, "0" ) );
+        this.threeUtrAntisenseDistanceLimit.setText( pref.get( wizardName + WizardPropertyStrings.PROP_MAX_DIST_FOR_3_UTR_ANTISENSE_DETECTION, "100" ) );
+        this.codonATG.setSelected( true );
+        this.codonGTG.setSelected( true );
     }
+
 
     public HashSet<FeatureType> getExcludedFeatreTypes() {
         return excludedFeatreTypes;
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -622,19 +647,20 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void exclusionOfAllIntragenicTssCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exclusionOfAllIntragenicTssCBActionPerformed
-        if (this.exclusionOfAllIntragenicTssCB.isSelected()) {
-            this.keepAllIntragenicTssCB.setSelected(false);
-            this.keepAllIntragenicTssCB.setEnabled(false);
-            this.keepAllIntragenicTssDistLimitTF.setEnabled(false);
-            this.keepOnlyIntragenicNextFeatCB.setEnabled(false);
-            this.keepOnlyIntragenicNextFeatDistLimitTF.setEnabled(false);
-            this.additionalTextToKeepOnlyIntragenicLabel.setEnabled(false);
-        } else {
-            this.keepAllIntragenicTssCB.setEnabled(true);
-            this.keepAllIntragenicTssDistLimitTF.setEnabled(false);
-            this.keepOnlyIntragenicNextFeatCB.setEnabled(true);
-            this.keepOnlyIntragenicNextFeatDistLimitTF.setEnabled(true);
-            this.additionalTextToKeepOnlyIntragenicLabel.setEnabled(true);
+        if( this.exclusionOfAllIntragenicTssCB.isSelected() ) {
+            this.keepAllIntragenicTssCB.setSelected( false );
+            this.keepAllIntragenicTssCB.setEnabled( false );
+            this.keepAllIntragenicTssDistLimitTF.setEnabled( false );
+            this.keepOnlyIntragenicNextFeatCB.setEnabled( false );
+            this.keepOnlyIntragenicNextFeatDistLimitTF.setEnabled( false );
+            this.additionalTextToKeepOnlyIntragenicLabel.setEnabled( false );
+        }
+        else {
+            this.keepAllIntragenicTssCB.setEnabled( true );
+            this.keepAllIntragenicTssDistLimitTF.setEnabled( false );
+            this.keepOnlyIntragenicNextFeatCB.setEnabled( true );
+            this.keepOnlyIntragenicNextFeatDistLimitTF.setEnabled( true );
+            this.additionalTextToKeepOnlyIntragenicLabel.setEnabled( true );
         }
     }//GEN-LAST:event_exclusionOfAllIntragenicTssCBActionPerformed
 
@@ -661,19 +687,20 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
     }//GEN-LAST:event_ratioTFActionPerformed
 
     private void keepAllIntragenicTssCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_keepAllIntragenicTssCBActionPerformed
-        if (this.keepAllIntragenicTssCB.isSelected()) {
-            this.exclusionOfAllIntragenicTssCB.setSelected(false);
-            this.exclusionOfAllIntragenicTssCB.setEnabled(false);
-            this.keepAllIntragenicTssDistLimitTF.setEnabled(true);
-            this.keepOnlyIntragenicNextFeatCB.setEnabled(false);
-            this.keepOnlyIntragenicNextFeatDistLimitTF.setEnabled(false);
-            additionalTextToKeepOnlyIntragenicLabel.setEnabled(false);
-        } else {
-            this.exclusionOfAllIntragenicTssCB.setEnabled(true);
-            this.keepAllIntragenicTssDistLimitTF.setEnabled(false);
-            this.keepOnlyIntragenicNextFeatCB.setEnabled(true);
-            this.keepOnlyIntragenicNextFeatDistLimitTF.setEnabled(true);
-            additionalTextToKeepOnlyIntragenicLabel.setEnabled(true);
+        if( this.keepAllIntragenicTssCB.isSelected() ) {
+            this.exclusionOfAllIntragenicTssCB.setSelected( false );
+            this.exclusionOfAllIntragenicTssCB.setEnabled( false );
+            this.keepAllIntragenicTssDistLimitTF.setEnabled( true );
+            this.keepOnlyIntragenicNextFeatCB.setEnabled( false );
+            this.keepOnlyIntragenicNextFeatDistLimitTF.setEnabled( false );
+            additionalTextToKeepOnlyIntragenicLabel.setEnabled( false );
+        }
+        else {
+            this.exclusionOfAllIntragenicTssCB.setEnabled( true );
+            this.keepAllIntragenicTssDistLimitTF.setEnabled( false );
+            this.keepOnlyIntragenicNextFeatCB.setEnabled( true );
+            this.keepOnlyIntragenicNextFeatDistLimitTF.setEnabled( true );
+            additionalTextToKeepOnlyIntragenicLabel.setEnabled( true );
         }
     }//GEN-LAST:event_keepAllIntragenicTssCBActionPerformed
 
@@ -682,42 +709,46 @@ public final class FivePrimeEnrichedTracksVisualPanel extends JPanel {
     }//GEN-LAST:event_keepAllIntragenicTssDistLimitTFActionPerformed
 
     private void featureTypSourceCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_featureTypSourceCBActionPerformed
-        if (featureTypSourceCB.isSelected()) {
-            this.excludedFeatreTypes.add(FeatureType.SOURCE);
-        } else {
-            this.excludedFeatreTypes.remove(FeatureType.SOURCE);
+        if( featureTypSourceCB.isSelected() ) {
+            this.excludedFeatreTypes.add( FeatureType.SOURCE );
+        }
+        else {
+            this.excludedFeatreTypes.remove( FeatureType.SOURCE );
         }
     }//GEN-LAST:event_featureTypSourceCBActionPerformed
 
     private void featureTypeMiscRnaCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_featureTypeMiscRnaCBActionPerformed
-        if (featureTypeMiscRnaCB.isSelected()) {
-            this.excludedFeatreTypes.add(FeatureType.MISC_RNA);
-        } else {
-            this.excludedFeatreTypes.remove(FeatureType.MISC_RNA);
+        if( featureTypeMiscRnaCB.isSelected() ) {
+            this.excludedFeatreTypes.add( FeatureType.MISC_RNA );
+        }
+        else {
+            this.excludedFeatreTypes.remove( FeatureType.MISC_RNA );
         }
     }//GEN-LAST:event_featureTypeMiscRnaCBActionPerformed
 
     private void keepOnlyIntragenicNextFeatCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_keepOnlyIntragenicNextFeatCBActionPerformed
-        if (keepOnlyIntragenicNextFeatCB.isSelected()) {
-            this.keepAllIntragenicTssCB.setEnabled(false);
-            this.keepAllIntragenicTssDistLimitTF.setEnabled(false);
-            this.exclusionOfAllIntragenicTssCB.setEnabled(false);
-        } else {
-            this.keepAllIntragenicTssCB.setEnabled(true);
-            this.keepAllIntragenicTssDistLimitTF.setEnabled(true);
-            this.exclusionOfAllIntragenicTssCB.setEnabled(true);
+        if( keepOnlyIntragenicNextFeatCB.isSelected() ) {
+            this.keepAllIntragenicTssCB.setEnabled( false );
+            this.keepAllIntragenicTssDistLimitTF.setEnabled( false );
+            this.exclusionOfAllIntragenicTssCB.setEnabled( false );
+        }
+        else {
+            this.keepAllIntragenicTssCB.setEnabled( true );
+            this.keepAllIntragenicTssDistLimitTF.setEnabled( true );
+            this.exclusionOfAllIntragenicTssCB.setEnabled( true );
         }
     }//GEN-LAST:event_keepOnlyIntragenicNextFeatCBActionPerformed
 
     private void manuallyMinStackSizeCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manuallyMinStackSizeCBActionPerformed
-        if (manuallyMinStackSizeCB.isSelected()) {
-            fractionLabel.setEnabled(false);
-            fractionTF.setEditable(false);
-            manuallyMinStackSizeTF.setEnabled(true);
-        } else {
-            fractionLabel.setEnabled(true);
-            fractionTF.setEditable(true);
-            manuallyMinStackSizeTF.setEnabled(false);
+        if( manuallyMinStackSizeCB.isSelected() ) {
+            fractionLabel.setEnabled( false );
+            fractionTF.setEditable( false );
+            manuallyMinStackSizeTF.setEnabled( true );
+        }
+        else {
+            fractionLabel.setEnabled( true );
+            fractionTF.setEditable( true );
+            manuallyMinStackSizeTF.setEnabled( false );
         }
     }//GEN-LAST:event_manuallyMinStackSizeCBActionPerformed
 

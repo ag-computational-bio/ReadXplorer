@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.thumbnail.Actions;
 
+
 /**
  *
  * @author denis
@@ -23,4 +24,6 @@ package de.cebitec.readXplorer.thumbnail.Actions;
 public interface OpenThumbCookie {
 
     public void open();
+
+
 }

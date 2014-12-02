@@ -4,6 +4,7 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.enums;
 
+
 /**
  * Enum class of all table types used in this module.
  *
@@ -24,7 +25,8 @@ public enum TableType {
      */
     RPKM_TABLE,
     /**
-     * table of operons 
+     * table of operons
      */
     OPERON_TABLE;
+
 }

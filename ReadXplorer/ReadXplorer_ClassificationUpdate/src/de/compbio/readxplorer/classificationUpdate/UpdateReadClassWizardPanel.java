@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,9 +16,11 @@
  */
 package de.compbio.readxplorer.classificationUpdate;
 
+
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningFinishWizardPanel;
 import java.awt.Component;
 import org.openide.WizardDescriptor;
+
 
 /**
  * A wizard panel displaying a message to decide, if the read classification
@@ -29,27 +31,32 @@ import org.openide.WizardDescriptor;
 class UpdateReadClassWizardPanel extends ChangeListeningFinishWizardPanel {
 
     private UpdateReadClassVisualPanel component;
-    
+
+
     /**
      * A wizard panel displaying a message to decide, if the read classification
      * for a DB shall be updated.
+     * <p>
      * @param errorMsg possible error message, none necessary here
      */
-    public UpdateReadClassWizardPanel(String errorMsg) {
-        super(errorMsg);
+    public UpdateReadClassWizardPanel( String errorMsg ) {
+        super( errorMsg );
     }
+
 
     @Override
     public Component getComponent() {
-        if (component == null) {
+        if( component == null ) {
             component = new UpdateReadClassVisualPanel();
         }
         return component;
     }
 
+
     @Override
-    public void storeSettings(WizardDescriptor settings) {
+    public void storeSettings( WizardDescriptor settings ) {
         //no settings to store, just run the action for the current DB
     }
-    
+
+
 }

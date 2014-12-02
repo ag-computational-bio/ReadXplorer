@@ -1,22 +1,25 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard;
 
+
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
+
 /**
  *
  * @author jritter
  */
-public final class RnaSeqDataTypeSelectionVisualPanel extends JPanel implements ActionListener {
+public final class RnaSeqDataTypeSelectionVisualPanel extends JPanel implements
+        ActionListener {
 
     private final String fiveprimeText = "<html><p align='justify'>A library preparation protocol for enrichment of 5’-ends comparable or similar to Pfeifer-Sancar et al., 2013 was used.</p></html>";
     private final String wholeTranscriptText = "<html><p align='justify'>A library preparation protocol comparable or similar to Pfeifer-Sancar et al., 2013 was used. "
-            + "Also, the gap between <b>paired reads</b>  has been <b><i>in silico</i></b>  extended.</p></html> ";
+                                               + "Also, the gap between <b>paired reads</b>  has been <b><i>in silico</i></b>  extended.</p></html> ";
+
 
     /**
      * Creates new form DataSetChoiceVisualPanel
@@ -24,29 +27,33 @@ public final class RnaSeqDataTypeSelectionVisualPanel extends JPanel implements 
     public RnaSeqDataTypeSelectionVisualPanel() {
         initComponents();
 
-        wholeTranscriptomeTrackCheckBox.addActionListener(this);
-        wholeTranscriptomeTrackCheckBox.setActionCommand(WizardPropertyStrings.PROP_WHOLEGENOME_DATASET);
-        fiveEnrichedTrackCheckBox.addActionListener(this);
-        fiveEnrichedTrackCheckBox.setActionCommand(WizardPropertyStrings.PROP_FIVEPRIME_DATASET);
+        wholeTranscriptomeTrackCheckBox.addActionListener( this );
+        wholeTranscriptomeTrackCheckBox.setActionCommand( WizardPropertyStrings.PROP_WHOLEGENOME_DATASET );
+        fiveEnrichedTrackCheckBox.addActionListener( this );
+        fiveEnrichedTrackCheckBox.setActionCommand( WizardPropertyStrings.PROP_FIVEPRIME_DATASET );
 
-        wholeTranscriptPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-        wholeTranscriptLabel.setText(wholeTranscriptText);
-        fivePrimeAnalysisPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-        fivePrimeExplanationLabel.setText(fiveprimeText);
+        wholeTranscriptPanel.setBorder( BorderFactory.createLineBorder( Color.black ) );
+        wholeTranscriptLabel.setText( wholeTranscriptText );
+        fivePrimeAnalysisPanel.setBorder( BorderFactory.createLineBorder( Color.black ) );
+        fivePrimeExplanationLabel.setText( fiveprimeText );
     }
+
 
     @Override
     public String getName() {
         return "Data selection";
     }
 
+
     public boolean isWholeGenomeTrack() {
         return this.wholeTranscriptomeTrackCheckBox.isSelected();
     }
 
+
     public boolean isFiveEnrichedTrack() {
         return this.fiveEnrichedTrackCheckBox.isSelected();
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -167,18 +174,21 @@ public final class RnaSeqDataTypeSelectionVisualPanel extends JPanel implements 
     private javax.swing.JCheckBox wholeTranscriptomeTrackCheckBox;
     // End of variables declaration//GEN-END:variables
 
+
     @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getActionCommand().equals(WizardPropertyStrings.PROP_WHOLEGENOME_DATASET)) {
-            if (((JCheckBox) e.getSource()).isSelected()) {
-                fiveEnrichedTrackCheckBox.setSelected(false);
+    public void actionPerformed( ActionEvent e ) {
+        if( e.getActionCommand().equals( WizardPropertyStrings.PROP_WHOLEGENOME_DATASET ) ) {
+            if( ((JCheckBox) e.getSource()).isSelected() ) {
+                fiveEnrichedTrackCheckBox.setSelected( false );
             }
         }
 
-        if (e.getActionCommand().equals(WizardPropertyStrings.PROP_FIVEPRIME_DATASET)) {
-            if (((JCheckBox) e.getSource()).isSelected()) {
-                wholeTranscriptomeTrackCheckBox.setSelected(false);
+        if( e.getActionCommand().equals( WizardPropertyStrings.PROP_FIVEPRIME_DATASET ) ) {
+            if( ((JCheckBox) e.getSource()).isSelected() ) {
+                wholeTranscriptomeTrackCheckBox.setSelected( false );
             }
         }
     }
+
+
 }

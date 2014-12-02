@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,17 +16,21 @@
  */
 package de.cebitec.readXplorer.databackend.dataObjects;
 
+
 /**
  * Interface for methods commonly used for data visualization.
- * 
+ * <p>
  * @author -Rolf Hilker-
  */
 public interface DataVisualisationI {
-    
+
     /**
-     * Visualizes the data handed over to this method as defined by the implementation.
+     * Visualizes the data handed over to this method as defined by the
+     * implementation.
+     * <p>
      * @param data the data object to visualize.
      */
-    public void showData(Object data);
-    
+    public void showData( Object data );
+
+
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,35 +16,43 @@
  */
 package de.cebitec.readXplorer.databackend;
 
+
 /**
  * A parameter set which contains read classification parameters.
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class ParameterSetWithReadClasses {
+
     private ParametersReadClasses readClassParams;
-    
+
+
     /**
      * A parameter set which contains read classification parameters.
+     * <p>
      * @param readClassParams The read classification parameters to set.
      */
-    public ParameterSetWithReadClasses(ParametersReadClasses readClassParams) {
+    public ParameterSetWithReadClasses( ParametersReadClasses readClassParams ) {
         this.readClassParams = readClassParams;
     }
 
+
     /**
-     * @return The read classification parameters, which shall be taken into 
-     * account for this analysis.
+     * @return The read classification parameters, which shall be taken into
+     *         account for this analysis.
      */
     public ParametersReadClasses getReadClassParams() {
         return readClassParams;
     }
 
+
     /**
      * @param readClassParams The read classification parameters, which shall be
-     * taken into account for this analysis.
+     *                        taken into account for this analysis.
      */
-    public void setReadClassParams(ParametersReadClasses readClassParams) {
+    public void setReadClassParams( ParametersReadClasses readClassParams ) {
         this.readClassParams = readClassParams;
     }
+
+
 }

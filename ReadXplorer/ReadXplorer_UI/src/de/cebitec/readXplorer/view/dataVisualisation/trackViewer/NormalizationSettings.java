@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,9 +16,11 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.trackViewer;
 
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 /**
  *
@@ -26,66 +28,68 @@ import java.util.Map;
  */
 public class NormalizationSettings {
 
-    
+
     public Map<Integer, Double[]> idToValue;
 
-    
-    public NormalizationSettings(List<Integer> trackIDs, List<Boolean> isLogNormList, List<Double> factors, List<Boolean> hasNormFactor) {
+
+    public NormalizationSettings( List<Integer> trackIDs, List<Boolean> isLogNormList, List<Double> factors, List<Boolean> hasNormFactor ) {
         idToValue = new HashMap<>();
         int j = 0;
-        for (int i : trackIDs) {
+        for( int i : trackIDs ) {
             Double[] d = new Double[3];
-            d[0] = isLogNormList.get(j) ? 1.0 : 0.0;
-            d[1] = factors.get(j);
-            d[2] = hasNormFactor.get(j) ? 1.0 : 0.0;
-            idToValue.put(i, d);
+            d[0] = isLogNormList.get( j ) ? 1.0 : 0.0;
+            d[1] = factors.get( j );
+            d[2] = hasNormFactor.get( j ) ? 1.0 : 0.0;
+            idToValue.put( i, d );
             j++;
         }
     }
 
-    
+
     public Map<Integer, Double[]> getIdToValue() {
         return idToValue;
     }
 
-    
-    public void setIdToValue(Map<Integer, Double[]> idToValue) {
+
+    public void setIdToValue( Map<Integer, Double[]> idToValue ) {
         this.idToValue = idToValue;
     }
 
-    
-    public double getFactors(int trackID) {
-        return idToValue.get(trackID)[1];
+
+    public double getFactors( int trackID ) {
+        return idToValue.get( trackID )[1];
     }
 
-    
-    public void setFactors(double factors, int trackID) {
-        Double[] d = idToValue.get(trackID);
+
+    public void setFactors( double factors, int trackID ) {
+        Double[] d = idToValue.get( trackID );
         d[1] = factors;
-        idToValue.put(trackID, d);
+        idToValue.put( trackID, d );
     }
 
-    
-    public Boolean getIsLogNorm(int trackID) {
-        return idToValue.get(trackID)[0] == 1.0;
+
+    public Boolean getIsLogNorm( int trackID ) {
+        return idToValue.get( trackID )[0] == 1.0;
     }
 
-    
-    public void setIsLogNorm(Boolean isLogNorm, int trackID) {
-        Double[] d = idToValue.get(trackID);
+
+    public void setIsLogNorm( Boolean isLogNorm, int trackID ) {
+        Double[] d = idToValue.get( trackID );
         d[0] = (isLogNorm ? 1.0 : 0.0);
-        idToValue.put(trackID, d);
+        idToValue.put( trackID, d );
     }
 
-    
-    public Boolean getHasNormFac(int trackID) {
-        return idToValue.get(trackID)[2] == 1.0;
+
+    public Boolean getHasNormFac( int trackID ) {
+        return idToValue.get( trackID )[2] == 1.0;
     }
 
-    
-    public void setHasNormFac(Boolean hasNorm, int trackID) {
-        Double[] d = idToValue.get(trackID);
+
+    public void setHasNormFac( Boolean hasNorm, int trackID ) {
+        Double[] d = idToValue.get( trackID );
         d[2] = (hasNorm ? 1.0 : 0.0);
-        idToValue.put(trackID, d);
+        idToValue.put( trackID, d );
     }
+
+
 }

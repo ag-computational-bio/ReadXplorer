@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cebitec.readXplorer.view.dataVisualisation.readPairViewer;
+
 
 import de.cebitec.readXplorer.databackend.IntervalRequest;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
@@ -48,6 +49,7 @@ import java.util.prefs.PreferenceChangeListener;
 import java.util.prefs.Preferences;
 import org.openide.util.NbPreferences;
 
+
 /**
  * Viewer for read pairs.
  *
@@ -75,147 +77,163 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
     private ReadPairResultPersistent readPairs;
     private boolean mappingsLoading = false;
     private List<BlockComponentPair> jBlockList;
-    
+
     private long start;
     private long stop;
+
 
     /**
      * Creates a new viewer for displaying read pair information between two
      * tracks. Each of them must hold one sequence of the pair.
+     * <p>
      * @param boundsInfoManager the bounds info manager
-     * @param basePanel base panel on which to display this viewer
-     * @param refGen the reference genome
-     * @param trackConnector track connector of one of the two read pair tracks
+     * @param basePanel         base panel on which to display this viewer
+     * @param refGen            the reference genome
+     * @param trackConnector    track connector of one of the two read pair
+     *                          tracks
      */
-    public ReadPairViewer(BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistentReference refGen, TrackConnector trackConnector) {
-        super(boundsInfoManager, basePanel, refGen);
+    public ReadPairViewer( BoundsInfoManager boundsInfoManager, BasePanel basePanel, PersistentReference refGen, TrackConnector trackConnector ) {
+        super( boundsInfoManager, basePanel, refGen );
 //        this.createFocusListener();
 //        this.paintPanel = new JPanel();
         this.refGen = refGen;
         this.trackConnector = trackConnector;
-        this.showSequenceBar(true, false);
+        this.showSequenceBar( true, false );
         blockHeight = 5;
         layerHeight = blockHeight + 1;
         minSaturationAndBrightness = 0.9f;
 //        maxSaturationAndBrightness = 0.9f;
-        this.setHorizontalMargin(10);
+        this.setHorizontalMargin( 10 );
         this.setupComponents();
-        this.setActive(false);
-        this.readPairs = new ReadPairResultPersistent(null, null);
-        
-        final Preferences pref = NbPreferences.forModule(Object.class);
-        pref.addPreferenceChangeListener(new PreferenceChangeListener() {
+        this.setActive( false );
+        this.readPairs = new ReadPairResultPersistent( null, null );
+
+        final Preferences pref = NbPreferences.forModule( Object.class );
+        pref.addPreferenceChangeListener( new PreferenceChangeListener() {
 
             @Override
-            public void preferenceChange(PreferenceChangeEvent evt) {
-                addBlocks(layout);
+            public void preferenceChange( PreferenceChangeEvent evt ) {
+                addBlocks( layout );
             }
-        });
+
+
+        } );
     }
+
 
     @Override
     public int getMaximalHeight() {
         return this.getHeight();
     }
 
+
     @Override
-    public void changeToolTipText(int logPos) {
+    public void changeToolTipText( int logPos ) {
     }
+
 
     @Override
     public void boundsChangedHook() {
 
-        if (this.isActive()) {
-            this.setInDrawingMode(true);
+        if( this.isActive() ) {
+            this.setInDrawingMode( true );
             this.setupComponents();
-        } else {
-            this.setInDrawingMode(false);
+        }
+        else {
+            this.setInDrawingMode( false );
         }
 
     }
+
 
     /**
      * Decides, if data needs to be requested and components have to be set up.
      */
     private void setupComponents() {
-        if (this.isInDrawingMode()) {
+        if( this.isInDrawingMode() ) {
             int from = this.getBoundsInfo().getLogLeft();
             int to = this.getBoundsInfo().getLogRight();
-            if (from != this.oldLogLeft || to != this.oldLogRight || this.isNewDataRequestNeeded()) {                
-                this.requestData(from, to);
+            if( from != this.oldLogLeft || to != this.oldLogRight || this.isNewDataRequestNeeded() ) {
+                this.requestData( from, to );
             }
         }
     }
 
+
     /**
      * Requests the needed mapping data for the given reference interval.
+     * <p>
      * @param from left (smaller) border of interval
-     * @param to right (larger) border of interval
+     * @param to   right (larger) border of interval
      */
-    private void requestData(int from, int to) {  
-        this.setNewDataRequestNeeded(false);
+    private void requestData( int from, int to ) {
+        this.setNewDataRequestNeeded( false );
         start = System.currentTimeMillis();
-        setCursor(new Cursor(Cursor.WAIT_CURSOR));
+        setCursor( new Cursor( Cursor.WAIT_CURSOR ) );
         this.jBlockList = new ArrayList<>();
         this.removeAll();
         //check for feature types in the exclusion list and adapt database query for performance
         List<Classification> excludedFeatureTypes = this.getExcludedClassifications(); //TODO: this does not do anything in the reader! rethink filtering here
         //TODO: add unique filter to read pair viewer
         this.mappingsLoading = true;
-        ParametersReadClasses readClassParams = new ParametersReadClasses(excludedFeatureTypes, new Byte("0"));
-        trackConnector.addMappingRequest(new IntervalRequest(from, to, from - 1000, to + 1000, this.getRefGen().getActiveChromId(), this, false, 
-                Properties.READ_PAIRS, Byte.valueOf("0"), readClassParams));
+        ParametersReadClasses readClassParams = new ParametersReadClasses( excludedFeatureTypes, new Byte( "0" ) );
+        trackConnector.addMappingRequest( new IntervalRequest( from, to, from - 1000, to + 1000, this.getRefGen().getActiveChromId(), this, false,
+                                                               Properties.READ_PAIRS, Byte.valueOf( "0" ), readClassParams ) );
         this.oldLogLeft = from;
         this.oldLogRight = to;
     }
 
+
     @Override
-    @SuppressWarnings("unchecked")
-    public void receiveData(Object data) {
-        if (data.getClass().equals(readPairs.getClass())) {
+    @SuppressWarnings( "unchecked" )
+    public void receiveData( Object data ) {
+        if( data.getClass().equals( readPairs.getClass() ) ) {
             this.readPairs = (ReadPairResultPersistent) data;
             stop = System.currentTimeMillis();
-            System.out.println(Benchmark.calculateDuration(start, stop, "Request: "));
+            System.out.println( Benchmark.calculateDuration( start, stop, "Request: " ) );
             this.createAndShowNewLayout();
         }
     }
-    
+
+
     /**
      * Creates the complete layout of this viewer for a given interval.
      */
-    public void createAndShowNewLayout() {        
-        
-        if (this.hasLegend()) {
-            this.add(this.getLegendLabel());
-            this.add(this.getLegendPanel());
+    public void createAndShowNewLayout() {
+
+        if( this.hasLegend() ) {
+            this.add( this.getLegendLabel() );
+            this.add( this.getLegendPanel() );
         }
         // if a sequence viewer was set for this panel, add/show it
-        if (this.hasSequenceBar()) {
-            this.add(this.getSequenceBar());
+        if( this.hasSequenceBar() ) {
+            this.add( this.getSequenceBar() );
         }
-        layout = new LayoutPairs(oldLogLeft, oldLogRight, readPairs.getReadPairs(), this.getExcludedClassifications());
+        layout = new LayoutPairs( oldLogLeft, oldLogRight, readPairs.getReadPairs(), this.getExcludedClassifications() );
         start = System.currentTimeMillis();
-        this.addBlocks(layout);
+        this.addBlocks( layout );
         stop = System.currentTimeMillis();
-        System.out.println(Benchmark.calculateDuration(start, stop, "CreateBlocks: "));
+        System.out.println( Benchmark.calculateDuration( start, stop, "CreateBlocks: " ) );
         start = System.currentTimeMillis();
-        for (BlockComponentPair comp : jBlockList) {
-            this.add(comp);
+        for( BlockComponentPair comp : jBlockList ) {
+            this.add( comp );
         }
         stop = System.currentTimeMillis();
-        System.out.println(Benchmark.calculateDuration(start, stop, "AddBlocks: "));
+        System.out.println( Benchmark.calculateDuration( start, stop, "AddBlocks: " ) );
         this.mappingsLoading = false;
         this.setViewerHeight();
         this.repaint();
-        setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        setCursor( new Cursor( Cursor.DEFAULT_CURSOR ) );
     }
+
 
     /**
      * Adds the read pair blocks to this viewer.
+     * <p>
      * @param layout the layout of the blocks to add
      */
-    private void addBlocks(LayoutI layout) {
-        
+    private void addBlocks( LayoutI layout ) {
+
         // only show reverse layer
         int layerCounter = -1;
         int countingStep = -1;
@@ -225,98 +243,107 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
         LayerI b;
         Iterator<BlockI> blockIt;
         BlockPair block;
-        while (layerIt.hasNext()) {
+        while( layerIt.hasNext() ) {
             b = layerIt.next();
             blockIt = b.getBlockIterator();
-            
-            while (blockIt.hasNext()) {
+
+            while( blockIt.hasNext() ) {
                 block = (BlockPair) blockIt.next();
-                isBlockAdded = this.createJBlock(block, layerCounter);
+                isBlockAdded = this.createJBlock( block, layerCounter );
                 isOneBlockAdded = isOneBlockAdded ? isOneBlockAdded : isBlockAdded;
             }
-            
-            if (isOneBlockAdded) {
+
+            if( isOneBlockAdded ) {
                 layerCounter += countingStep;
                 isOneBlockAdded = false;
             }
 
-        }        
-        this.viewerHeight = Math.abs(layerCounter) * this.layerHeight + 20;
+        }
+        this.viewerHeight = Math.abs( layerCounter ) * this.layerHeight + 20;
     }
+
 
     /**
      * Creates a new visible component (BlockComponentPair) representing a
      * read pair no matter if it only consists of a single mapping, one
      * mapping of the pair, or both pair mappings and other single mappings.
-     * @param block the pair data to show is stored in this object
+     * <p>
+     * @param block        the pair data to show is stored in this object
      * @param layerCounter determines the y-position of the component
+     * <p>
      * @return true, if the pair has visible components and should be added to
-     * the panel, false otherwise
+     *         the panel, false otherwise
      */
-    private boolean createJBlock(BlockPair block, int layerCounter) {
-        BlockComponentPair blockComp = new BlockComponentPair(block, this, blockHeight, minSaturationAndBrightness);
+    private boolean createJBlock( BlockPair block, int layerCounter ) {
+        BlockComponentPair blockComp = new BlockComponentPair( block, this, blockHeight, minSaturationAndBrightness );
 
-        if (blockComp.isPaintable()) {
-            // the read pair viewer only uses the negative/reverse layer 
+        if( blockComp.isPaintable() ) {
+            // the read pair viewer only uses the negative/reverse layer
             int lower = (layerCounter < 0 ? getPaintingAreaInfo().getReverseLow() : getPaintingAreaInfo().getForwardLow());
             int yPosition = lower - layerCounter * layerHeight;
             // reverse/negative layer
             yPosition -= blockComp.getHeight() / 2;
 
-            blockComp.setBounds(blockComp.getPhyStart(), yPosition, blockComp.getPhyWidth(), blockComp.getHeight());
-            this.jBlockList.add(blockComp);
+            blockComp.setBounds( blockComp.getPhyStart(), yPosition, blockComp.getPhyWidth(), blockComp.getHeight() );
+            this.jBlockList.add( blockComp );
             return true;
-        } else {
+        }
+        else {
             return false;
         }
 
     }
 
+
     @Override
-    protected void paintComponent(Graphics graphics) {
-        super.paintComponent(graphics);
+    protected void paintComponent( Graphics graphics ) {
+        super.paintComponent( graphics );
         Graphics2D g = (Graphics2D) graphics;
-//        
+//
 //        if (this.mappingsLoaded) {
 //
-            if (isInDrawingMode()) {
-                g.setColor(ColorProperties.TRACKPANEL_MIDDLE_LINE);
-                drawBaseLines(g);
-            }
+        if( isInDrawingMode() ) {
+            g.setColor( ColorProperties.TRACKPANEL_MIDDLE_LINE );
+            drawBaseLines( g );
+        }
 ////            g.setColor(Color.black);
 //        }
-        
-        if (mappingsLoading) {
+
+        if( mappingsLoading ) {
             Color fillcolor = ColorProperties.TITLE_BACKGROUND;
-            g.setColor(fillcolor);
+            g.setColor( fillcolor );
             BufferedImage loadingIndicator = this.getLoadingIndicator();
-            if (loadingIndicator != null) {
-                g.drawImage(loadingIndicator, this.getWidth() - 60 - loadingIndicator.getWidth(), 5, loadingIndicator.getWidth(), loadingIndicator.getHeight(), this);
+            if( loadingIndicator != null ) {
+                g.drawImage( loadingIndicator, this.getWidth() - 60 - loadingIndicator.getWidth(), 5, loadingIndicator.getWidth(), loadingIndicator.getHeight(), this );
             }
         }
     }
 
-    private void drawBaseLines(Graphics2D graphics) {
+
+    private void drawBaseLines( Graphics2D graphics ) {
         PaintingAreaInfo info = getPaintingAreaInfo();
-        graphics.drawLine(info.getPhyLeft(), info.getForwardLow(), info.getPhyRight(), info.getForwardLow());
-        graphics.drawLine(info.getPhyLeft(), info.getReverseLow(), info.getPhyRight(), info.getReverseLow());
+        graphics.drawLine( info.getPhyLeft(), info.getForwardLow(), info.getPhyRight(), info.getForwardLow() );
+        graphics.drawLine( info.getPhyLeft(), info.getReverseLow(), info.getPhyRight(), info.getReverseLow() );
     }
-    
+
 
     @Override
-    public int getWidthOfMouseOverlay(int position) {
-        PhysicalBaseBounds mouseAreaLeft = getPhysBoundariesForLogPos(position);
+    public int getWidthOfMouseOverlay( int position ) {
+        PhysicalBaseBounds mouseAreaLeft = getPhysBoundariesForLogPos( position );
 
         int width = (int) mouseAreaLeft.getPhysWidth();
         return width;
     }
 
+
     public PersistentReference getRefGen() {
         return refGen;
     }
 
+
     /**
-     * Adapts the height of the alignment viewer according to the content currently displayed.
+     * Adapts the height of the alignment viewer according to the content
+     * currently displayed.
      */
     private void setViewerHeight() {
 
@@ -327,15 +354,16 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
 //        }
         int newHeight = this.viewerHeight;//(int) (this.layerHeight * biggestCoverage * 1.5); //1.5 = factor for possible empty spacings between alignments
         final int spacer = 120;
-        this.setPreferredSize(new Dimension(this.getWidth(), newHeight + spacer));
+        this.setPreferredSize( new Dimension( this.getWidth(), newHeight + spacer ) );
         this.revalidate();
     }
 
+
     @Override
     public void notifySkipped() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException( "Not supported yet." ); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
 //    private void createFocusListener() {
 //        KeyboardFocusManager focusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
 //        focusManager.addPropertyChangeListener(new PropertyChangeListener() {
@@ -351,11 +379,11 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
 //            }
 //        });
 //    }
-    
+
     //    /**
 //     * Determines the (min and) max count of mappings on a given set of mappings.
 //     * Minimum count is currently disabled as it was not needed.
-//     * @param readPairs 
+//     * @param readPairs
 //     */
 //    private void findMinAndMaxCount(Collection<ReadPairGroup> readPairs) {
 ////        this.minCountInInterval = Integer.MAX_VALUE; //uncomment all these lines to get min count
@@ -368,7 +396,7 @@ public class ReadPairViewer extends AbstractViewer implements ThreadListener {
 ////            if (pair.getVisibleMapping().isForwardStrand()){
 ////                ++this.fwdMappingsInInterval;
 ////            }
-//            
+//
 //        }
 ////        this.revMappingsInInterval = readPairs.size() - this.fwdMappingsInInterval;
 //

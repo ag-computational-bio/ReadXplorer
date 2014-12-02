@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.view.dialogMenus;
 
+
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.parser.ReferenceJob;
@@ -32,91 +33,106 @@ import org.openide.DialogDisplayer;
 import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
 
+
 /**
  * A JPanel offering various methods useful for track import panels. E.g. it
  * allows to get the list of references present in the currently
- * opened ReadXplorer DB. 
- * 
+ * opened ReadXplorer DB.
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public abstract class ImportTrackBasePanel extends FileSelectionPanel {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     private boolean isAlreadyImported = false;
     private MappingParserI currentParser;
 
+
     /**
      * A JPanel offering various methods useful for track import panels. E.g. it
-     * allows to get the list of references present in the currently opened ReadXplorer
+     * allows to get the list of references present in the currently opened
+     * ReadXplorer
      * DB.
      */
     public ImportTrackBasePanel() {
     }
-    
+
+
     /**
-     * 
-     * Checks a given sam/bam file for the currently selected reference and 
+     *
+     * Checks a given sam/bam file for the currently selected reference and
      * displays an error message in case the selected reference does not occur
      * in the sequence dictionary of the sam/bam file.
-     * @param samBamFile the sam/bam file to check for the reference 
-     * @deprecated Use this method again, after refining it for single chromosomes
+     * <p>
+     * @param samBamFile the sam/bam file to check for the reference
+     * <p>
+     * @deprecated Use this method again, after refining it for single
+     * chromosomes
      */
     @Deprecated
-    public void checkSeqDictonary(File samBamFile) {
-        try (SAMFileReader samReader = new SAMFileReader(samBamFile)) {
+    public void checkSeqDictonary( File samBamFile ) {
+        try( SAMFileReader samReader = new SAMFileReader( samBamFile ) ) {
             SAMFileHeader header = samReader.getFileHeader();
-            int refIdx = header.getSequenceDictionary().getSequenceIndex(this.getReferenceJob().getName());
-            if (refIdx != -1) {
-                String msg = NbBundle.getMessage(ImportTrackBasePanel.class, "MSG_ErrorReference",
-                        this.getReferenceJob().getName(),
-                        samBamFile.getAbsolutePath(),
-                        this.createRefDictionaryString(header.getSequenceDictionary()));
-                NotifyDescriptor nd = new NotifyDescriptor.Message(msg, NotifyDescriptor.ERROR_MESSAGE);
-                nd.setTitle(NbBundle.getMessage(ImportTrackBasePanel.class, "TITLE_ErrorReference"));
-                DialogDisplayer.getDefault().notify(nd); //TODO: add to is required info set!
+            int refIdx = header.getSequenceDictionary().getSequenceIndex( this.getReferenceJob().getName() );
+            if( refIdx != -1 ) {
+                String msg = NbBundle.getMessage( ImportTrackBasePanel.class, "MSG_ErrorReference",
+                                                  this.getReferenceJob().getName(),
+                                                  samBamFile.getAbsolutePath(),
+                                                  this.createRefDictionaryString( header.getSequenceDictionary() ) );
+                NotifyDescriptor nd = new NotifyDescriptor.Message( msg, NotifyDescriptor.ERROR_MESSAGE );
+                nd.setTitle( NbBundle.getMessage( ImportTrackBasePanel.class, "TITLE_ErrorReference" ) );
+                DialogDisplayer.getDefault().notify( nd ); //TODO: add to is required info set!
             }
         }
     }
 
+
     /**
-     * Creates a concatenated string of all reference names contained in the 
+     * Creates a concatenated string of all reference names contained in the
      * given sequence dictionary. All names are separated by a new line (\n).
+     * <p>
      * @param sequenceDictionary The sequence dictionary whose reference names
-     * should be concatenated
+     *                           should be concatenated
+     * <p>
      * @return The concatenated reference names
      */
-    private String createRefDictionaryString(SAMSequenceDictionary sequenceDictionary) {
-        StringBuilder concatenatedDictionary = new StringBuilder(100);
-        concatenatedDictionary.append("\n");
-        for (SAMSequenceRecord ref : sequenceDictionary.getSequences()) {
-            concatenatedDictionary.append(ref.getSequenceName()).append("\n");
+    private String createRefDictionaryString( SAMSequenceDictionary sequenceDictionary ) {
+        StringBuilder concatenatedDictionary = new StringBuilder( 100 );
+        concatenatedDictionary.append( "\n" );
+        for( SAMSequenceRecord ref : sequenceDictionary.getSequences() ) {
+            concatenatedDictionary.append( ref.getSequenceName() ).append( "\n" );
         }
         return concatenatedDictionary.toString();
     }
-    
+
+
     /**
      * @param jobs list of reference jobs which shall be imported now and thus
-     * have to be available for the import of new tracks too.
-     * @return Complete list of reference jobs in the db and which are imported now
+     *             have to be available for the import of new tracks too.
+     * <p>
+     * @return Complete list of reference jobs in the db and which are imported
+     *         now
      */
-    public ReferenceJob[] getReferenceJobs(List<ReferenceJob> jobs) {
+    public ReferenceJob[] getReferenceJobs( List<ReferenceJob> jobs ) {
         List<ReferenceJob> refJobList = this.getRefJobList();
-        refJobList.addAll(jobs);
-        
-        ReferenceJob[] refJobs = refJobList.toArray(new ReferenceJob[1]);
+        refJobList.addAll( jobs );
+
+        ReferenceJob[] refJobs = refJobList.toArray( new ReferenceJob[1] );
         return refJobs;
     }
+
 
     /**
      * @return all reference genomes which are stored in the db until now.
      */
     public ReferenceJob[] getReferenceJobs() {
         List<ReferenceJob> refJobList = this.getRefJobList();
-        ReferenceJob[] refJobs = refJobList.toArray(new ReferenceJob[1]);
+        ReferenceJob[] refJobs = refJobList.toArray( new ReferenceJob[1] );
         return refJobs;
     }
-    
+
+
     /**
      * @return the list of reference jobs stored in the current db
      */
@@ -125,33 +141,36 @@ public abstract class ImportTrackBasePanel extends FileSelectionPanel {
 
         try {
             List<PersistentReference> refs = ProjectConnector.getInstance().getGenomes();
-            for (PersistentReference r : refs) {
-                refJobList.add(new ReferenceJob(r.getId(), r.getFastaFile(), null, r.getDescription(), r.getName(), r.getTimeStamp()));
+            for( PersistentReference r : refs ) {
+                refJobList.add( new ReferenceJob( r.getId(), r.getFastaFile(), null, r.getDescription(), r.getName(), r.getTimeStamp() ) );
             }
-        } catch (OutOfMemoryError e) {
-            VisualisationUtils.displayOutOfMemoryError(this);
+        }
+        catch( OutOfMemoryError e ) {
+            VisualisationUtils.displayOutOfMemoryError( this );
         }
         return refJobList;
     }
 
+
     /**
      * @return true, if this track was already imported in another readXplorer
-     * db. In that case the sam/bam file does not have to be extended anymore,
-     * because all needed data is already stored in the file.
+     *         db. In that case the sam/bam file does not have to be extended anymore,
+     *         because all needed data is already stored in the file.
      */
     public boolean isAlreadyImported() {
         return isAlreadyImported;
     }
 
+
     /**
      * @param isAlreadyImported true, if this track was already imported in
-     * another readXplorer db. In that case the sam/bam file does not have to be
-     * extended anymore, because all needed data is already stored in the file.
+     *                          another readXplorer db. In that case the sam/bam file does not have to be
+     *                          extended anymore, because all needed data is already stored in the file.
      */
-    protected void setIsAlreadyImported(boolean isAlreadyImported) {
+    protected void setIsAlreadyImported( boolean isAlreadyImported ) {
         this.isAlreadyImported = isAlreadyImported;
     }
-    
+
 
     /**
      * @return The parser, which shall be used for parsing this track job.
@@ -160,22 +179,26 @@ public abstract class ImportTrackBasePanel extends FileSelectionPanel {
         return currentParser;
     }
 
+
     /**
-     * @param currentParser  The parser, which shall be used for parsing this 
-     * track job.
+     * @param currentParser The parser, which shall be used for parsing this
+     *                      track job.
      */
-    protected void setCurrentParser(MappingParserI currentParser) {
+    protected void setCurrentParser( MappingParserI currentParser ) {
         this.currentParser = currentParser;
     }
-    
+
+
     /**
      * @return The reference job selected as reference for this track.
      */
     public abstract ReferenceJob getReferenceJob();
-    
+
+
     /**
      * @return The track name for this track.
      */
     public abstract String getTrackName();
-    
+
+
 }

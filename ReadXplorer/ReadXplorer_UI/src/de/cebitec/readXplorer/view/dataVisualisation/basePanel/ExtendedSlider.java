@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.basePanel;
 
+
 import de.cebitec.readXplorer.view.dataVisualisation.SynchronousNavigator;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -24,6 +25,7 @@ import java.util.List;
 import javax.swing.JSlider;
 //import javax.swing.event.ChangeEvent;
 //import javax.swing.event.ChangeListener;
+
 
 /**
  *
@@ -37,38 +39,45 @@ public class ExtendedSlider extends JSlider implements SynchronousNavigator {
 
     private List<AdjustmentPanelListenerI> listeners;
 
-    public ExtendedSlider(int min, int max, int init){
-        super(JSlider.HORIZONTAL, min, max, init);
+
+    public ExtendedSlider( int min, int max, int init ) {
+        super( JSlider.HORIZONTAL, min, max, init );
         this.current = init;
         listeners = new ArrayList<AdjustmentPanelListenerI>();
-        this.addMouseListener(new MouseListener() {
+        this.addMouseListener( new MouseListener() {
 
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void mouseClicked( MouseEvent e ) {
             }
 
-            @Override
-            public void mousePressed(MouseEvent e) {
-            }
 
             @Override
-            public void mouseReleased(MouseEvent e) {
+            public void mousePressed( MouseEvent e ) {
+            }
+
+
+            @Override
+            public void mouseReleased( MouseEvent e ) {
                 int newValue = ExtendedSlider.this.getValue();
-                if(newValue != current){
+                if( newValue != current ) {
                     current = newValue;
                     updateListeners();
                 }
             }
 
-            @Override
-            public void mouseEntered(MouseEvent e) {
-            }
 
             @Override
-            public void mouseExited(MouseEvent e) {
+            public void mouseEntered( MouseEvent e ) {
             }
-        });
-        
+
+
+            @Override
+            public void mouseExited( MouseEvent e ) {
+            }
+
+
+        } );
+
 //        this.addChangeListener(new ChangeListener() {
 //
 //            @Override
@@ -82,29 +91,35 @@ public class ExtendedSlider extends JSlider implements SynchronousNavigator {
 //        });
     }
 
-    public void addAdjustmentPanelListener(AdjustmentPanelListenerI listener){
-        listeners.add(listener);
-        listener.zoomLevelUpdated(current);
+
+    public void addAdjustmentPanelListener( AdjustmentPanelListenerI listener ) {
+        listeners.add( listener );
+        listener.zoomLevelUpdated( current );
     }
 
-    public void removeAdjustmentPanelListener(AdjustmentPanelListenerI listener){
-        listeners.remove(listener);
+
+    public void removeAdjustmentPanelListener( AdjustmentPanelListenerI listener ) {
+        listeners.remove( listener );
     }
+
 
     @Override
-    public void setCurrentScrollValue(int value) {
+    public void setCurrentScrollValue( int value ) {
     }
 
+
     @Override
-    public void setCurrentZoomValue(int value) {
+    public void setCurrentZoomValue( int value ) {
         current = value;
-        this.setValue(current);
+        this.setValue( current );
     }
 
-    private void updateListeners(){
-        for(AdjustmentPanelListenerI l : listeners){
-            l.zoomLevelUpdated(current);
+
+    private void updateListeners() {
+        for( AdjustmentPanelListenerI l : listeners ) {
+            l.zoomLevelUpdated( current );
         }
     }
+
 
 }

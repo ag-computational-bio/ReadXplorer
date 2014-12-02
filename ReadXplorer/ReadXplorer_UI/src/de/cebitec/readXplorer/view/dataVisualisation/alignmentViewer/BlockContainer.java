@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,22 +16,26 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer;
 
+
 import java.util.Comparator;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+
 /**
  * @author ddoppmei, rhilker
- * 
+ * <p>
  * A container for blocks. The blocks are added in a sorted fashion.
  */
 public class BlockContainer {
 
     private TreeMap<Integer, TreeSet<BlockI>> sortedMappings;
 
+
     public BlockContainer() {
         sortedMappings = new TreeMap<>();
     }
+
 
     /**
      * Adds a block to the container. The block order is sorted according to
@@ -39,60 +43,72 @@ public class BlockContainer {
      *
      * @param block block to add
      */
-    public void addBlock(BlockI block) {
+    public void addBlock( BlockI block ) {
         int start = block.getAbsStart();
-        if (!sortedMappings.containsKey(start)) {
-            sortedMappings.put(start, new TreeSet<BlockI>(new BlockComparator()));
+        if( !sortedMappings.containsKey( start ) ) {
+            sortedMappings.put( start, new TreeSet<BlockI>( new BlockComparator() ) );
         }
-        sortedMappings.get(start).add(block);
+        sortedMappings.get( start ).add( block );
     }
 
-    public BlockI getNextByPositionAndRemove(int pos) {
-        Integer key = sortedMappings.ceilingKey(pos);
-        if (key != null) {
-            TreeSet<BlockI> set = sortedMappings.get(key);
+
+    public BlockI getNextByPositionAndRemove( int pos ) {
+        Integer key = sortedMappings.ceilingKey( pos );
+        if( key != null ) {
+            TreeSet<BlockI> set = sortedMappings.get( key );
             BlockI b = set.pollFirst();
-            if (set.isEmpty()) {
-                sortedMappings.remove(key);
+            if( set.isEmpty() ) {
+                sortedMappings.remove( key );
             }
             return b;
-        } else {
+        }
+        else {
             return null;
         }
     }
+
 
     public boolean isEmpty() {
         return sortedMappings.isEmpty();
     }
 
+
     private class BlockComparator implements Comparator<BlockI> {
 
         @Override
-        public int compare(BlockI o1, BlockI o2) {
+        public int compare( BlockI o1, BlockI o2 ) {
             // order by start of block
-            if (o1.getAbsStart() < o2.getAbsStart()) {
+            if( o1.getAbsStart() < o2.getAbsStart() ) {
                 return -1;
-            } else if (o1.getAbsStart() > o2.getAbsStart()) {
+            }
+            else if( o1.getAbsStart() > o2.getAbsStart() ) {
                 return 1;
-            } else {
+            }
+            else {
                 // if blocks start at identical position use stop position
-                if (o1.getAbsStop() < o2.getAbsStop()) {
+                if( o1.getAbsStop() < o2.getAbsStop() ) {
                     return -1;
-                } else if (o1.getAbsStop() > o2.getAbsStop()) {
+                }
+                else if( o1.getAbsStop() > o2.getAbsStop() ) {
                     return 1;
-                } else {
+                }
+                else {
                     // stop position are identical, too
                     // use mapping id to distinguish and order
-                    if (o1.getObjectWithId().getId() < o2.getObjectWithId().getId()) {
+                    if( o1.getObjectWithId().getId() < o2.getObjectWithId().getId() ) {
                         return -1;
-                    } else if (o1.getObjectWithId().getId() > o2.getObjectWithId().getId()) {
+                    }
+                    else if( o1.getObjectWithId().getId() > o2.getObjectWithId().getId() ) {
                         return 1;
-                    } else {
+                    }
+                    else {
                         return 0;
                     }
                 }
             }
         }
+
+
     }
 
 }

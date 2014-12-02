@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.util;
 
+
 /**
  * Observer in the observer pattern.
  * The observer is updated whenever the update method is called.
@@ -25,11 +26,15 @@ package de.cebitec.readXplorer.util;
 public interface Observer {
 
     /**
-     * This method is called whenever the observed object is changed. An application
-     * calls an Observable object's notifyObservers method to have all the object's
+     * This method is called whenever the observed object is changed. An
+     * application
+     * calls an Observable object's notifyObservers method to have all the
+     * object's
      * observers notified of the change.
+     * <p>
      * @param args the arguments to be send to the observer
      */
-    public void update(Object args);
+    public void update( Object args );
+
 
 }

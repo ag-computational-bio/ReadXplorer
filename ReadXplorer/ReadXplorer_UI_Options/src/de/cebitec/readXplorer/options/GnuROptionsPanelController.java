@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,26 +16,30 @@
  */
 package de.cebitec.readXplorer.options;
 
+
 import org.netbeans.spi.options.OptionsPanelController;
 
-@OptionsPanelController.TopLevelRegistration(categoryName = "#OptionsCategory_Name_GnuR",
-iconBase = "de/cebitec/readXplorer/options/gnuR.png",
-keywords = "#OptionsCategory_Keywords_GnuR",
-keywordsCategory = "GnuR")
-@org.openide.util.NbBundle.Messages({"OptionsCategory_Name_GnuR=Gnu R", "OptionsCategory_Keywords_GnuR=GnuR"})
+
+@OptionsPanelController.TopLevelRegistration( categoryName = "#OptionsCategory_Name_GnuR",
+                                              iconBase = "de/cebitec/readXplorer/options/gnuR.png",
+                                              keywords = "#OptionsCategory_Keywords_GnuR",
+                                              keywordsCategory = "GnuR" )
+@org.openide.util.NbBundle.Messages( { "OptionsCategory_Name_GnuR=Gnu R", "OptionsCategory_Keywords_GnuR=GnuR" } )
 public final class GnuROptionsPanelController extends ChangeListeningOptionsPanelController {
 
     private GnuRPanel panel;
+
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected OptionsPanel getPanel() {
-        if (panel == null) {
-            panel = new GnuRPanel(this);
+        if( panel == null ) {
+            panel = new GnuRPanel( this );
         }
         return panel;
     }
+
 
 }

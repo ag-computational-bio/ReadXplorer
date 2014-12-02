@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.mapping;
 
+
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readXplorer.mapping.api.MappingApi;
 import de.cebitec.readXplorer.util.SimpleIO;
@@ -27,60 +28,71 @@ import org.openide.util.RequestProcessor;
 import org.openide.windows.IOProvider;
 import org.openide.windows.InputOutput;
 
+
 /**
  * MappingProcessor allows map a fasta file to a reference sequence
  * by using an external mapping script
  * The user will see a progress info.
- * 
+ * <p>
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
-public class MappingProcessor  {
-    private final static RequestProcessor RP = new RequestProcessor("interruptible tasks", 1, true);
-    private final static Logger LOG = Logger.getLogger(MappingProcessor.class.getName());
+public class MappingProcessor {
+
+    private final static RequestProcessor RP = new RequestProcessor( "interruptible tasks", 1, true );
+    private final static Logger LOG = Logger.getLogger( MappingProcessor.class.getName() );
     private RequestProcessor.Task theTask = null;
     private InputOutput io;
-    
+
+
     /**
      * If any message should be printed to the console, this method is used.
-     * If an error occured during the run of the parser, which does not interrupt
+     * If an error occured during the run of the parser, which does not
+     * interrupt
      * the parsing process, this method prints the error to the program console.
+     * <p>
      * @param msg the msg to print
      */
-    private void showMsg(String msg) {
-        this.io.getOut().println(msg);
+    private void showMsg( String msg ) {
+        this.io.getOut().println( msg );
     }
-    
-    public MappingProcessor(final String referencePath, final String sourcePath, final String mappingParam) {
-        this.io = IOProvider.getDefault().getIO(NbBundle.getMessage(MappingProcessor.class, "MappingProcessor.output.name"), true);
-        this.io.setOutputVisible(true);
-        this.io.getOut().println("");
-        
-        CentralLookup.getDefault().add(this);
+
+
+    public MappingProcessor( final String referencePath, final String sourcePath, final String mappingParam ) {
+        this.io = IOProvider.getDefault().getIO( NbBundle.getMessage( MappingProcessor.class, "MappingProcessor.output.name" ), true );
+        this.io.setOutputVisible( true );
+        this.io.getOut().println( "" );
+
+        CentralLookup.getDefault().add( this );
         try {
             io.getOut().reset();
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+        }
+        catch( IOException ex ) {
+            Exceptions.printStackTrace( ex );
         }
         io.select();
-        
+
         Runnable runnable = new Runnable() {
-            
-            
+
+
             @Override
             public void run() {
                 String sam = null;
                 try {
-                    sam = MappingApi.mapFastaFile(new SimpleIO(io), referencePath, sourcePath, mappingParam);
-                    showMsg("Extraction ready!");
-                } catch (IOException ex) {
-                    Exceptions.printStackTrace(ex);
+                    sam = MappingApi.mapFastaFile( new SimpleIO( io ), referencePath, sourcePath, mappingParam );
+                    showMsg( "Extraction ready!" );
                 }
-                
+                catch( IOException ex ) {
+                    Exceptions.printStackTrace( ex );
+                }
+
             }
 
+
         };
-        
-        theTask = RP.create(runnable); //the task is not started yet
-        theTask.schedule(1*1000); //start the task with a delay of 1 seconds
+
+        theTask = RP.create( runnable ); //the task is not started yet
+        theTask.schedule( 1 * 1000 ); //start the task with a delay of 1 seconds
     }
+
+
 }

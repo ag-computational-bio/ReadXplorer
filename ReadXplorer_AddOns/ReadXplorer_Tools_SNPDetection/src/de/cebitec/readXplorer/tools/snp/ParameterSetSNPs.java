@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,18 +16,22 @@
  */
 package de.cebitec.readXplorer.tools.snp;
 
+
 import de.cebitec.readXplorer.databackend.ParameterSetI;
 import de.cebitec.readXplorer.databackend.ParametersFeatureTypesAndReadClasses;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.util.Set;
 
+
 /**
  * Data storage for all parameters associated with a SNP and DIP detection.
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-class ParameterSetSNPs extends ParametersFeatureTypesAndReadClasses implements ParameterSetI<ParameterSetSNPs> {
+class ParameterSetSNPs extends ParametersFeatureTypesAndReadClasses implements
+        ParameterSetI<ParameterSetSNPs> {
+
     private int minMismatchBases;
     private int minPercentage;
     private final boolean useMainBase;
@@ -35,29 +39,36 @@ class ParameterSetSNPs extends ParametersFeatureTypesAndReadClasses implements P
     private final byte minAverageBaseQual;
     private final int minAverageMappingQual;
 
+
     /**
      * Data storage for all parameters associated with a SNP and DIP detection.
-     * @param minMismatchBases the minimum number of mismatches at a SNP
-     * position
-     * @param minPercentage the minimum percentage of mismatches at a SNP
-     * position
-     * @param useMainBase <code>true</code>, if the minVaryingBases count
-     * corresponds to the count of the most frequent base at the current
-     * position. <code>false</code>, if the minVaryingBases count corresponds to
-     * the overall mismatch count at the current position.
-     * @param selFeatureTypes list of seletect feature types to use for the snp
-     * translation.
-     * @param readClassParams only include mappings in the analysis, which
-     * belong to the selected mapping classes.
-     * @param minBaseQuality Minimum phred scaled base quality or -1 if unknown.
-     * @param minAverageBaseQual Minimum average phred scaled base quality or -1
-     * if unknown.
+     * <p>
+     * @param minMismatchBases      the minimum number of mismatches at a SNP
+     *                              position
+     * @param minPercentage         the minimum percentage of mismatches at a
+     *                              SNP
+     *                              position
+     * @param useMainBase           <code>true</code>, if the minVaryingBases
+     *                              count
+     *                              corresponds to the count of the most frequent base at the current
+     *                              position. <code>false</code>, if the minVaryingBases count corresponds to
+     *                              the overall mismatch count at the current position.
+     * @param selFeatureTypes       list of seletect feature types to use for
+     *                              the snp
+     *                              translation.
+     * @param readClassParams       only include mappings in the analysis, which
+     *                              belong to the selected mapping classes.
+     * @param minBaseQuality        Minimum phred scaled base quality or -1 if
+     *                              unknown.
+     * @param minAverageBaseQual    Minimum average phred scaled base quality or
+     *                              -1
+     *                              if unknown.
      * @param minAverageMappingQual Minimum average phred scaled mapping quality
-     * or -1 if unknown.
+     *                              or -1 if unknown.
      */
-    public ParameterSetSNPs(int minMismatchBases, int minPercentage, boolean useMainBase, Set<FeatureType> selFeatureTypes, ParametersReadClasses readClassParams,
-            byte minBaseQuality, byte minAverageBaseQual, int minAverageMappingQual) {
-        super(selFeatureTypes, readClassParams);
+    public ParameterSetSNPs( int minMismatchBases, int minPercentage, boolean useMainBase, Set<FeatureType> selFeatureTypes, ParametersReadClasses readClassParams,
+                             byte minBaseQuality, byte minAverageBaseQual, int minAverageMappingQual ) {
+        super( selFeatureTypes, readClassParams );
         this.minMismatchBases = minMismatchBases;
         this.minPercentage = minPercentage;
         this.useMainBase = useMainBase;
@@ -66,16 +77,19 @@ class ParameterSetSNPs extends ParametersFeatureTypesAndReadClasses implements P
         this.minAverageMappingQual = minAverageMappingQual;
     }
 
+
     /**
-     * @return the minimum number of mismatches at a SNP position 
+     * @return the minimum number of mismatches at a SNP position
      */
     public int getMinMismatchingBases() {
         return minMismatchBases;
     }
 
-    public void setMinVaryingBases(int minVaryingBases) {
+
+    public void setMinVaryingBases( int minVaryingBases ) {
         this.minMismatchBases = minVaryingBases;
     }
+
 
     /**
      * @return the minimum percentage of mismatches at a SNP position
@@ -84,26 +98,32 @@ class ParameterSetSNPs extends ParametersFeatureTypesAndReadClasses implements P
         return minPercentage;
     }
 
-    public void setMinPercentage(int minPercentage) {
+
+    public void setMinPercentage( int minPercentage ) {
         this.minPercentage = minPercentage;
     }
 
+
     /**
-     * @return <code>true</code>, if the minVaryingBases count corresponds to the count of
-     * the most frequent base at the current position. <code>false</code>, if the 
-     * minVaryingBases count corresponds to the overall mismatch count at the
-     * current position.
+     * @return <code>true</code>, if the minVaryingBases count corresponds to
+     *         the count of
+     *         the most frequent base at the current position. <code>false</code>, if
+     *         the
+     *         minVaryingBases count corresponds to the overall mismatch count at the
+     *         current position.
      */
     public boolean isUseMainBase() {
         return this.useMainBase;
     }
 
+
     /**
      * @return Minimum phred scaled base quality or -1 if unknown.
      */
     public byte getMinBaseQuality() {
-       return this.minBaseQuality; 
+        return this.minBaseQuality;
     }
+
 
     /**
      * @return Minimum average phred scaled base quality or -1 if unknown.
@@ -112,11 +132,13 @@ class ParameterSetSNPs extends ParametersFeatureTypesAndReadClasses implements P
         return this.minAverageBaseQual;
     }
 
+
     /**
      * @return Minimum average phred scaled mapping quality or 255 if unknown.
      */
     public int getMinAverageMappingQual() {
         return this.minAverageMappingQual;
     }
-    
+
+
 }

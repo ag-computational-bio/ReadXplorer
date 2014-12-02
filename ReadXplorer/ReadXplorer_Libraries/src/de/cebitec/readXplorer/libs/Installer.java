@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,21 +16,26 @@
  */
 package de.cebitec.readXplorer.libs;
 
+
 import net.sf.picard.reference.ReferenceSequenceFileFactory;
 import org.openide.modules.ModuleInstall;
 
+
 public class Installer extends ModuleInstall {
+
     private static final long serialVersionUID = 1L;
+
 
     @Override
     public void restored() {
         //add more fasta extensions to prevent errors when using such files as reference
-        ReferenceSequenceFileFactory.FASTA_EXTENSIONS.add(".fas");
-        ReferenceSequenceFileFactory.FASTA_EXTENSIONS.add(".fas.gz");
-        ReferenceSequenceFileFactory.FASTA_EXTENSIONS.add(".fna");
-        ReferenceSequenceFileFactory.FASTA_EXTENSIONS.add(".fna.gz");
+        ReferenceSequenceFileFactory.FASTA_EXTENSIONS.add( ".fas" );
+        ReferenceSequenceFileFactory.FASTA_EXTENSIONS.add( ".fas.gz" );
+        ReferenceSequenceFileFactory.FASTA_EXTENSIONS.add( ".fna" );
+        ReferenceSequenceFileFactory.FASTA_EXTENSIONS.add( ".fna.gz" );
 //        ReferenceSequenceFileFactory.FASTA_EXTENSIONS.add(".faa"); //amino acids not supported yet
 //        ReferenceSequenceFileFactory.FASTA_EXTENSIONS.add(".faa.gz");
     }
+
 
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,43 +16,50 @@
  */
 package de.cebitec.readXplorer.databackend.dataObjects;
 
+
 import de.cebitec.readXplorer.util.SequenceComparison;
+
 
 /**
  * Contains the two amino acid triplets for the reference and the mapped genome
  * plus the identifier for the gene to which the triplet belongs to.
- * 
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class CodonSnp {
-    
+
     private final String tripletRef;
     private final String tripletSnp;
     private final char aminoRef;
     private final char aminoSnp;
     private final SequenceComparison effect;
     private final PersistentFeature feature;
-    
-    
-    /** 
+
+
+    /**
      * Contains the two DNA triplets for the reference and the mapped genome
      * plus the identifier for the gene to which the triplet belongs.
-     * @param tripletRef DNA triplet of the reference genome for a certain position
+     * <p>
+     * @param tripletRef DNA triplet of the reference genome for a certain
+     *                   position
      * @param tripletSnp DNA triplet of the mapped genome for the same position
-     * @param aminoRef amino acid of the reference genome for a certain position
-     * @param aminoSnp amino acid of the mapped genome for the same position
-     * @param effect the effect type of a snp on the amino acid sequence among SequenceUtils.SUBSTITUTION, 
-     *             SequenceUtils.MATCH, SequenceUtils.DELETION, SequenceUtils.INSERTION
-     * @param feature identifier of the gene to which the triplet belongs
+     * @param aminoRef   amino acid of the reference genome for a certain
+     *                   position
+     * @param aminoSnp   amino acid of the mapped genome for the same position
+     * @param effect     the effect type of a snp on the amino acid sequence
+     *                   among SequenceUtils.SUBSTITUTION,
+     *                   SequenceUtils.MATCH, SequenceUtils.DELETION, SequenceUtils.INSERTION
+     * @param feature    identifier of the gene to which the triplet belongs
      */
-    public CodonSnp(String tripletRef, String tripletSnp, char aminoRef, char aminoSnp, SequenceComparison effect, PersistentFeature feature){
+    public CodonSnp( String tripletRef, String tripletSnp, char aminoRef, char aminoSnp, SequenceComparison effect, PersistentFeature feature ) {
         this.tripletRef = tripletRef;
         this.tripletSnp = tripletSnp;
-        this.feature = feature;    
+        this.feature = feature;
         this.aminoRef = aminoRef;
         this.aminoSnp = aminoSnp;
         this.effect = effect;
     }
+
 
     /**
      * @return The reference genome triplet stored in this object.
@@ -61,13 +68,16 @@ public class CodonSnp {
         return tripletRef;
     }
 
+
     /**
-     * @return The mapped genome triplet stored in this object, which should/might differ from
-     * the reference triplet.
+     * @return The mapped genome triplet stored in this object, which
+     *         should/might differ from
+     *         the reference triplet.
      */
     public String getTripletSnp() {
         return tripletSnp;
     }
+
 
     /**
      * @return The identifier of the gene or feature, this codon belongs to.
@@ -76,6 +86,7 @@ public class CodonSnp {
         return feature;
     }
 
+
     /**
      * @return The reference genome amino acid stored in this object.
      */
@@ -83,20 +94,24 @@ public class CodonSnp {
         return aminoRef;
     }
 
+
     /**
-     * @return The mapped genome amino acid stored in this object, which might differ from
-     * the reference amino acid.
+     * @return The mapped genome amino acid stored in this object, which might
+     *         differ from
+     *         the reference amino acid.
      */
     public char getAminoSnp() {
         return aminoSnp;
     }
 
+
     /**
-     * @return the effect type of a snp on the amino acid sequence among SequenceComparison values.
+     * @return the effect type of a snp on the amino acid sequence among
+     *         SequenceComparison values.
      */
     public SequenceComparison getEffect() {
         return effect;
     }
-    
-    
+
+
 }

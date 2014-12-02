@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,31 +16,36 @@
  */
 package de.cebitec.readXplorer.databackend.dataObjects;
 
+
 import de.cebitec.readXplorer.databackend.IntervalRequest;
 import java.util.List;
+
 
 /**
  * Able to store the result for mapping calls. Called persistent,
  * because it needs the persistent data types from its own package.
- * 
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class MappingResult extends AnalysisResult {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     private List<Mapping> mappings;
+
 
     /**
      * Able to store the result for mapping calls. Called persistent, because it
      * needs the persistent data types from its own package.
+     * <p>
      * @param mappings the list of mappings to store
-     * @param request the request for which the result was generated 
+     * @param request  the request for which the result was generated
      */
-    public MappingResult(List<Mapping> mappings, IntervalRequest request) {
-        super(request);
+    public MappingResult( List<Mapping> mappings, IntervalRequest request ) {
+        super( request );
         this.mappings = mappings;
     }
+
 
     /**
      * @return the mappings stored in this result
@@ -48,5 +53,6 @@ public class MappingResult extends AnalysisResult {
     public List<Mapping> getMappings() {
         return this.mappings;
     }
-    
+
+
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,38 +16,47 @@
  */
 package de.cebitec.readXplorer.databackend;
 
+
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.util.Set;
+
 
 /**
  * Creates a parameters set which contains all parameters concerning the usage
  * of ReadXplorer's feature types.
- * 
+ * <p>
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class ParametersFeatureTypes {
+
     private Set<FeatureType> selFeatureTypes;
+
 
     /**
      * Creates a parameters set which contains all parameters concerning the
      * usage of ReadXplorer's feature types.
-     * @param selFeatureTypes the set of selected feature types 
+     * <p>
+     * @param selFeatureTypes the set of selected feature types
      */
-    public ParametersFeatureTypes(Set<FeatureType> selFeatureTypes) {
+    public ParametersFeatureTypes( Set<FeatureType> selFeatureTypes ) {
         this.selFeatureTypes = selFeatureTypes;
     }
 
+
     /**
-     * @return the set of selected feature types 
+     * @return the set of selected feature types
      */
     public Set<FeatureType> getSelFeatureTypes() {
         return selFeatureTypes;
     }
 
+
     /**
-     * @param selFeatureTypes the set of selected feature types 
+     * @param selFeatureTypes the set of selected feature types
      */
-    public void setSelFeatureTypes(Set<FeatureType> selFeatureTypes) {
+    public void setSelFeatureTypes( Set<FeatureType> selFeatureTypes ) {
         this.selFeatureTypes = selFeatureTypes;
     }
+
+
 }

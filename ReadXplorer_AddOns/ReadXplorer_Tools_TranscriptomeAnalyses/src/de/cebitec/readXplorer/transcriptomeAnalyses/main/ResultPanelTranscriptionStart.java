@@ -1,5 +1,6 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
+
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
@@ -69,6 +70,7 @@ import org.openide.util.NbBundle;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
+
 /**
  * This panel is capable of showing a table with transcription start sites and
  * contains an export button, which exports the data into an excel file.
@@ -77,7 +79,8 @@ import org.openide.windows.WindowManager;
  *
  * @author -Rolf Hilker-, -jritter-
  */
-public class ResultPanelTranscriptionStart extends ResultTablePanel implements Observer {
+public class ResultPanelTranscriptionStart extends ResultTablePanel implements
+        Observer {
 
     private static final long serialVersionUID = 1L;
     public static final String TSS_TOTAL = "Total number of detected TSSs";
@@ -129,6 +132,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
     Integer prefixLength = 0;
     PersistentReference persistantRef;
 
+
     /**
      * This panel is capable of showing a table with transcription start sites
      * and contains an export button, which exports the data into an excel file.
@@ -138,53 +142,58 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         final int posColumnIdx = 0;
         final int trackColumnIdx = 25;
         final int chromColumnIdx = 1;
-        tableFilter = new TableRightClickFilter<>(UneditableTableModel.class, posColumnIdx, trackColumnIdx);
-        this.tSSTable.getTableHeader().addMouseListener(tableFilter);
-        this.tSSTable.addMouseListener(rowDeletion);
+        tableFilter = new TableRightClickFilter<>( UneditableTableModel.class, posColumnIdx, trackColumnIdx );
+        this.tSSTable.getTableHeader().addMouseListener( tableFilter );
+        this.tSSTable.addMouseListener( rowDeletion );
         this.initStatsMap();
 
         DefaultListSelectionModel listSelectionModel = (DefaultListSelectionModel) this.tSSTable.getSelectionModel();
-        listSelectionModel.addListSelectionListener(new ListSelectionListener() {
+        listSelectionModel.addListSelectionListener( new ListSelectionListener() {
             @Override
-            public void valueChanged(ListSelectionEvent e) {
-                TableUtils.showPosition(tSSTable, posColumnIdx, chromColumnIdx, boundsInfoManager);
+            public void valueChanged( ListSelectionEvent e ) {
+                TableUtils.showPosition( tSSTable, posColumnIdx, chromColumnIdx, boundsInfoManager );
             }
-        });
+
+
+        } );
     }
 
-    public void setDefaultTableModelToTable(DefaultTableModel model) {
-        this.tSSTable.setModel(model);
+
+    public void setDefaultTableModelToTable( DefaultTableModel model ) {
+        this.tSSTable.setModel( model );
     }
+
 
     /**
      * Initializes the statistics map.
      */
     private void initStatsMap() {
         statisticsMap = new HashMap<>();
-        statisticsMap.put(TSS_TOTAL, 0);
-        statisticsMap.put(TSS_FWD, 0);
-        statisticsMap.put(TSS_REV, 0);
-        statisticsMap.put(TSS_LEADERLESS, 0);
-        statisticsMap.put(TSS_INTRAGENIC_TSS, 0);
-        statisticsMap.put(TSS_INTERGENIC_TSS, 0);
-        statisticsMap.put(TSS_PUTATIVE_ANTISENSE_IN_TOTAL, 0);
-        statisticsMap.put(TSS_PUTATIVE_ANTISENSE_OF_5_PRIME_UTR, 0);
-        statisticsMap.put(TSS_PUTATIVE_ANTISENSE_OF_3_PRIME_UTR, 0);
-        statisticsMap.put(TSS_PUTATIVE_ANTISENSE_INTRAGENIC, 0);
-        statisticsMap.put(TSS_ASSIGNED_TO_STABLE_RNA, 0);
-        statisticsMap.put(MAPPINGS_COUNT, 0.0);
-        statisticsMap.put(AVERAGE_MAPPINGS_LENGTH, 0.0);
-        statisticsMap.put(MAPPINGS_MILLION, 0.0);
-        statisticsMap.put(BACKGROUND_THRESHOLD_MIN_STACKSIZE, 0.0);
-        statisticsMap.put(TSS_NO_PUTATIVE_CDS_SHIFTS, 0);
+        statisticsMap.put( TSS_TOTAL, 0 );
+        statisticsMap.put( TSS_FWD, 0 );
+        statisticsMap.put( TSS_REV, 0 );
+        statisticsMap.put( TSS_LEADERLESS, 0 );
+        statisticsMap.put( TSS_INTRAGENIC_TSS, 0 );
+        statisticsMap.put( TSS_INTERGENIC_TSS, 0 );
+        statisticsMap.put( TSS_PUTATIVE_ANTISENSE_IN_TOTAL, 0 );
+        statisticsMap.put( TSS_PUTATIVE_ANTISENSE_OF_5_PRIME_UTR, 0 );
+        statisticsMap.put( TSS_PUTATIVE_ANTISENSE_OF_3_PRIME_UTR, 0 );
+        statisticsMap.put( TSS_PUTATIVE_ANTISENSE_INTRAGENIC, 0 );
+        statisticsMap.put( TSS_ASSIGNED_TO_STABLE_RNA, 0 );
+        statisticsMap.put( MAPPINGS_COUNT, 0.0 );
+        statisticsMap.put( AVERAGE_MAPPINGS_LENGTH, 0.0 );
+        statisticsMap.put( MAPPINGS_MILLION, 0.0 );
+        statisticsMap.put( BACKGROUND_THRESHOLD_MIN_STACKSIZE, 0.0 );
+        statisticsMap.put( TSS_NO_PUTATIVE_CDS_SHIFTS, 0 );
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
      * regenerated by the Form Editor.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -367,10 +376,10 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
     private void exportButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportButtonActionPerformed
 
-        tssResult.setResults(this.updateTssResults());
+        tssResult.setResults( this.updateTssResults() );
 
         processResultForExport();
-        tssResult.setPromotorRegions(promotorRegions);
+        tssResult.setPromotorRegions( promotorRegions );
         NotificationWhenExportingPanel notification = new NotificationWhenExportingPanel();
         NotifyDescriptor nd = new NotifyDescriptor(
                 notification, // instance of your panel
@@ -381,13 +390,13 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                 //     new Object[] { NotifyDescriptor.YES_OPTION, ... etc. },
                 NotifyDescriptor.OK_CANCEL_OPTION // default option is "Yes"
         );
-        if (DialogDisplayer.getDefault().notify(nd) == NotifyDescriptor.OK_OPTION) {
-            TableExportFileChooser fileChooser = new TableExportFileChooser(TableExportFileChooser.getTableFileExtensions(), this.tssResult);
+        if( DialogDisplayer.getDefault().notify( nd ) == NotifyDescriptor.OK_OPTION ) {
+            TableExportFileChooser fileChooser = new TableExportFileChooser( TableExportFileChooser.getTableFileExtensions(), this.tssResult );
         }
     }//GEN-LAST:event_exportButtonActionPerformed
 
     private void statisticsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statisticsButtonActionPerformed
-        JOptionPane.showMessageDialog(this, new TssDetectionStatsPanel(statisticsMap), "TSS Detection Statistics", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog( this, new TssDetectionStatsPanel( statisticsMap ), "TSS Detection Statistics", JOptionPane.INFORMATION_MESSAGE );
     }//GEN-LAST:event_statisticsButtonActionPerformed
 
     private void tSSTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tSSTableMouseClicked
@@ -395,26 +404,26 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
     }//GEN-LAST:event_tSSTableMouseClicked
 
     private void startChartsOfTssDataActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startChartsOfTssDataActionPerformed
-        @SuppressWarnings("unchecked")
+        @SuppressWarnings( "unchecked" )
         VisualizationWizardIterator visualizationWizardIterator = new VisualizationWizardIterator();
-        WizardDescriptor wiz = new WizardDescriptor(visualizationWizardIterator);
-        visualizationWizardIterator.setWiz(wiz);
+        WizardDescriptor wiz = new WizardDescriptor( visualizationWizardIterator );
+        visualizationWizardIterator.setWiz( wiz );
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
-        wiz.setTitleFormat(new MessageFormat("{0}"));
-        wiz.setTitle("Visualizations");
+        wiz.setTitleFormat( new MessageFormat( "{0}" ) );
+        wiz.setTitle( "Visualizations" );
 
         //action to perform after successfuly finishing the wizard
-        if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
+        if( DialogDisplayer.getDefault().notify( wiz ) == WizardDescriptor.FINISH_OPTION ) {
             final List<TranscriptionStart> currentTss = updateTssResults();
-            vizualizationListener = new VisualizationListener(this.persistantRef, wiz, currentTss, tssResult);
-            vizualizationListener.actionPerformed(new ActionEvent(this, 1, ChartType.WIZARD.toString()));
-            if (vizualizationListener.isAbsoluteFrequencyPlotSelected()) {
-                vizualizationListener.actionPerformed(new ActionEvent(this, 2, ChartType.ABSOLUTE_FREQUENCY_OF_5_PRIME_UTRs.toString()));
+            vizualizationListener = new VisualizationListener( this.persistantRef, wiz, currentTss, tssResult );
+            vizualizationListener.actionPerformed( new ActionEvent( this, 1, ChartType.WIZARD.toString() ) );
+            if( vizualizationListener.isAbsoluteFrequencyPlotSelected() ) {
+                vizualizationListener.actionPerformed( new ActionEvent( this, 2, ChartType.ABSOLUTE_FREQUENCY_OF_5_PRIME_UTRs.toString() ) );
             }
-            if (vizualizationListener.isBaseDistributionPlotSelected()) {
-                vizualizationListener.actionPerformed(new ActionEvent(this, 3, ChartType.BASE_DISTRIBUTION.toString()));
+            if( vizualizationListener.isBaseDistributionPlotSelected() ) {
+                vizualizationListener.actionPerformed( new ActionEvent( this, 3, ChartType.BASE_DISTRIBUTION.toString() ) );
             }
-            this.tssResult.setResults(currentTss);
+            this.tssResult.setResults( currentTss );
         }
     }//GEN-LAST:event_startChartsOfTssDataActionPerformed
 
@@ -424,208 +433,218 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         DefaultTableModel tableModel = (DefaultTableModel) tSSTable.getModel();
         List<Integer> valuesToRemove = new ArrayList<>();
         int columnNo = tSSTable.getRowCount();
-        for (int i = 0; i < columnNo; i++) {
-            Integer posTableAti = (Integer) tSSTable.getValueAt(i, 0);
-            TranscriptionStart ts = tssInHash.get(posTableAti);
-            boolean isFalsePositive = (boolean) tSSTable.getValueAt(i, 10);
-            if (isFalsePositive) {
-                tssInHash.remove(posTableAti);
-                valuesToRemove.add(i);
-                tss.remove(ts);
+        for( int i = 0; i < columnNo; i++ ) {
+            Integer posTableAti = (Integer) tSSTable.getValueAt( i, 0 );
+            TranscriptionStart ts = tssInHash.get( posTableAti );
+            boolean isFalsePositive = (boolean) tSSTable.getValueAt( i, 10 );
+            if( isFalsePositive ) {
+                tssInHash.remove( posTableAti );
+                valuesToRemove.add( i );
+                tss.remove( ts );
             }
         }
 
-        for (int i = valuesToRemove.size() - 1; i >= 0; i--) {
-            Integer x = valuesToRemove.get(i);
-            tableModel.removeRow(x);
+        for( int i = valuesToRemove.size() - 1; i >= 0; i-- ) {
+            Integer x = valuesToRemove.get( i );
+            tableModel.removeRow( x );
         }
 
-        tSSTable.setModel(tableModel);
+        tSSTable.setModel( tableModel );
         tSSTable.updateUI();
-        tssResult.setResults(tss);
+        tssResult.setResults( tss );
 
     }//GEN-LAST:event_performDeletionOfAllFPActionPerformed
 
     private void performPromotorAnalysisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_performPromotorAnalysisActionPerformed
 
         PromotorAnalysisWizardIterator wizard = new PromotorAnalysisWizardIterator();
-        WizardDescriptor wiz = new WizardDescriptor(wizard);
-        wizard.setWiz(wiz);
+        WizardDescriptor wiz = new WizardDescriptor( wizard );
+        wizard.setWiz( wiz );
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
-        wiz.setTitleFormat(new MessageFormat("{0}"));
-        wiz.setTitle(NbBundle.getMessage(ResultPanelTranscriptionStart.class, "TTL_MotifSearchWizardTitle"));
+        wiz.setTitleFormat( new MessageFormat( "{0}" ) );
+        wiz.setTitle( NbBundle.getMessage( ResultPanelTranscriptionStart.class, "TTL_MotifSearchWizardTitle" ) );
 
         //action to perform after successfuly finishing the wizard
-        boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
-        if (!cancelled) {
+        boolean cancelled = DialogDisplayer.getDefault().notify( wiz ) != WizardDescriptor.FINISH_OPTION;
+        if( !cancelled ) {
 
-            boolean takeAllElements = (boolean) wiz.getProperty(ElementsOfInterest.ALL.toString());
-            boolean takeOnlyLeaderless = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_LEADERLESS_TRANSCRIPTS.toString());
-            boolean takeOnlyAntisense = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_ANTISENSE_TSS.toString());
-            boolean takeOnlyRealTss = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_TSS_WITH_UTR_EXCEPT_AS_LEADERLESS.toString());
-            boolean takeOnlySelectedElements = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_SELECTED_FOR_UPSTREAM_ANALYSES.toString());
+            boolean takeAllElements = (boolean) wiz.getProperty( ElementsOfInterest.ALL.toString() );
+            boolean takeOnlyLeaderless = (boolean) wiz.getProperty( ElementsOfInterest.ONLY_LEADERLESS_TRANSCRIPTS.toString() );
+            boolean takeOnlyAntisense = (boolean) wiz.getProperty( ElementsOfInterest.ONLY_ANTISENSE_TSS.toString() );
+            boolean takeOnlyRealTss = (boolean) wiz.getProperty( ElementsOfInterest.ONLY_TSS_WITH_UTR_EXCEPT_AS_LEADERLESS.toString() );
+            boolean takeOnlySelectedElements = (boolean) wiz.getProperty( ElementsOfInterest.ONLY_SELECTED_FOR_UPSTREAM_ANALYSES.toString() );
 
-            if (takeAllElements) {
+            if( takeAllElements ) {
                 this.elements = ElementsOfInterest.ALL;
-            } else if (takeOnlyLeaderless) {
+            }
+            else if( takeOnlyLeaderless ) {
                 this.elements = ElementsOfInterest.ONLY_LEADERLESS_TRANSCRIPTS;
-            } else if (takeOnlyAntisense) {
+            }
+            else if( takeOnlyAntisense ) {
                 this.elements = ElementsOfInterest.ONLY_ANTISENSE_TSS;
-            } else if (takeOnlyRealTss) {
+            }
+            else if( takeOnlyRealTss ) {
                 this.elements = ElementsOfInterest.ONLY_TSS_WITH_UTR_EXCEPT_AS_LEADERLESS;
-            } else if (takeOnlySelectedElements) {
+            }
+            else if( takeOnlySelectedElements ) {
                 this.elements = ElementsOfInterest.ONLY_SELECTED_FOR_UPSTREAM_ANALYSES;
             }
 
-            int minus10MotifWidth = (Integer) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_MINUS10_MOTIF_LENGTH);
-            int minus35MotifWidth = (Integer) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_MINUS35_MOTIF_LENGTH);
-            int noOfTimes = (Integer) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_NUMBER_OF_TRYING);
-            int minSpacer1 = (Integer) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER1_LENGTH);
-            int minSpacer2 = (Integer) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER2_LENGTH);
-            int seqWidthMinus10 = (Integer) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_PUTATIVE_10_REGION);
-            int seqWidthMinus35 = (Integer) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_PUTATIVE_35_REGION);
-            int alternativeSpacer = (Integer) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_ALTERNATIVE_SPACER);
-            final int lengthRelToTss = (Integer) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS);
+            int minus10MotifWidth = (Integer) wiz.getProperty( PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_MINUS10_MOTIF_LENGTH );
+            int minus35MotifWidth = (Integer) wiz.getProperty( PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_MINUS35_MOTIF_LENGTH );
+            int noOfTimes = (Integer) wiz.getProperty( PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_NUMBER_OF_TRYING );
+            int minSpacer1 = (Integer) wiz.getProperty( PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER1_LENGTH );
+            int minSpacer2 = (Integer) wiz.getProperty( PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER2_LENGTH );
+            int seqWidthMinus10 = (Integer) wiz.getProperty( PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_PUTATIVE_10_REGION );
+            int seqWidthMinus35 = (Integer) wiz.getProperty( PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_PUTATIVE_35_REGION );
+            int alternativeSpacer = (Integer) wiz.getProperty( PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_ALTERNATIVE_SPACER );
+            final int lengthRelToTss = (Integer) wiz.getProperty( PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS );
 
             final PromotorSearchParameters params = new PromotorSearchParameters(
                     minus10MotifWidth, minus35MotifWidth,
                     noOfTimes, minSpacer1, minSpacer2, alternativeSpacer,
-                    seqWidthMinus10, seqWidthMinus35, lengthRelToTss);
+                    seqWidthMinus10, seqWidthMinus35, lengthRelToTss );
 
             final List<TranscriptionStart> starts = updateTssResults();
-            this.topComponent = new MultiPurposeTopComponent(PurposeEnum.MOTIF_SEARCH);
-            this.topComponent.setLayout(new BorderLayout());
+            this.topComponent = new MultiPurposeTopComponent( PurposeEnum.MOTIF_SEARCH );
+            this.topComponent.setLayout( new BorderLayout() );
             this.topComponent.open();
             String type = elements.toString().toLowerCase();
-            this.topComponent.setName("Promotor motif search for " + type + " elements in Table");
+            this.topComponent.setName( "Promotor motif search for " + type + " elements in Table" );
 
-            model = new MotifSearchModel(this.persistantRef);
+            model = new MotifSearchModel( this.persistantRef );
             promotorMotifSearchPanel = new MotifSearchPanel();
-            promotorMotifSearchPanel.registerObserver(this);
+            promotorMotifSearchPanel.registerObserver( this );
 
-            Thread promotorSearch = new Thread(new Runnable() {
+            Thread promotorSearch = new Thread( new Runnable() {
                 @Override
                 public void run() {
-                    model.takeUpstreamRegions(elements, starts, lengthRelToTss, false);
-                    boolean success = model.utrPromotorAnalysis(params, starts);
+                    model.takeUpstreamRegions( elements, starts, lengthRelToTss, false );
+                    boolean success = model.utrPromotorAnalysis( params, starts );
 
-                    if (success) {
-                        promotorMotifSearchPanel.setUpstreamRegions(model.getUpstreamRegions());
-                        promotorMotifSearchPanel.setStyledDocumentToRegionOfIntrestMinusTen(model.getRegionOfIntrestMinus10().getStyledDocument());
-                        promotorMotifSearchPanel.setStyledDocumentToRegionOfIntrestMinus35(model.getRegionOfIntrestMinus35().getStyledDocument());
-                        promotorMotifSearchPanel.setMinus10Starts(model.getMinus10MotifStarts());
-                        promotorMotifSearchPanel.setMinus35Starts(model.getMinus35MotifStarts());
-                        promotorMotifSearchPanel.setMinus10Shifts(model.getIdsToMinus10Shifts());
-                        promotorMotifSearchPanel.setMinus35Shifts(model.getIdsToMinus35Shifts());
-                        promotorMotifSearchPanel.setMinus35MotifWidth(params.getMinus35MotifWidth());
-                        promotorMotifSearchPanel.setMinus10MotifWidth(params.getMinusTenMotifWidth());
-                        promotorMotifSearchPanel.setMinus10Input(model.getMinus10Input());
-                        promotorMotifSearchPanel.setMinus35Input(model.getMinus35Input());
-                        promotorMotifSearchPanel.setBioProspOutMinus10(model.getBioProspOutMinus10());
-                        promotorMotifSearchPanel.setBioProspOutMinus35(model.getBioProspOutMinus35());
-                        promotorMotifSearchPanel.setStyledDocToPromotorsFastaPane(model.getColoredPromotorRegions());
-                        promotorMotifSearchPanel.setContributionMinus10Label("Number of contributing/all sequences (-10 motif): "
-                                + (int) model.getContributingCitesForMinus10Motif() + "/" + model.getUpstreamRegions().size() / 2);
-                        promotorMotifSearchPanel.setContributionMinus35Label("Number of contributing/all sequences (-35 motif): "
-                                + (int) model.getContributingCitesForMinus35Motif() + "/" + model.getUpstreamRegions().size() / 2);
+                    if( success ) {
+                        promotorMotifSearchPanel.setUpstreamRegions( model.getUpstreamRegions() );
+                        promotorMotifSearchPanel.setStyledDocumentToRegionOfIntrestMinusTen( model.getRegionOfIntrestMinus10().getStyledDocument() );
+                        promotorMotifSearchPanel.setStyledDocumentToRegionOfIntrestMinus35( model.getRegionOfIntrestMinus35().getStyledDocument() );
+                        promotorMotifSearchPanel.setMinus10Starts( model.getMinus10MotifStarts() );
+                        promotorMotifSearchPanel.setMinus35Starts( model.getMinus35MotifStarts() );
+                        promotorMotifSearchPanel.setMinus10Shifts( model.getIdsToMinus10Shifts() );
+                        promotorMotifSearchPanel.setMinus35Shifts( model.getIdsToMinus35Shifts() );
+                        promotorMotifSearchPanel.setMinus35MotifWidth( params.getMinus35MotifWidth() );
+                        promotorMotifSearchPanel.setMinus10MotifWidth( params.getMinusTenMotifWidth() );
+                        promotorMotifSearchPanel.setMinus10Input( model.getMinus10Input() );
+                        promotorMotifSearchPanel.setMinus35Input( model.getMinus35Input() );
+                        promotorMotifSearchPanel.setBioProspOutMinus10( model.getBioProspOutMinus10() );
+                        promotorMotifSearchPanel.setBioProspOutMinus35( model.getBioProspOutMinus35() );
+                        promotorMotifSearchPanel.setStyledDocToPromotorsFastaPane( model.getColoredPromotorRegions() );
+                        promotorMotifSearchPanel.setContributionMinus10Label( "Number of contributing/all sequences (-10 motif): "
+                                                                              + (int) model.getContributingCitesForMinus10Motif() + "/" + model.getUpstreamRegions().size() / 2 );
+                        promotorMotifSearchPanel.setContributionMinus35Label( "Number of contributing/all sequences (-35 motif): "
+                                                                              + (int) model.getContributingCitesForMinus35Motif() + "/" + model.getUpstreamRegions().size() / 2 );
 
-                        String roundedMean = String.format("%.1f", model.getMeanMinus10SpacerToTSS());
-                        promotorMotifSearchPanel.setMinSpacer1LengthToLabel(roundedMean);
+                        String roundedMean = String.format( "%.1f", model.getMeanMinus10SpacerToTSS() );
+                        promotorMotifSearchPanel.setMinSpacer1LengthToLabel( roundedMean );
 
-                        promotorMotifSearchPanel.setLogoMinus10(new File(model.getLogoMinus10().getAbsolutePath() + ".eps"));
-                        promotorMotifSearchPanel.setMinus10LogoToPanel(model.getMinus10logoLabel());
+                        promotorMotifSearchPanel.setLogoMinus10( new File( model.getLogoMinus10().getAbsolutePath() + ".eps" ) );
+                        promotorMotifSearchPanel.setMinus10LogoToPanel( model.getMinus10logoLabel() );
 
-                        roundedMean = String.format("%.1f", model.getMeanMinus35SpacerToMinus10());
-                        promotorMotifSearchPanel.setMinSpacer2LengthToLabel(roundedMean);
+                        roundedMean = String.format( "%.1f", model.getMeanMinus35SpacerToMinus10() );
+                        promotorMotifSearchPanel.setMinSpacer2LengthToLabel( roundedMean );
 
-                        promotorMotifSearchPanel.setLogoMinus35(new File(model.getLogoMinus35().getAbsolutePath() + ".eps"));
-                        promotorMotifSearchPanel.setMinus35LogoToPanel(model.getMinus35LogoLabel());
+                        promotorMotifSearchPanel.setLogoMinus35( new File( model.getLogoMinus35().getAbsolutePath() + ".eps" ) );
+                        promotorMotifSearchPanel.setMinus35LogoToPanel( model.getMinus35LogoLabel() );
 
-                        promotorMotifSearchPanel.setInfo(model.getInfo());
+                        promotorMotifSearchPanel.setInfo( model.getInfo() );
 
-                        topComponent.add(promotorMotifSearchPanel, BorderLayout.CENTER);
+                        topComponent.add( promotorMotifSearchPanel, BorderLayout.CENTER );
                         topComponent.updateUI();
-                    } else {
-                        promotorMotifSearchPanel.setMinus10Input(model.getMinus10Input());
-                        promotorMotifSearchPanel.setMinus35Input(model.getMinus35Input());
-                        promotorMotifSearchPanel.setBioProspOutMinus10(model.getBioProspOutMinus10());
-                        promotorMotifSearchPanel.setBioProspOutMinus35(model.getBioProspOutMinus35());
-                        promotorMotifSearchPanel.setLogoMinus10(model.getLogoMinus10());
-                        promotorMotifSearchPanel.setLogoMinus35(model.getLogoMinus35());
-                        promotorMotifSearchPanel.setInfo(model.getInfo());
-                        topComponent.add(promotorMotifSearchPanel, BorderLayout.CENTER);
+                    }
+                    else {
+                        promotorMotifSearchPanel.setMinus10Input( model.getMinus10Input() );
+                        promotorMotifSearchPanel.setMinus35Input( model.getMinus35Input() );
+                        promotorMotifSearchPanel.setBioProspOutMinus10( model.getBioProspOutMinus10() );
+                        promotorMotifSearchPanel.setBioProspOutMinus35( model.getBioProspOutMinus35() );
+                        promotorMotifSearchPanel.setLogoMinus10( model.getLogoMinus10() );
+                        promotorMotifSearchPanel.setLogoMinus35( model.getLogoMinus35() );
+                        promotorMotifSearchPanel.setInfo( model.getInfo() );
+                        topComponent.add( promotorMotifSearchPanel, BorderLayout.CENTER );
                     }
                 }
-            });
+
+
+            } );
             promotorSearch.start();
 
-            this.tssResult.setResults(starts);
+            this.tssResult.setResults( starts );
         }
     }//GEN-LAST:event_performPromotorAnalysisActionPerformed
 
     private void performRbsAnalysisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_performRbsAnalysisActionPerformed
         final List<TranscriptionStart> currentTss = updateTssResults();
         RbsAnalysisWizardIterator wizard = new RbsAnalysisWizardIterator();
-        WizardDescriptor wiz = new WizardDescriptor(wizard);
-        wizard.setWiz(wiz);
+        WizardDescriptor wiz = new WizardDescriptor( wizard );
+        wizard.setWiz( wiz );
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
-        wiz.setTitleFormat(new MessageFormat("{0}"));
-        wiz.setTitle(NbBundle.getMessage(ResultPanelTranscriptionStart.class, "TTL_MotifSearchWizardTitle"));
+        wiz.setTitleFormat( new MessageFormat( "{0}" ) );
+        wiz.setTitle( NbBundle.getMessage( ResultPanelTranscriptionStart.class, "TTL_MotifSearchWizardTitle" ) );
 
         //action to perform after successfuly finishing the wizard
-        boolean cancelled = DialogDisplayer.getDefault().notify(wiz) != WizardDescriptor.FINISH_OPTION;
-        if (!cancelled) {
+        boolean cancelled = DialogDisplayer.getDefault().notify( wiz ) != WizardDescriptor.FINISH_OPTION;
+        if( !cancelled ) {
 
-            final int lengthRelToTls = (int) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS);
-            int motifWidth = (int) wiz.getProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_LENGTH_MOTIFWIDTH);
-            int noOfTrying = (int) wiz.getProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_NO_TRYING_BIOPROSPECTOR);
-            int minSpacer = (int) wiz.getProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_MIN_SPACER);
+            final int lengthRelToTls = (int) wiz.getProperty( PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS );
+            int motifWidth = (int) wiz.getProperty( RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_LENGTH_MOTIFWIDTH );
+            int noOfTrying = (int) wiz.getProperty( RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_NO_TRYING_BIOPROSPECTOR );
+            int minSpacer = (int) wiz.getProperty( RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_MIN_SPACER );
 
-            final RbsAnalysisParameters params = new RbsAnalysisParameters(lengthRelToTls, motifWidth, noOfTrying, minSpacer);
+            final RbsAnalysisParameters params = new RbsAnalysisParameters( lengthRelToTls, motifWidth, noOfTrying, minSpacer );
 
-            topComponent = new MultiPurposeTopComponent(PurposeEnum.MOTIF_SEARCH);
-            topComponent.setLayout(new BorderLayout());
+            topComponent = new MultiPurposeTopComponent( PurposeEnum.MOTIF_SEARCH );
+            topComponent.setLayout( new BorderLayout() );
             topComponent.open();
-            topComponent.setName("RBS motif search");
+            topComponent.setName( "RBS motif search" );
 
-            model = new MotifSearchModel(this.persistantRef);
+            model = new MotifSearchModel( this.persistantRef );
             rbsMotifSearchPanel = new RbsMotifSearchPanel();
-            rbsMotifSearchPanel.registerObserver(this);
+            rbsMotifSearchPanel.registerObserver( this );
 
-            Thread promotorSearch = new Thread(new Runnable() {
+            Thread promotorSearch = new Thread( new Runnable() {
                 @Override
                 public void run() {
-                    model.takeUpstreamRegions(ElementsOfInterest.ELEMENTS_FOR_RBS_ANALYSIS, currentTss, lengthRelToTls, true);
-                    boolean returnValue = model.rbsMotifAnalysis(params, currentTss, null);
-                    if (returnValue) {
-                        rbsMotifSearchPanel.setUpstreamRegions(model.getUpstreamRegions());
-                        rbsMotifSearchPanel.setRbsShifts(model.getContributedSequencesWithShift());
-                        rbsMotifSearchPanel.setRbsStarts(model.getRbsStarts());
-                        rbsMotifSearchPanel.setBioProspInput(model.getRbsBioProspectorInput());
-                        rbsMotifSearchPanel.setBioProspOut(model.getRbsBioProsFirstHit());
-                        rbsMotifSearchPanel.setContributedSequencesToMotif("" + (int) model.getContributingCitesForRbsMotif() + "/" + model.getUpstreamRegions().size() / 2);
-                        rbsMotifSearchPanel.setRegionsToAnalyzeToPane(model.getRegionsRelToTLSTextPane().getStyledDocument());
-                        rbsMotifSearchPanel.setRegionOfIntrestToPane(model.getRegionsForMotifSearch().getStyledDocument());
-                        String roundedMean = String.format("%.1f", model.getMeanSpacerLengthOfRBSMotif());
-                        rbsMotifSearchPanel.setParams(params);
-                        rbsMotifSearchPanel.setRegionLengthForBioProspector(params.getSeqLengthToAnalyze());
-                        rbsMotifSearchPanel.setMotifWidth(params.getMotifWidth());
-                        rbsMotifSearchPanel.setMeanSpacerLength(roundedMean);
-                        rbsMotifSearchPanel.setSequenceLogo(new File(model.getLogoRbs().getAbsolutePath() + ".eps"));
-                        rbsMotifSearchPanel.setLogo(model.getRbsLogoLabel());
-                        rbsMotifSearchPanel.setInfo(model.getInfo());
-                        topComponent.add(rbsMotifSearchPanel, BorderLayout.CENTER);
-                    } else {
-                        rbsMotifSearchPanel.setBioProspInput(model.getRbsBioProspectorInput());
-                        rbsMotifSearchPanel.setBioProspOut(model.getRbsBioProsFirstHit());
-                        rbsMotifSearchPanel.setSequenceLogo(model.getLogoRbs());
-                        rbsMotifSearchPanel.setInfo(model.getInfo());
-                        topComponent.add(rbsMotifSearchPanel, BorderLayout.CENTER);
+                    model.takeUpstreamRegions( ElementsOfInterest.ELEMENTS_FOR_RBS_ANALYSIS, currentTss, lengthRelToTls, true );
+                    boolean returnValue = model.rbsMotifAnalysis( params, currentTss, null );
+                    if( returnValue ) {
+                        rbsMotifSearchPanel.setUpstreamRegions( model.getUpstreamRegions() );
+                        rbsMotifSearchPanel.setRbsShifts( model.getContributedSequencesWithShift() );
+                        rbsMotifSearchPanel.setRbsStarts( model.getRbsStarts() );
+                        rbsMotifSearchPanel.setBioProspInput( model.getRbsBioProspectorInput() );
+                        rbsMotifSearchPanel.setBioProspOut( model.getRbsBioProsFirstHit() );
+                        rbsMotifSearchPanel.setContributedSequencesToMotif( "" + (int) model.getContributingCitesForRbsMotif() + "/" + model.getUpstreamRegions().size() / 2 );
+                        rbsMotifSearchPanel.setRegionsToAnalyzeToPane( model.getRegionsRelToTLSTextPane().getStyledDocument() );
+                        rbsMotifSearchPanel.setRegionOfIntrestToPane( model.getRegionsForMotifSearch().getStyledDocument() );
+                        String roundedMean = String.format( "%.1f", model.getMeanSpacerLengthOfRBSMotif() );
+                        rbsMotifSearchPanel.setParams( params );
+                        rbsMotifSearchPanel.setRegionLengthForBioProspector( params.getSeqLengthToAnalyze() );
+                        rbsMotifSearchPanel.setMotifWidth( params.getMotifWidth() );
+                        rbsMotifSearchPanel.setMeanSpacerLength( roundedMean );
+                        rbsMotifSearchPanel.setSequenceLogo( new File( model.getLogoRbs().getAbsolutePath() + ".eps" ) );
+                        rbsMotifSearchPanel.setLogo( model.getRbsLogoLabel() );
+                        rbsMotifSearchPanel.setInfo( model.getInfo() );
+                        topComponent.add( rbsMotifSearchPanel, BorderLayout.CENTER );
+                    }
+                    else {
+                        rbsMotifSearchPanel.setBioProspInput( model.getRbsBioProspectorInput() );
+                        rbsMotifSearchPanel.setBioProspOut( model.getRbsBioProsFirstHit() );
+                        rbsMotifSearchPanel.setSequenceLogo( model.getLogoRbs() );
+                        rbsMotifSearchPanel.setInfo( model.getInfo() );
+                        topComponent.add( rbsMotifSearchPanel, BorderLayout.CENTER );
                     }
                 }
-            });
+
+
+            } );
             promotorSearch.start();
-            this.tssResult.setResults(currentTss);
+            this.tssResult.setResults( currentTss );
         }
     }//GEN-LAST:event_performRbsAnalysisActionPerformed
 
@@ -633,165 +652,168 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
         final String wizardName = "Sequin Feature Table Export";
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
-        panels.add(new SequinTableSettingsWizardPanel(wizardName));
+        panels.add( new SequinTableSettingsWizardPanel( wizardName ) );
 //        DataSelectionWizardPanel selection = new DataSelectionWizardPanel(PurposeEnum.CHARTS);
 //        panels.add(selection);
         String[] steps = new String[panels.size()];
-        for (int i = 0; i < panels.size(); i++) {
-            Component c = panels.get(i).getComponent();
+        for( int i = 0; i < panels.size(); i++ ) {
+            Component c = panels.get( i ).getComponent();
             // Default step name to component name of panel.
             steps[i] = c.getName();
-            if (c instanceof JComponent) { // assume Swing components
+            if( c instanceof JComponent ) { // assume Swing components
                 JComponent jc = (JComponent) c;
-                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, i);
-                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DATA, steps);
-                jc.putClientProperty(WizardDescriptor.PROP_AUTO_WIZARD_STYLE, true);
-                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DISPLAYED, true);
-                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_NUMBERED, true);
+                jc.putClientProperty( WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, i );
+                jc.putClientProperty( WizardDescriptor.PROP_CONTENT_DATA, steps );
+                jc.putClientProperty( WizardDescriptor.PROP_AUTO_WIZARD_STYLE, true );
+                jc.putClientProperty( WizardDescriptor.PROP_CONTENT_DISPLAYED, true );
+                jc.putClientProperty( WizardDescriptor.PROP_CONTENT_NUMBERED, true );
             }
         }
-        WizardDescriptor wiz = new WizardDescriptor(new WizardDescriptor.ArrayIterator<>(panels));
+        WizardDescriptor wiz = new WizardDescriptor( new WizardDescriptor.ArrayIterator<>( panels ) );
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
-        wiz.setTitleFormat(new MessageFormat("{0}"));
-        wiz.setTitle("Export of a feature annotation table");
-        if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
+        wiz.setTitleFormat( new MessageFormat( "{0}" ) );
+        wiz.setTitle( "Export of a feature annotation table" );
+        if( DialogDisplayer.getDefault().notify( wiz ) == WizardDescriptor.FINISH_OPTION ) {
 
-            progresshandle = ProgressHandleFactory.createHandle("Export of feature annotation table");
+            progresshandle = ProgressHandleFactory.createHandle( "Export of feature annotation table" );
             final ArrayList<TranscriptionStart> tss = (ArrayList<TranscriptionStart>) this.updateTssResults();
-            tssResult.setResults(tss);
+            tssResult.setResults( tss );
 
-            final String featureName = (String) wiz.getProperty(SequinTableSettingsWizardPanel.SEQUIN_EXPORT_FEATURE_NAME);
+            final String featureName = (String) wiz.getProperty( SequinTableSettingsWizardPanel.SEQUIN_EXPORT_FEATURE_NAME );
 
-            final boolean isParsingLocusTagSelected = (boolean) wiz.getProperty(SequinTableSettingsWizardPanel.SEQUIN_EXPORT_PARSING_LOCUS_TAG);
+            final boolean isParsingLocusTagSelected = (boolean) wiz.getProperty( SequinTableSettingsWizardPanel.SEQUIN_EXPORT_PARSING_LOCUS_TAG );
 
-            if (isParsingLocusTagSelected) {
-                separator = (String) wiz.getProperty(SequinTableSettingsWizardPanel.SEQUIN_EXPORT_SEPARATOR);
-                prefixLength = (Integer) wiz.getProperty(SequinTableSettingsWizardPanel.SEQUIN_EXPORT_STRAIN_LENGTH);
+            if( isParsingLocusTagSelected ) {
+                separator = (String) wiz.getProperty( SequinTableSettingsWizardPanel.SEQUIN_EXPORT_SEPARATOR );
+                prefixLength = (Integer) wiz.getProperty( SequinTableSettingsWizardPanel.SEQUIN_EXPORT_STRAIN_LENGTH );
             }
 
-            ReadXplorerFileChooser fileChooser = new ReadXplorerFileChooser(new String[]{"tbl"}, "Table files for Sequin export") {
+            ReadXplorerFileChooser fileChooser = new ReadXplorerFileChooser( new String[]{ "tbl" }, "Table files for Sequin export" ) {
                 @Override
-                public void save(String fileLocation) {
-                    progresshandle.start(5);
-                    SequinTableFormatExporter exporter = new SequinTableFormatExporter(new File(fileLocation), (ArrayList<TranscriptionStart>) tss, null, null, tableType, featureName, separator, prefixLength, isParsingLocusTagSelected); //To change body of generated methods, choose Tools | Templates.
-                    progresshandle.progress(1);
+                public void save( String fileLocation ) {
+                    progresshandle.start( 5 );
+                    SequinTableFormatExporter exporter = new SequinTableFormatExporter( new File( fileLocation ), (ArrayList<TranscriptionStart>) tss, null, null, tableType, featureName, separator, prefixLength, isParsingLocusTagSelected ); //To change body of generated methods, choose Tools | Templates.
+                    progresshandle.progress( 1 );
                     exporter.start();
-                    progresshandle.progress(2);
-                    progresshandle.progress(3);
-                    progresshandle.progress(5);
+                    progresshandle.progress( 2 );
+                    progresshandle.progress( 3 );
+                    progresshandle.progress( 5 );
 
-                    JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successful!",
-                            "Export was successful!", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), "Export was successful!",
+                                                   "Export was successful!", JOptionPane.INFORMATION_MESSAGE );
                     progresshandle.finish();
                 }
 
+
                 @Override
-                public void open(String fileLocation) {
-                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+                public void open( String fileLocation ) {
+                    throw new UnsupportedOperationException( "Not supported yet." ); //To change body of generated methods, choose Tools | Templates.
                 }
+
+
             };
 
-            fileChooser.openFileChooser(ReadXplorerFileChooser.SAVE_DIALOG);
+            fileChooser.openFileChooser( ReadXplorerFileChooser.SAVE_DIALOG );
         }
     }//GEN-LAST:event_sequinTableExporterActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // filter the table in sub-tables
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
-        panels.add(new FilterWizardPanel("Filtration"));
+        panels.add( new FilterWizardPanel( "Filtration" ) );
         String[] steps = new String[panels.size()];
-        for (int i = 0; i < panels.size(); i++) {
-            Component c = panels.get(i).getComponent();
+        for( int i = 0; i < panels.size(); i++ ) {
+            Component c = panels.get( i ).getComponent();
             // Default step name to component name of panel.
             steps[i] = c.getName();
-            if (c instanceof JComponent) { // assume Swing components
+            if( c instanceof JComponent ) { // assume Swing components
                 JComponent jc = (JComponent) c;
-                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, i);
-                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DATA, steps);
-                jc.putClientProperty(WizardDescriptor.PROP_AUTO_WIZARD_STYLE, true);
-                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DISPLAYED, true);
-                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_NUMBERED, true);
+                jc.putClientProperty( WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, i );
+                jc.putClientProperty( WizardDescriptor.PROP_CONTENT_DATA, steps );
+                jc.putClientProperty( WizardDescriptor.PROP_AUTO_WIZARD_STYLE, true );
+                jc.putClientProperty( WizardDescriptor.PROP_CONTENT_DISPLAYED, true );
+                jc.putClientProperty( WizardDescriptor.PROP_CONTENT_NUMBERED, true );
             }
         }
-        WizardDescriptor wiz = new WizardDescriptor(new WizardDescriptor.ArrayIterator<>(panels));
+        WizardDescriptor wiz = new WizardDescriptor( new WizardDescriptor.ArrayIterator<>( panels ) );
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
-        wiz.setTitleFormat(new MessageFormat("{0}"));
-        wiz.setTitle("Select filter types");
-        if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
+        wiz.setTitleFormat( new MessageFormat( "{0}" ) );
+        wiz.setTitle( "Select filter types" );
+        if( DialogDisplayer.getDefault().notify( wiz ) == WizardDescriptor.FINISH_OPTION ) {
             List<TranscriptionStart> tss = this.updateTssResults();
-            tssResult.setResults(tss);
+            tssResult.setResults( tss );
 
-            boolean filterForMultipleTSS = (boolean) wiz.getProperty(FilterWizardPanel.PROP_FILTER_FOR_MULTIPLE_TSS);
-            boolean filterForGivenReadStartRange = (boolean) wiz.getProperty(FilterWizardPanel.PROP_FILTER_FOR_READSTARTS);
-            int readstartsLimit = (int) wiz.getProperty(FilterWizardPanel.PROP_FILTER_READSTARTS);
-            boolean filterForSingleTSS = (boolean) wiz.getProperty(FilterWizardPanel.PROP_FILTER_FOR_SINGLE_TSS);
-            boolean folterOnlyLeaderless = (boolean) wiz.getProperty(FilterWizardPanel.PROP_FILTER_ONLY_LEADERLESS);
-            boolean filterOnlyAntisense = (boolean) wiz.getProperty(FilterWizardPanel.PROP_FILTER_ONLY_ANTISENSE);
-            boolean filterOnlyTaggedAsFinish = (boolean) wiz.getProperty(FilterWizardPanel.PROP_FILTER_ONLY_TAGGED_AS_FINISH);
-            boolean filterOnlyForIntragenic = (boolean) wiz.getProperty(FilterWizardPanel.PROP_FILTER_ONLY_INTRAGENIC);
-            boolean filterOnlyForItergenic = (boolean) wiz.getProperty(FilterWizardPanel.PROP_FILTER_ONLY_INTERGENIC);
-            boolean filterOnlyTaggedForUpstreamAnalysis = (boolean) wiz.getProperty(FilterWizardPanel.PROP_FILTER_ONLY_TAGGED_FOR_UPSTREAM_ANALYSIS);
-            boolean filterOnlyForFalsePositeves = (boolean) wiz.getProperty(FilterWizardPanel.PROP_FILTER_FALSE_POSITIVE);
+            boolean filterForMultipleTSS = (boolean) wiz.getProperty( FilterWizardPanel.PROP_FILTER_FOR_MULTIPLE_TSS );
+            boolean filterForGivenReadStartRange = (boolean) wiz.getProperty( FilterWizardPanel.PROP_FILTER_FOR_READSTARTS );
+            int readstartsLimit = (int) wiz.getProperty( FilterWizardPanel.PROP_FILTER_READSTARTS );
+            boolean filterForSingleTSS = (boolean) wiz.getProperty( FilterWizardPanel.PROP_FILTER_FOR_SINGLE_TSS );
+            boolean folterOnlyLeaderless = (boolean) wiz.getProperty( FilterWizardPanel.PROP_FILTER_ONLY_LEADERLESS );
+            boolean filterOnlyAntisense = (boolean) wiz.getProperty( FilterWizardPanel.PROP_FILTER_ONLY_ANTISENSE );
+            boolean filterOnlyTaggedAsFinish = (boolean) wiz.getProperty( FilterWizardPanel.PROP_FILTER_ONLY_TAGGED_AS_FINISH );
+            boolean filterOnlyForIntragenic = (boolean) wiz.getProperty( FilterWizardPanel.PROP_FILTER_ONLY_INTRAGENIC );
+            boolean filterOnlyForItergenic = (boolean) wiz.getProperty( FilterWizardPanel.PROP_FILTER_ONLY_INTERGENIC );
+            boolean filterOnlyTaggedForUpstreamAnalysis = (boolean) wiz.getProperty( FilterWizardPanel.PROP_FILTER_ONLY_TAGGED_FOR_UPSTREAM_ANALYSIS );
+            boolean filterOnlyForFalsePositeves = (boolean) wiz.getProperty( FilterWizardPanel.PROP_FILTER_FALSE_POSITIVE );
 
-            boolean filterForIntragenicAntisense = (boolean) wiz.getProperty(FilterWizardPanel.PROP_FILTER_INTRAGENIC_ANTISENSE);
-            boolean filterForFivePrimeUtrAntisense = (boolean) wiz.getProperty(FilterWizardPanel.PROP_FILTER_FIVE_PRIME_UTR_ANTISENSE);
-            boolean filterForThreePrimeUtrAntisense = (boolean) wiz.getProperty(FilterWizardPanel.PROP_FILTER_THREE_PRIME_UTR_ANTISENSE);
-            boolean filterForStableRna = (boolean) wiz.getProperty(FilterWizardPanel.PROP_FILTER_STABLE_RNA);
-            boolean filterForNonStableRnaElements = (boolean) wiz.getProperty(FilterWizardPanel.PROP_FILTER_ALL_NON_STABLE_RNA);
+            boolean filterForIntragenicAntisense = (boolean) wiz.getProperty( FilterWizardPanel.PROP_FILTER_INTRAGENIC_ANTISENSE );
+            boolean filterForFivePrimeUtrAntisense = (boolean) wiz.getProperty( FilterWizardPanel.PROP_FILTER_FIVE_PRIME_UTR_ANTISENSE );
+            boolean filterForThreePrimeUtrAntisense = (boolean) wiz.getProperty( FilterWizardPanel.PROP_FILTER_THREE_PRIME_UTR_ANTISENSE );
+            boolean filterForStableRna = (boolean) wiz.getProperty( FilterWizardPanel.PROP_FILTER_STABLE_RNA );
+            boolean filterForNonStableRnaElements = (boolean) wiz.getProperty( FilterWizardPanel.PROP_FILTER_ALL_NON_STABLE_RNA );
 
             FilterTSS filter = new FilterTSS();
 
-            if (filterForStableRna) {
-                generateFilteredTable(filter, FilterType.STABLE_RNA, "Detected TSS assigned to stable RNA for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit);
+            if( filterForStableRna ) {
+                generateFilteredTable( filter, FilterType.STABLE_RNA, "Detected TSS assigned to stable RNA for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit );
             }
-            if (filterForThreePrimeUtrAntisense) {
-                generateFilteredTable(filter, FilterType.THREE_PRIME_ANTISENSE, "Detected 3'-UTR antisense TSS for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit);
+            if( filterForThreePrimeUtrAntisense ) {
+                generateFilteredTable( filter, FilterType.THREE_PRIME_ANTISENSE, "Detected 3'-UTR antisense TSS for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit );
             }
-            if (filterForFivePrimeUtrAntisense) {
-                generateFilteredTable(filter, FilterType.FIVE_PRIME_ANTISENSE, "Detected 5'-UTR antisense TSS for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit);
+            if( filterForFivePrimeUtrAntisense ) {
+                generateFilteredTable( filter, FilterType.FIVE_PRIME_ANTISENSE, "Detected 5'-UTR antisense TSS for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit );
             }
-            if (filterForIntragenicAntisense) {
-                generateFilteredTable(filter, FilterType.INTRAGENIC_ANTISENSE, "Detected intragenic antisense TSS for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit);
+            if( filterForIntragenicAntisense ) {
+                generateFilteredTable( filter, FilterType.INTRAGENIC_ANTISENSE, "Detected intragenic antisense TSS for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit );
             }
-            if (filterForGivenReadStartRange) {
-                generateFilteredTable(filter, FilterType.READSTARTS, "Detected TSS with at least " + readstartsLimit + " for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit);
+            if( filterForGivenReadStartRange ) {
+                generateFilteredTable( filter, FilterType.READSTARTS, "Detected TSS with at least " + readstartsLimit + " for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit );
             }
-            if (filterForMultipleTSS) {
-                generateFilteredTable(filter, FilterType.MULTIPLE, "Detected multiple TSSs for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit);
+            if( filterForMultipleTSS ) {
+                generateFilteredTable( filter, FilterType.MULTIPLE, "Detected multiple TSSs for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit );
             }
-            if (filterForSingleTSS) {
-                generateFilteredTable(filter, FilterType.SINGLE, "Detected single TSSs for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit);
-            }
-
-            if (filterOnlyAntisense) {
-                generateFilteredTable(filter, FilterType.ONLY_ANTISENSE, "Detected antisense TSSs for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit);
+            if( filterForSingleTSS ) {
+                generateFilteredTable( filter, FilterType.SINGLE, "Detected single TSSs for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit );
             }
 
-            if (filterOnlyForIntragenic) {
-                generateFilteredTable(filter, FilterType.ONLY_INTRAGENIC, "Detected intragenic TSSs for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit);
+            if( filterOnlyAntisense ) {
+                generateFilteredTable( filter, FilterType.ONLY_ANTISENSE, "Detected antisense TSSs for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit );
             }
 
-            if (filterOnlyForItergenic) {
-                generateFilteredTable(filter, FilterType.ONLY_INTERGENIC, "Detected intergenic TSSs for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit);
+            if( filterOnlyForIntragenic ) {
+                generateFilteredTable( filter, FilterType.ONLY_INTRAGENIC, "Detected intragenic TSSs for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit );
             }
 
-            if (filterOnlyTaggedAsFinish) {
-                generateFilteredTable(filter, FilterType.FINISHED_TAGGED, "Detected TSSs, which are tagged as finish, for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit);
+            if( filterOnlyForItergenic ) {
+                generateFilteredTable( filter, FilterType.ONLY_INTERGENIC, "Detected intergenic TSSs for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit );
             }
 
-            if (filterOnlyTaggedForUpstreamAnalysis) {
-                generateFilteredTable(filter, FilterType.UPSTREMA_ANALYSIS_TAGGED, "Detected TSSs, which are tagged for upstream analysis, for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit);
+            if( filterOnlyTaggedAsFinish ) {
+                generateFilteredTable( filter, FilterType.FINISHED_TAGGED, "Detected TSSs, which are tagged as finish, for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit );
             }
 
-            if (folterOnlyLeaderless) {
-                generateFilteredTable(filter, FilterType.ONLY_LEADERLESS, "Detected leaderless TSSs for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit);
+            if( filterOnlyTaggedForUpstreamAnalysis ) {
+                generateFilteredTable( filter, FilterType.UPSTREMA_ANALYSIS_TAGGED, "Detected TSSs, which are tagged for upstream analysis, for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit );
             }
 
-            if (filterOnlyForFalsePositeves) {
-                generateFilteredTable(filter, FilterType.ONLY_FALSE_POSITIVES, "Detected, but tagged as false positive TSSs for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit);
+            if( folterOnlyLeaderless ) {
+                generateFilteredTable( filter, FilterType.ONLY_LEADERLESS, "Detected leaderless TSSs for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit );
             }
-            if (filterForNonStableRnaElements) {
-                generateFilteredTable(filter, FilterType.ONLY_NON_STABLE_RNA, "Detected assigned to non stable (r/tRNA) Features ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit);
+
+            if( filterOnlyForFalsePositeves ) {
+                generateFilteredTable( filter, FilterType.ONLY_FALSE_POSITIVES, "Detected, but tagged as false positive TSSs for ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit );
+            }
+            if( filterForNonStableRnaElements ) {
+                generateFilteredTable( filter, FilterType.ONLY_NON_STABLE_RNA, "Detected assigned to non stable (r/tRNA) Features ", tss, (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters(), readstartsLimit );
             }
 
         }
@@ -799,57 +821,60 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // refresh list of TSS
-        this.progresshandle = ProgressHandleFactory.createHandle("Export Reference File");
-        ReadXplorerFileChooser fileChooser = new ReadXplorerFileChooser(new String[]{"txt"}, "Text file") {
+        this.progresshandle = ProgressHandleFactory.createHandle( "Export Reference File" );
+        ReadXplorerFileChooser fileChooser = new ReadXplorerFileChooser( new String[]{ "txt" }, "Text file" ) {
             @Override
-            public void save(String fileLocation) {
-                progresshandle.start(3);
+            public void save( String fileLocation ) {
+                progresshandle.start( 3 );
 
                 // update tss list
                 final List<TranscriptionStart> currentTss = updateTssResults();
                 Map<String, String[]> referenceEntries = new TreeMap<>();
-                progresshandle.progress(1);
+                progresshandle.progress( 1 );
 
-                for (TranscriptionStart transcriptionStart : currentTss) {
+                for( TranscriptionStart transcriptionStart : currentTss ) {
                     PersistentFeature feature = transcriptionStart.getAssignedFeature();
 
-                    if (feature != null) {
-                        if (transcriptionStart.getOffset() == 0 && transcriptionStart.getDist2start() > 0) {
+                    if( feature != null ) {
+                        if( transcriptionStart.getOffset() == 0 && transcriptionStart.getDist2start() > 0 ) {
                             continue;
                         }
                         String locus = feature.getLocus();
-                        if (referenceEntries.containsKey(locus)) {
+                        if( referenceEntries.containsKey( locus ) ) {
                             Integer start = transcriptionStart.getStartPosition();
-                            if (feature.isFwdStrand()) {
+                            if( feature.isFwdStrand() ) {
                                 Integer stop = feature.getStop();
 
-                                if (Integer.valueOf(referenceEntries.get(locus)[0]) > start) {
-                                    referenceEntries.get(locus)[0] = "" + (start - 1);
+                                if( Integer.valueOf( referenceEntries.get( locus )[0] ) > start ) {
+                                    referenceEntries.get( locus )[0] = "" + (start - 1);
                                 }
-                                if (Integer.valueOf(referenceEntries.get(locus)[1]) < stop) {
-                                    referenceEntries.get(locus)[1] = "" + (stop + 1);
-                                }
-                            } else {
-                                Integer stop = feature.getStart();
-                                if (Integer.valueOf(referenceEntries.get(locus)[0]) < start) {
-                                    referenceEntries.get(locus)[0] = "" + (start + 1);
-                                }
-                                if (Integer.valueOf(referenceEntries.get(locus)[1]) > stop) {
-                                    referenceEntries.get(locus)[1] = "" + (stop - 1);
+                                if( Integer.valueOf( referenceEntries.get( locus )[1] ) < stop ) {
+                                    referenceEntries.get( locus )[1] = "" + (stop + 1);
                                 }
                             }
-                            referenceEntries.get(locus)[2] = referenceEntries.get(locus)[2].concat("-" + transcriptionStart.getStartPosition());
-                            referenceEntries.get(locus)[3] = referenceEntries.get(locus)[3].concat("-" + transcriptionStart.getOffsetToAssignedFeature());
-                            referenceEntries.get(locus)[4] = referenceEntries.get(locus)[4].concat("-" + transcriptionStart.getStartRbsMotif() + ";" + transcriptionStart.getRbsMotifWidth());
-                            referenceEntries.get(locus)[5] = referenceEntries.get(locus)[5].concat("-" + transcriptionStart.getStartMinus10Motif() + ";" + transcriptionStart.getMinus10MotifWidth());
-                            referenceEntries.get(locus)[6] = referenceEntries.get(locus)[6].concat("-" + transcriptionStart.getStartMinus35Motif() + ";" + transcriptionStart.getMinus35MotifWidth());
-                        } else {
+                            else {
+                                Integer stop = feature.getStart();
+                                if( Integer.valueOf( referenceEntries.get( locus )[0] ) < start ) {
+                                    referenceEntries.get( locus )[0] = "" + (start + 1);
+                                }
+                                if( Integer.valueOf( referenceEntries.get( locus )[1] ) > stop ) {
+                                    referenceEntries.get( locus )[1] = "" + (stop - 1);
+                                }
+                            }
+                            referenceEntries.get( locus )[2] = referenceEntries.get( locus )[2].concat( "-" + transcriptionStart.getStartPosition() );
+                            referenceEntries.get( locus )[3] = referenceEntries.get( locus )[3].concat( "-" + transcriptionStart.getOffsetToAssignedFeature() );
+                            referenceEntries.get( locus )[4] = referenceEntries.get( locus )[4].concat( "-" + transcriptionStart.getStartRbsMotif() + ";" + transcriptionStart.getRbsMotifWidth() );
+                            referenceEntries.get( locus )[5] = referenceEntries.get( locus )[5].concat( "-" + transcriptionStart.getStartMinus10Motif() + ";" + transcriptionStart.getMinus10MotifWidth() );
+                            referenceEntries.get( locus )[6] = referenceEntries.get( locus )[6].concat( "-" + transcriptionStart.getStartMinus35Motif() + ";" + transcriptionStart.getMinus35MotifWidth() );
+                        }
+                        else {
                             Integer start = transcriptionStart.getStartPosition();
                             String[] array = new String[7];
                             array[0] = "" + start;
-                            if (feature.isFwdStrand()) {
+                            if( feature.isFwdStrand() ) {
                                 array[1] = "" + feature.getStop();
-                            } else {
+                            }
+                            else {
                                 array[1] = "" + feature.getStart();
                             }
                             array[2] = "" + transcriptionStart.getStartPosition();
@@ -857,60 +882,64 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                             array[4] = "" + transcriptionStart.getStartRbsMotif() + ";" + transcriptionStart.getRbsMotifWidth();
                             array[5] = "" + transcriptionStart.getStartMinus10Motif() + ";" + transcriptionStart.getMinus10MotifWidth();
                             array[6] = "" + transcriptionStart.getStartMinus35Motif() + ";" + transcriptionStart.getMinus35MotifWidth();
-                            referenceEntries.put(locus, array);
+                            referenceEntries.put( locus, array );
                         }
                     }
                 }
-                progresshandle.progress(2);
-                writeReferenceFile(fileLocation, referenceEntries);
-                progresshandle.progress(3);
-                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successful!",
-                        "Export was successful!", JOptionPane.INFORMATION_MESSAGE);
+                progresshandle.progress( 2 );
+                writeReferenceFile( fileLocation, referenceEntries );
+                progresshandle.progress( 3 );
+                JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), "Export was successful!",
+                                               "Export was successful!", JOptionPane.INFORMATION_MESSAGE );
                 progresshandle.finish();
             }
 
+
             @Override
-            public void open(String fileLocation) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            public void open( String fileLocation ) {
+                throw new UnsupportedOperationException( "Not supported yet." ); //To change body of generated methods, choose Tools | Templates.
             }
+
 
         };
 
-        fileChooser.openFileChooser(ReadXplorerFileChooser.SAVE_DIALOG);
+        fileChooser.openFileChooser( ReadXplorerFileChooser.SAVE_DIALOG );
     }//GEN-LAST:event_jButton2ActionPerformed
+
 
     /**
      *
-     * @param filter FilterTSS
-     * @param type FilterType
+     * @param filter            FilterTSS
+     * @param type              FilterType
      * @param filteredTableName table name for filteret table
-     * @param tss List<TranscriptionStart>
-     * @param params ParameterSetFiveEnrichedAnalyses
+     * @param tss               List<TranscriptionStart>
+     * @param params            ParameterSetFiveEnrichedAnalyses
      * @param munNoOfReadStarts the minimum numer of read starts
      */
-    private void generateFilteredTable(FilterTSS filter, FilterType type,
-            String filteredTableName, List<TranscriptionStart> tss,
-            ParameterSetFiveEnrichedAnalyses params, int munNoOfReadStarts) {
+    private void generateFilteredTable( FilterTSS filter, FilterType type,
+                                        String filteredTableName, List<TranscriptionStart> tss,
+                                        ParameterSetFiveEnrichedAnalyses params, int munNoOfReadStarts ) {
         List<TranscriptionStart> subTSS;
-        if (type == FilterType.READSTARTS) {
-            subTSS = filter.filter(type, tss, params, munNoOfReadStarts);
-        } else {
-            subTSS = filter.filter(type, tss, params, 0);
+        if( type == FilterType.READSTARTS ) {
+            subTSS = filter.filter( type, tss, params, munNoOfReadStarts );
+        }
+        else {
+            subTSS = filter.filter( type, tss, params, 0 );
         }
 
         ResultPanelTranscriptionStart transcriptionStartResultPanel = new ResultPanelTranscriptionStart();
 //        transcriptionStartResultPanel.setRefAndBoundsManager(this.persistantRef, this.boundsInfoManager);
-        transcriptionStartResultPanel.setPersistentReference(this.persistantRef);
-        transcriptionStartResultPanel.setBoundsInfoManager(this.boundsInfoManager);
-        TSSDetectionResults tssResultNew = new TSSDetectionResults(this.tssResult.getStats(), subTSS, tssResult.getTrackMap(), this.persistantRef);
-        tssResultNew.setResults(subTSS);
-        tssResultNew.setParameters(this.tssResult.getParameters());
-        transcriptionStartResultPanel.addResult(tssResultNew);
-        TopComponent findTopComponent = WindowManager.getDefault().findTopComponent(TranscriptomeAnalysesTopComponentTopComponent.PREFERRED_ID);
+        transcriptionStartResultPanel.setPersistentReference( this.persistantRef );
+        transcriptionStartResultPanel.setBoundsInfoManager( this.boundsInfoManager );
+        TSSDetectionResults tssResultNew = new TSSDetectionResults( this.tssResult.getStats(), subTSS, tssResult.getTrackMap(), this.persistantRef );
+        tssResultNew.setResults( subTSS );
+        tssResultNew.setParameters( this.tssResult.getParameters() );
+        transcriptionStartResultPanel.addResult( tssResultNew );
+        TopComponent findTopComponent = WindowManager.getDefault().findTopComponent( TranscriptomeAnalysesTopComponentTopComponent.PREFERRED_ID );
         TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp = (TranscriptomeAnalysesTopComponentTopComponent) findTopComponent;
-        String trackNames = GeneralUtils.generateConcatenatedString(tssResultNew.getTrackNameList(), 120);
+        String trackNames = GeneralUtils.generateConcatenatedString( tssResultNew.getTrackNameList(), 120 );
         String panelName = filteredTableName + trackNames + " Hits: " + transcriptionStartResultPanel.getDataSize();
-        transcAnalysesTopComp.openAnalysisTab(panelName, transcriptionStartResultPanel);
+        transcAnalysesTopComp.openAnalysisTab( panelName, transcriptionStartResultPanel );
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -927,21 +956,24 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
     private javax.swing.JScrollPane tssScrollPane;
     // End of variables declaration//GEN-END:variables
 
+
     /**
      * Set the reference viewer needed for updating the currently shown position
      * and extracting the reference sequence.
      *
      * @param referenceViewer the reference viewer belonging to this analysis
-     * result
+     *                        result
      */
-    public void setReferenceViewer(ReferenceViewer referenceViewer) {
+    public void setReferenceViewer( ReferenceViewer referenceViewer ) {
         this.boundsInfoManager = referenceViewer.getBoundsInformationManager();
         this.referenceViewer = referenceViewer;
     }
 
-    public void setPersistentReference(PersistentReference reference) {
+
+    public void setPersistentReference( PersistentReference reference ) {
         this.persistantRef = reference;
     }
+
 
     /**
      * @return The number of detected TSS
@@ -951,22 +983,24 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         return this.tssResult.getResults().size();
     }
 
+
     @Override
-    public void addResult(final ResultTrackAnalysis newResult) {
-        if (newResult instanceof TSSDetectionResults) {
+    public void addResult( final ResultTrackAnalysis newResult ) {
+        if( newResult instanceof TSSDetectionResults ) {
             final TSSDetectionResults tssResultNew = (TSSDetectionResults) newResult;
-            final List<TranscriptionStart> tsss = new ArrayList<>(tssResultNew.getResults());
+            final List<TranscriptionStart> tsss = new ArrayList<>( tssResultNew.getResults() );
             this.tssInHash = new HashMap<>();
 
-            if (tssResult == null) {
+            if( tssResult == null ) {
                 tssResult = tssResultNew;
-            } else {
-                tssResult.getResults().addAll(tssResultNew.getResults());
+            }
+            else {
+                tssResult.getResults().addAll( tssResultNew.getResults() );
             }
 
-            tssResult.setPromotorRegions(promotorRegions);
+            tssResult.setPromotorRegions( promotorRegions );
 
-            SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
+            SwingUtilities.invokeLater( new Runnable() { //because it is not called from the swing dispatch thread
                 @Override
                 public void run() {
                     final int nbColumns = 26;
@@ -991,54 +1025,56 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                     PersistentFeature feature;
                     PersistentFeature nextDownstreamFeature;
 
-                    for (TranscriptionStart tSS : tsss) {
+                    for( TranscriptionStart tSS : tsss ) {
                         String detectedFeatureStart = "0";
                         String detectedFeatureStop = "0";
 
-                        if (tSS.getAssignedFeature() != null) {
-                            if (tSS.getAssignedFeature().isFwdStrand()) {
-                                detectedFeatureStart = ref.getChromSequence(tSS.getChromId(), tSS.getAssignedFeature().getStart(), tSS.getAssignedFeature().getStart() + 2);
-                                detectedFeatureStop = ref.getChromSequence(tSS.getChromId(), tSS.getAssignedFeature().getStop() - 2, tSS.getAssignedFeature().getStop());
-                            } else {
-                                detectedFeatureStart = SequenceUtils.getReverseComplement(ref.getChromSequence(tSS.getChromId(), tSS.getAssignedFeature().getStop() - 2, tSS.getAssignedFeature().getStop()));
-                                detectedFeatureStop = SequenceUtils.getReverseComplement(ref.getChromSequence(tSS.getChromId(), tSS.getAssignedFeature().getStart(), tSS.getAssignedFeature().getStart() + 2));
+                        if( tSS.getAssignedFeature() != null ) {
+                            if( tSS.getAssignedFeature().isFwdStrand() ) {
+                                detectedFeatureStart = ref.getChromSequence( tSS.getChromId(), tSS.getAssignedFeature().getStart(), tSS.getAssignedFeature().getStart() + 2 );
+                                detectedFeatureStop = ref.getChromSequence( tSS.getChromId(), tSS.getAssignedFeature().getStop() - 2, tSS.getAssignedFeature().getStop() );
+                            }
+                            else {
+                                detectedFeatureStart = SequenceUtils.getReverseComplement( ref.getChromSequence( tSS.getChromId(), tSS.getAssignedFeature().getStop() - 2, tSS.getAssignedFeature().getStop() ) );
+                                detectedFeatureStop = SequenceUtils.getReverseComplement( ref.getChromSequence( tSS.getChromId(), tSS.getAssignedFeature().getStart(), tSS.getAssignedFeature().getStart() + 2 ) );
                             }
                         }
-                        if (tSS.isFwdStrand()) {
+                        if( tSS.isFwdStrand() ) {
                             strand = SequenceUtils.STRAND_FWD_STRING;
                             ++noFwdFeatures;
-                        } else {
+                        }
+                        else {
                             strand = SequenceUtils.STRAND_REV_STRING;
                             ++noRevFeatures;
                         }
 
-                        tSS.setDetectedFeatStart(detectedFeatureStart);
-                        tSS.setDetectedFeatStop(detectedFeatureStop);
+                        tSS.setDetectedFeatStart( detectedFeatureStart );
+                        tSS.setDetectedFeatStop( detectedFeatureStop );
 
-                        if (tSS.isIntergenicTSS()) {
+                        if( tSS.isIntergenicTSS() ) {
                             noIntergenic++;
                         }
-                        if (tSS.isAssignedToStableRNA()) {
+                        if( tSS.isAssignedToStableRNA() ) {
                             noOfTssAssignedToStableRna++;
                         }
-                        if (tSS.isIs3PrimeUtrAntisense()) {
+                        if( tSS.isIs3PrimeUtrAntisense() ) {
                             noPutativeAntisenseIn3PrimeUTR++;
                         }
 
-                        if (tSS.isIs5PrimeUtrAntisense()) {
+                        if( tSS.isIs5PrimeUtrAntisense() ) {
                             noPutativeAntisenseIn5PrimeUTR++;
                         }
-                        if (tSS.isIntragenicAntisense()) {
+                        if( tSS.isIntragenicAntisense() ) {
                             noPutativeAntisenseIntragenic++;
                         }
 
                         boolean leaderless = tSS.isLeaderless();
-                        if (leaderless) {
+                        if( leaderless ) {
                             ++noLeaderlessFeatures;
                         }
                         final Object[] rowData = new Object[nbColumns];
                         int position = tSS.getStartPosition();
-                        tssInHash.put(position, tSS);
+                        tssInHash.put( position, tSS );
 
                         int i = 0;
                         rowData[i++] = position;
@@ -1050,15 +1086,17 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
                         feature = tSS.getDetectedGene();
                         nextDownstreamFeature = tSS.getNextGene();
 
-                        if (feature != null) {
+                        if( feature != null ) {
                             rowData[i++] = feature.toString();
                             rowData[i++] = feature.getLocus();
                             rowData[i++] = tSS.getOffset();
-                        } else if (nextDownstreamFeature != null) {
+                        }
+                        else if( nextDownstreamFeature != null ) {
                             rowData[i++] = nextDownstreamFeature.toString();
                             rowData[i++] = nextDownstreamFeature.getLocus();
                             rowData[i++] = tSS.getOffsetToNextDownstrFeature();
-                        } else {
+                        }
+                        else {
                             rowData[i++] = "-";
                             rowData[i++] = "-";
                             rowData[i++] = 0;
@@ -1068,40 +1106,42 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
                         boolean cdsShift = tSS.isCdsShift();
                         rowData[i++] = cdsShift;
-                        if (cdsShift) {
+                        if( cdsShift ) {
                             noPutCdsShifts++;
                         }
 
                         rowData[i++] = tSS.isFalsePositive();
 
                         rowData[i++] = tSS.isIntragenicTSS();
-                        if (tSS.isIntragenicTSS()) {
+                        if( tSS.isIntragenicTSS() ) {
                             noIntragenicTSS++;
                         }
                         rowData[i++] = tSS.isIntergenicTSS();
 
                         // 13
                         rowData[i++] = tSS.isPutativeAntisense();
-                        if (tSS.isPutativeAntisense()) {
+                        if( tSS.isPutativeAntisense() ) {
                             noPutativeAntisenseInTotal++;
                         }
                         rowData[i++] = tSS.isSelected();
                         rowData[i++] = tSS.isConsideredTSS();
 
                         // additionally informations about detected gene
-                        if (feature != null) {
+                        if( feature != null ) {
                             rowData[i++] = feature.getStartOnStrand();
                             rowData[i++] = feature.getStopOnStrand();
                             rowData[i++] = feature.getStop() - feature.getStart();
-                            rowData[i++] = PersistentFeature.Utils.determineFrame(feature);
+                            rowData[i++] = PersistentFeature.Utils.determineFrame( feature );
                             rowData[i++] = feature.getProduct();
-                        } else if (nextDownstreamFeature != null) {
+                        }
+                        else if( nextDownstreamFeature != null ) {
                             rowData[i++] = nextDownstreamFeature.isFwdStrand() ? nextDownstreamFeature.getStart() : nextDownstreamFeature.getStop();
                             rowData[i++] = nextDownstreamFeature.isFwdStrand() ? nextDownstreamFeature.getStop() : nextDownstreamFeature.getStart();
                             rowData[i++] = nextDownstreamFeature.getStop() - nextDownstreamFeature.getStart();
-                            rowData[i++] = PersistentFeature.Utils.determineFrame(nextDownstreamFeature);
+                            rowData[i++] = PersistentFeature.Utils.determineFrame( nextDownstreamFeature );
                             rowData[i++] = nextDownstreamFeature.getProduct();
-                        } else {
+                        }
+                        else {
                             rowData[i++] = 0;
                             rowData[i++] = 0;
                             rowData[i++] = "0";
@@ -1111,42 +1151,44 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
 
                         rowData[i++] = detectedFeatureStart;
                         rowData[i++] = detectedFeatureStop;
-                        rowData[i++] = newResult.getChromosomeMap().get(tSS.getChromId());
+                        rowData[i++] = newResult.getChromosomeMap().get( tSS.getChromId() );
                         rowData[i++] = tSS.getChromId();
                         rowData[i++] = tSS.getTrackId();
 
-                        model.addRow(rowData);
+                        model.addRow( rowData );
                     }
 
                     //create statistics
-                    statisticsMap.put(TSS_TOTAL, (Integer) statisticsMap.get(TSS_TOTAL) + tsss.size());
-                    statisticsMap.put(TSS_FWD, (Integer) statisticsMap.get(TSS_FWD) + noFwdFeatures);
-                    statisticsMap.put(TSS_REV, (Integer) statisticsMap.get(TSS_REV) + noRevFeatures);
-                    statisticsMap.put(TSS_LEADERLESS, (Integer) statisticsMap.get(TSS_LEADERLESS) + noLeaderlessFeatures);
-                    statisticsMap.put(TSS_INTRAGENIC_TSS, (Integer) statisticsMap.get(TSS_INTRAGENIC_TSS) + noIntragenicTSS);
-                    statisticsMap.put(TSS_INTERGENIC_TSS, (Integer) statisticsMap.get(TSS_INTERGENIC_TSS) + noIntergenic);
-                    statisticsMap.put(TSS_PUTATIVE_ANTISENSE_IN_TOTAL, (Integer) statisticsMap.get(TSS_PUTATIVE_ANTISENSE_IN_TOTAL) + noPutativeAntisenseInTotal);
-                    statisticsMap.put(TSS_PUTATIVE_ANTISENSE_OF_3_PRIME_UTR, (Integer) statisticsMap.get(TSS_PUTATIVE_ANTISENSE_OF_3_PRIME_UTR) + noPutativeAntisenseIn3PrimeUTR);
-                    statisticsMap.put(TSS_PUTATIVE_ANTISENSE_OF_5_PRIME_UTR, (Integer) statisticsMap.get(TSS_PUTATIVE_ANTISENSE_OF_5_PRIME_UTR) + noPutativeAntisenseIn5PrimeUTR);
-                    statisticsMap.put(TSS_PUTATIVE_ANTISENSE_INTRAGENIC, (Integer) statisticsMap.get(TSS_PUTATIVE_ANTISENSE_INTRAGENIC) + noPutativeAntisenseIntragenic);
-                    statisticsMap.put(TSS_ASSIGNED_TO_STABLE_RNA, (Integer) statisticsMap.get(TSS_ASSIGNED_TO_STABLE_RNA) + noOfTssAssignedToStableRna);
-                    statisticsMap.put(TSS_NO_PUTATIVE_CDS_SHIFTS, (Integer) statisticsMap.get(TSS_NO_PUTATIVE_CDS_SHIFTS) + noPutCdsShifts);
-                    statisticsMap.put(MAPPINGS_COUNT, (Double) statisticsMap.get(MAPPINGS_COUNT) + tssResultNew.getStats().getMappingCount());
-                    statisticsMap.put(AVERAGE_MAPPINGS_LENGTH, (Double) statisticsMap.get(AVERAGE_MAPPINGS_LENGTH) + tssResultNew.getStats().getAverageReadLength());
-                    statisticsMap.put(MAPPINGS_MILLION, (Double) statisticsMap.get(MAPPINGS_MILLION) + tssResultNew.getStats().getMappingsPerMillion());
-                    statisticsMap.put(BACKGROUND_THRESHOLD_MIN_STACKSIZE, (Double) statisticsMap.get(BACKGROUND_THRESHOLD_MIN_STACKSIZE) + tssResultNew.getStats().getBgThreshold());
+                    statisticsMap.put( TSS_TOTAL, (Integer) statisticsMap.get( TSS_TOTAL ) + tsss.size() );
+                    statisticsMap.put( TSS_FWD, (Integer) statisticsMap.get( TSS_FWD ) + noFwdFeatures );
+                    statisticsMap.put( TSS_REV, (Integer) statisticsMap.get( TSS_REV ) + noRevFeatures );
+                    statisticsMap.put( TSS_LEADERLESS, (Integer) statisticsMap.get( TSS_LEADERLESS ) + noLeaderlessFeatures );
+                    statisticsMap.put( TSS_INTRAGENIC_TSS, (Integer) statisticsMap.get( TSS_INTRAGENIC_TSS ) + noIntragenicTSS );
+                    statisticsMap.put( TSS_INTERGENIC_TSS, (Integer) statisticsMap.get( TSS_INTERGENIC_TSS ) + noIntergenic );
+                    statisticsMap.put( TSS_PUTATIVE_ANTISENSE_IN_TOTAL, (Integer) statisticsMap.get( TSS_PUTATIVE_ANTISENSE_IN_TOTAL ) + noPutativeAntisenseInTotal );
+                    statisticsMap.put( TSS_PUTATIVE_ANTISENSE_OF_3_PRIME_UTR, (Integer) statisticsMap.get( TSS_PUTATIVE_ANTISENSE_OF_3_PRIME_UTR ) + noPutativeAntisenseIn3PrimeUTR );
+                    statisticsMap.put( TSS_PUTATIVE_ANTISENSE_OF_5_PRIME_UTR, (Integer) statisticsMap.get( TSS_PUTATIVE_ANTISENSE_OF_5_PRIME_UTR ) + noPutativeAntisenseIn5PrimeUTR );
+                    statisticsMap.put( TSS_PUTATIVE_ANTISENSE_INTRAGENIC, (Integer) statisticsMap.get( TSS_PUTATIVE_ANTISENSE_INTRAGENIC ) + noPutativeAntisenseIntragenic );
+                    statisticsMap.put( TSS_ASSIGNED_TO_STABLE_RNA, (Integer) statisticsMap.get( TSS_ASSIGNED_TO_STABLE_RNA ) + noOfTssAssignedToStableRna );
+                    statisticsMap.put( TSS_NO_PUTATIVE_CDS_SHIFTS, (Integer) statisticsMap.get( TSS_NO_PUTATIVE_CDS_SHIFTS ) + noPutCdsShifts );
+                    statisticsMap.put( MAPPINGS_COUNT, (Double) statisticsMap.get( MAPPINGS_COUNT ) + tssResultNew.getStats().getMappingCount() );
+                    statisticsMap.put( AVERAGE_MAPPINGS_LENGTH, (Double) statisticsMap.get( AVERAGE_MAPPINGS_LENGTH ) + tssResultNew.getStats().getAverageReadLength() );
+                    statisticsMap.put( MAPPINGS_MILLION, (Double) statisticsMap.get( MAPPINGS_MILLION ) + tssResultNew.getStats().getMappingsPerMillion() );
+                    statisticsMap.put( BACKGROUND_THRESHOLD_MIN_STACKSIZE, (Double) statisticsMap.get( BACKGROUND_THRESHOLD_MIN_STACKSIZE ) + tssResultNew.getStats().getBgThreshold() );
 
-                    tssResultNew.setStatsAndParametersMap(statisticsMap);
+                    tssResultNew.setStatsAndParametersMap( statisticsMap );
 
                     TableRowSorter<TableModel> sorter = new TableRowSorter<>();
-                    tSSTable.setRowSorter(sorter);
-                    sorter.setModel(model);
-                    TableComparatorProvider.setPersistentTrackComparator(sorter, 1);
+                    tSSTable.setRowSorter( sorter );
+                    sorter.setModel( model );
+                    TableComparatorProvider.setPersistentTrackComparator( sorter, 1 );
                 }
 
-            });
+
+            } );
         }
     }
+
 
     /**
      * This method checks all entries for changes in current table model.
@@ -1156,115 +1198,127 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
     public List<TranscriptionStart> updateTssResults() {
         List<TranscriptionStart> tss = tssResult.getResults();
         HashMap<Integer, TranscriptionStart> tmpHash = new HashMap<>();
-        tmpHash.putAll(this.tssInHash);
+        tmpHash.putAll( this.tssInHash );
 
         // iterating over all table entries
-        for (int i = 0; i < tSSTable.getRowCount(); i++) {
-            Integer posTableAti = (Integer) tSSTable.getValueAt(i, 0);
-            if (tmpHash.containsKey(posTableAti)) {
+        for( int i = 0; i < tSSTable.getRowCount(); i++ ) {
+            Integer posTableAti = (Integer) tSSTable.getValueAt( i, 0 );
+            if( tmpHash.containsKey( posTableAti ) ) {
 
                 // leaderless
-                if ((Boolean) tSSTable.getValueAt(i, 8)) {
-                    this.tssInHash.get(posTableAti).setLeaderless(true);
-                } else {
-                    this.tssInHash.get(posTableAti).setLeaderless(false);
+                if( (Boolean) tSSTable.getValueAt( i, 8 ) ) {
+                    this.tssInHash.get( posTableAti ).setLeaderless( true );
+                }
+                else {
+                    this.tssInHash.get( posTableAti ).setLeaderless( false );
                 }
 
                 // putative CDS-shift
-                if ((Boolean) tSSTable.getValueAt(i, 9)) {
-                    this.tssInHash.get(posTableAti).setCdsShift(true);
-                } else {
-                    this.tssInHash.get(posTableAti).setCdsShift(false);
+                if( (Boolean) tSSTable.getValueAt( i, 9 ) ) {
+                    this.tssInHash.get( posTableAti ).setCdsShift( true );
+                }
+                else {
+                    this.tssInHash.get( posTableAti ).setCdsShift( false );
                 }
 
                 // false positive
-                if ((Boolean) tSSTable.getValueAt(i, 10)) {
-                    this.tssInHash.get(posTableAti).setFalsePositive(true);
-                } else {
-                    this.tssInHash.get(posTableAti).setFalsePositive(false);
+                if( (Boolean) tSSTable.getValueAt( i, 10 ) ) {
+                    this.tssInHash.get( posTableAti ).setFalsePositive( true );
+                }
+                else {
+                    this.tssInHash.get( posTableAti ).setFalsePositive( false );
                 }
 
                 // inTRAgenic
-                if ((Boolean) tSSTable.getValueAt(i, 11)) {
-                    this.tssInHash.get(posTableAti).setIntragenicTSS(true);
-                } else {
-                    this.tssInHash.get(posTableAti).setIntragenicTSS(false);
+                if( (Boolean) tSSTable.getValueAt( i, 11 ) ) {
+                    this.tssInHash.get( posTableAti ).setIntragenicTSS( true );
+                }
+                else {
+                    this.tssInHash.get( posTableAti ).setIntragenicTSS( false );
                 }
 
                 // inTERgenic
-                if ((Boolean) tSSTable.getValueAt(i, 12)) {
-                    this.tssInHash.get(posTableAti).setIntergenicTSS(true);
-                } else {
-                    this.tssInHash.get(posTableAti).setIntergenicTSS(false);
+                if( (Boolean) tSSTable.getValueAt( i, 12 ) ) {
+                    this.tssInHash.get( posTableAti ).setIntergenicTSS( true );
+                }
+                else {
+                    this.tssInHash.get( posTableAti ).setIntergenicTSS( false );
                 }
 
                 // andisense
-                if ((Boolean) tSSTable.getValueAt(i, 13)) {
-                    this.tssInHash.get(posTableAti).setPutativeAntisense(true);
-                } else {
-                    this.tssInHash.get(posTableAti).setPutativeAntisense(false);
+                if( (Boolean) tSSTable.getValueAt( i, 13 ) ) {
+                    this.tssInHash.get( posTableAti ).setPutativeAntisense( true );
+                }
+                else {
+                    this.tssInHash.get( posTableAti ).setPutativeAntisense( false );
                 }
 
                 // slection for upstream analyses
-                if ((Boolean) tSSTable.getValueAt(i, 14)) {
-                    this.tssInHash.get(posTableAti).setSelected(true);
-                } else {
-                    this.tssInHash.get(posTableAti).setSelected(false);
+                if( (Boolean) tSSTable.getValueAt( i, 14 ) ) {
+                    this.tssInHash.get( posTableAti ).setSelected( true );
+                }
+                else {
+                    this.tssInHash.get( posTableAti ).setSelected( false );
                 }
 
-                if ((Boolean) tSSTable.getValueAt(i, 15)) {
-                    this.tssInHash.get(posTableAti).setIsconsideredTSS(true);
-                } else {
-                    this.tssInHash.get(posTableAti).setIsconsideredTSS(false);
+                if( (Boolean) tSSTable.getValueAt( i, 15 ) ) {
+                    this.tssInHash.get( posTableAti ).setIsconsideredTSS( true );
+                }
+                else {
+                    this.tssInHash.get( posTableAti ).setIsconsideredTSS( false );
                 }
 
-                this.tssInHash.get(posTableAti).setComment((String) tSSTable.getValueAt(i, 1));
+                this.tssInHash.get( posTableAti ).setComment( (String) tSSTable.getValueAt( i, 1 ) );
 
-                tmpHash.remove(posTableAti);
+                tmpHash.remove( posTableAti );
             }
         }
-        for (Integer key : tmpHash.keySet()) {
-            TranscriptionStart ts = tmpHash.get(key);
-            tssInHash.remove(key);
-            tss.remove(ts);
+        for( Integer key : tmpHash.keySet() ) {
+            TranscriptionStart ts = tmpHash.get( key );
+            tssInHash.remove( key );
+            tss.remove( ts );
         }
         return tss;
     }
 
+
     @Override
-    public void update(Object args) {
-        if (args instanceof RbsMotifSearchPanel) {
+    public void update( Object args ) {
+        if( args instanceof RbsMotifSearchPanel ) {
             RbsMotifSearchPanel panel = (RbsMotifSearchPanel) args;
-            if (this.model == null) {
-                this.model = new MotifSearchModel(this.persistantRef);
-                this.model.storeRbsAnalysisResults(panel.getUpstreamRegions(),
-                        panel.getRbsStarts(), panel.getRbsShifts(),
-                        panel.getParams(), this.updateTssResults()
+            if( this.model == null ) {
+                this.model = new MotifSearchModel( this.persistantRef );
+                this.model.storeRbsAnalysisResults( panel.getUpstreamRegions(),
+                                                    panel.getRbsStarts(), panel.getRbsShifts(),
+                                                    panel.getParams(), this.updateTssResults()
                 );
-            } else {
-                this.model.storeRbsAnalysisResults(panel.getUpstreamRegions(),
-                        panel.getRbsStarts(), panel.getRbsShifts(),
-                        panel.getParams(), this.updateTssResults()
+            }
+            else {
+                this.model.storeRbsAnalysisResults( panel.getUpstreamRegions(),
+                                                    panel.getRbsStarts(), panel.getRbsShifts(),
+                                                    panel.getParams(), this.updateTssResults()
                 );
             }
         }
 
-        if (args instanceof MotifSearchPanel) {
+        if( args instanceof MotifSearchPanel ) {
             MotifSearchPanel panel = (MotifSearchPanel) args;
-            if (this.model == null) {
-                this.model = new MotifSearchModel(this.persistantRef);
-                this.model.storePromoterAnalysisResults(panel.getUpstreamRegions(),
-                        panel.getMinus10Starts(), panel.getMinus35Starts(),
-                        panel.getMinus10Shifts(), panel.getMinus35Shifts(),
-                        panel.getParams(), this.updateTssResults());
-            } else {
-                this.model.storePromoterAnalysisResults(panel.getUpstreamRegions(),
-                        panel.getMinus10Starts(), panel.getMinus35Starts(),
-                        panel.getMinus10Shifts(), panel.getMinus35Shifts(),
-                        panel.getParams(), this.updateTssResults());
+            if( this.model == null ) {
+                this.model = new MotifSearchModel( this.persistantRef );
+                this.model.storePromoterAnalysisResults( panel.getUpstreamRegions(),
+                                                         panel.getMinus10Starts(), panel.getMinus35Starts(),
+                                                         panel.getMinus10Shifts(), panel.getMinus35Shifts(),
+                                                         panel.getParams(), this.updateTssResults() );
+            }
+            else {
+                this.model.storePromoterAnalysisResults( panel.getUpstreamRegions(),
+                                                         panel.getMinus10Starts(), panel.getMinus35Starts(),
+                                                         panel.getMinus10Shifts(), panel.getMinus35Shifts(),
+                                                         panel.getParams(), this.updateTssResults() );
             }
         }
     }
+
 
     /**
      * Prepares the result for output. Any special operations are carried out
@@ -1280,41 +1334,46 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel implements O
         //get the promotor region for each TSS
         int promotorStart;
         int chromLength = this.persistantRef.getActiveChromosome().getLength();
-        for (TranscriptionStart tSS : this.tssResult.getResults()) {
-            if (tSS.isFwdStrand()) {
+        for( TranscriptionStart tSS : this.tssResult.getResults() ) {
+            if( tSS.isFwdStrand() ) {
                 promotorStart = tSS.getStartPosition() - 70;
                 promotorStart = promotorStart < 0 ? 0 : promotorStart;
-                promotor = this.persistantRef.getActiveChromSequence(promotorStart, tSS.getStartPosition());
-            } else {
+                promotor = this.persistantRef.getActiveChromSequence( promotorStart, tSS.getStartPosition() );
+            }
+            else {
                 promotorStart = tSS.getStartPosition() + 70;
                 promotorStart = promotorStart > chromLength ? chromLength : promotorStart;
-                promotor = SequenceUtils.getReverseComplement(this.persistantRef.getActiveChromSequence(tSS.getStartPosition(), promotorStart));
+                promotor = SequenceUtils.getReverseComplement( this.persistantRef.getActiveChromSequence( tSS.getStartPosition(), promotorStart ) );
             }
-            this.promotorRegions.add(promotor);
+            this.promotorRegions.add( promotor );
         }
-        tssResult.setPromotorRegions(promotorRegions);
+        tssResult.setPromotorRegions( promotorRegions );
     }
+
 
     /**
      * For a given list of entries consisting of the locus, start, stop ant the
      * 5'-utr length this method generates a tab-separated file. Each row in
      * represents an entry in the given list.
      *
-     * @param fileLocation absolute filelocation.
+     * @param fileLocation     absolute filelocation.
      * @param referenceEntries
      */
-    private void writeReferenceFile(String fileLocation, Map<String, String[]> referenceEntries) {
+    private void writeReferenceFile( String fileLocation, Map<String, String[]> referenceEntries ) {
 
-        try (Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileLocation)))) {
+        try( Writer writer = new BufferedWriter( new OutputStreamWriter( new FileOutputStream( fileLocation ) ) ) ) {
 
-            writer.write("#Locus\tStart of Transcript\tStop of Transcript\tTSSs\tUTRs\tRBS\tPromotors\n");
-            for (String locus : referenceEntries.keySet()) {
-                writer.write(locus + "\t" + referenceEntries.get(locus)[0] + "\t" + referenceEntries.get(locus)[1] + "\t" + referenceEntries.get(locus)[2] + "\t" + referenceEntries.get(locus)[3] + "\t" + referenceEntries.get(locus)[4] + "\t" + referenceEntries.get(locus)[5] + "\t" + referenceEntries.get(locus)[6] + "\n");
+            writer.write( "#Locus\tStart of Transcript\tStop of Transcript\tTSSs\tUTRs\tRBS\tPromotors\n" );
+            for( String locus : referenceEntries.keySet() ) {
+                writer.write( locus + "\t" + referenceEntries.get( locus )[0] + "\t" + referenceEntries.get( locus )[1] + "\t" + referenceEntries.get( locus )[2] + "\t" + referenceEntries.get( locus )[3] + "\t" + referenceEntries.get( locus )[4] + "\t" + referenceEntries.get( locus )[5] + "\t" + referenceEntries.get( locus )[6] + "\n" );
             }
 
             // report
-        } catch (IOException ex) {
-            JOptionPane.showMessageDialog(this, "An error occured during wrtinging of the reference file: " + ex.getMessage(), "Write Reference Exception", JOptionPane.ERROR_MESSAGE);
+        }
+        catch( IOException ex ) {
+            JOptionPane.showMessageDialog( this, "An error occured during wrtinging of the reference file: " + ex.getMessage(), "Write Reference Exception", JOptionPane.ERROR_MESSAGE );
         }
     }
+
+
 }

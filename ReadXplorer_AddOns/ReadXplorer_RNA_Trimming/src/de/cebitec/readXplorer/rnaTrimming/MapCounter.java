@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,20 +16,28 @@
  */
 package de.cebitec.readXplorer.rnaTrimming;
 
+
 import java.util.HashMap;
+
 
 /**
  * A simple enchancement to the hashmap class to allow counting of values
+ * <p>
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
-public class MapCounter<T> extends HashMap<T,Integer> {
+public class MapCounter<T> extends HashMap<T, Integer> {
+
     private static final long serialVersionUID = 1L;
-    
-    public Integer incrementCount(T key) {
-        Integer counter = this.get(key);
-        if (counter==null) counter = 0;
+
+
+    public Integer incrementCount( T key ) {
+        Integer counter = this.get( key );
+        if( counter == null )
+            counter = 0;
         counter++;
-        this.put(key, counter);
+        this.put( key, counter );
         return counter;
     }
+
+
 }

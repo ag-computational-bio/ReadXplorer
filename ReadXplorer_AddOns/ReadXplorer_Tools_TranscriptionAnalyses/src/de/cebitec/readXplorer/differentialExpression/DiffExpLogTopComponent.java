@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cebitec.readXplorer.differentialExpression;
+
 
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
@@ -34,43 +35,48 @@ import org.openide.awt.ActionReference;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 
+
 /**
  * Top component which displays something.
  */
 @ConvertAsProperties(
-    dtd = "-//de.cebitec.readXplorer.differentialExpression//DiffExpLog//EN",
-autostore = false)
+         dtd = "-//de.cebitec.readXplorer.differentialExpression//DiffExpLog//EN",
+         autostore = false )
 @TopComponent.Description(
-    preferredID = "DiffExpLogTopComponent",
-//iconBase="SET/PATH/TO/ICON/HERE", 
-persistenceType = TopComponent.PERSISTENCE_NEVER)
-@TopComponent.Registration(mode = "output", openAtStartup = false)
-@ActionID(category = "Window", id = "de.cebitec.readXplorer.differentialExpression.DiffExpLogTopComponent")
-@ActionReference(path = "Menu/Window" /*, position = 333 */)
+         preferredID = "DiffExpLogTopComponent",
+         //iconBase="SET/PATH/TO/ICON/HERE",
+         persistenceType = TopComponent.PERSISTENCE_NEVER )
+@TopComponent.Registration( mode = "output", openAtStartup = false )
+@ActionID( category = "Window", id = "de.cebitec.readXplorer.differentialExpression.DiffExpLogTopComponent" )
+@ActionReference( path = "Menu/Window" /*, position = 333 */ )
 @TopComponent.OpenActionRegistration(
-    displayName = "#CTL_DiffExpLogAction",
-preferredID = "DiffExpLogTopComponent")
-@Messages({
+         displayName = "#CTL_DiffExpLogAction",
+         preferredID = "DiffExpLogTopComponent" )
+@Messages( {
     "CTL_DiffExpLogAction=DiffExpLog",
     "CTL_DiffExpLogTopComponent=Differential Gene Expression Analysis Log",
     "HINT_DiffExpLogTopComponent=Shows the log for the last run of the differential gene expression analysis."
-})
-public final class DiffExpLogTopComponent extends TopComponentExtended implements Observer {
+} )
+public final class DiffExpLogTopComponent extends TopComponentExtended
+        implements Observer {
 
     private DeAnalysisHandler analysisHandler = null;
 
+
     public DiffExpLogTopComponent() {
         initComponents();
-        setName(Bundle.CTL_DiffExpLogTopComponent());
-        setToolTipText(Bundle.HINT_DiffExpLogTopComponent());
+        setName( Bundle.CTL_DiffExpLogTopComponent() );
+        setToolTipText( Bundle.HINT_DiffExpLogTopComponent() );
     }
 
-    public DiffExpLogTopComponent(DeAnalysisHandler analysisHandler) {
+
+    public DiffExpLogTopComponent( DeAnalysisHandler analysisHandler ) {
         this.analysisHandler = analysisHandler;
         initComponents();
-        setName(Bundle.CTL_DiffExpLogTopComponent());
-        setToolTipText(Bundle.HINT_DiffExpLogTopComponent());
+        setName( Bundle.CTL_DiffExpLogTopComponent() );
+        setToolTipText( Bundle.HINT_DiffExpLogTopComponent() );
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -121,30 +127,35 @@ public final class DiffExpLogTopComponent extends TopComponentExtended implement
     }// </editor-fold>//GEN-END:initComponents
 
     private void saveLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveLogButtonActionPerformed
-        ReadXplorerFileChooser fc = new ReadXplorerFileChooser(new String[]{"txt"}, "txt") {
+        ReadXplorerFileChooser fc = new ReadXplorerFileChooser( new String[]{ "txt" }, "txt" ) {
             private static final long serialVersionUID = 1L;
 
+
             @Override
-            public void save(String fileLocation) {
-                File output = new File(fileLocation);
+            public void save( String fileLocation ) {
+                File output = new File( fileLocation );
                 String log = ProcessingLog.getInstance().generateLog();
                 FileWriter writer;
                 try {
-                    writer = new FileWriter(output);
-                    writer.write(log);
+                    writer = new FileWriter( output );
+                    writer.write( log );
                     writer.close();
-                } catch (IOException ex) {
-                    Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                    Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
-                    JOptionPane.showMessageDialog(null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE);
+                }
+                catch( IOException ex ) {
+                    Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                    Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                    JOptionPane.showMessageDialog( null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE );
                 }
             }
 
+
             @Override
-            public void open(String fileLocation) {
+            public void open( String fileLocation ) {
             }
+
+
         };
-        fc.openFileChooser(ReadXplorerFileChooser.SAVE_DIALOG);
+        fc.openFileChooser( ReadXplorerFileChooser.SAVE_DIALOG );
     }//GEN-LAST:event_saveLogButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
@@ -152,33 +163,40 @@ public final class DiffExpLogTopComponent extends TopComponentExtended implement
     private javax.swing.JButton saveLogButton;
     // End of variables declaration//GEN-END:variables
 
+
     @Override
     public void componentOpened() {
         String log = ProcessingLog.getInstance().generateLog();
-        logTextField.setText(log);
+        logTextField.setText( log );
     }
+
 
     @Override
     public void componentClosed() {
-        if (analysisHandler != null) {
-            analysisHandler.removeObserver(this);
+        if( analysisHandler != null ) {
+            analysisHandler.removeObserver( this );
         }
     }
 
-    void writeProperties(java.util.Properties p) {
+
+    void writeProperties( java.util.Properties p ) {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
-        p.setProperty("version", "1.0");
+        p.setProperty( "version", "1.0" );
         // TODO store your settings
     }
 
-    void readProperties(java.util.Properties p) {
-        String version = p.getProperty("version");
+
+    void readProperties( java.util.Properties p ) {
+        String version = p.getProperty( "version" );
         // TODO read your settings according to their version
     }
 
+
     @Override
-    public void update(Object args) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void update( Object args ) {
+        throw new UnsupportedOperationException( "Not supported yet." );
     }
+
+
 }

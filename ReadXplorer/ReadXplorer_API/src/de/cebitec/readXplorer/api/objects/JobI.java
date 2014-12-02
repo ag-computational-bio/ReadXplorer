@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,22 +16,25 @@
  */
 package de.cebitec.readXplorer.api.objects;
 
+
 /**
- * Interface for jobs having a known number of requests and also storing how 
+ * Interface for jobs having a known number of requests and also storing how
  * many requests were already carried out.
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public interface JobI {
-    
+
     /**
      * @return The number of requests already carried out.
      */
     public int getNbCarriedOutRequests();
-    
+
+
     /**
      * @return The total number of requests within this job.
      */
     public int getNbTotalRequests();
-    
+
+
 }

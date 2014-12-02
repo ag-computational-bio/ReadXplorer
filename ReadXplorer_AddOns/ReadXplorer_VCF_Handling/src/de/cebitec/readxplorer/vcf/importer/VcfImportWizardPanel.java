@@ -1,12 +1,15 @@
 package de.cebitec.readxplorer.vcf.importer;
 
+
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningFinishWizardPanel;
 import org.openide.WizardDescriptor;
+
 
 /**
  * The wizard panel for importing VCF files.
  *
- * @author marend, vetz, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ * @author marend, vetz, Rolf Hilker
+ * <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 class VcfImportWizardPanel extends ChangeListeningFinishWizardPanel {
 
@@ -18,14 +21,15 @@ class VcfImportWizardPanel extends ChangeListeningFinishWizardPanel {
     public static final String PROP_SELECTED_FILE = "selected File";
     public static final String PROP_SELECTED_REF = "selected Reference";
     public boolean validated = true;
-    
-   /**
-    * The wizard panel for importing VCF files.
-    */
+
+
+    /**
+     * The wizard panel for importing VCF files.
+     */
     public VcfImportWizardPanel() {
-        super("Select a file to continue.");
+        super( "Select a file to continue." );
     }
-    
+
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -33,7 +37,7 @@ class VcfImportWizardPanel extends ChangeListeningFinishWizardPanel {
     // create only those which really need to be visible.
     @Override
     public VcfImportVisualPanel getComponent() {
-        if (component == null) {
+        if( component == null ) {
             component = new VcfImportVisualPanel();
         }
         return component;
@@ -41,12 +45,13 @@ class VcfImportWizardPanel extends ChangeListeningFinishWizardPanel {
 
 
     @Override
-    public void storeSettings(WizardDescriptor wiz) {
+    public void storeSettings( WizardDescriptor wiz ) {
         // use wiz.putProperty to remember current panel state
-        if (isValid()) {
-            wiz.putProperty(VcfImportWizardPanel.PROP_SELECTED_FILE, this.component.getVcfFile());
-            wiz.putProperty(VcfImportWizardPanel.PROP_SELECTED_REF, this.component.getReference());
+        if( isValid() ) {
+            wiz.putProperty( VcfImportWizardPanel.PROP_SELECTED_FILE, this.component.getVcfFile() );
+            wiz.putProperty( VcfImportWizardPanel.PROP_SELECTED_REF, this.component.getReference() );
         }
     }
+
 
 }

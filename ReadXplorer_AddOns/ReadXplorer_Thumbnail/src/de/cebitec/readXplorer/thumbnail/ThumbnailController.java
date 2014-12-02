@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cebitec.readXplorer.thumbnail;
+
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readXplorer.controller.ViewController;
@@ -81,14 +82,17 @@ import org.openide.util.lookup.InstanceContent;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.windows.WindowManager;
 
+
 /**
  * ServiceProvider for IThumbnailView.
- * This Module can display all Tracks for a given List of Features in a Thumbnail-like View.
+ * This Module can display all Tracks for a given List of Features in a
+ * Thumbnail-like View.
  *
  * @author denis, rhilker
  */
-@ServiceProvider(service = IThumbnailView.class)
-public class ThumbnailController extends MouseAdapter implements IThumbnailView, Lookup.Provider {
+@ServiceProvider( service = IThumbnailView.class )
+public class ThumbnailController extends MouseAdapter implements IThumbnailView,
+                                                                 Lookup.Provider {
 
     private HashMap<ReferenceViewer, ThumbNailViewTopComponent> refThumbTopComponents;
     //Currently active ThumbnailTopComponent and ReferenceViewer
@@ -110,6 +114,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     //is true if SliderValues get calculated on creation of TrackPanel
     private boolean autoSlider = true;
 
+
     public ThumbnailController() {
         this.refThumbTopComponents = new HashMap<>();
         this.selectedFeatures = new HashMap<>();
@@ -118,36 +123,39 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         this.featureToLayoutWidget = new HashMap<>();
 
         content = new InstanceContent();
-        controllerLookup = new ThumbControllerLookup(content);
+        controllerLookup = new ThumbControllerLookup( content );
     }
 
+
     @Override
-    public void showThumbnailView(ReferenceViewer refViewer) {
+    public void showThumbnailView( ReferenceViewer refViewer ) {
         activeViewer = refViewer;
-        if (refThumbTopComponents.containsKey(activeViewer)) {
-            activeTopComp = refThumbTopComponents.get(activeViewer);
-        } else {
-            activeTopComp = new ThumbNailViewTopComponent();
-            refThumbTopComponents.put(activeViewer, activeTopComp);
+        if( refThumbTopComponents.containsKey( activeViewer ) ) {
+            activeTopComp = refThumbTopComponents.get( activeViewer );
         }
-        activeTopComp.setName("ThumbnailReference: " + refViewer.getReference().getName());
+        else {
+            activeTopComp = new ThumbNailViewTopComponent();
+            refThumbTopComponents.put( activeViewer, activeTopComp );
+        }
+        activeTopComp.setName( "ThumbnailReference: " + refViewer.getReference().getName() );
 
         activeTopComp.open();
         Scene scene = activeTopComp.getScene();
         scene.removeChildren();
-        scene.setLayout(LayoutFactory.createVerticalFlowLayout(LayoutFactory.SerialAlignment.LEFT_TOP, 5));
-        scene.getActions().addAction(ActionFactory.createMouseCenteredZoomAction(1.1));
+        scene.setLayout( LayoutFactory.createVerticalFlowLayout( LayoutFactory.SerialAlignment.LEFT_TOP, 5 ) );
+        scene.getActions().addAction( ActionFactory.createMouseCenteredZoomAction( 1.1 ) );
         //Get ViewController
-        Result<ViewController> viewControlResult = Utilities.actionsGlobalContext().lookupResult(ViewController.class);
+        Result<ViewController> viewControlResult = Utilities.actionsGlobalContext().lookupResult( ViewController.class );
         controller = viewControlResult.allInstances().iterator().next();
 
         //After Lookup-stuff is done requestActive for ThumbnailTopComponent
         activeTopComp.requestActive();
         //Build scene
-        if (selectedFeatures.containsKey(activeViewer) && selectedFeatures.get(activeViewer).size() > 40) {
-            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ThumbnailController.class, "MSG_TooManyFeatures"), NotifyDescriptor.INFORMATION_MESSAGE);
-            DialogDisplayer.getDefault().notify(nd);
-        } else {
+        if( selectedFeatures.containsKey( activeViewer ) && selectedFeatures.get( activeViewer ).size() > 40 ) {
+            NotifyDescriptor nd = new NotifyDescriptor.Message( NbBundle.getMessage( ThumbnailController.class, "MSG_TooManyFeatures" ), NotifyDescriptor.INFORMATION_MESSAGE );
+            DialogDisplayer.getDefault().notify( nd );
+        }
+        else {
             drawScene();
             //Cookie Stuff
             removeThumbSpecificCookies();
@@ -155,32 +163,36 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         }
     }
 
+
     /**
      * Creates ThumbnailView with given ViewController.Is called from JumpPanel.
+     * <p>
      * @param refViewer
      * @param con
      */
     @Override
-    public void showThumbnailView(ReferenceViewer refViewer, ViewController con) {
+    public void showThumbnailView( ReferenceViewer refViewer, ViewController con ) {
         activeViewer = refViewer;
-        if (refThumbTopComponents.containsKey(refViewer)) {
-            activeTopComp = refThumbTopComponents.get(refViewer);
-        } else {
+        if( refThumbTopComponents.containsKey( refViewer ) ) {
+            activeTopComp = refThumbTopComponents.get( refViewer );
+        }
+        else {
             activeTopComp = new ThumbNailViewTopComponent();
-            refThumbTopComponents.put(activeViewer, activeTopComp);
+            refThumbTopComponents.put( activeViewer, activeTopComp );
         }
         activeTopComp.open();
         Scene scene = activeTopComp.getScene();
         scene.removeChildren();
-        scene.setLayout(LayoutFactory.createVerticalFlowLayout(LayoutFactory.SerialAlignment.LEFT_TOP, 5));
-        scene.getActions().addAction(ActionFactory.createMouseCenteredZoomAction(1.1));
+        scene.setLayout( LayoutFactory.createVerticalFlowLayout( LayoutFactory.SerialAlignment.LEFT_TOP, 5 ) );
+        scene.getActions().addAction( ActionFactory.createMouseCenteredZoomAction( 1.1 ) );
         controller = con;
         activeTopComp.requestActive();
         //Build scene
-        if (selectedFeatures.containsKey(activeViewer) && selectedFeatures.get(activeViewer).size() > 40) {
-            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ThumbnailController.class, "MSG_TooManyFeatures"), NotifyDescriptor.INFORMATION_MESSAGE);
-            DialogDisplayer.getDefault().notify(nd);
-        } else {
+        if( selectedFeatures.containsKey( activeViewer ) && selectedFeatures.get( activeViewer ).size() > 40 ) {
+            NotifyDescriptor nd = new NotifyDescriptor.Message( NbBundle.getMessage( ThumbnailController.class, "MSG_TooManyFeatures" ), NotifyDescriptor.INFORMATION_MESSAGE );
+            DialogDisplayer.getDefault().notify( nd );
+        }
+        else {
             drawScene();
             removeThumbSpecificCookies();
             //Activate Synchronize-Action for ZoomSliders
@@ -189,64 +201,75 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
 
     }
 
+
     /**
      * Activates synchronize-Sliders Action in Menu.
      */
     private void addSyncCookieToLookup() {
-        getLookup().add(new SyncSliderCookie() {
+        getLookup().add( new SyncSliderCookie() {
 
             @Override
             public void syncSliders() {
-                sliderSynchronisation(true);
+                sliderSynchronisation( true );
                 //Sliders a synchronized now so remove old cookie and add a new one so that they can be asynchronized again.
-                getLookup().removeAll(SyncSliderCookie.class);
+                getLookup().removeAll( SyncSliderCookie.class );
                 addASynchCookieToLookup();
             }
-        });
+
+
+        } );
     }
+
 
     /**
      * Activates don't-synchronize-Sliders Action in Menu.
      */
     private void addASynchCookieToLookup() {
-        getLookup().add(new ASyncSliderCookie() {
+        getLookup().add( new ASyncSliderCookie() {
 
             @Override
             public void async() {
-                sliderSynchronisation(false);
-                getLookup().removeAll(ASyncSliderCookie.class);
+                sliderSynchronisation( false );
+                getLookup().removeAll( ASyncSliderCookie.class );
                 addSyncCookieToLookup();
             }
-        });
+
+
+        } );
     }
+
 
     /**
      * Sets all Sliders based on sync-Value
-     * @param sync Is Set through Cookie-Actions to specify if VerticalSliders should be synchronized.
+     * <p>
+     * @param sync Is Set through Cookie-Actions to specify if VerticalSliders
+     *             should be synchronized.
      */
-    private void sliderSynchronisation(boolean sync) {
+    private void sliderSynchronisation( boolean sync ) {
         //synchronize all Sliders for all RefrenceViewer's ThumbnailViewTopComponents
-        for (ReferenceViewer oneViewer : refThumbTopComponents.keySet()) {
-            if (selectedFeatures.containsKey(oneViewer)) {
-                for (PersistentFeature feature : selectedFeatures.get(oneViewer)) {
+        for( ReferenceViewer oneViewer : refThumbTopComponents.keySet() ) {
+            if( selectedFeatures.containsKey( oneViewer ) ) {
+                for( PersistentFeature feature : selectedFeatures.get( oneViewer ) ) {
                     ZoomChangeListener zoomChangeListener = new ZoomChangeListener();
-                    for (BasePanel bp : featureToTrackpanelList.get(feature)) {
+                    for( BasePanel bp : featureToTrackpanelList.get( feature ) ) {
                         try {
-                            JPanel panel = (JPanel) bp.getComponent(0);
-                            if (panel != null) {
-                                CoverageZoomSlider slider = (CoverageZoomSlider) panel.getComponent(1);
-                                if (sync) {
-                                    slider.addChangeListener(zoomChangeListener);
-                                    zoomChangeListener.addMapValue((TrackViewer) panel.getComponent(0), slider);
-                                } else {
-                                    while (slider.getChangeListeners().length > 1) {
-                                        slider.removeChangeListener(slider.getChangeListeners()[0]);
+                            JPanel panel = (JPanel) bp.getComponent( 0 );
+                            if( panel != null ) {
+                                CoverageZoomSlider slider = (CoverageZoomSlider) panel.getComponent( 1 );
+                                if( sync ) {
+                                    slider.addChangeListener( zoomChangeListener );
+                                    zoomChangeListener.addMapValue( (TrackViewer) panel.getComponent( 0 ), slider );
+                                }
+                                else {
+                                    while( slider.getChangeListeners().length > 1 ) {
+                                        slider.removeChangeListener( slider.getChangeListeners()[0] );
                                     }
                                 }
                             }
-                        } catch (ClassCastException e) {
-                            Logger.getLogger(ThumbnailController.class.getName()).log(
-                                    Level.WARNING, e.getMessage());
+                        }
+                        catch( ClassCastException e ) {
+                            Logger.getLogger( ThumbnailController.class.getName() ).log(
+                                    Level.WARNING, e.getMessage() );
                         }
                     }
                 }
@@ -260,275 +283,308 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
      */
     private void drawScene() {
         //Get all associated Tracks for Reference
-        ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector(controller.getCurrentRefGen().getId());
-        if (activeViewer != null && selectedFeatures.containsKey(activeViewer)) {
-            for (PersistentFeature feature : selectedFeatures.get(activeViewer)) {
-                this.addFeatureToView(feature, refCon);
+        ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector( controller.getCurrentRefGen().getId() );
+        if( activeViewer != null && selectedFeatures.containsKey( activeViewer ) ) {
+            for( PersistentFeature feature : selectedFeatures.get( activeViewer ) ) {
+                this.addFeatureToView( feature, refCon );
             }
-            if (!(WindowManager.getDefault().getRegistry().getActivated() == activeTopComp)) {
-                activeTopComp.requestAttention(true);
+            if( !(WindowManager.getDefault().getRegistry().getActivated() == activeTopComp) ) {
+                activeTopComp.requestAttention( true );
             }
-        } else {
-            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(ThumbnailController.class, "MSG_NoFeatures"), NotifyDescriptor.INFORMATION_MESSAGE);
-            DialogDisplayer.getDefault().notify(nd);
+        }
+        else {
+            NotifyDescriptor nd = new NotifyDescriptor.Message( NbBundle.getMessage( ThumbnailController.class, "MSG_NoFeatures" ), NotifyDescriptor.INFORMATION_MESSAGE );
+            DialogDisplayer.getDefault().notify( nd );
             activeTopComp.close();
-            refThumbTopComponents.remove(activeViewer);
+            refThumbTopComponents.remove( activeViewer );
         }
     }
 
+
     /**
-     * Creates BasePanel for one Track with TrackViewer and ZoomSlider for wrapping into ComponentWidget.
+     * Creates BasePanel for one Track with TrackViewer and ZoomSlider for
+     * wrapping into ComponentWidget.
      */
-    private BasePanel createTrackPanel(PersistentTrack track, ViewController controller, CheckBoxActionListener cbListener) {
-        BoundsInfoManager boundsManager = new BoundsInfoManager(controller.getCurrentRefGen());
-        BasePanel basePanel = new BasePanel(boundsManager, controller);
-        basePanel.setName(track.getDescription());
-        controller.addMousePositionListener(basePanel);
+    private BasePanel createTrackPanel( PersistentTrack track, ViewController controller, CheckBoxActionListener cbListener ) {
+        BoundsInfoManager boundsManager = new BoundsInfoManager( controller.getCurrentRefGen() );
+        BasePanel basePanel = new BasePanel( boundsManager, controller );
+        basePanel.setName( track.getDescription() );
+        controller.addMousePositionListener( basePanel );
 
         // create track viewer
         MultiTrackConnector tc;
         SaveFileFetcherForGUI fetcher = new SaveFileFetcherForGUI();
         try {
-            tc = fetcher.getMultiTrackConnector(track);
-        } catch (UserCanceledTrackPathUpdateException ex) {
+            tc = fetcher.getMultiTrackConnector( track );
+        }
+        catch( UserCanceledTrackPathUpdateException ex ) {
             SaveFileFetcherForGUI.showPathSelectionErrorMsg();
             return null;
         }
 
-        final TrackViewer trackV = new TrackViewer(boundsManager, basePanel, controller.getCurrentRefGen(), tc, false);
-        trackV.setName(track.getDescription());
-        trackV.setUseMinimalIntervalLength(false);
-        trackV.setIsPanModeOn(false);
-        trackV.setCanZoom(false);
+        final TrackViewer trackV = new TrackViewer( boundsManager, basePanel, controller.getCurrentRefGen(), tc, false );
+        trackV.setName( track.getDescription() );
+        trackV.setUseMinimalIntervalLength( false );
+        trackV.setIsPanModeOn( false );
+        trackV.setCanZoom( false );
 
 //        CoverageInfoLabel cil = new CoverageInfoLabel();
 //        trackV.setTrackInfoPanel(cil);
 
         //own ComponentListener for TrackViewer
-        trackV.addComponentListener(new TrackViewerCompListener(currentFeature, trackV));
+        trackV.addComponentListener( new TrackViewerCompListener( currentFeature, trackV ) );
 
         // create zoom slider
-        CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
+        CoverageZoomSlider slider = new CoverageZoomSlider( trackV );
 
         //Set initial Slider-value based on Coverage if autoSlider is true
-        trackV.setAutomaticScaling(autoSlider);
+        trackV.setAutomaticScaling( autoSlider );
 
-        basePanel.setViewer(trackV, slider);
-        basePanel.setTitlePanel(this.getTitlePanel(track.getDescription(), cbListener));
+        basePanel.setViewer( trackV, slider );
+        basePanel.setTitlePanel( this.getTitlePanel( track.getDescription(), cbListener ) );
 
         //adapt size
-        basePanel.setMinimumSize(new Dimension(200, 150));
-        basePanel.setPreferredSize(new Dimension(200, 150));
-        
+        basePanel.setMinimumSize( new Dimension( 200, 150 ) );
+        basePanel.setPreferredSize( new Dimension( 200, 150 ) );
+
         return basePanel;
     }
 
+
     /**
      * TitlePanel for TrackPanel with Label and Checkbox.
+     * <p>
      * @param title
+     *              <p>
      * @return
      */
-    private JPanel getTitlePanel(String title, CheckBoxActionListener cbListener) {
+    private JPanel getTitlePanel( String title, CheckBoxActionListener cbListener ) {
         JPanel p = new JPanel();
-        p.add(new JLabel(title));
-        final JCheckBox compare = new JCheckBox("Compare");
-        compare.addActionListener(cbListener);
-        p.add(compare);
-        p.setBackground(ColorProperties.TITLE_BACKGROUND);
+        p.add( new JLabel( title ) );
+        final JCheckBox compare = new JCheckBox( "Compare" );
+        compare.addActionListener( cbListener );
+        p.add( compare );
+        p.setBackground( ColorProperties.TITLE_BACKGROUND );
         return p;
     }
 
+
     @Override
-    public void removeAllFeatures(ReferenceViewer refViewer) {
+    public void removeAllFeatures( ReferenceViewer refViewer ) {
         //could be used as a function to delete all Features
     }
 
+
     @Override
-    public void removeCertainFeature(PersistentFeature f) {
-        selectedFeatures.get(activeViewer).remove(f);
+    public void removeCertainFeature( PersistentFeature f ) {
+        selectedFeatures.get( activeViewer ).remove( f );
         //If all Features for activeViewer have been removed it is also removed as key from the list
-        if (selectedFeatures.get(activeViewer).isEmpty()) {
-            selectedFeatures.remove(activeViewer);
+        if( selectedFeatures.get( activeViewer ).isEmpty() ) {
+            selectedFeatures.remove( activeViewer );
         }
     }
 
+
     @Override
-    public void addFeatureToList(PersistentFeature feature, final ReferenceViewer refViewer) {
-        if (!selectedFeatures.containsKey(refViewer)) {
+    public void addFeatureToList( PersistentFeature feature, final ReferenceViewer refViewer ) {
+        if( !selectedFeatures.containsKey( refViewer ) ) {
             ArrayList<PersistentFeature> list = new ArrayList<>();
-            list.add(feature);
-            selectedFeatures.put(refViewer, list);
-        } else {
-            selectedFeatures.get(refViewer).add(feature);
+            list.add( feature );
+            selectedFeatures.put( refViewer, list );
         }
-        activeTopComp = refThumbTopComponents.get(refViewer);
+        else {
+            selectedFeatures.get( refViewer ).add( feature );
+        }
+        activeTopComp = refThumbTopComponents.get( refViewer );
         //adds Feature directly to Scene if ThumbnailTopComponent for this RefViewer is open
-        if (WindowManager.getDefault().getRegistry().getOpened().contains(activeTopComp)) {
-            ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector(controller.getCurrentRefGen().getId());
-            addFeatureToView(feature, refCon);
-            if (getLookup().lookup(ASyncSliderCookie.class) != null) {
-                sliderSynchronisation(true);
+        if( WindowManager.getDefault().getRegistry().getOpened().contains( activeTopComp ) ) {
+            ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector( controller.getCurrentRefGen().getId() );
+            addFeatureToView( feature, refCon );
+            if( getLookup().lookup( ASyncSliderCookie.class ) != null ) {
+                sliderSynchronisation( true );
             }
-            if (!(WindowManager.getDefault().getRegistry().getActivated() == activeTopComp)) {
-                activeTopComp.requestAttention(true);
+            if( !(WindowManager.getDefault().getRegistry().getActivated() == activeTopComp) ) {
+                activeTopComp.requestAttention( true );
             }
             //activeTopComp.requestActive();
         }
 
-        if (getLookup().lookup(RemoveCookie.class) == null) {
-            getLookup().add(new RemoveCookie() {
+        if( getLookup().lookup( RemoveCookie.class ) == null ) {
+            getLookup().add( new RemoveCookie() {
 
                 @Override
                 public void removeTracks() {
-                    RemoveFeatureListPanel rfp = new RemoveFeatureListPanel(selectedFeatures.get(activeViewer));
-                    DialogDescriptor dialogDescriptor = new DialogDescriptor(rfp, "Remove Features");
-                    Dialog openRefGenDialog = DialogDisplayer.getDefault().createDialog(dialogDescriptor);
-                    openRefGenDialog.setVisible(true);
+                    RemoveFeatureListPanel rfp = new RemoveFeatureListPanel( selectedFeatures.get( activeViewer ) );
+                    DialogDescriptor dialogDescriptor = new DialogDescriptor( rfp, "Remove Features" );
+                    Dialog openRefGenDialog = DialogDisplayer.getDefault().createDialog( dialogDescriptor );
+                    openRefGenDialog.setVisible( true );
                     //Removes all Selected Features from Scene and ArrayLists
-                    if (dialogDescriptor.getValue().equals(DialogDescriptor.OK_OPTION)) {
-                        for (Object f : rfp.getSelectedValues()) {
+                    if( dialogDescriptor.getValue().equals( DialogDescriptor.OK_OPTION ) ) {
+                        for( Object f : rfp.getSelectedValues() ) {
                             PersistentFeature feat = (PersistentFeature) f;
-                            removeCertainFeature(feat);
-                            if (featureToLayoutWidget.containsKey(feat) && featureToTrackpanelList.containsKey(feat)) {
-                                activeTopComp.getScene().removeChild(featureToLayoutWidget.get(feat));
+                            removeCertainFeature( feat );
+                            if( featureToLayoutWidget.containsKey( feat ) && featureToTrackpanelList.containsKey( feat ) ) {
+                                activeTopComp.getScene().removeChild( featureToLayoutWidget.get( feat ) );
 
-                                for (BasePanel p : featureToTrackpanelList.get(feat)) {
-                                    trackPanelToTrack.remove(p);
+                                for( BasePanel p : featureToTrackpanelList.get( feat ) ) {
+                                    trackPanelToTrack.remove( p );
                                     //Stop CoverageThread
                                     ((TrackViewer) p.getViewer()).getTrackCon().getCoverageThread().stop();
                                 }
-                                featureToTrackpanelList.remove(feat);
-                                featureToLayoutWidget.remove(feat);
+                                featureToTrackpanelList.remove( feat );
+                                featureToLayoutWidget.remove( feat );
                                 //If no Features are to display remove Cookies and close TopComp.
-                                if (activeTopComp.getScene().getChildren().isEmpty()) {
-                                    getLookup().removeAll(RemoveCookie.class);
-                                    refThumbTopComponents.get(activeViewer).remove(activeTopComp);
-                                    refThumbTopComponents.remove(activeViewer);
+                                if( activeTopComp.getScene().getChildren().isEmpty() ) {
+                                    getLookup().removeAll( RemoveCookie.class );
+                                    refThumbTopComponents.get( activeViewer ).remove( activeTopComp );
+                                    refThumbTopComponents.remove( activeViewer );
                                     activeTopComp.close();
                                 }
                             }
                         }
                     }
                 }
-            });
+
+
+            } );
         }
         addOpenCookie();
     }
+
 
     /**
      * MouseAdapter, for updating Feature information
      */
     @Override
-    public void mousePressed(MouseEvent e) {
+    public void mousePressed( MouseEvent e ) {
         BasePanel p = (BasePanel) e.getSource();
-        if (p != null) {
-            this.updateCurrentFeature(p);
+        if( p != null ) {
+            this.updateCurrentFeature( p );
         }
     }
+
 
     @Override
     public ThumbControllerLookup getLookup() {
         return controllerLookup;
     }
 
+
     void removeThumbSpecificCookies() {
-        getLookup().removeAll(SyncSliderCookie.class);
-        getLookup().removeAll(ASyncSliderCookie.class);
+        getLookup().removeAll( SyncSliderCookie.class );
+        getLookup().removeAll( ASyncSliderCookie.class );
     }
 
+
     /**
-     * Updates the ReferenceFeatureComponent to the currently selected Feature and sets currentFeature value.
+     * Updates the ReferenceFeatureComponent to the currently selected Feature
+     * and sets currentFeature value.
+     * <p>
      * @param bp BasePanel where user has clicked
      */
-    private void updateCurrentFeature(BasePanel bp) {
+    private void updateCurrentFeature( BasePanel bp ) {
         ReferenceFeatureTopComp comp = ReferenceFeatureTopComp.findInstance();
-        if (comp != null) {
-            for (PersistentFeature feature : featureToTrackpanelList.keySet()) {
-                if (featureToTrackpanelList.get(feature).contains(bp)) {
+        if( comp != null ) {
+            for( PersistentFeature feature : featureToTrackpanelList.keySet() ) {
+                if( featureToTrackpanelList.get( feature ).contains( bp ) ) {
                     currentFeature = feature;
-                    comp.showFeatureDetails(feature);
+                    comp.showFeatureDetails( feature );
                     break;
                 }
             }
         }
     }
 
+
     @Override
-    public void showPopUp(final PersistentFeature f, final ReferenceViewer viewer, MouseEvent e, final JPopupMenu popUp) {
-        JMenuItem addListItem = new JMenuItem(NbBundle.getMessage(ThumbnailController.class, "ThumbController.Add"));
-        addListItem.addActionListener(new ActionListener() {
+    public void showPopUp( final PersistentFeature f, final ReferenceViewer viewer, MouseEvent e, final JPopupMenu popUp ) {
+        JMenuItem addListItem = new JMenuItem( NbBundle.getMessage( ThumbnailController.class, "ThumbController.Add" ) );
+        addListItem.addActionListener( new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
-                addFeatureToList(f, viewer);
+            public void actionPerformed( ActionEvent e ) {
+                addFeatureToList( f, viewer );
             }
-        });
-        popUp.add(addListItem);
 
-        JMenuItem showThumbnail = new JMenuItem(NbBundle.getMessage(ThumbnailController.class, "ThumbController.Show"));
-        showThumbnail.addActionListener(new ActionListener() {
+
+        } );
+        popUp.add( addListItem );
+
+        JMenuItem showThumbnail = new JMenuItem( NbBundle.getMessage( ThumbnailController.class, "ThumbController.Show" ) );
+        showThumbnail.addActionListener( new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
-                showThumbnailView(viewer);
+            public void actionPerformed( ActionEvent e ) {
+                showThumbnailView( viewer );
             }
-        });
-        popUp.add(showThumbnail);
-        if (viewer.getTrackCount() < 1){
-            addListItem.setEnabled(false);
-            showThumbnail.setEnabled(false);
+
+
+        } );
+        popUp.add( showThumbnail );
+        if( viewer.getTrackCount() < 1 ) {
+            addListItem.setEnabled( false );
+            showThumbnail.setEnabled( false );
         }
     }
 
+
     @Override
-    public void showTablePopUp(final JTable table, final ReferenceViewer refViewer, MouseEvent e) {
+    public void showTablePopUp( final JTable table, final ReferenceViewer refViewer, MouseEvent e ) {
         JPopupMenu popUp = new JPopupMenu();
-        JMenuItem addListItem = new JMenuItem(NbBundle.getMessage(ThumbnailController.class, "ThumbController.Add"));
-        addListItem.addActionListener(new ActionListener() {
+        JMenuItem addListItem = new JMenuItem( NbBundle.getMessage( ThumbnailController.class, "ThumbController.Add" ) );
+        addListItem.addActionListener( new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed( ActionEvent e ) {
                 //Chooses all selected Rows and adds them to ThumbnailViewList
                 int[] selectedRows = table.getSelectedRows();
-                if (selectedRows.length > 0) {
-                    for (int i : selectedRows) {
-                        int correctedRow = table.convertRowIndexToModel(i);
-                        PersistentFeature feature = (PersistentFeature) table.getModel().getValueAt(correctedRow, 0);
-                        addFeatureToList(feature, refViewer);
+                if( selectedRows.length > 0 ) {
+                    for( int i : selectedRows ) {
+                        int correctedRow = table.convertRowIndexToModel( i );
+                        PersistentFeature feature = (PersistentFeature) table.getModel().getValueAt( correctedRow, 0 );
+                        addFeatureToList( feature, refViewer );
                     }
                 }
             }
-        });
-        popUp.add(addListItem);
-        JMenuItem showThumbnail = new JMenuItem(NbBundle.getMessage(ThumbnailController.class, "ThumbController.Show"));
-        showThumbnail.addActionListener(new ActionListener() {
+
+
+        } );
+        popUp.add( addListItem );
+        JMenuItem showThumbnail = new JMenuItem( NbBundle.getMessage( ThumbnailController.class, "ThumbController.Show" ) );
+        showThumbnail.addActionListener( new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
-                AppPanelTopComponent appComp = TopComponentHelper.getActiveTopComp(AppPanelTopComponent.class);
-                if (appComp != null) {
+            public void actionPerformed( ActionEvent e ) {
+                AppPanelTopComponent appComp = TopComponentHelper.getActiveTopComp( AppPanelTopComponent.class );
+                if( appComp != null ) {
                     //Get ViewController from AppPanelTopComponent-Lookup
-                    ViewController co = appComp.getLookup().lookup(ViewController.class);
-                    showThumbnailView(refViewer, co);
+                    ViewController co = appComp.getLookup().lookup( ViewController.class );
+                    showThumbnailView( refViewer, co );
                 }
             }
-        });
-        popUp.add(showThumbnail);
-        popUp.show(table, e.getX(), e.getY());
+
+
+        } );
+        popUp.add( showThumbnail );
+        popUp.show( table, e.getX(), e.getY() );
     }
 
-    public void setAutoSlider(boolean set) {
+
+    public void setAutoSlider( boolean set ) {
         this.autoSlider = set;
     }
 
+
     /**
-     * Set selected ThumbnailTopComponent as active and also the respective ReferenceViewer.
+     * Set selected ThumbnailTopComponent as active and also the respective
+     * ReferenceViewer.
+     * <p>
      * @param aThis
      */
-    void setMeAsActive(ThumbNailViewTopComponent aThis) {
+    void setMeAsActive( ThumbNailViewTopComponent aThis ) {
         this.activeTopComp = aThis;
-        for (ReferenceViewer refV : refThumbTopComponents.keySet()) {
-            if (refThumbTopComponents.get(refV) == activeTopComp) {
+        for( ReferenceViewer refV : refThumbTopComponents.keySet() ) {
+            if( refThumbTopComponents.get( refV ) == activeTopComp ) {
                 this.activeViewer = refV;
                 break;
             }
@@ -536,69 +592,78 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
 
     }
 
+
     void removeOpenCookie() {
-        CentralLookup.getDefault().removeAll(OpenThumbCookie.class);
+        CentralLookup.getDefault().removeAll( OpenThumbCookie.class );
     }
 
+
     void addOpenCookie() {
-        if (CentralLookup.getDefault().lookup(OpenThumbCookie.class) == null) {
-            CentralLookup.getDefault().add(new OpenThumbCookie() {
+        if( CentralLookup.getDefault().lookup( OpenThumbCookie.class ) == null ) {
+            CentralLookup.getDefault().add( new OpenThumbCookie() {
 
                 @Override
                 public void open() {
-                    ReferenceViewer refViewer = Utilities.actionsGlobalContext().lookup(ReferenceViewer.class);
-                    if (refViewer != null) {
-                        showThumbnailView(refViewer);
+                    ReferenceViewer refViewer = Utilities.actionsGlobalContext().lookup( ReferenceViewer.class );
+                    if( refViewer != null ) {
+                        showThumbnailView( refViewer );
                     }
                 }
-            });
+
+
+            } );
         }
     }
 
+
     /**
      * Creates a new LayoutWidget for given feature and adds it to the scene.
+     * <p>
      * @param feature
      * @param refCon
      */
-    private void addFeatureToView(PersistentFeature feature, ReferenceConnector refCon) {
+    private void addFeatureToView( PersistentFeature feature, ReferenceConnector refCon ) {
         this.currentFeature = feature;
         //Create LayoutWidget to layout all Tracks for a feature in GridLayout
-        Widget layoutWidg = new Widget(activeTopComp.getScene());
-        layoutWidg.setLayout(new ThumbGridLayout((refCon.getAssociatedTracks().size())));
-        featureToLayoutWidget.put(feature, layoutWidg);
+        Widget layoutWidg = new Widget( activeTopComp.getScene() );
+        layoutWidg.setLayout( new ThumbGridLayout( (refCon.getAssociatedTracks().size()) ) );
+        featureToLayoutWidget.put( feature, layoutWidg );
 
         //Save all BasePanels for feature in List to put into HashMap
         List<BasePanel> bps = new ArrayList<>();
         CheckBoxActionListener cbListener = new CheckBoxActionListener();
-        for (PersistentTrack track : refCon.getAssociatedTracks()) {
-            BasePanel trackPanel = createTrackPanel(track, controller, cbListener);
-            if (trackPanel != null) {
-                bps.add(trackPanel);
-                this.trackPanelToTrack.put(trackPanel, track);
-                trackPanel.addMouseListener(this);
-                trackPanel.getViewer().addMouseMotionListener(this);
+        for( PersistentTrack track : refCon.getAssociatedTracks() ) {
+            BasePanel trackPanel = createTrackPanel( track, controller, cbListener );
+            if( trackPanel != null ) {
+                bps.add( trackPanel );
+                this.trackPanelToTrack.put( trackPanel, track );
+                trackPanel.addMouseListener( this );
+                trackPanel.getViewer().addMouseMotionListener( this );
                 //Put TrackPanel into ComponentWidget for Scene
-                ComponentWidget compWidg = new ComponentWidget(activeTopComp.getScene(), trackPanel);
-                compWidg.setBorder(BorderFactory.createResizeBorder(6, Color.GRAY, false));
-                compWidg.getActions().addAction(ActionFactory.createResizeAction(new ResizeStrategy() {
+                ComponentWidget compWidg = new ComponentWidget( activeTopComp.getScene(), trackPanel );
+                compWidg.setBorder( BorderFactory.createResizeBorder( 6, Color.GRAY, false ) );
+                compWidg.getActions().addAction( ActionFactory.createResizeAction( new ResizeStrategy() {
                     @Override
-                    public Rectangle boundsSuggested(Widget widget, Rectangle originalBounds, Rectangle suggestedBounds, ControlPoint controlPoint) {
+                    public Rectangle boundsSuggested( Widget widget, Rectangle originalBounds, Rectangle suggestedBounds, ControlPoint controlPoint ) {
                         Widget layout = widget.getParentWidget();
-                        for (Widget child : layout.getChildren()) {
-                            child.setPreferredBounds(suggestedBounds);
+                        for( Widget child : layout.getChildren() ) {
+                            child.setPreferredBounds( suggestedBounds );
                         }
                         return suggestedBounds;
                     }
-                }, ActionFactory.createDefaultResizeProvider()));
 
-                layoutWidg.addChild(compWidg);
-                layoutWidg.setBorder(javax.swing.BorderFactory.createTitledBorder("Tracks for feature:" + currentFeature.toString()));
+
+                }, ActionFactory.createDefaultResizeProvider() ) );
+
+                layoutWidg.addChild( compWidg );
+                layoutWidg.setBorder( javax.swing.BorderFactory.createTitledBorder( "Tracks for feature:" + currentFeature.toString() ) );
             }
         }
-        this.featureToTrackpanelList.put(currentFeature, bps);
-        activeTopComp.getScene().addChild(layoutWidg);
+        this.featureToTrackpanelList.put( currentFeature, bps );
+        activeTopComp.getScene().addChild( layoutWidg );
         activeTopComp.getScene().validate();
     }
+
 
     /**
      * ActionListener for CompareCheckBox's.
@@ -608,146 +673,164 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         private int countTracks;
         private BasePanel firstTrackPanelToCompare;
 
+
         public CheckBoxActionListener() {
             countTracks = 0;
         }
 
-        private void startCompare(ActionEvent e) {
+
+        private void startCompare( ActionEvent e ) {
             try {
                 BasePanel secondTrackBP = (BasePanel) ((Component) e.getSource()).getParent().getParent();
                 ArrayList<PersistentTrack> trackList = new ArrayList<>();
-                trackList.add(trackPanelToTrack.get(firstTrackPanelToCompare));
-                trackList.add(trackPanelToTrack.get(secondTrackBP));
-                this.compareTwoTracks(trackList, currentFeature);
-            } catch (ClassCastException ex) {
-                Logger.getLogger(ThumbnailController.class.getName()).log(
-                        Level.WARNING, ex.getMessage());
+                trackList.add( trackPanelToTrack.get( firstTrackPanelToCompare ) );
+                trackList.add( trackPanelToTrack.get( secondTrackBP ) );
+                this.compareTwoTracks( trackList, currentFeature );
+            }
+            catch( ClassCastException ex ) {
+                Logger.getLogger( ThumbnailController.class.getName() ).log(
+                        Level.WARNING, ex.getMessage() );
             }
         }
-        
+
+
         /**
          * Creates Widgets for CompareTrackBasePanel to display in
          * TopComponent's Scene
+         * <p>
          * @param tracks
          * @param feature
          */
-        private void compareTwoTracks(List<PersistentTrack> tracks, PersistentFeature feature) {
-            BasePanel bp = createDoubleTrackPanel(tracks, feature);
-            bp.addMouseListener(ThumbnailController.this);
-            featureToTrackpanelList.get(feature).add(bp);
+        private void compareTwoTracks( List<PersistentTrack> tracks, PersistentFeature feature ) {
+            BasePanel bp = createDoubleTrackPanel( tracks, feature );
+            bp.addMouseListener( ThumbnailController.this );
+            featureToTrackpanelList.get( feature ).add( bp );
             //If Sliders are currently synchronized, synchronize again for new MultipleTrackViewer
-            if (getLookup().lookup(ASyncSliderCookie.class) != null) {
-                sliderSynchronisation(true);
+            if( getLookup().lookup( ASyncSliderCookie.class ) != null ) {
+                sliderSynchronisation( true );
             }
-            ComponentWidget compWidg = new ComponentWidget(activeTopComp.getScene(), bp);
-            compWidg.setBorder(BorderFactory.createResizeBorder(6, Color.GRAY, false));
-            compWidg.getActions().addAction(ActionFactory.createResizeAction(new ResizeStrategy() {
+            ComponentWidget compWidg = new ComponentWidget( activeTopComp.getScene(), bp );
+            compWidg.setBorder( BorderFactory.createResizeBorder( 6, Color.GRAY, false ) );
+            compWidg.getActions().addAction( ActionFactory.createResizeAction( new ResizeStrategy() {
 
                 @Override
-                public Rectangle boundsSuggested(Widget widget, Rectangle originalBounds, Rectangle suggestedBounds, ControlPoint controlPoint) {
+                public Rectangle boundsSuggested( Widget widget, Rectangle originalBounds, Rectangle suggestedBounds, ControlPoint controlPoint ) {
                     Widget layout = widget.getParentWidget();
-                    for (Widget child : layout.getChildren()) {
-                        child.setPreferredBounds(suggestedBounds);
+                    for( Widget child : layout.getChildren() ) {
+                        child.setPreferredBounds( suggestedBounds );
                     }
                     return suggestedBounds;
                 }
-            }, ActionFactory.createDefaultResizeProvider()));
+
+
+            }, ActionFactory.createDefaultResizeProvider() ) );
 
             //Add MultipleTrackPanel to Layout for currentFeature
-            featureToLayoutWidget.get(currentFeature).addChild(compWidg);
+            featureToLayoutWidget.get( currentFeature ).addChild( compWidg );
             activeTopComp.getScene().validate();
         }
-        
+
+
         /**
          * Creates BasePanel of two Tracks which have been compared.
+         * <p>
          * @param tracks Tracks to compare.
+         * <p>
          * @return
          */
-        private BasePanel createDoubleTrackPanel(List<PersistentTrack> tracks, PersistentFeature feature) {
-            BoundsInfoManager boundsManager = new BoundsInfoManager(controller.getCurrentRefGen());
-            BasePanel b = new BasePanel(boundsManager, controller);
-            controller.addMousePositionListener(b);
+        private BasePanel createDoubleTrackPanel( List<PersistentTrack> tracks, PersistentFeature feature ) {
+            BoundsInfoManager boundsManager = new BoundsInfoManager( controller.getCurrentRefGen() );
+            BasePanel b = new BasePanel( boundsManager, controller );
+            controller.addMousePositionListener( b );
 
             // get double track connector
             MultiTrackConnector trackCon;
             SaveFileFetcherForGUI fetcher = new SaveFileFetcherForGUI();
             try {
-                trackCon = fetcher.getMultiTrackConnector(tracks);
-            } catch (UserCanceledTrackPathUpdateException ex) {
+                trackCon = fetcher.getMultiTrackConnector( tracks );
+            }
+            catch( UserCanceledTrackPathUpdateException ex ) {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
                 return null; //cannot occur, since both tracks are already open in the thumbnail viewer
             }
-            DoubleTrackViewer trackV = new DoubleTrackViewer(boundsManager, b, controller.getCurrentRefGen(), trackCon);
-            trackV.setUseMinimalIntervalLength(false);
-            trackV.setIsPanModeOn(false);
-            trackV.setCanZoom(false);
+            DoubleTrackViewer trackV = new DoubleTrackViewer( boundsManager, b, controller.getCurrentRefGen(), trackCon );
+            trackV.setUseMinimalIntervalLength( false );
+            trackV.setIsPanModeOn( false );
+            trackV.setCanZoom( false );
 
             //eigener ComponentListener für TrackV
-            trackV.addComponentListener(new TrackViewerCompListener(feature, trackV));
+            trackV.addComponentListener( new TrackViewerCompListener( feature, trackV ) );
 
 //        // create info panel
 //        CoverageInfoLabel cil = new CoverageInfoLabel();
 //        cil.renameFields();
 //        trackV.setTrackInfoPanel(cil);
             // create zoom slider and set its value based on other slider's values for this Feature
-            CoverageZoomSlider slider = new CoverageZoomSlider(trackV);
-            BasePanel p = featureToTrackpanelList.get(feature).get(0);
+            CoverageZoomSlider slider = new CoverageZoomSlider( trackV );
+            BasePanel p = featureToTrackpanelList.get( feature ).get( 0 );
             try {
-                int sValue = ((JSlider) ((Container) p.getComponent(0)).getComponent(1)).getValue();
-                slider.setValue(sValue);
-            } catch (ClassCastException e) {
-                Logger.getLogger(ThumbnailController.class.getName()).log(
-                        Level.WARNING, "{0}: Can't set value MultipleTrackPanel-Slider", e.getMessage());
+                int sValue = ((JSlider) ((Container) p.getComponent( 0 )).getComponent( 1 )).getValue();
+                slider.setValue( sValue );
+            }
+            catch( ClassCastException e ) {
+                Logger.getLogger( ThumbnailController.class.getName() ).log(
+                        Level.WARNING, "{0}: Can't set value MultipleTrackPanel-Slider", e.getMessage() );
             }
 
             // add panels to basepanel
-            b.setViewer(trackV, slider);
+            b.setViewer( trackV, slider );
 
             //TitlePanel
-            String title = tracks.get(0).getDescription() + " - " + tracks.get(1).getDescription();
+            String title = tracks.get( 0 ).getDescription() + " - " + tracks.get( 1 ).getDescription();
             JPanel tp = new JPanel();
-            tp.add(new JLabel(title));
-            tp.setBackground(ColorProperties.TITLE_BACKGROUND);
-            b.setTitlePanel(tp);
+            tp.add( new JLabel( title ) );
+            tp.setBackground( ColorProperties.TITLE_BACKGROUND );
+            b.setTitlePanel( tp );
             //estimate current size of other BPs based on first BP
-            BasePanel refBP = featureToTrackpanelList.get(feature).get(0);
-            b.setMinimumSize(new Dimension(200, 150));
-            b.setPreferredSize(new Dimension(refBP.getBounds().width, refBP.getBounds().height));
+            BasePanel refBP = featureToTrackpanelList.get( feature ).get( 0 );
+            b.setMinimumSize( new Dimension( 200, 150 ) );
+            b.setPreferredSize( new Dimension( refBP.getBounds().width, refBP.getBounds().height ) );
             return b;
         }
 
+
         @Override
-        public void actionPerformed(final ActionEvent e) {
+        public void actionPerformed( final ActionEvent e ) {
             //Get Source of Event i.e. BasePanel
             BasePanel bp = (BasePanel) ((Component) e.getSource()).getParent().getParent();
-            if (bp != null) {
-                updateCurrentFeature(bp);
+            if( bp != null ) {
+                updateCurrentFeature( bp );
                 JCheckBox src = (JCheckBox) e.getSource();
-                if (src.isSelected()) {
+                if( src.isSelected() ) {
                     countTracks++;
-                    switch (countTracks) {
+                    switch( countTracks ) {
                         case 1:
                             firstTrackPanelToCompare = bp;
                             break;
                         case 2: {
-                            if (featureToTrackpanelList.get(currentFeature).contains(firstTrackPanelToCompare)) {
-                                startCompare(e);
+                            if( featureToTrackpanelList.get( currentFeature ).contains( firstTrackPanelToCompare ) ) {
+                                startCompare( e );
 
-                            } else {
+                            }
+                            else {
                                 countTracks--;
-                                src.setSelected(false);
+                                src.setSelected( false );
                             }
                             break;
                         }
                         default:
                             countTracks--;
-                            src.setSelected(false);
+                            src.setSelected( false );
                             break;
                     }
-                } else {
+                }
+                else {
                     countTracks--;
                 }
             }
         }
+
+
     }
+
 }

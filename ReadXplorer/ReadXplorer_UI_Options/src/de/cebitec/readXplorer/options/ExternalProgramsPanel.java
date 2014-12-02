@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,9 +16,11 @@
  */
 package de.cebitec.readXplorer.options;
 
+
 import java.io.File;
 import javax.swing.JFileChooser;
 import org.openide.util.NbPreferences;
+
 
 final class ExternalProgramsPanel extends javax.swing.JPanel {
 
@@ -27,11 +29,13 @@ final class ExternalProgramsPanel extends javax.swing.JPanel {
     public static final String SEQLOGO_LOCATION = "seqlogo location";
     private JFileChooser fc;
 
-    ExternalProgramsPanel(ExternalProgramsOptionsPanelController controller) {
+
+    ExternalProgramsPanel( ExternalProgramsOptionsPanelController controller ) {
         this.controller = controller;
         initComponents();
         // TODO listen to changes in form fields and call controller.changed()
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -122,11 +126,11 @@ final class ExternalProgramsPanel extends javax.swing.JPanel {
     private void bioProspectorLocationButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bioProspectorLocationButtonActionPerformed
         fc = new JFileChooser();
 
-        int returnVal = fc.showOpenDialog(this);
+        int returnVal = fc.showOpenDialog( this );
 
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            if (fc.getSelectedFile().canExecute()) {
-                this.bioProspectorLocationTF.setText(fc.getSelectedFile().getAbsolutePath());
+        if( returnVal == JFileChooser.APPROVE_OPTION ) {
+            if( fc.getSelectedFile().canExecute() ) {
+                this.bioProspectorLocationTF.setText( fc.getSelectedFile().getAbsolutePath() );
             }
         }
 
@@ -135,11 +139,11 @@ final class ExternalProgramsPanel extends javax.swing.JPanel {
     private void SeqLogoLocationButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SeqLogoLocationButtonActionPerformed
         fc = new JFileChooser();
 
-        int returnVal = fc.showOpenDialog(this);
+        int returnVal = fc.showOpenDialog( this );
 
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            if (fc.getSelectedFile().canExecute()) {
-                this.seqLogoLocationTF.setText(fc.getSelectedFile().getAbsolutePath());
+        if( returnVal == JFileChooser.APPROVE_OPTION ) {
+            if( fc.getSelectedFile().canExecute() ) {
+                this.seqLogoLocationTF.setText( fc.getSelectedFile().getAbsolutePath() );
             }
         }
     }//GEN-LAST:event_SeqLogoLocationButtonActionPerformed
@@ -148,35 +152,41 @@ final class ExternalProgramsPanel extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_bioProspectorLocationTFActionPerformed
 
+
     void load() {
-        this.seqLogoLocationTF.setText(NbPreferences.forModule(Object.class).get(ExternalProgramsPanel.SEQLOGO_LOCATION, ""));
-        this.bioProspectorLocationTF.setText(NbPreferences.forModule(Object.class).get(ExternalProgramsPanel.BIOPROSPECTOR_LOCATION, ""));
+        this.seqLogoLocationTF.setText( NbPreferences.forModule( Object.class ).get( ExternalProgramsPanel.SEQLOGO_LOCATION, "" ) );
+        this.bioProspectorLocationTF.setText( NbPreferences.forModule( Object.class ).get( ExternalProgramsPanel.BIOPROSPECTOR_LOCATION, "" ) );
     }
 
+
     void store() {
-        NbPreferences.forModule(Object.class).put(ExternalProgramsPanel.BIOPROSPECTOR_LOCATION, this.bioProspectorLocationTF.getText());
-        NbPreferences.forModule(Object.class).put(ExternalProgramsPanel.SEQLOGO_LOCATION, this.seqLogoLocationTF.getText());
+        NbPreferences.forModule( Object.class ).put( ExternalProgramsPanel.BIOPROSPECTOR_LOCATION, this.bioProspectorLocationTF.getText() );
+        NbPreferences.forModule( Object.class ).put( ExternalProgramsPanel.SEQLOGO_LOCATION, this.seqLogoLocationTF.getText() );
     }
+
 
     boolean valid() {
         // TODO check whether form is consistent and complete
-        File bioPros = new File(this.bioProspectorLocationTF.getText());
+        File bioPros = new File( this.bioProspectorLocationTF.getText() );
         boolean bioProsCheck = false;
-        File seqlogo = new File(this.seqLogoLocationTF.getText());
+        File seqlogo = new File( this.seqLogoLocationTF.getText() );
         boolean seqLogoCheck = false;
-        if (bioPros.exists() && bioPros.isFile() && bioPros.canExecute()) {
+        if( bioPros.exists() && bioPros.isFile() && bioPros.canExecute() ) {
             bioProsCheck = true;
         }
-        if (seqlogo.exists() && seqlogo.isFile() && seqlogo.canExecute()) {
+        if( seqlogo.exists() && seqlogo.isFile() && seqlogo.canExecute() ) {
             seqLogoCheck = true;
         }
-        if (bioProsCheck && seqLogoCheck) {
+        if( bioProsCheck && seqLogoCheck ) {
             return true;
-        } else if (bioProsCheck) {
+        }
+        else if( bioProsCheck ) {
             return false;
-        } else if (seqLogoCheck) {
+        }
+        else if( seqLogoCheck ) {
             return false;
-        } else {
+        }
+        else {
             return false;
         }
     }

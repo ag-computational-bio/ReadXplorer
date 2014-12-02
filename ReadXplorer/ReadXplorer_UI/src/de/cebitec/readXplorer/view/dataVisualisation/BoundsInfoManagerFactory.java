@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,36 +16,45 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import java.util.HashMap;
 
+
 /**
- * This class keeps track of created BoundsInfoManager-Instances and 
+ * This class keeps track of created BoundsInfoManager-Instances and
  * ensures that there is only one BoundsInfoManager per genome
- * 
+ * <p>
  * This is to ensure, that the panel navigation (i.e. "Jump to") still
  * works even if there are multiple genome object instances in use
+ * <p>
  * @author Evgeny Anisiforov
  */
 public class BoundsInfoManagerFactory {
+
     private HashMap<Integer, BoundsInfoManager> data;
-    
+
+
     public BoundsInfoManagerFactory() {
         this.data = new HashMap<>();
     }
-    
-    public BoundsInfoManager get(PersistentReference genome) {
-        if (data.containsKey(genome.getId())) { 
-            return data.get(genome.getId());
-        } else {
-            BoundsInfoManager boundsManager = new BoundsInfoManager(genome);
-            data.put(genome.getId(), boundsManager);
+
+
+    public BoundsInfoManager get( PersistentReference genome ) {
+        if( data.containsKey( genome.getId() ) ) {
+            return data.get( genome.getId() );
+        }
+        else {
+            BoundsInfoManager boundsManager = new BoundsInfoManager( genome );
+            data.put( genome.getId(), boundsManager );
             return boundsManager;
         }
     }
-    
+
+
     public void clear() {
         data.clear();
     }
-    
+
+
 }

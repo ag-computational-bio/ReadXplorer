@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.options;
 
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import javax.swing.JComponent;
@@ -23,70 +24,83 @@ import org.netbeans.spi.options.OptionsPanelController;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 
+
 @OptionsPanelController.TopLevelRegistration(
-        categoryName = "#OptionsCategory_Name_ExternalPrograms",
-        iconBase = "de/cebitec/readXplorer/options/externalTools.jpg",
-        keywords = "#OptionsCategory_Keywords_ExternalPrograms",
-        keywordsCategory = "ExternalPrograms"
+         categoryName = "#OptionsCategory_Name_ExternalPrograms",
+         iconBase = "de/cebitec/readXplorer/options/externalTools.jpg",
+         keywords = "#OptionsCategory_Keywords_ExternalPrograms",
+         keywordsCategory = "ExternalPrograms"
 )
-@org.openide.util.NbBundle.Messages({"OptionsCategory_Name_ExternalPrograms=External Programs", "OptionsCategory_Keywords_ExternalPrograms=external_programs"})
+@org.openide.util.NbBundle.Messages( { "OptionsCategory_Name_ExternalPrograms=External Programs", "OptionsCategory_Keywords_ExternalPrograms=external_programs" } )
 public final class ExternalProgramsOptionsPanelController extends OptionsPanelController {
 
     private ExternalProgramsPanel panel;
-    private final PropertyChangeSupport pcs = new PropertyChangeSupport(this);
+    private final PropertyChangeSupport pcs = new PropertyChangeSupport( this );
     private boolean changed;
+
 
     public void update() {
         getPanel().load();
         changed = false;
     }
 
+
     public void applyChanges() {
         getPanel().store();
         changed = false;
     }
 
+
     public void cancel() {
         // need not do anything special, if no changes have been persisted yet
     }
+
 
     public boolean isValid() {
         return getPanel().valid();
     }
 
+
     public boolean isChanged() {
         return changed;
     }
+
 
     public HelpCtx getHelpCtx() {
         return null; // new HelpCtx("...ID") if you have a help set
     }
 
-    public JComponent getComponent(Lookup masterLookup) {
+
+    public JComponent getComponent( Lookup masterLookup ) {
         return getPanel();
     }
 
-    public void addPropertyChangeListener(PropertyChangeListener l) {
-        pcs.addPropertyChangeListener(l);
+
+    public void addPropertyChangeListener( PropertyChangeListener l ) {
+        pcs.addPropertyChangeListener( l );
     }
 
-    public void removePropertyChangeListener(PropertyChangeListener l) {
-        pcs.removePropertyChangeListener(l);
+
+    public void removePropertyChangeListener( PropertyChangeListener l ) {
+        pcs.removePropertyChangeListener( l );
     }
+
 
     private ExternalProgramsPanel getPanel() {
-        if (panel == null) {
-            panel = new ExternalProgramsPanel(this);
+        if( panel == null ) {
+            panel = new ExternalProgramsPanel( this );
         }
         return panel;
     }
 
+
     void changed() {
-        if (!changed) {
+        if( !changed ) {
             changed = true;
-            pcs.firePropertyChange(OptionsPanelController.PROP_CHANGED, false, true);
+            pcs.firePropertyChange( OptionsPanelController.PROP_CHANGED, false, true );
         }
-        pcs.firePropertyChange(OptionsPanelController.PROP_VALID, null, null);
+        pcs.firePropertyChange( OptionsPanelController.PROP_VALID, null, null );
     }
+
 
 }

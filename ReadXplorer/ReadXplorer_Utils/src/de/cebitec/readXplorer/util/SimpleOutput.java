@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,12 +16,19 @@
  */
 package de.cebitec.readXplorer.util;
 
+
 /**
  * This is a simple interface to define an abstract output for displaying
  * normal and error messages to the user
+ * <p>
  * @author Evgeny Anisiforov
  */
 public interface SimpleOutput {
-    public void showMessage(String s);
-    public void showError(String s);
+
+    public void showMessage( String s );
+
+
+    public void showError( String s );
+
+
 }

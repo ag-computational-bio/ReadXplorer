@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,10 @@
  */
 package de.cebitec.readXplorer.databackend.dataObjects;
 
+
 import de.cebitec.readXplorer.databackend.IntervalRequest;
 import java.util.Collection;
+
 
 /**
  * Able to store the result for read pair calls. Called persistent, because it
@@ -26,21 +28,25 @@ import java.util.Collection;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class ReadPairResultPersistent extends AnalysisResult {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     private final Collection<ReadPairGroup> readPairs;
 
+
     /**
-     * Able to store the result for read pair calls. Called persistent, because it
+     * Able to store the result for read pair calls. Called persistent, because
+     * it
      * needs the persistent data types from its own package.
+     * <p>
      * @param readPairs colleaction of read pairs to store
-     * @param request the request for which the result was generated 
+     * @param request   the request for which the result was generated
      */
-    public ReadPairResultPersistent(Collection<ReadPairGroup> readPairs, IntervalRequest request) {
-        super(request);
+    public ReadPairResultPersistent( Collection<ReadPairGroup> readPairs, IntervalRequest request ) {
+        super( request );
         this.readPairs = readPairs;
     }
+
 
     /**
      * @return the collection of read pairs
@@ -48,5 +54,6 @@ public class ReadPairResultPersistent extends AnalysisResult {
     public Collection<ReadPairGroup> getReadPairs() {
         return readPairs;
     }
-    
+
+
 }

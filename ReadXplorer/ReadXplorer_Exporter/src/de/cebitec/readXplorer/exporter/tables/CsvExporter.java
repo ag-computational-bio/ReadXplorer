@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.exporter.tables;
 
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -31,6 +32,7 @@ import org.openide.util.NbBundle;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
 
+
 /**
  * General csv exporter. Since csv does not support multiple sheets, data for
  * multiple sheets is written to multiple files appended with a file number
@@ -39,7 +41,7 @@ import org.supercsv.prefs.CsvPreference;
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class CsvExporter implements TableExporterI {
-    
+
     private List<List<List<Object>>> exportData;
     private List<List<String>> headers;
     private int fileCount = 0;
@@ -47,82 +49,91 @@ public class CsvExporter implements TableExporterI {
     private ProgressHandle progressHandle;
     private int rowNumberGlobal;
 
+
     /**
      * General csv exporter. Since csv does not support multiple sheets, data
      * for multiple sheets is written to multiple files appended with a file
      * number and the sheet name. All 3 data fields have to be set in order to
      * start a successful export.
+     * <p>
      * @param progressHandle the progress handle which should display the
-     * progress of the CsvExporter
+     *                       progress of the CsvExporter
      */
-    public CsvExporter(ProgressHandle progressHandle) {
+    public CsvExporter( ProgressHandle progressHandle ) {
         this.progressHandle = progressHandle;
         this.rowNumberGlobal = 0;
     }
-    
+
+
     /**
      * @param headers the header list for the tables which should be exported to
-     * the csv file. Must be set!
+     *                the csv file. Must be set!
      */
     @Override
-    public void setHeaders(List<List<String>> headers) {
+    public void setHeaders( List<List<String>> headers ) {
         this.headers = headers;
     }
 
+
     /**
      * @param dataSheetNames the sheet name listf for the sheets which should be
-     * exported to the csv file. Must be set!
+     *                       exported to the csv file. Must be set!
      */
     @Override
-    public void setSheetNames(List<String> dataSheetNames) {
+    public void setSheetNames( List<String> dataSheetNames ) {
         this.sheetNames = dataSheetNames;
     }
-    
+
+
     /**
      * @param exportData The list of data which should be exported to the csv
-     * file. Must be set!
+     *                   file. Must be set!
      */
     @Override
-    public void setExportData(List<List<List<Object>>> exportData) {
+    public void setExportData( List<List<List<Object>>> exportData ) {
         this.exportData = exportData;
     }
-    
+
+
     /**
      * Carries out the whole export process to a csv file.
+     * <p>
      * @param file the file in which to write the data.
+     * <p>
      * @return the base file to which the data was written.
+     * <p>
      * @throws FileNotFoundException
      * @throws IOException
      * @throws WriteException
      * @throws OutOfMemoryError
      */
-    @NbBundle.Messages({"CsvExporterSuccessMsg=Csv exporter stored data successfully: ",
-        "CsvExporterSuccessHeader=Information Message"})
+    @NbBundle.Messages( { "CsvExporterSuccessMsg=Csv exporter stored data successfully: ",
+                          "CsvExporterSuccessHeader=Information Message" } )
     @Override
-    public File writeFile(File file) throws FileNotFoundException, IOException, OutOfMemoryError, WriteException {
-        
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Starting to write csv file...{0}", file.getAbsolutePath());
+    public File writeFile( File file ) throws FileNotFoundException, IOException, OutOfMemoryError, WriteException {
+
+        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Starting to write csv file...{0}", file.getAbsolutePath() );
 
         String[] header = new String[0];
 
-        for (int i = 0; i < exportData.size(); ++i) { 
-            try (CsvListWriter csvWriter = new CsvListWriter(new FileWriter(this.createOutputFile(file, sheetNames.get(i))), CsvPreference.TAB_PREFERENCE)) {
-                this.progressHandle.progress("Storing line", this.rowNumberGlobal++);
-                csvWriter.writeHeader(headers.get(i).toArray(header));
-                List<List<Object>> sheetData = exportData.get(i);
-                
-                for (List<Object> exportRow : sheetData) {
-                    csvWriter.write(exportRow);
-                    if (this.rowNumberGlobal++ % 100 == 0) {
-                        this.progressHandle.progress("Storing line", this.rowNumberGlobal);
+        for( int i = 0; i < exportData.size(); ++i ) {
+            try( CsvListWriter csvWriter = new CsvListWriter( new FileWriter( this.createOutputFile( file, sheetNames.get( i ) ) ), CsvPreference.TAB_PREFERENCE ) ) {
+                this.progressHandle.progress( "Storing line", this.rowNumberGlobal++ );
+                csvWriter.writeHeader( headers.get( i ).toArray( header ) );
+                List<List<Object>> sheetData = exportData.get( i );
+
+                for( List<Object> exportRow : sheetData ) {
+                    csvWriter.write( exportRow );
+                    if( this.rowNumberGlobal++ % 100 == 0 ) {
+                        this.progressHandle.progress( "Storing line", this.rowNumberGlobal );
                     }
                 }
             }
         }
 
-        NotificationDisplayer.getDefault().notify(Bundle.SuccessHeader(), new ImageIcon(), Bundle.SuccessMsg() + sheetNames.get(0), null);
+        NotificationDisplayer.getDefault().notify( Bundle.SuccessHeader(), new ImageIcon(), Bundle.SuccessMsg() + sheetNames.get( 0 ), null );
 
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Finished writing csv file!");
+        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Finished writing csv file!" );
 
 //        int currentPage = 0;
 //        int totalPage = 0;
@@ -153,33 +164,38 @@ public class CsvExporter implements TableExporterI {
         return file;
     }
 
+
     /**
      * {@inheritDoc}
      */
     @Override
     public boolean readyToExport() {
         return this.exportData != null && !this.exportData.isEmpty()
-                && this.headers != null && !this.headers.isEmpty()
-                && this.sheetNames != null && !this.sheetNames.isEmpty();
+               && this.headers != null && !this.headers.isEmpty()
+               && this.sheetNames != null && !this.sheetNames.isEmpty();
     }
+
 
     /**
      * If more than one file are written, this method appends
      * "_fileCount_dataSheetName" to the end of the file name.
-     * @param file the original file to store
+     * <p>
+     * @param file          the original file to store
      * @param dataSheetName The name of the data sheet, will also be added to
-     * the file name
+     *                      the file name
+     * <p>
      * @return The new file including the file number, if more than one file
-     * are stored
+     *         are stored
      */
-    private File createOutputFile(File file, String dataSheetName) {
+    private File createOutputFile( File file, String dataSheetName ) {
         File newFile = file;
-        if (fileCount++ > 0) {
-            String newPath = file.getAbsolutePath().substring(0, file.getAbsolutePath().length() - 4);
+        if( fileCount++ > 0 ) {
+            String newPath = file.getAbsolutePath().substring( 0, file.getAbsolutePath().length() - 4 );
             newPath += "_" + fileCount + "_" + dataSheetName + ".csv";
-            newFile = new File(newPath);
+            newFile = new File( newPath );
         }
         return newFile;
     }
-    
+
+
 }

@@ -5,6 +5,7 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard;
 
+
 /**
  * This class only contains static property strings.
  *
@@ -27,7 +28,7 @@ public class WizardPropertyStrings {
     // Novel transcript detection
     public static final String PROP_MIN_LENGTH_OF_NOVEL_TRANSCRIPT = "Minimum length of new transcript in nucleotides (nt)";
 
-    // Transcription start site detection 
+    // Transcription start site detection
     public static final String PROP_Fraction = "Fraction (used for background calculation, #FP)";
     public static final String PROP_MANAULLY_MIN_STACK_SIZE = "Minimum number of required mapped reads.";
     public static final String PROP_SET_MANAULLY_MIN_STACK_SIZE = "Manually set stack size of mapped reads.";
@@ -58,4 +59,5 @@ public class WizardPropertyStrings {
     public static final String PROP_INCLUDE_BEST_MATCHED_READS_RPKM = "Include best matched reads into RPKM analysis";
     public static final String PROP_NORMAL_RPKM_ANALYSIS = "normalRPKMs";
     public static final String PROP_REFERENCE_FILE_RPKM_DETERMINATION = "Reference file with static start and stop positions";
+
 }

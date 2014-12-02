@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,20 +16,26 @@
  */
 package de.cebitec.readXplorer.api;
 
+
 import javax.swing.JPanel;
+
 
 /**
  *
  * @author ddoppmeier
  */
 public interface ApplicationFrameI {
-    
-    public void showRefGenPanel(JPanel refGenPanel);
 
-    public void removeRefGenPanel(JPanel genomeViewer);
+    public void showRefGenPanel( JPanel refGenPanel );
 
-    public void showTrackPanel(JPanel trackPanel);
 
-    public void closeTrackPanel(JPanel trackPanel);
+    public void removeRefGenPanel( JPanel genomeViewer );
+
+
+    public void showTrackPanel( JPanel trackPanel );
+
+
+    public void closeTrackPanel( JPanel trackPanel );
+
 
 }

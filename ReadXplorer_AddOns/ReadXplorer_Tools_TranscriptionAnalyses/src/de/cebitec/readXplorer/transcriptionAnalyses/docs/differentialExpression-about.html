@@ -17,29 +17,29 @@ and open the template in the editor.
             <li style="text-align: justify;">Setup the analysis design. The different steps are briefly explained on each wizard page and in detail in the corresponding list below.</li>
             <li style="text-align: justify;">General setup:
                 <ul>
-                    <li style="text-align: justify;">Select the genomic feature types, to take into consideration for the analysis. 
+                    <li style="text-align: justify;">Select the genomic feature types, to take into consideration for the analysis.
                         The other features types are ignored. </li>
-                    <li style="text-align: justify;">Set the offset for the start and stop positions of each genomic feature. 
-                        Very useful to include otherwise ignored reads for genomic features whose annotation starts further downstream 
+                    <li style="text-align: justify;">Set the offset for the start and stop positions of each genomic feature.
+                        Very useful to include otherwise ignored reads for genomic features whose annotation starts further downstream
                         of the actual start position observed in the RNA-Seq data. <br /></li>
-                    <li style="text-align: justify;">Decide, if the read orientation is taken into account (only reads on the feature 
+                    <li style="text-align: justify;">Decide, if the read orientation is taken into account (only reads on the feature
                         strand are taken into consideration), or if all reads from both strands within range of a genomic feature are used.<br /></li>
-                    <li style="text-align: justify;">Only for DESeq and baySeq: Decide, if you want to store the parameters and results 
+                    <li style="text-align: justify;">Only for DESeq and baySeq: Decide, if you want to store the parameters and results
                         generated from the used R tool for further processing.</li>
                 </ul>
             </li>
-            <li style="text-align: justify;">Select the mapping classes (see 
-                <i><a href="nbdocs://de.cebitec.readXplorer.view/de/cebitec/readXplorer/view/docs/classification-about.html">Read Classification</a></i>) 
+            <li style="text-align: justify;">Select the mapping classes (see
+                <i><a href="nbdocs://de.cebitec.readXplorer.view/de/cebitec/readXplorer/view/docs/classification-about.html">Read Classification</a></i>)
                 to include in the analysis.</li>
             <li style="text-align: justify;">Click "<span style="text-decoration: underline;">Finish</span>" to start the differential gene expression analysis.</li>
         </ol>
         <p style="text-align: justify;"><span style="text-decoration: underline;">Wizard steps DESeq (two condition design)</span>:</p>
         <ol>
-            <li style="text-align: justify;">Define the experiment design: standard two condition design or multifactor design (for further information see 
+            <li style="text-align: justify;">Define the experiment design: standard two condition design or multifactor design (for further information see
                 <a href="http://www.bioconductor.org/packages/release/bioc/html/DESeq.html">DESeq manual</a>).</li>
             <li style="text-align: justify;">First select the reference to use in the upper field and afterwards all tracks to include in the analysis in the second field.</li>
-            <li style="text-align: justify;">Assign each track to one of the two conditions by using the arrows next to the two condition fields. 
-                ReadXplorer automatically identifies the best mode to estimate the dispersion values of the data for the given setup (For details see 
+            <li style="text-align: justify;">Assign each track to one of the two conditions by using the arrows next to the two condition fields.
+                ReadXplorer automatically identifies the best mode to estimate the dispersion values of the data for the given setup (For details see
                 <a href="http://www.bioconductor.org/packages/release/bioc/html/DESeq.html">DESeq manual</a>).</li>
             <li style="text-align: justify;">Continue at "4. General setup" in the general instruction list above.</li>
         </ol>
@@ -66,35 +66,35 @@ and open the template in the editor.
         <ol>
             <li style="text-align: justify;"><b>DESeq:</b>
                 <ul>
-                    <li style="text-align: justify;">M/A-plot: An interactive M/A plot similar to DESeq's M/A plot (Log 2 fold change vs. base means) 
-                        created by ReadXplorer. On the x-axis, the plot visualizes A (normalized mean expression (0.5 * log2 (baseMeanA * baseMeanB))), 
-                        while the y-axis plots M (log2 fold change). Each dot in the plot can be hovered and selected by left clicking. This action 
-                        centers the synchronized viewers on the selected gene of interest, enabling visual inspection of the underlying data. A gene 
+                    <li style="text-align: justify;">M/A-plot: An interactive M/A plot similar to DESeq's M/A plot (Log 2 fold change vs. base means)
+                        created by ReadXplorer. On the x-axis, the plot visualizes A (normalized mean expression (0.5 * log2 (baseMeanA * baseMeanB))),
+                        while the y-axis plots M (log2 fold change). Each dot in the plot can be hovered and selected by left clicking. This action
+                        centers the synchronized viewers on the selected gene of interest, enabling visual inspection of the underlying data. A gene
                         is more likely to be differentially expressed, if it is located farther away from 0 on the y-axsis and has a higher normalized mean expression.</li>
-                    <li style="text-align: justify;">Gene dispersion vs. normalized mean expression: This plot contains the empirical per gene dispersion 
-                        values (black dots) on the y-axis and the corresponding fitted dispersion values as a red line plotted against the mean expression 
-                        strength of each gene on the x-axis. The plot is doubly logarithmic. For details on gene dispersion please read the DESeq 
+                    <li style="text-align: justify;">Gene dispersion vs. normalized mean expression: This plot contains the empirical per gene dispersion
+                        values (black dots) on the y-axis and the corresponding fitted dispersion values as a red line plotted against the mean expression
+                        strength of each gene on the x-axis. The plot is doubly logarithmic. For details on gene dispersion please read the DESeq
                         publication and the DESeq manual.</li>
-                    <li style="text-align: justify;">Log 2 fold change vs. base means: DESeq's M/A plot. It contains normalized mean expression (A) 
+                    <li style="text-align: justify;">Log 2 fold change vs. base means: DESeq's M/A plot. It contains normalized mean expression (A)
                         against log2 fold change (M) for each gene.</li>
-                    <li style="text-align: justify;">Histogram of p-values: This plot visualizes the probability of genes not to be differentially 
+                    <li style="text-align: justify;">Histogram of p-values: This plot visualizes the probability of genes not to be differentially
                         expressed against its frequency in the experiment.</li>
                 </ul>
             <li style="text-align: justify;"><b>baySeq:</b>
                 <ul>
                     <li style="text-align: justify;">Priors: The log prior probability means (see Prior probability on Wikipedia) for a selected sample group.</li>
-                    <li style="text-align: justify;">M/A plot for count data: Where the log-ratio would be infinite, because the data in 
+                    <li style="text-align: justify;">M/A plot for count data: Where the log-ratio would be infinite, because the data in
                         one of the sample groups consists entirely of zeros, we plot instead the log-values of the other group.</li>
-                    <li style="text-align: justify;">Posterior likelihoods of differential expression against log-ratio: Posterior likelihoods 
-                        of differential gene expression against log-ratio (where this would be non-infinite) or log values (where all 
+                    <li style="text-align: justify;">Posterior likelihoods of differential expression against log-ratio: Posterior likelihoods
+                        of differential gene expression against log-ratio (where this would be non-infinite) or log values (where all
                         data in the other sample group consists of zeros).</li>
                 </ul>
             <li style="text-align: justify;"><b>Express Test:</b>
                 <ul>
                     <li style="text-align: justify;">M/A plot: Shows the same data as the interactive M/A-plot of DESeq.</li>
-                    <li style="text-align: justify;">Ratio plots: These two plots visualize the gene ratio of AB or BA on the x-axis, while the 
+                    <li style="text-align: justify;">Ratio plots: These two plots visualize the gene ratio of AB or BA on the x-axis, while the
                         y-axis shows the calculated confidence value. A higher confidence (top) depicts a higher probability, that the result is trustworthy.</li>
                 </ul>
         </ol>
-</body>
+    </body>
 </html>

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.view.dialogMenus;
 
+
 /**
  * Interface designed for classes showing an RNAFolder view.
  *
@@ -25,8 +26,12 @@ public interface RNAFolderI {
 
     /**
      * Creates a new RNAFolder view.
+     * <p>
      * @param sequenceToFold the DNA or RNA sequence to fold
-     * @param header the description of the folded sequence to use as header
+     * @param header         the description of the folded sequence to use as
+     *                       header
      */
-    public void showRNAFolderView(String sequenceToFold, String header);
+    public void showRNAFolderView( String sequenceToFold, String header );
+
+
 }

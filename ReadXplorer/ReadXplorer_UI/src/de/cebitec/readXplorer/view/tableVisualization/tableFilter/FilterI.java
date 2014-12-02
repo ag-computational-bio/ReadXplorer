@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,22 +16,29 @@
  */
 package de.cebitec.readXplorer.view.tableVisualization.tableFilter;
 
+
 import javax.swing.table.DefaultTableModel;
+
 
 /**
  * Interface providing functionality for filtering a table.
  *
  * @param <E> some default table model implementation
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public interface FilterI<E extends DefaultTableModel> {
-    
+
     /**
      * Filters the given table model by the given column and filter value.
-     * @param tableModel the table model to filter
-     * @param column the column to check for the filterValue
+     * <p>
+     * @param tableModel  the table model to filter
+     * @param column      the column to check for the filterValue
      * @param filterValue the filterValue to use for the given column
+     * <p>
      * @return the filtered table model
      */
-    public E filterTable(E tableModel, int column, Object filterValue);
+    public E filterTable( E tableModel, int column, Object filterValue );
+
+
 }

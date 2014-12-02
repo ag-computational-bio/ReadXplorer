@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,13 +16,17 @@
  */
 package de.cebitec.readXplorer.databackend;
 
+
 /**
  *
  * @author ddoppmeier, rhilker
  */
 public interface ThreadListener {
 
-    public void receiveData(Object data);
-    
+    public void receiveData( Object data );
+
+
     public void notifySkipped();
+
+
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,28 +16,32 @@
  */
 package de.cebitec.readXplorer.options;
 
+
 import org.netbeans.spi.options.OptionsPanelController;
 
+
 @OptionsPanelController.TopLevelRegistration(
-        categoryName = "#OptionsCategory_Name_Viewer",
-        iconBase = "de/cebitec/readXplorer/options/trackOpen24.png",
-        keywords = "#OptionsCategory_Keywords_Viewer",
-        keywordsCategory = "Viewer"
+         categoryName = "#OptionsCategory_Name_Viewer",
+         iconBase = "de/cebitec/readXplorer/options/trackOpen24.png",
+         keywords = "#OptionsCategory_Keywords_Viewer",
+         keywordsCategory = "Viewer"
 )
-@org.openide.util.NbBundle.Messages({"OptionsCategory_Name_Viewer=Viewer", "OptionsCategory_Keywords_Viewer=viewer"})
+@org.openide.util.NbBundle.Messages( { "OptionsCategory_Name_Viewer=Viewer", "OptionsCategory_Keywords_Viewer=viewer" } )
 public final class ViewerOptionsPanelController extends ChangeListeningOptionsPanelController {
 
     private ViewerPanel panel;
+
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected OptionsPanel getPanel() {
-        if (panel == null) {
-            panel = new ViewerPanel(this);
+        if( panel == null ) {
+            panel = new ViewerPanel( this );
         }
         return panel;
     }
+
 
 }

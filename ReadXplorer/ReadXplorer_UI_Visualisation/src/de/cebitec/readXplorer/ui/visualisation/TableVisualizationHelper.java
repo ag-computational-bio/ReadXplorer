@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,11 +16,13 @@
  */
 package de.cebitec.readXplorer.ui.visualisation;
 
+
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readXplorer.controller.ViewController;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.view.tableVisualization.TablePanel;
 import java.util.Collection;
+
 
 /**
  * A utility class providing methods for visualizing tables.
@@ -28,10 +30,11 @@ import java.util.Collection;
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class TableVisualizationHelper {
-    
+
     private TableVisualizationHelper() {
     }
-    
+
+
     /**
      * A utility method for connecting a TablePanel to a corresponding
      * ReferenceViewer. It first checks if a ReferenceViewer for the given
@@ -39,31 +42,34 @@ public class TableVisualizationHelper {
      * AppPanelTopComponent with the desired ReferenceViewer is opened. In both
      * case, the BoundsInfoManager of the ReferenceViewer is added to the given
      * TablePanel, enabling updating the viewer position from the TablePanel.
-     * @param ref Reference for which the viewer shall be checked
-     * @param tablePanel Any table panel, which shall be able to update 
-     * genomic positions of the reference
+     * <p>
+     * @param ref        Reference for which the viewer shall be checked
+     * @param tablePanel Any table panel, which shall be able to update
+     *                   genomic positions of the reference
      */
-    public static void checkAndOpenRefViewer(PersistentReference ref, TablePanel tablePanel) {
-        @SuppressWarnings("unchecked")
-        Collection<ViewController> viewControllers = (Collection<ViewController>) CentralLookup.getDefault().lookupAll(ViewController.class);
+    public static void checkAndOpenRefViewer( PersistentReference ref, TablePanel tablePanel ) {
+        @SuppressWarnings( "unchecked" )
+        Collection<ViewController> viewControllers = (Collection<ViewController>) CentralLookup.getDefault().lookupAll( ViewController.class );
         boolean alreadyOpen = false;
-        for (ViewController tmpVCon : viewControllers) {
-            if (tmpVCon.getCurrentRefGen().equals(ref)) {
+        for( ViewController tmpVCon : viewControllers ) {
+            if( tmpVCon.getCurrentRefGen().equals( ref ) ) {
                 alreadyOpen = true;
-                tablePanel.setBoundsInfoManager(tmpVCon.getBoundsManager());
+                tablePanel.setBoundsInfoManager( tmpVCon.getBoundsManager() );
                 break;
             }
         }
 
-        if (!alreadyOpen) {
+        if( !alreadyOpen ) {
             //open reference genome now
             AppPanelTopComponent appPanelTopComponent = new AppPanelTopComponent();
             appPanelTopComponent.open();
-            ViewController viewController = appPanelTopComponent.getLookup().lookup(ViewController.class);
-            viewController.openGenome(ref);
-            appPanelTopComponent.setName(viewController.getDisplayName());
+            ViewController viewController = appPanelTopComponent.getLookup().lookup( ViewController.class );
+            viewController.openGenome( ref );
+            appPanelTopComponent.setName( viewController.getDisplayName() );
             appPanelTopComponent.requestActive();
-            tablePanel.setBoundsInfoManager(viewController.getBoundsManager());
+            tablePanel.setBoundsInfoManager( viewController.getBoundsManager() );
         }
     }
+
+
 }

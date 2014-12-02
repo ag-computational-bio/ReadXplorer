@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,29 +16,37 @@
  */
 package de.cebitec.readXplorer.tools.rnaFolder.naview;
 
-import java.awt.geom.Point2D.Double;
+
 import java.awt.geom.Point2D;
 
+
 public class Base {
-  protected int mate;
-  protected double x = 9999.0;
-  protected double y = 9999.0;
-  protected boolean extracted = false;
-  protected Region region = null;
 
-  protected Base(int mate) {
-    this.mate = mate;
-  }
+    protected int mate;
+    protected double x = 9999.0;
+    protected double y = 9999.0;
+    protected boolean extracted = false;
+    protected Region region = null;
 
-  public int getMate() {
-    return mate;
-  }
 
-  public Point2D getPosition() {
-    return new Point2D.Double(x, y);
-  }
+    protected Base( int mate ) {
+        this.mate = mate;
+    }
 
-  public Region getRegion() {
-    return region;
-  }
+
+    public int getMate() {
+        return mate;
+    }
+
+
+    public Point2D getPosition() {
+        return new Point2D.Double( x, y );
+    }
+
+
+    public Region getRegion() {
+        return region;
+    }
+
+
 }

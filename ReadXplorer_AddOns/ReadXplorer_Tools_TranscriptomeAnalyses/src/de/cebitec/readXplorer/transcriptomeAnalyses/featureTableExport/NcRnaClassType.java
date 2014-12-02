@@ -4,36 +4,37 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport;
 
+
 /**
- * Qualifier /ncRNA_class= 
- * 
- * Definition a structured description of the classification of the 
- * non-coding RNA described by the ncRNA parent key Value format "TYPE" 
- * Example:     /ncRNA_class="miRNA" 
+ * Qualifier /ncRNA_class=
+ * <p>
+ * Definition a structured description of the classification of the
+ * non-coding RNA described by the ncRNA parent key Value format "TYPE"
+ * Example: /ncRNA_class="miRNA"
  *              /ncRNA_class="siRNA"
- *              /ncRNA_class="scRNA" 
- * Comment:     TYPE is a term taken from the INSDC controlled
+ *              /ncRNA_class="scRNA"
+ * Comment: TYPE is a term taken from the INSDC controlled
  * vocabulary for ncRNA classes (http://www.insdc.org/rna_vocab.html); on
  * 15-Oct-2013, the following terms were valid:
  *
- * "antisense_RNA" 
- * "autocatalytically_spliced_intron" 
+ * "antisense_RNA"
+ * "autocatalytically_spliced_intron"
  * "ribozyme"
- * "hammerhead_ribozyme" 
- * "lncRNA" 
- * "RNase_P_RNA" 
- * "RNase_MRP_RNA" 
+ * "hammerhead_ribozyme"
+ * "lncRNA"
+ * "RNase_P_RNA"
+ * "RNase_MRP_RNA"
  * "telomerase_RNA"
- * "guide_RNA" 
- * "rasiRNA" 
- * "scRNA" 
- * "siRNA" 
- * "miRNA" 
- * "piRNA" 
- * "snoRNA" 
+ * "guide_RNA"
+ * "rasiRNA"
+ * "scRNA"
+ * "siRNA"
+ * "miRNA"
+ * "piRNA"
+ * "snoRNA"
  * "snRNA"
- * "SRP_RNA" 
- * "vault_RNA" 
+ * "SRP_RNA"
+ * "vault_RNA"
  * "Y_RNA"
  * "other"
  *
@@ -65,4 +66,5 @@ public enum NcRnaClassType {
     VAULT_RNA,
     Y_RNA,
     OTHER;
+
 }

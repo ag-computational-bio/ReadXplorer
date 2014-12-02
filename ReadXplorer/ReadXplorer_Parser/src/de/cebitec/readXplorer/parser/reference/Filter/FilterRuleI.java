@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.parser.reference.Filter;
 
+
 import de.cebitec.readXplorer.parser.common.ParsedFeature;
 
 
@@ -25,6 +26,7 @@ import de.cebitec.readXplorer.parser.common.ParsedFeature;
  */
 public interface FilterRuleI {
 
-    public boolean appliesRule(ParsedFeature feature);
+    public boolean appliesRule( ParsedFeature feature );
+
 
 }

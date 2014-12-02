@@ -1,55 +1,51 @@
 package de.cebitec.readxplorer.vcf.visualization;
 
-import de.cebitec.readXplorer.util.TabWithCloseX;
+
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.BasePanel;
-import static de.cebitec.readxplorer.vcf.visualization.Snp_VcfResultTopComponent.PREFERRED_ID;
 import java.awt.BorderLayout;
-import java.awt.event.ContainerEvent;
-import java.awt.event.ContainerListener;
-import javax.swing.JPanel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
-import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
-import org.openide.windows.WindowManager;
+import org.openide.windows.TopComponent;
+
 
 /**
  * Top component which displays something.
  */
 @ConvertAsProperties(
-        dtd = "-//de.cebitec.readxplorer.vcf.visualization//SNP_VCFViewer//EN",
-        autostore = false
+         dtd = "-//de.cebitec.readxplorer.vcf.visualization//SNP_VCFViewer//EN",
+         autostore = false
 )
 @TopComponent.Description(
-        preferredID = "SNP_VCFViewerTopComponent",
-        //iconBase="SET/PATH/TO/ICON/HERE", 
-        persistenceType = TopComponent.PERSISTENCE_ALWAYS
+         preferredID = "SNP_VCFViewerTopComponent",
+         //iconBase="SET/PATH/TO/ICON/HERE",
+         persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
-@TopComponent.Registration(mode = "editor", openAtStartup = false)
-@ActionID(category = "Window", id = "de.cebitec.readxplorer.vcf.visualization.SNP_VCFViewerTopComponent")
-@ActionReference(path = "Menu/Window" /*, position = 333 */)
+@TopComponent.Registration( mode = "editor", openAtStartup = false )
+@ActionID( category = "Window", id = "de.cebitec.readxplorer.vcf.visualization.SNP_VCFViewerTopComponent" )
+@ActionReference( path = "Menu/Window" /*, position = 333 */ )
 @TopComponent.OpenActionRegistration(
-        displayName = "#CTL_SNP_VCFViewerAction",
-        preferredID = "SNP_VCFViewerTopComponent"
+         displayName = "#CTL_SNP_VCFViewerAction",
+         preferredID = "SNP_VCFViewerTopComponent"
 )
-@Messages({
+@Messages( {
     "CTL_SNP_VCFViewerAction=SNP_VCFViewer",
     "CTL_SNP_VCFViewerTopComponent=SNP_VCFViewer Window",
     "HINT_SNP_VCFViewerTopComponent=This is a SNP_VCFViewer window"
-})
+} )
 public final class Snp_VcfViewerTopComponent extends TopComponent {
 
     public Snp_VcfViewerTopComponent() {
         initComponents();
-        setName(Bundle.CTL_SNP_VCFViewerTopComponent());
-        setToolTipText(Bundle.HINT_SNP_VCFViewerTopComponent());
-        putClientProperty(TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE);  // from CA
+        setName( Bundle.CTL_SNP_VCFViewerTopComponent() );
+        setToolTipText( Bundle.HINT_SNP_VCFViewerTopComponent() );
+        putClientProperty( TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE );  // from CA
 
-        }
-    
+    }
 
-         // add listener to close TopComponent when no tabs are shown
+
+    // add listener to close TopComponent when no tabs are shown
     // from AC
 //        this.viewerPanel.addContainerListener(new ContainerListener() {
 //            @Override
@@ -95,20 +91,23 @@ public final class Snp_VcfViewerTopComponent extends TopComponent {
         // TODO add custom code on component opening
     }
 
+
     @Override
     public void componentClosed() {
         // TODO add custom code on component closing
     }
 
-    void writeProperties(java.util.Properties p) {
+
+    void writeProperties( java.util.Properties p ) {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
-        p.setProperty("version", "1.0");
+        p.setProperty( "version", "1.0" );
         // TODO store your settings
     }
 
-    void readProperties(java.util.Properties p) {
-        String version = p.getProperty("version");
+
+    void readProperties( java.util.Properties p ) {
+        String version = p.getProperty( "version" );
         // TODO read your settings according to their version
     }
 
@@ -116,16 +115,19 @@ public final class Snp_VcfViewerTopComponent extends TopComponent {
 //        this.viewerPanel.add(panelName, resultPanel);
 //    }
 
-     public void openViewer(BasePanel viewPanel) {
-        this.viewPanel.add(viewPanel, BorderLayout.CENTER);
-     }
-    
+    public void openViewer( BasePanel viewPanel ) {
+        this.viewPanel.add( viewPanel, BorderLayout.CENTER );
+    }
+
+
     /**
      * @return true, if this component already contains other components, false
-     * otherwise.
+     *         otherwise.
      */
     public boolean hasComponents() {
         return true;
 //        return this.viewerPanel.getComponentCount() > 0;
     }
+
+
 }

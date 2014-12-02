@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.ui.importer;
 
+
 import de.cebitec.readXplorer.ui.importer.actions.ImportWizardAction;
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
@@ -28,7 +29,9 @@ import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
 
-public class ImportWizardSetupPanel implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
+
+public class ImportWizardSetupPanel implements
+        WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
     /**
      * The visual component that displays this panel. If you need to access the
@@ -36,7 +39,8 @@ public class ImportWizardSetupPanel implements WizardDescriptor.FinishablePanel<
      */
     private ImportSetupCard component;
     private boolean isValid;
-    private final Set<ChangeListener> listeners = new HashSet<>(1); // or can use ChangeSupport in NB 6.0, but how?!?
+    private final Set<ChangeListener> listeners = new HashSet<>( 1 ); // or can use ChangeSupport in NB 6.0, but how?!?
+
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -44,11 +48,12 @@ public class ImportWizardSetupPanel implements WizardDescriptor.FinishablePanel<
     // create only those which really need to be visible.
     @Override
     public Component getComponent() {
-        if (component == null) {
+        if( component == null ) {
             component = new ImportSetupCard();
         }
         return component;
     }
+
 
     @Override
     public HelpCtx getHelp() {
@@ -58,62 +63,73 @@ public class ImportWizardSetupPanel implements WizardDescriptor.FinishablePanel<
         // return new HelpCtx(SampleWizardPanel1.class);
     }
 
+
     @Override
     public boolean isValid() {
         return isValid;
     }
+
 
     @Override
     public boolean isFinishPanel() {
         return isValid;
     }
 
+
     @Override
-    public final void addChangeListener(ChangeListener l) {
-        synchronized (listeners) {
-            listeners.add(l);
+    public final void addChangeListener( ChangeListener l ) {
+        synchronized( listeners ) {
+            listeners.add( l );
         }
     }
 
+
     @Override
-    public final void removeChangeListener(ChangeListener l) {
-        synchronized (listeners) {
-            listeners.remove(l);
+    public final void removeChangeListener( ChangeListener l ) {
+        synchronized( listeners ) {
+            listeners.remove( l );
         }
     }
+
 
     protected final void fireChangeEvent() {
         Iterator<ChangeListener> it;
-        synchronized (listeners) {
-            it = new HashSet<>(listeners).iterator();
+        synchronized( listeners ) {
+            it = new HashSet<>( listeners ).iterator();
         }
-        ChangeEvent ev = new ChangeEvent(this);
-        while (it.hasNext()) {
-            it.next().stateChanged(ev);
+        ChangeEvent ev = new ChangeEvent( this );
+        while( it.hasNext() ) {
+            it.next().stateChanged( ev );
         }
     }
+
 
     // You can use a settings object to keep track of state. Normally the
     // settings object will be the WizardDescriptor, so you can use
     // WizardDescriptor.getProperty & putProperty to store information entered
     // by the user.
     @Override
-    public void readSettings(WizardDescriptor settings) {
-        component.addPropertyChangeListener(ImportWizardAction.PROP_CAN_IMPORT, new PropertyChangeListener() {
+    public void readSettings( WizardDescriptor settings ) {
+        component.addPropertyChangeListener( ImportWizardAction.PROP_CAN_IMPORT, new PropertyChangeListener() {
 
             @Override
-            public void propertyChange(PropertyChangeEvent evt) {
+            public void propertyChange( PropertyChangeEvent evt ) {
                 isValid = (Boolean) evt.getNewValue();
                 fireChangeEvent();
             }
-        });
+
+
+        } );
     }
 
+
     @Override
-    public void storeSettings(WizardDescriptor settings) {
+    public void storeSettings( WizardDescriptor settings ) {
         // store job to import
-        settings.putProperty(ImportWizardAction.PROP_REFJOBLIST, component.getRefJobList());
-        settings.putProperty(ImportWizardAction.PROP_TRACKJOBLIST, component.getTrackJobList());
-        settings.putProperty(ImportWizardAction.PROP_READPAIRJOBLIST, component.getReadPairTrackJobList());
+        settings.putProperty( ImportWizardAction.PROP_REFJOBLIST, component.getRefJobList() );
+        settings.putProperty( ImportWizardAction.PROP_TRACKJOBLIST, component.getTrackJobList() );
+        settings.putProperty( ImportWizardAction.PROP_READPAIRJOBLIST, component.getReadPairTrackJobList() );
     }
+
+
 }

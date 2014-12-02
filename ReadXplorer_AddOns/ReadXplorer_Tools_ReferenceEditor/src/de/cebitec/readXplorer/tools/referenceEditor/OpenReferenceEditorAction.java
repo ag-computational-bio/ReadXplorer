@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,36 +16,43 @@
  */
 package de.cebitec.readXplorer.tools.referenceEditor;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+
 /**
  * Action for opening a reference editor.
- * 
+ * <p>
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public final class OpenReferenceEditorAction implements ActionListener {
 
     private final ReferenceViewer context;
 
+
     /**
      * Action for opening a reference editor.
+     * <p>
      * @param context The reference associated to the reference editor
      */
-    public OpenReferenceEditorAction(ReferenceViewer context) {
+    public OpenReferenceEditorAction( ReferenceViewer context ) {
         this.context = context;
     }
 
+
     @Override
-    public void actionPerformed(ActionEvent ev) {
+    public void actionPerformed( ActionEvent ev ) {
         PersistentReference reference = this.context.getReference();
         ReferenceEditorTopComponent referenceEditor = new ReferenceEditorTopComponent();
-        referenceEditor.setName("Reference editor of ".concat(reference.getName()));
-        referenceEditor.setReference(reference);
+        referenceEditor.setName( "Reference editor of ".concat( reference.getName() ) );
+        referenceEditor.setReference( reference );
         referenceEditor.open();
         referenceEditor.requestActive();
         referenceEditor.toFront();
     }
+
+
 }

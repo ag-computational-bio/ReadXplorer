@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.parser.common;
 
+
 /**
  * Interface for all data parsers.
  *
@@ -28,14 +29,17 @@ public interface ParserI {
      */
     public String getName();
 
+
     /**
      * @return file extensions supported by this parser.
      */
     public String[] getFileExtensions();
-    
+
+
     /**
      * @return input file description string.
      */
     public String getInputFileDescription();
+
 
 }

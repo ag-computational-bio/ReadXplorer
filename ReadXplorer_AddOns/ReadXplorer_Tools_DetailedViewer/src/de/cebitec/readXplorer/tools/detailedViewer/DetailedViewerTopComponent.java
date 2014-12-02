@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cebitec.readXplorer.tools.detailedViewer;
+
 
 import de.cebitec.readXplorer.controller.ViewController;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
@@ -33,36 +34,38 @@ import org.openide.util.Utilities;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
+
 /**
  * Top component which displays something.
  */
 @ConvertAsProperties(
-        dtd = "-//de.cebitec.readXplorer.tools.detailedViewer//DetailedViewer//EN",
-        autostore = false
+         dtd = "-//de.cebitec.readXplorer.tools.detailedViewer//DetailedViewer//EN",
+         autostore = false
 )
 @TopComponent.Description(
-        preferredID = "DetailedViewerTopComponent",
-        iconBase = "de/cebitec/readXplorer/tools/detailedViewer/detailedViewer.png",
-        persistenceType = TopComponent.PERSISTENCE_ALWAYS
+         preferredID = "DetailedViewerTopComponent",
+         iconBase = "de/cebitec/readXplorer/tools/detailedViewer/detailedViewer.png",
+         persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
-@TopComponent.Registration(mode = "editor", openAtStartup = false)
-@ActionID(category = "Window", id = "de.cebitec.readXplorer.tools.detailedViewer.DetailedViewerTopComponent")
-@ActionReference(path = "Menu/Window" /*, position = 333 */)
+@TopComponent.Registration( mode = "editor", openAtStartup = false )
+@ActionID( category = "Window", id = "de.cebitec.readXplorer.tools.detailedViewer.DetailedViewerTopComponent" )
+@ActionReference( path = "Menu/Window" /*, position = 333 */ )
 @TopComponent.OpenActionRegistration(
-        displayName = "#CTL_DetailedViewerAction",
-        preferredID = "DetailedViewerTopComponent"
+         displayName = "#CTL_DetailedViewerAction",
+         preferredID = "DetailedViewerTopComponent"
 )
-@Messages({
+@Messages( {
     "CTL_DetailedViewerAction=DetailedViewer",
     "CTL_DetailedViewerTopComponent=DetailedViewer Window",
     "HINT_DetailedViewerTopComponent=This is a DetailedViewer window"
-})
+} )
 public final class DetailedViewerTopComponent extends TopComponentExtended {
+
     private static final long serialVersionUID = 1L;
     private static final String PREFERRED_ID = "DetailedViewerTopComponent";
-    
+
     private static DetailedViewerTopComponent instance;
-    
+
     private TrackConnector trackConnector;
     private BasePanel alignmentBasePanel;
     private BasePanel histogramBasePanel;
@@ -75,19 +78,22 @@ public final class DetailedViewerTopComponent extends TopComponentExtended {
 
     private String selectedViewer;
     private ViewController viewCon;
-    
+
+
     public DetailedViewerTopComponent() {
         initComponents();
-        setName(Bundle.CTL_DetailedViewerTopComponent());
-        setToolTipText(Bundle.HINT_DetailedViewerTopComponent());
-        this.viewCon = Utilities.actionsGlobalContext().lookup(ViewController.class);
+        setName( Bundle.CTL_DetailedViewerTopComponent() );
+        setToolTipText( Bundle.HINT_DetailedViewerTopComponent() );
+        this.viewCon = Utilities.actionsGlobalContext().lookup( ViewController.class );
     }
-    
-    public DetailedViewerTopComponent(ViewController viewCon) {
+
+
+    public DetailedViewerTopComponent( ViewController viewCon ) {
         this();
         this.viewCon = viewCon;
 
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -183,34 +189,34 @@ public final class DetailedViewerTopComponent extends TopComponentExtended {
 
     private void histogramButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_histogramButtonActionPerformed
         this.selectedViewer = HISTOGRAMCARD;
-        this.changeViewerStatus(this.selectedViewer, true);
-        this.changeViewerStatus(ALIGNMENTCARD, false);
-        this.changeViewerStatus(READPAIRCARD, false);
-        cards.show(cardPanel, HISTOGRAMCARD);
+        this.changeViewerStatus( this.selectedViewer, true );
+        this.changeViewerStatus( ALIGNMENTCARD, false );
+        this.changeViewerStatus( READPAIRCARD, false );
+        cards.show( cardPanel, HISTOGRAMCARD );
     }//GEN-LAST:event_histogramButtonActionPerformed
 
     private void alignmentButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alignmentButtonActionPerformed
         this.selectedViewer = ALIGNMENTCARD;
-        this.changeViewerStatus(HISTOGRAMCARD, false);
-        this.changeViewerStatus(this.selectedViewer, true);
-        this.changeViewerStatus(READPAIRCARD, false);
+        this.changeViewerStatus( HISTOGRAMCARD, false );
+        this.changeViewerStatus( this.selectedViewer, true );
+        this.changeViewerStatus( READPAIRCARD, false );
         //alignmentBasePanel.getViewer().setActive(true); //to ensure size calculation is performed correctly
-        cards.show(cardPanel, ALIGNMENTCARD);
+        cards.show( cardPanel, ALIGNMENTCARD );
     }//GEN-LAST:event_alignmentButtonActionPerformed
 
     private void colorHistogramBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_colorHistogramBoxActionPerformed
         HistogramViewer histViewer = (HistogramViewer) histogramBasePanel.getViewer();
-        histViewer.setIsColored(colorHistogramBox.isSelected());
+        histViewer.setIsColored( colorHistogramBox.isSelected() );
         histViewer.boundsChangedHook();
         histViewer.repaint();
     }//GEN-LAST:event_colorHistogramBoxActionPerformed
 
     private void readPairButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_readPairButtonActionPerformed
         this.selectedViewer = READPAIRCARD;
-        this.changeViewerStatus(HISTOGRAMCARD, false);
-        this.changeViewerStatus(ALIGNMENTCARD, false);
-        this.changeViewerStatus(this.selectedViewer, true);
-        this.cards.show(cardPanel, READPAIRCARD);
+        this.changeViewerStatus( HISTOGRAMCARD, false );
+        this.changeViewerStatus( ALIGNMENTCARD, false );
+        this.changeViewerStatus( this.selectedViewer, true );
+        this.cards.show( cardPanel, READPAIRCARD );
     }//GEN-LAST:event_readPairButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -227,67 +233,74 @@ public final class DetailedViewerTopComponent extends TopComponentExtended {
      * only, i.e. deserialization routines; otherwise you could get a
      * non-deserialized instance. To obtain the singleton instance, use
      * {@link #findInstance}.
+     * <p>
      * @return default instance
      */
     public static synchronized DetailedViewerTopComponent getDefault() {
-        if (instance == null) {
+        if( instance == null ) {
             instance = new DetailedViewerTopComponent();
         }
         return instance;
     }
 
+
     /**
      * Obtain the DetailedViewerTopComponent instance. Never call
      * {@link #getDefault} directly!
+     * <p>
      * @return the DetailedViewerTopComponent instance
      */
     public static synchronized DetailedViewerTopComponent findInstance() {
-        TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
-        if (win == null) {
-            Logger.getLogger(DetailedViewerTopComponent.class.getName()).warning(
-                    "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system.");
+        TopComponent win = WindowManager.getDefault().findTopComponent( PREFERRED_ID );
+        if( win == null ) {
+            Logger.getLogger( DetailedViewerTopComponent.class.getName() ).warning(
+                    "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
             return getDefault();
         }
-        if (win instanceof DetailedViewerTopComponent) {
+        if( win instanceof DetailedViewerTopComponent ) {
             return (DetailedViewerTopComponent) win;
         }
-        Logger.getLogger(DetailedViewerTopComponent.class.getName()).warning(
+        Logger.getLogger( DetailedViewerTopComponent.class.getName() ).warning(
                 "There seem to be multiple components with the '" + PREFERRED_ID
-                + "' ID. That is a potential source of errors and unexpected behavior.");
+                + "' ID. That is a potential source of errors and unexpected behavior." );
         return getDefault();
     }
+
 
     @Override
     public int getPersistenceType() {
         return TopComponent.PERSISTENCE_NEVER;
     }
 
+
     @Override
     public void componentOpened() {
         BasePanelFactory factory = viewCon.getBasePanelFac();
 
-        if (this.trackConnector.isReadPairTrack()) {
-            this.readPairBasePanel = factory.getReadPairBasePanel(this.trackConnector);
-            this.changeViewerStatus(READPAIRCARD, false);
-            this.cardPanel.add(this.readPairBasePanel, READPAIRCARD);
-        } else {
-            this.readPairButton.setEnabled(false);
+        if( this.trackConnector.isReadPairTrack() ) {
+            this.readPairBasePanel = factory.getReadPairBasePanel( this.trackConnector );
+            this.changeViewerStatus( READPAIRCARD, false );
+            this.cardPanel.add( this.readPairBasePanel, READPAIRCARD );
+        }
+        else {
+            this.readPairButton.setEnabled( false );
         }
 
-        this.histogramBasePanel = factory.getHistogrammViewerBasePanel(this.trackConnector);
-        this.changeViewerStatus(HISTOGRAMCARD, true);
+        this.histogramBasePanel = factory.getHistogrammViewerBasePanel( this.trackConnector );
+        this.changeViewerStatus( HISTOGRAMCARD, true );
         this.selectedViewer = HISTOGRAMCARD;
-        this.alignmentBasePanel = factory.getAlignmentViewBasePanel(this.trackConnector);
+        this.alignmentBasePanel = factory.getAlignmentViewBasePanel( this.trackConnector );
 //        this.alignmentBasePanel.setPreferredSize(new Dimension(490, 300));
-        this.changeViewerStatus(ALIGNMENTCARD, false);
+        this.changeViewerStatus( ALIGNMENTCARD, false );
         this.cards = (CardLayout) this.cardPanel.getLayout();
 
-        this.cardPanel.add(this.alignmentBasePanel, ALIGNMENTCARD);
-        this.cardPanel.add(this.histogramBasePanel, HISTOGRAMCARD);
-        this.cards.show(this.cardPanel, HISTOGRAMCARD);
+        this.cardPanel.add( this.alignmentBasePanel, ALIGNMENTCARD );
+        this.cardPanel.add( this.histogramBasePanel, HISTOGRAMCARD );
+        this.cards.show( this.cardPanel, HISTOGRAMCARD );
 //        this.histogramButton.setEnabled(false);
 
     }
+
 
     @Override
     public void componentClosed() {
@@ -295,60 +308,69 @@ public final class DetailedViewerTopComponent extends TopComponentExtended {
         this.histogramBasePanel.close();
         this.alignmentBasePanel = null;
         this.histogramBasePanel = null;
-        if (this.readPairBasePanel != null) {
+        if( this.readPairBasePanel != null ) {
             this.readPairBasePanel.close();
             this.readPairBasePanel = null;
         }
     }
 
-    void writeProperties(java.util.Properties p) {
+
+    void writeProperties( java.util.Properties p ) {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
-        p.setProperty("version", "1.0");
+        p.setProperty( "version", "1.0" );
         // store your settings
     }
 
-    Object readProperties(java.util.Properties p) {
-        if (instance == null) {
+
+    Object readProperties( java.util.Properties p ) {
+        if( instance == null ) {
             instance = this;
         }
-        instance.readPropertiesImpl(p);
+        instance.readPropertiesImpl( p );
         return instance;
     }
 
-    private void readPropertiesImpl(java.util.Properties p) {
-        String version = p.getProperty("version");
+
+    private void readPropertiesImpl( java.util.Properties p ) {
+        String version = p.getProperty( "version" );
         // read your settings according to their version
     }
+
 
     @Override
     protected String preferredID() {
         return PREFERRED_ID;
     }
 
+
     /**
      * Sets the corresponding track connector for this detailed viewer.
+     * <p>
      * @param trackConnector the corresponding track connector for this detailed
-     * viewer
+     *                       viewer
      */
-    public void setTrackConnector(TrackConnector trackConnector) {
+    public void setTrackConnector( TrackConnector trackConnector ) {
         this.trackConnector = trackConnector;
-        setName(NbBundle.getMessage(DetailedViewerTopComponent.class, "CTL_DetailedViewerTopComponent") + trackConnector.getAssociatedTrackName());
+        setName( NbBundle.getMessage( DetailedViewerTopComponent.class, "CTL_DetailedViewerTopComponent" ) + trackConnector.getAssociatedTrackName() );
     }
 
     /*
      * Overriding these two methods ensures that only displayed components are updated
      * and thus increases performance of the viewers.
      */
+
     @Override
     public void componentShowing() {
-        changeViewerStatus(getActiveViewer(), true);
+        changeViewerStatus( getActiveViewer(), true );
     }
+
 
     @Override
     public void componentHidden() {
-        changeViewerStatus(getActiveViewer(), false);
+        changeViewerStatus( getActiveViewer(), false );
     }
+
 
     /**
      * @return the property representing the currently active viewer
@@ -357,23 +379,28 @@ public final class DetailedViewerTopComponent extends TopComponentExtended {
         return this.selectedViewer;
     }
 
+
     /**
      * Update the viewer status of the selectedViewer
+     * <p>
      * @param selectedViewer the viewer whose status is to be changed
-     * @param activated true, if the viewer should be activated, false, if not
+     * @param activated      true, if the viewer should be activated, false, if
+     *                       not
      */
-    public void changeViewerStatus(String selectedViewer, boolean activated) {
-        if (selectedViewer.equals(HISTOGRAMCARD)) {
-            this.histogramBasePanel.getViewer().setActive(activated);
+    public void changeViewerStatus( String selectedViewer, boolean activated ) {
+        if( selectedViewer.equals( HISTOGRAMCARD ) ) {
+            this.histogramBasePanel.getViewer().setActive( activated );
 //            this.histogramButton.setEnabled(!activated);
         }
-        if (selectedViewer.equals(ALIGNMENTCARD)) {
-            this.alignmentBasePanel.getViewer().setActive(activated);
+        if( selectedViewer.equals( ALIGNMENTCARD ) ) {
+            this.alignmentBasePanel.getViewer().setActive( activated );
 //            this.alignmentButton.setEnabled(!activated);
         }
-        if (this.readPairBasePanel != null && selectedViewer.equals(READPAIRCARD)) {
+        if( this.readPairBasePanel != null && selectedViewer.equals( READPAIRCARD ) ) {
 //            this.readPairButton.setEnabled(!activated);
-            this.readPairBasePanel.getViewer().setActive(activated);
+            this.readPairBasePanel.getViewer().setActive( activated );
         }
     }
+
+
 }

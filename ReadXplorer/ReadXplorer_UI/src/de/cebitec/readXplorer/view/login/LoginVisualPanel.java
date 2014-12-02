@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.view.login;
 
+
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import java.io.File;
@@ -32,6 +33,7 @@ import org.openide.NotifyDescriptor;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 
+
 /**
  * @author ddopmeier?, jstraube?, rhilker
  */
@@ -44,6 +46,7 @@ public final class LoginVisualPanel extends JPanel {
     private String defaultuser;
     private String defaulthostname;
 
+
     /**
      * Creates new form LoginVisualPanel
      */
@@ -53,21 +56,24 @@ public final class LoginVisualPanel extends JPanel {
         this.updateUIForH2();
     }
 
+
     @Override
     public String getName() {
-        return NbBundle.getMessage(LoginVisualPanel.class, "LoginVisualPanel.name");
+        return NbBundle.getMessage( LoginVisualPanel.class, "LoginVisualPanel.name" );
     }
 
+
     private void setLoginData() {
-        Preferences prefs = Preferences.userNodeForPackage(LoginProperties.class);
-        defaultuser = prefs.get(LoginProperties.LOGIN_USER, null);
-        defaultDatabaseMySQL = prefs.get(LoginProperties.LOGIN_DATABASE_MYSQL, null);
-        defaulthostname = prefs.get(LoginProperties.LOGIN_HOSTNAME, null);
-        defaultdatabaseh2 = prefs.get(LoginProperties.LOGIN_DATABASE_H2, null);
-        userField.setText(defaultuser);
-        urlField.setText(defaulthostname);
-        databaseField.setText(defaultDatabaseMySQL);
+        Preferences prefs = Preferences.userNodeForPackage( LoginProperties.class );
+        defaultuser = prefs.get( LoginProperties.LOGIN_USER, null );
+        defaultDatabaseMySQL = prefs.get( LoginProperties.LOGIN_DATABASE_MYSQL, null );
+        defaulthostname = prefs.get( LoginProperties.LOGIN_HOSTNAME, null );
+        defaultdatabaseh2 = prefs.get( LoginProperties.LOGIN_DATABASE_H2, null );
+        userField.setText( defaultuser );
+        urlField.setText( defaulthostname );
+        databaseField.setText( defaultDatabaseMySQL );
     }
+
 
     public Map<String, String> getLoginData() {
         Map<String, String> loginData = new HashMap<>();
@@ -75,73 +81,83 @@ public final class LoginVisualPanel extends JPanel {
         String adapter = dbTypeBox.getSelectedItem().toString();
         String hostname, database, user, password;
 
-        if (adapter.equalsIgnoreCase("mysql")) {
+        if( adapter.equalsIgnoreCase( "mysql" ) ) {
             hostname = urlField.getText();
             database = databaseField.getText();
             user = userField.getText();
-            password = new String(passwordField.getPassword());
-        } else if (adapter.equalsIgnoreCase("h2")) {
+            password = new String( passwordField.getPassword() );
+        }
+        else if( adapter.equalsIgnoreCase( "h2" ) ) {
             hostname = null;
             database = databaseField.getText();
-            if (database.endsWith(".h2.db")) {
-                database = database.replace(".h2.db", "");
+            if( database.endsWith( ".h2.db" ) ) {
+                database = database.replace( ".h2.db", "" );
             }
-            if (database.endsWith(".h2")) {
-                database = database.replace(".h2", "");
+            if( database.endsWith( ".h2" ) ) {
+                database = database.replace( ".h2", "" );
             }
             user = null;
             password = null;
-        } else /* <editor-fold defaultstate="collapsed" desc="should not reach here">*/ {
+        }
+        else /* <editor-fold defaultstate="collapsed" desc="should not reach here">*/ {
             hostname = null;
             database = null;
             user = null;
             password = null;
         }// </editor-fold>
 
-        loginData.put(LoginWizardPanel.PROP_ADAPTER, adapter);
-        loginData.put(LoginWizardPanel.PROP_HOST, hostname);
-        loginData.put(LoginWizardPanel.PROP_DATABASE, database);
-        loginData.put(LoginWizardPanel.PROP_USER, user);
-        loginData.put(LoginWizardPanel.PROP_PASSWORD, password);
+        loginData.put( LoginWizardPanel.PROP_ADAPTER, adapter );
+        loginData.put( LoginWizardPanel.PROP_HOST, hostname );
+        loginData.put( LoginWizardPanel.PROP_DATABASE, database );
+        loginData.put( LoginWizardPanel.PROP_USER, user );
+        loginData.put( LoginWizardPanel.PROP_PASSWORD, password );
 
         // save login data if desired
-        saveLoginData(loginData);
+        saveLoginData( loginData );
 
         return loginData;
     }
 
-    private void saveLoginData(Map<String, String> loginData) {
-        Preferences prefs = Preferences.userNodeForPackage(LoginVisualPanel.class);
-        String adapter = loginData.get(LoginWizardPanel.PROP_ADAPTER);
 
-        if (saveDataCheckBox.isSelected()) {
-            if (adapter.equalsIgnoreCase("mysql")) {
-                prefs.put(LoginProperties.LOGIN_HOSTNAME, loginData.get(LoginWizardPanel.PROP_HOST));
-                prefs.put(LoginProperties.LOGIN_USER, loginData.get(LoginWizardPanel.PROP_USER));
-                prefs.put(LoginProperties.LOGIN_DATABASE_MYSQL, loginData.get(LoginWizardPanel.PROP_DATABASE));
-            } else if (adapter.equalsIgnoreCase("h2")) {
-                prefs.put(LoginProperties.LOGIN_DATABASE_H2, loginData.get(LoginWizardPanel.PROP_DATABASE));
-            } else {
+    private void saveLoginData( Map<String, String> loginData ) {
+        Preferences prefs = Preferences.userNodeForPackage( LoginVisualPanel.class );
+        String adapter = loginData.get( LoginWizardPanel.PROP_ADAPTER );
+
+        if( saveDataCheckBox.isSelected() ) {
+            if( adapter.equalsIgnoreCase( "mysql" ) ) {
+                prefs.put( LoginProperties.LOGIN_HOSTNAME, loginData.get( LoginWizardPanel.PROP_HOST ) );
+                prefs.put( LoginProperties.LOGIN_USER, loginData.get( LoginWizardPanel.PROP_USER ) );
+                prefs.put( LoginProperties.LOGIN_DATABASE_MYSQL, loginData.get( LoginWizardPanel.PROP_DATABASE ) );
+            }
+            else if( adapter.equalsIgnoreCase( "h2" ) ) {
+                prefs.put( LoginProperties.LOGIN_DATABASE_H2, loginData.get( LoginWizardPanel.PROP_DATABASE ) );
+            }
+            else {
                 // should not reach here
             }
-        } else {
-            if (adapter.equalsIgnoreCase("mysql")) {
-                prefs.put(LoginProperties.LOGIN_HOSTNAME, "");
-                prefs.put(LoginProperties.LOGIN_DATABASE_MYSQL, "");
-                prefs.put(LoginProperties.LOGIN_USER, "");
-            } else if (adapter.equalsIgnoreCase("h2")) {
-                prefs.put(LoginProperties.LOGIN_DATABASE_H2, "");
-            } else {
+        }
+        else {
+            if( adapter.equalsIgnoreCase( "mysql" ) ) {
+                prefs.put( LoginProperties.LOGIN_HOSTNAME, "" );
+                prefs.put( LoginProperties.LOGIN_DATABASE_MYSQL, "" );
+                prefs.put( LoginProperties.LOGIN_USER, "" );
+            }
+            else if( adapter.equalsIgnoreCase( "h2" ) ) {
+                prefs.put( LoginProperties.LOGIN_DATABASE_H2, "" );
+            }
+            else {
                 // should not reach here
             }
         }
 
         try {
             prefs.flush();
-        } catch (BackingStoreException ex) {
-            Logger.getLogger(LoginVisualPanel.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        catch( BackingStoreException ex ) {
+            Logger.getLogger( LoginVisualPanel.class.getName() ).log( Level.SEVERE, null, ex );
         }
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -260,58 +276,65 @@ public final class LoginVisualPanel extends JPanel {
 
     private void dbTypeBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dbTypeBoxActionPerformed
         String db = dbTypeBox.getSelectedItem().toString();
-        if (db.equalsIgnoreCase("h2")) {
+        if( db.equalsIgnoreCase( "h2" ) ) {
             this.updateUIForH2();
-        } else {
-            userField.setVisible(true);
-            urlField.setVisible(true);
-            passwordField.setVisible(true);
-            passwordLabel.setVisible(true);
-            urlLabel.setVisible(true);
-            userLabel.setVisible(true);
-            dbChooseButton.setVisible(false);
-            databaseField.setText(defaultDatabaseMySQL);
+        }
+        else {
+            userField.setVisible( true );
+            urlField.setVisible( true );
+            passwordField.setVisible( true );
+            passwordLabel.setVisible( true );
+            urlLabel.setVisible( true );
+            userLabel.setVisible( true );
+            dbChooseButton.setVisible( false );
+            databaseField.setText( defaultDatabaseMySQL );
         }
 }//GEN-LAST:event_dbTypeBoxActionPerformed
 
     private void dbChooseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dbChooseButtonActionPerformed
-        ReadXplorerFileChooser fileChooser = new ReadXplorerFileChooser(new String[]{"db"}, "db files") {
+        ReadXplorerFileChooser fileChooser = new ReadXplorerFileChooser( new String[]{ "db" }, "db files" ) {
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public void save(String fileLocation) {
-                NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(LoginVisualPanel.class, "MSG_LoginVisualPanel.warning.database", fileLocation), NotifyDescriptor.WARNING_MESSAGE);
-                DialogDisplayer.getDefault().notify(nd);
-                databaseField.setText(fileLocation);
-            }
 
             @Override
-            public void open(String fileLocation) {
+            public void save( String fileLocation ) {
+                NotifyDescriptor nd = new NotifyDescriptor.Message( NbBundle.getMessage( LoginVisualPanel.class, "MSG_LoginVisualPanel.warning.database", fileLocation ), NotifyDescriptor.WARNING_MESSAGE );
+                DialogDisplayer.getDefault().notify( nd );
+                databaseField.setText( fileLocation );
+            }
+
+
+            @Override
+            public void open( String fileLocation ) {
                 try { //store current directory
-                    NbPreferences.forModule(Object.class).put(Properties.ReadXplorer_DATABASE_DIRECTORY, this.getCurrentDirectory().getCanonicalPath());
-                } catch (IOException ex) {
+                    NbPreferences.forModule( Object.class ).put( Properties.ReadXplorer_DATABASE_DIRECTORY, this.getCurrentDirectory().getCanonicalPath() );
+                }
+                catch( IOException ex ) {
                     // do nothing, path is not stored in properties...
                 }
-                databaseField.setText(fileLocation);
+                databaseField.setText( fileLocation );
             }
-        };
-        fileChooser.setDirectory(NbPreferences.forModule(Object.class).get(Properties.ReadXplorer_DATABASE_DIRECTORY, null));
 
-        Preferences prefs2 = Preferences.userNodeForPackage(LoginVisualPanel.class);
+
+        };
+        fileChooser.setDirectory( NbPreferences.forModule( Object.class ).get( Properties.ReadXplorer_DATABASE_DIRECTORY, null ) );
+
+        Preferences prefs2 = Preferences.userNodeForPackage( LoginVisualPanel.class );
         String db = dbTypeBox.getSelectedItem().toString();
-        if (db.equalsIgnoreCase("h2")) {
-            String path = prefs2.get(LoginProperties.LOGIN_DATABASE_H2, null);
-            if (path != null) {
-                fileChooser.setCurrentDirectory(new File(path));
+        if( db.equalsIgnoreCase( "h2" ) ) {
+            String path = prefs2.get( LoginProperties.LOGIN_DATABASE_H2, null );
+            if( path != null ) {
+                fileChooser.setCurrentDirectory( new File( path ) );
             }
-        } else {
-            String path = prefs2.get(LoginProperties.LOGIN_DATABASE_MYSQL, null);
-            if (path != null) {
-                fileChooser.setCurrentDirectory(new File(path));
+        }
+        else {
+            String path = prefs2.get( LoginProperties.LOGIN_DATABASE_MYSQL, null );
+            if( path != null ) {
+                fileChooser.setCurrentDirectory( new File( path ) );
             }
         }
 
-        fileChooser.openFileChooser(ReadXplorerFileChooser.CUSTOM_DIALOG);
+        fileChooser.openFileChooser( ReadXplorerFileChooser.CUSTOM_DIALOG );
 }//GEN-LAST:event_dbChooseButtonActionPerformed
 
     private void databaseFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_databaseFieldActionPerformed
@@ -333,27 +356,31 @@ public final class LoginVisualPanel extends JPanel {
     private javax.swing.JLabel userLabel;
     // End of variables declaration//GEN-END:variables
 
+
     /**
      * Updates the ui that only the database field and choose button are still
      * active, since no login information is needed for the local h2 database.
      */
     private void updateUIForH2() {
-        userField.setVisible(false);
-        urlField.setVisible(false);
-        passwordField.setVisible(false);
-        userLabel.setVisible(false);
-        passwordLabel.setVisible(false);
-        urlLabel.setVisible(false);
-        dbChooseButton.setVisible(true);
-        databaseField.setText(defaultdatabaseh2);
+        userField.setVisible( false );
+        urlField.setVisible( false );
+        passwordField.setVisible( false );
+        userLabel.setVisible( false );
+        passwordLabel.setVisible( false );
+        urlLabel.setVisible( false );
+        dbChooseButton.setVisible( true );
+        databaseField.setText( defaultdatabaseh2 );
     }
+
 
     /**
      * Updates the choose button text.
      *
      * @param chooseButtonText
      */
-    public void setChooseButtonText(String chooseButtonText) {
-        this.dbChooseButton.setText(chooseButtonText);
+    public void setChooseButtonText( String chooseButtonText ) {
+        this.dbChooseButton.setText( chooseButtonText );
     }
+
+
 }

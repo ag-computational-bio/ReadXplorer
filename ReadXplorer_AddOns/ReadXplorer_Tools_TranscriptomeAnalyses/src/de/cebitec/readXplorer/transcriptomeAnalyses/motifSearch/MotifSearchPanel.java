@@ -1,5 +1,6 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch;
 
+
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.PurposeEnum;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Observer;
@@ -16,6 +17,7 @@ import javax.swing.JOptionPane;
 import javax.swing.text.StyledDocument;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
+
 
 /**
  *
@@ -38,6 +40,7 @@ public class MotifSearchPanel extends javax.swing.JPanel implements Observable {
     TreeMap<String, Integer> minus35Shifts;
     PromotorSearchParameters params;
 
+
     /**
      * Creates new form MotifSearchPanel
      */
@@ -46,98 +49,116 @@ public class MotifSearchPanel extends javax.swing.JPanel implements Observable {
         additionalInits();
     }
 
+
     /**
      * Some additional settings on components like setting borders.
      */
     private void additionalInits() {
         this.observerList = new ArrayList<>();
-        promotorsPanel.setBorder(BorderFactory.createTitledBorder("Promotor region in Fasta format"));
-        promotorsInFastaTextPane.setEditable(true);
-        promotorsInFastaTextPane.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        minus35RegionPanel.setBorder(BorderFactory.createTitledBorder("Region of intrest (-35)"));
-        minus10RegionPanel.setBorder(BorderFactory.createTitledBorder("Region of intrest (-10)"));
-        regionOfIntrestMinusThirtyviveTP.setEditable(true);
-        regionOfIntrestMinusThirtyviveTP.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        regionOfIntrestMinusTenTP.setEditable(true);
-        regionOfIntrestMinusTenTP.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        this.infoPanel.setBorder(BorderFactory.createTitledBorder("Info panel"));
+        promotorsPanel.setBorder( BorderFactory.createTitledBorder( "Promotor region in Fasta format" ) );
+        promotorsInFastaTextPane.setEditable( true );
+        promotorsInFastaTextPane.setFont( new Font( Font.MONOSPACED, Font.PLAIN, 12 ) );
+        minus35RegionPanel.setBorder( BorderFactory.createTitledBorder( "Region of intrest (-35)" ) );
+        minus10RegionPanel.setBorder( BorderFactory.createTitledBorder( "Region of intrest (-10)" ) );
+        regionOfIntrestMinusThirtyviveTP.setEditable( true );
+        regionOfIntrestMinusThirtyviveTP.setFont( new Font( Font.MONOSPACED, Font.PLAIN, 12 ) );
+        regionOfIntrestMinusTenTP.setEditable( true );
+        regionOfIntrestMinusTenTP.setFont( new Font( Font.MONOSPACED, Font.PLAIN, 12 ) );
+        this.infoPanel.setBorder( BorderFactory.createTitledBorder( "Info panel" ) );
 
-        this.minus10LogoPanel.setBorder(BorderFactory.createTitledBorder("Identified -10 motif"));
-        this.minus10LogoPanel.setLayout(new BorderLayout());
-        this.minus35LogoPanel.setBorder(BorderFactory.createTitledBorder("Identified -35 motif"));
-        this.minus35LogoPanel.setLayout(new BorderLayout());
+        this.minus10LogoPanel.setBorder( BorderFactory.createTitledBorder( "Identified -10 motif" ) );
+        this.minus10LogoPanel.setLayout( new BorderLayout() );
+        this.minus35LogoPanel.setBorder( BorderFactory.createTitledBorder( "Identified -35 motif" ) );
+        this.minus35LogoPanel.setLayout( new BorderLayout() );
     }
 
-    public void setMinSpacer1LengthToLabel(String length) {
-        this.meanSpacer1Label.setText(length);
+
+    public void setMinSpacer1LengthToLabel( String length ) {
+        this.meanSpacer1Label.setText( length );
     }
 
-    public void setMinSpacer2LengthToLabel(String length) {
-        this.meanSpacer2Label.setText(length);
+
+    public void setMinSpacer2LengthToLabel( String length ) {
+        this.meanSpacer2Label.setText( length );
     }
 
-    public void setMinus10MotifWidth(Integer width) {
-        this.motifWidthLabel10.setText(width.toString());
+
+    public void setMinus10MotifWidth( Integer width ) {
+        this.motifWidthLabel10.setText( width.toString() );
     }
 
-    public void setMinus35MotifWidth(Integer width) {
-        this.motifWidthLabel35.setText(width.toString());
+
+    public void setMinus35MotifWidth( Integer width ) {
+        this.motifWidthLabel35.setText( width.toString() );
     }
+
 
     public File getMinus10Input() {
         return minus10Input;
     }
 
-    public void setMinus10Input(File minus10Input) {
+
+    public void setMinus10Input( File minus10Input ) {
         this.minus10Input = minus10Input;
     }
+
 
     public File getMinus35Input() {
         return minus35Input;
     }
 
-    public void setMinus35Input(File minus35Input) {
+
+    public void setMinus35Input( File minus35Input ) {
         this.minus35Input = minus35Input;
     }
+
 
     public File getBioProspOutMinus10() {
         return bioProspOutMinus10;
     }
 
-    public void setBioProspOutMinus10(File bioProspOutMinus10) {
+
+    public void setBioProspOutMinus10( File bioProspOutMinus10 ) {
         this.bioProspOutMinus10 = bioProspOutMinus10;
     }
+
 
     public File getBioProspOutMinus35() {
         return bioProspOutMinus35;
     }
 
-    public void setBioProspOutMinus35(File bioProspOutMinus35) {
+
+    public void setBioProspOutMinus35( File bioProspOutMinus35 ) {
         this.bioProspOutMinus35 = bioProspOutMinus35;
     }
+
 
     public File getLogoMinus10() {
         return logoMinus10;
     }
 
-    public void setLogoMinus10(File logoMinus10) {
+
+    public void setLogoMinus10( File logoMinus10 ) {
         this.logoMinus10 = logoMinus10;
     }
+
 
     public File getLogoMinus35() {
         return logoMinus35;
     }
 
-    public void setLogoMinus35(File logoMinus35) {
+
+    public void setLogoMinus35( File logoMinus35 ) {
         this.logoMinus35 = logoMinus35;
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
      * regenerated by the Form Editor.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -367,36 +388,36 @@ public class MotifSearchPanel extends javax.swing.JPanel implements Observable {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        progressHandle = ProgressHandleFactory.createHandle("Saving Files ...");
+        progressHandle = ProgressHandleFactory.createHandle( "Saving Files ..." );
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
 
-        int returnVal = fileChooser.showSaveDialog(this);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            progressHandle.start(4);
-            this.notifyObservers(PurposeEnum.PROMOTER_ANALYSIS);
-            progressHandle.progress(1);
+        int returnVal = fileChooser.showSaveDialog( this );
+        if( returnVal == JFileChooser.APPROVE_OPTION ) {
+            progressHandle.start( 4 );
+            this.notifyObservers( PurposeEnum.PROMOTER_ANALYSIS );
+            progressHandle.progress( 1 );
             File inputMinus10 = getMinus10Input();
             File inputMinus35 = getMinus35Input();
-            inputMinus10.renameTo(new File(fileChooser.getSelectedFile().getAbsolutePath() + "\\intputSequencesForBioProspectorMinus10.fna"));
-            inputMinus35.renameTo(new File(fileChooser.getSelectedFile().getAbsolutePath() + "\\intputSequencesForBioProspectorMinus35.fna"));
+            inputMinus10.renameTo( new File( fileChooser.getSelectedFile().getAbsolutePath() + "\\intputSequencesForBioProspectorMinus10.fna" ) );
+            inputMinus35.renameTo( new File( fileChooser.getSelectedFile().getAbsolutePath() + "\\intputSequencesForBioProspectorMinus35.fna" ) );
             File outputMinus10 = getBioProspOutMinus10();
             File outputMinus35 = getBioProspOutMinus35();
-            outputMinus10.renameTo(new File(fileChooser.getSelectedFile().getAbsolutePath() + "\\bestOutputFromBioProspectorMinus10.fna"));
-            outputMinus35.renameTo(new File(fileChooser.getSelectedFile().getAbsolutePath() + "\\bestOutputFromBioProspectorMinus35.fna"));
+            outputMinus10.renameTo( new File( fileChooser.getSelectedFile().getAbsolutePath() + "\\bestOutputFromBioProspectorMinus10.fna" ) );
+            outputMinus35.renameTo( new File( fileChooser.getSelectedFile().getAbsolutePath() + "\\bestOutputFromBioProspectorMinus35.fna" ) );
             File logoMinus10 = getLogoMinus10();
             File logoMinus35 = getLogoMinus35();
-            logoMinus10.renameTo(new File(fileChooser.getSelectedFile().getAbsolutePath() + "\\sequenceLogoMinus10.eps"));
-            logoMinus35.renameTo(new File(fileChooser.getSelectedFile().getAbsolutePath() + "\\sequenceLogoMinus35.eps"));
+            logoMinus10.renameTo( new File( fileChooser.getSelectedFile().getAbsolutePath() + "\\sequenceLogoMinus10.eps" ) );
+            logoMinus35.renameTo( new File( fileChooser.getSelectedFile().getAbsolutePath() + "\\sequenceLogoMinus35.eps" ) );
             File info = getInfo();
-            info.renameTo(new File(fileChooser.getSelectedFile().getAbsoluteFile() + "\\info.txt"));
-            progressHandle.progress(2);
+            info.renameTo( new File( fileChooser.getSelectedFile().getAbsoluteFile() + "\\info.txt" ) );
+            progressHandle.progress( 2 );
         }
-        progressHandle.progress(3);
-        progressHandle.progress(4);
+        progressHandle.progress( 3 );
+        progressHandle.progress( 4 );
 
-        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successful!",
-                "Export was successful!", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), "Export was successful!",
+                                       "Export was successful!", JOptionPane.INFORMATION_MESSAGE );
         progressHandle.finish();
     }//GEN-LAST:event_jButton1ActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -428,106 +449,131 @@ public class MotifSearchPanel extends javax.swing.JPanel implements Observable {
     private javax.swing.JTextPane regionOfIntrestMinusThirtyviveTP;
     // End of variables declaration//GEN-END:variables
 
-    public void setStyledDocumentToRegionOfIntrestMinusTen(StyledDocument doc) {
 
-        this.regionOfIntrestMinusTenTP.setStyledDocument(doc);
+    public void setStyledDocumentToRegionOfIntrestMinusTen( StyledDocument doc ) {
+
+        this.regionOfIntrestMinusTenTP.setStyledDocument( doc );
     }
 
-    public void setStyledDocumentToRegionOfIntrestMinus35(StyledDocument doc) {
-        this.regionOfIntrestMinusThirtyviveTP.setStyledDocument(doc);
+
+    public void setStyledDocumentToRegionOfIntrestMinus35( StyledDocument doc ) {
+        this.regionOfIntrestMinusThirtyviveTP.setStyledDocument( doc );
     }
 
-    public void setStyledDocToPromotorsFastaPane(StyledDocument doc) {
-        this.promotorsInFastaTextPane.setStyledDocument(doc);
+
+    public void setStyledDocToPromotorsFastaPane( StyledDocument doc ) {
+        this.promotorsInFastaTextPane.setStyledDocument( doc );
     }
 
-    public void setMinus10LogoToPanel(JLabel logo) {
-        this.minus10LogoPanel.add(logo, BorderLayout.CENTER);
+
+    public void setMinus10LogoToPanel( JLabel logo ) {
+        this.minus10LogoPanel.add( logo, BorderLayout.CENTER );
     }
 
-    public void setMinus35LogoToPanel(JLabel logo) {
-        this.minus35LogoPanel.add(logo, BorderLayout.CENTER);
+
+    public void setMinus35LogoToPanel( JLabel logo ) {
+        this.minus35LogoPanel.add( logo, BorderLayout.CENTER );
     }
 
-    public void setContributionMinus10Label(String text) {
-        this.noSegmentsOfSeqsContributionToMotif10.setText(text);
+
+    public void setContributionMinus10Label( String text ) {
+        this.noSegmentsOfSeqsContributionToMotif10.setText( text );
     }
 
-    public void setContributionMinus35Label(String text) {
-        this.noSegmentsOfSeqsContributionToMotif35.setText(text);
+
+    public void setContributionMinus35Label( String text ) {
+        this.noSegmentsOfSeqsContributionToMotif35.setText( text );
     }
+
 
     @Override
-    public void registerObserver(Observer observer) {
-        this.observerList.add(observer);
+    public void registerObserver( Observer observer ) {
+        this.observerList.add( observer );
     }
 
-    @Override
-    public void removeObserver(Observer observer) {
-        this.observerList.remove(observer);
-    }
 
     @Override
-    public void notifyObservers(Object data) {
-        for (Observer observer : observerList) {
-            observer.update(data);
+    public void removeObserver( Observer observer ) {
+        this.observerList.remove( observer );
+    }
+
+
+    @Override
+    public void notifyObservers( Object data ) {
+        for( Observer observer : observerList ) {
+            observer.update( data );
         }
     }
+
 
     public List<String> getUpstreamRegions() {
         return upstreamRegions;
     }
 
-    public void setUpstreamRegions(List<String> upstreamRegions) {
+
+    public void setUpstreamRegions( List<String> upstreamRegions ) {
         this.upstreamRegions = upstreamRegions;
     }
+
 
     public TreeMap<String, Integer> getMinus10Starts() {
         return minus10Starts;
     }
 
-    public void setMinus10Starts(TreeMap<String, Integer> minus10Starts) {
+
+    public void setMinus10Starts( TreeMap<String, Integer> minus10Starts ) {
         this.minus10Starts = minus10Starts;
     }
+
 
     public TreeMap<String, Integer> getMinus35Starts() {
         return minus35Starts;
     }
 
-    public void setMinus35Starts(TreeMap<String, Integer> minus35Starts) {
+
+    public void setMinus35Starts( TreeMap<String, Integer> minus35Starts ) {
         this.minus35Starts = minus35Starts;
     }
+
 
     public TreeMap<String, Integer> getMinus10Shifts() {
         return minus10Shifts;
     }
 
-    public void setMinus10Shifts(TreeMap<String, Integer> minus10Shifts) {
+
+    public void setMinus10Shifts( TreeMap<String, Integer> minus10Shifts ) {
         this.minus10Shifts = minus10Shifts;
     }
+
 
     public TreeMap<String, Integer> getMinus35Shifts() {
         return minus35Shifts;
     }
 
-    public void setMinus35Shifts(TreeMap<String, Integer> minus35Shifts) {
+
+    public void setMinus35Shifts( TreeMap<String, Integer> minus35Shifts ) {
         this.minus35Shifts = minus35Shifts;
     }
+
 
     public PromotorSearchParameters getParams() {
         return params;
     }
 
-    public void setParams(PromotorSearchParameters params) {
+
+    public void setParams( PromotorSearchParameters params ) {
         this.params = params;
     }
+
 
     public File getInfo() {
         return info;
     }
 
-    public void setInfo(File info) {
+
+    public void setInfo( File info ) {
         this.info = info;
     }
+
 
 }

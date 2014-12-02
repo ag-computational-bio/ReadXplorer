@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.tools.rnaFolder;
 
+
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -28,9 +29,11 @@ import org.apache.axis.client.Service;
 import org.openide.util.NbBundle;
 import org.w3c.dom.Element;
 
+
 /**
  * Executes RNAFold on the bibiserv of the Bielefeld University at
- * http://bibiserv.techfak.uni-bielefeld.de/rnafold/submission.html with the given
+ * http://bibiserv.techfak.uni-bielefeld.de/rnafold/submission.html with the
+ * given
  * intput data and returns the resulting string.
  *
  * @author Rolf Hilker
@@ -38,56 +41,62 @@ import org.w3c.dom.Element;
 public class RNAFoldCaller {
 
     /**
-     * Calls http://bibiserv.techfak.uni-bielefeld.de/rnafold/submission.html with the given string
+     * Calls http://bibiserv.techfak.uni-bielefeld.de/rnafold/submission.html
+     * with the given string
      * and returns the result string of the program.
+     * <p>
      * @param selSequence the sequence to start RNA folder with
-     * @param header header string for the query
+     * @param header      header string for the query
+     * <p>
      * @return the resulting folded rna string
+     * <p>
      * @throws RNAFoldException
      */
-    @SuppressWarnings("SleepWhileHoldingLock")
-    public static String callRNAFolder(String selSequence, String header) throws RNAFoldException {
+    @SuppressWarnings( "SleepWhileHoldingLock" )
+    public static String callRNAFolder( String selSequence, String header ) throws RNAFoldException {
 
-        selSequence = ">".concat(header).concat("\r\n").concat(selSequence);
+        selSequence = ">".concat( header ).concat( "\r\n" ).concat( selSequence );
 
         /* declare addresslocation for service */
         final String server = "http://bibiwsserv.techfak.uni-bielefeld.de";
 
         try {
             /* declare where to find the describing WSDL */
-            final URL wsdl = new URL("http://bibiserv.techfak.uni-bielefeld.de/wsdl/RNAfold.wsdl");
+            final URL wsdl = new URL( "http://bibiserv.techfak.uni-bielefeld.de/wsdl/RNAfold.wsdl" );
 
             /* declare where to find the describing WSDL */
-            if (selSequence.isEmpty() || selSequence == null) {
-                throw new RNAFoldException(NbBundle.getMessage(RNAFoldCaller.class, "RFException.HighlightError"));
+            if( selSequence.isEmpty() || selSequence == null ) {
+                throw new RNAFoldException( NbBundle.getMessage( RNAFoldCaller.class, "RFException.HighlightError" ) );
                 //System.err.println("java RNAfoldCOrig -F <FastaFile> [-T <double>] \n"); //return popup with msg
             }
 
             /* prepare the call (the same for all called methods) */
-            Service ser = new Service(wsdl, new QName(server + "/RNAfold/axis/RNAfoldPort", "RNAfoldImplementationService"));
-            Call call = (Call) ser.createCall(new QName("RNAfoldPort"), "request_orig");
+            Service ser = new Service( wsdl, new QName( server + "/RNAfold/axis/RNAfoldPort", "RNAfoldImplementationService" ) );
+            Call call = (Call) ser.createCall( new QName( "RNAfoldPort" ), "request_orig" );
             /* call and get id */
-            String id = (String) call.invoke(new Object[] {new Object[] {"T", 37.0}, selSequence});
+            String id = (String) call.invoke( new Object[]{ new Object[]{ "T", 37.0 }, selSequence } );
 
             int statuscode = 601;
-            while ((statuscode > 600) && (statuscode < 700)) {
+            while( (statuscode > 600) && (statuscode < 700) ) {
                 try {
-                    Thread.sleep(2500);
-                    call = (Call) ser.createCall(new QName("RNAfoldPort"), "response_orig");
+                    Thread.sleep( 2500 );
+                    call = (Call) ser.createCall( new QName( "RNAfoldPort" ), "response_orig" );
                     // call and get result as DOM Tree(if finished)
-                    return (String) call.invoke(new Object[]{id});
+                    return (String) call.invoke( new Object[]{ id } );
 
-                } catch (InterruptedException e) {
-                    throw new RNAFoldException(NbBundle.getMessage(RNAFoldCaller.class, "RFException.ThreadError"));
-                } catch (RemoteException e) {
+                }
+                catch( InterruptedException e ) {
+                    throw new RNAFoldException( NbBundle.getMessage( RNAFoldCaller.class, "RFException.ThreadError" ) );
+                }
+                catch( RemoteException e ) {
                     // on error WS will throw a soapfault as hobitstatuscode
-                    Element root = ((AxisFault) e).lookupFaultDetail(new QName(
-                            "http://hobit.sourceforge.net/xsds/hobitStatuscode.xsd", "hobitStatuscode"));
-                    if (root == null) {
-                        throw new RNAFoldException(NbBundle.getMessage(RNAFoldCaller.class, "RFException.RemoteError") + e.toString());
+                    Element root = ((AxisFault) e).lookupFaultDetail( new QName(
+                            "http://hobit.sourceforge.net/xsds/hobitStatuscode.xsd", "hobitStatuscode" ) );
+                    if( root == null ) {
+                        throw new RNAFoldException( NbBundle.getMessage( RNAFoldCaller.class, "RFException.RemoteError" ) + e.toString() );
                     }
                     //String description = root.getLastChild().getFirstChild().getNodeValue();
-                    statuscode = Integer.parseInt(root.getFirstChild().getFirstChild().getNodeValue());
+                    statuscode = Integer.parseInt( root.getFirstChild().getFirstChild().getNodeValue() );
                     // print error to parent
                     //throw new RNAFoldException("(" + statuscode + " - " + description + ")");
                 }
@@ -95,16 +104,18 @@ public class RNAFoldCaller {
 
             /* error handling with proper information for the user */
 
-        } catch (RemoteException e) {
+        }
+        catch( RemoteException e ) {
             /* on error WS will throw a soapfault as hobitstatuscode */
-            Element root = ((AxisFault) e).lookupFaultDetail(new QName(
-                    "http://hobit.sourceforge.net/xsds/hobitStatuscode.xsd", "hobitStatuscode"));
-            if (root == null) {
-                throw new RNAFoldException(NbBundle.getMessage(RNAFoldCaller.class, "RFException.ThreadError")+ " " + e.toString());
-            } else {
+            Element root = ((AxisFault) e).lookupFaultDetail( new QName(
+                    "http://hobit.sourceforge.net/xsds/hobitStatuscode.xsd", "hobitStatuscode" ) );
+            if( root == null ) {
+                throw new RNAFoldException( NbBundle.getMessage( RNAFoldCaller.class, "RFException.ThreadError" ) + " " + e.toString() );
+            }
+            else {
                 String description = root.getLastChild().getFirstChild().getNodeValue();
                 String code = root.getFirstChild().getFirstChild().getNodeValue();
-                throw new RNAFoldException("Remote Error: Statuscode:  " + code + ", Description: " + description);
+                throw new RNAFoldException( "Remote Error: Statuscode:  " + code + ", Description: " + description );
             }
 
             /*
@@ -114,16 +125,21 @@ public class RNAFoldCaller {
              * the class name of the thrown exception. There is no way to get
              * more information, like the original stacktrace !!!
              */
-        } catch (MalformedURLException e) {
-            throw new RNAFoldException(NbBundle.getMessage(RNAFoldCaller.class, "RFException.URLError"));
+        }
+        catch( MalformedURLException e ) {
+            throw new RNAFoldException( NbBundle.getMessage( RNAFoldCaller.class, "RFException.URLError" ) );
             //System.err.println("failed (" + e.toString() + ")");
-        } catch (ServiceException e) {
-            throw new RNAFoldException(NbBundle.getMessage(RNAFoldCaller.class, "RFException.ServiceError") + " " + server);
-        } catch (IOException e) {
-            throw new RNAFoldException(NbBundle.getMessage(RNAFoldCaller.class, "RFException.InputError"));
+        }
+        catch( ServiceException e ) {
+            throw new RNAFoldException( NbBundle.getMessage( RNAFoldCaller.class, "RFException.ServiceError" ) + " " + server );
+        }
+        catch( IOException e ) {
+            throw new RNAFoldException( NbBundle.getMessage( RNAFoldCaller.class, "RFException.InputError" ) );
         }
 
         //should never be reached!
         return "";
     }
+
+
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,44 +16,51 @@
  */
 package de.cebitec.readXplorer.correlationAnalysis;
 
+
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
 import de.cebitec.readXplorer.view.dialogMenus.OpenTracksVisualPanel;
 
+
 /**
- * A track selection panel requiring the selection of a certain amount of tracks 
+ * A track selection panel requiring the selection of a certain amount of tracks
  * to proceed.
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class OpenTrackAmountVisualPanel extends OpenTracksVisualPanel {
+
     private static final long serialVersionUID = 1L;
-    
+
     private Integer selectedAmount;
     private final TrackListPanel parent;
+
 
     /**
      * A track selection panel requiring the selection of a certain amount of
      * tracks to proceed.
+     * <p>
      * @param referenceID id of the reference genome
-     * @param parent the parent track list panel
+     * @param parent      the parent track list panel
      */
-    public OpenTrackAmountVisualPanel(int referenceID, TrackListPanel parent) {
-        super(referenceID);
+    public OpenTrackAmountVisualPanel( int referenceID, TrackListPanel parent ) {
+        super( referenceID );
         this.parent = parent;
         this.selectedAmount = -1;
     }
-    
+
+
     @Override
     public boolean isRequiredInfoSet() {
-        boolean isRequiredInfoSet = super.isRequiredInfoSet() && this.getSelectAmount() > -1 && 
-                                    this.getSelectAmount() == this.getSelectedTracks().size();
-        if (!isRequiredInfoSet) {
-            this.parent.setErrorMsg("Please select " + this.getSelectAmount() + " tracks! (You selected "
-                    + this.getAllMarkedNodes().size() + ")");
+        boolean isRequiredInfoSet = super.isRequiredInfoSet() && this.getSelectAmount() > -1
+                                    && this.getSelectAmount() == this.getSelectedTracks().size();
+        if( !isRequiredInfoSet ) {
+            this.parent.setErrorMsg( "Please select " + this.getSelectAmount() + " tracks! (You selected "
+                                     + this.getAllMarkedNodes().size() + ")" );
         }
-        firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet);
+        firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet );
         return isRequiredInfoSet;
     }
+
 
     /**
      * @return the maximumAmount
@@ -62,11 +69,13 @@ public class OpenTrackAmountVisualPanel extends OpenTracksVisualPanel {
         return selectedAmount;
     }
 
+
     /**
      * @param maximumAmount the maximumAmount to set
      */
-    public void setSelectAmount(Integer maximumAmount) {
+    public void setSelectAmount( Integer maximumAmount ) {
         this.selectedAmount = maximumAmount;
     }
-    
+
+
 }

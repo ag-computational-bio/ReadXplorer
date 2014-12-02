@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,9 @@
  */
 package de.cebitec.readXplorer.options;
 
+
 import javax.swing.JPanel;
+
 
 /**
  * An interface for option panels to load and store data.
@@ -24,18 +26,22 @@ import javax.swing.JPanel;
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public abstract class OptionsPanel extends JPanel {
+
     private static final long serialVersionUID = 1L;
-    
+
+
     /**
      * Loads some data.
      */
     abstract void load();
-    
+
+
     /**
      * Stores some data.
      */
     abstract void store();
-    
+
+
     /**
      * @return true, if the object is valid, false otherwise.
      */
@@ -43,5 +49,6 @@ public abstract class OptionsPanel extends JPanel {
         // checks whether form is consistent and complete
         return true;
     }
-    
+
+
 }

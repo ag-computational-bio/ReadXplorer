@@ -3,8 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport;
+
 
 /**
  *
@@ -39,4 +39,5 @@ public enum ParsingPrefisSuffix {
     TERMINATOR,
     UTR,
     NONE;
+
 }

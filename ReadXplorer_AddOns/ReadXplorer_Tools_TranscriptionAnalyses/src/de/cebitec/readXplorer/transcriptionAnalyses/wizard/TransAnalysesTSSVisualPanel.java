@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,13 @@
  */
 package de.cebitec.readXplorer.transcriptionAnalyses.wizard;
 
+
 import de.cebitec.readXplorer.api.objects.JobPanel;
+import de.cebitec.readXplorer.util.GeneralUtils;
+import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
+import java.util.prefs.Preferences;
+import org.openide.util.NbPreferences;
+
 import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_ANALYSIS_DIRECTION;
 import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_AUTO_TSS_PARAMS;
 import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MAX_FEATURE_DISTANCE;
@@ -28,21 +34,18 @@ import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionA
 import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_TRANSCRIPT_EXTENSION_COV;
 import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_UNANNOTATED_TRANSCRIPT_DET;
 import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_WIZARD_NAME;
-import de.cebitec.readXplorer.util.GeneralUtils;
-import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
-import java.util.prefs.Preferences;
-import org.openide.util.NbPreferences;
+
 
 /**
- * Panel for showing all available options for the transcription start site 
+ * Panel for showing all available options for the transcription start site
  * detection.
- * 
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public final class TransAnalysesTSSVisualPanel extends JobPanel {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     private int minTotalIncrease;
     private int minTotalPercentIncrease;
     private int maxLowCovInitialCount;
@@ -53,6 +56,7 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
     private boolean detectUnannotatedTranscripts = true;
     private boolean tssAutomatic = false;
 
+
     /**
      * Panel for showing all available options for the transcription start site
      * detection.
@@ -62,10 +66,12 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         this.initAdditionalComponents();
     }
 
+
     @Override
     public String getName() {
         return "TSS Analysis Parameters";
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -281,24 +287,26 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
         this.performTssAutoBoxAction();
     }//GEN-LAST:event_transcriptionStartAutomaticBoxActionPerformed
 
+
     /**
-     * Updates the gui according to the button selection and stores the 
+     * Updates the gui according to the button selection and stores the
      * tssAutomatic parameter.
      */
     private void performTssAutoBoxAction() {
         this.tssAutomatic = this.transcriptionStartAutomaticBox.isSelected();
-        this.minPercentIncreaseField.setEnabled(!tssAutomatic);
-        this.minTotalIncreaseField.setEnabled(!tssAutomatic);
-        this.maxInitialCountField.setEnabled(!tssAutomatic);
-        this.minLowCovCountField.setEnabled(!tssAutomatic);
+        this.minPercentIncreaseField.setEnabled( !tssAutomatic );
+        this.minTotalIncreaseField.setEnabled( !tssAutomatic );
+        this.maxInitialCountField.setEnabled( !tssAutomatic );
+        this.minLowCovCountField.setEnabled( !tssAutomatic );
     }
 
     private void unannotatedTranscriptsBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_unannotatedTranscriptsBoxActionPerformed
         this.detectUnannotatedTranscripts = this.unannotatedTranscriptsBox.isSelected();
-        if (this.detectUnannotatedTranscripts) {
-            this.transcriptExtensionField.setEnabled(true);
-        } else {
-            this.transcriptExtensionField.setEnabled(false);
+        if( this.detectUnannotatedTranscripts ) {
+            this.transcriptExtensionField.setEnabled( true );
+        }
+        else {
+            this.transcriptExtensionField.setEnabled( false );
         }
     }//GEN-LAST:event_unannotatedTranscriptsBoxActionPerformed
 
@@ -334,169 +342,194 @@ public final class TransAnalysesTSSVisualPanel extends JobPanel {
 
 
     /**
-     * Initializes all additional stuff and components of this panel needed at startup.
+     * Initializes all additional stuff and components of this panel needed at
+     * startup.
      */
     private void initAdditionalComponents() {
-        
-        this.minTotalIncrease = Integer.parseInt(this.minTotalIncreaseField.getText());
-        this.minTotalPercentIncrease = Integer.parseInt(this.minPercentIncreaseField.getText());
-        this.maxLowCovInitialCount = Integer.parseInt(this.maxInitialCountField.getText());
-        this.minLowCovIncrease = Integer.parseInt(this.minLowCovCountField.getText());
-        this.minTranscriptExtensionCov = Integer.parseInt(this.transcriptExtensionField.getText());
-        this.maxLeaderlessDistance = Integer.parseInt(this.maxLeaderlessDistanceField.getText());
-        this.maxFeatureDistance = Integer.parseInt(this.maxFeatureDistField.getText());
-        
-        this.minTotalIncreaseField.getDocument().addDocumentListener(this.createDocumentListener());
-        this.minPercentIncreaseField.getDocument().addDocumentListener(this.createDocumentListener());
-        this.maxInitialCountField.getDocument().addDocumentListener(this.createDocumentListener());
-        this.minLowCovCountField.getDocument().addDocumentListener(this.createDocumentListener());
-        this.transcriptExtensionField.getDocument().addDocumentListener(this.createDocumentListener());
-        this.maxLeaderlessDistanceField.getDocument().addDocumentListener(this.createDocumentListener());
-        this.maxFeatureDistField.getDocument().addDocumentListener(this.createDocumentListener());
-        
+
+        this.minTotalIncrease = Integer.parseInt( this.minTotalIncreaseField.getText() );
+        this.minTotalPercentIncrease = Integer.parseInt( this.minPercentIncreaseField.getText() );
+        this.maxLowCovInitialCount = Integer.parseInt( this.maxInitialCountField.getText() );
+        this.minLowCovIncrease = Integer.parseInt( this.minLowCovCountField.getText() );
+        this.minTranscriptExtensionCov = Integer.parseInt( this.transcriptExtensionField.getText() );
+        this.maxLeaderlessDistance = Integer.parseInt( this.maxLeaderlessDistanceField.getText() );
+        this.maxFeatureDistance = Integer.parseInt( this.maxFeatureDistField.getText() );
+
+        this.minTotalIncreaseField.getDocument().addDocumentListener( this.createDocumentListener() );
+        this.minPercentIncreaseField.getDocument().addDocumentListener( this.createDocumentListener() );
+        this.maxInitialCountField.getDocument().addDocumentListener( this.createDocumentListener() );
+        this.minLowCovCountField.getDocument().addDocumentListener( this.createDocumentListener() );
+        this.transcriptExtensionField.getDocument().addDocumentListener( this.createDocumentListener() );
+        this.maxLeaderlessDistanceField.getDocument().addDocumentListener( this.createDocumentListener() );
+        this.maxFeatureDistField.getDocument().addDocumentListener( this.createDocumentListener() );
+
         this.loadLastParameterSelection();
     }
-    
+
+
     /**
      * Loads the last selected parameters into the component.
      */
     private void loadLastParameterSelection() {
-        Preferences pref = NbPreferences.forModule(Object.class);
-        tssAutomatic = pref.get(PROP_WIZARD_NAME + PROP_AUTO_TSS_PARAMS, "0").equals("1");
-        String minTotalIncreaseString = pref.get(PROP_WIZARD_NAME + PROP_MIN_TOTAL_INCREASE, minTotalIncreaseField.getText());
-        String minPercentIncreaseString = pref.get(PROP_WIZARD_NAME + PROP_MIN_PERCENT_INCREASE, minPercentIncreaseField.getText());
-        String maxInitialLowCov = pref.get(PROP_WIZARD_NAME + PROP_MAX_LOW_COV_INIT_COUNT, maxInitialCountField.getText());
-        String minInitialLowCov = pref.get(PROP_WIZARD_NAME + PROP_MIN_LOW_COV_INC, minLowCovCountField.getText());
-        detectUnannotatedTranscripts = pref.get(PROP_WIZARD_NAME + PROP_UNANNOTATED_TRANSCRIPT_DET, "1").equals("1");
-        String minExtensionCov = pref.get(PROP_WIZARD_NAME + PROP_MIN_TRANSCRIPT_EXTENSION_COV, transcriptExtensionField.getText());
-        String maxLeaderlessDist = pref.get(PROP_WIZARD_NAME + PROP_MAX_LEADERLESS_DISTANCE, maxLeaderlessDistanceField.getText());
-        String maxFeatureDist = pref.get(PROP_WIZARD_NAME + PROP_MAX_FEATURE_DISTANCE, maxFeatureDistField.getText());
-        boolean fwdAnalysisDirection = pref.get(PROP_WIZARD_NAME + PROP_ANALYSIS_DIRECTION, "1").equals("1");
-        
-        transcriptionStartAutomaticBox.setSelected(tssAutomatic);
-        unannotatedTranscriptsBox.setSelected(detectUnannotatedTranscripts);
-        dirFwdRadioButton.setSelected(fwdAnalysisDirection);
-        dirRevRadioButton.setSelected(!fwdAnalysisDirection);
-        minTotalIncreaseField.setText(minTotalIncreaseString);
-        minPercentIncreaseField.setText(minPercentIncreaseString);
-        maxInitialCountField.setText(maxInitialLowCov);
-        minLowCovCountField.setText(minInitialLowCov);
-        transcriptExtensionField.setText(minExtensionCov);
-        maxLeaderlessDistanceField.setText(maxLeaderlessDist);
-        maxFeatureDistField.setText(maxFeatureDist);
-        
+        Preferences pref = NbPreferences.forModule( Object.class );
+        tssAutomatic = pref.get( PROP_WIZARD_NAME + PROP_AUTO_TSS_PARAMS, "0" ).equals( "1" );
+        String minTotalIncreaseString = pref.get( PROP_WIZARD_NAME + PROP_MIN_TOTAL_INCREASE, minTotalIncreaseField.getText() );
+        String minPercentIncreaseString = pref.get( PROP_WIZARD_NAME + PROP_MIN_PERCENT_INCREASE, minPercentIncreaseField.getText() );
+        String maxInitialLowCov = pref.get( PROP_WIZARD_NAME + PROP_MAX_LOW_COV_INIT_COUNT, maxInitialCountField.getText() );
+        String minInitialLowCov = pref.get( PROP_WIZARD_NAME + PROP_MIN_LOW_COV_INC, minLowCovCountField.getText() );
+        detectUnannotatedTranscripts = pref.get( PROP_WIZARD_NAME + PROP_UNANNOTATED_TRANSCRIPT_DET, "1" ).equals( "1" );
+        String minExtensionCov = pref.get( PROP_WIZARD_NAME + PROP_MIN_TRANSCRIPT_EXTENSION_COV, transcriptExtensionField.getText() );
+        String maxLeaderlessDist = pref.get( PROP_WIZARD_NAME + PROP_MAX_LEADERLESS_DISTANCE, maxLeaderlessDistanceField.getText() );
+        String maxFeatureDist = pref.get( PROP_WIZARD_NAME + PROP_MAX_FEATURE_DISTANCE, maxFeatureDistField.getText() );
+        boolean fwdAnalysisDirection = pref.get( PROP_WIZARD_NAME + PROP_ANALYSIS_DIRECTION, "1" ).equals( "1" );
+
+        transcriptionStartAutomaticBox.setSelected( tssAutomatic );
+        unannotatedTranscriptsBox.setSelected( detectUnannotatedTranscripts );
+        dirFwdRadioButton.setSelected( fwdAnalysisDirection );
+        dirRevRadioButton.setSelected( !fwdAnalysisDirection );
+        minTotalIncreaseField.setText( minTotalIncreaseString );
+        minPercentIncreaseField.setText( minPercentIncreaseString );
+        maxInitialCountField.setText( maxInitialLowCov );
+        minLowCovCountField.setText( minInitialLowCov );
+        transcriptExtensionField.setText( minExtensionCov );
+        maxLeaderlessDistanceField.setText( maxLeaderlessDist );
+        maxFeatureDistField.setText( maxFeatureDist );
+
         this.performTssAutoBoxAction();
     }
+
+
     /**
-     * Checks if all required information to start the transcription start analysis is set.
+     * Checks if all required information to start the transcription start
+     * analysis is set.
      */
     @Override
     public boolean isRequiredInfoSet() {
         boolean isValidated = true;
-        if (GeneralUtils.isValidPositiveNumberInput(minTotalIncreaseField.getText())) {
-            this.minTotalIncrease = Integer.parseInt(minTotalIncreaseField.getText());
-        } else {
+        if( GeneralUtils.isValidPositiveNumberInput( minTotalIncreaseField.getText() ) ) {
+            this.minTotalIncrease = Integer.parseInt( minTotalIncreaseField.getText() );
+        }
+        else {
             isValidated = false;
         }
-        if (GeneralUtils.isValidPositiveNumberInput(minPercentIncreaseField.getText())) {
-            this.minTotalPercentIncrease = Integer.parseInt(minPercentIncreaseField.getText());
-        } else {
+        if( GeneralUtils.isValidPositiveNumberInput( minPercentIncreaseField.getText() ) ) {
+            this.minTotalPercentIncrease = Integer.parseInt( minPercentIncreaseField.getText() );
+        }
+        else {
             isValidated = false;
         }
-        if (GeneralUtils.isValidNumberInput(maxInitialCountField.getText())) {
-            this.maxLowCovInitialCount = Integer.parseInt(maxInitialCountField.getText());
-        } else {
+        if( GeneralUtils.isValidNumberInput( maxInitialCountField.getText() ) ) {
+            this.maxLowCovInitialCount = Integer.parseInt( maxInitialCountField.getText() );
+        }
+        else {
             isValidated = false;
         }
-        if (GeneralUtils.isValidPositiveNumberInput(minLowCovCountField.getText())) {
-            this.minLowCovIncrease = Integer.parseInt(minLowCovCountField.getText());
-        } else {
+        if( GeneralUtils.isValidPositiveNumberInput( minLowCovCountField.getText() ) ) {
+            this.minLowCovIncrease = Integer.parseInt( minLowCovCountField.getText() );
+        }
+        else {
             isValidated = false;
         }
-        if (GeneralUtils.isValidPositiveNumberInput(transcriptExtensionField.getText())) {
-            this.minTranscriptExtensionCov = Integer.parseInt(transcriptExtensionField.getText());
-        } else {
+        if( GeneralUtils.isValidPositiveNumberInput( transcriptExtensionField.getText() ) ) {
+            this.minTranscriptExtensionCov = Integer.parseInt( transcriptExtensionField.getText() );
+        }
+        else {
             isValidated = false;
         }
-        if (GeneralUtils.isValidPositiveNumberInput(maxLeaderlessDistanceField.getText())) {
-            this.maxLeaderlessDistance = Integer.parseInt(maxLeaderlessDistanceField.getText());
-        } else {
-            isValidated = false;
-        }   
-        if (GeneralUtils.isValidPositiveNumberInput(maxFeatureDistField.getText())) {
-            this.maxFeatureDistance = Integer.parseInt(maxFeatureDistField.getText());
-        } else {
+        if( GeneralUtils.isValidPositiveNumberInput( maxLeaderlessDistanceField.getText() ) ) {
+            this.maxLeaderlessDistance = Integer.parseInt( maxLeaderlessDistanceField.getText() );
+        }
+        else {
             isValidated = false;
         }
-        
-        firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated);
+        if( GeneralUtils.isValidPositiveNumberInput( maxFeatureDistField.getText() ) ) {
+            this.maxFeatureDistance = Integer.parseInt( maxFeatureDistField.getText() );
+        }
+        else {
+            isValidated = false;
+        }
+
+        firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated );
         return isValidated;
     }
+
 
     public int getMinTotalIncrease() {
         return minTotalIncrease;
     }
 
+
     public int getMinTotalPercentIncrease() {
         return minTotalPercentIncrease;
     }
+
 
     public int getMaxLowCovInitialCount() {
         return maxLowCovInitialCount;
     }
 
+
     public int getMinLowCovIncrease() {
         return minLowCovIncrease;
     }
+
 
     public int getMinTranscriptExtensionCov() {
         return minTranscriptExtensionCov;
     }
 
+
     public int getMaxLeaderlessDistance() {
         return maxLeaderlessDistance;
     }
+
 
     public int getMaxFeatureDistance() {
         return maxFeatureDistance;
     }
 
+
     /**
-     * @return true, if unannotated transcripts should be detected, false otherwise.
+     * @return true, if unannotated transcripts should be detected, false
+     *         otherwise.
      */
     public boolean getDetectUnannotatedTranscripts() {
         return detectUnannotatedTranscripts;
     }
 
+
     /**
      * @return true, if the transcription start site detection's autmatic
-     * parameter estimation should be used
+     *         parameter estimation should be used
      */
     public boolean isTssAutomatic() {
         return tssAutomatic;
     }
-    
+
+
     /**
      * @return <code>true</code>, if the analysis direction for the TSS is fwd,
-     * <code>false</code> if the analysis direction is rev. This means either
-     * only genes on the fwd or genes on the reverse strand can be assigned to
-     * TSS.
+     *         <code>false</code> if the analysis direction is rev. This means either
+     *         only genes on the fwd or genes on the reverse strand can be assigned to
+     *         TSS.
      */
     public boolean isFwdDirectionSelected() {
         return dirFwdRadioButton.isSelected();
     }
 
+
     /**
      * Set all components belonging to the analysis direction options visible
      * or not.
+     * <p>
      * @param isVisible <code>true</code> if the components shall be visible,
-     * <code>true</code> if not.
+     *                  <code>true</code> if not.
      */
-    public void setDirectionOptionsVisible(boolean isVisible) {
-        analysisDirectionLabel.setVisible(isVisible);
-        dirFwdRadioButton.setVisible(isVisible);
-        dirRevRadioButton.setVisible(isVisible);
-        analysisDirectionSeparator.setVisible(isVisible);
+    public void setDirectionOptionsVisible( boolean isVisible ) {
+        analysisDirectionLabel.setVisible( isVisible );
+        dirFwdRadioButton.setVisible( isVisible );
+        dirRevRadioButton.setVisible( isVisible );
+        analysisDirectionSeparator.setVisible( isVisible );
     }
 
 

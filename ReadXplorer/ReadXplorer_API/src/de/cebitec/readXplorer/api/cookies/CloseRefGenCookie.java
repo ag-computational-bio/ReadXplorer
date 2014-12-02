@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,12 +16,13 @@
  */
 package de.cebitec.readXplorer.api.cookies;
 
+
 /**
  * Cookie class that signifies the capability of a reference to be closed.
  *
  * @author jwinneba
  */
-public interface CloseRefGenCookie{
+public interface CloseRefGenCookie {
 
     /**
      * Closes the reference.
@@ -29,5 +30,6 @@ public interface CloseRefGenCookie{
      * @return true if reference could be closed, false otherwise
      */
     public boolean close();
+
 
 }

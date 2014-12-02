@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,23 +16,28 @@
  */
 package de.cebitec.readXplorer.parser.reference.Filter;
 
-import de.cebitec.readXplorer.util.classification.FeatureType;
+
 import de.cebitec.readXplorer.parser.common.ParsedFeature;
+import de.cebitec.readXplorer.util.classification.FeatureType;
+
 
 /**
  * @author ddoppmeier
- * 
- * This filter rule returns true for features of the sequence type FeatureType.SOURCE.
+ * <p>
+ * This filter rule returns true for features of the sequence type
+ * FeatureType.SOURCE.
  */
 public class FilterRuleSource implements FilterRuleI {
 
     @Override
-    public boolean appliesRule(ParsedFeature feature) {
-        if(feature.getType() == FeatureType.SOURCE){
+    public boolean appliesRule( ParsedFeature feature ) {
+        if( feature.getType() == FeatureType.SOURCE ) {
             return true;
-        } else {
+        }
+        else {
             return false;
         }
     }
+
 
 }

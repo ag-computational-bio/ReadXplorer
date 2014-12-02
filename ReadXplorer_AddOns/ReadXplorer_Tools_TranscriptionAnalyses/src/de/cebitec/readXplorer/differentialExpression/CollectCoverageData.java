@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression;
 
+
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
 import de.cebitec.readXplorer.databackend.dataObjects.MappingResult;
@@ -25,6 +26,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 
 /**
  * Collect the coverage data for a given track.
@@ -45,44 +47,49 @@ public class CollectCoverageData implements Observer {
     private final Map<PersistentFeature, Integer> countData = new HashMap<>();
     /**
      * Adjusts how many bases downstream from the start position of a feature a
-     * mapping should still be considered a hit. The features in the database are
-     * sometimes CDS positions. So it is normal that a lot of mappings will start in
+     * mapping should still be considered a hit. The features in the database
+     * are
+     * sometimes CDS positions. So it is normal that a lot of mappings will
+     * start in
      * an are downstream of the start position of the feature.
      */
     private final int startOffset;
     /**
      * Adjusts how many bases upstream from the stop position of a feature a
-     * mapping should still be considered a hit. The features in the database are
+     * mapping should still be considered a hit. The features in the database
+     * are
      * sometimes CDS positions. So it is normales that some mappings are not
      * located exactly indside the feature positions.
      */
     private final int stopOffset;
     private ParametersReadClasses readClassParams;
 
+
     /**
      * Constructor of the class.
      *
-     * @param trackID The ID of the track the instance of this class should
-     * collect the coverage data for
+     * @param trackID      The ID of the track the instance of this class should
+     *                     collect the coverage data for
      * @param perfAnalysis Instance of the calling instance of
-     * DeAnalysisHandler.
+     *                     DeAnalysisHandler.
      */
-    public CollectCoverageData(List<PersistentFeature> genomeFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams) {
+    public CollectCoverageData( List<PersistentFeature> genomeFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams ) {
         this.genomeFeatures = genomeFeatures;
         this.startOffset = startOffset;
         this.stopOffset = stopOffset;
         this.readClassParams = readClassParams;
-        Collections.sort(genomeFeatures);
+        Collections.sort( genomeFeatures );
     }
+
 
     /**
      * Updates the read count for the features with the given mappings.
      *
      * @param mappings the mappings
      */
-    private void updateReadCountForFeatures(MappingResult result) {
+    private void updateReadCountForFeatures( MappingResult result ) {
         List<Mapping> mappings = result.getMappings();
-        Collections.sort(mappings);
+        Collections.sort( mappings );
         int lastMappingIdx = 0;
         PersistentFeature feature;
         boolean fstFittingMapping;
@@ -90,9 +97,9 @@ public class CollectCoverageData implements Observer {
         boolean isFeatureStrand = readClassParams.isStrandFeatureOption();
         boolean analysisStrand;
 
-        for (int i = 0; i < this.genomeFeatures.size(); ++i) {
-            feature = this.genomeFeatures.get(i);
-            if (feature.getChromId() == result.getRequest().getChromId()) {
+        for( int i = 0; i < this.genomeFeatures.size(); ++i ) {
+            feature = this.genomeFeatures.get( i );
+            if( feature.getChromId() == result.getRequest().getChromId() ) {
 
                 int featStart = feature.getStart() - startOffset;
                 int featStop = feature.getStop() + stopOffset;
@@ -100,25 +107,26 @@ public class CollectCoverageData implements Observer {
                 fstFittingMapping = true;
                 //If no matching mapping is found, we still need to know that by
                 //writing down a count of zero for this feature.
-                if (!countData.containsKey(feature)) {
-                    countData.put(feature, 0);
+                if( !countData.containsKey( feature ) ) {
+                    countData.put( feature, 0 );
                 }
-                for (int j = lastMappingIdx; j < mappings.size(); ++j) {
-                    Mapping mapping = mappings.get(j);
+                for( int j = lastMappingIdx; j < mappings.size(); ++j ) {
+                    Mapping mapping = mappings.get( j );
                     //If the orientation of the read does not matter this one is always true.
                     //mappings identified within a feature
-                    if (mapping.getStop() > featStart && mapping.getStart() < featStop) {
+                    if( mapping.getStop() > featStart && mapping.getStart() < featStop ) {
 
-                        if (fstFittingMapping) {
+                        if( fstFittingMapping ) {
                             lastMappingIdx = j;
                             fstFittingMapping = false;
                         }
-                        if (isStrandBothOption || analysisStrand == mapping.isFwdStrand()) {
-                            countData.put(feature, countData.get(feature) + 1);
+                        if( isStrandBothOption || analysisStrand == mapping.isFwdStrand() ) {
+                            countData.put( feature, countData.get( feature ) + 1 );
                         }
 
                         //still mappings left, but need next feature
-                    } else if (mapping.getStart() > featStop) {
+                    }
+                    else if( mapping.getStart() > featStop ) {
                         break;
                     }
                 }
@@ -126,15 +134,19 @@ public class CollectCoverageData implements Observer {
         }
     }
 
+
     @Override
-    public void update(Object args) {
-        if (args instanceof MappingResult) {
+    public void update( Object args ) {
+        if( args instanceof MappingResult ) {
             MappingResult result = (MappingResult) args;
-            updateReadCountForFeatures(result);
+            updateReadCountForFeatures( result );
         }
     }
+
 
     public Map<PersistentFeature, Integer> getCountData() {
         return countData;
     }
+
+
 }

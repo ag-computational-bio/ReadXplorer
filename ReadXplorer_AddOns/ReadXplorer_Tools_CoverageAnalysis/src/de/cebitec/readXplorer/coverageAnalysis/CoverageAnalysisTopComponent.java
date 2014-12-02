@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.coverageAnalysis;
 
+
 import de.cebitec.readXplorer.view.TopComponentExtended;
 import de.cebitec.readXplorer.view.TopComponentHelper;
 import javax.swing.JPanel;
@@ -25,32 +26,35 @@ import org.openide.awt.ActionReference;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 
+
 /**
- * TopComponent of the coverage analysis. It displays all results of all carried 
+ * TopComponent of the coverage analysis. It displays all results of all carried
  * out coverage analyses.
  *
- * @author Tobias Zimmermann, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ * @author Tobias Zimmermann, Rolf Hilker
+ * <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 @ConvertAsProperties(
-        dtd = "-//CoverageAnalysis//CoverageAnalysisTopComponent//EN",
-        autostore = false)
+         dtd = "-//CoverageAnalysis//CoverageAnalysisTopComponent//EN",
+         autostore = false )
 @TopComponent.Description(
-        preferredID = "CoverageAnalysisTopComponent",
-        //iconBase="SET/PATH/TO/ICON/HERE", 
-        persistenceType = TopComponent.PERSISTENCE_ALWAYS)
-@TopComponent.Registration(mode = "output", openAtStartup = false)
-@ActionID(category = "Window", id = "CoverageAnalysis.CoverageAnalysisTopComponent")
-@ActionReference(path = "Menu/Window" /*, position = 333 */)
+         preferredID = "CoverageAnalysisTopComponent",
+         //iconBase="SET/PATH/TO/ICON/HERE",
+         persistenceType = TopComponent.PERSISTENCE_ALWAYS )
+@TopComponent.Registration( mode = "output", openAtStartup = false )
+@ActionID( category = "Window", id = "CoverageAnalysis.CoverageAnalysisTopComponent" )
+@ActionReference( path = "Menu/Window" /*, position = 333 */ )
 @TopComponent.OpenActionRegistration(
-        displayName = "#CTL_CoverageAnalysisTopComponent",
-        preferredID = "CoverageAnalysisTopComponent")
-@Messages({
+         displayName = "#CTL_CoverageAnalysisTopComponent",
+         preferredID = "CoverageAnalysisTopComponent" )
+@Messages( {
     "CTL_CoverageAnalysisTopComponent=Coverage Analysis Window",
     "HINT_CoverageAnalysisTopComponent=This is a Coverage Analysis Result window"
-})
+} )
 public final class CoverageAnalysisTopComponent extends TopComponentExtended {
 
     private static final long serialVersionUID = 1L;
+
 
     /**
      * TopComponent of the coverage analysis. It displays all results of
@@ -58,11 +62,12 @@ public final class CoverageAnalysisTopComponent extends TopComponentExtended {
      */
     public CoverageAnalysisTopComponent() {
         initComponents();
-        setName(Bundle.CTL_CoverageAnalysisTopComponent());
-        setToolTipText(Bundle.HINT_CoverageAnalysisTopComponent());
-        putClientProperty(TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE);
-        TopComponentHelper.setupContainerListener(coverageAnalysisTabbedPanel, preferredID());
+        setName( Bundle.CTL_CoverageAnalysisTopComponent() );
+        setToolTipText( Bundle.HINT_CoverageAnalysisTopComponent() );
+        putClientProperty( TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE );
+        TopComponentHelper.setupContainerListener( coverageAnalysisTabbedPanel, preferredID() );
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -94,38 +99,47 @@ public final class CoverageAnalysisTopComponent extends TopComponentExtended {
         // add custom code on component opening
     }
 
+
     @Override
     public void componentClosed() {
         // add custom code on component closing
     }
 
-    void writeProperties(java.util.Properties p) {
+
+    void writeProperties( java.util.Properties p ) {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
-        p.setProperty("version", "1.0");
+        p.setProperty( "version", "1.0" );
         // store your settings
     }
 
-    void readProperties(java.util.Properties p) {
-        String version = p.getProperty("version");
+
+    void readProperties( java.util.Properties p ) {
+        String version = p.getProperty( "version" );
         // read your settings according to their version
     }
 
-     /**
+
+    /**
      * This method needs to be called in order to open a new tab for a
      * covered feature detection. Make sure to call {@link setAnalysisContext()}
      * first in order to display the correct context for the analysis result.
-     * @param panelName title of the new tab to create
+     * <p>
+     * @param panelName   title of the new tab to create
      * @param resultPanel the panel to place in the new tab
      */
-    public void openAnalysisTab(String panelName, JPanel resultPanel) {
-        TopComponentHelper.openTableTab(coverageAnalysisTabbedPanel, panelName, resultPanel);
-    }    
-    
-     /**
-     * @return true, if this component already contains other components, false otherwise.
+    public void openAnalysisTab( String panelName, JPanel resultPanel ) {
+        TopComponentHelper.openTableTab( coverageAnalysisTabbedPanel, panelName, resultPanel );
+    }
+
+
+    /**
+     * @return true, if this component already contains other components, false
+     *         otherwise.
      */
     public boolean hasComponents() {
         return this.coverageAnalysisTabbedPanel.getComponentCount() > 0;
     }
+
+
 }

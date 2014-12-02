@@ -1,6 +1,8 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch;
 
+
 import de.cebitec.readXplorer.databackend.ParameterSetI;
+
 
 /**
  *
@@ -13,7 +15,8 @@ public class PromotorSearchParameters implements ParameterSetI<Object> {
     private int noOfTimesTrying;
     private int lengthOfPromotorRegion;
 
-    public PromotorSearchParameters(int minusTenMotifWidth, int minus35MotifWidth, int noOfTimesTryingTF, int minSpacer1, int minSpacer2, int alternativeSpacer, int seqWidthMinus10, int seqWidthMinus35, int lengthRelToTss) {
+
+    public PromotorSearchParameters( int minusTenMotifWidth, int minus35MotifWidth, int noOfTimesTryingTF, int minSpacer1, int minSpacer2, int alternativeSpacer, int seqWidthMinus10, int seqWidthMinus35, int lengthRelToTss ) {
         this.minusTenMotifWidth = minusTenMotifWidth;
         this.minus35MotifWidth = minus35MotifWidth;
         this.noOfTimesTrying = noOfTimesTryingTF;
@@ -25,71 +28,90 @@ public class PromotorSearchParameters implements ParameterSetI<Object> {
         this.lengthOfPromotorRegion = lengthRelToTss;
     }
 
+
     public int getMinusTenMotifWidth() {
         return minusTenMotifWidth;
     }
 
-    public void setMinusTenMotifWidth(int minusTenMotifWidth) {
+
+    public void setMinusTenMotifWidth( int minusTenMotifWidth ) {
         this.minusTenMotifWidth = minusTenMotifWidth;
     }
+
 
     public int getLengthOfPromotorRegion() {
         return lengthOfPromotorRegion;
     }
 
+
     public int getMinus35MotifWidth() {
         return minus35MotifWidth;
     }
+
 
     public int getAlternativeSpacer() {
         return alternativeSpacer;
     }
 
-    public void setAlternativeSpacer(int alternativeSpacer) {
+
+    public void setAlternativeSpacer( int alternativeSpacer ) {
         this.alternativeSpacer = alternativeSpacer;
     }
 
-    public void setMinus35MotifWidth(int minus35MotifWidth) {
+
+    public void setMinus35MotifWidth( int minus35MotifWidth ) {
         this.minus35MotifWidth = minus35MotifWidth;
     }
+
 
     public int getNoOfTimesTrying() {
         return noOfTimesTrying;
     }
 
-    public void setNoOfTimesTrying(int noOfTimesTryingTF) {
+
+    public void setNoOfTimesTrying( int noOfTimesTryingTF ) {
         this.noOfTimesTrying = noOfTimesTryingTF;
     }
+
 
     public int getMinSpacer1() {
         return minSpacer1;
     }
 
-    public void setMinSpacer1(int minSpacer1) {
+
+    public void setMinSpacer1( int minSpacer1 ) {
         this.minSpacer1 = minSpacer1;
     }
+
 
     public int getMinSpacer2() {
         return minSpacer2;
     }
 
-    public void setMinSpacer2(int spacer2) {
+
+    public void setMinSpacer2( int spacer2 ) {
         this.minSpacer2 = spacer2;
     }
+
 
     public int getSequenceWidthToAnalyzeMinus10() {
         return sequenceWidthToAnalyzeMinus10;
     }
 
-    public void setSequenceWidthToAnalyzeMinus10(int sequenceWidthToAnalyzeMinus10) {
+
+    public void setSequenceWidthToAnalyzeMinus10( int sequenceWidthToAnalyzeMinus10 ) {
         this.sequenceWidthToAnalyzeMinus10 = sequenceWidthToAnalyzeMinus10;
     }
+
 
     public int getSequenceWidthToAnalyzeMinus35() {
         return sequenceWidthToAnalyzeMinus35;
     }
 
-    public void setSequenceWidthToAnalyzeMinus35(int sequenceWidthToAnalyzeMinus35) {
+
+    public void setSequenceWidthToAnalyzeMinus35( int sequenceWidthToAnalyzeMinus35 ) {
         this.sequenceWidthToAnalyzeMinus35 = sequenceWidthToAnalyzeMinus35;
     }
+
+
 }

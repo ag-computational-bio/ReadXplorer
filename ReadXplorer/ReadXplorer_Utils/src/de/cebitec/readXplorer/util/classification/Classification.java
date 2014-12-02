@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.util.classification;
 
+
 /**
  * A general interface for classification enumerations, like read mapping
  * classes or genomic feature types.
@@ -23,14 +24,17 @@ package de.cebitec.readXplorer.util.classification;
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public interface Classification {
-    
+
     /**
      * @return The string representation associated with this Classification.
      */
     public String getTypeString();
-    
+
+
     /**
      * @return The integer value associated with this Classification.
      */
     public int getTypeByte();
+
+
 }

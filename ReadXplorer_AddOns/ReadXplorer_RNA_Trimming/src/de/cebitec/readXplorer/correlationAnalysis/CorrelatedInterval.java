@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,42 +16,49 @@
  */
 package de.cebitec.readXplorer.correlationAnalysis;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.TrackChromResultEntry;
 
+
 /**
- * CorrelatedInterval is a data class, that saves the data about a correlation 
+ * CorrelatedInterval is a data class, that saves the data about a correlation
  * between the data of two track in a defined interval
+ * <p>
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 public class CorrelatedInterval extends TrackChromResultEntry {
+
     private byte strand;
-    
-    private int from; 
+
+    private int from;
     private int to;
     private int track2Id;
     private double correlation;
     private double minPeakCoverage;
-    
+
+
     /**
      * CorrelatedInterval is a data class, that saves the data about a
      * correlation between the data of two tracks in a defined interval.
+     * <p>
      * @param strand
      * @param track1Id
      * @param chromId
      * @param from
      * @param to
      * @param correlation
-     * @param minPeakCoverage 
+     * @param minPeakCoverage
      */
-    public CorrelatedInterval(byte strand,
-            int track1Id, int track2Id, int chromId, int from, int to, double correlation, double minPeakCoverage) {
-        super(track1Id, chromId);
+    public CorrelatedInterval( byte strand,
+                               int track1Id, int track2Id, int chromId, int from, int to, double correlation, double minPeakCoverage ) {
+        super( track1Id, chromId );
         this.strand = strand;
         this.from = from;
         this.to = to;
         this.correlation = correlation;
         this.minPeakCoverage = minPeakCoverage;
     }
+
 
     /**
      * @return the strand
@@ -60,12 +67,14 @@ public class CorrelatedInterval extends TrackChromResultEntry {
         return strand;
     }
 
+
     /**
      * @param strand the strand to set
      */
-    public void setDirection(byte strand) {
+    public void setDirection( byte strand ) {
         this.strand = strand;
     }
+
 
     /**
      * @return the from
@@ -74,12 +83,14 @@ public class CorrelatedInterval extends TrackChromResultEntry {
         return from;
     }
 
+
     /**
      * @param from the from to set
      */
-    public void setFrom(int from) {
+    public void setFrom( int from ) {
         this.from = from;
     }
+
 
     /**
      * @return the to
@@ -88,12 +99,14 @@ public class CorrelatedInterval extends TrackChromResultEntry {
         return to;
     }
 
+
     /**
      * @param to the to to set
      */
-    public void setTo(int to) {
+    public void setTo( int to ) {
         this.to = to;
     }
+
 
     /**
      * @return the correlation
@@ -102,12 +115,14 @@ public class CorrelatedInterval extends TrackChromResultEntry {
         return correlation;
     }
 
+
     /**
      * @param correlation the correlation to set
      */
-    public void setCorrelation(double correlation) {
+    public void setCorrelation( double correlation ) {
         this.correlation = correlation;
     }
+
 
     /**
      * @return the minPeakCoverage
@@ -116,14 +131,18 @@ public class CorrelatedInterval extends TrackChromResultEntry {
         return minPeakCoverage;
     }
 
+
     /**
      * @param minPeakCoverage the minPeakCoverage to set
      */
-    public void setMinPeakCoverage(double minPeakCoverage) {
+    public void setMinPeakCoverage( double minPeakCoverage ) {
         this.minPeakCoverage = minPeakCoverage;
     }
+
 
     public int getTrack2Id() {
         return track2Id;
     }
+
+
 }

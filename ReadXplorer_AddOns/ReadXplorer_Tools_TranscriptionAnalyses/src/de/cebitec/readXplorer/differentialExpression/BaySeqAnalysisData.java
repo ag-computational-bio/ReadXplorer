@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,9 @@
  */
 package de.cebitec.readXplorer.differentialExpression;
 
+
 import java.util.List;
+
 
 /**
  *
@@ -33,12 +35,16 @@ public class BaySeqAnalysisData extends DeAnalysisData {
      */
     private final int[] replicateStructure;
 
-    public BaySeqAnalysisData(int capacity, List<Group> groups, int[] replicateStructure) {
-        super(capacity);
+
+    public BaySeqAnalysisData( int capacity, List<Group> groups, int[] replicateStructure ) {
+        super( capacity );
         this.groups = groups;
         this.replicateStructure = replicateStructure;
     }
+
+
     private int nextGroup = 0;
+
 
     /**
      * Returns the next group that has not been returned yet.
@@ -47,25 +53,27 @@ public class BaySeqAnalysisData extends DeAnalysisData {
      */
     public int[] getNextGroup() {
         int[] ret = new int[0];
-        if (!(nextGroup >= groups.size())) {
-            Integer[] current = groups.get(nextGroup++).getIntegerRepresentation();
+        if( !(nextGroup >= groups.size()) ) {
+            Integer[] current = groups.get( nextGroup++ ).getIntegerRepresentation();
             ret = new int[current.length];
-            for (int i = 0; i < current.length; i++) {
+            for( int i = 0; i < current.length; i++ ) {
                 ret[i] = current[i].intValue();
             }
         }
         return ret;
     }
 
+
     /**
      * Checks if there is still an unreturned group.
      *
      * @return true if there is still at least one unreturned group otherwise
-     * false
+     *         false
      */
     public boolean hasGroups() {
         return !(nextGroup >= groups.size());
     }
+
 
     /**
      * Return the replicate structure.
@@ -75,4 +83,6 @@ public class BaySeqAnalysisData extends DeAnalysisData {
     public int[] getReplicateStructure() {
         return replicateStructure;
     }
+
+
 }

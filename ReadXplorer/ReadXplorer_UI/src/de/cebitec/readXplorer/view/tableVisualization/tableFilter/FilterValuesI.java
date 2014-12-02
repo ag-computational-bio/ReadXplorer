@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,10 @@
  */
 package de.cebitec.readXplorer.view.tableVisualization.tableFilter;
 
+
 import java.util.Vector;
 import javax.swing.table.DefaultTableModel;
+
 
 /**
  * Interface for filtering values of a table row by a given cutoff
@@ -25,14 +27,17 @@ import javax.swing.table.DefaultTableModel;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public interface FilterValuesI {
-    
+
     /**
-     * Filters a table row according to the given cutoff and current entry value.
+     * Filters a table row according to the given cutoff and current entry
+     * value.
+     * <p>
      * @param filteredTableModel the table model to filter
-     * @param row the currently checked row
-     * @param cutoff the cutoff value
-     * @param currentEntryValue the current entry value from the row
+     * @param row                the currently checked row
+     * @param cutoff             the cutoff value
+     * @param currentEntryValue  the current entry value from the row
      */
-    public void filterTable(DefaultTableModel filteredTableModel, Vector row, double cutoff, double currentEntryValue);
-    
+    public void filterTable( DefaultTableModel filteredTableModel, Vector row, double cutoff, double currentEntryValue );
+
+
 }

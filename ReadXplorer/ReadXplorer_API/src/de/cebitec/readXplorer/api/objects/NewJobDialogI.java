@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,10 @@
  */
 package de.cebitec.readXplorer.api.objects;
 
+
 /**
- * Interface for all dialogs that create new jobs and need some required info set
+ * Interface for all dialogs that create new jobs and need some required info
+ * set
  * before they can finish successfully.
  *
  * @author jwinneba
@@ -25,8 +27,10 @@ package de.cebitec.readXplorer.api.objects;
 public interface NewJobDialogI {
 
     /**
-     * @return true, if all required info for this job dialog is set, false otherwise.
+     * @return true, if all required info for this job dialog is set, false
+     *         otherwise.
      */
     public boolean isRequiredInfoSet();
+
 
 }

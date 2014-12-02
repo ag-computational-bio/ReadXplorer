@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,29 +16,33 @@
  */
 package de.cebitec.readXplorer.transcriptionAnalyses.wizard;
 
-import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_OPERON_ANALYSIS;
-import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_RPKM_ANALYSIS;
-import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_TSS_ANALYSIS;
-import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_WIZARD_NAME;
+
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
 import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbPreferences;
 
+import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_OPERON_ANALYSIS;
+import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_RPKM_ANALYSIS;
+import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_TSS_ANALYSIS;
+import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_WIZARD_NAME;
+
+
 /**
  * Wizard panel allowing for selection of the transcription analyses, which
  * should be carried out and whose parameters have to be adjusted in the next
  * steps.
- * 
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class TransAnalysesSelectionWizardPanel extends ChangeListeningWizardPanel {
-    
+
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
     private TransAnalysesSelectionVisualPanel component;
+
 
     /**
      * Wizard panel allowing for selection of the transcription analyses, which
@@ -46,8 +50,9 @@ public class TransAnalysesSelectionWizardPanel extends ChangeListeningWizardPane
      * next steps.
      */
     public TransAnalysesSelectionWizardPanel() {
-        super("Please select at least one transcription analysis to continue!");
+        super( "Please select at least one transcription analysis to continue!" );
     }
+
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -55,45 +60,50 @@ public class TransAnalysesSelectionWizardPanel extends ChangeListeningWizardPane
     // create only those which really need to be visible.
     @Override
     public TransAnalysesSelectionVisualPanel getComponent() {
-        if (component == null) {
+        if( component == null ) {
             component = new TransAnalysesSelectionVisualPanel();
         }
         return component;
     }
-    
+
+
     @Override
-    public void readSettings(final WizardDescriptor wiz) {
-        super.readSettings(wiz);
-        Preferences pref = NbPreferences.forModule(Object.class);
-        byte tssSelected = Byte.valueOf(pref.get(PROP_WIZARD_NAME + PROP_TSS_ANALYSIS, "0"));
-        byte operonSelected = Byte.valueOf(pref.get(PROP_WIZARD_NAME + PROP_OPERON_ANALYSIS, "0"));
-        byte rpkmSelected = Byte.valueOf(pref.get(PROP_WIZARD_NAME + PROP_RPKM_ANALYSIS, "0"));
+    public void readSettings( final WizardDescriptor wiz ) {
+        super.readSettings( wiz );
+        Preferences pref = NbPreferences.forModule( Object.class );
+        byte tssSelected = Byte.valueOf( pref.get( PROP_WIZARD_NAME + PROP_TSS_ANALYSIS, "0" ) );
+        byte operonSelected = Byte.valueOf( pref.get( PROP_WIZARD_NAME + PROP_OPERON_ANALYSIS, "0" ) );
+        byte rpkmSelected = Byte.valueOf( pref.get( PROP_WIZARD_NAME + PROP_RPKM_ANALYSIS, "0" ) );
         boolean isTssSelected = tssSelected == 1;
         boolean isOperonSelected = operonSelected == 1;
         boolean isRpkmSelected = rpkmSelected == 1;
-        
-        this.getComponent().updateAnalysisSelection(isTssSelected, isOperonSelected, isRpkmSelected);
+
+        this.getComponent().updateAnalysisSelection( isTssSelected, isOperonSelected, isRpkmSelected );
     }
 
+
     @Override
-    public void storeSettings(WizardDescriptor wiz) {
+    public void storeSettings( WizardDescriptor wiz ) {
         // use wiz.putProperty to remember current panel state
-        if (this.isValid()) {
-            wiz.putProperty(PROP_TSS_ANALYSIS, this.component.isTSSAnalysisSelected());
-            wiz.putProperty(PROP_OPERON_ANALYSIS, this.component.isOperonAnalysisSelected());
-            wiz.putProperty(PROP_RPKM_ANALYSIS, this.component.isRPKMAnalysisSelected());
+        if( this.isValid() ) {
+            wiz.putProperty( PROP_TSS_ANALYSIS, this.component.isTSSAnalysisSelected() );
+            wiz.putProperty( PROP_OPERON_ANALYSIS, this.component.isOperonAnalysisSelected() );
+            wiz.putProperty( PROP_RPKM_ANALYSIS, this.component.isRPKMAnalysisSelected() );
             this.storePrefs();
         }
     }
-    
+
+
     /**
      * Stores the chosen TSS parameters for this wizard for later use, also
      * after restarting the software.
      */
     private void storePrefs() {
-        Preferences pref = NbPreferences.forModule(Object.class);
-        pref.put(PROP_WIZARD_NAME + PROP_TSS_ANALYSIS, this.component.isTSSAnalysisSelected() ? "1" : "0");
-        pref.put(PROP_WIZARD_NAME + PROP_OPERON_ANALYSIS, this.component.isOperonAnalysisSelected() ? "1" : "0");
-        pref.put(PROP_WIZARD_NAME + PROP_RPKM_ANALYSIS, this.component.isRPKMAnalysisSelected() ? "1" : "0");
+        Preferences pref = NbPreferences.forModule( Object.class );
+        pref.put( PROP_WIZARD_NAME + PROP_TSS_ANALYSIS, this.component.isTSSAnalysisSelected() ? "1" : "0" );
+        pref.put( PROP_WIZARD_NAME + PROP_OPERON_ANALYSIS, this.component.isOperonAnalysisSelected() ? "1" : "0" );
+        pref.put( PROP_WIZARD_NAME + PROP_RPKM_ANALYSIS, this.component.isRPKMAnalysisSelected() ? "1" : "0" );
     }
+
+
 }

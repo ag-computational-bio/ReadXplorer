@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,16 +16,19 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.readPairViewer;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.ObjectWithId;
 import de.cebitec.readXplorer.databackend.dataObjects.ReadPairGroup;
 import de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer.BlockI;
 import de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer.Brick;
 import java.util.Iterator;
 
+
 /**
- * A BlockPair is a block that contains detailed information about 
- * one read pair id = all corresponding mappings in the currently visible interval.
- * 
+ * A BlockPair is a block that contains detailed information about
+ * one read pair id = all corresponding mappings in the currently visible
+ * interval.
+ * <p>
  * @author rhilker
  */
 public class BlockPair implements BlockI {
@@ -34,13 +37,20 @@ public class BlockPair implements BlockI {
     private int absStop;
     private ReadPairGroup readPairGroup;
 
+
     /**
-     * A block is a block that contains detailed information about one read pair id = all corresponding mappings.
-     * @param absStart start of the block as sequence position (might be larger than start of mapping, when not in visible interval)
-     * @param absStop stop of the block as sequence position (might be smaller than stop of mapping, when not in visible interval)
+     * A block is a block that contains detailed information about one read pair
+     * id = all corresponding mappings.
+     * <p>
+     * @param absStart      start of the block as sequence position (might be
+     *                      larger than start of mapping, when not in visible
+     *                      interval)
+     * @param absStop       stop of the block as sequence position (might be
+     *                      smaller than stop of mapping, when not in visible
+     *                      interval)
      * @param readPairGroup read pair group of this block
      */
-    public BlockPair(int absStart, int absStop, ReadPairGroup readPairGroup){
+    public BlockPair( int absStart, int absStop, ReadPairGroup readPairGroup ) {
         this.absStart = absStart;
         this.absStop = absStop;
         this.readPairGroup = readPairGroup;
@@ -52,30 +62,33 @@ public class BlockPair implements BlockI {
         return this.absStart;
     }
 
+
     @Override
     public int getAbsStop() {
         return this.absStop;
     }
-    
-    
-    public long getSeqPairId(){
+
+
+    public long getSeqPairId() {
         return this.readPairGroup.getId();
     }
 
-    
+
     @Override
     public String toString() {
         //TODO: implement to string for BlockPair
         return "";
     }
 
-   /**
+
+    /**
      * @return null, because it is not supported for BlockPairs!
      */
     @Override
     public Iterator<Brick> getBrickIterator() {
         return null;
     }
+
 
     /**
      * @return -1, because it is not supported for BlockPairs!
@@ -85,6 +98,7 @@ public class BlockPair implements BlockI {
         return -1;
     }
 
+
     /**
      * @return The associated seq pair group.
      */
@@ -92,4 +106,6 @@ public class BlockPair implements BlockI {
     public ObjectWithId getObjectWithId() {
         return this.readPairGroup;
     }
+
+
 }

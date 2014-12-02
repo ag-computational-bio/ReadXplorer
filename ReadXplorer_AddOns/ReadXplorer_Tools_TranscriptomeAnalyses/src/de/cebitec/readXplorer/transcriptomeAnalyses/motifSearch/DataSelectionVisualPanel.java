@@ -4,59 +4,70 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch;
 
+
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.PurposeEnum;
 import javax.swing.JPanel;
+
 
 public final class DataSelectionVisualPanel extends JPanel {
 
     /**
      * Creates new form DataSelectionVisualPanel
      */
-    public DataSelectionVisualPanel(PurposeEnum purpose) {
+    public DataSelectionVisualPanel( PurposeEnum purpose ) {
         initComponents();
-        this.buttonSelectionGroup.add(onlyLeaderlessElementsCB);
-        this.buttonSelectionGroup.add(onlyPutAntisenseElementsCB);
-        this.buttonSelectionGroup.add(onlyRealTssCB);
-        this.buttonSelectionGroup.add(onlySelectedCB);
+        this.buttonSelectionGroup.add( onlyLeaderlessElementsCB );
+        this.buttonSelectionGroup.add( onlyPutAntisenseElementsCB );
+        this.buttonSelectionGroup.add( onlyRealTssCB );
+        this.buttonSelectionGroup.add( onlySelectedCB );
 
-        if (purpose == PurposeEnum.CHARTS || purpose == PurposeEnum.SEQUIN_EXPORT) {
+        if( purpose == PurposeEnum.CHARTS || purpose == PurposeEnum.SEQUIN_EXPORT ) {
             this.disableLengthSelection();
         }
     }
+
 
     @Override
     public String getName() {
         return "Data type selection";
     }
 
+
     public boolean isAllElements() {
         return allElementsCB.isSelected();
     }
+
 
     public boolean isOnlyLeaderlessElements() {
         return onlyLeaderlessElementsCB.isSelected();
     }
 
+
     public boolean isOnlyAntisenseElements() {
         return onlyPutAntisenseElementsCB.isSelected();
     }
+
 
     public boolean isOnlyRealTSS() {
         return onlyRealTssCB.isSelected();
     }
 
+
     public Integer getLengthRelativeToTss() {
-        return Integer.valueOf(this.lengthRelativeToTSS.getText());
+        return Integer.valueOf( this.lengthRelativeToTSS.getText() );
     }
 
+
     public void disableLengthSelection() {
-        this.lengthRelativeToTSS.setEnabled(false);
-        this.lengthSelectionLabel.setEnabled(false);
+        this.lengthRelativeToTSS.setEnabled( false );
+        this.lengthSelectionLabel.setEnabled( false );
     }
+
 
     public boolean isOnlySelected() {
         return onlySelectedCB.isSelected();
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -148,17 +159,18 @@ public final class DataSelectionVisualPanel extends JPanel {
 
     private void allElementsCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allElementsCBActionPerformed
 
-        if (allElementsCB.isSelected()) {
+        if( allElementsCB.isSelected() ) {
             buttonSelectionGroup.clearSelection();
-            this.onlyLeaderlessElementsCB.setEnabled(false);
-            this.onlyPutAntisenseElementsCB.setEnabled(false);
-            this.onlyRealTssCB.setEnabled(false);
-            this.onlySelectedCB.setEnabled(false);
-        } else {
-            this.onlyLeaderlessElementsCB.setEnabled(true);
-            this.onlyPutAntisenseElementsCB.setEnabled(true);
-            this.onlyRealTssCB.setEnabled(true);
-            this.onlySelectedCB.setEnabled(true);
+            this.onlyLeaderlessElementsCB.setEnabled( false );
+            this.onlyPutAntisenseElementsCB.setEnabled( false );
+            this.onlyRealTssCB.setEnabled( false );
+            this.onlySelectedCB.setEnabled( false );
+        }
+        else {
+            this.onlyLeaderlessElementsCB.setEnabled( true );
+            this.onlyPutAntisenseElementsCB.setEnabled( true );
+            this.onlyRealTssCB.setEnabled( true );
+            this.onlySelectedCB.setEnabled( true );
         }
 
     }//GEN-LAST:event_allElementsCBActionPerformed

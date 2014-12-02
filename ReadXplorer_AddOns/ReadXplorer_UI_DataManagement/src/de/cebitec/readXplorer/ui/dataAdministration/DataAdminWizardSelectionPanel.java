@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cebitec.readXplorer.ui.dataAdministration;
+
 
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import org.openide.WizardDescriptor;
 
+
 public class DataAdminWizardSelectionPanel extends ChangeListeningFinishWizardPanel {
 
     /**
@@ -41,9 +43,11 @@ public class DataAdminWizardSelectionPanel extends ChangeListeningFinishWizardPa
      */
     private SelectionCard component;
 
+
     public DataAdminWizardSelectionPanel() {
-        super("");
+        super( "" );
     }
+
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -51,67 +55,73 @@ public class DataAdminWizardSelectionPanel extends ChangeListeningFinishWizardPa
     // create only those which really need to be visible.
     @Override
     public Component getComponent() {
-        if (component == null) {
+        if( component == null ) {
             component = new SelectionCard();
         }
         return component;
     }
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public void readSettings(WizardDescriptor settings) {
-        
-        // get deletable references and tracks
-        Map<String, List<? extends Job>> possibleJobs = getDeletableReferencesAndTracks();
-        List<ReferenceJob> refJobs = (List<ReferenceJob>) possibleJobs.get("references");
-        List<TrackJob> trackJobs = (List<TrackJob>) possibleJobs.get("tracks");
-        component.setSelectableJobs(refJobs, trackJobs);
-        
-        super.readSettings(settings);
-    }
 
     @Override
-    public void storeSettings(WizardDescriptor settings) {
-        settings.putProperty(DataAdminWizardAction.PROP_REFS2DEL, component.getRef2DelJobs());
-        settings.putProperty(DataAdminWizardAction.PROP_TRACK2DEL, component.getTrack2DelJobs());
+    @SuppressWarnings( "unchecked" )
+    public void readSettings( WizardDescriptor settings ) {
+
+        // get deletable references and tracks
+        Map<String, List<? extends Job>> possibleJobs = getDeletableReferencesAndTracks();
+        List<ReferenceJob> refJobs = (List<ReferenceJob>) possibleJobs.get( "references" );
+        List<TrackJob> trackJobs = (List<TrackJob>) possibleJobs.get( "tracks" );
+        component.setSelectableJobs( refJobs, trackJobs );
+
+        super.readSettings( settings );
     }
-    
-    private Map<String, List<? extends Job>> getDeletableReferencesAndTracks(){
+
+
+    @Override
+    public void storeSettings( WizardDescriptor settings ) {
+        settings.putProperty( DataAdminWizardAction.PROP_REFS2DEL, component.getRef2DelJobs() );
+        settings.putProperty( DataAdminWizardAction.PROP_TRACK2DEL, component.getTrack2DelJobs() );
+    }
+
+
+    private Map<String, List<? extends Job>> getDeletableReferencesAndTracks() {
         List<ReferenceJob> refJobs = new ArrayList<>();
         List<TrackJob> trackJobs = new ArrayList<>();
         HashMap<Integer, ReferenceJob> indexedRefs = new HashMap<>();
-        
+
         try {
 
             List<PersistentReference> refs = ProjectConnector.getInstance().getGenomes();
-            for (PersistentReference ref : refs) {
+            for( PersistentReference ref : refs ) {
                 // File and parser parameter meaningless in this context
-                ReferenceJob r = new ReferenceJob(ref.getId(), null, null, ref.getDescription(), ref.getName(), ref.getTimeStamp());
-                indexedRefs.put(r.getID(), r);
-                refJobs.add(r);
+                ReferenceJob r = new ReferenceJob( ref.getId(), null, null, ref.getDescription(), ref.getName(), ref.getTimeStamp() );
+                indexedRefs.put( r.getID(), r );
+                refJobs.add( r );
             }
 
             List<PersistentTrack> dbTracks = ProjectConnector.getInstance().getTracks();
-            for (PersistentTrack dbTrack : dbTracks) {
+            for( PersistentTrack dbTrack : dbTracks ) {
                 // File and parser, refgenjob, runjob parameters meaningless in this context
-                TrackJob t = new TrackJob(dbTrack.getId(), new File(dbTrack.getFilePath()), 
-                        dbTrack.getDescription(), indexedRefs.get(dbTrack.getRefGenID()),
-                        null, false, dbTrack.getTimestamp());
+                TrackJob t = new TrackJob( dbTrack.getId(), new File( dbTrack.getFilePath() ),
+                                           dbTrack.getDescription(), indexedRefs.get( dbTrack.getRefGenID() ),
+                                           null, false, dbTrack.getTimestamp() );
 
                 // register dependent tracks at genome and run
-                ReferenceJob gen = indexedRefs.get(dbTrack.getRefGenID());
-                gen.registerTrackWithoutRunJob(t); //TODO: check if track without run job is still needed
-                trackJobs.add(t);
+                ReferenceJob gen = indexedRefs.get( dbTrack.getRefGenID() );
+                gen.registerTrackWithoutRunJob( t ); //TODO: check if track without run job is still needed
+                trackJobs.add( t );
             }
-        
-        } catch (OutOfMemoryError e) {
-            VisualisationUtils.displayOutOfMemoryError(this.component);
+
+        }
+        catch( OutOfMemoryError e ) {
+            VisualisationUtils.displayOutOfMemoryError( this.component );
         }
 
         // fill result map
         Map<String, List<? extends Job>> deletableStuff = new HashMap<>();
-        deletableStuff.put("references", refJobs);
-        deletableStuff.put("tracks", trackJobs);
+        deletableStuff.put( "references", refJobs );
+        deletableStuff.put( "tracks", trackJobs );
         return deletableStuff;
     }
+
+
 }

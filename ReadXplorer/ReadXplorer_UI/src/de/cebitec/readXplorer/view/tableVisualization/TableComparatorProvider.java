@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,9 +16,11 @@
  */
 package de.cebitec.readXplorer.view.tableVisualization;
 
+
 import java.util.Comparator;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+
 
 /**
  * Provides different table row comparators for different sorting purposes.
@@ -26,76 +28,92 @@ import javax.swing.table.TableRowSorter;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class TableComparatorProvider {
-    
-    
+
+
     /**
      * Creates and adds a PersistentTrack comparator to the given sorter and the
      * given table column.
-     * @param sorter the table row sorter to which the comparator should be added
-     * @param tableColumn the table column for which the comparator should be added
-     */
-    public static void setPersistentTrackComparator(TableRowSorter<TableModel> sorter, int tableColumn) {
-        sorter.setComparator(tableColumn, new Comparator<Object>() {
-            @Override
-            public int compare(Object a, Object b) {
-                return a.toString().compareToIgnoreCase(b.toString());
-            }
-        });
-    }
-    
-    /**
-     * Creates and adds a position string comparator for positions, which might 
-     * contain "_*" at the end of the position string.
-     * @param sorter the table row sorter to which the comparator should be
-     * added
+     * <p>
+     * @param sorter      the table row sorter to which the comparator should be
+     *                    added
      * @param tableColumn the table column for which the comparator should be
-     * added
+     *                    added
      */
-    public static void setPositionComparator(TableRowSorter<TableModel> sorter, int tableColumn) {
-        sorter.setComparator(tableColumn, new Comparator<String>() {
+    public static void setPersistentTrackComparator( TableRowSorter<TableModel> sorter, int tableColumn ) {
+        sorter.setComparator( tableColumn, new Comparator<Object>() {
             @Override
-            public int compare(String a, String b) {
-                if (a.contains("_")) {
-                    a = a.substring(0, a.length() - 2);
-                }
-                if (b.contains("_")) {
-                    b = b.substring(0, b.length() - 2);
-                }
-                Integer intA = Integer.parseInt(a);
-                Integer intB = Integer.parseInt(b);
-                return intA.compareTo(intB);
+            public int compare( Object a, Object b ) {
+                return a.toString().compareToIgnoreCase( b.toString() );
             }
-        });
+
+
+        } );
     }
-    
+
+
+    /**
+     * Creates and adds a position string comparator for positions, which might
+     * contain "_*" at the end of the position string.
+     * <p>
+     * @param sorter      the table row sorter to which the comparator should be
+     *                    added
+     * @param tableColumn the table column for which the comparator should be
+     *                    added
+     */
+    public static void setPositionComparator( TableRowSorter<TableModel> sorter, int tableColumn ) {
+        sorter.setComparator( tableColumn, new Comparator<String>() {
+            @Override
+            public int compare( String a, String b ) {
+                if( a.contains( "_" ) ) {
+                    a = a.substring( 0, a.length() - 2 );
+                }
+                if( b.contains( "_" ) ) {
+                    b = b.substring( 0, b.length() - 2 );
+                }
+                Integer intA = Integer.parseInt( a );
+                Integer intB = Integer.parseInt( b );
+                return intA.compareTo( intB );
+            }
+
+
+        } );
+    }
+
+
     /**
      * Creates a String comparator, that cuts the string after the first line
      * break "\n" and compares it to the second string afterwards as an Integer.
      * If one of the values is not an integer, they are compared as strings.
-     * @param sorter the table row sorter to which the comparator should be
-     * added
+     * <p>
+     * @param sorter      the table row sorter to which the comparator should be
+     *                    added
      * @param tableColumn the table column for which the comparator should be
-     * added
+     *                    added
      */
-    public static void setStringComparator(TableRowSorter<TableModel> sorter, int tableColumn) {
+    public static void setStringComparator( TableRowSorter<TableModel> sorter, int tableColumn ) {
 
-        sorter.setComparator(tableColumn, new Comparator<String>() {
+        sorter.setComparator( tableColumn, new Comparator<String>() {
             @Override
-            public int compare(String a, String b) {
-                if (a.contains("\n")) {
-                    a = a.substring(0, a.indexOf('\n'));
+            public int compare( String a, String b ) {
+                if( a.contains( "\n" ) ) {
+                    a = a.substring( 0, a.indexOf( '\n' ) );
                 }
-                if (b.contains("\n")) {
-                    b = b.substring(0, b.indexOf('\n'));
+                if( b.contains( "\n" ) ) {
+                    b = b.substring( 0, b.indexOf( '\n' ) );
                 }
                 try {
-                    Integer intA = Integer.parseInt(a);
-                    Integer intB = Integer.parseInt(b);
-                    return intA.compareTo(intB);
-                } catch (NumberFormatException e) {
-                    return a.compareTo(b);
+                    Integer intA = Integer.parseInt( a );
+                    Integer intB = Integer.parseInt( b );
+                    return intA.compareTo( intB );
+                }
+                catch( NumberFormatException e ) {
+                    return a.compareTo( b );
                 }
             }
-        });
+
+
+        } );
     }
+
+
 }

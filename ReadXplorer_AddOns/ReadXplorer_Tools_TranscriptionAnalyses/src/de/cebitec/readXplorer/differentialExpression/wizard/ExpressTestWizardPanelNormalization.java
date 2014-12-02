@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
+
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
@@ -29,7 +30,9 @@ import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 
-public class ExpressTestWizardPanelNormalization implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
+
+public class ExpressTestWizardPanelNormalization implements
+        WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     /**
      * The visual component that displays this panel. If you need to access the
@@ -37,17 +40,19 @@ public class ExpressTestWizardPanelNormalization implements WizardDescriptor.Val
      */
     private ExpressTestVisualPanelNormalization component;
 
+
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
     public ExpressTestVisualPanelNormalization getComponent() {
-        if (component == null) {
+        if( component == null ) {
             component = new ExpressTestVisualPanelNormalization();
         }
         return component;
     }
+
 
     @Override
     public HelpCtx getHelp() {
@@ -57,44 +62,52 @@ public class ExpressTestWizardPanelNormalization implements WizardDescriptor.Val
         // return new HelpCtx("help.key.here");
     }
 
+
     @Override
     public boolean isValid() {
         // If it is always OK to press Next or Finish, then:
         return true;
     }
 
-    @Override
-    public void addChangeListener(ChangeListener l) {
-    }
 
     @Override
-    public void removeChangeListener(ChangeListener l) {
+    public void addChangeListener( ChangeListener l ) {
     }
 
+
     @Override
-    public void readSettings(WizardDescriptor wiz) {
-        int id = (int) wiz.getProperty("genomeID");
-        Set<FeatureType> usedFeatures = (Set<FeatureType>) wiz.getProperty("featureType");
-        ReferenceConnector referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(id);
+    public void removeChangeListener( ChangeListener l ) {
+    }
+
+
+    @Override
+    public void readSettings( WizardDescriptor wiz ) {
+        int id = (int) wiz.getProperty( "genomeID" );
+        Set<FeatureType> usedFeatures = (Set<FeatureType>) wiz.getProperty( "featureType" );
+        ReferenceConnector referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector( id );
         List<PersistentFeature> allRefFeatures = new ArrayList<>();
-        for (PersistentChromosome chrom : referenceConnector.getChromosomesForGenome().values()) {
+        for( PersistentChromosome chrom : referenceConnector.getChromosomesForGenome().values() ) {
             int chromLength = chrom.getLength();
-            allRefFeatures.addAll(referenceConnector.getFeaturesForRegion(1, chromLength, usedFeatures, chrom.getId()));
+            allRefFeatures.addAll( referenceConnector.getFeaturesForRegion( 1, chromLength, usedFeatures, chrom.getId() ) );
         }
-        getComponent().setFeatureList(allRefFeatures);
+        getComponent().setFeatureList( allRefFeatures );
     }
 
+
     @Override
-    public void storeSettings(WizardDescriptor wiz) {
+    public void storeSettings( WizardDescriptor wiz ) {
         boolean useHouseKeepingGenesToNormalize = getComponent().useHouseKeepingGenesToNormalize();
-        wiz.putProperty("useHouseKeepingGenesToNormalize", useHouseKeepingGenesToNormalize);
-        if (useHouseKeepingGenesToNormalize) {
+        wiz.putProperty( "useHouseKeepingGenesToNormalize", useHouseKeepingGenesToNormalize );
+        if( useHouseKeepingGenesToNormalize ) {
             List<Integer> normalizationFeatures = getComponent().getSelectedFeatures();
-            wiz.putProperty("normalizationFeatures", normalizationFeatures);
+            wiz.putProperty( "normalizationFeatures", normalizationFeatures );
         }
     }
+
 
     @Override
     public void validate() throws WizardValidationException {
     }
+
+
 }

@@ -1,10 +1,13 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.datastructures;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+
 
 /**
  * A putative operon is a data structure for storing two neighboring features,
- * which might form an operon. It also contains the read counts only associated to feature1/2,
+ * which might form an operon. It also contains the read counts only associated
+ * to feature1/2,
  * the spanning and the internal read counts.
  *
  * @author MKD, rhilker
@@ -17,17 +20,19 @@ public class OperonAdjacency {
     private int spanningReads;
     private int readsFeature2;
     private int internalReads;
-  
+
+
     /**
      * A putative operon is a data structure for storing two neighboring
      * features, which might form an operon. It also contains the read counts
      * only associated to feature1/2, the spanning and the internal read
      * counts.
      */
-    public OperonAdjacency(PersistentFeature feature1, PersistentFeature feature2) {
+    public OperonAdjacency( PersistentFeature feature1, PersistentFeature feature2 ) {
         this.feature1 = feature1;
         this.feature2 = feature2;
     }
+
 
     /**
      * @return the first feature of the operon
@@ -36,12 +41,14 @@ public class OperonAdjacency {
         return feature1;
     }
 
+
     /**
      * @return the second feature of the operon
      */
     public PersistentFeature getFeature2() {
         return feature2;
     }
+
 
     /**
      * @return the reads associated with Feature1
@@ -50,12 +57,14 @@ public class OperonAdjacency {
         return readsFeature1;
     }
 
+
     /**
      * @param readsFeature1 the reads associated with Feature1
      */
-    public void setReadsFeature1(int readsFeature1) {
+    public void setReadsFeature1( int readsFeature1 ) {
         this.readsFeature1 = readsFeature1;
     }
+
 
     /**
      * @return the number of reads spanning from feature 1 into 2
@@ -64,12 +73,15 @@ public class OperonAdjacency {
         return spanningReads;
     }
 
+
     /**
-     * @param spanningReads set the number of reads spanning from feature 1 into 2
+     * @param spanningReads set the number of reads spanning from feature 1 into
+     *                      2
      */
-    public void setSpanningReads(int spanningReads) {
+    public void setSpanningReads( int spanningReads ) {
         this.spanningReads = spanningReads;
     }
+
 
     /**
      * @return the readsFeature2
@@ -78,12 +90,14 @@ public class OperonAdjacency {
         return readsFeature2;
     }
 
+
     /**
      * @param readsFeature2 the readsFeature2 to set
      */
-    public void setReadsFeature2(int readsFeature2) {
+    public void setReadsFeature2( int readsFeature2 ) {
         this.readsFeature2 = readsFeature2;
     }
+
 
     /**
      * @return the internalReads
@@ -92,10 +106,13 @@ public class OperonAdjacency {
         return internalReads;
     }
 
+
     /**
      * @param internalReads the internalReads to set
      */
-    public void setInternalReads(int internalReads) {
+    public void setInternalReads( int internalReads ) {
         this.internalReads = internalReads;
     }
+
+
 }

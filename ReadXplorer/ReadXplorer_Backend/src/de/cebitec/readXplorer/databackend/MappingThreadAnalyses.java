@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.databackend;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
 import de.cebitec.readXplorer.databackend.dataObjects.MappingResult;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
@@ -23,6 +24,7 @@ import de.cebitec.readXplorer.util.Properties;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 
 /**
  * This mapping thread should be used for analyses, but not for visualizing
@@ -34,13 +36,15 @@ import java.util.logging.Logger;
 public class MappingThreadAnalyses extends MappingThread {
 
     /**
-     * Creates a new mapping thread for carrying out mapping request either to a 
+     * Creates a new mapping thread for carrying out mapping request either to a
      * file.
+     * <p>
      * @param tracks the list of tracks for which this mapping thread is created
      */
-    public MappingThreadAnalyses(List<PersistentTrack> tracks) {
-        super(tracks);
+    public MappingThreadAnalyses( List<PersistentTrack> tracks ) {
+        super( tracks );
     }
+
 
     /**
      * {@inheritDoc }
@@ -48,26 +52,31 @@ public class MappingThreadAnalyses extends MappingThread {
     @Override
     public void run() {
 
-        while (!interrupted()) {
+        while( !interrupted() ) {
 
             IntervalRequest request = requestQueue.poll();
             List<Mapping> currentMappings;
-            if (request != null) {
-                if (request.getDesiredData() == Properties.REDUCED_MAPPINGS) {
-                    currentMappings = this.loadReducedMappings(request);
-                } else {
-                    currentMappings = this.loadMappings(request);
+            if( request != null ) {
+                if( request.getDesiredData() == Properties.REDUCED_MAPPINGS ) {
+                    currentMappings = this.loadReducedMappings( request );
                 }
-                request.getSender().receiveData(new MappingResult(currentMappings, request));
+                else {
+                    currentMappings = this.loadMappings( request );
+                }
+                request.getSender().receiveData( new MappingResult( currentMappings, request ) );
 
-            } else {
+            }
+            else {
                 try {
-                    Thread.sleep(10);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(CoverageThreadAnalyses.class.getName()).log(Level.SEVERE, null, ex);
+                    Thread.sleep( 10 );
+                }
+                catch( InterruptedException ex ) {
+                    Logger.getLogger( CoverageThreadAnalyses.class.getName() ).log( Level.SEVERE, null, ex );
                 }
             }
 
         }
     }
+
+
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.coverageAnalysis;
 
+
 import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
@@ -25,22 +26,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+
 /**
  * Container for all data belonging to a coverage analysis result. Also converts
  * a all data into the format readable for the ExcelExporter. Generates all
  * three, the sheet names, headers and data to write.
  *
- * @author Tobias Zimmermann, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ * @author Tobias Zimmermann, Rolf Hilker
+ * <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
-public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCoverageAnalysis> implements ExportDataI {
+public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCoverageAnalysis>
+        implements ExportDataI {
 
     private CoverageIntervalContainer results;
 
-    public CoverageAnalysisResult(CoverageIntervalContainer results, Map<Integer, PersistentTrack> trackMap, 
-            PersistentReference reference, boolean combineTracks) {
-        super(reference, trackMap, combineTracks, 0, 3);
+
+    public CoverageAnalysisResult( CoverageIntervalContainer results, Map<Integer, PersistentTrack> trackMap,
+                                   PersistentReference reference, boolean combineTracks ) {
+        super( reference, trackMap, combineTracks, 0, 3 );
         this.results = results;
     }
+
 
     @Override
     public List<String> dataSheetNames() {
@@ -48,16 +54,18 @@ public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCove
 
         ParameterSetCoverageAnalysis parameters = (ParameterSetCoverageAnalysis) this.getParameters();
         String tableHeader;
-        if (parameters.isDetectCoveredIntervals()) {
+        if( parameters.isDetectCoveredIntervals() ) {
             tableHeader = "Covered Intervals Table";
-        } else {
+        }
+        else {
             tableHeader = "Uncovered Intervals Table";
         }
-        sheetNames.add(tableHeader);
-        sheetNames.add("Parameters and Statistics");
+        sheetNames.add( tableHeader );
+        sheetNames.add( "Parameters and Statistics" );
         return sheetNames;
 
     }
+
 
     @Override
     public List<List<String>> dataColumnDescriptions() {
@@ -68,86 +76,91 @@ public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCove
         List<List<String>> dataColumnDescriptions = new ArrayList<>();
         List<String> resultDescriptions = new ArrayList<>();
 
-        resultDescriptions.add("Start");
-        resultDescriptions.add("Stop");
-        resultDescriptions.add("Track");
-        resultDescriptions.add("Chromosome");
-        resultDescriptions.add("Strand");
-        resultDescriptions.add("Length");
-        resultDescriptions.add("Mean Coverage");
+        resultDescriptions.add( "Start" );
+        resultDescriptions.add( "Stop" );
+        resultDescriptions.add( "Track" );
+        resultDescriptions.add( "Chromosome" );
+        resultDescriptions.add( "Strand" );
+        resultDescriptions.add( "Length" );
+        resultDescriptions.add( "Mean Coverage" );
 
 
-        dataColumnDescriptions.add(resultDescriptions);
+        dataColumnDescriptions.add( resultDescriptions );
 
         //add covered interval detection statistic sheet header
         List<String> statisticColumnDescriptions = new ArrayList<>();
-        statisticColumnDescriptions.add(coveredString + " Interval Analysis Parameter and Statistics Table");
+        statisticColumnDescriptions.add( coveredString + " Interval Analysis Parameter and Statistics Table" );
 
-        dataColumnDescriptions.add(statisticColumnDescriptions);
+        dataColumnDescriptions.add( statisticColumnDescriptions );
 
         return dataColumnDescriptions;
     }
+
 
     @Override
     public List<List<List<Object>>> dataToExcelExportList() {
         List<List<List<Object>>> coveredIntervalsExport = new ArrayList<>();
         List<List<Object>> coveredIntervalsResultList = new ArrayList<>();
 
-        fillTableRow(this.results.getCoverageIntervals(), coveredIntervalsResultList);
-        fillTableRow(this.results.getCoverageIntervalsRev(), coveredIntervalsResultList);
+        fillTableRow( this.results.getCoverageIntervals(), coveredIntervalsResultList );
+        fillTableRow( this.results.getCoverageIntervalsRev(), coveredIntervalsResultList );
 
-        coveredIntervalsExport.add(coveredIntervalsResultList);
+        coveredIntervalsExport.add( coveredIntervalsResultList );
 
         //create statistics sheet
         ParameterSetCoverageAnalysis parameters = (ParameterSetCoverageAnalysis) this.getParameters();
-         String coveredString = parameters.isDetectCoveredIntervals() ? "Covered" : "Uncovered";
+        String coveredString = parameters.isDetectCoveredIntervals() ? "Covered" : "Uncovered";
 
         List<List<Object>> statisticsExportData = new ArrayList<>();
-        statisticsExportData.add(ResultTrackAnalysis.createTableRow(coveredString + " interval analysis statistics for tracks:",
-                GeneralUtils.generateConcatenatedString(this.getTrackNameList(), 0)));
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow( coveredString + " interval analysis statistics for tracks:",
+                                                                      GeneralUtils.generateConcatenatedString( this.getTrackNameList(), 0 ) ) );
 
-        statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between title and parameters
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow( "" ) ); //placeholder between title and parameters
 
-        statisticsExportData.add(ResultTrackAnalysis.createTableRow(coveredString + " interval analysis detection parameters:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Minimum counted coverage:", parameters.getMinCoverageCount()));
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow( coveredString + " interval analysis detection parameters:" ) );
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow( "Minimum counted coverage:", parameters.getMinCoverageCount() ) );
 
         String coverageCount = parameters.isSumCoverageOfBothStrands() ? "sum coverage of both strands" : "treat each strand separately";
-        statisticsExportData.add(ResultTrackAnalysis.createTableRow("Count coverage for:", coverageCount));
-        parameters.getReadClassParams().addReadClassParamsToStats(statisticsExportData);
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow( "Count coverage for:", coverageCount ) );
+        parameters.getReadClassParams().addReadClassParamsToStats( statisticsExportData );
 
-        statisticsExportData.add(ResultTrackAnalysis.createTableRow("")); //placeholder between parameters and statistics
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow( "" ) ); //placeholder between parameters and statistics
 
-        statisticsExportData.add(ResultTrackAnalysis.createTableRow(coveredString + " interval analysis statistics:"));
-        statisticsExportData.add(ResultTrackAnalysis.createTableRow(
-                ResultPanelCoverageAnalysis.NUMBER_INTERVALS, getStatsMap().get(ResultPanelCoverageAnalysis.NUMBER_INTERVALS)));
-        statisticsExportData.add(ResultTrackAnalysis.createTableRow(
-                ResultPanelCoverageAnalysis.MEAN_INTERVAL_LENGTH, getStatsMap().get(ResultPanelCoverageAnalysis.MEAN_INTERVAL_LENGTH)));
-        statisticsExportData.add(ResultTrackAnalysis.createTableRow(
-                ResultPanelCoverageAnalysis.MEAN_INTERVAL_COVERAGE, getStatsMap().get(ResultPanelCoverageAnalysis.MEAN_INTERVAL_COVERAGE)));
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow( coveredString + " interval analysis statistics:" ) );
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow(
+                ResultPanelCoverageAnalysis.NUMBER_INTERVALS, getStatsMap().get( ResultPanelCoverageAnalysis.NUMBER_INTERVALS ) ) );
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow(
+                ResultPanelCoverageAnalysis.MEAN_INTERVAL_LENGTH, getStatsMap().get( ResultPanelCoverageAnalysis.MEAN_INTERVAL_LENGTH ) ) );
+        statisticsExportData.add( ResultTrackAnalysis.createTableRow(
+                ResultPanelCoverageAnalysis.MEAN_INTERVAL_COVERAGE, getStatsMap().get( ResultPanelCoverageAnalysis.MEAN_INTERVAL_COVERAGE ) ) );
 
 
-        coveredIntervalsExport.add(statisticsExportData);
+        coveredIntervalsExport.add( statisticsExportData );
 
 
         return coveredIntervalsExport;
     }
 
+
     public CoverageIntervalContainer getResults() {
         return results;
     }
 
-    private void fillTableRow(List<CoverageInterval> coverageList, List<List<Object>> coveredFeaturesResultList) {
-        for (CoverageInterval interval : coverageList) {
-            List<Object> coveredIntervalRow = new ArrayList<>();
-            coveredIntervalRow.add(interval.isFwdStrand() ? interval.getStart() : interval.getStop());
-            coveredIntervalRow.add(interval.isFwdStrand() ? interval.getStop() : interval.getStart());
-            coveredIntervalRow.add(this.getTrackEntry(interval.getTrackId(), true));
-            coveredIntervalRow.add(this.getChromosomeMap().get(interval.getChromId()));
-            coveredIntervalRow.add(interval.getStrandString());
-            coveredIntervalRow.add(interval.getLength());
-            coveredIntervalRow.add(interval.getMeanCoverage());
 
-            coveredFeaturesResultList.add(coveredIntervalRow);
+    private void fillTableRow( List<CoverageInterval> coverageList, List<List<Object>> coveredFeaturesResultList ) {
+        for( CoverageInterval interval : coverageList ) {
+            List<Object> coveredIntervalRow = new ArrayList<>();
+            coveredIntervalRow.add( interval.isFwdStrand() ? interval.getStart() : interval.getStop() );
+            coveredIntervalRow.add( interval.isFwdStrand() ? interval.getStop() : interval.getStart() );
+            coveredIntervalRow.add( this.getTrackEntry( interval.getTrackId(), true ) );
+            coveredIntervalRow.add( this.getChromosomeMap().get( interval.getChromId() ) );
+            coveredIntervalRow.add( interval.getStrandString() );
+            coveredIntervalRow.add( interval.getLength() );
+            coveredIntervalRow.add( interval.getMeanCoverage() );
+
+            coveredFeaturesResultList.add( coveredIntervalRow );
         }
     }
+
+
 }

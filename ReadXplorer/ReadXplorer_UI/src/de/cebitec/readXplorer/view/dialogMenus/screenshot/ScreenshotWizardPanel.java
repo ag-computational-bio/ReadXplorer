@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,24 +16,28 @@
  */
 package de.cebitec.readXplorer.view.dialogMenus.screenshot;
 
+
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
 
+
 /**
  * Panel for showing and handling all available options for storing screenshots.
- * 
+ * <p>
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
-public class ScreenshotWizardPanel implements WizardDescriptor.Panel<WizardDescriptor> {
+public class ScreenshotWizardPanel implements
+        WizardDescriptor.Panel<WizardDescriptor> {
 
     public static final String PROP_SELECTED_TOP_COMP = "selectedTopComp";
-    
+
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
     private ScreenshotVisualPanel component;
+
 
     /**
      * Panel for showing and handling all available options for storing
@@ -42,17 +46,19 @@ public class ScreenshotWizardPanel implements WizardDescriptor.Panel<WizardDescr
     public ScreenshotWizardPanel() {
     }
 
+
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
     public ScreenshotVisualPanel getComponent() {
-        if (component == null) {
+        if( component == null ) {
             component = new ScreenshotVisualPanel();
         }
         return component;
     }
+
 
     @Override
     public HelpCtx getHelp() {
@@ -61,6 +67,7 @@ public class ScreenshotWizardPanel implements WizardDescriptor.Panel<WizardDescr
         // If you have context help:
         // return new HelpCtx("help.key.here");
     }
+
 
     @Override
     public boolean isValid() {
@@ -72,21 +79,27 @@ public class ScreenshotWizardPanel implements WizardDescriptor.Panel<WizardDescr
         // WizardDescriptor.ERROR/WARNING/INFORMATION_MESSAGE will also be useful.
     }
 
-    @Override
-    public void addChangeListener(ChangeListener l) {
-    }
 
     @Override
-    public void removeChangeListener(ChangeListener l) {
+    public void addChangeListener( ChangeListener l ) {
     }
 
+
     @Override
-    public void readSettings(WizardDescriptor wiz) {
+    public void removeChangeListener( ChangeListener l ) {
+    }
+
+
+    @Override
+    public void readSettings( WizardDescriptor wiz ) {
         // use wiz.getProperty to retrieve previous panel state
     }
 
+
     @Override
-    public void storeSettings(WizardDescriptor wiz) {
-        wiz.putProperty(ScreenshotWizardPanel.PROP_SELECTED_TOP_COMP, this.component.getSelectedTopComponent());
+    public void storeSettings( WizardDescriptor wiz ) {
+        wiz.putProperty( ScreenshotWizardPanel.PROP_SELECTED_TOP_COMP, this.component.getSelectedTopComponent() );
     }
+
+
 }

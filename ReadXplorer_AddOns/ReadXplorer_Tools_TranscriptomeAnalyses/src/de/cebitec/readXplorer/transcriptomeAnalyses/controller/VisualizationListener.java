@@ -1,5 +1,6 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.controller;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.ChartsGenerationSelectChatTypeWizardPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.PlotGenerator;
@@ -20,6 +21,7 @@ import java.awt.event.ActionListener;
 import java.util.List;
 import org.openide.WizardDescriptor;
 
+
 /**
  * Controller class for all visualizations in this module.
  *
@@ -39,109 +41,123 @@ public class VisualizationListener implements ActionListener {
     private TSSDetectionResults tssResult;
     ParameterSetFiveEnrichedAnalyses params;
 
+
     /**
      * Constructor.
      *
-     * @param reference PersistentReference
-     * @param wiz WizardDescriptor
+     * @param reference  PersistentReference
+     * @param wiz        WizardDescriptor
      * @param currentTss list of current transcription start sites
-     * @param tssResult instance of TSSDetectionResults
+     * @param tssResult  instance of TSSDetectionResults
      */
-    public VisualizationListener(PersistentReference reference, WizardDescriptor wiz, List<TranscriptionStart> currentTss, TSSDetectionResults tssResult) {
+    public VisualizationListener( PersistentReference reference, WizardDescriptor wiz, List<TranscriptionStart> currentTss, TSSDetectionResults tssResult ) {
         this.persistentReference = reference;
         this.wiz = wiz;
         this.currentTss = currentTss;
         this.params = (ParameterSetFiveEnrichedAnalyses) tssResult.getParameters();
     }
 
+
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed( ActionEvent e ) {
         String command = e.getActionCommand();
-        if (command.equals(ChartType.WIZARD.toString())) {
+        if( command.equals( ChartType.WIZARD.toString() ) ) {
 
-            boolean takeAllElements = (boolean) wiz.getProperty(ElementsOfInterest.ALL.toString());
-            boolean takeOnlyLeaderless = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_LEADERLESS_TRANSCRIPTS.toString());
-            boolean takeOnlyAntisense = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_ANTISENSE_TSS.toString());
-            boolean takeOnlyRealTss = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_TSS_WITH_UTR_EXCEPT_AS_LEADERLESS.toString());
-            boolean takeOnlySelectedElements = (boolean) wiz.getProperty(ElementsOfInterest.ONLY_SELECTED_FOR_UPSTREAM_ANALYSES.toString());
+            boolean takeAllElements = (boolean) wiz.getProperty( ElementsOfInterest.ALL.toString() );
+            boolean takeOnlyLeaderless = (boolean) wiz.getProperty( ElementsOfInterest.ONLY_LEADERLESS_TRANSCRIPTS.toString() );
+            boolean takeOnlyAntisense = (boolean) wiz.getProperty( ElementsOfInterest.ONLY_ANTISENSE_TSS.toString() );
+            boolean takeOnlyRealTss = (boolean) wiz.getProperty( ElementsOfInterest.ONLY_TSS_WITH_UTR_EXCEPT_AS_LEADERLESS.toString() );
+            boolean takeOnlySelectedElements = (boolean) wiz.getProperty( ElementsOfInterest.ONLY_SELECTED_FOR_UPSTREAM_ANALYSES.toString() );
 
-            isAbsoluteFrequencyPlot = (boolean) wiz.getProperty(ChartType.ABSOLUTE_FREQUENCY_OF_5_PRIME_UTRs.toString());
-            isBaseDistributionPlot = (boolean) wiz.getProperty(ChartType.BASE_DISTRIBUTION.toString());
-            isBining = (boolean) wiz.getProperty(ChartsGenerationSelectChatTypeWizardPanel.CHARTS_BINING);
-            isGaToCtSelected = (boolean) wiz.getProperty(ChartType.CHARTS_BASE_DIST_GA_CT.toString());
-            isGcToAtSelected = (boolean) wiz.getProperty(ChartType.CHARTS_BASE_DIST_GC_AT.toString());
-            biningSize = (int) wiz.getProperty(ChartsGenerationSelectChatTypeWizardPanel.CHARTS_BINING_SIZE);
-            lengthRelToTls = (int) wiz.getProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_REGION_LENGTH);
+            isAbsoluteFrequencyPlot = (boolean) wiz.getProperty( ChartType.ABSOLUTE_FREQUENCY_OF_5_PRIME_UTRs.toString() );
+            isBaseDistributionPlot = (boolean) wiz.getProperty( ChartType.BASE_DISTRIBUTION.toString() );
+            isBining = (boolean) wiz.getProperty( ChartsGenerationSelectChatTypeWizardPanel.CHARTS_BINING );
+            isGaToCtSelected = (boolean) wiz.getProperty( ChartType.CHARTS_BASE_DIST_GA_CT.toString() );
+            isGcToAtSelected = (boolean) wiz.getProperty( ChartType.CHARTS_BASE_DIST_GC_AT.toString() );
+            biningSize = (int) wiz.getProperty( ChartsGenerationSelectChatTypeWizardPanel.CHARTS_BINING_SIZE );
+            lengthRelToTls = (int) wiz.getProperty( RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_REGION_LENGTH );
 
-            if (takeAllElements) {
+            if( takeAllElements ) {
                 elements = ElementsOfInterest.ALL;
-            } else if (takeOnlyLeaderless) {
+            }
+            else if( takeOnlyLeaderless ) {
                 elements = ElementsOfInterest.ONLY_LEADERLESS_TRANSCRIPTS;
-            } else if (takeOnlyAntisense) {
+            }
+            else if( takeOnlyAntisense ) {
                 elements = ElementsOfInterest.ONLY_ANTISENSE_TSS;
-            } else if (takeOnlyRealTss) {
+            }
+            else if( takeOnlyRealTss ) {
                 elements = ElementsOfInterest.ONLY_TSS_WITH_UTR_EXCEPT_AS_LEADERLESS;
-            } else if (takeOnlySelectedElements) {
+            }
+            else if( takeOnlySelectedElements ) {
                 elements = ElementsOfInterest.ONLY_SELECTED_FOR_UPSTREAM_ANALYSES;
             }
         }
-        if (command.equals(ChartType.ABSOLUTE_FREQUENCY_OF_5_PRIME_UTRs.toString())) {
-            topComponent = new MultiPurposeTopComponent(PurposeEnum.CHARTS);
-            topComponent.setLayout(new BorderLayout());
+        if( command.equals( ChartType.ABSOLUTE_FREQUENCY_OF_5_PRIME_UTRs.toString() ) ) {
+            topComponent = new MultiPurposeTopComponent( PurposeEnum.CHARTS );
+            topComponent.setLayout( new BorderLayout() );
             topComponent.open();
-            topComponent.setName("Distribution of 5′-UTR lengths");
-            Thread plotGeneration = new Thread(new Runnable() {
+            topComponent.setName( "Distribution of 5′-UTR lengths" );
+            Thread plotGeneration = new Thread( new Runnable() {
                 @Override
                 public void run() {
-                    PlotGenerator gen = new PlotGenerator(persistentReference);
-                    List<DataTable> dataList = gen.prepareDataForUtrDistr(elements, currentTss, params, isBining, biningSize);
-                    InteractivePanel panel = gen.generateBarPlot(dataList.get(0), "5′-UTR lenght (distance between TSS and TLS)", "Absolute frequency");
-                    topComponent.add(panel, BorderLayout.CENTER);
-                    topComponent.add(new SouthPanel(gen.getAbsFreqOf5PrimeUtrsInCSV()), BorderLayout.SOUTH);
+                    PlotGenerator gen = new PlotGenerator( persistentReference );
+                    List<DataTable> dataList = gen.prepareDataForUtrDistr( elements, currentTss, params, isBining, biningSize );
+                    InteractivePanel panel = gen.generateBarPlot( dataList.get( 0 ), "5′-UTR lenght (distance between TSS and TLS)", "Absolute frequency" );
+                    topComponent.add( panel, BorderLayout.CENTER );
+                    topComponent.add( new SouthPanel( gen.getAbsFreqOf5PrimeUtrsInCSV() ), BorderLayout.SOUTH );
                 }
-            });
-            plotGeneration.start();
-        } else if (command.equals(ChartType.BASE_DISTRIBUTION.toString())) {
 
-            if (isGaToCtSelected) {
-                final MultiPurposeTopComponent topComponentGA = new MultiPurposeTopComponent(PurposeEnum.CHARTS);
-                topComponentGA.setLayout(new BorderLayout());
+
+            } );
+            plotGeneration.start();
+        }
+        else if( command.equals( ChartType.BASE_DISTRIBUTION.toString() ) ) {
+
+            if( isGaToCtSelected ) {
+                final MultiPurposeTopComponent topComponentGA = new MultiPurposeTopComponent( PurposeEnum.CHARTS );
+                topComponentGA.setLayout( new BorderLayout() );
                 topComponentGA.open();
-                topComponentGA.setName("GA content distribution");
-                Thread plotGeneration = new Thread(new Runnable() {
+                topComponentGA.setName( "GA content distribution" );
+                Thread plotGeneration = new Thread( new Runnable() {
                     @Override
                     public void run() {
-                        PlotGenerator gen = new PlotGenerator(persistentReference);
-                        List<DataTable> dataList = gen.prepareData(ChartType.BASE_DISTRIBUTION, ChartType.CHARTS_BASE_DIST_GA_CT,
-                                elements, currentTss, params, lengthRelToTls);
-                        InteractivePanel panel = gen.generateOverlappedAreaPlot(ChartType.CHARTS_BASE_DIST_GA_CT, dataList.get(0), dataList.get(1), "upstream position relative to start codon (nt)", "purine/pyrimidine distribution (relative abundance)");
-                        topComponentGA.add(panel, BorderLayout.CENTER);
+                        PlotGenerator gen = new PlotGenerator( persistentReference );
+                        List<DataTable> dataList = gen.prepareData( ChartType.BASE_DISTRIBUTION, ChartType.CHARTS_BASE_DIST_GA_CT,
+                                                                    elements, currentTss, params, lengthRelToTls );
+                        InteractivePanel panel = gen.generateOverlappedAreaPlot( ChartType.CHARTS_BASE_DIST_GA_CT, dataList.get( 0 ), dataList.get( 1 ), "upstream position relative to start codon (nt)", "purine/pyrimidine distribution (relative abundance)" );
+                        topComponentGA.add( panel, BorderLayout.CENTER );
 //                        topComponent.add(new SouthPanel(null), BorderLayout.SOUTH);
                     }
-                });
+
+
+                } );
                 plotGeneration.start();
             }
 
-            if (isGcToAtSelected) {
-                final MultiPurposeTopComponent topComponentGC = new MultiPurposeTopComponent(PurposeEnum.CHARTS);
-                topComponentGC.setLayout(new BorderLayout());
+            if( isGcToAtSelected ) {
+                final MultiPurposeTopComponent topComponentGC = new MultiPurposeTopComponent( PurposeEnum.CHARTS );
+                topComponentGC.setLayout( new BorderLayout() );
                 topComponentGC.open();
-                topComponentGC.setName("GC content distribution");
-                Thread plotGeneration = new Thread(new Runnable() {
+                topComponentGC.setName( "GC content distribution" );
+                Thread plotGeneration = new Thread( new Runnable() {
                     @Override
                     public void run() {
-                        PlotGenerator gen = new PlotGenerator(persistentReference);
-                        List<DataTable> dataList = gen.prepareData(ChartType.BASE_DISTRIBUTION, ChartType.CHARTS_BASE_DIST_GC_AT,
-                                elements, currentTss, params, lengthRelToTls);
-                        InteractivePanel panel = gen.generateOverlappedAreaPlot(ChartType.CHARTS_BASE_DIST_GC_AT, dataList.get(0), dataList.get(1), "upstream position relative to start codon (nt)", "purine/pyrimidine distribution (relative abundance)");
-                        topComponentGC.add(panel, BorderLayout.CENTER);
+                        PlotGenerator gen = new PlotGenerator( persistentReference );
+                        List<DataTable> dataList = gen.prepareData( ChartType.BASE_DISTRIBUTION, ChartType.CHARTS_BASE_DIST_GC_AT,
+                                                                    elements, currentTss, params, lengthRelToTls );
+                        InteractivePanel panel = gen.generateOverlappedAreaPlot( ChartType.CHARTS_BASE_DIST_GC_AT, dataList.get( 0 ), dataList.get( 1 ), "upstream position relative to start codon (nt)", "purine/pyrimidine distribution (relative abundance)" );
+                        topComponentGC.add( panel, BorderLayout.CENTER );
 //                        topComponent.add(new SouthPanel(null), BorderLayout.SOUTH);
                     }
-                });
+
+
+                } );
                 plotGeneration.start();
             }
         }
     }
+
 
     /**
      *
@@ -151,6 +167,7 @@ public class VisualizationListener implements ActionListener {
         return isAbsoluteFrequencyPlot;
     }
 
+
     /**
      * @return <true> if base distribution plot is selected else <false>
      *
@@ -158,6 +175,7 @@ public class VisualizationListener implements ActionListener {
     public boolean isBaseDistributionPlotSelected() {
         return isBaseDistributionPlot;
     }
+
 
     /**
      *
@@ -167,6 +185,7 @@ public class VisualizationListener implements ActionListener {
         return lengthRelToTls;
     }
 
+
     /**
      *
      * @return <true> if pie chart representation is selected else <false>
@@ -174,5 +193,6 @@ public class VisualizationListener implements ActionListener {
     public boolean isPeiChartSelected() {
         return isPieChart;
     }
+
 
 }

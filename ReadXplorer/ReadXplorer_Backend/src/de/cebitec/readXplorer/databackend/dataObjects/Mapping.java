@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.databackend.dataObjects;
 
+
 import de.cebitec.readXplorer.util.SamAlignmentBlock;
 import de.cebitec.readXplorer.util.classification.MappingClass;
 import java.util.ArrayList;
@@ -25,9 +26,10 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+
 /**
  * Data structure for storing a mapping on a reference genome.
- * 
+ * <p>
  * @author ddoppmeier, rhilker
  */
 public class Mapping implements ObjectWithId, Comparable<Mapping> {
@@ -48,8 +50,10 @@ public class Mapping implements ObjectWithId, Comparable<Mapping> {
     private String originalSequence = null;
     private List<SamAlignmentBlock> alignmentBlocks;
 
+
     /**
      * Data structure for storing a mapping on a reference genome.
+     * <p>
      * @param id
      * @param start
      * @param stop
@@ -57,15 +61,17 @@ public class Mapping implements ObjectWithId, Comparable<Mapping> {
      * @param isFwdStrand
      * @param mismatches
      * @param sequenceID
-     * @param mappingClass classification of this mapping
-     * @param mappingQuality phred mapping quality (if available it is > 0 or -1
-     * for 255), otherwise 0
-     * @param baseQualities phred score array of base qualities, (if available
-     * it is > 0 or -1 for 255), otherwise 0
+     * @param mappingClass       classification of this mapping
+     * @param mappingQuality     phred mapping quality (if available it is > 0
+     *                           or -1
+     *                           for 255), otherwise 0
+     * @param baseQualities      phred score array of base qualities, (if
+     *                           available
+     *                           it is > 0 or -1 for 255), otherwise 0
      * @param numMappingsForRead number of mappings for the read of this mapping
      */
-    public Mapping(int id, int start, int stop, int trackId, boolean isFwdStrand, int mismatches, 
-            int sequenceID, MappingClass mappingClass, int mappingQuality, byte[] baseQualities, int numMappingsForRead) {
+    public Mapping( int id, int start, int stop, int trackId, boolean isFwdStrand, int mismatches,
+                    int sequenceID, MappingClass mappingClass, int mappingQuality, byte[] baseQualities, int numMappingsForRead ) {
         this.id = id;
         this.start = start;
         this.stop = stop;
@@ -81,31 +87,35 @@ public class Mapping implements ObjectWithId, Comparable<Mapping> {
         this.numMappingsForRead = numMappingsForRead;
         this.alignmentBlocks = new ArrayList<>(); //initialize as emtpy list
     }
-    
+
     /*
      * A minimal version of the mapping class. It is used to collect the count
      * data. For this only start, stop and direction are needed. Everything else
      * isn't needed and can be left out in order to save some memory
      */
-    public Mapping(int start, int stop, boolean isFwdStrand) {
+
+    public Mapping( int start, int stop, boolean isFwdStrand ) {
         this.start = start;
         this.stop = stop;
         this.isFwdStrand = isFwdStrand;
     }
-    
+
+
     /**
      * @return The complete Map of differences to the reference for this mapping
      */
     public Map<Integer, Difference> getDiffs() {
         return diffs;
     }
-    
+
+
     /**
      * @return The complete TreeMap of genome gaps for this mapping
      */
-    public TreeMap<Integer, TreeSet<ReferenceGap>> getGenomeGaps(){
+    public TreeMap<Integer, TreeSet<ReferenceGap>> getGenomeGaps() {
         return gaps;
     }
+
 
     /**
      * @return The unique id of this mapping.
@@ -115,12 +125,14 @@ public class Mapping implements ObjectWithId, Comparable<Mapping> {
         return id;
     }
 
+
     /**
      * @return direction of the mapping: 1 for fwd and -1 for rev
      */
     public boolean isFwdStrand() {
         return isFwdStrand;
     }
+
 
     /**
      * @return The track id of this mapping.
@@ -129,12 +141,14 @@ public class Mapping implements ObjectWithId, Comparable<Mapping> {
         return trackId;
     }
 
+
     /**
      * @return the absolute start position in genome coordinates.
      */
     public int getStart() {
         return start;
     }
+
 
     /**
      * @return the absolute stop position in genome coordinates.
@@ -143,6 +157,7 @@ public class Mapping implements ObjectWithId, Comparable<Mapping> {
         return stop;
     }
 
+
     /**
      * @return The number of differences of this mapping to the reference.
      */
@@ -150,13 +165,17 @@ public class Mapping implements ObjectWithId, Comparable<Mapping> {
         return differences;
     }
 
+
     /**
      * Sets the number of differences of this mapping to the reference.
-     * @param differences the number of differences of this mapping to the reference
+     * <p>
+     * @param differences the number of differences of this mapping to the
+     *                    reference
      */
-    public void setDifferences(int differences) {
+    public void setDifferences( int differences ) {
         this.differences = differences;
     }
+
 
     /**
      * @return The ID for this mapping sequence, not for the mapping itself!
@@ -165,116 +184,140 @@ public class Mapping implements ObjectWithId, Comparable<Mapping> {
         return sequenceID;
     }
 
+
     /**
      * @return The <code>MappingClass</code> = classification of this mapping.
      */
     public MappingClass getMappingClass() {
         return mappingClass;
     }
-    
-    /**
-     * @param position the position which should be checked for reference gaps
-     * @return <code>true</code>, if reference gaps are stored for the given 
-     * position, <code>false</code> otherwise
-     */
-    public boolean hasGenomeGapAtPosition(int position) {
-        return gaps.containsKey(position);
-    }
+
 
     /**
      * @param position the position which should be checked for reference gaps
-     * @return A TreeSet containing the reference gaps for the given position.
-     * If no gaps are stored for the position <code>null</code> is returned
+     * <p>
+     * @return <code>true</code>, if reference gaps are stored for the given
+     *         position, <code>false</code> otherwise
      */
-    public TreeSet<ReferenceGap> getGenomeGapsAtPosition(int position) {
-        return gaps.get(position);
+    public boolean hasGenomeGapAtPosition( int position ) {
+        return gaps.containsKey( position );
     }
+
+
+    /**
+     * @param position the position which should be checked for reference gaps
+     * <p>
+     * @return A TreeSet containing the reference gaps for the given position.
+     *         If no gaps are stored for the position <code>null</code> is returned
+     */
+    public TreeSet<ReferenceGap> getGenomeGapsAtPosition( int position ) {
+        return gaps.get( position );
+    }
+
 
     /**
      * @param position the position which should be checked for a difference
-     * to the reference
-     * @return <code>true</code>, if a difference is stored for the given position,
-     * <code>false</code> otherwise
+     *                 to the reference
+     * <p>
+     * @return <code>true</code>, if a difference is stored for the given
+     *         position,
+     *         <code>false</code> otherwise
      */
-    public boolean hasDiffAtPosition(int position){
-        return diffs.containsKey(position);
+    public boolean hasDiffAtPosition( int position ) {
+        return diffs.containsKey( position );
     }
+
 
     /**
      * @param position the position whose difference to the reference should be
-     * returned.
+     *                 returned.
+     * <p>
      * @return The character deviating from the reference at the given position
-     * Returns <code>null</code>, if no diff is stored for the given position
+     *         Returns <code>null</code>, if no diff is stored for the given position
      */
-    public Character getDiffAtPosition(int position){
-        return diffs.get(position).getBase();
+    public Character getDiffAtPosition( int position ) {
+        return diffs.get( position ).getBase();
     }
+
 
     /**
      * Adds a genome gap for a position of this mapping.
+     * <p>
      * @param gap the gap to add to this mapping
      */
-    public void addGenomeGap(ReferenceGap gap) {
-        if (!gaps.containsKey(gap.getPosition())) {
-            gaps.put(gap.getPosition(), new TreeSet<ReferenceGap>());
+    public void addGenomeGap( ReferenceGap gap ) {
+        if( !gaps.containsKey( gap.getPosition() ) ) {
+            gaps.put( gap.getPosition(), new TreeSet<ReferenceGap>() );
         }
-        gaps.get(gap.getPosition()).add(gap);
+        gaps.get( gap.getPosition() ).add( gap );
     }
+
 
     /**
      * Adds a difference to the reference for a position of this mapping.
+     * <p>
      * @param diff the difference to add to this mapping
      */
-    public void addDiff(Difference diff){
-        diffs.put(diff.getPosition(), diff);
+    public void addDiff( Difference diff ) {
+        diffs.put( diff.getPosition(), diff );
     }
+
 
     /**
      * Compares two mappings based on their start position. '0' is returned for
      * equal start positions, 1, if the start position of the other is larger
      * and -1, if the start position of this mapping is larger.
-     * @param mapping mapping to compare to this mapping 
+     * <p>
+     * @param mapping mapping to compare to this mapping
+     * <p>
      * @return '0' for equal start positions, 1, if the start
-     * position of the other is larger and -1, if the start position of this
-     * mapping is larger.
+     *         position of the other is larger and -1, if the start position of this
+     *         mapping is larger.
      */
     @Override
-    public int compareTo(Mapping mapping) {
+    public int compareTo( Mapping mapping ) {
         int result = 0;
-        if (this.start < mapping.getStart()) {
+        if( this.start < mapping.getStart() ) {
             result = -1;
-        } else if (this.start > mapping.getStart()) {
+        }
+        else if( this.start > mapping.getStart() ) {
             result = 1;
         }
         return result;
     }
-    
+
+
     /**
      * is the mapping unique?
+     * <p>
      * @return true if the mapping is unique
      */
     public boolean isUnique() {
         return this.numMappingsForRead == 1;
     }
 
+
     /**
      * @return the original sequence of the read
-     * this info is used only if the rna trim module has been used
-     * and the corresponding custom tag is contained in the sam/bam file
+     *         this info is used only if the rna trim module has been used
+     *         and the corresponding custom tag is contained in the sam/bam file
      */
     public String getOriginalSequence() {
         return originalSequence;
     }
 
+
     /**
      * @param originalSequence the originalSequence to set
      */
-    public void setOriginalSequence(String originalSequence) {
+    public void setOriginalSequence( String originalSequence ) {
         this.originalSequence = originalSequence;
     }
-    
+
+
     private int trimmedFromLeft = 0;
     private int trimmedFromRight = 0;
+
 
     /**
      * @return the trimmedFromLeft
@@ -283,12 +326,14 @@ public class Mapping implements ObjectWithId, Comparable<Mapping> {
         return trimmedFromLeft;
     }
 
+
     /**
      * @param trimmedFromLeft the trimmedFromLeft to set
      */
-    public void setTrimmedFromLeft(int trimmedFromLeft) {
+    public void setTrimmedFromLeft( int trimmedFromLeft ) {
         this.trimmedFromLeft = trimmedFromLeft;
     }
+
 
     /**
      * @return the trimmedFromRight
@@ -297,36 +342,42 @@ public class Mapping implements ObjectWithId, Comparable<Mapping> {
         return trimmedFromRight;
     }
 
+
     /**
      * @param trimmedFromRight the trimmedFromRight to set
      */
-    public void setTrimmedFromRight(int trimmedFromRight) {
+    public void setTrimmedFromRight( int trimmedFromRight ) {
         this.trimmedFromRight = trimmedFromRight;
     }
 
+
     /**
-     * @return The number of mappings for the read of this mapping. -1 Means that 
-     * this information is not available.
+     * @return The number of mappings for the read of this mapping. -1 Means
+     *         that
+     *         this information is not available.
      */
     public int getNumMappingsForRead() {
         return this.numMappingsForRead;
     }
 
+
     /**
      * @return phred score array of base qualities, (if available it is > 0 or
-     * -1 for 255), otherwise 0
+     *         -1 for 255), otherwise 0
      */
     public byte[] getBaseQualities() {
         return baseQualities;
     }
 
+
     /**
      * @return phred mapping quality (if available it is > 0 or -1 for 255),
-     * otherwise 0
+     *         otherwise 0
      */
     public int getMappingQuality() {
         return mappingQuality;
     }
+
 
     /**
      * Sets the alignment blocks formed by this mapping, if there are multiple
@@ -334,24 +385,26 @@ public class Mapping implements ObjectWithId, Comparable<Mapping> {
      * whole mapping it is not stored.Several blocks exist for split read
      * mappings with {@link CigarOperator.N} bases. The N blocks have to be
      * omitted in the list. Thus, the list only represents mapped regions.
+     * <p>
      * @param alignmentBlocks The blocks to set for this mapping
      */
-    public void setAlignmentBlocks(List<SamAlignmentBlock> alignmentBlocks) {
-        if (alignmentBlocks.size() > 1) {
+    public void setAlignmentBlocks( List<SamAlignmentBlock> alignmentBlocks ) {
+        if( alignmentBlocks.size() > 1 ) {
             this.alignmentBlocks = alignmentBlocks;
         }
     }
 
+
     /**
      * @return The alignment blocks formed by this mapping, if there are
-     * multiple alignment blocks. For mappings with a a single block
-     * representing the whole mapping it is not stored.Several blocks exist for
-     * split read mappings with {@link CigarOperator.N} bases. The N blocks have
-     * to be omitted in the list. Thus, the list only represents mapped regions.
+     *         multiple alignment blocks. For mappings with a a single block
+     *         representing the whole mapping it is not stored.Several blocks exist for
+     *         split read mappings with {@link CigarOperator.N} bases. The N blocks have
+     *         to be omitted in the list. Thus, the list only represents mapped regions.
      */
     public List<SamAlignmentBlock> getAlignmentBlocks() {
         return this.alignmentBlocks;
     }
-   
+
 
 }

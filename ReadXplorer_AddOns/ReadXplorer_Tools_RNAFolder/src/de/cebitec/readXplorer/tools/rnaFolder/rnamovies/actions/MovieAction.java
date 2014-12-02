@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.tools.rnaFolder.rnamovies.actions;
 
+
 import de.cebitec.readXplorer.tools.rnaFolder.rnamovies.MoviePane;
 import java.net.URL;
 import javax.swing.AbstractAction;
@@ -25,20 +26,24 @@ import javax.swing.ImageIcon;
 
 public abstract class MovieAction extends AbstractAction {
 
-  //protected RNAMovies movies;
+    //protected RNAMovies movies;
     protected MoviePane movies;
 
-  public MovieAction(String name, String iconName) {
-    super(name, loadIcon(iconName, name));
-  }
 
-  private static ImageIcon loadIcon(String name, String description) {
-    URL imageURL = MovieAction.class.getResource("icons/" + name.replaceAll(" ", "_")+ ".png");
-    ImageIcon icon = null;
-    if (imageURL!= null) {
-            icon = new ImageIcon(imageURL, description);
+    public MovieAction( String name, String iconName ) {
+        super( name, loadIcon( iconName, name ) );
     }
 
-    return icon;
-  }
+
+    private static ImageIcon loadIcon( String name, String description ) {
+        URL imageURL = MovieAction.class.getResource( "icons/" + name.replaceAll( " ", "_" ) + ".png" );
+        ImageIcon icon = null;
+        if( imageURL != null ) {
+            icon = new ImageIcon( imageURL, description );
+        }
+
+        return icon;
+    }
+
+
 }

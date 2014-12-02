@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,36 +16,47 @@
  */
 package de.cebitec.readXplorer.view;
 
+
 import org.openide.util.Lookup;
 import org.openide.windows.TopComponent;
 
+
 /**
- * A TopComponent, which returns its name when the <cc>toString()</cc> method is invoced.
+ * A TopComponent, which returns its name when the <cc>toString()</cc> method is
+ * invoced.
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
-public class TopComponentExtended  extends TopComponent {
+public class TopComponentExtended extends TopComponent {
+
     private static final long serialVersionUID = 1L;
 
+
     /**
-     * A TopComponent, which returns its name when the <cc>toString()</cc> method is invoced.
+     * A TopComponent, which returns its name when the <cc>toString()</cc>
+     * method is invoced.
      */
     public TopComponentExtended() {
     }
 
+
     /**
-     * A TopComponent, which returns its name when the <cc>toString()</cc> method is invoced.
+     * A TopComponent, which returns its name when the <cc>toString()</cc>
+     * method is invoced.
+     * <p>
      * @param lookup the lookup
      */
-    public TopComponentExtended(Lookup lookup) {
-        super(lookup);
+    public TopComponentExtended( Lookup lookup ) {
+        super( lookup );
     }
-    
+
+
     @Override
     public int getPersistenceType() {
         return TopComponent.PERSISTENCE_ALWAYS;
     }
-    
+
+
     /**
      * @return The name of this extended TopComponent.
      */
@@ -53,4 +64,6 @@ public class TopComponentExtended  extends TopComponent {
     public String toString() {
         return this.getName();
     }
+
+
 }

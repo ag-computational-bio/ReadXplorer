@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.view.dialogMenus;
 
+
 import de.cebitec.readXplorer.util.GeneralUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -24,14 +25,15 @@ import javax.swing.Action;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
+
 /**
  * @author -Rolf Hilker-
- * 
+ * <p>
  * Extends the ordinary JTextField by overwriting the CTRL+V shortcut to paste
- * the current system clipboard content. 
+ * the current system clipboard content.
  */
 public class JTextFieldPasteable extends JTextField {
-    
+
     /**
      * Extends the ordinary JTextField by overwriting the CTRL+V shortcut to
      * paste the current system clipboard content.
@@ -39,51 +41,57 @@ public class JTextFieldPasteable extends JTextField {
     public JTextFieldPasteable() {
         this.setPasteBehaviour();
     }
-    
+
+
     /**
-     * Updates the paste behaviour of the CTRL+V shortcut to paste the current 
+     * Updates the paste behaviour of the CTRL+V shortcut to paste the current
      * system clipboard content.
      */
     private void setPasteBehaviour() {
         Action action = createAction();
-        JTextFieldPasteable.this.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_V, KeyEvent.CTRL_DOWN_MASK), "Paste");
-        JTextFieldPasteable.this.getActionMap().put("Paste", action);
+        JTextFieldPasteable.this.getInputMap().put( KeyStroke.getKeyStroke( KeyEvent.VK_V, KeyEvent.CTRL_DOWN_MASK ), "Paste" );
+        JTextFieldPasteable.this.getActionMap().put( "Paste", action );
     }
-    
+
+
     /**
-     * @return Creates and returns the action that updates the paste behaviour 
-     * of the CTRL+V shortcut to paste the current system clipboard content.
+     * @return Creates and returns the action that updates the paste behaviour
+     *         of the CTRL+V shortcut to paste the current system clipboard content.
      */
     private Action createAction() {
-        
+
         Action action = new Action() {
 
             @Override
-            public void actionPerformed(final ActionEvent event) {
-                JTextFieldPasteable.this.setText(GeneralUtils.getClipboardContents(JTextFieldPasteable.this));
+            public void actionPerformed( final ActionEvent event ) {
+                JTextFieldPasteable.this.setText( GeneralUtils.getClipboardContents( JTextFieldPasteable.this ) );
             }
+
 
             /**
              * Method not implemented yet, returns null.
              */
             @Override
-            public Object getValue(String key) {
+            public Object getValue( String key ) {
                 return null;
             }
+
 
             /**
              * Method not implemented yet, does not add anything.
              */
             @Override
-            public void putValue(String key, Object value) {
+            public void putValue( String key, Object value ) {
             }
+
 
             /**
              * Method not implemented yet, does not set anything.
              */
             @Override
-            public void setEnabled(boolean b) {
+            public void setEnabled( boolean b ) {
             }
+
 
             /**
              * Method not implemented yet, always returns true.
@@ -93,22 +101,27 @@ public class JTextFieldPasteable extends JTextField {
                 return true;
             }
 
+
             /**
              * Method not implemented yet, does not set anything.
              */
             @Override
-            public void addPropertyChangeListener(PropertyChangeListener listener) {
+            public void addPropertyChangeListener( PropertyChangeListener listener ) {
             }
+
 
             /**
              * Method not implemented yet, does not delete anything.
              */
             @Override
-            public void removePropertyChangeListener(PropertyChangeListener listener) {
+            public void removePropertyChangeListener( PropertyChangeListener listener ) {
             }
+
+
         };
-        
+
         return action;
     }
-    
+
+
 }

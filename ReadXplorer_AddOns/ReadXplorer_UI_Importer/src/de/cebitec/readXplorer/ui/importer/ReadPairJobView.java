@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.ui.importer;
 
+
 import de.cebitec.readXplorer.parser.ReadPairJobContainer;
 import de.cebitec.readXplorer.parser.TrackJob;
 import java.util.ArrayList;
@@ -26,109 +27,130 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
+
 /**
  * View for showing all read pair jobs ready for import.
  *
  * @author Rolf Hilker
  */
-public class ReadPairJobView extends javax.swing.JPanel implements ListSelectionListener {
+public class ReadPairJobView extends javax.swing.JPanel implements
+        ListSelectionListener {
 
     public final static long serialVersionUID = 774342377;
     private List<ReadPairJobContainer> readPairJobContainerList;
     private boolean hasJobs;
 
-    /** View for showing all read pair jobs ready for import. */
+
+    /**
+     * View for showing all read pair jobs ready for import.
+     */
     public ReadPairJobView() {
         readPairJobContainerList = new ArrayList<>();
         initComponents();
     }
 
+
     /**
      * @return the selected read pair job
      */
     public ReadPairJobContainer getSelectedItem() {
-        return readPairJobContainerList.get(readPairJobTable.getSelectedRow());
+        return readPairJobContainerList.get( readPairJobTable.getSelectedRow() );
     }
+
 
     /**
      * Add a new readuence pair job to the table view.
+     * <p>
      * @param readPairJobContainer the container with the job to add
+     * <p>
      * @return the updated read pair job table
      */
-    public JTable add(ReadPairJobContainer readPairJobContainer){
+    public JTable add( ReadPairJobContainer readPairJobContainer ) {
         DefaultTableModel model = (DefaultTableModel) readPairJobTable.getModel();
-        
+
         String orientation = "fr";
         TrackJob trackJob = readPairJobContainer.getTrackJob1();
-        if (     readPairJobContainer.getOrientation() == 1){ orientation = "rf"; }
-        else if (readPairJobContainer.getOrientation() == 2){ orientation = "ff/rr"; }
-        String file2Name = readPairJobContainer.getTrackJob2() != null 
-                ? readPairJobContainer.getTrackJob2().getFile().getName() : "-";
-       
-        model.addRow(new Object[] {
-                trackJob.getFile().getName(),
-                file2Name,
-                trackJob.getDescription(),
-                trackJob.getRefGen().getDescription(), 
-                readPairJobContainer.getDistance(),
-                readPairJobContainer.getDeviation(), 
-                orientation,
-                trackJob.isAlreadyImported()});
-        
-        this.readPairJobContainerList.add(readPairJobContainer);
+        if( readPairJobContainer.getOrientation() == 1 ) {
+            orientation = "rf";
+        }
+        else if( readPairJobContainer.getOrientation() == 2 ) {
+            orientation = "ff/rr";
+        }
+        String file2Name = readPairJobContainer.getTrackJob2() != null
+                           ? readPairJobContainer.getTrackJob2().getFile().getName() : "-";
 
-        if (!hasJobs){
+        model.addRow( new Object[]{
+            trackJob.getFile().getName(),
+            file2Name,
+            trackJob.getDescription(),
+            trackJob.getRefGen().getDescription(),
+            readPairJobContainer.getDistance(),
+            readPairJobContainer.getDeviation(),
+            orientation,
+            trackJob.isAlreadyImported() } );
+
+        this.readPairJobContainerList.add( readPairJobContainer );
+
+        if( !hasJobs ) {
             hasJobs = true;
-            firePropertyChange(ImportSetupCard.PROP_HAS_JOBS, null, hasJobs);
+            firePropertyChange( ImportSetupCard.PROP_HAS_JOBS, null, hasJobs );
         }
         return readPairJobTable;
     }
 
+
     /**
      * Removes the selected readuence pair job.
+     * <p>
      * @param readPairJobContainer the container of the read pair job to remove
      */
-    public void remove(ReadPairJobContainer readPairJobContainer){
-        int index = readPairJobContainerList.indexOf(readPairJobContainer);
-        readPairJobContainerList.remove(readPairJobContainer);
+    public void remove( ReadPairJobContainer readPairJobContainer ) {
+        int index = readPairJobContainerList.indexOf( readPairJobContainer );
+        readPairJobContainerList.remove( readPairJobContainer );
 
         DefaultTableModel model = (DefaultTableModel) readPairJobTable.getModel();
-        model.removeRow(index);
+        model.removeRow( index );
 
-        if (readPairJobContainerList.isEmpty()){
+        if( readPairJobContainerList.isEmpty() ) {
             hasJobs = false;
-            firePropertyChange(ImportSetupCard.PROP_HAS_JOBS, null, hasJobs);
+            firePropertyChange( ImportSetupCard.PROP_HAS_JOBS, null, hasJobs );
         }
     }
+
 
     /**
      * @return the list of readuence pair jobs
      */
-    public List<ReadPairJobContainer> getJobs(){
+    public List<ReadPairJobContainer> getJobs() {
         return readPairJobContainerList;
     }
 
+
     @Override
-    public void valueChanged(ListSelectionEvent e) {
+    public void valueChanged( ListSelectionEvent e ) {
         ListSelectionModel model = (ListSelectionModel) e.getSource();
-        if(model.isSelectionEmpty()){
-            firePropertyChange(ImportSetupCard.PROP_JOB_SELECTED, null, Boolean.FALSE);
-        } else {
-            firePropertyChange(ImportSetupCard.PROP_JOB_SELECTED, null, Boolean.TRUE);
+        if( model.isSelectionEmpty() ) {
+            firePropertyChange( ImportSetupCard.PROP_JOB_SELECTED, null, Boolean.FALSE );
+        }
+        else {
+            firePropertyChange( ImportSetupCard.PROP_JOB_SELECTED, null, Boolean.TRUE );
         }
     }
 
-    public boolean isRowSelected(){
+
+    public boolean isRowSelected() {
         ListSelectionModel model = readPairJobTable.getSelectionModel();
         return !model.isSelectionEmpty();
     }
 
-    /** This method is called from within the constructor to
+
+    /**
+     * This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
      * always regenerated by the Form Editor.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,11 +16,13 @@
  */
 package de.cebitec.readXplorer.differentialExpression;
 
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
 
 /**
  *
@@ -32,58 +34,68 @@ public class ProcessingLog {
     private StringBuilder gnuRprocessing = new StringBuilder();
     private Map<String, Object> properties = null;
 
+
     private ProcessingLog() {
     }
 
+
     public static ProcessingLog getInstance() {
-        if (instance == null) {
+        if( instance == null ) {
             instance = new ProcessingLog();
         }
         return instance;
     }
 
-    public synchronized void logGNURoutput(String output) {
-        gnuRprocessing.append(output);
+
+    public synchronized void logGNURoutput( String output ) {
+        gnuRprocessing.append( output );
     }
 
-    public synchronized void setProperties(Map<String, Object> properties) {
-        if (this.properties == null) {
+
+    public synchronized void setProperties( Map<String, Object> properties ) {
+        if( this.properties == null ) {
             this.properties = properties;
         }
     }
-    
-    public synchronized void addProperty(String key, Object value){
-        properties.put(key, value);
+
+
+    public synchronized void addProperty( String key, Object value ) {
+        properties.put( key, value );
     }
+
 
     public synchronized void resetLog() {
         properties = null;
         gnuRprocessing = new StringBuilder();
     }
 
+
     public String generateLog() {
         StringBuilder log = new StringBuilder();
         Set<String> keys = properties.keySet();
-        Map<String, Object> tmpProperties = new HashMap<>(properties);
+        Map<String, Object> tmpProperties = new HashMap<>( properties );
 
-        for (Iterator<String> it = keys.iterator(); it.hasNext();) {
+        for( Iterator<String> it = keys.iterator(); it.hasNext(); ) {
             String key = it.next();
-            if (!key.startsWith("WizardPanel")) {
-                Object currentProperty = tmpProperties.get(key);
-                if(currentProperty instanceof Map){
+            if( !key.startsWith( "WizardPanel" ) ) {
+                Object currentProperty = tmpProperties.get( key );
+                if( currentProperty instanceof Map ) {
                     Map currentPropertyMap = (Map) currentProperty;
-                    log.append(key).append(" = ").append(Arrays.deepToString(currentPropertyMap.values().toArray())).append(System.getProperty("line.separator"));
-                } else {
-                    log.append(key).append(" = ").append(currentProperty.toString()).append(System.getProperty("line.separator"));
-                }                
+                    log.append( key ).append( " = " ).append( Arrays.deepToString( currentPropertyMap.values().toArray() ) ).append( System.getProperty( "line.separator" ) );
+                }
+                else {
+                    log.append( key ).append( " = " ).append( currentProperty.toString() ).append( System.getProperty( "line.separator" ) );
+                }
             }
         }
-        log.append(System.getProperty("line.separator"));
-        log.append("GNU R output during processing: ");
-        log.append(System.getProperty("line.separator"));
+        log.append( System.getProperty( "line.separator" ) );
+        log.append( "GNU R output during processing: " );
+        log.append( System.getProperty( "line.separator" ) );
 
-        log.append(gnuRprocessing);
+        log.append( gnuRprocessing );
 
         return log.toString();
     }
+
+
 }

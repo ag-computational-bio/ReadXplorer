@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.databackend;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResult;
 import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
@@ -23,6 +24,7 @@ import de.cebitec.readXplorer.util.Properties;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 
 /**
  * This coverage thread should be used for analyses, but not for visualizing
@@ -32,44 +34,52 @@ import java.util.logging.Logger;
  * @author -Rolf Hilker-
  */
 public class CoverageThreadAnalyses extends CoverageThread {
-    
+
     /**
-     * Thread for retrieving the coverage for a list of tracks from their 
+     * Thread for retrieving the coverage for a list of tracks from their
      * mapping files.
-     * @param tracks the tracks handled here
+     * <p>
+     * @param tracks        the tracks handled here
      * @param combineTracks true, if more than one track is added and their
-     * coverage should be combined in the results
+     *                      coverage should be combined in the results
      */
-    public CoverageThreadAnalyses(List<PersistentTrack> tracks, boolean combineTracks) {
-        super(tracks, combineTracks);
+    public CoverageThreadAnalyses( List<PersistentTrack> tracks, boolean combineTracks ) {
+        super( tracks, combineTracks );
     }
+
 
     @Override
     public void run() {
-        
-        while (!interrupted()) {
+
+        while( !interrupted() ) {
 
             IntervalRequest request = requestQueue.poll();
-            CoverageAndDiffResult currentCov = new CoverageAndDiffResult(new CoverageManager(0, 0), null, null, request);
-            if (request != null) {
-                if (request.getDesiredData() == Properties.READ_STARTS) {
-                    currentCov = this.loadReadStartsAndCoverageMultiple(request);
-                } else if (!currentCov.getCovManager().coversBounds(request.getFrom(), request.getTo())) {
-                    if (this.getTrackId2() != 0) {
-                        currentCov = this.loadCoverageDouble(request); //at the moment we only need the complete coverage here
-                    } else if (this.getTrackId() != 0 || this.canQueryCoverage()) {
-                        currentCov = this.loadCoverageMultiple(request);
+            CoverageAndDiffResult currentCov = new CoverageAndDiffResult( new CoverageManager( 0, 0 ), null, null, request );
+            if( request != null ) {
+                if( request.getDesiredData() == Properties.READ_STARTS ) {
+                    currentCov = this.loadReadStartsAndCoverageMultiple( request );
+                }
+                else if( !currentCov.getCovManager().coversBounds( request.getFrom(), request.getTo() ) ) {
+                    if( this.getTrackId2() != 0 ) {
+                        currentCov = this.loadCoverageDouble( request ); //at the moment we only need the complete coverage here
+                    }
+                    else if( this.getTrackId() != 0 || this.canQueryCoverage() ) {
+                        currentCov = this.loadCoverageMultiple( request );
                     }
                 }
-                request.getSender().receiveData(currentCov);
-            } else {
+                request.getSender().receiveData( currentCov );
+            }
+            else {
                 try {
-                    Thread.sleep(10);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(CoverageThreadAnalyses.class.getName()).log(Level.SEVERE, null, ex);
+                    Thread.sleep( 10 );
+                }
+                catch( InterruptedException ex ) {
+                    Logger.getLogger( CoverageThreadAnalyses.class.getName() ).log( Level.SEVERE, null, ex );
                 }
             }
 
         }
     }
+
+
 }

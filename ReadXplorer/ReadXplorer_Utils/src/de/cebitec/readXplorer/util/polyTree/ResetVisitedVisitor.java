@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,22 +16,27 @@
  */
 package de.cebitec.readXplorer.util.polyTree;
 
+
 /**
- * Node visitor for resetting the visited flag for the visited nodes after a traversal.
+ * Node visitor for resetting the visited flag for the visited nodes after a
+ * traversal.
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class ResetVisitedVisitor implements NodeVisitor {
 
     /**
-     * Node visitor for resetting the visited flag for the visited nodes after a traversal.
+     * Node visitor for resetting the visited flag for the visited nodes after a
+     * traversal.
      */
     public ResetVisitedVisitor() {
     }
-    
+
+
     @Override
-    public void visit(Node node) {
-        node.setVisited(false);
+    public void visit( Node node ) {
+        node.setVisited( false );
     }
-    
+
+
 }

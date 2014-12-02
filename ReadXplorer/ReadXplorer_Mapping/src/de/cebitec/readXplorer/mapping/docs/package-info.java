@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,7 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-@HelpSetRegistration(helpSet = "mapping-hs.xml", position = 3272)
+@HelpSetRegistration( helpSet = "mapping-hs.xml", position = 3272 )
 package de.cebitec.readXplorer.mapping.docs;
+
 
 import org.netbeans.api.javahelp.HelpSetRegistration;

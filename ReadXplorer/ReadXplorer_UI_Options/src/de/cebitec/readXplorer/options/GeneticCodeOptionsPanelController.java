@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,30 +16,35 @@
  */
 package de.cebitec.readXplorer.options;
 
+
 import org.netbeans.spi.options.OptionsPanelController;
+
 
 /**
  * Controller for genetic code options.
- * 
+ * <p>
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
-@OptionsPanelController.TopLevelRegistration(categoryName = "#OptionsCategory_Name_GeneticCode",
-iconBase = "de/cebitec/readXplorer/options/geneticCode.png",
-keywords = "#OptionsCategory_Keywords_GeneticCode",
-keywordsCategory = "GeneticCode",
-position = 905)
+@OptionsPanelController.TopLevelRegistration( categoryName = "#OptionsCategory_Name_GeneticCode",
+                                              iconBase = "de/cebitec/readXplorer/options/geneticCode.png",
+                                              keywords = "#OptionsCategory_Keywords_GeneticCode",
+                                              keywordsCategory = "GeneticCode",
+                                              position = 905 )
 public final class GeneticCodeOptionsPanelController extends ChangeListeningOptionsPanelController {
 
     private GeneticCodePanel panel;
+
 
     /**
      * {@inheritDoc}
      */
     @Override
     protected OptionsPanel getPanel() {
-        if (panel == null) {
-            panel = new GeneticCodePanel(this);
+        if( panel == null ) {
+            panel = new GeneticCodePanel( this );
         }
         return panel;
     }
+
+
 }

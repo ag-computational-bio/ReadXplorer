@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,19 +16,25 @@
  */
 package de.cebitec.readXplorer.thumbnail.Actions;
 
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 
 public final class AsyncSliders implements ActionListener {
 
     private final ASyncSliderCookie context;
 
-    public AsyncSliders(ASyncSliderCookie context) {
+
+    public AsyncSliders( ASyncSliderCookie context ) {
         this.context = context;
     }
 
+
     @Override
-    public void actionPerformed(ActionEvent ev) {
+    public void actionPerformed( ActionEvent ev ) {
         context.async();
     }
+
+
 }

@@ -4,6 +4,7 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch;
 
+
 import java.util.prefs.Preferences;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
@@ -11,7 +12,9 @@ import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbPreferences;
 
-public class RbsAnalysisWizardPanel implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
+
+public class RbsAnalysisWizardPanel implements
+        WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     /**
      * The visual component that displays this panel. If you need to access the
@@ -21,9 +24,11 @@ public class RbsAnalysisWizardPanel implements WizardDescriptor.ValidatingPanel<
     private String wizardName;
     private int wholeLengthOfAnalysisRegion;
 
-    public RbsAnalysisWizardPanel(String wizardName) {
+
+    public RbsAnalysisWizardPanel( String wizardName ) {
         this.wizardName = wizardName;
     }
+
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -31,11 +36,12 @@ public class RbsAnalysisWizardPanel implements WizardDescriptor.ValidatingPanel<
     // create only those which really need to be visible.
     @Override
     public RbsAnalysisVisualPanel getComponent() {
-        if (component == null) {
-            component = new RbsAnalysisVisualPanel(this.wizardName);
+        if( component == null ) {
+            component = new RbsAnalysisVisualPanel( this.wizardName );
         }
         return component;
     }
+
 
     @Override
     public HelpCtx getHelp() {
@@ -44,6 +50,7 @@ public class RbsAnalysisWizardPanel implements WizardDescriptor.ValidatingPanel<
         // If you have context help:
         // return new HelpCtx("help.key.here");
     }
+
 
     @Override
     public boolean isValid() {
@@ -55,47 +62,55 @@ public class RbsAnalysisWizardPanel implements WizardDescriptor.ValidatingPanel<
         // WizardDescriptor.ERROR/WARNING/INFORMATION_MESSAGE will also be useful.
     }
 
-    @Override
-    public void addChangeListener(ChangeListener l) {
-    }
 
     @Override
-    public void removeChangeListener(ChangeListener l) {
+    public void addChangeListener( ChangeListener l ) {
     }
 
+
     @Override
-    public void readSettings(WizardDescriptor wiz) {
+    public void removeChangeListener( ChangeListener l ) {
+    }
+
+
+    @Override
+    public void readSettings( WizardDescriptor wiz ) {
         // use wiz.getProperty to retrieve previous panel state
 //        this.wholeLengthOfAnalysisRegion = (int) wiz.getProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS);
     }
 
+
     @Override
-    public void storeSettings(WizardDescriptor wiz) {
+    public void storeSettings( WizardDescriptor wiz ) {
         // use wiz.putProperty to remember current panel state
-        wiz.putProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_LENGTH_MOTIFWIDTH, component.getExpectedMotifWidth());
-        wiz.putProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_NO_TRYING_BIOPROSPECTOR, component.getNoOfTrying());
-        wiz.putProperty(RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_MIN_SPACER, component.getMinSpacer());
-        wiz.putProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS, component.getLengthForAnalysis());
+        wiz.putProperty( RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_LENGTH_MOTIFWIDTH, component.getExpectedMotifWidth() );
+        wiz.putProperty( RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_NO_TRYING_BIOPROSPECTOR, component.getNoOfTrying() );
+        wiz.putProperty( RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_MIN_SPACER, component.getMinSpacer() );
+        wiz.putProperty( PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS, component.getLengthForAnalysis() );
         storePrefs();
     }
 
+
     private void storePrefs() {
-        Preferences pref = NbPreferences.forModule(Object.class);
-        pref.put(wizardName + RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_LENGTH_MOTIFWIDTH, component.getExpectedMotifWidth().toString());
-        pref.put(wizardName + RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_MIN_SPACER, component.getMinSpacer().toString());
-        pref.put(wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS, component.getLengthForAnalysis().toString());
+        Preferences pref = NbPreferences.forModule( Object.class );
+        pref.put( wizardName + RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_LENGTH_MOTIFWIDTH, component.getExpectedMotifWidth().toString() );
+        pref.put( wizardName + RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_MIN_SPACER, component.getMinSpacer().toString() );
+        pref.put( wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS, component.getLengthForAnalysis().toString() );
     }
+
 
     @Override
     public void validate() throws WizardValidationException {
         int fstMinSpacer = component.getMinSpacer();
         int rbsMotifWidth = component.getExpectedMotifWidth();
 
-        if (this.component.getLengthForAnalysis() < (fstMinSpacer + rbsMotifWidth)) {
-            throw new WizardValidationException(null, "Please check your Parameters for RBS analysis.", null);
+        if( this.component.getLengthForAnalysis() < (fstMinSpacer + rbsMotifWidth) ) {
+            throw new WizardValidationException( null, "Please check your Parameters for RBS analysis.", null );
         }
-        if ((this.component.getLengthForAnalysis() - fstMinSpacer) < rbsMotifWidth) {
-            throw new WizardValidationException(null, "Please check on expected RBS motif-width for, beacause it is bigger than the region of interest.", null);
+        if( (this.component.getLengthForAnalysis() - fstMinSpacer) < rbsMotifWidth ) {
+            throw new WizardValidationException( null, "Please check on expected RBS motif-width for, beacause it is bigger than the region of interest.", null );
         }
     }
+
+
 }

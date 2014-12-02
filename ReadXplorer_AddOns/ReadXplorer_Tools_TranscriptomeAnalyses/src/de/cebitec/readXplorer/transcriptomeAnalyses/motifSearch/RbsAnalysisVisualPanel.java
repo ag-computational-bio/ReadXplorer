@@ -4,71 +4,84 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch;
 
+
 import de.cebitec.readXplorer.transcriptomeAnalyses.verifier.IntegerVerifier;
 import java.io.File;
 import java.util.prefs.Preferences;
 import javax.swing.JPanel;
 import org.openide.util.NbPreferences;
 
+
 public final class RbsAnalysisVisualPanel extends JPanel {
 
     private String wizardName;
     private File workingDir;
 
+
     /**
      * Creates new form RbsAnalysisVisualPanel
      */
-    public RbsAnalysisVisualPanel(String wizardName) {
+    public RbsAnalysisVisualPanel( String wizardName ) {
         this.wizardName = wizardName;
         initComponents();
         additionalSettings();
         updateFields();
     }
 
+
     @Override
     public String getName() {
         return "Parameters for RBS detection using BioProspector";
     }
 
+
     private void additionalSettings() {
-        this.expectedMotifWidth.setInputVerifier(new IntegerVerifier(this.expectedMotifWidth));
-        this.noOfTryingTF.setInputVerifier(new IntegerVerifier(this.noOfTryingTF));
-        this.minSpacerTF.setInputVerifier(new IntegerVerifier(this.minSpacerTF));
-        this.lengthForAnalysis.setInputVerifier(new IntegerVerifier(this.lengthForAnalysis));
+        this.expectedMotifWidth.setInputVerifier( new IntegerVerifier( this.expectedMotifWidth ) );
+        this.noOfTryingTF.setInputVerifier( new IntegerVerifier( this.noOfTryingTF ) );
+        this.minSpacerTF.setInputVerifier( new IntegerVerifier( this.minSpacerTF ) );
+        this.lengthForAnalysis.setInputVerifier( new IntegerVerifier( this.lengthForAnalysis ) );
     }
+
 
     private void updateFields() {
-        Preferences pref = NbPreferences.forModule(Object.class);
-        this.expectedMotifWidth.setText(pref.get(wizardName + RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_LENGTH_MOTIFWIDTH, "6"));
-        this.noOfTryingTF.setText(pref.get(wizardName + RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_NO_TRYING_BIOPROSPECTOR, "40"));
-        this.minSpacerTF.setText(pref.get(wizardName + RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_MIN_SPACER, "6"));
-        this.lengthForAnalysis.setText(pref.get(wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS, "20"));
+        Preferences pref = NbPreferences.forModule( Object.class );
+        this.expectedMotifWidth.setText( pref.get( wizardName + RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_LENGTH_MOTIFWIDTH, "6" ) );
+        this.noOfTryingTF.setText( pref.get( wizardName + RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_NO_TRYING_BIOPROSPECTOR, "40" ) );
+        this.minSpacerTF.setText( pref.get( wizardName + RbsAnalysisWizardIterator.PROP_RBS_ANALYSIS_MIN_SPACER, "6" ) );
+        this.lengthForAnalysis.setText( pref.get( wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS, "20" ) );
 
     }
 
-    public void setWorkingDir(File inputFile) {
+
+    public void setWorkingDir( File inputFile ) {
         this.workingDir = inputFile;
     }
+
 
     public File getWorkingDir() {
         return workingDir;
     }
 
+
     public Integer getNoOfTrying() {
-        return Integer.valueOf(this.noOfTryingTF.getText());
+        return Integer.valueOf( this.noOfTryingTF.getText() );
     }
+
 
     public Integer getLengthForAnalysis() {
-        return Integer.valueOf(this.lengthForAnalysis.getText());
+        return Integer.valueOf( this.lengthForAnalysis.getText() );
     }
+
 
     public Integer getExpectedMotifWidth() {
-        return Integer.valueOf(this.expectedMotifWidth.getText());
+        return Integer.valueOf( this.expectedMotifWidth.getText() );
     }
 
+
     public Integer getMinSpacer() {
-        return Integer.valueOf(this.minSpacerTF.getText());
+        return Integer.valueOf( this.minSpacerTF.getText() );
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -188,9 +201,9 @@ public final class RbsAnalysisVisualPanel extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        this.minSpacerTF.setText("6");
-        this.noOfTryingTF.setText("40");
-        this.expectedMotifWidth.setText("6");
+        this.minSpacerTF.setText( "6" );
+        this.noOfTryingTF.setText( "40" );
+        this.expectedMotifWidth.setText( "6" );
     }//GEN-LAST:event_jButton1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

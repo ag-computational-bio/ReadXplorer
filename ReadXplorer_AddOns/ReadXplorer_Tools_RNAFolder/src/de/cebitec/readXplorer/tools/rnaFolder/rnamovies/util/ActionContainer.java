@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,13 +16,17 @@
  */
 package de.cebitec.readXplorer.tools.rnaFolder.rnamovies.util;
 
-import javax.swing.JToolBar;
+
 import javax.swing.JMenuBar;
+import javax.swing.JToolBar;
+
 
 public interface ActionContainer {
 
-  public abstract JMenuBar getMenuBar();
+    public abstract JMenuBar getMenuBar();
 
-  public abstract JToolBar getToolBar();
+
+    public abstract JToolBar getToolBar();
+
 
 }

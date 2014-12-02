@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,12 +16,14 @@
  */
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JPanel;
+
 
 public final class BaySeqVisualPanel2 extends JPanel {
 
@@ -30,6 +32,7 @@ public final class BaySeqVisualPanel2 extends JPanel {
     private int[] replicateStructure = new int[1];
     private int currentReplicateNumber = 1;
 
+
     /**
      * Creates new form bspVisualPanel2
      */
@@ -37,30 +40,34 @@ public final class BaySeqVisualPanel2 extends JPanel {
         initComponents();
     }
 
+
     @Override
     public String getName() {
         return "Define replicates structure";
     }
 
-    public void updateTrackList(List<PersistentTrack> selectedTracks) {
-        if (!this.selectedTracks.equals(selectedTracks)) {
+
+    public void updateTrackList( List<PersistentTrack> selectedTracks ) {
+        if( !this.selectedTracks.equals( selectedTracks ) ) {
             this.selectedTracks = selectedTracks;
             resetTrackList();
         }
 
     }
-    
+
+
     private void resetTrackList() {
         trackListModel.clear();
-        for (Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext();) {
+        for( Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext(); ) {
             PersistentTrack persistentTrack = it.next();
-            trackListModel.addElement(persistentTrack);
+            trackListModel.addElement( persistentTrack );
             replicateStructure = new int[1];
-            replicateStructureField.setText("");
-            addAsReplicates.setEnabled(true);
-            removeReplicates.setEnabled(false);
+            replicateStructureField.setText( "" );
+            addAsReplicates.setEnabled( true );
+            removeReplicates.setEnabled( false );
         }
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -145,38 +152,39 @@ public final class BaySeqVisualPanel2 extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void addAsReplicatesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addAsReplicatesActionPerformed
-        if (replicateStructure.length < 2) {
+        if( replicateStructure.length < 2 ) {
             replicateStructure = new int[selectedTracks.size()];
         }
-        if (!trackList.isSelectionEmpty()) {
+        if( !trackList.isSelectionEmpty() ) {
             List<PersistentTrack> tracks = trackList.getSelectedValuesList();
-            StringBuilder strBuilder = new StringBuilder(replicateStructureField.getText() + "{");
-            for (Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext();) {
+            StringBuilder strBuilder = new StringBuilder( replicateStructureField.getText() + "{" );
+            for( Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext(); ) {
                 PersistentTrack persistentTrack = it.next();
-                replicateStructure[selectedTracks.indexOf(persistentTrack)] = currentReplicateNumber;
-                strBuilder.append(persistentTrack.getDescription());
-                trackListModel.removeElement(persistentTrack);
-                if (it.hasNext()) {
-                    strBuilder.append(",");
-                } else {
-                    strBuilder.append("}");
+                replicateStructure[selectedTracks.indexOf( persistentTrack )] = currentReplicateNumber;
+                strBuilder.append( persistentTrack.getDescription() );
+                trackListModel.removeElement( persistentTrack );
+                if( it.hasNext() ) {
+                    strBuilder.append( "," );
+                }
+                else {
+                    strBuilder.append( "}" );
                 }
             }
-            replicateStructureField.setText(strBuilder.toString());
+            replicateStructureField.setText( strBuilder.toString() );
             currentReplicateNumber++;
         }
-        removeReplicates.setEnabled(true);
-        if (trackListModel.isEmpty()) {
-            addAsReplicates.setEnabled(false);
+        removeReplicates.setEnabled( true );
+        if( trackListModel.isEmpty() ) {
+            addAsReplicates.setEnabled( false );
         }
     }//GEN-LAST:event_addAsReplicatesActionPerformed
 
     private void removeReplicatesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeReplicatesActionPerformed
-        removeReplicates.setEnabled(false);
-        replicateStructureField.setText("");
+        removeReplicates.setEnabled( false );
+        replicateStructureField.setText( "" );
         replicateStructure = new int[1];
         resetTrackList();
-        addAsReplicates.setEnabled(true);
+        addAsReplicates.setEnabled( true );
     }//GEN-LAST:event_removeReplicatesActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addAsReplicates;
@@ -189,16 +197,20 @@ public final class BaySeqVisualPanel2 extends JPanel {
     private javax.swing.JList trackList;
     // End of variables declaration//GEN-END:variables
 
+
     public int[] getCreatedReplicates() {
         return replicateStructure;
     }
 
+
     public boolean noReplicatesCreated() {
-        for (int i = 0; i < replicateStructure.length; i++) {
-            if (replicateStructure[i] == 0) {
+        for( int i = 0; i < replicateStructure.length; i++ ) {
+            if( replicateStructure[i] == 0 ) {
                 return true;
             }
         }
         return false;
     }
+
+
 }

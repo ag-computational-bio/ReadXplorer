@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,9 +16,11 @@
  */
 package de.cebitec.readXplorer.databackend.connector;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.io.FileNotFoundException;
 import java.util.List;
+
 
 /**
  * Connector for more than one tracks.
@@ -27,11 +29,14 @@ import java.util.List;
  */
 public class MultiTrackConnector extends TrackConnector {
 
-    MultiTrackConnector(PersistentTrack track) throws FileNotFoundException {
-        super(track);
+    MultiTrackConnector( PersistentTrack track ) throws FileNotFoundException {
+        super( track );
     }
 
-    MultiTrackConnector(List<PersistentTrack> tracks) throws FileNotFoundException {
-        super(9999, tracks, false);
+
+    MultiTrackConnector( List<PersistentTrack> tracks ) throws FileNotFoundException {
+        super( 9999, tracks, false );
     }
+
+
 }

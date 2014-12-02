@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.parser.common;
 
+
 import de.cebitec.readXplorer.parser.TrackJob;
 import de.cebitec.readXplorer.util.StatsContainer;
 import java.io.File;
@@ -23,10 +24,11 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 
+
 /**
  * Contains all data (description, mappings and coverageContainer) belonging
  * to a track, which can be stored into a database now.
- * 
+ * <p>
  * @author ddoppmeier, rhilker
  */
 public class ParsedTrack {
@@ -35,26 +37,33 @@ public class ParsedTrack {
     private Map<String, Integer> readNameToSeqIDMap1;
     private Map<String, Integer> readNameToSeqIDMap2;
     private boolean isFirstTrack;
-    private int batchPos; /** Stop position of the current batch in the ref. genome. */
+    private int batchPos;
+    /**
+     * Stop position of the current batch in the ref. genome.
+     */
     private StatsContainer statsContainer;
+
 
     /**
      * Contains all data (description, mappings and coverageContainer) belonging
      * to a track, which can be stored into a database now.
+     * <p>
      * @param trackJob the track job for which the track is created
      */
-    public ParsedTrack(TrackJob trackJob){
+    public ParsedTrack( TrackJob trackJob ) {
         this.trackJob = trackJob;
         this.readNameToSeqIDMap1 = new HashMap<>();
         this.readNameToSeqIDMap2 = new HashMap<>();
     }
 
+
     /**
      * @return the description of the track
      */
-    public String getDescription(){
+    public String getDescription() {
         return trackJob.getDescription();
     }
+
 
     /**
      * @return the timestamp of the creation time of this track
@@ -63,6 +72,7 @@ public class ParsedTrack {
         return trackJob.getTimestamp();
     }
 
+
     /**
      * @return the track id of this track
      */
@@ -70,13 +80,15 @@ public class ParsedTrack {
         return trackJob.getID();
     }
 
+
     /**
      * @return the id of the reference genome in the db
      */
     public int getRefId() {
         return trackJob.getRefGen().getID();
     }
-    
+
+
     /**
      * @return the track name
      */
@@ -84,45 +96,56 @@ public class ParsedTrack {
         return trackJob.getName();
     }
 
+
     /**
      * @return true, if this is the first track of a stepwise import (which
-     * then consists of many tracks. One for each chunk of data).
+     *         then consists of many tracks. One for each chunk of data).
      */
     public boolean isFirstTrack() {
         return this.isFirstTrack;
     }
 
+
     /**
-     * @param isFirstTrack true, if this is the first track of a stepwise import (which
-     * then consists of many tracks. One for each chunk of data).
+     * @param isFirstTrack true, if this is the first track of a stepwise import
+     *                     (which
+     *                     then consists of many tracks. One for each chunk of data).
      */
-    public void setIsFirstTrack(boolean isFirstTrack) {
+    public void setIsFirstTrack( boolean isFirstTrack ) {
         this.isFirstTrack = isFirstTrack;
     }
 
+
     /**
      * Needed additional information from sequence pair parsers.
-     * @param seqToIdMap mapping of readname to sequence id for read 1 of the pair
+     * <p>
+     * @param seqToIdMap mapping of readname to sequence id for read 1 of the
+     *                   pair
      */
-    public void setReadnameToSeqIdMap1(HashMap<String, Integer> seqToIdMap){
+    public void setReadnameToSeqIdMap1( HashMap<String, Integer> seqToIdMap ) {
         this.readNameToSeqIDMap1 = seqToIdMap;
     }
-    
+
+
     /**
      * Needed additional information from sequence pair parsers.
-     * @param seqToIdMap mapping of readname to sequence id for read 2 of the pair
+     * <p>
+     * @param seqToIdMap mapping of readname to sequence id for read 2 of the
+     *                   pair
      */
-    public void setReadnameToSeqIdMap2(HashMap<String, Integer> seqToIdMap) {
+    public void setReadnameToSeqIdMap2( HashMap<String, Integer> seqToIdMap ) {
         this.readNameToSeqIDMap2 = seqToIdMap;
     }
-    
+
+
     /**
      * Clears the coverage container and ReadnameToseqIDMap.
      * All other information persists!
      */
-    public void clear(){
+    public void clear() {
         this.readNameToSeqIDMap1.clear();
     }
+
 
     /**
      * @return the file from which this track was created.
@@ -131,6 +154,7 @@ public class ParsedTrack {
         return this.trackJob.getFile();
     }
 
+
     /**
      * @return Stop position of the current batch in the ref. genome.
      */
@@ -138,31 +162,36 @@ public class ParsedTrack {
         return batchPos;
     }
 
+
     /**
      * @param batchPos Stop position of the current batch in the ref. genome.
      */
-    public void setBatchPos(int batchPos) {
+    public void setBatchPos( int batchPos ) {
         this.batchPos = batchPos;
     }
 
+
     /**
      * Sets the statistics container for this track.
+     * <p>
      * @param statsContainer The statistics container to set
      */
-    public void setStatsContainer(StatsContainer statsContainer) {
+    public void setStatsContainer( StatsContainer statsContainer ) {
         this.statsContainer = statsContainer;
     }
 
+
     /**
      * @return The statistics container for this track. If it it currently null
-     * a brand new StatsContainer is created and prepared for a standard track.
+     *         a brand new StatsContainer is created and prepared for a standard track.
      */
     public StatsContainer getStatsContainer() {
-        if (statsContainer == null) {
+        if( statsContainer == null ) {
             this.statsContainer = new StatsContainer();
             this.statsContainer.prepareForTrack();
         }
         return statsContainer;
     }
-    
+
+
 }

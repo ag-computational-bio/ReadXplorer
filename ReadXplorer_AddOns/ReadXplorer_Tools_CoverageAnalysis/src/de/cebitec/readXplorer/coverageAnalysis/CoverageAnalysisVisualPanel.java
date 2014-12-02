@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,20 +16,25 @@
  */
 package de.cebitec.readXplorer.coverageAnalysis;
 
+
 import de.cebitec.readXplorer.api.objects.JobPanel;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
 import java.util.prefs.Preferences;
 import org.openide.util.NbPreferences;
 
+
 /**
  * Visual panel of the coverage analysis wizard.
  *
- * @author Tobias Zimmermann, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ * @author Tobias Zimmermann, Rolf Hilker
+ * <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public final class CoverageAnalysisVisualPanel extends JobPanel {
+
     private static final long serialVersionUID = 1L;
     private int minCoverageCount;
+
 
     /**
      * Visual panel of the coverage analysis wizard.
@@ -39,10 +44,12 @@ public final class CoverageAnalysisVisualPanel extends JobPanel {
         initAdditionalComponents();
     }
 
+
     @Override
     public String getName() {
         return "Coverage Analysis Parameters";
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -135,66 +142,73 @@ public final class CoverageAnalysisVisualPanel extends JobPanel {
     private javax.swing.JCheckBox uncoveredCheckBox;
     // End of variables declaration//GEN-END:variables
 
+
     /**
      * Initializes all additional stuff and components of this panel needed at
      * startup.
      */
     private void initAdditionalComponents() {
         this.loadLastParameterSelection();
-        this.minCoverageCount = Integer.parseInt(this.minCoverageCountField.getText());
-        this.minCoverageCountField.getDocument().addDocumentListener(this.createDocumentListener());
+        this.minCoverageCount = Integer.parseInt( this.minCoverageCountField.getText() );
+        this.minCoverageCountField.getDocument().addDocumentListener( this.createDocumentListener() );
     }
-    
+
+
     @Override
     public boolean isRequiredInfoSet() {
         boolean isValidated = true;
-        if (GeneralUtils.isValidPositiveNumberInput(minCoverageCountField.getText())) {
-            this.minCoverageCount = Integer.parseInt(minCoverageCountField.getText());
-        } else {
+        if( GeneralUtils.isValidPositiveNumberInput( minCoverageCountField.getText() ) ) {
+            this.minCoverageCount = Integer.parseInt( minCoverageCountField.getText() );
+        }
+        else {
             isValidated = false;
         }
-        firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated);
+        firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated );
         return isValidated;
     }
-    
-    
+
+
     /**
      * @return The minimum coverage count at a certain genome position to count
-     *      for the coverage of a genome feature.
+     *         for the coverage of a genome feature.
      */
     public int getMinCoverageCount() {
         return minCoverageCount;
     }
-    
+
+
     /**
-     * @return <code>true</code> if the coverage of both strands shall be 
-     * combined, <code>false</code> if the coverage of each strand shall be 
-     * treated separately.
+     * @return <code>true</code> if the coverage of both strands shall be
+     *         combined, <code>false</code> if the coverage of each strand shall be
+     *         treated separately.
      */
     public boolean isSumCoverageOfBothStrands() {
         return this.sumCoverageButton.isSelected();
     }
-    
+
+
     /**
      * @return <code>true</code> if covered intervals shall be detected,
-     * <code>false</code> if uncovered intervals shall be detected
+     *         <code>false</code> if uncovered intervals shall be detected
      */
     public boolean isDetectCoveredIntervals() {
         return !this.uncoveredCheckBox.isSelected();
     }
-    
+
+
     /**
      * Updates the parameters for this panel with the globally stored settings
      * for this wizard panel. If no settings were stored, the default
      * configuration is chosen.
      */
     private void loadLastParameterSelection() {
-        Preferences pref = NbPreferences.forModule(Object.class);
-        minCoverageCountField.setText(pref.get(CoverageAnalysisWizardPanel.MIN_COVERAGE_COUNT, "5"));
-        String sumCov = pref.get(CoverageAnalysisWizardPanel.SUM_COVERAGE, "0");
-        countStrandsSeparatelyButton.setSelected(sumCov.equals("0"));
-        sumCoverageButton.setSelected(sumCov.equals("1"));
-        uncoveredCheckBox.setSelected(pref.get(CoverageAnalysisWizardPanel.COVERED_INTERVALS, "0").equals("0"));
+        Preferences pref = NbPreferences.forModule( Object.class );
+        minCoverageCountField.setText( pref.get( CoverageAnalysisWizardPanel.MIN_COVERAGE_COUNT, "5" ) );
+        String sumCov = pref.get( CoverageAnalysisWizardPanel.SUM_COVERAGE, "0" );
+        countStrandsSeparatelyButton.setSelected( sumCov.equals( "0" ) );
+        sumCoverageButton.setSelected( sumCov.equals( "1" ) );
+        uncoveredCheckBox.setSelected( pref.get( CoverageAnalysisWizardPanel.COVERED_INTERVALS, "0" ).equals( "0" ) );
     }
-}
 
+
+}

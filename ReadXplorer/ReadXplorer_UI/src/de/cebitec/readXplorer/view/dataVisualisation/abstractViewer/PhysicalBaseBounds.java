@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
 
+
 /**
  * Storage for the physical bounds of the base window.
  * Contains the left and right bounds, width and middle position.
@@ -29,18 +30,21 @@ public class PhysicalBaseBounds {
     private double physWidth;
     private double phyMiddle;
 
+
     /**
-     * Storage for the physical bounds of the base window. Contains the left 
+     * Storage for the physical bounds of the base window. Contains the left
      * and right bounds, width and middle position.
-     * @param leftPhysBound the left physical boundary (pixel)
+     * <p>
+     * @param leftPhysBound  the left physical boundary (pixel)
      * @param rightPhysBound the right physical boundary (pixel) (pixel)
      */
-    public PhysicalBaseBounds(double leftPhysBound, double rightPhysBound){
+    public PhysicalBaseBounds( double leftPhysBound, double rightPhysBound ) {
         this.leftPhysBound = leftPhysBound;
         this.rightPhysBound = rightPhysBound;
         this.physWidth = rightPhysBound - leftPhysBound + 1;
         phyMiddle = (leftPhysBound + rightPhysBound) / 2;
     }
+
 
     /**
      * @return the left physical boundary (pixel)
@@ -49,12 +53,14 @@ public class PhysicalBaseBounds {
         return leftPhysBound;
     }
 
+
     /**
      * @return the right physical boundary (pixel)
      */
     public double getRightPhysBound() {
         return rightPhysBound;
     }
+
 
     /**
      * @return the physical width.
@@ -63,12 +69,13 @@ public class PhysicalBaseBounds {
         return physWidth;
     }
 
+
     /**
      * @return the physical center value.
      */
     public double getPhyMiddle() {
         return phyMiddle;
     }
-    
+
 
 }

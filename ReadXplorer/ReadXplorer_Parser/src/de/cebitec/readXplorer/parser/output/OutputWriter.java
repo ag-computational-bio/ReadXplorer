@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.parser.output;
 
+
 /**
  * Contains different output parsers.
  *
@@ -26,17 +27,21 @@ public class OutputWriter {
     private OutputWriter() {
     }
 
+
     /**
      * Generates a string formatted in fasta format.
-     * @param sequence the sequence to be stored
-     * @param headerParameters the strings to be contained in the header line of the fasta
+     * <p>
+     * @param sequence         the sequence to be stored
+     * @param headerParameters the strings to be contained in the header line of
+     *                         the fasta
+     * <p>
      * @return the sequence string formatted in fasta format
      */
-    public static String generateFasta(String sequence, String... headerParameters) {
+    public static String generateFasta( String sequence, String... headerParameters ) {
 
         String header = ">";
-        for (int i=0; i<headerParameters.length; ++i){
-            header = header.concat(headerParameters[i]).concat(" ");
+        for( int i = 0; i < headerParameters.length; ++i ) {
+            header = header.concat( headerParameters[i] ).concat( " " );
         }
 
         final int lineLength = 80;
@@ -44,16 +49,17 @@ public class OutputWriter {
         String formattedSeq = "";
         int i = 0;
         int end = 0;
-        while (i < seqLength) {
+        while( i < seqLength ) {
             end = i + lineLength;
 
-            if (end > seqLength) {
+            if( end > seqLength ) {
                 end = i + (seqLength - i);
             }
-            formattedSeq = formattedSeq.concat(sequence.substring(i, end).concat("\r\n"));
+            formattedSeq = formattedSeq.concat( sequence.substring( i, end ).concat( "\r\n" ) );
             i += lineLength;
         }
-        return header.concat("\r\n").concat(formattedSeq);
+        return header.concat( "\r\n" ).concat( formattedSeq );
     }
+
 
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cebitec.readXplorer.differentialExpression;
+
 
 import de.cebitec.readXplorer.databackend.AnalysesHandler;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
@@ -48,6 +49,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
+
 /**
  * Abstract analysis handler for the differential gene expression. Takes care of
  * collecting all count data from each single AnalysisHandler of each track,
@@ -56,7 +58,8 @@ import javax.swing.JOptionPane;
  *
  * @author kstaderm
  */
-public abstract class DeAnalysisHandler extends Thread implements Observable, DataVisualisationI {
+public abstract class DeAnalysisHandler extends Thread implements Observable,
+                                                                  DataVisualisationI {
 
     private ReferenceConnector referenceConnector;
     private List<PersistentFeature> genomeAnnos;
@@ -73,37 +76,49 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
     private final int stopOffset;
     private final ParametersReadClasses readClassParams;
 
+
     public static enum Tool {
 
-        ExpressTest("Express Test"), DeSeq("DESeq"), DeSeq2("DESeq2"), BaySeq("baySeq"), ExportCountTable("Export only count table");
+        ExpressTest( "Express Test" ), DeSeq( "DESeq" ), DeSeq2( "DESeq2" ), BaySeq( "baySeq" ), ExportCountTable( "Export only count table" );
 
-        private Tool(String stringRep) {
+
+        private Tool( String stringRep ) {
             this.stringRep = stringRep;
         }
+
+
         private final String stringRep;
+
 
         @Override
         public String toString() {
             return stringRep;
         }
 
+
         public static Tool[] usableTools() {
-            if (GnuR.SecureGnuRInitiliser.isGnuRSetUpCorrect() && GnuR.SecureGnuRInitiliser.isGnuRInstanceFree()) {
+            if( GnuR.SecureGnuRInitiliser.isGnuRSetUpCorrect() && GnuR.SecureGnuRInitiliser.isGnuRInstanceFree() ) {
                 return Tool.values();
                 //If one Tool should not be available to the user return something like :
-                //new Tool[]{ ExpressTest, DeSeq, BaySeq, ExportCountTable }; 
-                        
-            } else {
+                //new Tool[]{ ExpressTest, DeSeq, BaySeq, ExportCountTable };
+
+            }
+            else {
                 Tool[] ret = new Tool[]{ ExpressTest, ExportCountTable };
                 return ret;
             }
         }
+
+
     }
+
 
     public static enum AnalysisStatus {
 
         RUNNING, FINISHED, ERROR;
+
     }
+
 
     /**
      * Abstract analysis handler for the differential gene expression. Takes
@@ -111,19 +126,21 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
      * each track, starting the processing by the chosen tool and displaying the
      * results after the calculations.
      *
-     * @param selectedTracks list of selected tracks for the analysis
-     * @param refGenomeID id of the selected reference genome
-     * @param saveFile file, in which some data for this analysis can be stored
+     * @param selectedTracks       list of selected tracks for the analysis
+     * @param refGenomeID          id of the selected reference genome
+     * @param saveFile             file, in which some data for this analysis
+     *                             can be stored
      * @param selectedFeatureTypes list of selected feature types to keep in the
-     * list of analyzed genomic features
-     * @param startOffset offset in bases left of each feature start
-     * @param stopOffset offset in bases right of each feature stop
-     * @param readClassParams Parameter set of the selected read classes for
-     * this analysis
+     *                             list of analyzed genomic features
+     * @param startOffset          offset in bases left of each feature start
+     * @param stopOffset           offset in bases right of each feature stop
+     * @param readClassParams      Parameter set of the selected read classes
+     *                             for
+     *                             this analysis
      */
-    public DeAnalysisHandler(List<PersistentTrack> selectedTracks, int refGenomeID,
-            File saveFile, Set<FeatureType> selectedFeatureTypes, int startOffset, int stopOffset,
-            ParametersReadClasses readClassParams) {
+    public DeAnalysisHandler( List<PersistentTrack> selectedTracks, int refGenomeID,
+                              File saveFile, Set<FeatureType> selectedFeatureTypes, int startOffset, int stopOffset,
+                              ParametersReadClasses readClassParams ) {
         ProcessingLog.getInstance().resetLog();
         this.selectedTracks = selectedTracks;
         this.refGenomeID = refGenomeID;
@@ -134,72 +151,77 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         this.readClassParams = readClassParams;
     }
 
+
     /**
      * Acutally starts the differential gene expression analysis.
      */
     private void startAnalysis() {
         collectCoverageDataInstances = new HashMap<>();
-        Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Starting to collect the necessary data for the differential gene expression analysis.", currentTimestamp);
-        referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector(refGenomeID);
+        Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: Starting to collect the necessary data for the differential gene expression analysis.", currentTimestamp );
+        referenceConnector = ProjectConnector.getInstance().getRefGenomeConnector( refGenomeID );
         List<AnalysesHandler> allHandler = new ArrayList<>();
         genomeAnnos = new ArrayList<>();
 
-        for (PersistentChromosome chrom : referenceConnector.getRefGenome().getChromosomes().values()) {
-            genomeAnnos.addAll(referenceConnector.getFeaturesForRegionInclParents(1, chrom.getLength(), selectedFeatureTypes, chrom.getId()));
+        for( PersistentChromosome chrom : referenceConnector.getRefGenome().getChromosomes().values() ) {
+            genomeAnnos.addAll( referenceConnector.getFeaturesForRegionInclParents( 1, chrom.getLength(), selectedFeatureTypes, chrom.getId() ) );
         }
 
-        for (Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext();) {
+        for( Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext(); ) {
 
             PersistentTrack currentTrack = it.next();
             try {
-                TrackConnector tc = (new SaveFileFetcherForGUI()).getTrackConnector(currentTrack);
+                TrackConnector tc = (new SaveFileFetcherForGUI()).getTrackConnector( currentTrack );
 
-                CollectCoverageData collCovData = new CollectCoverageData(genomeAnnos, startOffset, stopOffset, readClassParams);
-                collectCoverageDataInstances.put(currentTrack.getId(), collCovData);
-                AnalysesHandler handler = new AnalysesHandler(tc, this, "Collecting coverage data for track "
-                        + currentTrack.getDescription() + ".", readClassParams);
-                handler.setMappingsNeeded(true);
-                handler.setDesiredData(Properties.REDUCED_MAPPINGS);
-                handler.registerObserver(collCovData);
-                allHandler.add(handler);
-            } catch (SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex) {
+                CollectCoverageData collCovData = new CollectCoverageData( genomeAnnos, startOffset, stopOffset, readClassParams );
+                collectCoverageDataInstances.put( currentTrack.getId(), collCovData );
+                AnalysesHandler handler = new AnalysesHandler( tc, this, "Collecting coverage data for track "
+                                                                         + currentTrack.getDescription() + ".", readClassParams );
+                handler.setMappingsNeeded( true );
+                handler.setDesiredData( Properties.REDUCED_MAPPINGS );
+                handler.registerObserver( collCovData );
+                allHandler.add( handler );
+            }
+            catch( SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException ex ) {
                 SaveFileFetcherForGUI.showPathSelectionErrorMsg();
-                ProcessingLog.getInstance().addProperty("Unresolved track", currentTrack);
-                notifyObservers(AnalysisStatus.ERROR);
+                ProcessingLog.getInstance().addProperty( "Unresolved track", currentTrack );
+                notifyObservers( AnalysisStatus.ERROR );
                 this.interrupt();
                 return;
             }
         }
 
-        for (Iterator<AnalysesHandler> it = allHandler.iterator(); it.hasNext();) {
+        for( Iterator<AnalysesHandler> it = allHandler.iterator(); it.hasNext(); ) {
             AnalysesHandler handler = it.next();
             handler.startAnalysis();
         }
     }
 
-    protected void prepareFeatures(DeAnalysisData analysisData) {
-        analysisData.setFeatures(genomeAnnos);
-        analysisData.setSelectedTracks(selectedTracks);
+
+    protected void prepareFeatures( DeAnalysisData analysisData ) {
+        analysisData.setFeatures( genomeAnnos );
+        analysisData.setSelectedTracks( selectedTracks );
     }
 
-    protected void prepareCountData(DeAnalysisData analysisData, Map<Integer, Map<PersistentFeature, Integer>> allCountData) {
-        for (Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext();) {
+
+    protected void prepareCountData( DeAnalysisData analysisData, Map<Integer, Map<PersistentFeature, Integer>> allCountData ) {
+        for( Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext(); ) {
             Integer key = it.next().getId();
             Integer[] data = new Integer[getPersAnno().size()];
-            Map<PersistentFeature, Integer> currentTrack = allCountData.get(key);
+            Map<PersistentFeature, Integer> currentTrack = allCountData.get( key );
             int j = 0;
-            for (Iterator<PersistentFeature> it1 = getPersAnno().iterator(); it1.hasNext(); j++) {
+            for( Iterator<PersistentFeature> it1 = getPersAnno().iterator(); it1.hasNext(); j++ ) {
                 PersistentFeature persistentFeature = it1.next();
-                data[j] = currentTrack.get(persistentFeature);
+                data[j] = currentTrack.get( persistentFeature );
             }
-            analysisData.addCountDataForTrack(data);
+            analysisData.addCountDataForTrack( data );
         }
         //Kill all the references to allCountData...
         allCountData = null;
         //...so the GC will clean them up and free lots of memory.
         System.gc();
     }
+
 
     /**
      * When all countData is collected this method is called and the processing
@@ -208,7 +230,8 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
      * @return
      */
     protected abstract List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException,
-            JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException;
+                                                                       JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException;
+
 
     /**
      * This is the final Method which is called when all windows associated with
@@ -217,29 +240,36 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
      */
     public abstract void endAnalysis();
 
-    public void setResults(List<ResultDeAnalysis> results) {
+
+    public void setResults( List<ResultDeAnalysis> results ) {
         this.results = results;
     }
+
 
     public Map<Integer, Map<PersistentFeature, Integer>> getAllCountData() {
         return allCountData;
     }
 
+
     public File getSaveFile() {
         return saveFile;
     }
+
 
     public List<PersistentFeature> getPersAnno() {
         return genomeAnnos;
     }
 
+
     public List<PersistentTrack> getSelectedTracks() {
         return selectedTracks;
     }
 
+
     public List<ResultDeAnalysis> getResults() {
         return results;
     }
+
 
     /**
      * @return Id of the reference, for which the analysis is carried out.
@@ -248,64 +278,75 @@ public abstract class DeAnalysisHandler extends Thread implements Observable, Da
         return refGenomeID;
     }
 
+
     public Map<Integer, CollectCoverageData> getCollectCoverageDataInstances() {
         return collectCoverageDataInstances;
     }
 
+
     @Override
     public void run() {
-        notifyObservers(AnalysisStatus.RUNNING);
+        notifyObservers( AnalysisStatus.RUNNING );
         startAnalysis();
     }
 
-    @Override
-    public void registerObserver(Observer observer) {
-        this.observerList.add(observer);
-    }
 
     @Override
-    public void removeObserver(Observer observer) {
-        this.observerList.remove(observer);
-        if (this.observerList.isEmpty()) {
+    public void registerObserver( Observer observer ) {
+        this.observerList.add( observer );
+    }
+
+
+    @Override
+    public void removeObserver( Observer observer ) {
+        this.observerList.remove( observer );
+        if( this.observerList.isEmpty() ) {
             endAnalysis();
             this.interrupt();
         }
     }
 
+
     @Override
-    public void notifyObservers(Object data) {
+    public void notifyObservers( Object data ) {
         //Copy the observer list to avoid concurrent modification exception
-        List<Observer> tmpObserver = new ArrayList<>(observerList);
-        for (Iterator<Observer> it = tmpObserver.iterator(); it.hasNext();) {
+        List<Observer> tmpObserver = new ArrayList<>( observerList );
+        for( Iterator<Observer> it = tmpObserver.iterator(); it.hasNext(); ) {
             Observer currentObserver = it.next();
-            currentObserver.update(data);
+            currentObserver.update( data );
         }
     }
 
-    @Override
-    public synchronized void showData(Object data) {
-        Pair<Integer, String> res = (Pair<Integer, String>) data;
-        allCountData.put(res.getFirst(), getCollectCoverageDataInstances().get(res.getFirst()).getCountData());
 
-        if (++resultsReceivedBack == getCollectCoverageDataInstances().size()) {
+    @Override
+    public synchronized void showData( Object data ) {
+        Pair<Integer, String> res = (Pair<Integer, String>) data;
+        allCountData.put( res.getFirst(), getCollectCoverageDataInstances().get( res.getFirst() ).getCountData() );
+
+        if( ++resultsReceivedBack == getCollectCoverageDataInstances().size() ) {
             try {
                 results = processWithTool();
-            } catch (PackageNotLoadableException | UnknownGnuRException ex) {
-                Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
-                notifyObservers(AnalysisStatus.ERROR);
-                JOptionPane.showMessageDialog(null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE);
-                this.interrupt();
-            } catch (IllegalStateException ex) {
-                Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "{0}: " + ex.getMessage(), currentTimestamp);
-                JOptionPane.showMessageDialog(null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE);
-            } catch (JRILibraryNotInPathException ex) {
-                Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
-                JOptionPane.showMessageDialog(null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE);
             }
-            notifyObservers(AnalysisStatus.FINISHED);
+            catch( PackageNotLoadableException | UnknownGnuRException ex ) {
+                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                notifyObservers( AnalysisStatus.ERROR );
+                JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
+                this.interrupt();
+            }
+            catch( IllegalStateException ex ) {
+                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                Logger.getLogger( this.getClass().getName() ).log( Level.WARNING, "{0}: " + ex.getMessage(), currentTimestamp );
+                JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
+            }
+            catch( JRILibraryNotInPathException ex ) {
+                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
+            }
+            notifyObservers( AnalysisStatus.FINISHED );
         }
     }
+
+
 }

@@ -5,97 +5,120 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.filterWizard;
 
+
 import de.cebitec.readXplorer.transcriptomeAnalyses.verifier.IntegerVerifier;
 import java.util.prefs.Preferences;
 import javax.swing.JPanel;
 import org.openide.util.NbPreferences;
 
+
 public final class FilterVisualPanel extends JPanel {
 
     private final String wizardName;
 
+
     /**
      * Creates new form FilterVisualPanel1
      */
-    public FilterVisualPanel(String wizardName) {
+    public FilterVisualPanel( String wizardName ) {
         initComponents();
         this.wizardName = wizardName;
         updateFields();
-        this.atLeastReadStartsTF.setInputVerifier(new IntegerVerifier(this.atLeastReadStartsTF));
+        this.atLeastReadStartsTF.setInputVerifier( new IntegerVerifier( this.atLeastReadStartsTF ) );
     }
+
 
     @Override
     public String getName() {
         return "Choose Filter Options For Sub Tables";
     }
 
+
     public boolean isSingleSelected() {
         return this.singleCB.isSelected();
     }
+
 
     public boolean isMultipleSelected() {
         return this.multipleCB.isSelected();
     }
 
+
     public boolean isExtractionOfTSSWithAtLeastRSSelected() {
         return this.atLeastReadStartsCB.isSelected();
     }
+
 
     public boolean isOnlyIntergenic() {
         return this.intergenicCB.isSelected();
     }
 
+
     public boolean isOnlyIntragenic() {
         return this.intragenicCB.isSelected();
     }
+
 
     public boolean isOnlyLeaderless() {
         return this.leaderlessCB.isSelected();
     }
 
+
     public boolean isOnlyPutativeAntisense() {
         return this.putativeAntisenseCB.isSelected();
     }
+
 
     public boolean isOnlyFinished() {
         return this.onlyFinishedCB.isSelected();
     }
 
+
     public boolean isOnlyUpstreamRegions() {
         return this.onlyTagedUpstreamAnalysisCB.isSelected();
     }
+
 
     public boolean isFalsePositive() {
         return this.falsePositiveCB.isSelected();
     }
 
+
     public Integer getAtLeastReadStarts() {
-        return Integer.valueOf(this.atLeastReadStartsTF.getText());
+        return Integer.valueOf( this.atLeastReadStartsTF.getText() );
     }
+
 
     public boolean isStableRnaSelected() {
         return this.stableRnaCB.isSelected();
     }
+
+
     public boolean isOnlyNonStableRnaSelected() {
         return this.onlyNonStableRNACB.isSelected();
     }
+
 
     public boolean isIntragenicAntisenseSelected() {
         return this.intragenicAntisenseCB.isSelected();
     }
 
+
     public boolean isFivePrimeUtrAntisenseSelected() {
         return this.fivePrimeUtrAntisenseCB.isSelected();
     }
+
 
     public boolean isThreePrimeAntisenseSelected() {
         return this.threePrimeUtrAntisense.isSelected();
     }
 
+
     private void updateFields() {
-        Preferences pref = NbPreferences.forModule(Object.class);
-        this.atLeastReadStartsTF.setText(pref.get(wizardName + FilterWizardPanel.PROP_FILTER_READSTARTS, "10"));
+        Preferences pref = NbPreferences.forModule( Object.class );
+        this.atLeastReadStartsTF.setText( pref.get( wizardName + FilterWizardPanel.PROP_FILTER_READSTARTS, "10" ) );
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -258,10 +281,11 @@ public final class FilterVisualPanel extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void atLeastReadStartsCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_atLeastReadStartsCBActionPerformed
-        if (atLeastReadStartsCB.isSelected()) {
-            this.atLeastReadStartsTF.setEditable(true);
-        } else {
-            this.atLeastReadStartsTF.setEnabled(false);
+        if( atLeastReadStartsCB.isSelected() ) {
+            this.atLeastReadStartsTF.setEditable( true );
+        }
+        else {
+            this.atLeastReadStartsTF.setEnabled( false );
         }
     }//GEN-LAST:event_atLeastReadStartsCBActionPerformed
 

@@ -4,8 +4,10 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration;
 
+
 import de.cebitec.readXplorer.transcriptomeAnalyses.verifier.IntegerVerifier;
 import javax.swing.JPanel;
+
 
 public final class ChartsGenerationSelectChatTypeVisualPanel extends JPanel {
 
@@ -14,20 +16,22 @@ public final class ChartsGenerationSelectChatTypeVisualPanel extends JPanel {
      */
     public ChartsGenerationSelectChatTypeVisualPanel() {
         initComponents();
-        lengthOfAnalyzedRegionLabel.setEnabled(false);
-        rangeOfUpstreamSeqTF.setEditable(false);
-        rangeOfUpstreamSeqTF.setInputVerifier(new IntegerVerifier(rangeOfUpstreamSeqTF));
-        gaToCtCB.setEnabled(false);
-        gcToAtCB.setEnabled(false);
-        biningCB.setEnabled(false);
-        biningSizeTF.setEnabled(false);
-        biningSizeTF.setInputVerifier(new IntegerVerifier(biningSizeTF));
+        lengthOfAnalyzedRegionLabel.setEnabled( false );
+        rangeOfUpstreamSeqTF.setEditable( false );
+        rangeOfUpstreamSeqTF.setInputVerifier( new IntegerVerifier( rangeOfUpstreamSeqTF ) );
+        gaToCtCB.setEnabled( false );
+        gcToAtCB.setEnabled( false );
+        biningCB.setEnabled( false );
+        biningSizeTF.setEnabled( false );
+        biningSizeTF.setInputVerifier( new IntegerVerifier( biningSizeTF ) );
     }
+
 
     @Override
     public String getName() {
         return "Chart-type selection";
     }
+
 
     /**
      * Returns the length of upstream sequence for the base distribution plot.
@@ -35,8 +39,9 @@ public final class ChartsGenerationSelectChatTypeVisualPanel extends JPanel {
      * @return upstream sequence length
      */
     public Integer getRangeOfUpstrSeq() {
-        return Integer.valueOf(this.rangeOfUpstreamSeqTF.getText());
+        return Integer.valueOf( this.rangeOfUpstreamSeqTF.getText() );
     }
+
 
     /**
      *
@@ -46,6 +51,7 @@ public final class ChartsGenerationSelectChatTypeVisualPanel extends JPanel {
         return gaToCtCB.isSelected();
     }
 
+
     /**
      *
      * @return <true> if GC content analysis is selected else <false>
@@ -53,6 +59,7 @@ public final class ChartsGenerationSelectChatTypeVisualPanel extends JPanel {
     public boolean isDistOfGcATSelected() {
         return gcToAtCB.isSelected();
     }
+
 
     /**
      *
@@ -62,13 +69,15 @@ public final class ChartsGenerationSelectChatTypeVisualPanel extends JPanel {
         return biningCB.isSelected();
     }
 
+
     /**
-     * 
+     *
      * @return the binning size
      */
     public Integer getBiningSize() {
-        return Integer.parseInt(biningSizeTF.getText());
+        return Integer.parseInt( biningSizeTF.getText() );
     }
+
 
     /**
      *
@@ -78,10 +87,11 @@ public final class ChartsGenerationSelectChatTypeVisualPanel extends JPanel {
         return this.baseDistrPlotCB.isSelected();
     }
 
+
     /**
      *
      * @return <true> if absolute frequency of 5'-UTR length distribution was
-     * choosen, else <false>
+     *         choosen, else <false>
      */
     public boolean isAbsoluteFrequency() {
         return this.absoluteFrequencyOfupstreamLengthCB.isSelected();
@@ -202,31 +212,33 @@ public final class ChartsGenerationSelectChatTypeVisualPanel extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void baseDistrPlotCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_baseDistrPlotCBActionPerformed
-        if (this.baseDistrPlotCB.isSelected()) {
-            lengthOfAnalyzedRegionLabel.setEnabled(true);
-            rangeOfUpstreamSeqTF.setEditable(true);
-            gaToCtCB.setEnabled(true);
-            gcToAtCB.setEnabled(true);
+        if( this.baseDistrPlotCB.isSelected() ) {
+            lengthOfAnalyzedRegionLabel.setEnabled( true );
+            rangeOfUpstreamSeqTF.setEditable( true );
+            gaToCtCB.setEnabled( true );
+            gcToAtCB.setEnabled( true );
 
             // deselect all other
-            absoluteFrequencyOfupstreamLengthCB.setSelected(false);
-            biningCB.setSelected(false);
-            biningSizeTF.setEnabled(false);
-        } else {
-            lengthOfAnalyzedRegionLabel.setEnabled(false);
-            rangeOfUpstreamSeqTF.setEditable(false);
-            gaToCtCB.setEnabled(false);
-            gcToAtCB.setEnabled(false);
+            absoluteFrequencyOfupstreamLengthCB.setSelected( false );
+            biningCB.setSelected( false );
+            biningSizeTF.setEnabled( false );
+        }
+        else {
+            lengthOfAnalyzedRegionLabel.setEnabled( false );
+            rangeOfUpstreamSeqTF.setEditable( false );
+            gaToCtCB.setEnabled( false );
+            gcToAtCB.setEnabled( false );
         }
     }//GEN-LAST:event_baseDistrPlotCBActionPerformed
 
     private void absoluteFrequencyOfupstreamLengthCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_absoluteFrequencyOfupstreamLengthCBActionPerformed
-        if (absoluteFrequencyOfupstreamLengthCB.isSelected()) {
-            biningCB.setEnabled(true);
+        if( absoluteFrequencyOfupstreamLengthCB.isSelected() ) {
+            biningCB.setEnabled( true );
             // deselect all other
-            baseDistrPlotCB.setSelected(false);
-        } else {
-            biningCB.setEnabled(false);
+            baseDistrPlotCB.setSelected( false );
+        }
+        else {
+            biningCB.setEnabled( false );
 //            biningSizeTF.setEnabled(false);
 //            biningLeaderlessIntoZeroBinCB.setEnabled(false);
         }
@@ -237,10 +249,11 @@ public final class ChartsGenerationSelectChatTypeVisualPanel extends JPanel {
     }//GEN-LAST:event_biningSizeTFActionPerformed
 
     private void biningCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_biningCBActionPerformed
-        if (biningCB.isSelected()) {
-            biningSizeTF.setEnabled(true);
-        } else {
-            biningSizeTF.setEnabled(false);
+        if( biningCB.isSelected() ) {
+            biningSizeTF.setEnabled( true );
+        }
+        else {
+            biningSizeTF.setEnabled( false );
         }
     }//GEN-LAST:event_biningCBActionPerformed
 

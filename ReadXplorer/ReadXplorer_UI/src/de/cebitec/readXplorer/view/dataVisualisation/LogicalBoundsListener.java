@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,31 +16,38 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation;
 
+
 import java.awt.Dimension;
+
 
 /**
  * This interface defines listeners for changes in the size of the interval of
  * the reference sequence, that should be displayed.
- * 
+ * <p>
  * @author ddoppmeier
  */
 public interface LogicalBoundsListener {
 
     /**
      * Notify the listeners of new bounds.
+     * <p>
      * @param bounds the new boudns to set
      */
-    public void updateLogicalBounds(BoundsInfo bounds);
+    public void updateLogicalBounds( BoundsInfo bounds );
+
 
     /**
-     * @return The size of the area, that is used for drawing. Logical bounds 
-     * depend on the available size of each listener.
+     * @return The size of the area, that is used for drawing. Logical bounds
+     *         depend on the available size of each listener.
      */
     public Dimension getPaintingAreaDimension();
 
+
     /**
      * @return true, if the PaintingArea has coordinates to calculate bounds,
-     * false otherwise.
+     *         false otherwise.
      */
     public boolean isPaintingAreaAvailable();
+
+
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,12 +16,14 @@
  */
 package de.cebitec.readXplorer.databackend;
 
+
 /**
  * Use for all kinds of parameter sets.
+ * <p>
  * @param <T> class type of the implementing parameter set class
- * 
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public interface ParameterSetI<T> {
-    
+
 }

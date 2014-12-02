@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,22 +16,26 @@
  */
 package de.cebitec.readXplorer.databackend;
 
+
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.util.Set;
+
 
 /**
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class ParametersFeatureTypesAndReadClasses extends ParametersFeatureTypes {
-    
+
     private ParametersReadClasses parametersReadClasses;
 
-    public ParametersFeatureTypesAndReadClasses(Set<FeatureType> selFeatureTypes, 
-            ParametersReadClasses parametersReadClasses) {
-        super(selFeatureTypes);
+
+    public ParametersFeatureTypesAndReadClasses( Set<FeatureType> selFeatureTypes,
+                                                 ParametersReadClasses parametersReadClasses ) {
+        super( selFeatureTypes );
         this.parametersReadClasses = parametersReadClasses;
     }
+
 
     /**
      * @return The read class parameters associated to this parameter set.
@@ -43,7 +47,5 @@ public class ParametersFeatureTypesAndReadClasses extends ParametersFeatureTypes
 //    public void setParametersReadClasses(ParametersReadClasses parametersReadClasses) {
 //        this.parametersReadClasses = parametersReadClasses;
 //    }
-    
-    
-    
+
 }

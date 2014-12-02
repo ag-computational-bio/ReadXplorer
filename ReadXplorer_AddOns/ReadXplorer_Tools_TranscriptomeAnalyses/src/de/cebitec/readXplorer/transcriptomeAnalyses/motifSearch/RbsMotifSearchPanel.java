@@ -4,6 +4,7 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch;
 
+
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Observer;
@@ -21,11 +22,13 @@ import javax.swing.text.StyledDocument;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 
+
 /**
  *
  * @author jritter
  */
-public class RbsMotifSearchPanel extends javax.swing.JPanel implements Observable {
+public class RbsMotifSearchPanel extends javax.swing.JPanel implements
+        Observable {
 
     private ProgressHandle progressHandle;
     private File bioProspInput, bioProspOut, sequenceLogo, info;
@@ -36,6 +39,7 @@ public class RbsMotifSearchPanel extends javax.swing.JPanel implements Observabl
     List<Operon> operons;
     List<String> upstreamRegions;
 
+
     /**
      * Creates new form RbsMotifSearchPanel
      */
@@ -44,86 +48,102 @@ public class RbsMotifSearchPanel extends javax.swing.JPanel implements Observabl
         additionalInits();
     }
 
+
     /**
      * Some additional settings on components like setting borders.
      */
     private void additionalInits() {
-        this.logoPanel.setLayout(new BorderLayout());
-        this.logoPanel.setBorder(BorderFactory.createTitledBorder("Identified motif"));
-        this.jPanel2.setBorder(BorderFactory.createTitledBorder("Selected length of sequence for analysis"));
-        this.regionsToAnalyseTP.setEditable(true);
-        this.regionsToAnalyseTP.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        this.jPanel3.setBorder(BorderFactory.createTitledBorder("Regions of interest"));
-        this.regionOfIntrestTP.setEditable(true);
-        this.regionOfIntrestTP.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-        this.infoPanel.setBorder(BorderFactory.createTitledBorder("Info panel"));
+        this.logoPanel.setLayout( new BorderLayout() );
+        this.logoPanel.setBorder( BorderFactory.createTitledBorder( "Identified motif" ) );
+        this.jPanel2.setBorder( BorderFactory.createTitledBorder( "Selected length of sequence for analysis" ) );
+        this.regionsToAnalyseTP.setEditable( true );
+        this.regionsToAnalyseTP.setFont( new Font( Font.MONOSPACED, Font.PLAIN, 12 ) );
+        this.jPanel3.setBorder( BorderFactory.createTitledBorder( "Regions of interest" ) );
+        this.regionOfIntrestTP.setEditable( true );
+        this.regionOfIntrestTP.setFont( new Font( Font.MONOSPACED, Font.PLAIN, 12 ) );
+        this.infoPanel.setBorder( BorderFactory.createTitledBorder( "Info panel" ) );
         this.observerList = new ArrayList<>();
     }
 
-    public void setLogo(JLabel logo) {
-        this.logoPanel.add(logo, BorderLayout.CENTER);
+
+    public void setLogo( JLabel logo ) {
+        this.logoPanel.add( logo, BorderLayout.CENTER );
     }
 
-    public void setRegionsToAnalyzeToPane(StyledDocument doc) {
-        this.regionsToAnalyseTP.setStyledDocument(doc);
+
+    public void setRegionsToAnalyzeToPane( StyledDocument doc ) {
+        this.regionsToAnalyseTP.setStyledDocument( doc );
     }
 
-    public void setContributedSequencesToMotif(String text) {
-        this.contributedSequencesToMotifLabel.setText(text);
+
+    public void setContributedSequencesToMotif( String text ) {
+        this.contributedSequencesToMotifLabel.setText( text );
     }
 
-    public void setRegionOfIntrestToPane(StyledDocument doc) {
-        this.regionOfIntrestTP.setStyledDocument(doc);
+
+    public void setRegionOfIntrestToPane( StyledDocument doc ) {
+        this.regionOfIntrestTP.setStyledDocument( doc );
     }
+
 
     public File getBioProspOut() {
         return bioProspOut;
     }
 
-    public void setBioProspOut(File bioProspOut) {
+
+    public void setBioProspOut( File bioProspOut ) {
         this.bioProspOut = bioProspOut;
     }
 
+
     public void disableRegionOfIntrestPanel() {
-        this.regionOfIntrestTP.setEnabled(false);
-        this.jPanel3.setEnabled(false);
-        this.jScrollPane3.setEnabled(false);
+        this.regionOfIntrestTP.setEnabled( false );
+        this.jPanel3.setEnabled( false );
+        this.jScrollPane3.setEnabled( false );
     }
 
-    public void setMotifWidth(Integer width) {
-        this.motifWidthLabel.setText(width.toString());
+
+    public void setMotifWidth( Integer width ) {
+        this.motifWidthLabel.setText( width.toString() );
     }
 
-    public void setRegionLengthForBioProspector(Integer length) {
-        this.lengthOfSequenceForBioProspectorLabel.setText(length.toString());
+
+    public void setRegionLengthForBioProspector( Integer length ) {
+        this.lengthOfSequenceForBioProspectorLabel.setText( length.toString() );
     }
 
-    public void setMeanSpacerLength(String length) {
-        this.meanSpacerLabel.setText(length);
+
+    public void setMeanSpacerLength( String length ) {
+        this.meanSpacerLabel.setText( length );
     }
+
 
     public File getBioProspInput() {
         return bioProspInput;
     }
 
-    public void setBioProspInput(File bioProspInput) {
+
+    public void setBioProspInput( File bioProspInput ) {
         this.bioProspInput = bioProspInput;
     }
+
 
     public File getSequenceLogo() {
         return sequenceLogo;
     }
 
-    public void setSequenceLogo(File sequenceLogo) {
+
+    public void setSequenceLogo( File sequenceLogo ) {
         this.sequenceLogo = sequenceLogo;
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
      * regenerated by the Form Editor.
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings( "unchecked" )
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -307,30 +327,30 @@ public class RbsMotifSearchPanel extends javax.swing.JPanel implements Observabl
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        progressHandle = ProgressHandleFactory.createHandle("Saving Files ...");
+        progressHandle = ProgressHandleFactory.createHandle( "Saving Files ..." );
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setFileSelectionMode( JFileChooser.DIRECTORIES_ONLY );
 
-        int returnVal = fileChooser.showSaveDialog(this);
-        if (returnVal == JFileChooser.APPROVE_OPTION) {
-            progressHandle.start(4);
-            this.notifyObservers(this);
-            progressHandle.progress(1);
+        int returnVal = fileChooser.showSaveDialog( this );
+        if( returnVal == JFileChooser.APPROVE_OPTION ) {
+            progressHandle.start( 4 );
+            this.notifyObservers( this );
+            progressHandle.progress( 1 );
             File input = getBioProspInput();
-            input.renameTo(new File(fileChooser.getSelectedFile().getAbsolutePath() + "\\intputSequencesForBioProspector.fna"));
+            input.renameTo( new File( fileChooser.getSelectedFile().getAbsolutePath() + "\\intputSequencesForBioProspector.fna" ) );
             File output = getBioProspOut();
-            output.renameTo(new File(fileChooser.getSelectedFile().getAbsolutePath() + "\\bestOutputFromBioProspector.fna"));
+            output.renameTo( new File( fileChooser.getSelectedFile().getAbsolutePath() + "\\bestOutputFromBioProspector.fna" ) );
             File logo = getSequenceLogo();
-            logo.renameTo(new File(fileChooser.getSelectedFile().getAbsolutePath() + "\\rbsLogo.eps"));
+            logo.renameTo( new File( fileChooser.getSelectedFile().getAbsolutePath() + "\\rbsLogo.eps" ) );
             File info = getInfo();
-            info.renameTo(new File(fileChooser.getSelectedFile().getAbsoluteFile()+ "\\info.txt"));
-            progressHandle.progress(2);
+            info.renameTo( new File( fileChooser.getSelectedFile().getAbsoluteFile() + "\\info.txt" ) );
+            progressHandle.progress( 2 );
         }
-        progressHandle.progress(3);
-        progressHandle.progress(4);
+        progressHandle.progress( 3 );
+        progressHandle.progress( 4 );
 
-        JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), "Export was successful!",
-                "Export was successful!", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), "Export was successful!",
+                                       "Export was successful!", JOptionPane.INFORMATION_MESSAGE );
         progressHandle.finish();
     }//GEN-LAST:event_jButton1ActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -356,69 +376,85 @@ public class RbsMotifSearchPanel extends javax.swing.JPanel implements Observabl
     private javax.swing.JTextPane regionsToAnalyseTP;
     // End of variables declaration//GEN-END:variables
 
-    @Override
-    public void registerObserver(Observer observer) {
-        this.observerList.add(observer);
-    }
 
     @Override
-    public void removeObserver(Observer observer) {
-        this.observerList.remove(observer);
+    public void registerObserver( Observer observer ) {
+        this.observerList.add( observer );
     }
 
+
     @Override
-    public void notifyObservers(Object data) {
-        for (Observer observer : observerList) {
-            observer.update(data);
+    public void removeObserver( Observer observer ) {
+        this.observerList.remove( observer );
+    }
+
+
+    @Override
+    public void notifyObservers( Object data ) {
+        for( Observer observer : observerList ) {
+            observer.update( data );
         }
     }
+
 
     public TreeMap<String, Integer> getRbsStarts() {
         return rbsStarts;
     }
 
-    public void setRbsStarts(TreeMap<String, Integer> rbsStarts) {
+
+    public void setRbsStarts( TreeMap<String, Integer> rbsStarts ) {
         this.rbsStarts = rbsStarts;
     }
+
 
     public TreeMap<String, Integer> getRbsShifts() {
         return rbsShifts;
     }
 
-    public void setRbsShifts(TreeMap<String, Integer> rbsShifts) {
+
+    public void setRbsShifts( TreeMap<String, Integer> rbsShifts ) {
         this.rbsShifts = rbsShifts;
     }
+
 
     public RbsAnalysisParameters getParams() {
         return params;
     }
 
-    public void setParams(RbsAnalysisParameters params) {
+
+    public void setParams( RbsAnalysisParameters params ) {
         this.params = params;
     }
+
 
     public List<Operon> getOperons() {
         return operons;
     }
 
-    public void setOperons(List<Operon> operons) {
+
+    public void setOperons( List<Operon> operons ) {
         this.operons = operons;
     }
+
 
     public List<String> getUpstreamRegions() {
         return upstreamRegions;
     }
 
-    public void setUpstreamRegions(List<String> upstreamRegions) {
+
+    public void setUpstreamRegions( List<String> upstreamRegions ) {
         this.upstreamRegions = upstreamRegions;
     }
+
 
     public File getInfo() {
         return info;
     }
 
-    public void setInfo(File info) {
+
+    public void setInfo( File info ) {
         this.info = info;
     }
+
 
 }

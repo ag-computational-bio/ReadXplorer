@@ -4,6 +4,7 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport;
 
+
 /**
  * This Enum class represents a list of available qualifiers for feature keys
  * and their usage.
@@ -11,15 +12,14 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport;
  * @author jritter
  */
 public enum Qualifier {
-    
-    NONE,
 
-//Qualifier       name of qualifier; qualifier requires a value if followed by an equal 
-//                sign
-//Definition      definition of the qualifier
-//Value format    format of value, if required
-//Example         example of qualifier with value
-//Comment         comments, questions and clarifications
+    NONE,
+    //Qualifier       name of qualifier; qualifier requires a value if followed by an equal
+    //                sign
+    //Definition      definition of the qualifier
+    //Value format    format of value, if required
+    //Example         example of qualifier with value
+    //Comment         comments, questions and clarifications
     /**
      * Qualifier /allele= Definition name of the allele for the given gene Value
      * format "text" Example /allele="adh1-1" Comment all gene-related features
@@ -35,7 +35,7 @@ public enum Qualifier {
     //Value format    "text"
     //Example         /altitude="-256 m."
     //                /altitude="330.12 m."
-    //Comment         Values indicate altitudes above or below nominal sea level 
+    //Comment         Values indicate altitudes above or below nominal sea level
     //                provided in metres
 
     ALTITUDE,
@@ -74,16 +74,16 @@ public enum Qualifier {
     //                material_id is mandatory, institution_code and collection_code
     //                are optional; institution code is mandatory where collection
     //                code is present; institution code and collection code are taken
-    //                from a controlled vocabulary maintained by the INSDC. 
+    //                from a controlled vocabulary maintained by the INSDC.
 
     BIO_MATERIAL,
     //Qualifier       /bound_moiety=
-    //Definition      name of the molecule/complex that may bind to the 
-    //                given feature 
+    //Definition      name of the molecule/complex that may bind to the
+    //                given feature
     //Value format    "text"
-    //Example         /bound_moiety="GAL4" 
-    //Comment         Multiple /bound_moiety qualifiers are legal on "promoter" 
-    //                and "enhancer" features. A single /bound_moiety qualifier 
+    //Example         /bound_moiety="GAL4"
+    //Comment         Multiple /bound_moiety qualifiers are legal on "promoter"
+    //                and "enhancer" features. A single /bound_moiety qualifier
     //                is legal on the "misc_binding", "oriT" and "protein_bind"
     //                features.
 
@@ -120,7 +120,7 @@ public enum Qualifier {
     //Definition      clone from which the sequence was obtained
     //Value format    "text"
     //Example         /clone="lambda-hIL7.3"
-    //Comment         not more than one clone should be specified for a given source 
+    //Comment         not more than one clone should be specified for a given source
     //                feature;  to indicate that the sequence was obtained from
     //                multiple clones, multiple source features should be given.
 
@@ -139,13 +139,13 @@ public enum Qualifier {
     //Example         /codon_start=2
 
     CODON_START,
-    //Qualifier       /collected_by= 
-    //Definition      name of persons or institute who collected the specimen 
-    //Value format    "text" 
-    //Example         /collected_by="Dan Janzen" 
+    //Qualifier       /collected_by=
+    //Definition      name of persons or institute who collected the specimen
+    //Value format    "text"
+    //Example         /collected_by="Dan Janzen"
 
     COLLECTED_BY,
-    //Qualifier       /collection_date= 
+    //Qualifier       /collection_date=
     //
     //Definition      The date on which the specimen was collected.
     //                Date/time ranges are supported by providing two collection dates from among the supported value
@@ -156,9 +156,9 @@ public enum Qualifier {
     //Value format    "DD-Mmm-YYYY", "Mmm-YYYY", "YYYY"
     //                "YYYY-MM-DDThh:mmZ", "YYYY-MM-DDThhZ", "YYYY-MM-DD", or "YYYY-MM" will be supported from 15 December 2013.
     //
-    //Example         /collection_date="21-Oct-1952" 
-    //                /collection_date="Oct-1952" 
-    //                /collection_date="1952" 
+    //Example         /collection_date="21-Oct-1952"
+    //                /collection_date="Oct-1952"
+    //                /collection_date="1952"
     //                /collection_date="1952-10-21T11:43Z"
     //                /collection_date="1952-10-21T11Z"
     //                /collection_date="1952-10-21"
@@ -183,7 +183,7 @@ public enum Qualifier {
     //                combined with value formats that make use of 'MM' (two-digit month number)
     //
     //                Collection dates that are specified to at least the month, day, and year (DD-Mmm-YYYY or YYYY-MM-DD)
-    //                are strongly encouraged. If the day and/or month of the collection date are not known, 
+    //                are strongly encouraged. If the day and/or month of the collection date are not known,
     //                Mmm-YYYY or YYYY-MM or YYYY may be used.
     //
     //                Within a collection date range, the first date (possibly including time) must be
@@ -196,7 +196,7 @@ public enum Qualifier {
 
     COLLECTION_DATE,
     //Qualifier       /compare=
-    //Definition      Reference details of an existing public INSD entry 
+    //Definition      Reference details of an existing public INSD entry
     //                to which a comparison is made
     //Value format    [accession-number.sequence-version]
     //Example         /compare=AJ634337.1
@@ -204,9 +204,9 @@ public enum Qualifier {
     //                misc_difference, unsure, old_sequence and variation.
     //                The feature "old_sequence" must have either a
     //                /citation or a /compare qualifier. Multiple /compare
-    //                qualifiers with different contents are allowed within a 
-    //                single feature. 
-    //                This qualifier is not intended for large-scale annotation 
+    //                qualifiers with different contents are allowed within a
+    //                single feature.
+    //                This qualifier is not intended for large-scale annotation
     //                of variations, such as SNPs.
 
     COMPARE,
@@ -214,8 +214,8 @@ public enum Qualifier {
     //Definition      locality of isolation of the sequenced organism indicated in
     //                terms of political names for nations, oceans or seas, followed
     //                by regions and localities
-    //Value format    "<country_value>[:<region>][, <locality>]" where 
-    //                country_value is any value from the controlled vocabulary at 
+    //Value format    "<country_value>[:<region>][, <locality>]" where
+    //                country_value is any value from the controlled vocabulary at
     //                http://www.insdc.org/documents/country-qualifier-vocabulary
     //Example         /country="Canada:Vancouver"
     //                /country="France:Cote d'Azur, Antibes"
@@ -228,16 +228,16 @@ public enum Qualifier {
 
     COUNTRY,
     //Qualifier       /cultivar=
-    //Definition      cultivar (cultivated variety) of plant from which sequence was 
-    //                obtained. 
+    //Definition      cultivar (cultivated variety) of plant from which sequence was
+    //                obtained.
     //Value format    "text"
     //Example         /cultivar="Nipponbare"
     //                /cultivar="Tenuifolius"
     //                /cultivar="Candy Cane"
     //                /cultivar="IR36"
-    //Comment         'cultivar' is applied solely to products of artificial 
-    //                selection;  use the variety qualifier for natural, named 
-    //                plant and fungal varieties;  
+    //Comment         'cultivar' is applied solely to products of artificial
+    //                selection;  use the variety qualifier for natural, named
+    //                plant and fungal varieties;
 
     CULTIVAR,
     //Qualifier       /culture_collection=
@@ -267,20 +267,20 @@ public enum Qualifier {
 
     CULTURE_COLLECTION,
     //Qualifier       /db_xref=
-    //Definition      database cross-reference: pointer to related information in 
+    //Definition      database cross-reference: pointer to related information in
     //                another database.
     //Value format    "<database:identifier>" where database is
-    //                the name of the database containing related information, and 
+    //                the name of the database containing related information, and
     //                identifier is the internal identifier of the related information
-    //                according to the naming conventions of the cross-referenced 
+    //                according to the naming conventions of the cross-referenced
     //                database.
     //Example         /db_xref="UniProtKB/Swiss-Prot:P28763"
-    //Comment         the complete list of allowed database types is kept at 
+    //Comment         the complete list of allowed database types is kept at
     //                http://www.insdc.org/db_xref.html
 
     DB_XREF,
     //Qualifier       /dev_stage=
-    //Definition      if the sequence was obtained from an organism in a specific 
+    //Definition      if the sequence was obtained from an organism in a specific
     //                developmental stage, it is specified with this qualifier
     //Value format    "text"
     //Example         /dev_stage="fourth instar larva"
@@ -300,27 +300,27 @@ public enum Qualifier {
     //Example         /EC_number="1.1.2.4"
     //                /EC_number="1.1.2.-"
     //                /EC_number="1.1.2.n"
-    //Comment         valid values for EC numbers are defined in the list prepared by the 
+    //Comment         valid values for EC numbers are defined in the list prepared by the
     //                Nomenclature Committee of the International Union of Biochemistry and
     //                Molecular Biology (NC-IUBMB) (published in Enzyme Nomenclature 1992,
-    //                Academic Press, San Diego, or a more recent revision thereof). 
+    //                Academic Press, San Diego, or a more recent revision thereof).
     //                The format represents a string of four numbers separated by full
-    //                stops; up to three numbers starting from the end of the string can 
-    //                be replaced by dash "." to indicate uncertain assignment. 
-    //                Symbol "n" can be used in the last position instead of a number 
+    //                stops; up to three numbers starting from the end of the string can
+    //                be replaced by dash "." to indicate uncertain assignment.
+    //                Symbol "n" can be used in the last position instead of a number
     //                where the EC number is awaiting assignment. Please note that such
     //                incomplete EC numbers are not approved by NC-IUBMB.
 
     EC_NUMBER,
     //Qualifier       /ecotype=
-    //Definition      a population within a given species displaying genetically 
+    //Definition      a population within a given species displaying genetically
     //                based, phenotypic traits that reflect adaptation to a local habitat.
     //Value Format    "text"
     //Example         /ecotype="Columbia"
     //Comment         an example of such a population is one that has adapted hairier
     //                than normal leaves as a response to an especially sunny habitat.
     //                'Ecotype' is often applied to standard genetic stocks of
-    //                Arabidopsis thaliana, but it can be applied to any sessile 
+    //                Arabidopsis thaliana, but it can be applied to any sessile
     //                organism.
 
     ECOTYPE,
@@ -336,15 +336,15 @@ public enum Qualifier {
     //                host. They do not include endosymbionts that can be
     //                reliably recovered from a particular host, organisms
     //                from a readily identifiable but uncultured field sample
-    //                (e.g., many cyanobacteria), or phytoplasmas that can be 
-    //                reliably recovered from diseased plants (even though 
+    //                (e.g., many cyanobacteria), or phytoplasmas that can be
+    //                reliably recovered from diseased plants (even though
     //                these cannot be grown in axenic culture).
     //Value format    none
     //Example         /environmental_sample
-    //Comment         used only with the source feature key; source feature 
-    //                keys containing the /environmental_sample qualifier 
+    //Comment         used only with the source feature key; source feature
+    //                keys containing the /environmental_sample qualifier
     //                should also contain the /isolation_source qualifier.
-    //                entries including /environmental_sample must not include 
+    //                entries including /environmental_sample must not include
     //                the /strain qualifier
 
     ENVIRONMENTAL_SAMPLE,
@@ -365,26 +365,26 @@ public enum Qualifier {
     //                /exception="reasons given in citation"
     //                /exception="rearrangement required for product"
     //                /exception="annotated by transcript or proteomic data"
-    //Comment         only to be used to describe biological mechanisms such 
-    //                as RNA editing;  where the exception cannot easily be described 
+    //Comment         only to be used to describe biological mechanisms such
+    //                as RNA editing;  where the exception cannot easily be described
     //                a published citation must be referred to; protein translation of
-    //                /exception CDS will be different from the according conceptual 
-    //                translation; 
+    //                /exception CDS will be different from the according conceptual
+    //                translation;
     //                - An /inference qualifier should accompany any use of
     //                /exception="annotated by transcript or proteomic data", to
     //                provide support for the existence of the transcript/protein.
     //                - must not be used where transl_except would be adequate,
     //                  e.g. in case of stop codon completion use:
     //                /transl_except=(pos:6883,aa:TERM)
-    //                /note="TAA stop codon is completed by addition of 3' A residues to   
+    //                /note="TAA stop codon is completed by addition of 3' A residues to
     //                mRNA".
-    //                - must not be used for ribosomal slippage, instead use join operator, 
+    //                - must not be used for ribosomal slippage, instead use join operator,
     //                  e.g.: CDS   join(486..1784,1787..4810)
     //                              /note="ribosomal slip on tttt sequence at 1784..1787"
 
     EXCEPTION,
     //Qualifier       /experiment=
-    //Definition      a brief description of the nature of the experimental 
+    //Definition      a brief description of the nature of the experimental
     //                evidence that supports the feature identification or assignment.
     //Value format    "[CATEGORY:]text"
     //                where CATEGORY is one of the following:
@@ -400,7 +400,7 @@ public enum Qualifier {
     //                oocytes [PMID: 12345678, 10101010, 987654]"
     //                /experiment="COORDINATES: 5' and 3' RACE"
     //Comment         detailed experimental details should not be included, and would
-    //                normally be found in the cited publications; PMID, DOI and any 
+    //                normally be found in the cited publications; PMID, DOI and any
     //                experimental database ID is allowed to be used in /experiment
     //                qualifier; value "experimental evidence, no additional details
     //                recorded" was used to  replace instances of /evidence=EXPERIMENTAL in
@@ -438,18 +438,18 @@ public enum Qualifier {
     //Definition      function attributed to a sequence
     //Value format    "text"
     //Example         function="essential for recognition of cofactor"
-    //Comment         /function is used when the gene name and/or product name do not 
+    //Comment         /function is used when the gene name and/or product name do not
     //                convey the function attributable to a sequence.
 
     FUNCTION,
     //Qualifier       /gap_type=
-    //Definition      type of gap connecting components in records of a genome assembly, 
-    //                or the type of biological gap in a record that is part of a genome 
+    //Definition      type of gap connecting components in records of a genome assembly,
+    //                or the type of biological gap in a record that is part of a genome
     //                assembly;
     //Value format    "between scaffolds", "within scaffold", "telomere", "centromere",
-    //                "short arm", "heterochromatin", "repeat within scaffold", 
+    //                "short arm", "heterochromatin", "repeat within scaffold",
     //                "repeat between scaffolds", "unknown"
-    //Example         /gap_type="between scaffolds" 
+    //Example         /gap_type="between scaffolds"
     //                /gap_type="within scaffold"
     //Comment         This qualifier is used only for assembly_gap features and its values
     //                are controlled by the AGP Specification version 2.0:
@@ -460,7 +460,7 @@ public enum Qualifier {
     //Qualifier       /gene=
     //Definition      symbol of the gene corresponding to a sequence region
     //Value format    "text"
-    //Example         /gene="ilvE" 
+    //Example         /gene="ilvE"
 
     GENE,
     //Qualifier       /gene_synonym=
@@ -485,9 +485,9 @@ public enum Qualifier {
     //                /germline and /rearranged cannot be used in the same source
     //                feature;
     //                /germline and /rearranged should only be used for molecules that
-    //                can undergo somatic rearrangements as part of an adaptive immune 
+    //                can undergo somatic rearrangements as part of an adaptive immune
     //                response; these are the T-cell receptor (TCR) and immunoglobulin
-    //                loci in the jawed vertebrates, and the unrelated variable 
+    //                loci in the jawed vertebrates, and the unrelated variable
     //                lymphocyte receptor (VLR) locus in the jawless fish (lampreys
     //                and hagfish);
     //                /germline and /rearranged should not be used outside of the
@@ -520,10 +520,10 @@ public enum Qualifier {
     //                /host="Rhizobium NGR234"
 
     HOST,
-    //Qualifier       /identified_by= 
+    //Qualifier       /identified_by=
     //Definition      name of the expert who identified the specimen taxonomically
-    //Value format    "text" 
-    //Example         /identified_by="John Burns" 
+    //Value format    "text"
+    //Example         /identified_by="John Burns"
 
     IDENTIFIED_BY,
     //Qualifier       /inference=
@@ -531,14 +531,14 @@ public enum Qualifier {
     //                the feature identification or assignment.
     //
     //Value format    "[CATEGORY:]TYPE[ (same species)][:EVIDENCE_BASIS]"
-    //  
+    //
     //                where CATEGORY is one of the following:
     //                "COORDINATES" support for the annotated coordinates
     //                "DESCRIPTION" support for a broad concept of function such as that
     //                based on phenotype, genetic approach, biochemical function, pathway
     //                information, etc.
     //                "EXISTENCE" support for the known or inferred existence of the product
-    //  
+    //
     //                where TYPE is one of the following:
     //                "non-experimental evidence, no additional details recorded"
     //                   "similar to sequence"
@@ -553,14 +553,14 @@ public enum Qualifier {
     //                      "protein motif"
     //                      "ab initio prediction"
     //                   "alignment"
-    //  
+    //
     //                where the optional text "(same species)" is included when the
     //                inference comes from the same species as the entry.
-    //  
+    //
     //                where the optional "EVIDENCE_BASIS" is either a reference to a
     //                database entry (including accession and version) or an algorithm
     //                (including version) , eg 'INSD:AACN010222672.1', 'InterPro:IPR001900',
-    //                'ProDom:PD000600', 'Genscan:2.0', etc. and is structured 
+    //                'ProDom:PD000600', 'Genscan:2.0', etc. and is structured
     //                "[ALGORITHM][:EVIDENCE_DBREF[,EVIDENCE_DBREF]*[,...]]"
     //
     //Example         /inference="COORDINATES:profile:tRNAscan:2.1"
@@ -573,12 +573,12 @@ public enum Qualifier {
     //                /inference="alignment:Splign:1.0"
     //                /inference="alignment:Splign:1.26p:RefSeq:NM_000041.2,INSD:BC003557.1"
     //
-    //Comment         /inference="non-experimental evidence, no additional details 
-    //                recorded" was used to replace instances of 
+    //Comment         /inference="non-experimental evidence, no additional details
+    //                recorded" was used to replace instances of
     //                /evidence=NOT_EXPERIMENTAL in December 2005; any database ID can be
-    //                used in /inference= qualifier; recommentations for choice of resource 
+    //                used in /inference= qualifier; recommentations for choice of resource
     //                acronym for[EVIDENCE_BASIS] are provided in the /inference qualifier
-    //                vocabulary recommendation document (http://www.insdc.org/inference.html); 
+    //                vocabulary recommendation document (http://www.insdc.org/inference.html);
 
     INFERENCE,
     //Qualifier       /isolate=
@@ -593,15 +593,15 @@ public enum Qualifier {
     //                geographical source of the biological sample from which
     //                the sequence was derived
     //Value format    "text"
-    //Examples        /isolation_source="rumen isolates from standard 
+    //Examples        /isolation_source="rumen isolates from standard
     //                Pelleted ration-fed steer #67"
     //                /isolation_source="permanent Antarctic sea ice"
     //                /isolation_source="denitrifying activated sludge from
-    //                carbon_limited continuous reactor" 
+    //                carbon_limited continuous reactor"
     //Comment         used only with the source feature key;
     //                source feature keys containing an /environmental_sample
     //                qualifier should also contain an /isolation_source
-    //                qualifier; the /country qualifier should be used to 
+    //                qualifier; the /country qualifier should be used to
     //                describe the country and major geographical sub-region.
 
     ISOLATE_SOURCE,
@@ -618,21 +618,21 @@ public enum Qualifier {
     //                the host may also be included
 
     LAB_HOST,
-    //Qualifier       /lat_lon= 
+    //Qualifier       /lat_lon=
     //Definition      geographical coordinates of the location where the specimen was
-    //                collected 
-    //Value format    "text" 
-    //Example         /lat_lon="47.94 N 28.12 W" 
+    //                collected
+    //Value format    "text"
+    //Example         /lat_lon="47.94 N 28.12 W"
     //                /lat_lon="45.0123 S 4.1234 E"
     //Comment         degrees latitude and longitude in format "d[d.dddd] N|S d[dd.dddd] W|E"
     //                (see the examples)
 
     LAT_LON,
     //Qualifier       /linkage_evidence=
-    //Definition      type of evidence establishing linkage across an 
-    //		assembly_gap. Only allowed to be used with assembly_gap features that 
+    //Definition      type of evidence establishing linkage across an
+    //		assembly_gap. Only allowed to be used with assembly_gap features that
     //                have a /gap_type value of "within scaffold"or "repeat within scaffold";
-    //Value format    "pcr", "paired-ends", "align genus", "align xgenus", "align trnscpt", "within clone", 
+    //Value format    "pcr", "paired-ends", "align genus", "align xgenus", "align trnscpt", "within clone",
     //                "clone contig", "map", "strobe", "unspecified"
     //Example         /linkage_evidence="paired-ends"
     //		/linkage_evidence="within clone"
@@ -645,28 +645,28 @@ public enum Qualifier {
     //Qualifier       /locus_tag=
     //Definition      a submitter-supplied, systematic, stable identifier for a gene
     //                and its associated features, used for tracking purposes
-    //Value Format    "text"(single token) 
+    //Value Format    "text"(single token)
     //                but not "<1-5 letters><5-9 digit integer>[.<integer>]"
-    //Example         /locus_tag="ABC_0022" 
+    //Example         /locus_tag="ABC_0022"
     //                /locus_tag="A1C_00001"
-    //Comment         /locus_tag can be used with any feature that /gene can be used with;  
-    //                identical /locus_tag values may be used within an entry/record, 
-    //                but only if the identical /locus_tag values are associated 
-    //                with the same gene; in all other circumstances the /locus_tag 
-    //                value must be unique within that entry/record. Multiple /locus_tag 
-    //                values are not allowed within one feature for entries created 
-    //                after 15-OCT-2004. 
-    //                If a /locus_tag needs to be re-assigned the /old_locus_tag qualifier 
+    //Comment         /locus_tag can be used with any feature that /gene can be used with;
+    //                identical /locus_tag values may be used within an entry/record,
+    //                but only if the identical /locus_tag values are associated
+    //                with the same gene; in all other circumstances the /locus_tag
+    //                value must be unique within that entry/record. Multiple /locus_tag
+    //                values are not allowed within one feature for entries created
+    //                after 15-OCT-2004.
+    //                If a /locus_tag needs to be re-assigned the /old_locus_tag qualifier
     //                should be used to store the old value. The /locus_tag value should
-    //                not be in a format which resembles INSD accession numbers,                 
+    //                not be in a format which resembles INSD accession numbers,
     //                accession.version, or /protein_id identifiers.
 
     LOCUS_TAG,
     //Qualifier       /macronuclear
-    //Definition      if the sequence shown is DNA and from an organism which 
+    //Definition      if the sequence shown is DNA and from an organism which
     //                undergoes chromosomal differentiation between macronuclear and
-    //                micronuclear stages, this qualifier is used to denote that the 
-    //                sequence is from macronuclear DNA. 
+    //                micronuclear stages, this qualifier is used to denote that the
+    //                sequence is from macronuclear DNA.
     //Value format    none
     //Example         /macronuclear
 
@@ -698,14 +698,14 @@ public enum Qualifier {
     //                described by the parent feature
     //Value format    "<mobile_element_type>[:<mobile_element_name>]" where
     //                mobile_element_type is one of the following:
-    //                "transposon", "retrotransposon", "integron", 
-    //                "insertion sequence", "non-LTR retrotransposon", 
+    //                "transposon", "retrotransposon", "integron",
+    //                "insertion sequence", "non-LTR retrotransposon",
     //                "SINE", "MITE", "LINE", "other".
     //Example         /mobile_element_type="transposon:Tnp9"
-    //Comment         /mobile_element_type is legal on mobile_element feature key only.  
-    //                Mobile element should be used to represent both elements which 
-    //                are currently mobile, and those which were mobile in the past.  
-    //                Value "other" requires a mobile_element_name. 
+    //Comment         /mobile_element_type is legal on mobile_element feature key only.
+    //                Mobile element should be used to represent both elements which
+    //                are currently mobile, and those which were mobile in the past.
+    //                Value "other" requires a mobile_element_name.
 
     MOBILE_ELEMENT_TYPE,
     //Qualifier       /mod_base=
@@ -718,7 +718,7 @@ public enum Qualifier {
 
     MOD_BASE,
     //Qualifier       /mol_type=
-    //Definition      in vivo molecule type of sequence  
+    //Definition      in vivo molecule type of sequence
     //Value format    "genomic DNA", "genomic RNA", "mRNA", "tRNA", "rRNA", "other
     //                RNA", "other DNA", "transcribed RNA", "viral cRNA", "unassigned
     //                DNA", "unassigned RNA"
@@ -745,13 +745,13 @@ public enum Qualifier {
     //Value format   "TYPE"
     //Example         /ncRNA_class="miRNA"
     //                /ncRNA_class="siRNA"
-    //                /ncRNA_class="scRNA"       
+    //                /ncRNA_class="scRNA"
     //Comment         TYPE is a term taken from the INSDC controlled vocabulary for ncRNA
     //                classes (http://www.insdc.org/rna_vocab.html); on
     //                15-Oct-2013, the following terms were valid:
     //
     //                      "antisense_RNA"
-    //                      "autocatalytically_spliced_intron" 
+    //                      "autocatalytically_spliced_intron"
     //                      "ribozyme"
     //                      "hammerhead_ribozyme"
     //                      "lncRNA"
@@ -786,10 +786,10 @@ public enum Qualifier {
     //Qualifier       /number=
     //Definition      a number to indicate the order of genetic elements (e.g.,
     //                exons or introns) in the 5' to 3' direction
-    //Value format    unquoted text (single token) 
+    //Value format    unquoted text (single token)
     //Example         /number=4
     //                /number=6B
-    //Comment         text limited to integers, letters or combination of integers and/or 
+    //Comment         text limited to integers, letters or combination of integers and/or
     //                letters represented as an unquoted single token (e.g. 5a, XIIb);
     //                any additional terms should be included in /standard_name.
     //                Example:  /number=2A
@@ -797,30 +797,30 @@ public enum Qualifier {
 
     NUMBER,
     //Qualifier       /old_locus_tag=
-    //Definition      feature tag assigned for tracking purposes 
+    //Definition      feature tag assigned for tracking purposes
     //Value Format    "text" (single token)
     //Example         /old_locus_tag="RSc0382"
     //                /locus_tag="YPO0002"
-    //Comment         /old_locus_tag can be used with any feature where /gene is valid and 
-    //                where a /locus_tag qualifier is present.  
-    //                Identical /old_locus_tag values may be used within an entry/record, 
-    //                but only if the identical /old_locus_tag values are associated 
-    //                with the same gene; in all other circumstances the /old_locus_tag 
-    //                value must be unique within that entry/record. 
-    //                Multiple/old_locus_tag qualifiers with distinct values are 
-    //                allowed within a single feature; /old_locus_tag and /locus_tag 
+    //Comment         /old_locus_tag can be used with any feature where /gene is valid and
+    //                where a /locus_tag qualifier is present.
+    //                Identical /old_locus_tag values may be used within an entry/record,
+    //                but only if the identical /old_locus_tag values are associated
+    //                with the same gene; in all other circumstances the /old_locus_tag
+    //                value must be unique within that entry/record.
+    //                Multiple/old_locus_tag qualifiers with distinct values are
+    //                allowed within a single feature; /old_locus_tag and /locus_tag
     //                values must not be identical within a single feature.
     OLD_LOCUS_TAG,
     //Qualifier       /operon=
-    //Definition      name of the group of contiguous genes transcribed into a 
+    //Definition      name of the group of contiguous genes transcribed into a
     //                single transcript to which that feature belongs.
     //Value format    "text"
     //Example         /operon="lac"
     //Comment         currently valid only on Prokaryota-specific features
 
     OPERON,
-    //Qualifier       /organelle= 
-    //Definition      type of membrane-bound intracellular structure from which the 
+    //Qualifier       /organelle=
+    //Definition      type of membrane-bound intracellular structure from which the
     //                sequence was obtained
     //Value format    chromatophore, hydrogenosome, mitochondrion, nucleomorph, plastid,
     //                mitochondrion:kinetoplast, plastid:chloroplast, plastid:apicoplast,
@@ -842,13 +842,13 @@ public enum Qualifier {
 
     ORGANELLE,
     //Qualifier       /organism=
-    //Definition      scientific name of the organism that provided the 
-    //                sequenced genetic material.  
+    //Definition      scientific name of the organism that provided the
+    //                sequenced genetic material.
     //Value format    "text"
     //Example         /organism="Homo sapiens"
-    //Comment         the organism name which appears on the OS or ORGANISM line 
-    //                will match the value of the /organism qualifier of the 
-    //                source key in the simplest case of a one-source sequence.  
+    //Comment         the organism name which appears on the OS or ORGANISM line
+    //                will match the value of the /organism qualifier of the
+    //                source key in the simplest case of a one-source sequence.
 
     ORGANISM,
     //Qualifier       /partial
@@ -857,51 +857,51 @@ public enum Qualifier {
     //Example         /partial
     //Comment         not to be used for new entries from 15-DEC-2001;
     //                use '<' and '>' signs in the location descriptors to
-    //                indicate that the sequence is partial. 
+    //                indicate that the sequence is partial.
 
     PARTIAL,
     //Qualifier       /PCR_conditions=
-    //Definition      description of reaction conditions and components for PCR 
-    //Value format    "text" 
+    //Definition      description of reaction conditions and components for PCR
+    //Value format    "text"
     //Example         /PCR_conditions="Initial denaturation:94degC,1.5min"
     //Comment         used with primer_bind key
 
     PCR_CONDITIONS,
     //Qualifier       /PCR_primers=
     //Definition      PCR primers that were used to amplify the sequence.
-    //                A single /PCR_primers qualifier should contain all the primers used  
-    //                for a single PCR reaction. If multiple forward or reverse primers are                   
-    //                present in a  single PCR reaction, multiple sets of fwd_name/fwd_seq 
+    //                A single /PCR_primers qualifier should contain all the primers used
+    //                for a single PCR reaction. If multiple forward or reverse primers are
+    //                present in a  single PCR reaction, multiple sets of fwd_name/fwd_seq
     //                or rev_name/rev_seq values will be  present.
     //Value format    /PCR_primers="[fwd_name: XXX1, ]fwd_seq: xxxxx1,[fwd_name: XXX2,]
-    //                fwd_seq: xxxxx2, [rev_name: YYY1, ]rev_seq: yyyyy1, 
+    //                fwd_seq: xxxxx2, [rev_name: YYY1, ]rev_seq: yyyyy1,
     //                [rev_name: YYY2, ]rev_seq: yyyyy2"
     //
     //Example         /PCR_primers="fwd_name: CO1P1, fwd_seq: ttgattttttggtcayccwgaagt,
     //                rev_name: CO1R4, rev_seq: ccwvytardcctarraartgttg"
-    //                /PCR_primers=" fwd_name: hoge1, fwd_seq: cgkgtgtatcttact, 
-    //                rev_name: hoge2, rev_seq: cg<i>gtgtatcttact" 
+    //                /PCR_primers=" fwd_name: hoge1, fwd_seq: cgkgtgtatcttact,
+    //                rev_name: hoge2, rev_seq: cg<i>gtgtatcttact"
     //                /PCR_primers="fwd_name: CO1P1, fwd_seq: ttgattttttggtcayccwgaagt,
-    //                fwd_name: CO1P2, fwd_seq: gatacacaggtcayccwgaagt, rev_name: CO1R4,  
-    //                rev_seq: ccwvytardcctarraartgttg" 
+    //                fwd_name: CO1P2, fwd_seq: gatacacaggtcayccwgaagt, rev_name: CO1R4,
+    //                rev_seq: ccwvytardcctarraartgttg"
     //
     //Comment         fwd_seq and rev_seq are both mandatory; fwd_name and rev_name are
-    //                both optional. Both sequences should be presented in 5'>3' order. 
+    //                both optional. Both sequences should be presented in 5'>3' order.
     //                The sequences should be given in the IUPAC degenerate-base alphabet,
     //                except for the modified bases; those must be enclosed within angle
-    //                brackets <> 
+    //                brackets <>
 
     PCR_PRIMERS,
     //Qualifier       /phenotype=
-    //Definition      phenotype conferred by the feature, where phenotype is defined as a 
-    //                physical, biochemical or behavioural characteristic or set of 
+    //Definition      phenotype conferred by the feature, where phenotype is defined as a
+    //                physical, biochemical or behavioural characteristic or set of
     //                characteristics
     //Value format    "text"
     //Example         /phenotype="erythromycin resistance"
 
     PHENOTYPE,
     //Qualifier       /plasmid=
-    //Definition      name of naturally occurring plasmid from which the sequence was 
+    //Definition      name of naturally occurring plasmid from which the sequence was
     //                obtained, where plasmid is defined as an independently replicating
     //                genetic unit that cannot be described by /chromosome or /segment
     //Value format    "text"
@@ -910,20 +910,20 @@ public enum Qualifier {
     PLASMID,
     //Qualifier       /pop_variant=
     //Definition      name of subpopulation or phenotype of the sample from which the sequence
-    //                was derived 
+    //                was derived
     //Value format    "text"
-    //Example         /pop_variant="pop1" 
+    //Example         /pop_variant="pop1"
     //                /pop_variant="Bear Paw"
 
     POP_VARIANT,
     //Qualifier       /product=
-    //Definition      name of the product associated with the feature, e.g. the mRNA of an 
-    //                mRNA feature, the polypeptide of a CDS, the mature peptide of a 
+    //Definition      name of the product associated with the feature, e.g. the mRNA of an
+    //                mRNA feature, the polypeptide of a CDS, the mature peptide of a
     //                mat_peptide, etc.
     //Value format    "text"
     //Example         /product="trypsinogen" (when qualifier appears in CDS feature)
     //                /product="trypsin" (when qualifier appears in mat_peptide feature)
-    //                /product="XYZ neural-specific transcript" (when qualifier appears in 
+    //                /product="XYZ neural-specific transcript" (when qualifier appears in
     //                mRNA feature)
 
     PRODUCT,
@@ -934,12 +934,12 @@ public enum Qualifier {
     //                after the decimal point.
     //Value format    <identifier>
     //Example         /protein_id="AAA12345.1"
-    //Comment         when the protein sequence encoded by the CDS changes, only 
-    //                the version number of the /protein_id value is incremented; 
+    //Comment         when the protein sequence encoded by the CDS changes, only
+    //                the version number of the /protein_id value is incremented;
     //                the stable part of the /protein_id remains unchanged and as a
     //                result will permanently be associated with a given protein;
     //                this qualifier is valid only on CDS features which translate
-    //                into a valid protein. 
+    //                into a valid protein.
 
     PROTEIN_ID,
     //Qualifier       /proviral
@@ -954,12 +954,12 @@ public enum Qualifier {
     //                element named by the feature key
     //Value format    none
     //Example         /pseudo
-    //Comment         The qualifier /pseudo should be used to describe non-functional 
-    //                genes that are not formally described as pseudogenes, e.g. CDS 
+    //Comment         The qualifier /pseudo should be used to describe non-functional
+    //                genes that are not formally described as pseudogenes, e.g. CDS
     //                has no translation due to other reasons than pseudogenisation events.
     //                Other reasons may include sequencing or assembly errors.
     //                In order to annotate pseudogenes the qualifier /pseudogene= must be
-    //                used indicating the TYPE which can be taken from the INSDC controlled vocabulary 
+    //                used indicating the TYPE which can be taken from the INSDC controlled vocabulary
     //                for pseudogenes.
 
     PSEUDO,
@@ -979,7 +979,7 @@ public enum Qualifier {
     //Comment         TYPE is a term taken from the INSDC controlled vocabulary for pseudogenes
     //                (http://www.insdc.org/documents/pseudogene-qualifier-vocabulary):
     //
-    //                processed: the pseudogene has arisen by reverse transcription of a 
+    //                processed: the pseudogene has arisen by reverse transcription of a
     //                mRNA into cDNA, followed by reintegration into the genome. Therefore,
     //                it has lost any intron/exon structure, and it might have a pseudo-polyA-tail.
     //
@@ -989,7 +989,7 @@ public enum Qualifier {
     //                and a higher proportion of non-synonymous versus synonymous substitutions.
     //
     //                unitary: the pseudogene has no parent. It is the original gene, which is
-    //                functional is some species but disrupted in some way (indels, mutation, 
+    //                functional is some species but disrupted in some way (indels, mutation,
     //                recombination) in another species or strain.
     //
     //                allelic: a (unitary) pseudogene that is stable in the population but
@@ -1013,9 +1013,9 @@ public enum Qualifier {
     //                /germline and /rearranged cannot be used in the same source
     //                feature;
     //                /germline and /rearranged should only be used for molecules that
-    //                can undergo somatic rearrangements as part of an adaptive immune 
+    //                can undergo somatic rearrangements as part of an adaptive immune
     //                response; these are the T-cell receptor (TCR) and immunoglobulin
-    //                loci in the jawed vertebrates, and the unrelated variable 
+    //                loci in the jawed vertebrates, and the unrelated variable
     //                lymphocyte receptor (VLR) locus in the jawless fish (lampreys
     //                and hagfish);
     //                /germline and /rearranged should not be used outside of the
@@ -1023,8 +1023,8 @@ public enum Qualifier {
 
     REARRANGED,
     //Qualifier       /replace=
-    //Definition      indicates that the sequence identified a feature's intervals is  
-    //                replaced by the sequence shown in "text"; if no sequence is 
+    //Definition      indicates that the sequence identified a feature's intervals is
+    //                replaced by the sequence shown in "text"; if no sequence is
     //                contained within the qualifier, this indicates a deletion.
     //Value format    "text"
     //Example         /replace="a"
@@ -1033,12 +1033,12 @@ public enum Qualifier {
     REPLACE,
     //Qualifier       /ribosomal_slippage
     //Definition      during protein translation, certain sequences can program
-    //                ribosomes to change to an alternative reading frame by a 
-    //                mechanism known as ribosomal slippage 
-    //Value format    none 
-    //Example         /ribosomal_slippage 
-    //Comment         a join operator,e.g.: [join(486..1784,1787..4810)] should be used 
-    //                in the CDS spans to indicate the location of ribosomal_slippage 
+    //                ribosomes to change to an alternative reading frame by a
+    //                mechanism known as ribosomal slippage
+    //Value format    none
+    //Example         /ribosomal_slippage
+    //Comment         a join operator,e.g.: [join(486..1784,1787..4810)] should be used
+    //                in the CDS spans to indicate the location of ribosomal_slippage
 
     RIBOSOMAL_SLIPPAGE,
     //Qualifier       /rpt_family=
@@ -1051,7 +1051,7 @@ public enum Qualifier {
     //Definition      organization of repeated sequence
     //Value format    tandem, inverted, flanking, terminal, direct, dispersed, and other
     //Example         /rpt_type=INVERTED
-    //Comment         the values are case-insensitive, i.e. both "INVERTED" and "inverted" 
+    //Comment         the values are case-insensitive, i.e. both "INVERTED" and "inverted"
     //                are valid;
     //                Definitions of the values:
     //                tandem, a repeat that exists adjacent to another in the same
@@ -1074,7 +1074,7 @@ public enum Qualifier {
     //Definition      identity of a repeat range
     //Value format    <base_range>
     //Example         /rpt_unit_range=202..245
-    //Comment         used to indicate the base range of the sequence that constitutes 
+    //Comment         used to indicate the base range of the sequence that constitutes
     //                a repeated sequence specified by the feature keys oriT and
     //                repeat_region; qualifiers /rpt_unit_range and /rpt_unit_seq
     //                replaced qualifier /rpt_unit in December 2005
@@ -1095,7 +1095,7 @@ public enum Qualifier {
     //Definition      identifier for a satellite DNA marker, compose of many tandem
     //                repeats (identical or related) of a short basic repeated unit;
     //Value format    "<satellite_type>[:<class>][ <identifier>]"
-    //                where satellite_type is one of the following 
+    //                where satellite_type is one of the following
     //                    "satellite", "microsatellite", "minisatellite"
     //Example         /satellite="satellite: S1a"
     //                /satellite="satellite: alpha"
@@ -1120,7 +1120,7 @@ public enum Qualifier {
     //Example         /serotype="B1"
     //Comment         used only with the source feature key;
     //                the Bacteriological Code recommends the use of the
-    //                term 'serovar' instead of 'serotype' for the 
+    //                term 'serovar' instead of 'serotype' for the
     //                prokaryotes; see the International Code of Nomenclature
     //                of Bacteria (1990 Revision) Appendix 10.B "Infraspecific
     //                Terms".
@@ -1222,9 +1222,9 @@ public enum Qualifier {
 
     SUB_SPECIES,
     //Qualifier       /sub_strain=
-    //Definition      name or identifier of a genetically or otherwise modified 
-    //                strain from which sequence was obtained, derived from a 
-    //                parental strain (which should be annotated in the /strain 
+    //Definition      name or identifier of a genetically or otherwise modified
+    //                strain from which sequence was obtained, derived from a
+    //                parental strain (which should be annotated in the /strain
     //                qualifier).sub_strain from which sequence was obtained
     //Value format    "text"
     //Example         /sub_strain="abis"
@@ -1238,12 +1238,12 @@ public enum Qualifier {
 
     SUB_STREAIN,
     //Qualifier       /tag_peptide=
-    //Definition      base location encoding the polypeptide for proteolysis tag of 
+    //Definition      base location encoding the polypeptide for proteolysis tag of
     //                tmRNA and its termination codon;
     //Value format    <base_range>
     //Example         /tag_peptide=90..122
     //Comment         it is recommended that the amino acid sequence corresponding
-    //                to the /tag_peptide be annotated by describing a 5' partial 
+    //                to the /tag_peptide be annotated by describing a 5' partial
     //                CDS feature; e.g. CDS    <90..122;
 
     TAG_PEPTIDE,
@@ -1260,18 +1260,18 @@ public enum Qualifier {
 
     TISSUE_TYPE,
     //Qualifier       /transgenic
-    //Definition      identifies the source feature of the organism which was 
+    //Definition      identifies the source feature of the organism which was
     //                the recipient of transgenic DNA.
     //Value format    none
     //Example         /transgenic
-    //Comment         transgenic sequences must have at least two source feature keys; 
-    //                the source feature key having the /transgenic qualifier must 
-    //                span the whole sequence; the source feature carrying the 
-    //                /transgenic qualifier identifies the main organism of the entry, 
-    //                this determines: a) the name displayed in the organism lines, 
+    //Comment         transgenic sequences must have at least two source feature keys;
+    //                the source feature key having the /transgenic qualifier must
+    //                span the whole sequence; the source feature carrying the
+    //                /transgenic qualifier identifies the main organism of the entry,
+    //                this determines: a) the name displayed in the organism lines,
     //                b) if no translation table is specified, the translation table;
-    //                only one source feature with /transgenic is allowed in an entry; 
-    //                the /focus and /transgenic qualifiers are mutually exclusive in 
+    //                only one source feature with /transgenic is allowed in an entry;
+    //                the /focus and /transgenic qualifiers are mutually exclusive in
     //                an entry.
 
     TRANSGENIC,
@@ -1283,15 +1283,15 @@ public enum Qualifier {
     //Value format    IUPAC one-letter amino acid abbreviation, "X" is to be used
     //                for AA exceptions.
     //Example         /translation="MASTFPPWYRGCASTPSLKGLIMCTW"
-    //Comment         to be used with CDS feature only; this is a mandatory qualifier 
+    //Comment         to be used with CDS feature only; this is a mandatory qualifier
     //                in the CDS feature key except where /pseudogene="TYPE" or /pseudo
     //                is shown; see /transl_table for definition and location of genetic
-    //                code tables. 
+    //                code tables.
 
     TRANSLATION,
     //Qualifier       /transl_except=
     //Definition      translational exception: single codon the translation of which
-    //                does not conform to genetic code defined by /organism or 
+    //                does not conform to genetic code defined by /organism or
     //                /transl_table.
     //Value format    (pos:location,aa:<amino_acid>) where amino_acid is the
     //                amino acid coded by the codon at the base_range position
@@ -1312,7 +1312,7 @@ public enum Qualifier {
     //                /transl_except=(pos:1017,aa:TERM)
     //                if partial stop codon consists of two bases:
     //                /transl_except=(pos:2000..2001,aa:TERM) with
-    //                '/note='stop codon completed by the addition of 3' A residues 
+    //                '/note='stop codon completed by the addition of 3' A residues
     //                to the mRNA'.
 
     TRANSL_EXCEPT,
@@ -1325,11 +1325,11 @@ public enum Qualifier {
     //                reported in /transl_except qualifier.
 
     TRANSL_TABLE,
-    //Qualifier       /trans_splicing 
+    //Qualifier       /trans_splicing
     //Definition      indicates that exons from two RNA molecules are ligated in
-    //                intermolecular reaction to form mature RNA 
-    //Value format    none 
-    //Example         /trans_splicing 
+    //                intermolecular reaction to form mature RNA
+    //Value format    none
+    //Example         /trans_splicing
     //Comment         should be used on features such as CDS, mRNA and other features
     //                that are produced as a result of a trans-splicing event. This
     //                qualifier should be used only when the splice event is indicated in
@@ -1349,18 +1349,19 @@ public enum Qualifier {
     //                /type_material="holotype of Cercopitheus lomamiensis"
     //                /type_material="paratype of Cercopitheus lomamiensis"
     //Comment         <type-of-type> is taken from a controlled vocabularly, listed above.
-    //                <organism name> should be listed as the scientific name 
+    //                <organism name> should be listed as the scientific name
     //                (or as a synonym) at the species (or subsopecies) node in the taxonomy database.
     //                Usage of /type_material will start in the second half of 2014.
     TYPE_MATERIAL,
     //Qualifier       /variety=
-    //Definition      variety (= varietas, a formal Linnaean rank) of organism 
+    //Definition      variety (= varietas, a formal Linnaean rank) of organism
     //                from which sequence was derived.
     //Value format    "text"
     //Example         /variety="insularis"
-    //Comment         use the cultivar qualifier for cultivated plant 
+    //Comment         use the cultivar qualifier for cultivated plant
     //                varieties, i.e., products of artificial selection;
-    //                varieties other than plant and fungal variatas should be            
+    //                varieties other than plant and fungal variatas should be
     //                annotated via /note, e.g. /note="breed:Cukorova"
     VARIETY, PUBMED,
+
 }

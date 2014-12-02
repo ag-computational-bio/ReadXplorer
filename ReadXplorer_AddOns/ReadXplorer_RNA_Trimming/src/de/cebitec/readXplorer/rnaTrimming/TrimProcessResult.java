@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,29 +16,34 @@
  */
 package de.cebitec.readXplorer.rnaTrimming;
 
+
 import java.util.Map;
 import java.util.Observable;
+
 
 /**
  * TrimProcessResult contains important data of a trimming process.
  * The data of this object will be changed while processing the data.
- * Interested objects can subscribe to those changes by using addObserver()-Method.
- * 
+ * Interested objects can subscribe to those changes by using
+ * addObserver()-Method.
+ * <p>
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 class TrimProcessResult extends Observable {
+
     private Integer allReads = 0;
     private Integer mappedReads = 0;
     private Integer trimmedReads = 0;
     private Integer trimmedMappedReads = 0;
     private Map<String, Object> params;
     private Boolean ready = false;
-  
-    
+
+
     public TrimProcessResult() {
-        
+
     }
-    
+
+
     /**
      * @return the allReads
      */
@@ -46,12 +51,14 @@ class TrimProcessResult extends Observable {
         return allReads;
     }
 
+
     /**
      * @param allReads the allReads to set
      */
-    public void setAllReads(Integer allReads) {
+    public void setAllReads( Integer allReads ) {
         this.allReads = allReads;
     }
+
 
     /**
      * @return the mappedReads
@@ -60,12 +67,14 @@ class TrimProcessResult extends Observable {
         return mappedReads;
     }
 
+
     /**
      * @param mappedReads the mappedReads to set
      */
-    public void setMappedReads(Integer mappedReads) {
+    public void setMappedReads( Integer mappedReads ) {
         this.mappedReads = mappedReads;
     }
+
 
     /**
      * @return the trimmedReads
@@ -74,12 +83,14 @@ class TrimProcessResult extends Observable {
         return trimmedReads;
     }
 
+
     /**
      * @param trimmedReads the trimmedReads to set
      */
-    public void setTrimmedReads(Integer trimmedReads) {
+    public void setTrimmedReads( Integer trimmedReads ) {
         this.trimmedReads = trimmedReads;
     }
+
 
     /**
      * @return the trimmedMappedReads
@@ -88,30 +99,35 @@ class TrimProcessResult extends Observable {
         return trimmedMappedReads;
     }
 
+
     /**
      * @param trimmedMappedReads the trimmedMappedReads to set
      */
-    public void setTrimmedMappedReads(Integer trimmedMappedReads) {
+    public void setTrimmedMappedReads( Integer trimmedMappedReads ) {
         this.trimmedMappedReads = trimmedMappedReads;
     }
-    
+
+
     /**
      * Sets used analysis parameters to have them connected with the search
      * results.
-     * @param params 
+     * <p>
+     * @param params
      */
-    public void setAnalysisParameters(Map<String, Object> params) {
+    public void setAnalysisParameters( Map<String, Object> params ) {
         this.params = params;
     }
-    
+
+
     /**
      * returns the used analysis parameters
-     * @return 
+     * <p>
+     * @return
      */
     public Map<String, Object> getAnalysisParameters() {
         return this.params;
     }
-    
+
 
     public void ready() {
         this.ready = true;
@@ -119,22 +135,26 @@ class TrimProcessResult extends Observable {
         this.notifyObservers();
     }
 
+
     public void incrementTrimmedReads() {
         this.trimmedReads++;
     }
+
 
     public void incrementMappedReads() {
         this.mappedReads++;
     }
 
+
     public void incrementTrimmedMappedReads() {
         this.trimmedMappedReads++;
     }
+
 
     public void notifyChanged() {
         this.setChanged();
         this.notifyObservers();
     }
 
-    
+
 }

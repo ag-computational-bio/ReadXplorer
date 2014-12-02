@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.databackend.connector;
 
+
 /**
  *
  * @author ddoppmeier
@@ -24,21 +25,29 @@ public class StorageException extends Exception {
 
     private static final long serialVersionUID = 8835896;
 
+
     /**
-     * Creates a new instance of <code>StorageException</code> without detail message.
+     * Creates a new instance of <code>StorageException</code> without detail
+     * message.
      */
     public StorageException() {
     }
 
+
     /**
-     * Constructs an instance of <code>StorageException</code> with the specified detail message.
+     * Constructs an instance of <code>StorageException</code> with the
+     * specified detail message.
+     * <p>
      * @param msg the detail message.
      */
-    public StorageException(String msg) {
-        super(msg);
+    public StorageException( String msg ) {
+        super( msg );
     }
 
-    public StorageException(Throwable ex){
-        super(ex);
+
+    public StorageException( Throwable ex ) {
+        super( ex );
     }
+
+
 }

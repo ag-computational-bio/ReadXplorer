@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,18 +16,20 @@
  */
 package de.cebitec.readXplorer.databackend;
 
+
 /**
  * Contains all field names for data base requests.
  *
  * @author ddoppmeier, rhilker
  */
 public class FieldNames {
-    
+
     /**
      * Private constructor so this utility class can not be instantiated.
      */
     private FieldNames() {
     }
+
 
     // names for various database tables
     public static final String TABLE_PROJECT_FOLDER = "PROJECT_FOLDER";
@@ -35,18 +37,16 @@ public class FieldNames {
     public static final String TABLE_CHROMOSOME = "CHROMOSOME";
     public static final String TABLE_FEATURES = "FEATURE";
     public static final String TABLE_TRACK = "TRACK";
-    public static final String TABLE_STATISTICS = "STATISTICS";  
+    public static final String TABLE_STATISTICS = "STATISTICS";
     public static final String TABLE_COUNT_DISTRIBUTION = "COUNT_DISTRIBUTION";
-    public static final String TABLE_DB_VERSION = "DB_VERSION"; 
-    
-    
-    ////////////////////////  tables fields  //////////////////////////////// 
-        
+    public static final String TABLE_DB_VERSION = "DB_VERSION";
+
+
+    ////////////////////////  tables fields  ////////////////////////////////
     // project folder field
 //    public static final String PROJECT_FOLDER_PATH = "PATH";
-    
     // reference genome table fields
-    public static final String REF_GEN_ID ="ID";
+    public static final String REF_GEN_ID = "ID";
     public static final String REF_GEN_NAME = "NAME";
     public static final String REF_GEN_DESCRIPTION = "DESCRIPTION";
     public static final String REF_GEN_SEQUENCE = "SEQUENCE"; //still needed for old DBs...
@@ -59,11 +59,14 @@ public class FieldNames {
     public static final String CHROM_REFERENCE_ID = "REFERENCE_ID";
     public static final String CHROM_NAME = "NAME";
     public static final String CHROM_LENGTH = "LENGTH";
-    
+
     //all feature table fields
     public static final String FEATURE_ID = "ID";
-    /** Dont use this in new DBs, it is not available anmymore and was replaced by FEATURE_CHROMOSOME_ID!*/
-    public static final String FEATURE_REFGEN_ID = "REFERENCE_ID"; 
+    /**
+     * Dont use this in new DBs, it is not available anmymore and was replaced
+     * by FEATURE_CHROMOSOME_ID!
+     */
+    public static final String FEATURE_REFGEN_ID = "REFERENCE_ID";
     public static final String FEATURE_CHROMOSOME_ID = "CHROMOSOME_ID";
     public static final String FEATURE_PARENT_IDS = "PARENT_IDS"; //should be 0, if no parent exists
     public static final String FEATURE_TYPE = "TYPE";
@@ -82,13 +85,13 @@ public class FieldNames {
     public static final String TRACK_DESCRIPTION = "DESCRIPTION";
     public static final String TRACK_TIMESTAMP = "CREATIONTIME";
     public static final String TRACK_PATH = "PATH";
-    
+
     // statistics table fields
     public static final String STATISTICS_ID = "ID";
     public static final String STATISTICS_TRACK_ID = "TRACK_ID";
     public static final String STATISTICS_KEY = "KEY";
     public static final String STATISTICS_VALUE = "VALUE";
-    
+
     //old stats table fields
     public static final String STATISTICS_NUMBER_UNIQUE_MAPPINGS = "NUMBER_UNIQUE_MAPPINGS";
     public static final String STATISTICS_NUMBER_OF_UNIQUE_SEQ = "NUMBER_OF_UNIQUE_SEQ";
@@ -116,18 +119,18 @@ public class FieldNames {
     public static final String STATISTICS_NUM_LARGE_ORIENT_WRONG_PAIRS = "NUM_LARGE_ORIENT_WRONG_PAIRS";
     public static final String STATISTICS_NUM_UNIQ_LARGE_ORIENT_WRNG_PAIRS = "NUM_UNIQ_LARGE_ORIENT_WRNG_PAIRS";
     public static final String STATISTICS_AVERAGE_READ_LENGTH = "AVERAGE_READ_LENGTH";
-    public static final String STATISTICS_AVERAGE_SEQ_PAIR_LENGTH= "AVERAGE_SEQPAIR_LENGTH";
-    
-    
+    public static final String STATISTICS_AVERAGE_SEQ_PAIR_LENGTH = "AVERAGE_SEQPAIR_LENGTH";
+
+
     // unique mappings = count all distinct mapping ids
     // unique sequences = num mapped seq = count all distinct seq ids
     // num mappings = count ALL mapping ids
     // num reads = extra calculation: count all reads during import process, also possible later
-    
     public static final String COUNT_DISTRIBUTION_TRACK_ID = "TRACK_ID";
     public static final String COUNT_DISTRIBUTION_DISTRIBUTION_TYPE = "DISTRIBUTION_TYPE";
     public static final String COUNT_DISTRIBUTION_COV_INTERVAL_ID = "BIN_INDEX";
     public static final String COUNT_DISTRIBUTION_BIN_COUNT = "BIN_COUNT";
-    
+
     public static final String DB_VERSION_DB_VERSION_NO = "DB_VERSION_NO";
+
 }

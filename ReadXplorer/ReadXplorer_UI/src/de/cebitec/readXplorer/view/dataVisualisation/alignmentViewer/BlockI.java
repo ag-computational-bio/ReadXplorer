@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,10 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.ObjectWithId;
 import java.util.Iterator;
+
 
 /**
  *
@@ -27,11 +29,17 @@ public interface BlockI {
 
     public int getAbsStart();
 
+
     public int getAbsStop();
-    
+
+
     public Iterator<Brick> getBrickIterator();
+
 
     public ObjectWithId getObjectWithId();
 
+
     public int getNumOfBricks();
+
+
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,31 +16,38 @@
  */
 package de.cebitec.readXplorer.view.dialogMenus.screenshot;
 
+
 import de.cebitec.readXplorer.view.TopComponentHelper;
 import javax.swing.JPanel;
 import org.openide.windows.TopComponent;
 
+
 /**
  * Visual panel displaying options to store a screenshot of any TopComponent or
  * the whole application.
- * 
+ * <p>
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public final class ScreenshotVisualPanel extends JPanel {
+
     private static final long serialVersionUID = 1L;
 
+
     /**
-     * Visual panel displaying options to store a screenshot of any TopComponent or
+     * Visual panel displaying options to store a screenshot of any TopComponent
+     * or
      * the whole application.
      */
     public ScreenshotVisualPanel() {
         initComponents();
     }
 
+
     @Override
     public String getName() {
         return "Select Screenshot Component";
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -85,11 +92,13 @@ public final class ScreenshotVisualPanel extends JPanel {
     private javax.swing.JComboBox<TopComponent> topCompComboBox;
     // End of variables declaration//GEN-END:variables
 
+
     /**
      * @return The TopComponent selected in this panel.
      */
     public TopComponent getSelectedTopComponent() {
         return (TopComponent) this.topCompComboBox.getSelectedItem();
     }
+
 
 }

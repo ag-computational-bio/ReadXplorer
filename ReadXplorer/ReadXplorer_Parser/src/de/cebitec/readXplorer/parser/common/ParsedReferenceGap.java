@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,9 +16,10 @@
  */
 package de.cebitec.readXplorer.parser.common;
 
+
 /**
  * @author ddoppmeier
- * 
+ * <p>
  * Data structure representing a gap in the reference genome.
  */
 public class ParsedReferenceGap {
@@ -27,17 +28,21 @@ public class ParsedReferenceGap {
     private char base;
     private int order;
 
+
     /**
      * Data structure representing a gap in the reference genome.
+     * <p>
      * @param absPos absolute position of the gap in the reference genome
-     * @param base base of the gap in the mapping
-     * @param order the order at which position in a larger gap it occurs (1, 2, 3...)
+     * @param base   base of the gap in the mapping
+     * @param order  the order at which position in a larger gap it occurs (1,
+     *               2, 3...)
      */
-    public ParsedReferenceGap(int absPos, char base, int order) {
+    public ParsedReferenceGap( int absPos, char base, int order ) {
         this.absPos = absPos;
         this.base = base;
         this.order = order;
     }
+
 
     /**
      * @return the absolute position of the gap in the reference genome
@@ -46,12 +51,14 @@ public class ParsedReferenceGap {
         return absPos;
     }
 
+
     /**
      * @return the base of the gap in the mapping
      */
     public char getBase() {
         return base;
     }
+
 
     /**
      * @return at which position in a larger gap it occurs (1, 2, 3...)
@@ -60,19 +67,21 @@ public class ParsedReferenceGap {
         return order;
     }
 
+
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null || getClass() != obj.getClass()) {
+    public boolean equals( Object obj ) {
+        if( obj == null || getClass() != obj.getClass() ) {
             return false;
         }
         final ParsedReferenceGap other = (ParsedReferenceGap) obj;
-        if (    this.absPos != other.getAbsPos() ||
-                this.base   != other.getBase() ||
-                this.order  != other.getOrder()) {
+        if( this.absPos != other.getAbsPos()
+            || this.base != other.getBase()
+            || this.order != other.getOrder() ) {
             return false;
         }
         return true;
     }
+
 
     @Override
     public int hashCode() {
@@ -82,5 +91,6 @@ public class ParsedReferenceGap {
         hash = 71 * hash + this.order;
         return hash;
     }
+
 
 }

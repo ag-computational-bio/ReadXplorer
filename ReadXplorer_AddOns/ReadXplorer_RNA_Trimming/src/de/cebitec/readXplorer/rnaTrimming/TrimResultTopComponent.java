@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.rnaTrimming;
 
+
 import de.cebitec.readXplorer.correlationAnalysis.CorrelationResultTopComponent;
 import de.cebitec.readXplorer.util.TabWithCloseX;
 import de.cebitec.readXplorer.view.TopComponentExtended;
@@ -29,55 +30,61 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
+
 /**
- * This top component displays multiple tabs with results of a rna trimming process.
- * 
+ * This top component displays multiple tabs with results of a rna trimming
+ * process.
+ * <p>
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 @ConvertAsProperties(
-    dtd = "-//de.cebitec.readXplorer.correlationAnalysis//TrimResult//EN",
-autostore = false)
+         dtd = "-//de.cebitec.readXplorer.correlationAnalysis//TrimResult//EN",
+         autostore = false )
 @TopComponent.Description(
-    preferredID = "TrimResultTopComponent",
-//iconBase="SET/PATH/TO/ICON/HERE", 
-persistenceType = TopComponent.PERSISTENCE_ALWAYS)
-@TopComponent.Registration(mode = "editor", openAtStartup = false)
-@ActionID(category = "Window", id = "de.cebitec.readXplorer.correlationAnalysis.TrimResultTopComponent")
-@ActionReference(path = "Menu/Window"/* , position = 951*/)
+         preferredID = "TrimResultTopComponent",
+         //iconBase="SET/PATH/TO/ICON/HERE",
+         persistenceType = TopComponent.PERSISTENCE_ALWAYS )
+@TopComponent.Registration( mode = "editor", openAtStartup = false )
+@ActionID( category = "Window", id = "de.cebitec.readXplorer.correlationAnalysis.TrimResultTopComponent" )
+@ActionReference( path = "Menu/Window"/* , position = 951*/ )
 @TopComponent.OpenActionRegistration(
-    displayName = "#CTL_TrimResultAction",
-preferredID = "TrimResultTopComponent")
-@Messages({
+         displayName = "#CTL_TrimResultAction",
+         preferredID = "TrimResultTopComponent" )
+@Messages( {
     "CTL_TrimResultAction=TrimResult",
     "CTL_TrimResultTopComponent=Trim unmapped RNA reads",
     "HINT_TrimResultTopComponent="
-})
+} )
 public final class TrimResultTopComponent extends TopComponentExtended {
-    
+
     private static TrimResultTopComponent instance;
     private static final String PREFERRED_ID = "TrimResultTopComponent";
     private static final long serialVersionUID = 1L;
-    
-    
+
+
     public TrimResultTopComponent() {
         initComponents();
-        setName(Bundle.CTL_TrimResultTopComponent());
-        setToolTipText(Bundle.HINT_TrimResultTopComponent());
-        
-        resultTabs.addContainerListener(new ContainerListener() {
+        setName( Bundle.CTL_TrimResultTopComponent() );
+        setToolTipText( Bundle.HINT_TrimResultTopComponent() );
+
+        resultTabs.addContainerListener( new ContainerListener() {
 
             @Override
-            public void componentAdded(ContainerEvent e) {
+            public void componentAdded( ContainerEvent e ) {
             }
 
+
             @Override
-            public void componentRemoved(ContainerEvent e) {
-                if (resultTabs.getTabCount() == 0) {
-                    WindowManager.getDefault().findTopComponent(PREFERRED_ID).close();
+            public void componentRemoved( ContainerEvent e ) {
+                if( resultTabs.getTabCount() == 0 ) {
+                    WindowManager.getDefault().findTopComponent( PREFERRED_ID ).close();
                 }
             }
-        });
+
+
+        } );
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -104,80 +111,98 @@ public final class TrimResultTopComponent extends TopComponentExtended {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTabbedPane resultTabs;
     // End of variables declaration//GEN-END:variables
-    
+
+
     /**
-     * Gets default instance. Do not use directly: reserved for *.settings files only,
-     * i.e. deserialization routines; otherwise you could get a non-deserialized instance.
+     * Gets default instance. Do not use directly: reserved for *.settings files
+     * only,
+     * i.e. deserialization routines; otherwise you could get a non-deserialized
+     * instance.
      * To obtain the singleton instance, use {@link #findInstance}.
      */
     public static synchronized TrimResultTopComponent getDefault() {
-        if (instance == null) {
+        if( instance == null ) {
             instance = new TrimResultTopComponent();
         }
         return instance;
     }
 
+
     /**
-     * Obtain the TrimResultTopComponent instance. Never call {@link #getDefault} directly!
+     * Obtain the TrimResultTopComponent instance. Never call
+     * {@link #getDefault} directly!
      */
     public static synchronized TrimResultTopComponent findInstance() {
-        TopComponent win = WindowManager.getDefault().findTopComponent(PREFERRED_ID);
-        if (win == null) {
-            Logger.getLogger(CorrelationResultTopComponent.class.getName()).warning(
-                    "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system.");
+        TopComponent win = WindowManager.getDefault().findTopComponent( PREFERRED_ID );
+        if( win == null ) {
+            Logger.getLogger( CorrelationResultTopComponent.class.getName() ).warning(
+                    "Cannot find " + PREFERRED_ID + " component. It will not be located properly in the window system." );
             return getDefault();
         }
-        if (win instanceof TrimResultTopComponent) {
+        if( win instanceof TrimResultTopComponent ) {
             return (TrimResultTopComponent) win;
         }
-        Logger.getLogger(TrimResultTopComponent.class.getName()).warning(
+        Logger.getLogger( TrimResultTopComponent.class.getName() ).warning(
                 "There seem to be multiple components with the '" + PREFERRED_ID
-                + "' ID. That is a potential source of errors and unexpected behavior.");
+                + "' ID. That is a potential source of errors and unexpected behavior." );
         return getDefault();
     }
-    
+
+
     @Override
     protected String preferredID() {
         return PREFERRED_ID;
     }
-    
+
+
     @Override
     public int getPersistenceType() {
         return TopComponent.PERSISTENCE_ALWAYS;
     }
-    
+
+
     @Override
     public void componentOpened() {
         // add custom code on component opening
     }
+
 
     @Override
     public void componentClosed() {
         // add custom code on component closing
     }
 
-    void writeProperties(java.util.Properties p) {
+
+    void writeProperties( java.util.Properties p ) {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
-        p.setProperty("version", "1.0");
+        p.setProperty( "version", "1.0" );
         // store your settings
     }
 
-    void readProperties(java.util.Properties p) {
-        String version = p.getProperty("version");
+
+    void readProperties( java.util.Properties p ) {
+        String version = p.getProperty( "version" );
         // read your settings according to their version
     }
-    
+
+
     /**
-     * This method needs to be called in order to open a new tab for trim result detection.
-     * @param referenceViewer the reference viewer for which the snp detection should be carried out.
-     * @param trackIds the list of track ids (associated to the reference viewer) for which the snp 
-     *          detection should be carried out.
+     * This method needs to be called in order to open a new tab for trim result
+     * detection.
+     * <p>
+     * @param referenceViewer the reference viewer for which the snp detection
+     *                        should be carried out.
+     * @param trackIds        the list of track ids (associated to the reference
+     *                        viewer) for which the snp
+     *                        detection should be carried out.
      */
-    public TrimResultPanel openResultTab(String title) {
+    public TrimResultPanel openResultTab( String title ) {
         TrimResultPanel resultView = new TrimResultPanel();
-        resultTabs.addTab(title, resultView);
-        resultTabs.setTabComponentAt(resultTabs.getTabCount() - 1, new TabWithCloseX(resultTabs));
+        resultTabs.addTab( title, resultView );
+        resultTabs.setTabComponentAt( resultTabs.getTabCount() - 1, new TabWithCloseX( resultTabs ) );
         return resultView;
     }
+
+
 }

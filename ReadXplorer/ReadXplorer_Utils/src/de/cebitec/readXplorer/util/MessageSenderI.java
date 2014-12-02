@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,17 +16,20 @@
  */
 package de.cebitec.readXplorer.util;
 
+
 /**
  * An interface for classes, which are capable of sending messages.
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public interface MessageSenderI {
-    
+
     /**
      * Sends a message to someone/somewhere, if it is allowed.
+     * <p>
      * @param msg the message to send
      */
-    public void sendMsgIfAllowed(String msg);
-    
+    public void sendMsgIfAllowed( String msg );
+
+
 }

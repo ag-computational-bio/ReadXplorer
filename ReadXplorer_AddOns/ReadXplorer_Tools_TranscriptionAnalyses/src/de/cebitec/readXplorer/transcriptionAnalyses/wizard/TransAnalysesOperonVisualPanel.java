@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,21 +16,24 @@
  */
 package de.cebitec.readXplorer.transcriptionAnalyses.wizard;
 
+
 import de.cebitec.readXplorer.api.objects.JobPanel;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
 
+
 /**
  * Panel for showing all available options for the operon detection.
- * 
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public final class TransAnalysesOperonVisualPanel extends JobPanel {
-   
+
     private static final long serialVersionUID = 1L;
-    
+
     private int minSpanningReads;
     private boolean isAutoParamEstimation;
+
 
     /**
      * Panel for showing all available options for the operon detection.
@@ -40,10 +43,12 @@ public final class TransAnalysesOperonVisualPanel extends JobPanel {
         this.initAdditionalComponents();
     }
 
+
     @Override
     public String getName() {
         return "Operon Detection Parameters";
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -97,10 +102,11 @@ public final class TransAnalysesOperonVisualPanel extends JobPanel {
 
     private void operonDetectionAutomaticBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_operonDetectionAutomaticBoxActionPerformed
         this.isAutoParamEstimation = this.operonDetectionAutomaticBox.isSelected();
-        if (this.isAutoParamEstimation) {
-            this.spanningReadsField.setEnabled(false);
-        } else {
-            this.spanningReadsField.setEnabled(true);
+        if( this.isAutoParamEstimation ) {
+            this.spanningReadsField.setEnabled( false );
+        }
+        else {
+            this.spanningReadsField.setEnabled( true );
         }
     }//GEN-LAST:event_operonDetectionAutomaticBoxActionPerformed
 
@@ -110,11 +116,13 @@ public final class TransAnalysesOperonVisualPanel extends JobPanel {
     private javax.swing.JLabel spanningReadsLabel;
     // End of variables declaration//GEN-END:variables
 
+
     private void initAdditionalComponents() {
-        this.minSpanningReads = Integer.parseInt(this.spanningReadsField.getText());
-        this.spanningReadsField.getDocument().addDocumentListener(this.createDocumentListener());
+        this.minSpanningReads = Integer.parseInt( this.spanningReadsField.getText() );
+        this.spanningReadsField.getDocument().addDocumentListener( this.createDocumentListener() );
     }
-    
+
+
     /**
      * Checks if all required information to start the transcription start
      * analysis is set.
@@ -122,31 +130,34 @@ public final class TransAnalysesOperonVisualPanel extends JobPanel {
     @Override
     public boolean isRequiredInfoSet() {
         boolean isValidated = true;
-        if (GeneralUtils.isValidPositiveNumberInput(spanningReadsField.getText())) {
-            this.minSpanningReads = Integer.parseInt(spanningReadsField.getText());
-        } else {
+        if( GeneralUtils.isValidPositiveNumberInput( spanningReadsField.getText() ) ) {
+            this.minSpanningReads = Integer.parseInt( spanningReadsField.getText() );
+        }
+        else {
             isValidated = false;
         }
 
-        firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated);
+        firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated );
         return isValidated;
     }
 
+
     /**
      * @return the minimum number of spanning reads between two features
-     * to assign them to an operon
+     *         to assign them to an operon
      */
     public int getMinSpanningReads() {
         return this.minSpanningReads;
     }
 
+
     /**
-     * @return true, if the operon detection's autmatic  parameter estimation 
-     * should be used
+     * @return true, if the operon detection's autmatic parameter estimation
+     *         should be used
      */
     public boolean isOperonAutomatic() {
         return this.isAutoParamEstimation;
     }
-    
+
 
 }

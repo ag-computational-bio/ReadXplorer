@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,34 +16,38 @@
  */
 package de.cebitec.readXplorer.correlationAnalysis;
 
+
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningFinishWizardPanel;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
 
+
 /**
  * TrackListPanel displays a list of tracks for a certain reference.
- * 
+ * <p>
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 public class TrackListPanel extends ChangeListeningFinishWizardPanel {
-            
+
     private int referenceId;
-    
+
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
     private OpenTrackAmountVisualPanel component;
-    
+
 
     /**
      * Creates a new track list panel.
-     * @param referenceId reference id 
+     * <p>
+     * @param referenceId reference id
      */
-    public TrackListPanel(int referenceId) {
-        super("You selected a wrong amount of tracks!");
+    public TrackListPanel( int referenceId ) {
+        super( "You selected a wrong amount of tracks!" );
         this.referenceId = referenceId;
     }
+
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -51,11 +55,12 @@ public class TrackListPanel extends ChangeListeningFinishWizardPanel {
     // create only those which really need to be visible.
     @Override
     public OpenTrackAmountVisualPanel getComponent() {
-        if (component == null) {
-            component = new OpenTrackAmountVisualPanel(this.getReferenceId(), this);
+        if( component == null ) {
+            component = new OpenTrackAmountVisualPanel( this.getReferenceId(), this );
         }
         return component;
     }
+
 
     @Override
     public HelpCtx getHelp() {
@@ -65,12 +70,14 @@ public class TrackListPanel extends ChangeListeningFinishWizardPanel {
         // return new HelpCtx("help.key.here");
     }
 
+
     @Override
-    public void storeSettings(WizardDescriptor wiz) {
-        if (isFinishPanel()) {
-            wiz.putProperty(CorrelationAnalysisAction.PROP_SELECTED_TRACKS, this.component.getSelectedTracks());
+    public void storeSettings( WizardDescriptor wiz ) {
+        if( isFinishPanel() ) {
+            wiz.putProperty( CorrelationAnalysisAction.PROP_SELECTED_TRACKS, this.component.getSelectedTracks() );
         }
     }
+
 
     /**
      * @return the referenceId
@@ -78,4 +85,6 @@ public class TrackListPanel extends ChangeListeningFinishWizardPanel {
     public int getReferenceId() {
         return referenceId;
     }
+
+
 }

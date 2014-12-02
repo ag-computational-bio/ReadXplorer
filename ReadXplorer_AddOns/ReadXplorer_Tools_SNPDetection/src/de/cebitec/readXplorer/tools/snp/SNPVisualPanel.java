@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.tools.snp;
 
+
 import de.cebitec.readXplorer.api.objects.JobPanel;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
@@ -25,13 +26,14 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 import org.openide.util.NbPreferences;
 
+
 /**
  * Panel displaying all options for a SNP detection.
- * 
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public final class SNPVisualPanel extends JobPanel {
-    
+
     private static final long serialVersionUID = 1L;
     private Object minPercentage = 90;
     private int minMismatchBases = 15;
@@ -39,25 +41,28 @@ public final class SNPVisualPanel extends JobPanel {
     private byte minAverageBaseQual = 0;
     private byte minAverageMappingQual = 0;
 
+
     /**
      * Panel displaying all options for a SNP detection.
      */
     public SNPVisualPanel() {
         initComponents();
-        
-        this.absNumText.getDocument().addDocumentListener(this.createDocumentListener());
-        this.minBaseQualityField.getDocument().addDocumentListener(this.createDocumentListener());
-        this.minAvrgBaseQualField.getDocument().addDocumentListener(this.createDocumentListener());
-        this.minAvrgMappingQualField.getDocument().addDocumentListener(this.createDocumentListener());
-        
-        ((DefaultEditor) percentSpinner.getEditor()).getTextField().getDocument().addDocumentListener(this.createDocumentListener());
+
+        this.absNumText.getDocument().addDocumentListener( this.createDocumentListener() );
+        this.minBaseQualityField.getDocument().addDocumentListener( this.createDocumentListener() );
+        this.minAvrgBaseQualField.getDocument().addDocumentListener( this.createDocumentListener() );
+        this.minAvrgMappingQualField.getDocument().addDocumentListener( this.createDocumentListener() );
+
+        ((DefaultEditor) percentSpinner.getEditor()).getTextField().getDocument().addDocumentListener( this.createDocumentListener() );
         this.loadLastParameterSelection();
     }
+
 
     @Override
     public String getName() {
         return "SNP parameter setup";
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -236,9 +241,8 @@ public final class SNPVisualPanel extends JobPanel {
     private void percentSpinnerStateChanged(javax.swing.event.ChangeEvent evt) {//GEN-FIRST:event_percentSpinnerStateChanged
         this.isRequiredInfoSet();
     }//GEN-LAST:event_percentSpinnerStateChanged
-    
-    
-    
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField absNumText;
     private javax.swing.JLabel jLabel2;
@@ -258,12 +262,14 @@ public final class SNPVisualPanel extends JobPanel {
     private javax.swing.JCheckBox useMainBaseBox;
     // End of variables declaration//GEN-END:variables
 
+
     /**
      * @return the minimum percentage of mismatches at a SNP position
      */
     public Object getMinPercentage() {
         return this.minPercentage;
     }
+
 
     /**
      * @return the minimum number of mismatches at a SNP position
@@ -272,67 +278,77 @@ public final class SNPVisualPanel extends JobPanel {
         return this.minMismatchBases;
     }
 
+
     /**
      * @return <cc>true</cc>, if the minMismatchBases count corresponds to the
-     * count of the most frequent base at the current position. <cc>false</cc>,
-     * if the minMismatchBases count corresponds to the overall mismatch count at
-     * the current position.
+     *         count of the most frequent base at the current position. <cc>false</cc>,
+     *         if the minMismatchBases count corresponds to the overall mismatch count
+     *         at
+     *         the current position.
      */
     public boolean isUseMainBase() {
         return this.useMainBaseBox.isSelected();
     }
 
+
     /**
-     * @return <cc>true</cc>, if the quality filter options should be enabled. 
+     * @return <cc>true</cc>, if the quality filter options should be enabled.
      * <cc>false</cc>, if the quality options should not have any effect.
      */
     public boolean isUseQualFilter() {
         return this.qualFilterCheckBox.isSelected();
     }
 
+
     byte getMinBaseQuality() {
         return minBaseQuality;
     }
+
 
     byte getMinAverageBaseQual() {
         return minAverageBaseQual;
     }
 
+
     byte getMinAverageMappingQual() {
         return minAverageMappingQual;
     }
-    
+
+
     /**
      * Checks if all required information to start the SNP analysis is set.
      */
     @Override
     public boolean isRequiredInfoSet() {
         boolean isValidated = true;
-        if (GeneralUtils.isValidPositiveNumberInput(absNumText.getText())) {
-            this.minMismatchBases = Integer.parseInt(absNumText.getText());
-        } else {
+        if( GeneralUtils.isValidPositiveNumberInput( absNumText.getText() ) ) {
+            this.minMismatchBases = Integer.parseInt( absNumText.getText() );
+        }
+        else {
             isValidated = false;
         }
-        if (GeneralUtils.isValidByteInput(minBaseQualityField.getText())
-                && GeneralUtils.isValidByteInput(minAvrgBaseQualField.getText())
-                && GeneralUtils.isValidByteInput(minAvrgMappingQualField.getText())
-                ) {
-            this.minBaseQuality = Byte.parseByte(minBaseQualityField.getText());
-            this.minAverageBaseQual = Byte.parseByte(minAvrgBaseQualField.getText());
-            this.minAverageMappingQual = Byte.parseByte(minAvrgMappingQualField.getText());
-        } else {
+        if( GeneralUtils.isValidByteInput( minBaseQualityField.getText() )
+            && GeneralUtils.isValidByteInput( minAvrgBaseQualField.getText() )
+            && GeneralUtils.isValidByteInput( minAvrgMappingQualField.getText() ) ) {
+            this.minBaseQuality = Byte.parseByte( minBaseQualityField.getText() );
+            this.minAverageBaseQual = Byte.parseByte( minAvrgBaseQualField.getText() );
+            this.minAverageMappingQual = Byte.parseByte( minAvrgMappingQualField.getText() );
+        }
+        else {
             isValidated = false;
         }
         JTextField spinnerField = ((DefaultEditor) percentSpinner.getEditor()).getTextField();
-        if (GeneralUtils.isValidPercentage(spinnerField.getText())) {
+        if( GeneralUtils.isValidPercentage( spinnerField.getText() ) ) {
             this.minPercentage = this.percentSpinner.getValue();
-        } else {
+        }
+        else {
             isValidated = false;
         }
-        
-        firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated);
+
+        firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated );
         return isValidated;
     }
+
 
     /**
      * Updates the parameters for this panel with the globally stored
@@ -340,14 +356,15 @@ public final class SNPVisualPanel extends JobPanel {
      * configuration is chosen.
      */
     private void loadLastParameterSelection() {
-        Preferences pref = NbPreferences.forModule(Object.class);
-        ((DefaultEditor) percentSpinner.getEditor()).getTextField().setText(pref.get(SNPWizardPanel.PROP_MIN_PERCENT, "90"));
-        absNumText.setText(pref.get(SNPWizardPanel.PROP_MIN_VARYING_BASES, "15"));
-        useMainBaseBox.setSelected(pref.get(SNPWizardPanel.PROP_USE_MAIN_BASE, "1").equals("1"));
-        qualFilterCheckBox.setSelected(pref.get(SNPWizardPanel.PROP_SEL_QUAL_FILTER, "1").equals("1"));
-        minBaseQualityField.setText(pref.get(SNPWizardPanel.PROP_MIN_BASE_QUAL, "20"));
-        minAvrgBaseQualField.setText(pref.get(SNPWizardPanel.PROP_MIN_AVERAGE_BASE_QUAL, "20"));
-        minAvrgMappingQualField.setText(pref.get(SNPWizardPanel.PROP_MIN_AVERAGE_MAP_QUAL, "20"));        
+        Preferences pref = NbPreferences.forModule( Object.class );
+        ((DefaultEditor) percentSpinner.getEditor()).getTextField().setText( pref.get( SNPWizardPanel.PROP_MIN_PERCENT, "90" ) );
+        absNumText.setText( pref.get( SNPWizardPanel.PROP_MIN_VARYING_BASES, "15" ) );
+        useMainBaseBox.setSelected( pref.get( SNPWizardPanel.PROP_USE_MAIN_BASE, "1" ).equals( "1" ) );
+        qualFilterCheckBox.setSelected( pref.get( SNPWizardPanel.PROP_SEL_QUAL_FILTER, "1" ).equals( "1" ) );
+        minBaseQualityField.setText( pref.get( SNPWizardPanel.PROP_MIN_BASE_QUAL, "20" ) );
+        minAvrgBaseQualField.setText( pref.get( SNPWizardPanel.PROP_MIN_AVERAGE_BASE_QUAL, "20" ) );
+        minAvrgMappingQualField.setText( pref.get( SNPWizardPanel.PROP_MIN_AVERAGE_MAP_QUAL, "20" ) );
     }
-    
+
+
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,36 +16,46 @@
  */
 package de.cebitec.readXplorer.databackend;
 
+
 import java.util.concurrent.TimeUnit;
+
 
 /**
  * A simple StopWatch for measuring execution time
+ * <p>
  * @author evgeny
  */
 public class StopWatch {
+
     private long startTime;
-    
+
+
     public StopWatch() {
         reset();
     }
-    
+
+
     public void reset() {
         this.startTime = System.currentTimeMillis();
     }
-    
+
+
     public long getElapsedTime() {
-        return System.currentTimeMillis()-this.startTime;
+        return System.currentTimeMillis() - this.startTime;
     }
+
 
     public String getElapsedTimeAsString() {
         long millis = this.getElapsedTime();
-        long secs = TimeUnit.MILLISECONDS.toSeconds(millis);
-        long millis_carryover = millis - TimeUnit.SECONDS.toMillis(secs);
+        long secs = TimeUnit.MILLISECONDS.toSeconds( millis );
+        long millis_carryover = millis - TimeUnit.SECONDS.toMillis( secs );
         String s = "";
-        if (secs>0) { s = String.format("%d s ", secs); }
-        s += String.format("%d ms", millis_carryover);
+        if( secs > 0 ) {
+            s = String.format( "%d s ", secs );
+        }
+        s += String.format( "%d ms", millis_carryover );
         return s;
     }
-    
-    
+
+
 }

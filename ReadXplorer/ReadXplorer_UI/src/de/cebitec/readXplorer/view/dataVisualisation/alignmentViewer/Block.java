@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
 import de.cebitec.readXplorer.databackend.dataObjects.ReferenceGap;
 import de.cebitec.readXplorer.util.SamAlignmentBlock;
@@ -23,9 +24,10 @@ import de.cebitec.readXplorer.view.dataVisualisation.GenomeGapManager;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+
 /**
  * A block contains detailed information about one Mapping.
- * 
+ * <p>
  * @author ddoppmei, Rolf Hilker
  */
 public class Block implements BlockI {
@@ -36,16 +38,19 @@ public class Block implements BlockI {
     private GenomeGapManager gapManager;
     private ArrayList<Brick> bricks;
 
+
     /**
-     * A block contains detailed information about the visible part of one Mapping.
-     * @param absStart start of the block = start of the visible part of the
-     * mapping (might be larger than start of mapping)
-     * @param absStop stop of the block = stop of the visible part of the
-     * mapping (might be smaller than stop of mapping)
-     * @param mapping mapping whose detailed information is needed
+     * A block contains detailed information about the visible part of one
+     * Mapping.
+     * <p>
+     * @param absStart   start of the block = start of the visible part of the
+     *                   mapping (might be larger than start of mapping)
+     * @param absStop    stop of the block = stop of the visible part of the
+     *                   mapping (might be smaller than stop of mapping)
+     * @param mapping    mapping whose detailed information is needed
      * @param gapManager gap manager of the mapping
      */
-    public Block(int absStart, int absStop, Mapping mapping, GenomeGapManager gapManager) {
+    public Block( int absStart, int absStop, Mapping mapping, GenomeGapManager gapManager ) {
         this.absStart = absStart;
         this.absStop = absStop;
         this.mapping = mapping;
@@ -54,117 +59,134 @@ public class Block implements BlockI {
         this.createBricks();
     }
 
+
     /**
      * Each position in the block (visible part of the mapping) gets one brick.
      */
     private void createBricks() {
-        if (mapping.getAlignmentBlocks().isEmpty()) {
-            for (int i = absStart; i <= absStop; i++) {
-                if ((mapping.getStart() > i) || (i > mapping.getStop())) {
-                    bricks.add(Brick.TRIMMED);
-                } else {
-                    if (gapManager.hasGapAt(i)) {
-                        if (mapping.hasGenomeGapAtPosition(i)) {
-                            this.fillWithOwnGenomeGaps(mapping, i);
-                        } else {
-                            this.fillWithForeignGaps(gapManager.getNumOfGapsAt(i));
+        if( mapping.getAlignmentBlocks().isEmpty() ) {
+            for( int i = absStart; i <= absStop; i++ ) {
+                if( (mapping.getStart() > i) || (i > mapping.getStop()) ) {
+                    bricks.add( Brick.TRIMMED );
+                }
+                else {
+                    if( gapManager.hasGapAt( i ) ) {
+                        if( mapping.hasGenomeGapAtPosition( i ) ) {
+                            this.fillWithOwnGenomeGaps( mapping, i );
+                        }
+                        else {
+                            this.fillWithForeignGaps( gapManager.getNumOfGapsAt( i ) );
                         }
                     }
-                    if (i == 2055) {
-                        System.out.println("");
+                    if( i == 2055 ) {
+                        System.out.println( "" );
                     }
-                    this.addDiffOrMatchBrick(mapping, i);
+                    this.addDiffOrMatchBrick( mapping, i );
                 }
             }
-        } else {
-            for (int i = 0; i < mapping.getAlignmentBlocks().size(); ++i) {
-                SamAlignmentBlock alignmentBlock = mapping.getAlignmentBlocks().get(i);
+        }
+        else {
+            for( int i = 0; i < mapping.getAlignmentBlocks().size(); ++i ) {
+                SamAlignmentBlock alignmentBlock = mapping.getAlignmentBlocks().get( i );
                 int start = alignmentBlock.getRefStart() < absStart ? absStart : alignmentBlock.getRefStart();
                 int stop = alignmentBlock.getRefStop() > absStop ? absStop : alignmentBlock.getRefStop();
-                for (int j = start; j <= stop; j++) {
-                    if ((mapping.getStart() > j) || (j > mapping.getStop())) {
-                        bricks.add(Brick.TRIMMED);
-                    } else {
-                        if (gapManager.hasGapAt(j)) {
-                            if (mapping.hasGenomeGapAtPosition(j)) {
-                                this.fillWithOwnGenomeGaps(mapping, j);
-                            } else {
-                                this.fillWithForeignGaps(gapManager.getNumOfGapsAt(j));
+                for( int j = start; j <= stop; j++ ) {
+                    if( (mapping.getStart() > j) || (j > mapping.getStop()) ) {
+                        bricks.add( Brick.TRIMMED );
+                    }
+                    else {
+                        if( gapManager.hasGapAt( j ) ) {
+                            if( mapping.hasGenomeGapAtPosition( j ) ) {
+                                this.fillWithOwnGenomeGaps( mapping, j );
+                            }
+                            else {
+                                this.fillWithForeignGaps( gapManager.getNumOfGapsAt( j ) );
                             }
                         }
-                        this.addDiffOrMatchBrick(mapping, j);
+                        this.addDiffOrMatchBrick( mapping, j );
                     }
                 }
-                if (i + 1 < mapping.getAlignmentBlocks().size()) {
-                    int nexStart = mapping.getAlignmentBlocks().get(i + 1).getRefStart();
+                if( i + 1 < mapping.getAlignmentBlocks().size() ) {
+                    int nexStart = mapping.getAlignmentBlocks().get( i + 1 ).getRefStart();
                     start = alignmentBlock.getRefStop() < absStart ? absStart : alignmentBlock.getRefStop() + 1;
                     stop = nexStart > absStop ? absStop : nexStart;
-                    for (int j = start; j < stop; ++j) {
-                        if (j == 2055) {
-                            System.out.println("");
+                    for( int j = start; j < stop; ++j ) {
+                        if( j == 2055 ) {
+                            System.out.println( "" );
                         }
-                        bricks.add(Brick.SKIPPED);
+                        bricks.add( Brick.SKIPPED );
                     }
                 }
             }
         }
     }
 
-    private void fillWithOwnGenomeGaps(Mapping mapping, int position) {
+
+    private void fillWithOwnGenomeGaps( Mapping mapping, int position ) {
         // do not only paint one gap, but ALL of them
-        for (ReferenceGap gap : mapping.getGenomeGapsAtPosition(position)) {
-            bricks.add(Brick.determineGapType(gap.getBase()));
-        }
-    }
-    
-    private void fillWithForeignGaps(int numberOfForeignGaps) {
-        for (int x = 0; x < numberOfForeignGaps; x++) {
-            bricks.add(Brick.FOREIGN_GENOMEGAP);
+        for( ReferenceGap gap : mapping.getGenomeGapsAtPosition( position ) ) {
+            bricks.add( Brick.determineGapType( gap.getBase() ) );
         }
     }
 
-    private void addDiffOrMatchBrick(Mapping mapping, int position) {
+
+    private void fillWithForeignGaps( int numberOfForeignGaps ) {
+        for( int x = 0; x < numberOfForeignGaps; x++ ) {
+            bricks.add( Brick.FOREIGN_GENOMEGAP );
+        }
+    }
+
+
+    private void addDiffOrMatchBrick( Mapping mapping, int position ) {
         Brick type;
-        if (mapping.hasDiffAtPosition(position)) {
-            type = Brick.determineDiffType(mapping.getDiffAtPosition(position));
-        } else {
+        if( mapping.hasDiffAtPosition( position ) ) {
+            type = Brick.determineDiffType( mapping.getDiffAtPosition( position ) );
+        }
+        else {
             type = Brick.MATCH;
         }
-        bricks.add(type);
+        bricks.add( type );
     }
+
 
     @Override
     public int getAbsStart() {
         return absStart;
     }
 
+
     @Override
     public int getAbsStop() {
         return absStop;
     }
+
 
     @Override
     public Mapping getObjectWithId() {
         return mapping;
     }
 
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for (Brick b : bricks) {
-            sb.append(b);
+        for( Brick b : bricks ) {
+            sb.append( b );
         }
         return sb.toString();
     }
+
 
     @Override
     public Iterator<Brick> getBrickIterator() {
         return bricks.iterator();
     }
 
+
     @Override
     public int getNumOfBricks() {
         return bricks.size();
     }
+
 
 }

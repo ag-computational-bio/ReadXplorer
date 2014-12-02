@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,29 +16,36 @@
  */
 package de.cebitec.readXplorer.util;
 
+
 import org.openide.windows.InputOutput;
 
+
 /**
- * This class implements the SimpleOutput interface for the usage 
+ * This class implements the SimpleOutput interface for the usage
  * with Netbeans' InputOutput-Class
+ * <p>
  * @author Evgeny Anisiforov
  */
 public class SimpleIO implements SimpleOutput {
-    
+
     private InputOutput io;
-    
-    public SimpleIO(InputOutput io) {
+
+
+    public SimpleIO( InputOutput io ) {
         this.io = io;
     }
-    
-    @Override
-    public void showMessage(String s) {
-        this.io.getOut().println(s);
-    }
+
 
     @Override
-    public void showError(String s) {
-        this.io.getErr().println(s);
+    public void showMessage( String s ) {
+        this.io.getOut().println( s );
     }
-    
+
+
+    @Override
+    public void showError( String s ) {
+        this.io.getErr().println( s );
+    }
+
+
 }

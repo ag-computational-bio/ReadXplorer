@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.tools.rnaFolder.rnamovies;
 
+
 import de.cebitec.readXplorer.tools.rnaFolder.naview.PairTable;
 import de.cebitec.readXplorer.tools.rnaFolder.naview.Structure;
 import de.cebitec.readXplorer.tools.rnaFolder.rnamovies.configuration.Configuration;
@@ -28,23 +29,17 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.geom.Point2D;
-//import java.io.FileInputStream;
-//import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
-//import java.util.Hashtable;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.io.InputStream;
-import java.io.IOException;
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
-//import javax.swing.JFrame;
 import javax.swing.JToolBar;
-//import javax.swing.UIManager;
-//import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -65,35 +60,35 @@ import org.xml.sax.helpers.XMLReaderFactory;
  *
  * @author Alexander Kaiser <akaiser@TechFak.Uni-Bielefeld.DE>
  *
- *  RNAStructML,Commandline interface support added by
- *  Jan krueger <jkrueger@techfak.uni-bielefeld.de>
+ * RNAStructML,Commandline interface support added by
+ * Jan krueger <jkrueger@techfak.uni-bielefeld.de>
  *
- * Functionality limited for ReadXplorer (commented out main method, export and RNAStructML parts)
+ * Functionality limited for ReadXplorer (commented out main method, export and
+ * RNAStructML parts)
  * by Rolf Hilker. Also fixed some warnings.
  *
  */
 public class RNAMovies extends JPanel implements ActionContainer {
 
     public static final String TITLE = "RNAMovies";
-    public static final String VERSION ="2.04";
-    public static final String USAGE = TITLE+VERSION+"\n"+
-            "usage java "+TITLE+VERSION+".jar [<arguments>] :\n\n"+
-            "ATTENTION : cmdlineoptions in early beta state!\n\n"+
-            "-nogui                         :: run RNAMovies without starting the GUI\n"+
-            "-input <String>                :: set the input filename\n"+
-            "-output <String>               :: set the output filename\n"+
-            "[-xml]                         :: determines that the input file is in RNAStructML format\n"+
-            "-[structure <int>|steps <int>] :: creates ONLY the given structure (single frame)\n"+
-            "[-size <int>]                  :: set the size of the generated frame (in pixel)\n"+
-            "[-zoom <int>]                  :: zoom factor inside"+
-            "-(gif|png|svg|jpg)             :: set the image format\n"+
-            "[-h[elp]]                      :: print out a usage message\n";
-
+    public static final String VERSION = "2.04";
+    public static final String USAGE = TITLE + VERSION + "\n"
+                                       + "usage java " + TITLE + VERSION + ".jar [<arguments>] :\n\n"
+                                       + "ATTENTION : cmdlineoptions in early beta state!\n\n"
+                                       + "-nogui                         :: run RNAMovies without starting the GUI\n"
+                                       + "-input <String>                :: set the input filename\n"
+                                       + "-output <String>               :: set the output filename\n"
+                                       + "[-xml]                         :: determines that the input file is in RNAStructML format\n"
+                                       + "-[structure <int>|steps <int>] :: creates ONLY the given structure (single frame)\n"
+                                       + "[-size <int>]                  :: set the size of the generated frame (in pixel)\n"
+                                       + "[-zoom <int>]                  :: zoom factor inside"
+                                       + "-(gif|png|svg|jpg)             :: set the image format\n"
+                                       + "[-h[elp]]                      :: print out a usage message\n";
 
 
     private static final int SCALE = 15;
 
-    private static final Logger log = Logger.getLogger("RNAMovies");
+    private static final Logger log = Logger.getLogger( "RNAMovies" );
 
     private Configuration config;
 
@@ -101,8 +96,9 @@ public class RNAMovies extends JPanel implements ActionContainer {
     private MoviePane mp;
     private JToolBar tb;
 
-    protected RNAMovies(InputStream configStream, InputStream actionStream) {
-        super(new BorderLayout());
+
+    protected RNAMovies( InputStream configStream, InputStream actionStream ) {
+        super( new BorderLayout() );
 
         FieldAdapter fa;
         XMLReader parser;
@@ -112,64 +108,70 @@ public class RNAMovies extends JPanel implements ActionContainer {
 
         // toolbar
         tb = new JToolBar();
-        tb.setFloatable(false);
-        tb.setLayout(new FlowLayout());
+        tb.setFloatable( false );
+        tb.setLayout( new FlowLayout() );
 
         // load configuration
         try {
-            config = new Configuration(configStream);
-        } catch(IOException e) {
-            log.severe(e.getMessage());
-            System.exit(1);
-        } catch(SAXException e) {
-            log.severe("Error while parsing config: ".concat(e.getMessage()));
-            System.exit(1);
+            config = new Configuration( configStream );
+        }
+        catch( IOException e ) {
+            log.severe( e.getMessage() );
+            System.exit( 1 );
+        }
+        catch( SAXException e ) {
+            log.severe( "Error while parsing config: ".concat( e.getMessage() ) );
+            System.exit( 1 );
         }
 
         // load actions
         try {
             parser = XMLReaderFactory.createXMLReader();
-            parser.setContentHandler(new ActionXMLHandler((ActionContainer)this,
-                    new Class[]{this.getClass()},
-                    new Object[]{this}));
-            parser.parse(new InputSource(actionStream));
-        } catch(IOException e) {
-            log.severe(e.getMessage());
-            System.exit(1);
-        } catch(SAXException e) {
-            log.severe("Error while parsing action file: ".concat(e.getMessage()));
-            System.exit(1);
+            parser.setContentHandler( new ActionXMLHandler( (ActionContainer) this,
+                                                            new Class[]{ this.getClass() },
+                                                            new Object[]{ this } ) );
+            parser.parse( new InputSource( actionStream ) );
+        }
+        catch( IOException e ) {
+            log.severe( e.getMessage() );
+            System.exit( 1 );
+        }
+        catch( SAXException e ) {
+            log.severe( "Error while parsing action file: ".concat( e.getMessage() ) );
+            System.exit( 1 );
         }
 
-        add(mb, BorderLayout.NORTH);
+        add( mb, BorderLayout.NORTH );
 
         // movie pane
-        mp = new MoviePane(640, 460);
-        fa = new FieldAdapter(mp.getConfigurable());
-        config.addConfigListener(fa);
-        config.getCategory("animation").removeConfigListener(fa);
-        config.addConfigListener(mp);
+        mp = new MoviePane( 640, 460 );
+        fa = new FieldAdapter( mp.getConfigurable() );
+        config.addConfigListener( fa );
+        config.getCategory( "animation" ).removeConfigListener( fa );
+        config.addConfigListener( mp );
         config.initAll();
-        add(mp, BorderLayout.CENTER);
+        add( mp, BorderLayout.CENTER );
 
-        add(tb, BorderLayout.SOUTH);
+        add( tb, BorderLayout.SOUTH );
     }
+
 
     /**
      * Public default constructor, standard menu and configurations are loaded.
      */
     public RNAMovies() {
-        this(RNAMovies.class.getResourceAsStream("config.xml"),
-                RNAMovies.class.getResourceAsStream("actions.xml"));
+        this( RNAMovies.class.getResourceAsStream( "config.xml" ),
+              RNAMovies.class.getResourceAsStream( "actions.xml" ) );
     }
+
 
     /**
      * Set the movie data from a String.
      *
      * @param data A String containing a valid script.
      */
-    public void setData(String data) {
-        parseScript(mp,new StringTokenizer(data, "\n"), false);
+    public void setData( String data ) {
+        parseScript( mp, new StringTokenizer( data, "\n" ), false );
     }
 
 //    /**
@@ -186,11 +188,11 @@ public class RNAMovies extends JPanel implements ActionContainer {
     /**
      * Set the movie data from a String.
      *
-     * @param data A String containing a valid script.
+     * @param data   A String containing a valid script.
      * @param center Center structures to the maximal area of the whole script.
      */
-    public void setData(String data, boolean center) {
-        parseScript(mp,new StringTokenizer(data, "\n"), center);
+    public void setData( String data, boolean center ) {
+        parseScript( mp, new StringTokenizer( data, "\n" ), center );
     }
 
 //    /**
@@ -208,25 +210,32 @@ public class RNAMovies extends JPanel implements ActionContainer {
     /**
      * Set the movie data from an InputStream.
      *
-     * @param in An InputStream (e.g. FileInputStream) containing a valid script.
+     * @param in An InputStream (e.g. FileInputStream) containing a valid
+     *           script.
      */
-    public void setData(InputStream in) {
-        parseScript(mp,new LineScanner(in), false);
+    public void setData( InputStream in ) {
+        parseScript( mp, new LineScanner( in ), false );
     }
+
 
     /**
      * Set the movie data from an InputStream.
      *
-     * @param in An InputStream (i.e. FileInputStream) containing a valid script.
+     * @param in     An InputStream (i.e. FileInputStream) containing a valid
+     *               script.
      * @param center Center structures to the maximal area of the whole script.
      */
-    public void setData(InputStream in, boolean center) {
-        parseScript(mp,new LineScanner(in), center);
+    public void setData( InputStream in, boolean center ) {
+        parseScript( mp, new LineScanner( in ), center );
     }
-    private static void parseScript(MoviePane mp, Enumeration enumer, boolean center){
-         parseScript(mp,enumer, center,true);
+
+
+    private static void parseScript( MoviePane mp, Enumeration enumer, boolean center ) {
+        parseScript( mp, enumer, center, true );
     }
-    private static void parseScript(MoviePane mp, Enumeration enumer, boolean center, boolean gui) {
+
+
+    private static void parseScript( MoviePane mp, Enumeration enumer, boolean center, boolean gui ) {
         int i, w, h, length;
         int old_length = -1;
         int title_end = -1;
@@ -238,83 +247,88 @@ public class RNAMovies extends JPanel implements ActionContainer {
         List<PairTable> pairs;
         Structure struc = null;
 
-        if(!enumer.hasMoreElements()) {
-            throw new IllegalArgumentException("No Movie Data found!");
-        } else {
-            name = ((String)enumer.nextElement()).trim();
+        if( !enumer.hasMoreElements() ) {
+            throw new IllegalArgumentException( "No Movie Data found!" );
+        }
+        else {
+            name = ((String) enumer.nextElement()).trim();
         }
 
-        if(name.equals("")) {
-            throw new IllegalArgumentException("No Movie Data found!");
+        if( name.equals( "" ) ) {
+            throw new IllegalArgumentException( "No Movie Data found!" );
         }
 
-        if(name.charAt(0) == '>') {
+        if( name.charAt( 0 ) == '>' ) {
             dcse = false;
-        } else if(name.charAt(0) == '<') {
+        }
+        else if( name.charAt( 0 ) == '<' ) {
             dcse = true;
-        } else {
-            throw new IllegalArgumentException("Data Format Error: Missing '>' or '<' character!");
+        }
+        else {
+            throw new IllegalArgumentException( "Data Format Error: Missing '>' or '<' character!" );
         }
 
-        if(!enumer.hasMoreElements()) {
-            throw new IllegalArgumentException("No Movie Data found!");
-        } else {
-            sequence = ((String)enumer.nextElement()).trim();
+        if( !enumer.hasMoreElements() ) {
+            throw new IllegalArgumentException( "No Movie Data found!" );
+        }
+        else {
+            sequence = ((String) enumer.nextElement()).trim();
         }
 
         length = sequence.length();
 
         w = h = 0;
-        pairs = new ArrayList<PairTable>(350);
-        frames = new ArrayList<Point2D[]>(350);
-        sizes = new ArrayList<Dimension>(350);
-        while(enumer.hasMoreElements()) {
+        pairs = new ArrayList<PairTable>( 350 );
+        frames = new ArrayList<Point2D[]>( 350 );
+        sizes = new ArrayList<Dimension>( 350 );
+        while( enumer.hasMoreElements() ) {
 
-            if(struc != null) {
+            if( struc != null ) {
                 old_length = struc.length();
             }
 
-            if(dcse) {
-                structure = ((String)enumer.nextElement());
-                if(!enumer.hasMoreElements()) {
-                    throw new IllegalArgumentException("Error in DCSE structure: missing helix numbering.");
+            if( dcse ) {
+                structure = ((String) enumer.nextElement());
+                if( !enumer.hasMoreElements() ) {
+                    throw new IllegalArgumentException( "Error in DCSE structure: missing helix numbering." );
                 }
-                helices = ((String)enumer.nextElement());
-                struc = new Structure(sequence, structure, helices);
-            } else {
-                structure = ((String)enumer.nextElement()).trim();
-                struc = new Structure(sequence, structure);
+                helices = ((String) enumer.nextElement());
+                struc = new Structure( sequence, structure, helices );
+            }
+            else {
+                structure = ((String) enumer.nextElement()).trim();
+                struc = new Structure( sequence, structure );
             }
 
-            if(old_length != -1 && old_length > struc.length()) {
-                throw new IllegalArgumentException("Length of structures in descending order not allowed!");
+            if( old_length != -1 && old_length > struc.length() ) {
+                throw new IllegalArgumentException( "Length of structures in descending order not allowed!" );
             }
 
-            pairs.add(struc.getPairTable());
-            frames.add(struc.getNormalizedCoordinates(SCALE, SCALE, 0, 0));
-            sizes.add(new Dimension(struc.getWidth(SCALE), struc.getHeight(SCALE)));
-            if(struc.getWidth(SCALE) > w) {
-                w = struc.getWidth(SCALE);
+            pairs.add( struc.getPairTable() );
+            frames.add( struc.getNormalizedCoordinates( SCALE, SCALE, 0, 0 ) );
+            sizes.add( new Dimension( struc.getWidth( SCALE ), struc.getHeight( SCALE ) ) );
+            if( struc.getWidth( SCALE ) > w ) {
+                w = struc.getWidth( SCALE );
             }
-            if(struc.getHeight(SCALE) > h) {
-                h = struc.getHeight(SCALE);
-            }
-        }
-
-        if(frames.isEmpty()) {
-            throw new IllegalArgumentException("No Movie Data found!");
-        }
-
-        if(center) {
-            maxSize = new Dimension(w, h);
-            for(i = 0; i < frames.size(); i++) {
-                ShapeOps.center(frames.get(i), sizes.get(i), maxSize);
+            if( struc.getHeight( SCALE ) > h ) {
+                h = struc.getHeight( SCALE );
             }
         }
 
-        title_end = name.indexOf(' ');
-        mp.setMovie(frames, pairs, name.substring(1, title_end == -1 ? name.length() : title_end), sequence, w, h,gui);
-        log.log(Level.INFO, "{0} Structures loaded.", frames.size());
+        if( frames.isEmpty() ) {
+            throw new IllegalArgumentException( "No Movie Data found!" );
+        }
+
+        if( center ) {
+            maxSize = new Dimension( w, h );
+            for( i = 0; i < frames.size(); i++ ) {
+                ShapeOps.center( frames.get( i ), sizes.get( i ), maxSize );
+            }
+        }
+
+        title_end = name.indexOf( ' ' );
+        mp.setMovie( frames, pairs, name.substring( 1, title_end == -1 ? name.length() : title_end ), sequence, w, h, gui );
+        log.log( Level.INFO, "{0} Structures loaded.", frames.size() );
     }
 
 //    /**
@@ -397,16 +411,17 @@ public class RNAMovies extends JPanel implements ActionContainer {
 //
 //        mp.setMovie(frames,pairs,name,sequence,w,h,gui);
 //    }
-
     @Override
     public JToolBar getToolBar() {
         return tb;
     }
 
+
     @Override
     public JMenuBar getMenuBar() {
         return mb;
     }
+
 
     /**
      * Accessor method for the Movie
@@ -416,6 +431,7 @@ public class RNAMovies extends JPanel implements ActionContainer {
     public Movie getMovie() {
         return mp;
     }
+
 
     /**
      * Get an instance of the Configuration

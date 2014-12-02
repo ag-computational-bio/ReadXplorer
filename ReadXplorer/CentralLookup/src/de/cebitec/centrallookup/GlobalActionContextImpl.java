@@ -41,13 +41,14 @@
  * Version 2 license, then the option applies only if the new code is
  * made subject to such option by the copyright holder.
  */
-
 package de.cebitec.centrallookup;
+
 
 import org.openide.util.ContextGlobalProvider;
 import org.openide.util.Lookup;
 import org.openide.util.lookup.ProxyLookup;
 import org.openide.windows.TopComponent;
+
 
 /**
  * An implementation of ContextGlobalProvider that not only publishes
@@ -56,48 +57,62 @@ import org.openide.windows.TopComponent;
  * from ProjectLookup.Provider-instances. It is allmost the same as the
  * implementation given by the Netbeans platform.
  */
-@org.openide.util.lookup.ServiceProvider(service=org.openide.util.ContextGlobalProvider.class, supersedes="org.netbeans.modules.openide.windows.GlobalActionContextImpl")
+@org.openide.util.lookup.ServiceProvider( service = org.openide.util.ContextGlobalProvider.class, supersedes = "org.netbeans.modules.openide.windows.GlobalActionContextImpl" )
 public final class GlobalActionContextImpl extends Object
-implements ContextGlobalProvider, Lookup.Provider, java.beans.PropertyChangeListener {
-    /** registry to work with */
+        implements ContextGlobalProvider, Lookup.Provider,
+                   java.beans.PropertyChangeListener {
+
+    /**
+     * registry to work with
+     */
     private TopComponent.Registry registry;
 
-    public GlobalActionContextImpl () {
-        this (TopComponent.getRegistry());
+
+    public GlobalActionContextImpl() {
+        this( TopComponent.getRegistry() );
     }
 
-    public GlobalActionContextImpl (TopComponent.Registry r) {
+
+    public GlobalActionContextImpl( TopComponent.Registry r ) {
         this.registry = r;
     }
 
-    /** Let's create the proxy listener that delegates to currently
+
+    /**
+     * Let's create the proxy listener that delegates to currently
      * selected top component.
      */
-	@Override
+    @Override
     public Lookup createGlobalContext() {
-        registry.addPropertyChangeListener(this);
-        return org.openide.util.lookup.Lookups.proxy(this);
+        registry.addPropertyChangeListener( this );
+        return org.openide.util.lookup.Lookups.proxy( this );
     }
 
-    /** The current component lookup */
-	@Override
+
+    /**
+     * The current component lookup
+     */
+    @Override
     public Lookup getLookup() {
         TopComponent tc = registry.getActivated();
-        return new ProxyLookup(CentralLookup.getDefault(),
-				org.openide.util.lookup.Lookups.proxy(ProjectLookup.getCurrent()),
-				tc == null ? Lookup.EMPTY : tc.getLookup());
+        return new ProxyLookup( CentralLookup.getDefault(),
+                                org.openide.util.lookup.Lookups.proxy( ProjectLookup.getCurrent() ),
+                                tc == null ? Lookup.EMPTY : tc.getLookup() );
     }
 
-    /** Requests refresh of our lookup everytime component is chagned.
+
+    /**
+     * Requests refresh of our lookup everytime component is chagned.
      */
-	   @Override
-    public void propertyChange(java.beans.PropertyChangeEvent evt) {
-        if (TopComponent.Registry.PROP_ACTIVATED.equals(evt.getPropertyName())) {
-            org.openide.util.Utilities.actionsGlobalContext().lookup(javax.swing.ActionMap.class);
+    @Override
+    public void propertyChange( java.beans.PropertyChangeEvent evt ) {
+        if( TopComponent.Registry.PROP_ACTIVATED.equals( evt.getPropertyName() ) ) {
+            org.openide.util.Utilities.actionsGlobalContext().lookup( javax.swing.ActionMap.class );
         }
-        if (TopComponent.Registry.PROP_TC_CLOSED.equals(evt.getPropertyName())) {
-            org.openide.util.Utilities.actionsGlobalContext().lookup(javax.swing.ActionMap.class);
+        if( TopComponent.Registry.PROP_TC_CLOSED.equals( evt.getPropertyName() ) ) {
+            org.openide.util.Utilities.actionsGlobalContext().lookup( javax.swing.ActionMap.class );
         }
     }
+
 
 }

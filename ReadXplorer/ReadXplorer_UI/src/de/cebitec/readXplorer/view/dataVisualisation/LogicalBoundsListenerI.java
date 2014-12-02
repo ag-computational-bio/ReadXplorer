@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,11 +16,14 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation;
 
+
 import java.awt.Dimension;
+
 
 /**
  * This interface defines listeners for changes in the size of the interval to
- * display on the screen (position of zoom level of the reference sequence was changed)
+ * display on the screen (position of zoom level of the reference sequence was
+ * changed)
  *
  * @author ddoppmeier
  */
@@ -28,14 +31,18 @@ public interface LogicalBoundsListenerI {
 
     /**
      * Notify the listeners of new bounds
+     * <p>
      * @param bounds
      */
-    public void updateLogicalBounds(BoundsInfo bounds);
+    public void updateLogicalBounds( BoundsInfo bounds );
+
 
     /**
      *
-     * @return the size of the area, that is used for drawing. Logical bounds depend on the available size of each listener.
+     * @return the size of the area, that is used for drawing. Logical bounds
+     *         depend on the available size of each listener.
      */
     public Dimension getPaintingAreaDimension();
+
 
 }

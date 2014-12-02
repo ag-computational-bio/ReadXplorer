@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.rnaTrimming;
 
+
 import de.cebitec.readXplorer.mapping.api.MappingApi;
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
@@ -28,22 +29,28 @@ import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
 
+
 /**
  * This panel displays the card to select parameters for rna trimming process.
+ * <p>
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
-class RNATrimSelectionPanel implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
+class RNATrimSelectionPanel implements
+        WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
     public RNATrimSelectionPanel() {
-        this.getComponent().addPropertyChangeListener(RNATrimAction.PROP_SOURCEPATH, new PropertyChangeListener() {
+        this.getComponent().addPropertyChangeListener( RNATrimAction.PROP_SOURCEPATH, new PropertyChangeListener() {
 
             @Override
-            public void propertyChange(PropertyChangeEvent evt) {
+            public void propertyChange( PropertyChangeEvent evt ) {
                 isValid = !((String) evt.getNewValue()).isEmpty();
                 fireChangeEvent();
             }
-        });
+
+
+        } );
     }
+
 
     /**
      * The visual component that displays this panel. If you need to access the
@@ -51,7 +58,8 @@ class RNATrimSelectionPanel implements WizardDescriptor.FinishablePanel<WizardDe
      */
     private TrimSelectionCard component;
     private boolean isValid;
-    private final Set<ChangeListener> listeners = new HashSet<>(1); // or can use ChangeSupport in NB 6.0
+    private final Set<ChangeListener> listeners = new HashSet<>( 1 ); // or can use ChangeSupport in NB 6.0
+
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -59,11 +67,12 @@ class RNATrimSelectionPanel implements WizardDescriptor.FinishablePanel<WizardDe
     // create only those which really need to be visible.
     @Override
     public Component getComponent() {
-        if (component == null) {
+        if( component == null ) {
             component = new TrimSelectionCard();
         }
         return component;
     }
+
 
     @Override
     public HelpCtx getHelp() {
@@ -73,53 +82,61 @@ class RNATrimSelectionPanel implements WizardDescriptor.FinishablePanel<WizardDe
         // return new HelpCtx(SampleWizardPanel1.class);
     }
 
+
     @Override
     public boolean isValid() {
         return isValid;
     }
+
 
     @Override
     public boolean isFinishPanel() {
         return isValid;
     }
 
+
     @Override
-    public final void addChangeListener(ChangeListener l) {
-        synchronized (listeners) {
-            listeners.add(l);
+    public final void addChangeListener( ChangeListener l ) {
+        synchronized( listeners ) {
+            listeners.add( l );
         }
     }
 
+
     @Override
-    public final void removeChangeListener(ChangeListener l) {
-        synchronized (listeners) {
-            listeners.remove(l);
+    public final void removeChangeListener( ChangeListener l ) {
+        synchronized( listeners ) {
+            listeners.remove( l );
         }
     }
+
 
     protected final void fireChangeEvent() {
         Iterator<ChangeListener> it;
-        synchronized (listeners) {
-            it = new HashSet<>(listeners).iterator();
+        synchronized( listeners ) {
+            it = new HashSet<>( listeners ).iterator();
         }
-        ChangeEvent ev = new ChangeEvent(this);
-        while (it.hasNext()) {
-            it.next().stateChanged(ev);
+        ChangeEvent ev = new ChangeEvent( this );
+        while( it.hasNext() ) {
+            it.next().stateChanged( ev );
         }
     }
 
-    @Override
-    public void readSettings(WizardDescriptor data) {
-        component.setMappingParam(MappingApi.getLastMappingParams());
-    }
 
     @Override
-    public void storeSettings(WizardDescriptor settings) {
-        settings.putProperty(RNATrimAction.PROP_TRIMMETHOD, component.getTrimMethod());
-        settings.putProperty(RNATrimAction.PROP_TRIMMAXIMUM, component.getTrimMaximum());
-        settings.putProperty(RNATrimAction.PROP_SOURCEPATH, component.getSourcePath());
-        settings.putProperty(RNATrimAction.PROP_REFERENCEPATH, component.getReferencePath());
-        settings.putProperty(RNATrimAction.PROP_MAPPINGPARAM, component.getMappingParam());
+    public void readSettings( WizardDescriptor data ) {
+        component.setMappingParam( MappingApi.getLastMappingParams() );
     }
+
+
+    @Override
+    public void storeSettings( WizardDescriptor settings ) {
+        settings.putProperty( RNATrimAction.PROP_TRIMMETHOD, component.getTrimMethod() );
+        settings.putProperty( RNATrimAction.PROP_TRIMMAXIMUM, component.getTrimMaximum() );
+        settings.putProperty( RNATrimAction.PROP_SOURCEPATH, component.getSourcePath() );
+        settings.putProperty( RNATrimAction.PROP_REFERENCEPATH, component.getReferencePath() );
+        settings.putProperty( RNATrimAction.PROP_MAPPINGPARAM, component.getMappingParam() );
+    }
+
 
 }

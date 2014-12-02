@@ -4,38 +4,43 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch;
 
+
 import de.cebitec.readXplorer.transcriptomeAnalyses.verifier.IntegerVerifier;
 import java.util.prefs.Preferences;
 import javax.swing.JPanel;
 import org.openide.util.NbPreferences;
 
+
 public final class FivePrimeUTRPromotorSettingsVisualPanel extends JPanel {
-    
+
     private final String wizardName;
+
 
     /**
      * Creates new form FivePrimeUTRPromotorSettingsVisualPanel
      */
-    public FivePrimeUTRPromotorSettingsVisualPanel(String wizardName) {
+    public FivePrimeUTRPromotorSettingsVisualPanel( String wizardName ) {
         initComponents();
         setIntegerVerifierOnTextFields();
         this.wizardName = wizardName;
         updateFields();
     }
 
+
     /**
      * Set IntegerVerifier to all JTextFields.
      */
     private void setIntegerVerifierOnTextFields() {
-        this.putativeMinus35RegionTF.setInputVerifier(new IntegerVerifier(this.putativeMinus35RegionTF));
-        this.putativeMinus10RegionTF.setInputVerifier(new IntegerVerifier(this.putativeMinus10RegionTF));
-        this.alternativeSpacerTF.setInputVerifier(new IntegerVerifier(this.alternativeSpacerTF));
-        this.minSpacer1TF.setInputVerifier(new IntegerVerifier(this.minSpacer1TF));
-        this.minSpacer2TF.setInputVerifier(new IntegerVerifier(this.minSpacer2TF));
-        this.minus10MotifWidthTF.setInputVerifier(new IntegerVerifier(this.minus10MotifWidthTF));
-        this.minus35MotifWidthTF.setInputVerifier(new IntegerVerifier(this.minus35MotifWidthTF));
-        this.noTimesTryingTF.setInputVerifier(new IntegerVerifier(this.noTimesTryingTF));
+        this.putativeMinus35RegionTF.setInputVerifier( new IntegerVerifier( this.putativeMinus35RegionTF ) );
+        this.putativeMinus10RegionTF.setInputVerifier( new IntegerVerifier( this.putativeMinus10RegionTF ) );
+        this.alternativeSpacerTF.setInputVerifier( new IntegerVerifier( this.alternativeSpacerTF ) );
+        this.minSpacer1TF.setInputVerifier( new IntegerVerifier( this.minSpacer1TF ) );
+        this.minSpacer2TF.setInputVerifier( new IntegerVerifier( this.minSpacer2TF ) );
+        this.minus10MotifWidthTF.setInputVerifier( new IntegerVerifier( this.minus10MotifWidthTF ) );
+        this.minus35MotifWidthTF.setInputVerifier( new IntegerVerifier( this.minus35MotifWidthTF ) );
+        this.noTimesTryingTF.setInputVerifier( new IntegerVerifier( this.noTimesTryingTF ) );
     }
+
 
     /**
      * Updates the checkboxes for the read classes with the globally stored
@@ -43,57 +48,67 @@ public final class FivePrimeUTRPromotorSettingsVisualPanel extends JPanel {
      * configuration is chosen.
      */
     private void updateFields() {
-        Preferences pref = NbPreferences.forModule(Object.class);
-        this.minSpacer1TF.setText(pref.get(wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER1_LENGTH, "6"));
-        this.minSpacer2TF.setText(pref.get(wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER2_LENGTH, "17"));
-        this.putativeMinus10RegionTF.setText(pref.get(wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_PUTATIVE_10_REGION, "9"));
-        this.putativeMinus35RegionTF.setText(pref.get(wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_PUTATIVE_35_REGION, "9"));
-        minus10MotifWidthTF.setText(pref.get(wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_MINUS10_MOTIF_LENGTH, "6"));
-        minus35MotifWidthTF.setText(pref.get(wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_MINUS35_MOTIF_LENGTH, "6"));
-        noTimesTryingTF.setText(pref.get(wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_NUMBER_OF_TRYING, "40"));
-        alternativeSpacerTF.setText(pref.get(wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_ALTERNATIVE_SPACER, "29"));
+        Preferences pref = NbPreferences.forModule( Object.class );
+        this.minSpacer1TF.setText( pref.get( wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER1_LENGTH, "6" ) );
+        this.minSpacer2TF.setText( pref.get( wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_SPACER2_LENGTH, "17" ) );
+        this.putativeMinus10RegionTF.setText( pref.get( wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_PUTATIVE_10_REGION, "9" ) );
+        this.putativeMinus35RegionTF.setText( pref.get( wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_PUTATIVE_35_REGION, "9" ) );
+        minus10MotifWidthTF.setText( pref.get( wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_MINUS10_MOTIF_LENGTH, "6" ) );
+        minus35MotifWidthTF.setText( pref.get( wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_MINUS35_MOTIF_LENGTH, "6" ) );
+        noTimesTryingTF.setText( pref.get( wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_NUMBER_OF_TRYING, "40" ) );
+        alternativeSpacerTF.setText( pref.get( wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_ALTERNATIVE_SPACER, "29" ) );
     }
-    
+
+
     @Override
     public String getName() {
         return "Parameters for Promotor detection using BioProspector";
     }
-    
+
+
     public Integer getAlternativeSpacer() {
-        return Integer.valueOf(this.alternativeSpacerTF.getText());
+        return Integer.valueOf( this.alternativeSpacerTF.getText() );
     }
-    
+
+
     public Integer getSpacer1Length() {
-        return Integer.valueOf(this.minSpacer1TF.getText());
+        return Integer.valueOf( this.minSpacer1TF.getText() );
     }
-    
+
+
     public Integer getSpacer2Length() {
-        return Integer.valueOf(this.minSpacer2TF.getText());
+        return Integer.valueOf( this.minSpacer2TF.getText() );
     }
-    
+
+
     public Integer getPutativeMinusTenLength() {
-        return Integer.valueOf(this.putativeMinus10RegionTF.getText());
+        return Integer.valueOf( this.putativeMinus10RegionTF.getText() );
     }
-    
+
+
     public Integer getPutativeMinusThirtyFiveLength() {
-        return Integer.valueOf(this.putativeMinus35RegionTF.getText());
+        return Integer.valueOf( this.putativeMinus35RegionTF.getText() );
     }
-    
+
+
     public Integer getMinus10MotifWidth() {
-        return Integer.valueOf(this.minus10MotifWidthTF.getText());
+        return Integer.valueOf( this.minus10MotifWidthTF.getText() );
     }
-    
+
+
     public Integer getMinus35MotifWidth() {
-        return Integer.valueOf(this.minus35MotifWidthTF.getText());
+        return Integer.valueOf( this.minus35MotifWidthTF.getText() );
     }
+
 
     /**
      *
      * @return
      */
     public Integer getNoTrying() {
-        return Integer.valueOf(this.noTimesTryingTF.getText());
+        return Integer.valueOf( this.noTimesTryingTF.getText() );
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -278,20 +293,21 @@ public final class FivePrimeUTRPromotorSettingsVisualPanel extends JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_minSpacer1TFActionPerformed
 
+
     /**
      * Set all text fields to default values.
      *
      * @param evt
      */
     private void setToDefaultValuesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_setToDefaultValuesButtonActionPerformed
-        this.minSpacer1TF.setText("5");
-        this.minSpacer2TF.setText("16");
-        this.minus10MotifWidthTF.setText("6");
-        this.minus35MotifWidthTF.setText("6");
-        this.noTimesTryingTF.setText("40");
-        this.putativeMinus10RegionTF.setText("9");
-        this.putativeMinus35RegionTF.setText("9");
-        this.alternativeSpacerTF.setText("29");
+        this.minSpacer1TF.setText( "5" );
+        this.minSpacer2TF.setText( "16" );
+        this.minus10MotifWidthTF.setText( "6" );
+        this.minus35MotifWidthTF.setText( "6" );
+        this.noTimesTryingTF.setText( "40" );
+        this.putativeMinus10RegionTF.setText( "9" );
+        this.putativeMinus35RegionTF.setText( "9" );
+        this.alternativeSpacerTF.setText( "29" );
     }//GEN-LAST:event_setToDefaultValuesButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField alternativeSpacerTF;

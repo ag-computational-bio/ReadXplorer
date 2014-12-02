@@ -1,5 +1,6 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
+
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
 import de.cebitec.readXplorer.databackend.dataObjects.MappingResult;
@@ -19,6 +20,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 import jsc.distributions.Normal;
+
 
 /**
  * This class calculates and includes all statistical values ​​from a mapping
@@ -47,6 +49,7 @@ public class StatisticsOnMappingData implements Observer {
     private final TrackConnector trackConnector;
     private final PersistentReference refGenome;
 
+
     /**
      * Constructor for test cases.
      */
@@ -55,9 +58,11 @@ public class StatisticsOnMappingData implements Observer {
         this.refGenome = null;
     }
 
+
     /**
      * Constructor for this class.
-     * @param refGenome PersistentReference.
+     * <p>
+     * @param refGenome       PersistentReference.
      * @param fraction
      * @param forwardFeatures all reference features in forward direction. <key>
      * startposition on the reference, <value> list of different (overlapping)
@@ -65,12 +70,13 @@ public class StatisticsOnMappingData implements Observer {
      * @param reverseFeatures all reference features in reverse direction. <key>
      * startposition on the reference, <value> list of different (overlapping)
      * feature ids on that position
-     * @param allFeatures all reference features with feature id as <key> and a
+     * @param allFeatures     all reference features with feature id as <key>
+     * and a
      * PersistentFeature as <value>
      * @param region2Exclude
      */
-    public StatisticsOnMappingData(TrackConnector trackConnector, double fraction, Map<Integer, List<Integer>> forwardFeatures,
-            Map<Integer, List<Integer>> reverseFeatures, Map<Integer, PersistentFeature> allFeatures, List<Set<Integer>> region2Exclude) {
+    public StatisticsOnMappingData( TrackConnector trackConnector, double fraction, Map<Integer, List<Integer>> forwardFeatures,
+                                    Map<Integer, List<Integer>> reverseFeatures, Map<Integer, PersistentFeature> allFeatures, List<Set<Integer>> region2Exclude ) {
 
         this.trackConnector = trackConnector;
         this.refGenome = trackConnector.getRefGenome();
@@ -84,9 +90,9 @@ public class StatisticsOnMappingData implements Observer {
         this.revCoverage = new int[chromCount][];
 
         Map<Integer, PersistentChromosome> chroms = refGenome.getChromosomes();
-        for (PersistentChromosome chrom : chroms.values()) {
+        for( PersistentChromosome chrom : chroms.values() ) {
             int chromId = chrom.getId();
-            int chromNo = refGenome.getChromosome(chromId).getChromNumber();
+            int chromNo = refGenome.getChromosome( chromId ).getChromNumber();
             this.fwdReadStarts = new int[chromNo][chrom.getLength()]; //TODO: only store for a partial genome interval and run analyses on that interval - needs restructuring of this class and the analyses!
             this.revReadStarts = new int[chromNo][chrom.getLength()];
             this.fwdCoverage = new int[chromNo][chrom.getLength()];
@@ -101,15 +107,17 @@ public class StatisticsOnMappingData implements Observer {
         this.putativeOperonAdjacenciesREV = new TreeMap<>();
     }
 
+
     /**
      * This Constructor needed for import of existing analysis tables.
+     * <p>
      * @param refGenome Persistent Reference.
-     * @param mml Mean mapping length.
-     * @param mm Mean per million.
-     * @param mc Mapping count.
-     * @param bg Backgrount threshold.
+     * @param mml       Mean mapping length.
+     * @param mm        Mean per million.
+     * @param mc        Mapping count.
+     * @param bg        Backgrount threshold.
      */
-    public StatisticsOnMappingData(TrackConnector trackConnector, double mml, double mm, double mc, double bg) {
+    public StatisticsOnMappingData( TrackConnector trackConnector, double mml, double mm, double mc, double bg ) {
         this.trackConnector = trackConnector;
         this.refGenome = this.trackConnector.getRefGenome();
         this.averageReadLength = mml;
@@ -118,42 +126,45 @@ public class StatisticsOnMappingData implements Observer {
         this.bgThreshold = bg;
     }
 
+
     /**
      * Initializes the three statistic values mean-mapping-length, mean-mappings
      * count and mapping count.
      */
     public void initMappingsStatistics() {
-        DiscreteCountingDistribution readLengthDistribution = trackConnector.getCountDistribution(Properties.READ_LENGTH_DISTRIBUTION);
+        DiscreteCountingDistribution readLengthDistribution = trackConnector.getCountDistribution( Properties.READ_LENGTH_DISTRIBUTION );
         this.averageReadLength = readLengthDistribution.getAverageValue();
         this.mappingsPerMillion = uniqueCounts / 1000000.0;
         this.mappingCount = baseInTotal / 1000000.0;
     }
 
+
     /**
      * Parses all mappingResults of one Track. It also counts all unique
      * mappingResults and the total base count of the mappingResults. By the way
      * it cunstructs a List with OperonAdjacencies for further analyses.
+     * <p>
      * @param result MappingResultPersistent contains List of PersistenMappings.
      */
-    private void parseMappings(MappingResult result) {
+    private void parseMappings( MappingResult result ) {
 
         // Sorting all mappingResults
         int chromId = result.getRequest().getChromId();
-        int chromNo = refGenome.getChromosome(chromId).getChromNumber();
+        int chromNo = refGenome.getChromosome( chromId ).getChromNumber();
         List<Mapping> mappings = result.getMappings();
-        Collections.sort(mappings);
-        for (Mapping mapping : mappings) {
+        Collections.sort( mappings );
+        for( Mapping mapping : mappings ) {
             this.totalCount++;
             int start = mapping.getStart();
             int stop = mapping.getStop();
-            if (stop == refGenome.getChromosome(chromId).getLength()) {
+            if( stop == refGenome.getChromosome( chromId ).getLength() ) {
                 stop -= 1;
             }
 
             boolean isFwd = mapping.isFwdStrand();
 
             // count only mappings not overlapping any t/rRNA feature
-            if (!positions2Exclude.get(chromNo - 1).contains(start) && !positions2Exclude.get(chromNo - 1).contains(stop)) {
+            if( !positions2Exclude.get( chromNo - 1 ).contains( start ) && !positions2Exclude.get( chromNo - 1 ).contains( stop ) ) {
                 //Alternatively, could use intervals which have to be checked for each mapping
                 this.uniqueCounts++;
                 //TODO: alternatively: calc total intersection with t/rRNA feature and include part outside the feature
@@ -161,47 +172,52 @@ public class StatisticsOnMappingData implements Observer {
             }
 
             //	sum up the total coverage at all positions
-            if (isFwd) {
+            if( isFwd ) {
                 fwdReadStarts[chromNo - 1][start]++;
-                for (int i = start; i < stop; i++) {
+                for( int i = start; i < stop; i++ ) {
                     fwdCoverage[chromNo - 1][i]++;
                 }
-                checkOperonAdjacency(putativeOperonAdjacenciesFWD, fwdFeatures, stop, start);
-            } else {
+                checkOperonAdjacency( putativeOperonAdjacenciesFWD, fwdFeatures, stop, start );
+            }
+            else {
                 revReadStarts[chromNo - 1][stop]++;
-                for (int i = start; i < stop; i++) {
+                for( int i = start; i < stop; i++ ) {
                     revCoverage[chromNo - 1][i]++;
                 }
-                checkOperonAdjacency(putativeOperonAdjacenciesREV, revFeatures, stop, start);
+                checkOperonAdjacency( putativeOperonAdjacenciesREV, revFeatures, stop, start );
             }
         }
     }
 
+
     /**
      * Check two features for putative adjacency.
+     * <p>
      * @param putativeOperonAdjacencies Tree of putative operon adjacencies
-     * @param features list of PersistentFeature Ids <value> on a reference
-     * position <key>
-     * @param stop stop of certain region
-     * @param start start of certain region
+     * @param features                  list of PersistentFeature Ids <value> on
+     *                                  a reference
+     *                                  position <key>
+     * @param stop                      stop of certain region
+     * @param start                     start of certain region
      */
-    private void checkOperonAdjacency(TreeMap<Integer, OperonAdjacency> putativeOperonAdjacencies, Map<Integer, List<Integer>> features, int stop, int start) {
+    private void checkOperonAdjacency( TreeMap<Integer, OperonAdjacency> putativeOperonAdjacencies, Map<Integer, List<Integer>> features, int stop, int start ) {
         PersistentFeature feat1;
         PersistentFeature feat2;
-        if (features.containsKey(stop) && features.containsKey(start)) {
-            for (int featureIDrev1 : features.get(start)) {
-                feat1 = allFeatures.get(featureIDrev1);
+        if( features.containsKey( stop ) && features.containsKey( start ) ) {
+            for( int featureIDrev1 : features.get( start ) ) {
+                feat1 = allFeatures.get( featureIDrev1 );
 
-                for (int featureIDrev2 : features.get(stop)) {
-                    feat2 = allFeatures.get(featureIDrev2);
+                for( int featureIDrev2 : features.get( stop ) ) {
+                    feat2 = allFeatures.get( featureIDrev2 );
 
-                    if (feat1.getType() != FeatureType.MISC_RNA && feat2.getType() != FeatureType.MISC_RNA && featureIDrev1 != featureIDrev2) {
-                        if (putativeOperonAdjacencies.get(featureIDrev1) != null) {
-                            putativeOperonAdjacencies.get(featureIDrev1).setSpanningReads(putativeOperonAdjacencies.get(featureIDrev1).getSpanningReads() + 1);
-                        } else {
-                            OperonAdjacency operonAdj = new OperonAdjacency(feat1, feat2);
-                            operonAdj.setSpanningReads(operonAdj.getSpanningReads() + 1);
-                            putativeOperonAdjacencies.put(featureIDrev1, operonAdj);
+                    if( feat1.getType() != FeatureType.MISC_RNA && feat2.getType() != FeatureType.MISC_RNA && featureIDrev1 != featureIDrev2 ) {
+                        if( putativeOperonAdjacencies.get( featureIDrev1 ) != null ) {
+                            putativeOperonAdjacencies.get( featureIDrev1 ).setSpanningReads( putativeOperonAdjacencies.get( featureIDrev1 ).getSpanningReads() + 1 );
+                        }
+                        else {
+                            OperonAdjacency operonAdj = new OperonAdjacency( feat1, feat2 );
+                            operonAdj.setSpanningReads( operonAdj.getSpanningReads() + 1 );
+                            putativeOperonAdjacencies.put( featureIDrev1, operonAdj );
                         }
                     }
                 }
@@ -209,33 +225,37 @@ public class StatisticsOnMappingData implements Observer {
         }
     }
 
+
     /**
      * Calculates the inverse of the normal distribution. The mean is count of
      * unique mappingResults divided by the length of the reference * 2. The
      * variance is equals mean.
      *
      * @param fraction Fraction needed for calculation of allowed false
-     * pasitives.
+     *                 pasitives.
+     * <p>
      * @return a threshold.
      */
-    public double calculateBackgroundCutoff(double fraction) {
+    public double calculateBackgroundCutoff( double fraction ) {
 //        int length = refSeqLength * 2;
-        int wholeGenomeLength = PersistentReference.calcWholeGenomeLength(refGenome.getChromosomes());
+        int wholeGenomeLength = PersistentReference.calcWholeGenomeLength( refGenome.getChromosomes() );
         double mean = this.uniqueCounts / (wholeGenomeLength * 2);
-        double standardDiviation = Math.sqrt(mean);
-        jsc.distributions.Normal normal = new Normal(mean, standardDiviation);
-        return normal.inverseCdf(1 - (fraction / 1000));
+        double standardDiviation = Math.sqrt( mean );
+        jsc.distributions.Normal normal = new Normal( mean, standardDiviation );
+        return normal.inverseCdf( 1 - (fraction / 1000) );
     }
+
 
     /**
      * Simalation for a background threshold. We expect ~ one start per kb, and
      * we want less than $fraction false positives
      *
      * @param fraction quantil for false positive mappings.
+     * <p>
      * @return the simmulated background threshold
      */
-    public int simulateBackgroundThreshold(double fraction) {
-        int genomeSize = PersistentReference.calcWholeGenomeLength(refGenome.getChromosomes());
+    public int simulateBackgroundThreshold( double fraction ) {
+        int genomeSize = PersistentReference.calcWholeGenomeLength( refGenome.getChromosomes() );
         int doubleGenomeSize = genomeSize * 2;
         int maxRandomVariableValue = 0; // Das ist der Wert der größten Zufallsvariable
         int backgroundCutoff = 0;
@@ -247,49 +267,52 @@ public class StatisticsOnMappingData implements Observer {
         HashMap<Integer, Integer> relativeCountsOfRandomVariables = new HashMap<>();
 
         Random generator = new Random();
-        for (int j = 0; j < uniqueCounts; j++) {
-            int randomInt = generator.nextInt(doubleGenomeSize);
+        for( int j = 0; j < uniqueCounts; j++ ) {
+            int randomInt = generator.nextInt( doubleGenomeSize );
             bin[randomInt]++;
             //System.out.println("randomInt: "+randomInt);
         }
 
         // dermining Maximum coverage count for a mapping
-        for (int pos = 0; pos < doubleGenomeSize; pos++) {
+        for( int pos = 0; pos < doubleGenomeSize; pos++ ) {
             bgcount = bin[pos]; // Zufallsvariable an Stelle pos
-            if (relativeCountsOfRandomVariables.containsKey(bgcount)) {
-                relativeCountsOfRandomVariables.put(bgcount, relativeCountsOfRandomVariables.get(bgcount) + 1);
-            } else {
-                relativeCountsOfRandomVariables.put(bgcount, 1);
+            if( relativeCountsOfRandomVariables.containsKey( bgcount ) ) {
+                relativeCountsOfRandomVariables.put( bgcount, relativeCountsOfRandomVariables.get( bgcount ) + 1 );
             }
-            if (bgcount > maxRandomVariableValue) {
+            else {
+                relativeCountsOfRandomVariables.put( bgcount, 1 );
+            }
+            if( bgcount > maxRandomVariableValue ) {
                 maxRandomVariableValue = bgcount;
             }
         }
 
         double mean = (uniqueCounts / doubleGenomeSize); // y number of mappings, x genomesize y/x = mü and s^2 Erwartungswert und Varianz!
-        System.out.println("Limit: " + (int) (genomeSize / 1000 * fraction));
-        for (int num = maxRandomVariableValue; num >= 0; num--) {
+        System.out.println( "Limit: " + (int) (genomeSize / 1000 * fraction) );
+        for( int num = maxRandomVariableValue; num >= 0; num-- ) {
             // # we expect ~ one start per kb, and we want less than $fraction false positives
 
-            System.out.println("Num: " + num);
+            System.out.println( "Num: " + num );
 
-            if (bgtotal >= ((int) (genomeSize / 1000 * fraction))) {
+            if( bgtotal >= ((int) (genomeSize / 1000 * fraction)) ) {
                 break;
             }
 
-            if (relativeCountsOfRandomVariables.containsKey(num)) {
-                bgtotal += relativeCountsOfRandomVariables.get(num);
+            if( relativeCountsOfRandomVariables.containsKey( num ) ) {
+                bgtotal += relativeCountsOfRandomVariables.get( num );
                 backgroundCutoff = num;
-                System.out.println("BackgroundCutoff: " + backgroundCutoff);
-                System.out.println("count of BackgroundCutoff: " + relativeCountsOfRandomVariables.get(num));
-                System.out.println("BackgroundTotal: " + bgtotal);
-            } else {
-                System.out.println("Num nicht im Hash: " + num);
+                System.out.println( "BackgroundCutoff: " + backgroundCutoff );
+                System.out.println( "count of BackgroundCutoff: " + relativeCountsOfRandomVariables.get( num ) );
+                System.out.println( "BackgroundTotal: " + bgtotal );
+            }
+            else {
+                System.out.println( "Num nicht im Hash: " + num );
             }
 
         }
         return backgroundCutoff;
     }
+
 
     /**
      * Return the background threshold value.
@@ -300,6 +323,7 @@ public class StatisticsOnMappingData implements Observer {
         return this.bgThreshold;
     }
 
+
     /**
      * Get array of readstarts in forward orientation.
      *
@@ -308,6 +332,7 @@ public class StatisticsOnMappingData implements Observer {
     public int[][] getForwardReadStarts() {
         return fwdReadStarts;
     }
+
 
     /**
      * Get array of readstarts in reverse orientation.
@@ -318,6 +343,7 @@ public class StatisticsOnMappingData implements Observer {
         return revReadStarts;
     }
 
+
     /**
      *
      * @return
@@ -325,6 +351,7 @@ public class StatisticsOnMappingData implements Observer {
     public int[][] getFwdCov() {
         return fwdCoverage;
     }
+
 
     /**
      *
@@ -334,6 +361,7 @@ public class StatisticsOnMappingData implements Observer {
         return revCoverage;
     }
 
+
     /**
      *
      * @return hash representative of putative forward operon adjacencies.
@@ -342,6 +370,7 @@ public class StatisticsOnMappingData implements Observer {
         return putativeOperonAdjacenciesFWD;
     }
 
+
     /**
      *
      * @return hash representative of putative reverse operon adjacencies.
@@ -349,6 +378,7 @@ public class StatisticsOnMappingData implements Observer {
     public TreeMap<Integer, OperonAdjacency> getPutativeOperonAdjacenciesREV() {
         return putativeOperonAdjacenciesREV;
     }
+
 
     /**
      * Returns the number of total number of mapped reads.
@@ -359,6 +389,7 @@ public class StatisticsOnMappingData implements Observer {
         return totalCount;
     }
 
+
     /**
      * Returns the number of unique mapped reads.
      *
@@ -368,37 +399,45 @@ public class StatisticsOnMappingData implements Observer {
         return uniqueCounts;
     }
 
+
     /**
      * Returns the total number of bases of mapped reads.
+     * <p>
      * @return total number of bases of mapped reads.
      */
     public double getBaseInTotal() {
         return baseInTotal;
     }
 
+
     @Override
-    public void update(Object args) {
-        if (args instanceof MappingResult) {
+    public void update( Object args ) {
+        if( args instanceof MappingResult ) {
             MappingResult result = (MappingResult) args;
-            this.parseMappings(result);
+            this.parseMappings( result );
         }
     }
 
+
     /**
      * Returns the average mapping length of all mapped reads.
+     * <p>
      * @return the average mapping length
      */
     public double getAverageReadLength() {
         return averageReadLength;
     }
 
+
     /**
      * Returns the number of mapped reads per million nucleotides.
+     * <p>
      * @return the number of mapped reads per million nucleotides
      */
     public double getMappingsPerMillion() {
         return mappingsPerMillion;
     }
+
 
     /**
      * Returns the mapping count.
@@ -409,14 +448,16 @@ public class StatisticsOnMappingData implements Observer {
         return mappingCount;
     }
 
+
     /**
      * Sets the background threshold.
      *
      * @param bg threshold
      */
-    public void setBgThreshold(double bg) {
+    public void setBgThreshold( double bg ) {
         this.bgThreshold = bg;
     }
+
 
     /**
      * Set all memory inefficient structures to null.
@@ -433,4 +474,6 @@ public class StatisticsOnMappingData implements Observer {
         this.putativeOperonAdjacenciesREV = null;
         this.positions2Exclude = null;
     }
+
+
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.parser.common;
 
+
 /**
  *
  * @author ddoppmeier
@@ -25,36 +26,41 @@ public class ParsedDiff {
     private long position;
     private char base;
 
-    public ParsedDiff(long position, char c){
+
+    public ParsedDiff( long position, char c ) {
         this.position = position;
         this.base = c;
     }
+
 
     public char getBase() {
         return base;
     }
 
+
     public long getPosition() {
         return position;
     }
 
+
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
+    public boolean equals( Object obj ) {
+        if( obj == null ) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if( getClass() != obj.getClass() ) {
             return false;
         }
         final ParsedDiff other = (ParsedDiff) obj;
-        if (this.position != other.getPosition()) {
+        if( this.position != other.getPosition() ) {
             return false;
         }
-        if (this.base != other.getBase()) {
+        if( this.base != other.getBase() ) {
             return false;
         }
         return true;
     }
+
 
     @Override
     public int hashCode() {
@@ -63,5 +69,6 @@ public class ParsedDiff {
         hash = 37 * hash + this.base;
         return hash;
     }
-        
+
+
 }

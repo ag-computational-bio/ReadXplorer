@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,10 @@
  */
 package de.cebitec.readXplorer.databackend.dataObjects;
 
+
 import java.util.List;
 import java.util.Map;
+
 
 /**
  * A diff and gap result data storage for persistent objects for one mapping.
@@ -25,24 +27,29 @@ import java.util.Map;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class DiffAndGapResult {
+
     private int errors;
     private Map<Integer, Integer> gapOrderIndex;
     private List<Difference> diffs;
     private List<ReferenceGap> gaps;
 
+
     /**
-     * A diff and gap result data storage for persistent objects for one mapping.
-     * @param diffs list of diffs in a certain interval
-     * @param gaps list of gaps in a certain interval
+     * A diff and gap result data storage for persistent objects for one
+     * mapping.
+     * <p>
+     * @param diffs         list of diffs in a certain interval
+     * @param gaps          list of gaps in a certain interval
      * @param gapOrderIndex order of the gaps
-     * @param errors total number of differences to the reference
+     * @param errors        total number of differences to the reference
      */
-    public DiffAndGapResult(List<Difference> diffs, List<ReferenceGap> gaps, Map<Integer, Integer> gapOrderIndex, int errors) {
+    public DiffAndGapResult( List<Difference> diffs, List<ReferenceGap> gaps, Map<Integer, Integer> gapOrderIndex, int errors ) {
         this.diffs = diffs;
         this.gaps = gaps;
         this.gapOrderIndex = gapOrderIndex;
         this.errors = errors;
     }
+
 
     /**
      * @return the diffs of one mapping.
@@ -51,6 +58,7 @@ public class DiffAndGapResult {
         return diffs;
     }
 
+
     /**
      * @return the gaps of one mapping
      */
@@ -58,18 +66,24 @@ public class DiffAndGapResult {
         return gaps;
     }
 
+
     /**
-     * @return the gap order index belonging to the gaps of the mapping to which this object belongs
+     * @return the gap order index belonging to the gaps of the mapping to which
+     *         this object belongs
      */
     public Map<Integer, Integer> getGapOrderIndex() {
         return gapOrderIndex;
     }
 
+
     /**
-     * @return the number of differences the mapping, to which this object belongs,
-     *      has.
+     * @return the number of differences the mapping, to which this object
+     *         belongs,
+     *         has.
      */
     public int getErrors() {
         return errors;
     }
+
+
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,10 +16,12 @@
  */
 package de.cebitec.readXplorer.plotting;
 
+
 import java.awt.Graphics2D;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.event.OverlayChangeListener;
 import org.jfree.chart.panel.Overlay;
+
 
 /**
  *
@@ -29,23 +31,29 @@ public class ChartPanelOverlay implements Overlay {
 
     private MouseActions mouseActions;
 
-    public ChartPanelOverlay(MouseActions mouseActions) {
+
+    public ChartPanelOverlay( MouseActions mouseActions ) {
         this.mouseActions = mouseActions;
     }
 
+
     @Override
-    public void paintOverlay(Graphics2D gd, ChartPanel pnl) {
+    public void paintOverlay( Graphics2D gd, ChartPanel pnl ) {
         PlotDataItem selectedItem = mouseActions.getSelectedItem();
-        if (selectedItem != null) {
-        
+        if( selectedItem != null ) {
+
         }
     }
 
-    @Override
-    public void addChangeListener(OverlayChangeListener ol) {
-    }
 
     @Override
-    public void removeChangeListener(OverlayChangeListener ol) {
+    public void addChangeListener( OverlayChangeListener ol ) {
     }
+
+
+    @Override
+    public void removeChangeListener( OverlayChangeListener ol ) {
+    }
+
+
 }

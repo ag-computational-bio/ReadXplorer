@@ -72,7 +72,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             </file>
         </folder>
         <folder name="Window">
-<!--            <file name="de-cebitec-readXplorer-ui-visualisation-AppPanelAction.instance">
+            <!--            <file name="de-cebitec-readXplorer-ui-visualisation-AppPanelAction.instance">
                 <attr name="component" methodvalue="de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent.findInstance"/>
                 <attr name="displayName" bundlevalue="de.cebitec.readXplorer.ui.visualisation.Bundle#CTL_AppPanelAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
@@ -85,7 +85,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <folder name="Menu">
         <folder name="Visualisation">
             <attr name="position" intvalue="250"/>
-            
+
             <file name="de-cebitec-readXplorer-ui-visualisation-actions-CloseRefGenAction-separatorAfter.instance">
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                 <attr name="position" intvalue="300"/>
@@ -94,12 +94,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readXplorer-ui-visualisation-actions-CloseRefGenAction.instance"/>
                 <attr name="position" intvalue="200"/>
             </file>
-            
+
             <file name="de-cebitec-readXplorer-ui-visualisation-actions-MyCancelableAction.shadow">
                 <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readXplorer-ui-visualisation-actions-MyCancelableAction.instance"/>
                 <attr name="position" intvalue="205"/>
             </file>
-            
+
             <file name="de-cebitec-readXplorer-ui-visualisation-actions-CloseTrackAction-separatorAfter.instance">
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                 <attr name="position" intvalue="600"/>

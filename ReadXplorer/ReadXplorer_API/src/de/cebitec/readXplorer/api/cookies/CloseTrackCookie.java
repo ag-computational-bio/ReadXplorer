@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.api.cookies;
 
+
 /**
  * Cookie class that signifies the capability of a track to be closed.
  *
@@ -30,11 +31,13 @@ public interface CloseTrackCookie {
      */
     public boolean close();
 
+
     /**
      * Gets the name of the track the can be closed.
      *
      * @return track name
      */
     public String getName();
+
 
 }

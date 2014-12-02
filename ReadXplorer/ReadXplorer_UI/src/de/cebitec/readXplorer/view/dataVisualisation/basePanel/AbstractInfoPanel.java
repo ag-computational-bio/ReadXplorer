@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,17 +16,21 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.basePanel;
 
+
 import de.cebitec.readXplorer.view.dataVisualisation.MousePositionListener;
 import javax.swing.JPanel;
+
 
 /**
  *
  * @author ddoppmeier
  */
-public abstract class AbstractInfoPanel extends JPanel implements MousePositionListener{
-    
+public abstract class AbstractInfoPanel extends JPanel implements
+        MousePositionListener {
+
     private static final long serialVersionUID = 1L;
-    
+
+
     public abstract void close();
 
 

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,43 +16,50 @@
  */
 package de.cebitec.readXplorer.featureCoverageAnalysis;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.TrackResultEntry;
 
+
 /**
- * Data structure for storing an feature (gene), which is detected as 
+ * Data structure for storing an feature (gene), which is detected as
  * covered and its corresponding data.
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class CoveredFeature extends TrackResultEntry {
-    
+
     private PersistentFeature coveredFeature;
     private int featLength;
     private int noCoveredBases;
     private int percentCovered;
     private int meanCoverage = 0;
 
+
     /**
-     * Data structure for storing an feature (gene), which is detected as 
+     * Data structure for storing an feature (gene), which is detected as
      * covered and its corresponding data.
+     * <p>
      * @param coveredFeature the feature which is detected as covered
      * @param noCoveredBases the number of covered bases of this feature
      */
-    public CoveredFeature(PersistentFeature coveredFeature, int trackId) {
-        super(trackId);
+    public CoveredFeature( PersistentFeature coveredFeature, int trackId ) {
+        super( trackId );
         this.coveredFeature = coveredFeature;
         this.featLength = coveredFeature.getLength();
     }
 
+
     /**
      * Sets the number of covered bases of this feature.
+     * <p>
      * @param noCoveredBases the number of covered bases of this feature
      */
-    public void setNoCoveredBases(int noCoveredBases) {
+    public void setNoCoveredBases( int noCoveredBases ) {
         this.noCoveredBases = noCoveredBases;
         this.percentCovered = (int) ((float) this.noCoveredBases / this.featLength * 100);
     }
+
 
     /**
      * @return the feature which is detected as covered
@@ -61,12 +68,14 @@ public class CoveredFeature extends TrackResultEntry {
         return this.coveredFeature;
     }
 
+
     /**
      * @return the number of covered bases of this feature
      */
     public int getNoCoveredBases() {
         return this.noCoveredBases;
     }
+
 
     /**
      * @return the percentage of this feature, which is covered
@@ -75,6 +84,7 @@ public class CoveredFeature extends TrackResultEntry {
         return this.percentCovered;
     }
 
+
     /**
      * @return The mean coverage of this feature.
      */
@@ -82,10 +92,13 @@ public class CoveredFeature extends TrackResultEntry {
         return this.meanCoverage;
     }
 
+
     /**
      * @param meanCoverage The mean coverage of this feature.
      */
-    public void setMeanCoverage(int meanCoverage) {
+    public void setMeanCoverage( int meanCoverage ) {
         this.meanCoverage = meanCoverage;
     }
+
+
 }

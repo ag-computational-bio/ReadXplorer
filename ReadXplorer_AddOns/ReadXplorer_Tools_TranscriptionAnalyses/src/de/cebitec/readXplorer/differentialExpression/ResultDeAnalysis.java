@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,10 +16,12 @@
  */
 package de.cebitec.readXplorer.differentialExpression;
 
+
 import java.util.Vector;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.RFactor;
 import org.rosuda.JRI.RVector;
+
 
 /**
  *
@@ -36,7 +38,8 @@ public class ResultDeAnalysis {
     private Vector rowNames = null;
     private DeAnalysisData dEAdata;
 
-    public ResultDeAnalysis(RVector tableContents, REXP colnames, REXP rownames, String description, DeAnalysisData dEAdata) {
+
+    public ResultDeAnalysis( RVector tableContents, REXP colnames, REXP rownames, String description, DeAnalysisData dEAdata ) {
         rawTableContents = tableContents;
         rawColNames = colnames;
         rawRowNames = rownames;
@@ -44,43 +47,49 @@ public class ResultDeAnalysis {
         this.dEAdata = dEAdata;
     }
 
-    public ResultDeAnalysis(Vector<Vector> tableContents, Vector colNames, Vector rowNames, String description) {
+
+    public ResultDeAnalysis( Vector<Vector> tableContents, Vector colNames, Vector rowNames, String description ) {
         this.tableContents = tableContents;
         this.colNames = colNames;
         this.rowNames = rowNames;
         this.description = description;
     }
 
+
     public Vector<Vector> getTableContentsContainingRowNames() {
         Vector rnames = getRownames();
         Vector<Vector> data = getTableContents();
-        for (int i = 0; i < rnames.size(); i++) {
-            data.get(i).add(0, rnames.get(i));
+        for( int i = 0; i < rnames.size(); i++ ) {
+            data.get( i ).add( 0, rnames.get( i ) );
         }
         return data;
     }
 
+
     public Vector<Vector> getTableContents() {
-        if (tableContents == null) {
-            tableContents = convertRresults(rawTableContents);
+        if( tableContents == null ) {
+            tableContents = convertRresults( rawTableContents );
         }
         return tableContents;
     }
 
+
     public Vector getColnames() {
-        if (colNames == null) {
-            colNames = convertNames(rawColNames);
+        if( colNames == null ) {
+            colNames = convertNames( rawColNames );
 //            colNames.insertElementAt("Chromosome", 1);
         }
         return colNames;
     }
 
+
     public Vector getRownames() {
-        if (rowNames == null) {
-            rowNames = convertNames(rawRowNames);
+        if( rowNames == null ) {
+            rowNames = convertNames( rawRowNames );
         }
         return rowNames;
     }
+
 
     public String getDescription() {
         return description;
@@ -91,47 +100,50 @@ public class ResultDeAnalysis {
      * This way the primitive data types are automatically converted to their
      * corresponding Object presentation.
      */
-    private Vector convertNames(REXP currentValues) {
+
+    private Vector convertNames( REXP currentValues ) {
         int currentType = currentValues.getType();
         Vector current = new Vector();
-        switch (currentType) {
+        switch( currentType ) {
             case REXP.XT_ARRAY_DOUBLE:
                 double[] currentDoubleValues = currentValues.asDoubleArray();
-                for (int j = 0; j < currentDoubleValues.length; j++) {
-                    current.add(currentDoubleValues[j]);
+                for( int j = 0; j < currentDoubleValues.length; j++ ) {
+                    current.add( currentDoubleValues[j] );
                 }
                 break;
             case REXP.XT_ARRAY_INT:
                 int[] currentIntValues = currentValues.asIntArray();
-                for (int j = 0; j < currentIntValues.length; j++) {
-                    current.add(currentIntValues[j]);
+                for( int j = 0; j < currentIntValues.length; j++ ) {
+                    current.add( currentIntValues[j] );
                 }
                 break;
             case REXP.XT_ARRAY_STR:
                 String[] currentStringValues = currentValues.asStringArray();
-                for (int j = 0; j < currentStringValues.length; j++) {
+                for( int j = 0; j < currentStringValues.length; j++ ) {
                     String name = currentStringValues[j];
-                    if (dEAdata.existsPersistentFeatureForGNURName(name)) {
-                        current.add(dEAdata.getPersistentFeatureByGNURName(name));
-                    } else {
-                        current.add(name);
+                    if( dEAdata.existsPersistentFeatureForGNURName( name ) ) {
+                        current.add( dEAdata.getPersistentFeatureByGNURName( name ) );
+                    }
+                    else {
+                        current.add( name );
                     }
                 }
                 break;
             case REXP.XT_ARRAY_BOOL_INT:
                 int[] currentBoolValues = currentValues.asIntArray();
-                for (int j = 0; j < currentBoolValues.length; j++) {
-                    current.add(currentBoolValues[j] == 1);
+                for( int j = 0; j < currentBoolValues.length; j++ ) {
+                    current.add( currentBoolValues[j] == 1 );
                 }
                 break;
             case REXP.XT_FACTOR:
                 RFactor factor = currentValues.asFactor();
-                for (int j = 0; j < factor.size(); j++) {
-                    String name = factor.at(j);
-                    if (dEAdata.existsPersistentFeatureForGNURName(name)) {
-                        current.add(dEAdata.getPersistentFeatureByGNURName(name));
-                    } else {
-                        current.add(name);
+                for( int j = 0; j < factor.size(); j++ ) {
+                    String name = factor.at( j );
+                    if( dEAdata.existsPersistentFeatureForGNURName( name ) ) {
+                        current.add( dEAdata.getPersistentFeatureByGNURName( name ) );
+                    }
+                    else {
+                        current.add( name );
                     }
                 }
                 break;
@@ -139,30 +151,33 @@ public class ResultDeAnalysis {
         return current;
     }
 
+
     /**
      * Converts and RVector of data into a Vector of Vectors = table content.
      *
      * @param currentRVector The RVector to convert
+     * <p>
      * @return A Vector of Vectors = table content, generated from the given
-     * RVector.
+     *         RVector.
      */
-    private Vector<Vector> convertRresults(RVector currentRVector) {
+    private Vector<Vector> convertRresults( RVector currentRVector ) {
         Vector<Vector> current = new Vector<>();
-        for (int i = 0; i < currentRVector.size(); i++) {
-            REXP currentValues = currentRVector.at(i);
-            Vector converted = convertNames(currentValues);
-            for (int j = 0; j < converted.size(); j++) {
+        for( int i = 0; i < currentRVector.size(); i++ ) {
+            REXP currentValues = currentRVector.at( i );
+            Vector converted = convertNames( currentValues );
+            for( int j = 0; j < converted.size(); j++ ) {
                 try {
-                    current.get(j);
-                } catch (ArrayIndexOutOfBoundsException e) {
-                    current.add(new Vector());
+                    current.get( j );
                 }
-                current.get(j).add(converted.get(j));
+                catch( ArrayIndexOutOfBoundsException e ) {
+                    current.add( new Vector() );
+                }
+                current.get( j ).add( converted.get( j ) );
             }
         }
 
         // assign chromosomes to the column next to the PersistentFeature column
-        // TODO: This makes this converter methode to specific. It was 
+        // TODO: This makes this converter methode to specific. It was
         // intended to convert any GNU R table but the following code assumes
         // that the first column always contains a PersistentFeature which is not
         // always true (e.g. DESeq2). I have to finde a better solution.
@@ -171,4 +186,6 @@ public class ResultDeAnalysis {
 //        }
         return current;
     }
+
+
 }

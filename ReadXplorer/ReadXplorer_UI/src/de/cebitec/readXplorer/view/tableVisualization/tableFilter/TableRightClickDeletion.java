@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.view.tableVisualization.tableFilter;
 
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -26,6 +27,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
+
 
 /**
  * A MouseAdapter, which offers a row deletion option for a JTable. An instance
@@ -48,6 +50,7 @@ public class TableRightClickDeletion<E extends DefaultTableModel> extends MouseA
     private JMenuItem removeRow;
     private JMenuItem markRow;
 
+
     /**
      * A MouseAdapter, which offers a row deletion option for a JTable. An
      * instance of this class must be added as a listener to the Table that
@@ -60,28 +63,32 @@ public class TableRightClickDeletion<E extends DefaultTableModel> extends MouseA
         init();
     }
 
+
     /**
      * Initialize the JMenuItems, adds the actionListener with actionPerformes
      * and adds them into JPopupMenu.
      */
     private void init() {
-        removeRow = new JMenuItem("remove this row");
-        removeRow.addActionListener(new ActionListener() {
+        removeRow = new JMenuItem( "remove this row" );
+        removeRow.addActionListener( new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed( ActionEvent e ) {
                 DefaultTableModel model = (DefaultTableModel) lastTable.getModel();
 
                 try {
-                    if (lastTable.isRowSelected(lastSelectedRow)) {
-                        model.removeRow(lastSelectedRow);
+                    if( lastTable.isRowSelected( lastSelectedRow ) ) {
+                        model.removeRow( lastSelectedRow );
                     }
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(null, "Please select a row.");
+                }
+                catch( Exception ex ) {
+                    JOptionPane.showMessageDialog( null, "Please select a row." );
                 }
             }
-        });
 
-        popup.add(removeRow);
+
+        } );
+
+        popup.add( removeRow );
 
 //        markRow = new JMenuItem("mark this row");
 //        markRow.addActionListener(new ActionListener() {
@@ -93,13 +100,13 @@ public class TableRightClickDeletion<E extends DefaultTableModel> extends MouseA
 //
 //                if (lastTable.isRowSelected(row)) {
 //                    lastTable.setSelectionBackground(Color.yellow);
-                    
+
 //                    for (int i = 0; i < columsCount; i++) {
 //                        TableCellRenderer cellRenderer = (DefaultTableCellRenderer) lastTable.getCellRenderer(row, i);
-//                        
+//
 //                        JComponent comp = (JComponent) lastTable.prepareRenderer(cellRenderer, row, i);
 //                            comp.setBackground(Color.yellow);
-//                    } 
+//                    }
 //                }
 //            }
 //        });
@@ -108,14 +115,17 @@ public class TableRightClickDeletion<E extends DefaultTableModel> extends MouseA
 
     }
 
+
     @Override
-    public void mouseReleased(MouseEvent e) {
-        if (SwingUtilities.isRightMouseButton(e)) {
+    public void mouseReleased( MouseEvent e ) {
+        if( SwingUtilities.isRightMouseButton( e ) ) {
             lastTable = (JTable) e.getSource();
             lastSelectedRow = lastTable.getSelectedRow();
-            if (lastTable.getModel().getRowCount() > 0) {
-                popup.show(e.getComponent(), e.getX(), e.getY());
+            if( lastTable.getModel().getRowCount() > 0 ) {
+                popup.show( e.getComponent(), e.getX(), e.getY() );
             }
         }
     }
+
+
 }

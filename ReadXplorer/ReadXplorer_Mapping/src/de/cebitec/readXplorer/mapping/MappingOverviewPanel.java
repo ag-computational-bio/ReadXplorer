@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,18 +16,21 @@
  */
 package de.cebitec.readXplorer.mapping;
 
+
 import java.awt.Component;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
 
+
 /**
- * MappingOverviewPanel displays a simple overview of chosen parameters 
+ * MappingOverviewPanel displays a simple overview of chosen parameters
  * before the actual start of the mapping process.
- * 
+ * <p>
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
-public class MappingOverviewPanel implements WizardDescriptor.Panel<WizardDescriptor> {
+public class MappingOverviewPanel implements
+        WizardDescriptor.Panel<WizardDescriptor> {
 
     /**
      * The visual component that displays this panel. If you need to access the
@@ -35,17 +38,19 @@ public class MappingOverviewPanel implements WizardDescriptor.Panel<WizardDescri
      */
     private OverviewCard component;
 
+
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
     public Component getComponent() {
-        if (component == null) {
+        if( component == null ) {
             component = new OverviewCard();
         }
         return component;
     }
+
 
     @Override
     public HelpCtx getHelp() {
@@ -55,34 +60,41 @@ public class MappingOverviewPanel implements WizardDescriptor.Panel<WizardDescri
         // return new HelpCtx(SampleWizardPanel1.class);
     }
 
+
     @Override
     public boolean isValid() {
         return true;
     }
 
-    @Override
-    public final void addChangeListener(ChangeListener l) {
-    }
 
     @Override
-    public final void removeChangeListener(ChangeListener l) {
+    public final void addChangeListener( ChangeListener l ) {
     }
+
+
+    @Override
+    public final void removeChangeListener( ChangeListener l ) {
+    }
+
 
     // You can use a settings object to keep track of state. Normally the
     // settings object will be the WizardDescriptor, so you can use
     // WizardDescriptor.getProperty & putProperty to store information entered
     // by the user.
     @Override
-    @SuppressWarnings("unchecked")
-    public void readSettings(WizardDescriptor settings) {
+    @SuppressWarnings( "unchecked" )
+    public void readSettings( WizardDescriptor settings ) {
         component.showGenereateOverview(
-                settings.getProperty(MappingAction.PROP_REFERENCEPATH).toString(),
-                settings.getProperty(MappingAction.PROP_SOURCEPATH).toString(),
-                settings.getProperty(MappingAction.PROP_MAPPINGPARAM).toString()
-                );
+                settings.getProperty( MappingAction.PROP_REFERENCEPATH ).toString(),
+                settings.getProperty( MappingAction.PROP_SOURCEPATH ).toString(),
+                settings.getProperty( MappingAction.PROP_MAPPINGPARAM ).toString()
+        );
     }
 
+
     @Override
-    public void storeSettings(WizardDescriptor settings) {
+    public void storeSettings( WizardDescriptor settings ) {
     }
+
+
 }

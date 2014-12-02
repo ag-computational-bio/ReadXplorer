@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,63 +16,75 @@
  */
 package de.cebitec.readXplorer.featureCoverageAnalysis;
 
+
 import de.cebitec.readXplorer.databackend.ParameterSetI;
 import de.cebitec.readXplorer.databackend.ParametersFeatureTypesAndReadClasses;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.util.Set;
 
+
 /**
  * Data storage for all parameters associated with feature coverage analysis.
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class ParameterSetCoveredFeatures extends ParametersFeatureTypesAndReadClasses implements ParameterSetI<ParameterSetCoveredFeatures> {
-    
+public class ParameterSetCoveredFeatures extends ParametersFeatureTypesAndReadClasses
+        implements ParameterSetI<ParameterSetCoveredFeatures> {
+
     private int minCoveredPercent;
     private int minCoverageCount;
     private boolean getCoveredFeatures;
 
+
     /**
      * Data storage for all parameters associated with filtering features.
+     * <p>
      * @param performFilterAnalysis true, if the filtering should be carries out
-     * @param minCoveredPercent the minimum percent of an feature that has to be
-     * covered with at least minCoverageCount reads at each position
-     * @param minCoverageCount the minimum coverage at a position to be counted
-     * as covered
-     * @param getCoveredFeatures <code>true</code> if the covered features
-     * should be returned, <code>false</code> if the uncovered features should
-     * be returned
-     * @param readClassesParams The parameter set for the used read classes for
-     * this analysis instance
-     * @param selectedFeatureTypes The set of selected feature types to use for
-     * this analysis instance
+     * @param minCoveredPercent     the minimum percent of an feature that has
+     *                              to be
+     *                              covered with at least minCoverageCount reads at each position
+     * @param minCoverageCount      the minimum coverage at a position to be
+     *                              counted
+     *                              as covered
+     * @param getCoveredFeatures    <code>true</code> if the covered features
+     *                              should be returned, <code>false</code> if the uncovered features should
+     *                              be returned
+     * @param readClassesParams     The parameter set for the used read classes
+     *                              for
+     *                              this analysis instance
+     * @param selectedFeatureTypes  The set of selected feature types to use for
+     *                              this analysis instance
      */
-    public ParameterSetCoveredFeatures(int minCoveredPercent, int minCoverageCount, boolean getCoveredFeatures, 
-            ParametersReadClasses readClassesParams, Set<FeatureType> selectedFeatureTypes) {
-        super(selectedFeatureTypes, readClassesParams);
+    public ParameterSetCoveredFeatures( int minCoveredPercent, int minCoverageCount, boolean getCoveredFeatures,
+                                        ParametersReadClasses readClassesParams, Set<FeatureType> selectedFeatureTypes ) {
+        super( selectedFeatureTypes, readClassesParams );
         this.minCoveredPercent = minCoveredPercent;
         this.minCoverageCount = minCoverageCount;
         this.getCoveredFeatures = getCoveredFeatures;
     }
 
+
     /**
      * @return the minimum percent of an feature that has to be covered with
-     * at least minCoverageCount reads at each position
+     *         at least minCoverageCount reads at each position
      */
     public int getMinCoveredPercent() {
         return minCoveredPercent;
     }
 
+
     /**
      * Set the minimum percent of an feature that has to be covered with at
      * least minCoverageCount reads at each position
+     * <p>
      * @param minCoverageCount the minimum percent of an feature that has to
-     * be covered with at least minCoverageCount reads at each position
+     *                         be covered with at least minCoverageCount reads at each position
      */
-    public void setMinCoveredPercent(int minCoveredPercent) {
+    public void setMinCoveredPercent( int minCoveredPercent ) {
         this.minCoveredPercent = minCoveredPercent;
     }
+
 
     /**
      * @return the minimum coverage at a position to be counted as covered
@@ -81,28 +93,35 @@ public class ParameterSetCoveredFeatures extends ParametersFeatureTypesAndReadCl
         return minCoverageCount;
     }
 
+
     /**
      * Sets the minimum coverage at a position to be counted as covered
+     * <p>
      * @param minCoverageCount the minimum coverage at a position to be counted
-     *      as covered
+     *                         as covered
      */
-    public void setMinCoverageCount(int minCoverageCount) {
+    public void setMinCoverageCount( int minCoverageCount ) {
         this.minCoverageCount = minCoverageCount;
-    } 
+    }
+
 
     /**
      * @return <code>true</code> if the covered features should be returned,
-     * <code>false</code> if the uncovered features should be returned
+     *         <code>false</code> if the uncovered features should be returned
      */
     public boolean isGetCoveredFeatures() {
         return getCoveredFeatures;
     }
 
+
     /**
-     * @param getCoveredFeatures <code>true</code> if the covered features should be returned,
-     * <code>false</code> if the uncovered features should be returned
+     * @param getCoveredFeatures <code>true</code> if the covered features
+     *                           should be returned,
+     *                           <code>false</code> if the uncovered features should be returned
      */
-    public void setGetCoveredFeatures(boolean getCoveredFeatures) {
+    public void setGetCoveredFeatures( boolean getCoveredFeatures ) {
         this.getCoveredFeatures = getCoveredFeatures;
-    }  
+    }
+
+
 }

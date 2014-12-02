@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.util.Iterator;
@@ -27,6 +28,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 
+
 /**
  * Holds all the overlapping dataset between all analysis handlers.
  *
@@ -35,7 +37,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class DeAnalysisData {
 
     /**
-     * Contains ID of the reference features as keys and corresponding feature as values.
+     * Contains ID of the reference features as keys and corresponding feature
+     * as values.
      */
     private Map<String, PersistentFeature> featureData;
     /**
@@ -53,15 +56,17 @@ public class DeAnalysisData {
      * Track Descriptions. Each description just appears one time.
      */
     private String[] trackDescriptions;
-    
+
+
     /**
      * Creates a new instance of the DeAnalysisData class.
      *
      * @param capacity Number of selected tracks.
      */
-    public DeAnalysisData(int capacity) {
-        countData = new ArrayBlockingQueue<>(capacity);
+    public DeAnalysisData( int capacity ) {
+        countData = new ArrayBlockingQueue<>( capacity );
     }
+
 
     /**
      * Adds count data as an Integer array to a Queue holding all count data
@@ -70,9 +75,10 @@ public class DeAnalysisData {
      *
      * @param data count data
      */
-    public void addCountDataForTrack(Integer[] data) {
-        countData.add(data);
+    public void addCountDataForTrack( Integer[] data ) {
+        countData.add( data );
     }
+
 
     /**
      * Return the first count data value on the Queue and removes it. So this
@@ -87,21 +93,23 @@ public class DeAnalysisData {
     public int[] pollFirstCountData() {
         Integer[] cdata = countData.poll();
         int[] ret = new int[cdata.length];
-        for (int i = 0; i < cdata.length; i++) {
+        for( int i = 0; i < cdata.length; i++ ) {
             ret[i] = cdata[i].intValue();
         }
         return ret;
     }
 
+
     /**
      * Checks if there is still count data on the Queue
      *
      * @return true if there is at least on count data on the Queue or false if
-     * it is empty.
+     *         it is empty.
      */
     public boolean hasCountData() {
         return !countData.isEmpty();
     }
+
 
     /**
      * Return the start positions of the reference features.
@@ -111,12 +119,13 @@ public class DeAnalysisData {
     public int[] getStart() {
         int[] ret = new int[featureData.size()];
         int i = 0;
-        for (Iterator<String> it = featureData.keySet().iterator(); it.hasNext(); i++) {
+        for( Iterator<String> it = featureData.keySet().iterator(); it.hasNext(); i++ ) {
             String key = it.next();
-            ret[i] = featureData.get(key).getStart();
+            ret[i] = featureData.get( key ).getStart();
         }
         return ret;
     }
+
 
     /**
      * Return the stop positions of the reference features.
@@ -126,12 +135,13 @@ public class DeAnalysisData {
     public int[] getStop() {
         int[] ret = new int[featureData.size()];
         int i = 0;
-        for (Iterator<String> it = featureData.keySet().iterator(); it.hasNext(); i++) {
+        for( Iterator<String> it = featureData.keySet().iterator(); it.hasNext(); i++ ) {
             String key = it.next();
-            ret[i] = featureData.get(key).getStop();
+            ret[i] = featureData.get( key ).getStop();
         }
         return ret;
     }
+
 
     /**
      * Return the names of the reference features.
@@ -139,24 +149,27 @@ public class DeAnalysisData {
      * @return Names of the reference features as an String Array.
      */
     public String[] getFeatureNames() {
-        String[] ret = featureData.keySet().toArray(new String[featureData.keySet().size()]);
-        ProcessingLog.getInstance().addProperty("Number of annotations", ret.length);
+        String[] ret = featureData.keySet().toArray( new String[featureData.keySet().size()] );
+        ProcessingLog.getInstance().addProperty( "Number of annotations", ret.length );
         return ret;
     }
 
+
     /**
      * Returns the reference features.
+     * <p>
      * @return Reference features as an Array.
      */
     public PersistentFeature[] getFeatures() {
         PersistentFeature[] features = new PersistentFeature[featureData.keySet().size()];
         int i = 0;
-        for (Iterator<String> it = featureData.keySet().iterator(); it.hasNext(); i++) {
+        for( Iterator<String> it = featureData.keySet().iterator(); it.hasNext(); i++ ) {
             String key = it.next();
-            features[i] = featureData.get(key);
+            features[i] = featureData.get( key );
         }
         return features;
     }
+
 
     /**
      * Returns the tracks selected by the user to perform the analysis on.
@@ -167,40 +180,48 @@ public class DeAnalysisData {
         return selectedTracks;
     }
 
+
     public String[] getTrackDescriptions() {
         return trackDescriptions;
     }
 
-    public PersistentFeature getPersistentFeatureByGNURName(String gnuRName) {
-        return featureData.get(gnuRName);
+
+    public PersistentFeature getPersistentFeatureByGNURName( String gnuRName ) {
+        return featureData.get( gnuRName );
     }
 
-    public boolean existsPersistentFeatureForGNURName(String gnuRName) {
-        return featureData.containsKey(gnuRName);
+
+    public boolean existsPersistentFeatureForGNURName( String gnuRName ) {
+        return featureData.containsKey( gnuRName );
     }
 
-    public void setFeatures(List<PersistentFeature> features) {
+
+    public void setFeatures( List<PersistentFeature> features ) {
         featureData = new LinkedHashMap<>();
         int counter = 1;
-        for (Iterator<PersistentFeature> it = features.iterator(); it.hasNext();) {
+        for( Iterator<PersistentFeature> it = features.iterator(); it.hasNext(); ) {
             PersistentFeature persistentFeature = it.next();
-            if (featureData.containsKey(persistentFeature.getLocus())) {
-                featureData.put(persistentFeature.getLocus() + "_DN_" + counter++, persistentFeature);
-            } else {
-                featureData.put(persistentFeature.getLocus(), persistentFeature);
+            if( featureData.containsKey( persistentFeature.getLocus() ) ) {
+                featureData.put( persistentFeature.getLocus() + "_DN_" + counter++, persistentFeature );
+            }
+            else {
+                featureData.put( persistentFeature.getLocus(), persistentFeature );
             }
         }
     }
 
-    public void setSelectedTracks(List<PersistentTrack> selectedTracks) {
+
+    public void setSelectedTracks( List<PersistentTrack> selectedTracks ) {
         this.selectedTracks = selectedTracks;
         Set<String> tmpSet = new LinkedHashSet<>();
         int counter = 1;
-        for (int i = 0; i < selectedTracks.size(); i++) {
-            if (!tmpSet.add(selectedTracks.get(i).getDescription())) {
-                tmpSet.add(selectedTracks.get(i).getDescription() + "_DN_" + counter++);
+        for( int i = 0; i < selectedTracks.size(); i++ ) {
+            if( !tmpSet.add( selectedTracks.get( i ).getDescription() ) ) {
+                tmpSet.add( selectedTracks.get( i ).getDescription() + "_DN_" + counter++ );
             }
         }
-        trackDescriptions = tmpSet.toArray(new String[tmpSet.size()]);
+        trackDescriptions = tmpSet.toArray( new String[tmpSet.size()] );
     }
+
+
 }

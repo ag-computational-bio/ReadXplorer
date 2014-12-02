@@ -1,6 +1,8 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.datastructures;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.TrackChromResultEntry;
+
 
 /**
  * Novel Transcript defines a region on the reference, which is not determined
@@ -49,27 +51,29 @@ public class NovelTranscript extends TrackChromResultEntry {
     private final String sequence;
     private boolean isFalsePositive;
 
+
     /**
      * Novel Transcript defines a region on the reference, which is not
      * determined and annotated yet. This region may contain a novel transcript.
      *
-     * @param isFWD direction of novel transcript, <true> if forward.
-     * @param start possible start of novel transcript.
-     * @param dropoff possible end of novel transcript.
-     * @param site <intergenic> if novel region is between to annotated
-     * features. <cis-antisense> if an annotated feature is antisense on the
-     * complement strand.
-     * @param length possible length of novel transcript.
-     * @param sequence sequence representing novel transcript.
-     * @param isFP <true> if user set as a false positive determination of novel
-     * transcript.
+     * @param isFWD      direction of novel transcript, <true> if forward.
+     * @param start      possible start of novel transcript.
+     * @param dropoff    possible end of novel transcript.
+     * @param site       <intergenic> if novel region is between to annotated
+     *                   features. <cis-antisense> if an annotated feature is antisense on the
+     *                   complement strand.
+     * @param length     possible length of novel transcript.
+     * @param sequence   sequence representing novel transcript.
+     * @param isFP       <true> if user set as a false positive determination of
+     *                   novel
+     *                   transcript.
      * @param isSelected <true> if user selects novel transcript for fasta
-     * export.
-     * @param trackId PersistentTrack ID.
-     * @param chromId PersistentChromosome ID.
+     *                   export.
+     * @param trackId    PersistentTrack ID.
+     * @param chromId    PersistentChromosome ID.
      */
-    public NovelTranscript(boolean isFWD, int start, Integer dropoff, String site, int length, String sequence, boolean isFP, boolean isSelected, int trackId, int chromId) {
-        super(trackId, chromId);
+    public NovelTranscript( boolean isFWD, int start, Integer dropoff, String site, int length, String sequence, boolean isFP, boolean isSelected, int trackId, int chromId ) {
+        super( trackId, chromId );
         this.isFwd = isFWD;
         this.start = start;
         this.dropoff = dropoff;
@@ -80,6 +84,7 @@ public class NovelTranscript extends TrackChromResultEntry {
         this.isSelectedForFastaExport = isSelected;
     }
 
+
     /**
      * Gets strand information, on which the novel transcript is located.
      *
@@ -88,6 +93,7 @@ public class NovelTranscript extends TrackChromResultEntry {
     public boolean isFwdDirection() {
         return isFwd;
     }
+
 
     /**
      * Returns the possible 3'-end of putative novel transcript.
@@ -98,6 +104,7 @@ public class NovelTranscript extends TrackChromResultEntry {
         return this.dropoff;
     }
 
+
     /**
      * Returns possible start position of putative noval transcript.
      *
@@ -106,6 +113,7 @@ public class NovelTranscript extends TrackChromResultEntry {
     public int getStartPosition() {
         return this.start;
     }
+
 
     /**
      * Returns the location of putative novel transcript. <intergenic> if novel
@@ -118,6 +126,7 @@ public class NovelTranscript extends TrackChromResultEntry {
         return location;
     }
 
+
     /**
      * Returns the length of putative novel transcript.
      *
@@ -126,6 +135,7 @@ public class NovelTranscript extends TrackChromResultEntry {
     public int getLength() {
         return length;
     }
+
 
     /**
      * Returns the sequence, which represents this novel transcript.
@@ -136,16 +146,18 @@ public class NovelTranscript extends TrackChromResultEntry {
         return sequence;
     }
 
+
     /**
      * Information about the correctness of the detection. It can be edit by the
      * user.
      *
      * @return <true> if it is a false positve detection of a novel region.
-     * Default is <false>.
+     *         Default is <false>.
      */
     public boolean isFalsePositive() {
         return isFalsePositiveDetection;
     }
+
 
     /**
      * Returns <true> if user has selected this novel transcript for fasta
@@ -157,6 +169,7 @@ public class NovelTranscript extends TrackChromResultEntry {
         return isSelectedForFastaExport;
     }
 
+
     /**
      * Returns <true> if user marked novel transcript as finally considered.
      *
@@ -166,14 +179,16 @@ public class NovelTranscript extends TrackChromResultEntry {
         return isConsidered;
     }
 
+
     /**
      * Sets noval transcript as finally considered in analysis process.
      *
      * @param isConsidered <true> if considered.
      */
-    public void setIsConsidered(boolean isConsidered) {
+    public void setIsConsidered( boolean isConsidered ) {
         this.isConsidered = isConsidered;
     }
+
 
     /**
      *
@@ -184,12 +199,14 @@ public class NovelTranscript extends TrackChromResultEntry {
         return isFalsePositive;
     }
 
+
     /**
      *
      * @param isFalsePositive <true> if selected as false positive else <false>
      */
-    public void setFalsePositive(boolean isFalsePositive) {
+    public void setFalsePositive( boolean isFalsePositive ) {
         this.isFalsePositive = isFalsePositive;
     }
+
 
 }

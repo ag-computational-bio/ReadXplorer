@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,14 +16,17 @@
  */
 package de.cebitec.readXplorer.thumbnail;
 
+
 import de.cebitec.readXplorer.databackend.IntervalRequest;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.TrackViewer;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 
+
 /**
  * Requests drawing for given feature after TrackViewer is visible.
+ * <p>
  * @author denis
  */
 public class TrackViewerCompListener extends ComponentAdapter {
@@ -31,17 +34,21 @@ public class TrackViewerCompListener extends ComponentAdapter {
     private PersistentFeature currentFeature;
     private TrackViewer trackV;
 
-    public TrackViewerCompListener(PersistentFeature currentFeature, TrackViewer trackV) {
+
+    public TrackViewerCompListener( PersistentFeature currentFeature, TrackViewer trackV ) {
         this.currentFeature = currentFeature;
         this.trackV = trackV;
     }
 
+
     @Override
-    public void componentResized(ComponentEvent e) {
+    public void componentResized( ComponentEvent e ) {
         //new IntervalRequest
         int startFeature = currentFeature.getStart();
         int stopFeature = currentFeature.getStop();
-        ThumbnailCoverageListener covListener = new ThumbnailCoverageListener(trackV);
-        trackV.getTrackCon().addCoverageRequest(new IntervalRequest(startFeature, stopFeature, trackV.getReference().getActiveChromId(), covListener, false));
+        ThumbnailCoverageListener covListener = new ThumbnailCoverageListener( trackV );
+        trackV.getTrackCon().addCoverageRequest( new IntervalRequest( startFeature, stopFeature, trackV.getReference().getActiveChromId(), covListener, false ) );
     }
+
+
 }

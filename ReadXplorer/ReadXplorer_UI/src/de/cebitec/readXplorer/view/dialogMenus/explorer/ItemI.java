@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,11 +16,12 @@
  */
 package de.cebitec.readXplorer.view.dialogMenus.explorer;
 
+
 /**
  * Interface for any kind of items.
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public interface ItemI {
-    
+
 }

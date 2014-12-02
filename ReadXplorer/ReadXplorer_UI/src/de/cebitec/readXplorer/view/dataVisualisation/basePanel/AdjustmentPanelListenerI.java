@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,30 +16,37 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.basePanel;
 
+
 /**
  * This interface defines listeners for changes in the viewer's control panel.
- * 
+ * <p>
  * @author ddoppmeier, rhilker
  */
 public interface AdjustmentPanelListenerI {
 
     /**
      * Notify listeners of changes of the zoom level
+     * <p>
      * @param zoomValue new zoom value to be applied
      */
-    public void zoomLevelUpdated(int zoomValue);
+    public void zoomLevelUpdated( int zoomValue );
+
 
     /**
      * Notify listeners of changes in the navigation bar
+     * <p>
      * @param navigatorBarValue updated current position of the genome, that is
-     * to be shown
+     *                          to be shown
      */
-    public void navigatorBarUpdated(int navigatorBarValue);
-    
+    public void navigatorBarUpdated( int navigatorBarValue );
+
+
     /**
      * Notify listeners of the selection of a new chromosome.
+     * <p>
      * @param activeChromId Id of the new active chromosome
      */
-    public void chromosomeChanged(int activeChromId);
+    public void chromosomeChanged( int activeChromId );
+
 
 }

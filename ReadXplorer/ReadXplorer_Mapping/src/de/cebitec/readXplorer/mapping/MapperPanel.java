@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.mapping;
 
+
 import de.cebitec.readXplorer.mapping.api.MappingApi;
 import de.cebitec.readXplorer.util.FileUtils;
 import de.cebitec.readXplorer.util.Properties;
@@ -24,26 +25,31 @@ import java.util.prefs.Preferences;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import org.openide.util.NbPreferences;
 
+
 /**
- * MapperPanel is the gui part of the options panel to select the mapping script. 
- * The mapping script is a bash script that encapsulates the mapper 
- * functionality (which is often divided into multiple commands) 
+ * MapperPanel is the gui part of the options panel to select the mapping
+ * script.
+ * The mapping script is a bash script that encapsulates the mapper
+ * functionality (which is often divided into multiple commands)
  * into a single script.
- * 
+ * <p>
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 final class MapperPanel extends javax.swing.JPanel {
+
     private static final long serialVersionUID = 1L;
 
     private final MapperOptionsPanelController controller;
     private Preferences pref;
-    
-    MapperPanel(MapperOptionsPanelController controller) {
+
+
+    MapperPanel( MapperOptionsPanelController controller ) {
         this.controller = controller;
         initComponents();
-        
-        this.pref = NbPreferences.forModule(Object.class);
+
+        this.pref = NbPreferences.forModule( Object.class );
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -98,19 +104,22 @@ final class MapperPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void openButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openButtonActionPerformed
-        File file = FileUtils.showFileOpenDialogAndChangePrefs(Properties.MAPPER_PATH,
-                new FileNameExtensionFilter("Mapper Script File", "sh"),
-                mapperTextField, MapperPanel.class, this);
+        File file = FileUtils.showFileOpenDialogAndChangePrefs( Properties.MAPPER_PATH,
+                                                                new FileNameExtensionFilter( "Mapper Script File", "sh" ),
+                                                                mapperTextField, MapperPanel.class, this );
     }//GEN-LAST:event_openButtonActionPerformed
 
+
     void load() {
-        mapperTextField.setText(MappingApi.getMapperPath());
+        mapperTextField.setText( MappingApi.getMapperPath() );
     }
-    
+
+
     void store() {
-        pref.put(Properties.MAPPER_PATH, mapperTextField.getText());
+        pref.put( Properties.MAPPER_PATH, mapperTextField.getText() );
     }
-    
+
+
     boolean valid() {
         return true;
     }

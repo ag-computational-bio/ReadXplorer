@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,10 @@
  */
 package de.cebitec.readXplorer.parser.mappings;
 
+
 import de.cebitec.readXplorer.parser.TrackJob;
 import de.cebitec.readXplorer.parser.common.ParsingException;
+
 
 /**
  * Interface for classes preprocessing a track job.
@@ -25,14 +27,18 @@ import de.cebitec.readXplorer.parser.common.ParsingException;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public interface PreprocessorI {
-    
+
     /**
      * If any preprocessing is available for a track job, it is performed here.
+     * <p>
      * @param trackJob the trackjob to preprocess
+     * <p>
      * @return any object, depending on the implementing parser class
+     * <p>
      * @throws ParsingException
      * @throws OutOfMemoryError
      */
-    public Object preprocessData(TrackJob trackJob) throws ParsingException, OutOfMemoryError;
-    
+    public Object preprocessData( TrackJob trackJob ) throws ParsingException, OutOfMemoryError;
+
+
 }

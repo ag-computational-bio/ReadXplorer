@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cebitec.readXplorer.view.dialogMenus;
+
 
 import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
@@ -40,6 +41,7 @@ import javax.swing.KeyStroke;
 import javax.swing.text.JTextComponent;
 import org.openide.util.NbBundle;
 
+
 /**
  * Factory for different JMenuItems with predefined functionality.
  *
@@ -48,168 +50,204 @@ import org.openide.util.NbBundle;
 public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
 
     private static final long serialVersionUID = 1L;
-    
+
     private final Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-    
+
+
     /**
      * Creates a Factory for different JMenuItems with predefined functionality.
      */
     public MenuItemFactory() {
     }
-    
+
+
     /**
      * Returns a JMenuItem for copying a sequence.
      * The text to copy has to be known, when the method is called.
+     * <p>
      * @param sequenceToCopy the sequence to copy
+     * <p>
      * @return the JMenuItem for copying a sequence.
      */
-    public JMenuItem getCopyItem(final String sequenceToCopy){
+    public JMenuItem getCopyItem( final String sequenceToCopy ) {
 
-        JMenuItem copyItem = new JMenuItem(NbBundle.getMessage(MenuItemFactory.class, "MenuItem.Copy"));
-        copyItem.addActionListener(new ActionListener() {
+        JMenuItem copyItem = new JMenuItem( NbBundle.getMessage( MenuItemFactory.class, "MenuItem.Copy" ) );
+        copyItem.addActionListener( new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
-                clipboard.setContents(new StringSelection(sequenceToCopy), MenuItemFactory.this);
+            public void actionPerformed( ActionEvent e ) {
+                clipboard.setContents( new StringSelection( sequenceToCopy ), MenuItemFactory.this );
             }
-        });
+
+
+        } );
         return copyItem;
     }
-    
+
+
     /**
      * Returns a JMenuItem for copying a position.
+     * <p>
      * @param currentPosition the position to copy to the clipboard.
+     * <p>
      * @return JMenuItem for copying a position.
      */
-    public JMenuItem getCopyPositionItem(final int currentPosition) {
-        JMenuItem copyPositionItem = new JMenuItem(NbBundle.getMessage(MenuItemFactory.class, "MenuItem.CopyPosition"));
-        copyPositionItem.addActionListener(new ActionListener() {
+    public JMenuItem getCopyPositionItem( final int currentPosition ) {
+        JMenuItem copyPositionItem = new JMenuItem( NbBundle.getMessage( MenuItemFactory.class, "MenuItem.CopyPosition" ) );
+        copyPositionItem.addActionListener( new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
-                clipboard.setContents(new StringSelection(Integer.toString(currentPosition)), MenuItemFactory.this);
+            public void actionPerformed( ActionEvent e ) {
+                clipboard.setContents( new StringSelection( Integer.toString( currentPosition ) ), MenuItemFactory.this );
             }
-        });
+
+
+        } );
         return copyPositionItem;
     }
-    
+
+
     /**
      * Returns a JMenuItem for translating and copying a given DNA sequence.
+     * <p>
      * @param dnaSeqToTranslateAndCopy the dnaSequence to translate and copy
+     * <p>
      * @return The JMenuItem for translating and copying a given DNA sequence.
      */
-    public JMenuItem getCopyTranslatedItem(final String dnaSeqToTranslateAndCopy){
+    public JMenuItem getCopyTranslatedItem( final String dnaSeqToTranslateAndCopy ) {
 
-        JMenuItem translationItem = new JMenuItem(NbBundle.getMessage(MenuItemFactory.class, "MenuItem.Translation"));
-        translationItem.addActionListener(new ActionListener() {
+        JMenuItem translationItem = new JMenuItem( NbBundle.getMessage( MenuItemFactory.class, "MenuItem.Translation" ) );
+        translationItem.addActionListener( new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
-                
-                 GeneticCode code = CodonUtilities.getGeneticCode();
-                 String translatedSequence = code.getTranslationForString(dnaSeqToTranslateAndCopy);
-                 clipboard.setContents(new StringSelection(translatedSequence), MenuItemFactory.this);
+            public void actionPerformed( ActionEvent e ) {
+
+                GeneticCode code = CodonUtilities.getGeneticCode();
+                String translatedSequence = code.getTranslationForString( dnaSeqToTranslateAndCopy );
+                clipboard.setContents( new StringSelection( translatedSequence ), MenuItemFactory.this );
             }
-        });
+
+
+        } );
         return translationItem;
     }
-    
+
+
     /**
      * Returns a JMenuItem for storing a sequence in fasta format.
      * The sequence to store has to be known, when the method is called.
+     * <p>
      * @param sequence the sequence to store as fasta
-     * @param refName name of the reference sequence
-     * @param feature the feature whose sequence is to be converted to fasta
-     *                it contains the header information, but not the sequence
+     * @param refName  name of the reference sequence
+     * @param feature  the feature whose sequence is to be converted to fasta
+     *                 it contains the header information, but not the sequence
+     * <p>
      * @return The JMenuItem for storing a sequence in fasta format
      */
-    public JMenuItem getStoreFastaItem(final String sequence, final String refName, final PersistentFeature feature){
-        String title = NbBundle.getMessage(MenuItemFactory.class, "MenuItem.StoreFasta");
-        return this.initStoreFastaItem(title, sequence, refName, feature, -1, -1);
+    public JMenuItem getStoreFastaItem( final String sequence, final String refName, final PersistentFeature feature ) {
+        String title = NbBundle.getMessage( MenuItemFactory.class, "MenuItem.StoreFasta" );
+        return this.initStoreFastaItem( title, sequence, refName, feature, -1, -1 );
 
     }
-    
+
+
     /**
      * Returns a JMenuItem for storing the translation of a DNA sequence of a
      * reference feature in fasta format. The sequence to translate has to be
      * known, when the method is called.
+     * <p>
      * @param dnaSeqToTranslateAndStore the dna sequence to translate and store
-     * @param refName the name of the reference, of which the sequence originates
-     * @param feature the reference feature, for which the translation is stored
+     * @param refName                   the name of the reference, of which the
+     *                                  sequence originates
+     * @param feature                   the reference feature, for which the
+     *                                  translation is stored
+     * <p>
      * @return The JMenuItem for storing the translation of a DNA sequence of a
-     * reference feature in fasta format.
+     *         reference feature in fasta format.
      */
-    public JMenuItem getStoreTranslatedFeatureFastaItem(final String dnaSeqToTranslateAndStore,final String refName, final PersistentFeature feature){
-         GeneticCode code = CodonUtilities.getGeneticCode();
-         String translatedSequence = code.getTranslationForString(dnaSeqToTranslateAndStore);
-         String title = NbBundle.getMessage(MenuItemFactory.class, "MenuItem.StoreTranslatedFasta");
-           
-         return this.initStoreFastaItem(title,translatedSequence, refName, feature, -1, -1);
-    }
-
-    /**
-     * Returns a JMenuItem for storing a sequence in fasta format. The sequence
-     * to store has to be known, when the method is called.
-     * @param dnaSeqToTranslateAndStore the sequence to translate and store as
-     * fasta
-     * @param refName name of the reference sequence
-     * @param seqStart the startpoint of the sequence
-     * @param seqStop the endpoint of the sequence
-     * @return The JMenuItem  for storing a translated sequence in fasta format
-     */
-    public JMenuItem getStoreTranslatedFastaItem(final String dnaSeqToTranslateAndStore, final String refName, final int seqStart, final int seqStop){
+    public JMenuItem getStoreTranslatedFeatureFastaItem( final String dnaSeqToTranslateAndStore, final String refName, final PersistentFeature feature ) {
         GeneticCode code = CodonUtilities.getGeneticCode();
-        String translatedSequence = code.getTranslationForString(dnaSeqToTranslateAndStore);
-        String title = NbBundle.getMessage(MenuItemFactory.class, "MenuItem.StoreTranslatedFasta");
+        String translatedSequence = code.getTranslationForString( dnaSeqToTranslateAndStore );
+        String title = NbBundle.getMessage( MenuItemFactory.class, "MenuItem.StoreTranslatedFasta" );
 
-        return this.initStoreFastaItem(title, translatedSequence, refName, null, seqStart, seqStop);
+        return this.initStoreFastaItem( title, translatedSequence, refName, feature, -1, -1 );
     }
-    
+
+
     /**
      * Returns a JMenuItem for storing a sequence in fasta format. The sequence
      * to store has to be known, when the method is called.
-     * @param sequence the sequence to translate and store as
-     * fasta
-     * @param refName name of the reference sequence
-     * @param seqStart the startpoint of the sequence
-     * @param seqStop the endpoint of the sequence
+     * <p>
+     * @param dnaSeqToTranslateAndStore the sequence to translate and store as
+     *                                  fasta
+     * @param refName                   name of the reference sequence
+     * @param seqStart                  the startpoint of the sequence
+     * @param seqStop                   the endpoint of the sequence
+     * <p>
      * @return The JMenuItem for storing a translated sequence in fasta format
      */
-    public JMenuItem getStoreFastaItem(final String sequence, final String refName, final int seqStart, final int seqStop){
+    public JMenuItem getStoreTranslatedFastaItem( final String dnaSeqToTranslateAndStore, final String refName, final int seqStart, final int seqStop ) {
+        GeneticCode code = CodonUtilities.getGeneticCode();
+        String translatedSequence = code.getTranslationForString( dnaSeqToTranslateAndStore );
+        String title = NbBundle.getMessage( MenuItemFactory.class, "MenuItem.StoreTranslatedFasta" );
+
+        return this.initStoreFastaItem( title, translatedSequence, refName, null, seqStart, seqStop );
+    }
+
+
+    /**
+     * Returns a JMenuItem for storing a sequence in fasta format. The sequence
+     * to store has to be known, when the method is called.
+     * <p>
+     * @param sequence the sequence to translate and store as
+     *                 fasta
+     * @param refName  name of the reference sequence
+     * @param seqStart the startpoint of the sequence
+     * @param seqStop  the endpoint of the sequence
+     * <p>
+     * @return The JMenuItem for storing a translated sequence in fasta format
+     */
+    public JMenuItem getStoreFastaItem( final String sequence, final String refName, final int seqStart, final int seqStop ) {
         //GeneticCode code = GeneticCodeFactory.getGeneticCodeById(Integer.valueOf(pref.get(Properties.SEL_GENETIC_CODE, "1")));
         // String sequenceCopy= code.getTranslationForString(sequence);
-       String titel = NbBundle.getMessage(MenuItemFactory.class, "MenuItem.StoreFasta");
-        return this.initStoreFastaItem(titel, sequence, refName, null, seqStart, seqStop);
+        String titel = NbBundle.getMessage( MenuItemFactory.class, "MenuItem.StoreFasta" );
+        return this.initStoreFastaItem( titel, sequence, refName, null, seqStart, seqStop );
     }
+
 
     /**
      * Initializes a store fasta item either from an feature or with given start
      * and stop indices.
-     * @param title the title of the JMenuItem
+     * <p>
+     * @param title    the title of the JMenuItem
      * @param sequence the sequence to store in fasta format
-     * @param refName name of the reference sequence
-     * @param feature the feature containing the header information, <code>null</code> if not from an feature
+     * @param refName  name of the reference sequence
+     * @param feature  the feature containing the header information,
+     *                 <code>null</code> if not from an feature
      * @param seqStart the startpoint of the sequence (-1 if feature is used!)
-     * @param seqEnd the endpoint of the sequence (-1 if feature is used!)
+     * @param seqEnd   the endpoint of the sequence (-1 if feature is used!)
+     * <p>
      * @return a menu item capable of storing a sequence in fasta format
      */
-    private JMenuItem initStoreFastaItem(String title,final String sequence, final String refName, final PersistentFeature feature,
-            final int seqStart, final int seqEnd) {
-        
-        JMenuItem storeFastaItem = new JMenuItem(title);
-        storeFastaItem.addActionListener(new ActionListener() {
+    private JMenuItem initStoreFastaItem( String title, final String sequence, final String refName, final PersistentFeature feature,
+                                          final int seqStart, final int seqEnd ) {
+
+        JMenuItem storeFastaItem = new JMenuItem( title );
+        storeFastaItem.addActionListener( new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed( ActionEvent e ) {
                 String output;
-                if (feature != null) {
+                if( feature != null ) {
                     output = this.generateFastaFromFeature();
-                } else {
-                    String header = "Copied sequence from: " + refName + " position " + seqStart + " to " + seqEnd;
-                    output = OutputWriter.generateFasta(sequence, header);
                 }
-                new StoreStringFileChooser(new String[]{"fasta"}, "fasta", output);
+                else {
+                    String header = "Copied sequence from: " + refName + " position " + seqStart + " to " + seqEnd;
+                    output = OutputWriter.generateFasta( sequence, header );
+                }
+                new StoreStringFileChooser( new String[]{ "fasta" }, "fasta", output );
             }
+
 
             /**
              * Generates a string ready for output in a fasta file.
@@ -219,218 +257,265 @@ public class MenuItemFactory extends JMenuItem implements ClipboardOwner {
                 String locus = feature.getLocus() != null ? feature.getLocus() : "no locus";
                 String product = feature.getProduct() != null ? feature.getProduct() : "no product";
 
-                return OutputWriter.generateFasta(sequence, ecNumber, locus, product);
+                return OutputWriter.generateFasta( sequence, ecNumber, locus, product );
             }
-        });
-        
-        return storeFastaItem; 
+
+
+        } );
+
+        return storeFastaItem;
     }
-            
+
+
     /**
      * Returns a JMenuItem for copying one or more CDS sequences.
      * The text to copy has to be known, when the method is called.
+     * <p>
      * @param sequencesToStore the CDS sequence(s) to store
-     * @param regions the regions to store
-     * @param referenceName the name of the reference
+     * @param regions          the regions to store
+     * @param referenceName    the name of the reference
+     * <p>
      * @return the JMenuItem for copying one or more CDS sequences.
      */
-    public JMenuItem getStoreFastaForCdsItem(final List<String> sequencesToStore, final List<Region> regions,
-            final String referenceName){
+    public JMenuItem getStoreFastaForCdsItem( final List<String> sequencesToStore, final List<Region> regions,
+                                              final String referenceName ) {
 
-        JMenuItem storeFastaCdsItem = new JMenuItem(NbBundle.getMessage(MenuItemFactory.class, "MenuItem.StoreFastaORF"));
-        storeFastaCdsItem.addActionListener(new ActionListener() {
+        JMenuItem storeFastaCdsItem = new JMenuItem( NbBundle.getMessage( MenuItemFactory.class, "MenuItem.StoreFastaORF" ) );
+        storeFastaCdsItem.addActionListener( new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed( ActionEvent e ) {
                 String output = "";
-                for (int i = 0; i < sequencesToStore.size(); ++i) {
-                    int length = regions.get(i).getStop() + 1 - regions.get(i).getStart();
-                    String header = "Copied CDS sequence from: " 
-                            + referenceName 
-                            + ", Positions: " + regions.get(i).getStart()
-                            + " to " + regions.get(i).getStop()
-                            + ", Length: " + length 
-                            + "bp, Amino Acids: " + length / 3;
-                    output += OutputWriter.generateFasta(sequencesToStore.get(i), header);
+                for( int i = 0; i < sequencesToStore.size(); ++i ) {
+                    int length = regions.get( i ).getStop() + 1 - regions.get( i ).getStart();
+                    String header = "Copied CDS sequence from: "
+                                    + referenceName
+                                    + ", Positions: " + regions.get( i ).getStart()
+                                    + " to " + regions.get( i ).getStop()
+                                    + ", Length: " + length
+                                    + "bp, Amino Acids: " + length / 3;
+                    output += OutputWriter.generateFasta( sequencesToStore.get( i ), header );
                 }
-                new StoreStringFileChooser(new String[]{"fasta"}, "fasta", output);
+                new StoreStringFileChooser( new String[]{ "fasta" }, "fasta", output );
             }
-        });
+
+
+        } );
         return storeFastaCdsItem;
     }
 
+
     /**
-     * Returns a JMenuItem for calculating a possible folding of the selected DNA
+     * Returns a JMenuItem for calculating a possible folding of the selected
+     * DNA
      * sequence with RNAFold.
      * The sequence to fold has to be known already!
+     * <p>
      * @param rnaFolderControl instance of an rnafoldercontroller
-     * @param sequenceToFold the DNA/RNA sequence to fold with RNAFold
-     * @param header header string used for describing the folded rna
+     * @param sequenceToFold   the DNA/RNA sequence to fold with RNAFold
+     * @param header           header string used for describing the folded rna
+     * <p>
      * @return the menu item for RNA folding
      */
-    public JMenuItem getRNAFoldItem(final RNAFolderI rnaFolderControl, final String sequenceToFold, final String header) {
+    public JMenuItem getRNAFoldItem( final RNAFolderI rnaFolderControl, final String sequenceToFold, final String header ) {
 
-            JMenuItem rNAFoldItem = new JMenuItem(NbBundle.getMessage(MenuItemFactory.class, "MenuItem.RNAFold"));
-            rNAFoldItem.addActionListener(new ActionListener() {
+        JMenuItem rNAFoldItem = new JMenuItem( NbBundle.getMessage( MenuItemFactory.class, "MenuItem.RNAFold" ) );
+        rNAFoldItem.addActionListener( new ActionListener() {
 
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    rnaFolderControl.showRNAFolderView(sequenceToFold, header);
-                }
-            });
+            @Override
+            public void actionPerformed( ActionEvent e ) {
+                rnaFolderControl.showRNAFolderView( sequenceToFold, header );
+            }
 
-            return rNAFoldItem;
+
+        } );
+
+        return rNAFoldItem;
     }
-    
+
+
     /**
      * @param parentText the JTextComponent whose text is to be copied
+     * <p>
      * @return A JMenuItem for copying text from a JTextComponent.
      */
-    public JMenuItem getCopyTextfieldItem(final JTextComponent parentText) {
-        
-        final JMenuItem copyItem = new JMenuItem("Copy");
-        copyItem.setAccelerator(KeyStroke.getKeyStroke("ctrl C"));
-        copyItem.addActionListener(new ActionListener() {
+    public JMenuItem getCopyTextfieldItem( final JTextComponent parentText ) {
+
+        final JMenuItem copyItem = new JMenuItem( "Copy" );
+        copyItem.setAccelerator( KeyStroke.getKeyStroke( "ctrl C" ) );
+        copyItem.addActionListener( new ActionListener() {
 
             @Override
-            public void actionPerformed(final ActionEvent event) {
-                StringSelection textToCopy = new StringSelection(parentText.getSelectedText());
-                clipboard.setContents(textToCopy, MenuItemFactory.this);
+            public void actionPerformed( final ActionEvent event ) {
+                StringSelection textToCopy = new StringSelection( parentText.getSelectedText() );
+                clipboard.setContents( textToCopy, MenuItemFactory.this );
             }
-        });
+
+
+        } );
         return copyItem;
     }
-    
+
+
     /**
      * @param parentText the JTextComponent whose text is to be copied
+     * <p>
      * @return A JMenuItem for selecting all text from a JTextComponent.
      */
-    public JMenuItem getSelectAllItem(final JTextComponent parentText) {
-        
-        final JMenuItem selectAllItem = new JMenuItem("Select All");
-        selectAllItem.setAccelerator(KeyStroke.getKeyStroke("ctrl A"));
-                
-        selectAllItem.addActionListener(new ActionListener() {
+    public JMenuItem getSelectAllItem( final JTextComponent parentText ) {
+
+        final JMenuItem selectAllItem = new JMenuItem( "Select All" );
+        selectAllItem.setAccelerator( KeyStroke.getKeyStroke( "ctrl A" ) );
+
+        selectAllItem.addActionListener( new ActionListener() {
 
             @Override
-            public void actionPerformed(final ActionEvent event) {
+            public void actionPerformed( final ActionEvent event ) {
                 parentText.selectAll();
             }
-        });
+
+
+        } );
         return selectAllItem;
     }
-    
+
+
     /**
-     * Creates a JMenuItem which updates the navigator bar associated with the given
+     * Creates a JMenuItem which updates the navigator bar associated with the
+     * given
      * BoundsInfoManager to the stop of the first cdsRegion, when it is pressed.
-     * @param boundsManager the bounds info manager, whose navigator bar is to be updated
-     * @param cdsRegions the cds regions for which jumping to their stop position should be enabled
+     * <p>
+     * @param boundsManager the bounds info manager, whose navigator bar is to
+     *                      be updated
+     * @param cdsRegions    the cds regions for which jumping to their stop
+     *                      position should be enabled
+     * <p>
      * @return the JMenuItem with the above described functionality
      */
-    public JMenuItem getJumpToStopPosItem(final BoundsInfoManager boundsManager, final List<Region> cdsRegions) {
-        
-        final JMenuItem jumpToStopPosItem = new JMenuItem("Jump to associated stop codon");
-        
-        jumpToStopPosItem.addActionListener(new ActionListener() {
+    public JMenuItem getJumpToStopPosItem( final BoundsInfoManager boundsManager, final List<Region> cdsRegions ) {
+
+        final JMenuItem jumpToStopPosItem = new JMenuItem( "Jump to associated stop codon" );
+
+        jumpToStopPosItem.addActionListener( new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
-                if (!cdsRegions.isEmpty()) {
-                    if (cdsRegions.get(0).isForwardStrand()) {
-                        boundsManager.navigatorBarUpdated(cdsRegions.get(0).getStop());
-                    } else {
-                        boundsManager.navigatorBarUpdated(cdsRegions.get(0).getStart());
+            public void actionPerformed( ActionEvent e ) {
+                if( !cdsRegions.isEmpty() ) {
+                    if( cdsRegions.get( 0 ).isForwardStrand() ) {
+                        boundsManager.navigatorBarUpdated( cdsRegions.get( 0 ).getStop() );
+                    }
+                    else {
+                        boundsManager.navigatorBarUpdated( cdsRegions.get( 0 ).getStart() );
                     }
                 }
             }
-        });
+
+
+        } );
         return jumpToStopPosItem;
     }
-    
+
+
     /**
      * Creates a JMenuItem which centers the navigator bar associated with the
      * given BoundsInfoManager at the new position, when it is pressed.
+     * <p>
      * @param boundsManager the bounds info manager, whose navigator bar is to
-     * be updated
-     * @param pos the position to center
+     *                      be updated
+     * @param pos           the position to center
+     * <p>
      * @return the JMenuItem with the above described functionality
      */
-    public JMenuItem getJumpToPosItem(final BoundsInfoManager boundsManager, final int pos) {
+    public JMenuItem getJumpToPosItem( final BoundsInfoManager boundsManager, final int pos ) {
 
-        final JMenuItem jumpToPosItem = new JMenuItem("Center current position");
+        final JMenuItem jumpToPosItem = new JMenuItem( "Center current position" );
 
-        jumpToPosItem.addActionListener(new ActionListener() {
+        jumpToPosItem.addActionListener( new ActionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                boundsManager.navigatorBarUpdated(pos);
+            public void actionPerformed( ActionEvent e ) {
+                boundsManager.navigatorBarUpdated( pos );
             }
-        });
+
+
+        } );
         return jumpToPosItem;
     }
-    
+
+
     /**
      * @param parentText the JTextComponent whose text is to be copied
+     * <p>
      * @return A JMenuItem for pasting text into a JTextComponent.
      */
-    public JMenuItem getPasteItem(final JTextComponent parentText) {
-        
-        final JMenuItem pasteItem = new JMenuItem("Paste");
-        pasteItem.setAccelerator(KeyStroke.getKeyStroke("ctrl V"));
-        pasteItem.addActionListener(new ActionListener() {
+    public JMenuItem getPasteItem( final JTextComponent parentText ) {
+
+        final JMenuItem pasteItem = new JMenuItem( "Paste" );
+        pasteItem.setAccelerator( KeyStroke.getKeyStroke( "ctrl V" ) );
+        pasteItem.addActionListener( new ActionListener() {
 
             @Override
-            public void actionPerformed(final ActionEvent event) {
-                parentText.setText(getClipboardContents());
+            public void actionPerformed( final ActionEvent event ) {
+                parentText.setText( getClipboardContents() );
             }
-        });
+
+
+        } );
         return pasteItem;
     }
 
+
     /**
      * @param parentText the JTextComponent whose text is to be copied
+     * <p>
      * @return A JMenuItem for cutting text from a JTextComponent.
      */
-    public JMenuItem getCutItem(final JTextComponent parentText) {
-        
-        final JMenuItem cutItem = new JMenuItem("Cut");
-        cutItem.setAccelerator(KeyStroke.getKeyStroke("ctrl X"));
-        cutItem.addActionListener(new ActionListener() {
+    public JMenuItem getCutItem( final JTextComponent parentText ) {
+
+        final JMenuItem cutItem = new JMenuItem( "Cut" );
+        cutItem.setAccelerator( KeyStroke.getKeyStroke( "ctrl X" ) );
+        cutItem.addActionListener( new ActionListener() {
 
             @Override
-            public void actionPerformed(final ActionEvent event) {
-                StringSelection textToCopy = new StringSelection(parentText.getSelectedText());
-                clipboard.setContents(textToCopy, MenuItemFactory.this);
-                parentText.replaceSelection("");
+            public void actionPerformed( final ActionEvent event ) {
+                StringSelection textToCopy = new StringSelection( parentText.getSelectedText() );
+                clipboard.setContents( textToCopy, MenuItemFactory.this );
+                parentText.replaceSelection( "" );
             }
-        });
+
+
+        } );
         return cutItem;
     }
-    
+
+
     /**
-     * @return Any text found in the clipboard. If none is found, 
-     * an empty String is returned.
+     * @return Any text found in the clipboard. If none is found,
+     *         an empty String is returned.
      */
     public String getClipboardContents() {
         String result = "";
-        Transferable contents = clipboard.getContents(null);
+        Transferable contents = clipboard.getContents( null );
         final boolean hasTransferableText = (contents != null)
-                && contents.isDataFlavorSupported(DataFlavor.stringFlavor);
-        if (hasTransferableText) {
+                                            && contents.isDataFlavorSupported( DataFlavor.stringFlavor );
+        if( hasTransferableText ) {
             try {
-                result = (String) contents.getTransferData(DataFlavor.stringFlavor);
-            } catch (UnsupportedFlavorException ex) {
-                JOptionPane.showMessageDialog(this, "Unsupported DataFlavor for clipboard copying.", "Paste Error", JOptionPane.ERROR_MESSAGE);
-            } catch (IOException ex) {
-                JOptionPane.showMessageDialog(this, "IOException occured during recovering of text from clipboard.", "Paste Error", JOptionPane.ERROR_MESSAGE);
+                result = (String) contents.getTransferData( DataFlavor.stringFlavor );
+            }
+            catch( UnsupportedFlavorException ex ) {
+                JOptionPane.showMessageDialog( this, "Unsupported DataFlavor for clipboard copying.", "Paste Error", JOptionPane.ERROR_MESSAGE );
+            }
+            catch( IOException ex ) {
+                JOptionPane.showMessageDialog( this, "IOException occured during recovering of text from clipboard.", "Paste Error", JOptionPane.ERROR_MESSAGE );
             }
         }
         return result;
     }
-    
+
 
     @Override
-    public void lostOwnership(Clipboard clipboard, Transferable contents) {
+    public void lostOwnership( Clipboard clipboard, Transferable contents ) {
         //do nothing
     }
+
 
 }

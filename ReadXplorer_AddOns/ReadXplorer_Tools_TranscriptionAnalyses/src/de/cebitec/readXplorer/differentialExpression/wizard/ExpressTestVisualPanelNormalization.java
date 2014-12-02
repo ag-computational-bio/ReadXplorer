@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.ui.visualisation.reference.FeatureTableModel;
 import java.util.ArrayList;
@@ -29,7 +30,9 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+
 public final class ExpressTestVisualPanelNormalization extends JPanel {
+
     private static final long serialVersionUID = 1L;
 
     private ButtonGroup bg = new ButtonGroup();
@@ -38,69 +41,81 @@ public final class ExpressTestVisualPanelNormalization extends JPanel {
     private List<PersistentFeature> features;
     private TableRowSorter trs;
 
+
     /**
      * Creates new form ExpressTestVisualPanelNormalization
      */
     public ExpressTestVisualPanelNormalization() {
         initComponents();
-        bg.add(useHKGButton);
-        bg.add(calculateButton);
-        featureTable.setModel(emptyTm);
-        searchField.getDocument().addDocumentListener(new DocumentListener() {
+        bg.add( useHKGButton );
+        bg.add( calculateButton );
+        featureTable.setModel( emptyTm );
+        searchField.getDocument().addDocumentListener( new DocumentListener() {
             @Override
-            public void insertUpdate(DocumentEvent e) {
+            public void insertUpdate( DocumentEvent e ) {
                 updateFilter();
             }
 
+
             @Override
-            public void removeUpdate(DocumentEvent e) {
+            public void removeUpdate( DocumentEvent e ) {
                 updateFilter();
             }
 
+
             @Override
-            public void changedUpdate(DocumentEvent e) {
+            public void changedUpdate( DocumentEvent e ) {
                 updateFilter();
             }
-        });
+
+
+        } );
     }
+
 
     @Override
     public String getName() {
         return "Select Normalization";
     }
 
-    public void setFeatureList(List<PersistentFeature> features) {
+
+    public void setFeatureList( List<PersistentFeature> features ) {
         this.features = features;
-        tm = new FeatureTableModel(features.toArray(new PersistentFeature[features.size()]));
-        trs = new TableRowSorter<>(tm);
-        featureTable.setRowSorter(trs);
+        tm = new FeatureTableModel( features.toArray( new PersistentFeature[features.size()] ) );
+        trs = new TableRowSorter<>( tm );
+        featureTable.setRowSorter( trs );
         updateFilter();
     }
+
 
     private void updateFilter() {
         RowFilter<TableModel, Object> rf = null;
         //If current expression doesn't parse, don't update.
         try {
-            rf = RowFilter.regexFilter(searchField.getText(), 0);
-        } catch (java.util.regex.PatternSyntaxException e) {
+            rf = RowFilter.regexFilter( searchField.getText(), 0 );
+        }
+        catch( java.util.regex.PatternSyntaxException e ) {
             return;
         }
-        trs.setRowFilter(rf);
+        trs.setRowFilter( rf );
     }
-    
-    public boolean useHouseKeepingGenesToNormalize(){
+
+
+    public boolean useHouseKeepingGenesToNormalize() {
         return useHKGButton.isSelected();
     }
+
 
     public List<Integer> getSelectedFeatures() {
         List<Integer> ret = new ArrayList<>();
         int[] selected = featureTable.getSelectedRows();
-        for (int i = 0; i < selected.length; i++) {
-            int rowToModel = featureTable.convertRowIndexToModel(selected[i]);
-            ret.add(features.get(rowToModel).getId());
+        for( int i = 0; i < selected.length; i++ ) {
+            int rowToModel = featureTable.convertRowIndexToModel( selected[i] );
+            ret.add( features.get( rowToModel ).getId() );
         }
         return ret;
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -189,20 +204,20 @@ public final class ExpressTestVisualPanelNormalization extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void useHKGButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_useHKGButtonActionPerformed
-        featureTable.setModel(tm);
-        featureTable.setRowSorter(trs);
-        searchField.setEnabled(true);
-        searchLable.setEnabled(true);
-        featureTable.setEnabled(true);
-        jScrollPane2.setEnabled(true);
+        featureTable.setModel( tm );
+        featureTable.setRowSorter( trs );
+        searchField.setEnabled( true );
+        searchLable.setEnabled( true );
+        featureTable.setEnabled( true );
+        jScrollPane2.setEnabled( true );
     }//GEN-LAST:event_useHKGButtonActionPerformed
 
     private void calculateButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_calculateButtonActionPerformed
-        searchField.setEnabled(false);
-        searchLable.setEnabled(false);
-        featureTable.setEnabled(false);
-        jScrollPane2.setEnabled(false);
-        featureTable.setModel(emptyTm);
+        searchField.setEnabled( false );
+        searchLable.setEnabled( false );
+        featureTable.setEnabled( false );
+        jScrollPane2.setEnabled( false );
+        featureTable.setModel( emptyTm );
     }//GEN-LAST:event_calculateButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton calculateButton;

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cebitec.readXplorer.differentialExpression.plot;
+
 
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.differentialExpression.BaySeq;
@@ -64,24 +65,27 @@ import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 
+
 /**
  * TopComponent, which displays all graphics available for a baySeq analysis.
  */
-@ConvertAsProperties(dtd = "-//de.cebitec.readXplorer.differentialExpression//BaySeqGraphics//EN",
-        autostore = false)
-@TopComponent.Description(preferredID = "BaySeqGraphicsTopComponent",
-        persistenceType = TopComponent.PERSISTENCE_NEVER)
-@TopComponent.Registration(mode = "bottomSlidingSide", openAtStartup = false)
-@ActionID(category = "Window", id = "de.cebitec.readXplorer.differentialExpression.BaySeqGraphicsTopComponent")
-@ActionReference(path = "Menu/Window")
-@TopComponent.OpenActionRegistration(displayName = "#CTL_BaySeqGraphicsAction",
-        preferredID = "BaySeqGraphicsTopComponent")
-@Messages({
+@ConvertAsProperties( dtd = "-//de.cebitec.readXplorer.differentialExpression//BaySeqGraphics//EN",
+                      autostore = false )
+@TopComponent.Description( preferredID = "BaySeqGraphicsTopComponent",
+                           persistenceType = TopComponent.PERSISTENCE_NEVER )
+@TopComponent.Registration( mode = "bottomSlidingSide", openAtStartup = false )
+@ActionID( category = "Window", id = "de.cebitec.readXplorer.differentialExpression.BaySeqGraphicsTopComponent" )
+@ActionReference( path = "Menu/Window" )
+@TopComponent.OpenActionRegistration( displayName = "#CTL_BaySeqGraphicsAction",
+                                      preferredID = "BaySeqGraphicsTopComponent" )
+@Messages( {
     "CTL_BaySeqGraphicsAction=BaySeqGraphics",
     "CTL_BaySeqGraphicsTopComponent=BaySeq Graphics",
     "HINT_BaySeqGraphicsTopComponent=This is a baySeq graphics window"
-})
-public final class BaySeqGraphicsTopComponent extends TopComponentExtended implements Observer, ItemListener {
+} )
+public final class BaySeqGraphicsTopComponent extends TopComponentExtended
+        implements Observer, ItemListener {
+
     private static final long serialVersionUID = 1L;
 
     private BaySeqAnalysisHandler baySeqAnalysisHandler;
@@ -90,73 +94,85 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended imple
     private DefaultListModel<PersistentTrack> samplesA = new DefaultListModel<>();
     private DefaultListModel<PersistentTrack> samplesB = new DefaultListModel<>();
     private File currentlyDisplayed;
-    private ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Creating plot");
+    private ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating plot" );
     private ResultDeAnalysis result;
     private List<Group> groups;
     private ChartPanel chartPanel;
     private boolean SVGCanvasActive;
     private ProgressHandle svgExportProgressHandle;
 
+
     /**
-     * TopComponent, which displays all graphics available for a baySeq analysis.
+     * TopComponent, which displays all graphics available for a baySeq
+     * analysis.
      */
     public BaySeqGraphicsTopComponent() {
     }
 
+
     /**
-     * TopComponent, which displays all graphics available for a baySeq analysis.
+     * TopComponent, which displays all graphics available for a baySeq
+     * analysis.
+     * <p>
      * @param handler The analysis handler containing the results
      */
-    public BaySeqGraphicsTopComponent(DeAnalysisHandler handler) {
+    public BaySeqGraphicsTopComponent( DeAnalysisHandler handler ) {
         baySeqAnalysisHandler = (BaySeqAnalysisHandler) handler;
         List<ResultDeAnalysis> results = handler.getResults();
-        this.result = results.get(results.size() - 1);
+        this.result = results.get( results.size() - 1 );
         groups = baySeqAnalysisHandler.getGroups();
-        cbm = new DefaultComboBoxModel<>(BaySeqAnalysisHandler.Plot.values());
+        cbm = new DefaultComboBoxModel<>( BaySeqAnalysisHandler.Plot.values() );
         initComponents();
-        iSymbol.setVisible(false);
-        iSymbol.setToolTipText(org.openide.util.NbBundle.getMessage(BaySeqGraphicsTopComponent.class, "GraphicsTopComponent.iSymbol.toolTipText"));
-        setName(Bundle.CTL_BaySeqGraphicsTopComponent());
-        setToolTipText(Bundle.HINT_BaySeqGraphicsTopComponent());
+        iSymbol.setVisible( false );
+        iSymbol.setToolTipText( org.openide.util.NbBundle.getMessage( BaySeqGraphicsTopComponent.class, "GraphicsTopComponent.iSymbol.toolTipText" ) );
+        setName( Bundle.CTL_BaySeqGraphicsTopComponent() );
+        setToolTipText( Bundle.HINT_BaySeqGraphicsTopComponent() );
         svgCanvas = new JSVGCanvas();
-        jPanel1.add(svgCanvas, BorderLayout.CENTER);
-        svgCanvas.addSVGDocumentLoaderListener(new SVGDocumentLoaderListener() {
+        jPanel1.add( svgCanvas, BorderLayout.CENTER );
+        svgCanvas.addSVGDocumentLoaderListener( new SVGDocumentLoaderListener() {
             @Override
-            public void documentLoadingStarted(SVGDocumentLoaderEvent e) {
+            public void documentLoadingStarted( SVGDocumentLoaderEvent e ) {
                 progressHandle.start();
                 progressHandle.switchToIndeterminate();
             }
 
+
             @Override
-            public void documentLoadingCompleted(SVGDocumentLoaderEvent e) {
-                progressHandle.switchToDeterminate(100);
+            public void documentLoadingCompleted( SVGDocumentLoaderEvent e ) {
+                progressHandle.switchToDeterminate( 100 );
                 progressHandle.finish();
-                saveButton.setEnabled(true);
-                plotButton.setEnabled(true);
+                saveButton.setEnabled( true );
+                plotButton.setEnabled( true );
             }
 
-            @Override
-            public void documentLoadingCancelled(SVGDocumentLoaderEvent e) {
-            }
 
             @Override
-            public void documentLoadingFailed(SVGDocumentLoaderEvent e) {
-                messages.setText("Could not load SVG file. Please try again.");
+            public void documentLoadingCancelled( SVGDocumentLoaderEvent e ) {
             }
-        });
+
+
+            @Override
+            public void documentLoadingFailed( SVGDocumentLoaderEvent e ) {
+                messages.setText( "Could not load SVG file. Please try again." );
+            }
+
+
+        } );
         SVGCanvasActive = true;
     }
 
+
     private void addResults() {
         List<Group> resultGroups = baySeqAnalysisHandler.getGroups();
-        groupComboBox.setModel(new DefaultComboBoxModel(resultGroups.toArray()));
+        groupComboBox.setModel( new DefaultComboBoxModel( resultGroups.toArray() ) );
         List<PersistentTrack> tracks = baySeqAnalysisHandler.getSelectedTracks();
-        for (Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext();) {
+        for( Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext(); ) {
             PersistentTrack persistentTrack = it.next();
-            samplesA.addElement(persistentTrack);
-            samplesB.addElement(persistentTrack);
+            samplesA.addElement( persistentTrack );
+            samplesB.addElement( persistentTrack );
         }
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -331,114 +347,129 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended imple
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    @NbBundle.Messages({"BaySeqSuccessMsg=SVG image saved to ",
-        "BaySeqSuccessHeader=Success"})
+
+    @NbBundle.Messages( { "BaySeqSuccessMsg=SVG image saved to ",
+                          "BaySeqSuccessHeader=Success" } )
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        ReadXplorerFileChooser fc = new ReadXplorerFileChooser(new String[]{"svg"}, "svg") {
+        ReadXplorerFileChooser fc = new ReadXplorerFileChooser( new String[]{ "svg" }, "svg" ) {
             private static final long serialVersionUID = 1L;
 
+
             @Override
-            public void save(String fileLocation) {
-                Path to = FileSystems.getDefault().getPath(fileLocation, "");
+            public void save( String fileLocation ) {
+                Path to = FileSystems.getDefault().getPath( fileLocation, "" );
                 BaySeqAnalysisHandler.Plot selectedPlot = (BaySeqAnalysisHandler.Plot) plotTypeComboBox.getSelectedItem();
-                if (selectedPlot == BaySeqAnalysisHandler.Plot.MACD) {
-                    saveToSVG(fileLocation);
-                } else {
+                if( selectedPlot == BaySeqAnalysisHandler.Plot.MACD ) {
+                    saveToSVG( fileLocation );
+                }
+                else {
                     Path from = currentlyDisplayed.toPath();
                     try {
-                        Path outputFile = Files.copy(from, to, StandardCopyOption.REPLACE_EXISTING);
-                        NotificationDisplayer.getDefault().notify(Bundle.BaySeqSuccessHeader(), new ImageIcon(), Bundle.BaySeqSuccessMsg() + outputFile.toString(), null);
-                    } catch (IOException ex) {
-                        Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
-                        JOptionPane.showMessageDialog(null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE);
+                        Path outputFile = Files.copy( from, to, StandardCopyOption.REPLACE_EXISTING );
+                        NotificationDisplayer.getDefault().notify( Bundle.BaySeqSuccessHeader(), new ImageIcon(), Bundle.BaySeqSuccessMsg() + outputFile.toString(), null );
+                    }
+                    catch( IOException ex ) {
+                        Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                        Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                        JOptionPane.showMessageDialog( null, ex.getMessage(), "Could not write to file.", JOptionPane.WARNING_MESSAGE );
                     }
                 }
             }
 
+
             @Override
-            public void open(String fileLocation) {
+            public void open( String fileLocation ) {
             }
+
+
         };
-        fc.openFileChooser(ReadXplorerFileChooser.SAVE_DIALOG);
+        fc.openFileChooser( ReadXplorerFileChooser.SAVE_DIALOG );
     }//GEN-LAST:event_saveButtonActionPerformed
 
     private void plotButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_plotButtonActionPerformed
         BaySeqAnalysisHandler.Plot selectedPlot = (BaySeqAnalysisHandler.Plot) plotTypeComboBox.getSelectedItem();
-        messages.setText("");
+        messages.setText( "" );
         int[] samplA = samplesAList.getSelectedIndices();
         int[] samplB = samplesBList.getSelectedIndices();
-        if (selectedPlot == BaySeqAnalysisHandler.Plot.MACD) {
+        if( selectedPlot == BaySeqAnalysisHandler.Plot.MACD ) {
             progressHandle.start();
             progressHandle.switchToIndeterminate();
             List<Integer> sampleA = new ArrayList<>();
             List<Integer> sampleB = new ArrayList<>();
-            Group selectedGroup = groups.get(groupComboBox.getSelectedIndex());
+            Group selectedGroup = groups.get( groupComboBox.getSelectedIndex() );
             Integer[] integerRep = selectedGroup.getIntegerRepresentation();
             int integerGroupA = integerRep[0];
             Integer integerGroupB = null;
-            sampleA.add(0);
-            for (int i = 1; i < integerRep.length; i++) {
+            sampleA.add( 0 );
+            for( int i = 1; i < integerRep.length; i++ ) {
                 int currentInteger = integerRep[i];
-                if (currentInteger == integerGroupA) {
-                    sampleA.add(i);
-                } else {
-                    if (integerGroupB == null) {
+                if( currentInteger == integerGroupA ) {
+                    sampleA.add( i );
+                }
+                else {
+                    if( integerGroupB == null ) {
                         integerGroupB = currentInteger;
-                        sampleB.add(i);
-                    } else {
-                        if (integerGroupB == currentInteger) {
-                            sampleB.add(i);
-                        } else {
-                            messages.setText("Select a model with exactly two groups to create a MA-Plot.");
+                        sampleB.add( i );
+                    }
+                    else {
+                        if( integerGroupB == currentInteger ) {
+                            sampleB.add( i );
+                        }
+                        else {
+                            messages.setText( "Select a model with exactly two groups to create a MA-Plot." );
                             break;
                         }
                     }
                 }
             }
-            if (sampleB.isEmpty() || (sampleA.size() + sampleB.size()) != integerRep.length) {
-                messages.setText("Select a model with exactly two groups to create a MA-Plot.");
-            } else {
+            if( sampleB.isEmpty() || (sampleA.size() + sampleB.size()) != integerRep.length ) {
+                messages.setText( "Select a model with exactly two groups to create a MA-Plot." );
+            }
+            else {
                 chartPanel = CreatePlots.createInfPlot(
-                        ConvertData.createMAvalues(result, DeAnalysisHandler.Tool.BaySeq, sampleA.toArray(new Integer[sampleA.size()]),
-                        sampleB.toArray(new Integer[sampleB.size()])), "A ((log(baseMeanA)/log(2)) + (log(baseMeanB)/log(2)))/2", "M (log(baseMeanA)/log(2)) - (log(baseMeanB)/log(2))", new ToolTip());
-                if (SVGCanvasActive) {
-                    jPanel1.remove(svgCanvas);
+                        ConvertData.createMAvalues( result, DeAnalysisHandler.Tool.BaySeq, sampleA.toArray( new Integer[sampleA.size()] ),
+                                                    sampleB.toArray( new Integer[sampleB.size()] ) ), "A ((log(baseMeanA)/log(2)) + (log(baseMeanB)/log(2)))/2", "M (log(baseMeanA)/log(2)) - (log(baseMeanB)/log(2))", new ToolTip() );
+                if( SVGCanvasActive ) {
+                    jPanel1.remove( svgCanvas );
                     SVGCanvasActive = false;
                 }
-                jPanel1.add(chartPanel, BorderLayout.CENTER);
+                jPanel1.add( chartPanel, BorderLayout.CENTER );
                 jPanel1.updateUI();
-                plotButton.setEnabled(true);
-                saveButton.setEnabled(true);
+                plotButton.setEnabled( true );
+                saveButton.setEnabled( true );
             }
-            progressHandle.switchToDeterminate(100);
+            progressHandle.switchToDeterminate( 100 );
             progressHandle.finish();
-        } else {
-            if (!SVGCanvasActive) {
-                jPanel1.remove(chartPanel);
-                jPanel1.add(svgCanvas, BorderLayout.CENTER);
+        }
+        else {
+            if( !SVGCanvasActive ) {
+                jPanel1.remove( chartPanel );
+                jPanel1.add( svgCanvas, BorderLayout.CENTER );
                 jPanel1.updateUI();
                 SVGCanvasActive = true;
             }
             try {
-                messages.setText("");
-                plotButton.setEnabled(false);
-                saveButton.setEnabled(false);
-                currentlyDisplayed = baySeqAnalysisHandler.plot(selectedPlot, ((Group) groupComboBox.getSelectedItem()), samplA, samplB);
-                svgCanvas.setURI(currentlyDisplayed.toURI().toString());
-                svgCanvas.setVisible(true);
+                messages.setText( "" );
+                plotButton.setEnabled( false );
+                saveButton.setEnabled( false );
+                currentlyDisplayed = baySeqAnalysisHandler.plot( selectedPlot, ((Group) groupComboBox.getSelectedItem()), samplA, samplB );
+                svgCanvas.setURI( currentlyDisplayed.toURI().toString() );
+                svgCanvas.setVisible( true );
                 svgCanvas.repaint();
-            } catch (IOException ex) {
-                Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
-                JOptionPane.showMessageDialog(null, "Can't create the temporary svg file!", "Gnu R Error", JOptionPane.WARNING_MESSAGE);
-            } catch (BaySeq.SamplesNotValidException ex) {
-                messages.setText("Samples A and B must not be the same!");
-                plotButton.setEnabled(true);
-            } catch (GnuR.PackageNotLoadableException ex) {
-                Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp);
-                JOptionPane.showMessageDialog(null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE);
+            }
+            catch( IOException ex ) {
+                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                JOptionPane.showMessageDialog( null, "Can't create the temporary svg file!", "Gnu R Error", JOptionPane.WARNING_MESSAGE );
+            }
+            catch( BaySeq.SamplesNotValidException ex ) {
+                messages.setText( "Samples A and B must not be the same!" );
+                plotButton.setEnabled( true );
+            }
+            catch( GnuR.PackageNotLoadableException ex ) {
+                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
             }
         }
     }//GEN-LAST:event_plotButtonActionPerformed
@@ -464,65 +495,74 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended imple
     private javax.swing.JButton saveButton;
     // End of variables declaration//GEN-END:variables
 
+
     @Override
     public void componentOpened() {
         addResults();
     }
 
+
     @Override
     public void componentClosed() {
-        baySeqAnalysisHandler.removeObserver(this);
+        baySeqAnalysisHandler.removeObserver( this );
     }
 
-    void writeProperties(java.util.Properties p) {
+
+    void writeProperties( java.util.Properties p ) {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
-        p.setProperty("version", "1.0");
+        p.setProperty( "version", "1.0" );
         // TODO store your settings
     }
 
-    void readProperties(java.util.Properties p) {
+
+    void readProperties( java.util.Properties p ) {
 //        String version = p.getProperty("version");
         // TODO read your settings according to their version
     }
 
-    private void saveToSVG(String fileLocation) {
-        svgExportProgressHandle = ProgressHandleFactory.createHandle("Save plot to svg file: " + fileLocation);
-        Path to = FileSystems.getDefault().getPath(fileLocation, "");
-        ChartExporter exporter = new ChartExporter(to, chartPanel.getChart());
-        exporter.registerObserver(this);
-        new Thread(exporter).start();
+
+    private void saveToSVG( String fileLocation ) {
+        svgExportProgressHandle = ProgressHandleFactory.createHandle( "Save plot to svg file: " + fileLocation );
+        Path to = FileSystems.getDefault().getPath( fileLocation, "" );
+        ChartExporter exporter = new ChartExporter( to, chartPanel.getChart() );
+        exporter.registerObserver( this );
+        new Thread( exporter ).start();
 
     }
 
+
     @Override
-    public void update(Object args) {
-        if (args instanceof ChartExporter.ChartExportStatus) {
-            DgeExportUtilities.updateExportStatus(svgExportProgressHandle, (ChartExporter.ChartExportStatus) args, saveButton);
-        } else {
+    public void update( Object args ) {
+        if( args instanceof ChartExporter.ChartExportStatus ) {
+            DgeExportUtilities.updateExportStatus( svgExportProgressHandle, (ChartExporter.ChartExportStatus) args, saveButton );
+        }
+        else {
             addResults();
         }
     }
 
-    @Override
-    public void itemStateChanged(ItemEvent e) {
-        BaySeqAnalysisHandler.Plot item = (BaySeqAnalysisHandler.Plot) e.getItem();
-        if (    item == BaySeqAnalysisHandler.Plot.Priors || 
-                item == BaySeqAnalysisHandler.Plot.MACD) {
-            samplesAList.setEnabled(false);
-            samplesALabel.setEnabled(false);
-            samplesBList.setEnabled(false);
-            samplesBLabel.setEnabled(false);
-            groupComboBox.setEnabled(true);
-        }
-        if (item == BaySeqAnalysisHandler.Plot.Posteriors) {
-            samplesAList.setEnabled(true);
-            samplesALabel.setEnabled(true);
-            samplesBList.setEnabled(true);
-            samplesBLabel.setEnabled(true);
-            groupComboBox.setEnabled(true);
-        }
-        iSymbol.setVisible(item == BaySeqAnalysisHandler.Plot.MACD);
-    }
-}
 
+    @Override
+    public void itemStateChanged( ItemEvent e ) {
+        BaySeqAnalysisHandler.Plot item = (BaySeqAnalysisHandler.Plot) e.getItem();
+        if( item == BaySeqAnalysisHandler.Plot.Priors
+            || item == BaySeqAnalysisHandler.Plot.MACD ) {
+            samplesAList.setEnabled( false );
+            samplesALabel.setEnabled( false );
+            samplesBList.setEnabled( false );
+            samplesBLabel.setEnabled( false );
+            groupComboBox.setEnabled( true );
+        }
+        if( item == BaySeqAnalysisHandler.Plot.Posteriors ) {
+            samplesAList.setEnabled( true );
+            samplesALabel.setEnabled( true );
+            samplesBList.setEnabled( true );
+            samplesBLabel.setEnabled( true );
+            groupComboBox.setEnabled( true );
+        }
+        iSymbol.setVisible( item == BaySeqAnalysisHandler.Plot.MACD );
+    }
+
+
+}

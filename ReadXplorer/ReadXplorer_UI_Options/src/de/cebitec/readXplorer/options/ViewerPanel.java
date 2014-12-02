@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,33 +16,39 @@
  */
 package de.cebitec.readXplorer.options;
 
+
 import de.cebitec.readXplorer.util.Properties;
 import java.util.prefs.Preferences;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import org.openide.util.NbPreferences;
 
+
 /**
  * Panel for configuring the options of viewers.
- * 
+ * <p>
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public final class ViewerPanel extends OptionsPanel {
+
     private static final long serialVersionUID = 1L;
 
     private final ViewerOptionsPanelController controller;
     private final Preferences pref;
-    
+
+
     /**
      * Panel for configuring the options of viewers.
+     * <p>
      * @param controller The controller of the panel
      */
-    public ViewerPanel(ViewerOptionsPanelController controller) {
+    public ViewerPanel( ViewerOptionsPanelController controller ) {
         this.controller = controller;
-        this.pref = NbPreferences.forModule(Object.class);
+        this.pref = NbPreferences.forModule( Object.class );
         initComponents();
         // TODO listen to changes in form fields and call controller.changed()
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -99,16 +105,18 @@ public final class ViewerPanel extends OptionsPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+
     @Override
     void load() {
-        this.viewerSizeSlider.setValue(pref.getInt(Properties.VIEWER_HEIGHT, Properties.DEFAULT_HEIGHT));
-        this.autoScalingBox.setSelected(pref.getBoolean(Properties.VIEWER_AUTO_SCALING, false));
+        this.viewerSizeSlider.setValue( pref.getInt( Properties.VIEWER_HEIGHT, Properties.DEFAULT_HEIGHT ) );
+        this.autoScalingBox.setSelected( pref.getBoolean( Properties.VIEWER_AUTO_SCALING, false ) );
     }
+
 
     @Override
     void store() {
-        pref.putInt(Properties.VIEWER_HEIGHT, this.viewerSizeSlider.getValue());
-        pref.putBoolean(Properties.VIEWER_AUTO_SCALING, this.autoScalingBox.isSelected());
+        pref.putInt( Properties.VIEWER_HEIGHT, this.viewerSizeSlider.getValue() );
+        pref.putBoolean( Properties.VIEWER_AUTO_SCALING, this.autoScalingBox.isSelected() );
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -117,17 +125,21 @@ public final class ViewerPanel extends OptionsPanel {
     private javax.swing.JSlider viewerSizeSlider;
     // End of variables declaration//GEN-END:variables
 
+
     private HyperlinkListener getHyperlinkListener() {
         return new HyperlinkListener() {
             @Override
-            public void hyperlinkUpdate(HyperlinkEvent e) {
-                if (HyperlinkEvent.EventType.ACTIVATED.equals(e.getEventType())) {
+            public void hyperlinkUpdate( HyperlinkEvent e ) {
+                if( HyperlinkEvent.EventType.ACTIVATED.equals( e.getEventType() ) ) {
 //                    HelpCtx.setHelpIDString(jEditorPane1, e.getURL().toString());
 //                    HelpCtx help = new HelpCtx(e.getURL().toString());
 //                    help.display();
                 }
             }
+
+
         };
     }
+
 
 }

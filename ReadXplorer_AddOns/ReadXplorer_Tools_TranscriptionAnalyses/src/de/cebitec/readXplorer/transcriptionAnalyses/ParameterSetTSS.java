@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,10 @@
  */
 package de.cebitec.readXplorer.transcriptionAnalyses;
 
+
 import de.cebitec.readXplorer.databackend.ParameterSetI;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
+
 
 /**
  * Data storage for all parameters associated with a transcription analysis.
@@ -25,7 +27,7 @@ import de.cebitec.readXplorer.databackend.ParametersReadClasses;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
-    
+
     private boolean performTSSAnalysis;
     private boolean autoTssParamEstimation;
     private boolean performUnannotatedTranscriptDet;
@@ -38,9 +40,10 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
     private int maxFeatureDistance;
     private ParametersReadClasses readClassParams;
 
-    
+
     /**
      * Data storage for all parameters associated with a transcription analysis.
+     * <p>
      * @param performTSSAnalysis
      * @param autoTssParamEstimation
      * @param performUnannotatedTranscriptDet
@@ -49,11 +52,11 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
      * @param maxLowCovInitCount
      * @param minLowCovIncrease
      * @param maxLeaderlessDistance
-     * @param minTranscriptExtensionCov 
+     * @param minTranscriptExtensionCov
      */
-    ParameterSetTSS(boolean performTSSAnalysis, boolean autoTssParamEstimation, boolean performUnannotatedTranscriptDet, 
-            int minNoReadStarts, int minPercentIncrease, int maxLowCovInitCount, int minLowCovIncrease, 
-            int minTranscriptExtensionCov, int maxLeaderlessDistance, int maxFeatureDistance, ParametersReadClasses readClassParams) {
+    ParameterSetTSS( boolean performTSSAnalysis, boolean autoTssParamEstimation, boolean performUnannotatedTranscriptDet,
+                     int minNoReadStarts, int minPercentIncrease, int maxLowCovInitCount, int minLowCovIncrease,
+                     int minTranscriptExtensionCov, int maxLeaderlessDistance, int maxFeatureDistance, ParametersReadClasses readClassParams ) {
         this.performTSSAnalysis = performTSSAnalysis;
         this.autoTssParamEstimation = autoTssParamEstimation;
         this.performUnannotatedTranscriptDet = performUnannotatedTranscriptDet;
@@ -65,95 +68,118 @@ public class ParameterSetTSS implements ParameterSetI<ParameterSetTSS> {
         this.maxLeaderlessDistance = maxLeaderlessDistance;
         this.maxFeatureDistance = maxFeatureDistance;
         this.readClassParams = readClassParams;
-        
+
     }
+
 
     public boolean isPerformTSSAnalysis() {
         return performTSSAnalysis;
     }
 
+
     public boolean isAutoTssParamEstimation() {
         return autoTssParamEstimation;
     }
-    
+
+
     public boolean isPerformUnannotatedTranscriptDet() {
         return performUnannotatedTranscriptDet;
     }
+
 
     public int getMinNoReadStarts() {
         return minNoReadStarts;
     }
 
+
     public int getMinPercentIncrease() {
         return minPercentIncrease;
     }
+
 
     public int getMaxLowCovReadStarts() {
         return maxLowCovInitCount;
     }
 
+
     public int getMinLowCovReadStarts() {
         return minLowCovIncrease;
     }
+
 
     public int getMinTranscriptExtensionCov() {
         return minTranscriptExtensionCov;
     }
 
+
     public int getMaxLeaderlessDistance() {
         return this.maxLeaderlessDistance;
     }
+
 
     public int getMaxFeatureDistance() {
         return this.maxFeatureDistance;
     }
 
+
     public ParametersReadClasses getReadClassParams() {
         return readClassParams;
     }
 
-    public void setPerformTSSAnalysis(boolean performTSSAnalysis) {
+
+    public void setPerformTSSAnalysis( boolean performTSSAnalysis ) {
         this.performTSSAnalysis = performTSSAnalysis;
     }
 
-    public void setAutoTssParamEstimation(boolean autoTssParamEstimation) {
+
+    public void setAutoTssParamEstimation( boolean autoTssParamEstimation ) {
         this.autoTssParamEstimation = autoTssParamEstimation;
     }
 
-    public void setPerformUnannotatedTranscriptDet(boolean performUnannotatedTranscriptDet) {
+
+    public void setPerformUnannotatedTranscriptDet( boolean performUnannotatedTranscriptDet ) {
         this.performUnannotatedTranscriptDet = performUnannotatedTranscriptDet;
     }
 
-    public void setMinNoReadStarts(int minNoReadStarts) {
+
+    public void setMinNoReadStarts( int minNoReadStarts ) {
         this.minNoReadStarts = minNoReadStarts;
     }
 
-    public void setMinPercentIncrease(int minPercentIncrease) {
+
+    public void setMinPercentIncrease( int minPercentIncrease ) {
         this.minPercentIncrease = minPercentIncrease;
     }
 
-    public void setMaxLowCovInitCount(int maxLowCovInitCount) {
+
+    public void setMaxLowCovInitCount( int maxLowCovInitCount ) {
         this.maxLowCovInitCount = maxLowCovInitCount;
     }
 
-    public void setMinLowCovIncrease(int minLowCovIncrease) {
+
+    public void setMinLowCovIncrease( int minLowCovIncrease ) {
         this.minLowCovIncrease = minLowCovIncrease;
     }
 
-    public void setMinTranscriptExtensionCov(int minTranscriptExtensionCov) {
-        this.minTranscriptExtensionCov = minTranscriptExtensionCov;
-    }  
 
-    public void setMaxLeaderlessDistance(int maxLeaderlessDistance) {
+    public void setMinTranscriptExtensionCov( int minTranscriptExtensionCov ) {
+        this.minTranscriptExtensionCov = minTranscriptExtensionCov;
+    }
+
+
+    public void setMaxLeaderlessDistance( int maxLeaderlessDistance ) {
         this.maxLeaderlessDistance = maxLeaderlessDistance;
     }
 
-    public void setMaxFeatureDistance(int maxFeatureDistance) {
+
+    public void setMaxFeatureDistance( int maxFeatureDistance ) {
         this.maxFeatureDistance = maxFeatureDistance;
     }
 
-    public void setReadClassParams(ParametersReadClasses readClassParams) {
+
+    public void setReadClassParams( ParametersReadClasses readClassParams ) {
         this.readClassParams = readClassParams;
     }
-    
+
+
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.databackend.dataObjects;
 
+
 /**
  * Base class for result entries for any kind of analyses carried out on a
  * specific track data set.
@@ -23,17 +24,21 @@ package de.cebitec.readXplorer.databackend.dataObjects;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class TrackResultEntry {
-    
+
     private int trackId;
+
 
     /**
      * Base class for result entries for any kind of analyses carried out on a
      * specific track data set.
-     * @param trackId The track id of the track to which this result entry belongs
+     * <p>
+     * @param trackId The track id of the track to which this result entry
+     *                belongs
      */
-    public TrackResultEntry(int trackId) {
+    public TrackResultEntry( int trackId ) {
         this.trackId = trackId;
     }
+
 
     /**
      * @return The track id of the track to which this result entry belongs
@@ -41,4 +46,6 @@ public class TrackResultEntry {
     public int getTrackId() {
         return trackId;
     }
+
+
 }

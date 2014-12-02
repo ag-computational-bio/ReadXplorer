@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.util.List;
 import java.util.Vector;
@@ -23,10 +24,12 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 import javax.swing.table.DefaultTableModel;
 
+
 public final class DeSeqVisualPanelDesign extends JPanel {
 
     private DefaultTableModel tm;
-    private DefaultComboBoxModel cbm = new DefaultComboBoxModel(new Integer[]{1});
+    private DefaultComboBoxModel cbm = new DefaultComboBoxModel( new Integer[]{ 1 } );
+
 
     /**
      * Creates new form DeSeqVisualPanelDesign
@@ -35,10 +38,12 @@ public final class DeSeqVisualPanelDesign extends JPanel {
         initComponents();
     }
 
+
     @Override
     public String getName() {
         return "Experimental design";
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -120,14 +125,14 @@ public final class DeSeqVisualPanelDesign extends JPanel {
 
     private void addRowButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addRowButtonActionPerformed
         String[] rowData = new String[tm.getColumnCount()];
-        tm.addRow(rowData);
-        cbm.addElement(tm.getRowCount());
+        tm.addRow( rowData );
+        cbm.addElement( tm.getRowCount() );
     }//GEN-LAST:event_addRowButtonActionPerformed
 
     private void removeRowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeRowActionPerformed
         int rowIndex = ((int) cbm.getSelectedItem()) - 1;
-        tm.removeRow(rowIndex);
-        cbm.removeElementAt(cbm.getSize() - 1);
+        tm.removeRow( rowIndex );
+        cbm.removeElementAt( cbm.getSize() - 1 );
     }//GEN-LAST:event_removeRowActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addRowButton;
@@ -137,22 +142,26 @@ public final class DeSeqVisualPanelDesign extends JPanel {
     private javax.swing.JComboBox rowNumberSelection;
     // End of variables declaration//GEN-END:variables
 
-    protected void setTracks(List<PersistentTrack> tracks) {     
+
+    protected void setTracks( List<PersistentTrack> tracks ) {
         String[] columnNames = new String[tracks.size() + 1];
         columnNames[0] = "Group name";
-        for (int i = 0; i < tracks.size(); i++) {
-            String description = tracks.get(i).getDescription();
+        for( int i = 0; i < tracks.size(); i++ ) {
+            String description = tracks.get( i ).getDescription();
             columnNames[i + 1] = description;
         }
-        tm = new DefaultTableModel(columnNames, 1);
-        jTable2.setModel(tm);
+        tm = new DefaultTableModel( columnNames, 1 );
+        jTable2.setModel( tm );
     }
+
 
     protected Vector getTableData() {
         //If a cell is still selected when you click on "next" the input you
         //have done won't be used unless you change the edited cell first.
         //This is done automatically by this command.
-        jTable2.editCellAt(-1, -1);
+        jTable2.editCellAt( -1, -1 );
         return tm.getDataVector();
     }
+
+
 }

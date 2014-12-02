@@ -5,6 +5,7 @@
  */
 package de.cebitec.readxplorer.vcf.importer;
 
+
 import de.cebitec.readXplorer.api.objects.JobPanel;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
@@ -12,15 +13,16 @@ import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import java.io.File;
 import org.openide.WizardDescriptor;
 
+
 /**
- * 
+ *
  * @author marend
  */
 public final class VcfImportVisualPanel extends JobPanel {
+
     private WizardDescriptor wiz;
     private File vcfFile = null;
-  
-   
+
 
     /**
      * Creates new form VcfImportVisualPanel1
@@ -29,20 +31,24 @@ public final class VcfImportVisualPanel extends JobPanel {
         initComponents();
 
     }
-    
-     public File getVcfFile() {
+
+
+    public File getVcfFile() {
         return vcfFile;
     }
+
 
     @Override
     public String getName() {
         return "VCF Parser";
     }
-    
+
+
     public PersistentReference getReference() {
         return (PersistentReference) jComboBox1.getSelectedItem();
-        
+
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -95,27 +101,30 @@ public final class VcfImportVisualPanel extends JobPanel {
 
     private void chooseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseButtonActionPerformed
         ReadXplorerFileChooser fc;
-        fc = new ReadXplorerFileChooser(new String[]{"vcf", "VCF", "Vcf"}, "VCF") {
-            
+        fc = new ReadXplorerFileChooser( new String[]{ "vcf", "VCF", "Vcf" }, "VCF" ) {
+
             private static final long serialVersionUID = 1L;
             private String fileLocation;
-        
-           
+
+
             @Override
-            public void save(String fileLocation) {
-                throw new UnsupportedOperationException("Operation not supported!");
+            public void save( String fileLocation ) {
+                throw new UnsupportedOperationException( "Operation not supported!" );
             }
-            
+
+
             @Override
-            public void open(String fileLocation) {
-                vcfFile = new File(fileLocation);
-                fileTextField.setText(fileLocation);
+            public void open( String fileLocation ) {
+                vcfFile = new File( fileLocation );
+                fileTextField.setText( fileLocation );
                 isRequiredInfoSet();
             }
+
+
         };
 //        fc.setDirectoryProperty("Converter.Filepath");
-        fc.setMultiSelectionEnabled(false);
-        fc.openFileChooser(ReadXplorerFileChooser.OPEN_DIALOG);
+        fc.setMultiSelectionEnabled( false );
+        fc.openFileChooser( ReadXplorerFileChooser.OPEN_DIALOG );
     }//GEN-LAST:event_chooseButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -123,12 +132,15 @@ public final class VcfImportVisualPanel extends JobPanel {
     private javax.swing.JTextField fileTextField;
     private javax.swing.JComboBox<PersistentReference> jComboBox1;
     // End of variables declaration//GEN-END:variables
- 
+
+
     @Override
     public boolean isRequiredInfoSet() {
         boolean isValidated = vcfFile != null && vcfFile.exists();
-        firePropertyChange(VcfImportWizardPanel.PROP_VALIDATE, null, isValidated);
+        firePropertyChange( VcfImportWizardPanel.PROP_VALIDATE, null, isValidated );
         return isValidated;
 
-    }    
+    }
+
+
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,12 +16,14 @@
  */
 package de.cebitec.readXplorer.view.dialogMenus;
 
+
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.util.HashSet;
 import java.util.List;
 import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbPreferences;
+
 
 /**
  * Wizard panel for showing and handling the selection of feature types.
@@ -38,16 +40,19 @@ public class SelectFeatureTypeWizardPanel extends ChangeListeningWizardPanel {
     private SelectFeatureTypeVisualPanel component;
     private final String analysisName;
 
+
     /**
      * Wizard panel for showing and handling the selection of feature types.
+     * <p>
      * @param analysisName the name of the analysis using this wizard panel. It
-     * will be used to store the selected settings for this wizard panel under a
-     * unique identifier.
+     *                     will be used to store the selected settings for this wizard panel under a
+     *                     unique identifier.
      */
-    public SelectFeatureTypeWizardPanel(String analysisName) {
-        super("Please select at least one feature type to continue.");
+    public SelectFeatureTypeWizardPanel( String analysisName ) {
+        super( "Please select at least one feature type to continue." );
         this.analysisName = analysisName;
     }
+
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -55,40 +60,45 @@ public class SelectFeatureTypeWizardPanel extends ChangeListeningWizardPanel {
     // create only those which really need to be visible.
     @Override
     public SelectFeatureTypeVisualPanel getComponent() {
-        if (component == null) {
-            component = new SelectFeatureTypeVisualPanel(analysisName);
+        if( component == null ) {
+            component = new SelectFeatureTypeVisualPanel( analysisName );
         }
         return component;
     }
 
+
     @Override
-    public void storeSettings(WizardDescriptor wiz) {
-        if (isValid()) {
-            wiz.putProperty(getPropSelectedFeatTypes(), new HashSet<>(this.component.getSelectedFeatureTypes()));
-            this.storeFeatureTypes(this.component.getSelectedFeatureTypes());
+    public void storeSettings( WizardDescriptor wiz ) {
+        if( isValid() ) {
+            wiz.putProperty( getPropSelectedFeatTypes(), new HashSet<>( this.component.getSelectedFeatureTypes() ) );
+            this.storeFeatureTypes( this.component.getSelectedFeatureTypes() );
         }
     }
+
 
     /**
      * Stores the selected feature types for this specific wizard for later use,
      * also after restarting the software.
+     * <p>
      * @param readClassParams The parameters to store
      */
-    private void storeFeatureTypes(List<FeatureType> featureTypeList) {
-        StringBuilder featTypeString = new StringBuilder(30);
-        for (FeatureType type : featureTypeList) {
-            featTypeString.append(type.getTypeString()).append(",");
+    private void storeFeatureTypes( List<FeatureType> featureTypeList ) {
+        StringBuilder featTypeString = new StringBuilder( 30 );
+        for( FeatureType type : featureTypeList ) {
+            featTypeString.append( type.getTypeString() ).append( "," );
         }
-        Preferences pref = NbPreferences.forModule(Object.class);
-        pref.put(getPropSelectedFeatTypes(), featTypeString.toString());
+        Preferences pref = NbPreferences.forModule( Object.class );
+        pref.put( getPropSelectedFeatTypes(), featTypeString.toString() );
     }
+
 
     /**
      * @return The property string for the selected feature type list for the
-     * corresponding wizard.
+     *         corresponding wizard.
      */
     public String getPropSelectedFeatTypes() {
         return this.analysisName + PROP_SELECTED_FEAT_TYPES;
     }
+
 
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,9 @@
  */
 package de.cebitec.readXplorer.view.dialogMenus;
 
+
 import org.openide.WizardDescriptor;
+
 
 /**
  * A Change listening wizard panel, which can control enabling and disabling
@@ -24,21 +26,25 @@ import org.openide.WizardDescriptor;
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
-public abstract class ChangeListeningFinishWizardPanel extends ChangeListeningWizardPanel implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
+public abstract class ChangeListeningFinishWizardPanel extends ChangeListeningWizardPanel
+        implements WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
     /**
      * A Change listening wizard panel, which can control enabling and disabling
      * of the finish button.
+     * <p>
      * @param errorMsg The error message to display, in case the required
-     * information for this wizard panel is not set correctly.
+     *                 information for this wizard panel is not set correctly.
      */
-    public ChangeListeningFinishWizardPanel(String errorMsg) {
-        super(errorMsg);
+    public ChangeListeningFinishWizardPanel( String errorMsg ) {
+        super( errorMsg );
     }
-    
+
+
     @Override
     public boolean isFinishPanel() {
         return this.isValid();
     }
-    
+
+
 }

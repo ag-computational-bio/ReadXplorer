@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.view.dialogMenus;
 
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,18 +29,20 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import org.openide.util.NbBundle;
 
+
 /**
- * A standard JPanel with functionality to handle multiple files, a list of 
+ * A standard JPanel with functionality to handle multiple files, a list of
  * mapping files and manage a used directory.
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class FileSelectionPanel extends JPanel {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     private boolean useMultipleImport = false;
     private List<File> mappingFiles = new ArrayList<>();
+
 
     /**
      * A standard JPanel with functionality to handle multiple files
@@ -47,31 +50,35 @@ public class FileSelectionPanel extends JPanel {
      */
     public FileSelectionPanel() {
     }
-    
+
+
     /**
      * Adds a single file to the list of mapping files.
-     * @param file the file to add to the list
+     * <p>
+     * @param file             the file to add to the list
      * @param mappingFileField the field, which should display the file name
      */
-    @NbBundle.Messages({"ErrorTitle=Open File Error",
-        "ErrorMsg=Could not open the given file! (Are the permissions set correctly?)"})
-    public void addFile(File file, JTextField mappingFileField) {
-        if (file.canRead()) {
-            addMappingFile(file);
+    @NbBundle.Messages( { "ErrorTitle=Open File Error",
+                          "ErrorMsg=Could not open the given file! (Are the permissions set correctly?)" } )
+    public void addFile( File file, JTextField mappingFileField ) {
+        if( file.canRead() ) {
+            addMappingFile( file );
             /*TODO: Read sam header & check against reference, show a mapping of references up to 100? entries. Show button to list more/all
-            //try (SAMFileReader samReader = new SAMFileReader(trackJob.getFile())) {
-            //samReader.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
-            //SAMFileHeader header = samReader.getFileHeader();
-            //} } catch (Exception e) {
-            this.notifyObservers(e.getMessage() != null ? e.getMessage() : e);
-            Exceptions.printStackTrace(e);
-            } */ 
-            mappingFileField.setText(file.getAbsolutePath());
-        } else {
-            JOptionPane.showMessageDialog(this, Bundle.ErrorMsg(), Bundle.ErrorTitle(), JOptionPane.ERROR_MESSAGE);
+             //try (SAMFileReader samReader = new SAMFileReader(trackJob.getFile())) {
+             //samReader.setValidationStringency(SAMFileReader.ValidationStringency.LENIENT);
+             //SAMFileHeader header = samReader.getFileHeader();
+             //} } catch (Exception e) {
+             this.notifyObservers(e.getMessage() != null ? e.getMessage() : e);
+             Exceptions.printStackTrace(e);
+             } */
+            mappingFileField.setText( file.getAbsolutePath() );
+        }
+        else {
+            JOptionPane.showMessageDialog( this, Bundle.ErrorMsg(), Bundle.ErrorTitle(), JOptionPane.ERROR_MESSAGE );
         }
     }
-    
+
+
     /**
      * @return true, if multiple files can be imported at once, false otherwise
      */
@@ -79,95 +86,113 @@ public class FileSelectionPanel extends JPanel {
         return useMultipleImport;
     }
 
+
     /**
      * Sets if mutliple tracks should be imported at once
+     * <p>
      * @param useMultipleImport true, if multiple files can be imported at once,
-     * false otherwise
+     *                          false otherwise
      */
-    protected void setUseMultipleImport(boolean useMultipleImport) {
+    protected void setUseMultipleImport( boolean useMultipleImport ) {
         this.useMultipleImport = useMultipleImport;
     }
+
 
     /**
      * @return The single mapping file to import
      */
     public File getMappingFile() {
-        if (getMappingFiles().isEmpty()) {
+        if( getMappingFiles().isEmpty() ) {
             return null;
-        } else {
-            return getMappingFiles().get(0);
+        }
+        else {
+            return getMappingFiles().get( 0 );
         }
     }
 
+
     /**
      * @return The complete list of mapping files1 to import for multiple data
-     * set import with the same parameters at once.
+     *         set import with the same parameters at once.
      */
     public List<File> getMappingFiles() {
         return mappingFiles;
     }
 
+
     /**
      * Sets the mapping files for multiple track import at once.
+     * <p>
      * @param mappingFiles The list of mapping files to import at once
      */
-    protected void setMappingFiles(List<File> mappingFiles) {
+    protected void setMappingFiles( List<File> mappingFiles ) {
         this.mappingFiles = mappingFiles;
     }
 
+
     /**
      * Adds a single mapping file to the list.
+     * <p>
      * @param mappingFile The mapping file to add to the list
      */
-    protected void addMappingFile(File mappingFile) {
-        this.mappingFiles.add(mappingFile);
+    protected void addMappingFile( File mappingFile ) {
+        this.mappingFiles.add( mappingFile );
     }
+
 
     /**
      * Fills the table showing all tracks selected for a multiple track at once
      * import.
-     * @param model the model to which the data should be added
+     * <p>
+     * @param model        the model to which the data should be added
      * @param mappingFiles the files whose names should be appended to the model
-     * @param title the title above the file names to add
+     * @param title        the title above the file names to add
      */
-    protected void fillMultipleImportTable(DefaultListModel<String> model, List<File> mappingFiles, String title) {
-        model.addElement(title);
-        for (File mappingFile : mappingFiles) {
-            model.addElement(mappingFile.getName());
+    protected void fillMultipleImportTable( DefaultListModel<String> model, List<File> mappingFiles, String title ) {
+        model.addElement( title );
+        for( File mappingFile : mappingFiles ) {
+            model.addElement( mappingFile.getName() );
         }
-        if (mappingFiles.isEmpty()) {
-            model.addElement("-");
+        if( mappingFiles.isEmpty() ) {
+            model.addElement( "-" );
         }
     }
-    
+
+
     /**
      * Updates the gui for multiple or single file handling.
+     * <p>
      * @param multiFileImportEnabled true, if multiple files can be imported at
-     * once, false otherwise
-     * @param multiTrackScrollPane scrollpane to display multiple files
-     * @param multiTrackList list which actually displays the multiple files on
-     * the scrollpane
-     * @param multiTrackListLabel the label which should only be visible for
-     * multiple file handling
-     * @param fileTextField text field displaying either the file path for
-     * single files or the count of files to handle for multiple file handling
+     *                               once, false otherwise
+     * @param multiTrackScrollPane   scrollpane to display multiple files
+     * @param multiTrackList         list which actually displays the multiple
+     *                               files on
+     *                               the scrollpane
+     * @param multiTrackListLabel    the label which should only be visible for
+     *                               multiple file handling
+     * @param fileTextField          text field displaying either the file path
+     *                               for
+     *                               single files or the count of files to handle for multiple file handling
      */
-    public void updateGuiForMultipleFiles(boolean multiFileImportEnabled, JScrollPane multiTrackScrollPane, JList<String> multiTrackList,
-            JLabel multiTrackListLabel, JTextField fileTextField) {
-        this.setUseMultipleImport(multiFileImportEnabled);
-        multiTrackScrollPane.setVisible(this.useMultipleImport());
-        multiTrackList.setVisible(this.useMultipleImport());
-        multiTrackListLabel.setVisible(this.useMultipleImport());
-        if (this.useMultipleImport()) {
-            fileTextField.setText(getMappingFiles().size() + " tracks to import");
+    public void updateGuiForMultipleFiles( boolean multiFileImportEnabled, JScrollPane multiTrackScrollPane, JList<String> multiTrackList,
+                                           JLabel multiTrackListLabel, JTextField fileTextField ) {
+        this.setUseMultipleImport( multiFileImportEnabled );
+        multiTrackScrollPane.setVisible( this.useMultipleImport() );
+        multiTrackList.setVisible( this.useMultipleImport() );
+        multiTrackListLabel.setVisible( this.useMultipleImport() );
+        if( this.useMultipleImport() ) {
+            fileTextField.setText( getMappingFiles().size() + " tracks to import" );
             DefaultListModel<String> model = new DefaultListModel<>();
-            fillMultipleImportTable(model, getMappingFiles(), "Mapping file list:");
-            multiTrackList.setModel(model);
-            this.setSize(this.getPreferredSize());
-        } else {
-            fileTextField.setText(getMappingFile() != null ? getMappingFile().getAbsolutePath() : "");
+            fillMultipleImportTable( model, getMappingFiles(), "Mapping file list:" );
+            multiTrackList.setModel( model );
+            this.setSize( this.getPreferredSize() );
+        }
+        else {
+            fileTextField.setText( getMappingFile() != null ? getMappingFile().getAbsolutePath() : "" );
             getMappingFiles().clear();
-            multiTrackList.setModel(new DefaultListModel<String>());
+            multiTrackList.setModel( new DefaultListModel<String>() );
         }
     }
+
+
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,14 +16,15 @@
  */
 package de.cebitec.readXplorer.differentialExpression.plot;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler;
 import de.cebitec.readXplorer.differentialExpression.ResultDeAnalysis;
 import de.cebitec.readXplorer.plotting.ChartExporter;
 import de.cebitec.readXplorer.plotting.CreatePlots;
-import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Pair;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readXplorer.view.TopComponentExtended;
 import java.nio.file.FileSystems;
@@ -44,40 +45,44 @@ import org.openide.awt.ActionReference;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 
+
 /**
  * TopComponent, which displays all graphics available for the express test.
  */
 @ConvertAsProperties(
-        dtd = "-//de.cebitec.readXplorer.differentialExpression.plot//Plot//EN",
-        autostore = false)
+         dtd = "-//de.cebitec.readXplorer.differentialExpression.plot//Plot//EN",
+         autostore = false )
 @TopComponent.Description(
-        preferredID = "PlotTopComponent",
-        //iconBase="SET/PATH/TO/ICON/HERE", 
-        persistenceType = TopComponent.PERSISTENCE_NEVER)
-@TopComponent.Registration(mode = "editor", openAtStartup = false)
+         preferredID = "PlotTopComponent",
+         //iconBase="SET/PATH/TO/ICON/HERE",
+         persistenceType = TopComponent.PERSISTENCE_NEVER )
+@TopComponent.Registration( mode = "editor", openAtStartup = false )
 //@ActionID(category = "Tools", id = "de.cebitec.readXplorer.differentialExpression.plot.PlotTopComponent")
 //@ActionReference(path = "Menu/Tools")
-@ActionID(category = "Window", id = "de.cebitec.readXplorer.differentialExpression.plot.PlotTopComponent")
-@ActionReference(path = "Menu/Window")
+@ActionID( category = "Window", id = "de.cebitec.readXplorer.differentialExpression.plot.PlotTopComponent" )
+@ActionReference( path = "Menu/Window" )
 @TopComponent.OpenActionRegistration(
-        displayName = "#CTL_PlotAction",
-        preferredID = "PlotTopComponent")
-@Messages({
+         displayName = "#CTL_PlotAction",
+         preferredID = "PlotTopComponent" )
+@Messages( {
     "CTL_PlotAction=Plot",
     "CTL_PlotTopComponent=Express Test Graphics",
     "HINT_PlotTopComponent=This is a differential expression plot window"
-})
-public final class ExpressTestGraphicsTopComponent extends TopComponentExtended implements Observer {
+} )
+public final class ExpressTestGraphicsTopComponent extends TopComponentExtended
+        implements Observer {
+
     private static final long serialVersionUID = 1L;
 
-    private DefaultComboBoxModel<PlotTypes> cbmPlotType = new DefaultComboBoxModel<>(PlotTypes.values());
+    private DefaultComboBoxModel<PlotTypes> cbmPlotType = new DefaultComboBoxModel<>( PlotTypes.values() );
     private DefaultComboBoxModel<String> cbmDataSet;
     private DeAnalysisHandler analysisHandler;
     private List<ResultDeAnalysis> results;
     private DeAnalysisHandler.Tool usedTool;
     private ChartPanel chartPanel;
-    private ProgressHandle progressHandle = ProgressHandleFactory.createHandle("Creating plot");
+    private ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating plot" );
     private ProgressHandle svgExportProgressHandle;
+
 
     /**
      * TopComponent, which displays all graphics available for the express test.
@@ -86,56 +91,63 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended 
         cbmDataSet = new DefaultComboBoxModel<>();
         initComponents();
         initAdditionalComponents();
-        ChartPanel panel = CreatePlots.createInfPlot(createSamplePoints(500), "X", "Y", new ToolTip());
-        plotPanel.add(panel);
+        ChartPanel panel = CreatePlots.createInfPlot( createSamplePoints( 500 ), "X", "Y", new ToolTip() );
+        plotPanel.add( panel );
         plotPanel.updateUI();
 
     }
 
+
     /**
      * TopComponent, which displays all graphics available for the express test.
+     * <p>
      * @param analysisHandler The analysis handler containing the results
-     * @param usedTool The tool used for the analysis (has to be the ExpressTest in this case)
+     * @param usedTool        The tool used for the analysis (has to be the
+     *                        ExpressTest in this case)
      */
-    public ExpressTestGraphicsTopComponent(DeAnalysisHandler analysisHandler, DeAnalysisHandler.Tool usedTool) {
+    public ExpressTestGraphicsTopComponent( DeAnalysisHandler analysisHandler, DeAnalysisHandler.Tool usedTool ) {
         this.analysisHandler = analysisHandler;
         this.usedTool = usedTool;
         results = analysisHandler.getResults();
         List<String> descriptions = new ArrayList<>();
-        for (Iterator<ResultDeAnalysis> it = results.iterator(); it.hasNext();) {
+        for( Iterator<ResultDeAnalysis> it = results.iterator(); it.hasNext(); ) {
             ResultDeAnalysis currentResult = it.next();
-            descriptions.add(currentResult.getDescription());
+            descriptions.add( currentResult.getDescription() );
         }
-        cbmDataSet = new DefaultComboBoxModel<>(descriptions.toArray(new String[descriptions.size()]));
+        cbmDataSet = new DefaultComboBoxModel<>( descriptions.toArray( new String[descriptions.size()] ) );
         initComponents();
         initAdditionalComponents();
     }
 
+
     private void initAdditionalComponents() {
-        setName(Bundle.CTL_PlotTopComponent());
-        setToolTipText(Bundle.HINT_PlotTopComponent());
-        iSymbol.setToolTipText(org.openide.util.NbBundle.getMessage(ExpressTestGraphicsTopComponent.class, "GraphicsTopComponent.iSymbol.toolTipText"));
+        setName( Bundle.CTL_PlotTopComponent() );
+        setToolTipText( Bundle.HINT_PlotTopComponent() );
+        iSymbol.setToolTipText( org.openide.util.NbBundle.getMessage( ExpressTestGraphicsTopComponent.class, "GraphicsTopComponent.iSymbol.toolTipText" ) );
     }
 
-    public Map<PersistentFeature, Pair<Double, Double>> createSamplePoints(int n) {
-        Random r = new Random(System.nanoTime());
+
+    public Map<PersistentFeature, Pair<Double, Double>> createSamplePoints( int n ) {
+        Random r = new Random( System.nanoTime() );
         Map<PersistentFeature, Pair<Double, Double>> points = new HashMap<>();
-        for (int i = 0; i < n; i++) {
-            PersistentFeature dummyFeature = new PersistentFeature(0, 0, "", "", "", "", 0, 0, true, FeatureType.ANY, "");
+        for( int i = 0; i < n; i++ ) {
+            PersistentFeature dummyFeature = new PersistentFeature( 0, 0, "", "", "", "", 0, 0, true, FeatureType.ANY, "" );
             double random = Math.random();
-            if (random > 0.95) {
-                points.put(dummyFeature, new Pair<>(r.nextDouble() * 256.0d, Double.POSITIVE_INFINITY));
-                points.put(dummyFeature, new Pair<>(r.nextDouble() * 256.0d, Double.NEGATIVE_INFINITY));
-            } else {
-                points.put(dummyFeature, new Pair<>(2 * i + (r.nextGaussian() - 0.5d), r.nextDouble() * 256.0d));
+            if( random > 0.95 ) {
+                points.put( dummyFeature, new Pair<>( r.nextDouble() * 256.0d, Double.POSITIVE_INFINITY ) );
+                points.put( dummyFeature, new Pair<>( r.nextDouble() * 256.0d, Double.NEGATIVE_INFINITY ) );
+            }
+            else {
+                points.put( dummyFeature, new Pair<>( 2 * i + (r.nextGaussian() - 0.5d), r.nextDouble() * 256.0d ) );
             }
         }
-        PersistentFeature dummyFeature = new PersistentFeature(0, 0, "", "", "", "", 0, 0, true, FeatureType.ANY, "");
-        points.put(dummyFeature, new Pair<>(200d, 300d));
-        dummyFeature = new PersistentFeature(0, 0, "", "", "", "", 0, 0, true, FeatureType.ANY, "");
-        points.put(dummyFeature, new Pair<>(100d, Double.POSITIVE_INFINITY));
+        PersistentFeature dummyFeature = new PersistentFeature( 0, 0, "", "", "", "", 0, 0, true, FeatureType.ANY, "" );
+        points.put( dummyFeature, new Pair<>( 200d, 300d ) );
+        dummyFeature = new PersistentFeature( 0, 0, "", "", "", "", 0, 0, true, FeatureType.ANY, "" );
+        points.put( dummyFeature, new Pair<>( 100d, Double.POSITIVE_INFINITY ) );
         return points;
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -272,46 +284,50 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended 
         progressHandle.start();
         progressHandle.switchToIndeterminate();
         plotPanel.removeAll();
-        messages.setText("");
+        messages.setText( "" );
         PlotTypes type = (PlotTypes) cbmPlotType.getSelectedItem();
         int index = dataSetComboBox.getSelectedIndex();
-        final ResultDeAnalysis result = results.get(index);
-        switch (type) {
+        final ResultDeAnalysis result = results.get( index );
+        switch( type ) {
             case MA_Plot:
-                chartPanel = CreatePlots.createInfPlot(ConvertData.createMAvalues(result, usedTool, null, null), "A ((log(baseMeanA)/log(2)) + (log(baseMeanB)/log(2)))/2", "M (log(baseMeanA)/log(2)) - (log(baseMeanB)/log(2))", new ToolTip());
-                plotPanel.add(chartPanel);
+                chartPanel = CreatePlots.createInfPlot( ConvertData.createMAvalues( result, usedTool, null, null ), "A ((log(baseMeanA)/log(2)) + (log(baseMeanB)/log(2)))/2", "M (log(baseMeanA)/log(2)) - (log(baseMeanB)/log(2))", new ToolTip() );
+                plotPanel.add( chartPanel );
                 plotPanel.updateUI();
                 break;
             case RatioAB_Confidence:
-                chartPanel = CreatePlots.createPlot(ConvertData.ratioABagainstConfidence(result), "ratioAB", "Confidence", new ToolTip());
-                plotPanel.add(chartPanel);
+                chartPanel = CreatePlots.createPlot( ConvertData.ratioABagainstConfidence( result ), "ratioAB", "Confidence", new ToolTip() );
+                plotPanel.add( chartPanel );
                 plotPanel.updateUI();
                 break;
             case RatioBA_Confidence:
-                chartPanel = CreatePlots.createPlot(ConvertData.ratioBAagainstConfidence(result), "ratioBA", "Confidence", new ToolTip());
-                plotPanel.add(chartPanel);
+                chartPanel = CreatePlots.createPlot( ConvertData.ratioBAagainstConfidence( result ), "ratioBA", "Confidence", new ToolTip() );
+                plotPanel.add( chartPanel );
                 plotPanel.updateUI();
                 break;
         }
-        saveButton.setEnabled(true);
-        progressHandle.switchToDeterminate(100);
+        saveButton.setEnabled( true );
+        progressHandle.switchToDeterminate( 100 );
         progressHandle.finish();
     }//GEN-LAST:event_createPlotButtonActionPerformed
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
-        ReadXplorerFileChooser fc = new ReadXplorerFileChooser(new String[]{"svg"}, "svg") {
+        ReadXplorerFileChooser fc = new ReadXplorerFileChooser( new String[]{ "svg" }, "svg" ) {
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public void save(String fileLocation) {
-                saveToSVG(fileLocation);
-            }
 
             @Override
-            public void open(String fileLocation) {
+            public void save( String fileLocation ) {
+                saveToSVG( fileLocation );
             }
+
+
+            @Override
+            public void open( String fileLocation ) {
+            }
+
+
         };
-        fc.openFileChooser(ReadXplorerFileChooser.SAVE_DIALOG);
+        fc.openFileChooser( ReadXplorerFileChooser.SAVE_DIALOG );
     }//GEN-LAST:event_saveButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton createPlotButton;
@@ -328,59 +344,71 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended 
     private javax.swing.JButton saveButton;
     // End of variables declaration//GEN-END:variables
 
+
     @Override
     public void componentOpened() {
         // TODO add custom code on component opening
     }
 
+
     @Override
     public void componentClosed() {
-        if (analysisHandler != null) {
-            analysisHandler.removeObserver(this);
+        if( analysisHandler != null ) {
+            analysisHandler.removeObserver( this );
         }
     }
 
-    void writeProperties(java.util.Properties p) {
+
+    void writeProperties( java.util.Properties p ) {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
-        p.setProperty("version", "1.0");
+        p.setProperty( "version", "1.0" );
         // TODO store your settings
     }
 
-    void readProperties(java.util.Properties p) {
-        String version = p.getProperty("version");
+
+    void readProperties( java.util.Properties p ) {
+        String version = p.getProperty( "version" );
         // TODO read your settings according to their version
     }
 
-    private void saveToSVG(String fileLocation) {
-        svgExportProgressHandle = ProgressHandleFactory.createHandle("Save plot to svg file: " + fileLocation);
-        Path to = FileSystems.getDefault().getPath(fileLocation, "");
-        ChartExporter exporter = new ChartExporter(to, chartPanel.getChart());
-        exporter.registerObserver(this);
-        new Thread(exporter).start();
+
+    private void saveToSVG( String fileLocation ) {
+        svgExportProgressHandle = ProgressHandleFactory.createHandle( "Save plot to svg file: " + fileLocation );
+        Path to = FileSystems.getDefault().getPath( fileLocation, "" );
+        ChartExporter exporter = new ChartExporter( to, chartPanel.getChart() );
+        exporter.registerObserver( this );
+        new Thread( exporter ).start();
 
     }
+
 
     @Override
-    public void update(Object args) {
-        if (args instanceof ChartExporter.ChartExportStatus) {
-            DgeExportUtilities.updateExportStatus(svgExportProgressHandle, (ChartExporter.ChartExportStatus) args, saveButton);
+    public void update( Object args ) {
+        if( args instanceof ChartExporter.ChartExportStatus ) {
+            DgeExportUtilities.updateExportStatus( svgExportProgressHandle, (ChartExporter.ChartExportStatus) args, saveButton );
         }
     }
+
 
     public static enum PlotTypes {
 
-        MA_Plot("MA Plot"), RatioAB_Confidence("Ratio A/B against Confidence"),
-        RatioBA_Confidence("Ratio B/A against Confidence");
+        MA_Plot( "MA Plot" ), RatioAB_Confidence( "Ratio A/B against Confidence" ),
+        RatioBA_Confidence( "Ratio B/A against Confidence" );
         private String name;
 
-        private PlotTypes(String name) {
+
+        private PlotTypes( String name ) {
             this.name = name;
         }
+
 
         @Override
         public String toString() {
             return name;
         }
+
+
     }
+
 }

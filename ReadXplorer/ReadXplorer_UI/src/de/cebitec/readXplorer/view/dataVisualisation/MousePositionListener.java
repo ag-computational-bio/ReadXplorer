@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation;
 
+
 /**
  * Listener for the current mouse position.
  *
@@ -23,8 +24,10 @@ package de.cebitec.readXplorer.view.dataVisualisation;
  */
 public interface MousePositionListener {
 
-    public void setCurrentMousePosition(int logPos);
+    public void setCurrentMousePosition( int logPos );
 
-    public void setMouseOverPaintingRequested(boolean requested);
+
+    public void setMouseOverPaintingRequested( boolean requested );
+
 
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.util.fileChooser;
 
+
 import java.awt.HeadlessException;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -28,6 +29,7 @@ import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.awt.NotificationDisplayer;
 import org.openide.util.NbBundle.Messages;
 
+
 /**
  * ReadXplorer's String file chooser. Contains the save method storing an
  * arbitrary string.
@@ -35,64 +37,73 @@ import org.openide.util.NbBundle.Messages;
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class StoreStringFileChooser extends ReadXplorerFileChooser {
+
     private static final long serialVersionUID = 1L;
-    
+
     private ProgressHandle progressHandle;
+
 
     /**
      * Creates a new String file chooser. Contains the save method storing an
      * arbitrary string.
-     * @param fileExtension file extension to use for this file
+     * <p>
+     * @param fileExtension   file extension to use for this file
      * @param fileDescription file description
-     * @param string string to store in the file
+     * @param string          string to store in the file
      */
-    public StoreStringFileChooser(final String[] fileExtension, final String fileDescription, final String string){
-        super(fileExtension, fileDescription, string);
-        this.openFileChooser(ReadXplorerFileChooser.SAVE_DIALOG);
+    public StoreStringFileChooser( final String[] fileExtension, final String fileDescription, final String string ) {
+        super( fileExtension, fileDescription, string );
+        this.openFileChooser( ReadXplorerFileChooser.SAVE_DIALOG );
     }
 
 
-    @Messages({"NoStringError=Given data is not a string and cannot be saved as fasta.", 
-               "Error=An error occured during the file saving process.",
-               "ProgressName=Storing data in file...",
-               "SuccessMsg=Data successfully stored in ",
-               "SuccessHeader=Success"})
+    @Messages( { "NoStringError=Given data is not a string and cannot be saved as fasta.",
+                 "Error=An error occured during the file saving process.",
+                 "ProgressName=Storing data in file...",
+                 "SuccessMsg=Data successfully stored in ",
+                 "SuccessHeader=Success" } )
     @Override
-    public void save(final String fileLocation) {
-        
-        if (data instanceof String) {
-            this.progressHandle = ProgressHandleFactory.createHandle(Bundle.ProgressName());
+    public void save( final String fileLocation ) {
+
+        if( data instanceof String ) {
+            this.progressHandle = ProgressHandleFactory.createHandle( Bundle.ProgressName() );
             final String dataString = (String) data;
             this.progressHandle.start();
 
-            Thread exportThread = new Thread(new Runnable() {
+            Thread exportThread = new Thread( new Runnable() {
 
                 @Override
                 public void run() {
 
                     try {
-                        final FileWriter fileStream = new FileWriter(fileLocation);
-                        final BufferedWriter outputWriter = new BufferedWriter(fileStream);
-                        outputWriter.write(dataString);
+                        final FileWriter fileStream = new FileWriter( fileLocation );
+                        final BufferedWriter outputWriter = new BufferedWriter( fileStream );
+                        outputWriter.write( dataString );
                         outputWriter.close();
-                        NotificationDisplayer.getDefault().notify(Bundle.SuccessHeader(), new ImageIcon(), Bundle.SuccessMsg() + fileLocation, null);
-                    } catch (IOException | MissingResourceException | HeadlessException e) {
-                        JOptionPane.showMessageDialog(StoreStringFileChooser.this, Bundle.Error());
+                        NotificationDisplayer.getDefault().notify( Bundle.SuccessHeader(), new ImageIcon(), Bundle.SuccessMsg() + fileLocation, null );
+                    }
+                    catch( IOException | MissingResourceException | HeadlessException e ) {
+                        JOptionPane.showMessageDialog( StoreStringFileChooser.this, Bundle.Error() );
                     }
                     progressHandle.finish();
                 }
-            });
+
+
+            } );
             exportThread.start();
-            
-        } else {
-            JOptionPane.showMessageDialog(this, Bundle.NoStringError());
+
+        }
+        else {
+            JOptionPane.showMessageDialog( this, Bundle.NoStringError() );
         }
     }
 
+
     @Override
-    public void open(String fileLocation) {
+    public void open( String fileLocation ) {
         //this is a save dialog, so nothing to do here
         //refactor when open option is needed and add funcationality
     }
+
 
 }

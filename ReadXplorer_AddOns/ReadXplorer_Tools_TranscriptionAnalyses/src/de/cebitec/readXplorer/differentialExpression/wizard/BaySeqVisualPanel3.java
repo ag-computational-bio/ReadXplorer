@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.differentialExpression.Group;
 import java.util.ArrayList;
@@ -27,7 +28,9 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionListener {
+
+public final class BaySeqVisualPanel3 extends JPanel implements
+        ListSelectionListener {
 
     private DefaultListModel<PersistentTrack> trackListModel = new DefaultListModel<>();
     private DefaultListModel<String> groupListModel = new DefaultListModel<>();
@@ -37,6 +40,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
     private int currentGroupNumber = 1;
     private int selectedIndex = -1;
 
+
     /**
      * Creates new form BaySeqVisualPanel3
      */
@@ -44,8 +48,9 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
         initComponents();
     }
 
-    public void updateTrackList(List<PersistentTrack> selectedTracks) {
-        if (!this.selectedTracks.equals(selectedTracks)) {
+
+    public void updateTrackList( List<PersistentTrack> selectedTracks ) {
+        if( !this.selectedTracks.equals( selectedTracks ) ) {
             this.selectedTracks = selectedTracks;
             currentGroupNumber = 1;
             selectedIndex = -1;
@@ -53,32 +58,35 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
             createdGroups.clear();
             groupListModel.clear();
             Integer[] defaultGroup = new Integer[selectedTracks.size()];
-            StringBuilder strBuilder = new StringBuilder("{");
-            for (Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext();) {
+            StringBuilder strBuilder = new StringBuilder( "{" );
+            for( Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext(); ) {
                 PersistentTrack persistentTrack = it.next();
-                defaultGroup[selectedTracks.indexOf(persistentTrack)] = currentGroupNumber;
-                strBuilder.append(persistentTrack.getDescription());
-                if (it.hasNext()) {
-                    strBuilder.append(",");
-                } else {
-                    strBuilder.append("}");
+                defaultGroup[selectedTracks.indexOf( persistentTrack )] = currentGroupNumber;
+                strBuilder.append( persistentTrack.getDescription() );
+                if( it.hasNext() ) {
+                    strBuilder.append( "," );
+                }
+                else {
+                    strBuilder.append( "}" );
                 }
             }
             currentGroupNumber++;
-            createdGroups.add(new Group(defaultGroup, strBuilder.toString()));
-            infoText.setText("The group "+strBuilder.toString()+" is created automatically.");
+            createdGroups.add( new Group( defaultGroup, strBuilder.toString() ) );
+            infoText.setText( "The group " + strBuilder.toString() + " is created automatically." );
         }
         trackListModel.clear();
-        for (Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext();) {
+        for( Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext(); ) {
             PersistentTrack persistentTrack = it.next();
-            trackListModel.addElement(persistentTrack);
+            trackListModel.addElement( persistentTrack );
         }
     }
+
 
     @Override
     public String getName() {
         return "Create models";
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -212,49 +220,50 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
     }// </editor-fold>//GEN-END:initComponents
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
-        if (currentGroupBeingCreated == null) {
+        if( currentGroupBeingCreated == null ) {
             currentGroupBeingCreated = new Integer[selectedTracks.size()];
         }
-        if (!trackList.isSelectionEmpty()) {
+        if( !trackList.isSelectionEmpty() ) {
             List<PersistentTrack> tracks = trackList.getSelectedValuesList();
-            StringBuilder strBuilder = new StringBuilder(groupCreationField.getText() + "{");
-            for (Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext();) {
+            StringBuilder strBuilder = new StringBuilder( groupCreationField.getText() + "{" );
+            for( Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext(); ) {
                 PersistentTrack persistentTrack = it.next();
-                currentGroupBeingCreated[selectedTracks.indexOf(persistentTrack)] = currentGroupNumber;
-                strBuilder.append(persistentTrack.getDescription());
-                trackListModel.removeElement(persistentTrack);
-                if (it.hasNext()) {
-                    strBuilder.append(",");
-                } else {
-                    strBuilder.append("}");
+                currentGroupBeingCreated[selectedTracks.indexOf( persistentTrack )] = currentGroupNumber;
+                strBuilder.append( persistentTrack.getDescription() );
+                trackListModel.removeElement( persistentTrack );
+                if( it.hasNext() ) {
+                    strBuilder.append( "," );
+                }
+                else {
+                    strBuilder.append( "}" );
                 }
             }
-            groupCreationField.setText(strBuilder.toString());
+            groupCreationField.setText( strBuilder.toString() );
             currentGroupNumber++;
         }
-        if (trackListModel.isEmpty()) {
-            addModelButton.setEnabled(true);
-            addButton.setEnabled(false);
+        if( trackListModel.isEmpty() ) {
+            addModelButton.setEnabled( true );
+            addButton.setEnabled( false );
         }
     }//GEN-LAST:event_addButtonActionPerformed
 
     private void addModelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addModelButtonActionPerformed
 
-        createdGroups.add(new Group(currentGroupBeingCreated, groupCreationField.getText()));
+        createdGroups.add( new Group( currentGroupBeingCreated, groupCreationField.getText() ) );
         currentGroupBeingCreated = null;
-        groupListModel.addElement(groupCreationField.getText());
-        groupCreationField.setText("");
-        updateTrackList(selectedTracks);
-        addButton.setEnabled(true);
-        addModelButton.setEnabled(false);
+        groupListModel.addElement( groupCreationField.getText() );
+        groupCreationField.setText( "" );
+        updateTrackList( selectedTracks );
+        addButton.setEnabled( true );
+        addModelButton.setEnabled( false );
         jScrollPane5.updateUI();
     }//GEN-LAST:event_addModelButtonActionPerformed
 
     private void removeModelButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeModelButtonActionPerformed
-        createdGroups.remove(selectedIndex);
-        groupListModel.remove(selectedIndex);
+        createdGroups.remove( selectedIndex );
+        groupListModel.remove( selectedIndex );
         selectedIndex = -1;
-        removeModelButton.setEnabled(false);
+        removeModelButton.setEnabled( false );
     }//GEN-LAST:event_removeModelButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -274,19 +283,24 @@ public final class BaySeqVisualPanel3 extends JPanel implements ListSelectionLis
     private javax.swing.JList trackList;
     // End of variables declaration//GEN-END:variables
 
+
     @Override
-    public void valueChanged(ListSelectionEvent e) {
-        if (selectedIndex != e.getFirstIndex()) {
+    public void valueChanged( ListSelectionEvent e ) {
+        if( selectedIndex != e.getFirstIndex() ) {
             selectedIndex = e.getFirstIndex();
-            removeModelButton.setEnabled(true);
+            removeModelButton.setEnabled( true );
         }
     }
+
 
     public List<Group> getCreatedGroups() {
         return createdGroups;
     }
 
+
     public boolean noGroupCreated() {
         return createdGroups.isEmpty();
     }
+
+
 }

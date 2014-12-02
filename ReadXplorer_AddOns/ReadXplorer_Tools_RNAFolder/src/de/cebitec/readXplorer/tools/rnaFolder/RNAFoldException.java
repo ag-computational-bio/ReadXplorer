@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,9 +16,12 @@
  */
 package de.cebitec.readXplorer.tools.rnaFolder;
 
+
 /**
- * Should be used to combine all exceptions occuring during the run of RNAFolder.
- * Each exception should contain a user readable string msg which can be displayed
+ * Should be used to combine all exceptions occuring during the run of
+ * RNAFolder.
+ * Each exception should contain a user readable string msg which can be
+ * displayed
  * in a notifier.
  *
  * @author Rolf Hilker
@@ -26,11 +29,14 @@ package de.cebitec.readXplorer.tools.rnaFolder;
 public class RNAFoldException extends Exception {
 
     /**
-     * Constructs an instance of <code>RNAFoldException</code> with the specified detail message.
+     * Constructs an instance of <code>RNAFoldException</code> with the
+     * specified detail message.
+     * <p>
      * @param msg the detail message.
      */
-    public RNAFoldException(String msg) {
-        super(msg);
+    public RNAFoldException( String msg ) {
+        super( msg );
     }
+
 
 }

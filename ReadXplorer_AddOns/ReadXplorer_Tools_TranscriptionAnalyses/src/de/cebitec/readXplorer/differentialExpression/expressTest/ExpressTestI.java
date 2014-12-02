@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,9 +16,11 @@
  */
 package de.cebitec.readXplorer.differentialExpression.expressTest;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import java.util.List;
 import java.util.Vector;
+
 
 /**
  *
@@ -31,24 +33,28 @@ public interface ExpressTestI {
      *
      * @param groupA countData of group A.
      * @param groupB countData of group B.
+     * <p>
      * @throws IllegalArgumentException if not all arrays have a proper
-     * dimension
+     *                                  dimension
      */
-    public void performAnalysis(PersistentFeature[] regionNames, int[] start, int[] stop, int[][] groupA, int[][] groupB, double cutOff) throws IllegalArgumentException;
+    public void performAnalysis( PersistentFeature[] regionNames, int[] start, int[] stop, int[][] groupA, int[][] groupB, double cutOff ) throws IllegalArgumentException;
+
 
     /**
      * Adds a new observer listening for results.
      *
      * @param o the observer to be added.
      */
-    public void addObserver(ExpressTestObserver o);
+    public void addObserver( ExpressTestObserver o );
+
 
     /**
      * Removes a observer listening for results.
      *
      * @param o the observer to be removed.
      */
-    public void removeObserver(ExpressTestObserver o);
+    public void removeObserver( ExpressTestObserver o );
+
 
     /**
      * Returns the results of an Express Test differential expression analysis.
@@ -58,15 +64,18 @@ public interface ExpressTestI {
      * @return results of the analysis.
      */
     public Vector<Vector> getResults();
-    
+
+
     /**
-     * Returns the normalized results of an Express Test differential expression analysis.
+     * Returns the normalized results of an Express Test differential expression
+     * analysis.
      * The Object array can be handed over directly to a JTable as the rowData
      * argument.
      *
      * @return normalized results of the analysis.
      */
     public Vector<Vector> getResultsNormalized();
+
 
     /**
      * Returns the columnNames fitting the analysis run.
@@ -75,17 +84,22 @@ public interface ExpressTestI {
      */
     public Vector getColumnNames();
 
+
     /**
-     * Returns the rowNames fitting the analysis run. 
+     * Returns the rowNames fitting the analysis run.
      *
      * @return columnNames for the current analysis run.
      */
     public Vector getRowNames();
 
+
     /**
      * Sets features that should be used for normalization, if the user selected
      * some.
+     * <p>
      * @param normalizationFeatures features for normalization
      */
-    public void setNormalizationFeatures(List<Integer> normalizationFeatures);
+    public void setNormalizationFeatures( List<Integer> normalizationFeatures );
+
+
 }

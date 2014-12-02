@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cebitec.readXplorer.ui.dataAdministration.actions;
+
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readXplorer.api.cookies.LoginCookie;
@@ -41,19 +42,20 @@ import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
 import org.openide.util.RequestProcessor;
 
+
 @ActionID(
-        category = "File",
-        id = "de.cebitec.readXplorer.ui.dataAdministration.actions.DataAdminWizardAction"
+         category = "File",
+         id = "de.cebitec.readXplorer.ui.dataAdministration.actions.DataAdminWizardAction"
 )
 @ActionRegistration(
-        iconBase = "de/cebitec/readXplorer/ui/dataAdministration/manage.png",
-        displayName = "#CTL_DataAdminWizardAction"
+         iconBase = "de/cebitec/readXplorer/ui/dataAdministration/manage.png",
+         displayName = "#CTL_DataAdminWizardAction"
 )
-@ActionReferences({
-    @ActionReference(path = "Menu/File", position = 1462),
-    @ActionReference(path = "Toolbars/Management", position = 401)
-})
-@NbBundle.Messages("CTL_DataAdminWizardAction=Manage data")
+@ActionReferences( {
+    @ActionReference( path = "Menu/File", position = 1462 ),
+    @ActionReference( path = "Toolbars/Management", position = 401 )
+} )
+@NbBundle.Messages( "CTL_DataAdminWizardAction=Manage data" )
 public final class DataAdminWizardAction implements ActionListener {
 
     private final LoginCookie context;
@@ -62,37 +64,41 @@ public final class DataAdminWizardAction implements ActionListener {
     public static final String PROP_REFS2DEL = "refdel";
     public static final String PROP_TRACK2DEL = "trackdel";
 
-    public DataAdminWizardAction(LoginCookie context) {
+
+    public DataAdminWizardAction( LoginCookie context ) {
         this.context = context;
     }
 
+
     @Override
-    @SuppressWarnings("unchecked")
-    public void actionPerformed(ActionEvent ev) {
-        if (CentralLookup.getDefault().lookup(SwingWorker.class) != null){
-            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(DataAdminWizardAction.class, "MSG_BackgroundActivity"), NotifyDescriptor.WARNING_MESSAGE);
-            DialogDisplayer.getDefault().notify(nd);
+    @SuppressWarnings( "unchecked" )
+    public void actionPerformed( ActionEvent ev ) {
+        if( CentralLookup.getDefault().lookup( SwingWorker.class ) != null ) {
+            NotifyDescriptor nd = new NotifyDescriptor.Message( NbBundle.getMessage( DataAdminWizardAction.class, "MSG_BackgroundActivity" ), NotifyDescriptor.WARNING_MESSAGE );
+            DialogDisplayer.getDefault().notify( nd );
             return;
         }
-        if (panels == null) {
+        if( panels == null ) {
             panels = new ArrayList<>();
-            panels.add(new DataAdminWizardSelectionPanel());
-            panels.add(new DataAdminWizardOverviewPanel());
+            panels.add( new DataAdminWizardSelectionPanel() );
+            panels.add( new DataAdminWizardOverviewPanel() );
         }
-        WizardDescriptor wiz = new WizardDescriptor(new WizardDescriptor.ArrayIterator<>(VisualisationUtils.getWizardPanels(panels)));
+        WizardDescriptor wiz = new WizardDescriptor( new WizardDescriptor.ArrayIterator<>( VisualisationUtils.getWizardPanels( panels ) ) );
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
-        wiz.setTitleFormat(new MessageFormat("{0}"));
-        wiz.setTitle(NbBundle.getMessage(DataAdminWizardAction.class, "TTL_DataAdminWizardAction.title"));
-        Dialog dialog = DialogDisplayer.getDefault().createDialog(wiz);
-        dialog.setVisible(true);
+        wiz.setTitleFormat( new MessageFormat( "{0}" ) );
+        wiz.setTitle( NbBundle.getMessage( DataAdminWizardAction.class, "TTL_DataAdminWizardAction.title" ) );
+        Dialog dialog = DialogDisplayer.getDefault().createDialog( wiz );
+        dialog.setVisible( true );
         dialog.toFront();
         boolean cancelled = wiz.getValue() != WizardDescriptor.FINISH_OPTION;
-        if (!cancelled) {
-            List<ReferenceJob> refs2del = (List<ReferenceJob>) wiz.getProperty(DataAdminWizardAction.PROP_REFS2DEL);
-            List<TrackJob> tracks2del = (List<TrackJob>) wiz.getProperty(DataAdminWizardAction.PROP_TRACK2DEL);
-            DeletionThread dt = new DeletionThread(refs2del, tracks2del);
-            RequestProcessor rp = new RequestProcessor("Deletion Threads", 2);
-            rp.post(dt);
+        if( !cancelled ) {
+            List<ReferenceJob> refs2del = (List<ReferenceJob>) wiz.getProperty( DataAdminWizardAction.PROP_REFS2DEL );
+            List<TrackJob> tracks2del = (List<TrackJob>) wiz.getProperty( DataAdminWizardAction.PROP_TRACK2DEL );
+            DeletionThread dt = new DeletionThread( refs2del, tracks2del );
+            RequestProcessor rp = new RequestProcessor( "Deletion Threads", 2 );
+            rp.post( dt );
         }
     }
+
+
 }

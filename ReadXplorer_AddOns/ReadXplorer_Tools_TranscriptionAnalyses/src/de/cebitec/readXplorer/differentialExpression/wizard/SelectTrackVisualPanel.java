@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
+
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
@@ -28,19 +29,23 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+
 /**
  * Panel to first select a reference and then some tracks associated with this
  * reference for an analysis.
- * 
+ * <p>
  * @author kstadermann
  */
-public final class SelectTrackVisualPanel extends JPanel implements ListSelectionListener {
+public final class SelectTrackVisualPanel extends JPanel implements
+        ListSelectionListener {
+
     private static final long serialVersionUID = 1L;
 
     private PersistentReference[] references;
     private int selectedIndex = -1;
     private PersistentReference selectedRef;
     private DefaultListModel<PersistentTrack> trackListModel = new DefaultListModel<>();
+
 
     /**
      * Panel to first select a reference and then some tracks associated with
@@ -52,6 +57,7 @@ public final class SelectTrackVisualPanel extends JPanel implements ListSelectio
         initComponents();
     }
 
+
     /**
      * @return The name is: "Select tracks".
      */
@@ -59,6 +65,7 @@ public final class SelectTrackVisualPanel extends JPanel implements ListSelectio
     public String getName() {
         return "Select tracks";
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -126,24 +133,27 @@ public final class SelectTrackVisualPanel extends JPanel implements ListSelectio
     private javax.swing.JList<de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack> trackList;
     // End of variables declaration//GEN-END:variables
 
+
     @Override
-    public void valueChanged(ListSelectionEvent e) {
-        if (selectedIndex != referenceList.getSelectedIndex() && !e.getValueIsAdjusting()) {
+    public void valueChanged( ListSelectionEvent e ) {
+        if( selectedIndex != referenceList.getSelectedIndex() && !e.getValueIsAdjusting() ) {
             selectedIndex = referenceList.getSelectedIndex();
             selectedRef = references[selectedIndex];
-            ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector(selectedRef.getId());
+            ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector( selectedRef.getId() );
             List<PersistentTrack> tracks = refCon.getAssociatedTracks();
             trackListModel.clear();
-            for (Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext();) {
+            for( Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext(); ) {
                 PersistentTrack persistentTrack = it.next();
-                trackListModel.addElement(persistentTrack);
+                trackListModel.addElement( persistentTrack );
             }
         }
     }
 
+
     public int getSelectedReferenceGenomeID() {
         return selectedRef.getId();
     }
+
 
     /**
      * @return The list of selected tracks for the single selected reference.
@@ -152,20 +162,25 @@ public final class SelectTrackVisualPanel extends JPanel implements ListSelectio
         return trackList.getSelectedValuesList();
     }
 
+
     /**
      * @return Checks whether the selection of tracks is valid. true, if it is
-     * valid, false otherwise.
+     *         valid, false otherwise.
      */
     public boolean selectionFinished() {
-        if (trackList.isSelectionEmpty()) {
+        if( trackList.isSelectionEmpty() ) {
             return false;
-        } else {
+        }
+        else {
             List<PersistentTrack> selectedTracks = trackList.getSelectedValuesList();
-            if (selectedTracks.size() >= 2) {
+            if( selectedTracks.size() >= 2 ) {
                 return true;
-            } else {
+            }
+            else {
                 return false;
             }
         }
     }
+
+
 }

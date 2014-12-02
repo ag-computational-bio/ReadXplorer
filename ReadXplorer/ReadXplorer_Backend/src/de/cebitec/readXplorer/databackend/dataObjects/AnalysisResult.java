@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,38 +16,48 @@
  */
 package de.cebitec.readXplorer.databackend.dataObjects;
 
+
 import de.cebitec.readXplorer.databackend.IntervalRequest;
 import java.io.Serializable;
 
+
 /**
  * Contains the basic functionality of an analysis result.
- * 
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class AnalysisResult implements Serializable {
+
     private static final long serialVersionUID = 1L;
-    
+
     private IntervalRequest request;
+
 
     /**
      * Common functionality of of an analysis result.
+     * <p>
      * @param request the interval request for which the result was created
      */
-    public AnalysisResult(IntervalRequest request) {
+    public AnalysisResult( IntervalRequest request ) {
         this.request = request;
     }
-    
-    /** a parameterless constructor is needed to enable deserialization 
-     *  of child classed */
+
+
+    /**
+     * a parameterless constructor is needed to enable deserialization
+     * of child classed
+     */
     public AnalysisResult() {
-        this.request = new IntervalRequest(-1, -1, -1, null, false);
+        this.request = new IntervalRequest( -1, -1, -1, null, false );
     }
-    
+
+
     /**
      * @return the interval request for which the result was created
      */
     public IntervalRequest getRequest() {
         return this.request;
     }
-    
+
+
 }

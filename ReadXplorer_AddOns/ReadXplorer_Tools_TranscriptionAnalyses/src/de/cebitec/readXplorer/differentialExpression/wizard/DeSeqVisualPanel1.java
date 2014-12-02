@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,43 +16,51 @@
  */
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
+
 import javax.swing.ButtonGroup;
 import javax.swing.ButtonModel;
 import javax.swing.JPanel;
 
+
 public final class DeSeqVisualPanel1 extends JPanel {
 
     private ButtonGroup btGroup = new ButtonGroup();
+
 
     /**
      * Creates new form DeSeqVisualPanel1
      */
     public DeSeqVisualPanel1() {
         initComponents();
-        twoConditionsRB.getModel().setActionCommand("two");
-        moreConditionsRB.getModel().setActionCommand("more");
-        btGroup.add(twoConditionsRB);
-        btGroup.add(moreConditionsRB);
+        twoConditionsRB.getModel().setActionCommand( "two" );
+        moreConditionsRB.getModel().setActionCommand( "more" );
+        btGroup.add( twoConditionsRB );
+        btGroup.add( moreConditionsRB );
     }
+
 
     @Override
     public String getName() {
         return "Number of conditions";
     }
-    
-    public boolean buttonChecked(){
-        return (twoConditionsRB.isSelected() || moreConditionsRB.isSelected()); 
+
+
+    public boolean buttonChecked() {
+        return (twoConditionsRB.isSelected() || moreConditionsRB.isSelected());
     }
+
 
     public boolean moreThanTwoConditions() {
         ButtonModel bm = btGroup.getSelection();
         String ac = bm.getActionCommand();
-        if (ac.equals("two")) {
+        if( ac.equals( "two" ) ) {
             return false;
-        } else {
+        }
+        else {
             return true;
         }
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.

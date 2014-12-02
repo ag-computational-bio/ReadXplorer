@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,9 @@
  */
 package de.cebitec.readXplorer.parser;
 
+
 import java.util.List;
+
 
 /**
  *
@@ -24,16 +26,22 @@ import java.util.List;
  */
 public interface JobManager {
 
-    public void removeRefGenJob(ReferenceJob refGenJob);
+    public void removeRefGenJob( ReferenceJob refGenJob );
 
-    public void unRemoveRefGenJob(ReferenceJob refGenJob);
 
-    public void removeTrackJobRun(TrackJob trackJob);
+    public void unRemoveRefGenJob( ReferenceJob refGenJob );
 
-    public void unRemoveTrackJobRun(TrackJob trackJob);
+
+    public void removeTrackJobRun( TrackJob trackJob );
+
+
+    public void unRemoveTrackJobRun( TrackJob trackJob );
+
 
     public List<TrackJob> getScheduledTrackJobsRun();
 
+
     public List<ReferenceJob> getScheduledRefGenJobs();
+
 
 }

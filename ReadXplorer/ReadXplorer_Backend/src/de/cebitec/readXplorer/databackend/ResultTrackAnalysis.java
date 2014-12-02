@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.databackend;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
@@ -26,8 +27,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 /**
  * Data container for a result of an analysis for a list of tracks.
+ * <p>
  * @param <T> class type of the parameter set
  *
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
@@ -43,28 +46,34 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
     private int trackColumn;
     private int filterColumn;
 
+
     /**
      * A result of an analysis for a list of tracks. It also fetches and stores
      * the map of chromosomes for which the analysis was carried out hashed to
      * their respective chromosomes id.
-     * @param reference reference for which the analysis result was generated
-     * @param trackMap the map of track ids to the tracks for which the analysis
-     * @param combineTracks <code>true</code>, if the tracks in the list are 
-     * combined, <code>false</code> otherwise
-     * generated
-     * @param trackColumn column of the track id in result tables
-     * @param filterColumn column of the position or genomic feature in result tables
+     * <p>
+     * @param reference     reference for which the analysis result was
+     *                      generated
+     * @param trackMap      the map of track ids to the tracks for which the
+     *                      analysis
+     * @param combineTracks <code>true</code>, if the tracks in the list are
+     *                      combined, <code>false</code> otherwise
+     *                      generated
+     * @param trackColumn   column of the track id in result tables
+     * @param filterColumn  column of the position or genomic feature in result
+     *                      tables
      */
-    public ResultTrackAnalysis(PersistentReference reference, Map<Integer, PersistentTrack> trackMap, boolean combineTracks,
-            int trackColumn, int filterColumn) {
+    public ResultTrackAnalysis( PersistentReference reference, Map<Integer, PersistentTrack> trackMap, boolean combineTracks,
+                                int trackColumn, int filterColumn ) {
         this.reference = reference;
         this.trackMap = trackMap;
-        this.trackNameList = PersistentTrack.generateTrackDescriptionList(trackMap.values());
+        this.trackNameList = PersistentTrack.generateTrackDescriptionList( trackMap.values() );
         this.statsMap = new HashMap<>();
         this.combineTracks = combineTracks;
         this.trackColumn = trackColumn;
         this.filterColumn = filterColumn;
     }
+
 
     /**
      * @return trackColumn column of the track id in result tables
@@ -73,41 +82,49 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
         return trackColumn;
     }
 
+
     /**
-     * @return filterColumn column of the position or genomic feature in result tables
+     * @return filterColumn column of the position or genomic feature in result
+     *         tables
      */
     public int getFilterColumn() {
         return filterColumn;
     }
 
+
     /**
      * @return <code>true</code>, if the tracks in the list are combined,
-     * <code>false</code> otherwise
+     *         <code>false</code> otherwise
      */
     public boolean isCombineTracks() {
         return combineTracks;
     }
 
+
     /**
      * Concatenates all track names either in full length or each name trimmed
      * to 20 characters.
-     * @param fullLength <code>true</code>, if the track names shall appear in full 
-     * length, <code>false</code> otherwise
+     * <p>
+     * @param fullLength <code>true</code>, if the track names shall appear in
+     *                   full
+     *                   length, <code>false</code> otherwise
+     * <p>
      * @return The concatenated String containing all track names.
      */
-    private String getCombinedTrackNames(boolean fullLength) {
+    private String getCombinedTrackNames( boolean fullLength ) {
         String concatTrackNames = "";
         String description;
-        for (PersistentTrack track : trackMap.values()) {
-            if (fullLength || track.getDescription().length() <= 20) {
+        for( PersistentTrack track : trackMap.values() ) {
+            if( fullLength || track.getDescription().length() <= 20 ) {
                 description = track.getDescription();
-            } else {
-                description = track.getDescription().substring(0, 20) + "...";
+            }
+            else {
+                description = track.getDescription().substring( 0, 20 ) + "...";
             }
             concatTrackNames += description + ", ";
         }
-        if (!concatTrackNames.isEmpty()) {
-            concatTrackNames = concatTrackNames.substring(0, concatTrackNames.length() - 2);
+        if( !concatTrackNames.isEmpty() ) {
+            concatTrackNames = concatTrackNames.substring( 0, concatTrackNames.length() - 2 );
         }
         return concatTrackNames;
     }
@@ -122,25 +139,28 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
 //        }
 //        return concatTrackIds;
 //    }
-    
+
     /**
-     * @param trackId the track id of the track whose entry is needed
+     * @param trackId          the track id of the track whose entry is needed
      * @param getFullengthName true, if the concated names shall be returned for
-     * combined tracks, false, if shortened concated names shall be returned for
-     * combined tracks. For single tracks, this option does not have an
-     * influence.
+     *                         combined tracks, false, if shortened concated names shall be returned for
+     *                         combined tracks. For single tracks, this option does not have an
+     *                         influence.
+     * <p>
      * @return Either a Track entry for a single track or a String of the track
-     * names or ids for a combined list of tracks
+     *         names or ids for a combined list of tracks
      */
-    public Object getTrackEntry(int trackId, boolean getFullengthName) {
+    public Object getTrackEntry( int trackId, boolean getFullengthName ) {
         Object trackEntry;
-        if (this.isCombineTracks()) {
-            trackEntry = this.getCombinedTrackNames(getFullengthName);
-        } else {
-            trackEntry = this.getTrackMap().get(trackId);
+        if( this.isCombineTracks() ) {
+            trackEntry = this.getCombinedTrackNames( getFullengthName );
+        }
+        else {
+            trackEntry = this.getTrackMap().get( trackId );
         }
         return trackEntry;
     }
+
 
     /**
      * Sets the map of tracks for which the analysis was carried out hashed to
@@ -148,26 +168,29 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
      *
      * @param trackMap the map of tracks for which the analysis was carried out
      */
-    public void setTrackMap(Map<Integer, PersistentTrack> trackMap) {
+    public void setTrackMap( Map<Integer, PersistentTrack> trackMap ) {
         this.trackMap = trackMap;
-        this.trackNameList = PersistentTrack.generateTrackDescriptionList(trackMap.values());
+        this.trackNameList = PersistentTrack.generateTrackDescriptionList( trackMap.values() );
     }
+
 
     /**
      * @return the map of tracks for which the analysis was carried out hashed
-     * to their respective track id
+     *         to their respective track id
      */
     public Map<Integer, PersistentTrack> getTrackMap() {
         return trackMap;
     }
 
+
     /**
      * @return The map of chromosomes for which the analysis was carried out
-     * hashed to their respective chromosome id.
+     *         hashed to their respective chromosome id.
      */
     public Map<Integer, PersistentChromosome> getChromosomeMap() {
         return reference.getChromosomes();
     }
+
 
     /**
      * @return Reference genome for which the analysis was carried out
@@ -176,6 +199,7 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
         return reference;
     }
 
+
     /**
      * @return the parameter set which was used for the analysis
      */
@@ -183,21 +207,25 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
         return this.parameters;
     }
 
+
     /**
      * Sets the parameter set which was used for the analysis
+     * <p>
      * @param parameters the parameter set which was used for the analysis
      */
-    public void setParameters(ParameterSetI<T> parameters) {
+    public void setParameters( ParameterSetI<T> parameters ) {
         this.parameters = parameters;
     }
 
+
     /**
      * @return the list of track names associated with the overall analysis, of
-     * which this analysis result is one part
+     *         which this analysis result is one part
      */
     public List<String> getTrackNameList() {
         return this.trackNameList;
     }
+
 
     /**
      * @return The statistics map associated with this analysis
@@ -206,76 +234,92 @@ public abstract class ResultTrackAnalysis<T> implements ExportDataI {
         return this.statsMap;
     }
 
+
     /**
      * Sets the statistics map associated with this analysis.
+     * <p>
      * @param statsMap the statistics map associated with this analysis
      */
-    public void setStatsMap(Map<String, Integer> statsMap) {
+    public void setStatsMap( Map<String, Integer> statsMap ) {
         this.statsMap = statsMap;
     }
 
+
     /**
      * Adds a key value pair to the stats map.
-     * @param key the key of the pair
+     * <p>
+     * @param key   the key of the pair
      * @param value the value of the pair
      */
-    public void addStatsToMap(String key, int value) {
-        this.statsMap.put(key, value);
+    public void addStatsToMap( String key, int value ) {
+        this.statsMap.put( key, value );
     }
-    
+
+
     /**
      * Update the stats map of this track analysis result with the given data.
+     * <p>
      * @param newStatsMap A new stats map, whose content shall be merged /
-     * summed with the content of the stats map contained in this result object.
+     *                    summed with the content of the stats map contained in this result object.
      */
-    public void updateStatsMap(Map<String, Integer> newStatsMap) {
+    public void updateStatsMap( Map<String, Integer> newStatsMap ) {
         Map<String, Integer> internalStatsMap = this.getStatsMap();
-        for (Map.Entry<String, Integer> entrySet : newStatsMap.entrySet()) {
+        for( Map.Entry<String, Integer> entrySet : newStatsMap.entrySet() ) {
             String key = entrySet.getKey();
             Integer value = entrySet.getValue();
-            if (internalStatsMap.containsKey(key)) {
-                internalStatsMap.put(key, internalStatsMap.get(key) + value);
-            } else {
-                internalStatsMap.put(key, value);
+            if( internalStatsMap.containsKey( key ) ) {
+                internalStatsMap.put( key, internalStatsMap.get( key ) + value );
+            }
+            else {
+                internalStatsMap.put( key, value );
             }
         }
     }
 
+
     /**
      * Creates a table row for statistic entries by the given identifier
+     * <p>
      * @param identifier the identifier of the statistic value
+     * <p>
      * @return the list containing the identifier and its statistic value
      */
-    public List<Object> createStatisticTableRow(String identifier) {
+    public List<Object> createStatisticTableRow( String identifier ) {
         List<Object> row = new ArrayList<>();
-        if (statsMap.containsKey(identifier)) {
-            row.add(identifier);
-            row.add(this.getStatsMap().get(identifier));
+        if( statsMap.containsKey( identifier ) ) {
+            row.add( identifier );
+            row.add( this.getStatsMap().get( identifier ) );
         }
         return row;
     }
+
 
     /**
      * Adds the complete content of the internal statistics map to the given
      * table content (list of object list)
+     * <p>
      * @param statisticsExportData the table content, to which the content of
-     * the internal statistics map shall be added
+     *                             the internal statistics map shall be added
      */
-    public void createStatisticTableRows(List<List<Object>> statisticsExportData) {
-        for (String id : statsMap.keySet()) {
-            statisticsExportData.add(this.createStatisticTableRow(id));
+    public void createStatisticTableRows( List<List<Object>> statisticsExportData ) {
+        for( String id : statsMap.keySet() ) {
+            statisticsExportData.add( this.createStatisticTableRow( id ) );
         }
     }
 
+
     /**
      * Creates a table row (= object list) with two elemets.
+     * <p>
      * @param content entries to add to the table row
+     * <p>
      * @return the new table row (= object list)
      */
-    public static List<Object> createTableRow(Object... content) {
+    public static List<Object> createTableRow( Object... content ) {
         List<Object> row = new ArrayList<>();
-        row.addAll(Arrays.asList(content));
+        row.addAll( Arrays.asList( content ) );
         return row;
     }
+
 
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 import javax.swing.DefaultListModel;
 import javax.swing.JPanel;
+
 
 public final class DeSeqVisualPanelFit extends JPanel {
 
@@ -33,52 +35,59 @@ public final class DeSeqVisualPanelFit extends JPanel {
     private List<String> fittingGroupTwo = new ArrayList<>();
     private Set<String> assignedGroups = new HashSet<>();
 
+
     /**
      * Creates new form DeSeqVisualPanelFit
      */
     public DeSeqVisualPanelFit() {
         initComponents();
-        infoLabel.setText("");
+        infoLabel.setText( "" );
     }
 
-    public void updateConditionGroupsList(Set<String> conditionGroups) {
+
+    public void updateConditionGroupsList( Set<String> conditionGroups ) {
         boolean newDataSet = false;
-        for (Iterator<String> it = conditionGroups.iterator(); it.hasNext();) {
+        for( Iterator<String> it = conditionGroups.iterator(); it.hasNext(); ) {
             String currentGroup = it.next();
-            if (!allConditionGroupsModel.contains(currentGroup)
-                    && !fittingOneModel.contains(currentGroup)
-                    && !fittingTwoModel.contains(currentGroup)) {
+            if( !allConditionGroupsModel.contains( currentGroup )
+                && !fittingOneModel.contains( currentGroup )
+                && !fittingTwoModel.contains( currentGroup ) ) {
                 newDataSet = true;
                 break;
             }
         }
-        if (newDataSet) {
+        if( newDataSet ) {
             allConditionGroupsModel.clear();
             fittingOneModel.clear();
             fittingTwoModel.clear();
-            for (Iterator<String> it = conditionGroups.iterator(); it.hasNext();) {
+            for( Iterator<String> it = conditionGroups.iterator(); it.hasNext(); ) {
                 String currentGroup = it.next();
-                allConditionGroupsModel.addElement(currentGroup);
+                allConditionGroupsModel.addElement( currentGroup );
             }
         }
     }
+
 
     public List<String> getFittingGroupOne() {
         return fittingGroupOne;
     }
 
+
     public List<String> getFittingGroupTwo() {
         return fittingGroupTwo;
     }
+
 
     public boolean allConditionGroupsAssigned() {
         return (allConditionGroupsModel.getSize() == assignedGroups.size());
     }
 
+
     @Override
     public String getName() {
         return "Fitting model";
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -210,53 +219,55 @@ public final class DeSeqVisualPanelFit extends JPanel {
 
     private void addToFittingOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addToFittingOneActionPerformed
         List<String> tracks = conditionGroupsList.getSelectedValuesList();
-        for (Iterator<String> it = tracks.iterator(); it.hasNext();) {
+        for( Iterator<String> it = tracks.iterator(); it.hasNext(); ) {
             String currentGroup = it.next();
-            if (!fittingOneModel.contains(currentGroup)) {
-                fittingOneModel.addElement(currentGroup);
-                fittingGroupOne.add(currentGroup);
-                assignedGroups.add(currentGroup);
-                infoLabel.setText("");
-            } else{
-                infoLabel.setText("Each group can just be added once to a fitting group.");
+            if( !fittingOneModel.contains( currentGroup ) ) {
+                fittingOneModel.addElement( currentGroup );
+                fittingGroupOne.add( currentGroup );
+                assignedGroups.add( currentGroup );
+                infoLabel.setText( "" );
+            }
+            else {
+                infoLabel.setText( "Each group can just be added once to a fitting group." );
             }
         }
     }//GEN-LAST:event_addToFittingOneActionPerformed
 
     private void removeFromFittingOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeFromFittingOneActionPerformed
         List<String> tracks = fittingOneList.getSelectedValuesList();
-        for (Iterator<String> it = tracks.iterator(); it.hasNext();) {
+        for( Iterator<String> it = tracks.iterator(); it.hasNext(); ) {
             String currentGroup = it.next();
-            fittingOneModel.removeElement(currentGroup);
-            fittingGroupOne.remove(currentGroup);
-            assignedGroups.remove(currentGroup);
-            infoLabel.setText("");
+            fittingOneModel.removeElement( currentGroup );
+            fittingGroupOne.remove( currentGroup );
+            assignedGroups.remove( currentGroup );
+            infoLabel.setText( "" );
         }
     }//GEN-LAST:event_removeFromFittingOneActionPerformed
 
     private void addToFittingTwoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addToFittingTwoActionPerformed
         List<String> tracks = conditionGroupsList.getSelectedValuesList();
-        for (Iterator<String> it = tracks.iterator(); it.hasNext();) {
+        for( Iterator<String> it = tracks.iterator(); it.hasNext(); ) {
             String currentGroup = it.next();
-            if (!fittingTwoModel.contains(currentGroup)) {
-                fittingTwoModel.addElement(currentGroup);
-                fittingGroupTwo.add(currentGroup);
-                assignedGroups.add(currentGroup);
-                infoLabel.setText("");
-            } else{
-                infoLabel.setText("Each group can just be added once to a fitting group.");
+            if( !fittingTwoModel.contains( currentGroup ) ) {
+                fittingTwoModel.addElement( currentGroup );
+                fittingGroupTwo.add( currentGroup );
+                assignedGroups.add( currentGroup );
+                infoLabel.setText( "" );
+            }
+            else {
+                infoLabel.setText( "Each group can just be added once to a fitting group." );
             }
         }
     }//GEN-LAST:event_addToFittingTwoActionPerformed
 
     private void removeFromFittingTwoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeFromFittingTwoActionPerformed
         List<String> tracks = fittingTwoList.getSelectedValuesList();
-        for (Iterator<String> it = tracks.iterator(); it.hasNext();) {
+        for( Iterator<String> it = tracks.iterator(); it.hasNext(); ) {
             String currentGroup = it.next();
-            fittingTwoModel.removeElement(currentGroup);
-            fittingGroupTwo.remove(currentGroup);
-            assignedGroups.remove(currentGroup);
-            infoLabel.setText("");
+            fittingTwoModel.removeElement( currentGroup );
+            fittingGroupTwo.remove( currentGroup );
+            assignedGroups.remove( currentGroup );
+            infoLabel.setText( "" );
         }
     }//GEN-LAST:event_removeFromFittingTwoActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables

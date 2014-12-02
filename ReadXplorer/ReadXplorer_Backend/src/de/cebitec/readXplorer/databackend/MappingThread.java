@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cebitec.readXplorer.databackend;
+
 
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
@@ -37,6 +38,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
 /**
  * This mapping thread should be used for analyses, but not for visualizing
  * data. The thread carries out the database querries to receive the mappings
@@ -53,153 +55,174 @@ public class MappingThread extends RequestThread {
     private Collection<ReadPairGroup> currentReadPairs;
     private PersistentReference refGenome;
 
+
     /**
      * Creates a new mapping thread for carrying out mapping request either to a
      * database or a file.
+     * <p>
      * @param tracks the track for which this mapping thread is created
      */
-    public MappingThread(List<PersistentTrack> tracks) {
+    public MappingThread( List<PersistentTrack> tracks ) {
         super();
         // do general stuff
         this.requestQueue = new ConcurrentLinkedQueue<>();
         this.tracks = tracks;
-        if (this.canQueryData()) {
-            ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(tracks.get(0).getRefGenID());
+        if( this.canQueryData() ) {
+            ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector( tracks.get( 0 ).getRefGenID() );
             this.refGenome = refConnector.getRefGenome();
         }
     }
 
+
     /**
-     * {@inheritDoc } 
+     * {@inheritDoc }
      */
     @Override
-    public void addRequest(IntervalRequest request) {
-        this.setLatestRequest(request);
-        this.requestQueue.add(request);
+    public void addRequest( IntervalRequest request ) {
+        this.setLatestRequest( request );
+        this.requestQueue.add( request );
     }
-    
+
+
     /**
      * Collects all mappings of the associated tracks for the interval described
      * by the request parameters.
+     * <p>
      * @param request the interval request containing the requested reference
-     * interval
+     *                interval
+     * <p>
      * @return the collection of mappings for the given interval
      */
-    List<Mapping> loadMappings(IntervalRequest request) {
+    List<Mapping> loadMappings( IntervalRequest request ) {
         List<Mapping> mappingList = new ArrayList<>();
-        if (request.getFrom() < request.getTo() && request.getFrom() > 0 && request.getTo() > 0) {
+        if( request.getFrom() < request.getTo() && request.getFrom() > 0 && request.getTo() > 0 ) {
 
-            Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Reading mapping data from file...", currentTimestamp);
+            Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: Reading mapping data from file...", currentTimestamp );
 
-            for (PersistentTrack track : tracks) {
-                SamBamFileReader externalDataReader = new SamBamFileReader(new File(track.getFilePath()), track.getId(), refGenome);
-                Collection<Mapping> intermedRes = externalDataReader.getMappingsFromBam(request);
+            for( PersistentTrack track : tracks ) {
+                SamBamFileReader externalDataReader = new SamBamFileReader( new File( track.getFilePath() ), track.getId(), refGenome );
+                Collection<Mapping> intermedRes = externalDataReader.getMappingsFromBam( request );
                 externalDataReader.close();
-                mappingList.addAll(intermedRes);
+                mappingList.addAll( intermedRes );
             }
-            if (tracks.size() > 1) {
-                Collections.sort(mappingList);
+            if( tracks.size() > 1 ) {
+                Collections.sort( mappingList );
             }
 
-            currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Done reading mapping data from file...", currentTimestamp);
+            currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: Done reading mapping data from file...", currentTimestamp );
 
         }
         return mappingList;
     }
 
+
     /**
-     * Receives all reduced mappings belonging to the associated tracks. In 
+     * Receives all reduced mappings belonging to the associated tracks. In
      * order to save memory only start, stop and strand are received by this
      * method. Diffs and gaps are never included.
+     * <p>
      * @param request the request to carry out
+     * <p>
      * @return list of reduced mappings. Diffs and gaps are never included.
      */
-    public List<Mapping> loadReducedMappings(IntervalRequest request) {
-        
-        Date currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Reading mapping data from file...", currentTimestamp);
+    public List<Mapping> loadReducedMappings( IntervalRequest request ) {
+
+        Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: Reading mapping data from file...", currentTimestamp );
 
         List<Mapping> mappings = new ArrayList<>();
-        for (PersistentTrack track : tracks) {
-            SamBamFileReader externalDataReader = new SamBamFileReader(new File(track.getFilePath()), track.getId(), refGenome);
-            Collection<Mapping> intermedRes = externalDataReader.getReducedMappingsFromBam(request);
+        for( PersistentTrack track : tracks ) {
+            SamBamFileReader externalDataReader = new SamBamFileReader( new File( track.getFilePath() ), track.getId(), refGenome );
+            Collection<Mapping> intermedRes = externalDataReader.getReducedMappingsFromBam( request );
             externalDataReader.close();
-            mappings.addAll(intermedRes);
+            mappings.addAll( intermedRes );
         }
-        if (tracks.size() > 1) {
-            Collections.sort(mappings);
+        if( tracks.size() > 1 ) {
+            Collections.sort( mappings );
         }
 
-        currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Done reading mapping data from file...", currentTimestamp);
+        currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: Done reading mapping data from file...", currentTimestamp );
 
         return mappings;
     }
-    
+
+
     /**
      * Fetches all read pair mappings for the given interval and typeFlag.
+     * <p>
      * @param request The request for which the data shall be gathered
+     * <p>
      * @return the collection of read pair mappings for the given interval
-     * and typeFlag
+     *         and typeFlag
      */
-    public Collection<ReadPairGroup> getReadPairMappings(IntervalRequest request) {
+    public Collection<ReadPairGroup> getReadPairMappings( IntervalRequest request ) {
         Collection<ReadPairGroup> readPairs = new ArrayList<>();
         int from = request.getFrom();
         int to = request.getTo();
-        
-        if (from > 0 && to > 0 && from < to) {
-            for (PersistentTrack track : tracks) {
-                SamBamFileReader reader = new SamBamFileReader(new File(track.getFilePath()), track.getId(), refGenome);
-                Collection<ReadPairGroup> intermedRes = reader.getReadPairMappingsFromBam(request);
-                readPairs.addAll(intermedRes);
+
+        if( from > 0 && to > 0 && from < to ) {
+            for( PersistentTrack track : tracks ) {
+                SamBamFileReader reader = new SamBamFileReader( new File( track.getFilePath() ), track.getId(), refGenome );
+                Collection<ReadPairGroup> intermedRes = reader.getReadPairMappingsFromBam( request );
+                readPairs.addAll( intermedRes );
             }
         }
         return readPairs;
     }
 
+
     /**
-     * {@inheritDoc } 
+     * {@inheritDoc }
      */
     @Override
     public void run() {
 
-        while (!interrupted()) {
+        while( !interrupted() ) {
 
             IntervalRequest request = requestQueue.poll();
-            if (request != null) {
-                if (doesNotMatchLatestRequestBounds(request)) {
-                    if (request.getDesiredData() == Properties.READ_PAIRS) {
-                        this.currentReadPairs = this.getReadPairMappings(request);
-                    } else if (request.getDesiredData() == Properties.REDUCED_MAPPINGS) {
-                        currentMappings = this.loadReducedMappings(request);
-                    } else {
-                        currentMappings = this.loadMappings(request);
+            if( request != null ) {
+                if( doesNotMatchLatestRequestBounds( request ) ) {
+                    if( request.getDesiredData() == Properties.READ_PAIRS ) {
+                        this.currentReadPairs = this.getReadPairMappings( request );
+                    }
+                    else if( request.getDesiredData() == Properties.REDUCED_MAPPINGS ) {
+                        currentMappings = this.loadReducedMappings( request );
+                    }
+                    else {
+                        currentMappings = this.loadMappings( request );
                     }
                     //switch between ordinary mappings and read pairs
-                    if (request.getDesiredData() != Properties.READ_PAIRS) {
-                        request.getSender().receiveData(new MappingResult(currentMappings, request));
-                    } else {
-                        request.getSender().receiveData(new ReadPairResultPersistent(currentReadPairs, request));
+                    if( request.getDesiredData() != Properties.READ_PAIRS ) {
+                        request.getSender().receiveData( new MappingResult( currentMappings, request ) );
+                    }
+                    else {
+                        request.getSender().receiveData( new ReadPairResultPersistent( currentReadPairs, request ) );
                     }
                 }
 
-            } else {
+            }
+            else {
                 try {
-                    Thread.sleep(10);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(CoverageThreadAnalyses.class.getName()).log(Level.SEVERE, null, ex);
+                    Thread.sleep( 10 );
+                }
+                catch( InterruptedException ex ) {
+                    Logger.getLogger( CoverageThreadAnalyses.class.getName() ).log( Level.SEVERE, null, ex );
                 }
             }
 
         }
     }
+
 
     /**
      * @return true, if the tracklist is not null or empty, false otherwise
      */
     protected boolean canQueryData() {
         return this.tracks != null && !this.tracks.isEmpty();
-    }   
+    }
+
+
 }

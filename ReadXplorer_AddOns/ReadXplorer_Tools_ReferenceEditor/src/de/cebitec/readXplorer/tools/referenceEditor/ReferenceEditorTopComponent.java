@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.tools.referenceEditor;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -25,35 +26,38 @@ import org.openide.awt.ActionReference;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 
+
 /**
  * Top component which displays the reference editor.
  */
 @ConvertAsProperties(
-        dtd = "-//de.cebitec.readXplorer.tools.referenceEditor//ReferenceEditor//EN",
-        autostore = false
+         dtd = "-//de.cebitec.readXplorer.tools.referenceEditor//ReferenceEditor//EN",
+         autostore = false
 )
 @TopComponent.Description(
-        preferredID = "ReferenceEditorTopComponent",
-        iconBase = "de/cebitec/readXplorer/tools/referenceEditor/openRefEditor.png",
-        persistenceType = TopComponent.PERSISTENCE_ALWAYS
+         preferredID = "ReferenceEditorTopComponent",
+         iconBase = "de/cebitec/readXplorer/tools/referenceEditor/openRefEditor.png",
+         persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
-@TopComponent.Registration(mode = "editor", openAtStartup = false)
-@ActionID(category = "Window", id = "de.cebitec.readXplorer.tools.referenceEditor.ReferenceEditorTopComponent")
-@ActionReference(path = "Menu/Window" /*, position = 333 */)
+@TopComponent.Registration( mode = "editor", openAtStartup = false )
+@ActionID( category = "Window", id = "de.cebitec.readXplorer.tools.referenceEditor.ReferenceEditorTopComponent" )
+@ActionReference( path = "Menu/Window" /*, position = 333 */ )
 @TopComponent.OpenActionRegistration(
-        displayName = "#CTL_ReferenceEditorAction",
-        preferredID = "ReferenceEditorTopComponent"
+         displayName = "#CTL_ReferenceEditorAction",
+         preferredID = "ReferenceEditorTopComponent"
 )
-@Messages({
+@Messages( {
     "CTL_ReferenceEditorAction=ReferenceEditor",
     "CTL_ReferenceEditorTopComponent=ReferenceEditor Window",
     "HINT_ReferenceEditorTopComponent=This is a ReferenceEditor window"
-})
+} )
 public final class ReferenceEditorTopComponent extends TopComponent {
+
     private static final long serialVersionUID = 1L;
-    
+
     private PersistentReference reference;
     private String activeChromSubSeq;
+
 
     /**
      * Top component which displays the reference editor.
@@ -62,10 +66,11 @@ public final class ReferenceEditorTopComponent extends TopComponent {
      */
     public ReferenceEditorTopComponent() {
         initComponents();
-        setName(Bundle.CTL_ReferenceEditorTopComponent());
-        setToolTipText(Bundle.HINT_ReferenceEditorTopComponent());
-        
+        setName( Bundle.CTL_ReferenceEditorTopComponent() );
+        setToolTipText( Bundle.HINT_ReferenceEditorTopComponent() );
+
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -158,16 +163,17 @@ public final class ReferenceEditorTopComponent extends TopComponent {
         int from = (Integer) fromSpinner.getValue();
         int to = (Integer) toSpinner.getValue();
 
-        if (from > 0 && to > 0 && from <= reference.getActiveChromLength() && to < reference.getActiveChromLength() && from < to) {
-            activeChromSubSeq = reference.getActiveChromSequence(from - 1, to);
+        if( from > 0 && to > 0 && from <= reference.getActiveChromLength() && to < reference.getActiveChromLength() && from < to ) {
+            activeChromSubSeq = reference.getActiveChromSequence( from - 1, to );
 
-            if (revComlementCheckBox.isSelected()) {
-                activeChromSubSeq = SequenceUtils.getReverseComplement(activeChromSubSeq);
+            if( revComlementCheckBox.isSelected() ) {
+                activeChromSubSeq = SequenceUtils.getReverseComplement( activeChromSubSeq );
             }
-            genomeTextArea.setLineWrap(true);
-            genomeTextArea.setText(activeChromSubSeq);
-        } else {
-            NotifyDescriptor nd = new NotifyDescriptor.Message("The values don't fit in the genome range", NotifyDescriptor.INFORMATION_MESSAGE);
+            genomeTextArea.setLineWrap( true );
+            genomeTextArea.setText( activeChromSubSeq );
+        }
+        else {
+            NotifyDescriptor nd = new NotifyDescriptor.Message( "The values don't fit in the genome range", NotifyDescriptor.INFORMATION_MESSAGE );
         }
     }//GEN-LAST:event_getSequenceButtonActionPerformed
 
@@ -182,34 +188,41 @@ public final class ReferenceEditorTopComponent extends TopComponent {
     private javax.swing.JLabel toLabel;
     private javax.swing.JSpinner toSpinner;
     // End of variables declaration//GEN-END:variables
-    
+
+
     @Override
     public void componentOpened() {
         // add custom code on component opening
     }
+
 
     @Override
     public void componentClosed() {
         // add custom code on component closing
     }
 
-    void writeProperties(java.util.Properties p) {
+
+    void writeProperties( java.util.Properties p ) {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
-        p.setProperty("version", "1.0");
+        p.setProperty( "version", "1.0" );
         // store your settings
     }
 
-    void readProperties(java.util.Properties p) {
-        String version = p.getProperty("version");
+
+    void readProperties( java.util.Properties p ) {
+        String version = p.getProperty( "version" );
         // read your settings according to their version
     }
-    
+
+
     /**
-     * @param reference Set the reference genome used in this editor. 
+     * @param reference Set the reference genome used in this editor.
      * <br>Must be called before anything else can be done!
      */
-    public void setReference(PersistentReference reference) {
+    public void setReference( PersistentReference reference ) {
         this.reference = reference;
     }
+
+
 }

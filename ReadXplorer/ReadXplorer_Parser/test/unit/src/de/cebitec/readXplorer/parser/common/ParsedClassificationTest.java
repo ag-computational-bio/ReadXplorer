@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,15 +16,18 @@
  */
 package de.cebitec.readXplorer.parser.common;
 
+
 import de.cebitec.readXplorer.parser.common.ParsedClassification;
-import java.util.List;
 import net.sf.samtools.SAMFileHeader;
 import org.junit.After;
 import org.junit.AfterClass;
+
 import static org.junit.Assert.*;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 
 /**
  * Tests the calculating methods of the ParsedClassification.
@@ -32,22 +35,26 @@ import org.junit.Test;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class ParsedClassificationTest {
-    
+
     public ParsedClassificationTest() {
     }
-    
+
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
+
     @Before
     public void setUp() {
     }
-    
+
+
     @After
     public void tearDown() {
     }
@@ -78,7 +85,6 @@ public class ParsedClassificationTest {
 //        // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
 //    }
-
 //    /**
 //     * Test of getReadStarts method, of class ParsedClassification.
 //     */
@@ -92,50 +98,49 @@ public class ParsedClassificationTest {
 //        // TODO review the generated test code and remove the default call to fail.
 //        fail("The test case is a prototype.");
 //    }
-
     /**
      * Test of getNextMappingStart method, of class ParsedClassification.
      */
     @Test
     public void testGetNextMappingStart() {
-        System.out.println("getNextMappingStart");
+        System.out.println( "getNextMappingStart" );
         int start1 = 717;
         int start2 = 818;
         int start3 = 850;
         int start4 = 950;
         int start5 = 951;
-        ParsedClassification classificationSorted = new ParsedClassification(SAMFileHeader.SortOrder.coordinate);
-        ParsedClassification classificationUnsorted = new ParsedClassification(SAMFileHeader.SortOrder.unsorted);
-        
-        assertTrue(classificationSorted.getNextMappingStart(start1) == 0);
-        assertTrue(classificationUnsorted.getNextMappingStart(start1) == 0);
-        
-        classificationSorted.addReadStart(start1);
-        classificationUnsorted.addReadStart(start5);
-        
-        assertTrue(classificationSorted.getNextMappingStart(start1) == 0);
-        assertTrue(classificationUnsorted.getNextMappingStart(start1) == 0);
-        
-        classificationSorted.addReadStart(start2);
-        classificationSorted.addReadStart(start3);
-        classificationSorted.addReadStart(start4);
-        classificationSorted.addReadStart(start5);
-        
-        classificationUnsorted.addReadStart(start4);
-        classificationUnsorted.addReadStart(start3);
-        classificationUnsorted.addReadStart(start2);
-        classificationUnsorted.addReadStart(start1);
-        
-        assertTrue(classificationSorted.getNextMappingStart(start1) == start2);
-        assertTrue(classificationUnsorted.getNextMappingStart(start1) == start2);
-        assertTrue(classificationSorted.getNextMappingStart(start2) == start3);
-        assertTrue(classificationUnsorted.getNextMappingStart(start2) == start3);
-        assertTrue(classificationSorted.getNextMappingStart(start3) == start4);
-        assertTrue(classificationUnsorted.getNextMappingStart(start3) == start4);
-        assertTrue(classificationSorted.getNextMappingStart(start4) == start5);
-        assertTrue(classificationUnsorted.getNextMappingStart(start4) == start5);
-        assertTrue(classificationSorted.getNextMappingStart(start5) == start1);
-        assertTrue(classificationUnsorted.getNextMappingStart(start5) == start1);
+        ParsedClassification classificationSorted = new ParsedClassification( SAMFileHeader.SortOrder.coordinate );
+        ParsedClassification classificationUnsorted = new ParsedClassification( SAMFileHeader.SortOrder.unsorted );
+
+        assertTrue( classificationSorted.getNextMappingStart( start1 ) == 0 );
+        assertTrue( classificationUnsorted.getNextMappingStart( start1 ) == 0 );
+
+        classificationSorted.addReadStart( start1 );
+        classificationUnsorted.addReadStart( start5 );
+
+        assertTrue( classificationSorted.getNextMappingStart( start1 ) == 0 );
+        assertTrue( classificationUnsorted.getNextMappingStart( start1 ) == 0 );
+
+        classificationSorted.addReadStart( start2 );
+        classificationSorted.addReadStart( start3 );
+        classificationSorted.addReadStart( start4 );
+        classificationSorted.addReadStart( start5 );
+
+        classificationUnsorted.addReadStart( start4 );
+        classificationUnsorted.addReadStart( start3 );
+        classificationUnsorted.addReadStart( start2 );
+        classificationUnsorted.addReadStart( start1 );
+
+        assertTrue( classificationSorted.getNextMappingStart( start1 ) == start2 );
+        assertTrue( classificationUnsorted.getNextMappingStart( start1 ) == start2 );
+        assertTrue( classificationSorted.getNextMappingStart( start2 ) == start3 );
+        assertTrue( classificationUnsorted.getNextMappingStart( start2 ) == start3 );
+        assertTrue( classificationSorted.getNextMappingStart( start3 ) == start4 );
+        assertTrue( classificationUnsorted.getNextMappingStart( start3 ) == start4 );
+        assertTrue( classificationSorted.getNextMappingStart( start4 ) == start5 );
+        assertTrue( classificationUnsorted.getNextMappingStart( start4 ) == start5 );
+        assertTrue( classificationSorted.getNextMappingStart( start5 ) == start1 );
+        assertTrue( classificationUnsorted.getNextMappingStart( start5 ) == start1 );
     }
 
 //    /**

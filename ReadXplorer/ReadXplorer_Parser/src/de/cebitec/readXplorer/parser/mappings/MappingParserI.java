@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,12 +16,14 @@
  */
 package de.cebitec.readXplorer.parser.mappings;
 
+
 import de.cebitec.readXplorer.parser.TrackJob;
 import de.cebitec.readXplorer.parser.common.ParserI;
 import de.cebitec.readXplorer.parser.common.ParsingException;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.StatsContainer;
 import java.util.Map;
+
 
 /**
  * Interface to be implemented for all mapping parsers.
@@ -32,30 +34,40 @@ public interface MappingParserI extends ParserI, Observable, PreprocessorI {
 
     /**
      * Parses the input determined by the track job.
-     * @param trackJob the track job to parse
+     * <p>
+     * @param trackJob       the track job to parse
      * @param chromLengthMap the map of chromosome names to chromosome length
+     * <p>
      * @return the parsed data object
+     * <p>
      * @throws ParsingException
-     * @throws OutOfMemoryError 
+     * @throws OutOfMemoryError
      */
-    public Boolean parseInput(TrackJob trackJob, Map<String, Integer> chromLengthMap) throws ParsingException, OutOfMemoryError;
-    
+    public Boolean parseInput( TrackJob trackJob, Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError;
+
+
     /**
      * Converts some data for the given track job and the given reference.
-     * @param trackJob the track job whose data needs to be converted
+     * <p>
+     * @param trackJob       the track job whose data needs to be converted
      * @param chromLengthMap the mapping of chromosome name to chromosome length
-     * for this track
+     *                       for this track
+     * <p>
      * @return Any object the specific implementation needs
+     * <p>
      * @throws ParsingException
-     * @throws OutOfMemoryError  
+     * @throws OutOfMemoryError
      */
-    public Boolean convert(TrackJob trackJob, Map<String, Integer> chromLengthMap) throws ParsingException, OutOfMemoryError;
-        
+    public Boolean convert( TrackJob trackJob, Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError;
+
+
     /**
      * Sets the given stats container to this parser. Then this parser can
      * store statistics.
+     * <p>
      * @param statsContainer the stats container to set
      */
-    public void setStatsContainer(StatsContainer statsContainer);
+    public void setStatsContainer( StatsContainer statsContainer );
+
 
 }

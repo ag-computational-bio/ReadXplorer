@@ -1,11 +1,13 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.datastructures;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.TrackResultEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
 
 /**
  * @author MKD, rhilker, edit by jritter
@@ -30,19 +32,21 @@ public class Operon extends TrackResultEntry {
     private int[] rbsStartStop;
     private HashMap<Integer, ArrayList<Integer[]>> tssToPromotor;
 
+
     /**
      *
      * @param trackId The track ID of the track on which the analysis has taken
-     * place.
+     *                place.
      */
-    public Operon(int trackId) {
-        super(trackId);
+    public Operon( int trackId ) {
+        super( trackId );
         this.operonAdjacencies = new CopyOnWriteArrayList<>();
         this.tsSites = new ArrayList<>();
         this.utRegions = new ArrayList<>();
         this.rbsStartStop = new int[2];
         this.tssToPromotor = new HashMap<>();
     }
+
 
     /**
      * Returns the number of genes the operon consists of.
@@ -53,6 +57,7 @@ public class Operon extends TrackResultEntry {
         return this.operonAdjacencies.size() + 1;
     }
 
+
     /**
      * @return the operon adjacencies
      */
@@ -60,38 +65,43 @@ public class Operon extends TrackResultEntry {
         return this.operonAdjacencies;
     }
 
+
     /**
      * @param operon the operon adjacencies to associate with this operon
-     * object.
+     *               object.
      */
-    public void setOperonAdjacencies(List<OperonAdjacency> newOperonAdjacencys) {
+    public void setOperonAdjacencies( List<OperonAdjacency> newOperonAdjacencys ) {
         this.operonAdjacencies = newOperonAdjacencys;
     }
+
 
     /**
      * Remove all operon adjacencies associated with this operon object.
      */
     public void clearOperonAdjacencyList() {
-        this.operonAdjacencies.removeAll(this.operonAdjacencies);
+        this.operonAdjacencies.removeAll( this.operonAdjacencies );
     }
+
 
     /**
      * Adds the operon adjacency to the list of OperonAdjacencies.
      *
      * @param operonAdjacency
      */
-    public void addOperonAdjacency(OperonAdjacency operonAdjacency) {
-        this.operonAdjacencies.add(operonAdjacency);
+    public void addOperonAdjacency( OperonAdjacency operonAdjacency ) {
+        this.operonAdjacencies.add( operonAdjacency );
     }
+
 
     /**
      * Adds the operon adjacencies to the end of the list of OperonAdjacencies.
      *
      * @param operonAdjacencies
      */
-    public void addAllOperonAdjacencies(List<OperonAdjacency> operonAdjacencies) {
-        this.operonAdjacencies.addAll(operonAdjacencies);
+    public void addAllOperonAdjacencies( List<OperonAdjacency> operonAdjacencies ) {
+        this.operonAdjacencies.addAll( operonAdjacencies );
     }
+
 
     /**
      * Concatinates all locus tags from CDS features in operon.
@@ -101,22 +111,24 @@ public class Operon extends TrackResultEntry {
     public String toOperonString() {
         String operon = "";
 
-        if (operonAdjacencies.get(0).getFeature1().getLocus().equals("BMMGA3_00365")) {
-            System.out.println("");
+        if( operonAdjacencies.get( 0 ).getFeature1().getLocus().equals( "BMMGA3_00365" ) ) {
+            System.out.println( "" );
         }
-        for (Iterator<OperonAdjacency> it = operonAdjacencies.iterator(); it.hasNext();) {
+        for( Iterator<OperonAdjacency> it = operonAdjacencies.iterator(); it.hasNext(); ) {
             OperonAdjacency operonAdjacency = it.next();
 
-            if (it.hasNext()) {
+            if( it.hasNext() ) {
                 operon += operonAdjacency.getFeature1().getLocus() + "-";
-            } else {
+            }
+            else {
                 operon += operonAdjacency.getFeature1().getLocus()
-                        + "-" + operonAdjacency.getFeature2().getLocus();
+                          + "-" + operonAdjacency.getFeature2().getLocus();
             }
         }
 
         return operon;
     }
+
 
     /**
      * Returns the direction of this Operon.
@@ -125,21 +137,24 @@ public class Operon extends TrackResultEntry {
      */
     public boolean isFwd() {
         this.isFwd = false;
-        if (operonAdjacencies.isEmpty() || operonAdjacencies.get(0).getFeature1() == null) {
+        if( operonAdjacencies.isEmpty() || operonAdjacencies.get( 0 ).getFeature1() == null ) {
             return isFwd;
-        } else {
-            return isFwd = operonAdjacencies.get(0).getFeature1().isFwdStrand();
+        }
+        else {
+            return isFwd = operonAdjacencies.get( 0 ).getFeature1().isFwdStrand();
         }
     }
+
 
     /**
      * Set direction of this operon.
      *
      * @param isFwd <true> if forward.
      */
-    public void setFwdDirection(boolean isFwd) {
+    public void setFwdDirection( boolean isFwd ) {
         this.isFwd = isFwd;
     }
+
 
     /**
      * Return <true> if this operon was finally considered during analysis.
@@ -150,14 +165,16 @@ public class Operon extends TrackResultEntry {
         return isConsidered;
     }
 
+
     /**
      * Set <true> if operon was considered during analysis process.
      *
      * @param isConsidered <true> if considered.
      */
-    public void setIsConsidered(boolean isConsidered) {
+    public void setIsConsidered( boolean isConsidered ) {
         this.isConsidered = isConsidered;
     }
+
 
     /**
      * Returns putative transcription start of this opreron if known, else the
@@ -169,22 +186,26 @@ public class Operon extends TrackResultEntry {
         return startPositionOfTranscript;
     }
 
+
     public int getStopPositionOfOperonTranscript() {
-        if (isFwd) {
-            return getOperonAdjacencies().get(getOperonAdjacencies().size() - 1).getFeature2().getStop();
-        } else {
-            return getOperonAdjacencies().get(0).getFeature1().getStart();
+        if( isFwd ) {
+            return getOperonAdjacencies().get( getOperonAdjacencies().size() - 1 ).getFeature2().getStop();
+        }
+        else {
+            return getOperonAdjacencies().get( 0 ).getFeature1().getStart();
         }
     }
+
 
     /**
      * Sets putative transcription start of this opreron.
      *
      * @param startPositionOfTranscript
      */
-    public void setStartPositionOfTranscript(int startPositionOfTranscript) {
+    public void setStartPositionOfTranscript( int startPositionOfTranscript ) {
         this.startPositionOfTranscript = startPositionOfTranscript;
     }
+
 
     /**
      *
@@ -194,13 +215,15 @@ public class Operon extends TrackResultEntry {
         return markedForUpstreamAnalysis;
     }
 
+
     /**
      *
      * @param markedForUpstreamAnalysis
      */
-    public void setMarkedForUpstreamAnalysis(boolean markedForUpstreamAnalysis) {
+    public void setMarkedForUpstreamAnalysis( boolean markedForUpstreamAnalysis ) {
         this.markedForUpstreamAnalysis = markedForUpstreamAnalysis;
     }
+
 
     /**
      *
@@ -210,14 +233,16 @@ public class Operon extends TrackResultEntry {
         return minus10MotifWidth;
     }
 
+
     /**
      * Set -10 motif width.
      *
      * @param minus10MotifWidth
      */
-    public void setMinus10MotifWidth(int minus10MotifWidth) {
+    public void setMinus10MotifWidth( int minus10MotifWidth ) {
         this.minus10MotifWidth = minus10MotifWidth;
     }
+
 
     /**
      *
@@ -227,14 +252,16 @@ public class Operon extends TrackResultEntry {
         return minus35MotifWidth;
     }
 
+
     /**
      * Set -35 motif width.
      *
      * @param minus35MotifWidth
      */
-    public void setMinus35MotifWidth(int minus35MotifWidth) {
+    public void setMinus35MotifWidth( int minus35MotifWidth ) {
         this.minus35MotifWidth = minus35MotifWidth;
     }
+
 
     /**
      * Get width of ribosome binding site motif.
@@ -245,13 +272,15 @@ public class Operon extends TrackResultEntry {
         return rbsMotifWidth;
     }
 
+
     /**
      *
      * @param rbsMotifWidth
      */
-    public void setRbsMotifWidth(int rbsMotifWidth) {
+    public void setRbsMotifWidth( int rbsMotifWidth ) {
         this.rbsMotifWidth = rbsMotifWidth;
     }
+
 
     /**
      *
@@ -261,13 +290,15 @@ public class Operon extends TrackResultEntry {
         return hasRbsFeatureAssigned;
     }
 
+
     /**
      *
      * @param hasRbsFeatureAssigned
      */
-    public void setRbsFeatureAssigned(boolean hasRbsFeatureAssigned) {
+    public void setRbsFeatureAssigned( boolean hasRbsFeatureAssigned ) {
         this.hasRbsFeatureAssigned = hasRbsFeatureAssigned;
     }
+
 
     /**
      *
@@ -277,13 +308,15 @@ public class Operon extends TrackResultEntry {
         return hasPromtorFeaturesAssigned;
     }
 
+
     /**
      *
      * @param hasPromtorFeaturesAssigned
      */
-    public void setHasPromtorFeaturesAssigned(boolean hasPromtorFeaturesAssigned) {
+    public void setHasPromtorFeaturesAssigned( boolean hasPromtorFeaturesAssigned ) {
         this.hasPromtorFeaturesAssigned = hasPromtorFeaturesAssigned;
     }
+
 
     /**
      *
@@ -293,13 +326,15 @@ public class Operon extends TrackResultEntry {
         return additionalLocus;
     }
 
+
     /**
      *
      * @param additionalLocus
      */
-    public void setAdditionalLocus(String additionalLocus) {
+    public void setAdditionalLocus( String additionalLocus ) {
         this.additionalLocus = additionalLocus;
     }
+
 
     /**
      *
@@ -309,13 +344,15 @@ public class Operon extends TrackResultEntry {
         return promotorSequenceLength;
     }
 
+
     /**
      *
      * @param promotorSequenceLength
      */
-    public void setPromotorSequenceLength(int promotorSequenceLength) {
+    public void setPromotorSequenceLength( int promotorSequenceLength ) {
         this.promotorSequenceLength = promotorSequenceLength;
     }
+
 
     /**
      *
@@ -325,13 +362,15 @@ public class Operon extends TrackResultEntry {
         return rbsSequenceLength;
     }
 
+
     /**
      *
      * @param rbsSequenceLength
      */
-    public void setRbsSequenceLength(int rbsSequenceLength) {
+    public void setRbsSequenceLength( int rbsSequenceLength ) {
         this.rbsSequenceLength = rbsSequenceLength;
     }
+
 
     /**
      *
@@ -341,13 +380,15 @@ public class Operon extends TrackResultEntry {
         return startMinus10Motif;
     }
 
+
     /**
      *
      * @param startMinus10Motif
      */
-    public void setStartMinus10Motif(int startMinus10Motif) {
+    public void setStartMinus10Motif( int startMinus10Motif ) {
         this.startMinus10Motif = startMinus10Motif;
     }
+
 
     /**
      *
@@ -357,13 +398,15 @@ public class Operon extends TrackResultEntry {
         return startMinus35Motif;
     }
 
+
     /**
      *
      * @param startMinus35Motif
      */
-    public void setStartMinus35Motif(int startMinus35Motif) {
+    public void setStartMinus35Motif( int startMinus35Motif ) {
         this.startMinus35Motif = startMinus35Motif;
     }
+
 
     /**
      *
@@ -373,13 +416,15 @@ public class Operon extends TrackResultEntry {
         return startRbsMotif;
     }
 
+
     /**
      *
      * @param startRbsMotif
      */
-    public void setStartRbsMotif(int startRbsMotif) {
+    public void setStartRbsMotif( int startRbsMotif ) {
         this.startRbsMotif = startRbsMotif;
     }
+
 
     /**
      *
@@ -389,21 +434,24 @@ public class Operon extends TrackResultEntry {
         return falsPositive;
     }
 
+
     /**
      *
      * @param falsPositive
      */
-    public void setFalsPositive(boolean falsPositive) {
+    public void setFalsPositive( boolean falsPositive ) {
         this.falsPositive = falsPositive;
     }
+
 
     /**
      *
      * @param adj
      */
-    public void removeAdjaceny(OperonAdjacency adj) {
-        this.operonAdjacencies.remove(adj);
+    public void removeAdjaceny( OperonAdjacency adj ) {
+        this.operonAdjacencies.remove( adj );
     }
+
 
     /**
      *
@@ -413,13 +461,15 @@ public class Operon extends TrackResultEntry {
         return tsSites;
     }
 
+
     /**
      *
      * @param tsSites
      */
-    public void setTsSites(ArrayList<Integer> tsSites) {
+    public void setTsSites( ArrayList<Integer> tsSites ) {
         this.tsSites = tsSites;
     }
+
 
     /**
      *
@@ -429,13 +479,15 @@ public class Operon extends TrackResultEntry {
         return utRegions;
     }
 
+
     /**
      *
      * @param utRegions
      */
-    public void setUtRegions(ArrayList<Integer> utRegions) {
+    public void setUtRegions( ArrayList<Integer> utRegions ) {
         this.utRegions = utRegions;
     }
+
 
     /**
      *
@@ -445,39 +497,44 @@ public class Operon extends TrackResultEntry {
         return rbsStartStop;
     }
 
+
     /**
      *
      * @param rbsStartStop
      */
-    public void setRbsStartStop(int[] rbsStartStop) {
+    public void setRbsStartStop( int[] rbsStartStop ) {
         this.rbsStartStop = rbsStartStop;
     }
+
 
     /**
      *
      * @param tss
      */
-    public void addTss(int tss) {
-        this.tsSites.add(tss);
+    public void addTss( int tss ) {
+        this.tsSites.add( tss );
     }
+
 
     /**
      *
      * @param start
      * @param stop
      */
-    public void addRbs(int start, int stop) {
+    public void addRbs( int start, int stop ) {
         this.rbsStartStop[0] = start;
         this.rbsStartStop[1] = stop;
     }
+
 
     /**
      *
      * @param utr
      */
-    public void addUtrs(Integer utr) {
-        this.utRegions.add(utr);
+    public void addUtrs( Integer utr ) {
+        this.utRegions.add( utr );
     }
+
 
     /**
      *
@@ -487,13 +544,15 @@ public class Operon extends TrackResultEntry {
         return tssToPromotor;
     }
 
+
     /**
      *
      * @param tssToPromotor
      */
-    public void setTssToPromotor(HashMap<Integer, ArrayList<Integer[]>> tssToPromotor) {
+    public void setTssToPromotor( HashMap<Integer, ArrayList<Integer[]>> tssToPromotor ) {
         this.tssToPromotor = tssToPromotor;
     }
+
 
     /**
      *
@@ -501,19 +560,23 @@ public class Operon extends TrackResultEntry {
      * @param minus35
      * @param minus10
      */
-    public void addTssToPromotor(Integer tss, Integer[] minus35, Integer[] minus10) {
+    public void addTssToPromotor( Integer tss, Integer[] minus35, Integer[] minus10 ) {
         List<Integer[]> list = new ArrayList<>();
-        list.add(minus35);
-        list.add(minus10);
-        this.tssToPromotor.put(tss, (ArrayList<Integer[]>) list);
+        list.add( minus35 );
+        list.add( minus10 );
+        this.tssToPromotor.put( tss, (ArrayList<Integer[]>) list );
     }
+
 
     /**
      *
      * @param tss
+     *            <p>
      * @return
      */
-    public ArrayList<Integer[]> getPromotor(Integer tss) {
-        return this.tssToPromotor.get(tss);
+    public ArrayList<Integer[]> getPromotor( Integer tss ) {
+        return this.tssToPromotor.get( tss );
     }
+
+
 }

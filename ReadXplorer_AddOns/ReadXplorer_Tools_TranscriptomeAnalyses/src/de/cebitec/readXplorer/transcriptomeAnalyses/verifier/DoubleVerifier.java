@@ -4,6 +4,7 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.verifier;
 
+
 import java.awt.Color;
 import java.awt.Toolkit;
 import javax.swing.BorderFactory;
@@ -12,36 +13,41 @@ import javax.swing.JComponent;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
+
 /**
  *
  * @author jritter
  */
-public class DoubleVerifier extends InputVerifier{
+public class DoubleVerifier extends InputVerifier {
 
     private JTextField tf;
     private Border border;
 
-    public DoubleVerifier(JComponent comp) {
+
+    public DoubleVerifier( JComponent comp ) {
         this.tf = (JTextField) comp;
         this.border = tf.getBorder();
     }
 
+
     @Override
-    public boolean verify(JComponent input) {
+    public boolean verify( JComponent input ) {
         boolean returnValue = true;
         JTextField textField = (JTextField) input;
         String content = textField.getText();
-        if (content.length() != 0) {
+        if( content.length() != 0 ) {
             try {
-                Double.parseDouble(textField.getText());
-                this.tf.setBorder(border);
-            } catch (NumberFormatException e) {
+                Double.parseDouble( textField.getText() );
+                this.tf.setBorder( border );
+            }
+            catch( NumberFormatException e ) {
                 Toolkit.getDefaultToolkit().beep();
-                this.tf.setBorder(BorderFactory.createLineBorder(Color.red));
+                this.tf.setBorder( BorderFactory.createLineBorder( Color.red ) );
                 returnValue = false;
             }
         }
         return returnValue;
     }
-    
+
+
 }

@@ -1,5 +1,6 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard;
 
+
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
@@ -12,12 +13,15 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-public final class SelectTrackVisualPanel extends JPanel implements ListSelectionListener {
+
+public final class SelectTrackVisualPanel extends JPanel implements
+        ListSelectionListener {
 
     private List<PersistentReference> references;
     private int selectedIndex = -1;
     private PersistentReference selectedRef;
     private DefaultListModel<PersistentTrack> trackListModel;
+
 
     /**
      * Creates new form SelectTrackVisualPanel
@@ -29,10 +33,12 @@ public final class SelectTrackVisualPanel extends JPanel implements ListSelectio
         initComponents();
     }
 
+
     @Override
     public String getName() {
         return "Select tracks";
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -43,96 +49,106 @@ public final class SelectTrackVisualPanel extends JPanel implements ListSelectio
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        referenceList = new javax.swing.JList(references.toArray());
+        referenceList = new javax.swing.JList( references.toArray() );
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
-        trackList = new javax.swing.JList(trackListModel);
+        trackList = new javax.swing.JList( trackListModel );
 
-        referenceList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        referenceList.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        referenceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        referenceList.addListSelectionListener(this);
-        jScrollPane1.setViewportView(referenceList);
+        referenceList.setSelectionMode( javax.swing.ListSelectionModel.SINGLE_SELECTION );
+        referenceList.setCursor( new java.awt.Cursor( java.awt.Cursor.DEFAULT_CURSOR ) );
+        referenceList.setSelectionMode( ListSelectionModel.SINGLE_SELECTION );
+        referenceList.addListSelectionListener( this );
+        jScrollPane1.setViewportView( referenceList );
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(SelectTrackVisualPanel.class, "SelectTrackVisualPanel.jLabel1.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText( jLabel1, org.openide.util.NbBundle.getMessage( SelectTrackVisualPanel.class, "SelectTrackVisualPanel.jLabel1.text" ) ); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(jLabel2, org.openide.util.NbBundle.getMessage(SelectTrackVisualPanel.class, "SelectTrackVisualPanel.jLabel2.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText( jLabel2, org.openide.util.NbBundle.getMessage( SelectTrackVisualPanel.class, "SelectTrackVisualPanel.jLabel2.text" ) ); // NOI18N
 
-        jScrollPane2.setViewportView(trackList);
+        jScrollPane2.setViewportView( trackList );
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
-        this.setLayout(layout);
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout( this );
+        this.setLayout( layout );
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane1)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2))
-                        .addGap(0, 9, Short.MAX_VALUE))
-                    .addComponent(jScrollPane2))
-                .addContainerGap())
+                layout.createParallelGroup( javax.swing.GroupLayout.Alignment.LEADING )
+                .addGroup( layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup( layout.createParallelGroup( javax.swing.GroupLayout.Alignment.LEADING )
+                                .addComponent( jScrollPane1 )
+                                .addGroup( layout.createSequentialGroup()
+                                        .addGroup( layout.createParallelGroup( javax.swing.GroupLayout.Alignment.LEADING )
+                                                .addComponent( jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE )
+                                                .addComponent( jLabel2 ) )
+                                        .addGap( 0, 9, Short.MAX_VALUE ) )
+                                .addComponent( jScrollPane2 ) )
+                        .addContainerGap() )
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(16, Short.MAX_VALUE))
+                layout.createParallelGroup( javax.swing.GroupLayout.Alignment.LEADING )
+                .addGroup( layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent( jLabel1 )
+                        .addPreferredGap( javax.swing.LayoutStyle.ComponentPlacement.UNRELATED )
+                        .addComponent( jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE )
+                        .addPreferredGap( javax.swing.LayoutStyle.ComponentPlacement.UNRELATED )
+                        .addComponent( jLabel2 )
+                        .addPreferredGap( javax.swing.LayoutStyle.ComponentPlacement.RELATED )
+                        .addComponent( jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE )
+                        .addContainerGap( 16, Short.MAX_VALUE ) )
         );
     }// </editor-fold>//GEN-END:initComponents
     // Variables declaration - do not modify//GEN-BEGIN:variables
+
+
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JList referenceList;
     private javax.swing.JList<PersistentTrack> trackList;
+
     // End of variables declaration//GEN-END:variables
 
     @Override
-    public void valueChanged(ListSelectionEvent e) {
-        if (selectedIndex != referenceList.getSelectedIndex() && !e.getValueIsAdjusting()) {
+    public void valueChanged( ListSelectionEvent e ) {
+        if( selectedIndex != referenceList.getSelectedIndex() && !e.getValueIsAdjusting() ) {
             selectedIndex = referenceList.getSelectedIndex();
-            selectedRef = references.get(selectedIndex);
-            ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector(selectedRef.getId());
+            selectedRef = references.get( selectedIndex );
+            ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector( selectedRef.getId() );
             List<PersistentTrack> tracks = refCon.getAssociatedTracks();
             trackListModel.clear();
-            for (Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext();) {
+            for( Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext(); ) {
                 PersistentTrack persistentTrack = it.next();
-                trackListModel.addElement(persistentTrack);
+                trackListModel.addElement( persistentTrack );
             }
         }
     }
+
 
     public int getSelectedReferenceGenomeID() {
         return selectedRef.getId();
     }
 
+
     public List<PersistentTrack> getSelectedTracks() {
         return trackList.getSelectedValuesList();
     }
 
+
     public boolean selectionFinished() {
-        if (trackList.isSelectionEmpty()) {
+        if( trackList.isSelectionEmpty() ) {
             return false;
-        } else {
+        }
+        else {
             List<PersistentTrack> selectedTracks = trackList.getSelectedValuesList();
-            if (selectedTracks.size() == 1) {
+            if( selectedTracks.size() == 1 ) {
                 return true;
-            } else {
+            }
+            else {
                 return false;
             }
         }
     }
+
+
 }

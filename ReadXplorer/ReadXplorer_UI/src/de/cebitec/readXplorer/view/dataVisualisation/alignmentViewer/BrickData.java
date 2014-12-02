@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,10 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer;
 
+
 import java.awt.Color;
 import java.awt.Rectangle;
+
 
 /**
  * Contains all data for painting a Brick.
@@ -25,24 +27,28 @@ import java.awt.Rectangle;
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class BrickData {
+
     private final Brick brick;
     private final Color brickColor;
     private final Rectangle rectangle;
     private final int labelCenter;
 
+
     /**
      * Contains all data for painting a Brick.
-     * @param brick The brick to represent
-     * @param rectangle Rectangle representing the brick
-     * @param brickColor Color of the brick rectangle
+     * <p>
+     * @param brick       The brick to represent
+     * @param rectangle   Rectangle representing the brick
+     * @param brickColor  Color of the brick rectangle
      * @param labelCenter Center position of the brick label
      */
-    public BrickData(Brick brick, Rectangle rectangle, Color brickColor, int labelCenter) {
+    public BrickData( Brick brick, Rectangle rectangle, Color brickColor, int labelCenter ) {
         this.brick = brick;
         this.brickColor = brickColor;
         this.rectangle = rectangle;
         this.labelCenter = labelCenter;
     }
+
 
     /**
      * @return The brick to represent
@@ -51,12 +57,14 @@ public class BrickData {
         return brick;
     }
 
+
     /**
      * @return Rectangle representing the brick
      */
     public Rectangle getRectangle() {
         return rectangle;
     }
+
 
     /**
      * @return Color of the brick rectangle
@@ -65,13 +73,15 @@ public class BrickData {
         return brickColor;
     }
 
+
     /**
      * @return x position of the brick label
      */
     public int getLabelCenter() {
         return labelCenter;
     }
-    
+
+
     /**
      * @return The type string of the brick stored in this data object.
      */
@@ -79,4 +89,6 @@ public class BrickData {
     public String toString() {
         return this.brick.getTypeString();
     }
+
+
 }

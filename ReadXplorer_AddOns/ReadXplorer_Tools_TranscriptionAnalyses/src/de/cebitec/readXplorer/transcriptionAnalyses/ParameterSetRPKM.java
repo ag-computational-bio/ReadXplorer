@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,40 +16,48 @@
  */
 package de.cebitec.readXplorer.transcriptionAnalyses;
 
+
 import de.cebitec.readXplorer.databackend.ParameterSetI;
 import de.cebitec.readXplorer.databackend.ParametersFeatureTypesAndReadClasses;
 import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.util.Set;
 
+
 /**
- * Data storage for all parameters associated with an RPKM and read count 
+ * Data storage for all parameters associated with an RPKM and read count
  * calculation.
- * 
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public class ParameterSetRPKM extends ParametersFeatureTypesAndReadClasses implements ParameterSetI<ParameterSetRPKM> {
-    
+public class ParameterSetRPKM extends ParametersFeatureTypesAndReadClasses
+        implements ParameterSetI<ParameterSetRPKM> {
+
     private boolean performRPKMAnalysis;
     private int minReadCount;
     private int maxReadCount;
-    
+
+
     /**
      * Data storage for all parameters associated with an RPKM and read count
      * calculation.
+     * <p>
      * @param performRPKMAnalysis true, if the RPKM analysis shall be performed
-     * @param minReadCount minimum read count of a feature to return it in the result
-     * @param maxReadCount maximum read count of a feature to return it in the result
-     * @param selFeatureTypes the set of selected feature types
+     * @param minReadCount        minimum read count of a feature to return it
+     *                            in the result
+     * @param maxReadCount        maximum read count of a feature to return it
+     *                            in the result
+     * @param selFeatureTypes     the set of selected feature types
      * @param readClassParams
      */
-    public ParameterSetRPKM(boolean performRPKMAnalysis, int minReadCount, int maxReadCount, Set<FeatureType> selFeatureTypes, ParametersReadClasses readClassParams) {
-        
-        super(selFeatureTypes, readClassParams);
+    public ParameterSetRPKM( boolean performRPKMAnalysis, int minReadCount, int maxReadCount, Set<FeatureType> selFeatureTypes, ParametersReadClasses readClassParams ) {
+
+        super( selFeatureTypes, readClassParams );
         this.performRPKMAnalysis = performRPKMAnalysis;
         this.minReadCount = minReadCount;
         this.maxReadCount = maxReadCount;
     }
+
 
     /**
      * @return true, if the RPKM analysis shall be performed
@@ -58,12 +66,14 @@ public class ParameterSetRPKM extends ParametersFeatureTypesAndReadClasses imple
         return performRPKMAnalysis;
     }
 
+
     /**
      * @return the minimum read count of a feature to return it in the result
      */
     public int getMinReadCount() {
         return minReadCount;
     }
+
 
     /**
      * @return the maximum read count of a feature to return it in the result
@@ -72,18 +82,23 @@ public class ParameterSetRPKM extends ParametersFeatureTypesAndReadClasses imple
         return maxReadCount;
     }
 
+
     /**
-     * @param minRPKM the minimum read count of a feature to return it in the result
+     * @param minRPKM the minimum read count of a feature to return it in the
+     *                result
      */
-    public void setMinReadCount(int minRPKM) {
+    public void setMinReadCount( int minRPKM ) {
         this.minReadCount = minRPKM;
     }
 
+
     /**
-     * @param maxRPKM the maximum read count of a feature to return it in the result
+     * @param maxRPKM the maximum read count of a feature to return it in the
+     *                result
      */
-    public void setMaxReadCount(int maxRPKM) {
+    public void setMaxReadCount( int maxRPKM ) {
         this.maxReadCount = maxRPKM;
-    }    
+    }
+
 
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,26 +16,32 @@
  */
 package de.cebitec.readXplorer.thumbnail;
 
+
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.Collection;
 import org.netbeans.api.visual.layout.Layout;
 import org.netbeans.api.visual.widget.Widget;
 
+
 /**
- * Creates a custom layout to display all Widgets in a GridLayout used by the scene.
+ * Creates a custom layout to display all Widgets in a GridLayout used by the
+ * scene.
+ * <p>
  * @author dkramer
  */
 public class ThumbGridLayout implements Layout {
 
     private int columns;
 
-    public ThumbGridLayout(int columns) {
-        this.columns = columns;        
+
+    public ThumbGridLayout( int columns ) {
+        this.columns = columns;
     }
 
+
     @Override
-    public void layout(Widget widget) {
+    public void layout( Widget widget ) {
         Collection<Widget> children = widget.getChildren();
         int posX = 0;
         int posY = 0;
@@ -43,20 +49,20 @@ public class ThumbGridLayout implements Layout {
         int maxHeight = 0;
         int maxWidth = 0;
         //Calculates maxHeigth, maxWidth for all Children
-        for (Widget child : children) {
+        for( Widget child : children ) {
             Rectangle prefferedBounds = child.getPreferredBounds();
             int width = prefferedBounds.width;
             int height = prefferedBounds.height;
-            if (height > maxHeight) {
+            if( height > maxHeight ) {
                 maxHeight = height;
             }
-            if (width > maxWidth) {
+            if( width > maxWidth ) {
                 maxWidth = width;
             }
         }
 
         //positions all Children in a gridlayou
-        for (Widget child : children) {
+        for( Widget child : children ) {
             Rectangle prefferedBounds = child.getPreferredBounds();
             int x = prefferedBounds.x;
             int y = prefferedBounds.y;
@@ -64,14 +70,15 @@ public class ThumbGridLayout implements Layout {
             int height = prefferedBounds.height;
             int lx = posX - x;
             int ly = posY - y;
-            if (child.isVisible()) {
-                child.resolveBounds(new Point(lx, ly), new Rectangle(x, y, width, height));
+            if( child.isVisible() ) {
+                child.resolveBounds( new Point( lx, ly ), new Rectangle( x, y, width, height ) );
                 posX += maxWidth;
-            } else {
-                child.resolveBounds(new Point(lx, ly), new Rectangle(x, y, 0, 0));
+            }
+            else {
+                child.resolveBounds( new Point( lx, ly ), new Rectangle( x, y, 0, 0 ) );
             }
             col++;
-            if (col == columns) {
+            if( col == columns ) {
                 col = 0;
                 posX = 0;
                 posY += maxHeight;
@@ -79,12 +86,16 @@ public class ThumbGridLayout implements Layout {
         }
     }
 
+
     @Override
-    public boolean requiresJustification(Widget widget) {
+    public boolean requiresJustification( Widget widget ) {
         return false;
     }
 
+
     @Override
-    public void justify(Widget widget) {
+    public void justify( Widget widget ) {
     }
+
+
 }

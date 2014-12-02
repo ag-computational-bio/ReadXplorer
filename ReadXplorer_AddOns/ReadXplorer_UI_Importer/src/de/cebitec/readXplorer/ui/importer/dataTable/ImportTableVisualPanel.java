@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cebitec.readXplorer.ui.importer.dataTable;
+
 
 import de.cebitec.readXplorer.api.objects.JobPanel;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
@@ -33,6 +34,7 @@ import javax.swing.ScrollPaneConstants;
 import org.openide.util.NbBundle;
 import org.supercsv.prefs.CsvPreference;
 
+
 /**
  * Creates a panel for displaying the selection of different table parsers and
  * their options.
@@ -45,7 +47,8 @@ public final class ImportTableVisualPanel extends JobPanel {
 
     private String fileLocation;
     private String fileLocationStatsCsv;
-    private final TableParserI[] availableParsers = {new CsvTableParser(), new XlsTranscriptomeTableParser()};
+    private final TableParserI[] availableParsers = { new CsvTableParser(), new XlsTranscriptomeTableParser() };
+
 
     /**
      * Creates a panel for displaying the selection of different table parsers
@@ -53,16 +56,18 @@ public final class ImportTableVisualPanel extends JobPanel {
      */
     public ImportTableVisualPanel() {
         initComponents();
-        statsAndParamsButton.setEnabled(false);
-        statsAndParamsFileTextField.setEnabled(false);
-        this.descriptionScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+        statsAndParamsButton.setEnabled( false );
+        statsAndParamsFileTextField.setEnabled( false );
+        this.descriptionScrollPane.setVerticalScrollBarPolicy( ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER );
     }
 
-    @NbBundle.Messages("StepName=Choose table parser")
+
+    @NbBundle.Messages( "StepName=Choose table parser" )
     @Override
     public String getName() {
         return Bundle.StepName();
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -225,72 +230,81 @@ public final class ImportTableVisualPanel extends JobPanel {
 
     private void fileButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileButtonActionPerformed
         TableParserI currentParser = (TableParserI) parserComboBox.getSelectedItem();
-        ReadXplorerFileChooser chooser = new ReadXplorerFileChooser(currentParser.getFileExtensions(), currentParser.getInputFileDescription()) {
+        ReadXplorerFileChooser chooser = new ReadXplorerFileChooser( currentParser.getFileExtensions(), currentParser.getInputFileDescription() ) {
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public void save(String fileLocation) {
-                throw new UnsupportedOperationException("Only opening is supported by this file chooser.");
-            }
 
             @Override
-            public void open(String fileLocation) {
+            public void save( String fileLocation ) {
+                throw new UnsupportedOperationException( "Only opening is supported by this file chooser." );
+            }
+
+
+            @Override
+            public void open( String fileLocation ) {
                 File[] files = this.getSelectedFiles();
                 ImportTableVisualPanel.this.fileLocation = fileLocation;
             }
+
+
         };
-        chooser.openFileChooser(ReadXplorerFileChooser.OPEN_DIALOG);
-        this.fileTextField.setText(fileLocation);
+        chooser.openFileChooser( ReadXplorerFileChooser.OPEN_DIALOG );
+        this.fileTextField.setText( fileLocation );
         this.isRequiredInfoSet();
     }//GEN-LAST:event_fileButtonActionPerformed
 
     private void delimiterCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_delimiterCheckBoxActionPerformed
-        this.csvPrefComboBox.setVisible(!delimiterCheckBox.isSelected());
+        this.csvPrefComboBox.setVisible( !delimiterCheckBox.isSelected() );
     }//GEN-LAST:event_delimiterCheckBoxActionPerformed
 
     private void parserComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_parserComboBoxActionPerformed
         this.fileLocation = "";
-        this.fileTextField.setText(org.openide.util.NbBundle.getMessage(ImportTableVisualPanel.class, "ImportTableVisualPanel.fileTextField.text"));
+        this.fileTextField.setText( org.openide.util.NbBundle.getMessage( ImportTableVisualPanel.class, "ImportTableVisualPanel.fileTextField.text" ) );
         boolean isCsvParser = (this.parserComboBox.getSelectedItem() instanceof CsvTableParser);
-        this.csvPrefComboBox.setVisible(isCsvParser && !this.delimiterCheckBox.isSelected());
-        this.delimiterCheckBox.setVisible(isCsvParser);
+        this.csvPrefComboBox.setVisible( isCsvParser && !this.delimiterCheckBox.isSelected() );
+        this.delimiterCheckBox.setVisible( isCsvParser );
     }//GEN-LAST:event_parserComboBoxActionPerformed
 
     private void tableComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tableComboBoxActionPerformed
 
         boolean isCsvParser = (this.parserComboBox.getSelectedItem() instanceof CsvTableParser);
-        if (isCsvParser
-                && ((TableType) tableComboBox.getSelectedItem() == TableType.OPERON_DETECTION_JR
+        if( isCsvParser
+            && ((TableType) tableComboBox.getSelectedItem() == TableType.OPERON_DETECTION_JR
                 || (TableType) tableComboBox.getSelectedItem() == TableType.NOVEL_TRANSCRIPT_DETECTION_JR
                 || (TableType) tableComboBox.getSelectedItem() == TableType.RPKM_ANALYSIS_JR
-                || (TableType) tableComboBox.getSelectedItem() == TableType.TSS_DETECTION_JR)) {
-            statsAndParamsButton.setEnabled(true);
-            statsAndParamsFileTextField.setEnabled(true);
-        } else {
-            statsAndParamsButton.setEnabled(false);
-            statsAndParamsFileTextField.setEnabled(false);
+                || (TableType) tableComboBox.getSelectedItem() == TableType.TSS_DETECTION_JR) ) {
+            statsAndParamsButton.setEnabled( true );
+            statsAndParamsFileTextField.setEnabled( true );
+        }
+        else {
+            statsAndParamsButton.setEnabled( false );
+            statsAndParamsFileTextField.setEnabled( false );
         }
 
     }//GEN-LAST:event_tableComboBoxActionPerformed
 
     private void statsAndParamsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_statsAndParamsButtonActionPerformed
         TableParserI currentParser = (TableParserI) parserComboBox.getSelectedItem();
-        ReadXplorerFileChooser chooser = new ReadXplorerFileChooser(currentParser.getFileExtensions(), currentParser.getInputFileDescription()) {
+        ReadXplorerFileChooser chooser = new ReadXplorerFileChooser( currentParser.getFileExtensions(), currentParser.getInputFileDescription() ) {
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public void save(String fileLocation) {
-                throw new UnsupportedOperationException("Only opening is supported by this file chooser.");
-            }
 
             @Override
-            public void open(String fileLocation) {
+            public void save( String fileLocation ) {
+                throw new UnsupportedOperationException( "Only opening is supported by this file chooser." );
+            }
+
+
+            @Override
+            public void open( String fileLocation ) {
                 File[] files = this.getSelectedFiles();
                 ImportTableVisualPanel.this.fileLocationStatsCsv = fileLocation;
             }
+
+
         };
-        chooser.openFileChooser(ReadXplorerFileChooser.OPEN_DIALOG);
-        this.statsAndParamsFileTextField.setText(fileLocationStatsCsv);
+        chooser.openFileChooser( ReadXplorerFileChooser.OPEN_DIALOG );
+        this.statsAndParamsFileTextField.setText( fileLocationStatsCsv );
         this.isRequiredInfoSet();
     }//GEN-LAST:event_statsAndParamsButtonActionPerformed
 
@@ -312,13 +326,15 @@ public final class ImportTableVisualPanel extends JobPanel {
     private javax.swing.JLabel tableLabel;
     // End of variables declaration//GEN-END:variables
 
+
     @Override
     public boolean isRequiredInfoSet() {
         boolean isValidated = tableComboBox.getSelectedIndex() > -1 && refComboBox.getSelectedIndex() > -1
-                && fileLocation != null && !fileLocation.isEmpty();
-        firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated);
+                              && fileLocation != null && !fileLocation.isEmpty();
+        firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated );
         return isValidated;
     }
+
 
     /**
      * @return The table type selected in this panel.
@@ -327,12 +343,14 @@ public final class ImportTableVisualPanel extends JobPanel {
         return (TableType) this.tableComboBox.getSelectedItem();
     }
 
+
     /**
      * @return The file location of the file containing the table to import.
      */
     public String getFileLocation() {
         return fileLocation;
     }
+
 
     /**
      * @return The file location of the file containing the table to import.
@@ -341,12 +359,14 @@ public final class ImportTableVisualPanel extends JobPanel {
         return fileLocationStatsCsv;
     }
 
+
     /**
      * @return The reference for which the table shall be imported.
      */
     public PersistentReference getReference() {
         return (PersistentReference) refComboBox.getSelectedItem();
     }
+
 
     /**
      * @return The currently selected CsvPreference.
@@ -355,14 +375,16 @@ public final class ImportTableVisualPanel extends JobPanel {
         return ((CsvPreferenceForUsers) this.csvPrefComboBox.getSelectedItem()).getCsvPref();
     }
 
+
     /**
      * @return <code>true</code>, if the delimiter shall be detected
-     * automatically, <code>false</code>, if the delimiter was selected by the
-     * user.
+     *         automatically, <code>false</code>, if the delimiter was selected by the
+     *         user.
      */
     public boolean isAutodetectDelimiter() {
         return this.delimiterCheckBox.isSelected();
     }
+
 
     /**
      * @return The selected table parser to use.
@@ -370,10 +392,12 @@ public final class ImportTableVisualPanel extends JobPanel {
     public TableParserI getParser() {
         return (TableParserI) this.parserComboBox.getSelectedItem();
     }
-    
-    public void paint(Graphics g) {
-        super.paint(g);
-        this.csvPrefComboBox.setVisible(!delimiterCheckBox.isSelected());
+
+
+    public void paint( Graphics g ) {
+        super.paint( g );
+        this.csvPrefComboBox.setVisible( !delimiterCheckBox.isSelected() );
     }
+
 
 }

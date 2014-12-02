@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
+
 
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
@@ -43,11 +44,12 @@ import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JPopupMenu;
 
+
 /**
  * A sequence bar is used to display the sequence of a reference genome within
  * another AbstractViewer. Further, it contains several options for highlighting
  * areas, start or stop codons and patterns.
- * 
+ * <p>
  * @author ddoppmeier, rhilker
  */
 public class SequenceBar extends JComponent implements HighlightableI {
@@ -74,17 +76,19 @@ public class SequenceBar extends JComponent implements HighlightableI {
     private RegionManager regionManager;
     private byte frameCurrFeature;
 
+
     /**
      * A sequence bar is used to display the sequence of a reference genome
      * within another AbstractViewer. Further, it contains several options for
      * highlighting areas, start or stop codons and patterns.
+     * <p>
      * @param parentViewer the viewer containing the sequence bar
      */
-    public SequenceBar(AbstractViewer parentViewer) {
+    public SequenceBar( AbstractViewer parentViewer ) {
         super();
         this.parentViewer = parentViewer;
-        this.setSize(new Dimension(0, this.height));
-        this.font = new Font(Font.MONOSPACED, Font.PLAIN, 10);
+        this.setSize( new Dimension( 0, this.height ) );
+        this.font = new Font( Font.MONOSPACED, Font.PLAIN, 10 );
         this.refGen = parentViewer.getReference();
         this.baseLineY = 30;
         this.offsetY = 10;
@@ -94,58 +98,67 @@ public class SequenceBar extends JComponent implements HighlightableI {
         this.halfMarkingWidth = markingWidth / 2;
         this.initMouseListener(); //this order has to be obeyed, otherwise the highlight listener
         this.initHighlightListener(); //will not be shown in the highlighted area!
-        this.regionManager = new RegionManager(this, parentViewer, refGen, highlightListener);
+        this.regionManager = new RegionManager( this, parentViewer, refGen, highlightListener );
     }
+
 
     /**
      * Adds a mouse listener to this sequence bar, which allows selecting the
      * sequence, currently displayed on the screen.
      */
     private void initHighlightListener() {
-        highlightListener = new HighlightAreaListener(this, baseLineY, offsetY);
-        this.addMouseListener(highlightListener);
-        this.addMouseMotionListener(highlightListener);
+        highlightListener = new HighlightAreaListener( this, baseLineY, offsetY );
+        this.addMouseListener( highlightListener );
+        this.addMouseMotionListener( highlightListener );
     }
-    
-    
+
+
     private void initMouseListener() {
-        this.addMouseListener(new MouseListener() {
+        this.addMouseListener( new MouseListener() {
 
             @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON3) {
+            public void mouseClicked( MouseEvent e ) {
+                if( e.getButton() == MouseEvent.BUTTON3 ) {
                     JPopupMenu popUp = new JPopupMenu();
                     MenuItemFactory menuItemFactory = new MenuItemFactory();
 
                     //add copy mouse position option
-                    popUp.add(menuItemFactory.getCopyPositionItem(parentViewer.getCurrentMousePos()));
+                    popUp.add( menuItemFactory.getCopyPositionItem( parentViewer.getCurrentMousePos() ) );
                     //add center current position option
-                    popUp.add(menuItemFactory.getJumpToPosItem(parentViewer.getBoundsInformationManager(), parentViewer.getCurrentMousePos()));
-                    popUp.show(e.getComponent(), e.getX(), e.getY());
+                    popUp.add( menuItemFactory.getJumpToPosItem( parentViewer.getBoundsInformationManager(), parentViewer.getCurrentMousePos() ) );
+                    popUp.show( e.getComponent(), e.getX(), e.getY() );
                 }
             }
 
-            @Override
-            public void mousePressed(MouseEvent e) {
-            }
 
             @Override
-            public void mouseReleased(MouseEvent e) {
+            public void mousePressed( MouseEvent e ) {
             }
 
-            @Override
-            public void mouseEntered(MouseEvent e) {
-            }
 
             @Override
-            public void mouseExited(MouseEvent e) {
+            public void mouseReleased( MouseEvent e ) {
             }
-        });
+
+
+            @Override
+            public void mouseEntered( MouseEvent e ) {
+            }
+
+
+            @Override
+            public void mouseExited( MouseEvent e ) {
+            }
+
+
+        } );
     }
 
-    public void setGenomeGapManager(GenomeGapManager gapManager) {
+
+    public void setGenomeGapManager( GenomeGapManager gapManager ) {
         this.gapManager = gapManager;
     }
+
 
     /**
      * Should be called, when the bounds have been changed. Updates the content
@@ -159,193 +172,213 @@ public class SequenceBar extends JComponent implements HighlightableI {
         this.highlightListener.boundsChangedHook();
     }
 
+
     @Override
-    protected void paintComponent(Graphics graphics) {
+    protected void paintComponent( Graphics graphics ) {
         Graphics2D g = (Graphics2D) graphics;
         BoundsInfo bounds = parentViewer.getBoundsInfo();
         PaintingAreaInfo info = parentViewer.getPaintingAreaInfo();
 
-        g.setColor(ColorProperties.TRACKPANEL_MIDDLE_LINE);
-        this.drawSequence(g);
+        g.setColor( ColorProperties.TRACKPANEL_MIDDLE_LINE );
+        this.drawSequence( g );
         // draw a line indicating the sequence
-        g.draw(new Line2D.Double(info.getPhyLeft(), baseLineY, info.getPhyRight(), baseLineY));
+        g.draw( new Line2D.Double( info.getPhyLeft(), baseLineY, info.getPhyRight(), baseLineY ) );
 
         // draw markings to indicate current parentViewerposition
         int temp = bounds.getLogLeft();
         temp += (halfMarkingWidth - temp % halfMarkingWidth);
 
         int logright = bounds.getLogRight();
-        while (temp <= logright) {
-            if (temp % markingWidth == 0) {
-                this.drawThickLine(g, temp);
-            } else {
-                this.drawThinLine(g, temp);
+        while( temp <= logright ) {
+            if( temp % markingWidth == 0 ) {
+                this.drawThickLine( g, temp );
+            }
+            else {
+                this.drawThinLine( g, temp );
             }
             temp += halfMarkingWidth;
         }
 
         //paint the hightlight rectangle if there is currently one
-        if (this.highlightRect != null) {
-            g.setColor(ColorProperties.HIGHLIGHT_BORDER);
-            g.draw(this.highlightRect);
-            g.setColor(ColorProperties.HIGHLIGHT_FILL);
-            g.fill(this.highlightRect);
+        if( this.highlightRect != null ) {
+            g.setColor( ColorProperties.HIGHLIGHT_BORDER );
+            g.draw( this.highlightRect );
+            g.setColor( ColorProperties.HIGHLIGHT_FILL );
+            g.fill( this.highlightRect );
         }
     }
+
 
     /**
      * Draw sequence, if current zoom allows it.
+     * <p>
      * @param g Graphics2D object to print on
      */
-    private void drawSequence(Graphics2D g) {
+    private void drawSequence( Graphics2D g ) {
 
         // print sequence if sufficient space
-        if (printSeq) {
-            
+        if( printSeq ) {
+
             // get the font metrics
-            g.setFont(font);
-            metrics = g.getFontMetrics(font);
-            
+            g.setFont( font );
+            metrics = g.getFontMetrics( font );
+
             BoundsInfo bounds = parentViewer.getBoundsInfo();
             int logleft = bounds.getLogLeft();
-            if (logleft < 1) { //might happen for very short reference sequences
+            if( logleft < 1 ) { //might happen for very short reference sequences
                 logleft = 1;
             }
             int logright = bounds.getLogRight();
-            String currentChromSeq = refGen.getActiveChromSequence(logleft, logright);
-            
-            for (int i = logleft; i <= logright; i++) {
-                this.drawChar(g, i, currentChromSeq);
-                this.drawCharReverse(g, i, currentChromSeq);
+            String currentChromSeq = refGen.getActiveChromSequence( logleft, logright );
+
+            for( int i = logleft; i <= logright; i++ ) {
+                this.drawChar( g, i, currentChromSeq );
+                this.drawCharReverse( g, i, currentChromSeq );
             }
         }
     }
 
+
     /**
      * Draw base of the sequence.
-     * @param g Graphics2D object to paint on
-     * @param pos position of the base in the reference genome starting with 1 (not 0!).
-     *      To get the correct base 1 is substracted from pos within this method.
+     * <p>
+     * @param g        Graphics2D object to paint on
+     * @param pos      position of the base in the reference genome starting
+     *                 with 1 (not 0!).
+     *                 To get the correct base 1 is substracted from pos within this method.
      * @param chromSeq complete chromosome sequence
      */
-    private void drawChar(Graphics2D g, int pos, String chromSeq) {
+    private void drawChar( Graphics2D g, int pos, String chromSeq ) {
         // pos depents on slider value and cannot be smaller 1
         // since counting in strings starts with 0, we have to substract 1
         int basePosition = pos - parentViewer.getBoundsInfo().getLogLeft();
 
-        PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos(pos);
+        PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos( pos );
         double physX = bounds.getPhyMiddle();
-        if (gapManager != null && gapManager.hasGapAt(pos)) {
-            int numOfGaps = gapManager.getNumOfGapsAt(pos);
-            for (int i = 0; i < numOfGaps; i++) {
+        if( gapManager != null && gapManager.hasGapAt( pos ) ) {
+            int numOfGaps = gapManager.getNumOfGapsAt( pos );
+            for( int i = 0; i < numOfGaps; i++ ) {
                 int tmp = (int) (physX + i * bounds.getPhysWidth());
                 String base = "-";
-                int offset = metrics.stringWidth(base) / 2;
-                g.drawString(base, (float) tmp - offset, (float) baseLineY - offsetY);
+                int offset = metrics.stringWidth( base ) / 2;
+                g.drawString( base, (float) tmp - offset, (float) baseLineY - offsetY );
             }
             physX += numOfGaps * bounds.getPhysWidth();
         }
-        String base = chromSeq.substring(basePosition, basePosition + 1);
-        int offset = metrics.stringWidth(base) / 2;
+        String base = chromSeq.substring( basePosition, basePosition + 1 );
+        int offset = metrics.stringWidth( base ) / 2;
         /*BaseBackground b = new BaseBackground(12,5, base);
-        b.setBounds((int)physX-offset,baseLineY-10,b.getSize().width, b.getSize().height);
-        this.add(b);*/
-        g.drawString(base, (float) physX - offset, (float) baseLineY - offsetY);
+         b.setBounds((int)physX-offset,baseLineY-10,b.getSize().width, b.getSize().height);
+         this.add(b);*/
+        g.drawString( base, (float) physX - offset, (float) baseLineY - offsetY );
     }
+
 
     /**
      * draws the a character of the reverse strand of the sequence.
-     * @param g the graphics object to paint on
-     * @param pos position of the base in the reference genome
+     * <p>
+     * @param g        the graphics object to paint on
+     * @param pos      position of the base in the reference genome
      * @param chromSeq complete chromosome sequence
      */
-    private void drawCharReverse(Graphics2D g, int pos, String chromSeq) {
+    private void drawCharReverse( Graphics2D g, int pos, String chromSeq ) {
         // logX depents on slider value and cannot be smaller 1
         // since counting in strings starts with 0, we have to substract 1
         int basePosition = pos - parentViewer.getBoundsInfo().getLogLeft();
 
-        PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos(pos);
+        PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos( pos );
         double physX = bounds.getPhyMiddle();
-        if (gapManager != null && gapManager.hasGapAt(pos)) {
-            int numOfGaps = gapManager.getNumOfGapsAt(pos);
-            for (int i = 0; i < numOfGaps; i++) {
+        if( gapManager != null && gapManager.hasGapAt( pos ) ) {
+            int numOfGaps = gapManager.getNumOfGapsAt( pos );
+            for( int i = 0; i < numOfGaps; i++ ) {
                 int tmp = (int) (physX + i * bounds.getPhysWidth());
                 String base = "-";
-                int offset = metrics.stringWidth(base) / 2;
-                g.drawString(base,
-                        (float) tmp - offset,
-                        (float) baseLineY + offsetY);
+                int offset = metrics.stringWidth( base ) / 2;
+                g.drawString( base,
+                              (float) tmp - offset,
+                              (float) baseLineY + offsetY );
             }
             physX += numOfGaps * bounds.getPhysWidth();
         }
-        String base = chromSeq.substring(basePosition, basePosition + 1);
-        String revBase = SequenceUtils.getDnaComplement(base);
-        int offset = metrics.stringWidth(revBase) / 2;
-        g.drawString(revBase,
-                (float) physX - offset,
-                (float) baseLineY + offsetY);
+        String base = chromSeq.substring( basePosition, basePosition + 1 );
+        String revBase = SequenceUtils.getDnaComplement( base );
+        int offset = metrics.stringWidth( revBase ) / 2;
+        g.drawString( revBase,
+                      (float) physX - offset,
+                      (float) baseLineY + offsetY );
     }
+
 
     /**
      * draw a thick vertical line with length largeBar
-     * @param g Graphics2D object to paint on
+     * <p>
+     * @param g      Graphics2D object to paint on
      * @param logPos logical position, that should be marked
      */
-    private void drawThickLine(Graphics2D g, int logPos) {
+    private void drawThickLine( Graphics2D g, int logPos ) {
         // draw a line and the label (position) in the middle of the space for this base
-        PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos(logPos);
+        PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos( logPos );
         double physX = bounds.getPhyMiddle();
-        if (gapManager != null && gapManager.hasGapAt(logPos)) {
-            physX += gapManager.getNumOfGapsAt(logPos) * bounds.getPhysWidth();
+        if( gapManager != null && gapManager.hasGapAt( logPos ) ) {
+            physX += gapManager.getNumOfGapsAt( logPos ) * bounds.getPhysWidth();
         }
         g.draw(
                 new Line2D.Double(
-                physX, baseLineY - largeBar / 2, physX, baseLineY + largeBar / 2));
+                        physX, baseLineY - largeBar / 2, physX, baseLineY + largeBar / 2 ) );
 
-        String label = getRulerLabel(logPos);
+        String label = getRulerLabel( logPos );
 
-        int offset = metrics.stringWidth(label) / 2;
-        g.drawString(label, (float) physX - offset, (float) baseLineY + 2 * offsetY);
+        int offset = metrics.stringWidth( label ) / 2;
+        g.drawString( label, (float) physX - offset, (float) baseLineY + 2 * offsetY );
     }
+
 
     /**
      * Return the label for a marking position
+     * <p>
      * @param logPos the position that is intended to be marked
-     * @return the label used at that mark. 4000 is abbreviated by 4k, for example.
+     * <p>
+     * @return the label used at that mark. 4000 is abbreviated by 4k, for
+     *         example.
      */
-    private String getRulerLabel(int logPos) {
+    private String getRulerLabel( int logPos ) {
         String label = null;
-        if (logPos >= 1000 && markingWidth >= 1000) {
-            if (logPos % 1000 == 0) {
-                label = String.valueOf(logPos / 1000);
-            } else if (logPos % 500 == 0) {
-                label = String.valueOf(logPos / 1000);
+        if( logPos >= 1000 && markingWidth >= 1000 ) {
+            if( logPos % 1000 == 0 ) {
+                label = String.valueOf( logPos / 1000 );
+            }
+            else if( logPos % 500 == 0 ) {
+                label = String.valueOf( logPos / 1000 );
                 label += ".5";
             }
             label += "K";
 
-        } else {
-            label = String.valueOf(logPos);
+        }
+        else {
+            label = String.valueOf( logPos );
         }
 
         return label;
     }
 
+
     /**
      * draw a thin vertical line with length smallBar
-     * @param g Graphics2D object to paint on
+     * <p>
+     * @param g      Graphics2D object to paint on
      * @param logPos logical position, that should be marked
      */
-    private void drawThinLine(Graphics2D g, int logPos) {
-        PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos(logPos);
+    private void drawThinLine( Graphics2D g, int logPos ) {
+        PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos( logPos );
         double physX = bounds.getPhyMiddle();
-        if (gapManager != null && gapManager.hasGapAt(logPos)) {
-            physX += gapManager.getNumOfGapsAt(logPos) * bounds.getPhysWidth();
+        if( gapManager != null && gapManager.hasGapAt( logPos ) ) {
+            physX += gapManager.getNumOfGapsAt( logPos ) * bounds.getPhysWidth();
         }
 
-        g.draw(new Line2D.Double(
-                physX, baseLineY - smallBar / 2, physX, baseLineY + smallBar / 2));
+        g.draw( new Line2D.Double(
+                physX, baseLineY - smallBar / 2, physX, baseLineY + smallBar / 2 ) );
     }
+
 
     /**
      * Adjust the width that is used for marking bases to the current size
@@ -360,143 +393,181 @@ public class SequenceBar extends JComponent implements HighlightableI {
         // pixels available per base
         double pxPerBp = (double) parentViewer.getPaintingAreaInfo().getPhyWidth() / parentViewer.getBoundsInfo().getLogWidth();
 
-        if (10 * pxPerBp > labelWidth) {
+        if( 10 * pxPerBp > labelWidth ) {
             markingWidth = 10;
-        } else if (20 * pxPerBp > labelWidth) {
+        }
+        else if( 20 * pxPerBp > labelWidth ) {
             markingWidth = 20;
-        } else if (50 * pxPerBp > labelWidth) {
+        }
+        else if( 50 * pxPerBp > labelWidth ) {
             markingWidth = 50;
-        } else if (100 * pxPerBp > labelWidth) {
+        }
+        else if( 100 * pxPerBp > labelWidth ) {
             markingWidth = 100;
-        } else if (250 * pxPerBp > labelWidth) {
+        }
+        else if( 250 * pxPerBp > labelWidth ) {
             markingWidth = 250;
-        } else if (500 * pxPerBp > labelWidth) {
+        }
+        else if( 500 * pxPerBp > labelWidth ) {
             markingWidth = 500;
-        } else if (1000 * pxPerBp > labelWidth) {
+        }
+        else if( 1000 * pxPerBp > labelWidth ) {
             markingWidth = 1000;
-        } else if (5000 * pxPerBp > labelWidth) {
+        }
+        else if( 5000 * pxPerBp > labelWidth ) {
             markingWidth = 5000;
-        } else if (10000 * pxPerBp > labelWidth) {
+        }
+        else if( 10000 * pxPerBp > labelWidth ) {
             markingWidth = 10000;
         }
 
         halfMarkingWidth = markingWidth / 2;
     }
 
+
     /**
-     * Determines the frame of the currently selected feature. if there is none it
+     * Determines the frame of the currently selected feature. if there is none
+     * it
      * is set to 10.
+     * <p>
      * @return the correct reading frame (-3 to 3 excluding 0)
      */
     public byte determineFeatureFrame() {
         this.frameCurrFeature = StartCodonFilter.INIT;//if it is 10 later, no selected feature exists yet!
-        if (this.parentViewer instanceof ReferenceViewer) {
+        if( this.parentViewer instanceof ReferenceViewer ) {
             ReferenceViewer refViewer = (ReferenceViewer) this.parentViewer;
-            if (refViewer.getCurrentlySelectedFeature() != null) {
-                frameCurrFeature = (byte) PersistentFeature.Utils.determineFrame(refViewer.getCurrentlySelectedFeature().getPersistentFeature());
+            if( refViewer.getCurrentlySelectedFeature() != null ) {
+                frameCurrFeature = (byte) PersistentFeature.Utils.determineFrame( refViewer.getCurrentlySelectedFeature().getPersistentFeature() );
             }
         }
         return frameCurrFeature;
     }
-    
+
+
     /**
-     * Transforms a region object into a JRegion object for visualization in this
+     * Transforms a region object into a JRegion object for visualization in
+     * this
      * sequence bar.
+     * <p>
      * @param region the region object to transform for this sequence bar
-     * @return the corresponding JRegion object for visualization in this sequence bar
+     * <p>
+     * @return the corresponding JRegion object for visualization in this
+     *         sequence bar
      */
-    public JRegion transformRegionToJRegion(Region region) {
+    public JRegion transformRegionToJRegion( Region region ) {
         BoundsInfo bounds = this.parentViewer.getBoundsInfo();
-        int from = this.getStart(bounds, region);
-        int to = this.getStop(bounds, region);
+        int from = this.getStart( bounds, region );
+        int to = this.getStop( bounds, region );
 
         int length = to - from + 1;
         // make sure it is visible when using high zoom levels
-        if (length < 3) {
+        if( length < 3 ) {
             length = 3;
         }
-        JRegion jreg = new JRegion(length, 10, region.getType(), region.getStart(), region.getStop());
-        if (region.isForwardStrand()) {
-            jreg.setBounds(from, baseLineY - jreg.getSize().height - 6, jreg.getSize().width, jreg.getSize().height);
-        } else {
-            jreg.setBounds(from, baseLineY + 4, jreg.getSize().width, jreg.getSize().height);
+        JRegion jreg = new JRegion( length, 10, region.getType(), region.getStart(), region.getStop() );
+        if( region.isForwardStrand() ) {
+            jreg.setBounds( from, baseLineY - jreg.getSize().height - 6, jreg.getSize().width, jreg.getSize().height );
         }
-        
+        else {
+            jreg.setBounds( from, baseLineY + 4, jreg.getSize().width, jreg.getSize().height );
+        }
+
         return jreg;
     }
-    
+
+
     /**
-     * Calculates the position of the first pixel of the region handed over to the method.
+     * Calculates the position of the first pixel of the region handed over to
+     * the method.
      * Gaps do not play a role here, because they are not extended to the left.
+     * <p>
      * @param bounds the bounds info object of the context of the region
-     * @param r the region, whose start is to be calculated
-     * @return the correct position of the first pixel of the region handed over to the method.
+     * @param r      the region, whose start is to be calculated
+     * <p>
+     * @return the correct position of the first pixel of the region handed over
+     *         to the method.
      */
-    private int getStart(BoundsInfo bounds, Region r) {
+    private int getStart( BoundsInfo bounds, Region r ) {
         int start = r.getStart();
-        if (start < bounds.getLogLeft()) {
+        if( start < bounds.getLogLeft() ) {
             start = bounds.getLogLeft();
         }
-        return (int) parentViewer.getPhysBoundariesForLogPos(start).getLeftPhysBound();
+        return (int) parentViewer.getPhysBoundariesForLogPos( start ).getLeftPhysBound();
     }
-    
+
+
     /**
-     * Calculates the position of the last pixel of the region handed over to the method.
+     * Calculates the position of the last pixel of the region handed over to
+     * the method.
      * This includes gaps that might occur in the reference.
+     * <p>
      * @param bounds the bounds info object of the context of the region
-     * @param r the region, whose end is to be calculated
-     * @return the correct position of the last pixel of the region handed over to the method.
+     * @param r      the region, whose end is to be calculated
+     * <p>
+     * @return the correct position of the last pixel of the region handed over
+     *         to the method.
      */
-    private int getStop(BoundsInfo bounds, Region r) {
+    private int getStop( BoundsInfo bounds, Region r ) {
         int stop = r.getStop();
-        if (stop > bounds.getLogRight()) {
+        if( stop > bounds.getLogRight() ) {
             stop = bounds.getLogRight();
         }
-        PhysicalBaseBounds stopBounds = parentViewer.getPhysBoundariesForLogPos(stop);
+        PhysicalBaseBounds stopBounds = parentViewer.getPhysBoundariesForLogPos( stop );
         int to = (int) stopBounds.getRightPhysBound();
 
-        if (gapManager != null && gapManager.hasGapAt(stop)) {
-            to = (int) (gapManager.getNumOfGapsAt(stop) * stopBounds.getPhysWidth());
+        if( gapManager != null && gapManager.hasGapAt( stop ) ) {
+            to = (int) (gapManager.getNumOfGapsAt( stop ) * stopBounds.getPhysWidth());
         }
         return to;
     }
 
+
     /**
      * Calculates which start codons should be highlighted and updates the gui.
-     * @param i the index of the codon to update
+     * <p>
+     * @param i          the index of the codon to update
      * @param isSelected true, if the codon should be selected
      */
-    public void showStartCodons(final int i, final boolean isSelected) {
-        this.regionManager.showStartCodons(i, isSelected);
+    public void showStartCodons( final int i, final boolean isSelected ) {
+        this.regionManager.showStartCodons( i, isSelected );
     }
-    
+
+
     /**
      * Calculates which stop codons should be highlighted and updates the gui.
-     * @param i the index of the codon to update
+     * <p>
+     * @param i          the index of the codon to update
      * @param isSelected true, if the codon should be selected
      */
-    public void showStopCodons(final int i, final boolean isSelected) {
-        this.regionManager.showStopCodons(i, isSelected);
+    public void showStopCodons( final int i, final boolean isSelected ) {
+        this.regionManager.showStopCodons( i, isSelected );
     }
+
 
     /**
      * Returns if the codon with the index i is currently selected.
+     * <p>
      * @param i the index of the codon
+     * <p>
      * @return true, if the codon with the index i is currently selected
      */
-    public boolean isStartCodonShown(final int i) {
-        return this.regionManager.isStartCodonShown(i);
+    public boolean isStartCodonShown( final int i ) {
+        return this.regionManager.isStartCodonShown( i );
     }
+
 
     /**
      * Detects the occurrences of the given pattern in the currently shown
      * interval or the next occurrence of the pattern in the genome.
+     * <p>
      * @param pattern Pattern to search for
+     * <p>
      * @return the next (closest) occurrence of the pattern
      */
-    public int showPattern(String pattern) {
-        return this.regionManager.showPattern(pattern);
-    }    
+    public int showPattern( String pattern ) {
+        return this.regionManager.showPattern( pattern );
+    }
+
 
     /**
      * Identifies the codons according to the currently selected codons to show
@@ -505,23 +576,28 @@ public class SequenceBar extends JComponent implements HighlightableI {
     public void findCodons() {
         this.regionManager.findCodons();
     }
-    
+
+
     /**
-     * Identifies the currently in this object stored pattern in the genome sequence.
+     * Identifies the currently in this object stored pattern in the genome
+     * sequence.
      */
     public void findPattern() {
         this.regionManager.findPattern();
     }
-    
+
+
     /**
      * Identifies next (closest) occurrence from either forward or reverse
      * strand of a pattern in the current reference genome.
+     * <p>
      * @return the position of the next occurrence of the pattern
      */
     public int findNextPatternOccurrence() {
         return this.regionManager.findNextPatternOccurrence();
     }
-    
+
+
     /**
      * @return The frame of the current feature
      */
@@ -529,52 +605,61 @@ public class SequenceBar extends JComponent implements HighlightableI {
         return this.frameCurrFeature;
     }
 
+
     /**
      * Paints the background of each base with a base specific color.
      * Before calling this method make sure to call "removeAll" on this sequence
      * bar! Otherwise the colors accumulate.
+     * <p>
      * @param basePosition Position of the current base in the genome
      */
-    public void paintBaseBackgroundColor(int basePosition) {
-        if (basePosition < 1) { basePosition = 1; }
-        PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos(basePosition);
-        if (bounds != null) {
+    public void paintBaseBackgroundColor( int basePosition ) {
+        if( basePosition < 1 ) {
+            basePosition = 1;
+        }
+        PhysicalBaseBounds bounds = parentViewer.getPhysBoundariesForLogPos( basePosition );
+        if( bounds != null ) {
             double physX = bounds.getPhyMiddle();
-            if (gapManager != null && gapManager.hasGapAt(basePosition)) {
-                int numOfGaps = gapManager.getNumOfGapsAt(basePosition);
+            if( gapManager != null && gapManager.hasGapAt( basePosition ) ) {
+                int numOfGaps = gapManager.getNumOfGapsAt( basePosition );
                 physX += numOfGaps * bounds.getPhysWidth();
             }
-            String base = refGen.getActiveChromSequence(basePosition, basePosition);
-            
-            if (base != null && metrics != null) {
-                int offset = metrics.stringWidth(base) / 2;
-                BaseBackground b = new BaseBackground(12, 12, base);
-                b.setBounds((int) physX - offset, baseLineY - 18, b.getSize().width, b.getSize().height);
-                this.add(b);
-                BaseBackground brev = new BaseBackground(12, 12, SequenceUtils.getDnaComplement(base));
-                brev.setBounds((int) physX - offset, baseLineY + 2, b.getSize().width, b.getSize().height);
-                this.add(brev);
+            String base = refGen.getActiveChromSequence( basePosition, basePosition );
+
+            if( base != null && metrics != null ) {
+                int offset = metrics.stringWidth( base ) / 2;
+                BaseBackground b = new BaseBackground( 12, 12, base );
+                b.setBounds( (int) physX - offset, baseLineY - 18, b.getSize().width, b.getSize().height );
+                this.add( b );
+                BaseBackground brev = new BaseBackground( 12, 12, SequenceUtils.getDnaComplement( base ) );
+                brev.setBounds( (int) physX - offset, baseLineY + 2, b.getSize().width, b.getSize().height );
+                this.add( brev );
             }
         }
     }
 
+
     /**
      * Sets the rectangle used for highlighting something in this sequence bar.
+     * <p>
      * @param rect the rectangle to set
      */
     @Override
-    public void setHighlightRectangle(final Rectangle rect) {
+    public void setHighlightRectangle( final Rectangle rect ) {
         this.highlightRect = rect;
         this.repaint();
     }
 
+
     /**
      * Returns the persistent reference used for this sequence bar.
+     * <p>
      * @return the persistent reference used for this sequence bar
      */
     public PersistentReference getPersistentReference() {
         return this.refGen;
     }
+
 
     /**
      * @return The bounds info of the parent viewer
@@ -583,6 +668,7 @@ public class SequenceBar extends JComponent implements HighlightableI {
         return this.parentViewer.getBoundsInfo();
     }
 
+
     /**
      * @return the base width defined in the parent viewer.
      */
@@ -590,24 +676,30 @@ public class SequenceBar extends JComponent implements HighlightableI {
         return this.parentViewer.getBaseWidth();
     }
 
+
     /**
      * @return the horizontal margin of the parent viewer.
      */
     public int getViewerHorizontalMargin() {
         return this.parentViewer.getHorizontalMargin();
     }
-    
+
+
     public int getCurrentMousePosition() {
         return this.parentViewer.getCurrentMousePos();
     }
-    
+
+
     /**
      * @param pixelPos physical position (pixel) in the sequence bar sequence
-     * @return the physical pixel position converted into the logical sequence position.
+     * <p>
+     * @return the physical pixel position converted into the logical sequence
+     *         position.
      */
-    public int getLogicalPosForPixel(int pixelPos) {
-        return parentViewer.getLogicalPosForPixel(pixelPos);
+    public int getLogicalPosForPixel( int pixelPos ) {
+        return parentViewer.getLogicalPosForPixel( pixelPos );
     }
+
 
     /**
      * @return the y baseline of this sequence bar.
@@ -615,7 +707,8 @@ public class SequenceBar extends JComponent implements HighlightableI {
     public int getBaseLineY() {
         return this.baseLineY;
     }
-    
+
+
     /**
      * @return The bounds information manager of the parent abstract viewer.
      */
@@ -623,54 +716,67 @@ public class SequenceBar extends JComponent implements HighlightableI {
         return this.parentViewer.getBoundsInformationManager();
     }
 
+
     /**
-     * This method is to be called, when a mouse listener associated to this component
+     * This method is to be called, when a mouse listener associated to this
+     * component
      * registered a mouse moved event.
+     * <p>
      * @param e the mouse event which triggered this call
      */
-    public void updateMouseListeners(MouseEvent e) {
-        for (MouseMotionListener mml : this.parentViewer.getMouseMotionListeners()) {
-            mml.mouseMoved(e);
-            this.setToolTipText(this.parentViewer.getToolTipText());
+    public void updateMouseListeners( MouseEvent e ) {
+        for( MouseMotionListener mml : this.parentViewer.getMouseMotionListeners() ) {
+            mml.mouseMoved( e );
+            this.setToolTipText( this.parentViewer.getToolTipText() );
         }
     }
 
+
     /**
      * Removes all JRegions from this component of all the given types.
-     * Removed by Properties.START, Properties.STOP, Properties.PATTERN, Properties.CDS and
+     * Removed by Properties.START, Properties.STOP, Properties.PATTERN,
+     * Properties.CDS and
      * Properties.ALL
+     * <p>
      * @param typeList list of types of components to remove
      */
-    protected void removeAll(List<Byte> typeList) {
-        for (Component comp : this.getComponents()) {
-            for (int type : typeList) {
-                if (comp instanceof JRegion && ((JRegion) comp).getType() == type) {
-                    this.remove(comp);
+    protected void removeAll( List<Byte> typeList ) {
+        for( Component comp : this.getComponents() ) {
+            for( int type : typeList ) {
+                if( comp instanceof JRegion && ((JRegion) comp).getType() == type ) {
+                    this.remove( comp );
                     break;
                 }
             }
         }
     }
-    
-    /**
-     * Removes all JRegions from this component of a given type.
-     * Removed by Properties.START, Properties.STOP, Properties.PATTERN, Properties.CDS and
-     * Properties.ALL
-     * @param type the type of components to remove
-     */
-    protected void removeAll(Byte type) {
-        List<Byte> typeList = new ArrayList<>();
-        typeList.add(type);
-        this.removeAll(typeList);
-    }
+
 
     /**
-     * Sets a list of cds regions for the sequence bar and replaces the list stored in this
+     * Removes all JRegions from this component of a given type.
+     * Removed by Properties.START, Properties.STOP, Properties.PATTERN,
+     * Properties.CDS and
+     * Properties.ALL
+     * <p>
+     * @param type the type of components to remove
+     */
+    protected void removeAll( Byte type ) {
+        List<Byte> typeList = new ArrayList<>();
+        typeList.add( type );
+        this.removeAll( typeList );
+    }
+
+
+    /**
+     * Sets a list of cds regions for the sequence bar and replaces the list
+     * stored in this
      * variable until now.
+     * <p>
      * @param cdsRegions the cdsRegions to set
      */
-    public void setCdsRegions(List<Region> cdsRegions) {
-        this.regionManager.setCdsRegions(cdsRegions);
+    public void setCdsRegions( List<Region> cdsRegions ) {
+        this.regionManager.setCdsRegions( cdsRegions );
     }
+
 
 }

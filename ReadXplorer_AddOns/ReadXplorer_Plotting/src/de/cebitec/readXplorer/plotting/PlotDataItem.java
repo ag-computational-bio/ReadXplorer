@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,38 +16,47 @@
  */
 package de.cebitec.readXplorer.plotting;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import java.awt.Paint;
 import org.jfree.data.xy.XYDataItem;
+
 
 /**
  *
  * @author kstaderm
  */
-public class PlotDataItem extends XYDataItem{
+public class PlotDataItem extends XYDataItem {
 
     private PersistentFeature feature;
     private Paint paint;
-    
-    public PlotDataItem(PersistentFeature feature, Number x, Number y) {
-        super(x, y);
+
+
+    public PlotDataItem( PersistentFeature feature, Number x, Number y ) {
+        super( x, y );
         this.feature = feature;
     }
 
-    public PlotDataItem(PersistentFeature feature, double x, double y) {
-        super(x, y);
+
+    public PlotDataItem( PersistentFeature feature, double x, double y ) {
+        super( x, y );
         this.feature = feature;
     }
+
 
     public PersistentFeature getFeature() {
         return feature;
     }
 
+
     public Paint getPaint() {
         return paint;
     }
 
-    public void setPaint(Paint paint) {
+
+    public void setPaint( Paint paint ) {
         this.paint = paint;
     }
+
+
 }

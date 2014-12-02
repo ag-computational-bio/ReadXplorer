@@ -5,7 +5,9 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration;
 
+
 import javax.swing.JPanel;
+
 
 public final class ElementsSelectionVisualPanel extends JPanel {
 
@@ -16,10 +18,12 @@ public final class ElementsSelectionVisualPanel extends JPanel {
         initComponents();
     }
 
+
     @Override
     public String getName() {
         return "Data selection";
     }
+
 
     /**
      *
@@ -29,6 +33,7 @@ public final class ElementsSelectionVisualPanel extends JPanel {
         return this.allElementsCB.isSelected();
     }
 
+
     /**
      *
      * @return <true> if all elements with a 5'-UTR are selected else <false>
@@ -37,6 +42,7 @@ public final class ElementsSelectionVisualPanel extends JPanel {
         return this.allWithUTRCB.isSelected();
     }
 
+
     /**
      *
      * @return <true> if only selected elements are selected else <false>
@@ -44,6 +50,7 @@ public final class ElementsSelectionVisualPanel extends JPanel {
     public boolean isOnlyForUpstrAnalSelected() {
         return this.onlySelectedCB.isSelected();
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -110,23 +117,23 @@ public final class ElementsSelectionVisualPanel extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void allElementsCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allElementsCBActionPerformed
-        if (allElementsCB.isSelected()) {
-            allWithUTRCB.setSelected(false);
-            onlySelectedCB.setSelected(false);
+        if( allElementsCB.isSelected() ) {
+            allWithUTRCB.setSelected( false );
+            onlySelectedCB.setSelected( false );
         }
     }//GEN-LAST:event_allElementsCBActionPerformed
 
     private void allWithUTRCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_allWithUTRCBActionPerformed
-        if (allWithUTRCB.isSelected()) {
-            allElementsCB.setSelected(false);
-            onlySelectedCB.setSelected(false);
+        if( allWithUTRCB.isSelected() ) {
+            allElementsCB.setSelected( false );
+            onlySelectedCB.setSelected( false );
         }
     }//GEN-LAST:event_allWithUTRCBActionPerformed
 
     private void onlySelectedCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_onlySelectedCBActionPerformed
-        if (onlySelectedCB.isSelected()) {
-            allElementsCB.setSelected(false);
-            allWithUTRCB.setSelected(false);
+        if( onlySelectedCB.isSelected() ) {
+            allElementsCB.setSelected( false );
+            allWithUTRCB.setSelected( false );
         }
     }//GEN-LAST:event_onlySelectedCBActionPerformed
 

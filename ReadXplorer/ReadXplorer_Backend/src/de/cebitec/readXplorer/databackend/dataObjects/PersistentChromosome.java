@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,14 +16,16 @@
  */
 package de.cebitec.readXplorer.databackend.dataObjects;
 
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+
 /**
  * Data holder for a chromosome.
- * 
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class PersistentChromosome {
@@ -34,15 +36,17 @@ public class PersistentChromosome {
     private final int chromLength;
     private final String name;
 
+
     /**
-     * Data holder for a chromosome. 
-     * @param id The id of the chromosome
+     * Data holder for a chromosome.
+     * <p>
+     * @param id          The id of the chromosome
      * @param chromNumber The chromosome number (1 until x) in this reference.
-     * @param refGenID The id of the reference.
-     * @param name the name of this chromosome
+     * @param refGenID    The id of the reference.
+     * @param name        the name of this chromosome
      * @param chromLength length of this chromosome
      */
-    public PersistentChromosome(int id, int chromNumber, int refGenID, String name, int chromLength) {
+    public PersistentChromosome( int id, int chromNumber, int refGenID, String name, int chromLength ) {
         this.id = id;
         this.chromNumber = chromNumber;
         this.refGenID = refGenID;
@@ -50,33 +54,38 @@ public class PersistentChromosome {
         this.chromLength = chromLength;
     }
 
+
     /**
      * @return The database id of the reference.
      */
     public int getId() {
         return this.id;
     }
-    
+
+
     /**
      * @return The chromosome number (1 until x) in this reference.
      */
     public int getChromNumber() {
         return this.chromNumber;
     }
-    
+
+
     /**
      * @return The id of the reference.
      */
     public int getRefGenID() {
         return this.refGenID;
     }
-    
+
+
     /**
      * @return The name of this chromosome.
      */
     public String getName() {
         return this.name;
     }
+
 
     /**
      * @return the length of the chromosome sequence
@@ -85,6 +94,7 @@ public class PersistentChromosome {
         return chromLength;
     }
 
+
     /**
      * @return The name of the chromosome.
      */
@@ -92,25 +102,30 @@ public class PersistentChromosome {
     public String toString() {
         return this.name;
     }
-    
+
+
     /**
      * Checks if the given chromosome is equal to this one.
+     * <p>
      * @param object object to compare to this object
-     * @return 
+     * <p>
+     * @return
      */
     @Override
-    public boolean equals(Object object) {
+    public boolean equals( Object object ) {
 
-        if (object instanceof PersistentChromosome) {
+        if( object instanceof PersistentChromosome ) {
             PersistentChromosome other = (PersistentChromosome) object;
-            return     other.getName().equals(this.name)
-                    && other.getId() == this.id
-                    && other.getRefGenID() == this.refGenID
-                    && other.getLength() == this.chromLength;
-        } else {
-            return super.equals(object);
+            return other.getName().equals( this.name )
+                   && other.getId() == this.id
+                   && other.getRefGenID() == this.refGenID
+                   && other.getLength() == this.chromLength;
+        }
+        else {
+            return super.equals( object );
         }
     }
+
 
     @Override
     public int hashCode() {
@@ -118,21 +133,26 @@ public class PersistentChromosome {
         hash = 19 * hash + this.id;
         hash = 19 * hash + this.chromNumber;
         hash = 19 * hash + this.refGenID;
-        hash = 19 * hash + Objects.hashCode(this.name);
+        hash = 19 * hash + Objects.hashCode( this.name );
         hash = 19 * hash + this.chromLength;
         return hash;
     }
-    
+
+
     /**
      * Creates a mapping of the chromosome names to the chromosome.
+     * <p>
      * @param chroms chromosome list to transform into the chromosome name map
+     * <p>
      * @return The mapping of chromosome name to chromosome
      */
-    public static Map<String, PersistentChromosome> getChromNameMap(Collection<PersistentChromosome> chroms) {
+    public static Map<String, PersistentChromosome> getChromNameMap( Collection<PersistentChromosome> chroms ) {
         Map<String, PersistentChromosome> chromMap = new HashMap<>();
-        for (PersistentChromosome chrom : chroms) {
-            chromMap.put(chrom.getName(), chrom);
+        for( PersistentChromosome chrom : chroms ) {
+            chromMap.put( chrom.getName(), chrom );
         }
         return chromMap;
     }
+
+
 }

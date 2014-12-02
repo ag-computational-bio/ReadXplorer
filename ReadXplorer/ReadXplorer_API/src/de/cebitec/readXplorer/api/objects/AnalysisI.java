@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,20 +16,20 @@
  */
 package de.cebitec.readXplorer.api.objects;
 
+
 /**
  * Interface to use for any kind of analysis, which can take advantage of using
  * the given methods.
- * 
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  * @param <T> Object type of the result of this analysis.
  */
-public interface AnalysisI<T> {    
-    
+public interface AnalysisI<T> {
+
     /**
      * @return Returns the results of the analysis.
      */
     public T getResults();
-    
-    
-    
+
+
 }

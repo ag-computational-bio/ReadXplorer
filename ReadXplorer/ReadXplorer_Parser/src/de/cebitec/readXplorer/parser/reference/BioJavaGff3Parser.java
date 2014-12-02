@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cebitec.readXplorer.parser.reference;
+
 
 import de.cebitec.readXplorer.parser.ReferenceJob;
 import de.cebitec.readXplorer.parser.common.ParsedChromosome;
@@ -43,54 +44,61 @@ import org.biojava.ontology.Ontology;
 import org.biojava.ontology.Term;
 import org.biojava.utils.ParserException;
 
+
 /**
  * A GFF 3 parser for parsing the sequence from a fasta file contained in the
  * ReferenceJob and the GFF3 annotations from the GFF3 file contained in the
  * ReferenceJob.
- * 
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class BioJavaGff3Parser implements ReferenceParserI {
-    
+
     // File extension used by Filechooser to choose files to be parsed by this parser
-    private static final String[] fileExtension = new String[]{"gff", "gff3"};
+    private static final String[] fileExtension = new String[]{ "gff", "gff3" };
     // name of this parser for use in ComboBoxes
     private static final String parserName = "GFF3 file";
     private static final String fileDescription = "GFF3 file";
     private ArrayList<Observer> observers = new ArrayList<>();
 
+
     /**
      * Parses the sequence from a fasta file contained in the ReferenceJob and
      * the GFF3 annotations from the GFF3 file contained in the ReferenceJob.
+     * <p>
      * @param referenceJob the reference job containing the files
-     * @param filter the feature filter to use (removes undesired features)
+     * @param filter       the feature filter to use (removes undesired
+     *                     features)
+     * <p>
      * @return the parsed reference object with all parsed features
-     * @throws ParsingException 
+     * <p>
+     * @throws ParsingException
      */
     @Override
-    public ParsedReference parseReference(final ReferenceJob referenceJob, FeatureFilter filter) throws ParsingException {
-        
-        FastaReferenceParser fastaParser = new FastaReferenceParser();
-        for (Observer observer : this.observers) {
-            fastaParser.registerObserver(observer);
-        }
-        final ParsedReference refGenome = fastaParser.parseReference(referenceJob, filter);
-        for (Observer observer : this.observers) {
-            fastaParser.removeObserver(observer);
-        }
-        
-        refGenome.setFeatureFilter(filter);
-        final Map<String, ParsedChromosome> chromMap = CommonsRefParser.generateStringMap(refGenome.getChromosomes());
+    public ParsedReference parseReference( final ReferenceJob referenceJob, FeatureFilter filter ) throws ParsingException {
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(referenceJob.getGffFile()))) {
+        FastaReferenceParser fastaParser = new FastaReferenceParser();
+        for( Observer observer : this.observers ) {
+            fastaParser.registerObserver( observer );
+        }
+        final ParsedReference refGenome = fastaParser.parseReference( referenceJob, filter );
+        for( Observer observer : this.observers ) {
+            fastaParser.removeObserver( observer );
+        }
+
+        refGenome.setFeatureFilter( filter );
+        final Map<String, ParsedChromosome> chromMap = CommonsRefParser.generateStringMap( refGenome.getChromosomes() );
+
+        try( BufferedReader reader = new BufferedReader( new FileReader( referenceJob.getGffFile() ) ) ) {
             GFF3Parser gff3Parser = new GFF3Parser();
-            
-            gff3Parser.parse(reader, new GFF3DocumentHandler() {
+
+            gff3Parser.parse( reader, new GFF3DocumentHandler() {
 
                 @Override
-                public void startDocument(String string) {
+                public void startDocument( String string ) {
 //                    registerObserver(refGenome);
                 }
+
 
                 @Override
                 public void endDocument() {
@@ -98,15 +106,17 @@ public class BioJavaGff3Parser implements ReferenceParserI {
 //                    removeObserver(refGenome);
                 }
 
+
                 @Override
-                public void commentLine(String string) {
+                public void commentLine( String string ) {
                     //TODO: anything to do here? check for extra information?
                 }
 
+
                 @Override
-                @SuppressWarnings("unchecked")
-                public void recordLine(GFF3Record gffr) {
-                    
+                @SuppressWarnings( "unchecked" )
+                public void recordLine( GFF3Record gffr ) {
+
                     final String UNKNOWN_LOCUS_TAG = "unknown locus tag";
                     String parsedType;
                     String locusTag = UNKNOWN_LOCUS_TAG;
@@ -119,15 +129,15 @@ public class BioJavaGff3Parser implements ReferenceParserI {
                     int strand;
                     List<String> parentIds = new ArrayList<>();
                     ParsedChromosome currentChrom;
-                    
-                    if (chromMap.containsKey(gffr.getSequenceID())) {
-                        currentChrom = chromMap.get(gffr.getSequenceID());
+
+                    if( chromMap.containsKey( gffr.getSequenceID() ) ) {
+                        currentChrom = chromMap.get( gffr.getSequenceID() );
 
                         parsedType = gffr.getType().getName();
                         start = gffr.getStart();
                         stop = gffr.getEnd();
-                        strand = gffr.getStrand().equals(StrandedFeature.POSITIVE) ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV;
-                        
+                        strand = gffr.getStrand().equals( StrandedFeature.POSITIVE ) ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV;
+
                         //phase can be used for translation within incomplete annotated genes. a given phase shows where to start in such a case
 //                        int phase = gffr.getPhase(); //0, 1, 2 or -1, if not used
 //                        if (phase >= 0 && phase <= 2) {
@@ -137,7 +147,7 @@ public class BioJavaGff3Parser implements ReferenceParserI {
 //                                stop -= phase;
 //                            }
 //                        } // else ignore phase as it is not used
-                        
+
                         Map attributes = gffr.getAnnotation().asMap();
                         Iterator attrIt = attributes.keySet().iterator();
                         Object key;
@@ -145,37 +155,41 @@ public class BioJavaGff3Parser implements ReferenceParserI {
                         Object value;
                         Object attribute;
                         String attrString;
-                        
-                        while (attrIt.hasNext()) {
+
+                        while( attrIt.hasNext() ) {
                             key = attrIt.next();
-                            if (key instanceof Term) {
+                            if( key instanceof Term ) {
                                 keyString = ((Term) key).getName();
-                                value = attributes.get((Term) key);
-                                if (value instanceof List && !((List) value).isEmpty()) {
-                                    attribute = ((List) value).get(0); //currently only one item per tag is supported, except for parent
-                                    if (attribute instanceof String) { //TODO: think about some way to keep all provided data - write it to product field?
+                                value = attributes.get( (Term) key );
+                                if( value instanceof List && !((List) value).isEmpty() ) {
+                                    attribute = ((List) value).get( 0 ); //currently only one item per tag is supported, except for parent
+                                    if( attribute instanceof String ) { //TODO: think about some way to keep all provided data - write it to product field?
                                         attrString = (String) attribute;
-                                        if (keyString.equalsIgnoreCase("ID")) {
+                                        if( keyString.equalsIgnoreCase( "ID" ) ) {
                                             identifier = attrString;
-                                            if (locusTag.equals(UNKNOWN_LOCUS_TAG)) {
+                                            if( locusTag.equals( UNKNOWN_LOCUS_TAG ) ) {
                                                 locusTag = attrString;
                                             }
-                                        }  else if (keyString.equalsIgnoreCase("product")) {
+                                        }
+                                        else if( keyString.equalsIgnoreCase( "product" ) ) {
                                             product = attrString;
-                                        } else if (attrString.length() < 20 && 
-                                                (keyString.equalsIgnoreCase("name") ||
-                                                 keyString.equalsIgnoreCase("gene") ||
-                                                 keyString.equalsIgnoreCase("gene_name") ||
-                                                 keyString.equalsIgnoreCase("genename"))) {
+                                        }
+                                        else if( attrString.length() < 20
+                                                 && (keyString.equalsIgnoreCase( "name" )
+                                                     || keyString.equalsIgnoreCase( "gene" )
+                                                     || keyString.equalsIgnoreCase( "gene_name" )
+                                                     || keyString.equalsIgnoreCase( "genename" )) ) {
                                             geneName = attrString;
-                                        } else if ((keyString.equalsIgnoreCase("name") ||
-                                                    keyString.equalsIgnoreCase("gene_id") ||
-                                                    keyString.equalsIgnoreCase("gene_name") ||
-                                                    keyString.equalsIgnoreCase("gene")) && product.isEmpty()) {
+                                        }
+                                        else if( (keyString.equalsIgnoreCase( "name" )
+                                                  || keyString.equalsIgnoreCase( "gene_id" )
+                                                  || keyString.equalsIgnoreCase( "gene_name" )
+                                                  || keyString.equalsIgnoreCase( "gene" )) && product.isEmpty() ) {
                                             product = attrString;
-                                        } else if (keyString.equalsIgnoreCase("alias") ||
-                                                   keyString.equalsIgnoreCase("locus") ||
-                                                   keyString.equalsIgnoreCase("locus_tag")) {
+                                        }
+                                        else if( keyString.equalsIgnoreCase( "alias" )
+                                                 || keyString.equalsIgnoreCase( "locus" )
+                                                 || keyString.equalsIgnoreCase( "locus_tag" ) ) {
                                             locusTag = attrString;
                                         }
 //                                    case "Target": break; //other available fields according to gff3 definition
@@ -188,10 +202,12 @@ public class BioJavaGff3Parser implements ReferenceParserI {
 //                                    case "Alias": break;
                                     }
                                     //process tags with multiple entries in a block
-                                    switch (keyString) {
-                                        case "Parent": parentIds = (List<String>) value; break;
+                                    switch( keyString ) {
+                                        case "Parent":
+                                            parentIds = (List<String>) value;
+                                            break;
                                     }
-                                    
+
 //                                    //process tags with multiple entries here
 //                                    for (Object attr : (List) value) {
 //                                        if (attr instanceof String) {
@@ -204,57 +220,68 @@ public class BioJavaGff3Parser implements ReferenceParserI {
                                 }
                             }
                         }
-                        
-                        FeatureType type = FeatureType.getFeatureType(parsedType);
-                        if (type == FeatureType.UNDEFINED) {
-                            notifyObservers(referenceJob.getFile().getName()
-                                    + ": Using unknown feature type for " + parsedType);
+
+                        FeatureType type = FeatureType.getFeatureType( parsedType );
+                        if( type == FeatureType.UNDEFINED ) {
+                            notifyObservers( referenceJob.getFile().getName()
+                                             + ": Using unknown feature type for " + parsedType );
                         }
-                        
-                        ParsedFeature currentFeature = new ParsedFeature(type, start, stop, strand, 
-                                locusTag, product, ecNumber, geneName, null, parentIds, identifier);
-                        currentChrom.addFeature(currentFeature);
+
+                        ParsedFeature currentFeature = new ParsedFeature( type, start, stop, strand,
+                                                                          locusTag, product, ecNumber, geneName, null, parentIds, identifier );
+                        currentChrom.addFeature( currentFeature );
                     }
                 }
-            }, new Ontology.Impl("Ontologyname", "name of ontology"));
-            
-        } catch (IOException | BioException | ParserException ex) {
-            JOptionPane.showMessageDialog(new JPanel(), ex.toString(), "Exception", JOptionPane.ERROR_MESSAGE);
-            throw new ParsingException(ex);
+
+
+            }, new Ontology.Impl( "Ontologyname", "name of ontology" ) );
+
+        }
+        catch( IOException | BioException | ParserException ex ) {
+            JOptionPane.showMessageDialog( new JPanel(), ex.toString(), "Exception", JOptionPane.ERROR_MESSAGE );
+            throw new ParsingException( ex );
         }
 
         return refGenome;
     }
+
 
     @Override
     public String getName() {
         return parserName;
     }
 
+
     @Override
     public String getInputFileDescription() {
         return fileDescription;
     }
+
 
     @Override
     public String[] getFileExtensions() {
         return fileExtension;
     }
 
-    @Override
-    public void registerObserver(Observer observer) {
-        this.observers.add(observer);
-    }
 
     @Override
-    public void removeObserver(Observer observer) {
-        this.observers.remove(observer);
+    public void registerObserver( Observer observer ) {
+        this.observers.add( observer );
     }
 
+
     @Override
-    public void notifyObservers(Object data) {
-        for (Observer observer : this.observers) {
-            observer.update(data);
+    public void removeObserver( Observer observer ) {
+        this.observers.remove( observer );
+    }
+
+
+    @Override
+    public void notifyObservers( Object data ) {
+        for( Observer observer : this.observers ) {
+            observer.update( data );
         }
     }
+
+
 }

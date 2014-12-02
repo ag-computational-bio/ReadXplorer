@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,9 @@
  */
 package de.cebitec.readXplorer.parser.common;
 
+
 import java.util.HashSet;
+
 
 /**
  * Since the RUN domain has been excluded a PersistentRun is not needed anymore!
@@ -30,29 +32,36 @@ public class ParsedReadname {
     private HashSet<String> reads;
     private long id;
     public int numOfReads;
-    
-    public ParsedReadname(){
+
+
+    public ParsedReadname() {
         reads = new HashSet<String>();
     }
 
-    public void addRead(String readname){
-        reads.add(readname);
+
+    public void addRead( String readname ) {
+        reads.add( readname );
     }
 
-    public HashSet<String> getReads(){
+
+    public HashSet<String> getReads() {
         return reads;
     }
+
 
     public int getNumOfReads() {
         return reads.size();
     }
 
+
     public long getID() {
         return id;
     }
 
-    public void setID(long seqID) {
+
+    public void setID( long seqID ) {
         this.id = seqID;
     }
+
 
 }

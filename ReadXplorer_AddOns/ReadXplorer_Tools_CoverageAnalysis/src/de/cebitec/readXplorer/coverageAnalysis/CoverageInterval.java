@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,13 +16,16 @@
  */
 package de.cebitec.readXplorer.coverageAnalysis;
 
+
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.SequenceUtils;
 
+
 /**
  * A coverage interval container.
- * 
- * @author Tobias Zimmermann, Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
+ * <p>
+ * @author Tobias Zimmermann, Rolf Hilker
+ * <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class CoverageInterval {
 
@@ -34,17 +37,21 @@ public class CoverageInterval {
     private int stop;
     private int length;
     private int meanCoverage;
-    
+
+
     /**
      * A complete coverage interval object.
-     * @param trackId the track id of the track to which the interval belongs
-     * @param chromId The id of the chromosome to which this interval belongs
-     * @param strand the strand, for which the interval shall be created
-     * @param start the start position of the interval
-     * @param stop the stop position of the interval
+     * <p>
+     * @param trackId      the track id of the track to which the interval
+     *                     belongs
+     * @param chromId      The id of the chromosome to which this interval
+     *                     belongs
+     * @param strand       the strand, for which the interval shall be created
+     * @param start        the start position of the interval
+     * @param stop         the stop position of the interval
      * @param meanCoverage the mean coverage of the interval
      */
-    public CoverageInterval(int trackId, int chromId, byte strand, int start, int stop, int meanCoverage) {
+    public CoverageInterval( int trackId, int chromId, byte strand, int start, int stop, int meanCoverage ) {
         this.trackId = trackId;
         this.chromId = chromId;
         this.strand = strand;
@@ -55,16 +62,19 @@ public class CoverageInterval {
         this.isFwdStrand = strand != SequenceUtils.STRAND_REV;
     }
 
+
     /**
      * Constructor for a blank coverage interval. Start and stop are -1, length
      * and meanCoverage are 0.
+     * <p>
      * @param trackId the track id of the track to which the interval belongs
      * @param chromId The id of the chromosome to which this interval belongs
-     * @param strand the strand, for which the interval shall be created
+     * @param strand  the strand, for which the interval shall be created
      */
-    public CoverageInterval(int trackId, int chromId, byte strand) {
-        this(trackId, chromId, strand, -1, -1, 0);
+    public CoverageInterval( int trackId, int chromId, byte strand ) {
+        this( trackId, chromId, strand, -1, -1, 0 );
     }
+
 
     /**
      * @return true for intervals on forward and false on reverse strand
@@ -73,21 +83,25 @@ public class CoverageInterval {
         return this.isFwdStrand;
     }
 
+
     /**
      * @return The String representing the strand.
      */
     public String getStrandString() {
         String output = "no strand";
-        if (strand == Properties.STRAND_BOTH) {
+        if( strand == Properties.STRAND_BOTH ) {
             output = SequenceUtils.STRAND_BOTH_STRING;
-        } else if (strand == SequenceUtils.STRAND_FWD) {
+        }
+        else if( strand == SequenceUtils.STRAND_FWD ) {
             output = SequenceUtils.STRAND_FWD_STRING;
-        } else if (strand == SequenceUtils.STRAND_REV) {
+        }
+        else if( strand == SequenceUtils.STRAND_REV ) {
             output = SequenceUtils.STRAND_REV_STRING;
         }
         return output;
 
     }
+
 
     /**
      * @return the track id of the track to which the interval belongs
@@ -96,12 +110,14 @@ public class CoverageInterval {
         return trackId;
     }
 
+
     /**
      * @return The id of the chromosome to which this interval belongs.
      */
     public int getChromId() {
         return chromId;
     }
+
 
     /**
      * @return the start position of the interval
@@ -110,12 +126,14 @@ public class CoverageInterval {
         return start;
     }
 
+
     /**
      * @return the stop position of the interval
      */
     public int getStop() {
         return stop;
     }
+
 
     /**
      * @return the length of the interval
@@ -124,6 +142,7 @@ public class CoverageInterval {
         return length;
     }
 
+
     /**
      * @return the mean coverage of the interval
      */
@@ -131,54 +150,63 @@ public class CoverageInterval {
         return meanCoverage;
     }
 
+
     /**
      * @param trackId the track id of the track to which the interval belongs
      */
-    public void setTrack(int trackId) {
+    public void setTrack( int trackId ) {
         this.trackId = trackId;
     }
+
 
     /**
      * @param chromId The id of the chromosome to which this interval belongs
      */
-    public void setChromId(int chromId) {
+    public void setChromId( int chromId ) {
         this.chromId = chromId;
     }
+
 
     /**
      * @param strand the strand of this interval
      */
-    public void setStrand(byte strand) {
+    public void setStrand( byte strand ) {
         this.strand = strand;
     }
+
 
     /**
      * @param start the start position of the interval
      */
-    public void setStart(int start) {
+    public void setStart( int start ) {
         this.start = start;
         this.updateLength();
     }
 
+
     /**
      * @param stop the stop position of the interval
      */
-    public void setStop(int stop) {
+    public void setStop( int stop ) {
         this.stop = stop;
         this.updateLength();
     }
 
+
     /**
      * @param meanCoverage the mean coverage of the interval
      */
-    public void setMeanCoverage(int meanCoverage) {
+    public void setMeanCoverage( int meanCoverage ) {
         this.meanCoverage = meanCoverage;
     }
-    
+
+
     /**
      * Updates the length of the interval.
      */
     private void updateLength() {
         this.length = this.stop + 1 - this.start;
     }
+
+
 }

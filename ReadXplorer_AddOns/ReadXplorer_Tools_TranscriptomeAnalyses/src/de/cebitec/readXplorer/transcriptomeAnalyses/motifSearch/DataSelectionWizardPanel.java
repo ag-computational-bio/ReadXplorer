@@ -4,6 +4,7 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch;
 
+
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ElementsOfInterest;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.PurposeEnum;
 import javax.swing.event.ChangeListener;
@@ -11,7 +12,9 @@ import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 
-public class DataSelectionWizardPanel implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
+
+public class DataSelectionWizardPanel implements
+        WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     /**
      * The visual component that displays this panel. If you need to access the
@@ -20,9 +23,11 @@ public class DataSelectionWizardPanel implements WizardDescriptor.ValidatingPane
     private DataSelectionVisualPanel component;
     private PurposeEnum purpose;
 
-    public DataSelectionWizardPanel(PurposeEnum purpose) {
+
+    public DataSelectionWizardPanel( PurposeEnum purpose ) {
         this.purpose = purpose;
     }
+
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -30,11 +35,12 @@ public class DataSelectionWizardPanel implements WizardDescriptor.ValidatingPane
     // create only those which really need to be visible.
     @Override
     public DataSelectionVisualPanel getComponent() {
-        if (component == null) {
-            component = new DataSelectionVisualPanel(this.purpose);
+        if( component == null ) {
+            component = new DataSelectionVisualPanel( this.purpose );
         }
         return component;
     }
+
 
     @Override
     public HelpCtx getHelp() {
@@ -43,6 +49,7 @@ public class DataSelectionWizardPanel implements WizardDescriptor.ValidatingPane
         // If you have context help:
         // return new HelpCtx("help.key.here");
     }
+
 
     @Override
     public boolean isValid() {
@@ -54,39 +61,46 @@ public class DataSelectionWizardPanel implements WizardDescriptor.ValidatingPane
         // WizardDescriptor.ERROR/WARNING/INFORMATION_MESSAGE will also be useful.
     }
 
-    @Override
-    public void addChangeListener(ChangeListener l) {
-    }
 
     @Override
-    public void removeChangeListener(ChangeListener l) {
+    public void addChangeListener( ChangeListener l ) {
     }
 
+
     @Override
-    public void readSettings(WizardDescriptor wiz) {
+    public void removeChangeListener( ChangeListener l ) {
+    }
+
+
+    @Override
+    public void readSettings( WizardDescriptor wiz ) {
         // use wiz.getProperty to retrieve previous panel state
     }
 
+
     @Override
-    public void storeSettings(WizardDescriptor wiz) {
+    public void storeSettings( WizardDescriptor wiz ) {
         // use wiz.putProperty to remember current panel state
-        wiz.putProperty(ElementsOfInterest.ALL.toString(), component.isAllElements());
-        wiz.putProperty(ElementsOfInterest.ONLY_ANTISENSE_TSS.toString(), component.isOnlyAntisenseElements());
-        wiz.putProperty(ElementsOfInterest.ONLY_LEADERLESS_TRANSCRIPTS.toString(), component.isOnlyLeaderlessElements());
-        wiz.putProperty(ElementsOfInterest.ONLY_TSS_WITH_UTR_EXCEPT_AS_LEADERLESS.toString(), component.isOnlyRealTSS());
-        wiz.putProperty(ElementsOfInterest.ONLY_SELECTED_FOR_UPSTREAM_ANALYSES.toString(), component.isOnlySelected());
-        wiz.putProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS, component.getLengthRelativeToTss());
+        wiz.putProperty( ElementsOfInterest.ALL.toString(), component.isAllElements() );
+        wiz.putProperty( ElementsOfInterest.ONLY_ANTISENSE_TSS.toString(), component.isOnlyAntisenseElements() );
+        wiz.putProperty( ElementsOfInterest.ONLY_LEADERLESS_TRANSCRIPTS.toString(), component.isOnlyLeaderlessElements() );
+        wiz.putProperty( ElementsOfInterest.ONLY_TSS_WITH_UTR_EXCEPT_AS_LEADERLESS.toString(), component.isOnlyRealTSS() );
+        wiz.putProperty( ElementsOfInterest.ONLY_SELECTED_FOR_UPSTREAM_ANALYSES.toString(), component.isOnlySelected() );
+        wiz.putProperty( PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS, component.getLengthRelativeToTss() );
     }
+
 
     @Override
     public void validate() throws WizardValidationException {
 
-        if (this.component.isAllElements() == false
-                && this.component.isOnlyAntisenseElements() == false
-                && this.component.isOnlyLeaderlessElements() == false
-                && this.component.isOnlyRealTSS() == false
-                && this.component.isOnlySelected() == false) {
-            throw new WizardValidationException(null, "Plese select one of the possible Element types!", null);
+        if( this.component.isAllElements() == false
+            && this.component.isOnlyAntisenseElements() == false
+            && this.component.isOnlyLeaderlessElements() == false
+            && this.component.isOnlyRealTSS() == false
+            && this.component.isOnlySelected() == false ) {
+            throw new WizardValidationException( null, "Plese select one of the possible Element types!", null );
         }
     }
+
+
 }

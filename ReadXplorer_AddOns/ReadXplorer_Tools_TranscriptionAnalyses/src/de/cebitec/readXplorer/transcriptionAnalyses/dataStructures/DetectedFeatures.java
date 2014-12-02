@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,23 +16,28 @@
  */
 package de.cebitec.readXplorer.transcriptionAnalyses.dataStructures;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+
 
 /**
  * Data structure for storing the features belonging to a certain position. E.g.
- * the features belonging to a gene start position. It can contain three different
- * types of features: A correctStartFeature, starting at the position belonging to
+ * the features belonging to a gene start position. It can contain three
+ * different
+ * types of features: A correctStartFeature, starting at the position belonging
+ * to
  * this element. An upstream- and a downstreamFeature.
  * If they are not stored the return methods return null.
  *
  * @author -Rolf Hilker-
  */
 public class DetectedFeatures {
-    
+
     private PersistentFeature upstreamFeature;
     private PersistentFeature correctStartFeature;
     private PersistentFeature downstreamFeature;
     private boolean isLeaderless;
+
 
     /**
      * Data structure for storing the features belonging to a certain
@@ -44,45 +49,54 @@ public class DetectedFeatures {
      */
     public DetectedFeatures() {
     }
-    
+
+
     public PersistentFeature getDownstreamFeature() {
         return this.downstreamFeature;
     }
 
-    public void setDownstreamFeature(PersistentFeature downstreamFeature) {
+
+    public void setDownstreamFeature( PersistentFeature downstreamFeature ) {
         this.downstreamFeature = downstreamFeature;
     }
+
 
     public PersistentFeature getCorrectStartFeature() {
         return this.correctStartFeature;
     }
 
-    public void setCorrectStartFeature(PersistentFeature correctStartFeature) {
+
+    public void setCorrectStartFeature( PersistentFeature correctStartFeature ) {
         this.correctStartFeature = correctStartFeature;
     }
+
 
     public PersistentFeature getUpstreamFeature() {
         return this.upstreamFeature;
     }
 
-    public void setUpstreamFeature(PersistentFeature upstreamFeature) {
+
+    public void setUpstreamFeature( PersistentFeature upstreamFeature ) {
         this.upstreamFeature = upstreamFeature;
     }
 
+
     /**
      * @return true, if this start has a downstream feature and is classified as
-     * leaderless, false otherwise.
+     *         leaderless, false otherwise.
      */
     public boolean isLeaderless() {
         return isLeaderless;
     }
 
+
     /**
      * @param isLeaderless Set true, if this start has a downstream feature and
-     * is classified as leaderless, set false otherwise.
+     *                     is classified as leaderless, set false otherwise.
      */
-    public void setIsLeaderless(boolean isLeaderless) {
+    public void setIsLeaderless( boolean isLeaderless ) {
         this.isLeaderless = isLeaderless;
     }
-    
+
+
 }

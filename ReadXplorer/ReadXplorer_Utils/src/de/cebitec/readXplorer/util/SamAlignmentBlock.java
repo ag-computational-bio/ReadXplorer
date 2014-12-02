@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,25 +16,29 @@
  */
 package de.cebitec.readXplorer.util;
 
+
 /**
  * A block representing a part of a sam alignment.
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class SamAlignmentBlock {
-    
+
     private final int refStart;
     private final int refStop;
 
+
     /**
      * A block representing a part of a sam alignment.
+     * <p>
      * @param refStart block start in reference coordinates
-     * @param refStop block stop in reference coordinates
+     * @param refStop  block stop in reference coordinates
      */
-    public SamAlignmentBlock(int refStart, int refStop) {
+    public SamAlignmentBlock( int refStart, int refStop ) {
         this.refStart = refStart;
         this.refStop = refStop;
     }
+
 
     /**
      * @return block start in reference coordinates
@@ -43,6 +47,7 @@ public class SamAlignmentBlock {
         return refStart;
     }
 
+
     /**
      * @return block stop in reference coordinates
      */
@@ -50,9 +55,10 @@ public class SamAlignmentBlock {
         return refStop;
     }
 
+
     /**
      * {@inheritDoc }
-     */ 
+     */
     @Override
     public int hashCode() {
         int hash = 5;
@@ -61,25 +67,27 @@ public class SamAlignmentBlock {
         return hash;
     }
 
+
     /**
      * {@inheritDoc }
      */
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null) {
+    public boolean equals( Object obj ) {
+        if( obj == null ) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if( getClass() != obj.getClass() ) {
             return false;
         }
         final SamAlignmentBlock other = (SamAlignmentBlock) obj;
-        if (this.refStart != other.getRefStart()) {
+        if( this.refStart != other.getRefStart() ) {
             return false;
         }
-        if (this.refStop != other.getRefStop()) {
+        if( this.refStop != other.getRefStop() ) {
             return false;
         }
         return true;
     }
-    
+
+
 }

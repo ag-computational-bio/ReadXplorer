@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,10 @@
  */
 package de.cebitec.readXplorer.parser.tables;
 
+
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.prefs.CsvPreference;
+
 
 /**
  * Interface for CSV table parsers.
@@ -28,19 +30,22 @@ public interface CsvParserI extends TableParserI {
 
     /**
      * @param autoDelimiter <cc>true</cc>, if the delimiter shall be detected
-     * automatically, <cc>false</cc>, if the delimiter was selected by the user.
+     *                      automatically, <cc>false</cc>, if the delimiter was selected by the user.
      */
-    public void setAutoDelimiter(boolean autoDelimiter);
+    public void setAutoDelimiter( boolean autoDelimiter );
+
 
     /**
      * @param csvPref The currently selected CsvPreference.
      */
-    public void setCsvPref(CsvPreference csvPref);
+    public void setCsvPref( CsvPreference csvPref );
+
 
     /**
      *
      * @param cellProcessors The currently CellProcessor for selected CSV table
      */
-    public void setCellProscessors(CellProcessor[] cellProcessors);
+    public void setCellProscessors( CellProcessor[] cellProcessors );
+
 
 }

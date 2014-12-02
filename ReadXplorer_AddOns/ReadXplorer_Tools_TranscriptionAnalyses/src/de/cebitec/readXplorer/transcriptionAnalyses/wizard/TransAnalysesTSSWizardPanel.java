@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,13 @@
  */
 package de.cebitec.readXplorer.transcriptionAnalyses.wizard;
 
+
+import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
+import java.util.prefs.Preferences;
+import org.openide.WizardDescriptor;
+import org.openide.util.NbPreferences;
+
 import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_ANALYSIS_DIRECTION;
 import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_AUTO_TSS_PARAMS;
 import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MAX_FEATURE_DISTANCE;
@@ -27,17 +34,13 @@ import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionA
 import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_TRANSCRIPT_EXTENSION_COV;
 import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_UNANNOTATED_TRANSCRIPT_DET;
 import static de.cebitec.readXplorer.transcriptionAnalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_WIZARD_NAME;
-import de.cebitec.readXplorer.util.Properties;
-import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
 import static de.cebitec.readXplorer.view.dialogMenus.SelectReadClassWizardPanel.PROP_STRAND_OPTION;
-import java.util.prefs.Preferences;
-import org.openide.WizardDescriptor;
-import org.openide.util.NbPreferences;
+
 
 /**
  * Panel for showing and handling all available options for the transcription
  * start site detection.
- * 
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public class TransAnalysesTSSWizardPanel extends ChangeListeningWizardPanel {
@@ -48,13 +51,15 @@ public class TransAnalysesTSSWizardPanel extends ChangeListeningWizardPanel {
      */
     private TransAnalysesTSSVisualPanel component;
 
+
     /**
      * Panel for showing and handling all available options for the
      * transcription start site detection.
      */
     public TransAnalysesTSSWizardPanel() {
-        super("Please enter valid parameters (only positive numbers are allowed)");
+        super( "Please enter valid parameters (only positive numbers are allowed)" );
     }
+
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -62,53 +67,58 @@ public class TransAnalysesTSSWizardPanel extends ChangeListeningWizardPanel {
     // create only those which really need to be visible.
     @Override
     public TransAnalysesTSSVisualPanel getComponent() {
-        if (component == null) {
+        if( component == null ) {
             component = new TransAnalysesTSSVisualPanel();
         }
         return component;
     }
-    
-    @Override
-    public void readSettings(final WizardDescriptor wiz) {        
-        super.readSettings(wiz);
-        byte strandOption = Byte.valueOf(NbPreferences.forModule(Object.class).get(
-                PROP_WIZARD_NAME + PROP_STRAND_OPTION, "1"));
-        boolean isBothStrandOption = strandOption == Properties.STRAND_BOTH;
-        this.getComponent().setDirectionOptionsVisible(isBothStrandOption);
-    }
+
 
     @Override
-    public void storeSettings(WizardDescriptor wiz) {
-        if (this.isValid()) {
-            wiz.putProperty(PROP_AUTO_TSS_PARAMS, this.component.isTssAutomatic());
-            wiz.putProperty(PROP_MIN_TOTAL_INCREASE, this.component.getMinTotalIncrease());
-            wiz.putProperty(PROP_MIN_PERCENT_INCREASE, this.component.getMinTotalPercentIncrease());
-            wiz.putProperty(PROP_MAX_LOW_COV_INIT_COUNT, this.component.getMaxLowCovInitialCount());
-            wiz.putProperty(PROP_MIN_LOW_COV_INC, this.component.getMinLowCovIncrease());
-            wiz.putProperty(PROP_UNANNOTATED_TRANSCRIPT_DET, this.component.getDetectUnannotatedTranscripts());
-            wiz.putProperty(PROP_MIN_TRANSCRIPT_EXTENSION_COV, this.component.getMinTranscriptExtensionCov());
-            wiz.putProperty(PROP_MAX_LEADERLESS_DISTANCE, this.component.getMaxLeaderlessDistance());
-            wiz.putProperty(PROP_MAX_FEATURE_DISTANCE, this.component.getMaxFeatureDistance());
-            wiz.putProperty(PROP_ANALYSIS_DIRECTION, this.component.isFwdDirectionSelected());
+    public void readSettings( final WizardDescriptor wiz ) {
+        super.readSettings( wiz );
+        byte strandOption = Byte.valueOf( NbPreferences.forModule( Object.class ).get(
+                PROP_WIZARD_NAME + PROP_STRAND_OPTION, "1" ) );
+        boolean isBothStrandOption = strandOption == Properties.STRAND_BOTH;
+        this.getComponent().setDirectionOptionsVisible( isBothStrandOption );
+    }
+
+
+    @Override
+    public void storeSettings( WizardDescriptor wiz ) {
+        if( this.isValid() ) {
+            wiz.putProperty( PROP_AUTO_TSS_PARAMS, this.component.isTssAutomatic() );
+            wiz.putProperty( PROP_MIN_TOTAL_INCREASE, this.component.getMinTotalIncrease() );
+            wiz.putProperty( PROP_MIN_PERCENT_INCREASE, this.component.getMinTotalPercentIncrease() );
+            wiz.putProperty( PROP_MAX_LOW_COV_INIT_COUNT, this.component.getMaxLowCovInitialCount() );
+            wiz.putProperty( PROP_MIN_LOW_COV_INC, this.component.getMinLowCovIncrease() );
+            wiz.putProperty( PROP_UNANNOTATED_TRANSCRIPT_DET, this.component.getDetectUnannotatedTranscripts() );
+            wiz.putProperty( PROP_MIN_TRANSCRIPT_EXTENSION_COV, this.component.getMinTranscriptExtensionCov() );
+            wiz.putProperty( PROP_MAX_LEADERLESS_DISTANCE, this.component.getMaxLeaderlessDistance() );
+            wiz.putProperty( PROP_MAX_FEATURE_DISTANCE, this.component.getMaxFeatureDistance() );
+            wiz.putProperty( PROP_ANALYSIS_DIRECTION, this.component.isFwdDirectionSelected() );
             this.storePrefs();
         }
     }
-    
+
+
     /**
      * Stores the chosen TSS parameters for this wizard for later use, also
      * after restarting the software.
      */
     private void storePrefs() {
-        Preferences pref = NbPreferences.forModule(Object.class);
-        pref.put(PROP_WIZARD_NAME + PROP_AUTO_TSS_PARAMS, component.isTssAutomatic() ? "1" : "0");
-        pref.put(PROP_WIZARD_NAME + PROP_MIN_TOTAL_INCREASE, String.valueOf(component.getMinTotalIncrease()));
-        pref.put(PROP_WIZARD_NAME + PROP_MIN_PERCENT_INCREASE, String.valueOf(component.getMinTotalPercentIncrease()));
-        pref.put(PROP_WIZARD_NAME + PROP_MAX_LOW_COV_INIT_COUNT, String.valueOf(component.getMaxLowCovInitialCount()));
-        pref.put(PROP_WIZARD_NAME + PROP_MIN_LOW_COV_INC, String.valueOf(component.getMinLowCovIncrease()));
-        pref.put(PROP_WIZARD_NAME + PROP_UNANNOTATED_TRANSCRIPT_DET, component.getDetectUnannotatedTranscripts() ? "1" : "0");
-        pref.put(PROP_WIZARD_NAME + PROP_MIN_TRANSCRIPT_EXTENSION_COV, String.valueOf(component.getMinTranscriptExtensionCov()));
-        pref.put(PROP_WIZARD_NAME + PROP_MAX_LEADERLESS_DISTANCE, String.valueOf(component.getMaxLeaderlessDistance()));
-        pref.put(PROP_WIZARD_NAME + PROP_MAX_FEATURE_DISTANCE, String.valueOf(component.getMaxFeatureDistance()));
-        pref.put(PROP_WIZARD_NAME + PROP_ANALYSIS_DIRECTION, component.isFwdDirectionSelected() ? "1" : "0");
+        Preferences pref = NbPreferences.forModule( Object.class );
+        pref.put( PROP_WIZARD_NAME + PROP_AUTO_TSS_PARAMS, component.isTssAutomatic() ? "1" : "0" );
+        pref.put( PROP_WIZARD_NAME + PROP_MIN_TOTAL_INCREASE, String.valueOf( component.getMinTotalIncrease() ) );
+        pref.put( PROP_WIZARD_NAME + PROP_MIN_PERCENT_INCREASE, String.valueOf( component.getMinTotalPercentIncrease() ) );
+        pref.put( PROP_WIZARD_NAME + PROP_MAX_LOW_COV_INIT_COUNT, String.valueOf( component.getMaxLowCovInitialCount() ) );
+        pref.put( PROP_WIZARD_NAME + PROP_MIN_LOW_COV_INC, String.valueOf( component.getMinLowCovIncrease() ) );
+        pref.put( PROP_WIZARD_NAME + PROP_UNANNOTATED_TRANSCRIPT_DET, component.getDetectUnannotatedTranscripts() ? "1" : "0" );
+        pref.put( PROP_WIZARD_NAME + PROP_MIN_TRANSCRIPT_EXTENSION_COV, String.valueOf( component.getMinTranscriptExtensionCov() ) );
+        pref.put( PROP_WIZARD_NAME + PROP_MAX_LEADERLESS_DISTANCE, String.valueOf( component.getMaxLeaderlessDistance() ) );
+        pref.put( PROP_WIZARD_NAME + PROP_MAX_FEATURE_DISTANCE, String.valueOf( component.getMaxFeatureDistance() ) );
+        pref.put( PROP_WIZARD_NAME + PROP_ANALYSIS_DIRECTION, component.isFwdDirectionSelected() ? "1" : "0" );
     }
+
+
 }

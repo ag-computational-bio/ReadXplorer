@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
+
 import de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler;
 import de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler.Tool;
 import de.cebitec.readXplorer.differentialExpression.GnuR;
@@ -23,32 +24,38 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 
+
 public final class ChooseVisualPanel extends JPanel {
 
-    private final ComboBoxModel cbm = new DefaultComboBoxModel(DeAnalysisHandler.Tool.usableTools());
+    private final ComboBoxModel cbm = new DefaultComboBoxModel( DeAnalysisHandler.Tool.usableTools() );
+
 
     /**
      * Creates new form ChooseVisualPanel
      */
     public ChooseVisualPanel() {
         initComponents();
-        if (!GnuR.SecureGnuRInitiliser.isGnuRSetUpCorrect()) {
-            jriErrorText.setText("GNU R is not installed.\nOnly the ExpressTest and the count table export can be used\nas long as no GNU R is installed.");
-        } else {
-            if (!GnuR.SecureGnuRInitiliser.isGnuRInstanceFree()) {
-                jriErrorText.setText("GNU R instance is already in use.\nOnly the ExpressTest and the count table export can be used\nas long as an other GNU R based test is opened.");
+        if( !GnuR.SecureGnuRInitiliser.isGnuRSetUpCorrect() ) {
+            jriErrorText.setText( "GNU R is not installed.\nOnly the ExpressTest and the count table export can be used\nas long as no GNU R is installed." );
+        }
+        else {
+            if( !GnuR.SecureGnuRInitiliser.isGnuRInstanceFree() ) {
+                jriErrorText.setText( "GNU R instance is already in use.\nOnly the ExpressTest and the count table export can be used\nas long as an other GNU R based test is opened." );
             }
         }
     }
+
 
     public DeAnalysisHandler.Tool getSelectedTool() {
         return (Tool) cbm.getSelectedItem();
     }
 
+
     @Override
     public String getName() {
         return "Choose analysis software";
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.

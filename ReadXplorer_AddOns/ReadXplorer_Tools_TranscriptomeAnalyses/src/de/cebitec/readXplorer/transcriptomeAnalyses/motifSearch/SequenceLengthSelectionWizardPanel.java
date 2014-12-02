@@ -4,6 +4,7 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.motifSearch;
 
+
 import java.util.prefs.Preferences;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
@@ -11,11 +12,13 @@ import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbPreferences;
 
+
 /**
  *
  * @author jritter
  */
-public class SequenceLengthSelectionWizardPanel implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
+public class SequenceLengthSelectionWizardPanel implements
+        WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     /**
      * The visual component that displays this panel. If you need to access the
@@ -25,9 +28,11 @@ public class SequenceLengthSelectionWizardPanel implements WizardDescriptor.Vali
     private String wizardName;
     private int wholeLengthOfAnalysisRegion;
 
-    public SequenceLengthSelectionWizardPanel(String wizardName) {
+
+    public SequenceLengthSelectionWizardPanel( String wizardName ) {
         this.wizardName = wizardName;
     }
+
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -35,11 +40,12 @@ public class SequenceLengthSelectionWizardPanel implements WizardDescriptor.Vali
     // create only those which really need to be visible.
     @Override
     public SequenceLengthSelectionForMotifAnalysis getComponent() {
-        if (component == null) {
-            component = new SequenceLengthSelectionForMotifAnalysis(this.wizardName);
+        if( component == null ) {
+            component = new SequenceLengthSelectionForMotifAnalysis( this.wizardName );
         }
         return component;
     }
+
 
     @Override
     public HelpCtx getHelp() {
@@ -48,6 +54,7 @@ public class SequenceLengthSelectionWizardPanel implements WizardDescriptor.Vali
         // If you have context help:
         // return new HelpCtx("help.key.here");
     }
+
 
     @Override
     public boolean isValid() {
@@ -59,32 +66,40 @@ public class SequenceLengthSelectionWizardPanel implements WizardDescriptor.Vali
         // WizardDescriptor.ERROR/WARNING/INFORMATION_MESSAGE will also be useful.
     }
 
-    @Override
-    public void addChangeListener(ChangeListener l) {
-    }
 
     @Override
-    public void removeChangeListener(ChangeListener l) {
+    public void addChangeListener( ChangeListener l ) {
     }
 
+
     @Override
-    public void readSettings(WizardDescriptor wiz) {
+    public void removeChangeListener( ChangeListener l ) {
+    }
+
+
+    @Override
+    public void readSettings( WizardDescriptor wiz ) {
         // use wiz.getProperty to retrieve previous panel state
     }
 
+
     @Override
-    public void storeSettings(WizardDescriptor wiz) {
+    public void storeSettings( WizardDescriptor wiz ) {
         // use wiz.putProperty to remember current panel state
-        wiz.putProperty(PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS, component.getLength());
+        wiz.putProperty( PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS, component.getLength() );
         storePrefs();
     }
 
+
     private void storePrefs() {
-        Preferences pref = NbPreferences.forModule(Object.class);
-        pref.put(wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS, component.getLength().toString());
+        Preferences pref = NbPreferences.forModule( Object.class );
+        pref.put( wizardName + PromotorAnalysisWizardIterator.PROP_PROMOTOR_ANALYSIS_LENGTH_ALL_ELEMENTS, component.getLength().toString() );
     }
+
 
     @Override
     public void validate() throws WizardValidationException {
     }
+
+
 }

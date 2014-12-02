@@ -13,23 +13,23 @@ and open the template in the editor.
             }
         </style>
     </head>
-    <body>       
+    <body>
         <p style="text-align: center;"><span style="font-size: 14pt;"><strong>RNA Trimming:</strong></span></p>
-        <p> 
+        <p>
             With the trimming function a SAM file can be parsed for unmapped
-            reads. In this process the reads will be shortened by using the 
-            chosen trimming method. 
+            reads. In this process the reads will be shortened by using the
+            chosen trimming method.
         </p>
         <p>
             This component is based on regular exception. There are currently
-            6 implemented methods, which are available to the user for selection. 
-            The following table shows the implemented methods and the 
-            result of the given method used on the following example read: 
-            <span class="mono">AATGCGGTATATAAAAA</span>. 
-            The generation of the regular expression used in the program 
-            takes place in dependence of maximum length parameter. 
-            When using the trimming from both sides (3' and 5') this value is halved, 
-            and the appropriate number of nucleotides on each side is shortened. 
+            6 implemented methods, which are available to the user for selection.
+            The following table shows the implemented methods and the
+            result of the given method used on the following example read:
+            <span class="mono">AATGCGGTATATAAAAA</span>.
+            The generation of the regular expression used in the program
+            takes place in dependence of maximum length parameter.
+            When using the trimming from both sides (3' and 5') this value is halved,
+            and the appropriate number of nucleotides on each side is shortened.
             For the same reason, the value range is limited to just even numbers.
         </p>
         <table>
@@ -38,61 +38,61 @@ and open the template in the editor.
                     <th>Method name</th>
                     <th>Regular expression</th>
                     <th>Example effect</th>
-                </tr>    
+                </tr>
             </thead>
             <tbody>
                 <tr>
-              <td>trim poly-A from 3' end (right to left) by variable length</td>
-              <td><span class="mono">^(.*?)(A{0,4})$</span></td>
-              <td><span class="mono">AATGCGGTATATA----</span></td>
-            </tr>
-            <tr>
-              <td>trim poly-A from 5' end (left to right) by variable length</td>
-              <td><span class="mono">^(A{0,4})(.*?)$</span></td>
-              <td><span class="mono">--TGCGGTATATAAAAA</span></td>
-            </tr>
-            <tr>
-              <td>trim poly-A from 3' and from 5' end by variable length</td>
-              <td><span class="mono">^(A{0,2})(.*?)(A{0,2})$</span></td>
-              <td><span class="mono">--TGCGGTATATAAA--</span></td>
-            </tr>
-            <tr>
-              <td>trim all nucleotides from 3' end (right to left) by fixed length</td>
-              <td><span class="mono">^(.*?)(.{4})$</span></td>
-              <td><span class="mono">AATGCGGTATATA----</span></td>
-            </tr>
-            <tr>
-              <td>trim all nucleotides from 5' end (left to right) by fixed length</td>
-              <td><span class="mono">^(.{4})(.*?)$</span></td>
-              <td><span class="mono">----CGGTATATAAAAA</span></td>
-            </tr>
-            <tr>
-              <td>trim all nucleotides from 3' and from 5' end by fixed length</td>
-              <td><span class="mono">^(.{2})(.*?)(.{2})$</span></td>
-              <td><span class="mono">--TGCGGTATATAAA--</span></td>
-            </tr>
+                    <td>trim poly-A from 3' end (right to left) by variable length</td>
+                    <td><span class="mono">^(.*?)(A{0,4})$</span></td>
+                    <td><span class="mono">AATGCGGTATATA----</span></td>
+                </tr>
+                <tr>
+                    <td>trim poly-A from 5' end (left to right) by variable length</td>
+                    <td><span class="mono">^(A{0,4})(.*?)$</span></td>
+                    <td><span class="mono">--TGCGGTATATAAAAA</span></td>
+                </tr>
+                <tr>
+                    <td>trim poly-A from 3' and from 5' end by variable length</td>
+                    <td><span class="mono">^(A{0,2})(.*?)(A{0,2})$</span></td>
+                    <td><span class="mono">--TGCGGTATATAAA--</span></td>
+                </tr>
+                <tr>
+                    <td>trim all nucleotides from 3' end (right to left) by fixed length</td>
+                    <td><span class="mono">^(.*?)(.{4})$</span></td>
+                    <td><span class="mono">AATGCGGTATATA----</span></td>
+                </tr>
+                <tr>
+                    <td>trim all nucleotides from 5' end (left to right) by fixed length</td>
+                    <td><span class="mono">^(.{4})(.*?)$</span></td>
+                    <td><span class="mono">----CGGTATATAAAAA</span></td>
+                </tr>
+                <tr>
+                    <td>trim all nucleotides from 3' and from 5' end by fixed length</td>
+                    <td><span class="mono">^(.{2})(.*?)(.{2})$</span></td>
+                    <td><span class="mono">--TGCGGTATATAAA--</span></td>
+                </tr>
             </tbody>
         </table>
         <h3>Trim parameters</h3>
-        <p> 
+        <p>
             <b>Reference FASTA file:</b>
-            this reference sequence will be used for the mapping of 
+            this reference sequence will be used for the mapping of
             the trimmed sequences
         </p>
-        <p> 
+        <p>
             <b>Mapped SAM Souce File:</b>
-            provide a file which contains some unmapped reads. Only unmapped 
-            reads will be extracted in a new FNA file, trimmed and mapped against 
-            your reference sequence again. 
+            provide a file which contains some unmapped reads. Only unmapped
+            reads will be extracted in a new FNA file, trimmed and mapped against
+            your reference sequence again.
         </p>
-        <p> 
+        <p>
             <b>Mapping parameter:</b>
             you can provide additional mapping parameters for the used mapping script.
         </p>
-        <p> 
+        <p>
             <b>Maximum nucleotides to trim:</b>
-            variable length trim methods will use this length as the maximum 
-            number of nucleotides, that will be deleted from the sequence. 
+            variable length trim methods will use this length as the maximum
+            number of nucleotides, that will be deleted from the sequence.
             If you use fixed length trim methods, then this parameter will determine
             the exact number of trimmed nucleotides. If you use two-sided trim methods,
             the given number is used as the upper bound for the sum of the trimmed

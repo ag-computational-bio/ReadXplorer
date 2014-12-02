@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,10 @@
  */
 package de.cebitec.readXplorer.transcriptionAnalyses.dataStructures;
 
+
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.databackend.dataObjects.TrackResultEntry;
+
 
 /**
  * Data storage for RPKM and read count values of a reference feature.
@@ -25,24 +27,28 @@ import de.cebitec.readXplorer.databackend.dataObjects.TrackResultEntry;
  * @author Martin Tötsches, Rolf Hilker
  */
 public class RPKMvalue extends TrackResultEntry {
-    
+
     private PersistentFeature feature;
     private double rpkm;
     private int readCount;
-    
+
+
     /**
      * Data storage for RPKM and read count values of a reference feature.
-     * @param feature feature for which the values shall be stored
-     * @param rpkm the RPKM value for this feature
+     * <p>
+     * @param feature   feature for which the values shall be stored
+     * @param rpkm      the RPKM value for this feature
      * @param readCount the raw read count for this feature
-     * @param trackId the trackId for which these result values where calculated
+     * @param trackId   the trackId for which these result values where
+     *                  calculated
      */
-    public RPKMvalue(PersistentFeature feature, double rpkm, int readCount, int trackId) {
-        super(trackId);
+    public RPKMvalue( PersistentFeature feature, double rpkm, int readCount, int trackId ) {
+        super( trackId );
         this.feature = feature;
         this.rpkm = rpkm;
         this.readCount = readCount;
     }
+
 
     /**
      * @return the RPKM value for this feature.
@@ -51,12 +57,14 @@ public class RPKMvalue extends TrackResultEntry {
         return rpkm;
     }
 
+
     /**
      * @param rpkm the RPKM value for this feature
      */
-    public void setRpkm(double rpkm) {
+    public void setRpkm( double rpkm ) {
         this.rpkm = rpkm;
     }
+
 
     /**
      * @return the feature for which the values shall be stored.
@@ -65,12 +73,14 @@ public class RPKMvalue extends TrackResultEntry {
         return feature;
     }
 
+
     /**
      * @param feature feature for which the values shall be stored
      */
-    public void setFeature(PersistentFeature feature) {
+    public void setFeature( PersistentFeature feature ) {
         this.feature = feature;
     }
+
 
     /**
      * @return the raw read count for this feature.
@@ -79,10 +89,13 @@ public class RPKMvalue extends TrackResultEntry {
         return readCount;
     }
 
+
     /**
      * @param readCount the raw read count for this feature
      */
-    public void setReadCount(int readCount) {
+    public void setReadCount( int readCount ) {
         this.readCount = readCount;
     }
+
+
 }

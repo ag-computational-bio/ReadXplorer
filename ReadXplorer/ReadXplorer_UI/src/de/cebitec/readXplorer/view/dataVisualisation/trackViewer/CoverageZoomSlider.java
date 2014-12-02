@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,9 +16,11 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.trackViewer;
 
+
 import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
 
 /**
  *
@@ -28,18 +30,23 @@ public class CoverageZoomSlider extends JSlider {
 
     private static final long serialVersionUID = 249753543;
 
-    public CoverageZoomSlider(final TrackViewer trackViewer) {
-        super(1, 150, 1);
-        trackViewer.verticalZoomLevelUpdated(this.getValue());
 
-        this.addChangeListener(new ChangeListener() {
+    public CoverageZoomSlider( final TrackViewer trackViewer ) {
+        super( 1, 150, 1 );
+        trackViewer.verticalZoomLevelUpdated( this.getValue() );
+
+        this.addChangeListener( new ChangeListener() {
 
             @Override
-            public void stateChanged(ChangeEvent e) {
+            public void stateChanged( ChangeEvent e ) {
                 JSlider slide = (JSlider) e.getSource();
-                slide.setToolTipText(slide.getValue() + "");
-                trackViewer.verticalZoomLevelUpdated(CoverageZoomSlider.this.getValue());
+                slide.setToolTipText( slide.getValue() + "" );
+                trackViewer.verticalZoomLevelUpdated( CoverageZoomSlider.this.getValue() );
             }
-        });
+
+
+        } );
     }
+
+
 }

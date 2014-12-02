@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,46 +16,56 @@
  */
 package de.cebitec.readXplorer.thumbnail;
 
+
 import java.util.Collection;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
+
 
 /**
  *
  * @author denis
  */
 public class ThumbControllerLookup extends AbstractLookup {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     private InstanceContent content = null;
     private static ThumbControllerLookup def = new ThumbControllerLookup();
 
-    public ThumbControllerLookup(InstanceContent content) {
-        super(content);
+
+    public ThumbControllerLookup( InstanceContent content ) {
+        super( content );
         this.content = content;
     }
 
+
     public ThumbControllerLookup() {
-        this(new InstanceContent());
+        this( new InstanceContent() );
     }
 
-    public void add(Object instance) {
-        content.add(instance);
+
+    public void add( Object instance ) {
+        content.add( instance );
     }
 
-    public void remove(Object instance) {
-        content.remove(instance);
+
+    public void remove( Object instance ) {
+        content.remove( instance );
     }
 
-    public <T> void removeAll(Class<T> clazz) {
-        Collection<? extends T> col = lookupAll(clazz);
-        for (T o : col) {
-            remove(o);
+
+    public <T> void removeAll( Class<T> clazz ) {
+        Collection<? extends T> col = lookupAll( clazz );
+        for( T o : col ) {
+            remove( o );
         }
     }
+
 
     public static ThumbControllerLookup getDefault() {
         return def;
     }
+
+
 }

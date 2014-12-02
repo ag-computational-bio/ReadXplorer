@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,11 +16,14 @@
  */
 package de.cebitec.readXplorer.differentialExpression.expressTest;
 
+
 /**
  *
  * @author kstaderm
  */
 public interface ExpressTestObserver {
-    
-    public void update(ExpressTestI origin, ExpressTestStatus status);
+
+    public void update( ExpressTestI origin, ExpressTestStatus status );
+
+
 }

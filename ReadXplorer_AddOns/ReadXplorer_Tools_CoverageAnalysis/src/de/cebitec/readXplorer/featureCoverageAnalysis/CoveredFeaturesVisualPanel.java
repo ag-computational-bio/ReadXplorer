@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,19 +16,22 @@
  */
 package de.cebitec.readXplorer.featureCoverageAnalysis;
 
+
 import de.cebitec.readXplorer.api.objects.JobPanel;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
 import java.util.prefs.Preferences;
 import org.openide.util.NbPreferences;
 
+
 public final class CoveredFeaturesVisualPanel extends JobPanel {
-    
+
     private static final long serialVersionUID = 1L;
 
     private int minCoveragePercent;
     private int minCoverageCount;
-    
+
+
     /**
      * Creates new form CoveredFeaturesVisualPanel
      */
@@ -37,10 +40,12 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
         this.initAdditionalComponents();
     }
 
+
     @Override
     public String getName() {
         return "Feature Coverage Analysis Parameters";
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -126,18 +131,20 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
     private javax.swing.JTextArea tssTextArea;
     // End of variables declaration//GEN-END:variables
 
+
     /**
      * Initializes all additional stuff and components of this panel needed at
      * startup.
      */
     private void initAdditionalComponents() {
         this.loadLastParameterSelection();
-        this.minCoveragePercent = Integer.parseInt(this.minCoveragePercentField.getText());
-        this.minCoverageCount = Integer.parseInt(this.minCoverageCountField.getText());
+        this.minCoveragePercent = Integer.parseInt( this.minCoveragePercentField.getText() );
+        this.minCoverageCount = Integer.parseInt( this.minCoverageCountField.getText() );
 
-        this.minCoveragePercentField.getDocument().addDocumentListener(this.createDocumentListener());
-        this.minCoverageCountField.getDocument().addDocumentListener(this.createDocumentListener());
+        this.minCoveragePercentField.getDocument().addDocumentListener( this.createDocumentListener() );
+        this.minCoverageCountField.getDocument().addDocumentListener( this.createDocumentListener() );
     }
+
 
     /**
      * Checks if all required information to start the transcription start
@@ -146,54 +153,62 @@ public final class CoveredFeaturesVisualPanel extends JobPanel {
     @Override
     public boolean isRequiredInfoSet() {
         boolean isValidated = true;
-        if (GeneralUtils.isValidNumberInput(minCoveragePercentField.getText())) {
-            this.minCoveragePercent = Integer.parseInt(minCoveragePercentField.getText());
-        } else {
+        if( GeneralUtils.isValidNumberInput( minCoveragePercentField.getText() ) ) {
+            this.minCoveragePercent = Integer.parseInt( minCoveragePercentField.getText() );
+        }
+        else {
             isValidated = false;
         }
-        if (GeneralUtils.isValidPositiveNumberInput(minCoverageCountField.getText())) {
-            this.minCoverageCount = Integer.parseInt(minCoverageCountField.getText());
-        } else {
+        if( GeneralUtils.isValidPositiveNumberInput( minCoverageCountField.getText() ) ) {
+            this.minCoverageCount = Integer.parseInt( minCoverageCountField.getText() );
+        }
+        else {
             isValidated = false;
         }
 
-        firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated);
+        firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isValidated );
         return isValidated;
     }
-    
+
+
     /**
-     * @return <code>true</code> if the covered features should be returned, 
-     * <code>false</code> if the uncovered features should be returned
+     * @return <code>true</code> if the covered features should be returned,
+     *         <code>false</code> if the uncovered features should be returned
      */
     public boolean isGetCoveredFeatures() {
         return !this.detectUncoveredBox.isSelected();
     }
 
+
     /**
      * @return The minimum covered percent of a genome feature to be considered
-     *      in this analysis.
+     *         in this analysis.
      */
     public int getMinCoveredPercent() {
         return minCoveragePercent;
     }
 
+
     /**
      * @return The minimum coverage count at a certain genome position to count
-     *      for the coverage of a genome feature.
+     *         for the coverage of a genome feature.
      */
     public int getMinCoverageCount() {
         return minCoverageCount;
     }
-    
+
+
     /**
      * Updates the parameters for this panel with the globally stored settings
      * for this wizard panel. If no settings were stored, the default
      * configuration is chosen.
      */
     private void loadLastParameterSelection() {
-        Preferences pref = NbPreferences.forModule(Object.class);
-        minCoverageCountField.setText(pref.get(CoveredFeaturesWizardPanel.PROP_MIN_COVERAGE_COUNT, "10"));
-        minCoveragePercentField.setText(pref.get(CoveredFeaturesWizardPanel.PROP_MIN_COVERED_PERCENT, "90"));
-        detectUncoveredBox.setSelected(pref.get(CoveredFeaturesWizardPanel.PROP_GET_COVERED_FEATURES, "1").equals("0"));
+        Preferences pref = NbPreferences.forModule( Object.class );
+        minCoverageCountField.setText( pref.get( CoveredFeaturesWizardPanel.PROP_MIN_COVERAGE_COUNT, "10" ) );
+        minCoveragePercentField.setText( pref.get( CoveredFeaturesWizardPanel.PROP_MIN_COVERED_PERCENT, "90" ) );
+        detectUncoveredBox.setSelected( pref.get( CoveredFeaturesWizardPanel.PROP_GET_COVERED_FEATURES, "1" ).equals( "0" ) );
     }
+
+
 }

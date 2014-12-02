@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -36,66 +36,79 @@ import org.openide.util.TaskListener;
  */
 public final class MyCancelableAction implements ActionListener {
 
-    private final static RequestProcessor RP = new RequestProcessor("interruptible tasks", 1, true);
-    private final static Logger LOG = Logger.getLogger(MyCancelableAction.class.getName());
+    private final static RequestProcessor RP = new RequestProcessor( "interruptible tasks", 1, true );
+    private final static Logger LOG = Logger.getLogger( MyCancelableAction.class.getName() );
     private RequestProcessor.Task theTask = null;
 
+
     @Override
-    public void actionPerformed(ActionEvent e) {
-        final ProgressHandle ph = ProgressHandleFactory.createHandle("task thats shows progress", new Cancellable() {
+    public void actionPerformed( ActionEvent e ) {
+        final ProgressHandle ph = ProgressHandleFactory.createHandle( "task thats shows progress", new Cancellable() {
 
             @Override
             public boolean cancel() {
                 return handleCancel();
             }
-        });
+
+
+        } );
 
         Runnable runnable = new Runnable() {
 
             private final int NUM = 60000;
 
+
             @Override
             public void run() {
                 try {
                     ph.start(); //we must start the PH before we swith to determinate
-                    ph.switchToDeterminate(NUM);
-                    for (int i = 0; i < NUM; i++) {
-                        doSomething(i);
-                        ph.progress(i);
-                        Thread.sleep(0); //throws InterruptedException is the task was cancelled
+                    ph.switchToDeterminate( NUM );
+                    for( int i = 0; i < NUM; i++ ) {
+                        doSomething( i );
+                        ph.progress( i );
+                        Thread.sleep( 0 ); //throws InterruptedException is the task was cancelled
                     }
 
-                } catch (InterruptedException ex) {
-                    LOG.info("the task was CANCELLED");
-                } 
+                }
+                catch( InterruptedException ex ) {
+                    LOG.info( "the task was CANCELLED" );
+                }
 
             }
 
-            private void doSomething(int i) {
-                LOG.log(Level.INFO, "doSomething with {0}", i);                
+
+            private void doSomething( int i ) {
+                LOG.log( Level.INFO, "doSomething with {0}", i );
             }
+
+
         };
 
-        theTask = RP.create(runnable); //the task is not started yet
+        theTask = RP.create( runnable ); //the task is not started yet
 
-        theTask.addTaskListener(new TaskListener() {
+        theTask.addTaskListener( new TaskListener() {
             @Override
-            public void taskFinished(Task task) {
+            public void taskFinished( Task task ) {
                 ph.finish();
             }
-        });
 
-        theTask.schedule(0); //start the task
+
+        } );
+
+        theTask.schedule( 0 ); //start the task
 
 
     }
 
+
     private boolean handleCancel() {
-        LOG.info("handleCancel");
-        if (null == theTask) {
+        LOG.info( "handleCancel" );
+        if( null == theTask ) {
             return false;
         }
 
         return theTask.cancel();
     }
+
+
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.view.tableVisualization;
 
+
 import de.cebitec.readXplorer.view.TopComponentExtended;
 import de.cebitec.readXplorer.view.TopComponentHelper;
 import javax.swing.JPanel;
@@ -25,40 +26,44 @@ import org.openide.awt.ActionReference;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 
+
 /**
  * Top component which displays something.
  */
 @ConvertAsProperties(
-        dtd = "-//de.cebitec.readXplorer.view.tableVisualization//TableTopComponent//EN",
-        autostore = false
+         dtd = "-//de.cebitec.readXplorer.view.tableVisualization//TableTopComponent//EN",
+         autostore = false
 )
 @TopComponent.Description(
-        preferredID = "TableTopComponent",
-        //iconBase="SET/PATH/TO/ICON/HERE", 
-        persistenceType = TopComponent.PERSISTENCE_ALWAYS
+         preferredID = "TableTopComponent",
+         //iconBase="SET/PATH/TO/ICON/HERE",
+         persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
-@TopComponent.Registration(mode = "output", openAtStartup = false)
-@ActionID(category = "Window", id = "de.cebitec.readXplorer.view.tableVisualization.TableTopComponent")
-@ActionReference(path = "Menu/Window" /*, position = 333 */)
+@TopComponent.Registration( mode = "output", openAtStartup = false )
+@ActionID( category = "Window", id = "de.cebitec.readXplorer.view.tableVisualization.TableTopComponent" )
+@ActionReference( path = "Menu/Window" /*, position = 333 */ )
 @TopComponent.OpenActionRegistration(
-        displayName = "#CTL_TableTopComponent",
-        preferredID = "TableTopComponent"
+         displayName = "#CTL_TableTopComponent",
+         preferredID = "TableTopComponent"
 )
-@Messages({
+@Messages( {
     "CTL_TableTopComponent=TableTopComponent",
     "HINT_TableTopComponent=This is a TableTopComponent window"
-})
+} )
 public class TableTopComponent extends TopComponentExtended {
+
     private static final long serialVersionUID = 1L;
+
 
     public TableTopComponent() {
         initComponents();
-        setName(Bundle.CTL_TableTopComponent());
-        setToolTipText(Bundle.HINT_TableTopComponent());
-        putClientProperty(TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE);
-        TopComponentHelper.setupContainerListener(tableTabsPane, preferredID());
-        
+        setName( Bundle.CTL_TableTopComponent() );
+        setToolTipText( Bundle.HINT_TableTopComponent() );
+        putClientProperty( TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE );
+        TopComponentHelper.setupContainerListener( tableTabsPane, preferredID() );
+
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -90,37 +95,45 @@ public class TableTopComponent extends TopComponentExtended {
         // add custom code on component opening
     }
 
+
     @Override
     public void componentClosed() {
         this.tableTabsPane.removeAll();
     }
 
-    protected void writeProperties(java.util.Properties p) {
+
+    protected void writeProperties( java.util.Properties p ) {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
-        p.setProperty("version", "1.0");
+        p.setProperty( "version", "1.0" );
         // store your settings
     }
 
-    protected void readProperties(java.util.Properties p) {
-        String version = p.getProperty("version");
+
+    protected void readProperties( java.util.Properties p ) {
+        String version = p.getProperty( "version" );
         // read your settings according to their version
     }
-    
+
+
     /**
      * This method needs to be called in order to open a new tab for a table.
-     * @param panelName name of the panel to open
+     * <p>
+     * @param panelName  name of the panel to open
      * @param tablePanel the panel to display in the new tab
      */
-    public void openTableTab(String panelName, JPanel tablePanel) {
-        TopComponentHelper.openTableTab(tableTabsPane, panelName, tablePanel);
+    public void openTableTab( String panelName, JPanel tablePanel ) {
+        TopComponentHelper.openTableTab( tableTabsPane, panelName, tablePanel );
     }
+
 
     /**
      * @return true, if this component already contains other components, false
-     * otherwise.
+     *         otherwise.
      */
     public boolean hasComponents() {
         return this.tableTabsPane.getComponentCount() > 0;
     }
+
+
 }

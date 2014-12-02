@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.api.cookies;
 
+
 /**
  * Signals that the user is logged in.
  *
@@ -29,5 +30,6 @@ public interface LoginCookie {
      * @return login status
      */
     public boolean isLoggedIn();
+
 
 }

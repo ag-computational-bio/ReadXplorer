@@ -4,42 +4,48 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport;
 
-import static de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.SequinTableSettingsWizardPanel.SEQUIN_EXPORT_FEATURE_NAME;
+
 import de.cebitec.readXplorer.transcriptomeAnalyses.verifier.IntegerVerifier;
 import java.util.prefs.Preferences;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import org.openide.util.NbPreferences;
 
+import static de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport.SequinTableSettingsWizardPanel.SEQUIN_EXPORT_FEATURE_NAME;
+
+
 public final class SequinTableSettingsVisualPanel extends JPanel {
 
     private final String wizardName;
     private final String descriptionText = "<html><p align='justify'>The parsing "
-            + "of the loci_tags is needed, if you want to assign the qualifiers "
-            + "to each locus_tag in sequin table. </p></html>";
+                                           + "of the loci_tags is needed, if you want to assign the qualifiers "
+                                           + "to each locus_tag in sequin table. </p></html>";
     private String separator = "";
+
 
     /**
      * Creates new form SequinTableSettingsVisualPanel
      */
-    public SequinTableSettingsVisualPanel(String wizardName) {
+    public SequinTableSettingsVisualPanel( String wizardName ) {
         this.wizardName = wizardName;
         initComponents();
-        strainTF.setInputVerifier(new IntegerVerifier(this.strainTF));
-        this.separatorTF.setEnabled(false);
-        this.descriptionLabel.setText(descriptionText);
-        this.descriptionLabel.setBorder(BorderFactory.createTitledBorder("Description -parsing-"));
-        this.separatorCB.setEnabled(false);
-        this.strainLabel.setEnabled(false);
-        this.seperatorLabel.setEnabled(false);
-        this.strainTF.setEnabled(false);
+        strainTF.setInputVerifier( new IntegerVerifier( this.strainTF ) );
+        this.separatorTF.setEnabled( false );
+        this.descriptionLabel.setText( descriptionText );
+        this.descriptionLabel.setBorder( BorderFactory.createTitledBorder( "Description -parsing-" ) );
+        this.separatorCB.setEnabled( false );
+        this.strainLabel.setEnabled( false );
+        this.seperatorLabel.setEnabled( false );
+        this.strainTF.setEnabled( false );
         updateFields();
     }
+
 
     @Override
     public String getName() {
         return "Sequin Table Export";
     }
+
 
     /**
      * Getter for the taped feature.
@@ -50,27 +56,33 @@ public final class SequinTableSettingsVisualPanel extends JPanel {
         return this.featureTF.getText();
     }
 
+
     private void updateFields() {
-        Preferences pref = NbPreferences.forModule(Object.class);
-        this.featureTF.setText(pref.get(wizardName + SEQUIN_EXPORT_FEATURE_NAME, ""));
-        this.strainTF.setInputVerifier(new IntegerVerifier(this.strainTF));
+        Preferences pref = NbPreferences.forModule( Object.class );
+        this.featureTF.setText( pref.get( wizardName + SEQUIN_EXPORT_FEATURE_NAME, "" ) );
+        this.strainTF.setInputVerifier( new IntegerVerifier( this.strainTF ) );
     }
 
+
     public Integer getStrainLength() {
-        return Integer.valueOf(this.strainTF.getText());
+        return Integer.valueOf( this.strainTF.getText() );
     }
+
 
     public boolean isLocusTagParsingSelected() {
         return this.parseLocusTagsCB.isSelected();
     }
 
+
     public String getSeparator() {
         return this.separatorTF.getText();
     }
 
+
     public boolean isSeparatorChoosen() {
         return this.separatorCB.isSelected();
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -208,12 +220,13 @@ public final class SequinTableSettingsVisualPanel extends JPanel {
     }//GEN-LAST:event_strainTFActionPerformed
 
     private void separatorCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_separatorCBActionPerformed
-        if (separatorCB.isSelected()) {
-            separatorTF.setEnabled(true);
-            strainTF.setEnabled(false);
-        } else {
-            separatorTF.setEditable(false);
-            strainTF.setEnabled(true);
+        if( separatorCB.isSelected() ) {
+            separatorTF.setEnabled( true );
+            strainTF.setEnabled( false );
+        }
+        else {
+            separatorTF.setEditable( false );
+            strainTF.setEnabled( true );
         }
     }//GEN-LAST:event_separatorCBActionPerformed
 
@@ -222,16 +235,17 @@ public final class SequinTableSettingsVisualPanel extends JPanel {
     }//GEN-LAST:event_separatorTFActionPerformed
 
     private void parseLocusTagsCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_parseLocusTagsCBActionPerformed
-        if (parseLocusTagsCB.isSelected()) {
-            this.separatorCB.setEnabled(true);
-            this.strainLabel.setEnabled(true);
-            this.seperatorLabel.setEnabled(true);
-            this.strainTF.setEnabled(true);
-        } else {
-            this.separatorCB.setEnabled(false);
-            this.strainLabel.setEnabled(false);
-            this.seperatorLabel.setEnabled(false);
-            this.strainTF.setEnabled(false);
+        if( parseLocusTagsCB.isSelected() ) {
+            this.separatorCB.setEnabled( true );
+            this.strainLabel.setEnabled( true );
+            this.seperatorLabel.setEnabled( true );
+            this.strainTF.setEnabled( true );
+        }
+        else {
+            this.separatorCB.setEnabled( false );
+            this.strainLabel.setEnabled( false );
+            this.seperatorLabel.setEnabled( false );
+            this.strainTF.setEnabled( false );
         }
     }//GEN-LAST:event_parseLocusTagsCBActionPerformed
 

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.util;
 
+
 import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.File;
@@ -28,121 +29,147 @@ import javax.swing.JFileChooser;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+
 /**
  * Utils for work with files and directories
+ * <p>
  * @author Evgeny Anisiforov
  */
 public class FileUtils {
-    
+
     private FileUtils() {
     }
-    
+
+
     /**
-     * extract the whole path part without extension  
-     * @param file the file 
+     * extract the whole path part without extension
+     * <p>
+     * @param file the file
+     * <p>
      * @return file path witout extension
      */
-    public static String getFilePathWithoutExtension(File file) {
-        return getFilePathWithoutExtension(file.getAbsolutePath());
-    } 
-    
+    public static String getFilePathWithoutExtension( File file ) {
+        return getFilePathWithoutExtension( file.getAbsolutePath() );
+    }
+
+
     /**
-     * extract the whole path part without extension  
+     * extract the whole path part without extension
+     * <p>
      * @param filePath the full absolute path to the file
+     * <p>
      * @return file path witout extension
      */
-    public static String getFilePathWithoutExtension(String filePath) {
-        String[] nameParts = filePath.split("\\.");
+    public static String getFilePathWithoutExtension( String filePath ) {
+        String[] nameParts = filePath.split( "\\." );
         String newFileName = nameParts[0];
-        for (int i = 1; i < (nameParts.length - 1); i++) {
+        for( int i = 1; i < (nameParts.length - 1); i++ ) {
             newFileName += "." + nameParts[i];
         }
 
         return newFileName;
-    } 
-    
+    }
+
+
     /**
-     * count lines in a file 
+     * count lines in a file
      * equivalent of wc -l in unix
+     * <p>
      * @param file
+     *             <p>
      * @return number of lines or 0 if an error occured during reading
      */
-    public static int countLinesInFile(File file) {
+    public static int countLinesInFile( File file ) {
         int lines = 0;
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            while (reader.readLine() != null) {
+        try( BufferedReader reader = new BufferedReader( new FileReader( file ) ) ) {
+            while( reader.readLine() != null ) {
                 lines++;
             }
-        } catch (Exception e) {
+        }
+        catch( Exception e ) {
             lines = 0;
         }
         return lines;
     }
-    
-    public static int countLinesInFile(String filepath) {
-        return countLinesInFile(new File(filepath));
+
+
+    public static int countLinesInFile( String filepath ) {
+        return countLinesInFile( new File( filepath ) );
     }
-    
+
+
     /**
      * displays a file open dialog and copies the result to an edit field
+     * <p>
      * @param prefName
      * @param fileNameExtensionFilter
      * @param textField
      * @param forClass
      * @param parent
-     * @return 
+     *                                <p>
+     * @return
      */
-    public static File showFileOpenDialogAndChangePrefs(String prefName, FileNameExtensionFilter fileNameExtensionFilter,
-            JTextField textField, Class forClass, Component parent) {
+    public static File showFileOpenDialogAndChangePrefs( String prefName, FileNameExtensionFilter fileNameExtensionFilter,
+                                                         JTextField textField, Class forClass, Component parent ) {
         JFileChooser fc = new JFileChooser();
-        fc.setFileFilter(fileNameExtensionFilter);
-        Preferences prefs2 = Preferences.userNodeForPackage(forClass);
-        String path = prefs2.get(prefName, null);
-        if (path != null) {
-            fc.setCurrentDirectory(new File(path));
+        fc.setFileFilter( fileNameExtensionFilter );
+        Preferences prefs2 = Preferences.userNodeForPackage( forClass );
+        String path = prefs2.get( prefName, null );
+        if( path != null ) {
+            fc.setCurrentDirectory( new File( path ) );
         }
-        int result = fc.showOpenDialog(parent);
+        int result = fc.showOpenDialog( parent );
 
-        if (result == 0) {
+        if( result == 0 ) {
             // file chosen
             File file = fc.getSelectedFile();
 
-            if (file.canRead()) {
-                Preferences prefs = Preferences.userNodeForPackage(forClass);
-                prefs.put(prefName, file.getAbsolutePath());
-                textField.setText(file.getAbsolutePath());
+            if( file.canRead() ) {
+                Preferences prefs = Preferences.userNodeForPackage( forClass );
+                prefs.put( prefName, file.getAbsolutePath() );
+                textField.setText( file.getAbsolutePath() );
                 try {
                     prefs.flush();
-                } catch (BackingStoreException ex) {
-                    Logger.getLogger(forClass.getName()).log(Level.SEVERE, null, ex);
+                }
+                catch( BackingStoreException ex ) {
+                    Logger.getLogger( forClass.getName() ).log( Level.SEVERE, null, ex );
                 }
                 return file;
-            } else {
-                Logger.getLogger(forClass.getName()).log(Level.WARNING, "Could not read file");
+            }
+            else {
+                Logger.getLogger( forClass.getName() ).log( Level.WARNING, "Could not read file" );
             }
         }
         return null;
     }
-    
+
+
     /**
      * check that the given path exists
+     * <p>
      * @param filePathString
+     *                       <p>
      * @return boolean true if the file exists
      */
-    public static boolean fileExists(String filePathString) {
-        File f = new File(filePathString);
+    public static boolean fileExists( String filePathString ) {
+        File f = new File( filePathString );
         boolean result = f.exists();
         return result;
     }
-    
+
+
     /**
      * check that the given path exists, is readable and can be executed
+     * <p>
      * @param filePathString
+     *                       <p>
      * @return boolean true if the file can be executed
      */
-    public static boolean fileExistsAndIsExecutable(String filePathString) {
-        File f = new File(filePathString);
+    public static boolean fileExistsAndIsExecutable( String filePathString ) {
+        File f = new File( filePathString );
         boolean result = f.exists() && f.canRead() && f.canExecute();
         return result;
     }
+
+
 }

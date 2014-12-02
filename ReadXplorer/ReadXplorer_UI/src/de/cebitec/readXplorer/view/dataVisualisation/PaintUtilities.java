@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,10 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation;
 
+
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
 import java.awt.Rectangle;
+
 
 /**
  * Utility class for common methods to aid painting of data.
@@ -31,23 +33,28 @@ public class PaintUtilities {
      */
     private PaintUtilities() {
     }
-    
+
+
     /**
      * Calculates the physical (pixel) boundaries of some component with a start
      * and stop position in reference coordinates.
+     * <p>
      * @param refStart start of the component in reference coordinates
-     * @param refStop stop of the component in reference coordinates
-     * @param viewer The viewer in which the component is shown later
-     * @param phyLeft Left physical (pixel) of the component in the viewer
-     * @param height Height to set for the rectangle
-     * @return 
+     * @param refStop  stop of the component in reference coordinates
+     * @param viewer   The viewer in which the component is shown later
+     * @param phyLeft  Left physical (pixel) of the component in the viewer
+     * @param height   Height to set for the rectangle
+     * <p>
+     * @return
      */
-    public static Rectangle calcBlockBoundaries(int refStart, int refStop, AbstractViewer viewer, int phyLeft, int height) {
-        int startPixel = (int) viewer.getPhysBoundariesForLogPos(refStart).getLeftPhysBound();
-        int stopPixel = (int) viewer.getPhysBoundariesForLogPos(refStop).getRightPhysBound();
+    public static Rectangle calcBlockBoundaries( int refStart, int refStop, AbstractViewer viewer, int phyLeft, int height ) {
+        int startPixel = (int) viewer.getPhysBoundariesForLogPos( refStart ).getLeftPhysBound();
+        int stopPixel = (int) viewer.getPhysBoundariesForLogPos( refStop ).getRightPhysBound();
         int absLength = stopPixel - startPixel;
         int minBlockLength = 3;
         absLength = absLength < minBlockLength ? minBlockLength : absLength;
-        return new Rectangle(startPixel - phyLeft, 0, absLength, height);
+        return new Rectangle( startPixel - phyLeft, 0, absLength, height );
     }
+
+
 }

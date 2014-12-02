@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cebitec.readXplorer.ui.visualisation;
+
 
 import de.cebitec.readXplorer.api.ApplicationFrameI;
 import de.cebitec.readXplorer.api.cookies.CloseRefGenCookie;
@@ -54,34 +55,38 @@ import org.openide.util.lookup.InstanceContent;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
+
 /**
- * Top component which displays the main work area of ReadXplorer, which contains the
+ * Top component which displays the main work area of ReadXplorer, which
+ * contains the
  * reference and track viewers.
- * 
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 @ConvertAsProperties(
-        dtd = "-//de.cebitec.readXplorer.ui.visualisation//AppPanel//EN",
-        autostore = false
+         dtd = "-//de.cebitec.readXplorer.ui.visualisation//AppPanel//EN",
+         autostore = false
 )
 @TopComponent.Description(
-        preferredID = "AppPanelTopComponent",
-        //iconBase="SET/PATH/TO/ICON/HERE", 
-        persistenceType = TopComponent.PERSISTENCE_ALWAYS
+         preferredID = "AppPanelTopComponent",
+         //iconBase="SET/PATH/TO/ICON/HERE",
+         persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
-@TopComponent.Registration(mode = "editor", openAtStartup = false)
-@ActionID(category = "Window", id = "de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent")
-@ActionReference(path = "Menu/Window" /*, position = 333 */)
+@TopComponent.Registration( mode = "editor", openAtStartup = false )
+@ActionID( category = "Window", id = "de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent" )
+@ActionReference( path = "Menu/Window" /*, position = 333 */ )
 @TopComponent.OpenActionRegistration(
-        displayName = "#CTL_AppPanelAction",
-        preferredID = "AppPanelTopComponent"
+         displayName = "#CTL_AppPanelAction",
+         preferredID = "AppPanelTopComponent"
 )
-@Messages({
+@Messages( {
     "CTL_AppPanelAction=AppPanel",
     "CTL_AppPanelTopComponent=AppPanel Window",
     "HINT_AppPanelTopComponent=This is a AppPanel window"
-})
-public final class AppPanelTopComponent extends TopComponentExtended implements ApplicationFrameI {
+} )
+public final class AppPanelTopComponent extends TopComponentExtended implements
+        ApplicationFrameI {
+
     /**
      * path to the icon used by the component and its open action
      */
@@ -98,34 +103,38 @@ public final class AppPanelTopComponent extends TopComponentExtended implements 
     private JPanel tracksPanel;
     private JPanel basePanelPanel;
 
+
     /**
-     * Top component which displays the main work area of ReadXplorer, which contains
+     * Top component which displays the main work area of ReadXplorer, which
+     * contains
      * the reference and track viewers.
      */
     public AppPanelTopComponent() {
         initComponents();
-        setName(Bundle.CTL_AppPanelTopComponent());
-        setToolTipText(Bundle.HINT_AppPanelTopComponent());
+        setName( Bundle.CTL_AppPanelTopComponent() );
+        setToolTipText( Bundle.HINT_AppPanelTopComponent() );
 //        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
-        localLookup = new AbstractLookup(content);
-        associateLookup(localLookup);
+        localLookup = new AbstractLookup( content );
+        associateLookup( localLookup );
         this.trackViewerList = new ArrayList<>();
         this.tracksPanel = new JPanel();
-        this.tracksPanel.setLayout(new javax.swing.BoxLayout(tracksPanel, javax.swing.BoxLayout.PAGE_AXIS));
+        this.tracksPanel.setLayout( new javax.swing.BoxLayout( tracksPanel, javax.swing.BoxLayout.PAGE_AXIS ) );
         this.basePanelPanel = new JPanel();
-        this.basePanelPanel.setLayout(new javax.swing.BoxLayout(basePanelPanel, javax.swing.BoxLayout.PAGE_AXIS));
+        this.basePanelPanel.setLayout( new javax.swing.BoxLayout( basePanelPanel, javax.swing.BoxLayout.PAGE_AXIS ) );
     }
+
 
     /**
      * Removes all cookies which are contained in TopComponent.getLookup().
      */
     private void clearLookup() {
-        Collection<? extends Object> allCookies = getLookup().lookupAll(Object.class);
+        Collection<? extends Object> allCookies = getLookup().lookupAll( Object.class );
 
-        for (Object cookie : allCookies) {
-            content.remove(cookie);
+        for( Object cookie : allCookies ) {
+            content.remove( cookie );
         }
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -155,10 +164,12 @@ public final class AppPanelTopComponent extends TopComponentExtended implements 
     private javax.swing.JPanel visualPanel;
     // End of variables declaration//GEN-END:variables
 
+
     @Override
     public int getPersistenceType() {
         return TopComponent.PERSISTENCE_NEVER;
     }
+
 
     /**
      * Sets the view controller for this top component, which will display the
@@ -166,27 +177,29 @@ public final class AppPanelTopComponent extends TopComponentExtended implements 
      */
     @Override
     public void componentOpened() {
-        ViewController vc = new ViewController(this);
+        ViewController vc = new ViewController( this );
         //vc.openRefGen();
-        content.add(vc);
+        content.add( vc );
 
-        if (vc.hasRefGen()) {
-            setName(vc.getDisplayName());
+        if( vc.hasRefGen() ) {
+            setName( vc.getDisplayName() );
         }
         //else {
         //    this.close();
         //}
     }
 
+
     @Override
     public void componentClosed() {
         // remove all viewers
         Component[] comps = visualPanel.getComponents();
-        for (Component comp : comps) {
-            if (comp instanceof BasePanel) {
+        for( Component comp : comps ) {
+            if( comp instanceof BasePanel ) {
                 try {
                     ((BasePanel) comp).getViewer().close();
-                } catch (NullPointerException e) {
+                }
+                catch( NullPointerException e ) {
                     //do nothing, we want to close something, which is already destroyed
                 }
             }
@@ -199,165 +212,181 @@ public final class AppPanelTopComponent extends TopComponentExtended implements 
         // if last Viewer close Navigator
         boolean lastViewer = true;
         WindowManager windowManager = WindowManager.getDefault();
-        for (TopComponent tc : windowManager.getRegistry().getOpened()) {
-            if (tc instanceof ApplicationFrameI && !tc.equals(this)) {
+        for( TopComponent tc : windowManager.getRegistry().getOpened() ) {
+            if( tc instanceof ApplicationFrameI && !tc.equals( this ) ) {
                 lastViewer = false;
                 break;
             }
         }
-        if (lastViewer) {
-            windowManager.findTopComponent("ReferenceNavigatorTopComp").close();
-            windowManager.findTopComponent("ReferenceIntervalTopComp").close();
-            windowManager.findTopComponent("ReferenceFeatureTopComp").close();
-            windowManager.findTopComponent("TrackStatisticsTopComponent").close();
+        if( lastViewer ) {
+            windowManager.findTopComponent( "ReferenceNavigatorTopComp" ).close();
+            windowManager.findTopComponent( "ReferenceIntervalTopComp" ).close();
+            windowManager.findTopComponent( "ReferenceFeatureTopComp" ).close();
+            windowManager.findTopComponent( "TrackStatisticsTopComponent" ).close();
         }
     }
 
-    void writeProperties(java.util.Properties p) {
+
+    void writeProperties( java.util.Properties p ) {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
-        p.setProperty("version", "1.0");
+        p.setProperty( "version", "1.0" );
         // store your settings
     }
 
-    Object readProperties(java.util.Properties p) {
-        if (instance == null) {
+
+    Object readProperties( java.util.Properties p ) {
+        if( instance == null ) {
             instance = this;
         }
-        instance.readPropertiesImpl(p);
+        instance.readPropertiesImpl( p );
         return instance;
     }
 
-    private void readPropertiesImpl(java.util.Properties p) {
-        String version = p.getProperty("version");
+
+    private void readPropertiesImpl( java.util.Properties p ) {
+        String version = p.getProperty( "version" );
         // read your settings according to their version
     }
+
 
     @Override
     protected String preferredID() {
         return PREFERRED_ID;
     }
 
+
     @Override
     public Lookup getLookup() {
         return localLookup;
     }
 
+
     // ===================== AppFrameI stuff ============================== //
     @Override
-    public void showRefGenPanel(JPanel refGenPanel) {
-        visualPanel.add(refGenPanel);
+    public void showRefGenPanel( JPanel refGenPanel ) {
+        visualPanel.add( refGenPanel );
         visualPanel.updateUI();
 
-        WindowManager.getDefault().findTopComponent("ReferenceNavigatorTopComp").open();
-        WindowManager.getDefault().findTopComponent("ReferenceIntervalTopComp").open();
-        WindowManager.getDefault().findTopComponent("ReferenceFeatureTopComp").open();
+        WindowManager.getDefault().findTopComponent( "ReferenceNavigatorTopComp" ).open();
+        WindowManager.getDefault().findTopComponent( "ReferenceIntervalTopComp" ).open();
+        WindowManager.getDefault().findTopComponent( "ReferenceFeatureTopComp" ).open();
 
         // put the panels ReferenceViewer in lookup so it can be accessed
         BasePanel bp = (BasePanel) refGenPanel;
         ReferenceViewer rv = (ReferenceViewer) bp.getViewer();
-        rv.setViewerLookup(localLookup);
-        content.add(rv);
+        rv.setViewerLookup( localLookup );
+        content.add( rv );
         this.referenceViewer = rv;
 
-        content.add(new CloseRefGenCookie() {
+        content.add( new CloseRefGenCookie() {
             @Override
             public boolean close() {
-                getLookup().lookup(ViewController.class).closeRefGen();
-                content.remove(this);
+                getLookup().lookup( ViewController.class ).closeRefGen();
+                content.remove( this );
                 return true;
             }
-        });
-        content.add(new OpenTrackCookie() {
+
+
+        } );
+        content.add( new OpenTrackCookie() {
             @Override
             public void open() {
-                getLookup().lookup(ViewController.class).openTrack();
+                getLookup().lookup( ViewController.class ).openTrack();
             }
-        });
+
+
+        } );
     }
 
+
     @Override
-    public void removeRefGenPanel(JPanel genomeViewer) {
+    public void removeRefGenPanel( JPanel genomeViewer ) {
         this.close();
     }
 
+
     @Override
-    public void showTrackPanel(final JPanel trackPanel) {
-        if (this.trackScrollPane == null) {
-            this.trackScrollPane = new JScrollPane(this.tracksPanel);
-            trackScrollPane.setPreferredSize(new Dimension (trackScrollPane.getWidth(), 100));
-            this.visualPanel.add(this.trackScrollPane);
+    public void showTrackPanel( final JPanel trackPanel ) {
+        if( this.trackScrollPane == null ) {
+            this.trackScrollPane = new JScrollPane( this.tracksPanel );
+            trackScrollPane.setPreferredSize( new Dimension( trackScrollPane.getWidth(), 100 ) );
+            this.visualPanel.add( this.trackScrollPane );
         }
 
         // add the trackPanel
-        tracksPanel.add(trackPanel);
+        tracksPanel.add( trackPanel );
         visualPanel.updateUI();
         this.referenceViewer.increaseTrackCount();
 
         // search for opened tracks, if there are none open the track statistics window
-        if (getLookup().lookupAll(TrackViewer.class).isEmpty()) {
-            WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").open();
+        if( getLookup().lookupAll( TrackViewer.class ).isEmpty() ) {
+            WindowManager.getDefault().findTopComponent( "TrackStatisticsTopComponent" ).open();
         }
 
         // put the panel's TrackViewer in lookup so it can be accessed
         BasePanel basePanel = (BasePanel) trackPanel;
         // make sure the multiple track viewers do not cause a mess in the lookup
-        if (!(basePanel.getViewer() instanceof MultipleTrackViewer)) {
+        if( !(basePanel.getViewer() instanceof MultipleTrackViewer) ) {
             TrackViewer trackViewer = (TrackViewer) basePanel.getViewer();
-            this.content.add(trackViewer);
-            this.trackViewerList.add(trackViewer);
+            this.content.add( trackViewer );
+            this.trackViewerList.add( trackViewer );
         }
 
         CloseTrackCookie closeTrackCookie = new CloseTrackCookie() {
             @Override
             public boolean close() {
-                getLookup().lookup(ViewController.class).closeTrackPanel(trackPanel);
-                content.remove(this);
+                getLookup().lookup( ViewController.class ).closeTrackPanel( trackPanel );
+                content.remove( this );
                 referenceViewer.decreaseTrackCount();
                 return true;
             }
+
 
             @Override
             public String getName() {
                 return trackPanel.getName();
             }
+
+
         };
 
-        content.add(closeTrackCookie);
+        content.add( closeTrackCookie );
 //        all.add(new WeakReference<JPanel>(trackPanel));
     }
 
+
     @Override
-    public void closeTrackPanel(JPanel trackPanel) {
-        tracksPanel.remove(trackPanel);
+    public void closeTrackPanel( JPanel trackPanel ) {
+        tracksPanel.remove( trackPanel );
         visualPanel.updateUI();
 
         // remove the panel's TrackViewer from lookup
         BasePanel bp = (BasePanel) trackPanel;
         TrackViewer tv = (TrackViewer) bp.getViewer();
-        content.remove(tv);
-        trackViewerList.remove(tv);
+        content.remove( tv );
+        trackViewerList.remove( tv );
 
         // if this was the last trackPanel close the track statistics window
-        if (getLookup().lookupAll(TrackViewer.class).isEmpty()) {
-            WindowManager.getDefault().findTopComponent("TrackStatisticsTopComponent").close();
+        if( getLookup().lookupAll( TrackViewer.class ).isEmpty() ) {
+            WindowManager.getDefault().findTopComponent( "TrackStatisticsTopComponent" ).close();
         }
     }
-    
-    
-    public void showBasePanel(final BasePanel basePanel) {
-        if (this.basePanelScrollPane == null) {
-            this.basePanelScrollPane = new JScrollPane(this.basePanelPanel);
-            basePanelScrollPane.setPreferredSize(new Dimension(basePanelScrollPane.getWidth(), 50));
-            this.visualPanel.add(this.basePanelScrollPane);
+
+
+    public void showBasePanel( final BasePanel basePanel ) {
+        if( this.basePanelScrollPane == null ) {
+            this.basePanelScrollPane = new JScrollPane( this.basePanelPanel );
+            basePanelScrollPane.setPreferredSize( new Dimension( basePanelScrollPane.getWidth(), 50 ) );
+            this.visualPanel.add( this.basePanelScrollPane );
         }
 
         // add the basePanelPanel
-        basePanelPanel.add(basePanel);
+        basePanelPanel.add( basePanel );
 
         // put the panel's Viewer in lookup so it can be accessed
         AbstractViewer viewer = basePanel.getViewer();
-        this.content.add(viewer);
+        this.content.add( viewer );
 
         //maybe use this later
 //        CloseTrackCookie closeViewerCookie = new CloseTrackCookie() {
@@ -400,49 +429,58 @@ public final class AppPanelTopComponent extends TopComponentExtended implements 
      */
     @Override
     public void componentShowing() {
-        if (referenceViewer != null) {
-            this.referenceViewer.setActive(true);
-            this.changeActiveTrackStatus(true);
+        if( referenceViewer != null ) {
+            this.referenceViewer.setActive( true );
+            this.changeActiveTrackStatus( true );
         }
     }
+
 
     @Override
     public void componentHidden() {
-        if (referenceViewer != null) {
-            this.referenceViewer.setActive(false);
-            this.changeActiveTrackStatus(false);
+        if( referenceViewer != null ) {
+            this.referenceViewer.setActive( false );
+            this.changeActiveTrackStatus( false );
         }
     }
+
 
     /**
      * Updates the status of all track viewers belonging to this top component.
+     * <p>
      * @param isActive true, if track viewers should be active, false, if not.
      */
-    private void changeActiveTrackStatus(boolean isActive) {
-        for (TrackViewer viewer : this.trackViewerList) {
-            viewer.setActive(isActive);
+    private void changeActiveTrackStatus( boolean isActive ) {
+        for( TrackViewer viewer : this.trackViewerList ) {
+            viewer.setActive( isActive );
         }
     }
+
+
     // ==================== Experimental track closing stuff ==================== //
-    private List<Reference<JPanel>> all = Collections.synchronizedList(new ArrayList<Reference<JPanel>>());
+    private List<Reference<JPanel>> all = Collections.synchronizedList( new ArrayList<Reference<JPanel>>() );
+
 
     public List<Action> allTrackCloseActions() {
         List<Action> result = new ArrayList<>();
-        for (Iterator<Reference<JPanel>> it = all.iterator(); it.hasNext();) {
+        for( Iterator<Reference<JPanel>> it = all.iterator(); it.hasNext(); ) {
             Reference<JPanel> cookieRef = it.next();
             JPanel cookie = cookieRef.get();
-            if (cookie == null) {
+            if( cookie == null ) {
                 it.remove();
-            } else {
-                result.add(new ShowAction(cookie.getName(), cookieRef, new WeakReference<>(getLookup().lookup(ViewController.class))));
+            }
+            else {
+                result.add( new ShowAction( cookie.getName(), cookieRef, new WeakReference<>( getLookup().lookup( ViewController.class ) ) ) );
             }
         }
         return result;
     }
 
+
     public ReferenceViewer getReferenceViewer() {
         return this.referenceViewer;
     }
+
 
     private static final class ShowAction extends AbstractAction {
 
@@ -453,36 +491,46 @@ public final class AppPanelTopComponent extends TopComponentExtended implements 
         private final Reference<JPanel> tc;
         private final Reference<ViewController> vc;
 
-        ShowAction(String name, Reference<JPanel> tc, Reference<ViewController> vc) {
+
+        ShowAction( String name, Reference<JPanel> tc, Reference<ViewController> vc ) {
             this.tc = tc;
             this.vc = vc;
-            putValue(NAME, name);
+            putValue( NAME, name );
         }
 
+
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed( ActionEvent e ) {
             JPanel comp = tc.get();
-            if (comp != null) { //Could have been garbage collected
-                vc.get().closeTrackPanel(comp);
-            } else {
+            if( comp != null ) { //Could have been garbage collected
+                vc.get().closeTrackPanel( comp );
+            }
+            else {
                 //will almost never happen
                 Toolkit.getDefaultToolkit().beep();
             }
         }
+
 
         @Override
         public boolean isEnabled() {
             JPanel comp = tc.get();
             return comp != null;
         }
+
+
     }
 
+
     @Override
-    public void paint(Graphics g) {
+    public void paint( Graphics g ) {
         try {
-            super.paint(g);
-        } catch (OutOfMemoryError e) {
-            VisualisationUtils.displayOutOfMemoryError(this);
+            super.paint( g );
+        }
+        catch( OutOfMemoryError e ) {
+            VisualisationUtils.displayOutOfMemoryError( this );
         }
     }
+
+
 }

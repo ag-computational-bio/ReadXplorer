@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cebitec.readXplorer.plotting;
+
 
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.util.Pair;
@@ -42,6 +43,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.RectangleEdge;
 import org.jfree.ui.TextAnchor;
 
+
 /**
  *
  * @author kstaderm
@@ -50,141 +52,150 @@ public class CreatePlots {
 
     private CreatePlots() {
     }
-    
-    public synchronized static ChartPanel createPlot(Map<PersistentFeature, Pair<Double, Double>> data, String xName, String yName, XYToolTipGenerator toolTip) {
+
+
+    public synchronized static ChartPanel createPlot( Map<PersistentFeature, Pair<Double, Double>> data, String xName, String yName, XYToolTipGenerator toolTip ) {
         XYSeriesCollection normal = new XYSeriesCollection();
-        XYSeries nor = new XYSeries("Normal");
-        for (Iterator<PersistentFeature> it = data.keySet().iterator(); it.hasNext();) {
+        XYSeries nor = new XYSeries( "Normal" );
+        for( Iterator<PersistentFeature> it = data.keySet().iterator(); it.hasNext(); ) {
             PersistentFeature key = it.next();
-            Pair<Double, Double> pair = data.get(key);
+            Pair<Double, Double> pair = data.get( key );
             Double X = pair.getFirst();
             Double Y = pair.getSecond();
-            nor.add(new PlotDataItem(key, X, Y));
+            nor.add( new PlotDataItem( key, X, Y ) );
         }
-        normal.addSeries(nor);
+        normal.addSeries( nor );
         // create subplot 1...
         final XYItemRenderer renderer1 = new XYShapeRenderer();
-        renderer1.setBaseToolTipGenerator(toolTip);
-        final NumberAxis domainAxis1 = new NumberAxis(xName);
-        final NumberAxis rangeAxis1 = new NumberAxis(yName);
-        final XYPlot subplot1 = new XYPlot(normal, domainAxis1, rangeAxis1, renderer1);
-        JFreeChart chart = new JFreeChart(subplot1);
+        renderer1.setBaseToolTipGenerator( toolTip );
+        final NumberAxis domainAxis1 = new NumberAxis( xName );
+        final NumberAxis rangeAxis1 = new NumberAxis( yName );
+        final XYPlot subplot1 = new XYPlot( normal, domainAxis1, rangeAxis1, renderer1 );
+        JFreeChart chart = new JFreeChart( subplot1 );
         chart.removeLegend();
-        ChartPanel panel = new ChartPanel(chart, true, false, true, true, true);
-        panel.setInitialDelay(0);
-        panel.setMaximumDrawHeight(1080);
-        panel.setMaximumDrawWidth(1920);
-        panel.setMouseWheelEnabled(true);
-        panel.setMouseZoomable(true);
+        ChartPanel panel = new ChartPanel( chart, true, false, true, true, true );
+        panel.setInitialDelay( 0 );
+        panel.setMaximumDrawHeight( 1080 );
+        panel.setMaximumDrawWidth( 1920 );
+        panel.setMouseWheelEnabled( true );
+        panel.setMouseZoomable( true );
         MouseActions mouseAction = new MouseActions();
-        panel.addChartMouseListener(mouseAction);
-        ChartPanelOverlay overlay = new ChartPanelOverlay(mouseAction);
-        panel.addOverlay(overlay);
+        panel.addChartMouseListener( mouseAction );
+        ChartPanelOverlay overlay = new ChartPanelOverlay( mouseAction );
+        panel.addOverlay( overlay );
         return panel;
     }
 
-    public synchronized static ChartPanel createInfPlot(Map<PersistentFeature, Pair<Double, Double>> data, String xName, String yName, XYToolTipGenerator toolTip) {
+
+    public synchronized static ChartPanel createInfPlot( Map<PersistentFeature, Pair<Double, Double>> data, String xName, String yName, XYToolTipGenerator toolTip ) {
         XYSeriesCollection normal = new XYSeriesCollection();
         XYSeriesCollection posInf = new XYSeriesCollection();
         XYSeriesCollection negInf = new XYSeriesCollection();
-        XYSeries nor = new XYSeries("Normal");
-        XYSeries pos = new XYSeries("Positive Infinite");
-        XYSeries neg = new XYSeries("Negative Infinite");
-        for (Iterator<PersistentFeature> it = data.keySet().iterator(); it.hasNext();) {
+        XYSeries nor = new XYSeries( "Normal" );
+        XYSeries pos = new XYSeries( "Positive Infinite" );
+        XYSeries neg = new XYSeries( "Negative Infinite" );
+        for( Iterator<PersistentFeature> it = data.keySet().iterator(); it.hasNext(); ) {
             PersistentFeature key = it.next();
-            Pair<Double, Double> pair = data.get(key);
+            Pair<Double, Double> pair = data.get( key );
             Double X = pair.getFirst();
             Double Y = pair.getSecond();
 
-            if (Y == Double.POSITIVE_INFINITY) {
+            if( Y == Double.POSITIVE_INFINITY ) {
                 Y = 0d;
-                pos.add(new PlotDataItem(key, X, Y));
+                pos.add( new PlotDataItem( key, X, Y ) );
             }
-            if (Y == Double.NEGATIVE_INFINITY) {
+            if( Y == Double.NEGATIVE_INFINITY ) {
                 Y = 0d;
-                neg.add(new PlotDataItem(key, X, Y));
+                neg.add( new PlotDataItem( key, X, Y ) );
             }
-            if (!Y.isInfinite() && !X.isInfinite()) {
-                nor.add(new PlotDataItem(key, X, Y));
+            if( !Y.isInfinite() && !X.isInfinite() ) {
+                nor.add( new PlotDataItem( key, X, Y ) );
             }
         }
-        normal.addSeries(nor);
-        posInf.addSeries(pos);
-        negInf.addSeries(neg);
-        JFreeChart chart = createCombinedChart(normal, posInf, negInf, xName, yName, toolTip);
+        normal.addSeries( nor );
+        posInf.addSeries( pos );
+        negInf.addSeries( neg );
+        JFreeChart chart = createCombinedChart( normal, posInf, negInf, xName, yName, toolTip );
         chart.removeLegend();
-        ChartPanel panel = new ChartPanel(chart, true, false, true, true, true);
-        panel.setInitialDelay(0);
-        panel.setMaximumDrawHeight(1080);
-        panel.setMaximumDrawWidth(1920);
-        panel.setMouseWheelEnabled(true);
-        panel.setMouseZoomable(true);
+        ChartPanel panel = new ChartPanel( chart, true, false, true, true, true );
+        panel.setInitialDelay( 0 );
+        panel.setMaximumDrawHeight( 1080 );
+        panel.setMaximumDrawWidth( 1920 );
+        panel.setMouseWheelEnabled( true );
+        panel.setMouseZoomable( true );
         MouseActions mouseAction = new MouseActions();
-        panel.addChartMouseListener(mouseAction);
-        ChartPanelOverlay overlay = new ChartPanelOverlay(mouseAction);
-        panel.addOverlay(overlay);
+        panel.addChartMouseListener( mouseAction );
+        ChartPanelOverlay overlay = new ChartPanelOverlay( mouseAction );
+        panel.addOverlay( overlay );
         return panel;
     }
 
-    private synchronized static JFreeChart createCombinedChart(XYSeriesCollection normal,
-            XYSeriesCollection posInf, XYSeriesCollection negInf, String xName, String yName, XYToolTipGenerator toolTip) {
 
-        final NumberAxis domainAxis = new NumberAxis(xName);
-        
+    private synchronized static JFreeChart createCombinedChart( XYSeriesCollection normal,
+                                                                XYSeriesCollection posInf, XYSeriesCollection negInf, String xName, String yName, XYToolTipGenerator toolTip ) {
+
+        final NumberAxis domainAxis = new NumberAxis( xName );
+
         // create subplot 1...
         final XYDataset data1 = normal;
         final XYItemRenderer renderer1 = new XYShapeRenderer();
-        renderer1.setBaseToolTipGenerator(toolTip);
-        final NumberAxis rangeAxis1 = new NumberAxis(yName);
-        final XYPlot subplot1 = new XYPlot(data1, domainAxis, rangeAxis1, renderer1);
-        subplot1.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
+        renderer1.setBaseToolTipGenerator( toolTip );
+        final NumberAxis rangeAxis1 = new NumberAxis( yName );
+        final XYPlot subplot1 = new XYPlot( data1, domainAxis, rangeAxis1, renderer1 );
+        subplot1.setRangeAxisLocation( AxisLocation.BOTTOM_OR_LEFT );
 
         // create subplot 2...
         final XYDataset data2 = negInf;
         final XYItemRenderer renderer2 = new XYShapeRenderer();
-        renderer2.setBaseToolTipGenerator(toolTip);
+        renderer2.setBaseToolTipGenerator( toolTip );
         final NumberAxis rangeAxis2 = new NumberAxis() {
             @Override
-            public List refreshTicks(Graphics2D g2, AxisState state,
-                    Rectangle2D dataArea, RectangleEdge edge) {
+            public List refreshTicks( Graphics2D g2, AxisState state,
+                                      Rectangle2D dataArea, RectangleEdge edge ) {
                 List myTicks = new ArrayList();
-                myTicks.add(new NumberTick(0, "-Inf", TextAnchor.CENTER_RIGHT, TextAnchor.CENTER_RIGHT, 0.0));
+                myTicks.add( new NumberTick( 0, "-Inf", TextAnchor.CENTER_RIGHT, TextAnchor.CENTER_RIGHT, 0.0 ) );
                 return myTicks;
             }
+
+
         };
-        rangeAxis2.setAutoRangeIncludesZero(false);
-        final XYPlot subplot2 = new XYPlot(data2, domainAxis, rangeAxis2, renderer2);
-        subplot2.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
+        rangeAxis2.setAutoRangeIncludesZero( false );
+        final XYPlot subplot2 = new XYPlot( data2, domainAxis, rangeAxis2, renderer2 );
+        subplot2.setRangeAxisLocation( AxisLocation.BOTTOM_OR_LEFT );
 
         // create subplot 3...
         final XYDataset data3 = posInf;
         final XYItemRenderer renderer3 = new XYShapeRenderer();
-        renderer3.setBaseToolTipGenerator(toolTip);
+        renderer3.setBaseToolTipGenerator( toolTip );
         final NumberAxis rangeAxis3 = new NumberAxis() {
             @Override
-            public List refreshTicks(Graphics2D g2, AxisState state,
-                    Rectangle2D dataArea, RectangleEdge edge) {
+            public List refreshTicks( Graphics2D g2, AxisState state,
+                                      Rectangle2D dataArea, RectangleEdge edge ) {
                 List myTicks = new ArrayList();
-                myTicks.add(new NumberTick(0, "Inf", TextAnchor.CENTER_RIGHT, TextAnchor.CENTER_RIGHT, 0.0));
+                myTicks.add( new NumberTick( 0, "Inf", TextAnchor.CENTER_RIGHT, TextAnchor.CENTER_RIGHT, 0.0 ) );
                 return myTicks;
             }
+
+
         };
-        rangeAxis3.setAutoRangeIncludesZero(false);
-        final XYPlot subplot3 = new XYPlot(data3, domainAxis, rangeAxis3, renderer3);
-        subplot2.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
-        
+        rangeAxis3.setAutoRangeIncludesZero( false );
+        final XYPlot subplot3 = new XYPlot( data3, domainAxis, rangeAxis3, renderer3 );
+        subplot2.setRangeAxisLocation( AxisLocation.BOTTOM_OR_LEFT );
+
         // parent plot...
-        final CombinedDomainXYPlot plot = new CombinedDomainXYPlot(domainAxis);
-        plot.setGap(0);
+        final CombinedDomainXYPlot plot = new CombinedDomainXYPlot( domainAxis );
+        plot.setGap( 0 );
 
         // add the subplots...
-        plot.add(subplot3, 1);
-        plot.add(subplot1, 10);
-        plot.add(subplot2, 1);
-        plot.setOrientation(PlotOrientation.VERTICAL);
+        plot.add( subplot3, 1 );
+        plot.add( subplot1, 10 );
+        plot.add( subplot2, 1 );
+        plot.setOrientation( PlotOrientation.VERTICAL );
 
         // return a new chart containing the overlaid plot...
-        return new JFreeChart(plot);
+        return new JFreeChart( plot );
 
     }
+
+
 }

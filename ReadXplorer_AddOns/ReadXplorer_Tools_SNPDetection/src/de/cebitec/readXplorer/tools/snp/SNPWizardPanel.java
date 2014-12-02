@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,16 +16,18 @@
  */
 package de.cebitec.readXplorer.tools.snp;
 
+
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
 import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbPreferences;
 
+
 /**
  * The SNP detection wizard main panel.
  */
 public class SNPWizardPanel extends ChangeListeningWizardPanel {
-    
+
     static final String PROP_MIN_PERCENT = "minPercent";
     static final String PROP_MIN_VARYING_BASES = "minNoBases";
     static final String PROP_USE_MAIN_BASE = "useMainBase";
@@ -33,23 +35,24 @@ public class SNPWizardPanel extends ChangeListeningWizardPanel {
     static final String PROP_MIN_BASE_QUAL = "minBaseQual";
     static final String PROP_MIN_AVERAGE_BASE_QUAL = "minAvrgBaseQual";
     static final String PROP_MIN_AVERAGE_MAP_QUAL = "minAvrgMapQual";
-    
-    
+
+
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
     private SNPVisualPanel component;
 
+
     /**
      * The SNP detection wizard main panel.
-     * @param referenceId reference id 
+     * <p>
+     * @param referenceId reference id
      */
     public SNPWizardPanel() {
-        super("Please enter valid parameters (Only number & percent values. Quality values need to be between 0 & 127)");
+        super( "Please enter valid parameters (Only number & percent values. Quality values need to be between 0 & 127)" );
     }
-    
-    
+
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
@@ -57,37 +60,41 @@ public class SNPWizardPanel extends ChangeListeningWizardPanel {
     // create only those which really need to be visible.
     @Override
     public SNPVisualPanel getComponent() {
-        if (component == null) {
+        if( component == null ) {
             component = new SNPVisualPanel();
         }
         return component;
     }
 
+
     @Override
-    public void storeSettings(WizardDescriptor wiz) {
-        if (this.isValid()) {
-            wiz.putProperty(PROP_MIN_PERCENT, this.component.getMinPercentage());
-            wiz.putProperty(PROP_MIN_VARYING_BASES, this.component.getMinMismatchingBases());
-            wiz.putProperty(PROP_USE_MAIN_BASE, this.component.isUseMainBase());
-            wiz.putProperty(PROP_MIN_BASE_QUAL, this.component.isUseQualFilter() ? this.component.getMinBaseQuality() : 0);
-            wiz.putProperty(PROP_MIN_AVERAGE_BASE_QUAL, this.component.isUseQualFilter() ? this.component.getMinAverageBaseQual() : 0);
-            wiz.putProperty(PROP_MIN_AVERAGE_MAP_QUAL, this.component.isUseQualFilter() ? this.component.getMinAverageMappingQual() : 0);
+    public void storeSettings( WizardDescriptor wiz ) {
+        if( this.isValid() ) {
+            wiz.putProperty( PROP_MIN_PERCENT, this.component.getMinPercentage() );
+            wiz.putProperty( PROP_MIN_VARYING_BASES, this.component.getMinMismatchingBases() );
+            wiz.putProperty( PROP_USE_MAIN_BASE, this.component.isUseMainBase() );
+            wiz.putProperty( PROP_MIN_BASE_QUAL, this.component.isUseQualFilter() ? this.component.getMinBaseQuality() : 0 );
+            wiz.putProperty( PROP_MIN_AVERAGE_BASE_QUAL, this.component.isUseQualFilter() ? this.component.getMinAverageBaseQual() : 0 );
+            wiz.putProperty( PROP_MIN_AVERAGE_MAP_QUAL, this.component.isUseQualFilter() ? this.component.getMinAverageMappingQual() : 0 );
             this.storePrefs();
         }
     }
-    
+
+
     /**
-     * Stores the selected parameters for this specific wizard page for later 
+     * Stores the selected parameters for this specific wizard page for later
      * use, also after restarting the software.
      */
     private void storePrefs() {
-        Preferences pref = NbPreferences.forModule(Object.class);
-        pref.put(PROP_MIN_PERCENT, this.component.getMinPercentage().toString());
-        pref.put(PROP_MIN_VARYING_BASES, String.valueOf(this.component.getMinMismatchingBases()));
-        pref.put(PROP_USE_MAIN_BASE, this.component.isUseMainBase() ? "1" : "0");
-        pref.put(PROP_SEL_QUAL_FILTER, this.component.isUseQualFilter() ? "1" : "0");
-        pref.put(PROP_MIN_BASE_QUAL, String.valueOf(this.component.getMinBaseQuality()));
-        pref.put(PROP_MIN_AVERAGE_BASE_QUAL, String.valueOf(this.component.getMinAverageBaseQual()));
-        pref.put(PROP_MIN_AVERAGE_MAP_QUAL, String.valueOf(this.component.getMinAverageMappingQual()));
+        Preferences pref = NbPreferences.forModule( Object.class );
+        pref.put( PROP_MIN_PERCENT, this.component.getMinPercentage().toString() );
+        pref.put( PROP_MIN_VARYING_BASES, String.valueOf( this.component.getMinMismatchingBases() ) );
+        pref.put( PROP_USE_MAIN_BASE, this.component.isUseMainBase() ? "1" : "0" );
+        pref.put( PROP_SEL_QUAL_FILTER, this.component.isUseQualFilter() ? "1" : "0" );
+        pref.put( PROP_MIN_BASE_QUAL, String.valueOf( this.component.getMinBaseQuality() ) );
+        pref.put( PROP_MIN_AVERAGE_BASE_QUAL, String.valueOf( this.component.getMinAverageBaseQual() ) );
+        pref.put( PROP_MIN_AVERAGE_MAP_QUAL, String.valueOf( this.component.getMinAverageMappingQual() ) );
     }
+
+
 }

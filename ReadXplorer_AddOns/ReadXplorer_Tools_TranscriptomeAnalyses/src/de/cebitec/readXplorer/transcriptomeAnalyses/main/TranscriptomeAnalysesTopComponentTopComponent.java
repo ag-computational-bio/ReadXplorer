@@ -1,5 +1,6 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
+
 import de.cebitec.readXplorer.util.TabWithCloseX;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
@@ -12,61 +13,66 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
+
 /**
  * Top component which displays something.
  */
 @ConvertAsProperties(
-        dtd = "-//de.cebitec.readXplorer.transcriptomeAnalyses//TranscriptomeAnalysesTopComponent//EN",
-        autostore = false)
+         dtd = "-//de.cebitec.readXplorer.transcriptomeAnalyses//TranscriptomeAnalysesTopComponent//EN",
+         autostore = false )
 @TopComponent.Description(
-        preferredID = "TranscriptomeAnalysesTopComponentTopComponent",
-        //iconBase="SET/PATH/TO/ICON/HERE", 
-        persistenceType = TopComponent.PERSISTENCE_ALWAYS)
-@TopComponent.Registration(mode = "output", openAtStartup = false)
-@ActionID(category = "Window", id = "de.cebitec.readXplorer.transcriptomeAnalyses.TranscriptomeAnalysesTopComponentTopComponent")
-@ActionReference(path = "Menu/Window" /*, position = 333 */)
+         preferredID = "TranscriptomeAnalysesTopComponentTopComponent",
+         //iconBase="SET/PATH/TO/ICON/HERE",
+         persistenceType = TopComponent.PERSISTENCE_ALWAYS )
+@TopComponent.Registration( mode = "output", openAtStartup = false )
+@ActionID( category = "Window", id = "de.cebitec.readXplorer.transcriptomeAnalyses.TranscriptomeAnalysesTopComponentTopComponent" )
+@ActionReference( path = "Menu/Window" /*, position = 333 */ )
 @TopComponent.OpenActionRegistration(
-        displayName = "#CTL_TranscriptomeAnalysesTopComponentAction",
-        preferredID = "TranscriptomeAnalysesTopComponentTopComponent")
-@Messages({
+         displayName = "#CTL_TranscriptomeAnalysesTopComponentAction",
+         preferredID = "TranscriptomeAnalysesTopComponentTopComponent" )
+@Messages( {
     "CTL_TranscriptomeAnalysesTopComponentAction=TranscriptomeAnalysesTopComponent",
     "CTL_TranscriptomeAnalysesTopComponentTopComponent=Analyses Result Window",
     "HINT_TranscriptomeAnalysesTopComponentTopComponent=This is a TranscriptomeAnalysesTopComponent window"
-})
+} )
 public final class TranscriptomeAnalysesTopComponentTopComponent extends TopComponent {
 
-    
+
     private static final long serialVersionUID = 1L;
     public static final String PREFERRED_ID = "TranscriptomeAnalysesTopComponentTopComponent";
 
-    
+
     /**
      * TopComponent for displaying all gui elements belonging to the
      * transcription analyses.
      */
     public TranscriptomeAnalysesTopComponentTopComponent() {
-       
-    
+
+
         initComponents();
-        setName(Bundle.CTL_TranscriptomeAnalysesTopComponentTopComponent());
-        setToolTipText(Bundle.HINT_TranscriptomeAnalysesTopComponentTopComponent());
-        putClientProperty(TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE);
+        setName( Bundle.CTL_TranscriptomeAnalysesTopComponentTopComponent() );
+        setToolTipText( Bundle.HINT_TranscriptomeAnalysesTopComponentTopComponent() );
+        putClientProperty( TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE );
 
         // add listener to close TopComponent when no tabs are shown
-        this.analysesTabbedPane.addContainerListener(new ContainerListener() {
+        this.analysesTabbedPane.addContainerListener( new ContainerListener() {
             @Override
-            public void componentAdded(ContainerEvent e) {
+            public void componentAdded( ContainerEvent e ) {
             }
 
+
             @Override
-            public void componentRemoved(ContainerEvent e) {
-                if (analysesTabbedPane.getTabCount() == 0) {
-                    WindowManager.getDefault().findTopComponent(PREFERRED_ID).close();
+            public void componentRemoved( ContainerEvent e ) {
+                if( analysesTabbedPane.getTabCount() == 0 ) {
+                    WindowManager.getDefault().findTopComponent( PREFERRED_ID ).close();
                 }
             }
-        });
+
+
+        } );
 
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -98,52 +104,63 @@ public final class TranscriptomeAnalysesTopComponentTopComponent extends TopComp
         // TODO add custom code on component opening
     }
 
+
     @Override
     public void componentClosed() {
         // TODO add custom code on component closing
     }
 
-    void writeProperties(java.util.Properties p) {
+
+    void writeProperties( java.util.Properties p ) {
         // better to version settings since initial version as advocated at
         // http://wiki.apidesign.org/wiki/PropertyFiles
-        p.setProperty("version", "1.0");
+        p.setProperty( "version", "1.0" );
         // TODO store your settings
     }
 
-    void readProperties(java.util.Properties p) {
-        String version = p.getProperty("version");
+
+    void readProperties( java.util.Properties p ) {
+        String version = p.getProperty( "version" );
         // TODO read your settings according to their version
     }
-    
+
+
     @Override
     protected String preferredID() {
         return PREFERRED_ID;
     }
-    
+
+
     /**
      * This method needs to be called in order to open a new tab for
-     * transcription analyses. Make sure to call {@link setAnalysisContext()} 
+     * transcription analyses. Make sure to call {@link setAnalysisContext()}
      * first in order to display the correct context for the analysis result.
-     * @param panelName title of the new tab to create
-     * @param resultPanel the panel to place in the new tab 
+     * <p>
+     * @param panelName   title of the new tab to create
+     * @param resultPanel the panel to place in the new tab
      */
-    public void openAnalysisTab(final String panelName, final JPanel resultPanel) { //TranscriptionAnalysesPanel transAnalysisPanel, 
-        SwingUtilities.invokeLater(new Runnable() {
+    public void openAnalysisTab( final String panelName, final JPanel resultPanel ) { //TranscriptionAnalysesPanel transAnalysisPanel,
+        SwingUtilities.invokeLater( new Runnable() {
 
             @Override
             public void run() {
-                analysesTabbedPane.add(panelName, resultPanel);
-                analysesTabbedPane.setTabComponentAt(analysesTabbedPane.getTabCount() - 1, new TabWithCloseX(analysesTabbedPane));
-                analysesTabbedPane.setSelectedIndex(analysesTabbedPane.getTabCount() - 1);
+                analysesTabbedPane.add( panelName, resultPanel );
+                analysesTabbedPane.setTabComponentAt( analysesTabbedPane.getTabCount() - 1, new TabWithCloseX( analysesTabbedPane ) );
+                analysesTabbedPane.setSelectedIndex( analysesTabbedPane.getTabCount() - 1 );
             }
-        });
+
+
+        } );
     }
-    
+
+
     /**
      * @return true, if this component already contains other components, false
-     * otherwise.
+     *         otherwise.
      */
     public boolean hasComponents() {
         return this.analysesTabbedPane.getComponentCount() > 0;
     }
+
+
 }

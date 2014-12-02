@@ -4,16 +4,20 @@
  */
 package de.cebitec.readXplorer.parser.tables;
 
+
 import javax.swing.table.DefaultTableModel;
+
 
 /**
  *
  * @author jritter
  */
 public interface ExcelImportDataI {
-        
+
     /**
      * @return creates and returns the list of rows belonging to the excel file.
      */
     public DefaultTableModel dataToDataTableImport();
+
+
 }

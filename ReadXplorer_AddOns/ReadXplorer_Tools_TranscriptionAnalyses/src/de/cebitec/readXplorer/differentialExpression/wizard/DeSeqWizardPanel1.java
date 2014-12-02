@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,12 +16,15 @@
  */
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
+
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 
-public class DeSeqWizardPanel1 implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
+
+public class DeSeqWizardPanel1 implements
+        WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     /**
      * The visual component that displays this panel. If you need to access the
@@ -29,17 +32,19 @@ public class DeSeqWizardPanel1 implements WizardDescriptor.ValidatingPanel<Wizar
      */
     private DeSeqVisualPanel1 component;
 
+
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
     public DeSeqVisualPanel1 getComponent() {
-        if (component == null) {
+        if( component == null ) {
             component = new DeSeqVisualPanel1();
         }
         return component;
     }
+
 
     @Override
     public HelpCtx getHelp() {
@@ -48,6 +53,7 @@ public class DeSeqWizardPanel1 implements WizardDescriptor.ValidatingPanel<Wizar
         // If you have context help:
         // return new HelpCtx("help.key.here");
     }
+
 
     @Override
     public boolean isValid() {
@@ -59,30 +65,37 @@ public class DeSeqWizardPanel1 implements WizardDescriptor.ValidatingPanel<Wizar
         // WizardDescriptor.ERROR/WARNING/INFORMATION_MESSAGE will also be useful.
     }
 
-    @Override
-    public void addChangeListener(ChangeListener l) {
-    }
 
     @Override
-    public void removeChangeListener(ChangeListener l) {
+    public void addChangeListener( ChangeListener l ) {
     }
 
+
     @Override
-    public void readSettings(WizardDescriptor wiz) {
+    public void removeChangeListener( ChangeListener l ) {
+    }
+
+
+    @Override
+    public void readSettings( WizardDescriptor wiz ) {
         // use wiz.getProperty to retrieve previous panel state
     }
 
+
     @Override
-    public void storeSettings(WizardDescriptor wiz) {
-        if (getComponent().buttonChecked()) {
-            wiz.putProperty("moreThanTwoConditions", getComponent().moreThanTwoConditions());
+    public void storeSettings( WizardDescriptor wiz ) {
+        if( getComponent().buttonChecked() ) {
+            wiz.putProperty( "moreThanTwoConditions", getComponent().moreThanTwoConditions() );
         }
     }
 
+
     @Override
     public void validate() throws WizardValidationException {
-        if (!getComponent().buttonChecked()) {
-            throw new WizardValidationException(null, "Please select one of the options above.", null);
+        if( !getComponent().buttonChecked() ) {
+            throw new WizardValidationException( null, "Please select one of the options above.", null );
         }
     }
+
+
 }

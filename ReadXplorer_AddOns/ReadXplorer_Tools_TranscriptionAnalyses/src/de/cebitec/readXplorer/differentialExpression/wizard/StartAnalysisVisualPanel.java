@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,23 +16,29 @@
  */
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
+
 import javax.swing.JPanel;
 
+
 public final class StartAnalysisVisualPanel extends JPanel {
+
     private static final long serialVersionUID = 1L;
+
 
     /**
      * Creates new form StartAnalysisVisualPanel
      */
-    public StartAnalysisVisualPanel(StartAnalysisWizardPanel wizardPanel3) {
+    public StartAnalysisVisualPanel( StartAnalysisWizardPanel wizardPanel3 ) {
         initComponents();
-        jScrollPane1.setBorder(null);
+        jScrollPane1.setBorder( null );
     }
-    
+
+
     @Override
     public String getName() {
         return "Start the analysis";
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -74,7 +80,7 @@ public final class StartAnalysisVisualPanel extends JPanel {
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextArea jTextArea1;

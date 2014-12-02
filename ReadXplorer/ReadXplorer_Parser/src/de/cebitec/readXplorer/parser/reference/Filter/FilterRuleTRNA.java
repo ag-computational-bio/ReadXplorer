@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,10 @@
  */
 package de.cebitec.readXplorer.parser.reference.Filter;
 
-import de.cebitec.readXplorer.util.classification.FeatureType;
+
 import de.cebitec.readXplorer.parser.common.ParsedFeature;
+import de.cebitec.readXplorer.util.classification.FeatureType;
+
 
 /**
  *
@@ -26,12 +28,14 @@ import de.cebitec.readXplorer.parser.common.ParsedFeature;
 public class FilterRuleTRNA implements FilterRuleI {
 
     @Override
-    public boolean appliesRule(ParsedFeature feature) {
-        if(feature.getType() == FeatureType.TRNA){
+    public boolean appliesRule( ParsedFeature feature ) {
+        if( feature.getType() == FeatureType.TRNA ) {
             return true;
-        } else {
+        }
+        else {
             return false;
         }
     }
+
 
 }

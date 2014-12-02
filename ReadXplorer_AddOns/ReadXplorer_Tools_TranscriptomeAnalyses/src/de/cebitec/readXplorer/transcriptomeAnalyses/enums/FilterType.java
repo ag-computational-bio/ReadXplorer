@@ -5,6 +5,7 @@
  */
 package de.cebitec.readXplorer.transcriptomeAnalyses.enums;
 
+
 /**
  * Properties for filtering a TranscriptionStart List.
  *
@@ -28,4 +29,5 @@ public enum FilterType {
     THREE_PRIME_ANTISENSE,
     INTRAGENIC_ANTISENSE,
     ONLY_NON_STABLE_RNA;
+
 }

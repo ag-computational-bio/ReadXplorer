@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cebitec.readXplorer.view.dataVisualisation.basePanel;
+
 
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.GeneralUtils;
@@ -33,120 +34,139 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import org.openide.util.NbBundle;
 
+
 /**
  * A provider for panels containing generally available options.
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 public class LegendAndOptionsProvider {
-    
+
     /**
      * A provider for panels containing generally available options.
      */
     private LegendAndOptionsProvider() {
     }
-    
+
+
     /**
      * Creates a mapping quality (phred scale) filter.
-     * @param viewer The viewer for to which the filter shall be added
+     * <p>
+     * @param viewer      The viewer for to which the filter shall be added
      * @param parentPanel The panel in which the filter shall be embedded
      */
-    @NbBundle.Messages("MinMappingQualityText=Filter by min. mapping quality")
-    public static void createMappingQualityFilter(final AbstractViewer viewer, JPanel parentPanel) {
+    @NbBundle.Messages( "MinMappingQualityText=Filter by min. mapping quality" )
+    public static void createMappingQualityFilter( final AbstractViewer viewer, JPanel parentPanel ) {
         final JPanel optionPanel = new JPanel();
-        optionPanel.setLayout(new BoxLayout(optionPanel, BoxLayout.X_AXIS));
-        optionPanel.setBackground(ColorProperties.LEGEND_BACKGROUND);
-        final JTextField minMappingQualityField = new JTextField("0");
-        minMappingQualityField.setMinimumSize(new Dimension(50, 20));
-        minMappingQualityField.setPreferredSize(new Dimension(50, 20));
-        minMappingQualityField.setMaximumSize(new Dimension(50, 20));
-        final JButton minMappingQualityButton = new JButton(Bundle.MinMappingQualityText());
+        optionPanel.setLayout( new BoxLayout( optionPanel, BoxLayout.X_AXIS ) );
+        optionPanel.setBackground( ColorProperties.LEGEND_BACKGROUND );
+        final JTextField minMappingQualityField = new JTextField( "0" );
+        minMappingQualityField.setMinimumSize( new Dimension( 50, 20 ) );
+        minMappingQualityField.setPreferredSize( new Dimension( 50, 20 ) );
+        minMappingQualityField.setMaximumSize( new Dimension( 50, 20 ) );
+        final JButton minMappingQualityButton = new JButton( Bundle.MinMappingQualityText() );
 
         //create listener for updating the viewer when the filter value has been changed
-        minMappingQualityButton.addActionListener(new ActionListener() {
+        minMappingQualityButton.addActionListener( new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
-                updateMinMappingQuality(viewer, minMappingQualityField);
+            public void actionPerformed( ActionEvent e ) {
+                updateMinMappingQuality( viewer, minMappingQualityField );
             }
-        });
-        optionPanel.add(minMappingQualityField);
-        optionPanel.add(createPlaceholder());
-        optionPanel.add(minMappingQualityButton);
-        parentPanel.add(optionPanel, BorderLayout.WEST);
+
+
+        } );
+        optionPanel.add( minMappingQualityField );
+        optionPanel.add( createPlaceholder() );
+        optionPanel.add( minMappingQualityButton );
+        parentPanel.add( optionPanel, BorderLayout.WEST );
     }
-    
+
+
     /**
-     * Updates the minimum mapping quality value of the given viewer if the 
+     * Updates the minimum mapping quality value of the given viewer if the
      * input is valid. Otherwise an error message is displayed.
-     * @param viewer The viewer to update
+     * <p>
+     * @param viewer                 The viewer to update
      * @param minMappingQualityField The minimum mapping quality to set
      */
-    private static void updateMinMappingQuality(AbstractViewer viewer, JTextField minMappingQualityField) {
-        if (GeneralUtils.isValidByteInput(minMappingQualityField.getText())) {
-            byte minMappingQual = Byte.parseByte(minMappingQualityField.getText().trim());
-            viewer.setMinMappingQuality(minMappingQual);
-            viewer.setNewDataRequestNeeded(true);
+    private static void updateMinMappingQuality( AbstractViewer viewer, JTextField minMappingQualityField ) {
+        if( GeneralUtils.isValidByteInput( minMappingQualityField.getText() ) ) {
+            byte minMappingQual = Byte.parseByte( minMappingQualityField.getText().trim() );
+            viewer.setMinMappingQuality( minMappingQual );
+            viewer.setNewDataRequestNeeded( true );
             viewer.boundsChangedHook();
-        } else if (!minMappingQualityField.getText().isEmpty()) {
-            JOptionPane.showMessageDialog(minMappingQualityField, "Please enter a valid mapping quality value! (1-127)", "Invalid Position", JOptionPane.ERROR_MESSAGE);
+        }
+        else if( !minMappingQualityField.getText().isEmpty() ) {
+            JOptionPane.showMessageDialog( minMappingQualityField, "Please enter a valid mapping quality value! (1-127)", "Invalid Position", JOptionPane.ERROR_MESSAGE );
         }
     }
-    
+
+
     /**
      * @return A placeholder with width 3 and height 20.
      */
     public static JPanel createPlaceholder() {
         JPanel placeholder = new JPanel();
-        placeholder.setBackground(ColorProperties.LEGEND_BACKGROUND);
-        placeholder.setMinimumSize(new Dimension(3, 20));
-        placeholder.setPreferredSize(new Dimension(3, 20));
+        placeholder.setBackground( ColorProperties.LEGEND_BACKGROUND );
+        placeholder.setMinimumSize( new Dimension( 3, 20 ) );
+        placeholder.setPreferredSize( new Dimension( 3, 20 ) );
         return placeholder;
     }
-    
+
+
     /**
      * @param text Text to place on the label.
+     * <p>
      * @return A label with ColorProperties.LEGEND_BACKGROUND background color
-     * and font Arial in 11 with the given text.
+     *         and font Arial in 11 with the given text.
      */
-    public static JLabel createLabel(String text) {
-        final JLabel label = new JLabel(text);
-        label.setBackground(ColorProperties.LEGEND_BACKGROUND);
-        label.setFont(new Font("Arial", Font.BOLD, 11));
+    public static JLabel createLabel( String text ) {
+        final JLabel label = new JLabel( text );
+        label.setBackground( ColorProperties.LEGEND_BACKGROUND );
+        label.setFont( new Font( "Arial", Font.BOLD, 11 ) );
         return label;
     }
 
+
     /**
      * @return A JPanel with ColorProperties.LEGEND_BACKGROUND background color
-     * and a standard border layout.
+     *         and a standard border layout.
      */
     public static JPanel createStandardPanel() {
-        final JPanel panel = new JPanel(new BorderLayout());
-        panel.setBackground(ColorProperties.LEGEND_BACKGROUND);
+        final JPanel panel = new JPanel( new BorderLayout() );
+        panel.setBackground( ColorProperties.LEGEND_BACKGROUND );
         return panel;
     }
 
+
     /**
      * @param text The text to place on the check box
-     * @return A JCheckBox with ColorProperties.LEGEND_BACKGROUND background 
-     * color.
+     * <p>
+     * @return A JCheckBox with ColorProperties.LEGEND_BACKGROUND background
+     *         color.
      */
-    public static JCheckBox createStandardCheckBox(String text) {
-        final JCheckBox checkBox = new JCheckBox(text);
-        checkBox.setBackground(ColorProperties.LEGEND_BACKGROUND);
+    public static JCheckBox createStandardCheckBox( String text ) {
+        final JCheckBox checkBox = new JCheckBox( text );
+        checkBox.setBackground( ColorProperties.LEGEND_BACKGROUND );
         return checkBox;
-    }    
-    
+    }
+
+
     /**
      * Creates a panel to use as header for some other component.
+     * <p>
      * @param text The text to place on the header panel
+     * <p>
      * @return The header panel
      */
-    public static JPanel createHeader(String text) {
-        JLabel header = LegendAndOptionsProvider.createLabel(text);
+    public static JPanel createHeader( String text ) {
+        JLabel header = LegendAndOptionsProvider.createLabel( text );
         final JPanel headerPanel = LegendAndOptionsProvider.createStandardPanel();
-        headerPanel.add(header, BorderLayout.CENTER);
-        headerPanel.setPreferredSize(new Dimension(headerPanel.getPreferredSize().width, headerPanel.getPreferredSize().height + 2));
+        headerPanel.add( header, BorderLayout.CENTER );
+        headerPanel.setPreferredSize( new Dimension( headerPanel.getPreferredSize().width, headerPanel.getPreferredSize().height + 2 ) );
         return headerPanel;
     }
+
+
 }

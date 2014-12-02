@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer;
 
+
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.LegendAndOptionsProvider;
@@ -29,91 +30,94 @@ import javax.swing.JPanel;
 import org.openide.util.NbBundle;
 import org.openide.util.NbPreferences;
 
+
 /**
  * Panel showing general options for an alignment viewer.
- * 
+ * <p>
  * @author -Rolf Hilker-
  */
 public class AlignmentOptionsPanel extends JPanel {
+
     private static final long serialVersionUID = 1L;
-    
+
     private final AlignmentViewer alignmentViewer;
 
-    public AlignmentOptionsPanel(AlignmentViewer alignmentViewer) {
+
+    public AlignmentOptionsPanel( AlignmentViewer alignmentViewer ) {
         this.alignmentViewer = alignmentViewer;
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        this.setBackground(ColorProperties.LEGEND_BACKGROUND);
+        this.setLayout( new BoxLayout( this, BoxLayout.Y_AXIS ) );
+        this.setBackground( ColorProperties.LEGEND_BACKGROUND );
         this.initOtherComponents();
     }
 
-    @NbBundle.Messages({"AlignmentOptionsPanel.General=General:",
-                        "AlignmentOptionsPanel.Centering=Enable centering sequence bar",
-                        "AlignmentOptionsPanel.Qualities=Show base qualities", 
-                        "AlignmentOptionsPanel_QualityToolTip=Good quality bases = bright hue, bad quality bases = dark hue"})
+
+    @NbBundle.Messages( { "AlignmentOptionsPanel.General=General:",
+                          "AlignmentOptionsPanel.Centering=Enable centering sequence bar",
+                          "AlignmentOptionsPanel.Qualities=Show base qualities",
+                          "AlignmentOptionsPanel_QualityToolTip=Good quality bases = bright hue, bad quality bases = dark hue" } )
     private void initOtherComponents() {
         //create header
-        this.add(LegendAndOptionsProvider.createHeader(Bundle.AlignmentOptionsPanel_General()));
+        this.add( LegendAndOptionsProvider.createHeader( Bundle.AlignmentOptionsPanel_General() ) );
         //create mapping filter
-        LegendAndOptionsProvider.createMappingQualityFilter(alignmentViewer, this);
+        LegendAndOptionsProvider.createMappingQualityFilter( alignmentViewer, this );
         this.createCenterSeqBarBox();
         this.createShowBaseQualitiesBox();
-        
+
         this.updateUI();
     }
+
 
     /**
      * Creates a check box for centering the sequence bar when selected.
      */
     private void createCenterSeqBarBox() {
         JPanel generalPanel = LegendAndOptionsProvider.createStandardPanel();
-        final JCheckBox centerBox = LegendAndOptionsProvider.createStandardCheckBox(Bundle.AlignmentOptionsPanel_Centering());
-        centerBox.setSelected(true);
-        
+        final JCheckBox centerBox = LegendAndOptionsProvider.createStandardCheckBox( Bundle.AlignmentOptionsPanel_Centering() );
+        centerBox.setSelected( true );
+
         //automatic centering around the sequence bar enabled event
-        centerBox.addActionListener(new ActionListener() {
+        centerBox.addActionListener( new ActionListener() {
 
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed( ActionEvent e ) {
                 JCheckBox scaleBox = (JCheckBox) e.getSource();
-                alignmentViewer.setAutomaticCentering(scaleBox.isSelected());
+                alignmentViewer.setAutomaticCentering( scaleBox.isSelected() );
             }
-        });
-        generalPanel.add(centerBox, BorderLayout.WEST);
-        this.add(generalPanel);
+
+
+        } );
+        generalPanel.add( centerBox, BorderLayout.WEST );
+        this.add( generalPanel );
     }
+
 
     /**
      * Creates a check box for enabling visualization of base qualities when
      * selected.
      */
     private void createShowBaseQualitiesBox() {
-        Preferences pref = NbPreferences.forModule(Object.class);
+        Preferences pref = NbPreferences.forModule( Object.class );
         JPanel generalPanel = LegendAndOptionsProvider.createStandardPanel();
-        final JCheckBox qualitiesBox = LegendAndOptionsProvider.createStandardCheckBox(Bundle.AlignmentOptionsPanel_Qualities());
-        qualitiesBox.setSelected(pref.getBoolean(Properties.BASE_QUALITY_OPTION, true));
-        qualitiesBox.setToolTipText(Bundle.AlignmentOptionsPanel_QualityToolTip());
-        generalPanel.add(qualitiesBox, BorderLayout.WEST);
-        
+        final JCheckBox qualitiesBox = LegendAndOptionsProvider.createStandardCheckBox( Bundle.AlignmentOptionsPanel_Qualities() );
+        qualitiesBox.setSelected( pref.getBoolean( Properties.BASE_QUALITY_OPTION, true ) );
+        qualitiesBox.setToolTipText( Bundle.AlignmentOptionsPanel_QualityToolTip() );
+        generalPanel.add( qualitiesBox, BorderLayout.WEST );
+
         //update base qualities property, when the box selection is changed
-        qualitiesBox.addActionListener(new ActionListener() {
+        qualitiesBox.addActionListener( new ActionListener() {
 
             //
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void actionPerformed( ActionEvent e ) {
                 JCheckBox scaleBox = (JCheckBox) e.getSource();
-                NbPreferences.forModule(Object.class).putBoolean(Properties.BASE_QUALITY_OPTION, scaleBox.isSelected());
+                NbPreferences.forModule( Object.class ).putBoolean( Properties.BASE_QUALITY_OPTION, scaleBox.isSelected() );
             }
-        });
-        
-        this.add(generalPanel);
+
+
+        } );
+
+        this.add( generalPanel );
     }
-    
+
+
 }
-
-
-
-
-
-
-
-

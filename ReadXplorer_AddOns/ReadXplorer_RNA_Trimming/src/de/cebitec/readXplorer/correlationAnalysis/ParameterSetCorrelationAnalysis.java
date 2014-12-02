@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.correlationAnalysis;
 
+
 import de.cebitec.readXplorer.correlationAnalysis.CorrelationAnalysisAction.CorrelationCoefficient;
 import de.cebitec.readXplorer.databackend.ParameterSetI;
 import de.cebitec.readXplorer.databackend.ParameterSetWithReadClasses;
@@ -23,32 +24,38 @@ import de.cebitec.readXplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import java.util.List;
 
+
 /**
  * Data storage for all parameters associated with a correlation analysis.
  *
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
-public class ParameterSetCorrelationAnalysis extends ParameterSetWithReadClasses implements ParameterSetI<ParameterSetCorrelationAnalysis> {
+public class ParameterSetCorrelationAnalysis extends ParameterSetWithReadClasses
+        implements ParameterSetI<ParameterSetCorrelationAnalysis> {
+
     private final CorrelationCoefficient correlationCoefficient;
     private final int intervalLength;
     private final int minCorrelation;
     private final int minPeakCoverage;
     private final List<PersistentTrack> selectedTracks;
 
+
     /**
      * Data storage for all parameters associated with a correlation analysis.
-     * @param selFeatureTypes the set of selected feature types
-     * @param readClassParams only include data in the analysis, which belong to
-     * the selected read classes.
+     * <p>
+     * @param selFeatureTypes        the set of selected feature types
+     * @param readClassParams        only include data in the analysis, which
+     *                               belong to
+     *                               the selected read classes.
      * @param correlationCoefficient
      * @param intervalLength
      * @param minCorrelation
-     * @param minPeakCoverage 
+     * @param minPeakCoverage
      */
-    public ParameterSetCorrelationAnalysis(ParametersReadClasses readClassParams, CorrelationCoefficient correlationCoefficient, 
-            int intervalLength, int minCorrelation, int minPeakCoverage, List<PersistentTrack> selectedTracks) {
-        super(readClassParams);
-        
+    public ParameterSetCorrelationAnalysis( ParametersReadClasses readClassParams, CorrelationCoefficient correlationCoefficient,
+                                            int intervalLength, int minCorrelation, int minPeakCoverage, List<PersistentTrack> selectedTracks ) {
+        super( readClassParams );
+
         this.correlationCoefficient = correlationCoefficient;
         this.intervalLength = intervalLength;
         this.minCorrelation = minCorrelation;
@@ -56,24 +63,30 @@ public class ParameterSetCorrelationAnalysis extends ParameterSetWithReadClasses
         this.selectedTracks = selectedTracks;
     }
 
+
     public CorrelationCoefficient getCorrelationCoefficient() {
         return correlationCoefficient;
     }
+
 
     public int getIntervalLength() {
         return intervalLength;
     }
 
+
     public int getMinCorrelation() {
         return minCorrelation;
     }
+
 
     public int getMinPeakCoverage() {
         return minPeakCoverage;
     }
 
+
     public List<PersistentTrack> getSelectedTracks() {
         return selectedTracks;
     }
-    
+
+
 }

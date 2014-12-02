@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cebitec.readXplorer.ui.importer.actions;
+
 
 import de.cebitec.readXplorer.api.cookies.LoginCookie;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
@@ -51,117 +52,126 @@ import org.openide.util.NbBundle;
 import org.openide.windows.WindowManager;
 import org.supercsv.prefs.CsvPreference;
 
+
 @ActionID(
-        category = "File",
-        id = "de.cebitec.readXplorer.ui.importer.actions.ImportTableWizardAction"
+         category = "File",
+         id = "de.cebitec.readXplorer.ui.importer.actions.ImportTableWizardAction"
 )
 @ActionRegistration(
-        iconBase = "de/cebitec/readXplorer/ui/importer/import.png",
-        displayName = "#CTL_ImportTableWizardAction"
+         iconBase = "de/cebitec/readXplorer/ui/importer/import.png",
+         displayName = "#CTL_ImportTableWizardAction"
 )
-@ActionReference(path = "Menu/File", position = 1481)
-@NbBundle.Messages("CTL_ImportTableWizardAction=Import any data table")
+@ActionReference( path = "Menu/File", position = 1481 )
+@NbBundle.Messages( "CTL_ImportTableWizardAction=Import any data table" )
 public final class ImportTableWizardAction implements ActionListener {
 
     private TableTopComponent topComp;
+
 
     /**
      * Action to import an arbitrary table into ReadXplorer and display it in a
      * new TopComonent.
      *
      * @param context A LoginCookie to assure, that a DB has already been
-     * opened.
+     *                opened.
      */
-    public ImportTableWizardAction(LoginCookie context) {
+    public ImportTableWizardAction( LoginCookie context ) {
         this.topComp = new TableTopComponent();
     }
 
-    @NbBundle.Messages({"WizardTitle=Import any data table wizard",
-        "ErrorHeader=Import Table Error"})
+
+    @NbBundle.Messages( { "WizardTitle=Import any data table wizard",
+                          "ErrorHeader=Import Table Error" } )
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed( ActionEvent e ) {
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
-        panels.add(new ImportTableWizardPanel());
-        WizardDescriptor wiz = new WizardDescriptor(new WizardDescriptor.ArrayIterator<>(VisualisationUtils.getWizardPanels(panels)));
+        panels.add( new ImportTableWizardPanel() );
+        WizardDescriptor wiz = new WizardDescriptor( new WizardDescriptor.ArrayIterator<>( VisualisationUtils.getWizardPanels( panels ) ) );
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
-        wiz.setTitleFormat(new MessageFormat("{0}"));
-        wiz.setTitle(Bundle.WizardTitle());
+        wiz.setTitleFormat( new MessageFormat( "{0}" ) );
+        wiz.setTitle( Bundle.WizardTitle() );
 
         //wizard has finished
-        if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
-            final TableType tableType = (TableType) wiz.getProperty(ImportTableWizardPanel.PROP_TABLE_TYPE);
-            final String fileLocation = (String) wiz.getProperty(ImportTableWizardPanel.PROP_SELECTED_FILE);
-            final String statsFileLocation = (String) wiz.getProperty(ImportTableWizardPanel.PROP_SELECTED_STATS_FILE);
-            final PersistentReference ref = (PersistentReference) wiz.getProperty(ImportTableWizardPanel.PROP_SELECTED_REF);
-            final boolean autoDelimiter = (boolean) wiz.getProperty(ImportTableWizardPanel.PROP_AUTO_DELEMITER);
-            final CsvPreference csvPref = (CsvPreference) wiz.getProperty(ImportTableWizardPanel.PROP_SEL_PREF);
-            final TableParserI parser = (TableParserI) wiz.getProperty(ImportTableWizardPanel.PROP_SEL_PARSER);
-            final TranscriptomeTableViewI tableView = Lookup.getDefault().lookup(TranscriptomeTableViewI.class);
+        if( DialogDisplayer.getDefault().notify( wiz ) == WizardDescriptor.FINISH_OPTION ) {
+            final TableType tableType = (TableType) wiz.getProperty( ImportTableWizardPanel.PROP_TABLE_TYPE );
+            final String fileLocation = (String) wiz.getProperty( ImportTableWizardPanel.PROP_SELECTED_FILE );
+            final String statsFileLocation = (String) wiz.getProperty( ImportTableWizardPanel.PROP_SELECTED_STATS_FILE );
+            final PersistentReference ref = (PersistentReference) wiz.getProperty( ImportTableWizardPanel.PROP_SELECTED_REF );
+            final boolean autoDelimiter = (boolean) wiz.getProperty( ImportTableWizardPanel.PROP_AUTO_DELEMITER );
+            final CsvPreference csvPref = (CsvPreference) wiz.getProperty( ImportTableWizardPanel.PROP_SEL_PREF );
+            final TableParserI parser = (TableParserI) wiz.getProperty( ImportTableWizardPanel.PROP_SEL_PARSER );
+            final TranscriptomeTableViewI tableView = Lookup.getDefault().lookup( TranscriptomeTableViewI.class );
 
-            if (parser instanceof CsvTableParser) {
+            if( parser instanceof CsvTableParser ) {
                 CsvTableParser csvParser = (CsvTableParser) parser;
-                csvParser.setAutoDelimiter(autoDelimiter);
-                csvParser.setCsvPref(csvPref);
-                csvParser.setTableModel(tableType);
+                csvParser.setAutoDelimiter( autoDelimiter );
+                csvParser.setCsvPref( csvPref );
+                csvParser.setTableModel( tableType );
             }
 
             //parse file in readable format for a table
-            final File tableFile = new File(fileLocation);
+            final File tableFile = new File( fileLocation );
             List<List<?>> tableData = new ArrayList<>();
             try {
 //                List<List<?>> tableData = parser.parseTable(tableFile);
 
-                if (tableView != null && (tableType.equals(TableType.OPERON_DETECTION_JR)
-                        || tableType.equals(TableType.RPKM_ANALYSIS_JR)
-                        || tableType.equals(TableType.NOVEL_TRANSCRIPT_DETECTION_JR)
-                        || tableType.equals(TableType.TSS_DETECTION_JR))) {
+                if( tableView != null && (tableType.equals( TableType.OPERON_DETECTION_JR )
+                                          || tableType.equals( TableType.RPKM_ANALYSIS_JR )
+                                          || tableType.equals( TableType.NOVEL_TRANSCRIPT_DETECTION_JR )
+                                          || tableType.equals( TableType.TSS_DETECTION_JR )) ) {
 
                     //xls handling of transcriptome tables
-                    if (parser instanceof XlsTranscriptomeTableParser) {
+                    if( parser instanceof XlsTranscriptomeTableParser ) {
                         XlsTranscriptomeTableParser xlsParser = (XlsTranscriptomeTableParser) parser;
-                        xlsParser.setTableType(tableType);
-                        xlsParser.parseTable(new File(fileLocation));
+                        xlsParser.setTableType( tableType );
+                        xlsParser.parseTable( new File( fileLocation ) );
                         DefaultTableModel model = xlsParser.getModel();
                         HashMap<String, String> secondSheetMap = xlsParser.getSecondSheetMap();
                         HashMap<String, String> secondSheetMapThirdCol = xlsParser.getSecondSheetMapThirdCol();
-                        tableView.processXlsInput(ref, model, secondSheetMap, secondSheetMapThirdCol);
-
-                    } else if (parser instanceof CsvTableParser) {
-                        CsvTableParser csvParser = (CsvTableParser) parser;
-                        final File parametersFile = new File(statsFileLocation);
-                        tableData = csvParser.parseTable(tableFile);
-                        csvParser.setTableModel(TableType.STATS_TABLE);
-                        List<List<?>> tableData2 = parser.parseTable(parametersFile);
-                        tableView.processCsvInput(tableData, tableData2, tableType, ref);
+                        tableView.processXlsInput( ref, model, secondSheetMap, secondSheetMapThirdCol );
 
                     }
-                } else {
-                    tableData = parser.parseTable(tableFile);
+                    else if( parser instanceof CsvTableParser ) {
+                        CsvTableParser csvParser = (CsvTableParser) parser;
+                        final File parametersFile = new File( statsFileLocation );
+                        tableData = csvParser.parseTable( tableFile );
+                        csvParser.setTableModel( TableType.STATS_TABLE );
+                        List<List<?>> tableData2 = parser.parseTable( parametersFile );
+                        tableView.processCsvInput( tableData, tableData2, tableType, ref );
 
-                    final UneditableTableModel tableModel = TableUtils.transformDataToTableModel(tableData);
+                    }
+                }
+                else {
+                    tableData = parser.parseTable( tableFile );
+
+                    final UneditableTableModel tableModel = TableUtils.transformDataToTableModel( tableData );
 
                     //open table visualization panel with given reference for jumping to the position
-                    SwingUtilities.invokeLater(new Runnable() { //because it is not called from the swing dispatch thread
+                    SwingUtilities.invokeLater( new Runnable() { //because it is not called from the swing dispatch thread
                         @Override
                         public void run() {
-                            PosTablePanel tablePanel = new PosTablePanel(tableModel, tableType);
-                            tablePanel.setReferenceGenome(ref);
+                            PosTablePanel tablePanel = new PosTablePanel( tableModel, tableType );
+                            tablePanel.setReferenceGenome( ref );
 //                            tablePanel.setTableType(tableType);
-                            TableVisualizationHelper.checkAndOpenRefViewer(ref, tablePanel);
+                            TableVisualizationHelper.checkAndOpenRefViewer( ref, tablePanel );
 
                             String panelName = "Imported table from: " + tableFile.getName();
-                            topComp = (TableTopComponent) WindowManager.getDefault().findTopComponent("TableTopComponent");
+                            topComp = (TableTopComponent) WindowManager.getDefault().findTopComponent( "TableTopComponent" );
                             topComp.open();
-                            topComp.openTableTab(panelName, tablePanel);
+                            topComp.openTableTab( panelName, tablePanel );
                         }
-                    });
+
+
+                    } );
                 }
 
-            } catch (ParsingException ex) {
-                JOptionPane.showMessageDialog(JOptionPane.getRootFrame(), ex.getMessage() + "\nFile: " + fileLocation,
-                        Bundle.ErrorHeader(), JOptionPane.INFORMATION_MESSAGE);
+            }
+            catch( ParsingException ex ) {
+                JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), ex.getMessage() + "\nFile: " + fileLocation,
+                                               Bundle.ErrorHeader(), JOptionPane.INFORMATION_MESSAGE );
             }
         }
     }
+
 
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,6 +16,7 @@
  */
 package de.cebitec.readXplorer.ui.visualisation.actions;
 
+
 import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
@@ -29,38 +30,44 @@ import org.openide.awt.DynamicMenuContent;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
+
 /**
  *
  * @author jwinneba
  */
-public class TrackCloseSelectionAction extends AbstractAction implements DynamicMenuContent{
+public class TrackCloseSelectionAction extends AbstractAction implements
+        DynamicMenuContent {
 
     private static final long serialVersionUID = 1L;
 
+
     @Override
-    public void actionPerformed(ActionEvent e) {
-        throw new AssertionError("Should never be called");
+    public void actionPerformed( ActionEvent e ) {
+        throw new AssertionError( "Should never be called" );
     }
+
 
     @Override
     public JComponent[] getMenuPresenters() {
         AppPanelTopComponent context = null;
         TopComponent tc = WindowManager.getDefault().getRegistry().getActivated();
-        if (tc instanceof AppPanelTopComponent) {
+        if( tc instanceof AppPanelTopComponent ) {
             context = (AppPanelTopComponent) tc;
         }
 
         List<Action> actions = context != null ? context.allTrackCloseActions() : new ArrayList<Action>();
-        JMenu menu = new JMenu("Close specific tracks");
-        for (Action a : actions) {
-            menu.add(new JMenuItem(a));
+        JMenu menu = new JMenu( "Close specific tracks" );
+        for( Action a : actions ) {
+            menu.add( new JMenuItem( a ) );
         }
-        return new JComponent[] { menu };
+        return new JComponent[]{ menu };
     }
 
+
     @Override
-    public JComponent[] synchMenuPresenters(JComponent[] items) {
+    public JComponent[] synchMenuPresenters( JComponent[] items ) {
         return getMenuPresenters();
     }
+
 
 }

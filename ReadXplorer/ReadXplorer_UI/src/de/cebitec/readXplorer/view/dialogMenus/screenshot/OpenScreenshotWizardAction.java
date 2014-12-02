@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.cebitec.readXplorer.view.dialogMenus.screenshot;
+
 
 import de.cebitec.readXplorer.util.ScreenshotUtils;
 import de.cebitec.readXplorer.util.VisualisationUtils;
@@ -33,25 +34,26 @@ import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 
+
 /**
  * Action for storing a screenshot of any of the TopComponents, which are
  * currently open in ReadXplorer.
- * 
+ * <p>
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 @ActionID(
-        category = "Visualisation",
-        id = "de.cebitec.readXplorer.view.dialogMenus.screenshot.OpenScreenshotWizardAction")
+         category = "Visualisation",
+         id = "de.cebitec.readXplorer.view.dialogMenus.screenshot.OpenScreenshotWizardAction" )
 @ActionRegistration(
-        iconBase = "de/cebitec/readXplorer/view/dialogMenus/screenshot/screenshot.png",
-        displayName = "#CTL_OpenScreenshotWizardAction")
-@ActionReferences({
-    @ActionReference(path = "Menu/Visualisation", position = 700),
-    @ActionReference(path = "Toolbars/Visualisation", position = 487),
-    @ActionReference(path = "Shortcuts", name = "D-P")
-})
-@Messages({ "CTL_OpenScreenshotWizardAction=Open Screenshot Wizard", 
-            "ScreenshotWizardTitle=Screenshot Wizard"})
+         iconBase = "de/cebitec/readXplorer/view/dialogMenus/screenshot/screenshot.png",
+         displayName = "#CTL_OpenScreenshotWizardAction" )
+@ActionReferences( {
+    @ActionReference( path = "Menu/Visualisation", position = 700 ),
+    @ActionReference( path = "Toolbars/Visualisation", position = 487 ),
+    @ActionReference( path = "Shortcuts", name = "D-P" )
+} )
+@Messages( { "CTL_OpenScreenshotWizardAction=Open Screenshot Wizard",
+             "ScreenshotWizardTitle=Screenshot Wizard" } )
 public final class OpenScreenshotWizardAction implements ActionListener {
 
     /**
@@ -60,25 +62,29 @@ public final class OpenScreenshotWizardAction implements ActionListener {
      */
     public OpenScreenshotWizardAction() {
     }
-    
+
+
     /**
      * Opens a wizard displaying all available options for storing screenshots.
+     * <p>
      * @param e event is currently not used
      */
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed( ActionEvent e ) {
         List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
-        panels.add(new ScreenshotWizardPanel());
-        WizardDescriptor wiz = new WizardDescriptor(new WizardDescriptor.ArrayIterator<>(VisualisationUtils.getWizardPanels(panels)));
+        panels.add( new ScreenshotWizardPanel() );
+        WizardDescriptor wiz = new WizardDescriptor( new WizardDescriptor.ArrayIterator<>( VisualisationUtils.getWizardPanels( panels ) ) );
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()
-        wiz.setTitleFormat(new MessageFormat("{0}"));
-        wiz.setTitle(Bundle.ScreenshotWizardTitle());
-        if (DialogDisplayer.getDefault().notify(wiz) == WizardDescriptor.FINISH_OPTION) {
-            TopComponent comp = (TopComponent) wiz.getProperty(ScreenshotWizardPanel.PROP_SELECTED_TOP_COMP);
+        wiz.setTitleFormat( new MessageFormat( "{0}" ) );
+        wiz.setTitle( Bundle.ScreenshotWizardTitle() );
+        if( DialogDisplayer.getDefault().notify( wiz ) == WizardDescriptor.FINISH_OPTION ) {
+            TopComponent comp = (TopComponent) wiz.getProperty( ScreenshotWizardPanel.PROP_SELECTED_TOP_COMP );
             Rectangle oldBounds = comp.getBounds();
-            ScreenshotUtils.saveScreenshot(comp);
-            comp.setBounds(oldBounds);
+            ScreenshotUtils.saveScreenshot( comp );
+            comp.setBounds( oldBounds );
             comp.validate();
         }
     }
+
+
 }

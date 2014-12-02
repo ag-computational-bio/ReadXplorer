@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,13 +16,16 @@
  */
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
+
 import java.util.Map;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 
-public class DeSeqWizardPanelFit implements WizardDescriptor.ValidatingPanel<WizardDescriptor> {
+
+public class DeSeqWizardPanelFit implements
+        WizardDescriptor.ValidatingPanel<WizardDescriptor> {
 
     /**
      * The visual component that displays this panel. If you need to access the
@@ -30,17 +33,19 @@ public class DeSeqWizardPanelFit implements WizardDescriptor.ValidatingPanel<Wiz
      */
     private DeSeqVisualPanelFit component;
 
+
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
     public DeSeqVisualPanelFit getComponent() {
-        if (component == null) {
+        if( component == null ) {
             component = new DeSeqVisualPanelFit();
         }
         return component;
     }
+
 
     @Override
     public HelpCtx getHelp() {
@@ -49,6 +54,7 @@ public class DeSeqWizardPanelFit implements WizardDescriptor.ValidatingPanel<Wiz
         // If you have context help:
         // return new HelpCtx("help.key.here");
     }
+
 
     @Override
     public boolean isValid() {
@@ -60,32 +66,39 @@ public class DeSeqWizardPanelFit implements WizardDescriptor.ValidatingPanel<Wiz
         // WizardDescriptor.ERROR/WARNING/INFORMATION_MESSAGE will also be useful.
     }
 
-    @Override
-    public void addChangeListener(ChangeListener l) {
-    }
 
     @Override
-    public void removeChangeListener(ChangeListener l) {
+    public void addChangeListener( ChangeListener l ) {
     }
 
-    @Override
-    public void readSettings(WizardDescriptor wiz) {
-        Map<String, String[]> design = (Map<String, String[]>) wiz.getProperty("design");
-        getComponent().updateConditionGroupsList(design.keySet());
-    }
 
     @Override
-    public void storeSettings(WizardDescriptor wiz) {
-        if (getComponent().allConditionGroupsAssigned()) {
-            wiz.putProperty("fittingGroupOne", getComponent().getFittingGroupOne());
-            wiz.putProperty("fittingGroupTwo", getComponent().getFittingGroupTwo());
+    public void removeChangeListener( ChangeListener l ) {
+    }
+
+
+    @Override
+    public void readSettings( WizardDescriptor wiz ) {
+        Map<String, String[]> design = (Map<String, String[]>) wiz.getProperty( "design" );
+        getComponent().updateConditionGroupsList( design.keySet() );
+    }
+
+
+    @Override
+    public void storeSettings( WizardDescriptor wiz ) {
+        if( getComponent().allConditionGroupsAssigned() ) {
+            wiz.putProperty( "fittingGroupOne", getComponent().getFittingGroupOne() );
+            wiz.putProperty( "fittingGroupTwo", getComponent().getFittingGroupTwo() );
         }
     }
+
 
     @Override
     public void validate() throws WizardValidationException {
-        if(!getComponent().allConditionGroupsAssigned()){
-            throw new WizardValidationException(null, "Please assign all conditional groups to a fitting group.", null);       
+        if( !getComponent().allConditionGroupsAssigned() ) {
+            throw new WizardValidationException( null, "Please assign all conditional groups to a fitting group.", null );
         }
     }
+
+
 }

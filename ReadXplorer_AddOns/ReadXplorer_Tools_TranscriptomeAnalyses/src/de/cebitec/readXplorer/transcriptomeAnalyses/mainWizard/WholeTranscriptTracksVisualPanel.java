@@ -1,5 +1,6 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard;
 
+
 import de.cebitec.readXplorer.transcriptomeAnalyses.verifier.DoubleVerifier;
 import de.cebitec.readXplorer.transcriptomeAnalyses.verifier.IntegerVerifier;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
@@ -7,6 +8,7 @@ import java.io.File;
 import java.util.prefs.Preferences;
 import javax.swing.JPanel;
 import org.openide.util.NbPreferences;
+
 
 public final class WholeTranscriptTracksVisualPanel extends JPanel {
 
@@ -16,98 +18,117 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
     private final String ratioText = "<html>Include <b>Ratio</b> as additional threshold</html>";
     private final String includeBestMatchedReadsText = "<html>Include <b>best matched</b> reads into analysis</html>";
 
+
     /**
      * Creates new form WholeTranscriptTracksVisualPanel
      */
-    public WholeTranscriptTracksVisualPanel(String wizardName) {
+    public WholeTranscriptTracksVisualPanel( String wizardName ) {
         this.wizardName = wizardName;
         initComponents();
-        this.fractionNovelRegionTF.setInputVerifier(new DoubleVerifier(this.fractionNovelRegionTF));
-        this.fractionOperonDetectionTF.setInputVerifier(new DoubleVerifier(this.fractionOperonDetectionTF));
-        this.increaseRatioValueTF.setInputVerifier(new IntegerVerifier(this.increaseRatioValueTF));
-        this.increaseRatioValueTF.setEnabled(false);
+        this.fractionNovelRegionTF.setInputVerifier( new DoubleVerifier( this.fractionNovelRegionTF ) );
+        this.fractionOperonDetectionTF.setInputVerifier( new DoubleVerifier( this.fractionOperonDetectionTF ) );
+        this.increaseRatioValueTF.setInputVerifier( new IntegerVerifier( this.increaseRatioValueTF ) );
+        this.increaseRatioValueTF.setEnabled( false );
         this.referenceFile = null;
-        this.fractionForNrLabel.setText(fractionText);
-        this.fractionForOpLabel.setText(fractionText);
-        this.includeRatioValueCB.setText(ratioText);
-        this.includeBestMatchedReadsIntoOPAnalysis.setText(includeBestMatchedReadsText);
-        this.includeBestMatchedReadsIntoNRAnalysis.setText(includeBestMatchedReadsText);
-        this.includeBestMatchedReadsIntoRpkmAnalysis.setText(includeBestMatchedReadsText);
-        bgThresholdSetManually_novelTrans.setEnabled(false);
-        bgThresholdSetManually_novelTrans.setInputVerifier(new IntegerVerifier(bgThresholdSetManually_novelTrans));
-        bgThresholdSetManually_op.setEnabled(false);
-        bgThresholdSetManually_op.setInputVerifier(new IntegerVerifier(bgThresholdSetManually_op));
+        this.fractionForNrLabel.setText( fractionText );
+        this.fractionForOpLabel.setText( fractionText );
+        this.includeRatioValueCB.setText( ratioText );
+        this.includeBestMatchedReadsIntoOPAnalysis.setText( includeBestMatchedReadsText );
+        this.includeBestMatchedReadsIntoNRAnalysis.setText( includeBestMatchedReadsText );
+        this.includeBestMatchedReadsIntoRpkmAnalysis.setText( includeBestMatchedReadsText );
+        bgThresholdSetManually_novelTrans.setEnabled( false );
+        bgThresholdSetManually_novelTrans.setInputVerifier( new IntegerVerifier( bgThresholdSetManually_novelTrans ) );
+        bgThresholdSetManually_op.setEnabled( false );
+        bgThresholdSetManually_op.setInputVerifier( new IntegerVerifier( bgThresholdSetManually_op ) );
         updateCheckFields();
     }
+
 
     @Override
     public String getName() {
         return "Analysis of whole transcript RNA-seq data set";
     }
 
+
     public boolean isNewRegions() {
         return this.newRegionsCheckBox.isSelected();
     }
+
 
     public boolean isOperonDetection() {
         return this.operonsCheckBox.isSelected();
     }
 
+
     public boolean isRPKM() {
         return this.rpkmCheckBox.isSelected();
     }
+
 
     public boolean isBgThresholdSetManually_NT() {
         return isBgThresholdSetManually_novelTrans.isSelected();
     }
 
+
     public boolean isBgThresholdSetManually_OP() {
         return isBgThresholdSetManually_op.isSelected();
     }
 
+
     public Integer getBgThresholdSetManually_NT() {
-        return Integer.parseInt(bgThresholdSetManually_novelTrans.getText());
+        return Integer.parseInt( bgThresholdSetManually_novelTrans.getText() );
     }
+
 
     public Integer getBgThresholdSetManually_OP() {
-        return Integer.parseInt(bgThresholdSetManually_op.getText());
+        return Integer.parseInt( bgThresholdSetManually_op.getText() );
     }
+
 
     public double getFractionForOperonDetection() {
-        return Double.valueOf(this.fractionOperonDetectionTF.getText()) / 100;
+        return Double.valueOf( this.fractionOperonDetectionTF.getText() ) / 100;
     }
+
 
     public Double getFractionForNewRegionDetection() {
-        return Double.valueOf(this.fractionNovelRegionTF.getText()) / 100;
+        return Double.valueOf( this.fractionNovelRegionTF.getText() ) / 100;
     }
 
+
     public Integer getMinBoundaryForNovelRegionDetection() {
-        return Integer.valueOf(this.minBoundaryNovelRegionTF.getText());
+        return Integer.valueOf( this.minBoundaryNovelRegionTF.getText() );
     }
+
 
     public boolean isInclusionOfRatioValueSelected() {
         return this.includeRatioValueCB.isSelected();
     }
 
+
     public boolean isIncludeBestMatchedReadsNR() {
         return this.includeBestMatchedReadsIntoNRAnalysis.isSelected();
     }
+
 
     public boolean isIncludeBestMatchedReadsOP() {
         return this.includeBestMatchedReadsIntoOPAnalysis.isSelected();
     }
 
+
     public boolean isIncludeBestMatchedReadsRpkm() {
         return this.includeBestMatchedReadsIntoRpkmAnalysis.isSelected();
     }
 
+
     public Integer getIncreaseRatioValue() {
-        return Integer.valueOf(this.increaseRatioValueTF.getText());
+        return Integer.valueOf( this.increaseRatioValueTF.getText() );
     }
+
 
     public File getRefFile() {
         return this.referenceFile;
     }
+
 
     /**
      * Updates the checkboxes for the read classes with the globally stored
@@ -115,34 +136,37 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
      * configuration is chosen.
      */
     private void updateCheckFields() {
-        Preferences pref = NbPreferences.forModule(Object.class);
+        Preferences pref = NbPreferences.forModule( Object.class );
 
-        if (pref.getBoolean(wizardName + WizardPropertyStrings.PROP_NOVEL_ANALYSIS, false)) {
-            String fractionValueNR = pref.get(wizardName + WizardPropertyStrings.PROP_Fraction, "5");
+        if( pref.getBoolean( wizardName + WizardPropertyStrings.PROP_NOVEL_ANALYSIS, false ) ) {
+            String fractionValueNR = pref.get( wizardName + WizardPropertyStrings.PROP_Fraction, "5" );
             int fractionNR;
-            if (fractionValueNR.equals("5")) {
+            if( fractionValueNR.equals( "5" ) ) {
                 fractionNR = 5;
-            } else {
-                double iNR = Double.valueOf(fractionValueNR);
+            }
+            else {
+                double iNR = Double.valueOf( fractionValueNR );
                 fractionNR = (int) (iNR * 100);
             }
-            this.fractionNovelRegionTF.setText("" + fractionNR);
+            this.fractionNovelRegionTF.setText( "" + fractionNR );
         }
 
-        this.minBoundaryNovelRegionTF.setText(pref.get(wizardName + WizardPropertyStrings.PROP_MIN_LENGTH_OF_NOVEL_TRANSCRIPT, "100"));
-        if (pref.getBoolean(wizardName + WizardPropertyStrings.PROP_OPERON_ANALYSIS, false)) {
+        this.minBoundaryNovelRegionTF.setText( pref.get( wizardName + WizardPropertyStrings.PROP_MIN_LENGTH_OF_NOVEL_TRANSCRIPT, "100" ) );
+        if( pref.getBoolean( wizardName + WizardPropertyStrings.PROP_OPERON_ANALYSIS, false ) ) {
             int fractionOP;
-            String fractionValueOP = pref.get(wizardName + WizardPropertyStrings.PROP_Fraction, "5");
-            if (fractionValueOP.equals("5")) {
+            String fractionValueOP = pref.get( wizardName + WizardPropertyStrings.PROP_Fraction, "5" );
+            if( fractionValueOP.equals( "5" ) ) {
                 fractionOP = 5;
-            } else {
-                double iOP = Double.valueOf(pref.get(wizardName + WizardPropertyStrings.PROP_Fraction, "5"));
+            }
+            else {
+                double iOP = Double.valueOf( pref.get( wizardName + WizardPropertyStrings.PROP_Fraction, "5" ) );
                 fractionOP = (int) (iOP * 100);
             }
-            this.fractionOperonDetectionTF.setText("" + fractionOP);
+            this.fractionOperonDetectionTF.setText( "" + fractionOP );
         }
-        this.increaseRatioValueTF.setText(pref.get(wizardName + WizardPropertyStrings.PROP_RATIO_NOVELREGION_DETECTION, "5"));
+        this.increaseRatioValueTF.setText( pref.get( wizardName + WizardPropertyStrings.PROP_RATIO_NOVELREGION_DETECTION, "5" ) );
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -400,10 +424,11 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void includeRatioValueCBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_includeRatioValueCBActionPerformed
-        if (includeRatioValueCB.isSelected()) {
-            increaseRatioValueTF.setEnabled(true);
-        } else {
-            increaseRatioValueTF.setEnabled(false);
+        if( includeRatioValueCB.isSelected() ) {
+            increaseRatioValueTF.setEnabled( true );
+        }
+        else {
+            increaseRatioValueTF.setEnabled( false );
         }
     }//GEN-LAST:event_includeRatioValueCBActionPerformed
 
@@ -412,27 +437,29 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
     }//GEN-LAST:event_minBoundaryNovelRegionTFActionPerformed
 
     private void loadRefFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadRefFileActionPerformed
-        ReadXplorerFileChooser fileChooser = new ReadXplorerFileChooser(new String[]{"txt"}, "Text file") {
+        ReadXplorerFileChooser fileChooser = new ReadXplorerFileChooser( new String[]{ "txt" }, "Text file" ) {
             @Override
-            public void save(String fileLocation) {
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            public void save( String fileLocation ) {
+                throw new UnsupportedOperationException( "Not supported yet." ); //To change body of generated methods, choose Tools | Templates.
 
             }
 
+
             @Override
-            public void open(String fileLocation) {
-                referenceFile = new File(fileLocation);
-                referenceLocation.setText(referenceFile.getName());
+            public void open( String fileLocation ) {
+                referenceFile = new File( fileLocation );
+                referenceLocation.setText( referenceFile.getName() );
             }
+
 
         };
-        fileChooser.openFileChooser(ReadXplorerFileChooser.OPEN_DIALOG);
+        fileChooser.openFileChooser( ReadXplorerFileChooser.OPEN_DIALOG );
     }//GEN-LAST:event_loadRefFileActionPerformed
 
     private void newRegionsCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newRegionsCheckBoxActionPerformed
-        if (newRegionsCheckBox.isSelected()) {
-            operonsCheckBox.setSelected(false);
-            rpkmCheckBox.setSelected(false);
+        if( newRegionsCheckBox.isSelected() ) {
+            operonsCheckBox.setSelected( false );
+            rpkmCheckBox.setSelected( false );
         }
     }//GEN-LAST:event_newRegionsCheckBoxActionPerformed
 
@@ -441,40 +468,42 @@ public final class WholeTranscriptTracksVisualPanel extends JPanel {
     }//GEN-LAST:event_bgThresholdSetManually_opActionPerformed
 
     private void isBgThresholdSetManually_novelTransActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_isBgThresholdSetManually_novelTransActionPerformed
-        if (isBgThresholdSetManually_novelTrans.isSelected()) {
-            bgThresholdSetManually_novelTrans.setEnabled(true);
-            fractionForNrLabel.setEnabled(false);
-            fractionNovelRegionTF.setEnabled(false);
-        } else {
-            bgThresholdSetManually_novelTrans.setEnabled(false);
-            fractionForNrLabel.setEnabled(true);
-            fractionNovelRegionTF.setEnabled(true);
+        if( isBgThresholdSetManually_novelTrans.isSelected() ) {
+            bgThresholdSetManually_novelTrans.setEnabled( true );
+            fractionForNrLabel.setEnabled( false );
+            fractionNovelRegionTF.setEnabled( false );
+        }
+        else {
+            bgThresholdSetManually_novelTrans.setEnabled( false );
+            fractionForNrLabel.setEnabled( true );
+            fractionNovelRegionTF.setEnabled( true );
         }
     }//GEN-LAST:event_isBgThresholdSetManually_novelTransActionPerformed
 
     private void operonsCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_operonsCheckBoxActionPerformed
-        if (operonsCheckBox.isSelected()) {
-            newRegionsCheckBox.setSelected(false);
-            rpkmCheckBox.setSelected(false);
+        if( operonsCheckBox.isSelected() ) {
+            newRegionsCheckBox.setSelected( false );
+            rpkmCheckBox.setSelected( false );
         }
     }//GEN-LAST:event_operonsCheckBoxActionPerformed
 
     private void rpkmCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rpkmCheckBoxActionPerformed
-        if (rpkmCheckBox.isSelected()) {
-            operonsCheckBox.setSelected(false);
-            newRegionsCheckBox.setSelected(false);
+        if( rpkmCheckBox.isSelected() ) {
+            operonsCheckBox.setSelected( false );
+            newRegionsCheckBox.setSelected( false );
         }
     }//GEN-LAST:event_rpkmCheckBoxActionPerformed
 
     private void isBgThresholdSetManually_opActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_isBgThresholdSetManually_opActionPerformed
-        if (isBgThresholdSetManually_op.isSelected()) {
-            bgThresholdSetManually_op.setEnabled(true);
-            fractionForOpLabel.setEnabled(false);
-            fractionOperonDetectionTF.setEnabled(false);
-        } else {
-            bgThresholdSetManually_op.setEnabled(false);
-            fractionForOpLabel.setEnabled(true);
-            fractionOperonDetectionTF.setEnabled(true);
+        if( isBgThresholdSetManually_op.isSelected() ) {
+            bgThresholdSetManually_op.setEnabled( true );
+            fractionForOpLabel.setEnabled( false );
+            fractionOperonDetectionTF.setEnabled( false );
+        }
+        else {
+            bgThresholdSetManually_op.setEnabled( false );
+            fractionForOpLabel.setEnabled( true );
+            fractionOperonDetectionTF.setEnabled( true );
         }
     }//GEN-LAST:event_isBgThresholdSetManually_opActionPerformed
 

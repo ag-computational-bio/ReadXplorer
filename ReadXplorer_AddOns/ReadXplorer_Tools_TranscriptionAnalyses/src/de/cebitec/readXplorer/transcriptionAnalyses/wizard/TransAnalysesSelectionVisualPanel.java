@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,18 +16,21 @@
  */
 package de.cebitec.readXplorer.transcriptionAnalyses.wizard;
 
+
 import de.cebitec.readXplorer.api.objects.JobPanel;
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
+
 
 /**
  * Panel showing all different kinds of transcription analyses functions and
  * allowing for selection of these.
- * 
+ * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 public final class TransAnalysesSelectionVisualPanel extends JobPanel {
-    
+
     private static final long serialVersionUID = 1L;
+
 
     /**
      * Panel showing all different kinds of transcription analyses functions and
@@ -37,10 +40,12 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
         initComponents();
     }
 
+
     @Override
     public String getName() {
         return "Transcription Analyses Selection";
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -150,15 +155,15 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void transcriptionStartBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_transcriptionStartBoxActionPerformed
-        firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet());
+        firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet() );
     }//GEN-LAST:event_transcriptionStartBoxActionPerformed
 
     private void rpkmValuesBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rpkmValuesBoxActionPerformed
-        firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet());
+        firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet() );
     }//GEN-LAST:event_rpkmValuesBoxActionPerformed
 
     private void operonDetectionBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_operonDetectionBoxActionPerformed
-        firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet());
+        firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet() );
     }//GEN-LAST:event_operonDetectionBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -173,28 +178,33 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
     private javax.swing.JTextArea tssTextArea;
     // End of variables declaration//GEN-END:variables
 
+
     /**
-     * @return true, if the transcription start analysis is selected, false otherwise
+     * @return true, if the transcription start analysis is selected, false
+     *         otherwise
      */
     public boolean isTSSAnalysisSelected() {
         return this.transcriptionStartBox.isSelected();
     }
-    
+
+
     /**
      * @return true, if the operon analysis is selected, false
-     * otherwise
+     *         otherwise
      */
     public boolean isOperonAnalysisSelected() {
         return this.operonDetectionBox.isSelected();
     }
-    
+
+
     /**
      * @return true, if the rpkm analysis is selected, false
-     * otherwise
+     *         otherwise
      */
     public boolean isRPKMAnalysisSelected() {
         return this.rpkmValuesBox.isSelected();
     }
+
 
     /**
      * @return true, if the panel contains valid information, false otherwise
@@ -203,23 +213,28 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
     public boolean isRequiredInfoSet() {
         return this.transcriptionStartBox.isSelected()
                || this.operonDetectionBox.isSelected()
-                || this.rpkmValuesBox.isSelected();
+               || this.rpkmValuesBox.isSelected();
     }
-    
+
+
     /**
-     * Updates the components for all offered analyses depending on the 
+     * Updates the components for all offered analyses depending on the
      * selection.
-     * @param isTssSelected true, if the TSS analysis shall be selected, 
-     * false otherwise
+     * <p>
+     * @param isTssSelected    true, if the TSS analysis shall be selected,
+     *                         false otherwise
      * @param isOperonSelected true, if the operon analysis shall be selected,
-     * false otherwise
-     * @param isRpkmSelected true, if the RPKM analysis shall be selected, false
-     * otherwise
+     *                         false otherwise
+     * @param isRpkmSelected   true, if the RPKM analysis shall be selected,
+     *                         false
+     *                         otherwise
      */
-    protected void updateAnalysisSelection(boolean isTssSelected, boolean isOperonSelected, boolean isRpkmSelected) {
-        this.transcriptionStartBox.setSelected(isTssSelected);
-        this.operonDetectionBox.setSelected(isOperonSelected);
-        this.rpkmValuesBox.setSelected(isRpkmSelected);
-        firePropertyChange(ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet());
+    protected void updateAnalysisSelection( boolean isTssSelected, boolean isOperonSelected, boolean isRpkmSelected ) {
+        this.transcriptionStartBox.setSelected( isTssSelected );
+        this.operonDetectionBox.setSelected( isOperonSelected );
+        this.rpkmValuesBox.setSelected( isRpkmSelected );
+        firePropertyChange( ChangeListeningWizardPanel.PROP_VALIDATE, null, isRequiredInfoSet() );
     }
+
+
 }

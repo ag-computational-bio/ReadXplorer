@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,9 @@
  */
 package de.cebitec.readXplorer.view.dataVisualisation;
 
+
 import java.awt.Rectangle;
+
 
 /**
  * By implementing this interface the class gains a method for setting the
@@ -27,5 +29,7 @@ import java.awt.Rectangle;
  */
 public interface HighlightableI {
 
-    public void setHighlightRectangle(Rectangle rect);
+    public void setHighlightRectangle( Rectangle rect );
+
+
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,12 +16,14 @@
  */
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
+
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import java.io.File;
 import java.util.List;
 import javax.swing.JPanel;
+
 
 /**
  * Panel displaying general options for the differential expression wizard, such
@@ -35,6 +37,7 @@ public final class GeneralSettingsVisualPanel extends JPanel {
     private static final long serialVersionUID = 1L;
     private boolean saveBoxChecked;
 
+
     /**
      * Panel displaying general options for the differential expression wizard,
      * such as the annotation selection, start and stop offset selection and if
@@ -43,43 +46,52 @@ public final class GeneralSettingsVisualPanel extends JPanel {
     public GeneralSettingsVisualPanel() {
         initComponents();
         this.saveBoxChecked = this.saveCheckBox.isSelected();
-        fileNameField.setText(System.getProperty("user.home") + File.separator + "DiffExpResult.rdata");
-        int[] selectedIndex = {0,1};
-        usedAnnotationsList.setSelectedIndices(selectedIndex);
+        fileNameField.setText( System.getProperty( "user.home" ) + File.separator + "DiffExpResult.rdata" );
+        int[] selectedIndex = { 0, 1 };
+        usedAnnotationsList.setSelectedIndices( selectedIndex );
     }
 
-    public void enableSaveOptions(boolean bool) {
-        saveCheckBox.setEnabled(bool);
+
+    public void enableSaveOptions( boolean bool ) {
+        saveCheckBox.setEnabled( bool );
     }
+
 
     public boolean verifyInput() {
-        return GeneralUtils.isValidNumberInput(startOffset.getText()) && GeneralUtils.isValidNumberInput(stopOffset.getText());
+        return GeneralUtils.isValidNumberInput( startOffset.getText() ) && GeneralUtils.isValidNumberInput( stopOffset.getText() );
     }
+
 
     public Integer getStartOffset() {
-        return Integer.parseInt(startOffset.getText());
+        return Integer.parseInt( startOffset.getText() );
     }
 
+
     public Integer getStopOffset() {
-        return Integer.parseInt(stopOffset.getText());
+        return Integer.parseInt( stopOffset.getText() );
     }
+
 
     @Override
     public String getName() {
         return "General Setup";
     }
 
+
     public List<FeatureType> getSelectedFeatureTypes() {
         return usedAnnotationsList.getSelectedValuesList();
     }
+
 
     public String getSavePath() {
         return fileNameField.getText();
     }
 
+
     public boolean isSaveBoxChecked() {
         return saveBoxChecked;
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -188,24 +200,28 @@ public final class GeneralSettingsVisualPanel extends JPanel {
 
     private void saveCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveCheckBoxActionPerformed
         saveBoxChecked = this.saveCheckBox.isSelected();
-        fileChooserButton.setEnabled(saveBoxChecked);
-        fileNameField.setEnabled(saveBoxChecked);
+        fileChooserButton.setEnabled( saveBoxChecked );
+        fileNameField.setEnabled( saveBoxChecked );
     }//GEN-LAST:event_saveCheckBoxActionPerformed
 
     private void fileChooserButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fileChooserButtonActionPerformed
-        ReadXplorerFileChooser fc = new ReadXplorerFileChooser(new String[]{"rdata"}, "rdata") {
+        ReadXplorerFileChooser fc = new ReadXplorerFileChooser( new String[]{ "rdata" }, "rdata" ) {
             private static final long serialVersionUID = 1L;
 
-            @Override
-            public void save(String fileLocation) {
-                fileNameField.setText(fileLocation);
-            }
 
             @Override
-            public void open(String fileLocation) {
+            public void save( String fileLocation ) {
+                fileNameField.setText( fileLocation );
             }
+
+
+            @Override
+            public void open( String fileLocation ) {
+            }
+
+
         };
-        fc.openFileChooser(ReadXplorerFileChooser.SAVE_DIALOG);
+        fc.openFileChooser( ReadXplorerFileChooser.SAVE_DIALOG );
     }//GEN-LAST:event_fileChooserButtonActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton fileChooserButton;

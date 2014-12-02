@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,24 +16,29 @@
  */
 package de.cebitec.readXplorer.ui.visualisation.actions;
 
+
 import de.cebitec.readXplorer.api.cookies.CloseTrackCookie;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
+
 public final class CloseTrackAction implements ActionListener {
 
     private final List<CloseTrackCookie> context;
 
-    public CloseTrackAction(List<CloseTrackCookie> context) {
+
+    public CloseTrackAction( List<CloseTrackCookie> context ) {
         this.context = context;
     }
 
+
     @Override
-    public void actionPerformed(ActionEvent e) {
-        for (CloseTrackCookie closeCookie : context) {
+    public void actionPerformed( ActionEvent e ) {
+        for( CloseTrackCookie closeCookie : context ) {
             closeCookie.close();
         }
     }
-    
+
+
 }

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package de.compbio.readxplorer.classificationUpdate;
+
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readXplorer.api.cookies.LoginCookie;
@@ -36,61 +37,67 @@ import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.RequestProcessor;
 
+
 /**
  * An action to update the read classification data from older RX versions to
  * the most recent classification.
- * 
+ * <p>
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
 @ActionID(
-        category = "File",
-        id = "de.compbio.readxplorer.UpdateReadClassificationAction"
+         category = "File",
+         id = "de.compbio.readxplorer.UpdateReadClassificationAction"
 )
 @ActionRegistration(
-        displayName = "#CTL_UpdateReadClassificationAction"
+         displayName = "#CTL_UpdateReadClassificationAction"
 )
-@ActionReference(path = "Menu/File", position = 2000)
-@Messages("CTL_UpdateReadClassificationAction=Update Read Classification")
+@ActionReference( path = "Menu/File", position = 2000 )
+@Messages( "CTL_UpdateReadClassificationAction=Update Read Classification" )
 public final class UpdateReadClassificationAction implements ActionListener {
 
     private final LoginCookie context;
     private List<WizardDescriptor.Panel<WizardDescriptor>> panels;
 
+
     /**
      * An action to update the read classification data from older RX versions
      * to the most recent classification.
+     * <p>
      * @param context The user needs to be logged into a DB to use this action
      */
-    public UpdateReadClassificationAction(LoginCookie context) {
+    public UpdateReadClassificationAction( LoginCookie context ) {
         this.context = context;
     }
 
+
     @Override
-    @NbBundle.Messages("TTL_UpdateWizardTitle=ReadXplorer Classification Update")
-    public void actionPerformed(ActionEvent ev) {
-        if (CentralLookup.getDefault().lookup(SwingWorker.class) != null) {
-            NotifyDescriptor nd = new NotifyDescriptor.Message(NbBundle.getMessage(UpdateReadClassificationAction.class, "MSG_BackgroundActivity"), NotifyDescriptor.WARNING_MESSAGE);
-            DialogDisplayer.getDefault().notify(nd);
+    @NbBundle.Messages( "TTL_UpdateWizardTitle=ReadXplorer Classification Update" )
+    public void actionPerformed( ActionEvent ev ) {
+        if( CentralLookup.getDefault().lookup( SwingWorker.class ) != null ) {
+            NotifyDescriptor nd = new NotifyDescriptor.Message( NbBundle.getMessage( UpdateReadClassificationAction.class, "MSG_BackgroundActivity" ), NotifyDescriptor.WARNING_MESSAGE );
+            DialogDisplayer.getDefault().notify( nd );
             return;
         }
 
-        if (panels == null) {
+        if( panels == null ) {
             panels = new ArrayList<>();
-            panels.add(new UpdateReadClassWizardPanel(""));
+            panels.add( new UpdateReadClassWizardPanel( "" ) );
         }
-        WizardDescriptor wizardDescriptor = new WizardDescriptor(new WizardDescriptor.ArrayIterator<>(VisualisationUtils.getWizardPanels(panels)));
+        WizardDescriptor wizardDescriptor = new WizardDescriptor( new WizardDescriptor.ArrayIterator<>( VisualisationUtils.getWizardPanels( panels ) ) );
         // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()
-        wizardDescriptor.setTitleFormat(new MessageFormat("{0}"));
-        wizardDescriptor.setTitle(Bundle.TTL_UpdateWizardTitle());
-        Dialog dialog = DialogDisplayer.getDefault().createDialog(wizardDescriptor);
-        dialog.setVisible(true);
+        wizardDescriptor.setTitleFormat( new MessageFormat( "{0}" ) );
+        wizardDescriptor.setTitle( Bundle.TTL_UpdateWizardTitle() );
+        Dialog dialog = DialogDisplayer.getDefault().createDialog( wizardDescriptor );
+        dialog.setVisible( true );
         dialog.toFront();
 
         boolean cancelled = wizardDescriptor.getValue() != WizardDescriptor.FINISH_OPTION;
-        if (!cancelled) {
+        if( !cancelled ) {
             UpdateThread updateThread = new UpdateThread();
-            RequestProcessor rp = new RequestProcessor("Update Thread", 2);
-            rp.post(updateThread);
+            RequestProcessor rp = new RequestProcessor( "Update Thread", 2 );
+            rp.post( updateThread );
         }
     }
+
+
 }

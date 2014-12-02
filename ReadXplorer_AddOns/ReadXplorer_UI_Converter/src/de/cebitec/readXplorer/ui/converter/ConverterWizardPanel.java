@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -16,10 +16,12 @@
  */
 package de.cebitec.readXplorer.ui.converter;
 
+
 import de.cebitec.readXplorer.parser.output.ConverterI;
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningFinishWizardPanel;
 import java.awt.Component;
 import org.openide.WizardDescriptor;
+
 
 /**
  * The wizard panel representing the options for file conversion in ReadXplorer.
@@ -29,27 +31,31 @@ import org.openide.WizardDescriptor;
 class ConverterWizardPanel extends ChangeListeningFinishWizardPanel {
 
     private ConverterSetupCard converterPanel;
-    
+
+
     public ConverterWizardPanel() {
-        super("");
+        super( "" );
     }
+
 
     @Override
     public Component getComponent() {
-        if (this.converterPanel == null) {
+        if( this.converterPanel == null ) {
             this.converterPanel = new ConverterSetupCard();
         }
         return this.converterPanel;
     }
 
+
     @Override
-    public void storeSettings(WizardDescriptor settings) {
+    public void storeSettings( WizardDescriptor settings ) {
         // store converter parameters
-        if (this.isFinishPanel()) {
+        if( this.isFinishPanel() ) {
             ConverterI converter = converterPanel.getSelectedConverter();
-            converter.setDataToConvert(converterPanel.getMappingFiles(), converterPanel.getRefChromosomeName(), converterPanel.getChromosomeLength());
-            settings.putProperty(ConverterAction.PROP_CONVERTER_TYPE, converter);
+            converter.setDataToConvert( converterPanel.getMappingFiles(), converterPanel.getRefChromosomeName(), converterPanel.getChromosomeLength() );
+            settings.putProperty( ConverterAction.PROP_CONVERTER_TYPE, converter );
         }
     }
-    
+
+
 }
