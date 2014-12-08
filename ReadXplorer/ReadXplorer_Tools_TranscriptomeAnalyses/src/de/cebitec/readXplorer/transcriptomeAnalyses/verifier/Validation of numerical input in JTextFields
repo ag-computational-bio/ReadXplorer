@@ -1,0 +1,432 @@
+VALIDATING NUMERICAL INPUT IN A JTEXTFIELD
+
+The Java 2 SDK, Standard Edition, v 1.4 which is currently 
+available as a Beta release, adds a JFormattedTextField component 
+for formatted text input. Among other things, this gives you the 
+ability to validate input to the field. But what do you do if you 
+need to validate input now and can't wait for the new release? 
+There are at least three different ways you can validate your text 
+input fields today: keystroke level, focus level, and data model 
+level. This tip shows you how to use these techniques to create an 
+input field that only accepts numeric input.
+
+
+As is the case for the AWT TextField component, the Swing 
+JTextField component supports registering a KeyListener with the 
+component. When a listener is registered, you can watch for keys 
+pressed. If the key pressed is not a numeric key, you can reject 
+it, that is, with one exception: you have to permit backspace and 
+delete to correct mistakes. Rejection is handled by calling the 
+consume() method of the KeyEvent, which tells the component that 
+the keystroke was dealt with by one of its input listeners and 
+shouldn't be displayed.
+
+
+Here's what input verification using a listener like this might 
+look like:
+
+
+  keyText.addKeyListener(new KeyAdapter() {
+    public void keyTyped(KeyEvent e) {
+      char c = e.getKeyChar();
+      if (!((c >= '0') && (c <= '9') ||
+         (c == KeyEvent.VK_BACK_SPACE) ||
+         (c == KeyEvent.VK_DELETE))) {
+        getToolkit().beep();
+        e.consume();
+      }
+    }
+  });
+
+
+There's a special consideration in using a key listener if you
+are working in an environment where you need to install an input 
+method listener. In this case, the input method listener will 
+disable the ability to capture keystrokes with a key listener. 
+This usually happens when there are not enough keyboard keys to 
+map to input characters. An example of this is accepting Chinese 
+or Japanese characters as input.
+
+
+Using a FocusListener instead of a KeyListener provides 
+a slightly different behavior. Where the KeyListener verifies 
+each keystroke, the FocusListener validates the input when the 
+focus on the input field is lost. Because it verifies the whole 
+field, this technique simply involves parsing the input with the 
+parseInt() method of Integer. In fact, the input value doesn't 
+matter. What does matter is that you can parse the input.
+
+
+Here's what the FocusListner version of input verification looks 
+like:
+
+
+  focusText.addFocusListener(new FocusAdapter() {
+    public void focusLost(FocusEvent e) {
+      JTextField textField = 
+        (JTextField)e.getSource();
+      String content = textField.getText();
+      if (content.length() != 0) {
+        try {
+          Integer.parseInt(content);
+        } catch (NumberFormatException nfe) {
+          getToolkit().beep();
+          textField.requestFocus();
+        }
+      }
+    }
+  });
+
+
+Unfortunately, there is a problem with using focus level 
+listeners when your input screen has a menu or pops up a dialog. 
+Either of these events would trigger a call to the focus 
+listener. With menus, the listener is actually called when each 
+top-level menu gets input focus, that is, as you move to find the 
+right menu item to select. The listener shown above beeps on 
+invalid input, however, imagine what would happen if a dialog 
+popped up to display an error message.
+
+
+There's a second way of doing focus-level verification of Swing 
+components. You can attach an InputVerifier to the component. 
+The abstract class has a single method, 
+boolean verify(JComponent), that you implement to perform
+validation of the input. The method needs to return true if the 
+input is valid, and false otherwise. As in the FocusListener 
+technique, you can use parseInt() to check for true or false. 
+To attach the verifier, you call the setInputVerifier() method. 
+When a user tries to move the input focus beyond the associated 
+field, the verifier takes action to validate the input. 
+
+
+As with the FocusListener, the InputVerifier permits validation 
+on the whole field, versus trying to determine if part of the 
+input is valid. This is important, for instance, if you want 
+the input to be within a certain range.
+
+
+There's a second method in InputVerifier for handling how to
+respond to invalid input: boolean shouldYieldFocus(JComponent).
+The default implementation of the method returns the value
+returned by verify(). If you want to beep on invalid input, you
+have to check the value before returning.
+
+
+Here's an example of input verification and beeping on invalid
+input using an InputVerifier:
+
+
+  inputText.setInputVerifier(new InputVerifier() {
+    public boolean verify(JComponent comp) {
+      boolean returnValue = true;
+      JTextField textField = (JTextField)comp;
+      String content = textField.getText();
+      if (content.length() != 0) {
+        try {
+          Integer.parseInt(textField.getText());
+        } catch (NumberFormatException e) {
+          returnValue = false;
+        }
+      }
+      return returnValue;
+    }
+    public boolean shouldYieldFocus(JComponent input) {
+      boolean valid = super.shouldYieldFocus(input);
+      if (!valid) {
+        getToolkit().beep();
+      }
+      return valid;
+    }
+  });
+
+
+While this third way might look a little cleaner, in that it 
+doesn't require you to provide the requestFocus() call to return 
+the input focus, it too suffers from the same problem as the 
+FocusListener.
+
+
+The final way to validate input covered in this tip involves 
+understanding Swing's Model-View-Controller (MVC) architecture. 
+Behind every JTextComponent (such as a JTextField), is a model 
+that holds the data in the text component. The JTextField is 
+just one view into that model. By limiting what you can put in 
+the model, you can limit what can be displayed in the JTextField.
+
+
+By adding the validation of the input to the data model, you 
+avoid the previously mentioned problems of what to do when a menu 
+is selected or how to validate the input when an input method 
+listener is attached. While this last validation model is the 
+most complex, it works well.
+
+
+The default model for the JTextField is the 
+javax.swing.text.PlainDocument class. The class provides 
+insertString() and remove() methods that are called when a user 
+enters or removes text in the component. Normally, this would be 
+done a character at a time. However, you must take into account 
+when a cut or paste operation is performed. What each method does 
+is make sure the model would be valid if the new data was added 
+to the model or removed from the model. This task sounds more 
+complicated then it really is. You just have to manually 
+determine what the new content would be with (or without) the new 
+data. Assuming the validation passes, you pass the data to the 
+superclass by calling super.insertString() or super.remove().
+
+
+Here's what the core part of the insertString() method looks 
+like. To validate the input, you determine what the new string 
+would be. If the model was originally empty, the new value is the 
+input. Otherwise, you insert the new value in the middle of the 
+existing contents. After you have the new value, you validate it 
+with the parseInt() method of Integer. If the validation 
+succeeds, you call super.insertString(). Notice that rejection 
+is indicated simply by not calling super.insertString(). If you
+don't insert the string, you don't have to do anything. However, 
+this code does beep if the input fails.  
+
+
+  String newValue;
+  int length = getLength();
+  if (length == 0) {
+    newValue = string;
+  } else {
+    String currentContent = 
+      getText(0, length);
+    StringBuffer currentBuffer = 
+      new StringBuffer(currentContent);
+    currentBuffer.insert(offset, string);
+    newValue = currentBuffer.toString();
+  }
+  try {
+    Integer.parseInt(newValue);
+    super.insertString(offset, string, 
+      attributes);
+  } catch (Exception exception) {
+    Toolkit.getDefaultToolkit().beep();
+  }
+
+
+For the case of a model that only accepts integer input, it isn't 
+necessary to override the default behavior of the remove() 
+method. It is impossible to remove data from an integer text 
+string and get back a non-integer.
+
+
+After you define the complete model, use the setDocument() method
+to associate the model with the text field:
+
+
+  modelText.setDocument(new IntegerDocument());
+
+
+Here's a complete example that demonstrates all four options. 
+In it, you'll also find the definition of the IntegerDocument 
+class:
+
+
+  import java.awt.*;
+  import java.awt.event.*;
+  import javax.swing.*;
+  import javax.swing.text.*;
+  
+  public class TextInput extends JFrame {
+    JPanel contentPane;
+    JPanel jPanel1 = new JPanel();
+    FlowLayout flowLayout1 = new FlowLayout();
+    GridLayout gridLayout1 = new GridLayout();
+    JLabel keyLabel = new JLabel();
+    JTextField keyText = new JTextField();
+    JLabel focusLabel = new JLabel();
+    JTextField focusText = new JTextField();
+    JLabel inputLabel = new JLabel();
+    JTextField inputText = new JTextField();
+    JLabel modelLabel = new JLabel();
+    JTextField modelText = new JTextField();
+    IntegerDocument integerDocument1 =
+      new IntegerDocument();
+  
+    public TextInput() {
+      this.setDefaultCloseOperation(
+        JFrame.EXIT_ON_CLOSE);
+      contentPane = (JPanel)getContentPane();
+      contentPane.setLayout(flowLayout1);
+      this.setSize(new Dimension(400, 300));
+      this.setTitle("Input Validation");
+      jPanel1.setLayout(gridLayout1);
+      gridLayout1.setRows(4);
+      gridLayout1.setColumns(2);
+      gridLayout1.setHgap(20);
+      keyLabel.setText("Key Listener");
+      modelLabel.setText("Model");
+      focusLabel.setText("Focus Listener");
+      inputLabel.setText("Input Verifier");
+
+
+
+      keyText.addKeyListener(new KeyAdapter() {
+        public void keyTyped(KeyEvent e) {
+          char c = e.getKeyChar();
+          if (!((c >= '0') && (c <= '9') ||
+             (c == KeyEvent.VK_BACK_SPACE) ||
+             (c == KeyEvent.VK_DELETE))) {
+            getToolkit().beep();
+            e.consume();
+          }
+        }
+      });
+
+
+
+      focusText.addFocusListener(new FocusAdapter() {
+        public void focusLost(FocusEvent e) {
+          JTextField textField = 
+            (JTextField)e.getSource();
+          String content = textField.getText();
+          if (content.length() != 0) {
+            try {
+              Integer.parseInt(content);
+            } catch (NumberFormatException nfe) {
+              getToolkit().beep();
+              textField.requestFocus();
+            }
+          }
+        }
+      });
+
+
+
+      inputText.setInputVerifier(new InputVerifier() {
+        public boolean verify(JComponent comp) {
+          boolean returnValue = true;
+          JTextField textField = (JTextField)comp;
+          String content = textField.getText();
+          if (content.length() != 0) {
+            try {
+              Integer.parseInt(textField.getText());
+            } catch (NumberFormatException e) {
+              getToolkit().beep();
+              returnValue = false;
+            }
+          }
+          return returnValue;
+        }
+      });
+
+
+
+      modelText.setDocument(integerDocument1);
+
+
+
+      contentPane.add(jPanel1);
+      jPanel1.add(keyLabel);
+      jPanel1.add(keyText);
+      jPanel1.add(focusLabel);
+      jPanel1.add(focusText);
+      jPanel1.add(inputLabel);
+      jPanel1.add(inputText);
+      jPanel1.add(modelLabel);
+      jPanel1.add(modelText);
+    }
+  
+    public static void main(String args[]) {
+      TextInput frame = new TextInput();
+      frame.pack();
+      frame.show();
+    }
+  
+    static class IntegerDocument 
+        extends PlainDocument {
+  
+      public void insertString(int offset, 
+          String string, AttributeSet attributes)
+          throws BadLocationException {
+  
+        if (string == null) {
+          return;
+        } else {
+          String newValue;
+          int length = getLength();
+          if (length == 0) {
+            newValue = string;
+          } else {
+            String currentContent = 
+              getText(0, length);
+            StringBuffer currentBuffer = 
+              new StringBuffer(currentContent);
+            currentBuffer.insert(offset, string);
+            newValue = currentBuffer.toString();
+          }
+          try {
+            checkInput(newValue);
+            super.insertString(offset, string, 
+              attributes);
+          } catch (Exception exception) {
+            Toolkit.getDefaultToolkit().beep();
+          }
+        }
+      }
+
+
+
+      public void remove(int offset, int length) 
+          throws BadLocationException {
+  
+        int currentLength = getLength();
+        String currentContent = getText(0, 
+          currentLength);
+        String before = currentContent.substring(
+          0, offset);
+        String after = currentContent.substring(
+          length+offset, currentLength);
+        String newValue = before + after;
+        try {
+          checkInput(newValue);
+          super.remove(offset, length);
+        } catch (Exception exception) {
+          Toolkit.getDefaultToolkit().beep();
+        }
+      }
+
+
+
+      private int checkInput(String proposedValue) 
+          throws NumberFormatException {
+  
+        int newValue = 0;
+        if (proposedValue.length() > 0) {
+          newValue = Integer.parseInt(
+            proposedValue);
+        }
+        return newValue;
+      }
+    }
+  }
+
+
+Be sure to try out all four text fields with cut-and-paste to see 
+what happens. For instance, the text field validated using the
+KeyListener technique allows you to paste non-numerical data into 
+the field. To correct this behavior, you would have to disable 
+pasting. By comparison, the text field that is validated with the 
+IntegerDocument, that is, the one labeled "Model," works properly
+when pasting text data.
+
+
+If you are transitioning a program with an AWT TextField 
+component to a Swing JTextField, note that one TextField behavior 
+that is not supported on the JTextField is the ability to attach 
+a TextListener to the control. However, you can you can easily 
+replace this behavior by using the data model approach of 
+attaching a custom Document. The Document usage directly maps to 
+being notified when the value of the text has changed (or, at 
+least, wants to change).
+
+
+To learn more about the Swing text components, see the Using 
+Swing Components lesson in the Creating a GUI with JFC/Swing 
+trail found in The Java Tutorial at 
+http://java.sun.com/docs/books/tutorial/uiswing/components/text.html.
