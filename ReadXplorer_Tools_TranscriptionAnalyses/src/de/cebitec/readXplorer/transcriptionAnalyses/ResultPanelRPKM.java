@@ -52,10 +52,10 @@ public class ResultPanelRPKM extends ResultTablePanel {
     public static final String FEATURES_TOTAL = "Total number of reference features";
 
     private RPKMAnalysisResult rpkmCalcResult;
-    private HashMap<String, Integer> filterStatisticsMap;
+    private final HashMap<String, Integer> filterStatisticsMap;
     private PersistentFeature feature;
-    private boolean statistics = false;
-    private TableRightClickFilter<UneditableTableModel> tableFilter;
+    private final boolean statistics = false;
+    private final TableRightClickFilter<UneditableTableModel> tableFilter;
     private ReferenceFeatureTopComp refComp;
 
 

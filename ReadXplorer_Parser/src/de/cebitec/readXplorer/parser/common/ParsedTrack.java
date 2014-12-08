@@ -34,7 +34,7 @@ import java.util.Map;
  */
 public class ParsedTrack {
 
-    private TrackJob trackJob;
+    private final TrackJob trackJob;
     private Map<String, Integer> readNameToSeqIDMap1;
     private Map<String, Integer> readNameToSeqIDMap2;
     private boolean isFirstTrack;

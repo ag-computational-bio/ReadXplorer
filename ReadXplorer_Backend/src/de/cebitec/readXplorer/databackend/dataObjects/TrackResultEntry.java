@@ -26,7 +26,7 @@ package de.cebitec.readXplorer.databackend.dataObjects;
  */
 public class TrackResultEntry {
 
-    private int trackId;
+    private final int trackId;
 
 
     /**

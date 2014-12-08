@@ -65,11 +65,11 @@ import org.openide.windows.InputOutput;
 public class ImportThread extends SwingWorker<Object, Object> implements
         Observer {
 
-    private InputOutput io;
-    private List<ReferenceJob> referenceJobs;
-    private List<TrackJob> tracksJobs;
-    private List<ReadPairJobContainer> readPairJobs;
-    private ProgressHandle ph;
+    private final InputOutput io;
+    private final List<ReferenceJob> referenceJobs;
+    private final List<TrackJob> tracksJobs;
+    private final List<ReadPairJobContainer> readPairJobs;
+    private final ProgressHandle ph;
     private int workunits;
     private boolean noErrors = true;
     private Map<String, Integer> chromLengthMap;

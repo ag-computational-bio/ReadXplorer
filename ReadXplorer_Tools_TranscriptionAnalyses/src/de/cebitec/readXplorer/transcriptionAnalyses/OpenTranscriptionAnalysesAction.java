@@ -72,9 +72,9 @@ import org.openide.windows.WindowManager;
 public final class OpenTranscriptionAnalysesAction implements ActionListener,
                                                               DataVisualisationI {
 
-    private TranscriptionAnalysesTopComponent transcAnalysesTopComp;
+    private final TranscriptionAnalysesTopComponent transcAnalysesTopComp;
     private final ReferenceViewer refViewer;
-    private PersistentReference reference;
+    private final PersistentReference reference;
     private List<PersistentTrack> tracks;
     private int finishedCovAnalyses = 0;
     private int finishedMappingAnalyses = 0;
@@ -83,7 +83,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
     private ParameterSetRPKM parametersRPKM;
     private boolean combineTracks;
     private Map<Integer, PersistentTrack> trackMap;
-    private Map<Integer, AnalysisContainer> trackToAnalysisMap;
+    private final Map<Integer, AnalysisContainer> trackToAnalysisMap;
     private ResultPanelTranscriptionStart transcriptionStartResultPanel;
     private ResultPanelOperonDetection operonResultPanel;
     private ResultPanelRPKM rpkmResultPanel;
@@ -411,7 +411,7 @@ public final class OpenTranscriptionAnalysesAction implements ActionListener,
         /**
          * Container class for all available transcription analyses.
          */
-        public AnalysisContainer( AnalysisTranscriptionStart analysisTSS, AnalysisOperon analysisOperon, AnalysisRPKM analysisRPKM ) {
+        AnalysisContainer( AnalysisTranscriptionStart analysisTSS, AnalysisOperon analysisOperon, AnalysisRPKM analysisRPKM ) {
             this.analysisTSS = analysisTSS;
             this.analysisOperon = analysisOperon;
             this.analysisRPKM = analysisRPKM;

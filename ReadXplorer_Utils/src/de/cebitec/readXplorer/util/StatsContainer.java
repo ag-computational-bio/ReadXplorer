@@ -65,7 +65,7 @@ public class StatsContainer {
     public static final String NO_UNIQ_WRNG_ORIENT_LARGE_PAIRS = "Unique Wrong Orient. Larger Pairs";
     public static final String AVERAGE_READ_PAIR_SIZE = "Average Read Pair Size";
 
-    private Map<String, Integer> statsMap;
+    private final Map<String, Integer> statsMap;
     private DiscreteCountingDistribution readLengthDistribution;
     private DiscreteCountingDistribution readPairSizeDistribution;
 

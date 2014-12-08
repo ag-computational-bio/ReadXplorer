@@ -31,12 +31,12 @@ import java.sql.Timestamp;
 public class TrackJob implements Job {
 
     private File file;
-    private String description;
-    private Timestamp timestamp;
-    private MappingParserI parser;
-    private int trackID;
+    private final String description;
+    private final Timestamp timestamp;
+    private final MappingParserI parser;
+    private final int trackID;
     private ReferenceJob refGen;
-    private boolean isAlreadyImported;
+    private final boolean isAlreadyImported;
 
 
     /**

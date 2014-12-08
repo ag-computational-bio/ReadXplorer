@@ -62,7 +62,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel {
 
     private OperonDetectionResult operonResult;
     private HashMap<String, Integer> operonDetStats;
-    private TableRightClickFilter<UneditableTableModel> tableFilter;
+    private final TableRightClickFilter<UneditableTableModel> tableFilter;
 
 
     /**

@@ -120,15 +120,14 @@ public class ResultDeAnalysis {
                 break;
             case REXP.XT_ARRAY_STR:
                 String[] currentStringValues = currentValues.asStringArray();
-                for( int j = 0; j < currentStringValues.length; j++ ) {
-                    String name = currentStringValues[j];
-                    if( dEAdata.existsPersistentFeatureForGNURName( name ) ) {
-                        current.add( dEAdata.getPersistentFeatureByGNURName( name ) );
-                    }
-                    else {
-                        current.add( name );
-                    }
-                }
+        for( String name : currentStringValues ) {
+            if( dEAdata.existsPersistentFeatureForGNURName( name ) ) {
+                current.add( dEAdata.getPersistentFeatureByGNURName( name ) );
+            }
+            else {
+                current.add( name );
+            }
+        }
                 break;
             case REXP.XT_ARRAY_BOOL_INT:
                 int[] currentBoolValues = currentValues.asIntArray();

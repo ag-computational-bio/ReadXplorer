@@ -44,9 +44,9 @@ import org.w3c.dom.Document;
  */
 public class ChartExporter implements Runnable, Observable {
 
-    private Path file;
-    private JFreeChart chart;
-    private List<Observer> obs = new ArrayList<>();
+    private final Path file;
+    private final JFreeChart chart;
+    private final List<Observer> obs = new ArrayList<>();
 
 
     public enum ChartExportStatus {
@@ -98,8 +98,7 @@ public class ChartExporter implements Runnable, Observable {
 
     @Override
     public void notifyObservers( Object data ) {
-        for( Iterator<Observer> it = obs.iterator(); it.hasNext(); ) {
-            Observer observer = it.next();
+        for( Observer observer : obs ) {
             observer.update( data );
         }
     }

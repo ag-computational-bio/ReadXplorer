@@ -167,8 +167,7 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
         List<Group> resultGroups = baySeqAnalysisHandler.getGroups();
         groupComboBox.setModel( new DefaultComboBoxModel( resultGroups.toArray() ) );
         List<PersistentTrack> tracks = baySeqAnalysisHandler.getSelectedTracks();
-        for( Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext(); ) {
-            PersistentTrack persistentTrack = it.next();
+        for( PersistentTrack persistentTrack : tracks ) {
             samplesA.addElement( persistentTrack );
             samplesB.addElement( persistentTrack );
         }

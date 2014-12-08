@@ -34,12 +34,12 @@ import java.util.List;
 public class ParsedMapping {
 
     private long id;
-    private int start;
-    private int stop;
-    private byte direction;
-    private int errors;
-    private List<ParsedDiff> diffs;
-    private List<ParsedReferenceGap> gaps;
+    private final int start;
+    private final int stop;
+    private final byte direction;
+    private final int errors;
+    private final List<ParsedDiff> diffs;
+    private final List<ParsedReferenceGap> gaps;
     private boolean bestMapping;
     private int numOfReplicates;
 

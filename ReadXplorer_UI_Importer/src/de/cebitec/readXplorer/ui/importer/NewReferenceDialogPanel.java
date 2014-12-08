@@ -52,7 +52,7 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
     private File refSeqFile = null;
     private File refFeatureFile = null;
     private String referenceName = null;
-    private ReferenceParserI[] availableParsers = new ReferenceParserI[]{ new BioJavaParser( BioJavaParser.EMBL ),
+    private final ReferenceParserI[] availableParsers = new ReferenceParserI[]{ new BioJavaParser( BioJavaParser.EMBL ),
                                                                           new BioJavaParser( BioJavaParser.GENBANK ), new BioJavaGff3Parser(), new BioJavaGff2Parser(), new FastaReferenceParser() };
     private ReferenceParserI currentParser;
 

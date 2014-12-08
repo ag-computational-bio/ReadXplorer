@@ -29,12 +29,12 @@ import javax.swing.JPanel;
 
 public final class DeSeqVisualPanelFit extends JPanel {
 
-    private DefaultListModel<String> allConditionGroupsModel = new DefaultListModel<>();
-    private DefaultListModel<String> fittingOneModel = new DefaultListModel<>();
-    private DefaultListModel<String> fittingTwoModel = new DefaultListModel<>();
-    private List<String> fittingGroupOne = new ArrayList<>();
-    private List<String> fittingGroupTwo = new ArrayList<>();
-    private Set<String> assignedGroups = new HashSet<>();
+    private final DefaultListModel<String> allConditionGroupsModel = new DefaultListModel<>();
+    private final DefaultListModel<String> fittingOneModel = new DefaultListModel<>();
+    private final DefaultListModel<String> fittingTwoModel = new DefaultListModel<>();
+    private final List<String> fittingGroupOne = new ArrayList<>();
+    private final List<String> fittingGroupTwo = new ArrayList<>();
+    private final Set<String> assignedGroups = new HashSet<>();
 
 
     /**
@@ -48,8 +48,7 @@ public final class DeSeqVisualPanelFit extends JPanel {
 
     public void updateConditionGroupsList( Set<String> conditionGroups ) {
         boolean newDataSet = false;
-        for( Iterator<String> it = conditionGroups.iterator(); it.hasNext(); ) {
-            String currentGroup = it.next();
+        for( String currentGroup : conditionGroups ) {
             if( !allConditionGroupsModel.contains( currentGroup )
                 && !fittingOneModel.contains( currentGroup )
                 && !fittingTwoModel.contains( currentGroup ) ) {
@@ -61,8 +60,7 @@ public final class DeSeqVisualPanelFit extends JPanel {
             allConditionGroupsModel.clear();
             fittingOneModel.clear();
             fittingTwoModel.clear();
-            for( Iterator<String> it = conditionGroups.iterator(); it.hasNext(); ) {
-                String currentGroup = it.next();
+            for( String currentGroup : conditionGroups ) {
                 allConditionGroupsModel.addElement( currentGroup );
             }
         }
@@ -220,8 +218,7 @@ public final class DeSeqVisualPanelFit extends JPanel {
 
     private void addToFittingOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addToFittingOneActionPerformed
         List<String> tracks = conditionGroupsList.getSelectedValuesList();
-        for( Iterator<String> it = tracks.iterator(); it.hasNext(); ) {
-            String currentGroup = it.next();
+        for( String currentGroup : tracks ) {
             if( !fittingOneModel.contains( currentGroup ) ) {
                 fittingOneModel.addElement( currentGroup );
                 fittingGroupOne.add( currentGroup );
@@ -236,8 +233,7 @@ public final class DeSeqVisualPanelFit extends JPanel {
 
     private void removeFromFittingOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeFromFittingOneActionPerformed
         List<String> tracks = fittingOneList.getSelectedValuesList();
-        for( Iterator<String> it = tracks.iterator(); it.hasNext(); ) {
-            String currentGroup = it.next();
+        for( String currentGroup : tracks ) {
             fittingOneModel.removeElement( currentGroup );
             fittingGroupOne.remove( currentGroup );
             assignedGroups.remove( currentGroup );
@@ -247,8 +243,7 @@ public final class DeSeqVisualPanelFit extends JPanel {
 
     private void addToFittingTwoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addToFittingTwoActionPerformed
         List<String> tracks = conditionGroupsList.getSelectedValuesList();
-        for( Iterator<String> it = tracks.iterator(); it.hasNext(); ) {
-            String currentGroup = it.next();
+        for( String currentGroup : tracks ) {
             if( !fittingTwoModel.contains( currentGroup ) ) {
                 fittingTwoModel.addElement( currentGroup );
                 fittingGroupTwo.add( currentGroup );
@@ -263,8 +258,7 @@ public final class DeSeqVisualPanelFit extends JPanel {
 
     private void removeFromFittingTwoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeFromFittingTwoActionPerformed
         List<String> tracks = fittingTwoList.getSelectedValuesList();
-        for( Iterator<String> it = tracks.iterator(); it.hasNext(); ) {
-            String currentGroup = it.next();
+        for( String currentGroup : tracks ) {
             fittingTwoModel.removeElement( currentGroup );
             fittingGroupTwo.remove( currentGroup );
             assignedGroups.remove( currentGroup );

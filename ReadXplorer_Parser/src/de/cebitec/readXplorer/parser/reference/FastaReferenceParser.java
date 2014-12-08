@@ -47,10 +47,10 @@ import java.util.logging.Logger;
  */
 public class FastaReferenceParser implements ReferenceParserI {
 
-    private static String parsername = "Fasta file";
-    private static String[] fileExtension = new String[]{ "fas", "fasta", "fna", "fa" };
-    private static String fileDescription = "Fasta File";
-    private ArrayList<Observer> observers = new ArrayList<>();
+    private static final String parsername = "Fasta file";
+    private static final String[] fileExtension = new String[]{ "fas", "fasta", "fna", "fa" };
+    private static final String fileDescription = "Fasta File";
+    private final ArrayList<Observer> observers = new ArrayList<>();
     private String errorMsg;
 
 

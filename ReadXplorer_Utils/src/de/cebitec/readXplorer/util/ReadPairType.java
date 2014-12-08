@@ -110,8 +110,8 @@ public enum ReadPairType {
     private static final String OR_DIST_LARGE_UNQ_PAIR_STRING = "Unique Larger Wrong Orientation Pair";
     private static final String OR_DIST_SMALL_UNQ_PAIR_STRING = "Unique Smaller Wrong Orientation Pair";
 
-    private int typeInt;
-    private String typeString;
+    private final int typeInt;
+    private final String typeString;
 
 
     private ReadPairType( int typeInt, String typeString ) {

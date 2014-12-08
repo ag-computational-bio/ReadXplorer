@@ -29,10 +29,10 @@ import java.util.Iterator;
  */
 public class Layer implements LayerI {
 
-    private ArrayList<BlockI> blocks;
-    private int absStart;
-    private int absStop;
-    private GenomeGapManager gapManager;
+    private final ArrayList<BlockI> blocks;
+    private final int absStart;
+    private final int absStop;
+    private final GenomeGapManager gapManager;
 
 
     public Layer( int absStart, int absStop, GenomeGapManager gapManager ) {

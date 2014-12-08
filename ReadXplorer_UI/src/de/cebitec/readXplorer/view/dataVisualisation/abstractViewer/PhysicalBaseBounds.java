@@ -26,10 +26,10 @@ package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
  */
 public class PhysicalBaseBounds {
 
-    private double leftPhysBound;
-    private double rightPhysBound;
-    private double physWidth;
-    private double phyMiddle;
+    private final double leftPhysBound;
+    private final double rightPhysBound;
+    private final double physWidth;
+    private final double phyMiddle;
 
 
     /**

@@ -24,8 +24,8 @@ package de.cebitec.readXplorer.parser.common;
  */
 public class ParsedDiff {
 
-    private long position;
-    private char base;
+    private final long position;
+    private final char base;
 
 
     public ParsedDiff( long position, char c ) {

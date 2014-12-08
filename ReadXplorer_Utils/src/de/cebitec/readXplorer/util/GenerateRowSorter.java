@@ -42,9 +42,9 @@ public class GenerateRowSorter {
         TableRowSorter<DefaultTableModel> rowSorter = new TableRowSorter<>( tm );
         if( tm.getRowCount() > 1 ) {
             Vector<Vector> tableContents = tm.getDataVector();
-            Vector firstRow = tableContents.get( 0 );
+            Vector<?> firstRow = tableContents.get( 0 );
             int columnCounter = 0;
-            for( Iterator it1 = firstRow.iterator(); it1.hasNext(); columnCounter++ ) {
+            for( Iterator<?> it1 = firstRow.iterator(); it1.hasNext(); columnCounter++ ) {
                 Object object = it1.next();
                 if( object instanceof Double ) {
                     rowSorter.setComparator( columnCounter, new Comparator<Double>() {

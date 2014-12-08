@@ -38,13 +38,13 @@ public class ExtendedSlider extends JSlider implements SynchronousNavigator {
 
     private int current;
 
-    private List<AdjustmentPanelListenerI> listeners;
+    private final List<AdjustmentPanelListenerI> listeners;
 
 
     public ExtendedSlider( int min, int max, int init ) {
         super( JSlider.HORIZONTAL, min, max, init );
         this.current = init;
-        listeners = new ArrayList<AdjustmentPanelListenerI>();
+        listeners = new ArrayList<>();
         this.addMouseListener( new MouseListener() {
 
             @Override

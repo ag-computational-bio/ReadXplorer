@@ -40,11 +40,11 @@ import org.openide.util.NbPreferences;
  */
 public class RegionManager {
 
-    private SequenceBar regionVisualizer; //component that visualizes the regions
-    private AbstractViewer parentViewer; //the viewer, in which the sequence bar is embedded
-    private StartCodonFilter codonFilter;
-    private PatternFilter patternFilter;
-    private HighlightAreaListener highlightListener;
+    private final SequenceBar regionVisualizer; //component that visualizes the regions
+    private final AbstractViewer parentViewer; //the viewer, in which the sequence bar is embedded
+    private final StartCodonFilter codonFilter;
+    private final PatternFilter patternFilter;
+    private final HighlightAreaListener highlightListener;
     private Preferences pref;
     private List<Region> cdsRegions;
 

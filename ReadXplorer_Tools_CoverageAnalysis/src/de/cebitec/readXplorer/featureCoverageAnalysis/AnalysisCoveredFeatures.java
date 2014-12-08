@@ -42,14 +42,14 @@ import java.util.List;
 public class AnalysisCoveredFeatures implements Observer,
                                                 AnalysisI<List<CoveredFeature>> {
 
-    private TrackConnector trackConnector;
-    private ParameterSetCoveredFeatures analysisParams;
-    private List<PersistentFeature> genomeFeatures;
-    private HashMap<Integer, CoveredFeature> coveredFeatureCount; //feature id to count of covered positions for feature
-    private List<CoveredFeature> detectedFeatures;
+    private final TrackConnector trackConnector;
+    private final ParameterSetCoveredFeatures analysisParams;
+    private final List<PersistentFeature> genomeFeatures;
+    private final HashMap<Integer, CoveredFeature> coveredFeatureCount; //feature id to count of covered positions for feature
+    private final List<CoveredFeature> detectedFeatures;
     private int summedCov = 0;
 
-    private int lastFeatureIdx;
+    private final int lastFeatureIdx;
 
 
     /**

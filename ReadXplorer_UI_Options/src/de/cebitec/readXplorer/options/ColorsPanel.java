@@ -44,8 +44,8 @@ final class ColorsPanel extends OptionsPanel {
 
     private static final long serialVersionUID = 1L;
     private final ColorsOptionsPanelController controller;
-    private Preferences pref = NbPreferences.forModule( Object.class );
-    private Map<Classification, JPanel> classToPanelMap = new HashMap<>();
+    private final Preferences pref = NbPreferences.forModule( Object.class );
+    private final Map<Classification, JPanel> classToPanelMap = new HashMap<>();
 
 
     /**
@@ -54,7 +54,7 @@ final class ColorsPanel extends OptionsPanel {
      * <p>
      * @param controller
      */
-    public ColorsPanel( ColorsOptionsPanelController controller ) {
+    ColorsPanel( ColorsOptionsPanelController controller ) {
         this.controller = controller;
         this.initComponents();
         this.initClassToPanelMap();

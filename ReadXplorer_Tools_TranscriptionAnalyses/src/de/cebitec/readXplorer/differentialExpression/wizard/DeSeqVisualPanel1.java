@@ -25,7 +25,7 @@ import javax.swing.JPanel;
 
 public final class DeSeqVisualPanel1 extends JPanel {
 
-    private ButtonGroup btGroup = new ButtonGroup();
+    private final ButtonGroup btGroup = new ButtonGroup();
 
 
     /**

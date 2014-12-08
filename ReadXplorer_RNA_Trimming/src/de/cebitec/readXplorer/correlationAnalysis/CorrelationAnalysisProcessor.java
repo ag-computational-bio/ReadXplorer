@@ -54,17 +54,17 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
 
     private static final int MINIMUMINTERVALLENGTH = 90000;
 
-    private Integer rightBound;
+    private final Integer rightBound;
     private byte strand;
     private boolean canceled = false;
-    private CorrelationResult analysisResult;
+    private final CorrelationResult analysisResult;
     private final ArrayList<CorrelatedInterval> correlationsList;
 
     private int steps;
     private int currentStep = 0;
     private int currentPosition = 1;
     private int currentTotalPos = 0;
-    private CorrelationResultPanel resultView;
+    private final CorrelationResultPanel resultView;
 
     private List<CoverageAndDiffResult> resultList;
     private List<TrackConnector> trackConnectors;
@@ -269,7 +269,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
                     else if( analysisParams.getCorrelationCoefficient().equals( CorrelationCoefficient.SPEARMAN ) ) {
                         correlation = new SpearmansCorrelation().correlation( x, y );
                     }
-                    double minCorr = ((double) analysisParams.getMinCorrelation()) / 100.0;
+                    double minCorr = analysisParams.getMinCorrelation() / 100.0;
 
                     if( (correlation > minCorr) || (correlation < (minCorr * (-1))) ) {
                         this.showMsg( "correlation of interval [" + this.currentPosition + "-" + to + "] is " + correlation + " on " + strand );

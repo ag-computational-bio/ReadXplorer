@@ -65,10 +65,10 @@ public final class TranscriptionAnalysesWizardIterator implements
     private static final String FINISH_MSG = "Press 'Finish' to start";
 
     private int index;
-    private ChangeSupport changeSupport;
+    private final ChangeSupport changeSupport;
     private WizardDescriptor wiz;
     private String[] steps;
-    private int referenceId;
+    private final int referenceId;
 
     private List<WizardDescriptor.Panel<WizardDescriptor>> allPanels;
     private List<WizardDescriptor.Panel<WizardDescriptor>> currentPanels;
@@ -82,7 +82,7 @@ public final class TranscriptionAnalysesWizardIterator implements
     private SelectFeatureTypeWizardPanel featTypeRPKMPanel;
     private SelectFeatureTypeWizardPanel featTypeOperonPanel;
 
-    private Map<WizardDescriptor.Panel<WizardDescriptor>, Integer> panelToStepMap = new HashMap<>();
+    private final Map<WizardDescriptor.Panel<WizardDescriptor>, Integer> panelToStepMap = new HashMap<>();
 
 
     /**

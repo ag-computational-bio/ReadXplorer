@@ -68,7 +68,6 @@ public final class MyCancelableAction implements ActionListener {
                 }
                 catch( InterruptedException ex ) {
                     LOG.info( "the task was CANCELLED" );
-                    return;
                 }
 
             }
@@ -76,7 +75,6 @@ public final class MyCancelableAction implements ActionListener {
 
             private void doSomething( int i ) {
                 LOG.info( "doSomething with " + i );
-                return;
             }
 
 

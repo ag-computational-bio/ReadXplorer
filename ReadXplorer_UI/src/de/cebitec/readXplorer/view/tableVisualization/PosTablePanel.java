@@ -38,7 +38,7 @@ public class PosTablePanel extends TablePanel {
     private static final long serialVersionUID = 1L;
     private final UneditableTableModel tableData;
     private PersistentReference reference;
-    private TableRightClickFilter<UneditableTableModel> filterListener;
+    private final TableRightClickFilter<UneditableTableModel> filterListener;
 
 
     /**

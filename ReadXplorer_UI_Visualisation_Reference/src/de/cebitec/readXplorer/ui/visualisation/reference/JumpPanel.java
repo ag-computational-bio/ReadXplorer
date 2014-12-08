@@ -72,7 +72,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
     private ReferenceConnector refGenCon;
     private BoundsInfoManager boundsManager;
     private ReferenceViewer curRefViewer;
-    private Lookup.Result<ReferenceViewer> res;
+    private final Lookup.Result<ReferenceViewer> res;
     private AbstractViewer viewer;
     private FeatureTableObserver featTableObserver;
     private ChromComboObserver chromObserver;
@@ -651,7 +651,7 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
             else if( name1 != null && name2 == null ) {
                 return -1;
             }
-            else if( name1 == name2 ) { //== comparison desired here 4 nullcheck
+            else if( name1 == null ? name2 == null : name1.equals( name2 ) ) { //== comparison desired here 4 nullcheck
                 // both are null
                 return 0;
             }

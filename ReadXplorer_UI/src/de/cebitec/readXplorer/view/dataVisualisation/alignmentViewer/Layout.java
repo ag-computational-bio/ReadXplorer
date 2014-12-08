@@ -36,14 +36,14 @@ import java.util.List;
  */
 public class Layout implements LayoutI {
 
-    private int absStart;
+    private final int absStart;
     private int absStop;
     private GenomeGapManager gapManager;
-    private ArrayList<LayerI> forwardLayers;
-    private ArrayList<LayerI> reverseLayers;
-    private BlockContainer forwardBlockContainer;
-    private BlockContainer reverseBlockContainer;
-    private List<Classification> exclusionList;
+    private final ArrayList<LayerI> forwardLayers;
+    private final ArrayList<LayerI> reverseLayers;
+    private final BlockContainer forwardBlockContainer;
+    private final BlockContainer reverseBlockContainer;
+    private final List<Classification> exclusionList;
 
 
     /**

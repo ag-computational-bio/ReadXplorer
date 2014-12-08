@@ -41,7 +41,7 @@ import java.util.Map;
  */
 public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
 
-    private List<SnpI> snpList;
+    private final List<SnpI> snpList;
 
 
     /**

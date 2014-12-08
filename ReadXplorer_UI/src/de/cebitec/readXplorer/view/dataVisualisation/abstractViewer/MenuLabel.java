@@ -50,7 +50,7 @@ public class MenuLabel extends JLabel implements Observer, Observable {
     private boolean isShowingLabel;
     private Icon expandIcon;
     private Icon collapseIcon;
-    private List<Observer> observers;
+    private final List<Observer> observers;
 
 
     /**

@@ -31,8 +31,8 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
  */
 public class OperonAdjacency {
 
-    private PersistentFeature feature1;
-    private PersistentFeature feature2;
+    private final PersistentFeature feature1;
+    private final PersistentFeature feature2;
     private int readsFeature1;
     private int spanningReads;
     private int readsFeature2;

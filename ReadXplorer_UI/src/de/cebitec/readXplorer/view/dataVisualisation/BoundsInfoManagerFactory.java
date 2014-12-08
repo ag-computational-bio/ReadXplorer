@@ -33,7 +33,7 @@ import java.util.HashMap;
  */
 public class BoundsInfoManagerFactory {
 
-    private HashMap<Integer, BoundsInfoManager> data;
+    private final HashMap<Integer, BoundsInfoManager> data;
 
 
     public BoundsInfoManagerFactory() {

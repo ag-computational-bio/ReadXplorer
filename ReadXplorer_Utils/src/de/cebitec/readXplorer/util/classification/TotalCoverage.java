@@ -33,8 +33,8 @@ public enum TotalCoverage implements Classification {
     private static final byte TOTAL_COVERAGE_BYTE = 0;
     private static final String TOTAL_COVERAGE_STRING = "Total Coverage";
 
-    private byte typeByte;
-    private String typeString;
+    private final byte typeByte;
+    private final String typeString;
 
 
     private TotalCoverage( byte typeByte, String typeString ) {

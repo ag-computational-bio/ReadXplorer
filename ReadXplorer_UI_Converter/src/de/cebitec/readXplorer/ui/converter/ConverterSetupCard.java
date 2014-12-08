@@ -45,12 +45,12 @@ public class ConverterSetupCard extends FileSelectionPanel {
     private static final long serialVersionUID = 1L;
 
     private String fileExtension; //TODO: add file extension to converter
-    private ConverterI[] availableParsers = new ConverterI[]{ new JokToBamConverter() };
+    private final ConverterI[] availableParsers = new ConverterI[]{ new JokToBamConverter() };
     private ConverterI currentConverter;
     private String refChromName;
     private int chromLength;
     private boolean canConvert;
-    private boolean isConnected;
+    private final boolean isConnected;
     private PersistentChromosome selectedChrom;
     private PersistentReference[] genomesAsArray;
 

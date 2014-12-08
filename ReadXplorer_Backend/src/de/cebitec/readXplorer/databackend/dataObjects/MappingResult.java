@@ -32,7 +32,7 @@ public class MappingResult extends AnalysisResult {
 
     private static final long serialVersionUID = 1L;
 
-    private List<Mapping> mappings;
+    private final List<Mapping> mappings;
 
 
     /**

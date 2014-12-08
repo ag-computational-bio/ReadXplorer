@@ -67,8 +67,7 @@ public class ConvertData {
                 break;
         }
         Map<PersistentFeature, Pair<Double, Double>> ret = new HashMap<>();
-        for( Iterator<PersistentFeature> it = input.keySet().iterator(); it.hasNext(); ) {
-            PersistentFeature key = it.next();
+        for( PersistentFeature key : input.keySet() ) {
             Pair<Double, Double> pair = input.get( key );
             Double R = pair.getFirst();
             Double G = pair.getSecond();
@@ -101,18 +100,17 @@ public class ConvertData {
 
     private static Map<PersistentFeature, Pair<Double, Double>> convertBaySeqResults( Vector<Vector> resultTable, Integer[] sampleA, Integer[] sampleB ) {
         Map<PersistentFeature, Pair<Double, Double>> ret = new HashMap<>();
-        for( Iterator<Vector> it = resultTable.iterator(); it.hasNext(); ) {
-            Vector row = it.next();
+        for( Vector row : resultTable ) {
             PersistentFeature key = (PersistentFeature) row.get( 0 );
             Double X = 0d;
-            for( int i = 0; i < sampleA.length; i++ ) {
-                int index = sampleA[i] + BAY_SEQ_OFFSET;
+            for( Integer sampleA1 : sampleA ) {
+                int index = sampleA1 + BAY_SEQ_OFFSET;
                 X += GeneralUtils.convertNumber( Double.class, (Number) row.get( index ) );
             }
             X /= sampleA.length;
             Double Y = 0d;
-            for( int i = 0; i < sampleB.length; i++ ) {
-                int index = sampleB[i] + BAY_SEQ_OFFSET;
+            for( Integer sampleB1 : sampleB ) {
+                int index = sampleB1 + BAY_SEQ_OFFSET;
                 Y += GeneralUtils.convertNumber( Double.class, (Number) row.get( index ) );
             }
             Y /= sampleB.length;
@@ -140,8 +138,7 @@ public class ConvertData {
      */
     private static Map<PersistentFeature, Pair<Double, Double>> createDataPairForFeature( Vector<Vector> resultTable, int columnFeature, int column1, int column2 ) {
         Map<PersistentFeature, Pair<Double, Double>> ret = new HashMap<>();
-        for( Iterator<Vector> it = resultTable.iterator(); it.hasNext(); ) {
-            Vector row = it.next();
+        for( Vector row : resultTable ) {
             PersistentFeature key = (PersistentFeature) row.get( columnFeature );
             Double x = (Double) row.get( column1 );
             Double y = (Double) row.get( column2 );

@@ -177,8 +177,7 @@ public class DeSeq {
                 //Handing over the first fitting group to Gnu R...
                 concatenate = new StringBuilder();
                 List<String> fittingGroupOne = analysisData.getFittingGroupOne();
-                for( Iterator<String> it = fittingGroupOne.iterator(); it.hasNext(); ) {
-                    String current = it.next();
+                for( String current : fittingGroupOne ) {
                     concatenate.append( current ).append( "+" );
                 }
                 concatenate.deleteCharAt( concatenate.length() - 1 );
@@ -187,8 +186,7 @@ public class DeSeq {
                 //..and then the secound one.
                 concatenate = new StringBuilder();
                 List<String> fittingGroupTwo = analysisData.getFittingGroupTwo();
-                for( Iterator<String> it = fittingGroupTwo.iterator(); it.hasNext(); ) {
-                    String current = it.next();
+                for( String current : fittingGroupTwo ) {
                     concatenate.append( current ).append( "+" );
                 }
                 concatenate.deleteCharAt( concatenate.length() - 1 );

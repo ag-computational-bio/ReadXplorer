@@ -33,7 +33,7 @@ import org.netbeans.api.visual.widget.Widget;
  */
 public class ThumbGridLayout implements Layout {
 
-    private int columns;
+    private final int columns;
 
 
     public ThumbGridLayout( int columns ) {

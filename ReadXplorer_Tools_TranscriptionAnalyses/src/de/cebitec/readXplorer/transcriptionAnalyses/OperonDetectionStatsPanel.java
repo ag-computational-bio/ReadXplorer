@@ -31,7 +31,7 @@ public class OperonDetectionStatsPanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    private HashMap<String, Integer> operonStatsMap;
+    private final HashMap<String, Integer> operonStatsMap;
 
 
     /**

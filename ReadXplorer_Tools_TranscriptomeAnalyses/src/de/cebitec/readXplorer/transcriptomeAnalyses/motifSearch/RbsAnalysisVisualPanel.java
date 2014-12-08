@@ -15,7 +15,7 @@ import org.openide.util.NbPreferences;
 
 public final class RbsAnalysisVisualPanel extends JPanel {
 
-    private String wizardName;
+    private final String wizardName;
     private File workingDir;
 
 

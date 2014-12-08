@@ -40,7 +40,7 @@ class TrimProcessResult extends Observable {
     private Boolean ready = false;
 
 
-    public TrimProcessResult() {
+    TrimProcessResult() {
 
     }
 

@@ -53,10 +53,10 @@ import org.openide.util.NbPreferences;
 public class AlignmentViewer extends AbstractViewer implements ThreadListener {
 
     private static final long serialVersionUID = 234765253;
-    private TrackConnector trackConnector;
+    private final TrackConnector trackConnector;
     private LayoutI layout;
-    private int blockHeight;
-    private int layerHeight;
+    private final int blockHeight;
+    private final int layerHeight;
     private int fwdMappingsInInterval;
     private int revMappingsInInterval;
     private int maxCoverageInInterval;

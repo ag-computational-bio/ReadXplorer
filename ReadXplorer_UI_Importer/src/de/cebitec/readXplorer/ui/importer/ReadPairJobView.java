@@ -38,7 +38,7 @@ public class ReadPairJobView extends javax.swing.JPanel implements
         ListSelectionListener {
 
     public final static long serialVersionUID = 774342377;
-    private List<ReadPairJobContainer> readPairJobContainerList;
+    private final List<ReadPairJobContainer> readPairJobContainerList;
     private boolean hasJobs;
 
 

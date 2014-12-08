@@ -31,7 +31,7 @@ public class FeatureTableModel extends AbstractTableModel {
     private static final long serialVersionUID = 1L;
 
     PersistentFeature[] featureData;
-    private String[] columnNames = { "Feature", "Type", "Gene", "Product", "EC-Number" };
+    private final String[] columnNames = { "Feature", "Type", "Gene", "Product", "EC-Number" };
     private Object[][] data;
 
 

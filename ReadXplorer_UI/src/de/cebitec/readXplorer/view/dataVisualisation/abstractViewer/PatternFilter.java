@@ -40,10 +40,10 @@ public class PatternFilter implements RegionFilterI {
 
     public static final int INIT = 10;
     private static final int INTERVAL_SIZE = 3000000;
-    private List<Region> matchedPatterns;
+    private final List<Region> matchedPatterns;
     private int absStart;
     private int absStop;
-    private PersistentReference refGen;
+    private final PersistentReference refGen;
     private String sequence;
     private Pattern pattern;
 //    private Pattern patternRev;

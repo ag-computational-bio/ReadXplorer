@@ -45,8 +45,8 @@ public enum ComparisonClass implements Classification {
     private static final String TRACK1_COVERAGE_STRING = "Coverage Track 1";
     private static final String TRACK2_COVERAGE_STRING = "Coverage Track 2";
 
-    private byte typeByte;
-    private String typeString;
+    private final byte typeByte;
+    private final String typeString;
 
 
     private ComparisonClass( byte typeByte, String typeString ) {

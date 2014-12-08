@@ -48,9 +48,9 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements
     private static final long serialVersionUID = 1L;
 
     private JFXPanel fxPanel;
-    private TopComponentExtended topComp;
+    private final TopComponentExtended topComp;
     private JPanel mainPanel;
-    private List<RPKMvalue> rpkmValues;
+    private final List<RPKMvalue> rpkmValues;
     private BarChart<String, Number> barChart;
     private BorderPane border;
     private Scene scene;
@@ -95,12 +95,12 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements
 
                 double max = 0;
                 double min = Integer.MAX_VALUE;
-                for( int j = 0; j < rpkmValues.size(); j++ ) {
-                    if( rpkmValues.get( j ).getRPKM() < min ) {
-                        min = rpkmValues.get( j ).getRPKM();
+                for( RPKMvalue rpkmValue : rpkmValues ) {
+                    if( rpkmValue.getRPKM() < min ) {
+                        min = rpkmValue.getRPKM();
                     }
-                    if( rpkmValues.get( j ).getRPKM() >= max ) {
-                        max = rpkmValues.get( j ).getRPKM();
+                    if( rpkmValue.getRPKM() >= max ) {
+                        max = rpkmValue.getRPKM();
                     }
                 }
                 double shift = max / 20;
@@ -108,8 +108,8 @@ public class ResultHistogramRPKM extends javax.swing.JPanel implements
                 for( int l = 0; l < intervals.length; l++ ) {
                     intervals[l] = 0;
                 }
-                for( int k = 0; k < rpkmValues.size(); k++ ) {
-                    double value = rpkmValues.get( k ).getRPKM();
+                for( RPKMvalue rpkmValue : rpkmValues ) {
+                    double value = rpkmValue.getRPKM();
                     int index = (int) Math.floor( value / shift );
                     intervals[index]++;
                 }

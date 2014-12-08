@@ -51,8 +51,8 @@ public class SamBamCombiner implements CombinerI {
 
     private final TrackJob trackJob1;
     private final TrackJob trackJob2;
-    private boolean sortCoordinate;
-    private List<Observer> observers;
+    private final boolean sortCoordinate;
+    private final List<Observer> observers;
 
 
     /**

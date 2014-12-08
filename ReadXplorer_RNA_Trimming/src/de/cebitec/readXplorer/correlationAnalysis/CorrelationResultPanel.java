@@ -44,7 +44,7 @@ public class CorrelationResultPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
     private BoundsInfoManager bim;
-    private TableRightClickFilter<UneditableTableModel> tableFilter;
+    private final TableRightClickFilter<UneditableTableModel> tableFilter;
 
 
     /**

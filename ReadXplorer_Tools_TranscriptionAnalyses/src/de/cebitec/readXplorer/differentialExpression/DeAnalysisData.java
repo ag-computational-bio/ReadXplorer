@@ -95,7 +95,7 @@ public class DeAnalysisData {
         Integer[] cdata = countData.poll();
         int[] ret = new int[cdata.length];
         for( int i = 0; i < cdata.length; i++ ) {
-            ret[i] = cdata[i].intValue();
+            ret[i] = cdata[i];
         }
         return ret;
     }
@@ -200,8 +200,7 @@ public class DeAnalysisData {
     public void setFeatures( List<PersistentFeature> features ) {
         featureData = new LinkedHashMap<>();
         int counter = 1;
-        for( Iterator<PersistentFeature> it = features.iterator(); it.hasNext(); ) {
-            PersistentFeature persistentFeature = it.next();
+        for( PersistentFeature persistentFeature : features ) {
             if( featureData.containsKey( persistentFeature.getLocus() ) ) {
                 featureData.put( persistentFeature.getLocus() + "_DN_" + counter++, persistentFeature );
             }
@@ -216,9 +215,9 @@ public class DeAnalysisData {
         this.selectedTracks = selectedTracks;
         Set<String> tmpSet = new LinkedHashSet<>();
         int counter = 1;
-        for( int i = 0; i < selectedTracks.size(); i++ ) {
-            if( !tmpSet.add( selectedTracks.get( i ).getDescription() ) ) {
-                tmpSet.add( selectedTracks.get( i ).getDescription() + "_DN_" + counter++ );
+        for( PersistentTrack selectedTrack : selectedTracks ) {
+            if( !tmpSet.add( selectedTrack.getDescription() ) ) {
+                tmpSet.add( selectedTrack.getDescription() + "_DN_" + counter++ );
             }
         }
         trackDescriptions = tmpSet.toArray( new String[tmpSet.size()] );

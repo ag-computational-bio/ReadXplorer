@@ -50,15 +50,15 @@ public class BasePanel extends JPanel implements MousePositionListener {
     private AbstractViewer viewer;
     private AbstractInfoPanel rightPanel;
     private AbstractInfoPanel leftPanel;
-    private BoundsInfoManager boundsManager;
+    private final BoundsInfoManager boundsManager;
     private MousePositionListener viewController;
-    private List<MousePositionListener> currentMousePosListeners;
+    private final List<MousePositionListener> currentMousePosListeners;
     private JPanel centerPanel;
     private AdjustmentPanel adjustmentPanelHorizontal;
     private Component topPanel;
     private JScrollPane centerScrollpane;
     private final Preferences pref = NbPreferences.forModule( Object.class );
-    private List<PreferenceChangeListener> listeners = new ArrayList<>();
+    private final List<PreferenceChangeListener> listeners = new ArrayList<>();
 
 
     /**

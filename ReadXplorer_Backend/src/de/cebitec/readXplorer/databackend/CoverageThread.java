@@ -49,7 +49,7 @@ public class CoverageThread extends RequestThread {
 
     private long trackID;
     private long trackID2;
-    private List<PersistentTrack> tracks;
+    private final List<PersistentTrack> tracks;
     ConcurrentLinkedQueue<IntervalRequest> requestQueue;
     private CoverageAndDiffResult currentCov;
 //    private double requestCounter = 0;

@@ -82,9 +82,9 @@ import org.openide.util.NbPreferences;
 public class BasePanelFactory {
 
     private final Preferences pref = NbPreferences.forModule( Object.class );
-    private BoundsInfoManager boundsManager;
+    private final BoundsInfoManager boundsManager;
     private PersistentReference refGenome;
-    private ViewController viewController;
+    private final ViewController viewController;
 
 
     /**
@@ -841,7 +841,7 @@ public class BasePanelFactory {
          * @param viewer the viewer whose excluded feature list should be
          *               updated
          */
-        public FeatureTypeListener( Classification type, AbstractViewer viewer ) {
+        FeatureTypeListener( Classification type, AbstractViewer viewer ) {
             this.type = type;
             this.viewer = viewer;
         }

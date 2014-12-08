@@ -58,18 +58,18 @@ import org.openide.util.NbBundle.Messages;
  */
 public class ViewController implements MousePositionListener {
 
-    private List<MousePositionListener> mousePosListener;
+    private final List<MousePositionListener> mousePosListener;
     private BoundsInfoManager boundsManager;
     private BasePanelFactory basePanelFac;
 
     private PersistentReference currentRefGen;
     private BasePanel genomeViewer;
-    private Map<PersistentTrack, BasePanel> trackToPanel;
-    private List<BasePanel> currentTracks = new ArrayList<>();
+    private final Map<PersistentTrack, BasePanel> trackToPanel;
+    private final List<BasePanel> currentTracks = new ArrayList<>();
 
-    private BoundsInfoManagerFactory boundsInfoManagerFactory;
+    private final BoundsInfoManagerFactory boundsInfoManagerFactory;
 
-    private ApplicationFrameI app;
+    private final ApplicationFrameI app;
 
 
     /**

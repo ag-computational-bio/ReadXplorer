@@ -28,13 +28,13 @@ import javax.swing.JPanel;
 
 public final class DeSeqVisualPanelConds extends JPanel {
 
-    private DefaultListModel<PersistentTrack> trackListModel = new DefaultListModel<>();
-    private DefaultListModel<PersistentTrack> conditionOneModel = new DefaultListModel<>();
-    private DefaultListModel<PersistentTrack> conditionTwoModel = new DefaultListModel<>();
+    private final DefaultListModel<PersistentTrack> trackListModel = new DefaultListModel<>();
+    private final DefaultListModel<PersistentTrack> conditionOneModel = new DefaultListModel<>();
+    private final DefaultListModel<PersistentTrack> conditionTwoModel = new DefaultListModel<>();
     private List<PersistentTrack> selectedTracks = new ArrayList<>();
     private String[] conds;
-    private List<Integer> groupA = new ArrayList<>();
-    private List<Integer> groupB = new ArrayList<>();
+    private final List<Integer> groupA = new ArrayList<>();
+    private final List<Integer> groupB = new ArrayList<>();
 
 
     /**
@@ -60,8 +60,7 @@ public final class DeSeqVisualPanelConds extends JPanel {
             groupA.clear();
             groupB.clear();
             conds = new String[selectedTracks.size()];
-            for( Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext(); ) {
-                PersistentTrack persistentTrack = it.next();
+            for( PersistentTrack persistentTrack : selectedTracks ) {
                 trackListModel.addElement( persistentTrack );
             }
         }
@@ -69,8 +68,8 @@ public final class DeSeqVisualPanelConds extends JPanel {
 
 
     public boolean conditionsComplete() {
-        for( int i = 0; i < conds.length; i++ ) {
-            if( conds[i] == null ) {
+        for( String cond : conds ) {
+            if( cond == null ) {
                 return false;
             }
         }
@@ -224,8 +223,7 @@ public final class DeSeqVisualPanelConds extends JPanel {
 
     private void addToConditionOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addToConditionOneActionPerformed
         List<PersistentTrack> tracks = trackList.getSelectedValuesList();
-        for( Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext(); ) {
-            PersistentTrack persistentTrack = it.next();
+        for( PersistentTrack persistentTrack : tracks ) {
             trackListModel.removeElement( persistentTrack );
             conditionOneModel.addElement( persistentTrack );
             conds[selectedTracks.indexOf( persistentTrack )] = "ONE";
@@ -238,8 +236,7 @@ public final class DeSeqVisualPanelConds extends JPanel {
 
     private void addToConditionTwoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addToConditionTwoActionPerformed
         List<PersistentTrack> tracks = trackList.getSelectedValuesList();
-        for( Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext(); ) {
-            PersistentTrack persistentTrack = it.next();
+        for( PersistentTrack persistentTrack : tracks ) {
             trackListModel.removeElement( persistentTrack );
             conditionTwoModel.addElement( persistentTrack );
             conds[selectedTracks.indexOf( persistentTrack )] = "TWO";
@@ -252,8 +249,7 @@ public final class DeSeqVisualPanelConds extends JPanel {
 
     private void removeFromConditionOneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeFromConditionOneActionPerformed
         List<PersistentTrack> tracks = conditionOneList.getSelectedValuesList();
-        for( Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext(); ) {
-            PersistentTrack persistentTrack = it.next();
+        for( PersistentTrack persistentTrack : tracks ) {
             conditionOneModel.removeElement( persistentTrack );
             trackListModel.addElement( persistentTrack );
             conds[selectedTracks.indexOf( persistentTrack )] = null;
@@ -266,8 +262,7 @@ public final class DeSeqVisualPanelConds extends JPanel {
 
     private void removeFromConditionTwoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeFromConditionTwoActionPerformed
         List<PersistentTrack> tracks = conditionTwoList.getSelectedValuesList();
-        for( Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext(); ) {
-            PersistentTrack persistentTrack = it.next();
+        for( PersistentTrack persistentTrack : tracks ) {
             conditionTwoModel.removeElement( persistentTrack );
             trackListModel.addElement( persistentTrack );
             conds[selectedTracks.indexOf( persistentTrack )] = null;

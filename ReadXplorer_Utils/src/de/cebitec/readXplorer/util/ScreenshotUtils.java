@@ -25,7 +25,6 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.logging.Level;
@@ -100,11 +99,8 @@ public class ScreenshotUtils {
                         Thread exportThread = new Thread( new Runnable() {
                             @Override
                             public void run() {
-                                try {
-                                    OutputStream file = new FileOutputStream( fileLocation );
-                                    Writer out = new OutputStreamWriter( file, "UTF-8" );
+                                try( Writer out = new OutputStreamWriter( new FileOutputStream( fileLocation ), "UTF-8" ); ) {
                                     svgGenerator.stream( out, false );
-                                    out.close();
                                 }
                                 catch( IOException ex ) {
                                     JOptionPane.showMessageDialog( JOptionPane.getRootFrame(), NbBundle.getMessage( ScreenshotUtils.class, "ScreenshotUtils.ErrorMsg", ex.toString() ),

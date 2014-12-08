@@ -36,7 +36,7 @@ public class ExtendedScroller extends JScrollBar implements SynchronousNavigator
     private final static long serialVersionUID = 7416234;
 
     private int currentValue;
-    private List<AdjustmentPanelListenerI> listeners;
+    private final List<AdjustmentPanelListenerI> listeners;
 
 
     public ExtendedScroller( int min, int max, int init ) {

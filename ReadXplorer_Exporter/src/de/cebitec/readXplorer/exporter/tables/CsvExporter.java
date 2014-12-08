@@ -47,7 +47,7 @@ public class CsvExporter implements TableExporterI {
     private List<List<String>> headers;
     private int fileCount = 0;
     private List<String> sheetNames;
-    private ProgressHandle progressHandle;
+    private final ProgressHandle progressHandle;
     private int rowNumberGlobal;
 
 

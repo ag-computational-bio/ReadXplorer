@@ -381,7 +381,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel implements
                         line = br.readLine();
                     }
                     // skip header line !
-                    while( line != null && !line.equals( "" ) ) {
+                    while( line != null && !line.isEmpty( ) ) {
 
                         String[] split = line.split( "\t" );
                         String locus = split[0];

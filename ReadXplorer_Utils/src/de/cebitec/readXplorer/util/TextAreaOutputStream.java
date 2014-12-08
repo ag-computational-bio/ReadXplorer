@@ -32,7 +32,7 @@ public class TextAreaOutputStream extends OutputStream {
 
     private final JTextArea textArea;
     private final StringBuilder sb = new StringBuilder();
-    private String title;
+    private final String title;
 
 
     public TextAreaOutputStream( final JTextArea textArea, String title ) {

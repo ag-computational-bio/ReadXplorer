@@ -31,7 +31,7 @@ public class LoadingDialog extends javax.swing.JDialog {
 
     private static final long serialVersionUID = 1L;
 
-    private Frame parent;
+    private final Frame parent;
 
 
     /**

@@ -38,7 +38,7 @@ import org.openide.util.HelpCtx;
 class ParameterSelectionPanel implements
         WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
-    public ParameterSelectionPanel() {
+    ParameterSelectionPanel() {
         PropertyChangeListener pc = new PropertyChangeListener() {
             @Override
             public void propertyChange( PropertyChangeEvent evt ) {
@@ -65,7 +65,7 @@ class ParameterSelectionPanel implements
      */
     private ParameterSelectionCard component;
     private boolean isValid;
-    private final Set<ChangeListener> listeners = new HashSet<ChangeListener>( 1 ); // or can use ChangeSupport in NB 6.0
+    private final Set<ChangeListener> listeners = new HashSet<>( 1 ); // or can use ChangeSupport in NB 6.0
 
 
     // Get the visual component for the panel. In this template, the component
@@ -121,7 +121,7 @@ class ParameterSelectionPanel implements
     protected final void fireChangeEvent() {
         Iterator<ChangeListener> it;
         synchronized( listeners ) {
-            it = new HashSet<ChangeListener>( listeners ).iterator();
+            it = new HashSet<>( listeners ).iterator();
         }
         ChangeEvent ev = new ChangeEvent( this );
         while( it.hasNext() ) {

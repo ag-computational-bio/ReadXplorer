@@ -42,10 +42,10 @@ public class StartCodonFilter implements RegionFilterI {
     public static final int INIT = 10;
     private static final int INTERVAL_SIZE = 3000000;
 
-    private List<Region> regions;
+    private final List<Region> regions;
     private int absStart;
     private int absStop;
-    private PersistentReference refGen;
+    private final PersistentReference refGen;
     private String sequence;
     private ArrayList<Boolean> selectedStarts;
     private ArrayList<Boolean> selectedStops;

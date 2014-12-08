@@ -43,10 +43,10 @@ public final class ThumbNailViewTopComponent extends TopComponentExtended
 
     private static final long serialVersionUID = 1L;
 
-    private JComponent myView;
-    private Scene scene;
-    private BirdViewController birdCont;
-    private ThumbnailController thumbCon;
+    private final JComponent myView;
+    private final Scene scene;
+    private final BirdViewController birdCont;
+    private final ThumbnailController thumbCon;
 
 
     public Scene getScene() {

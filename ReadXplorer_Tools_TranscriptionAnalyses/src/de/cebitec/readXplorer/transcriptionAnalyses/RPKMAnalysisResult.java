@@ -39,7 +39,7 @@ import java.util.Map;
  */
 public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetRPKM> {
 
-    private List<RPKMvalue> rpkmResults;
+    private final List<RPKMvalue> rpkmResults;
     private int noGenomeFeatures;
 
 

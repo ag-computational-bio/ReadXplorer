@@ -31,7 +31,7 @@ import java.util.Iterator;
  */
 public class LayerPair implements LayerI {
 
-    private ArrayList<BlockI> blocks;
+    private final ArrayList<BlockI> blocks;
 
 
     /**

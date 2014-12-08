@@ -26,7 +26,7 @@ public class SequenceLengthSelectionWizardPanel implements
      * component from this class, just use getComponent().
      */
     private SequenceLengthSelectionForMotifAnalysis component;
-    private String wizardName;
+    private final String wizardName;
     private int wholeLengthOfAnalysisRegion;
 
 

@@ -68,7 +68,7 @@ public class GapCount {
      */
     private static final int UNKNOWN_MAP_QUAL = -1;
 
-    private List<int[][]> gapOrderCount; //The gap order count list containing the arrays for the base counts at each gap order index.
+    private final List<int[][]> gapOrderCount; //The gap order count list containing the arrays for the base counts at each gap order index.
 
 
     /**

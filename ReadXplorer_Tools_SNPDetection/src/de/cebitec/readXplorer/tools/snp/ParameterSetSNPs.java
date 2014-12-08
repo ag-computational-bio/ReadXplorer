@@ -67,7 +67,7 @@ class ParameterSetSNPs extends ParametersFeatureTypesAndReadClasses implements
      * @param minAverageMappingQual Minimum average phred scaled mapping quality
      *                              or -1 if unknown.
      */
-    public ParameterSetSNPs( int minMismatchBases, int minPercentage, boolean useMainBase, Set<FeatureType> selFeatureTypes, ParametersReadClasses readClassParams,
+    ParameterSetSNPs( int minMismatchBases, int minPercentage, boolean useMainBase, Set<FeatureType> selFeatureTypes, ParametersReadClasses readClassParams,
                              byte minBaseQuality, byte minAverageBaseQual, int minAverageMappingQual ) {
         super( selFeatureTypes, readClassParams );
         this.minMismatchBases = minMismatchBases;

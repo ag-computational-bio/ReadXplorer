@@ -78,7 +78,7 @@ public final class OpenSnpDetectionAction implements ActionListener,
 
     private final ReferenceViewer context;
 
-    private PersistentReference reference;
+    private final PersistentReference reference;
     private List<PersistentTrack> tracks;
     private Map<Integer, PersistentTrack> trackMap;
     private SNP_DetectionTopComponent snpDetectionTopComp;

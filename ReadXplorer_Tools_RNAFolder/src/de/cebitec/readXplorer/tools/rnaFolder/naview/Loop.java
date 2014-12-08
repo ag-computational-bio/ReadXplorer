@@ -37,7 +37,7 @@ public class Loop {
 
     protected Loop( int number ) {
         this.number = number;
-        this.connections = new ArrayList<Connection>();
+        this.connections = new ArrayList<>();
     }
 
 

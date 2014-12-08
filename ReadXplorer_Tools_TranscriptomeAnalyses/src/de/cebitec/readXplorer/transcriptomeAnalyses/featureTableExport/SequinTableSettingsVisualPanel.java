@@ -21,7 +21,7 @@ public final class SequinTableSettingsVisualPanel extends JPanel {
     private final String descriptionText = "<html><p align='justify'>The parsing "
                                            + "of the loci_tags is needed, if you want to assign the qualifiers "
                                            + "to each locus_tag in sequin table. </p></html>";
-    private String separator = "";
+    private final String separator = "";
 
 
     /**

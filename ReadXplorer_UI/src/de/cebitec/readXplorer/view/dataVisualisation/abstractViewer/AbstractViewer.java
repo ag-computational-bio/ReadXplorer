@@ -100,7 +100,7 @@ public abstract class AbstractViewer extends JPanel implements
     private int zoom = 1;
     private boolean canZoom = true;
     private double basewidth;
-    private BoundsInfoManager boundsManager;
+    private final BoundsInfoManager boundsManager;
     private int oldLogMousePos;
     /**
      * the position of the genome, where to mouse is currently hovering.
@@ -108,11 +108,11 @@ public abstract class AbstractViewer extends JPanel implements
     private int currentLogMousePos;
     private int lastPhysPos = 0;
     private boolean printMouseOver;
-    private BasePanel basePanel;
+    private final BasePanel basePanel;
     private SequenceBar seqBar;
     private boolean centerSeqBar;
-    private PaintingAreaInfo paintingAreaInfo;
-    private PersistentReference reference;
+    private final PaintingAreaInfo paintingAreaInfo;
+    private final PersistentReference reference;
     private boolean isInMaxZoomLevel;
     private boolean inDrawingMode;
     private boolean isActive;
@@ -124,7 +124,7 @@ public abstract class AbstractViewer extends JPanel implements
     private boolean hasOptions;
     private JPanel chromSelectionPanel;
     private boolean hasChromSelection;
-    private List<Classification> excludedClassifications;
+    private final List<Classification> excludedClassifications;
     private byte minMappingQuality = 0;
     private boolean pAInfoIsAvailable = false;
     public static final String PROP_MOUSEPOSITION_CHANGED = "mousePos changed";

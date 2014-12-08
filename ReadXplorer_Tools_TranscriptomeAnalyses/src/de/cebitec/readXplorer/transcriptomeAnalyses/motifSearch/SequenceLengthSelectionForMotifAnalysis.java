@@ -16,7 +16,7 @@ import org.openide.util.NbPreferences;
  */
 public class SequenceLengthSelectionForMotifAnalysis extends javax.swing.JPanel {
 
-    private String wizardName;
+    private final String wizardName;
 
 
     /**

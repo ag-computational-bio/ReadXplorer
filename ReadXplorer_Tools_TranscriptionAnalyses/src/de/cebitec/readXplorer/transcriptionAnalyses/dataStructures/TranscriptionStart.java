@@ -31,12 +31,12 @@ import de.cebitec.readXplorer.databackend.dataObjects.TrackChromResultEntry;
  */
 public class TranscriptionStart extends TrackChromResultEntry {
 
-    private int pos;
-    private boolean isFwdStrand;
-    private int readStarts;
-    private DetectedFeatures detFeatures;
-    private int percentIncrease;
-    private int coverageIncrease;
+    private final int pos;
+    private final boolean isFwdStrand;
+    private final int readStarts;
+    private final DetectedFeatures detFeatures;
+    private final int percentIncrease;
+    private final int coverageIncrease;
 
 
     /**

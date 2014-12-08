@@ -25,9 +25,9 @@ package de.cebitec.readXplorer.parser.common;
  */
 public class ParsedReferenceGap {
 
-    private long absPos;
-    private char base;
-    private int order;
+    private final long absPos;
+    private final char base;
+    private final int order;
 
 
     /**

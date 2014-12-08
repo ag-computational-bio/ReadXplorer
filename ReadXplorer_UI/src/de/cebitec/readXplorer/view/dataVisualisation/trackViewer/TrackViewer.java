@@ -69,13 +69,13 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
     private final Preferences pref = NbPreferences.forModule( Object.class );
     private NormalizationSettings normSetting = null;
     private TrackConnector trackCon;
-    private List<Integer> trackIDs;
+    private final List<Integer> trackIDs;
     private List<CoverageManager> covManagers;
     private CoverageManager covManager;
     private boolean covLoaded;
-    private boolean twoTracks;
-    private int id1;
-    private int id2;
+    private final boolean twoTracks;
+    private final int id1;
+    private final int id2;
     private boolean colorChanges;
     private boolean hasNormalizationFactor = false;
     private boolean automaticScaling = pref.getBoolean( Properties.VIEWER_AUTO_SCALING, false );
@@ -85,14 +85,14 @@ public class TrackViewer extends AbstractViewer implements ThreadListener {
 
     private double scaleFactor;
     private int scaleLineStep;
-    private int labelMargin;
+    private final int labelMargin;
     //mapping class list determining the order of the paths
     private List<Classification> classList;
     private Map<Classification, Color> classToColorMap;
-    private Map<Classification, Pair<GeneralPath, GeneralPath>> classToPathsMap;
+    private final Map<Classification, Pair<GeneralPath, GeneralPath>> classToPathsMap;
     //   public static final String PROP_TRACK_CLICKED = "track clicked";
     //  public static final String PROP_TRACK_ENTERED = "track entered";
-    private boolean combineTracks;
+    private final boolean combineTracks;
 
 
     /**

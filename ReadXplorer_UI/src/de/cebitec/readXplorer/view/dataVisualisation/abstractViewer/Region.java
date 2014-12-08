@@ -27,10 +27,10 @@ package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
  */
 public class Region {
 
-    private int start;
-    private int stop;
-    private boolean isForwardStrand;
-    private int type;
+    private final int start;
+    private final int stop;
+    private final boolean isForwardStrand;
+    private final int type;
 
 
     /**

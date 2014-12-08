@@ -48,10 +48,10 @@ import java.util.logging.Logger;
  */
 public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
 
-    private TrackConnector trackConnector;
-    private List<Operon> operonList; //final result list of OperonAdjacencies
-    private HashMap<Integer, OperonAdjacency> featureToPutativeOperonMap; //feature id of mappings to count for features
-    private List<OperonAdjacency> operonAdjacencies;
+    private final TrackConnector trackConnector;
+    private final List<Operon> operonList; //final result list of OperonAdjacencies
+    private final HashMap<Integer, OperonAdjacency> featureToPutativeOperonMap; //feature id of mappings to count for features
+    private final List<OperonAdjacency> operonAdjacencies;
     private int averageReadLength = 0;
     private int averageReadPairLength = 0;
     private int lastMappingIdx;

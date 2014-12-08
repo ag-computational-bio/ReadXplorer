@@ -36,7 +36,7 @@ public class RefJobView extends javax.swing.JPanel implements
 
     private static final long serialVersionUID = 1231231;
 
-    private List<ReferenceJob> jobs;
+    private final List<ReferenceJob> jobs;
     private boolean hasJobs;
 
 

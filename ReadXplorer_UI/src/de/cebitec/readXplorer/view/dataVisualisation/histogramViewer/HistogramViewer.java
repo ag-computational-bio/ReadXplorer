@@ -65,9 +65,9 @@ public class HistogramViewer extends AbstractViewer implements ThreadListener {
     private static final long serialVersionUID = 234765253;
     private static final int MININTERVALLENGTH = 3000;
 //    private InputOutput io;
-    private static int height = 200;
-    private TrackConnector trackConnector;
-    private PersistentReference refGen;
+    private static final int height = 200;
+    private final TrackConnector trackConnector;
+    private final PersistentReference refGen;
     private GenomeGapManager gapManager;
     private int lowerBound;
     private int upperBound;

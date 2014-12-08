@@ -50,7 +50,7 @@ import org.openide.util.NbBundle;
 public class ExcelExporter implements TableExporterI {
 
 
-    private ProgressHandle progressHandle;
+    private final ProgressHandle progressHandle;
     private List<String> sheetNames; //contains all sheet names
     private List<List<String>> headers; //contains all headers
     /**

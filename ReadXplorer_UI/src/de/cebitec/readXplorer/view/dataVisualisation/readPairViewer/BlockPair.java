@@ -34,9 +34,9 @@ import java.util.Iterator;
  */
 public class BlockPair implements BlockI {
 
-    private int absStart;
-    private int absStop;
-    private ReadPairGroup readPairGroup;
+    private final int absStart;
+    private final int absStop;
+    private final ReadPairGroup readPairGroup;
 
 
     /**

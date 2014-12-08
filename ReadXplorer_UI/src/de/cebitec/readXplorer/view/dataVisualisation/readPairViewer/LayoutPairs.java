@@ -41,10 +41,10 @@ import java.util.List;
  */
 public class LayoutPairs implements LayoutI {
 
-    private int absStart;
-    private int absStop;
-    private ArrayList<LayerI> reverseLayers;
-    private BlockContainer reverseBlockContainer;
+    private final int absStart;
+    private final int absStop;
+    private final ArrayList<LayerI> reverseLayers;
+    private final BlockContainer reverseBlockContainer;
     private final List<Classification> exclusionList;
 
 

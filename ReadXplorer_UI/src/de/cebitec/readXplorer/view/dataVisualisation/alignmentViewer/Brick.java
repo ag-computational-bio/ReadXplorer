@@ -63,7 +63,7 @@ public enum Brick {
     private final static String SKIPPED_STRING = " ";
     private final static String TRIMMED_STRING = "|";
 
-    private String typeString;
+    private final String typeString;
 
 
     /**

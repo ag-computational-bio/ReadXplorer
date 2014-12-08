@@ -48,7 +48,7 @@ final class VcfParser {
      * <p>
      * @param vcfFile
      */
-    public VcfParser( File vcfFile ) {
+    VcfParser( File vcfFile ) {
         this.vcfFile = vcfFile;
         getVariantContextList();
     }

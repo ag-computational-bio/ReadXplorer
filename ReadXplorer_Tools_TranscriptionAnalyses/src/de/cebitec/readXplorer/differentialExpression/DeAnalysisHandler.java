@@ -168,9 +168,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
             genomeAnnos.addAll( referenceConnector.getFeaturesForRegionInclParents( 1, chrom.getLength(), selectedFeatureTypes, chrom.getId() ) );
         }
 
-        for( Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext(); ) {
-
-            PersistentTrack currentTrack = it.next();
+        for( PersistentTrack currentTrack : selectedTracks ) {
             try {
                 TrackConnector tc = (new SaveFileFetcherForGUI()).getTrackConnector( currentTrack );
 
@@ -191,9 +189,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
                 return;
             }
         }
-
-        for( Iterator<AnalysesHandler> it = allHandler.iterator(); it.hasNext(); ) {
-            AnalysesHandler handler = it.next();
+        for( AnalysesHandler handler : allHandler ) {
             handler.startAnalysis();
         }
     }
@@ -312,8 +308,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
     public void notifyObservers( Object data ) {
         //Copy the observer list to avoid concurrent modification exception
         List<Observer> tmpObserver = new ArrayList<>( observerList );
-        for( Iterator<Observer> it = tmpObserver.iterator(); it.hasNext(); ) {
-            Observer currentObserver = it.next();
+        for( Observer currentObserver : tmpObserver ) {
             currentObserver.update( data );
         }
     }

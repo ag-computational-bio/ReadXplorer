@@ -248,10 +248,10 @@ public class TrimResultPanel extends JPanel implements Observer {
                         NumberAxis yAxis = new NumberAxis();
                         yAxis.setAutoRanging( true );
                         chart
-                                = new StackedBarChart<String, Number>( xAxis, yAxis );
+                                = new StackedBarChart<>( xAxis, yAxis );
                         chart.setAnimated( false );
-                        series2 = new XYChart.Series<String, Number>();
-                        series1 = new XYChart.Series<String, Number>();
+                        series2 = new XYChart.Series<>();
+                        series1 = new XYChart.Series<>();
 
                         series1.setName( "mapped" );
                         series2.setName( "unmapped" );

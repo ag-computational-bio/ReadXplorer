@@ -49,9 +49,9 @@ public class OpenTracksVisualPanel extends JobPanel implements
 
     private static final long serialVersionUID = 1L;
 
-    private ExplorerManager explorerManager;
-    private OutlineView outlineView;
-    private ReferenceConnector refGenConnector;
+    private final ExplorerManager explorerManager;
+    private final OutlineView outlineView;
+    private final ReferenceConnector refGenConnector;
     private List<PersistentTrack> selectedTracks;
 
 
@@ -297,7 +297,7 @@ public class OpenTracksVisualPanel extends JobPanel implements
      */
     public class TrackItem extends StandardItem {
 
-        private PersistentTrack track;
+        private final PersistentTrack track;
 
 
         /**

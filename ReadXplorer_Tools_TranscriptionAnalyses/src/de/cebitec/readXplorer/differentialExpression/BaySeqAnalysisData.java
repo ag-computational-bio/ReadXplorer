@@ -58,7 +58,7 @@ public class BaySeqAnalysisData extends DeAnalysisData {
             Integer[] current = groups.get( nextGroup++ ).getIntegerRepresentation();
             ret = new int[current.length];
             for( int i = 0; i < current.length; i++ ) {
-                ret[i] = current[i].intValue();
+                ret[i] = current[i];
             }
         }
         return ret;

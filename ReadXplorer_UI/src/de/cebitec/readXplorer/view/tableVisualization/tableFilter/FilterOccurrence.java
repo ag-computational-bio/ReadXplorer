@@ -43,13 +43,13 @@ class FilterOccurrence<E extends DefaultTableModel> {
     private int sortedTable;
     private E sortedTableModel;
     private final TableRightClickFilter<E> tableRightClickFilter;
-    private E tableModel;
-    private Class<E> classType;
-    private int posColumn;
-    private int trackColumn;
+    private final E tableModel;
+    private final Class<E> classType;
+    private final int posColumn;
+    private final int trackColumn;
 
 
-    public FilterOccurrence( String selectedButton, int occurrenceCount, TableRightClickFilter<E> tableRightClickFilter,
+    FilterOccurrence( String selectedButton, int occurrenceCount, TableRightClickFilter<E> tableRightClickFilter,
                              int trackColumn, int posColumn ) {
         this.selectedButton = selectedButton;
         this.occurrenceCount = occurrenceCount;

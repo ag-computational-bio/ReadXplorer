@@ -18,7 +18,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class OperonDetection {
 
-    private int trackId;
+    private final int trackId;
 
 
     public OperonDetection( int trackId ) {

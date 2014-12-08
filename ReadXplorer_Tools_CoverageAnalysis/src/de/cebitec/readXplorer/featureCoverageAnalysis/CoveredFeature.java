@@ -30,8 +30,8 @@ import de.cebitec.readXplorer.databackend.dataObjects.TrackResultEntry;
  */
 public class CoveredFeature extends TrackResultEntry {
 
-    private PersistentFeature coveredFeature;
-    private int featLength;
+    private final PersistentFeature coveredFeature;
+    private final int featLength;
     private int noCoveredBases;
     private int percentCovered;
     private int meanCoverage = 0;

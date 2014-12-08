@@ -27,7 +27,7 @@ public class FieldAdapter implements ConfigListener {
 
     private static final Logger log = Logger.getLogger( "FieldAdapter" );
 
-    private Object configurable;
+    private final Object configurable;
 
 
     public FieldAdapter( Object configurable ) {
@@ -47,13 +47,13 @@ public class FieldAdapter implements ConfigListener {
         try {
             field = configurable.getClass().getDeclaredField( name );
             if( value instanceof Boolean ) {
-                field.setBoolean( configurable, ((Boolean) value).booleanValue() );
+                field.setBoolean(configurable, ((Boolean) value));
             }
             else if( value instanceof Integer ) {
-                field.setInt( configurable, ((Integer) value).intValue() );
+                field.setInt(configurable, ((Integer) value));
             }
             else if( value instanceof Float ) {
-                field.setFloat( configurable, ((Float) value).floatValue() );
+                field.setFloat(configurable, ((Float) value));
             }
             else if( value instanceof BoundedRangeModel ) {
                 field.setInt( configurable, ((BoundedRangeModel) e.getValue()).getValue() );

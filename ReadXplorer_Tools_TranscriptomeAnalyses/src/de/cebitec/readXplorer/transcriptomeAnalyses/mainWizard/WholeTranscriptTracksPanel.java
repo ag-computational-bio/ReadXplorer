@@ -78,25 +78,25 @@ public class WholeTranscriptTracksPanel implements
 
     @Override
     public void storeSettings( WizardDescriptor wiz ) {
-        wiz.putProperty( WizardPropertyStrings.PROP_RPKM_ANALYSIS, (boolean) component.isRPKM() );
-        wiz.putProperty( WizardPropertyStrings.PROP_NOVEL_ANALYSIS, (boolean) component.isNewRegions() );
-        wiz.putProperty( WizardPropertyStrings.PROP_OPERON_ANALYSIS, (boolean) component.isOperonDetection() );
+        wiz.putProperty(WizardPropertyStrings.PROP_RPKM_ANALYSIS, component.isRPKM());
+        wiz.putProperty(WizardPropertyStrings.PROP_NOVEL_ANALYSIS, component.isNewRegions());
+        wiz.putProperty(WizardPropertyStrings.PROP_OPERON_ANALYSIS, component.isOperonDetection());
         if( component.isNewRegions() ) {
-            wiz.putProperty( WizardPropertyStrings.PROP_Fraction, (double) component.getFractionForNewRegionDetection() );
-            wiz.putProperty( WizardPropertyStrings.PROP_MIN_LENGTH_OF_NOVEL_TRANSCRIPT, (int) component.getMinBoundaryForNovelRegionDetection() );
-            wiz.putProperty( WizardPropertyStrings.PROP_INCLUDE_RATIO_VALUE_IN_NOVEL_REGION_DETECTION, (boolean) component.isInclusionOfRatioValueSelected() );
-            wiz.putProperty( WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_NR, (boolean) component.isIncludeBestMatchedReadsNR() );
-            wiz.putProperty( WizardPropertyStrings.PROP_SET_MANAULLY_MIN_STACK_SIZE, (boolean) component.isBgThresholdSetManually_NT() );
-            wiz.putProperty( WizardPropertyStrings.PROP_MANAULLY_MIN_STACK_SIZE, (int) component.getBgThresholdSetManually_NT() );
-            wiz.putProperty( WizardPropertyStrings.PROP_RATIO_NOVELREGION_DETECTION, (int) component.getIncreaseRatioValue() );
+            wiz.putProperty(WizardPropertyStrings.PROP_Fraction, component.getFractionForNewRegionDetection());
+            wiz.putProperty(WizardPropertyStrings.PROP_MIN_LENGTH_OF_NOVEL_TRANSCRIPT, component.getMinBoundaryForNovelRegionDetection());
+            wiz.putProperty(WizardPropertyStrings.PROP_INCLUDE_RATIO_VALUE_IN_NOVEL_REGION_DETECTION, component.isInclusionOfRatioValueSelected());
+            wiz.putProperty(WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_NR, component.isIncludeBestMatchedReadsNR());
+            wiz.putProperty(WizardPropertyStrings.PROP_SET_MANAULLY_MIN_STACK_SIZE, component.isBgThresholdSetManually_NT());
+            wiz.putProperty(WizardPropertyStrings.PROP_MANAULLY_MIN_STACK_SIZE, component.getBgThresholdSetManually_NT());
+            wiz.putProperty(WizardPropertyStrings.PROP_RATIO_NOVELREGION_DETECTION, component.getIncreaseRatioValue());
         }
         else if( component.isOperonDetection() ) {
-            wiz.putProperty( WizardPropertyStrings.PROP_Fraction, (double) component.getFractionForOperonDetection() );
-            wiz.putProperty( WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_OP, (boolean) component.isIncludeBestMatchedReadsOP() );
-            wiz.putProperty( WizardPropertyStrings.PROP_SET_MANAULLY_MIN_STACK_SIZE, (boolean) component.isBgThresholdSetManually_OP() );
-            wiz.putProperty( WizardPropertyStrings.PROP_MANAULLY_MIN_STACK_SIZE, (int) component.getBgThresholdSetManually_OP() );
+            wiz.putProperty(WizardPropertyStrings.PROP_Fraction, component.getFractionForOperonDetection());
+            wiz.putProperty(WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_OP, component.isIncludeBestMatchedReadsOP());
+            wiz.putProperty(WizardPropertyStrings.PROP_SET_MANAULLY_MIN_STACK_SIZE, component.isBgThresholdSetManually_OP());
+            wiz.putProperty(WizardPropertyStrings.PROP_MANAULLY_MIN_STACK_SIZE, component.getBgThresholdSetManually_OP());
         }
-        wiz.putProperty( WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_RPKM, (boolean) component.isIncludeBestMatchedReadsRpkm() );
+        wiz.putProperty(WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_RPKM, component.isIncludeBestMatchedReadsRpkm());
 
 
 //        wiz.putProperty(WizardPropertyStrings.PROP_FRACTION_NOVELREGION_DETECTION, (double) component.getFractionForNewRegionDetection());
@@ -152,20 +152,13 @@ public class WholeTranscriptTracksPanel implements
     @Override
     public void validate() throws WizardValidationException {
 
-        double fractionOP;
-        double fractionNT;
-        int bGThreshold_NT;
-        int bGThreshold_OP;
-        int minLength_NT;
-        int ratio_NT;
-
         try {
-            fractionNT = component.getFractionForNewRegionDetection();
-            fractionOP = component.getFractionForOperonDetection();
-            bGThreshold_NT = component.getBgThresholdSetManually_NT();
-            bGThreshold_OP = component.getBgThresholdSetManually_OP();
-            minLength_NT = component.getMinBoundaryForNovelRegionDetection();
-            ratio_NT = component.getIncreaseRatioValue();
+            double fractionNT = component.getFractionForNewRegionDetection();
+            double fractionOP = component.getFractionForOperonDetection();
+            int bGThreshold_NT = component.getBgThresholdSetManually_NT();
+            int bGThreshold_OP = component.getBgThresholdSetManually_OP();
+            int minLength_NT = component.getMinBoundaryForNovelRegionDetection();
+            int ratio_NT = component.getIncreaseRatioValue();
         }
         catch( NumberFormatException e ) {
             throw new WizardValidationException( null, "Please check your textfields regarding string input.", null );

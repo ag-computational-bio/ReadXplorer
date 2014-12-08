@@ -50,7 +50,7 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
     private int minBoundaryLength;
     private int increaseRatioValue;
     private boolean isBgThresholdSetManually;
-    private TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
+    private final TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
     private File referenceFile;
 
 

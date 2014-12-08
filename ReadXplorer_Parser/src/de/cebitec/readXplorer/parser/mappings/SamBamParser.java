@@ -59,13 +59,13 @@ import org.openide.util.NbBundle;
  */
 public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
 
-    private static String name = "SAM/BAM Parser";
-    private static String[] fileExtension = new String[]{ "sam", "SAM", "Sam", "bam", "BAM", "Bam" };
-    private static String fileDescription = "SAM/BAM Read Mappings";
+    private static final String name = "SAM/BAM Parser";
+    private static final String[] fileExtension = new String[]{ "sam", "SAM", "Sam", "bam", "BAM", "Bam" };
+    private static final String fileDescription = "SAM/BAM Read Mappings";
 
-    private List<Observer> observers;
+    private final List<Observer> observers;
     private StatsContainer statsContainer;
-    private ErrorLimit errorLimit;
+    private final ErrorLimit errorLimit;
     private RefSeqFetcher refSeqFetcher;
     private boolean deleteSortedFile;
 

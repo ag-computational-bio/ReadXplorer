@@ -30,11 +30,11 @@ import net.sf.samtools.SAMRecord;
  */
 public class ReadPair {
 
-    private SAMRecord record1;
-    private SAMRecord record2;
-    private int readPairId;
+    private final SAMRecord record1;
+    private final SAMRecord record2;
+    private final int readPairId;
     private ReadPairType type;
-    private int distance;
+    private final int distance;
 
 
     /**

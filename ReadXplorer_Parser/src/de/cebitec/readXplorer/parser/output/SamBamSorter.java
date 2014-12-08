@@ -43,7 +43,7 @@ import org.openide.util.NbBundle;
  */
 public class SamBamSorter implements Observable {
 
-    private List<Observer> observers;
+    private final List<Observer> observers;
 
 
     /**

@@ -76,8 +76,7 @@ public class ProcessingLog {
         Set<String> keys = properties.keySet();
         Map<String, Object> tmpProperties = new HashMap<>( properties );
 
-        for( Iterator<String> it = keys.iterator(); it.hasNext(); ) {
-            String key = it.next();
+        for( String key : keys ) {
             if( !key.startsWith( "WizardPanel" ) ) {
                 Object currentProperty = tmpProperties.get( key );
                 if( currentProperty instanceof Map ) {

@@ -23,7 +23,7 @@ public class NovelTranscriptDetection implements Observer,
 
     private List<NovelTranscript> novelRegions;
     private final PersistentReference refGenome;
-    private int trackid;
+    private final int trackid;
 
 
     public NovelTranscriptDetection( PersistentReference refGenome, int trackID ) {

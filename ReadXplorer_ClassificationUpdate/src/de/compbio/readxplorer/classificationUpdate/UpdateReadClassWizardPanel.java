@@ -40,7 +40,7 @@ class UpdateReadClassWizardPanel extends ChangeListeningFinishWizardPanel {
      * <p>
      * @param errorMsg possible error message, none necessary here
      */
-    public UpdateReadClassWizardPanel( String errorMsg ) {
+    UpdateReadClassWizardPanel( String errorMsg ) {
         super( errorMsg );
     }
 

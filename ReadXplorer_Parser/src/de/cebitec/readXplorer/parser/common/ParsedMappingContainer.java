@@ -41,7 +41,7 @@ public class ParsedMappingContainer {
     private int numUniqueSeq = 0; //mappingseq only occurs once in data set
     private int numUniqueMappings = 0; //calculate number of unique mappings (map only to one position, but have replicates)
     private int numReads = 0;
-    private HashMap<Integer, ParsedMappingGroup> mappings;
+    private final HashMap<Integer, ParsedMappingGroup> mappings;
     private boolean lastMappingContainer = false;
     private boolean firstMappingContainer = false;
     private int sumReadLength;

@@ -67,8 +67,8 @@ public enum MappingClass implements Classification {
     private static final String SINGLE_PERFECT_MATCH_STRING = "Single Perfect Match";
     private static final String SINGLE_BEST_MATCH_STRING = "Single Best Match";
 
-    private byte typeByte;
-    private String typeString;
+    private final byte typeByte;
+    private final String typeString;
 
 
     private MappingClass( byte typeByte, String typeString ) {

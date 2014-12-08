@@ -44,40 +44,29 @@ public class PairTable {
 
     // DCSE input
     public PairTable( String sequence, String structure, String helices ) {
-        boolean end, paired, gu;
-        char c;
-        int mate, regions, pos, i, j, h_idx, pk_start, pk_end, sum;
-        String tmp, label;
-        String[] blubb;
-        StringBuffer sb = new StringBuffer();
-        List<String> labels = new ArrayList<String>();
-        List<Integer> pt_list = new ArrayList<Integer>();
-        List<Byte> type_list = new ArrayList<Byte>();
-        Stack<Integer> s0 = new Stack<Integer>();
-        Stack<Integer> s1 = new Stack<Integer>();
-        Stack<Integer> s2 = new Stack<Integer>();
-        HashSet<String> pseudoknots = new HashSet<String>();
-        HashSet<String> knots = new HashSet<String>();
-        StringTokenizer st = null;
+
+        final List<String> labels = new ArrayList<>();
+        final HashSet<String> pseudoknots = new HashSet<>();
+        final HashSet<String> knots = new HashSet<>();
 
         // extract region labels from the helix numbering
-        h_idx = helices.indexOf( 'H' );
+        final int h_idx = helices.indexOf( 'H' );
         if( h_idx < 0 )
             throw new IllegalArgumentException( "Missing terminating 'H' character in helix numbering." );
-        blubb = helices.substring( 0, h_idx ).split( "(\\s*-\\s*)+" );
-        for( i = 0; i < blubb.length; i++ ) {
-            tmp = blubb[i].trim();
+        final String[] blubb = helices.substring( 0, h_idx ).split( "(\\s*-\\s*)+" );
+        for( String blubb1 : blubb ) {
+            String tmp = blubb1.trim();
             if( tmp.matches( "\\d+('?)" ) )
                 labels.add( tmp );
         }
 
         // extract pseudoknot labels
-        pk_start = structure.lastIndexOf( '#' );
-        pk_end = structure.lastIndexOf( '&' );
+        final int pk_start = structure.lastIndexOf( '#' );
+        final int pk_end   = structure.lastIndexOf( '&' );
         if( pk_start > 0 && pk_end > 0 && pk_start < pk_end ) {
-            st = new StringTokenizer( structure.substring( pk_start, pk_end ), " " );
+            StringTokenizer st = new StringTokenizer( structure.substring( pk_start, pk_end ), " " );
             while( st.hasMoreTokens() ) {
-                tmp = st.nextToken().trim();
+                String tmp = st.nextToken().trim();
                 if( tmp.matches( "\\d+" ) ) {
                     pseudoknots.add( tmp );
                     pseudoknots.add( tmp + "'" );
@@ -87,9 +76,9 @@ public class PairTable {
 
         // extract entagled helix (knot) labels
         if( pk_end > 0 && pk_end < structure.length() ) {
-            st = new StringTokenizer( structure.substring( pk_end, structure.length() ), " " );
+            StringTokenizer st = new StringTokenizer( structure.substring( pk_end, structure.length() ), " " );
             while( st.hasMoreTokens() ) {
-                tmp = st.nextToken().trim();
+                String tmp = st.nextToken().trim();
                 if( tmp.matches( "\\d+" ) ) {
                     knots.add( tmp );
                     knots.add( tmp + "'" );
@@ -98,11 +87,18 @@ public class PairTable {
         }
 
         // parse structure
-        end = false;
-        paired = false;
-        pos = regions = 0;
-        for( i = 0; i < structure.length() && !end; i++ ) {
-            switch( c = structure.charAt( i ) ) {
+        boolean end = false;
+        boolean paired = false;
+        int pos = 0;
+        int regions = 0;
+        int mate, sum;
+        final List<Integer> pt_list = new ArrayList<>();
+        final List<Byte> type_list = new ArrayList<>();
+        final Stack<Integer> s0 = new Stack<>();
+        final Stack<Integer> s1 = new Stack<>();
+        final Stack<Integer> s2 = new Stack<>();
+        for( int i = 0; i < structure.length() && !end; i++ ) {
+            switch( structure.charAt( i ) ) {
                 case '[':
                     paired = true;
                 case '^':
@@ -128,21 +124,21 @@ public class PairTable {
                     if( paired ) {
                         if( regions > labels.size() )
                             throw new IllegalArgumentException( "Structure contains more regions than helix numbering." );
-                        label = labels.get( regions - 1 );
+                        final String label = labels.get( regions - 1 );
                         if( label.endsWith( "'" ) ) {
                             if( pseudoknots.contains( label ) ) {
                                 type_list.add( PK1 );
                                 if( s1.empty() )
                                     throw new IllegalArgumentException( "Unbalanced pseudoknot pair(s) in structure." );
-                                mate = s1.pop().intValue();
+                                mate = s1.pop();
                             }
                             else {
                                 if( s0.empty() )
                                     throw new IllegalArgumentException( "Unbalanced base pair(s) in structure." );
-                                mate = s0.pop().intValue();
+                                mate = s0.pop();
                                 sum = sequence.toUpperCase().charAt( pos - 1 )
                                       + sequence.toUpperCase().charAt( mate );
-                                gu = sum == GU || sum == GT;
+                                boolean gu = sum == GU || sum == GT;
                                 if( knots.contains( label ) ) {
                                     type_list.add( gu ? KNOT_GU : KNOT );
                                     type_list.set( mate, gu ? KNOT_GU : KNOT );
@@ -185,32 +181,34 @@ public class PairTable {
         pairTable = new int[length];
         bondTypes = new byte[length];
 
-        for( i = 0; i < length; i++ ) {
-            pairTable[i] = pt_list.get( i ).intValue();
-            bondTypes[i] = type_list.get( i ).byteValue();
+        for( int i = 0; i < length; i++ ) {
+            pairTable[i] = pt_list.get( i );
+            bondTypes[i] = type_list.get( i );
         }
     }
 
 
     // Vienna (dot-bracket) input
     public PairTable( String sequence, String structure ) {
-        boolean gu;
-        int i, mate, sp0, sp1, sp2, sp3, sum;
-        int[] s0, s1, s2, s3;
-        char c;
+
+        int sp0 = 0;
+        int sp1 = 0;
+        int sp2 = 0;
+        int sp3 = 0;
 
         if( structure.length() > sequence.length() )
             throw new IllegalArgumentException( "Length of structure exceeds length of sequence!" );
 
         length = structure.length();
-        s0 = new int[length];
-        s1 = new int[length];
-        s2 = new int[length];
-        s3 = new int[length];
+        int[] s0 = new int[length];
+        int[] s1 = new int[length];
+        int[] s2 = new int[length];
+        int[] s3 = new int[length];
         pairTable = new int[length];
         bondTypes = new byte[length];
 
-        for( sp0 = sp1 = sp2 = sp3 = 0, i = 0; i < length; i++ ) {
+        for( int i=0; i<length; i++ ) {
+            char c;
             switch( c = structure.charAt( i ) ) {
                 case '(':
                     s0[sp0++] = i;
@@ -228,12 +226,12 @@ public class PairTable {
                     if( --sp0 < 0 )
                         throw new IllegalArgumentException( "Unbalanced braces in "
                                                             + "dot-bracket string." );
-                    mate = s0[sp0];
+                    int mate = s0[sp0];
                     pairTable[i] = mate;
                     pairTable[mate] = i;
-                    sum = sequence.toUpperCase().charAt( i )
+                    int sum = sequence.toUpperCase().charAt( i )
                           + sequence.toUpperCase().charAt( mate );
-                    gu = sum == GU || sum == GT;
+                    boolean gu = sum == GU || sum == GT;
                     bondTypes[i] = bondTypes[mate] = gu ? GU_BOND : NORMAL_BOND;
                     break;
                 case ']':
@@ -273,8 +271,6 @@ public class PairTable {
                                                         + "dot-bracket string." );
             }
         }
-
-        s0 = s1 = s2 = s3 = null;
 
         if( sp0 != 0 || sp1 != 0 || sp2 != 0 || sp3 != 0 )
             throw new IllegalArgumentException( "Unbalanced braces in "

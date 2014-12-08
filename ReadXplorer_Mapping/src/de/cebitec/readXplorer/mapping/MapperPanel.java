@@ -41,7 +41,7 @@ final class MapperPanel extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
 
     private final MapperOptionsPanelController controller;
-    private Preferences pref;
+    private final Preferences pref;
 
 
     MapperPanel( MapperOptionsPanelController controller ) {

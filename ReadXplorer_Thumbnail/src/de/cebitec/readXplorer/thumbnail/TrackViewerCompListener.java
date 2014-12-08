@@ -32,8 +32,8 @@ import java.awt.event.ComponentEvent;
  */
 public class TrackViewerCompListener extends ComponentAdapter {
 
-    private PersistentFeature currentFeature;
-    private TrackViewer trackV;
+    private final PersistentFeature currentFeature;
+    private final TrackViewer trackV;
 
 
     public TrackViewerCompListener( PersistentFeature currentFeature, TrackViewer trackV ) {

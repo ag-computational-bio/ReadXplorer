@@ -35,8 +35,8 @@ import java.util.List;
 public class ReadPairGroup implements ObjectWithId {
 
     private long readPairId;
-    private List<ReadPair> readPairs;
-    private List<Mapping> singleMappings;
+    private final List<ReadPair> readPairs;
+    private final List<Mapping> singleMappings;
 //    private boolean hasNewRead; //set true when new read was added until this variable was send to the observers
 //    private ArrayList<Observer> observers;
     private List<FeatureType> excludedFeatureTypes;

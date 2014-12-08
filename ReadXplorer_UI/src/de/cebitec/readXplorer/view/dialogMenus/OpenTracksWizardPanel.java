@@ -34,7 +34,7 @@ public class OpenTracksWizardPanel extends ChangeListeningWizardPanel {
     public static final String PROP_COMBINE_TRACKS = "PROP_COMBINE_TRACKS";
 
     private OpenTracksVisualPanel component;
-    private String wizardName;
+    private final String wizardName;
     private final int referenceId;
 
 

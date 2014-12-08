@@ -95,14 +95,14 @@ public final class AppPanelTopComponent extends TopComponentExtended implements
     private static final String PREFERRED_ID = "AppPanelTopComponent";
     private static final long serialVersionUID = 1L;
     private static AppPanelTopComponent instance;
-    private InstanceContent content = new InstanceContent();
-    private Lookup localLookup;
+    private final InstanceContent content = new InstanceContent();
+    private final Lookup localLookup;
     private ReferenceViewer referenceViewer;
-    private ArrayList<TrackViewer> trackViewerList;
+    private final ArrayList<TrackViewer> trackViewerList;
     private JScrollPane trackScrollPane;
     private JScrollPane basePanelScrollPane;
-    private JPanel tracksPanel;
-    private JPanel basePanelPanel;
+    private final JPanel tracksPanel;
+    private final JPanel basePanelPanel;
 
 
     /**
@@ -459,7 +459,7 @@ public final class AppPanelTopComponent extends TopComponentExtended implements
 
 
     // ==================== Experimental track closing stuff ==================== //
-    private List<Reference<JPanel>> all = Collections.synchronizedList( new ArrayList<Reference<JPanel>>() );
+    private final List<Reference<JPanel>> all = Collections.synchronizedList( new ArrayList<Reference<JPanel>>() );
 
 
     public List<Action> allTrackCloseActions() {

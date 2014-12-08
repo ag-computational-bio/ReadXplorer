@@ -158,7 +158,7 @@ public class RPKMValuesCalculation {
             if( j != 0 ) {
                 count++;
                 readCounts += j;
-                Integer integer = new Integer( j );
+                Integer integer = j;
                 double logValue = Math.log( integer.doubleValue() );
                 sumLog += logValue;
                 logdata.add( logValue );

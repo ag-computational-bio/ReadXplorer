@@ -93,7 +93,7 @@ public class CustomOutlineCellRenderer extends DefaultOutlineCellRenderer {
                     ((HtmlRenderer.Renderer) cell).setCentered( centered );
                 }
                 else if( cell instanceof DefaultTableCellRenderer.UIResource ) {
-                    ((DefaultTableCellRenderer.UIResource) cell).setHorizontalAlignment( JLabel.CENTER );
+                    ((JLabel) cell).setHorizontalAlignment( JLabel.CENTER );
                 }
             }
             Color foregroundColor = table.getForeground();

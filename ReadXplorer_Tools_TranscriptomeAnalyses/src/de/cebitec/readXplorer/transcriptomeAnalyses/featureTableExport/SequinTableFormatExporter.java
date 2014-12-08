@@ -428,7 +428,7 @@ public class SequinTableFormatExporter extends Thread {
                 }
                 writer.write( generateSecondLine( Qualifier.LOCUS_TAG, parsedLocus ) );
             }
-            if( feature.hasFeatureName() && !feature.getName().equals( "" ) ) {
+            if( feature.hasFeatureName() && !feature.getName().isEmpty( ) ) {
                 writer.write( generateSecondLine( Qualifier.GENE, feature.getName() ) );
             }
             // CDS
@@ -438,10 +438,10 @@ public class SequinTableFormatExporter extends Thread {
             else {
                 writer.write( createSequinTableEntry( feature.getStop(), feature.getStart(), FeatureKey.CDS ) );
             }
-            if( !feature.getProduct().equals( "" ) ) {
+            if( !feature.getProduct().isEmpty( ) ) {
                 writer.write( generateSecondLine( Qualifier.PRODUCT, feature.getProduct() ) );
             }
-            if( !feature.getEcNumber().equals( "" ) ) {
+            if( !feature.getEcNumber().isEmpty( ) ) {
                 writer.write( generateSecondLine( Qualifier.EC_NUMBER, feature.getEcNumber() ) );
             }
             if( feature.hasLocus() ) {
@@ -776,7 +776,7 @@ public class SequinTableFormatExporter extends Thread {
         String suffString = "";
         String prefix = "";
         boolean flag = false;
-        if( separator != null && !separator.equals( "" ) ) {
+        if( separator != null && !separator.isEmpty( ) ) {
             splittedTag = locusTag.split( separator );
             prefix = splittedTag[0];
             if( splittedTag.length == 2 ) {

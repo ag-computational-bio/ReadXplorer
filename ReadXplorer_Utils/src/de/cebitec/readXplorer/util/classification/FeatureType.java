@@ -238,8 +238,8 @@ public enum FeatureType implements Classification {
     private static final String DISTORTED_PAIR_STRING = "Distorted read pair";
     private static final String SINGLE_MAPPING_STRING = "Single mapping";
 
-    private int typeInt;
-    private String typeString;
+    private final int typeInt;
+    private final String typeString;
 
     /**
      * FeatureTypes that are GUI selectable.

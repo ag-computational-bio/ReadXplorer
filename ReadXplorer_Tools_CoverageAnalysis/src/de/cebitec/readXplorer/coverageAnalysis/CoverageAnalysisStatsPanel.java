@@ -32,7 +32,7 @@ public class CoverageAnalysisStatsPanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    private Map<String, Integer> featureStatsMap;
+    private final Map<String, Integer> featureStatsMap;
 
 
     /**
@@ -120,7 +120,7 @@ public class CoverageAnalysisStatsPanel extends javax.swing.JPanel {
                     NbBundle.getMessage( CoverageAnalysisStatsPanel.class, "CoverageAnalysisStatsPanel.coveredAnalysisStatsTable.columnModel.title1" )
                 } ) {
                     private static final long serialVersionUID = 1L;
-                    Class[] types = new Class[]{
+                    Class<?>[] types = new Class<?>[]{
                         java.lang.String.class, java.lang.String.class
                     };
                     boolean[] canEdit = new boolean[]{
@@ -129,7 +129,7 @@ public class CoverageAnalysisStatsPanel extends javax.swing.JPanel {
 
 
                     @Override
-                    public Class getColumnClass( int columnIndex ) {
+                    public Class<?> getColumnClass( int columnIndex ) {
                         return types[columnIndex];
                     }
 

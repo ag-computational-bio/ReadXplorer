@@ -59,18 +59,18 @@ import org.openide.util.NbPreferences;
 public class ReadPairViewer extends AbstractViewer implements ThreadListener {
 
     private static final long serialVersionUID = 234765253;
-    private TrackConnector trackConnector;
+    private final TrackConnector trackConnector;
     private LayoutI layout;
-    private PersistentReference refGen;
-    private int blockHeight;
-    private int layerHeight;
+    private final PersistentReference refGen;
+    private final int blockHeight;
+    private final int layerHeight;
 //    private int minCountInInterval;
     private int viewerHeight;
 //    private int maxCountInInterval;
 //    private int fwdMappingsInInterval;
 //    private int revMappingsInInterval;
 //    private int maxCoverageInInterval;
-    private float minSaturationAndBrightness;
+    private final float minSaturationAndBrightness;
 //    private float maxSaturationAndBrightness;
 //    private float percentSandBPerCovUnit;
     private int oldLogLeft;

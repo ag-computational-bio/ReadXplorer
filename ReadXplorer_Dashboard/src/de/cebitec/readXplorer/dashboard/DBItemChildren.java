@@ -33,7 +33,7 @@ import org.openide.util.Exceptions;
  */
 public class DBItemChildren extends StandardItemChildren {
 
-    private List<DBItem> items;
+    private final List<DBItem> items;
 
 
     /**

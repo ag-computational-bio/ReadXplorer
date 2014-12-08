@@ -147,7 +147,7 @@ public class MotifSearchModel implements Observer {
 
         // BioProspector search for -10 motif
         String posixPath = "/cygdrive/c";
-        String sub = minus10Input.getAbsolutePath().toString().substring( 2 );
+        String sub = minus10Input.getAbsolutePath().substring( 2 );
         posixPath += sub.replaceAll( "\\\\", "/" );
         boolean successfulyBioProspRun = false;
         try {
@@ -175,7 +175,7 @@ public class MotifSearchModel implements Observer {
 //                alignmentshiftsOFMinusTenArray, regionOfIntrestMinus10, regionOfIntrestMinus35);
 
             posixPath = "/cygdrive/c";
-            sub = minus35Input.getAbsolutePath().toString().substring( 2 );
+            sub = minus35Input.getAbsolutePath().substring( 2 );
             posixPath += sub.replaceAll( "\\\\", "/" );
 
             try {
@@ -526,7 +526,6 @@ public class MotifSearchModel implements Observer {
         int shift = 0;
         boolean isShifts = false;
         String header = "";
-        String substring = "";
         if( alignmentShifts != null ) {
             isShifts = true;
         }
@@ -549,6 +548,7 @@ public class MotifSearchModel implements Observer {
                 }
                 else {
                     if( isShifts ) {
+                        String substring;
                         if( alignmentShifts.containsKey( header ) ) {
                             int stringLength = string.length();
                             int offset = stringLength - (spacer + 1) - (seqLengthForMotifSearch - (shift - 1)) - spacer2 - seqLengthForMotifSearch2;
@@ -569,7 +569,7 @@ public class MotifSearchModel implements Observer {
                         int stringLength = string.length();
                         int offset = stringLength - (spacer + 1) - seqLengthForMotifSearch;
                         int end = (offset - 1) + (seqLengthForMotifSearch + 1);
-                        substring = string.substring( offset, end );
+                        String substring = string.substring( offset, end );
                         writer.append( substring + "\n" );
                         minus10AnalysisStrings.add( substring + "\n" );
                     }
@@ -658,12 +658,12 @@ public class MotifSearchModel implements Observer {
         int sumOfMinus35Spacer = 0;
         int shiftPosMinus10 = 0;
         int shiftPosMinus35 = 0;
-        int length = params.getLengthOfPromotorRegion();
-        int spacer1 = params.getMinSpacer1();
-        int spacer2 = params.getMinSpacer2();
-        int seqWidthToAnalyzeMinus10 = params.getSequenceWidthToAnalyzeMinus10();
-        int seqWidthToAnalyzeMinus35 = params.getSequenceWidthToAnalyzeMinus35();
-        int motifStartMinus35 = 0;
+        final int length = params.getLengthOfPromotorRegion();
+        final int spacer1 = params.getMinSpacer1();
+        final int spacer2 = params.getMinSpacer2();
+        final int seqWidthToAnalyzeMinus10 = params.getSequenceWidthToAnalyzeMinus10();
+        final int seqWidthToAnalyzeMinus35 = params.getSequenceWidthToAnalyzeMinus35();
+
         String header = "";
         for( String string : upstreamRegions ) {
             if( string.startsWith( ">" ) ) {
@@ -684,6 +684,7 @@ public class MotifSearchModel implements Observer {
                 }
             }
             else {
+                int motifStartMinus35;
                 if( shifts10.containsKey( header ) ) {
                     sumOfMinus10Spacer += spacer1 + (params.getSequenceWidthToAnalyzeMinus10() - params.getMinusTenMotifWidth() - (shiftPosMinus10 - 1));
                     int motifStartMinus10 = length - spacer1 - seqWidthToAnalyzeMinus10 + shiftPosMinus10;
@@ -726,20 +727,17 @@ public class MotifSearchModel implements Observer {
         Font font = new Font( Font.MONOSPACED, Font.PLAIN, 16 );
 
         int alignmentStartMinus10 = 0;
-        int alignmentStartMinus35 = 0;
         boolean minus10StartExists = false;
         boolean minus35StartExists = false;
-        String locus = "";
         for( String string : upstreamRegions ) {
             if( string.startsWith( ">" ) ) {
-                locus = string.substring( 1, string.length() - 1 );
+                String locus = string.substring( 1, string.length() - 1 );
                 if( minus10Starts.containsKey( locus ) ) {
                     alignmentStartMinus10 = minus10Starts.get( locus );
                     minus10StartExists = true;
                 }
 
                 if( minus35Starts.containsKey( locus ) ) {
-                    alignmentStartMinus35 = minus35Starts.get( locus );
                     minus35StartExists = true;
                 }
                 try {
@@ -1329,12 +1327,11 @@ public class MotifSearchModel implements Observer {
                 }
             }
 
-            for( int i = 0; i < upstreamRegions.size(); i++ ) {
-                String str = upstreamRegions.get( i );
+            for( String str : upstreamRegions ) {
                 String locus;
                 if( str.startsWith( ">" ) ) {
                     locus = str.substring( 1, str.length() - 1 );
-                    if( tssInTreeMap.containsKey( locus.toString() ) ) {
+                    if( tssInTreeMap.containsKey( locus ) ) {
                         TranscriptionStart start = tssInTreeMap.get( locus );
                         if( rbsShifts.containsKey( locus ) ) {
                             start.setRbsFeatureAssigned( true );

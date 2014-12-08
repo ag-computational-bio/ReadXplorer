@@ -32,10 +32,10 @@ import net.sf.samtools.SAMFileHeader;
  */
 public class ParsedClassification {
 
-    private SAMFileHeader.SortOrder sortOrder;
+    private final SAMFileHeader.SortOrder sortOrder;
     private int minMismatches;
-    private List<Integer> readStarts;
-    private Map<Integer, Integer> mismatchCountMap = new HashMap<>();
+    private final List<Integer> readStarts;
+    private final Map<Integer, Integer> mismatchCountMap = new HashMap<>();
 
     //    private List<String> refNames; //TODO: use this when multiple import is enabled
 

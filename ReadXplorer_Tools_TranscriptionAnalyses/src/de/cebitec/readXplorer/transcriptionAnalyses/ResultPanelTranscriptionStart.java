@@ -58,7 +58,7 @@ public class ResultPanelTranscriptionStart extends ResultTablePanel {
     private List<String> promotorRegions;
     private ReferenceViewer referenceViewer;
     private TssDetectionResult tssResult;
-    private TableRightClickFilter<UneditableTableModel> tableFilter;
+    private final TableRightClickFilter<UneditableTableModel> tableFilter;
 
 
     /**

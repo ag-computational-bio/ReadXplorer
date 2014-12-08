@@ -48,7 +48,7 @@ import org.openide.util.Lookup;
 public class HighlightAreaListener extends MouseAdapter {
 
     private static final int HEIGHT = 12;
-    private HashMap<Integer, List<JRegion>> specialRegionList;
+    private final HashMap<Integer, List<JRegion>> specialRegionList;
     private final SequenceBar parentComponent;
     private final int baseLineY;
     private final int offsetY;
@@ -59,7 +59,7 @@ public class HighlightAreaListener extends MouseAdapter {
     private boolean isFwdStrand;
     private int seqStart;
     private int seqEnd;
-    private String refName;
+    private final String refName;
 
 
     /**

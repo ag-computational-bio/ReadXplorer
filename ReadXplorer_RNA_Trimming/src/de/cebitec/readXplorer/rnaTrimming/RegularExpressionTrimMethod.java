@@ -31,11 +31,11 @@ import java.util.regex.Pattern;
 public class RegularExpressionTrimMethod extends TrimMethod {
 
     private Pattern regularexpression;
-    private String regularexpression_template;
-    private int groupnumber_main;
-    private int groupnumber_trimLeft;
-    private int groupnumber_trimRight;
-    private String name;
+    private final String regularexpression_template;
+    private final int groupnumber_main;
+    private final int groupnumber_trimLeft;
+    private final int groupnumber_trimRight;
+    private final String name;
 
 
     public RegularExpressionTrimMethod( String regularexpression, int groupnumber_main, int groupnumber_trimLeft, int groupnumber_trimRight, String name, String shortName ) {

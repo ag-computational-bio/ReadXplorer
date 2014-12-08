@@ -48,9 +48,9 @@ import org.openide.util.NbBundle;
 public class SamBamReadPairStatsParser extends SamBamReadPairClassifier {
 
     //TODO: identify when pair goes across end of genome but only if circular reference genome
-    private TrackJob trackJob;
-    private int dist;
-    private DiscreteCountingDistribution readPairSizeDistribution;
+    private final TrackJob trackJob;
+    private final int dist;
+    private final DiscreteCountingDistribution readPairSizeDistribution;
 
 
     /**

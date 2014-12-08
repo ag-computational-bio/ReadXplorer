@@ -30,7 +30,7 @@ import java.util.TreeSet;
  */
 public class BlockContainer {
 
-    private TreeMap<Integer, TreeSet<BlockI>> sortedMappings;
+    private final TreeMap<Integer, TreeSet<BlockI>> sortedMappings;
 
 
     public BlockContainer() {
@@ -47,7 +47,7 @@ public class BlockContainer {
     public void addBlock( BlockI block ) {
         int start = block.getAbsStart();
         if( !sortedMappings.containsKey( start ) ) {
-            sortedMappings.put( start, new TreeSet<BlockI>( new BlockComparator() ) );
+            sortedMappings.put( start, new TreeSet<>( new BlockComparator() ) );
         }
         sortedMappings.get( start ).add( block );
     }

@@ -24,9 +24,9 @@ package de.cebitec.readXplorer.differentialExpression;
  */
 public class Group {
 
-    private Integer[] integerRepresentation;
+    private final Integer[] integerRepresentation;
     private final int id;
-    private String stringRepresentation;
+    private final String stringRepresentation;
 
     private static int nextUnusedID = 0;
 

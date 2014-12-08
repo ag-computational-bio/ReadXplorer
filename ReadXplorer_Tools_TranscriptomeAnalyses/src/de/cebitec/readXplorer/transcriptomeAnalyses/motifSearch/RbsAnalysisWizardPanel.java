@@ -22,7 +22,7 @@ public class RbsAnalysisWizardPanel implements
      * component from this class, just use getComponent().
      */
     private RbsAnalysisVisualPanel component;
-    private String wizardName;
+    private final String wizardName;
     private int wholeLengthOfAnalysisRegion;
 
 

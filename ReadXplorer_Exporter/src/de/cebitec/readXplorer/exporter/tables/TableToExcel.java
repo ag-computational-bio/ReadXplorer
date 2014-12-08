@@ -33,7 +33,7 @@ import javax.swing.table.DefaultTableModel;
  */
 public class TableToExcel implements ExportDataI {
 
-    private String tableName;
+    private final String tableName;
     private List<String> columnName;
     private List<List<Object>> tableContent;
 

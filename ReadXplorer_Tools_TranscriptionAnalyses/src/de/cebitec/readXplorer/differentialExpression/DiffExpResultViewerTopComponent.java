@@ -161,13 +161,12 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
         if( analysisHandler.getResults() != null ) {
             List<ResultDeAnalysis> results = analysisHandler.getResults();
             List<String> descriptions = new ArrayList<>();
-            for( Iterator<ResultDeAnalysis> it = results.iterator(); it.hasNext(); ) {
-                ResultDeAnalysis currentResult = it.next();
+            for( ResultDeAnalysis currentResult : results ) {
                 Vector colNames = new Vector( currentResult.getColnames() );
                 Vector<Vector> tableContents;
                 switch( usedTool ) {
                     case ExportCountTable:
-                    //fallthrough, since handling is same as for DESeq2
+                        //fallthrough, since handling is same as for DESeq2
                     case DeSeq2:
                         colNames.add( 0, "Feature" );
                         tableContents = currentResult.getTableContentsContainingRowNames();
@@ -300,13 +299,13 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
             case DeSeq:
                 graphicsTopComponent = new DeSeqGraphicsTopComponent( analysisHandler,
                                                                       ((DeSeqAnalysisHandler) analysisHandler).moreThanTwoCondsForDeSeq() );
-                analysisHandler.registerObserver( (DeSeqGraphicsTopComponent) graphicsTopComponent );
+                analysisHandler.registerObserver( (Observer) graphicsTopComponent );
                 graphicsTopComponent.open();
                 graphicsTopComponent.requestActive();
                 break;
             case BaySeq:
                 graphicsTopComponent = new BaySeqGraphicsTopComponent( analysisHandler );
-                analysisHandler.registerObserver( (BaySeqGraphicsTopComponent) graphicsTopComponent );
+                analysisHandler.registerObserver( (Observer) graphicsTopComponent );
                 graphicsTopComponent.open();
                 graphicsTopComponent.requestActive();
                 break;
@@ -318,7 +317,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
                 break;
             case DeSeq2:
                 graphicsTopComponent = new DeSeq2GraphicsTopComponent( analysisHandler );
-                analysisHandler.registerObserver( (DeSeq2GraphicsTopComponent) graphicsTopComponent );
+                analysisHandler.registerObserver( (Observer) graphicsTopComponent );
                 graphicsTopComponent.open();
                 graphicsTopComponent.requestActive();
                 break;
@@ -327,12 +326,12 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
 
     private void saveTableButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveTableButtonActionPerformed
         TableExportFileChooser fileChooser = new TableExportFileChooser( TableExportFileChooser.getTableFileExtensions(),
-                                                                         new TableToExcel( resultComboBox.getSelectedItem().toString(), (UneditableTableModel) topCountsTable.getModel() ) );
+                                                                         new TableToExcel( resultComboBox.getSelectedItem().toString(), (DefaultTableModel) topCountsTable.getModel() ) );
     }//GEN-LAST:event_saveTableButtonActionPerformed
 
     private void showLogButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showLogButtonActionPerformed
         LogTopComponent = new DiffExpLogTopComponent( analysisHandler );
-        analysisHandler.registerObserver( (DiffExpLogTopComponent) LogTopComponent );
+        analysisHandler.registerObserver( (Observer) LogTopComponent );
         LogTopComponent.open();
         LogTopComponent.requestActive();
     }//GEN-LAST:event_showLogButtonActionPerformed

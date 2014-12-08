@@ -73,7 +73,7 @@ public class SNP_DetectionResultPanel extends ResultTablePanel {
     private SnpDetectionResult completeSnpData;
     private Map<String, Integer> snpStatsMap;
     private PersistentReference reference;
-    private TableRightClickFilter<UneditableTableModel> tableFilter;
+    private final TableRightClickFilter<UneditableTableModel> tableFilter;
 
 
     /**

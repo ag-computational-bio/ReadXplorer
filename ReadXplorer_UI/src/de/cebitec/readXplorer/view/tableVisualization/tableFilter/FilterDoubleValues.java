@@ -67,8 +67,8 @@ public class FilterDoubleValues<T extends DefaultTableModel> implements
             Vector row = it.next();
             Object currentEntry = row.get( column );
             if( currentEntry instanceof Integer ) {
-                int intValue = (int) currentEntry;
-                valueFilter.filterTable( filteredTableModel, row, cutoff, (double) intValue );
+                int intValue = (Integer) currentEntry;
+                valueFilter.filterTable( filteredTableModel, row, cutoff, intValue );
             }
             if( currentEntry instanceof Double ) {
                 valueFilter.filterTable( filteredTableModel, row, cutoff, (double) currentEntry );

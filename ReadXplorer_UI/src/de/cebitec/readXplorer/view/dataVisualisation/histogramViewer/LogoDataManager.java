@@ -46,11 +46,11 @@ public class LogoDataManager {
     private static final int N = 5;
     private static final int READGAP = 6;
 
-    private int[][] counts; //array for the positions in the interval and all 7 base types (fwd and rev = 14)
-    private int absStart;
+    private final int[][] counts; //array for the positions in the interval and all 7 base types (fwd and rev = 14)
+    private final int absStart;
     private int stop;
     private int width;
-    private int upperCutoff;
+    private final int upperCutoff;
     private int maxFoundCoverage;
 
 

@@ -26,7 +26,7 @@ package de.cebitec.readXplorer.transcriptionAnalyses.dataStructures;
  */
 public class TransStartUnannotated extends TranscriptionStart {
 
-    private int detectedStop;
+    private final int detectedStop;
 
 
     /**

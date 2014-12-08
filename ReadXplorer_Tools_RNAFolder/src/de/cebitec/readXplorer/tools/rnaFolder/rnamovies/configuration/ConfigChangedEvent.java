@@ -23,11 +23,11 @@ import java.util.EventObject;
 
 public class ConfigChangedEvent extends EventObject {
 
-    private int id;
+    private final int id;
 
-    private String key;
+    private final String key;
 
-    private Object value;
+    private final Object value;
 
 
     public ConfigChangedEvent( Object source, int id, String key, Object value ) {

@@ -55,10 +55,10 @@ public class NeuQuant {
     /* defs for freq and bias */
     protected static final int intbiasshift = 16; /* bias for fractions */
 
-    protected static final int intbias = (((int) 1) << intbiasshift);
+    protected static final int intbias = 1 << intbiasshift;
     protected static final int gammashift = 10; /* gamma = 1024 */
 
-    protected static final int gamma = (((int) 1) << gammashift);
+    protected static final int gamma = 1 << gammashift;
     protected static final int betashift = 10;
     protected static final int beta = (intbias >> betashift); /* beta = 1/1024 */
 
@@ -70,7 +70,7 @@ public class NeuQuant {
 
     protected static final int radiusbiasshift = 6; /* at 32.0 biased by 6 bits */
 
-    protected static final int radiusbias = (((int) 1) << radiusbiasshift);
+    protected static final int radiusbias = 1 << radiusbiasshift;
     protected static final int initradius = (initrad * radiusbias); /* and decreases by a */
 
     protected static final int radiusdec = 30; /* factor of 1/30 each cycle */
@@ -78,15 +78,15 @@ public class NeuQuant {
     /* defs for decreasing alpha factor */
     protected static final int alphabiasshift = 10; /* alpha starts at 1.0 */
 
-    protected static final int initalpha = (((int) 1) << alphabiasshift);
+    protected static final int initalpha = 1 << alphabiasshift;
 
     protected int alphadec; /* biased by 10 bits */
 
     /* radbias and alpharadbias used for radpower calculation */
     protected static final int radbiasshift = 8;
-    protected static final int radbias = (((int) 1) << radbiasshift);
+    protected static final int radbias = 1 << radbiasshift;
     protected static final int alpharadbshift = (alphabiasshift + radbiasshift);
-    protected static final int alpharadbias = (((int) 1) << alpharadbshift);
+    protected static final int alpharadbias = 1 << alpharadbshift;
 
     /* Types and Global Variables
      -------------------------- */
@@ -114,17 +114,14 @@ public class NeuQuant {
 
     public NeuQuant( byte[] thepic, int len, int sample ) {
 
-        int i;
-        int[] p;
-
         thepicture = thepic;
         lengthcount = len;
         samplefac = sample;
 
         network = new int[netsize][];
-        for( i = 0; i < netsize; i++ ) {
+        for( int i = 0; i < netsize; i++ ) {
             network[i] = new int[4];
-            p = network[i];
+            int[] p = network[i];
             p[0] = p[1] = p[2] = (i << (netbiasshift + 8)) / netsize;
             freq[i] = intbias / netsize; /* 1/netsize */
 
@@ -154,21 +151,16 @@ public class NeuQuant {
 
     public void inxbuild() {
 
-        int i, j, smallpos, smallval;
-        int[] p;
-        int[] q;
-        int previouscol, startpos;
-
-        previouscol = 0;
-        startpos = 0;
-        for( i = 0; i < netsize; i++ ) {
-            p = network[i];
-            smallpos = i;
-            smallval = p[1]; /* index on g */
+        int previouscol = 0;
+        int startpos = 0;
+        for( int i = 0; i < netsize; i++ ) {
+            int[] p = network[i];
+            int smallpos = i;
+            int smallval = p[1]; /* index on g */
             /* find smallest in i..netsize-1 */
 
-            for( j = i + 1; j < netsize; j++ ) {
-                q = network[j];
+            for( int j = i + 1; j < netsize; j++ ) {
+                int[] q = network[j];
                 if( q[1] < smallval ) { /* index on g */
 
                     smallpos = j;
@@ -176,10 +168,10 @@ public class NeuQuant {
 
                 }
             }
-            q = network[smallpos];
+            int[] q = network[smallpos];
             /* swap p (i) and q (smallpos) entries */
             if( i != smallpos ) {
-                j = q[0];
+                int j = q[0];
                 q[0] = p[0];
                 p[0] = j;
                 j = q[1];
@@ -195,7 +187,7 @@ public class NeuQuant {
             /* smallval entry is now in position i */
             if( smallval != previouscol ) {
                 netindex[previouscol] = (startpos + i) >> 1;
-                for( j = previouscol + 1; j < smallval; j++ ) {
+                for( int j = previouscol + 1; j < smallval; j++ ) {
                     netindex[j] = i;
                 }
                 previouscol = smallval;
@@ -203,7 +195,7 @@ public class NeuQuant {
             }
         }
         netindex[previouscol] = (startpos + maxnetpos) >> 1;
-        for( j = previouscol + 1; j < 256; j++ ) {
+        for( int j = previouscol + 1; j < 256; j++ ) {
             netindex[j] = maxnetpos; /* really 256 */
 
         }
@@ -214,7 +206,6 @@ public class NeuQuant {
 
     public void learn() {
 
-        int i, j, b, g, r;
         int radius, rad, alpha, step, delta, samplepixels;
         byte[] p;
         int pix, lim;
@@ -233,7 +224,7 @@ public class NeuQuant {
         rad = radius >> radiusbiasshift;
         if( rad <= 1 )
             rad = 0;
-        for( i = 0; i < rad; i++ ) {
+        for( int i = 0; i < rad; i++ ) {
             radpower[i]
                     = alpha * (((rad * rad - i * i) * radbias) / (rad * rad));
         }
@@ -255,16 +246,16 @@ public class NeuQuant {
             }
         }
 
-        i = 0;
+        int i = 0;
         while( i < samplepixels ) {
-            b = (p[pix + 0] & 0xff) << netbiasshift;
-            g = (p[pix + 1] & 0xff) << netbiasshift;
-            r = (p[pix + 2] & 0xff) << netbiasshift;
-            j = contest( b, g, r );
+            final int b = (p[pix + 0] & 0xff) << netbiasshift;
+            final int g = (p[pix + 1] & 0xff) << netbiasshift;
+            final int r = (p[pix + 2] & 0xff) << netbiasshift;
+            final int q = contest( b, g, r );
 
-            altersingle( alpha, j, b, g, r );
+            altersingle( alpha, q, b, g, r );
             if( rad != 0 )
-                alterneigh( rad, j, b, g, r ); /* alter neighbours */
+                alterneigh( rad, q, b, g, r ); /* alter neighbours */
 
             pix += step;
             if( pix >= lim )
@@ -279,7 +270,7 @@ public class NeuQuant {
                 rad = radius >> radiusbiasshift;
                 if( rad <= 1 )
                     rad = 0;
-                for( j = 0; j < rad; j++ ) {
+                for( int j = 0; j < rad; j++ ) {
                     radpower[j]
                             = alpha * (((rad * rad - j * j) * radbias) / (rad * rad));
                 }
@@ -293,21 +284,17 @@ public class NeuQuant {
 
     public int map( int b, int g, int r ) {
 
-        int i, j, dist, a, bestd;
-        int[] p;
-        int best;
+        int best = -1;
+        int bestd = 1000; /* biggest possible dist is 256*3 */
 
-        bestd = 1000; /* biggest possible dist is 256*3 */
+        int i = netindex[g]; /* index on g */
 
-        best = -1;
-        i = netindex[g]; /* index on g */
-
-        j = i - 1; /* start at netindex[g] and work outwards */
+        int j = i - 1; /* start at netindex[g] and work outwards */
 
         while( (i < netsize) || (j >= 0) ) {
             if( i < netsize ) {
-                p = network[i];
-                dist = p[1] - g; /* inx key */
+                int[] p = network[i];
+                int dist = p[1] - g; /* inx key */
 
                 if( dist >= bestd )
                     i = netsize; /* stop iter */
@@ -316,7 +303,7 @@ public class NeuQuant {
                     i++;
                     if( dist < 0 )
                         dist = -dist;
-                    a = p[0] - b;
+                    int a = p[0] - b;
                     if( a < 0 )
                         a = -a;
                     dist += a;
@@ -333,8 +320,8 @@ public class NeuQuant {
                 }
             }
             if( j >= 0 ) {
-                p = network[j];
-                dist = g - p[1]; /* inx key - reverse dif */
+                int[] p = network[j];
+                int dist = g - p[1]; /* inx key - reverse dif */
 
                 if( dist >= bestd )
                     j = -1; /* stop iter */
@@ -343,7 +330,7 @@ public class NeuQuant {
                     j--;
                     if( dist < 0 )
                         dist = -dist;
-                    a = p[0] - b;
+                    int a = p[0] - b;
                     if( a < 0 )
                         a = -a;
                     dist += a;
@@ -360,7 +347,9 @@ public class NeuQuant {
                 }
             }
         }
-        return (best);
+
+        return best;
+
     }
 
 
@@ -376,39 +365,32 @@ public class NeuQuant {
 
     public void unbiasnet() {
 
-        int i, j;
-
-        for( i = 0; i < netsize; i++ ) {
+        for( int i = 0; i < netsize; i++ ) {
             network[i][0] >>= netbiasshift;
             network[i][1] >>= netbiasshift;
             network[i][2] >>= netbiasshift;
             network[i][3] = i; /* record colour no */
-
         }
     }
 
     /* Move adjacent neurons by precomputed alpha*(1-((i-j)^2/[r]^2)) in radpower[|i-j|]
      --------------------------------------------------------------------------------- */
 
-    protected void alterneigh( int rad, int i, int b, int g, int r ) {
+    protected void alterneigh( final int rad, final int i, final int b, final int g, final int r ) {
 
-        int j, k, lo, hi, a, m;
-        int[] p;
+        int tmp = i - rad;
+        final int lo = tmp < -1 ? -1 : tmp;
 
-        lo = i - rad;
-        if( lo < -1 )
-            lo = -1;
-        hi = i + rad;
-        if( hi > netsize )
-            hi = netsize;
+        tmp = i + rad;
+        final int hi = tmp > netsize ? netsize : tmp;
 
-        j = i + 1;
-        k = i - 1;
-        m = 1;
+        int j = i + 1;
+        int k = i - 1;
+        int m = 1;
         while( (j < hi) || (k > lo) ) {
-            a = radpower[m++];
+            final int a = radpower[m++];
             if( j < hi ) {
-                p = network[j++];
+                int[] p = network[j++];
                 try {
                     p[0] -= (a * (p[0] - b)) / alpharadbias;
                     p[1] -= (a * (p[1] - g)) / alpharadbias;
@@ -418,7 +400,7 @@ public class NeuQuant {
                 } // prevents 1.3 miscompilation
             }
             if( k > lo ) {
-                p = network[k--];
+                int[] p = network[k--];
                 try {
                     p[0] -= (a * (p[0] - b)) / alpharadbias;
                     p[1] -= (a * (p[1] - g)) / alpharadbias;
@@ -452,21 +434,18 @@ public class NeuQuant {
         /* for frequently chosen neurons, freq[i] is high and bias[i] is negative */
         /* bias[i] = gamma*((1/netsize)-freq[i]) */
 
-        int i, dist, a, biasdist, betafreq;
-        int bestpos, bestbiaspos, bestd, bestbiasd;
-        int[] n;
+        int bestd = ~(1 << 31);
+        int bestbiasd = bestd;
+        int bestpos = -1;
+        int bestbiaspos = bestpos;
 
-        bestd = ~(((int) 1) << 31);
-        bestbiasd = bestd;
-        bestpos = -1;
-        bestbiaspos = bestpos;
+        for( int i = 0; i < netsize; i++ ) {
 
-        for( i = 0; i < netsize; i++ ) {
-            n = network[i];
-            dist = n[0] - b;
+            int[] n = network[i];
+            int dist = n[0] - b;
             if( dist < 0 )
                 dist = -dist;
-            a = n[1] - g;
+            int a = n[1] - g;
             if( a < 0 )
                 a = -a;
             dist += a;
@@ -478,18 +457,21 @@ public class NeuQuant {
                 bestd = dist;
                 bestpos = i;
             }
-            biasdist = dist - ((bias[i]) >> (intbiasshift - netbiasshift));
+            int biasdist = dist - ((bias[i]) >> (intbiasshift - netbiasshift));
             if( biasdist < bestbiasd ) {
                 bestbiasd = biasdist;
                 bestbiaspos = i;
             }
-            betafreq = (freq[i] >> betashift);
+            int betafreq = (freq[i] >> betashift);
             freq[i] -= betafreq;
             bias[i] += (betafreq << gammashift);
         }
+
         freq[bestpos] += beta;
         bias[bestpos] -= betagamma;
+
         return (bestbiaspos);
+
     }
 
 

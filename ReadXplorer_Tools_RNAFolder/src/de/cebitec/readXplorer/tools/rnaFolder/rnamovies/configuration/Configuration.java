@@ -34,7 +34,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 public class Configuration {
 
-    private Map<String, Category> categories = Collections.synchronizedMap( new LinkedHashMap<String, Category>() );
+    private final Map<String, Category> categories = Collections.synchronizedMap( new LinkedHashMap<String, Category>() );
 
 
     public Configuration( InputStream in ) throws IOException, SAXException {

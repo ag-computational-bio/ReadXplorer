@@ -35,7 +35,7 @@ import javax.swing.table.DefaultTableModel;
 public class TrackJobView extends javax.swing.JPanel implements
         ListSelectionListener {
 
-    private List<TrackJob> tracks;
+    private final List<TrackJob> tracks;
     public final static long serialVersionUID = 774292377;
     private boolean hasJobs;
 

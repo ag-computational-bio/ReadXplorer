@@ -26,7 +26,7 @@ import java.util.Map;
  */
 public class RPKMAnalysisResult extends ResultTrackAnalysis<ParameterSetWholeTranscriptAnalyses> {
 
-    private List<RPKMvalue> rpkmResults;
+    private final List<RPKMvalue> rpkmResults;
     private int noGenomeFeatures;
     private HashMap<String, Object> rpkmStatsMap;
     private static final TableType TABLE_TYPE = TableType.RPKM_TABLE;

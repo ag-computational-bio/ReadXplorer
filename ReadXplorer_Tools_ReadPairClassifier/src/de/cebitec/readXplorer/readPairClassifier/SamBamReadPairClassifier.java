@@ -725,7 +725,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
     @Override
     public void update( Object args ) {
         if( args instanceof String ) {
-            this.notifyObservers( (String) args );
+            this.notifyObservers(args);
         }
     }
 

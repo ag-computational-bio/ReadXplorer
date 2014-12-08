@@ -32,13 +32,13 @@ import java.util.List;
  */
 public class ParsedMappingGroup {
 
-    private ArrayList<ParsedMapping> mappings;
+    private final ArrayList<ParsedMapping> mappings;
     private int minError;
     private boolean bestMappingTagged;
 
 
     public ParsedMappingGroup() {
-        mappings = new ArrayList<ParsedMapping>();
+        mappings = new ArrayList<>();
         minError = Integer.MAX_VALUE;
         bestMappingTagged = true;
     }

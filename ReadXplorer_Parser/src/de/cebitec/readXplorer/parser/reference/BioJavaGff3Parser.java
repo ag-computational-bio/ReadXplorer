@@ -31,6 +31,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +61,7 @@ public class BioJavaGff3Parser implements ReferenceParserI {
     // name of this parser for use in ComboBoxes
     private static final String parserName = "GFF3 file";
     private static final String fileDescription = "GFF3 file";
-    private ArrayList<Observer> observers = new ArrayList<>();
+    private final ArrayList<Observer> observers = new ArrayList<>();
 
 
     /**
@@ -161,8 +162,8 @@ public class BioJavaGff3Parser implements ReferenceParserI {
                             key = attrIt.next();
                             if( key instanceof Term ) {
                                 keyString = ((Term) key).getName();
-                                value = attributes.get( (Term) key );
-                                if( value instanceof List && !((List) value).isEmpty() ) {
+                                value = attributes.get(key);
+                                if( value instanceof List && !((Collection) value).isEmpty() ) {
                                     attribute = ((List) value).get( 0 ); //currently only one item per tag is supported, except for parent
                                     if( attribute instanceof String ) { //TODO: think about some way to keep all provided data - write it to product field?
                                         attrString = (String) attribute;

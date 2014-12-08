@@ -20,8 +20,8 @@ import javax.swing.border.Border;
  */
 public class IntegerKeyVerifier extends KeyAdapter {
 
-    private JTextField tf;
-    private Border border;
+    private final JTextField tf;
+    private final Border border;
 
 
     public IntegerKeyVerifier( JTextField tf ) {

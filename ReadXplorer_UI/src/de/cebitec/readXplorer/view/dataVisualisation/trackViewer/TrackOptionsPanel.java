@@ -55,8 +55,8 @@ public class TrackOptionsPanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    private TrackViewer trackViewer;
-    private Preferences pref = NbPreferences.forModule( Object.class );
+    private final TrackViewer trackViewer;
+    private final Preferences pref = NbPreferences.forModule( Object.class );
 
 
     /**

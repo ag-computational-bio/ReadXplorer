@@ -40,9 +40,9 @@ import java.util.logging.Logger;
  */
 public class Downloader implements Runnable, Observable {
 
-    private List<Observer> observers = new ArrayList<>();
-    private String from;
-    private File to;
+    private final List<Observer> observers = new ArrayList<>();
+    private final String from;
+    private final File to;
 
 
     public Downloader( String from, File to ) {
@@ -99,8 +99,7 @@ public class Downloader implements Runnable, Observable {
     @Override
     public void notifyObservers( Object data ) {
         List<Observer> tmpObservers = new ArrayList<>( observers );
-        for( Iterator<Observer> it = tmpObservers.iterator(); it.hasNext(); ) {
-            Observer observer = it.next();
+        for( Observer observer : tmpObservers ) {
             observer.update( data );
         }
     }

@@ -53,7 +53,7 @@ import javax.swing.filechooser.FileFilter;
 public class Export extends MovieAction {
 
     private File lastDir = null;
-    private String header;
+    private final String header;
 
 //    //global variables needed for coordinate transformations
 //    private double xTrans = 0.0;
@@ -433,22 +433,21 @@ public class Export extends MovieAction {
                                     String format,
                                     File outfile )
             throws IOException {
-        ImageWriter writer = null;
-        ImageOutputStream ios;
-        Iterator iter;
+
 
         if( !outfile.getParentFile().canWrite() ) {
 
             throw new IOException( outfile.getPath() + " (Permission denied)" );
         }
 
-        iter = ImageIO.getImageWritersByFormatName( format );
+        Iterator iter = ImageIO.getImageWritersByFormatName( format );
+        ImageWriter writer = null;
         if( iter.hasNext() ) {
             writer = (ImageWriter) iter.next();
         }
 
         // Prepare output file
-        ios = ImageIO.createImageOutputStream( outfile );
+        ImageOutputStream ios = ImageIO.createImageOutputStream( outfile );
         writer.setOutput( ios );
 
         // Write the image

@@ -48,8 +48,7 @@ public class CommonsRefParser {
      */
     public static <E> Map<String, E> generateStringMap( Collection<E> mapToTransform ) {
         Map<String, E> stringMap = new HashMap<>();
-        for( Iterator<E> itemIt = mapToTransform.iterator(); itemIt.hasNext(); ) {
-            E item = itemIt.next();
+        for( E item : mapToTransform ) {
             stringMap.put( item.toString(), item );
         }
         return stringMap;

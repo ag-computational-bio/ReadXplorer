@@ -50,13 +50,13 @@ import org.openide.util.Lookup;
 public class ReferenceViewer extends AbstractViewer {
 
     private final static long serialVersionUID = 7964236;
-    private static int height = 230;
-    private static int FRAMEHEIGHT = 20;
-    private Map<FeatureType, Integer> featureStats;
+    private static final int height = 230;
+    private static final int FRAMEHEIGHT = 20;
+    private final Map<FeatureType, Integer> featureStats;
     private JFeature selectedFeature;
-    private int labelMargin;
+    private final int labelMargin;
     private ReferenceConnector refGenConnector;
-    private ArrayList<JFeature> features;
+    private final ArrayList<JFeature> features;
 
     public final static String PROP_FEATURE_STATS_CHANGED = "feats changed";
     public final static String PROP_FEATURE_SELECTED = "feat selected";
@@ -411,7 +411,7 @@ public class ReferenceViewer extends AbstractViewer {
      */
     private class PaintNodeVisitor implements NodeVisitor {
 
-        private int frame;
+        private final int frame;
 
 
         /**
@@ -419,7 +419,7 @@ public class ReferenceViewer extends AbstractViewer {
          * the viewer stats for the visited feature. Also updates the frame
          * according to the <tt>frame</tt> set in the constructor.
          */
-        public PaintNodeVisitor( int frame ) {
+        PaintNodeVisitor( int frame ) {
             this.frame = frame;
         }
 

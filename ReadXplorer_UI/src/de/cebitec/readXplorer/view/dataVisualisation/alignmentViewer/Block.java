@@ -33,11 +33,11 @@ import java.util.Iterator;
  */
 public class Block implements BlockI {
 
-    private int absStart;
-    private int absStop;
-    private Mapping mapping;
-    private GenomeGapManager gapManager;
-    private ArrayList<Brick> bricks;
+    private final int absStart;
+    private final int absStop;
+    private final Mapping mapping;
+    private final GenomeGapManager gapManager;
+    private final ArrayList<Brick> bricks;
 
 
     /**

@@ -29,10 +29,10 @@ import java.util.Map;
  */
 public class DiffAndGapResult {
 
-    private int errors;
-    private Map<Integer, Integer> gapOrderIndex;
-    private List<Difference> diffs;
-    private List<ReferenceGap> gaps;
+    private final int errors;
+    private final Map<Integer, Integer> gapOrderIndex;
+    private final List<Difference> diffs;
+    private final List<ReferenceGap> gaps;
 
 
     /**

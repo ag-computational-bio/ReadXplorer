@@ -51,19 +51,19 @@ public class AnalysesHandler implements ThreadListener, Observable, JobI {
      */
     public static final byte MAPPING_QUERRIES_FINISHED = 2;
     private final ProgressHandle progressHandle;
-    private DataVisualisationI parent;
-    private TrackConnector trackConnector;
+    private final DataVisualisationI parent;
+    private final TrackConnector trackConnector;
     private int nbCovRequests;
     private int nbMappingRequests;
     private int nbRequests;
     private int nbCarriedOutRequests;
     private String queryType;
-    private ArrayList<Observer> observers;
+    private final ArrayList<Observer> observers;
     private boolean diffsAndGapsNeeded;
     private boolean coverageNeeded;
     private boolean mappingsNeeded;
     private byte desiredData = Properties.NORMAL;
-    private ParametersReadClasses readClassParams;
+    private final ParametersReadClasses readClassParams;
     private long start;
 
 

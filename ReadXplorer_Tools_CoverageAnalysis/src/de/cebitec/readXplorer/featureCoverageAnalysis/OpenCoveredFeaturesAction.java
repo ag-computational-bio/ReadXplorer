@@ -78,7 +78,7 @@ public final class OpenCoveredFeaturesAction implements ActionListener,
     private static final String PROP_WIZARD_NAME = "FeatureCoverageWiz";
 
     private final ReferenceViewer context;
-    private PersistentReference reference;
+    private final PersistentReference reference;
     private List<PersistentTrack> tracks;
     private CoveredFeaturesAnalysisTopComponent coveredAnnoAnalysisTopComp;
     private Map<Integer, AnalysisCoveredFeatures> trackToAnalysisMap;

@@ -49,8 +49,7 @@ public class ImportOverviewCard extends javax.swing.JPanel {
 
         if( !refGenJobList.isEmpty() ) {
             overviewTextArea.append( NbBundle.getMessage( ImportOverviewCard.class, "MSG_ImportOverviewCard.text.references" ) + ":\n" );
-            for( Iterator<ReferenceJob> it = refGenJobList.iterator(); it.hasNext(); ) {
-                ReferenceJob r = it.next();
+            for( ReferenceJob r : refGenJobList ) {
                 overviewTextArea.append( r.getFile().getAbsolutePath() + "\n" );
                 overviewTextArea.append( "\t" + r.getName() + "\n" );
                 overviewTextArea.append( "\t" + r.getDescription() + "\n" );
@@ -60,8 +59,7 @@ public class ImportOverviewCard extends javax.swing.JPanel {
 
         if( !trackJobList.isEmpty() ) {
             overviewTextArea.append( NbBundle.getMessage( ImportOverviewCard.class, "MSG_ImportOverviewCard.text.tracks" ) + ":\n" );
-            for( Iterator<TrackJob> it = trackJobList.iterator(); it.hasNext(); ) {
-                TrackJob r = it.next();
+            for( TrackJob r : trackJobList ) {
                 overviewTextArea.append( r.getFile().getAbsolutePath() + "\n" );
                 overviewTextArea.append( "\t" + r.getDescription() + "\n" );
             }
@@ -69,8 +67,7 @@ public class ImportOverviewCard extends javax.swing.JPanel {
 
         if( !seqPairJobList.isEmpty() ) {
             overviewTextArea.append( NbBundle.getMessage( ImportOverviewCard.class, "MSG_ImportOverviewCard.text.readPairs" ) + ":\n" );
-            for( Iterator<ReadPairJobContainer> it = seqPairJobList.iterator(); it.hasNext(); ) {
-                ReadPairJobContainer seqPairCont = it.next();
+            for( ReadPairJobContainer seqPairCont : seqPairJobList ) {
                 String file2Name = seqPairCont.getTrackJob2() != null ? seqPairCont.getTrackJob2().getFile().getAbsolutePath() : "-";
                 overviewTextArea.append( seqPairCont.getTrackJob1().getFile().getAbsolutePath() + "\n" );
                 overviewTextArea.append( "\t" + seqPairCont.getTrackJob1().getDescription() + "\n" );

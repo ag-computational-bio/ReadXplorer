@@ -57,12 +57,12 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
     private Integer refSeqLength;
     private File outputFile;
 
-    private static String name = "Jok to BAM";
-    private static String[] fileExtension = new String[]{ "out", "Jok", "jok", "JOK" };
-    private static String fileDescription = "Saruman Output (jok)";
-    private ArrayList<Observer> observers;
+    private static final String name = "Jok to BAM";
+    private static final String[] fileExtension = new String[]{ "out", "Jok", "jok", "JOK" };
+    private static final String fileDescription = "Saruman Output (jok)";
+    private final ArrayList<Observer> observers;
     private String msg;
-    private ErrorLimit errorLimit;
+    private final ErrorLimit errorLimit;
 
 
     /**

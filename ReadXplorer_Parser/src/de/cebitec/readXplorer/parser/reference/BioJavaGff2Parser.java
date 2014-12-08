@@ -31,6 +31,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +61,7 @@ public class BioJavaGff2Parser implements ReferenceParserI {
     private static final String parserName = "GFF2/GTF file";
     private static final String fileDescription = parserName;
 
-    private List<Observer> observers = new ArrayList<>();
+    private final List<Observer> observers = new ArrayList<>();
 
 
     /**
@@ -160,7 +161,7 @@ public class BioJavaGff2Parser implements ReferenceParserI {
                             if( key instanceof String ) {
                                 keyString = ((String) key);
                                 value = attributes.get( keyString );
-                                if( value instanceof List && !((List) value).isEmpty() ) {
+                                if( value instanceof List && !((Collection) value).isEmpty() ) {
                                     attribute = ((List) value).get( 0 ); //currently only one item per tag is supported, except for parent
                                     if( attribute instanceof String ) {
                                         attrString = (String) attribute;

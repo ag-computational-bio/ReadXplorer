@@ -27,7 +27,7 @@ class VcfImportWizardPanel extends ChangeListeningFinishWizardPanel {
     /**
      * The wizard panel for importing VCF files.
      */
-    public VcfImportWizardPanel() {
+    VcfImportWizardPanel() {
         super( "Select a file to continue." );
     }
 

@@ -5,6 +5,7 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
@@ -179,13 +180,13 @@ public final class RnaSeqDataTypeSelectionVisualPanel extends JPanel implements
     @Override
     public void actionPerformed( ActionEvent e ) {
         if( e.getActionCommand().equals( WizardPropertyStrings.PROP_WHOLEGENOME_DATASET ) ) {
-            if( ((JCheckBox) e.getSource()).isSelected() ) {
+            if( ((AbstractButton) e.getSource()).isSelected() ) {
                 fiveEnrichedTrackCheckBox.setSelected( false );
             }
         }
 
         if( e.getActionCommand().equals( WizardPropertyStrings.PROP_FIVEPRIME_DATASET ) ) {
-            if( ((JCheckBox) e.getSource()).isSelected() ) {
+            if( ((AbstractButton) e.getSource()).isSelected() ) {
                 wholeTranscriptomeTrackCheckBox.setSelected( false );
             }
         }

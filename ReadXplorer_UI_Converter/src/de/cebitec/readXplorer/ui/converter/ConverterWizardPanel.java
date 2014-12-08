@@ -34,7 +34,7 @@ class ConverterWizardPanel extends ChangeListeningFinishWizardPanel {
     private ConverterSetupCard converterPanel;
 
 
-    public ConverterWizardPanel() {
+    ConverterWizardPanel() {
         super( "" );
     }
 

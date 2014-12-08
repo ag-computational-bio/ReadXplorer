@@ -41,18 +41,18 @@ import java.util.Set;
 public class PersistentFeature extends Node implements PersistentFeatureI,
                                                        Comparable<PersistentFeature> {
 
-    private int id;
-    private int chromId;
-    private String ecNumber;
-    private String locus;
-    private String product;
-    private int start;
-    private int stop;
-    private boolean isFwdStrand;
-    private FeatureType type;
-    private String featureName;
+    private final int id;
+    private final int chromId;
+    private final String ecNumber;
+    private final String locus;
+    private final String product;
+    private final int start;
+    private final int stop;
+    private final boolean isFwdStrand;
+    private final FeatureType type;
+    private final String featureName;
 //    private List<PersistentSubFeature> subFeatures;
-    private List<Integer> parentIds;
+    private final List<Integer> parentIds;
     private int frame;
 
 

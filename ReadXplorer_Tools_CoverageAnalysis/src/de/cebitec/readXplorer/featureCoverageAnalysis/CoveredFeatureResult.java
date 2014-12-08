@@ -39,7 +39,7 @@ import java.util.Map;
 public class CoveredFeatureResult extends ResultTrackAnalysis<ParameterSetCoveredFeatures>
         implements ExportDataI {
 
-    private List<CoveredFeature> results;
+    private final List<CoveredFeature> results;
 
 
     /**

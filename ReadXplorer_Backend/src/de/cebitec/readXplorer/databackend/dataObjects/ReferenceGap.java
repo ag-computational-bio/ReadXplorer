@@ -31,7 +31,7 @@ public class ReferenceGap extends BasicDiff implements Comparable<ReferenceGap>,
 
     private static final long serialVersionUID = 1L;
 
-    private int order;
+    private final int order;
 
 
     /**

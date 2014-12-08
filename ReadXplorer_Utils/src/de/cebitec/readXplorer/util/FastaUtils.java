@@ -48,7 +48,7 @@ import org.openide.DialogDisplayer;
  */
 public class FastaUtils implements Observable {
 
-    private List<Observer> observers;
+    private final List<Observer> observers;
 
 
     /**

@@ -68,20 +68,20 @@ public class BlockComponentPair extends JComponent implements ActionListener {
      * all three arrays. The line list is a bit independent, since it is always grey.
      */
 
-    private ArrayList<Rectangle> rectList = new ArrayList<>();
-    private ArrayList<Color> colorList = new ArrayList<>();
-    private ArrayList<Line2D> lineList = new ArrayList<>();
-    private ArrayList<Color> pairColors = new ArrayList<>();
+    private final ArrayList<Rectangle> rectList = new ArrayList<>();
+    private final ArrayList<Color> colorList = new ArrayList<>();
+    private final ArrayList<Line2D> lineList = new ArrayList<>();
+    private final ArrayList<Color> pairColors = new ArrayList<>();
 
-    private BlockPair block;
+    private final BlockPair block;
     private int length;
-    private int height;
-    private AbstractViewer parentViewer;
-    private int phyLeft;
-    private int phyRight;
-    private float minSatAndBright;
-    private static String COPY_SEQUENCE = NbBundle.getMessage( BlockComponentPair.class, "CopyRefSeq" );
-    private static String COPY_TOOLTIP = NbBundle.getMessage( BlockComponentPair.class, "CopyAttention" );
+    private final int height;
+    private final AbstractViewer parentViewer;
+    private final int phyLeft;
+    private final int phyRight;
+    private final float minSatAndBright;
+    private static final String COPY_SEQUENCE = NbBundle.getMessage( BlockComponentPair.class, "CopyRefSeq" );
+    private static final String COPY_TOOLTIP = NbBundle.getMessage( BlockComponentPair.class, "CopyAttention" );
     private JPopupMenu copyMenu = new JPopupMenu();
     private ReadPairPopup readPairPopup;
     private static JMenuItem COPY_SEQUENCE_ITEM;

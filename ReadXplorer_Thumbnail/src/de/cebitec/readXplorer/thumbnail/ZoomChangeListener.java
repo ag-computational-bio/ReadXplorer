@@ -32,10 +32,10 @@ import javax.swing.event.ChangeListener;
  */
 class ZoomChangeListener implements ChangeListener {
 
-    private Map<TrackViewer, CoverageZoomSlider> sliderMap;
+    private final Map<TrackViewer, CoverageZoomSlider> sliderMap;
 
 
-    public ZoomChangeListener() {
+    ZoomChangeListener() {
         sliderMap = new HashMap<>();
     }
 

@@ -36,10 +36,10 @@ public class ParsedRun {
 
     HashMap<String, ParsedReadname> sequences;
     private HashMap<String, String> errorMap;
-    private String description;
+    private final String description;
     private Timestamp timestamp;
     private long id;
-    HashSet<String> s = new HashSet<String>();
+    HashSet<String> s = new HashSet<>();
 
 
     public Timestamp getTimestamp() {
@@ -54,8 +54,8 @@ public class ParsedRun {
 
     public ParsedRun( String description ) {
         this.description = description;
-        sequences = new HashMap<String, ParsedReadname>();
-        errorMap = new HashMap<String, String>();
+        sequences = new HashMap<>();
+        errorMap = new HashMap<>();
     }
 
 
@@ -103,8 +103,7 @@ public class ParsedRun {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for( Iterator<String> it = sequences.keySet().iterator(); it.hasNext(); ) {
-            String sequence = it.next();
+        for( String sequence : sequences.keySet() ) {
             sb.append( sequence ).append( " " ).append( sequences.get( sequence ).getReads().size() ).append( "\n" );
         }
 

@@ -22,6 +22,7 @@ import java.lang.reflect.Constructor;
 import java.util.Stack;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -41,22 +42,22 @@ public class ActionXMLHandler implements ContentHandler {
 
     private JMenuBar jmb;
     private JToolBar jtb;
-    private Class[] consTypes;
+    private Class<?>[] consTypes;
     private Object[] consObjs;
 
-    private Stack<Attributes> lastAtts = new Stack<Attributes>();
-    private Stack<StringBuffer> lastChars = new Stack<StringBuffer>();
+    private Stack<Attributes> lastAtts = new Stack<>();
+    private Stack<StringBuffer> lastChars = new Stack<>();
 
-    private Stack<JMenu> menuPath = new Stack<JMenu>();
+    private Stack<JMenu> menuPath = new Stack<>();
 
 
     public ActionXMLHandler( ActionContainer ac ) {
-        this( ac, new Class[]{}, new Object[]{} );
+        this( ac, new Class<?>[]{}, new Object[]{} );
     }
 
 
     public ActionXMLHandler( ActionContainer ac,
-                             Class[] consTypes,
+                             Class<?>[] consTypes,
                              Object[] consObjs ) {
         this.consTypes = consTypes;
         this.consObjs = consObjs;
@@ -90,23 +91,15 @@ public class ActionXMLHandler implements ContentHandler {
     @Override
     public void endElement( String uri, String localName, String qName )
             throws SAXException {
-        int modifier;
-        String text, toolBar, mnemonic, key;
-        Attributes atts;
-        KeyStroke accelerator;
-        JMenu menu;
-        JMenuItem item;
-        Class class_ = null;
-        Constructor cons_ = null;
-        Object obj_ = null;
 
-        atts = lastAtts.pop();
-        text = lastChars.pop().toString();
+        Attributes atts = lastAtts.pop();
+        lastChars.pop();
 
         if( qName.equalsIgnoreCase( "menu" ) ) {
-            menu = menuPath.pop();
+            JMenu menu = menuPath.pop();
 
-            if( (mnemonic = atts.getValue( "mnemonic" )) != null && mnemonic.length() > 0 )
+            String mnemonic = atts.getValue( "mnemonic" );
+            if( mnemonic != null && mnemonic.length() > 0 )
                 menu.setMnemonic( mnemonic.charAt( 0 ) );
 
             if( menuPath.empty() )
@@ -118,19 +111,19 @@ public class ActionXMLHandler implements ContentHandler {
         else if( qName.equalsIgnoreCase( "action" ) ) {
 
             try {
-                class_ = Class.forName( atts.getValue( "class" ) );
-                cons_ = class_.getConstructor( consTypes );
-                obj_ = cons_.newInstance( consObjs );
+                Class<?> class_ = Class.forName( atts.getValue( "class" ) );
+                Constructor<?> cons_ = class_.getConstructor( consTypes );
+                Object obj_ = cons_.newInstance( consObjs );
 
                 if( !menuPath.empty() && obj_ instanceof AbstractAction ) {
-                    item = new JMenuItem( (AbstractAction) obj_ );
+                    JMenuItem item = new JMenuItem( (Action) obj_ );
                     item.setIcon( null );
 
-                    key = atts.getValue( "key" );
+                    String key = atts.getValue( "key" );
                     if( key != null && key.length() > 0 ) {
                         try {
-                            modifier = Integer.parseInt( atts.getValue( "modifier" ) );
-                            accelerator = KeyStroke.getKeyStroke( key.charAt( 0 ), modifier );
+                            int modifier = Integer.parseInt( atts.getValue( "modifier" ) );
+                            KeyStroke accelerator = KeyStroke.getKeyStroke( key.charAt( 0 ), modifier );
                             item.setAccelerator( accelerator );
                         }
                         catch( NumberFormatException e ) {
@@ -140,10 +133,11 @@ public class ActionXMLHandler implements ContentHandler {
                     menuPath.peek().add( item );
                 }
 
+                String toolBar;
                 if( (toolBar = atts.getValue( "toolBar" )) != null
-                    && (Boolean.valueOf( toolBar )).booleanValue()
+                    && (Boolean.valueOf( toolBar ))
                     && obj_ instanceof AbstractAction )
-                    jtb.add( (AbstractAction) obj_ );
+                    jtb.add( (Action) obj_ );
 
             }
             catch( NoSuchMethodException e ) {
@@ -152,10 +146,7 @@ public class ActionXMLHandler implements ContentHandler {
             catch( InstantiationException e ) {
                 log.warning( "Could not instantiate: ".concat( e.getMessage() ) );
             }
-            catch( IllegalAccessException e ) {
-                log.warning( e.getMessage() );
-            }
-            catch( java.lang.reflect.InvocationTargetException e ) {
+            catch( IllegalAccessException | java.lang.reflect.InvocationTargetException e ) {
                 log.warning( e.getMessage() );
             }
             catch( ClassNotFoundException e ) {

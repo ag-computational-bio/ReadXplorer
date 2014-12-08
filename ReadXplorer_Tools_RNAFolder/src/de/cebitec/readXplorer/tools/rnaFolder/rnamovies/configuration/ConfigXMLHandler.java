@@ -18,12 +18,12 @@
 package de.cebitec.readXplorer.tools.rnaFolder.rnamovies.configuration;
 
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
@@ -37,20 +37,20 @@ public class ConfigXMLHandler implements ContentHandler {
     /**
      * The 3 different states the parser can be in
      */
-    private static final Integer MODE_CATEGORY = new Integer( 0 );
-    private static final Integer MODE_VALUE = new Integer( 1 );
-    private static final Integer MODE_CONSTRUCTOR = new Integer( 2 );
+    private static final Integer MODE_CATEGORY = 0;
+    private static final Integer MODE_VALUE = 1;
+    private static final Integer MODE_CONSTRUCTOR = 2;
 
     private static final Logger log = Logger.getLogger( "ConfigXMLHandler" );
 
-    private Map<String, Category> cats;
+    private final Map<String, Category> cats;
     private Map<String, TypeWrapper> vals;
 
-    private Stack<Attributes> lastAtts;
-    private Stack<StringBuffer> lastChars;
-    private Stack<Integer> lastMode;
-    private Stack<List<Class>> lastCons;
-    private Stack<List<Object>> lastArgs;
+    private final Stack<Attributes> lastAtts;
+    private final Stack<StringBuffer> lastChars;
+    private final Stack<Integer> lastMode;
+    private final Stack<List<Class<?>>> lastCons;
+    private final Stack<List<Object>> lastArgs;
 
     private Object value = null;
 
@@ -62,11 +62,11 @@ public class ConfigXMLHandler implements ContentHandler {
         this.cats = cats;
 
         // init Stacks
-        lastChars = new Stack<StringBuffer>();
-        lastAtts = new Stack<Attributes>();
-        lastMode = new Stack<Integer>();
-        lastCons = new Stack<List<Class>>();
-        lastArgs = new Stack<List<Object>>();
+        lastChars = new Stack<>();
+        lastAtts = new Stack<>();
+        lastMode = new Stack<>();
+        lastCons = new Stack<>();
+        lastArgs = new Stack<>();
     }
 
 
@@ -83,7 +83,7 @@ public class ConfigXMLHandler implements ContentHandler {
         if( qName.equalsIgnoreCase( "category" ) ) {
             lastMode.push( mode );
             mode = MODE_CATEGORY;
-            vals = new LinkedHashMap<String, TypeWrapper>();
+            vals = new LinkedHashMap<>();
         }
         else if( qName.equalsIgnoreCase( "value" ) ) {
             lastMode.push( mode );
@@ -93,8 +93,8 @@ public class ConfigXMLHandler implements ContentHandler {
         else if( qName.equalsIgnoreCase( "object" ) ) {
             lastMode.push( mode );
             mode = MODE_CONSTRUCTOR;
-            lastCons.push( new ArrayList<Class>( 5 ) );
-            lastArgs.push( new ArrayList<Object>( 5 ) );
+            lastCons.push( new ArrayList<Class<?>>( 5 ) );
+            lastArgs.push( new ArrayList<>( 5 ) );
         }
     }
 
@@ -102,32 +102,22 @@ public class ConfigXMLHandler implements ContentHandler {
     @Override
     public void endElement( String uri, String localName, String qName )
             throws SAXException {
-        int i;
-        String key, text;
-        int id;
-        Attributes atts;
-        TypeWrapper tw;
-        Class[] paramTypes;
-        Object[] initArgs;
-        Class class_ = null;
-        Constructor cons_ = null;
-        Object obj_ = null;
 
-        atts = lastAtts.pop();
-        text = lastChars.pop().toString();
-
+        final Attributes atts = lastAtts.pop();
+        String text = lastChars.pop().toString();
         if( qName.equalsIgnoreCase( "category" ) ) {
             mode = lastMode.pop();
 
-            key = atts.getValue( "key" );
+            String key = atts.getValue( "key" );
             key = key == null ? "unnamed" : key;
+            int id;
             try {
                 text = atts.getValue( "id" );
                 id = text == null ? -1 : Integer.parseInt( text );
                 id = id < -1 ? -1 : id;
             }
             catch( NumberFormatException e ) {
-                log.warning( "Cannot convert " + e.getMessage() + " to java.lang.Integer." );
+                log.log( Level.WARNING, "Cannot convert {0} to java.lang.Integer.", e.getMessage() );
                 id = -1;
             }
 
@@ -136,12 +126,12 @@ public class ConfigXMLHandler implements ContentHandler {
         }
         else if( qName.equalsIgnoreCase( "value" ) ) {
             mode = lastMode.pop();
-            key = atts.getValue( "key" );
+            final String key = atts.getValue( "key" );
 
             if( value != null ) {
-                tw = new TypeWrapper( value );
+                TypeWrapper tw = new TypeWrapper( value );
 
-                for( i = 0; i < atts.getLength(); i++ ) {
+                for( int i = 0; i < atts.getLength(); i++ ) {
                     tw.putAttribute( atts.getQName( i ), atts.getValue( i ) );
                 }
 
@@ -153,13 +143,12 @@ public class ConfigXMLHandler implements ContentHandler {
         else if( qName.equalsIgnoreCase( "object" ) ) {
             mode = lastMode.pop();
 
-            paramTypes = lastCons.pop().toArray( new Class[]{} );
-            initArgs = lastArgs.pop().toArray( new Object[]{} );
+            final Class<?>[] paramTypes = lastCons.pop().toArray( new Class<?>[]{} );
+            final Object[] initArgs = lastArgs.pop().toArray( new Object[]{} );
 
             try {
-                class_ = Class.forName( atts.getValue( "class" ) );
-                cons_ = class_.getConstructor( paramTypes );
-                obj_ = cons_.newInstance( initArgs );
+                Class<?> class_ = Class.forName( atts.getValue( "class" ) );
+                Object obj_ = class_.getConstructor( paramTypes ).newInstance( initArgs );
 
                 //log.info("Loaded "+obj_.getClass().getName()+": "+obj_.toString());
 
@@ -175,19 +164,16 @@ public class ConfigXMLHandler implements ContentHandler {
                 }
             }
             catch( NoSuchMethodException e ) {
-                log.warning( "Could not find Constructor: " + e.getMessage() );
+                log.log( Level.WARNING, "Could not find Constructor: {0}", e.getMessage() );
             }
             catch( InstantiationException e ) {
-                log.warning( "Could not instantiate: " + e.getMessage() );
+                log.log( Level.WARNING, "Could not instantiate: {0}", e.getMessage() );
             }
-            catch( IllegalAccessException e ) {
-                log.warning( e.getMessage() );
-            }
-            catch( java.lang.reflect.InvocationTargetException e ) {
+            catch( IllegalAccessException | java.lang.reflect.InvocationTargetException e ) {
                 log.warning( e.getMessage() );
             }
             catch( ClassNotFoundException e ) {
-                log.warning( "Could not find class: " + e.getMessage() );
+                log.log( Level.WARNING, "Could not find class: {0}", e.getMessage() );
             }
         }
         else if( qName.equalsIgnoreCase( "string" ) ) {
@@ -212,7 +198,7 @@ public class ConfigXMLHandler implements ContentHandler {
                 }
             }
             catch( NumberFormatException e ) {
-                log.warning( "Cannot convert " + e.getMessage() + " to java.lang.Integer." );
+                log.log( Level.WARNING, "Cannot convert {0} to java.lang.Integer.", e.getMessage() );
             }
         }
         else if( qName.equalsIgnoreCase( "float" ) ) {
@@ -228,7 +214,7 @@ public class ConfigXMLHandler implements ContentHandler {
                 }
             }
             catch( NumberFormatException e ) {
-                log.warning( "Cannot convert " + e.getMessage() + " to java.lang.Float." );
+                log.log( Level.WARNING, "Cannot convert {0} to java.lang.Float.", e.getMessage() );
             }
         }
         else if( qName.equalsIgnoreCase( "boolean" ) ) {

@@ -57,8 +57,8 @@ import org.openide.windows.InputOutput;
 public class UpdateThread extends SwingWorker<Object, Object> implements
         Observer {
 
-    private InputOutput io;
-    private ProgressHandle ph;
+    private final InputOutput io;
+    private final ProgressHandle ph;
     private int workunits;
     private boolean noErrors = true;
 
@@ -168,11 +168,7 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
                         }
                     }
                 }
-                catch( ParsingException ex ) {
-                    Exceptions.printStackTrace( ex );
-                    noErrors = false;
-                }
-                catch( OutOfMemoryError ex ) {
+                catch( ParsingException | OutOfMemoryError ex ) {
                     Exceptions.printStackTrace( ex );
                     noErrors = false;
                 }

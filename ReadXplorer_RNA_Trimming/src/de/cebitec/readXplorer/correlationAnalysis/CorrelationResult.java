@@ -37,7 +37,7 @@ import java.util.Map.Entry;
  */
 public class CorrelationResult extends ResultTrackAnalysis<CorrelationResult> {
 
-    private List<CorrelatedInterval> correlationsList;
+    private final List<CorrelatedInterval> correlationsList;
     private Map<String, Object> params;
 
 

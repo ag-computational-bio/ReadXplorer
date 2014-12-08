@@ -55,7 +55,7 @@ public class ResultPanelCoverageAnalysis extends javax.swing.JPanel {
     private BoundsInfoManager bim;
     private CoverageAnalysisResult coverageAnalysisResult;
     private final Map<String, Integer> coverageStatisticsMap;
-    private TableRightClickFilter<UneditableTableModel> tableFilter;
+    private final TableRightClickFilter<UneditableTableModel> tableFilter;
 
 
     /**

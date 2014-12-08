@@ -521,7 +521,7 @@ public class SaveFileFetcherForGUI {
      */
     public static class UserCanceledTrackPathUpdateException extends Exception {
 
-        private static String errorMessage = "The user canceled the track path update. Thus, no TrackConnector can be created!";
+        private static final String errorMessage = "The user canceled the track path update. Thus, no TrackConnector can be created!";
         private static final long serialVersionUID = 1L;
 
 

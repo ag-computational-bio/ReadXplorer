@@ -92,7 +92,7 @@ public final class LoginWizardAction implements ActionListener {
                 final Map<String, Object> loginProps = wiz.getProperties();
                 //add database path to main window title
                 JFrame mainFrame = (JFrame) WindowManager.getDefault().getMainWindow();
-                mainFrame.setTitle( mainFrame.getTitle() + " - " + (String) loginProps.get( LoginWizardPanel.PROP_DATABASE ) );
+                mainFrame.setTitle( mainFrame.getTitle() + " - " + loginProps.get( LoginWizardPanel.PROP_DATABASE ) );
                 Thread connectThread = new Thread( new Runnable() {
                     @Override
                     public void run() {

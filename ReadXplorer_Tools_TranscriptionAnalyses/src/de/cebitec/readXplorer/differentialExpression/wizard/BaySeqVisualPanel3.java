@@ -33,9 +33,9 @@ import javax.swing.event.ListSelectionListener;
 public final class BaySeqVisualPanel3 extends JPanel implements
         ListSelectionListener {
 
-    private DefaultListModel<PersistentTrack> trackListModel = new DefaultListModel<>();
-    private DefaultListModel<String> groupListModel = new DefaultListModel<>();
-    private List<Group> createdGroups = new ArrayList<>();
+    private final DefaultListModel<PersistentTrack> trackListModel = new DefaultListModel<>();
+    private final DefaultListModel<String> groupListModel = new DefaultListModel<>();
+    private final List<Group> createdGroups = new ArrayList<>();
     private List<PersistentTrack> selectedTracks = new ArrayList<>();
     private Integer[] currentGroupBeingCreated = null;
     private int currentGroupNumber = 1;
@@ -76,8 +76,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements
             infoText.setText( "The group " + strBuilder.toString() + " is created automatically." );
         }
         trackListModel.clear();
-        for( Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext(); ) {
-            PersistentTrack persistentTrack = it.next();
+        for( PersistentTrack persistentTrack : selectedTracks ) {
             trackListModel.addElement( persistentTrack );
         }
     }

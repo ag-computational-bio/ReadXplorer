@@ -31,7 +31,7 @@ public class RpkmStatsPanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    private HashMap<String, Integer> returnedFeaturesStatsMap;
+    private final HashMap<String, Integer> returnedFeaturesStatsMap;
 
 
     /**

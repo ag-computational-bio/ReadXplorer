@@ -81,7 +81,7 @@ public enum SequenceComparison {
      */
     private static final char I = 'I';
 
-    private char type;
+    private final char type;
 
 
     /**

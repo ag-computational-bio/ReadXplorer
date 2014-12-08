@@ -18,10 +18,10 @@ import javax.swing.event.ListSelectionListener;
 public final class SelectTrackVisualPanel extends JPanel implements
         ListSelectionListener {
 
-    private List<PersistentReference> references;
+    private final List<PersistentReference> references;
     private int selectedIndex = -1;
     private PersistentReference selectedRef;
-    private DefaultListModel<PersistentTrack> trackListModel;
+    private final DefaultListModel<PersistentTrack> trackListModel;
 
 
     /**
@@ -118,8 +118,7 @@ public final class SelectTrackVisualPanel extends JPanel implements
             ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector( selectedRef.getId() );
             List<PersistentTrack> tracks = refCon.getAssociatedTracks();
             trackListModel.clear();
-            for( Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext(); ) {
-                PersistentTrack persistentTrack = it.next();
+            for( PersistentTrack persistentTrack : tracks ) {
                 trackListModel.addElement( persistentTrack );
             }
         }

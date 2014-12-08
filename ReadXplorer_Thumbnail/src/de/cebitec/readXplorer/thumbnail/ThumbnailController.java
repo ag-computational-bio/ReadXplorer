@@ -95,23 +95,23 @@ import org.openide.windows.WindowManager;
 public class ThumbnailController extends MouseAdapter implements IThumbnailView,
                                                                  Lookup.Provider {
 
-    private HashMap<ReferenceViewer, ThumbNailViewTopComponent> refThumbTopComponents;
+    private final HashMap<ReferenceViewer, ThumbNailViewTopComponent> refThumbTopComponents;
     //Currently active ThumbnailTopComponent and ReferenceViewer
     private ThumbNailViewTopComponent activeTopComp;
     private ReferenceViewer activeViewer;
     //Gives access to all Features which are displayed for a referenceViewer
-    private HashMap<ReferenceViewer, List<PersistentFeature>> selectedFeatures;
+    private final HashMap<ReferenceViewer, List<PersistentFeature>> selectedFeatures;
     //Gives access to all BasePanels for Feature
-    private HashMap<PersistentFeature, List<BasePanel>> featureToTrackpanelList;
+    private final HashMap<PersistentFeature, List<BasePanel>> featureToTrackpanelList;
     //Gives access to PersistentTrack from BasePanel
-    private HashMap<BasePanel, PersistentTrack> trackPanelToTrack;
+    private final HashMap<BasePanel, PersistentTrack> trackPanelToTrack;
     //Gives access to LayoutWidget for currentFeature
-    private HashMap<PersistentFeature, Widget> featureToLayoutWidget;
+    private final HashMap<PersistentFeature, Widget> featureToLayoutWidget;
     private PersistentFeature currentFeature;
     private ViewController controller;
-    private InstanceContent content;
+    private final InstanceContent content;
     //Controller of ThumbnailController
-    private ThumbControllerLookup controllerLookup;
+    private final ThumbControllerLookup controllerLookup;
     //is true if SliderValues get calculated on creation of TrackPanel
     private boolean autoSlider = true;
 
@@ -675,7 +675,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         private BasePanel firstTrackPanelToCompare;
 
 
-        public CheckBoxActionListener() {
+        CheckBoxActionListener() {
             countTracks = 0;
         }
 

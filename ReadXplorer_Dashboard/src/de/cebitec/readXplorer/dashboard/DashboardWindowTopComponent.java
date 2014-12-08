@@ -90,7 +90,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
 
     private static final long serialVersionUID = 1L;
 
-    private ExplorerManager em = new ExplorerManager();
+    private final ExplorerManager em = new ExplorerManager();
     private OutlineView ov;
     private Map<Long, HashSet<Long>> genomesAndTracksToOpen;
 
@@ -530,7 +530,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
             List<PersistentTrack> allTracksForThisGenome = genomesAndTracks.get( genome );
             List<PersistentTrack> tracksToShow = new ArrayList<>();
             for( PersistentTrack track : allTracksForThisGenome ) {
-                if( trackIds.contains( new Long( track.getId() ) ) ) {
+                if( trackIds.contains((long) track.getId()) ) {
                     tracksToShow.add( track );
                 }
             }

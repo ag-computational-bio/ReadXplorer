@@ -32,11 +32,11 @@ public class ParsedReadPairMapping {
 
     private long id;
     private long seqPairID;
-    private long mappingId1;
-    private long mappingId2;
-    private ReadPairType type;
+    private final long mappingId1;
+    private final long mappingId2;
+    private final ReadPairType type;
     private int nbReplicates;
-    private int distance;
+    private final int distance;
 
 
     /**

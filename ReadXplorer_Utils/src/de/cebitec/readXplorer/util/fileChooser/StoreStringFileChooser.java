@@ -76,11 +76,8 @@ public class StoreStringFileChooser extends ReadXplorerFileChooser {
                 @Override
                 public void run() {
 
-                    try {
-                        final FileWriter fileStream = new FileWriter( fileLocation );
-                        final BufferedWriter outputWriter = new BufferedWriter( fileStream );
+                    try( final BufferedWriter outputWriter = new BufferedWriter( new FileWriter( fileLocation ) ); ) {
                         outputWriter.write( dataString );
-                        outputWriter.close();
                         NotificationDisplayer.getDefault().notify( Bundle.SuccessHeader(), new ImageIcon(), Bundle.SuccessMsg() + fileLocation, null );
                     }
                     catch( IOException | MissingResourceException | HeadlessException e ) {

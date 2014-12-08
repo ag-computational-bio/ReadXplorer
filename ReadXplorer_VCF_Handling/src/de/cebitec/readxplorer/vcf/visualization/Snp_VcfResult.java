@@ -22,7 +22,7 @@ import org.broadinstitute.variant.variantcontext.VariantContext;
  */
 public class Snp_VcfResult extends ResultTrackAnalysis<Object> {
 
-    private List<VariantContext> snpVcfList;
+    private final List<VariantContext> snpVcfList;
 //    private VcfParser vcf = new VcfParser();
 
 

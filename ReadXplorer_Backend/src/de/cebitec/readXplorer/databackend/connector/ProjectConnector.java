@@ -77,10 +77,10 @@ public class ProjectConnector extends Observable {
     private String user;
     private String password;
     private String adapter;
-    private HashMap<Integer, TrackConnector> trackConnectors;
-    private HashMap<Integer, MultiTrackConnector> multiTrackConnectors;
+    private final HashMap<Integer, TrackConnector> trackConnectors;
+    private final HashMap<Integer, MultiTrackConnector> multiTrackConnectors;
 //    private List<MultiTrackConnector> multiTrackConnectors;
-    private HashMap<Integer, ReferenceConnector> refConnectors;
+    private final HashMap<Integer, ReferenceConnector> refConnectors;
     private static final int BATCH_SIZE = 100000; //TODO: test larger batch sizes
     private final static int FEATURE_BATCH_SIZE = BATCH_SIZE;
     private final static String BIGINT_UNSIGNED = "BIGINT UNSIGNED";

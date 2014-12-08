@@ -56,7 +56,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements
     private NovelTranscriptDetection newRegionDetection;
     private final ReferenceViewer refViewer;
     private final TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
-    private Map<Integer, PersistentTrack> trackMap;
+    private final Map<Integer, PersistentTrack> trackMap;
     private ProgressHandle progressHandle;
     /**
      * Key: featureID , Value: PersistentFeature
@@ -191,8 +191,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements
     @Override
     public void notifyObservers( Object data ) {
         List<de.cebitec.readXplorer.util.Observer> tmpObserver = new ArrayList<>( observer );
-        for( Iterator<de.cebitec.readXplorer.util.Observer> it = tmpObserver.iterator(); it.hasNext(); ) {
-            de.cebitec.readXplorer.util.Observer currentObserver = it.next();
+        for( de.cebitec.readXplorer.util.Observer currentObserver : tmpObserver ) {
             currentObserver.update( data );
         }
     }

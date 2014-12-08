@@ -35,11 +35,11 @@ public class Snp_VcfViewer extends AbstractViewer implements ThreadListener {
 
     private List<VariantContext> snpVcfList;
 
-    private static int height = 70;
+    private static final int height = 70;
     private final int labelMargin;
     private final int scaleFactor;
     private final boolean snpsLoaded;
-    private List<VariantContext> visibleSNPs;
+    private final List<VariantContext> visibleSNPs;
 
 
     private static Color SNP_A = new Color( 178, 34, 34 );
@@ -47,9 +47,9 @@ public class Snp_VcfViewer extends AbstractViewer implements ThreadListener {
     private static Color SNP_G = new Color( 0, 0, 128 );
     private static Color SNP_T = new Color( 255, 140, 0 );
     private static Color SNP_N = new Color( 0, 0, 0 );
-    private boolean colorChanges = false;
-    private boolean automaticScaling = false;
-    private JSlider verticalSlider = null;
+    private final boolean colorChanges = false;
+    private final boolean automaticScaling = false;
+    private final JSlider verticalSlider = null;
 
 
     /**

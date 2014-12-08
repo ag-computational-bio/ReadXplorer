@@ -56,14 +56,14 @@ import javax.swing.JPopupMenu;
 public class SequenceBar extends JComponent implements HighlightableI {
 
     private static final long serialVersionUID = 23446398;
-    private int height = 50;
-    private AbstractViewer parentViewer;
-    private PersistentReference refGen;
-    private Font font;
+    private final int height = 50;
+    private final AbstractViewer parentViewer;
+    private final PersistentReference refGen;
+    private final Font font;
     private FontMetrics metrics;
     private boolean printSeq;
-    private int baseLineY;
-    private int offsetY;
+    private final int baseLineY;
+    private final int offsetY;
     private Rectangle highlightRect;
     private GenomeGapManager gapManager;
     // the width in bases (logical positions), that is used for marking
@@ -71,10 +71,10 @@ public class SequenceBar extends JComponent implements HighlightableI {
     // base is marked by a small bar
     private int markingWidth;
     private int halfMarkingWidth;
-    private int largeBar;
-    private int smallBar;
+    private final int largeBar;
+    private final int smallBar;
     private HighlightAreaListener highlightListener;
-    private RegionManager regionManager;
+    private final RegionManager regionManager;
     private byte frameCurrFeature;
 
 

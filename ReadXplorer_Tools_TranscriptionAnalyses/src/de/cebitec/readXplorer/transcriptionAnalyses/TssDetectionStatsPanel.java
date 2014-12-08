@@ -30,7 +30,7 @@ import org.openide.util.NbBundle;
 public class TssDetectionStatsPanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
-    private Map<String, Integer> tssStatisticsMap;
+    private final Map<String, Integer> tssStatisticsMap;
 
 
     /**

@@ -34,8 +34,8 @@ import java.util.TreeSet;
  */
 public class GenomeGapManager {
 
-    private int lowerBound;
-    private int upperBound;
+    private final int lowerBound;
+    private final int upperBound;
     private TreeMap<Integer, Integer> maxNumGapsPerOriginalPosition;
     private TreeMap<Integer, Integer> addedGapsOriginalPosition;
     private TreeMap<Integer, Integer> addedGapsAccumulatedPositions;
@@ -51,10 +51,10 @@ public class GenomeGapManager {
 
 
     private void initMaps() {
-        maxNumGapsPerOriginalPosition = new TreeMap<Integer, Integer>();
+        maxNumGapsPerOriginalPosition = new TreeMap<>();
         fillMap( maxNumGapsPerOriginalPosition );
 
-        addedGapsOriginalPosition = new TreeMap<Integer, Integer>();
+        addedGapsOriginalPosition = new TreeMap<>();
         fillMap( addedGapsOriginalPosition );
     }
 
@@ -104,7 +104,6 @@ public class GenomeGapManager {
 
     public void addNumOfGapsAtPosition( int position, int numOfGaps ) {
         if( !fitsIntoBounds( position ) ) {
-            return;
         }
         else {
             int oldValue = getNumOfGapsAt( position );
@@ -133,7 +132,7 @@ public class GenomeGapManager {
 
     private void computeAccumulatedGaps() {
 
-        addedGapsAccumulatedPositions = new TreeMap<Integer, Integer>();
+        addedGapsAccumulatedPositions = new TreeMap<>();
         int gapCounter = 1;
         for( int i = lowerBound; i <= upperBound; i++ ) {
             if( this.hasGapAt( i ) ) {

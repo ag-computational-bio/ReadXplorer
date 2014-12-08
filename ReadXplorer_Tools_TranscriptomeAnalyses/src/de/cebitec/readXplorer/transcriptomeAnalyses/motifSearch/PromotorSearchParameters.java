@@ -14,7 +14,7 @@ public class PromotorSearchParameters implements ParameterSetI<Object> {
     private int minusTenMotifWidth, minus35MotifWidth;
     private int minSpacer1, minSpacer2, alternativeSpacer, sequenceWidthToAnalyzeMinus10, sequenceWidthToAnalyzeMinus35;
     private int noOfTimesTrying;
-    private int lengthOfPromotorRegion;
+    private final int lengthOfPromotorRegion;
 
 
     public PromotorSearchParameters( int minusTenMotifWidth, int minus35MotifWidth, int noOfTimesTryingTF, int minSpacer1, int minSpacer2, int alternativeSpacer, int seqWidthMinus10, int seqWidthMinus35, int lengthRelToTss ) {

@@ -111,7 +111,7 @@ public class FileUtils {
      * @return
      */
     public static File showFileOpenDialogAndChangePrefs( String prefName, FileNameExtensionFilter fileNameExtensionFilter,
-                                                         JTextField textField, Class forClass, Component parent ) {
+                                                         JTextField textField, Class<?> forClass, Component parent ) {
         JFileChooser fc = new JFileChooser();
         fc.setFileFilter( fileNameExtensionFilter );
         Preferences prefs2 = Preferences.userNodeForPackage( forClass );

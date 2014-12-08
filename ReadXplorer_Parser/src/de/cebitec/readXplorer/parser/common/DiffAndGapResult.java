@@ -28,9 +28,9 @@ import java.util.List;
  */
 public class DiffAndGapResult {
 
-    private int differences;
-    private List<ParsedDiff> diffs;
-    private List<ParsedReferenceGap> gaps;
+    private final int differences;
+    private final List<ParsedDiff> diffs;
+    private final List<ParsedReferenceGap> gaps;
 
 
     /**

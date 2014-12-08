@@ -55,7 +55,7 @@ class BasicDiff {
      * @param mappingQuality  The phred mapping quality value of the read from
      *                        which the diff originated
      */
-    public BasicDiff( int position, char base, boolean isForwardStrand, int count, byte baseQuality, Byte mappingQuality ) {
+    BasicDiff( int position, char base, boolean isForwardStrand, int count, byte baseQuality, Byte mappingQuality ) {
         this.position = position;
         this.base = base;
         this.isForwardStrand = isForwardStrand;

@@ -30,13 +30,13 @@ import java.util.HashSet;
 @Deprecated
 public class ParsedReadname {
 
-    private HashSet<String> reads;
+    private final HashSet<String> reads;
     private long id;
     public int numOfReads;
 
 
     public ParsedReadname() {
-        reads = new HashSet<String>();
+        reads = new HashSet<>();
     }
 
 

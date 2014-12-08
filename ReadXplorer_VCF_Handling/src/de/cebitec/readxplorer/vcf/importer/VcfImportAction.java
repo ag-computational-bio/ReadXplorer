@@ -56,17 +56,17 @@ import org.openide.windows.WindowManager;
 public final class VcfImportAction implements ActionListener {
 
 
-    private LoginCookie context;
+    private final LoginCookie context;
     private List<VariantContext> variantCList;
 
-    private Map<Integer, PersistentTrack> trackMap = new HashMap<>();
+    private final Map<Integer, PersistentTrack> trackMap = new HashMap<>();
     private PersistentReference reference;
     private boolean combineTracks;
 
     private AppPanelTopComponent appPanelTopComp;
     private Snp_VcfViewer snpVcfViewer;
     private Snp_VcfResultTopComponent vcfResultTopComp;
-    private Snp_VcfResultPanel resultPanel = new Snp_VcfResultPanel();
+    private final Snp_VcfResultPanel resultPanel = new Snp_VcfResultPanel();
     private WizardDescriptor wiz;
 
     //private WizardDescriptor.Panel<WizardDescriptor>[] panel;

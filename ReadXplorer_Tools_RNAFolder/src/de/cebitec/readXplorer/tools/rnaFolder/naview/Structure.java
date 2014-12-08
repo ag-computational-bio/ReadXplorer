@@ -71,7 +71,7 @@ public class Structure {
     private static final double pi = Math.PI;
     private static final int maxiter = 500;
 
-    private static Logger log = Logger.getLogger( "Structure" );
+    private static final Logger log = Logger.getLogger( "Structure" );
 
     private Base[] bases;
     private List<Region> regions;
@@ -104,8 +104,8 @@ public class Structure {
 
         // initialize arrays for bases, regions and loops
         bases = new Base[nbase + 1];
-        regions = new ArrayList<Region>( nbase + 1 );
-        loops = new ArrayList<Loop>( nbase + 1 );
+        regions = new ArrayList<>( nbase + 1 );
+        loops = new ArrayList<>( nbase + 1 );
 
         // build up data structures
         readBases();

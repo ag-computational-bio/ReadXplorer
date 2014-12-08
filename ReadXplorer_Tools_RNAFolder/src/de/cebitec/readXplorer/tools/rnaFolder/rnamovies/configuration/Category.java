@@ -127,7 +127,7 @@ public class Category {
 
         value = get( key );
         if( value instanceof Integer )
-            return ((Integer) value).intValue();
+            return ((Integer) value);
         else
             throw new IllegalArgumentException( "Invalid argument: " + key + ": " + value.getClass().getName() + " where java.lang.Integer is expected." );
 
@@ -139,7 +139,7 @@ public class Category {
 
         value = get( key );
         if( value instanceof Boolean )
-            return ((Boolean) value).booleanValue();
+            return ((Boolean) value);
         else
             throw new IllegalArgumentException( "Invalid argument: " + key + ": " + value.getClass().getName() + " where java.lang.Boolean is expected." );
 

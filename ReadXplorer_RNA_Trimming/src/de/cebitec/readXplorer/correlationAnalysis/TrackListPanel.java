@@ -30,7 +30,7 @@ import org.openide.util.HelpCtx;
  */
 public class TrackListPanel extends ChangeListeningFinishWizardPanel {
 
-    private int referenceId;
+    private final int referenceId;
 
     /**
      * The visual component that displays this panel. If you need to access the

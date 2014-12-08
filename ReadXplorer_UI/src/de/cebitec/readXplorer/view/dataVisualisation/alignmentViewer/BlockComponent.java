@@ -67,21 +67,21 @@ import static de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.Abstr
 public class BlockComponent extends JComponent {
 
     private static final long serialVersionUID = 1324672345;
-    private BlockI block;
-    private int length;
-    private int height;
-    private AbstractViewer parentViewer;
-    private GenomeGapManager gapManager;
-    private int absLogBlockStart;
-    private int absLogBlockStop;
-    private int phyLeft;
+    private final BlockI block;
+    private final int length;
+    private final int height;
+    private final AbstractViewer parentViewer;
+    private final GenomeGapManager gapManager;
+    private final int absLogBlockStart;
+    private final int absLogBlockStop;
+    private final int phyLeft;
     private int phyRight;
     private final String toolTipInfoPart;
-    private List<Rectangle> rectList;
-    private List<BrickData> brickDataList;
+    private final List<Rectangle> rectList;
+    private final List<BrickData> brickDataList;
     private Color blockColor;
     private final boolean showBaseQualities;
-    private Map<Classification, Color> classToColorMap;
+    private final Map<Classification, Color> classToColorMap;
 
 
     /**

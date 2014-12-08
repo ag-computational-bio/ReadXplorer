@@ -82,10 +82,10 @@ public class SamBamFileReader implements Observable {
     private final File dataFile;
     private final int trackId;
     private final PersistentReference reference;
-    private SamUtils samUtils;
+    private final SamUtils samUtils;
     private SAMFileReader samFileReader;
     private String header;
-    private List<Observer> observers;
+    private final List<Observer> observers;
 //    long startTime;
 //    long finish;
 

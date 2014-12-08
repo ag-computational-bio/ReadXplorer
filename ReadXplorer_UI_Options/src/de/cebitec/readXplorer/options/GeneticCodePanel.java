@@ -43,7 +43,7 @@ final class GeneticCodePanel extends OptionsPanel {
     private static final long serialVersionUID = 1L;
 
     private final GeneticCodeOptionsPanelController controller;
-    private Preferences pref;
+    private final Preferences pref;
     List<GeneticCode> genCodes;
 
 
@@ -389,10 +389,10 @@ final class GeneticCodePanel extends OptionsPanel {
 
         private static final long serialVersionUID = 1L;
 
-        private List<String> geneticCodesDataModel;
+        private final List<String> geneticCodesDataModel;
 
 
-        public GeneticCodeListModel( List<String> geneticCodesData ) {
+        GeneticCodeListModel( List<String> geneticCodesData ) {
             this.geneticCodesDataModel = geneticCodesData;
         }
 

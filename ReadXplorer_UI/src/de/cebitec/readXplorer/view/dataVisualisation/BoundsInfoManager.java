@@ -35,9 +35,9 @@ public class BoundsInfoManager implements AdjustmentPanelListenerI {
 
     private int currentHorizontalPosition;
     private int zoomfactor;
-    private PersistentReference refGenome;
-    private List<LogicalBoundsListener> boundListeners;
-    private List<SynchronousNavigator> syncedNavigators;
+    private final PersistentReference refGenome;
+    private final List<LogicalBoundsListener> boundListeners;
+    private final List<SynchronousNavigator> syncedNavigators;
 
 
     /**

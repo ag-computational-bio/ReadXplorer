@@ -33,7 +33,7 @@ public class GenomeFeatureParser {
      * A list of intervals (inner list) for each chromosome (outer list).
      */
     private final List<List<Pair<Integer, Integer>>> regions2Exclude;
-    private List<Set<Integer>> excludedGenomePos;
+    private final List<Set<Integer>> excludedGenomePos;
     private final Map<Integer, List<Integer>> fwdFeatures;
     private final Map<Integer, List<Integer>> revFeatures;
     private final ReferenceConnector refConnector;

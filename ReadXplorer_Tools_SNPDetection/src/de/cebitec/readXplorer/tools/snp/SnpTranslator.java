@@ -50,9 +50,9 @@ import java.util.List;
 public class SnpTranslator {
 
     private final PersistentChromosome chromosome;
-    private long refLength;
-    private List<PersistentFeature> genomicFeatures;
-    private GeneticCode code;
+    private final long refLength;
+    private final List<PersistentFeature> genomicFeatures;
+    private final GeneticCode code;
     private int featIdx;
     private int subPos; //summed up bases in subfeatures up to the snp position regarding the strand of the feature
     private boolean posDirectAtLeftChromBorder;

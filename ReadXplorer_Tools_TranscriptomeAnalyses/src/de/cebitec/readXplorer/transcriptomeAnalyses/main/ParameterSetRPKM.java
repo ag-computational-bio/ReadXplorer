@@ -17,7 +17,7 @@ import java.util.Set;
 public class ParameterSetRPKM extends ParametersFeatureTypes implements
         ParameterSetI<ParameterSetRPKM> {
 
-    private boolean performRPKMAnalysis;
+    private final boolean performRPKMAnalysis;
     private int minReadCount;
     private int maxReadCount;
 

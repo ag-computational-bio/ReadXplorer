@@ -36,9 +36,9 @@ public final class ExpressTestVisualPanelNormalization extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    private ButtonGroup bg = new ButtonGroup();
+    private final ButtonGroup bg = new ButtonGroup();
     private FeatureTableModel tm;
-    private DefaultTableModel emptyTm = new DefaultTableModel();
+    private final DefaultTableModel emptyTm = new DefaultTableModel();
     private List<PersistentFeature> features;
     private TableRowSorter trs;
 

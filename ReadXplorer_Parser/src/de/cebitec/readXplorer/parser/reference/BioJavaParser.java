@@ -90,12 +90,12 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
     private static final String parserNameGbk = "GenBank file";
     private static final String fileDescriptionEmbl = "EMBL file";
     private static final String fileDescriptionGbk = "GenBank file";
-    private String[] fileExtension;
-    private String parserName;
-    private String fileDescription;
+    private final String[] fileExtension;
+    private final String parserName;
+    private final String fileDescription;
     private final RichSequenceFormat seqFormat;
-    private ArrayList<Observer> observers = new ArrayList<>();
-    private ErrorLimit errorLimit;
+    private final ArrayList<Observer> observers = new ArrayList<>();
+    private final ErrorLimit errorLimit;
 
 
     /**

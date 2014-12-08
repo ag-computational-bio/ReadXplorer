@@ -36,7 +36,7 @@ import org.openide.util.actions.Presenter;
  */
 public final class ActivateSliderCalc implements ActionListener, Presenter.Menu {
 
-    private String ITEM_TEXT = "Auto Slider Calculation";
+    private final String ITEM_TEXT = "Auto Slider Calculation";
 
 
     @Override

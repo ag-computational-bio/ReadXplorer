@@ -33,9 +33,9 @@ public class BarComponent extends JComponent {
 
     private final static long serialVersionUID = 38461064;
 
-    private int height;
-    private int width;
-    private Color color;
+    private final int height;
+    private final int width;
+    private final Color color;
 
 
     /**

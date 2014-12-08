@@ -30,7 +30,7 @@ import org.jfree.chart.panel.Overlay;
  */
 public class ChartPanelOverlay implements Overlay {
 
-    private MouseActions mouseActions;
+    private final MouseActions mouseActions;
 
 
     public ChartPanelOverlay( MouseActions mouseActions ) {

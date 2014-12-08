@@ -32,10 +32,10 @@ import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.TrackViewer;
  */
 class ThumbnailCoverageListener implements ThreadListener {
 
-    private TrackViewer trackViewer;
+    private final TrackViewer trackViewer;
 
 
-    public ThumbnailCoverageListener( TrackViewer trackViewer ) {
+    ThumbnailCoverageListener( TrackViewer trackViewer ) {
         this.trackViewer = trackViewer;
     }
 

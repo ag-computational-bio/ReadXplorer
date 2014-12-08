@@ -42,7 +42,7 @@ public abstract class ChangeListeningWizardPanel implements
 
     public static final String PROP_VALIDATE = "validated";
 
-    private ChangeSupport changeSupport;
+    private final ChangeSupport changeSupport;
     private boolean isValidated = true;
     private String errorMsg;
 

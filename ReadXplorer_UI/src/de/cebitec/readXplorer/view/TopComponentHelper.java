@@ -54,8 +54,7 @@ public class TopComponentHelper {
         //Get all open Components and filter for AppPanelTopComponent
         Set<TopComponent> topComps = WindowManager.getDefault().getRegistry().getOpened();
         T desiredTopComp = null;
-        for( Iterator<TopComponent> it = topComps.iterator(); it.hasNext(); ) {
-            TopComponent topComponent = it.next();
+        for( TopComponent topComponent : topComps ) {
             if( topComponent.getClass().isAssignableFrom( activeTopCompToGet ) && topComponent.isShowing() ) {
                 desiredTopComp = (T) topComponent;
                 break;
@@ -81,8 +80,7 @@ public class TopComponentHelper {
         List<T> topCompsOfClass = new ArrayList<>();
         //Get all open Components and filter for AppPanelTopComponent
         Set<TopComponent> topComps = WindowManager.getDefault().getRegistry().getOpened();
-        for( Iterator<TopComponent> it = topComps.iterator(); it.hasNext(); ) {
-            TopComponent topComponent = it.next();
+        for( TopComponent topComponent : topComps ) {
             if( topComponent.getClass().isAssignableFrom( topCompClassToGet ) ) {
                 topCompsOfClass.add( (T) topComponent );
             }

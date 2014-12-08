@@ -54,7 +54,7 @@ public class ResultPanelCoveredFeatures extends javax.swing.JPanel {
     private BoundsInfoManager bim;
     private CoveredFeatureResult coveredFeaturesResult;
     private Map<String, Integer> coveredStatisticsMap;
-    private TableRightClickFilter<UneditableTableModel> tableFilter;
+    private final TableRightClickFilter<UneditableTableModel> tableFilter;
     private ReferenceFeatureTopComp refFeatureComp;
 
 

@@ -29,7 +29,7 @@ import javax.swing.table.DefaultTableModel;
 public final class DeSeqVisualPanelDesign extends JPanel {
 
     private DefaultTableModel tm;
-    private DefaultComboBoxModel cbm = new DefaultComboBoxModel( new Integer[]{ 1 } );
+    private final DefaultComboBoxModel cbm = new DefaultComboBoxModel( new Integer[]{ 1 } );
 
 
     /**
@@ -144,7 +144,7 @@ public final class DeSeqVisualPanelDesign extends JPanel {
     // End of variables declaration//GEN-END:variables
 
 
-    protected void setTracks( List<PersistentTrack> tracks ) {
+    void setTracks( List<PersistentTrack> tracks ) {
         String[] columnNames = new String[tracks.size() + 1];
         columnNames[0] = "Group name";
         for( int i = 0; i < tracks.size(); i++ ) {
@@ -156,7 +156,7 @@ public final class DeSeqVisualPanelDesign extends JPanel {
     }
 
 
-    protected Vector getTableData() {
+    Vector getTableData() {
         //If a cell is still selected when you click on "next" the input you
         //have done won't be used unless you change the edited cell first.
         //This is done automatically by this command.

@@ -29,7 +29,7 @@ import org.openide.windows.InputOutput;
  */
 public class SimpleIO implements SimpleOutput {
 
-    private InputOutput io;
+    private final InputOutput io;
 
 
     public SimpleIO( InputOutput io ) {

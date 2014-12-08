@@ -42,7 +42,7 @@ import javax.swing.table.DefaultTableModel;
  */
 public class TableRightClickDeletion<E extends DefaultTableModel> extends MouseAdapter {
 
-    private JPopupMenu popup = new JPopupMenu();
+    private final JPopupMenu popup = new JPopupMenu();
     private JTable lastTable;
     /**
      * Stores the original TableModel.

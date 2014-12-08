@@ -50,11 +50,11 @@ import java.util.logging.Logger;
  */
 public class ReferenceConnector {
 
-    private int refGenID;
-    private Connection con;
+    private final int refGenID;
+    private final Connection con;
 //    private String projectFolder;
 //    private boolean isFolderSet = false;
-    private List<PersistentTrack> associatedTracks;
+    private final List<PersistentTrack> associatedTracks;
 
 
     /**
@@ -390,8 +390,7 @@ public class ReferenceConnector {
      *         given type, false otherwise
      */
     public boolean hasFeatures( List<FeatureType> typeList ) {
-        for( Iterator<FeatureType> it = typeList.iterator(); it.hasNext(); ) {
-            FeatureType featureType = it.next();
+        for( FeatureType featureType : typeList ) {
             if( hasFeatures( featureType ) ) {
                 return true;
             }

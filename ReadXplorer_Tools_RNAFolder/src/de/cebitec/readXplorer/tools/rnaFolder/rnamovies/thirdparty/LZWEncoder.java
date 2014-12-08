@@ -29,9 +29,9 @@ class LZWEncoder {
 
     private static final int EOF = -1;
 
-    private int imgW, imgH;
-    private byte[] pixAry;
-    private int initCodeSize;
+    private final int imgW, imgH;
+    private final byte[] pixAry;
+    private final int initCodeSize;
     private int remaining;
     private int curPixel;
 

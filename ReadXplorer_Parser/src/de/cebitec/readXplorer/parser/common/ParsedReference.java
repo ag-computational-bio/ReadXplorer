@@ -37,7 +37,7 @@ public class ParsedReference {
 
     public static String FINISHED = "ParsingFinished";
 
-    private List<ParsedChromosome> chromosomes;
+    private final List<ParsedChromosome> chromosomes;
     private String description;
     private String name;
     private FeatureFilter filter;

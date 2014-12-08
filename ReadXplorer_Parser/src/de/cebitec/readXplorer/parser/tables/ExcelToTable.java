@@ -27,7 +27,7 @@ import jxl.read.biff.BiffException;
 public class ExcelToTable implements ExcelImportDataI {
 
     private String tableName;
-    private List<String> columnNames;
+    private final List<String> columnNames;
     private Object[][] fileContentFirstSheet;
     private HashMap<String, String> fileContentSecondSheet;
     private HashMap<String, String> fileContentSecondSheetThirdColumn;

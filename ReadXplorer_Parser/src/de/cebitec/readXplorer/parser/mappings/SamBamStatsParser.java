@@ -54,10 +54,10 @@ import org.openide.util.NbBundle;
  */
 public class SamBamStatsParser implements Observable, MessageSenderI {
 
-    private List<Observer> observers;
+    private final List<Observer> observers;
     private StatsContainer statsContainer;
-    private DiscreteCountingDistribution readLengthDistribution;
-    private ErrorLimit errorLimit;
+    private final DiscreteCountingDistribution readLengthDistribution;
+    private final ErrorLimit errorLimit;
 
 
     /**

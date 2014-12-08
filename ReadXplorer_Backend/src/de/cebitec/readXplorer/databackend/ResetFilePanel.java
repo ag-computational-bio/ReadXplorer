@@ -32,8 +32,8 @@ public class ResetFilePanel extends javax.swing.JPanel {
     private static final long serialVersionUID = 1L;
 
     private String newFileLocation;
-    private String filePath;
-    private String[] fileExtension;
+    private final String filePath;
+    private final String[] fileExtension;
 
 
     /**

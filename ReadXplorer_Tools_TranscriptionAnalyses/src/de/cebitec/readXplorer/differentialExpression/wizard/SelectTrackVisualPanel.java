@@ -42,10 +42,10 @@ public final class SelectTrackVisualPanel extends JPanel implements
 
     private static final long serialVersionUID = 1L;
 
-    private PersistentReference[] references;
+    private final PersistentReference[] references;
     private int selectedIndex = -1;
     private PersistentReference selectedRef;
-    private DefaultListModel<PersistentTrack> trackListModel = new DefaultListModel<>();
+    private final DefaultListModel<PersistentTrack> trackListModel = new DefaultListModel<>();
 
 
     /**
@@ -143,8 +143,7 @@ public final class SelectTrackVisualPanel extends JPanel implements
             ReferenceConnector refCon = ProjectConnector.getInstance().getRefGenomeConnector( selectedRef.getId() );
             List<PersistentTrack> tracks = refCon.getAssociatedTracks();
             trackListModel.clear();
-            for( Iterator<PersistentTrack> it = tracks.iterator(); it.hasNext(); ) {
-                PersistentTrack persistentTrack = it.next();
+            for( PersistentTrack persistentTrack : tracks ) {
                 trackListModel.addElement( persistentTrack );
             }
         }

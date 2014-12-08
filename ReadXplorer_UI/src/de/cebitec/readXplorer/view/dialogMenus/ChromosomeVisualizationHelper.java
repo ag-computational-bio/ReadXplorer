@@ -96,7 +96,7 @@ public class ChromosomeVisualizationHelper {
      */
     public class ChromosomeListener implements ActionListener {
 
-        private JComboBox<PersistentChromosome> chromSelectionBox;
+        private final JComboBox<PersistentChromosome> chromSelectionBox;
         private AbstractViewer viewer;
 
 
@@ -142,7 +142,7 @@ public class ChromosomeVisualizationHelper {
      */
     public class ChromComboObserver implements Observer {
 
-        private JComboBox<PersistentChromosome> chromSelectionBox;
+        private final JComboBox<PersistentChromosome> chromSelectionBox;
         private PersistentReference refGenome;
 
 

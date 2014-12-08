@@ -39,12 +39,12 @@ import java.util.Map;
  */
 public class JokToBamDirectParser implements MappingParserI, Observer {
 
-    private static String name = "Jok to Bam Direct Access Parser";
-    private static String[] fileExtension = new String[]{ "out", "Jok", "jok", "JOK" };
-    private static String fileDescription = "Jok Read Mappings converted to BAM";
-    private SamBamParser bamParser;
-    private List<Observer> observers;
-    private boolean alreadyConverted = false;
+    private static final String name = "Jok to Bam Direct Access Parser";
+    private static final String[] fileExtension = new String[]{ "out", "Jok", "jok", "JOK" };
+    private static final String fileDescription = "Jok Read Mappings converted to BAM";
+    private final SamBamParser bamParser;
+    private final List<Observer> observers;
+    private final boolean alreadyConverted = false;
 
 
     /**

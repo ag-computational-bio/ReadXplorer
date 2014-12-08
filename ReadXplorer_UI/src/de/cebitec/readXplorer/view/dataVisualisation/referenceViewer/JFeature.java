@@ -48,18 +48,18 @@ import org.openide.util.Utilities;
 public class JFeature extends JComponent {
 
     private static final long serialVersionUID = 347348234;
-    private PersistentFeature feature;
-    private Dimension size;
+    private final PersistentFeature feature;
+    private final Dimension size;
     public static final int NORMAL_HEIGHT = 12;
     public static final int PARENT_FEATURE_HEIGHT = 8;
     public static final byte BORDER_NONE = 0;
     public static final byte BORDER_LEFT = -1;
     public static final byte BORDER_RIGHT = 1;
     public static final byte BORDER_BOTH = 2;
-    private int height;
-    private Font font;
+    private final int height;
+    private final Font font;
     private Color color;
-    private short border;
+    private final short border;
 
 
     /**
@@ -311,7 +311,7 @@ public class JFeature extends JComponent {
             private void showPopUp( MouseEvent e ) {
                 if( (e.getButton() == MouseEvent.BUTTON3) || (e.isPopupTrigger()) ) {
                     final Lookup.Result<ReferenceViewer> resultReferenceView = Utilities.actionsGlobalContext().lookupResult( ReferenceViewer.class );
-                    final ReferenceViewer viewer = (ReferenceViewer) resultReferenceView.allInstances().iterator().next();
+                    final ReferenceViewer viewer = resultReferenceView.allInstances().iterator().next();
 
                     JPopupMenu popUp = new JPopupMenu();
 

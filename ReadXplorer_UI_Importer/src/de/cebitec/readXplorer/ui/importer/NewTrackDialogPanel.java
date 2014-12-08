@@ -44,11 +44,11 @@ public class NewTrackDialogPanel extends ImportTrackBasePanel implements
         NewJobDialogI {
 
     private static final long serialVersionUID = 774275254;
-    private ReferenceJob[] refGenJobs;
+    private final ReferenceJob[] refGenJobs;
 
     private final JokToBamDirectParser jokToBamDirectParser;
     private final SamBamParser samBamDirectParser;
-    private MappingParserI[] parsers;
+    private final MappingParserI[] parsers;
 
 
     /**

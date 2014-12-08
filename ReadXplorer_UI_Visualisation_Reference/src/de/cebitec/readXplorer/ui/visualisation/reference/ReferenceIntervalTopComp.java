@@ -22,6 +22,7 @@ import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.view.TopComponentExtended;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfo;
 import de.cebitec.readXplorer.view.dataVisualisation.MousePositionListener;
+import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -260,7 +261,7 @@ public final class ReferenceIntervalTopComp extends TopComponentExtended
                     ReferenceIntervalTopComp.this.showFeatureStatsForInterval( featureStats );
 
                     // update intervall
-                    BoundsInfo boundsInfo = ((ReferenceViewer) evt.getSource()).getBoundsInfo();
+                    BoundsInfo boundsInfo = ((AbstractViewer) evt.getSource()).getBoundsInfo();
                     setInterval( boundsInfo.getLogLeft(), boundsInfo.getLogRight() );
                 }
 
@@ -334,8 +335,7 @@ public final class ReferenceIntervalTopComp extends TopComponentExtended
         DefaultListModel<String> model = new DefaultListModel<>();
 
         Set<FeatureType> keys = featureStats.keySet();
-        for( Iterator<FeatureType> it = keys.iterator(); it.hasNext(); ) {
-            FeatureType type = it.next();
+        for( FeatureType type : keys ) {
             String typeS = type.getTypeString();
             model.addElement( typeS + ": " + featureStats.get( type ) );
         }

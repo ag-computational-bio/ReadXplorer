@@ -67,9 +67,9 @@ public class ModalProgressMonitor extends Object {
     private JDialog dialog;
     private JOptionPane pane;
     private JProgressBar myBar;
-    private JLabel noteLabel;
+    private final JLabel noteLabel;
     private String note;
-    private String message;
+    private final String message;
     private Object[] cancelOption = null;
     private int min;
     private int max;

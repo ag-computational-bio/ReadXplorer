@@ -83,9 +83,9 @@ public class DashboardTest {
         assertTrue( r1.equals( r2 ) );
         assertFalse( r1.equals( r3 ) );
 
-        Object o1 = (Object) r1;
-        Object o2 = (Object) r2;
-        Object o3 = (Object) r3;
+        Object o1 = r1;
+        Object o2 = r2;
+        Object o3 = r3;
         assertTrue( o1.equals( o2 ) );
         assertFalse( o1.equals( o3 ) );
     }

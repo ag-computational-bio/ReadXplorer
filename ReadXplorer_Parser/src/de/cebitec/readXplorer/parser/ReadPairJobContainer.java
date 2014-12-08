@@ -28,11 +28,11 @@ package de.cebitec.readXplorer.parser;
  */
 public class ReadPairJobContainer {
 
-    private TrackJob trackJob1;
-    private TrackJob trackJob2;
-    private int distance; //distance of the sequences in a sequence pair in bp
-    private short deviation; //deviation allowed from that distance in %
-    private byte orientation; //0 = fr, 1 = rf, 2 = ff/rr
+    private final TrackJob trackJob1;
+    private final TrackJob trackJob2;
+    private final int distance; //distance of the sequences in a sequence pair in bp
+    private final short deviation; //deviation allowed from that distance in %
+    private final byte orientation; //0 = fr, 1 = rf, 2 = ff/rr
 
 
     public ReadPairJobContainer( TrackJob trackJob1, TrackJob trackJob2, int distance, short deviation, byte orientation ) {

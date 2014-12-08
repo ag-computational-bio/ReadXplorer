@@ -77,8 +77,7 @@ public class MouseActions implements ChartMouseListener {
         if( feature != null ) {
             int pos = feature.getStart();
             Collection<ViewController> viewControllers = (Collection<ViewController>) CentralLookup.getDefault().lookupAll( ViewController.class );
-            for( Iterator<ViewController> it = viewControllers.iterator(); it.hasNext(); ) {
-                ViewController tmpVCon = it.next();
+            for( ViewController tmpVCon : viewControllers ) {
                 BoundsInfoManager bm = tmpVCon.getBoundsManager();
                 if( bm != null && tmpVCon.getCurrentRefGen().getChromosome( feature.getChromId() ) != null ) {
                     bm.chromosomeChanged( feature.getChromId() );

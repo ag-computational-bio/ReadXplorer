@@ -40,7 +40,7 @@ import org.openide.util.HelpCtx;
 class MappingSelectionPanel implements
         WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
-    public MappingSelectionPanel() {
+    MappingSelectionPanel() {
         this.getComponent().addPropertyChangeListener( MappingAction.PROP_SOURCEPATH, new PropertyChangeListener() {
 
             @Override

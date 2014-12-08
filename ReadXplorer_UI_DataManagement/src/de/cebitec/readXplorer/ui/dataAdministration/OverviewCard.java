@@ -47,8 +47,7 @@ public class OverviewCard extends javax.swing.JPanel {
 
         if( !scheduledRefGenJobs.isEmpty() ) {
             overviewTextArea.append( "References:\n" );
-            for( Iterator<ReferenceJob> it = scheduledRefGenJobs.iterator(); it.hasNext(); ) {
-                ReferenceJob r = it.next();
+            for( ReferenceJob r : scheduledRefGenJobs ) {
                 overviewTextArea.append( r.getName() + "\n" );
                 overviewTextArea.append( "\t" + r.getDescription() + "\n" );
             }
@@ -57,8 +56,7 @@ public class OverviewCard extends javax.swing.JPanel {
 
         if( !scheduledTrackJobs.isEmpty() ) {
             overviewTextArea.append( "Tracks:\n" );
-            for( Iterator<TrackJob> it = scheduledTrackJobs.iterator(); it.hasNext(); ) {
-                TrackJob r = it.next();
+            for( TrackJob r : scheduledTrackJobs ) {
                 overviewTextArea.append( r.getDescription() + "\n" );
             }
             overviewTextArea.append( "\n" );

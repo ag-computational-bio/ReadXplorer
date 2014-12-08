@@ -23,7 +23,6 @@ import de.cebitec.readXplorer.util.Pair;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.jfree.chart.ChartPanel;
@@ -58,8 +57,7 @@ public class CreatePlots {
     public synchronized static ChartPanel createPlot( Map<PersistentFeature, Pair<Double, Double>> data, String xName, String yName, XYToolTipGenerator toolTip ) {
         XYSeriesCollection normal = new XYSeriesCollection();
         XYSeries nor = new XYSeries( "Normal" );
-        for( Iterator<PersistentFeature> it = data.keySet().iterator(); it.hasNext(); ) {
-            PersistentFeature key = it.next();
+        for( PersistentFeature key : data.keySet() ) {
             Pair<Double, Double> pair = data.get( key );
             Double X = pair.getFirst();
             Double Y = pair.getSecond();
@@ -95,8 +93,7 @@ public class CreatePlots {
         XYSeries nor = new XYSeries( "Normal" );
         XYSeries pos = new XYSeries( "Positive Infinite" );
         XYSeries neg = new XYSeries( "Negative Infinite" );
-        for( Iterator<PersistentFeature> it = data.keySet().iterator(); it.hasNext(); ) {
-            PersistentFeature key = it.next();
+        for( PersistentFeature key : data.keySet() ) {
             Pair<Double, Double> pair = data.get( key );
             Double X = pair.getFirst();
             Double Y = pair.getSecond();

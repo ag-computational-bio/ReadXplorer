@@ -28,7 +28,7 @@ import java.util.Set;
  */
 public class ParametersFeatureTypesAndReadClasses extends ParametersFeatureTypes {
 
-    private ParametersReadClasses parametersReadClasses;
+    private final ParametersReadClasses parametersReadClasses;
 
 
     public ParametersFeatureTypesAndReadClasses( Set<FeatureType> selFeatureTypes,

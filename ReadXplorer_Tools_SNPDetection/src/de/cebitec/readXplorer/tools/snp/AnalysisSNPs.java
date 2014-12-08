@@ -54,10 +54,10 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
     private static final int BASE_N = 4;
     private static final int BASE_GAP = 5;
 
-    private TrackConnector trackConnector;
-    private ParameterSetSNPs analysisParams;
-    private List<Classification> excludedClasses;
-    private List<SnpI> snps;
+    private final TrackConnector trackConnector;
+    private final ParameterSetSNPs analysisParams;
+    private final List<Classification> excludedClasses;
+    private final List<SnpI> snps;
     private boolean hasBaseQualities = true;
     private boolean hasMappingQualities = true;
 
@@ -94,7 +94,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
      * @param trackConnector the track connector for this analysis
      * @param analysisParams the set of parameters for this analysis
      */
-    public AnalysisSNPs( TrackConnector trackConnector, ParameterSetSNPs analysisParams ) {
+    AnalysisSNPs( TrackConnector trackConnector, ParameterSetSNPs analysisParams ) {
         this.trackConnector = trackConnector;
         this.analysisParams = analysisParams;
         this.excludedClasses = analysisParams.getReadClassParams().getExcludedClasses();

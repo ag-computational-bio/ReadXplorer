@@ -39,7 +39,7 @@ import java.util.Map;
 public class CoverageAnalysisResult extends ResultTrackAnalysis<ParameterSetCoverageAnalysis>
         implements ExportDataI {
 
-    private CoverageIntervalContainer results;
+    private final CoverageIntervalContainer results;
 
 
     public CoverageAnalysisResult( CoverageIntervalContainer results, Map<Integer, PersistentTrack> trackMap,

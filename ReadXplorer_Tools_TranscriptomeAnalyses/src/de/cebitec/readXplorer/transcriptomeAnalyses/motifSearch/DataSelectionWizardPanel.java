@@ -22,7 +22,7 @@ public class DataSelectionWizardPanel implements
      * component from this class, just use getComponent().
      */
     private DataSelectionVisualPanel component;
-    private PurposeEnum purpose;
+    private final PurposeEnum purpose;
 
 
     public DataSelectionWizardPanel( PurposeEnum purpose ) {

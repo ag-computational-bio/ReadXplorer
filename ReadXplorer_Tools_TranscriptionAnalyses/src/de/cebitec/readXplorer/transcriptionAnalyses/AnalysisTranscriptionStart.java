@@ -72,7 +72,7 @@ import java.util.Map;
 public class AnalysisTranscriptionStart implements Observer,
                                                    AnalysisI<List<TranscriptionStart>> {
 
-    private TrackConnector trackConnector;
+    private final TrackConnector trackConnector;
     private final ParameterSetTSS parametersTSS;
     private boolean isStrandBothOption;
     private boolean isBothFwdDirection;
@@ -90,8 +90,8 @@ public class AnalysisTranscriptionStart implements Observer,
     private int lastFeatureIdxGenStartsRev;
     private ReferenceConnector refConnector;
 
-    private Map<Integer, Integer> exactReadStartDist = new HashMap<>(); //exact read start distribution
-    private Map<Integer, Integer> exactCovIncPercDist = new HashMap<>(); //exact coverage increase percent distribution
+    private final Map<Integer, Integer> exactReadStartDist = new HashMap<>(); //exact read start distribution
+    private final Map<Integer, Integer> exactCovIncPercDist = new HashMap<>(); //exact coverage increase percent distribution
 
     protected CoverageManager currentCoverage;
     private Map<Integer, PersistentChromosome> chromosomes;

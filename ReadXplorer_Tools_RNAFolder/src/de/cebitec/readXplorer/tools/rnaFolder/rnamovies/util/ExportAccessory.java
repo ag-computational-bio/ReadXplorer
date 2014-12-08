@@ -51,13 +51,13 @@ public class ExportAccessory extends JPanel implements PropertyChangeListener {
     /* create a private instance of a Logger */
     private static final Logger log = Logger.getLogger( ExportAccessory.class.getName() );
 
-    private JSpinner from, to, zoom, steps, fps;
+    private final JSpinner zoom;
 
-    private JTextField w, h;
+    private final JTextField w, h;
 
-    private JCheckBox trans;
+    private final JCheckBox trans;
 
-    private int ws, hs;
+    private final int ws, hs;
 
 
     public ExportAccessory( JFileChooser jfc, int fromVal, int toVal, int size, int ws, int hs ) {

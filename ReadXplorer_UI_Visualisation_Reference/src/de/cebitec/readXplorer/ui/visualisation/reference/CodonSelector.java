@@ -161,7 +161,7 @@ public class CodonSelector extends javax.swing.JPanel {
 
         private static final long serialVersionUID = 1L;
 
-        private String familyId;
+        private final String familyId;
 
 
         /**
@@ -174,7 +174,7 @@ public class CodonSelector extends javax.swing.JPanel {
          * @param the      list of codons, for which check boxes should be
          *                 created.
          */
-        public CodonFamilyPanel( String familyId, String[] codons ) {
+        CodonFamilyPanel( String familyId, String[] codons ) {
             this.familyId = familyId;
             this.updateComponents( codons );
         }

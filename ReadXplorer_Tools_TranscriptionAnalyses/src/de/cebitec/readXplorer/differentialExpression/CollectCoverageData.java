@@ -63,7 +63,7 @@ public class CollectCoverageData implements Observer {
      * located exactly indside the feature positions.
      */
     private final int stopOffset;
-    private ParametersReadClasses readClassParams;
+    private final ParametersReadClasses readClassParams;
 
 
     /**

@@ -31,7 +31,7 @@ import java.util.Enumeration;
  */
 public class LineScanner implements Enumeration<String> {
 
-    private BufferedReader br;
+    private final BufferedReader br;
     private String next;
 
 
@@ -63,7 +63,7 @@ public class LineScanner implements Enumeration<String> {
             do {
                 next = br.readLine();
             }
-            while( next != null && next.trim().equals( "" ) );
+            while( next != null && next.trim().isEmpty( ) );
         }
         catch( IOException e ) {
             next = null;

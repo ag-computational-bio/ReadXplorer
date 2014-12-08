@@ -47,11 +47,11 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
         implements NewJobDialogI {
 
     private static final long serialVersionUID = 776435254;
-    private List<File> mappingFiles2;
-    private ReferenceJob[] refGenJobs;
+    private final List<File> mappingFiles2;
+    private final ReferenceJob[] refGenJobs;
     private final JokToBamDirectParser jokToBamDirectParser;
     private final SamBamParser samBamDirectParser;
-    private MappingParserI[] parsers;
+    private final MappingParserI[] parsers;
     private int distance; //distance of the sequences in a read pair in bp
     private short deviation; //deviation allowed from that distance in %
     private byte orientation; //0 = fr, 1 = rf, 2 = ff/rr

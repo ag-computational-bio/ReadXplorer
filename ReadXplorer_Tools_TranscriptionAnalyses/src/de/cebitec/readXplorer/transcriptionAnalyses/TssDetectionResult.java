@@ -65,7 +65,7 @@ public class TssDetectionResult extends ResultTrackAnalysis<ParameterSetTSS> {
     public static final String TSS_DOWNSTREAM250 = "Distance to downstream feature 101-250 bp";
     public static final int UNUSED_STATISTICS_VALUE = -1;
 
-    private List<TranscriptionStart> results;
+    private final List<TranscriptionStart> results;
     private List<String> promotorRegions;
 
 

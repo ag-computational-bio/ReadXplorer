@@ -41,7 +41,7 @@ import org.biojava.utils.ParserException;
 public class BioJavaGff2IdParser implements IdParserI {
 
 
-    private List<Observer> observers = new ArrayList<>();
+    private final List<Observer> observers = new ArrayList<>();
     private List<String> seqIds;
 
 

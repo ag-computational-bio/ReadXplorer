@@ -128,8 +128,8 @@ public class RNAMovies extends JPanel implements ActionContainer {
         // load actions
         try {
             parser = XMLReaderFactory.createXMLReader();
-            parser.setContentHandler( new ActionXMLHandler( (ActionContainer) this,
-                                                            new Class[]{ this.getClass() },
+            parser.setContentHandler( new ActionXMLHandler( this,
+                                                            new Class<?>[]{ this.getClass() },
                                                             new Object[]{ this } ) );
             parser.parse( new InputSource( actionStream ) );
         }
@@ -255,7 +255,7 @@ public class RNAMovies extends JPanel implements ActionContainer {
             name = ((String) enumer.nextElement()).trim();
         }
 
-        if( name.equals( "" ) ) {
+        if( name.isEmpty( ) ) {
             throw new IllegalArgumentException( "No Movie Data found!" );
         }
 
@@ -279,9 +279,9 @@ public class RNAMovies extends JPanel implements ActionContainer {
         length = sequence.length();
 
         w = h = 0;
-        pairs = new ArrayList<PairTable>( 350 );
-        frames = new ArrayList<Point2D[]>( 350 );
-        sizes = new ArrayList<Dimension>( 350 );
+        pairs = new ArrayList<>( 350 );
+        frames = new ArrayList<>( 350 );
+        sizes = new ArrayList<>( 350 );
         while( enumer.hasMoreElements() ) {
 
             if( struc != null ) {

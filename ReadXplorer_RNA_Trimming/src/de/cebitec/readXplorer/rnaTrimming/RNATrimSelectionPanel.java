@@ -39,7 +39,7 @@ import org.openide.util.HelpCtx;
 class RNATrimSelectionPanel implements
         WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
-    public RNATrimSelectionPanel() {
+    RNATrimSelectionPanel() {
         this.getComponent().addPropertyChangeListener( RNATrimAction.PROP_SOURCEPATH, new PropertyChangeListener() {
 
             @Override

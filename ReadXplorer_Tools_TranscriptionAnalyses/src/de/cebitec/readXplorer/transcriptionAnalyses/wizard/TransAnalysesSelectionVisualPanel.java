@@ -230,7 +230,7 @@ public final class TransAnalysesSelectionVisualPanel extends JobPanel {
      *                         false
      *                         otherwise
      */
-    protected void updateAnalysisSelection( boolean isTssSelected, boolean isOperonSelected, boolean isRpkmSelected ) {
+    void updateAnalysisSelection( boolean isTssSelected, boolean isOperonSelected, boolean isRpkmSelected ) {
         this.transcriptionStartBox.setSelected( isTssSelected );
         this.operonDetectionBox.setSelected( isOperonSelected );
         this.rpkmValuesBox.setSelected( isRpkmSelected );

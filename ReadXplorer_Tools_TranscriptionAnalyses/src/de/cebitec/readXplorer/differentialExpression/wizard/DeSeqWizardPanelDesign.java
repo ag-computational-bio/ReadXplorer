@@ -97,8 +97,7 @@ public class DeSeqWizardPanelDesign implements
             newTracks = true;
         }
         else {
-            for( Iterator<PersistentTrack> it = tmpTracks.iterator(); it.hasNext(); ) {
-                PersistentTrack persistentTrack = it.next();
+            for( PersistentTrack persistentTrack : tmpTracks ) {
                 if( !tracks.contains( persistentTrack ) ) {
                     newTracks = true;
                     break;
@@ -147,7 +146,7 @@ public class DeSeqWizardPanelDesign implements
                 if( currentCell == null ) {
                     throw new WizardValidationException( null, "Please fill out the complete row or remove it.", null );
                 }
-                if( !stringBefore.equals( "" ) && !currentCell.equals( stringBefore ) ) {
+                if( !stringBefore.isEmpty( ) && !currentCell.equals( stringBefore ) ) {
                     differentCondsUsed = true;
                 }
                 rowAsStringArray[i - 1] = currentCell;

@@ -73,7 +73,7 @@ public final class OpenCoverageAnalysisAction implements ActionListener,
 
     private static final String PROP_WIZARD_NAME = "CoverageAnalysisWiz";
     private final ReferenceViewer context;
-    private PersistentReference reference;
+    private final PersistentReference reference;
     private List<PersistentTrack> tracks;
     private Map<Integer, AnalysisCoverage> trackToAnalysisMap;
     private ParameterSetCoverageAnalysis parameters;

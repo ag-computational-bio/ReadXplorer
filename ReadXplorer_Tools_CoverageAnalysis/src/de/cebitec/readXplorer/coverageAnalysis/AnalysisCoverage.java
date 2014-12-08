@@ -38,13 +38,13 @@ public class AnalysisCoverage implements Observer,
                                          AnalysisI<CoverageIntervalContainer> {
 
     private CoverageIntervalContainer intervalContainer;
-    private List<CoverageInterval> intervalsSumOrFwd;
-    private List<CoverageInterval> intervalsRev;
+    private final List<CoverageInterval> intervalsSumOrFwd;
+    private final List<CoverageInterval> intervalsRev;
     private final TrackConnector connector;
     private final ParameterSetCoverageAnalysis parameters;
     private int[] coverageArraySumOrFwd;
     private int[] coverageArrayRev;
-    private List<CoverageInterval> tempIntervals;
+    private final List<CoverageInterval> tempIntervals;
 
 
     /**

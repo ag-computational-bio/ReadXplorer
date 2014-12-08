@@ -17,7 +17,7 @@ import javax.swing.JFileChooser;
  */
 public class SouthPanel extends javax.swing.JPanel {
 
-    private File tmpFile;
+    private final File tmpFile;
 
 
     /**

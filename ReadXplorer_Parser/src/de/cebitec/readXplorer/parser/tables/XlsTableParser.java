@@ -39,9 +39,9 @@ import org.openide.util.Exceptions;
  */
 public class XlsTableParser implements TableParserI {
 
-    private static String name = "Xls Table Parser";
-    private static String[] fileExtension = new String[]{ "xls", "XLS", "Xls" };
-    private static String fileDescription = "Xls table";
+    private static final String name = "Xls Table Parser";
+    private static final String[] fileExtension = new String[]{ "xls", "XLS", "Xls" };
+    private static final String fileDescription = "Xls table";
 
 
     /**

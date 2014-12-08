@@ -213,12 +213,12 @@ public class GnuR extends Rengine {
 
     @Override
     public boolean assign( String string, double[] doubles ) {
-        StringBuilder sb = new StringBuilder( "[" );
+        StringBuilder sb = new StringBuilder().append( '[' );
         for( int i = 0; i < doubles.length; i++ ) {
-            sb.append( doubles[i] ).append( ";" );
+            sb.append( doubles[i] ).append( ';' );
         }
         sb.deleteCharAt( sb.length() - 1 );
-        sb.append( "]" );
+        sb.append( ']' );
         ProcessingLog.getInstance().logGNURoutput( "> assign: \"" + sb.toString() + "\" to variable \"" + string + "\"\n" );
         return super.assign( string, doubles );
     }
@@ -226,12 +226,12 @@ public class GnuR extends Rengine {
 
     @Override
     public boolean assign( String string, int[] ints ) {
-        StringBuilder sb = new StringBuilder( "[" );
+        StringBuilder sb = new StringBuilder().append( '[' );
         for( int i = 0; i < ints.length; i++ ) {
-            sb.append( ints[i] ).append( ";" );
+            sb.append( ints[i] ).append( ';' );
         }
         sb.deleteCharAt( sb.length() - 1 );
-        sb.append( "]" );
+        sb.append( ']' );
         ProcessingLog.getInstance().logGNURoutput( "> assign: \"" + sb.toString() + "\" to variable \"" + string + "\"\n" );
         return super.assign( string, ints );
     }
@@ -239,12 +239,12 @@ public class GnuR extends Rengine {
 
     @Override
     public boolean assign( String string, boolean[] blns ) {
-        StringBuilder sb = new StringBuilder( "[" );
+        StringBuilder sb = new StringBuilder().append( '[' );
         for( int i = 0; i < blns.length; i++ ) {
-            sb.append( blns[i] ).append( ";" );
+            sb.append( blns[i] ).append( ';' );
         }
         sb.deleteCharAt( sb.length() - 1 );
-        sb.append( "]" );
+        sb.append( ']' );
         ProcessingLog.getInstance().logGNURoutput( "> assign: \"" + sb.toString() + "\" to variable \"" + string + "\"\n" );
         return super.assign( string, blns );
     }
@@ -252,12 +252,12 @@ public class GnuR extends Rengine {
 
     @Override
     public boolean assign( String string, String[] strings ) {
-        StringBuilder sb = new StringBuilder( "[" );
-        for( int i = 0; i < strings.length; i++ ) {
-            sb.append( strings[i] ).append( ";" );
+        StringBuilder sb = new StringBuilder().append( '[' );
+        for( String string1 : strings ) {
+            sb.append( string1 ).append( ';' );
         }
         sb.deleteCharAt( sb.length() - 1 );
-        sb.append( "]" );
+        sb.append( ']' );
         ProcessingLog.getInstance().logGNURoutput( "> assign: \"" + sb.toString() + "\" to variable \"" + string + "\"\n" );
         return super.assign( string, strings );
     }

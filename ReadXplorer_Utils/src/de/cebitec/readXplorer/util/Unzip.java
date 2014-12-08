@@ -36,8 +36,8 @@ import java.util.zip.ZipInputStream;
  */
 public class Unzip implements Runnable, Observable {
 
-    private List<Observer> observers = new ArrayList<>();
-    private File zip;
+    private final List<Observer> observers = new ArrayList<>();
+    private final File zip;
     private File to;
 
 
@@ -139,8 +139,7 @@ public class Unzip implements Runnable, Observable {
     @Override
     public void notifyObservers( Object data ) {
         List<Observer> tmpObservers = new ArrayList<>( observers );
-        for( Iterator<Observer> it = tmpObservers.iterator(); it.hasNext(); ) {
-            Observer observer = it.next();
+        for( Observer observer : tmpObservers ) {
             observer.update( data );
         }
     }

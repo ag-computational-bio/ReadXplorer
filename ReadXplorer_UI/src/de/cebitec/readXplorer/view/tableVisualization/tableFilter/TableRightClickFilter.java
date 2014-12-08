@@ -55,7 +55,7 @@ import org.openide.util.NbBundle;
  */
 public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAdapter {
 
-    private JPopupMenu popup = new JPopupMenu();
+    private final JPopupMenu popup = new JPopupMenu();
     private JTable lastTable;
     /**
      * Stores the original TableModel.
@@ -191,9 +191,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
                     input = input.replace( ",", "." );
                     try {
                         Double cutoff = Double.parseDouble( input );
-                        E newModel = filterValuesSmallerThan(
-                                (E) lastTable.getModel(), cutoff, lastSelectedColumn );
-                        setNewTableModel( newModel );
+                        setNewTableModel( filterValuesSmallerThan( (E) lastTable.getModel(), cutoff, lastSelectedColumn ) );
                     }
                     catch( NumberFormatException nfe ) {
                         JOptionPane.showMessageDialog( null, "Please insert a valid number value." );
@@ -214,9 +212,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
                     input = input.replace( ",", "." );
                     try {
                         Double cutoff = Double.parseDouble( input );
-                        E newModel = filterValuesLargerThan(
-                                (E) lastTable.getModel(), cutoff, lastSelectedColumn );
-                        setNewTableModel( newModel );
+                        setNewTableModel( filterValuesLargerThan( (E) lastTable.getModel(), cutoff, lastSelectedColumn ) );
                     }
                     catch( NumberFormatException nfe ) {
                         JOptionPane.showMessageDialog( null, "Please insert a valid value." );
@@ -236,8 +232,7 @@ public class TableRightClickFilter<E extends DefaultTableModel> extends MouseAda
                 if( input != null ) {
                     try {
                         Pattern.compile( input );
-                        E newModel = filterRegExp( (E) lastTable.getModel(), input, lastSelectedColumn );
-                        setNewTableModel( newModel );
+                        setNewTableModel( filterRegExp( (E) lastTable.getModel(), input, lastSelectedColumn ) );
                     }
                     catch( PatternSyntaxException pse ) {
                         JOptionPane.showMessageDialog( null, "Please enter a valid pattern." );

@@ -44,10 +44,10 @@ import java.util.Set;
  */
 public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
 
-    private TrackConnector trackConnector;
-    private List<RPKMvalue> rpkmValues;
-    private List<PersistentFeature> genomeFeatures;
-    private HashMap<Integer, RPKMvalue> featureReadCount;
+    private final TrackConnector trackConnector;
+    private final List<RPKMvalue> rpkmValues;
+    private final List<PersistentFeature> genomeFeatures;
+    private final HashMap<Integer, RPKMvalue> featureReadCount;
     private double totalMappedReads = 0;
 
     private int lastMappingIdx;

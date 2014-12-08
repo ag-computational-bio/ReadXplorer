@@ -25,12 +25,12 @@ import java.util.Map;
 public class TypeWrapper {
 
     private Object obj;
-    private Map<String, String> attributes;
+    private final Map<String, String> attributes;
 
 
     public TypeWrapper( Object obj ) {
         this.obj = obj;
-        attributes = new HashMap<String, String>();
+        attributes = new HashMap<>();
     }
 
 

@@ -49,9 +49,9 @@ public class DoubleTrackViewer extends TrackViewer {
 
     private static final long serialVersionUID = 572406471;
 
-    private List<Integer> trackIDs;
-    private int id1;
-    private int id2;
+    private final List<Integer> trackIDs;
+    private final int id1;
+    private final int id2;
     private List<Classification> visibleClasses;
 
     //   public static final String PROP_TRACK_CLICKED = "track clicked";

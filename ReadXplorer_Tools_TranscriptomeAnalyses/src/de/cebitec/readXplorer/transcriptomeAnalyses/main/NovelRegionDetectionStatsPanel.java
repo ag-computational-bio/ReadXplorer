@@ -14,7 +14,7 @@ import org.openide.util.NbBundle;
 public class NovelRegionDetectionStatsPanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
-    private HashMap<String, Object> statisticsMap;
+    private final HashMap<String, Object> statisticsMap;
 
 
     /**
@@ -115,7 +115,7 @@ public class NovelRegionDetectionStatsPanel extends javax.swing.JPanel {
                     NbBundle.getMessage( NovelRegionDetectionStatsPanel.class, "TssDetectionStatsPanel.tssDetectionStatsTable.columnModel.title1" )
                 } ) {
                     private static final long serialVersionUID = 1L;
-                    Class[] types = new Class[]{
+                    Class<?>[] types = new Class<?>[]{
                         java.lang.String.class, java.lang.String.class
                     };
                     boolean[] canEdit = new boolean[]{
@@ -124,7 +124,7 @@ public class NovelRegionDetectionStatsPanel extends javax.swing.JPanel {
 
 
                     @Override
-                    public Class getColumnClass( int columnIndex ) {
+                    public Class<?> getColumnClass( int columnIndex ) {
                         return types[columnIndex];
                     }
 

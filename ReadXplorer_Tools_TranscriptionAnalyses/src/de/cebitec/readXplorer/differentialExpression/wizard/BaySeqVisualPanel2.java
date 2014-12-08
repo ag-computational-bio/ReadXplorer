@@ -29,7 +29,7 @@ import javax.swing.JPanel;
 public final class BaySeqVisualPanel2 extends JPanel {
 
     private List<PersistentTrack> selectedTracks = new ArrayList<>();
-    private DefaultListModel<PersistentTrack> trackListModel = new DefaultListModel<>();
+    private final DefaultListModel<PersistentTrack> trackListModel = new DefaultListModel<>();
     private int[] replicateStructure = new int[1];
     private int currentReplicateNumber = 1;
 
@@ -59,8 +59,7 @@ public final class BaySeqVisualPanel2 extends JPanel {
 
     private void resetTrackList() {
         trackListModel.clear();
-        for( Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext(); ) {
-            PersistentTrack persistentTrack = it.next();
+        for( PersistentTrack persistentTrack : selectedTracks ) {
             trackListModel.addElement( persistentTrack );
             replicateStructure = new int[1];
             replicateStructureField.setText( "" );

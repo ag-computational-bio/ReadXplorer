@@ -178,7 +178,7 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
 
 
     public boolean hasStrand() {
-        return strand != null && strand.intValue() != 0;
+        return strand != null && strand != 0;
     }
 
 

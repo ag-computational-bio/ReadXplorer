@@ -71,7 +71,7 @@ public class SamUtils implements Observable {
     public static final String EXTENDED_STRING = "_extended";
     public static final String COMBINED_STRING = "_combined";
 
-    private List<Observer> observers;
+    private final List<Observer> observers;
 
 
     /**

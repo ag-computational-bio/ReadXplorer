@@ -30,10 +30,10 @@ import java.util.Iterator;
 public class FeatureFilter {
 
     // valid feature if one of the whitelist rules is applied
-    private ArrayList<FilterRuleI> whitelist;
+    private final ArrayList<FilterRuleI> whitelist;
     // valid features have to apply all blacklist rules
     // e.g. o FilterRuleCDS added to the blacklist means, that a CDS Type feature is not accepted
-    private ArrayList<FilterRuleI> blacklist;
+    private final ArrayList<FilterRuleI> blacklist;
 
 
     public FeatureFilter() {

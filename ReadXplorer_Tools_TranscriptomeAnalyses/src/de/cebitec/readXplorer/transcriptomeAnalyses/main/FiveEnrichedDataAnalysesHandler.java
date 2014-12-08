@@ -52,7 +52,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements
     private ResultPanelTranscriptionStart transcriptionStartResultPanel;
     private final ReferenceViewer refViewer;
     private final TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
-    private Map<Integer, PersistentTrack> trackMap;
+    private final Map<Integer, PersistentTrack> trackMap;
     private ProgressHandle progressHandleParsingFeatures;
     /**
      * Key: featureID , Value: PersistentFeature

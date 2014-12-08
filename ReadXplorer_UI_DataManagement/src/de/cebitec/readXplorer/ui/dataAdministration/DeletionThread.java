@@ -46,11 +46,11 @@ import org.openide.windows.InputOutput;
  */
 public class DeletionThread extends SwingWorker<Object, Object> {
 
-    private List<ReferenceJob> references;
-    private List<TrackJob> tracks;
-    private Set<ReferenceJob> invalidGens;
-    private InputOutput io;
-    private ProgressHandle ph;
+    private final List<ReferenceJob> references;
+    private final List<TrackJob> tracks;
+    private final Set<ReferenceJob> invalidGens;
+    private final InputOutput io;
+    private final ProgressHandle ph;
     private int workunits;
 
 
@@ -92,8 +92,7 @@ public class DeletionThread extends SwingWorker<Object, Object> {
         if( !tracks.isEmpty() ) {
             io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.start.track" ) + ":" );
             ph.progress( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.progress.track" ), workunits );
-            for( Iterator<TrackJob> it = tracks.iterator(); it.hasNext(); ) {
-                TrackJob t = it.next();
+            for( TrackJob t : tracks ) {
                 ph.progress( ++workunits );
                 try {
                     ProjectConnector.getInstance().deleteTrack( t.getID() );
@@ -114,8 +113,7 @@ public class DeletionThread extends SwingWorker<Object, Object> {
         if( !references.isEmpty() ) {
             io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.start.ref" ) + ":" );
             ph.progress( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.progress.ref" ), workunits );
-            for( Iterator<ReferenceJob> it = references.iterator(); it.hasNext(); ) {
-                ReferenceJob r = it.next();
+            for( ReferenceJob r : references ) {
                 ph.progress( ++workunits );
                 if( invalidGens.contains( r ) ) {
                     io.getOut().println( NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.error.before" ) + " \"" + r.getDescription() + "\" " + NbBundle.getMessage( DeletionThread.class, "MSG_DeletionThread.deletion.error.after" ) );

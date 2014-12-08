@@ -21,8 +21,8 @@ import javax.swing.border.Border;
  */
 public class IntegerVerifier extends InputVerifier {
 
-    private JTextField tf;
-    private Border border;
+    private final JTextField tf;
+    private final Border border;
 
 
     public IntegerVerifier( JComponent comp ) {

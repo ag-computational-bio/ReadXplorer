@@ -53,16 +53,16 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     private static final long serialVersionUID = 1L;
 
     private final GnuROptionsPanelController controller;
-    private Preferences pref;
+    private final Preferences pref;
     private Downloader downloader;
     private Unzip unzip;
     private File zipFile;
-    private String user_dir = System.getProperty( "netbeans.user" );
-    private File r_dir = new File( user_dir + File.separator + "R" );
+    private final String user_dir = System.getProperty( "netbeans.user" );
+    private final File r_dir = new File( user_dir + File.separator + "R" );
     private static final String SOURCE_URI = "R.tar.gz";
     private static final String R_ZIP = "R.zip";
     private static final String DEFAULT_CRAN_MIRROR = "ftp://ftp.cebitec.uni-bielefeld.de/pub/readxplorer_repo/R/";
-    private String license = "		    GNU GENERAL PUBLIC LICENSE\n"
+    private final String license = "		    GNU GENERAL PUBLIC LICENSE\n"
                              + "		       Version 2, June 1991\n"
                              + "\n"
                              + " Copyright (C) 1989, 1991 Free Software Foundation, Inc.\n"

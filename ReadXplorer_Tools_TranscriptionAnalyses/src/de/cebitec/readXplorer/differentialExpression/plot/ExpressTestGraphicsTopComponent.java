@@ -111,8 +111,7 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended
         this.usedTool = usedTool;
         results = analysisHandler.getResults();
         List<String> descriptions = new ArrayList<>();
-        for( Iterator<ResultDeAnalysis> it = results.iterator(); it.hasNext(); ) {
-            ResultDeAnalysis currentResult = it.next();
+        for( ResultDeAnalysis currentResult : results ) {
             descriptions.add( currentResult.getDescription() );
         }
         cbmDataSet = new DefaultComboBoxModel<>( descriptions.toArray( new String[descriptions.size()] ) );
@@ -396,7 +395,7 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended
 
         MA_Plot( "MA Plot" ), RatioAB_Confidence( "Ratio A/B against Confidence" ),
         RatioBA_Confidence( "Ratio B/A against Confidence" );
-        private String name;
+        private final String name;
 
 
         private PlotTypes( String name ) {

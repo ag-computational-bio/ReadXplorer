@@ -15,7 +15,7 @@ public class RpkmStatsPanel extends javax.swing.JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    private HashMap<String, Integer> returnedFeaturesStatsMap;
+    private final HashMap<String, Integer> returnedFeaturesStatsMap;
 
 
     /**
@@ -93,10 +93,10 @@ public class RpkmStatsPanel extends javax.swing.JPanel {
 
 
     private void initAdditionalComponents() {
-        double mappingCount = (double) this.returnedFeaturesStatsMap.get( ResultPanelTranscriptionStart.MAPPINGS_COUNT );
-        double meanMappingLength = (double) this.returnedFeaturesStatsMap.get( ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH );
-        double mappingsPerMio = (double) this.returnedFeaturesStatsMap.get( ResultPanelTranscriptionStart.MAPPINGS_MILLION );
-        double backgroundThreshold = (double) this.returnedFeaturesStatsMap.get( ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_STACKSIZE );
+        double mappingCount = this.returnedFeaturesStatsMap.get( ResultPanelTranscriptionStart.MAPPINGS_COUNT );
+        double meanMappingLength = this.returnedFeaturesStatsMap.get( ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH );
+        double mappingsPerMio = this.returnedFeaturesStatsMap.get( ResultPanelTranscriptionStart.MAPPINGS_MILLION );
+        double backgroundThreshold = this.returnedFeaturesStatsMap.get( ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_STACKSIZE );
         returnedFeatureStatsTable.setModel( new javax.swing.table.DefaultTableModel(
                 new Object[][]{
                     { ResultPanelRPKM.RETURNED_FEATURES, this.returnedFeaturesStatsMap.get( ResultPanelRPKM.RETURNED_FEATURES ) },
@@ -115,7 +115,7 @@ public class RpkmStatsPanel extends javax.swing.JPanel {
                     NbBundle.getMessage( RpkmStatsPanel.class, "RpkmStatsPanel.returnedFeatureStatsTable.columnModel.title1" )
                 } ) {
                     private static final long serialVersionUID = 1L;
-                    Class[] types = new Class[]{
+                    Class<?>[] types = new Class<?>[]{
                         java.lang.String.class, java.lang.String.class
                     };
                     boolean[] canEdit = new boolean[]{
@@ -124,7 +124,7 @@ public class RpkmStatsPanel extends javax.swing.JPanel {
 
 
                     @Override
-                    public Class getColumnClass( int columnIndex ) {
+                    public Class<?> getColumnClass( int columnIndex ) {
                         return types[columnIndex];
                     }
 
