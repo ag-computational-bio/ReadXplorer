@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Kai Bernd Stadermann <kstaderm at cebitec.uni-bielefeld.de>
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package de.cebitec.readXplorer.differentialExpression;
 
 //package de.cebitec.readXplorer.differentialExpression;
@@ -172,9 +173,9 @@ package de.cebitec.readXplorer.differentialExpression;
 //        analysisData.setSelectedTracks(new ArrayList<>(selectedTracks));
 //        for (Iterator<List<Integer>> it = allCountData.iterator(); it.hasNext();) {
 //            List<Integer> current = it.next();
-//            analysisData.addCountDataForTrack(current.toArray(new Integer[current.size()]));            
+//            analysisData.addCountDataForTrack(current.toArray(new Integer[current.size()]));
 //        }
-//        
+//
 //        List result=new ArrayList();
 //        try {
 //            result = instance.process(analysisData, numberOfFeatures, numberOfTracks, saveFile);
@@ -182,33 +183,33 @@ package de.cebitec.readXplorer.differentialExpression;
 //            Exceptions.printStackTrace(ex);
 //        }
 //        assertEquals(expResult, result.size());
-//        
+//
 //        expResult = 3;
 //        analysisData = new DeSeqAnalysisData(tracks.size(), new HashMap<>(TwoFactorDesign), false, new ArrayList<>(fit1), new ArrayList<>(fit2), false);
 //        analysisData.setLoci(loci.toArray(new String[loci.size()]));
-//        
+//
 //        List<PersistentTrack> selectedTracksTwoFactor = new ArrayList<>();
-//        
+//
 //        List<Integer> current = allCountData.get(2);
-//        analysisData.addCountDataForTrack(current.toArray(new Integer[current.size()])); 
+//        analysisData.addCountDataForTrack(current.toArray(new Integer[current.size()]));
 //        Timestamp currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
 //        selectedTracksTwoFactor.add(new PersistentTrack(2, "", tracks.get(2), currentTimestamp, 0, 0));
-//        
+//
 //        current = allCountData.get(3);
 //        analysisData.addCountDataForTrack(current.toArray(new Integer[current.size()]));
 //        currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
 //        selectedTracksTwoFactor.add(new PersistentTrack(3, "", tracks.get(3), currentTimestamp, 0, 0));
-//        
+//
 //        current = allCountData.get(5);
-//        analysisData.addCountDataForTrack(current.toArray(new Integer[current.size()])); 
+//        analysisData.addCountDataForTrack(current.toArray(new Integer[current.size()]));
 //        currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
 //        selectedTracksTwoFactor.add(new PersistentTrack(5, "", tracks.get(5), currentTimestamp, 0, 0));
-//        
+//
 //        current = allCountData.get(6);
-//        analysisData.addCountDataForTrack(current.toArray(new Integer[current.size()]));  
+//        analysisData.addCountDataForTrack(current.toArray(new Integer[current.size()]));
 //        currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
 //        selectedTracksTwoFactor.add(new PersistentTrack(6, "", tracks.get(6), currentTimestamp, 0, 0));
-//        
+//
 //        analysisData.setSelectedTracks(selectedTracksTwoFactor);
 //        try {
 //            result = instance.process(analysisData, numberOfFeatures, numberOfTracks, null);

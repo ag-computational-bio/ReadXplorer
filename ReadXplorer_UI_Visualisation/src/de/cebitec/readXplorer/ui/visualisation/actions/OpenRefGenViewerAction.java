@@ -14,12 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package de.cebitec.readXplorer.ui.visualisation.actions;
 
 
 import de.cebitec.readXplorer.api.cookies.LoginCookie;
-import de.cebitec.readXplorer.view.controller.ViewController;
 import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
+import de.cebitec.readXplorer.view.controller.ViewController;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 

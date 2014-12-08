@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package de.cebitec.readXplorer.dashboard;
 
 
-import de.cebitec.readXplorer.view.controller.ViewController;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
@@ -25,6 +25,7 @@ import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readXplorer.view.TopComponentExtended;
+import de.cebitec.readXplorer.view.controller.ViewController;
 import de.cebitec.readXplorer.view.dialogMenus.explorer.CustomOutlineCellRenderer;
 import de.cebitec.readXplorer.view.dialogMenus.explorer.StandardItem;
 import de.cebitec.readXplorer.view.dialogMenus.explorer.StandardNode;

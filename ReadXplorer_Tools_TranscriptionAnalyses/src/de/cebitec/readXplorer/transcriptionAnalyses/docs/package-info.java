@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 @HelpSetRegistration( helpSet = "transcriptionAnalyses-hs.xml", position = 3305 )
 package de.cebitec.readXplorer.transcriptionAnalyses.docs;
 

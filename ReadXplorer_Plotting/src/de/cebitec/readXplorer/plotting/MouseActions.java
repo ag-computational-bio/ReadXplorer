@@ -14,13 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package de.cebitec.readXplorer.plotting;
 
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.readXplorer.view.controller.ViewController;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
+import de.cebitec.readXplorer.view.controller.ViewController;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import java.awt.Point;
 import java.util.Collection;

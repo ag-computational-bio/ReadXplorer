@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 @HelpSetRegistration( helpSet = "importer-hs.xml", position = 3952 )
 package de.cebitec.readXplorer.ui.importer.docs;
 

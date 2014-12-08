@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 @HelpSetRegistration( helpSet = "rnaFolder-hs.xml", position = 3379 )
 package de.cebitec.readXplorer.tools.rnaFolder.docs;
 

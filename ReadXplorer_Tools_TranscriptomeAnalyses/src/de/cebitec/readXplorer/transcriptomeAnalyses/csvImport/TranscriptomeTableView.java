@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 package de.cebitec.readXplorer.transcriptomeAnalyses.csvImport;
 
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.readXplorer.view.controller.ViewController;
 import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
@@ -41,6 +41,7 @@ import de.cebitec.readXplorer.ui.importer.TranscriptomeTableViewI;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.view.analysis.ResultTablePanel;
+import de.cebitec.readXplorer.view.controller.ViewController;
 import java.awt.HeadlessException;
 import java.util.ArrayList;
 import java.util.Collection;

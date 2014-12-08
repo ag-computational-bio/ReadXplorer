@@ -1,13 +1,14 @@
+
 package de.cebitec.readxplorer.vcf.importer;
 
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readXplorer.api.cookies.LoginCookie;
-import de.cebitec.readXplorer.view.controller.ViewController;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.readXplorer.util.VisualisationUtils;
+import de.cebitec.readXplorer.view.controller.ViewController;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.BasePanelFactory;
 import de.cebitec.readxplorer.vcf.visualization.Snp_VcfResult;

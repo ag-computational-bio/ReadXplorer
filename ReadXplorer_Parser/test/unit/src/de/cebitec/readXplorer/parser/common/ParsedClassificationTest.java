@@ -14,19 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package de.cebitec.readXplorer.parser.common;
 
 
-import de.cebitec.readXplorer.parser.common.ParsedClassification;
 import net.sf.samtools.SAMFileHeader;
 import org.junit.After;
 import org.junit.AfterClass;
-
-import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import static org.junit.Assert.assertTrue;
 
 
 /**

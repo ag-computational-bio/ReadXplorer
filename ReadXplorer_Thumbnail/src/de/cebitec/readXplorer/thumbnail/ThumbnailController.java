@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package de.cebitec.readXplorer.thumbnail;
 
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.readXplorer.view.controller.ViewController;
 import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException;
 import de.cebitec.readXplorer.databackend.connector.MultiTrackConnector;
@@ -34,6 +34,7 @@ import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.view.TopComponentHelper;
+import de.cebitec.readXplorer.view.controller.ViewController;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.IThumbnailView;

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
  *
  * This program is free software: you can redistribute it and/or modify
@@ -14,6 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package de.cebitec.readXplorer.parser.reference;
 
 //package de.cebitec.readXplorer.parser.reference;
@@ -52,12 +53,12 @@ package de.cebitec.readXplorer.parser.reference;
 // * @author -Rolf Hilker-
 // */
 //public class BioJavaToBedConverter {
-//    
+//
 //        /** Use this for initializing an embl parser. */
 //    public static final int EMBL = 1;
 //    /** Use this for initializing a genbank parser. */
 //    public static final int GENBANK = 2;
-//    
+//
 //     // Fileextension used by Filechooser to choose files to be parsed by this parser
 //    private static final String[] fileExtensionEmbl = new String[]{"embl"};
 //    private static final String[] fileExtensionGbk = new String[]{"gbk", "gb", "genbank"};
@@ -66,23 +67,23 @@ package de.cebitec.readXplorer.parser.reference;
 //    private static final String parserNameGbk = "BioJava GenBank";
 //    private static final String fileDescriptionEmbl = "EMBL file";
 //    private static final String fileDescriptionGbk = "GenBank file";
-//    
+//
 //    private String[] fileExtension;
 //    private String parserName;
 //    private String fileDescription;
-//    
+//
 //    private final RichSequenceFormat seqFormat;
-//    
+//
 //    private ArrayList<Observer> observers = new ArrayList<Observer>();
 //    private String errorMsg;
-//    
+//
 //    public BioJavaToBedConverter(int type) {
 //        if (type == BioJavaParser.EMBL){
 //            this.fileExtension = fileExtensionEmbl;
 //            this.parserName = parserNameEmbl;
 //            this.fileDescription = fileDescriptionEmbl;
 //            this.seqFormat = new EMBLFormat();
-//            
+//
 //        } else { //for your info: if (type == BioJavaParser.GENBANK){
 //            this.fileExtension = fileExtensionGbk;
 //            this.parserName = parserNameGbk;
@@ -93,8 +94,8 @@ package de.cebitec.readXplorer.parser.reference;
 //
 //    @Override
 //    public void convertReference(ReferenceJob referenceJob, FeatureFilter filter) throws ParsingException {
-//        
-//        
+//
+//
 //        outf = open('test/annotation/vitis_vinifera.bed', 'w')
 //    header = """track name=vitVinGenes description="V. vinifera cpdna genes" itemRgb=On\n"""
 //    outf.write(header)
@@ -115,7 +116,7 @@ package de.cebitec.readXplorer.parser.reference;
 //                bed_line = "cpdna\t{0}\t{1}\t{2}\t1000\t{3}\t{0}\t{1}\t65,105,225\n".format(start, stop, name, strand)
 //                outf.write(bed_line)
 //    outf.close()
-//                
+//
 //        refGenome.setFeatureFilter(filter);
 //        //at first store all eonxs in one data structure and add them to the ref genome at the end
 //        List<ParsedFeature> exons = new ArrayList<ParsedFeature>();
@@ -137,7 +138,7 @@ package de.cebitec.readXplorer.parser.reference;
 //                try {
 //                    seq = seqIter.nextRichSequence();
 ////                    this.sendErrorMsg("rich seq set");
-//                    
+//
 //                    out.append("track name=" + referenceJob.getName() + " description=" + referenceJob.getDescription() + "\n");
 //                    refGenome.setDescription(referenceJob.getDescription());
 //                    refGenome.setName(referenceJob.getName());
@@ -165,7 +166,7 @@ package de.cebitec.readXplorer.parser.reference;
 //                        start = location.getMin();
 //                        stop = location.getMax();
 //                        if (start > stop) {
-//                            this.sendErrorMsg("Start bigger than stop in " + referenceJob.getFile().getAbsolutePath() 
+//                            this.sendErrorMsg("Start bigger than stop in " + referenceJob.getFile().getAbsolutePath()
 //                                    + ". Found start: " + start + ", stop: " + stop + ". Feature ignored.");
 //                            continue;
 //                        }
@@ -198,7 +199,7 @@ package de.cebitec.readXplorer.parser.reference;
 //                            }
 //                        }
 //
-//                        /* 
+//                        /*
 //                         * If the type of the annotation is unknown to readXplorer (see below),
 //                         * an undefined type is used.
 //                         */
@@ -226,14 +227,14 @@ package de.cebitec.readXplorer.parser.reference;
 //                        } else if (parsedType.equalsIgnoreCase("exon")) {
 //                            type = FeatureType.EXON;
 //                            System.out.println("exon found"); //if exon is within range of lastGene = belongs to it
-//                            
+//
 //                            exons.add(new ParsedFeature(type, start, stop, strand, locusTag, product, ecNumber, geneName, subFeatures));
 //                            continue;
 //                        } else {
 //                            this.sendErrorMsg(referenceJob.getFile().getName()
 //                                    + ": Using unknown annotation type for " + parsedType);
 //                        }
-//                        
+//
 //
 //                        /*
 //                         * for eukaryotic organism its important to see the single cds/exons
@@ -279,7 +280,7 @@ package de.cebitec.readXplorer.parser.reference;
 //        }
 //        refGenome.addSubFeatures(exons);
 //        return refGenome;
-//        
+//
 //    }
 //    @Override
 //    public String getParserName() {
@@ -310,7 +311,7 @@ package de.cebitec.readXplorer.parser.reference;
 //    public void notifyObservers(Object data) {
 //        throw new UnsupportedOperationException("Not supported yet.");
 //    }
-//    
-//    
-//    
+//
+//
+//
 //}
