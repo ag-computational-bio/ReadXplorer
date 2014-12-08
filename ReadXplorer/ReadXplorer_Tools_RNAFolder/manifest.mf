@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+OpenIDE-Module: de.cebitec.readXplorer.tools.rnaFolder
+OpenIDE-Module-Layer: de/cebitec/readXplorer/tools/rnaFolder/layer.xml
+OpenIDE-Module-Localizing-Bundle: de/cebitec/readXplorer/tools/rnaFolder/Bundle.properties
+OpenIDE-Module-Requires: org.openide.windows.WindowManager
+OpenIDE-Module-Specification-Version: 1.0.1
+
