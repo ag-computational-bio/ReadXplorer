@@ -1,20 +1,14 @@
-build/
-dist/
+# Created by https://www.gitignore.io
+
+### Java ###
+*.class
+
+### NetBeans ###
 nbproject/private/
-private/
-*.orig
-*.orig/
-*.chg/
-*.rej
-*.conflict/
-syntax: glob
-*.DS_Store
-jreMac
-jre64.exe
-jre386.exe
-jre8_x86.exe
-R.zip
-unzipsfx64.exe
-unzipsfx32.exe
-jre7u67x86.exe
-jre7u67x64.exe
+build/
+nbbuild/
+dist/
+nbdist/
+nbactions.xml
+nb-configuration.xml
+
