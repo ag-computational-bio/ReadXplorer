@@ -18,7 +18,7 @@ package de.cebitec.readXplorer.differentialExpression;
 
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.readXplorer.controller.ViewController;
+import de.cebitec.readXplorer.view.controller.ViewController;
 import de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler.AnalysisStatus;
 import de.cebitec.readXplorer.differentialExpression.plot.BaySeqGraphicsTopComponent;
 import de.cebitec.readXplorer.differentialExpression.plot.DeSeq2GraphicsTopComponent;

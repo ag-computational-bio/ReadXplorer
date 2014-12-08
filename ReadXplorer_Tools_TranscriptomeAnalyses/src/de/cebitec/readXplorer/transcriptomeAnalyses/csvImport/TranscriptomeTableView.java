@@ -7,7 +7,7 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.csvImport;
 
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.readXplorer.controller.ViewController;
+import de.cebitec.readXplorer.view.controller.ViewController;
 import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;

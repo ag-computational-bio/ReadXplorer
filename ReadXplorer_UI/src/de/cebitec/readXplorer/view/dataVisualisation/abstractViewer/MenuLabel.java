@@ -65,8 +65,8 @@ public class MenuLabel extends JLabel implements Observer, Observable {
         this.observers = new ArrayList<>();
         this.associatedPanel = associatedPanel;
         isShowingLabel = false;
-        expandIcon = new ImageIcon( this.getClass().getClassLoader().getResource( "de/cebitec/readXplorer/resources/expandIcon.png" ) );
-        collapseIcon = new ImageIcon( this.getClass().getClassLoader().getResource( "de/cebitec/readXplorer/resources/collapseIcon.png" ) );
+        expandIcon = new ImageIcon( this.getClass().getClassLoader().getResource( "de/cebitec/readXplorer/view/resources/expandIcon.png" ) );
+        collapseIcon = new ImageIcon( this.getClass().getClassLoader().getResource( "de/cebitec/readXplorer/view/resources/collapseIcon.png" ) );
         this.setIcon( expandIcon );
 
         this.addMouseListener( new MouseListener() {

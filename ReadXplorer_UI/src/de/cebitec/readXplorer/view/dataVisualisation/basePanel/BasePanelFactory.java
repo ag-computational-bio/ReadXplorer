@@ -17,7 +17,7 @@
 package de.cebitec.readXplorer.view.dataVisualisation.basePanel;
 
 
-import de.cebitec.readXplorer.controller.ViewController;
+import de.cebitec.readXplorer.view.controller.ViewController;
 import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;

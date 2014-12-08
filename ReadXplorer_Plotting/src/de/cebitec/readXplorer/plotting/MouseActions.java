@@ -18,7 +18,7 @@ package de.cebitec.readXplorer.plotting;
 
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.readXplorer.controller.ViewController;
+import de.cebitec.readXplorer.view.controller.ViewController;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;

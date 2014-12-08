@@ -186,9 +186,9 @@
                 </test-type>
             </test-dependencies>
             <public-packages>
-                <package>de.cebitec.readXplorer.controller</package>
                 <package>de.cebitec.readXplorer.view</package>
                 <package>de.cebitec.readXplorer.view.analysis</package>
+                <package>de.cebitec.readXplorer.view.controller</package>
                 <package>de.cebitec.readXplorer.view.dataVisualisation</package>
                 <package>de.cebitec.readXplorer.view.dataVisualisation.abstractViewer</package>
                 <package>de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer</package>
