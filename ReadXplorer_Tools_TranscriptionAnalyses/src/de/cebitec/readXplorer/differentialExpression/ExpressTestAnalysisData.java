@@ -18,9 +18,6 @@
 package de.cebitec.readXplorer.differentialExpression;
 
 
-import java.util.List;
-
-
 /**
  *
  * @author kstaderm
@@ -30,11 +27,11 @@ public class ExpressTestAnalysisData extends DeAnalysisData {
     private final int[] groupA;
     private final int[] groupB;
     private final boolean workingWithoutReplicates;
-    private final List<Integer> normalizationFeatures;
+    private final int[] normalizationFeatures;
 
 
     public ExpressTestAnalysisData( int capacity, int[] groupA, int[] groupB,
-                                    boolean workingWithoutReplicates, List<Integer> normalizationFeatures ) {
+                                    boolean workingWithoutReplicates, int[] normalizationFeatures ) {
         super( capacity );
         this.groupA = groupA;
         this.groupB = groupB;
@@ -58,7 +55,7 @@ public class ExpressTestAnalysisData extends DeAnalysisData {
     }
 
 
-    public List<Integer> getNormalizationFeatures() {
+    public int[] getNormalizationFeatures() {
         return normalizationFeatures;
     }
 

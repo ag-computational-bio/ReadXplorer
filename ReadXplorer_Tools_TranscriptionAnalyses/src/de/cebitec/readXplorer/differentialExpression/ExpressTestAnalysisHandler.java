@@ -71,11 +71,12 @@ public class ExpressTestAnalysisHandler extends DeAnalysisHandler implements
     public ExpressTestAnalysisHandler( List<PersistentTrack> selectedTracks,
                                        int[] groupA, int[] groupB, Integer refGenomeID, boolean workingWithoutReplicates,
                                        File saveFile, Set<FeatureType> selectedFeatures, int startOffset, int stopOffset,
-                                       ParametersReadClasses readClassParams, List<Integer> normalizationFeatures ) {
+                                       ParametersReadClasses readClassParams, int[] normalizationFeatures ) {
+
         super( selectedTracks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams );
-        expressTestAnalysisData = new ExpressTestAnalysisData( selectedTracks.size(),
-                                                               groupA, groupB, workingWithoutReplicates, normalizationFeatures );
+        expressTestAnalysisData = new ExpressTestAnalysisData( selectedTracks.size(), groupA, groupB, workingWithoutReplicates, normalizationFeatures );
         expressTestAnalysisData.setSelectedTracks( selectedTracks );
+
     }
 
 
@@ -90,7 +91,7 @@ public class ExpressTestAnalysisHandler extends DeAnalysisHandler implements
         et.addObserver( this );
         PersistentFeature[] regionNames = expressTestAnalysisData.getFeatures();
         int[] start = expressTestAnalysisData.getStart();
-        int[] stop = expressTestAnalysisData.getStop();
+        int[] stop  = expressTestAnalysisData.getStop();
         int[] indexA = expressTestAnalysisData.getGroupA();
         int[] indexB = expressTestAnalysisData.getGroupB();
         int[][] groupA = new int[indexA.length][];
@@ -129,17 +130,17 @@ public class ExpressTestAnalysisHandler extends DeAnalysisHandler implements
         }
 
         return results;
+
     }
 
 
     @Override
     public void update( ExpressTestI origin, ExpressTestStatus status ) {
         if( status == ExpressTestStatus.FINISHED ) {
-            ArrayList<ResultDeAnalysis> tmpRes = new ArrayList<>();
+            List<ResultDeAnalysis> tmpRes = new ArrayList<>();
             tmpRes.add( new ResultDeAnalysis( origin.getResults(), origin.getColumnNames(), origin.getRowNames(), "result" ) );
             tmpRes.add( new ResultDeAnalysis( origin.getResultsNormalized(), origin.getColumnNames(), origin.getRowNames(), "normalized result" ) );
-            results = new ArrayList<>();
-            results.addAll( tmpRes );
+            results = tmpRes;
         }
     }
 

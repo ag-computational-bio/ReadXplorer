@@ -165,8 +165,7 @@ public class DeAnalysisData {
         PersistentFeature[] features = new PersistentFeature[featureData.keySet().size()];
         int i = 0;
         for( Iterator<String> it = featureData.keySet().iterator(); it.hasNext(); i++ ) {
-            String key = it.next();
-            features[i] = featureData.get( key );
+            features[i] = featureData.get( it.next() );
         }
         return features;
     }

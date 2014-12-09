@@ -95,7 +95,7 @@ public final class DiffExpressionWizardIterator implements
      * @param e
      */
     @Override
-    @SuppressWarnings( "unchecked" )
+    @SuppressWarnings( { "unchecked", "unchecked" } )
     public void actionPerformed( ActionEvent e ) {
         initializePanels();
         wiz = new WizardDescriptor( this );
@@ -159,9 +159,9 @@ public final class DiffExpressionWizardIterator implements
                 }
 
                 boolean useHouseKeepingGenesToNormalize = (boolean) wiz.getProperty( "useHouseKeepingGenesToNormalize" );
-                List<Integer> normalizationFeatures = null;
+                int[] normalizationFeatures = null;
                 if( useHouseKeepingGenesToNormalize ) {
-                    normalizationFeatures = (List<Integer>) wiz.getProperty( "normalizationFeatures" );
+                    normalizationFeatures = (int[]) wiz.getProperty( "normalizationFeatures" );
                 }
 
                 handler = new ExpressTestAnalysisHandler( selectedTracks, groupA, groupB, genomeID, workingWithoutReplicates,

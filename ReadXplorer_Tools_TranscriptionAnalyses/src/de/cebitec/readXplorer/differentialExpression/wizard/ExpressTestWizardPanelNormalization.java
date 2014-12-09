@@ -100,8 +100,7 @@ public class ExpressTestWizardPanelNormalization implements
         boolean useHouseKeepingGenesToNormalize = getComponent().useHouseKeepingGenesToNormalize();
         wiz.putProperty( "useHouseKeepingGenesToNormalize", useHouseKeepingGenesToNormalize );
         if( useHouseKeepingGenesToNormalize ) {
-            List<Integer> normalizationFeatures = getComponent().getSelectedFeatures();
-            wiz.putProperty( "normalizationFeatures", normalizationFeatures );
+            wiz.putProperty( "normalizationFeatures", getComponent().getSelectedFeatures() );
         }
     }
 

@@ -18,7 +18,8 @@
 package de.cebitec.readXplorer.differentialExpression;
 
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 import org.rosuda.JRI.REXP;
 import org.rosuda.JRI.RFactor;
 import org.rosuda.JRI.RVector;
@@ -32,11 +33,11 @@ public class ResultDeAnalysis {
 
     private final String description;
     private RVector rawTableContents;
-    private Vector<Vector> tableContents = null;
+    private List<List<Object>> tableContents = null;
     private REXP rawColNames;
-    private Vector colNames = null;
+    private List<Object> colNames = null;
     private REXP rawRowNames;
-    private Vector rowNames = null;
+    private List<Object> rowNames = null;
     private DeAnalysisData dEAdata;
 
 
@@ -49,7 +50,7 @@ public class ResultDeAnalysis {
     }
 
 
-    public ResultDeAnalysis( Vector<Vector> tableContents, Vector colNames, Vector rowNames, String description ) {
+    public ResultDeAnalysis( List<List<Object>> tableContents, List<Object> colNames, List<Object> rowNames, String description ) {
         this.tableContents = tableContents;
         this.colNames = colNames;
         this.rowNames = rowNames;
@@ -57,17 +58,17 @@ public class ResultDeAnalysis {
     }
 
 
-    public Vector<Vector> getTableContentsContainingRowNames() {
-        Vector rnames = getRownames();
-        Vector<Vector> data = getTableContents();
-        for( int i = 0; i < rnames.size(); i++ ) {
+    public List<List<Object>> getTableContentsContainingRowNames() {
+        List<Object> rnames = getRownames();
+        List<List<Object>> data = getTableContents();
+        for( int i=0; i<rnames.size(); i++ ) {
             data.get( i ).add( 0, rnames.get( i ) );
         }
         return data;
     }
 
 
-    public Vector<Vector> getTableContents() {
+    public List<List<Object>> getTableContents() {
         if( tableContents == null ) {
             tableContents = convertRresults( rawTableContents );
         }
@@ -75,7 +76,7 @@ public class ResultDeAnalysis {
     }
 
 
-    public Vector getColnames() {
+    public List<Object> getColnames() {
         if( colNames == null ) {
             colNames = convertNames( rawColNames );
 //            colNames.insertElementAt("Chromosome", 1);
@@ -84,7 +85,7 @@ public class ResultDeAnalysis {
     }
 
 
-    public Vector getRownames() {
+    public List<Object> getRownames() {
         if( rowNames == null ) {
             rowNames = convertNames( rawRowNames );
         }
@@ -102,39 +103,44 @@ public class ResultDeAnalysis {
      * corresponding Object presentation.
      */
 
-    private Vector convertNames( REXP currentValues ) {
-        int currentType = currentValues.getType();
-        Vector current = new Vector();
-        switch( currentType ) {
+    private List<Object> convertNames( REXP currentValues ) {
+
+        List<Object> current = new ArrayList<>();
+        switch( currentValues.getType() ) {
+
             case REXP.XT_ARRAY_DOUBLE:
                 double[] currentDoubleValues = currentValues.asDoubleArray();
                 for( int j = 0; j < currentDoubleValues.length; j++ ) {
                     current.add( currentDoubleValues[j] );
                 }
                 break;
+
             case REXP.XT_ARRAY_INT:
                 int[] currentIntValues = currentValues.asIntArray();
                 for( int j = 0; j < currentIntValues.length; j++ ) {
                     current.add( currentIntValues[j] );
                 }
                 break;
+
             case REXP.XT_ARRAY_STR:
                 String[] currentStringValues = currentValues.asStringArray();
-        for( String name : currentStringValues ) {
-            if( dEAdata.existsPersistentFeatureForGNURName( name ) ) {
-                current.add( dEAdata.getPersistentFeatureByGNURName( name ) );
-            }
-            else {
-                current.add( name );
-            }
-        }
+                for( String name : currentStringValues ) {
+                    if( dEAdata.existsPersistentFeatureForGNURName( name ) ) {
+                        current.add( dEAdata.getPersistentFeatureByGNURName( name ) );
+                    }
+                    else {
+                        current.add( name );
+                    }
+                }
                 break;
+
             case REXP.XT_ARRAY_BOOL_INT:
                 int[] currentBoolValues = currentValues.asIntArray();
                 for( int j = 0; j < currentBoolValues.length; j++ ) {
                     current.add( currentBoolValues[j] == 1 );
                 }
                 break;
+
             case REXP.XT_FACTOR:
                 RFactor factor = currentValues.asFactor();
                 for( int j = 0; j < factor.size(); j++ ) {
@@ -147,8 +153,11 @@ public class ResultDeAnalysis {
                     }
                 }
                 break;
+
         }
+
         return current;
+
     }
 
 
@@ -160,20 +169,25 @@ public class ResultDeAnalysis {
      * @return A Vector of Vectors = table content, generated from the given
      *         RVector.
      */
-    private Vector<Vector> convertRresults( RVector currentRVector ) {
-        Vector<Vector> current = new Vector<>();
-        for( int i = 0; i < currentRVector.size(); i++ ) {
-            REXP currentValues = currentRVector.at( i );
-            Vector converted = convertNames( currentValues );
-            for( int j = 0; j < converted.size(); j++ ) {
+    private List<List<Object>> convertRresults( final RVector currentRVector ) {
+
+        List<List<Object>> current = new ArrayList<>();
+        for( int i=0; i<currentRVector.size(); i++ ) {
+
+            List<Object> converted = convertNames( currentRVector.at( i ) );
+            for( int j=0; j<converted.size(); j++ ) {
+
+//                if( j>=current.size() )
+//                    current.add( new ArrayList<>() );
                 try {
                     current.get( j );
                 }
                 catch( ArrayIndexOutOfBoundsException e ) {
-                    current.add( new Vector() );
+                    current.add( new ArrayList<>() );
                 }
                 current.get( j ).add( converted.get( j ) );
             }
+
         }
 
         // assign chromosomes to the column next to the PersistentFeature column

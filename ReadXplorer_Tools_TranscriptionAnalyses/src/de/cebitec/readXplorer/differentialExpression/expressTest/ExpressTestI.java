@@ -20,7 +20,6 @@ package de.cebitec.readXplorer.differentialExpression.expressTest;
 
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import java.util.List;
-import java.util.Vector;
 
 
 /**
@@ -64,7 +63,7 @@ public interface ExpressTestI {
      *
      * @return results of the analysis.
      */
-    public Vector<Vector> getResults();
+    public List<List<Object>> getResults();
 
 
     /**
@@ -75,7 +74,7 @@ public interface ExpressTestI {
      *
      * @return normalized results of the analysis.
      */
-    public Vector<Vector> getResultsNormalized();
+    public List<List<Object>> getResultsNormalized();
 
 
     /**
@@ -83,7 +82,7 @@ public interface ExpressTestI {
      *
      * @return columnNames for the current analysis run.
      */
-    public Vector getColumnNames();
+    public List<Object> getColumnNames();
 
 
     /**
@@ -91,7 +90,7 @@ public interface ExpressTestI {
      *
      * @return columnNames for the current analysis run.
      */
-    public Vector getRowNames();
+    public List<Object> getRowNames();
 
 
     /**
@@ -100,7 +99,7 @@ public interface ExpressTestI {
      * <p>
      * @param normalizationFeatures features for normalization
      */
-    public void setNormalizationFeatures( List<Integer> normalizationFeatures );
+    public void setNormalizationFeatures( int[] normalizationFeatures );
 
 
 }

@@ -24,9 +24,8 @@ import de.cebitec.readXplorer.differentialExpression.ResultDeAnalysis;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Pair;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import static de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler.Tool.BaySeq;
 import static de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler.Tool.DeSeq;
@@ -98,26 +97,30 @@ public class ConvertData {
     }
 
 
-    private static Map<PersistentFeature, Pair<Double, Double>> convertBaySeqResults( Vector<Vector> resultTable, Integer[] sampleA, Integer[] sampleB ) {
+    private static Map<PersistentFeature, Pair<Double, Double>> convertBaySeqResults( List<List<Object>> resultTable, Integer[] sampleA, Integer[] sampleB ) {
         Map<PersistentFeature, Pair<Double, Double>> ret = new HashMap<>();
-        for( Vector row : resultTable ) {
+        for( List<Object> row : resultTable ) {
             PersistentFeature key = (PersistentFeature) row.get( 0 );
-            Double X = 0d;
-            for( Integer sampleA1 : sampleA ) {
-                int index = sampleA1 + BAY_SEQ_OFFSET;
-                X += GeneralUtils.convertNumber( Double.class, (Number) row.get( index ) );
+            double x = 0d;
+            for( int idx : sampleA ) {
+                int index = idx + BAY_SEQ_OFFSET;
+                x += GeneralUtils.convertNumber( Double.class, (Number) row.get( index ) );
             }
-            X /= sampleA.length;
-            Double Y = 0d;
-            for( Integer sampleB1 : sampleB ) {
-                int index = sampleB1 + BAY_SEQ_OFFSET;
-                Y += GeneralUtils.convertNumber( Double.class, (Number) row.get( index ) );
+            x /= sampleA.length;
+            double y = 0d;
+            for( int idx : sampleB ) {
+                int index = idx + BAY_SEQ_OFFSET;
+                y += GeneralUtils.convertNumber( Double.class, (Number) row.get( index ) );
             }
-            Y /= sampleB.length;
-            Pair<Double, Double> values = new Pair<>( X, Y );
+            y /= sampleB.length;
+
+            Pair<Double, Double> values = new Pair<>( x, y );
             ret.put( key, values );
+
         }
+
         return ret;
+        
     }
 
 
@@ -136,14 +139,13 @@ public class ConvertData {
      * <p>
      * @return
      */
-    private static Map<PersistentFeature, Pair<Double, Double>> createDataPairForFeature( Vector<Vector> resultTable, int columnFeature, int column1, int column2 ) {
+    private static Map<PersistentFeature, Pair<Double, Double>> createDataPairForFeature( List<List<Object>> resultTable, int columnFeature, int column1, int column2 ) {
         Map<PersistentFeature, Pair<Double, Double>> ret = new HashMap<>();
-        for( Vector row : resultTable ) {
+        for( List<Object> row : resultTable ) {
             PersistentFeature key = (PersistentFeature) row.get( columnFeature );
             Double x = (Double) row.get( column1 );
             Double y = (Double) row.get( column2 );
-            Pair<Double, Double> values = new Pair<>( x, y );
-            ret.put( key, values );
+            ret.put( key, new Pair<>( x, y ) );
         }
         return ret;
     }

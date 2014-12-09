@@ -39,7 +39,6 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.ComboBoxModel;
@@ -160,21 +159,21 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
     private void addResults() {
         if( analysisHandler.getResults() != null ) {
             List<ResultDeAnalysis> results = analysisHandler.getResults();
-            List<String> descriptions = new ArrayList<>();
-            for( ResultDeAnalysis currentResult : results ) {
+            List<String> descriptions = new ArrayList<>( results.size() );
+            for( final ResultDeAnalysis currentResult : results ) {
                 Vector colNames = new Vector( currentResult.getColnames() );
-                Vector<Vector> tableContents;
+                Vector<Vector<Object>> tableContents;
                 switch( usedTool ) {
                     case ExportCountTable:
                         //fallthrough, since handling is same as for DESeq2
                     case DeSeq2:
                         colNames.add( 0, "Feature" );
-                        tableContents = currentResult.getTableContentsContainingRowNames();
+                        tableContents = transformData( currentResult.getTableContentsContainingRowNames() );
                         break;
                     default:
                         colNames.remove( 0 );
                         colNames.add( 0, "Feature" );
-                        tableContents = currentResult.getTableContents();
+                        tableContents = transformData( currentResult.getTableContents() );
                 }
 
                 DefaultTableModel tmpTableModel = new UneditableTableModel( tableContents, colNames );
@@ -203,6 +202,32 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
             jLabel1.setEnabled( true );
         }
     }
+
+
+
+    /**
+     * Temporary method in order to workaround the <code>Vector</code> mess
+     * @param data
+     */
+    private static Vector<Vector<Object>> transformData( List<List<Object>> data ) {
+
+        Vector<Vector<Object>> newData = new Vector<>();
+
+        for( List<Object> innerData : data ) {
+
+            Vector<Object> newInnerData = new Vector<Object>();
+            for( Object innerDatum : innerData ) {
+                newInnerData.add( innerDatum );
+            }
+
+            newData.add( newInnerData );
+
+        }
+
+        return newData;
+
+    }
+
 
 
     /**

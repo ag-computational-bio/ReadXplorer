@@ -53,25 +53,26 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
     protected List<ResultDeAnalysis> processWithTool() throws GnuR.PackageNotLoadableException, GnuR.JRILibraryNotInPathException, IllegalStateException, GnuR.UnknownGnuRException {
         prepareFeatures( data );
         prepareCountData( data, getAllCountData() );
+
+        final PersistentFeature[] feature = data.getFeatures();
+
         ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating Count Data Table" );
-        progressHandle.start( data.getFeatures().length );
-        results = new ArrayList<>();
-        PersistentFeature[] feature = data.getFeatures();
+        progressHandle.start( feature.length );
         String[] trackDescriptions = data.getTrackDescriptions();
-        int[][] countData = new int[data.getSelectedTracks().size()][];
-        List<PersistentFeature> regionNamesList = new ArrayList<>();
+        final int[][] countData = new int[data.getSelectedTracks().size()][];
+        final List<Object> regionNamesList = new ArrayList<>();
         int i = 0;
         while( data.hasCountData() ) {
             countData[i++] = data.pollFirstCountData();
         }
-        Vector<Vector> tableContents = new Vector<>();
-        for( i = 0; i < data.getFeatures().length; i++ ) {
+        List<List<Object>> tableContents = new ArrayList<>();
+        for( i=0; i < feature.length; i++ ) {
             boolean allZero = true;
             Integer[] tmp = new Integer[data.getSelectedTracks().size() + 3];
             tmp[0] = feature[i].getChromId();
             tmp[1] = feature[i].getStart();
             tmp[2] = feature[i].getStop();
-            for( int j = 3; j < data.getSelectedTracks().size() + 3; j++ ) {
+            for( int j=3; j<data.getSelectedTracks().size()+3; j++ ) {
                 int value = countData[j - 3][i];
                 if( value != 0 ) {
                     allZero = false;
@@ -84,16 +85,19 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
             }
             progressHandle.progress( i );
         }
-        Vector colNames = new Vector();
-        colNames.add( "Chromosome" );
-        colNames.add( "Start" );
-        colNames.add( "Stop" );
-        colNames.addAll( Arrays.asList( trackDescriptions ) );
-        Vector rowNames = new Vector( regionNamesList );
+        List<Object> colNames = new ArrayList<>( trackDescriptions.length + 3);
+            colNames.add( "Chromosome" );
+            colNames.add( "Start" );
+            colNames.add( "Stop" );
+            colNames.addAll( Arrays.asList( trackDescriptions ) );
+//        Vector rowNames = new Vector( regionNamesList );
 
-        results.add( new ResultDeAnalysis( tableContents, colNames, rowNames, "Count Data Table" ) );
+        results = new ArrayList<>();
+        results.add( new ResultDeAnalysis( tableContents, colNames, regionNamesList, "Count Data Table" ) );
         progressHandle.finish();
+
         return results;
+
     }
 
 

@@ -20,7 +20,6 @@ package de.cebitec.readXplorer.differentialExpression.wizard;
 
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.ui.visualisation.reference.FeatureTableModel;
-import java.util.ArrayList;
 import java.util.List;
 import javax.swing.ButtonGroup;
 import javax.swing.JPanel;
@@ -107,14 +106,17 @@ public final class ExpressTestVisualPanelNormalization extends JPanel {
     }
 
 
-    public List<Integer> getSelectedFeatures() {
-        List<Integer> ret = new ArrayList<>();
+    public int[] getSelectedFeatures() {
+
         int[] selected = featureTable.getSelectedRows();
-        for( int i = 0; i < selected.length; i++ ) {
-            int rowToModel = featureTable.convertRowIndexToModel( selected[i] );
-            ret.add( features.get( rowToModel ).getId() );
+        int[] selectedFeatures = new int[ selected.length ];
+        for( int i=0; i<selected.length; i++ ) {
+            int idx = featureTable.convertRowIndexToModel( selected[i] );
+            selectedFeatures[i] = features.get( idx ).getId();
         }
-        return ret;
+        
+        return selectedFeatures;
+
     }
 
 
