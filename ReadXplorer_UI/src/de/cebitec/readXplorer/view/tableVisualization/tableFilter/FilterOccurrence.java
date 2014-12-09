@@ -40,7 +40,6 @@ class FilterOccurrence<E extends DefaultTableModel> {
 
     private final String selectedButton;
     private final int occurrenceCount;
-    private int sortedTable;
     private E sortedTableModel;
     private final TableRightClickFilter<E> tableRightClickFilter;
     private final E tableModel;
