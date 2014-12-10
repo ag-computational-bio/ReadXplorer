@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.visualisation.actions;
+package de.cebitec.readxplorer.ui.visualisation.actions;
 
 
 import de.cebitec.readxplorer.api.cookies.LoginCookie;
-import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
+import de.cebitec.readxplorer.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.readxplorer.view.controller.ViewController;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.visualisation;
+package de.cebitec.readxplorer.ui.visualisation;
 
 
 import de.cebitec.centrallookup.CentralLookup;

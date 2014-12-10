@@ -123,7 +123,7 @@
                 </test-type>
             </test-dependencies>
             <public-packages>
-                <package>de.cebitec.readXplorer.ui.visualisation</package>
+                <package>de.cebitec.readxplorer.ui.visualisation</package>
             </public-packages>
         </data>
     </configuration>

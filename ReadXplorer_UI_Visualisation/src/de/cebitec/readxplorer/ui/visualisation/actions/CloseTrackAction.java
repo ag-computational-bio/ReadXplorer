@@ -15,27 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.visualisation.actions;
+package de.cebitec.readxplorer.ui.visualisation.actions;
 
 
-import de.cebitec.readxplorer.api.cookies.CloseRefGenCookie;
+import de.cebitec.readxplorer.api.cookies.CloseTrackCookie;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 
-public final class CloseRefGenAction implements ActionListener {
+public final class CloseTrackAction implements ActionListener {
 
-    private final CloseRefGenCookie context;
+    private final List<CloseTrackCookie> context;
 
 
-    public CloseRefGenAction( CloseRefGenCookie context ) {
+    public CloseTrackAction( List<CloseTrackCookie> context ) {
         this.context = context;
     }
 
 
     @Override
-    public void actionPerformed( ActionEvent ev ) {
-        context.close();
+    public void actionPerformed( ActionEvent e ) {
+        for( CloseTrackCookie closeCookie : context ) {
+            closeCookie.close();
+        }
     }
 
 

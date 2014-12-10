@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.tools.detailedviewer;
 
 
-import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
+import de.cebitec.readxplorer.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.readxplorer.view.TopComponentHelper;
 import de.cebitec.readxplorer.view.controller.ViewController;
 import de.cebitec.readxplorer.view.datavisualisation.abstractviewer.AbstractViewer;

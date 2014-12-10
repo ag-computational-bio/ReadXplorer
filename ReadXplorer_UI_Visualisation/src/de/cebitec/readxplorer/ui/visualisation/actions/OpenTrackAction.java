@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.visualisation.actions;
+package de.cebitec.readxplorer.ui.visualisation.actions;
 
 
 import de.cebitec.readxplorer.api.cookies.OpenTrackCookie;

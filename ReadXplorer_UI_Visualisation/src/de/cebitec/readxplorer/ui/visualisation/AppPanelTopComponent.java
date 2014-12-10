@@ -15,14 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.visualisation;
+package de.cebitec.readxplorer.ui.visualisation;
 
 
+import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readxplorer.api.ApplicationFrameI;
 import de.cebitec.readxplorer.api.cookies.CloseRefGenCookie;
 import de.cebitec.readxplorer.api.cookies.CloseTrackCookie;
 import de.cebitec.readxplorer.api.cookies.OpenTrackCookie;
-import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readxplorer.view.TopComponentExtended;
 import de.cebitec.readxplorer.view.controller.ViewController;
 import de.cebitec.readxplorer.view.datavisualisation.abstractviewer.AbstractViewer;
@@ -65,7 +65,7 @@ import org.openide.windows.WindowManager;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 @ConvertAsProperties(
-         dtd = "-//de.cebitec.readXplorer.ui.visualisation//AppPanel//EN",
+         dtd = "-//de.cebitec.readxplorer.ui.visualisation//AppPanel//EN",
          autostore = false
 )
 @TopComponent.Description(
@@ -74,7 +74,7 @@ import org.openide.windows.WindowManager;
          persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
 @TopComponent.Registration( mode = "editor", openAtStartup = false )
-@ActionID( category = "Window", id = "de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent" )
+@ActionID( category = "Window", id = "de.cebitec.readxplorer.ui.visualisation.AppPanelTopComponent" )
 @ActionReference( path = "Menu/Window" /*, position = 333 */ )
 @TopComponent.OpenActionRegistration(
          displayName = "#CTL_AppPanelAction",
@@ -117,7 +117,7 @@ public final class AppPanelTopComponent extends TopComponentExtended implements
 //        setIcon(ImageUtilities.loadImage(ICON_PATH, true));
         localLookup = new AbstractLookup( content );
         associateLookup( localLookup );
-        this.trackViewerList = new ArrayList<>();
+        this.trackViewerList = new ArrayList<>( 10 );
         this.tracksPanel = new JPanel();
         this.tracksPanel.setLayout( new javax.swing.BoxLayout( tracksPanel, javax.swing.BoxLayout.PAGE_AXIS ) );
         this.basePanelPanel = new JPanel();
@@ -161,7 +161,7 @@ public final class AppPanelTopComponent extends TopComponentExtended implements
         );
     }// </editor-fold>//GEN-END:initComponents
 
-// Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel visualPanel;
     // End of variables declaration//GEN-END:variables
 
@@ -459,11 +459,11 @@ public final class AppPanelTopComponent extends TopComponentExtended implements
 
 
     // ==================== Experimental track closing stuff ==================== //
-    private final List<Reference<JPanel>> all = Collections.synchronizedList( new ArrayList<Reference<JPanel>>() );
+    private final List<Reference<JPanel>> all = Collections.synchronizedList( new ArrayList<Reference<JPanel>>( 10 ) );
 
 
     public List<Action> allTrackCloseActions() {
-        List<Action> result = new ArrayList<>();
+        List<Action> result = new ArrayList<>( all.size() );
         for( Iterator<Reference<JPanel>> it = all.iterator(); it.hasNext(); ) {
             Reference<JPanel> cookieRef = it.next();
             JPanel cookie = cookieRef.get();
