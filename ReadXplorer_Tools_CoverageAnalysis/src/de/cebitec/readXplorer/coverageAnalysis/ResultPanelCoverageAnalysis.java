@@ -19,7 +19,7 @@ package de.cebitec.readXplorer.coverageAnalysis;
 
 
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
+import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.util.UneditableTableModel;
 import de.cebitec.readXplorer.util.fileChooser.StoreStringFileChooser;

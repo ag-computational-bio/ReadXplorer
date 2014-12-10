@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.exporter.tables;
+package de.cebitec.readxplorer.exporter.tables;
 
 
 import java.util.ArrayList;

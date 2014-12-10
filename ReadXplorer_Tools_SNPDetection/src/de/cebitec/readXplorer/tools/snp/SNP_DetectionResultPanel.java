@@ -28,7 +28,7 @@ import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataObjects.Snp;
 import de.cebitec.readxplorer.databackend.dataObjects.SnpI;
-import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
+import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.util.LineWrapCellRenderer;
 import de.cebitec.readXplorer.util.SequenceComparison;
 import de.cebitec.readXplorer.util.UneditableTableModel;

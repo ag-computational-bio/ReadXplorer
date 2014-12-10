@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.correlationAnalysis;
 
 
-import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
+import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.util.UneditableTableModel;

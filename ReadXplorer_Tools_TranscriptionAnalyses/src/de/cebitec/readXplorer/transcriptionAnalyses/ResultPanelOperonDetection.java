@@ -25,7 +25,7 @@ package de.cebitec.readXplorer.transcriptionAnalyses;
 
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
+import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.Operon;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.OperonAdjacency;
 import de.cebitec.readXplorer.util.LineWrapCellRenderer;

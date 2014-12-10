@@ -24,8 +24,8 @@ import de.cebitec.readXplorer.differentialExpression.plot.BaySeqGraphicsTopCompo
 import de.cebitec.readXplorer.differentialExpression.plot.DeSeq2GraphicsTopComponent;
 import de.cebitec.readXplorer.differentialExpression.plot.DeSeqGraphicsTopComponent;
 import de.cebitec.readXplorer.differentialExpression.plot.ExpressTestGraphicsTopComponent;
-import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
-import de.cebitec.readXplorer.exporter.tables.TableToExcel;
+import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
+import de.cebitec.readxplorer.exporter.tables.TableToExcel;
 import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.readXplorer.util.GenerateRowSorter;
 import de.cebitec.readXplorer.util.Observer;

@@ -16,7 +16,7 @@
  */
 
 @HelpSetRegistration( helpSet = "exporter-hs.xml", position = 3050 )
-package de.cebitec.readXplorer.exporter.docs;
+package de.cebitec.readxplorer.exporter.docs;
 
 
 import org.netbeans.api.javahelp.HelpSetRegistration;

@@ -21,7 +21,7 @@ package de.cebitec.readxplorer.databackend;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
-import de.cebitec.readXplorer.exporter.tables.ExportDataI;
+import de.cebitec.readxplorer.exporter.tables.ExportDataI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;

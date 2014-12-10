@@ -75,7 +75,7 @@
                 </test-type>
             </test-dependencies>
             <public-packages>
-                <package>de.cebitec.readXplorer.exporter.tables</package>
+                <package>de.cebitec.readxplorer.exporter.tables</package>
             </public-packages>
         </data>
     </configuration>
