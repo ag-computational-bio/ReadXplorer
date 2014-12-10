@@ -3,11 +3,19 @@
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>de.cebitec.readXplorer.databackend</code-name-base>
+            <code-name-base>de.cebitec.readxplorer.databackend</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
-                    <code-name-base>de.cebitec.readXplorer.api</code-name-base>
+                    <code-name-base>de.cebitec.readxplorer.utils</code-name-base>
+                    <build-prerequisite/>
+                    <compile-dependency/>
+                    <run-dependency>
+                        <specification-version>1.0.4</specification-version>
+                    </run-dependency>
+                </dependency>
+                <dependency>
+                    <code-name-base>de.cebitec.readxplorer.api</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -15,7 +23,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>de.cebitec.readXplorer.exporter</code-name-base>
+                    <code-name-base>de.cebitec.readxplorer.exporter</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -23,7 +31,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>de.cebitec.readXplorer.libs</code-name-base>
+                    <code-name-base>de.cebitec.readxplorer.libs</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -31,15 +39,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>de.cebitec.readXplorer.parser</code-name-base>
-                    <build-prerequisite/>
-                    <compile-dependency/>
-                    <run-dependency>
-                        <specification-version>1.0</specification-version>
-                    </run-dependency>
-                </dependency>
-                <dependency>
-                    <code-name-base>de.cebitec.readXplorer.util</code-name-base>
+                    <code-name-base>de.cebitec.readxplorer.parser</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>

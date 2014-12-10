@@ -15,12 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.databackend;
+package de.cebitec.readxplorer.databackend;
 
 
-import de.cebitec.readxplorer.databackend.IntervalRequest;
-import de.cebitec.readxplorer.databackend.SamBamFileReader;
-import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.dataObjects.CoverageManager;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.utils.Properties;

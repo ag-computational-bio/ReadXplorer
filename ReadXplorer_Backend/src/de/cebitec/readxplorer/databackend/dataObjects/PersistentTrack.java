@@ -97,7 +97,7 @@ public class PersistentTrack {
 
 
     /**
-     * @return The readXplorer database id of the reference genome
+     * @return The readxplorer database id of the reference genome
      */
     public int getRefGenID() {
         return refGenID;

@@ -19,7 +19,6 @@ package de.cebitec.readxplorer.databackend.dataObjects;
 
 
 import de.cebitec.readxplorer.utils.ReadPairType;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,13 +38,13 @@ public class ReadPairGroup implements ObjectWithId {
     private final List<Mapping> singleMappings;
 //    private boolean hasNewRead; //set true when new read was added until this variable was send to the observers
 //    private ArrayList<Observer> observers;
-    private List<FeatureType> excludedFeatureTypes;
+//    private List<FeatureType> excludedFeatureTypes;
 
 
     public ReadPairGroup() {
 //        observers = new ArrayList<Observer>();
-        this.readPairs = new ArrayList<>();
-        this.singleMappings = new ArrayList<>();
+        this.readPairs = new ArrayList<>( 10 );
+        this.singleMappings = new ArrayList<>( 10 );
     }
 
 
@@ -54,7 +53,7 @@ public class ReadPairGroup implements ObjectWithId {
      * <p>
      * @param mapping    the mapping to add to the group
      * @param type       type of the read pair this mapping is belonging to
-     *                   (@see de.cebitec.readXplorer.util.Properties)
+     *                   (@see de.cebitec.readxplorer.utils.Properties)
      * @param mapping1Id id of the first mapping of the read pair to create, or
      *                   -1 in case of a single mapping
      * @param mapping2Id id of the second mapping of the read pair to create, or
@@ -177,10 +176,10 @@ public class ReadPairGroup implements ObjectWithId {
 //        }
 //        this.hasNewRead = false;
 //    }
-
-    public void setExcludedFeatureTypes( List<FeatureType> excludedFeatureTypes ) {
-        this.excludedFeatureTypes = excludedFeatureTypes;
-    }
+//
+//    public void setExcludedFeatureTypes( List<FeatureType> excludedFeatureTypes ) {
+//        this.excludedFeatureTypes = excludedFeatureTypes;
+//    }
 
 
     @Override

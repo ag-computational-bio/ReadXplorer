@@ -15,11 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.databackend;
+package de.cebitec.readxplorer.databackend;
 
 
-import de.cebitec.readxplorer.databackend.RequestThread;
-import de.cebitec.readxplorer.databackend.IntervalRequest;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
