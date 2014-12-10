@@ -19,7 +19,7 @@ package de.cebitec.readXplorer.rnaTrimming;
 
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.readXplorer.mapping.api.MappingApi;
+import de.cebitec.readxplorer.mapping.api.MappingApi;
 import de.cebitec.readXplorer.util.SimpleOutput;
 import java.io.BufferedWriter;
 import java.io.File;

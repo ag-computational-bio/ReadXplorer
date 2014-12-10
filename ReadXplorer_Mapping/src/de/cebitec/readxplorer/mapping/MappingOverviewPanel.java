@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.mapping;
+package de.cebitec.readxplorer.mapping;
 
 
 import java.awt.Component;

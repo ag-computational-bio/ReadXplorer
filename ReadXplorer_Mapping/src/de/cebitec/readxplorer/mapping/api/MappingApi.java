@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.mapping.api;
+package de.cebitec.readxplorer.mapping.api;
 
 
 import de.cebitec.readXplorer.util.CommandLineUtils;

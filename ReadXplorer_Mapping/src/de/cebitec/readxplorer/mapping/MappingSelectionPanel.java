@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.mapping;
+package de.cebitec.readxplorer.mapping;
 
 
-import de.cebitec.readXplorer.mapping.api.MappingApi;
+import de.cebitec.readxplorer.mapping.api.MappingApi;
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

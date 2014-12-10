@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.mapping;
+package de.cebitec.readxplorer.mapping;
 
 
 import java.beans.PropertyChangeListener;
@@ -37,7 +37,7 @@ import org.openide.util.Lookup;
  */
 @OptionsPanelController.TopLevelRegistration(
          categoryName = "#OptionsCategory_Name_Mapper",
-         iconBase = "de/cebitec/readXplorer/mapping/mapper.png",
+         iconBase = "de/cebitec/readxplorer/mapping/mapper.png",
          keywords = "#AdvancedOption_Keywords_Mapper",
          keywordsCategory = "General/Mapper" )
 @org.openide.util.NbBundle.Messages( { "AdvancedOption_DisplayName_Mapper=Mapper", "AdvancedOption_Keywords_Mapper=Mapper Mapping " } )

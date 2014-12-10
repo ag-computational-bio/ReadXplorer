@@ -20,7 +20,7 @@ package de.cebitec.readXplorer.rnaTrimming;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readxplorer.api.cookies.LoginCookie;
-import de.cebitec.readXplorer.mapping.api.MappingApi;
+import de.cebitec.readxplorer.mapping.api.MappingApi;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;

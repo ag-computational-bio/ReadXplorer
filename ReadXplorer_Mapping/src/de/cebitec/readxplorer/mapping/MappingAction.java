@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.mapping;
+package de.cebitec.readxplorer.mapping;
 
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readxplorer.api.cookies.LoginCookie;
-import de.cebitec.readXplorer.mapping.api.MappingApi;
+import de.cebitec.readxplorer.mapping.api.MappingApi;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;

@@ -125,6 +125,7 @@
             </test-dependencies>
             <public-packages>
                 <package>de.cebitec.readXplorer.mapping.api</package>
+                <package>de.cebitec.readxplorer.mapping.api</package>
             </public-packages>
         </data>
     </configuration>

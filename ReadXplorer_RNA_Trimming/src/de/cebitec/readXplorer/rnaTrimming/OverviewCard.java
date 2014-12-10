@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.rnaTrimming;
 
 
-import de.cebitec.readXplorer.mapping.api.MappingApi;
+import de.cebitec.readxplorer.mapping.api.MappingApi;
 import org.openide.util.NbBundle;
 
 
