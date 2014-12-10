@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.ui.dataAdministration;
 
 
-import de.cebitec.readXplorer.api.objects.JobPanel;
+import de.cebitec.readxplorer.api.objects.JobPanel;
 import de.cebitec.readXplorer.parser.ReferenceJob;
 import de.cebitec.readXplorer.parser.TrackJob;
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;

@@ -15,30 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.api.cookies;
+package de.cebitec.readxplorer.api.objects;
 
 
 /**
- * Cookie class that signifies the capability of a track to be closed.
+ * Interface for jobs having a known number of requests and also storing how
+ * many requests were already carried out.
  *
- * @author joern
+ * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
-public interface CloseTrackCookie {
+public interface JobI {
 
     /**
-     * Closes the track.
-     *
-     * @return true if track could be closed, false otherwise
+     * @return The number of requests already carried out.
      */
-    public boolean close();
+    public int getNbCarriedOutRequests();
 
 
     /**
-     * Gets the name of the track the can be closed.
-     *
-     * @return track name
+     * @return The total number of requests within this job.
      */
-    public String getName();
+    public int getNbTotalRequests();
 
 
 }

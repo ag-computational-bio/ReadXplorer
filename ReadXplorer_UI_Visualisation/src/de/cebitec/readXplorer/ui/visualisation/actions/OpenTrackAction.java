@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.ui.visualisation.actions;
 
 
-import de.cebitec.readXplorer.api.cookies.OpenTrackCookie;
+import de.cebitec.readxplorer.api.cookies.OpenTrackCookie;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;

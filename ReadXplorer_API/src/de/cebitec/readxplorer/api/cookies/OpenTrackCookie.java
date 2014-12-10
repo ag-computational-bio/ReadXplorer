@@ -15,22 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.api.cookies;
+package de.cebitec.readxplorer.api.cookies;
 
 
 /**
- * Signals that the user is logged in.
+ * Cookie class that signifies the capability of a track to be opened.
  *
- * @author jwinneba
+ * @author joern
  */
-public interface LoginCookie {
+public interface OpenTrackCookie {
 
     /**
-     * Never used, but nice to know you are logged in, isn't it?
-     *
-     * @return login status
+     * Opens the corresponding track.
      */
-    public boolean isLoggedIn();
+    public void open();
 
 
 }

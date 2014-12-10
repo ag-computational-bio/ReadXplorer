@@ -18,8 +18,8 @@
 package de.cebitec.readXplorer.view.dialogMenus;
 
 
-import de.cebitec.readXplorer.api.objects.JobPanel;
-import de.cebitec.readXplorer.api.objects.NewJobDialogI;
+import de.cebitec.readxplorer.api.objects.JobPanel;
+import de.cebitec.readxplorer.api.objects.NewJobDialogI;
 import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

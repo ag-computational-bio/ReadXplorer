@@ -3,7 +3,7 @@ package de.cebitec.readxplorer.vcf.importer;
 
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.readXplorer.api.cookies.LoginCookie;
+import de.cebitec.readxplorer.api.cookies.LoginCookie;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;

@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.coverageAnalysis;
 
 
-import de.cebitec.readXplorer.api.objects.JobPanel;
+import de.cebitec.readxplorer.api.objects.JobPanel;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
 import java.util.prefs.Preferences;

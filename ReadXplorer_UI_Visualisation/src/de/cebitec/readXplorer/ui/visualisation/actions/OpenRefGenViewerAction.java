@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.ui.visualisation.actions;
 
 
-import de.cebitec.readXplorer.api.cookies.LoginCookie;
+import de.cebitec.readxplorer.api.cookies.LoginCookie;
 import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.readXplorer.view.controller.ViewController;
 import java.awt.event.ActionEvent;

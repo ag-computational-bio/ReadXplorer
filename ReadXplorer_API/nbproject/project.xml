@@ -16,9 +16,9 @@
                 </test-type>
             </test-dependencies>
             <public-packages>
-                <package>de.cebitec.readXplorer.api</package>
-                <package>de.cebitec.readXplorer.api.cookies</package>
-                <package>de.cebitec.readXplorer.api.objects</package>
+                <package>de.cebitec.readxplorer.api</package>
+                <package>de.cebitec.readxplorer.api.cookies</package>
+                <package>de.cebitec.readxplorer.api.objects</package>
             </public-packages>
         </data>
     </configuration>

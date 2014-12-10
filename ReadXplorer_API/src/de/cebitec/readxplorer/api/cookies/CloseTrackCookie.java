@@ -15,28 +15,30 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.api;
-
-
-import javax.swing.JPanel;
+package de.cebitec.readxplorer.api.cookies;
 
 
 /**
+ * Cookie class that signifies the capability of a track to be closed.
  *
- * @author ddoppmeier
+ * @author joern
  */
-public interface ApplicationFrameI {
+public interface CloseTrackCookie {
 
-    public void showRefGenPanel( JPanel refGenPanel );
+    /**
+     * Closes the track.
+     *
+     * @return true if track could be closed, false otherwise
+     */
+    public boolean close();
 
 
-    public void removeRefGenPanel( JPanel genomeViewer );
-
-
-    public void showTrackPanel( JPanel trackPanel );
-
-
-    public void closeTrackPanel( JPanel trackPanel );
+    /**
+     * Gets the name of the track the can be closed.
+     *
+     * @return track name
+     */
+    public String getName();
 
 
 }

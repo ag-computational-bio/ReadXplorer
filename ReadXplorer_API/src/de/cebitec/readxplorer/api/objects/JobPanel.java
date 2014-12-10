@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.api.objects;
+package de.cebitec.readxplorer.api.objects;
 
 
 import java.awt.event.MouseAdapter;

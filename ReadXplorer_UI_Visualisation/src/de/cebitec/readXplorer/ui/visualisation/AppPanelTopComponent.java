@@ -18,10 +18,10 @@
 package de.cebitec.readXplorer.ui.visualisation;
 
 
-import de.cebitec.readXplorer.api.ApplicationFrameI;
-import de.cebitec.readXplorer.api.cookies.CloseRefGenCookie;
-import de.cebitec.readXplorer.api.cookies.CloseTrackCookie;
-import de.cebitec.readXplorer.api.cookies.OpenTrackCookie;
+import de.cebitec.readxplorer.api.ApplicationFrameI;
+import de.cebitec.readxplorer.api.cookies.CloseRefGenCookie;
+import de.cebitec.readxplorer.api.cookies.CloseTrackCookie;
+import de.cebitec.readxplorer.api.cookies.OpenTrackCookie;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readXplorer.view.TopComponentExtended;
 import de.cebitec.readXplorer.view.controller.ViewController;

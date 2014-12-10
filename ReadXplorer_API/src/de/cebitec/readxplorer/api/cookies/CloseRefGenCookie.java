@@ -15,27 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.api.objects;
+package de.cebitec.readxplorer.api.cookies;
 
 
 /**
- * Interface for jobs having a known number of requests and also storing how
- * many requests were already carried out.
+ * Cookie class that signifies the capability of a reference to be closed.
  *
- * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
+ * @author jwinneba
  */
-public interface JobI {
+public interface CloseRefGenCookie {
 
     /**
-     * @return The number of requests already carried out.
+     * Closes the reference.
+     *
+     * @return true if reference could be closed, false otherwise
      */
-    public int getNbCarriedOutRequests();
-
-
-    /**
-     * @return The total number of requests within this job.
-     */
-    public int getNbTotalRequests();
+    public boolean close();
 
 
 }

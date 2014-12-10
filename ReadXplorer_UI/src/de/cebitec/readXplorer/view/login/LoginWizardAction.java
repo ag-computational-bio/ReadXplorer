@@ -19,7 +19,7 @@ package de.cebitec.readXplorer.view.login;
 
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.readXplorer.api.cookies.LoginCookie;
+import de.cebitec.readxplorer.api.cookies.LoginCookie;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readXplorer.view.dialogMenus.LoadingDialog;

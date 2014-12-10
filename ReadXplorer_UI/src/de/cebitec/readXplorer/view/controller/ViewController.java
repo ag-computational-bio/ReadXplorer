@@ -19,7 +19,7 @@ package de.cebitec.readXplorer.view.controller;
 
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.readXplorer.api.ApplicationFrameI;
+import de.cebitec.readxplorer.api.ApplicationFrameI;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.Properties;

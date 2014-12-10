@@ -15,22 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.api.cookies;
+package de.cebitec.readxplorer.api.cookies;
 
 
 /**
- * Cookie class that signifies the capability of a reference to be closed.
+ * Signals that the user is logged in.
  *
  * @author jwinneba
  */
-public interface CloseRefGenCookie {
+public interface LoginCookie {
 
     /**
-     * Closes the reference.
+     * Never used, but nice to know you are logged in, isn't it?
      *
-     * @return true if reference could be closed, false otherwise
+     * @return login status
      */
-    public boolean close();
+    public boolean isLoggedIn();
 
 
 }

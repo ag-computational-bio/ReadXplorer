@@ -15,20 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.api.cookies;
+package de.cebitec.readxplorer.api;
+
+
+import javax.swing.JPanel;
 
 
 /**
- * Cookie class that signifies the capability of a track to be opened.
  *
- * @author joern
+ * @author ddoppmeier
  */
-public interface OpenTrackCookie {
+public interface ApplicationFrameI {
 
-    /**
-     * Opens the corresponding track.
-     */
-    public void open();
+    public void showRefGenPanel( JPanel refGenPanel );
+
+
+    public void removeRefGenPanel( JPanel genomeViewer );
+
+
+    public void showTrackPanel( JPanel trackPanel );
+
+
+    public void closeTrackPanel( JPanel trackPanel );
 
 
 }

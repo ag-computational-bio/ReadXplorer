@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.ui.visualisation.actions;
 
 
-import de.cebitec.readXplorer.api.cookies.CloseRefGenCookie;
+import de.cebitec.readxplorer.api.cookies.CloseRefGenCookie;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 

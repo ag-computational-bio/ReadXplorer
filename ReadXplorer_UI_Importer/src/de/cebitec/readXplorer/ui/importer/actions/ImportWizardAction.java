@@ -19,7 +19,7 @@ package de.cebitec.readXplorer.ui.importer.actions;
 
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.readXplorer.api.cookies.LoginCookie;
+import de.cebitec.readxplorer.api.cookies.LoginCookie;
 import de.cebitec.readXplorer.parser.ReadPairJobContainer;
 import de.cebitec.readXplorer.parser.ReferenceJob;
 import de.cebitec.readXplorer.parser.TrackJob;

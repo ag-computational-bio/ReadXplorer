@@ -19,7 +19,7 @@ package de.comp.bio.readxplorer.classificationUpdate;
 
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.readXplorer.api.cookies.LoginCookie;
+import de.cebitec.readxplorer.api.cookies.LoginCookie;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;

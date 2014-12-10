@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.ui.importer.dataTable;
 
 
-import de.cebitec.readXplorer.api.objects.JobPanel;
+import de.cebitec.readxplorer.api.objects.JobPanel;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.parser.tables.CsvPreferenceForUsers;

@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.tools.snp;
 
 
-import de.cebitec.readXplorer.api.objects.AnalysisI;
+import de.cebitec.readxplorer.api.objects.AnalysisI;
 import de.cebitec.readXplorer.databackend.IntervalRequest;
 import de.cebitec.readXplorer.databackend.SamBamFileReader;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;

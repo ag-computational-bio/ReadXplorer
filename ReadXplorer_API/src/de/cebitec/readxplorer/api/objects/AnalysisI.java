@@ -15,23 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.api.objects;
+package de.cebitec.readxplorer.api.objects;
 
 
 /**
- * Interface for all dialogs that create new jobs and need some required info
- * set
- * before they can finish successfully.
- *
- * @author jwinneba
+ * Interface to use for any kind of analysis, which can take advantage of using
+ * the given methods.
+ * <p>
+ * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
+ * @param <T> Object type of the result of this analysis.
  */
-public interface NewJobDialogI {
+public interface AnalysisI<T> {
 
     /**
-     * @return true, if all required info for this job dialog is set, false
-     *         otherwise.
+     * @return Returns the results of the analysis.
      */
-    public boolean isRequiredInfoSet();
+    public T getResults();
 
 
 }

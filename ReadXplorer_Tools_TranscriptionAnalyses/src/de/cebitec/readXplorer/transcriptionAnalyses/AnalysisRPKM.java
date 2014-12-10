@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.transcriptionAnalyses;
 
 
-import de.cebitec.readXplorer.api.objects.AnalysisI;
+import de.cebitec.readxplorer.api.objects.AnalysisI;
 import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.databackend.connector.TrackConnector;

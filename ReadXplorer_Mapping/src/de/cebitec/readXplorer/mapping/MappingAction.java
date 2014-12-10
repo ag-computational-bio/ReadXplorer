@@ -19,7 +19,7 @@ package de.cebitec.readXplorer.mapping;
 
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.readXplorer.api.cookies.LoginCookie;
+import de.cebitec.readxplorer.api.cookies.LoginCookie;
 import de.cebitec.readXplorer.mapping.api.MappingApi;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import java.awt.Dialog;

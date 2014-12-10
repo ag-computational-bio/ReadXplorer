@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.ui.importer;
 
 
-import de.cebitec.readXplorer.api.objects.NewJobDialogI;
+import de.cebitec.readxplorer.api.objects.NewJobDialogI;
 import de.cebitec.readXplorer.util.Properties;
 import java.io.File;
 import javax.swing.JFileChooser;
