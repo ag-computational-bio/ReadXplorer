@@ -98,6 +98,7 @@
             </module-dependencies>
             <public-packages>
                 <package>de.cebitec.readXplorer.plotting</package>
+                <package>de.cebitec.readxplorer.plotting</package>
             </public-packages>
         </data>
     </configuration>

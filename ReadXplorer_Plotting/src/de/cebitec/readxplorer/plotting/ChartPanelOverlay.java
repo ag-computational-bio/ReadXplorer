@@ -15,48 +15,45 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.plotting;
+package de.cebitec.readxplorer.plotting;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import java.awt.Paint;
-import org.jfree.data.xy.XYDataItem;
+import java.awt.Graphics2D;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.event.OverlayChangeListener;
+import org.jfree.chart.panel.Overlay;
 
 
 /**
  *
  * @author kstaderm
  */
-public class PlotDataItem extends XYDataItem {
+public class ChartPanelOverlay implements Overlay {
 
-    private PersistentFeature feature;
-    private Paint paint;
+    private final MouseActions mouseActions;
 
 
-    public PlotDataItem( PersistentFeature feature, Number x, Number y ) {
-        super( x, y );
-        this.feature = feature;
+    public ChartPanelOverlay( MouseActions mouseActions ) {
+        this.mouseActions = mouseActions;
     }
 
 
-    public PlotDataItem( PersistentFeature feature, double x, double y ) {
-        super( x, y );
-        this.feature = feature;
+    @Override
+    public void paintOverlay( Graphics2D gd, ChartPanel pnl ) {
+        PlotDataItem selectedItem = mouseActions.getSelectedItem();
+        if( selectedItem != null ) {
+
+        }
     }
 
 
-    public PersistentFeature getFeature() {
-        return feature;
+    @Override
+    public void addChangeListener( OverlayChangeListener ol ) {
     }
 
 
-    public Paint getPaint() {
-        return paint;
-    }
-
-
-    public void setPaint( Paint paint ) {
-        this.paint = paint;
+    @Override
+    public void removeChangeListener( OverlayChangeListener ol ) {
     }
 
 

@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.differentialExpression.plot;
 
 
-import de.cebitec.readXplorer.plotting.ChartExporter;
+import de.cebitec.readxplorer.plotting.ChartExporter;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.util.Calendar;

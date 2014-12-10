@@ -19,7 +19,7 @@ package de.cebitec.readXplorer.differentialExpression.plot;
 
 
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readXplorer.plotting.PlotDataItem;
+import de.cebitec.readxplorer.plotting.PlotDataItem;
 import org.jfree.chart.labels.XYToolTipGenerator;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYSeriesCollection;

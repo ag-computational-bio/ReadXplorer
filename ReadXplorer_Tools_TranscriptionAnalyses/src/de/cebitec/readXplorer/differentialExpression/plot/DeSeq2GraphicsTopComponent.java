@@ -22,7 +22,7 @@ import de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler;
 import de.cebitec.readXplorer.differentialExpression.DeSeq2AnalysisHandler;
 import de.cebitec.readXplorer.differentialExpression.GnuR;
 import de.cebitec.readXplorer.differentialExpression.ResultDeAnalysis;
-import de.cebitec.readXplorer.plotting.ChartExporter;
+import de.cebitec.readxplorer.plotting.ChartExporter;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readXplorer.view.TopComponentExtended;
