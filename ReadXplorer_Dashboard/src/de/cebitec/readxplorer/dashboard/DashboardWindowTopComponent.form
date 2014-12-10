@@ -42,7 +42,7 @@
     <Component class="javax.swing.JLabel" name="quickstartLabel">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readXplorer/dashboard/Bundle.properties" key="DashboardWindowTopComponent.quickstartLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/dashboard/Bundle.properties" key="DashboardWindowTopComponent.quickstartLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
@@ -103,7 +103,7 @@
             <Component class="javax.swing.JButton" name="openButton">
               <Properties>
                 <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                  <ResourceString bundle="de/cebitec/readXplorer/dashboard/Bundle.properties" key="DashboardWindowTopComponent.openButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                  <ResourceString bundle="de/cebitec/readxplorer/dashboard/Bundle.properties" key="DashboardWindowTopComponent.openButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                 </Property>
                 <Property name="margin" type="java.awt.Insets" editor="org.netbeans.beaninfo.editors.InsetsEditor">
                   <Insets value="[15, 50, 15, 50]"/>
@@ -154,7 +154,7 @@
                 <Component class="javax.swing.JButton" name="selectAllButton">
                   <Properties>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="de/cebitec/readXplorer/dashboard/Bundle.properties" key="DashboardWindowTopComponent.selectAllButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                      <ResourceString bundle="de/cebitec/readxplorer/dashboard/Bundle.properties" key="DashboardWindowTopComponent.selectAllButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
                   <Events>
@@ -164,7 +164,7 @@
                 <Component class="javax.swing.JButton" name="deselectAllButton">
                   <Properties>
                     <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-                      <ResourceString bundle="de/cebitec/readXplorer/dashboard/Bundle.properties" key="DashboardWindowTopComponent.deselectAllButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+                      <ResourceString bundle="de/cebitec/readxplorer/dashboard/Bundle.properties" key="DashboardWindowTopComponent.deselectAllButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
                     </Property>
                   </Properties>
                   <Events>
@@ -218,7 +218,7 @@
         <Component class="javax.swing.JButton" name="createDBButton">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/cebitec/readXplorer/dashboard/Bundle.properties" key="DashboardWindowTopComponent.createDBButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="de/cebitec/readxplorer/dashboard/Bundle.properties" key="DashboardWindowTopComponent.createDBButton.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>
