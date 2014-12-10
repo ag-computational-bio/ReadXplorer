@@ -37,7 +37,7 @@ import de.cebitec.readxplorer.transcriptomeanalyses.main.TSSDetectionResults;
 import de.cebitec.readxplorer.transcriptomeanalyses.main.TranscriptomeAnalysesTopComponentTopComponent;
 import de.cebitec.readxplorer.transcriptomeanalyses.mainWizard.FivePrimeEnrichedTracksVisualPanel;
 import de.cebitec.readxplorer.transcriptomeanalyses.mainWizard.WizardPropertyStrings;
-import de.cebitec.readXplorer.ui.importer.TranscriptomeTableViewI;
+import de.cebitec.readxplorer.ui.importer.TranscriptomeTableViewI;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readxplorer.view.analysis.ResultTablePanel;

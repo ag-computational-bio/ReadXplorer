@@ -15,9 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.importer.dataTable;
+package de.cebitec.readxplorer.ui.importer.dataTable;
 
 
+import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readxplorer.api.objects.JobPanel;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
@@ -26,10 +27,8 @@ import de.cebitec.readxplorer.parser.tables.CsvTableParser;
 import de.cebitec.readxplorer.parser.tables.TableParserI;
 import de.cebitec.readxplorer.parser.tables.TableType;
 import de.cebitec.readxplorer.parser.tables.XlsTranscriptomeTableParser;
-import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readxplorer.view.dialogmenus.ChangeListeningWizardPanel;
 import java.awt.Graphics;
-import java.io.File;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ScrollPaneConstants;
 import org.openide.util.NbBundle;
@@ -243,7 +242,6 @@ public final class ImportTableVisualPanel extends JobPanel {
 
             @Override
             public void open( String fileLocation ) {
-                File[] files = this.getSelectedFiles();
                 ImportTableVisualPanel.this.fileLocation = fileLocation;
             }
 
@@ -298,7 +296,6 @@ public final class ImportTableVisualPanel extends JobPanel {
 
             @Override
             public void open( String fileLocation ) {
-                File[] files = this.getSelectedFiles();
                 ImportTableVisualPanel.this.fileLocationStatsCsv = fileLocation;
             }
 
@@ -395,6 +392,7 @@ public final class ImportTableVisualPanel extends JobPanel {
     }
 
 
+    @Override
     public void paint( Graphics g ) {
         super.paint( g );
         this.csvPrefComboBox.setVisible( !delimiterCheckBox.isSelected() );

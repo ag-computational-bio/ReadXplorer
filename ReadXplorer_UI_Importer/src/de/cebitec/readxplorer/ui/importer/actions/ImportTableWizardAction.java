@@ -15,9 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.importer.actions;
+package de.cebitec.readxplorer.ui.importer.actions;
 
 
+import de.cebitec.readXplorer.ui.visualisation.TableVisualizationHelper;
+import de.cebitec.readXplorer.util.UneditableTableModel;
+import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readxplorer.api.cookies.LoginCookie;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.parser.common.ParsingException;
@@ -25,11 +28,8 @@ import de.cebitec.readxplorer.parser.tables.CsvTableParser;
 import de.cebitec.readxplorer.parser.tables.TableParserI;
 import de.cebitec.readxplorer.parser.tables.TableType;
 import de.cebitec.readxplorer.parser.tables.XlsTranscriptomeTableParser;
-import de.cebitec.readXplorer.ui.importer.TranscriptomeTableViewI;
-import de.cebitec.readXplorer.ui.importer.dataTable.ImportTableWizardPanel;
-import de.cebitec.readXplorer.ui.visualisation.TableVisualizationHelper;
-import de.cebitec.readXplorer.util.UneditableTableModel;
-import de.cebitec.readXplorer.util.VisualisationUtils;
+import de.cebitec.readxplorer.ui.importer.TranscriptomeTableViewI;
+import de.cebitec.readxplorer.ui.importer.dataTable.ImportTableWizardPanel;
 import de.cebitec.readxplorer.view.tablevisualization.PosTablePanel;
 import de.cebitec.readxplorer.view.tablevisualization.TableTopComponent;
 import de.cebitec.readxplorer.view.tablevisualization.TableUtils;
@@ -56,10 +56,10 @@ import org.supercsv.prefs.CsvPreference;
 
 @ActionID(
          category = "File",
-         id = "de.cebitec.readXplorer.ui.importer.actions.ImportTableWizardAction"
+         id = "de.cebitec.readxplorer.ui.importer.actions.ImportTableWizardAction"
 )
 @ActionRegistration(
-         iconBase = "de/cebitec/readXplorer/ui/importer/import.png",
+         iconBase = "de/cebitec/readxplorer/ui/importer/import.png",
          displayName = "#CTL_ImportTableWizardAction"
 )
 @ActionReference( path = "Menu/File", position = 1481 )
@@ -85,7 +85,7 @@ public final class ImportTableWizardAction implements ActionListener {
                           "ErrorHeader=Import Table Error" } )
     @Override
     public void actionPerformed( ActionEvent e ) {
-        List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
+        List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>( 1 );
         panels.add( new ImportTableWizardPanel() );
         WizardDescriptor wiz = new WizardDescriptor( new WizardDescriptor.ArrayIterator<>( VisualisationUtils.getWizardPanels( panels ) ) );
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()

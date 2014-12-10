@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.importer;
+package de.cebitec.readxplorer.ui.importer;
 
 
 import de.cebitec.readxplorer.parser.ReadPairJobContainer;
@@ -184,14 +184,16 @@ public class ReadPairJobView extends javax.swing.JPanel implements
         });
         readPairJobTable.setFillsViewportHeight(true);
         jScrollPane1.setViewportView(readPairJobTable);
-        readPairJobTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "ReadPairJobView.readPairJobTable.columnModel.title0")); // NOI18N
-        readPairJobTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "SeqPairJobView.trackTable.columnModel.title6")); // NOI18N
-        readPairJobTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "SeqPairJobView.trackTable.columnModel.title1")); // NOI18N
-        readPairJobTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "SeqPairJobView.trackTable.columnModel.title2")); // NOI18N
-        readPairJobTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "SeqPairJobView.trackTable.columnModel.title3")); // NOI18N
-        readPairJobTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "SeqPairJobView.trackTable.columnModel.title4")); // NOI18N
-        readPairJobTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "SeqPairJobView.trackTable.columnModel.title5")); // NOI18N
-        readPairJobTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "ReadPairJobView.readPairJobTable.columnModel.title7")); // NOI18N
+        if (readPairJobTable.getColumnModel().getColumnCount() > 0) {
+            readPairJobTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "ReadPairJobView.readPairJobTable.columnModel.title0")); // NOI18N
+            readPairJobTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "SeqPairJobView.trackTable.columnModel.title6")); // NOI18N
+            readPairJobTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "SeqPairJobView.trackTable.columnModel.title1")); // NOI18N
+            readPairJobTable.getColumnModel().getColumn(3).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "SeqPairJobView.trackTable.columnModel.title2")); // NOI18N
+            readPairJobTable.getColumnModel().getColumn(4).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "SeqPairJobView.trackTable.columnModel.title3")); // NOI18N
+            readPairJobTable.getColumnModel().getColumn(5).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "SeqPairJobView.trackTable.columnModel.title4")); // NOI18N
+            readPairJobTable.getColumnModel().getColumn(6).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "SeqPairJobView.trackTable.columnModel.title5")); // NOI18N
+            readPairJobTable.getColumnModel().getColumn(7).setHeaderValue(org.openide.util.NbBundle.getMessage(ReadPairJobView.class, "ReadPairJobView.readPairJobTable.columnModel.title7")); // NOI18N
+        }
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);

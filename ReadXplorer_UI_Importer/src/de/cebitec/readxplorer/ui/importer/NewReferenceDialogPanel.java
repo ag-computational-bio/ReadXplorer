@@ -15,9 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.importer;
+package de.cebitec.readxplorer.ui.importer;
 
 
+import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readxplorer.api.objects.NewJobDialogI;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.common.ParserI;
@@ -26,7 +27,6 @@ import de.cebitec.readxplorer.parser.reference.BioJavaGff3Parser;
 import de.cebitec.readxplorer.parser.reference.BioJavaParser;
 import de.cebitec.readxplorer.parser.reference.FastaReferenceParser;
 import de.cebitec.readxplorer.parser.reference.ReferenceParserI;
-import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import java.awt.Component;
 import java.io.File;
 import java.sql.Timestamp;

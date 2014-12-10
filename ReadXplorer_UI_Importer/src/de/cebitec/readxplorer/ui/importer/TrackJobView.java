@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.importer;
+package de.cebitec.readxplorer.ui.importer;
 
 
 import de.cebitec.readxplorer.parser.TrackJob;
@@ -146,9 +146,11 @@ public class TrackJobView extends javax.swing.JPanel implements
         });
         trackTable.setFillsViewportHeight(true);
         jScrollPane1.setViewportView(trackTable);
-        trackTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(TrackJobView.class, "TrackJobView.trackTable.file")); // NOI18N
-        trackTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(TrackJobView.class, "TrackJobView.trackTable.description")); // NOI18N
-        trackTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(TrackJobView.class, "TrackJobView.trackTable.reference")); // NOI18N
+        if (trackTable.getColumnModel().getColumnCount() > 0) {
+            trackTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(TrackJobView.class, "TrackJobView.trackTable.file")); // NOI18N
+            trackTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(TrackJobView.class, "TrackJobView.trackTable.description")); // NOI18N
+            trackTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(TrackJobView.class, "TrackJobView.trackTable.reference")); // NOI18N
+        }
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);

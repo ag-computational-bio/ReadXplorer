@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.importer;
+package de.cebitec.readxplorer.ui.importer;
 
 
+import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readxplorer.api.objects.NewJobDialogI;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.common.ParserI;
 import de.cebitec.readxplorer.parser.mappings.JokToBamDirectParser;
 import de.cebitec.readxplorer.parser.mappings.MappingParserI;
 import de.cebitec.readxplorer.parser.mappings.SamBamParser;
-import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readxplorer.view.dialogmenus.ImportTrackBasePanel;
 import java.awt.Component;
 import java.io.File;
@@ -67,7 +67,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
         this.samBamDirectParser = new SamBamParser();
         this.parsers = new MappingParserI[]{ this.samBamDirectParser, jokToBamDirectParser };
         this.setCurrentParser( parsers[0] );
-        mappingFiles2 = new ArrayList<>();
+        mappingFiles2 = new ArrayList<>( 10 );
         initComponents();
         this.alreadyImportedBox.setVisible( true );
         this.multiTrackScrollPane.setVisible( false );

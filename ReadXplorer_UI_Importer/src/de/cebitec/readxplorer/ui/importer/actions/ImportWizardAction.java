@@ -15,18 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.importer.actions;
+package de.cebitec.readxplorer.ui.importer.actions;
 
 
 import de.cebitec.centrallookup.CentralLookup;
+import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readxplorer.api.cookies.LoginCookie;
 import de.cebitec.readxplorer.parser.ReadPairJobContainer;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.TrackJob;
-import de.cebitec.readXplorer.ui.importer.ImportThread;
-import de.cebitec.readXplorer.ui.importer.ImportWizardOverviewPanel;
-import de.cebitec.readXplorer.ui.importer.ImportWizardSetupPanel;
-import de.cebitec.readXplorer.util.VisualisationUtils;
+import de.cebitec.readxplorer.ui.importer.ImportThread;
+import de.cebitec.readxplorer.ui.importer.ImportWizardOverviewPanel;
+import de.cebitec.readxplorer.ui.importer.ImportWizardSetupPanel;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -52,10 +52,10 @@ import org.openide.util.RequestProcessor;
  */
 @ActionID(
          category = "File",
-         id = "de.cebitec.readXplorer.ui.importer.actions.ImportWizardAction"
+         id = "de.cebitec.readxplorer.ui.importer.actions.ImportWizardAction"
 )
 @ActionRegistration(
-         iconBase = "de/cebitec/readXplorer/ui/importer/import.png",
+         iconBase = "de/cebitec/readxplorer/ui/importer/import.png",
          displayName = "#CTL_ImportWizardAction"
 )
 @ActionReferences( {
@@ -65,7 +65,7 @@ import org.openide.util.RequestProcessor;
 @NbBundle.Messages( "CTL_ImportWizardAction=Import data" )
 public final class ImportWizardAction implements ActionListener {
 
-    private final LoginCookie context;
+//    private final LoginCookie context;
     private List<WizardDescriptor.Panel<WizardDescriptor>> panels;
 
     public static final String PROP_CAN_IMPORT = "canImport";
@@ -83,7 +83,7 @@ public final class ImportWizardAction implements ActionListener {
      * @param context Only available, if already logged into a database
      */
     public ImportWizardAction( LoginCookie context ) {
-        this.context = context;
+//        this.context = context;
     }
 
 
@@ -98,7 +98,7 @@ public final class ImportWizardAction implements ActionListener {
         }
 
         if( panels == null ) {
-            panels = new ArrayList<>();
+            panels = new ArrayList<>( 2 );
             panels.add( new ImportWizardSetupPanel() );
             panels.add( new ImportWizardOverviewPanel() );
         }

@@ -15,32 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.importer;
+package de.cebitec.readxplorer.ui.importer;
 
 
-import de.cebitec.readXplorer.ui.importer.actions.ImportWizardAction;
+import de.cebitec.readxplorer.parser.ReadPairJobContainer;
+import de.cebitec.readxplorer.parser.ReferenceJob;
+import de.cebitec.readxplorer.parser.TrackJob;
+import de.cebitec.readxplorer.ui.importer.actions.ImportWizardAction;
 import java.awt.Component;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-import javax.swing.event.ChangeEvent;
+import java.util.List;
 import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
 
 
-public class ImportWizardSetupPanel implements
-        WizardDescriptor.FinishablePanel<WizardDescriptor> {
+public class ImportWizardOverviewPanel implements
+        WizardDescriptor.Panel<WizardDescriptor> {
 
     /**
      * The visual component that displays this panel. If you need to access the
      * component from this class, just use getComponent().
      */
-    private ImportSetupCard component;
-    private boolean isValid;
-    private final Set<ChangeListener> listeners = new HashSet<>( 1 ); // or can use ChangeSupport in NB 6.0, but how?!?
+    private ImportOverviewCard importOverviewCard;
 
 
     // Get the visual component for the panel. In this template, the component
@@ -49,10 +45,10 @@ public class ImportWizardSetupPanel implements
     // create only those which really need to be visible.
     @Override
     public Component getComponent() {
-        if( component == null ) {
-            component = new ImportSetupCard();
+        if( importOverviewCard == null ) {
+            importOverviewCard = new ImportOverviewCard();
         }
-        return component;
+        return importOverviewCard;
     }
 
 
@@ -67,41 +63,17 @@ public class ImportWizardSetupPanel implements
 
     @Override
     public boolean isValid() {
-        return isValid;
-    }
-
-
-    @Override
-    public boolean isFinishPanel() {
-        return isValid;
+        return true;
     }
 
 
     @Override
     public final void addChangeListener( ChangeListener l ) {
-        synchronized( listeners ) {
-            listeners.add( l );
-        }
     }
 
 
     @Override
     public final void removeChangeListener( ChangeListener l ) {
-        synchronized( listeners ) {
-            listeners.remove( l );
-        }
-    }
-
-
-    protected final void fireChangeEvent() {
-        Iterator<ChangeListener> it;
-        synchronized( listeners ) {
-            it = new HashSet<>( listeners ).iterator();
-        }
-        ChangeEvent ev = new ChangeEvent( this );
-        while( it.hasNext() ) {
-            it.next().stateChanged( ev );
-        }
     }
 
 
@@ -110,26 +82,19 @@ public class ImportWizardSetupPanel implements
     // WizardDescriptor.getProperty & putProperty to store information entered
     // by the user.
     @Override
+    @SuppressWarnings( "unchecked" )
     public void readSettings( WizardDescriptor settings ) {
-        component.addPropertyChangeListener( ImportWizardAction.PROP_CAN_IMPORT, new PropertyChangeListener() {
+        // load jobs to be imported
+        List<ReferenceJob> refJobs = (List<ReferenceJob>) settings.getProperty( ImportWizardAction.PROP_REFJOBLIST );
+        List<TrackJob> trackJobs = (List<TrackJob>) settings.getProperty( ImportWizardAction.PROP_TRACKJOBLIST );
+        List<ReadPairJobContainer> readPairJobs = (List<ReadPairJobContainer>) settings.getProperty( ImportWizardAction.PROP_READPAIRJOBLIST );
 
-            @Override
-            public void propertyChange( PropertyChangeEvent evt ) {
-                isValid = (Boolean) evt.getNewValue();
-                fireChangeEvent();
-            }
-
-
-        } );
+        importOverviewCard.showOverview( refJobs, trackJobs, readPairJobs );
     }
 
 
     @Override
     public void storeSettings( WizardDescriptor settings ) {
-        // store job to import
-        settings.putProperty( ImportWizardAction.PROP_REFJOBLIST, component.getRefJobList() );
-        settings.putProperty( ImportWizardAction.PROP_TRACKJOBLIST, component.getTrackJobList() );
-        settings.putProperty( ImportWizardAction.PROP_READPAIRJOBLIST, component.getReadPairTrackJobList() );
     }
 
 

@@ -16,7 +16,7 @@
  */
 
 @HelpSetRegistration( helpSet = "importer-hs.xml", position = 3952 )
-package de.cebitec.readXplorer.ui.importer.docs;
+package de.cebitec.readxplorer.ui.importer.docs;
 
 
 import org.netbeans.api.javahelp.HelpSetRegistration;

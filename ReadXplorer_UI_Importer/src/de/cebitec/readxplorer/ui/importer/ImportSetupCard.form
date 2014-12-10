@@ -48,7 +48,7 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
       <SubComponents>
-        <Component class="de.cebitec.readXplorer.ui.importer.RefJobView" name="refJobView">
+        <Component class="de.cebitec.readxplorer.ui.importer.RefJobView" name="refJobView">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="References">
@@ -57,7 +57,7 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="de.cebitec.readXplorer.ui.importer.TrackJobView" name="trackJobView">
+        <Component class="de.cebitec.readxplorer.ui.importer.TrackJobView" name="trackJobView">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="Tracks">
@@ -66,10 +66,10 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="de.cebitec.readXplorer.ui.importer.ReadPairJobView" name="readPairTrackJobsView">
+        <Component class="de.cebitec.readxplorer.ui.importer.ReadPairJobView" name="readPairTrackJobsView">
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_AddingCodePost" type="java.lang.String" value="}"/>
-            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new de.cebitec.readXplorer.ui.importer.ReadPairJobView()"/>
+            <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new de.cebitec.readxplorer.ui.importer.ReadPairJobView()"/>
             <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="final ReadPairClassifierI readPairCalculator = Lookup.getDefault().lookup(ReadPairClassifierI.class);&#xa;if (readPairCalculator != null) {"/>
           </AuxValues>
           <Constraints>
@@ -85,7 +85,7 @@
     <Component class="javax.swing.JButton" name="addJob">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readXplorer/ui/importer/Bundle.properties" key="ImportSetupCard.button.newJob" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/ui/importer/Bundle.properties" key="ImportSetupCard.button.newJob" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
       <Events>
@@ -95,7 +95,7 @@
     <Component class="javax.swing.JButton" name="removeJob">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readXplorer/ui/importer/Bundle.properties" key="ImportSetupCard.button.removeJob" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/ui/importer/Bundle.properties" key="ImportSetupCard.button.removeJob" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>

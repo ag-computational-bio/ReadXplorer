@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.importer;
+package de.cebitec.readxplorer.ui.importer;
 
 
 import de.cebitec.readxplorer.parser.ReferenceJob;
@@ -136,9 +136,11 @@ public class RefJobView extends javax.swing.JPanel implements
         refTable.setFillsViewportHeight(true);
         refTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane1.setViewportView(refTable);
-        refTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(RefJobView.class, "RefJobView.trackTable.name")); // NOI18N
-        refTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(RefJobView.class, "RefJobView.trackTable.file")); // NOI18N
-        refTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(RefJobView.class, "RefJobView.trackTable.description")); // NOI18N
+        if (refTable.getColumnModel().getColumnCount() > 0) {
+            refTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(RefJobView.class, "RefJobView.trackTable.name")); // NOI18N
+            refTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(RefJobView.class, "RefJobView.trackTable.file")); // NOI18N
+            refTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(RefJobView.class, "RefJobView.trackTable.description")); // NOI18N
+        }
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);

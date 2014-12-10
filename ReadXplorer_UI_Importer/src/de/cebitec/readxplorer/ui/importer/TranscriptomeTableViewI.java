@@ -1,5 +1,5 @@
 
-package de.cebitec.readXplorer.ui.importer;
+package de.cebitec.readxplorer.ui.importer;
 
 
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;

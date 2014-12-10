@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.importer;
+package de.cebitec.readxplorer.ui.importer;
 
 
 import de.cebitec.readxplorer.api.objects.NewJobDialogI;
@@ -24,7 +24,7 @@ import de.cebitec.readxplorer.parser.ReadPairJobContainer;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readxplorer.parser.mappings.ReadPairClassifierI;
-import de.cebitec.readXplorer.ui.importer.actions.ImportWizardAction;
+import de.cebitec.readxplorer.ui.importer.actions.ImportWizardAction;
 import de.cebitec.readxplorer.view.dialogmenus.ImportTrackBasePanel;
 import java.awt.Component;
 import java.awt.Dialog;
@@ -134,9 +134,9 @@ public class ImportSetupCard extends javax.swing.JPanel {
     private void initComponents() {
 
         jTabbedPane1 = new javax.swing.JTabbedPane();
-        refJobView = new de.cebitec.readXplorer.ui.importer.RefJobView();
-        trackJobView = new de.cebitec.readXplorer.ui.importer.TrackJobView();
-        readPairTrackJobsView = new de.cebitec.readXplorer.ui.importer.ReadPairJobView();
+        refJobView = new de.cebitec.readxplorer.ui.importer.RefJobView();
+        trackJobView = new de.cebitec.readxplorer.ui.importer.TrackJobView();
+        readPairTrackJobsView = new de.cebitec.readxplorer.ui.importer.ReadPairJobView();
         addJob = new javax.swing.JButton();
         removeJob = new javax.swing.JButton();
 
@@ -338,10 +338,10 @@ public class ImportSetupCard extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton addJob;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private de.cebitec.readXplorer.ui.importer.ReadPairJobView readPairTrackJobsView;
-    private de.cebitec.readXplorer.ui.importer.RefJobView refJobView;
+    private de.cebitec.readxplorer.ui.importer.ReadPairJobView readPairTrackJobsView;
+    private de.cebitec.readxplorer.ui.importer.RefJobView refJobView;
     private javax.swing.JButton removeJob;
-    private de.cebitec.readXplorer.ui.importer.TrackJobView trackJobView;
+    private de.cebitec.readxplorer.ui.importer.TrackJobView trackJobView;
     // End of variables declaration//GEN-END:variables
 
 
