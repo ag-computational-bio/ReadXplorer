@@ -18,6 +18,7 @@
 package de.cebitec.readXplorer.tools.snp;
 
 
+import de.cebitec.readxplorer.tools.snpdetection.SnpTranslator;
 import de.cebitec.readxplorer.databackend.dataObjects.CodonSnp;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;

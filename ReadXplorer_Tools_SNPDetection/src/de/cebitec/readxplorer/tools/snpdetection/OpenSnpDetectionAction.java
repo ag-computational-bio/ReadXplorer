@@ -15,17 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.tools.snp;
+package de.cebitec.readxplorer.tools.snpdetection;
 
 
-import de.cebitec.readxplorer.databackend.AnalysesHandler;
-import de.cebitec.readxplorer.databackend.ParametersReadClasses;
-import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
-import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.connector.TrackConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.DataVisualisationI;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.VisualisationUtils;
@@ -34,6 +26,14 @@ import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceVi
 import de.cebitec.readXplorer.view.dialogMenus.OpenTracksWizardPanel;
 import de.cebitec.readXplorer.view.dialogMenus.SelectFeatureTypeWizardPanel;
 import de.cebitec.readXplorer.view.dialogMenus.SelectReadClassWizardPanel;
+import de.cebitec.readxplorer.databackend.AnalysesHandler;
+import de.cebitec.readxplorer.databackend.ParametersReadClasses;
+import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
+import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readxplorer.databackend.connector.TrackConnector;
+import de.cebitec.readxplorer.databackend.dataObjects.DataVisualisationI;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
@@ -62,8 +62,8 @@ import org.openide.windows.WindowManager;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 @ActionID( category = "Tools",
-           id = "de.cebitec.readXplorer.tools.snp.OpenSnpDetectionAction" )
-@ActionRegistration( iconBase = "de/cebitec/readXplorer/tools/snp/snpDetection.png",
+           id = "de.cebitec.readxplorer.tools.snpdetection.OpenSnpDetectionAction" )
+@ActionRegistration( iconBase = "de/cebitec/readxplorer/tools/snpdetection/snpDetection.png",
                      displayName = "#CTL_OpenSNPDetection" )
 @ActionReferences( {
     @ActionReference( path = "Menu/Tools", position = 125 ),

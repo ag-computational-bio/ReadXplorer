@@ -16,7 +16,7 @@
  */
 
 @HelpSetRegistration( helpSet = "snp-hs.xml", position = 3559 )
-package de.cebitec.readXplorer.tools.snp.docs;
+package de.cebitec.readxplorer.tools.snpdetection.docs;
 
 
 import org.netbeans.api.javahelp.HelpSetRegistration;

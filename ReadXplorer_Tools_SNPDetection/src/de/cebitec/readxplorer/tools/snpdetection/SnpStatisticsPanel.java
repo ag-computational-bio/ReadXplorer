@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.tools.snp;
+package de.cebitec.readxplorer.tools.snpdetection;
 
 
 import java.util.Map;
@@ -87,7 +87,9 @@ public class SnpStatisticsPanel extends javax.swing.JPanel {
             }
         });
         snpTypeScrollpane.setViewportView(snpTypeTable);
-        snpTypeTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(SnpStatisticsPanel.class, "SnpStatisticsPanel.snpTypeTable.columnModel.title0")); // NOI18N
+        if (snpTypeTable.getColumnModel().getColumnCount() > 0) {
+            snpTypeTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(SnpStatisticsPanel.class, "SnpStatisticsPanel.snpTypeTable.columnModel.title0")); // NOI18N
+        }
 
         snpEffectTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -120,7 +122,9 @@ public class SnpStatisticsPanel extends javax.swing.JPanel {
             }
         });
         snpEffectScrollpane.setViewportView(snpEffectTable);
-        snpEffectTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(SnpStatisticsPanel.class, "SnpStatisticsPanel.snpEffectTable.columnModel.title0")); // NOI18N
+        if (snpEffectTable.getColumnModel().getColumnCount() > 0) {
+            snpEffectTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(SnpStatisticsPanel.class, "SnpStatisticsPanel.snpEffectTable.columnModel.title0")); // NOI18N
+        }
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.tools.snp;
+package de.cebitec.readxplorer.tools.snpdetection;
 
 
 import de.cebitec.common.sequencetools.geneticcode.AminoAcidProperties;

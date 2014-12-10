@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.tools.snp;
+package de.cebitec.readxplorer.tools.snpdetection;
 
 
 import de.cebitec.readXplorer.view.TopComponentExtended;
@@ -33,13 +33,13 @@ import org.openide.windows.TopComponent;
  * <p>
  * @author jwinneba, rhilker
  */
-@ConvertAsProperties( dtd = "-//de.cebitec.readXplorer.tools.snp//SNP_Detection//EN",
+@ConvertAsProperties( dtd = "-//de.cebitec.readxplorer.tools.snpdetection//SNP_Detection//EN",
                       autostore = false )
 @TopComponent.Description( preferredID = "SNP_DetectionTopComponent",
-                           iconBase = "de/cebitec/readXplorer/tools/snp/snpDetection.png",
+                           iconBase = "de/cebitec/readxplorer/tools/snpdetection/snpDetection.png",
                            persistenceType = TopComponent.PERSISTENCE_ALWAYS )
 @TopComponent.Registration( mode = "output", openAtStartup = false )
-@ActionID( category = "Window", id = "de.cebitec.readXplorer.tools.snp.SNP_DetectionTopComponent" )
+@ActionID( category = "Window", id = "de.cebitec.readxplorer.tools.snpdetection.SNP_DetectionTopComponent" )
 @ActionReference( path = "Menu/Window", position = 950 )
 @TopComponent.OpenActionRegistration( displayName = "#CTL_SNP_DetectionAction",
                                       preferredID = "SNP_DetectionTopComponent" )
