@@ -2,7 +2,7 @@
 package de.cebitec.readxplorer.vcf.handling.visualization;
 
 
-import de.cebitec.readxplorer.view.datavisualisation.basePanel.BasePanel;
+import de.cebitec.readxplorer.ui.datavisualisation.basePanel.BasePanel;
 import java.awt.BorderLayout;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;

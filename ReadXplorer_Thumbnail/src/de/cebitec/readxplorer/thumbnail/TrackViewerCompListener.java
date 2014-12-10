@@ -20,7 +20,7 @@ package de.cebitec.readxplorer.thumbnail;
 
 import de.cebitec.readxplorer.databackend.IntervalRequest;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readxplorer.view.datavisualisation.trackviewer.TrackViewer;
+import de.cebitec.readxplorer.ui.datavisualisation.trackviewer.TrackViewer;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 

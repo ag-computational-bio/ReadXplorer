@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-OpenIDE-Module: de.cebitec.readXplorer.tools.referenceEditor
+OpenIDE-Module: de.cebitec.readxplorer.tools.referenceeditor
 OpenIDE-Module-Layer: de/cebitec/readxplorer/tools/referenceeditor/layer.xml
 OpenIDE-Module-Localizing-Bundle: de/cebitec/readxplorer/tools/referenceeditor/Bundle.properties
 OpenIDE-Module-Requires: org.openide.windows.WindowManager

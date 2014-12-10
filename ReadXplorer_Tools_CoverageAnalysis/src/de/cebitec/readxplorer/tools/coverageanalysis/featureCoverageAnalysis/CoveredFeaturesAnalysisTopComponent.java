@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.tools.coverageanalysis.featureCoverageAnalysis;
 
 
-import de.cebitec.readxplorer.view.TopComponentExtended;
-import de.cebitec.readxplorer.view.TopComponentHelper;
+import de.cebitec.readxplorer.ui.TopComponentExtended;
+import de.cebitec.readxplorer.ui.TopComponentHelper;
 import javax.swing.JPanel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
@@ -36,14 +36,14 @@ import org.openide.windows.TopComponent;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 @ConvertAsProperties(
-         dtd = "-//de.cebitec.readXplorer.genomeAnalyses//CoveredFeaturesAnalysis//EN",
+         dtd = "-//de.cebitec.readxplorer.genomeAnalyses//CoveredFeaturesAnalysis//EN",
          autostore = false )
 @TopComponent.Description(
          preferredID = "CoveredFeaturesAnalysisTopComponent",
          iconBase = "de/cebitec/readxplorer/genomeAnalyses/coveredFeatures.png",
          persistenceType = TopComponent.PERSISTENCE_ALWAYS )
 @TopComponent.Registration( mode = "output", openAtStartup = false )
-@ActionID( category = "Window", id = "de.cebitec.readXplorer.genomeAnalyses.CoveredFeaturesAnalysisTopComponent" )
+@ActionID( category = "Window", id = "de.cebitec.readxplorer.genomeAnalyses.CoveredFeaturesAnalysisTopComponent" )
 @ActionReference( path = "Menu/Window" /*, position = 333 */ )
 @TopComponent.OpenActionRegistration(
          displayName = "#CTL_CoveredFeaturesAnalysisAction",

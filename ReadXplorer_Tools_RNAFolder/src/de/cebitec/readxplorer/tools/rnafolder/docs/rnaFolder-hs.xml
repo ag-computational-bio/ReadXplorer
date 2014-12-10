@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <helpset version="2.0">
     <title>RNA Secondary Structure Prediction</title>
     <maps>
-        <homeID>de.cebitec.readXplorer.tools.rnaFolder.about</homeID>
+        <homeID>de.cebitec.readxplorer.tools.rnaFolder.about</homeID>
         <mapref location="rnaFolder-map.xml"/>
     </maps>
     <view mergetype="javax.help.AppendMerge">

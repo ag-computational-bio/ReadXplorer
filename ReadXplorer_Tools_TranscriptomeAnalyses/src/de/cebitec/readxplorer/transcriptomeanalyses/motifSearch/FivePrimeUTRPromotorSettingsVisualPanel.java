@@ -140,7 +140,7 @@ public final class FivePrimeUTRPromotorSettingsVisualPanel extends JPanel {
         alternativeSpacerTF = new javax.swing.JTextField();
         jSeparator2 = new javax.swing.JSeparator();
 
-        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cebitec/readXplorer/transcriptomeAnalyses/resources/promotorSearchWizardFig.png"))); // NOI18N
+        jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cebitec/readxplorer/transcriptomeanalyses/resources/promotorSearchWizardFig.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLabel6, org.openide.util.NbBundle.getMessage(FivePrimeUTRPromotorSettingsVisualPanel.class, "FivePrimeUTRPromotorSettingsVisualPanel.jLabel6.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(FivePrimeUTRPromotorSettingsVisualPanel.class, "FivePrimeUTRPromotorSettingsVisualPanel.jLabel1.text")); // NOI18N

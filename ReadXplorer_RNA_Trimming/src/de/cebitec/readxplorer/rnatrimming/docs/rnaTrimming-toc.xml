@@ -19,8 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <!DOCTYPE toc PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 2.0//EN" "http://java.sun.com/products/javahelp/toc_2_0.dtd">
 <toc version="2.0">
     <tocitem text="RNA Trimming Help">
-        <tocitem text="RNA Trimming" target="de.cebitec.readXplorer.rnaTrimming.about"/>
-        <tocitem text="Trimming methods" target="de.cebitec.readXplorer.rnaTrimming.methods"/>
-        <tocitem text="Correlation analysis" target="de.cebitec.readXplorer.rnaTrimming.correlationanalysis"/>
+        <tocitem text="RNA Trimming" target="de.cebitec.readxplorer.rnaTrimming.about"/>
+        <tocitem text="Trimming methods" target="de.cebitec.readxplorer.rnaTrimming.methods"/>
+        <tocitem text="Correlation analysis" target="de.cebitec.readxplorer.rnaTrimming.correlationanalysis"/>
     </tocitem>
 </toc>

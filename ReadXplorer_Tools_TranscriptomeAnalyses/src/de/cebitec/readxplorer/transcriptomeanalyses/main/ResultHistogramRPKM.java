@@ -3,7 +3,7 @@ package de.cebitec.readxplorer.transcriptomeanalyses.main;
 
 
 import de.cebitec.readxplorer.transcriptomeanalyses.datastructures.RPKMvalue;
-import de.cebitec.readxplorer.view.TopComponentExtended;
+import de.cebitec.readxplorer.ui.TopComponentExtended;
 import java.awt.BorderLayout;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;

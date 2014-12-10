@@ -3,7 +3,7 @@
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>de.cebitec.readXplorer.mapping</code-name-base>
+            <code-name-base>de.cebitec.readxplorer.mapping</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
@@ -15,7 +15,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>de.cebitec.readXplorer.api</code-name-base>
+                    <code-name-base>de.cebitec.readxplorer.api</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -23,7 +23,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>de.cebitec.readXplorer.databackend</code-name-base>
+                    <code-name-base>de.cebitec.readxplorer.databackend</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -31,7 +31,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>de.cebitec.readXplorer.util</code-name-base>
+                    <code-name-base>de.cebitec.readxplorer.utils</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -124,7 +124,7 @@
                 </test-type>
             </test-dependencies>
             <public-packages>
-                <package>de.cebitec.readXplorer.mapping.api</package>
+                <package>de.cebitec.readxplorer.mapping.api</package>
                 <package>de.cebitec.readxplorer.mapping.api</package>
             </public-packages>
         </data>

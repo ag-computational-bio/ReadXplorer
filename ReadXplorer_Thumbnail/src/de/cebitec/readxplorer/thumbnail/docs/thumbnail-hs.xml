@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <helpset version="2.0">
     <title>Thumbnail Viewer</title>
     <maps>
-        <homeID>de.cebitec.readXplorer.thumbnail.about</homeID>
+        <homeID>de.cebitec.readxplorer.thumbnail.about</homeID>
         <mapref location="thumbnail-map.xml"/>
     </maps>
     <view mergetype="javax.help.AppendMerge">

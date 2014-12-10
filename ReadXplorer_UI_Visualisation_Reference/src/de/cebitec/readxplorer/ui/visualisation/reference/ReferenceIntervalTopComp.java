@@ -19,14 +19,13 @@ package de.cebitec.readxplorer.ui.visualisation.reference;
 
 
 import de.cebitec.readxplorer.utils.classification.FeatureType;
-import de.cebitec.readxplorer.view.TopComponentExtended;
-import de.cebitec.readxplorer.view.datavisualisation.BoundsInfo;
-import de.cebitec.readxplorer.view.datavisualisation.MousePositionListener;
-import de.cebitec.readxplorer.view.datavisualisation.abstractviewer.AbstractViewer;
-import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
+import de.cebitec.readxplorer.ui.TopComponentExtended;
+import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfo;
+import de.cebitec.readxplorer.ui.datavisualisation.MousePositionListener;
+import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer;
+import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -44,7 +43,7 @@ import org.openide.windows.WindowManager;
 /**
  * Top component which displays something.
  */
-@ConvertAsProperties( dtd = "-//de.cebitec.readXplorer.ui.visualisation.reference//ReferenceInterval//EN", autostore = false )
+@ConvertAsProperties( dtd = "-//de.cebitec.readxplorer.ui.visualisation.reference//ReferenceInterval//EN", autostore = false )
 public final class ReferenceIntervalTopComp extends TopComponentExtended
         implements LookupListener, MousePositionListener {
 

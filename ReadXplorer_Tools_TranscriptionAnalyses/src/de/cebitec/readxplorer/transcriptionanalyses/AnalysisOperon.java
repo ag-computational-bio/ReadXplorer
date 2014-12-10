@@ -53,7 +53,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
     private final HashMap<Integer, OperonAdjacency> featureToPutativeOperonMap; //feature id of mappings to count for features
     private final List<OperonAdjacency> operonAdjacencies;
     private int averageReadLength = 0;
-    private int averageReadPairLength = 0;
+//    private int averageReadPairLength = 0;
     private int lastMappingIdx;
     private int readsFeature1 = 0;
     private int spanningReads = 0;
@@ -90,7 +90,7 @@ public class AnalysisOperon implements Observer, AnalysisI<List<Operon>> {
     private void initDatastructures() {
         Map<String, Integer> statsMap = trackConnector.getTrackStats().getStatsMap();
         averageReadLength = statsMap.get( StatsContainer.AVERAGE_READ_LENGTH );
-        averageReadPairLength = statsMap.get( StatsContainer.AVERAGE_READ_PAIR_SIZE );
+//        averageReadPairLength = statsMap.get( StatsContainer.AVERAGE_READ_PAIR_SIZE );
         refConnector = ProjectConnector.getInstance().getRefGenomeConnector( trackConnector.getRefGenome().getId() );
 
         for( PersistentChromosome chrom : refConnector.getChromosomesForGenome().values() ) {

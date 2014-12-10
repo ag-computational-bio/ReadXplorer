@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.rnatrimming.correlationAnalysis;
 
 
-import de.cebitec.readxplorer.view.dialogmenus.ChangeListeningWizardPanel;
-import de.cebitec.readxplorer.view.dialogmenus.OpenTracksVisualPanel;
+import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
+import de.cebitec.readxplorer.ui.dialogmenus.OpenTracksVisualPanel;
 
 
 /**

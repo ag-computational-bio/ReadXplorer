@@ -3,11 +3,11 @@
     <type>org.netbeans.modules.apisupport.project</type>
     <configuration>
         <data xmlns="http://www.netbeans.org/ns/nb-module-project/3">
-            <code-name-base>de.cebitec.readXplorer.ui.visualisation.track</code-name-base>
+            <code-name-base>de.cebitec.readxplorer.ui.visualisation.track</code-name-base>
             <suite-component/>
             <module-dependencies>
                 <dependency>
-                    <code-name-base>de.cebitec.readXplorer.databackend</code-name-base>
+                    <code-name-base>de.cebitec.readxplorer.databackend</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -15,7 +15,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>de.cebitec.readXplorer.util</code-name-base>
+                    <code-name-base>de.cebitec.readxplorer.utils</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>
@@ -23,7 +23,7 @@
                     </run-dependency>
                 </dependency>
                 <dependency>
-                    <code-name-base>de.cebitec.readXplorer.view</code-name-base>
+                    <code-name-base>de.cebitec.readxplorer.ui</code-name-base>
                     <build-prerequisite/>
                     <compile-dependency/>
                     <run-dependency>

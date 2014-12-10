@@ -2,7 +2,7 @@
 package de.cebitec.readxplorer.vcf.handling.importer;
 
 
-import de.cebitec.readxplorer.view.dialogmenus.ChangeListeningFinishWizardPanel;
+import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningFinishWizardPanel;
 import org.openide.WizardDescriptor;
 
 

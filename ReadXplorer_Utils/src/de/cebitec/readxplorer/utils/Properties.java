@@ -133,7 +133,7 @@ public class Properties {
     public static final byte ALL = 0;
 
     /**
-     * 'Yc' = Tag for read classification in one of the three readXplorer
+     * 'Yc' = Tag for read classification in one of the three readxplorer
      * classes.
      */
     public static final String TAG_READ_CLASS = "Yc";

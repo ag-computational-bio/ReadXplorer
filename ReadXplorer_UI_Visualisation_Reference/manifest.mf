@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-OpenIDE-Module: de.cebitec.readXplorer.ui.visualisation.reference
+OpenIDE-Module: de.cebitec.readxplorer.ui.visualisation.reference
 OpenIDE-Module-Layer: de/cebitec/readxplorer/ui/visualisation/reference/layer.xml
 OpenIDE-Module-Localizing-Bundle: de/cebitec/readxplorer/ui/visualisation/reference/Bundle.properties
 OpenIDE-Module-Requires: org.openide.windows.WindowManager

@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 -->
 
 <mode version="2.3">
-    <module name="de.cebitec.readXplorer.thumbnail" spec="1.0"/>
+    <module name="de.cebitec.readxplorer.thumbnail" spec="1.0"/>
     <name unique="ThumbMode"/>
     <kind type="editor"/>
     <state type="joined"/>

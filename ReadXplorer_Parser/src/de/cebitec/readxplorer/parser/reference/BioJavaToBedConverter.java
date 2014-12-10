@@ -17,16 +17,16 @@
 
 package de.cebitec.readxplorer.parser.reference;
 
-//package de.cebitec.readXplorer.parser.reference;
+//package de.cebitec.readxplorer.parser.reference;
 //
-//import de.cebitec.readXplorer.api.objects.FeatureType;
-//import de.cebitec.readXplorer.parser.ReferenceJob;
-//import de.cebitec.readXplorer.parser.common.ParsedFeature;
-//import de.cebitec.readXplorer.parser.common.ParsedReference;
-//import de.cebitec.readXplorer.parser.common.ParsedSubFeature;
-//import de.cebitec.readXplorer.parser.common.ParsingException;
-//import de.cebitec.readXplorer.parser.reference.Filter.FeatureFilter;
-//import de.cebitec.readXplorer.util.Observer;
+//import de.cebitec.readxplorer.api.objects.FeatureType;
+//import de.cebitec.readxplorer.parser.ReferenceJob;
+//import de.cebitec.readxplorer.parser.common.ParsedFeature;
+//import de.cebitec.readxplorer.parser.common.ParsedReference;
+//import de.cebitec.readxplorer.parser.common.ParsedSubFeature;
+//import de.cebitec.readxplorer.parser.common.ParsingException;
+//import de.cebitec.readxplorer.parser.reference.Filter.FeatureFilter;
+//import de.cebitec.readxplorer.utils.Observer;
 //import java.io.BufferedReader;
 //import java.io.BufferedWriter;
 //import java.io.FileReader;
@@ -200,7 +200,7 @@ package de.cebitec.readxplorer.parser.reference;
 //                        }
 //
 //                        /*
-//                         * If the type of the annotation is unknown to readXplorer (see below),
+//                         * If the type of the annotation is unknown to readxplorer (see below),
 //                         * an undefined type is used.
 //                         */
 //                        FeatureType type = FeatureType.UNDEFINED;

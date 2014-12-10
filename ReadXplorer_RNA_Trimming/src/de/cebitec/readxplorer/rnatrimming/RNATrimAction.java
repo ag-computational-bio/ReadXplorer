@@ -46,7 +46,7 @@ import org.openide.util.NbBundle.Messages;
  */
 @ActionID(
          category = "Tools",
-         id = "de.cebitec.readXplorer.rnaTrimming.RNATrimAction" )
+         id = "de.cebitec.readxplorer.rnaTrimming.RNATrimAction" )
 @ActionRegistration(
          displayName = "#CTL_RNATrimAction" )
 @ActionReference( path = "Menu/Tools", position = 155 )

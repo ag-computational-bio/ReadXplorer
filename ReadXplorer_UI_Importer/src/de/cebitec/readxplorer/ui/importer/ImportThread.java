@@ -483,7 +483,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
         this.showMsg( "Your current JVM config allows up to " + GeneralUtils.formatNumber( rt.maxMemory() / 1000000 ) + " MB of memory to be allocated." );
         this.showMsg( "Currently the platform is using " + GeneralUtils.formatNumber( (rt.totalMemory() - rt.freeMemory()) / 1000000 ) + " MB of memory." );
         this.showMsg( "Please be aware that you might need to change the -J-d64 and -J-Xmx value of your JVM to process large imports successfully." );
-        this.showMsg( "The value can be configured in the ../readXplorer/etc/readXplorer.conf file in the application folder." );
+        this.showMsg( "The value can be configured in the ../readxplorer/etc/readxplorer.conf file in the application folder." );
         this.showMsg( "" );
 
         this.processTrackJobs();

@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.tools.snpdetection;
 
 
-import de.cebitec.readxplorer.view.TopComponentExtended;
-import de.cebitec.readxplorer.view.TopComponentHelper;
+import de.cebitec.readxplorer.ui.TopComponentExtended;
+import de.cebitec.readxplorer.ui.TopComponentHelper;
 import javax.swing.JPanel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;

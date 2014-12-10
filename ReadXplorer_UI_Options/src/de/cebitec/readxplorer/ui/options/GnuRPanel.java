@@ -635,7 +635,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             r_dll = r_dir.getAbsolutePath() + File.separator + "bin" + File.separator + "x64";
         }
 
-        try( InputStream jarPath = GnuRPanel.class.getResourceAsStream( "/de/cebitec/readXplorer/options/setPath.ps1" ) ) {
+        try( InputStream jarPath = GnuRPanel.class.getResourceAsStream( "/de/cebitec/readxplorer/options/setPath.ps1" ) ) {
             File to = File.createTempFile( "ReadXplorer_", ".ps1" );
             to.deleteOnExit();
             Files.copy( jarPath, to.toPath(), StandardCopyOption.REPLACE_EXISTING );

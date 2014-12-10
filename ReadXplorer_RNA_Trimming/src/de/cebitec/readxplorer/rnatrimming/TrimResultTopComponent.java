@@ -18,9 +18,9 @@
 package de.cebitec.readxplorer.rnatrimming;
 
 
-import de.cebitec.readxplorer.utils.TabWithCloseX;
-import de.cebitec.readxplorer.view.TopComponentExtended;
 import de.cebitec.readxplorer.rnatrimming.correlationAnalysis.CorrelationResultTopComponent;
+import de.cebitec.readxplorer.utils.TabWithCloseX;
+import de.cebitec.readxplorer.ui.TopComponentExtended;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import java.util.logging.Logger;
@@ -39,14 +39,14 @@ import org.openide.windows.WindowManager;
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 @ConvertAsProperties(
-         dtd = "-//de.cebitec.readXplorer.correlationAnalysis//TrimResult//EN",
+         dtd = "-//de.cebitec.readxplorer.rnatrimming.correlationAnalysis//TrimResult//EN",
          autostore = false )
 @TopComponent.Description(
          preferredID = "TrimResultTopComponent",
          //iconBase="SET/PATH/TO/ICON/HERE",
          persistenceType = TopComponent.PERSISTENCE_ALWAYS )
 @TopComponent.Registration( mode = "editor", openAtStartup = false )
-@ActionID( category = "Window", id = "de.cebitec.readXplorer.correlationAnalysis.TrimResultTopComponent" )
+@ActionID( category = "Window", id = "de.cebitec.readxplorer.rnatrimming.correlationAnalysis.TrimResultTopComponent" )
 @ActionReference( path = "Menu/Window"/* , position = 951*/ )
 @TopComponent.OpenActionRegistration(
          displayName = "#CTL_TrimResultAction",

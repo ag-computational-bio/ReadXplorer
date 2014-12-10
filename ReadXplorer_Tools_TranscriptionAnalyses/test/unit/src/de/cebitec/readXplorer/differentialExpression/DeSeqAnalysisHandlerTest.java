@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.differentialExpression;
+package de.cebitec.readxplorer.differentialexpression;
 
-//package de.cebitec.readXplorer.differentialExpression;
+//package de.cebitec.readxplorer.differentialExpression;
 //
-//import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
-//import de.cebitec.readXplorer.util.FeatureType;
+//import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+//import de.cebitec.readxplorer.utilss.FeatureType;
 //import java.sql.Timestamp;
 //import java.util.ArrayList;
 //import java.util.Calendar;
@@ -38,7 +38,7 @@ package de.cebitec.readXplorer.differentialExpression;
 // *
 // * @author Kai
 // */
-//public class DeSeqAnalysisHandlerTest implements de.cebitec.readXplorer.util.Observer {
+//public class DeSeqAnalysisHandlerTest implements de.cebitec.readxplorer.utils.Observer {
 //
 //    private DeSeqAnalysisHandler instance;
 //    private static final int numberOfTracks = 4;

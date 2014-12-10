@@ -15,10 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.parser.common;
+package de.cebitec.readxplorer.parser.common;
 
 
-import de.cebitec.readxplorer.parser.common.ParsedClassification;
 import net.sf.samtools.SAMFileHeader;
 import org.junit.After;
 import org.junit.AfterClass;

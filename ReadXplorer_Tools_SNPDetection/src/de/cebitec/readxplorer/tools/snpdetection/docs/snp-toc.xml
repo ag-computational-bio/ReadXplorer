@@ -19,6 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <!DOCTYPE toc PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 2.0//EN" "http://java.sun.com/products/javahelp/toc_2_0.dtd">
 <toc version="2.0">
     <tocitem text="SNP and DIP Detection Help">
-        <tocitem text="SNP and DIP Detection" target="de.cebitec.readXplorer.tools.snp.about"/>
+        <tocitem text="SNP and DIP Detection" target="de.cebitec.readxplorer.tools.snp.about"/>
     </tocitem>
 </toc>

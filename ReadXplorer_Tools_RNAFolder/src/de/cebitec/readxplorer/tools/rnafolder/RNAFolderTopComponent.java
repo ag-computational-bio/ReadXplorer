@@ -21,7 +21,7 @@ package de.cebitec.readxplorer.tools.rnafolder;
 import de.cebitec.readxplorer.tools.rnafolder.rnamovies.MoviePane;
 import de.cebitec.readxplorer.tools.rnafolder.rnamovies.actions.Export;
 import de.cebitec.readxplorer.utils.TabWithCloseX;
-import de.cebitec.readxplorer.view.TopComponentExtended;
+import de.cebitec.readxplorer.ui.TopComponentExtended;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -36,7 +36,7 @@ import org.openide.windows.WindowManager;
  * Top component displaying a tabbed pane for visualizing folded RNAs (with the
  * aid of RNAFold and RNAMovies).
  */
-@ConvertAsProperties( dtd = "-//de.cebitec.readXplorer.tools.rnaFolder//RNAFolder//EN",
+@ConvertAsProperties( dtd = "-//de.cebitec.readxplorer.tools.rnaFolder//RNAFolder//EN",
                       autostore = false )
 public final class RNAFolderTopComponent extends TopComponentExtended {
 

@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.utils.classification;
 
 
 /**
- * Enumeration for all different features types used in readXplorer. This does
+ * Enumeration for all different features types used in readxplorer. This does
  * not only
  * include genetic features, but also features displayed in viewers.
  * Each type is created with an integer and a string representation and

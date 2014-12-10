@@ -18,7 +18,6 @@
 package de.cebitec.readxplorer.rnatrimming.correlationAnalysis;
 
 
-import de.cebitec.readxplorer.rnatrimming.correlationAnalysis.CorrelationAnalysisAction.CorrelationCoefficient;
 import de.cebitec.readxplorer.databackend.IntervalRequest;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException;
@@ -29,8 +28,9 @@ import de.cebitec.readxplorer.databackend.dataObjects.CoverageAndDiffResult;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.rnatrimming.correlationAnalysis.CorrelationAnalysisAction.CorrelationCoefficient;
 import de.cebitec.readxplorer.utils.SequenceUtils;
-import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
+import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -68,7 +68,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
 
     private List<CoverageAndDiffResult> resultList;
     private List<TrackConnector> trackConnectors;
-    private boolean ready = false;
+//    private boolean ready = false;
     private final Map<Integer, PersistentChromosome> chromMap;
     private int lastChromId = 0;
     private final ParameterSetCorrelationAnalysis analysisParams;
@@ -88,7 +88,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
     public CorrelationAnalysisProcessor( ReferenceViewer referenceViewer, ParameterSetCorrelationAnalysis analysisParams ) {
 
         this.analysisParams = analysisParams;
-        this.ready = false;
+//        this.ready = false;
         this.currentPosition = 1;
         this.strand = SequenceUtils.STRAND_FWD;
         this.correlationsList = new ArrayList<>();
@@ -326,7 +326,7 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
      */
     private void finish() {
         ph.finish();
-        ready = true;
+//        ready = true;
         this.resultView.ready( this.analysisResult );
     }
 

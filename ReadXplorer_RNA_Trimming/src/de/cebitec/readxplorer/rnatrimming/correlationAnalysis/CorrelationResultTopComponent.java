@@ -19,8 +19,8 @@ package de.cebitec.readxplorer.rnatrimming.correlationAnalysis;
 
 
 import de.cebitec.readxplorer.utils.TabWithCloseX;
-import de.cebitec.readxplorer.view.TopComponentExtended;
-import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
+import de.cebitec.readxplorer.ui.TopComponentExtended;
+import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import java.util.logging.Logger;
@@ -38,14 +38,14 @@ import org.openide.windows.WindowManager;
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 @ConvertAsProperties(
-         dtd = "-//de.cebitec.readXplorer.correlationAnalysis//CorrelationResult//EN",
+         dtd = "-//de.cebitec.readxplorer.rnatrimming.correlationAnalysis//CorrelationResult//EN",
          autostore = false )
 @TopComponent.Description(
          preferredID = "CorrelationResultTopComponent",
          //iconBase="SET/PATH/TO/ICON/HERE",
          persistenceType = TopComponent.PERSISTENCE_ALWAYS )
 @TopComponent.Registration( mode = "output", openAtStartup = false )
-@ActionID( category = "Window", id = "de.cebitec.readXplorer.correlationAnalysis.CorrelationResultTopComponent" )
+@ActionID( category = "Window", id = "de.cebitec.readxplorer.rnatrimming.correlationAnalysis.CorrelationResultTopComponent" )
 @ActionReference( path = "Menu/Window"/* , position = 951*/ )
 @TopComponent.OpenActionRegistration(
          displayName = "#CTL_CorrelationResultAction",

@@ -44,15 +44,15 @@ public abstract class ReadXplorerFileChooser extends JFileChooser {
     private static final long serialVersionUID = 1L;
 
     protected Object data;
-    private String[] fileExtensions;
-    private String fileDescription;
+//    private String[] fileExtensions;
+//    private String fileDescription;
     private Preferences pref;
     private String directoryProperty;
     private String currentDirectory;
 
 
     /**
-     * Creates a new readXplorer file chooser.
+     * Creates a new readxplorer file chooser.
      *
      * @param fileExtensions  the file extensions to use. If the first entry is
      *                        the empty string, no file filter is set
@@ -64,7 +64,7 @@ public abstract class ReadXplorerFileChooser extends JFileChooser {
 
 
     /**
-     * Creates a new readXplorer file chooser.
+     * Creates a new readxplorer file chooser.
      *
      * @param fileExtensions  the file extensions to use. If the first entry is
      *                        the empty string, no file filter is set
@@ -74,8 +74,8 @@ public abstract class ReadXplorerFileChooser extends JFileChooser {
      */
     public ReadXplorerFileChooser( final String[] fileExtensions, String fileDescription, final Object data ) {
         this.data = data;
-        this.fileExtensions = fileExtensions;
-        this.fileDescription = fileDescription;
+//        this.fileExtensions = fileExtensions;
+//        this.fileDescription = fileDescription;
         if( fileExtensions != null && !fileExtensions[0].isEmpty() ) {
             this.setFileFilter( new FileNameExtensionFilter( fileDescription, fileExtensions ) );
         }
@@ -87,8 +87,8 @@ public abstract class ReadXplorerFileChooser extends JFileChooser {
     /**
      * Opens a file chooser for input or output file selection/creation.
      *
-     * @param option the option: readXplorerFileChooser.OPEN_DIALOG for file
-     *               selection and readXplorerFileChooser.SAVE_DIALOG for storing a file.
+     * @param option the option: readxplorerFileChooser.OPEN_DIALOG for file
+     *               selection and readxplorerFileChooser.SAVE_DIALOG for storing a file.
      */
     public void openFileChooser( final int option ) {
 
@@ -170,8 +170,8 @@ public abstract class ReadXplorerFileChooser extends JFileChooser {
         File file = new File( fileLocation );
         if( file.exists() ) {
             final int overwriteFile = JOptionPane.showConfirmDialog( jfc, NbBundle.getMessage( ReadXplorerFileChooser.class,
-                                                                                               "readXplorerFileChooser.FileExists" ), NbBundle.getMessage( ReadXplorerFileChooser.class,
-                                                                                                                                                           "readXplorerFileChooser.Dialog" ), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE );
+                                                                                               "readxplorerFileChooser.FileExists" ), NbBundle.getMessage( ReadXplorerFileChooser.class,
+                                                                                                                                                           "readxplorerFileChooser.Dialog" ), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE );
             if( overwriteFile == JOptionPane.YES_OPTION ) {
                 this.save( fileLocation );
             }

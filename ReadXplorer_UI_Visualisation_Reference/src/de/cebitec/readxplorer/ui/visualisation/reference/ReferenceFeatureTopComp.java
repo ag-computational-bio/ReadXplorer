@@ -18,13 +18,13 @@
 package de.cebitec.readxplorer.ui.visualisation.reference;
 
 
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.polyTree.Node;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readxplorer.view.TopComponentExtended;
-import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.JFeature;
-import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
-import de.cebitec.readxplorer.view.tablevisualization.TableUtils;
+import de.cebitec.readxplorer.ui.TopComponentExtended;
+import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.JFeature;
+import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
+import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
@@ -45,7 +45,7 @@ import org.openide.windows.WindowManager;
  * Top component which displays the details of the currently selected
  * reference feature.
  */
-@ConvertAsProperties( dtd = "-//de.cebitec.readXplorer.ui.visualisation.reference//ReferenceFeature//EN", autostore = false )
+@ConvertAsProperties( dtd = "-//de.cebitec.readxplorer.ui.visualisation.reference//ReferenceFeature//EN", autostore = false )
 public final class ReferenceFeatureTopComp extends TopComponentExtended
         implements LookupListener {
 

@@ -20,64 +20,64 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <filesystem>
     <folder name="Actions">
         <folder name="Visualisation">
-            <file name="de-cebitec-readXplorer-ui-visualisation-actions-CloseRefGenAction.instance">
+            <file name="de-cebitec-readxplorer-ui-visualisation-actions-CloseRefGenAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
-                <attr name="displayName" bundlevalue="de.cebitec.readXplorer.ui.visualisation.actions.Bundle#CTL_CloseRefGenAction"/>
-                <attr name="iconBase" stringvalue="de/cebitec/readXplorer/ui/visualisation/refClose.png"/>
-                <attr name="injectable" stringvalue="de.cebitec.readXplorer.ui.visualisation.actions.CloseRefGenAction"/>
+                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.ui.visualisation.actions.Bundle#CTL_CloseRefGenAction"/>
+                <attr name="iconBase" stringvalue="de/cebitec/readxplorer/ui/visualisation/refClose.png"/>
+                <attr name="injectable" stringvalue="de.cebitec.readxplorer.ui.visualisation.actions.CloseRefGenAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
-                <attr name="type" stringvalue="de.cebitec.readXplorer.api.cookies.CloseRefGenCookie"/>
+                <attr name="type" stringvalue="de.cebitec.readxplorer.api.cookies.CloseRefGenCookie"/>
             </file>
-            <file name="de-cebitec-readXplorer-ui-visualisation-actions-CloseTrackAction.instance">
+            <file name="de-cebitec-readxplorer-ui-visualisation-actions-CloseTrackAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
-                <attr name="displayName" bundlevalue="de.cebitec.readXplorer.ui.visualisation.actions.Bundle#CTL_CloseTrackAction"/>
-                <attr name="iconBase" stringvalue="de/cebitec/readXplorer/ui/visualisation/trackClose.png"/>
-                <attr name="injectable" stringvalue="de.cebitec.readXplorer.ui.visualisation.actions.CloseTrackAction"/>
+                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.ui.visualisation.actions.Bundle#CTL_CloseTrackAction"/>
+                <attr name="iconBase" stringvalue="de/cebitec/readxplorer/ui/visualisation/trackClose.png"/>
+                <attr name="injectable" stringvalue="de.cebitec.readxplorer.ui.visualisation.actions.CloseTrackAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="ANY"/>
-                <attr name="type" stringvalue="de.cebitec.readXplorer.api.cookies.CloseTrackCookie"/>
+                <attr name="type" stringvalue="de.cebitec.readxplorer.api.cookies.CloseTrackCookie"/>
             </file><!--
-            <file name="de-cebitec-readXplorer-ui-visualisation-actions-OpenRefGenDialogAction.instance">
+            <file name="de-cebitec-readxplorer-ui-visualisation-actions-OpenRefGenDialogAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
-                <attr name="displayName" bundlevalue="de.cebitec.readXplorer.ui.visualisation.actions.Bundle#CTL_OpenRefGenDialogAction"/>
-                <attr name="iconBase" stringvalue="de/cebitec/readXplorer/ui/visualisation/refOpen.png"/>
-                <attr name="injectable" stringvalue="de.cebitec.readXplorer.ui.visualisation.actions.OpenRefGenDialogAction"/>
+                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.ui.visualisation.actions.Bundle#CTL_OpenRefGenDialogAction"/>
+                <attr name="iconBase" stringvalue="de/cebitec/readxplorer/ui/visualisation/refOpen.png"/>
+                <attr name="injectable" stringvalue="de.cebitec.readxplorer.ui.visualisation.actions.OpenRefGenDialogAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
-                <attr name="type" stringvalue="de.cebitec.readXplorer.api.cookies.OpenRefGenCookie"/>
+                <attr name="type" stringvalue="de.cebitec.readxplorer.api.cookies.OpenRefGenCookie"/>
             </file>-->
-            <file name="de-cebitec-readXplorer-ui-visualisation-actions-OpenRefGenViewerAction.instance">
+            <file name="de-cebitec-readxplorer-ui-visualisation-actions-OpenRefGenViewerAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
-                <attr name="displayName" bundlevalue="de.cebitec.readXplorer.ui.visualisation.actions.Bundle#CTL_OpenRefGenViewerAction"/>
-                <attr name="iconBase" stringvalue="de/cebitec/readXplorer/ui/visualisation/refOpen.png"/>
-                <attr name="injectable" stringvalue="de.cebitec.readXplorer.ui.visualisation.actions.OpenRefGenViewerAction"/>
+                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.ui.visualisation.actions.Bundle#CTL_OpenRefGenViewerAction"/>
+                <attr name="iconBase" stringvalue="de/cebitec/readxplorer/ui/visualisation/refOpen.png"/>
+                <attr name="injectable" stringvalue="de.cebitec.readxplorer.ui.visualisation.actions.OpenRefGenViewerAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
-                <attr name="type" stringvalue="de.cebitec.readXplorer.api.cookies.LoginCookie"/>
+                <attr name="type" stringvalue="de.cebitec.readxplorer.api.cookies.LoginCookie"/>
             </file>
-            <file name="de-cebitec-readXplorer-ui-visualisation-actions-OpenTrackAction.instance">
+            <file name="de-cebitec-readxplorer-ui-visualisation-actions-OpenTrackAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
-                <attr name="displayName" bundlevalue="de.cebitec.readXplorer.ui.visualisation.actions.Bundle#CTL_OpenTrackAction"/>
-                <attr name="iconBase" stringvalue="de/cebitec/readXplorer/ui/visualisation/trackOpen.png"/>
-                <attr name="injectable" stringvalue="de.cebitec.readXplorer.ui.visualisation.actions.OpenTrackAction"/>
+                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.ui.visualisation.actions.Bundle#CTL_OpenTrackAction"/>
+                <attr name="iconBase" stringvalue="de/cebitec/readxplorer/ui/visualisation/trackOpen.png"/>
+                <attr name="injectable" stringvalue="de.cebitec.readxplorer.ui.visualisation.actions.OpenTrackAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="ANY"/>
-                <attr name="type" stringvalue="de.cebitec.readXplorer.api.cookies.OpenTrackCookie"/>
+                <attr name="type" stringvalue="de.cebitec.readxplorer.api.cookies.OpenTrackCookie"/>
             </file>
         </folder>
         <folder name="Window">
-            <!--            <file name="de-cebitec-readXplorer-ui-visualisation-AppPanelAction.instance">
-                <attr name="component" methodvalue="de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent.findInstance"/>
-                <attr name="displayName" bundlevalue="de.cebitec.readXplorer.ui.visualisation.Bundle#CTL_AppPanelAction"/>
+            <!--            <file name="de-cebitec-readxplorer-ui-visualisation-AppPanelAction.instance">
+                <attr name="component" methodvalue="de.cebitec.readxplorer.ui.visualisation.AppPanelTopComponent.findInstance"/>
+                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.ui.visualisation.Bundle#CTL_AppPanelAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
             </file>
-            <file name="de-cebitec-readXplorer-ui-visualisation-actions-TrackCloseSelectionAction.instance">
+            <file name="de-cebitec-readxplorer-ui-visualisation-actions-TrackCloseSelectionAction.instance">
                 <attr name="position" intvalue="230"/>
             </file>-->
         </folder>
@@ -86,66 +86,66 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <folder name="Visualisation">
             <attr name="position" intvalue="250"/>
 
-            <file name="de-cebitec-readXplorer-ui-visualisation-actions-CloseRefGenAction-separatorAfter.instance">
+            <file name="de-cebitec-readxplorer-ui-visualisation-actions-CloseRefGenAction-separatorAfter.instance">
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                 <attr name="position" intvalue="300"/>
             </file>
-            <file name="de-cebitec-readXplorer-ui-visualisation-actions-CloseRefGenAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readXplorer-ui-visualisation-actions-CloseRefGenAction.instance"/>
+            <file name="de-cebitec-readxplorer-ui-visualisation-actions-CloseRefGenAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readxplorer-ui-visualisation-actions-CloseRefGenAction.instance"/>
                 <attr name="position" intvalue="200"/>
             </file>
 
-            <file name="de-cebitec-readXplorer-ui-visualisation-actions-MyCancelableAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readXplorer-ui-visualisation-actions-MyCancelableAction.instance"/>
+            <file name="de-cebitec-readxplorer-ui-visualisation-actions-MyCancelableAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readxplorer-ui-visualisation-actions-MyCancelableAction.instance"/>
                 <attr name="position" intvalue="205"/>
             </file>
 
-            <file name="de-cebitec-readXplorer-ui-visualisation-actions-CloseTrackAction-separatorAfter.instance">
+            <file name="de-cebitec-readxplorer-ui-visualisation-actions-CloseTrackAction-separatorAfter.instance">
                 <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                 <attr name="position" intvalue="600"/>
             </file>
-            <file name="de-cebitec-readXplorer-ui-visualisation-actions-CloseTrackAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readXplorer-ui-visualisation-actions-CloseTrackAction.instance"/>
+            <file name="de-cebitec-readxplorer-ui-visualisation-actions-CloseTrackAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readxplorer-ui-visualisation-actions-CloseTrackAction.instance"/>
                 <attr name="position" intvalue="500"/>
             </file><!--
-            <file name="de-cebitec-readXplorer-ui-visualisation-actions-OpenRefGenDialogAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readXplorer-ui-visualisation-actions-OpenRefGenDialogAction.instance"/>
+            <file name="de-cebitec-readxplorer-ui-visualisation-actions-OpenRefGenDialogAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readxplorer-ui-visualisation-actions-OpenRefGenDialogAction.instance"/>
                 <attr name="position" intvalue="100"/>
             </file>-->
-            <file name="de-cebitec-readXplorer-ui-visualisation-actions-OpenRefGenViewerAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readXplorer-ui-visualisation-actions-OpenRefGenViewerAction.instance"/>
+            <file name="de-cebitec-readxplorer-ui-visualisation-actions-OpenRefGenViewerAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readxplorer-ui-visualisation-actions-OpenRefGenViewerAction.instance"/>
                 <attr name="position" intvalue="101"/>
             </file>
-            <file name="de-cebitec-readXplorer-ui-visualisation-actions-OpenTrackAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readXplorer-ui-visualisation-actions-OpenTrackAction.instance"/>
+            <file name="de-cebitec-readxplorer-ui-visualisation-actions-OpenTrackAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readxplorer-ui-visualisation-actions-OpenTrackAction.instance"/>
                 <attr name="position" intvalue="400"/>
             </file>
         </folder><!--
         <folder name="Window">
-            <file name="de-cebitec-readXplorer-ui-visualisation-actions-TrackCloseSelectionAction.shadow">
+            <file name="de-cebitec-readxplorer-ui-visualisation-actions-TrackCloseSelectionAction.shadow">
                 <attr name="position" intvalue="230"/>
                 <attr name="originalFile"
-                stringvalue="Actions/Window/de-cebitec-readXplorer-ui-visualisation-actions-TrackCloseSelectionAction.instance"/>
+                stringvalue="Actions/Window/de-cebitec-readxplorer-ui-visualisation-actions-TrackCloseSelectionAction.instance"/>
             </file>
         </folder>-->
     </folder>
     <folder name="Toolbars">
         <folder name="Visualisation">
             <attr name="position" intvalue="150"/>
-            <file name="de-cebitec-readXplorer-ui-visualisation-actions-CloseRefGenAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readXplorer-ui-visualisation-actions-CloseRefGenAction.instance"/>
+            <file name="de-cebitec-readxplorer-ui-visualisation-actions-CloseRefGenAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readxplorer-ui-visualisation-actions-CloseRefGenAction.instance"/>
                 <attr name="position" intvalue="350"/>
             </file>
-            <file name="de-cebitec-readXplorer-ui-visualisation-actions-CloseTrackAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readXplorer-ui-visualisation-actions-CloseTrackAction.instance"/>
+            <file name="de-cebitec-readxplorer-ui-visualisation-actions-CloseTrackAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readxplorer-ui-visualisation-actions-CloseTrackAction.instance"/>
                 <attr name="position" intvalue="387"/>
             </file>
-            <file name="de-cebitec-readXplorer-ui-visualisation-actions-OpenRefGenViewerAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readXplorer-ui-visualisation-actions-OpenRefGenViewerAction.instance"/>
+            <file name="de-cebitec-readxplorer-ui-visualisation-actions-OpenRefGenViewerAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readxplorer-ui-visualisation-actions-OpenRefGenViewerAction.instance"/>
                 <attr name="position" intvalue="301"/>
             </file>
-            <file name="de-cebitec-readXplorer-ui-visualisation-actions-OpenTrackAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readXplorer-ui-visualisation-actions-OpenTrackAction.instance"/>
+            <file name="de-cebitec-readxplorer-ui-visualisation-actions-OpenTrackAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/Visualisation/de-cebitec-readxplorer-ui-visualisation-actions-OpenTrackAction.instance"/>
                 <attr name="position" intvalue="375"/>
             </file>
         </folder>

@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.thumbnail;
 
 
-import de.cebitec.readxplorer.view.datavisualisation.trackviewer.CoverageZoomSlider;
-import de.cebitec.readxplorer.view.datavisualisation.trackviewer.TrackViewer;
+import de.cebitec.readxplorer.ui.datavisualisation.trackviewer.CoverageZoomSlider;
+import de.cebitec.readxplorer.ui.datavisualisation.trackviewer.TrackViewer;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.event.ChangeEvent;

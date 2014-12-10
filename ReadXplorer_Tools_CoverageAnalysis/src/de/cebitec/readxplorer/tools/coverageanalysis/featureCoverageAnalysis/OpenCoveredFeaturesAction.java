@@ -18,14 +18,6 @@
 package de.cebitec.readxplorer.tools.coverageanalysis.featureCoverageAnalysis;
 
 
-import de.cebitec.readxplorer.utils.Pair;
-import de.cebitec.readxplorer.utils.VisualisationUtils;
-import de.cebitec.readxplorer.utils.classification.FeatureType;
-import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
-import de.cebitec.readxplorer.view.dialogmenus.OpenTracksVisualPanel;
-import de.cebitec.readxplorer.view.dialogmenus.OpenTracksWizardPanel;
-import de.cebitec.readxplorer.view.dialogmenus.SelectFeatureTypeWizardPanel;
-import de.cebitec.readxplorer.view.dialogmenus.SelectReadClassWizardPanel;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
@@ -34,6 +26,14 @@ import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.utils.Pair;
+import de.cebitec.readxplorer.utils.VisualisationUtils;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
+import de.cebitec.readxplorer.ui.dialogmenus.OpenTracksVisualPanel;
+import de.cebitec.readxplorer.ui.dialogmenus.OpenTracksWizardPanel;
+import de.cebitec.readxplorer.ui.dialogmenus.SelectFeatureTypeWizardPanel;
+import de.cebitec.readxplorer.ui.dialogmenus.SelectReadClassWizardPanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
@@ -63,7 +63,7 @@ import org.openide.windows.WindowManager;
  */
 @ActionID(
          category = "Tools",
-         id = "de.cebitec.readXplorer.genomeAnalyses.OpenCoveredFeaturesAction" )
+         id = "de.cebitec.readxplorer.genomeAnalyses.OpenCoveredFeaturesAction" )
 @ActionRegistration(
          iconBase = "de/cebitec/readxplorer/tools/coverageanalysis/featureCoverageAnalysis/coveredFeatures.png",
          displayName = "#CTL_OpenCoveredFeaturesAction" )

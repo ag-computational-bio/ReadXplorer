@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <helpset version="2.0">
     <title>Transcription Analyses (TSS, RPKM and Read Count, Operon Analyses)</title>
     <maps>
-        <homeID>de.cebitec.readXplorer.transcriptionAnalyses.about</homeID>
+        <homeID>de.cebitec.readxplorer.transcriptionAnalyses.about</homeID>
         <mapref location="transcriptionAnalyses-map.xml"/>
     </maps>
     <view mergetype="javax.help.AppendMerge">

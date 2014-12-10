@@ -49,7 +49,7 @@ public class TrackJob implements Job {
      *                          reference
      * @param parser            the parser to use for parsing
      * @param isAlreadyImported true, if this track was already imported in
-     *                          another readXplorer db.
+     *                          another readxplorer db.
      * @param timestamp         the timestamp when it was created
      */
     public TrackJob( int trackID, File file, String description, ReferenceJob refGen,
@@ -153,7 +153,7 @@ public class TrackJob implements Job {
 
 
     /**
-     * @return true, if this track was already imported in another readXplorer
+     * @return true, if this track was already imported in another readxplorer
      *         db, false otherwise.
      */
     public boolean isAlreadyImported() {

@@ -23,7 +23,7 @@ import java.net.URL;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 
-//import de.cebitec.readXplorer.tools.rnaFolder.rnamovies.RNAMovies;
+//import de.cebitec.readxplorer.tools.rnaFolder.rnamovies.RNAMovies;
 
 public abstract class MovieAction extends AbstractAction {
 

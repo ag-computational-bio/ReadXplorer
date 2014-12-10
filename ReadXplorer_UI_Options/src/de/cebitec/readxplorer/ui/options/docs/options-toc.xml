@@ -19,6 +19,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <!DOCTYPE toc PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 2.0//EN" "http://java.sun.com/products/javahelp/toc_2_0.dtd">
 <toc version="2.0">
     <tocitem text="General Options Help">
-        <tocitem text="General Options" target="de.cebitec.readXplorer.options.about"/>
+        <tocitem text="General Options" target="de.cebitec.readxplorer.options.about"/>
     </tocitem>
 </toc>

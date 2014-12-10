@@ -18,8 +18,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <!DOCTYPE settings PUBLIC "-//NetBeans//DTD Session settings 1.0//EN" "http://www.netbeans.org/dtds/sessionsettings-1_0.dtd">
 <settings version="1.0">
-    <module name="de.cebitec.readXplorer.ui.visualisation.reference" spec="1.0"/>
+    <module name="de.cebitec.readxplorer.ui.visualisation.reference" spec="1.0"/>
     <instanceof class="org.openide.windows.TopComponent"/>
-    <instanceof class="de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp"/>
-    <instance class="de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp" method="getDefault"/>
+    <instanceof class="de.cebitec.readxplorer.ui.visualisation.reference.ReferenceFeatureTopComp"/>
+    <instance class="de.cebitec.readxplorer.ui.visualisation.reference.ReferenceFeatureTopComp" method="getDefault"/>
 </settings>

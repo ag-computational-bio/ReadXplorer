@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <helpset version="2.0">
     <title>Importer Data Help</title>
     <maps>
-        <homeID>de.cebitec.readXplorer.ui.importer.about</homeID>
+        <homeID>de.cebitec.readxplorer.ui.importer.about</homeID>
         <mapref location="importer-map.xml"/>
     </maps>
     <view mergetype="javax.help.AppendMerge">

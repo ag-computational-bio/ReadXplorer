@@ -40,8 +40,8 @@ import de.cebitec.readxplorer.transcriptomeanalyses.mainWizard.WizardPropertyStr
 import de.cebitec.readxplorer.ui.importer.TranscriptomeTableViewI;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
-import de.cebitec.readxplorer.view.analysis.ResultTablePanel;
-import de.cebitec.readxplorer.view.controller.ViewController;
+import de.cebitec.readxplorer.ui.analysis.ResultTablePanel;
+import de.cebitec.readxplorer.ui.controller.ViewController;
 import java.awt.HeadlessException;
 import java.util.ArrayList;
 import java.util.Collection;

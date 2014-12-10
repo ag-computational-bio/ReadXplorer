@@ -23,7 +23,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -71,7 +70,7 @@ public class Unzip implements Runnable, Observable {
      * @param zip zip file
      * @param to  target file for the unzip process
      * <p>
-     * @throws de.cebitec.readXplorer.util.Unzip.NoDirectoryException
+     * @throws de.cebitec.readxplorer.utils.Unzip.NoDirectoryException
      */
     public Unzip( File zip, File to ) throws NoDirectoryException {
         this.zip = zip;

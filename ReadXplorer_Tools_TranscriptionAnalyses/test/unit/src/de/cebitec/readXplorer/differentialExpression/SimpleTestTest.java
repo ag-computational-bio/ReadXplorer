@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.differentialExpression;
+package de.cebitec.readxplorer.differentialExpression;
 
-//package de.cebitec.readXplorer.differentialExpression;
+//package de.cebitec.readxplorer.differentialExpression;
 //
-//import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
-//import de.cebitec.readXplorer.differentialExpression.GnuR.JRILibraryNotInPathException;
-//import de.cebitec.readXplorer.differentialExpression.GnuR.UnknownGnuRException;
+//import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+//import de.cebitec.readxplorer.differentialExpression.GnuR.JRILibraryNotInPathException;
+//import de.cebitec.readxplorer.differentialExpression.GnuR.UnknownGnuRException;
 //import java.io.BufferedReader;
 //import java.io.File;
 //import java.io.FileReader;
@@ -73,7 +73,7 @@ package de.cebitec.readXplorer.differentialExpression;
 //        List<Integer> countData6 = new ArrayList<>();
 //        List<Integer> countData7 = new ArrayList<>();
 //        try {
-//            fr = new FileReader("C:/Users/Kai/Documents/NetBeansProjects/ReadXplorer/ReadXplorer_AddOns/ReadXplorer_Tools_TranscriptionAnalyses/test/unit/src/de/cebitec/readXplorer/differentialExpression/pasilla_gene_counts.tsv");
+//            fr = new FileReader("C:/Users/Kai/Documents/NetBeansProjects/ReadXplorer/ReadXplorer_AddOns/ReadXplorer_Tools_TranscriptionAnalyses/test/unit/src/de/cebitec/readxplorer/differentialExpression/pasilla_gene_counts.tsv");
 //            BufferedReader br = new BufferedReader(fr);
 //            String[] headLine = br.readLine().split("\t");
 //            for (int i = 1; i < headLine.length; i++) {

@@ -3,7 +3,7 @@ package de.cebitec.readxplorer.transcriptomeanalyses.mainWizard;
 
 
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
-import de.cebitec.readxplorer.view.dialogmenus.OpenTracksWizardPanel;
+import de.cebitec.readxplorer.ui.dialogmenus.OpenTracksWizardPanel;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.List;

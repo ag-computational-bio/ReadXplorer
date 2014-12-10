@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.thumbnail;
 
 
-import de.cebitec.readxplorer.view.TopComponentExtended;
+import de.cebitec.readxplorer.ui.TopComponentExtended;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -36,7 +36,7 @@ import org.openide.windows.WindowManager;
 /**
  * TopComponent to display a Scene for the Track-Widgets.
  */
-@ConvertAsProperties( dtd = "-//de.cebitec.readXplorer.thumbnail//ThumbNailView//EN",
+@ConvertAsProperties( dtd = "-//de.cebitec.readxplorer.thumbnail//ThumbNailView//EN",
                       autostore = false )
 public final class ThumbNailViewTopComponent extends TopComponentExtended
         implements MouseListener {

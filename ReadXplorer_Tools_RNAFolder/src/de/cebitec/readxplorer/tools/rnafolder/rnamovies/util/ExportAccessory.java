@@ -217,14 +217,14 @@ public class ExportAccessory extends JPanel implements PropertyChangeListener {
             /* insert a  try/catch block because on MACOSX adding additional filefilters leads to
              * an NullPointerException; don't know what's exactly the problem here, JK */
             try {
-//                if (evt.getNewValue().getClass().getName().equals("de.cebitec.readXplorer.tools.rnaFolder.rnamovies.actions.Export$GIFFilter")){
+//                if (evt.getNewValue().getClass().getName().equals("de.cebitec.readxplorer.tools.rnaFolder.rnamovies.actions.Export$GIFFilter")){
 //                    fps.setEnabled(true);
 //                    steps.setEnabled(true);
 //                } else {
 //                    fps.setEnabled(false);
 //                    steps.setEnabled(false);
 //                }
-                if( evt.getNewValue().getClass().getName().equals( "de.cebitec.readXplorer.tools.rnaFolder.rnamovies.actions.Export$JPGFilter" ) ) {
+                if( evt.getNewValue().getClass().getName().equals( "de.cebitec.readxplorer.tools.rnaFolder.rnamovies.actions.Export$JPGFilter" ) ) {
                     trans.setEnabled( false );
                 }
                 else {

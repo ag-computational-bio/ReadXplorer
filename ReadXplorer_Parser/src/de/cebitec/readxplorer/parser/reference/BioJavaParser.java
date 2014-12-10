@@ -259,7 +259,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                         }
 
                         /*
-                         * If the type of the feature is unknown to readXplorer (see below),
+                         * If the type of the feature is unknown to readxplorer (see below),
                          * an undefined type is used.
                          */
                         FeatureType type = FeatureType.getFeatureType( parsedType );

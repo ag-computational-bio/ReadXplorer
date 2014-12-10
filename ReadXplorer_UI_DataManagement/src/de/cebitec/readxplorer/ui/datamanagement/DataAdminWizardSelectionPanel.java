@@ -26,7 +26,7 @@ import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readxplorer.ui.datamanagement.actions.DataAdminWizardAction;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
-import de.cebitec.readxplorer.view.dialogmenus.ChangeListeningFinishWizardPanel;
+import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningFinishWizardPanel;
 import java.awt.Component;
 import java.io.File;
 import java.util.ArrayList;

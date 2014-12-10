@@ -106,7 +106,7 @@ public final class RbsAnalysisVisualPanel extends JPanel {
         jLabel3 = new javax.swing.JLabel();
         lengthForAnalysis = new javax.swing.JTextField();
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cebitec/readXplorer/transcriptomeAnalyses/resources/rbsMotifSearchWizardFig.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/de/cebitec/readxplorer/transcriptomeanalyses/resources/rbsMotifSearchWizardFig.png"))); // NOI18N
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(RbsAnalysisVisualPanel.class, "RbsAnalysisVisualPanel.jLabel1.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel5, org.openide.util.NbBundle.getMessage(RbsAnalysisVisualPanel.class, "RbsAnalysisVisualPanel.jLabel5.text")); // NOI18N

@@ -20,7 +20,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.wizard;
 
 import de.cebitec.readxplorer.api.objects.JobPanel;
 import de.cebitec.readxplorer.utils.GeneralUtils;
-import de.cebitec.readxplorer.view.dialogmenus.ChangeListeningWizardPanel;
+import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
 
 
 /**

@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <helpset version="2.0">
     <title>SNP and DIP Detection Help</title>
     <maps>
-        <homeID>de.cebitec.readXplorer.tools.snp.about</homeID>
+        <homeID>de.cebitec.readxplorer.tools.snp.about</homeID>
         <mapref location="snp-map.xml"/>
     </maps>
     <view mergetype="javax.help.AppendMerge">

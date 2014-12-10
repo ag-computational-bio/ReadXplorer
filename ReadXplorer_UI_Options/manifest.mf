@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-OpenIDE-Module: de.cebitec.readXplorer.options
+OpenIDE-Module: de.cebitec.readxplorer.options
 OpenIDE-Module-Localizing-Bundle: de/cebitec/readxplorer/ui/options/Bundle.properties
 OpenIDE-Module-Specification-Version: 1.1.1
 

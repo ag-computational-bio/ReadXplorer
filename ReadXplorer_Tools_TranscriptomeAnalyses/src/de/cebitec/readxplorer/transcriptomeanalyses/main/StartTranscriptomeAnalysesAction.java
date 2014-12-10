@@ -9,7 +9,7 @@ import de.cebitec.readxplorer.transcriptomeanalyses.mainWizard.FivePrimeEnriched
 import de.cebitec.readxplorer.transcriptomeanalyses.mainWizard.TranscriptomeAnalysisWizardIterator;
 import de.cebitec.readxplorer.transcriptomeanalyses.mainWizard.WizardPropertyStrings;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
-import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
+import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -31,7 +31,7 @@ import org.openide.windows.WindowManager;
 
 @ActionID(
          category = "Tools",
-         id = "de.cebitec.readXplorer.transcriptomeAnalyses.main.StartTranscriptomeAnalysesAction" )
+         id = "de.cebitec.readxplorer.transcriptomeanalyses.main.StartTranscriptomeAnalysesAction" )
 @ActionRegistration(
          displayName = "#CTL_StartTranscriptomeAnalysesAction" )
 @ActionReference( path = "Menu/Tools", position = 112 )

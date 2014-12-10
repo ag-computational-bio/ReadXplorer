@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.rnatrimming.correlationAnalysis;
 
 
-import de.cebitec.readxplorer.view.dialogmenus.ChangeListeningFinishWizardPanel;
+import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningFinishWizardPanel;
 import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
 

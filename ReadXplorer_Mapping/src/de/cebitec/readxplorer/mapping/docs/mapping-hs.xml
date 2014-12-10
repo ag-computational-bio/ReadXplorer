@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <helpset version="2.0">
     <title>ReadXplorer Mapping Help</title>
     <maps>
-        <homeID>de.cebitec.readXplorer.mapping.about</homeID>
+        <homeID>de.cebitec.readxplorer.mapping.about</homeID>
         <mapref location="mapping-map.xml"/>
     </maps>
     <view mergetype="javax.help.AppendMerge">

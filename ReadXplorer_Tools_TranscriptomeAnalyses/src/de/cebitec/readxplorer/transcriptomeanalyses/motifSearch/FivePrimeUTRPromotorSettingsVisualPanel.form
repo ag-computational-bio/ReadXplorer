@@ -133,7 +133,7 @@
     <Component class="javax.swing.JLabel" name="jLabel6">
       <Properties>
         <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
-          <Image iconType="3" name="/de/cebitec/readXplorer/transcriptomeAnalyses/resources/promotorSearchWizardFig.png"/>
+          <Image iconType="3" name="/de/cebitec/readxplorer/transcriptomeanalyses/resources/promotorSearchWizardFig.png"/>
         </Property>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="de/cebitec/readxplorer/transcriptomeanalyses/motifSearch/Bundle.properties" key="FivePrimeUTRPromotorSettingsVisualPanel.jLabel6.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>

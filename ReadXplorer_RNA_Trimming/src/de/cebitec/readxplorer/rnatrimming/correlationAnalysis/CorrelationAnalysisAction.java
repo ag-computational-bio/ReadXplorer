@@ -21,8 +21,8 @@ package de.cebitec.readxplorer.rnatrimming.correlationAnalysis;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
-import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
-import de.cebitec.readxplorer.view.dialogmenus.SelectReadClassWizardPanel;
+import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
+import de.cebitec.readxplorer.ui.dialogmenus.SelectReadClassWizardPanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
@@ -45,7 +45,7 @@ import org.openide.util.NbBundle.Messages;
  */
 @ActionID(
          category = "Tools",
-         id = "de.cebitec.readXplorer.correlationAnalysis.CorrelationAnalysisAction" )
+         id = "de.cebitec.readxplorer.rnatrimming.correlationAnalysis.CorrelationAnalysisAction" )
 @ActionRegistration(
          displayName = "#CTL_CorrelationAnalysisAction" )
 @ActionReference( path = "Menu/Tools", position = 156 )
@@ -85,7 +85,7 @@ public final class CorrelationAnalysisAction implements ActionListener {
     @Override
     public void actionPerformed( ActionEvent ev ) {
         @SuppressWarnings( "unchecked" )
-        List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
+        List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>( 5 );
         TrackListPanel trackPanel = new TrackListPanel( this.context.getReference().getId() );
         this.readClassWizPanel = new SelectReadClassWizardPanel( PROP_WIZARD_NAME, false );
         trackPanel.getComponent().setSelectAmount( 2 );

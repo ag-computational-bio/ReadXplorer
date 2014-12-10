@@ -25,7 +25,7 @@ import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readxplorer.parser.mappings.ReadPairClassifierI;
 import de.cebitec.readxplorer.ui.importer.actions.ImportWizardAction;
-import de.cebitec.readxplorer.view.dialogmenus.ImportTrackBasePanel;
+import de.cebitec.readxplorer.ui.dialogmenus.ImportTrackBasePanel;
 import java.awt.Component;
 import java.awt.Dialog;
 import java.beans.PropertyChangeEvent;

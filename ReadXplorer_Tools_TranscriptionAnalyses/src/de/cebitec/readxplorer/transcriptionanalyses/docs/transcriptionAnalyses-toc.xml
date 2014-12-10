@@ -19,11 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <!DOCTYPE toc PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 2.0//EN" "http://java.sun.com/products/javahelp/toc_2_0.dtd">
 <toc version="2.0">
     <tocitem text="Transcription Analyses Help">
-        <tocitem text="Transcription Analyses (TSS, RPKM and Read Count, Operon Analyses)" target="de.cebitec.readXplorer.transcriptionAnalyses.about"/>
-        <tocitem text="Differential Gene Expression Analysis" target="de.cebitec.readXplorer.differentialExpression.about"/>
-        <tocitem text="Installation Differential Gene Expression Analysis" target="de.cebitec.readXplorer.differentialExpression.installation"/>
-        <tocitem text="Transcription Start Site (TSS) Detection" target="de.cebitec.readXplorer.transcriptionAnalyses.tss"/>
-        <tocitem text="RPKM and Read Count Calculations" target="de.cebitec.readXplorer.transcriptionAnalyses.rpkm"/>
-        <tocitem text="Operon Detection" target="de.cebitec.readXplorer.transcriptionAnalyses.operon"/>
+        <tocitem text="Transcription Analyses (TSS, RPKM and Read Count, Operon Analyses)" target="de.cebitec.readxplorer.transcriptionAnalyses.about"/>
+        <tocitem text="Differential Gene Expression Analysis" target="de.cebitec.readxplorer.differentialExpression.about"/>
+        <tocitem text="Installation Differential Gene Expression Analysis" target="de.cebitec.readxplorer.differentialExpression.installation"/>
+        <tocitem text="Transcription Start Site (TSS) Detection" target="de.cebitec.readxplorer.transcriptionAnalyses.tss"/>
+        <tocitem text="RPKM and Read Count Calculations" target="de.cebitec.readxplorer.transcriptionAnalyses.rpkm"/>
+        <tocitem text="Operon Detection" target="de.cebitec.readxplorer.transcriptionAnalyses.operon"/>
     </tocitem>
 </toc>

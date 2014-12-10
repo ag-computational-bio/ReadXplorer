@@ -20,9 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <filesystem><!--
     <folder name="Actions">
         <folder name="Tools">
-            <file name="de-cebitec-readXplorer-tools-rnaFolder-RNAFolderAction.instance">
-                <attr name="component" methodvalue="de.cebitec.readXplorer.tools.rnaFolder.RNAFolderTopComponent.findInstance"/>
-                <attr name="displayName" bundlevalue="de.cebitec.readXplorer.tools.rnaFolder.Bundle#CTL_RNAFolderAction"/>
+            <file name="de-cebitec-readxplorer-tools-rnaFolder-RNAFolderAction.instance">
+                <attr name="component" methodvalue="de.cebitec.readxplorer.tools.rnaFolder.RNAFolderTopComponent.findInstance"/>
+                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.tools.rnaFolder.Bundle#CTL_RNAFolderAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
             </file>
         </folder>
@@ -30,7 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <folder name="Menu">
         <folder name="Tools">
             <file name="RNAFolderAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Tools/de-cebitec-readXplorer-tools-rnaFolder-RNAFolderAction.instance"/>
+                <attr name="originalFile" stringvalue="Actions/Tools/de-cebitec-readxplorer-tools-rnaFolder-RNAFolderAction.instance"/>
                 <attr name="position" intvalue="160"/>
             </file>
         </folder>

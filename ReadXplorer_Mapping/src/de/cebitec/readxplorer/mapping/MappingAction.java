@@ -46,7 +46,7 @@ import org.openide.util.NbBundle.Messages;
  */
 @ActionID(
          category = "Tools",
-         id = "de.cebitec.readXplorer.mapping.MappingAction" )
+         id = "de.cebitec.readxplorer.mapping.MappingAction" )
 @ActionRegistration(
          displayName = "#CTL_MappingAction" )
 @ActionReference( path = "Menu/Tools", position = 154 )

@@ -19,9 +19,9 @@ package de.cebitec.readxplorer.tools.doubletrackviewer;
 
 
 import de.cebitec.readxplorer.ui.visualisation.AppPanelTopComponent;
-import de.cebitec.readxplorer.view.TopComponentHelper;
-import de.cebitec.readxplorer.view.controller.ViewController;
-import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
+import de.cebitec.readxplorer.ui.TopComponentHelper;
+import de.cebitec.readxplorer.ui.controller.ViewController;
+import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import org.openide.awt.ActionID;

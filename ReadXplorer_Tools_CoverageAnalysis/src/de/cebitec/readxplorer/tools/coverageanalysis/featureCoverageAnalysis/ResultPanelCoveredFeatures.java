@@ -20,11 +20,11 @@ package de.cebitec.readxplorer.tools.coverageanalysis.featureCoverageAnalysis;
 
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
+import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
+import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
+import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
-import de.cebitec.readxplorer.view.datavisualisation.BoundsInfoManager;
-import de.cebitec.readxplorer.view.tablevisualization.TableUtils;
-import de.cebitec.readxplorer.view.tablevisualization.tablefilter.TableRightClickFilter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

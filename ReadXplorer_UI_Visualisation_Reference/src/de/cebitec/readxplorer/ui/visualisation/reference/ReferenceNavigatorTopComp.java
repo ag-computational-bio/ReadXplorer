@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.ui.visualisation.reference;
 
 
-import de.cebitec.readxplorer.view.TopComponentExtended;
-import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
+import de.cebitec.readxplorer.ui.TopComponentExtended;
+import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import java.util.logging.Logger;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.Lookup.Result;
@@ -38,7 +38,7 @@ import org.openide.windows.WindowManager;
  * <p>
  * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
  */
-@ConvertAsProperties( dtd = "-//de.cebitec.readXplorer.ui.visualisation.reference//ReferenceNavigator//EN", autostore = false )
+@ConvertAsProperties( dtd = "-//de.cebitec.readxplorer.ui.visualisation.reference//ReferenceNavigator//EN", autostore = false )
 public final class ReferenceNavigatorTopComp extends TopComponentExtended
         implements LookupListener {
 
