@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.visualisation.reference;
+package de.cebitec.readxplorer.ui.visualisation.reference;
 
 
 import de.cebitec.readxplorer.view.TopComponentExtended;
@@ -87,14 +87,14 @@ public final class ReferenceNavigatorTopComp extends TopComponentExtended
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jumpPanel = new de.cebitec.readXplorer.ui.visualisation.reference.JumpPanel();
+        jumpPanel = new de.cebitec.readxplorer.ui.visualisation.reference.JumpPanel();
 
         setLayout(new java.awt.BorderLayout());
         add(jumpPanel, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private de.cebitec.readXplorer.ui.visualisation.reference.JumpPanel jumpPanel;
+    private de.cebitec.readxplorer.ui.visualisation.reference.JumpPanel jumpPanel;
     // End of variables declaration//GEN-END:variables
     /**
      * Gets default instance. Do not use directly: reserved for *.settings files

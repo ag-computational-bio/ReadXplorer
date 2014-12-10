@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.visualisation.reference;
+package de.cebitec.readxplorer.ui.visualisation.reference;
 
 
 import de.cebitec.readXplorer.util.CodonUtilities;

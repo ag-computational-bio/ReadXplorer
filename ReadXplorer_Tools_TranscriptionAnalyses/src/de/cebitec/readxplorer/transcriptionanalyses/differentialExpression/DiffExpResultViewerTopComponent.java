@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialExpression;
 
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
+import de.cebitec.readxplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.readXplorer.util.GenerateRowSorter;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.UneditableTableModel;

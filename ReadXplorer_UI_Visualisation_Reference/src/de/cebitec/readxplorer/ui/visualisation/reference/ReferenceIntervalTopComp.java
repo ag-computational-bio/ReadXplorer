@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.visualisation.reference;
+package de.cebitec.readxplorer.ui.visualisation.reference;
 
 
 import de.cebitec.readXplorer.util.classification.FeatureType;
@@ -90,7 +90,7 @@ public final class ReferenceIntervalTopComp extends TopComponentExtended
         currentPosField = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
-        codonSelector = new de.cebitec.readXplorer.ui.visualisation.reference.CodonSelector();
+        codonSelector = new de.cebitec.readxplorer.ui.visualisation.reference.CodonSelector();
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComp.class, "ReferenceIntervalTopComp.jLabel1.text")); // NOI18N
         jLabel1.setToolTipText(org.openide.util.NbBundle.getMessage(ReferenceIntervalTopComp.class, "ReferenceIntervalTopComp.jLabel1.toolTipText")); // NOI18N
@@ -172,7 +172,7 @@ public final class ReferenceIntervalTopComp extends TopComponentExtended
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private de.cebitec.readXplorer.ui.visualisation.reference.CodonSelector codonSelector;
+    private de.cebitec.readxplorer.ui.visualisation.reference.CodonSelector codonSelector;
     private javax.swing.JTextField currentPosField;
     private javax.swing.JTextField intervalFromField;
     private javax.swing.JTextField intervalToField;

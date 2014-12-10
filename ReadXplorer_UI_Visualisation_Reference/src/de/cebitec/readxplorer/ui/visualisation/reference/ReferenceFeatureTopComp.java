@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.visualisation.reference;
+package de.cebitec.readxplorer.ui.visualisation.reference;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.polyTree.Node;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.view.TopComponentExtended;
 import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.JFeature;
 import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
@@ -279,7 +279,7 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended
     private javax.swing.JTextField locusField;
     private javax.swing.JLabel locusLabel;
     private javax.swing.JLabel parentLabel;
-    private javax.swing.JList<PersistentFeature> parentList;
+    private javax.swing.JList<de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature> parentList;
     private javax.swing.JLabel productLabel;
     private javax.swing.JTextArea productText;
     private javax.swing.JTextField startField;
@@ -289,7 +289,7 @@ public final class ReferenceFeatureTopComp extends TopComponentExtended
     private javax.swing.JLabel strandLabel;
     private javax.swing.JTextField strandText;
     private javax.swing.JLabel subfeatureLabel;
-    private javax.swing.JList<PersistentFeature> subfeatureList;
+    private javax.swing.JList<de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature> subfeatureList;
     private javax.swing.JLabel typeLabel;
     private javax.swing.JTextField typeText;
     // End of variables declaration//GEN-END:variables

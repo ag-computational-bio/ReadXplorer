@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.visualisation.reference;
+package de.cebitec.readxplorer.ui.visualisation.reference;
 
 
+import de.cebitec.readXplorer.util.GeneralUtils;
+import de.cebitec.readXplorer.util.Observer;
+import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.util.GeneralUtils;
-import de.cebitec.readXplorer.util.Observer;
-import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readxplorer.view.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.view.datavisualisation.abstractviewer.AbstractViewer;
 import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.IThumbnailView;
@@ -268,7 +268,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
                 .addGroup(filterPropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jumpFilterLabel)
                     .addComponent(filterTextfield, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 6, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(filterPropertiesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(filterForLabel)
                     .addComponent(radioProduct)
@@ -328,7 +328,7 @@ public class JumpPanel extends javax.swing.JPanel implements LookupListener {
         featureGroundPanel.setLayout(featureGroundPanelLayout);
         featureGroundPanelLayout.setHorizontalGroup(
             featureGroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(filterProperties, 0, 229, Short.MAX_VALUE)
+            .addComponent(filterProperties, 0, 0, Short.MAX_VALUE)
             .addComponent(tableScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
             .addGroup(featureGroundPanelLayout.createSequentialGroup()
                 .addGroup(featureGroundPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -455,7 +455,7 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JCheckBox chromCheckBox;
-    private javax.swing.JComboBox<PersistentChromosome> chromComboBox;
+    private javax.swing.JComboBox<de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome> chromComboBox;
     private javax.swing.JPanel featureGroundPanel;
     private javax.swing.JTable featureTable;
     private javax.swing.JLabel filterForLabel;
@@ -560,7 +560,7 @@ private void radioGeneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIR
      * and displays the list in the featureTable.
      */
     private void fillFeatureList() {
-        List<PersistentFeature> features = new ArrayList<>();
+        List<PersistentFeature> features = new ArrayList<>( 10 );
         if( this.chromCheckBox.isSelected() ) { //TODO: improve performance or add waiting symbol somewhere
             for( PersistentChromosome chrom : refGenome.getChromosomes().values() ) {
                 features.addAll( refGenCon.getFeaturesForRegion( 0, chrom.getLength(),

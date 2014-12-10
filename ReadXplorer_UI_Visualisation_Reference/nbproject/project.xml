@@ -122,7 +122,7 @@
                 </test-type>
             </test-dependencies>
             <public-packages>
-                <package>de.cebitec.readXplorer.ui.visualisation.reference</package>
+                <package>de.cebitec.readxplorer.ui.visualisation.reference</package>
             </public-packages>
         </data>
     </configuration>

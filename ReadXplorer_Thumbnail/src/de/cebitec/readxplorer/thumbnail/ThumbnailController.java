@@ -31,7 +31,7 @@ import de.cebitec.readxplorer.thumbnail.Actions.OpenThumbCookie;
 import de.cebitec.readxplorer.thumbnail.Actions.RemoveCookie;
 import de.cebitec.readxplorer.thumbnail.Actions.SyncSliderCookie;
 import de.cebitec.readxplorer.ui.visualisation.AppPanelTopComponent;
-import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
+import de.cebitec.readxplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readxplorer.view.TopComponentHelper;
 import de.cebitec.readxplorer.view.controller.ViewController;

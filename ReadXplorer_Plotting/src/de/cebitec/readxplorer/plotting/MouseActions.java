@@ -20,7 +20,7 @@ package de.cebitec.readxplorer.plotting;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
+import de.cebitec.readxplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.readxplorer.view.controller.ViewController;
 import de.cebitec.readxplorer.view.datavisualisation.BoundsInfoManager;
 import java.awt.Point;
