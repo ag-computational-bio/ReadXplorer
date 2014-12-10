@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <helpset version="2.0">
     <title>ReadXplorer Data Export Help</title>
     <maps>
-        <homeID>de.cebitec.readXplorer.exporter.about</homeID>
+        <homeID>de.cebitec.readxplorer.exporter.about</homeID>
         <mapref location="exporter-map.xml"/>
     </maps>
     <view mergetype="javax.help.AppendMerge">
