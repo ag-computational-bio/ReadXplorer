@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.readPairClassifier;
+package de.cebitec.readxplorer.readpairclassifier;
 
 
 import de.cebitec.readXplorer.util.ReadPairType;

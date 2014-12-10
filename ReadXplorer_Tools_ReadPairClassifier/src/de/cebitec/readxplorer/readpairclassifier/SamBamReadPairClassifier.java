@@ -15,19 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.readPairClassifier;
+package de.cebitec.readxplorer.readpairclassifier;
 
 
-import de.cebitec.readxplorer.parser.ReadPairJobContainer;
-import de.cebitec.readxplorer.parser.TrackJob;
-import de.cebitec.readxplorer.parser.common.ParsedClassification;
-import de.cebitec.readxplorer.parser.common.ParsedReadPairContainer;
-import de.cebitec.readxplorer.parser.common.ParsingException;
-import de.cebitec.readxplorer.parser.common.RefSeqFetcher;
-import de.cebitec.readxplorer.parser.mappings.CommonsMappingParser;
-import de.cebitec.readxplorer.parser.mappings.ReadPairClassifierI;
-import de.cebitec.readxplorer.parser.mappings.SamBamParser;
-import de.cebitec.readxplorer.parser.output.SamBamSorter;
 import de.cebitec.readXplorer.util.Benchmark;
 import de.cebitec.readXplorer.util.DiscreteCountingDistribution;
 import de.cebitec.readXplorer.util.ErrorLimit;
@@ -41,6 +31,16 @@ import de.cebitec.readXplorer.util.ReadPairType;
 import de.cebitec.readXplorer.util.SamUtils;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.util.StatsContainer;
+import de.cebitec.readxplorer.parser.ReadPairJobContainer;
+import de.cebitec.readxplorer.parser.TrackJob;
+import de.cebitec.readxplorer.parser.common.ParsedClassification;
+import de.cebitec.readxplorer.parser.common.ParsedReadPairContainer;
+import de.cebitec.readxplorer.parser.common.ParsingException;
+import de.cebitec.readxplorer.parser.common.RefSeqFetcher;
+import de.cebitec.readxplorer.parser.mappings.CommonsMappingParser;
+import de.cebitec.readxplorer.parser.mappings.ReadPairClassifierI;
+import de.cebitec.readxplorer.parser.mappings.SamBamParser;
+import de.cebitec.readxplorer.parser.output.SamBamSorter;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -77,8 +77,8 @@ import org.openide.util.lookup.ServiceProvider;
 public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                                                  Observable, MessageSenderI {
 
-    private ErrorLimit errorLimit;
-    private ArrayList<Observer> observers;
+    private final ErrorLimit errorLimit;
+    private final List<Observer> observers;
     private TrackJob trackJob;
     private int dist;
     private int minDist;
@@ -184,7 +184,6 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
             this.notifyObservers( Bundle.Classifier_Classification_Start() );
 
             int lineno = 0;
-            int noReads = 0;
             int noSkippedReads = 0;
             SAMFileReader samBamReader = new SAMFileReader( trackJob.getFile() );
             samBamReader.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
@@ -204,8 +203,8 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
             SAMRecord record;
             String readName; //read name without pair tag
             String lastReadName = ""; //read name without pair tag
-            Map<SAMRecord, Integer> diffMap1 = new HashMap<>(); //mapping of record to number of differences
-            Map<SAMRecord, Integer> diffMap2 = new HashMap<>(); //mapping of record to number of differences
+            Map<SAMRecord, Integer> diffMap1 = new HashMap<>( 1024 ); //mapping of record to number of differences
+            Map<SAMRecord, Integer> diffMap2 = new HashMap<>( 1024 ); //mapping of record to number of differences
             class1 = new ParsedClassification( sortOrder ); //classification data for all reads with same read name
             class2 = new ParsedClassification( sortOrder );
             char pairTag;
@@ -227,8 +226,6 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                             CommonsMappingParser.writeSamRecord( diffMap2, class2, samBamWriter );
                             class1 = new ParsedClassification( sortOrder );
                             class2 = new ParsedClassification( sortOrder );
-
-                            noReads += diffMap1.size() > 0 ? 1 : 0 + diffMap2.size() > 0 ? 1 : 0;
                             ++readPairId;
 
                         }
@@ -278,7 +275,6 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
                 this.performClassification( diffMap1, diffMap2, readPairId );
                 CommonsMappingParser.writeSamRecord( diffMap1, class1, samBamWriter );
                 CommonsMappingParser.writeSamRecord( diffMap2, class2, samBamWriter );
-                noReads += diffMap1.size() > 0 ? 1 : 0 + diffMap2.size() > 0 ? 1 : 0;
             }
 
             if( errorLimit.getSkippedCount() > 0 ) {
