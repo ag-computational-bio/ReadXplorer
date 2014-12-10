@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.tools.detailedViewer;
+package de.cebitec.readxplorer.tools.detailedviewer;
 
 
-import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.view.TopComponentExtended;
 import de.cebitec.readXplorer.view.controller.ViewController;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.BasePanel;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.BasePanelFactory;
 import de.cebitec.readXplorer.view.dataVisualisation.histogramViewer.HistogramViewer;
+import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import java.awt.CardLayout;
 import java.util.logging.Logger;
 import org.netbeans.api.settings.ConvertAsProperties;
@@ -40,16 +40,16 @@ import org.openide.windows.WindowManager;
  * Top component which displays something.
  */
 @ConvertAsProperties(
-         dtd = "-//de.cebitec.readXplorer.tools.detailedViewer//DetailedViewer//EN",
+         dtd = "-//de.cebitec.readxplorer.tools.detailedviewer//DetailedViewer//EN",
          autostore = false
 )
 @TopComponent.Description(
          preferredID = "DetailedViewerTopComponent",
-         iconBase = "de/cebitec/readXplorer/tools/detailedViewer/detailedViewer.png",
+         iconBase = "de/cebitec/readxplorer/tools/detailedviewer/detailedViewer.png",
          persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
 @TopComponent.Registration( mode = "editor", openAtStartup = false )
-@ActionID( category = "Window", id = "de.cebitec.readXplorer.tools.detailedViewer.DetailedViewerTopComponent" )
+@ActionID( category = "Window", id = "de.cebitec.readxplorer.tools.detailedviewer.DetailedViewerTopComponent" )
 @ActionReference( path = "Menu/Window" /*, position = 333 */ )
 @TopComponent.OpenActionRegistration(
          displayName = "#CTL_DetailedViewerAction",

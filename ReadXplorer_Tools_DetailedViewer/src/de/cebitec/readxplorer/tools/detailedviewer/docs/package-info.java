@@ -16,7 +16,7 @@
  */
 
 @HelpSetRegistration( helpSet = "detailedViewer-hs.xml", position = 3417 )
-package de.cebitec.readXplorer.tools.detailedViewer.docs;
+package de.cebitec.readxplorer.tools.detailedviewer.docs;
 
 
 import org.netbeans.api.javahelp.HelpSetRegistration;

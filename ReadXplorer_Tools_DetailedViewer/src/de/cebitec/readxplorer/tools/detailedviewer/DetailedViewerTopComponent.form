@@ -65,7 +65,7 @@
         <Component class="javax.swing.JButton" name="histogramButton">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/cebitec/readXplorer/tools/detailedViewer/Bundle.properties" key="DetailedViewerTopComponent.histogramButton.text_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="de/cebitec/readxplorer/tools/detailedviewer/Bundle.properties" key="DetailedViewerTopComponent.histogramButton.text_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>
@@ -75,7 +75,7 @@
         <Component class="javax.swing.JButton" name="alignmentButton">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/cebitec/readXplorer/tools/detailedViewer/Bundle.properties" key="DetailedViewerTopComponent.alignmentButton.text_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="de/cebitec/readxplorer/tools/detailedviewer/Bundle.properties" key="DetailedViewerTopComponent.alignmentButton.text_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>
@@ -88,7 +88,7 @@
               <Font name="Dialog" size="10" style="1"/>
             </Property>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/cebitec/readXplorer/tools/detailedViewer/Bundle.properties" key="DetailedViewerTopComponent.colorHistogramBox.text_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="de/cebitec/readxplorer/tools/detailedviewer/Bundle.properties" key="DetailedViewerTopComponent.colorHistogramBox.text_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
             <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[50, 22]"/>
@@ -104,7 +104,7 @@
         <Component class="javax.swing.JButton" name="readPairButton">
           <Properties>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/cebitec/readXplorer/tools/detailedViewer/Bundle.properties" key="DetailedViewerTopComponent.readPairButton.text_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="de/cebitec/readxplorer/tools/detailedviewer/Bundle.properties" key="DetailedViewerTopComponent.readPairButton.text_1" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
           </Properties>
           <Events>

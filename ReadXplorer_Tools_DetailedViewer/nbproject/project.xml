@@ -107,6 +107,8 @@
             </module-dependencies>
             <public-packages>
                 <package>de.cebitec.readXplorer.tools.detailedViewer</package>
+                <package>de.cebitec.readxplorer.tools.detailedViewer</package>
+                <package>de.cebitec.readxplorer.tools.detailedviewer</package>
             </public-packages>
         </data>
     </configuration>

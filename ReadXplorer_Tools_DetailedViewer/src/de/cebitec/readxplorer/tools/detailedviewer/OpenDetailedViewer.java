@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.tools.detailedViewer;
+package de.cebitec.readxplorer.tools.detailedviewer;
 
 
 import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
