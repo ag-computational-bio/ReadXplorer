@@ -82,7 +82,7 @@
                 </dependency>
             </module-dependencies>
             <public-packages>
-                <package>de.cebitec.readXplorer.ui.visualisation.track</package>
+                <package>de.cebitec.readxplorer.ui.visualisation.track</package>
             </public-packages>
         </data>
     </configuration>

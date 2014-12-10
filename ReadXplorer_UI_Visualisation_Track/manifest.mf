@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 OpenIDE-Module: de.cebitec.readXplorer.ui.visualisation.track
-OpenIDE-Module-Layer: de/cebitec/readXplorer/ui/visualisation/track/layer.xml
-OpenIDE-Module-Localizing-Bundle: de/cebitec/readXplorer/ui/visualisation/track/Bundle.properties
+OpenIDE-Module-Layer: de/cebitec/readxplorer/ui/visualisation/track/layer.xml
+OpenIDE-Module-Localizing-Bundle: de/cebitec/readxplorer/ui/visualisation/track/Bundle.properties
 OpenIDE-Module-Requires: org.openide.windows.WindowManager
 OpenIDE-Module-Specification-Version: 1.0.1
 

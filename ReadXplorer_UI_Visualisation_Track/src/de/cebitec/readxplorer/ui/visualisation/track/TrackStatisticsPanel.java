@@ -15,13 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.visualisation.track;
+package de.cebitec.readxplorer.ui.visualisation.track;
 
 
-import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.util.StatsContainer;
 import de.cebitec.readXplorer.util.classification.MappingClass;
 import de.cebitec.readXplorer.util.classification.TotalCoverage;
+import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import java.util.Map;
 import javax.swing.SwingUtilities;
 

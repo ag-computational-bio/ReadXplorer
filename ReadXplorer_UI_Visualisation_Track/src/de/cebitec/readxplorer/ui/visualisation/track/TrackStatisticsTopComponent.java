@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.visualisation.track;
+package de.cebitec.readxplorer.ui.visualisation.track;
 
 
 import de.cebitec.readxplorer.view.TopComponentExtended;
@@ -37,7 +37,7 @@ import org.openide.windows.WindowManager;
 /**
  * Top component which displays something.
  */
-@ConvertAsProperties( dtd = "-//de.cebitec.readXplorer.ui.visualisation.track//TrackStatistics//EN", autostore = false )
+@ConvertAsProperties( dtd = "-//de.cebitec.readxplorer.ui.visualisation.track//TrackStatistics//EN", autostore = false )
 public final class TrackStatisticsTopComponent extends TopComponentExtended
         implements LookupListener {
 
@@ -73,7 +73,7 @@ public final class TrackStatisticsTopComponent extends TopComponentExtended
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        trackStatisticsPanel = new de.cebitec.readXplorer.ui.visualisation.track.TrackStatisticsPanel();
+        trackStatisticsPanel = new de.cebitec.readxplorer.ui.visualisation.track.TrackStatisticsPanel();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -82,7 +82,7 @@ public final class TrackStatisticsTopComponent extends TopComponentExtended
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private de.cebitec.readXplorer.ui.visualisation.track.TrackStatisticsPanel trackStatisticsPanel;
+    private de.cebitec.readxplorer.ui.visualisation.track.TrackStatisticsPanel trackStatisticsPanel;
     // End of variables declaration//GEN-END:variables
     /**
      * Gets default instance. Do not use directly: reserved for *.settings files
