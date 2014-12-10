@@ -20,7 +20,7 @@ package de.cebitec.readxplorer.dashboard;
 
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
-import de.cebitec.readXplorer.view.dialogMenus.explorer.StandardItem;
+import de.cebitec.readxplorer.view.dialogmenus.explorer.StandardItem;
 import java.util.Date;
 
 

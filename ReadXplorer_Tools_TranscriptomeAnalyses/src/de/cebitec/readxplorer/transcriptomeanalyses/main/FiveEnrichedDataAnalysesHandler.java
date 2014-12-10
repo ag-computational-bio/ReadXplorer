@@ -21,7 +21,7 @@ import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.classification.Classification;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.classification.MappingClass;
-import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

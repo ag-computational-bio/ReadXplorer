@@ -20,9 +20,9 @@ package de.cebitec.readxplorer.tools.coverageanalysis;
 
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.VisualisationUtils;
-import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.readXplorer.view.dialogMenus.OpenTracksWizardPanel;
-import de.cebitec.readXplorer.view.dialogMenus.SelectReadClassWizardPanel;
+import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
+import de.cebitec.readxplorer.view.dialogmenus.OpenTracksWizardPanel;
+import de.cebitec.readxplorer.view.dialogmenus.SelectReadClassWizardPanel;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;

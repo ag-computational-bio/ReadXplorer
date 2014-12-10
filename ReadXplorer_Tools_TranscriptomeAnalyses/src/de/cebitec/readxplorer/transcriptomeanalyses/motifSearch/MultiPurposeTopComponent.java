@@ -7,7 +7,7 @@ package de.cebitec.readxplorer.transcriptomeanalyses.motifSearch;
 
 
 import de.cebitec.readxplorer.transcriptomeanalyses.enums.PurposeEnum;
-import de.cebitec.readXplorer.view.TopComponentExtended;
+import de.cebitec.readxplorer.view.TopComponentExtended;
 import de.erichseifert.gral.ui.InteractivePanel;
 import java.io.File;
 

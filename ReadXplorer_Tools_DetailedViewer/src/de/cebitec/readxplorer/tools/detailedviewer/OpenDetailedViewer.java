@@ -19,11 +19,11 @@ package de.cebitec.readxplorer.tools.detailedviewer;
 
 
 import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
-import de.cebitec.readXplorer.view.TopComponentHelper;
-import de.cebitec.readXplorer.view.controller.ViewController;
-import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
-import de.cebitec.readXplorer.view.dataVisualisation.basePanel.BasePanel;
-import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.TrackViewer;
+import de.cebitec.readxplorer.view.TopComponentHelper;
+import de.cebitec.readxplorer.view.controller.ViewController;
+import de.cebitec.readxplorer.view.datavisualisation.abstractviewer.AbstractViewer;
+import de.cebitec.readxplorer.view.datavisualisation.basePanel.BasePanel;
+import de.cebitec.readxplorer.view.datavisualisation.trackviewer.TrackViewer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;

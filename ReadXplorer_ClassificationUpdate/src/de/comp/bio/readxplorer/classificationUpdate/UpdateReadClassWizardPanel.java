@@ -18,7 +18,7 @@
 package de.comp.bio.readxplorer.classificationUpdate;
 
 
-import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningFinishWizardPanel;
+import de.cebitec.readxplorer.view.dialogmenus.ChangeListeningFinishWizardPanel;
 import java.awt.Component;
 import org.openide.WizardDescriptor;
 

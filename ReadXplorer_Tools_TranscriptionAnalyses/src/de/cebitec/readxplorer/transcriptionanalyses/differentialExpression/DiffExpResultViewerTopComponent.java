@@ -23,11 +23,11 @@ import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp
 import de.cebitec.readXplorer.util.GenerateRowSorter;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.UneditableTableModel;
-import de.cebitec.readXplorer.view.TopComponentExtended;
-import de.cebitec.readXplorer.view.controller.ViewController;
-import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
-import de.cebitec.readXplorer.view.tableVisualization.TableUtils;
-import de.cebitec.readXplorer.view.tableVisualization.tableFilter.TableRightClickFilter;
+import de.cebitec.readxplorer.view.TopComponentExtended;
+import de.cebitec.readxplorer.view.controller.ViewController;
+import de.cebitec.readxplorer.view.datavisualisation.BoundsInfoManager;
+import de.cebitec.readxplorer.view.tablevisualization.TableUtils;
+import de.cebitec.readxplorer.view.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readxplorer.exporter.tables.TableToExcel;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.DeAnalysisHandler.AnalysisStatus;

@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.tools.coverageanalysis.featureCoverageAnalysis;
 
 
-import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
+import de.cebitec.readxplorer.view.dialogmenus.ChangeListeningWizardPanel;
 import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbPreferences;

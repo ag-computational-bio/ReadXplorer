@@ -30,7 +30,7 @@ import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.SequenceUtils;
-import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

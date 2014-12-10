@@ -9,7 +9,7 @@ import de.cebitec.readxplorer.transcriptomeanalyses.mainWizard.FivePrimeEnriched
 import de.cebitec.readxplorer.transcriptomeanalyses.mainWizard.TranscriptomeAnalysisWizardIterator;
 import de.cebitec.readxplorer.transcriptomeanalyses.mainWizard.WizardPropertyStrings;
 import de.cebitec.readXplorer.util.classification.FeatureType;
-import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;

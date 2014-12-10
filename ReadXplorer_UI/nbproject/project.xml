@@ -203,6 +203,23 @@
                 <package>de.cebitec.readXplorer.view.login</package>
                 <package>de.cebitec.readXplorer.view.tableVisualization</package>
                 <package>de.cebitec.readXplorer.view.tableVisualization.tableFilter</package>
+                <package>de.cebitec.readxplorer.view</package>
+                <package>de.cebitec.readxplorer.view.analysis</package>
+                <package>de.cebitec.readxplorer.view.controller</package>
+                <package>de.cebitec.readxplorer.view.datavisualisation</package>
+                <package>de.cebitec.readxplorer.view.datavisualisation.abstractviewer</package>
+                <package>de.cebitec.readxplorer.view.datavisualisation.alignmentviewer</package>
+                <package>de.cebitec.readxplorer.view.datavisualisation.basePanel</package>
+                <package>de.cebitec.readxplorer.view.datavisualisation.histogramviewer</package>
+                <package>de.cebitec.readxplorer.view.datavisualisation.readpairviewer</package>
+                <package>de.cebitec.readxplorer.view.datavisualisation.referenceviewer</package>
+                <package>de.cebitec.readxplorer.view.datavisualisation.trackviewer</package>
+                <package>de.cebitec.readxplorer.view.dialogmenus</package>
+                <package>de.cebitec.readxplorer.view.dialogmenus.explorer</package>
+                <package>de.cebitec.readxplorer.view.dialogmenus.screenshot</package>
+                <package>de.cebitec.readxplorer.view.login</package>
+                <package>de.cebitec.readxplorer.view.tablevisualization</package>
+                <package>de.cebitec.readxplorer.view.tablevisualization.tablefilter</package>
             </public-packages>
         </data>
     </configuration>

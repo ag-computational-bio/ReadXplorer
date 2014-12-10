@@ -18,9 +18,9 @@
 package de.cebitec.readXplorer.ui.visualisation.track;
 
 
-import de.cebitec.readXplorer.view.TopComponentExtended;
-import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.readXplorer.view.dataVisualisation.trackViewer.TrackViewer;
+import de.cebitec.readxplorer.view.TopComponentExtended;
+import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
+import de.cebitec.readxplorer.view.datavisualisation.trackviewer.TrackViewer;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.logging.Logger;

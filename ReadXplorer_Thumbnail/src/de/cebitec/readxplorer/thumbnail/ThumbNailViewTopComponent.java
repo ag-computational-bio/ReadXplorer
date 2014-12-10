@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.thumbnail;
 
 
-import de.cebitec.readXplorer.view.TopComponentExtended;
+import de.cebitec.readxplorer.view.TopComponentExtended;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;

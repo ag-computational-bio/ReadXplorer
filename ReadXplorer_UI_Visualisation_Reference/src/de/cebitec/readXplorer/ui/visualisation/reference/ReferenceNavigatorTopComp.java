@@ -18,8 +18,8 @@
 package de.cebitec.readXplorer.ui.visualisation.reference;
 
 
-import de.cebitec.readXplorer.view.TopComponentExtended;
-import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import de.cebitec.readxplorer.view.TopComponentExtended;
+import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
 import java.util.logging.Logger;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.util.Lookup.Result;

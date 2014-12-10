@@ -19,7 +19,7 @@ package de.cebitec.readXplorer.ui.converter;
 
 
 import de.cebitec.readxplorer.parser.output.ConverterI;
-import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningFinishWizardPanel;
+import de.cebitec.readxplorer.view.dialogmenus.ChangeListeningFinishWizardPanel;
 import java.awt.Component;
 import org.openide.WizardDescriptor;
 

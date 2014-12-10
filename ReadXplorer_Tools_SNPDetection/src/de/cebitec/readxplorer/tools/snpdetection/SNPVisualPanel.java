@@ -20,7 +20,7 @@ package de.cebitec.readxplorer.tools.snpdetection;
 
 import de.cebitec.readxplorer.api.objects.JobPanel;
 import de.cebitec.readXplorer.util.GeneralUtils;
-import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
+import de.cebitec.readxplorer.view.dialogmenus.ChangeListeningWizardPanel;
 import java.util.prefs.Preferences;
 import javax.swing.JSpinner.DefaultEditor;
 import javax.swing.JTextField;

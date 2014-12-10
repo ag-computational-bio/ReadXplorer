@@ -21,7 +21,7 @@ package de.cebitec.readXplorer.ui.visualisation.reference;
 import de.cebitec.readXplorer.util.CodonUtilities;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.Properties;
-import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridLayout;

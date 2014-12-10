@@ -25,7 +25,7 @@ import de.cebitec.readxplorer.parser.mappings.JokToBamDirectParser;
 import de.cebitec.readxplorer.parser.mappings.MappingParserI;
 import de.cebitec.readxplorer.parser.mappings.SamBamParser;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
-import de.cebitec.readXplorer.view.dialogMenus.ImportTrackBasePanel;
+import de.cebitec.readxplorer.view.dialogmenus.ImportTrackBasePanel;
 import java.awt.Component;
 import java.io.File;
 import java.util.List;

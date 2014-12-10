@@ -4,10 +4,10 @@ package de.cebitec.readxplorer.vcf.visualization;
 
 import de.cebitec.readxplorer.databackend.ThreadListener;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
-import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
-import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;
-import de.cebitec.readXplorer.view.dataVisualisation.basePanel.BasePanel;
+import de.cebitec.readxplorer.view.datavisualisation.BoundsInfoManager;
+import de.cebitec.readxplorer.view.datavisualisation.abstractviewer.AbstractViewer;
+import de.cebitec.readxplorer.view.datavisualisation.abstractviewer.PhysicalBaseBounds;
+import de.cebitec.readxplorer.view.datavisualisation.basePanel.BasePanel;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;

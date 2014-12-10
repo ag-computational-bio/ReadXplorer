@@ -19,11 +19,11 @@ package de.cebitec.readXplorer.ui.visualisation.reference;
 
 
 import de.cebitec.readXplorer.util.classification.FeatureType;
-import de.cebitec.readXplorer.view.TopComponentExtended;
-import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfo;
-import de.cebitec.readXplorer.view.dataVisualisation.MousePositionListener;
-import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
-import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import de.cebitec.readxplorer.view.TopComponentExtended;
+import de.cebitec.readxplorer.view.datavisualisation.BoundsInfo;
+import de.cebitec.readxplorer.view.datavisualisation.MousePositionListener;
+import de.cebitec.readxplorer.view.datavisualisation.abstractviewer.AbstractViewer;
+import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Iterator;

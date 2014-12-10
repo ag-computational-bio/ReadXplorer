@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.rnatrimming;
 
 
 import de.cebitec.readXplorer.util.TabWithCloseX;
-import de.cebitec.readXplorer.view.TopComponentExtended;
+import de.cebitec.readxplorer.view.TopComponentExtended;
 import de.cebitec.readxplorer.rnatrimming.correlationAnalysis.CorrelationResultTopComponent;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;

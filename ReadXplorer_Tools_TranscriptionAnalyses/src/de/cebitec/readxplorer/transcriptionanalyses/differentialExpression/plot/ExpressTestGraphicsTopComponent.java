@@ -22,7 +22,7 @@ import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
-import de.cebitec.readXplorer.view.TopComponentExtended;
+import de.cebitec.readxplorer.view.TopComponentExtended;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.plotting.ChartExporter;
 import de.cebitec.readxplorer.plotting.CreatePlots;

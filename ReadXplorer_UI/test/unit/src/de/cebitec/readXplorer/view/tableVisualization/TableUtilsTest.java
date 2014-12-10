@@ -18,6 +18,7 @@
 package de.cebitec.readXplorer.view.tableVisualization;
 
 
+import de.cebitec.readxplorer.view.tablevisualization.TableUtils;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

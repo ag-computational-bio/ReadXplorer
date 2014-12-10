@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.dashboard;
 
 
-import de.cebitec.readXplorer.view.dialogMenus.explorer.StandardNode;
+import de.cebitec.readxplorer.view.dialogmenus.explorer.StandardNode;
 import java.beans.IntrospectionException;
 import javax.swing.Action;
 

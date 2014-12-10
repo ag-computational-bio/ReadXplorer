@@ -20,11 +20,11 @@ package de.cebitec.readxplorer.transcriptionanalyses;
 
 import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.util.UneditableTableModel;
-import de.cebitec.readXplorer.view.analysis.ResultTablePanel;
-import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.readXplorer.view.tableVisualization.TableComparatorProvider;
-import de.cebitec.readXplorer.view.tableVisualization.TableUtils;
-import de.cebitec.readXplorer.view.tableVisualization.tableFilter.TableRightClickFilter;
+import de.cebitec.readxplorer.view.analysis.ResultTablePanel;
+import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
+import de.cebitec.readxplorer.view.tablevisualization.TableComparatorProvider;
+import de.cebitec.readxplorer.view.tablevisualization.TableUtils;
+import de.cebitec.readxplorer.view.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;

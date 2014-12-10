@@ -21,7 +21,7 @@ package de.cebitec.readxplorer.tools.rnafolder;
 import de.cebitec.readxplorer.tools.rnafolder.rnamovies.MoviePane;
 import de.cebitec.readxplorer.tools.rnafolder.rnamovies.actions.Export;
 import de.cebitec.readXplorer.util.TabWithCloseX;
-import de.cebitec.readXplorer.view.TopComponentExtended;
+import de.cebitec.readxplorer.view.TopComponentExtended;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;

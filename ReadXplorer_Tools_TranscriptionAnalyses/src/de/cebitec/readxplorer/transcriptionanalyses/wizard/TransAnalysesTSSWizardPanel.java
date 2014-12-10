@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.wizard;
 
 
 import de.cebitec.readXplorer.util.Properties;
-import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
+import de.cebitec.readxplorer.view.dialogmenus.ChangeListeningWizardPanel;
 import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbPreferences;
@@ -35,7 +35,7 @@ import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionA
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_MIN_TRANSCRIPT_EXTENSION_COV;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_UNANNOTATED_TRANSCRIPT_DET;
 import static de.cebitec.readxplorer.transcriptionanalyses.wizard.TranscriptionAnalysesWizardIterator.PROP_WIZARD_NAME;
-import static de.cebitec.readXplorer.view.dialogMenus.SelectReadClassWizardPanel.PROP_STRAND_OPTION;
+import static de.cebitec.readxplorer.view.dialogmenus.SelectReadClassWizardPanel.PROP_STRAND_OPTION;
 
 
 /**

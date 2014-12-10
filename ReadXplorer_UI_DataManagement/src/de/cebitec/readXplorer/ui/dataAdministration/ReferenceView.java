@@ -19,7 +19,7 @@ package de.cebitec.readXplorer.ui.dataAdministration;
 
 
 import de.cebitec.readxplorer.parser.ReferenceJob;
-import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
+import de.cebitec.readxplorer.view.dialogmenus.ChangeListeningWizardPanel;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.event.TableModelEvent;

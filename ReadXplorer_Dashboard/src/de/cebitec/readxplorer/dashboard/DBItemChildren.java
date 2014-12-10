@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.dashboard;
 
 
-import de.cebitec.readXplorer.view.dialogMenus.explorer.StandardItemChildren;
+import de.cebitec.readxplorer.view.dialogmenus.explorer.StandardItemChildren;
 import java.beans.IntrospectionException;
 import java.util.ArrayList;
 import java.util.List;

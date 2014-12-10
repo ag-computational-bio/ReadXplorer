@@ -20,8 +20,8 @@ package de.cebitec.readXplorer.ui.visualisation;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.view.controller.ViewController;
-import de.cebitec.readXplorer.view.tableVisualization.TablePanel;
+import de.cebitec.readxplorer.view.controller.ViewController;
+import de.cebitec.readxplorer.view.tablevisualization.TablePanel;
 import java.util.Collection;
 
 

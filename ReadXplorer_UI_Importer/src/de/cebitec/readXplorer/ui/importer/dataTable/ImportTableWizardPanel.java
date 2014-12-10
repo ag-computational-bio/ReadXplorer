@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.ui.importer.dataTable;
 
 
-import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningFinishWizardPanel;
+import de.cebitec.readxplorer.view.dialogmenus.ChangeListeningFinishWizardPanel;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbBundle;
 

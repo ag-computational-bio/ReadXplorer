@@ -19,9 +19,9 @@ package de.cebitec.readxplorer.transcriptionanalyses.wizard;
 
 
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
-import de.cebitec.readXplorer.view.dialogMenus.OpenTracksWizardPanel;
-import de.cebitec.readXplorer.view.dialogMenus.SelectFeatureTypeWizardPanel;
-import de.cebitec.readXplorer.view.dialogMenus.SelectReadClassWizardPanel;
+import de.cebitec.readxplorer.view.dialogmenus.OpenTracksWizardPanel;
+import de.cebitec.readxplorer.view.dialogmenus.SelectFeatureTypeWizardPanel;
+import de.cebitec.readxplorer.view.dialogmenus.SelectReadClassWizardPanel;
 import java.awt.Component;
 import java.util.ArrayList;
 import java.util.HashMap;

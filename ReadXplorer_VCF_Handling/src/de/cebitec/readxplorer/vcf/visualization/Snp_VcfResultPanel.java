@@ -9,9 +9,9 @@ package de.cebitec.readxplorer.vcf.visualization;
 
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.util.UneditableTableModel;
-import de.cebitec.readXplorer.view.analysis.ResultTablePanel;
-import de.cebitec.readXplorer.view.tableVisualization.TableUtils;
-import de.cebitec.readXplorer.view.tableVisualization.tableFilter.TableRightClickFilter;
+import de.cebitec.readxplorer.view.analysis.ResultTablePanel;
+import de.cebitec.readxplorer.view.tablevisualization.TableUtils;
+import de.cebitec.readxplorer.view.tablevisualization.tablefilter.TableRightClickFilter;
 import java.util.List;
 import java.util.Map;
 import javax.swing.DefaultListSelectionModel;

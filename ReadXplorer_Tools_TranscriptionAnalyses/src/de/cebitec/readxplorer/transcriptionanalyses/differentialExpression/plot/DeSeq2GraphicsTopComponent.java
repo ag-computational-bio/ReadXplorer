@@ -20,7 +20,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.plot
 
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
-import de.cebitec.readXplorer.view.TopComponentExtended;
+import de.cebitec.readxplorer.view.TopComponentExtended;
 import de.cebitec.readxplorer.plotting.ChartExporter;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.DeAnalysisHandler;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.DeSeq2AnalysisHandler;

@@ -20,12 +20,12 @@ package de.cebitec.readxplorer.dashboard;
 
 import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.readXplorer.util.VisualisationUtils;
-import de.cebitec.readXplorer.view.TopComponentExtended;
-import de.cebitec.readXplorer.view.controller.ViewController;
-import de.cebitec.readXplorer.view.dialogMenus.explorer.CustomOutlineCellRenderer;
-import de.cebitec.readXplorer.view.dialogMenus.explorer.StandardItem;
-import de.cebitec.readXplorer.view.dialogMenus.explorer.StandardNode;
-import de.cebitec.readXplorer.view.login.LoginWizardAction;
+import de.cebitec.readxplorer.view.TopComponentExtended;
+import de.cebitec.readxplorer.view.controller.ViewController;
+import de.cebitec.readxplorer.view.dialogmenus.explorer.CustomOutlineCellRenderer;
+import de.cebitec.readxplorer.view.dialogmenus.explorer.StandardItem;
+import de.cebitec.readxplorer.view.dialogmenus.explorer.StandardNode;
+import de.cebitec.readxplorer.view.login.LoginWizardAction;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;

@@ -20,7 +20,7 @@ package de.cebitec.readxplorer.tools.rnafolder;
 
 import de.cebitec.readxplorer.tools.rnafolder.rnamovies.MoviePane;
 import de.cebitec.readxplorer.tools.rnafolder.rnamovies.RNAMovies;
-import de.cebitec.readXplorer.view.dialogMenus.RNAFolderI;
+import de.cebitec.readxplorer.view.dialogmenus.RNAFolderI;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;
 import org.openide.DialogDisplayer;
