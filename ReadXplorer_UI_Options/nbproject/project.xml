@@ -99,7 +99,7 @@
                 </test-type>
             </test-dependencies>
             <public-packages>
-                <package>de.cebitec.readXplorer.options</package>
+                <package>de.cebitec.readxplorer.ui.options</package>
             </public-packages>
         </data>
     </configuration>

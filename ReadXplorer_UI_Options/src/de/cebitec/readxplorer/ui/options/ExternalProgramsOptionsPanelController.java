@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.options;
+package de.cebitec.readxplorer.ui.options;
 
 
 import java.beans.PropertyChangeListener;
@@ -28,7 +28,7 @@ import org.openide.util.Lookup;
 
 @OptionsPanelController.TopLevelRegistration(
          categoryName = "#OptionsCategory_Name_ExternalPrograms",
-         iconBase = "de/cebitec/readXplorer/options/externalTools.jpg",
+         iconBase = "de/cebitec/readxplorer/ui/options/externalTools.jpg",
          keywords = "#OptionsCategory_Keywords_ExternalPrograms",
          keywordsCategory = "ExternalPrograms"
 )
@@ -40,48 +40,57 @@ public final class ExternalProgramsOptionsPanelController extends OptionsPanelCo
     private boolean changed;
 
 
+    @Override
     public void update() {
         getPanel().load();
         changed = false;
     }
 
 
+    @Override
     public void applyChanges() {
         getPanel().store();
         changed = false;
     }
 
 
+    @Override
     public void cancel() {
         // need not do anything special, if no changes have been persisted yet
     }
 
 
+    @Override
     public boolean isValid() {
         return getPanel().valid();
     }
 
 
+    @Override
     public boolean isChanged() {
         return changed;
     }
 
 
+    @Override
     public HelpCtx getHelpCtx() {
         return null; // new HelpCtx("...ID") if you have a help set
     }
 
 
+    @Override
     public JComponent getComponent( Lookup masterLookup ) {
         return getPanel();
     }
 
 
+    @Override
     public void addPropertyChangeListener( PropertyChangeListener l ) {
         pcs.addPropertyChangeListener( l );
     }
 
 
+    @Override
     public void removePropertyChangeListener( PropertyChangeListener l ) {
         pcs.removePropertyChangeListener( l );
     }

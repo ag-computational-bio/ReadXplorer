@@ -16,7 +16,7 @@
  */
 
 @HelpSetRegistration( helpSet = "options-hs.xml", position = 3058 )
-package de.cebitec.readXplorer.options.docs;
+package de.cebitec.readxplorer.ui.options.docs;
 
 
 import org.netbeans.api.javahelp.HelpSetRegistration;

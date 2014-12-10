@@ -15,26 +15,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.options;
+package de.cebitec.readxplorer.ui.options;
 
 
 import org.netbeans.spi.options.OptionsPanelController;
 
 
-@OptionsPanelController.TopLevelRegistration( categoryName = "#OptionsCategory_Name_Colours",
-                                              iconBase = "de/cebitec/readXplorer/options/colorOptions.png",
-                                              keywords = "#OptionsCategory_Keywords_Colours",
-                                              keywordsCategory = "Colours",
-                                              position = 900 )
-public final class ColorsOptionsPanelController extends ChangeListeningOptionsPanelController {
+@OptionsPanelController.TopLevelRegistration(
+         categoryName = "#OptionsCategory_Name_Viewer",
+         iconBase = "de/cebitec/readxplorer/ui/options/trackOpen24.png",
+         keywords = "#OptionsCategory_Keywords_Viewer",
+         keywordsCategory = "Viewer"
+)
+@org.openide.util.NbBundle.Messages( { "OptionsCategory_Name_Viewer=Viewer", "OptionsCategory_Keywords_Viewer=viewer" } )
+public final class ViewerOptionsPanelController extends ChangeListeningOptionsPanelController {
 
-    private ColorsPanel panel;
+    private ViewerPanel panel;
 
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected OptionsPanel getPanel() {
         if( panel == null ) {
-            panel = new ColorsPanel( this );
+            panel = new ViewerPanel( this );
         }
         return panel;
     }

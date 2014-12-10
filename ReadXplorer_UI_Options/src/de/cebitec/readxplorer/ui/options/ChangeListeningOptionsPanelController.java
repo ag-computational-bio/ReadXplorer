@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.options;
+package de.cebitec.readxplorer.ui.options;
 
 
 import java.beans.PropertyChangeListener;

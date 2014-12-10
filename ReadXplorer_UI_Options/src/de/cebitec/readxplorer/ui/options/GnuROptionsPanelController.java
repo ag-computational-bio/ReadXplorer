@@ -15,25 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.options;
+package de.cebitec.readxplorer.ui.options;
 
 
 import org.netbeans.spi.options.OptionsPanelController;
 
 
-/**
- * Controller for genetic code options.
- * <p>
- * @author Rolf Hilker <rolf.hilker at mikrobio.med.uni-giessen.de>
- */
-@OptionsPanelController.TopLevelRegistration( categoryName = "#OptionsCategory_Name_GeneticCode",
-                                              iconBase = "de/cebitec/readXplorer/options/geneticCode.png",
-                                              keywords = "#OptionsCategory_Keywords_GeneticCode",
-                                              keywordsCategory = "GeneticCode",
-                                              position = 905 )
-public final class GeneticCodeOptionsPanelController extends ChangeListeningOptionsPanelController {
+@OptionsPanelController.TopLevelRegistration( categoryName = "#OptionsCategory_Name_GnuR",
+                                              iconBase = "de/cebitec/readxplorer/ui/options/gnuR.png",
+                                              keywords = "#OptionsCategory_Keywords_GnuR",
+                                              keywordsCategory = "GnuR" )
+@org.openide.util.NbBundle.Messages( { "OptionsCategory_Name_GnuR=Gnu R", "OptionsCategory_Keywords_GnuR=GnuR" } )
+public final class GnuROptionsPanelController extends ChangeListeningOptionsPanelController {
 
-    private GeneticCodePanel panel;
+    private GnuRPanel panel;
 
 
     /**
@@ -42,7 +37,7 @@ public final class GeneticCodeOptionsPanelController extends ChangeListeningOpti
     @Override
     protected OptionsPanel getPanel() {
         if( panel == null ) {
-            panel = new GeneticCodePanel( this );
+            panel = new GnuRPanel( this );
         }
         return panel;
     }
