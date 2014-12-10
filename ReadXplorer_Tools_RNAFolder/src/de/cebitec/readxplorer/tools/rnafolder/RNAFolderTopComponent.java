@@ -20,8 +20,8 @@ package de.cebitec.readxplorer.tools.rnafolder;
 
 import de.cebitec.readxplorer.tools.rnafolder.rnamovies.MoviePane;
 import de.cebitec.readxplorer.tools.rnafolder.rnamovies.actions.Export;
-import de.cebitec.readxplorer.utils.TabWithCloseX;
 import de.cebitec.readxplorer.ui.TopComponentExtended;
+import de.cebitec.readxplorer.utils.TabWithCloseX;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;

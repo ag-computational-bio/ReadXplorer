@@ -62,7 +62,7 @@ public class PairTable {
 
         // extract pseudoknot labels
         final int pk_start = structure.lastIndexOf( '#' );
-        final int pk_end   = structure.lastIndexOf( '&' );
+        final int pk_end = structure.lastIndexOf( '&' );
         if( pk_start > 0 && pk_end > 0 && pk_start < pk_end ) {
             StringTokenizer st = new StringTokenizer( structure.substring( pk_start, pk_end ), " " );
             while( st.hasMoreTokens() ) {
@@ -207,7 +207,7 @@ public class PairTable {
         pairTable = new int[length];
         bondTypes = new byte[length];
 
-        for( int i=0; i<length; i++ ) {
+        for( int i = 0; i < length; i++ ) {
             char c;
             switch( c = structure.charAt( i ) ) {
                 case '(':
@@ -230,7 +230,7 @@ public class PairTable {
                     pairTable[i] = mate;
                     pairTable[mate] = i;
                     int sum = sequence.toUpperCase().charAt( i )
-                          + sequence.toUpperCase().charAt( mate );
+                              + sequence.toUpperCase().charAt( mate );
                     boolean gu = sum == GU || sum == GT;
                     bondTypes[i] = bondTypes[mate] = gu ? GU_BOND : NORMAL_BOND;
                     break;

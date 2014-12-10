@@ -68,7 +68,7 @@ class ParameterSetSNPs extends ParametersFeatureTypesAndReadClasses implements
      *                              or -1 if unknown.
      */
     ParameterSetSNPs( int minMismatchBases, int minPercentage, boolean useMainBase, Set<FeatureType> selFeatureTypes, ParametersReadClasses readClassParams,
-                             byte minBaseQuality, byte minAverageBaseQual, int minAverageMappingQual ) {
+                      byte minBaseQuality, byte minAverageBaseQual, int minAverageMappingQual ) {
         super( selFeatureTypes, readClassParams );
         this.minMismatchBases = minMismatchBases;
         this.minPercentage = minPercentage;

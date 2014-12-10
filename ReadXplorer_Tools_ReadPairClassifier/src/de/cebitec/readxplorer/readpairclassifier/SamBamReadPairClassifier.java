@@ -18,6 +18,16 @@
 package de.cebitec.readxplorer.readpairclassifier;
 
 
+import de.cebitec.readxplorer.parser.ReadPairJobContainer;
+import de.cebitec.readxplorer.parser.TrackJob;
+import de.cebitec.readxplorer.parser.common.ParsedClassification;
+import de.cebitec.readxplorer.parser.common.ParsedReadPairContainer;
+import de.cebitec.readxplorer.parser.common.ParsingException;
+import de.cebitec.readxplorer.parser.common.RefSeqFetcher;
+import de.cebitec.readxplorer.parser.mappings.CommonsMappingParser;
+import de.cebitec.readxplorer.parser.mappings.ReadPairClassifierI;
+import de.cebitec.readxplorer.parser.mappings.SamBamParser;
+import de.cebitec.readxplorer.parser.output.SamBamSorter;
 import de.cebitec.readxplorer.utils.Benchmark;
 import de.cebitec.readxplorer.utils.DiscreteCountingDistribution;
 import de.cebitec.readxplorer.utils.ErrorLimit;
@@ -31,16 +41,6 @@ import de.cebitec.readxplorer.utils.ReadPairType;
 import de.cebitec.readxplorer.utils.SamUtils;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.StatsContainer;
-import de.cebitec.readxplorer.parser.ReadPairJobContainer;
-import de.cebitec.readxplorer.parser.TrackJob;
-import de.cebitec.readxplorer.parser.common.ParsedClassification;
-import de.cebitec.readxplorer.parser.common.ParsedReadPairContainer;
-import de.cebitec.readxplorer.parser.common.ParsingException;
-import de.cebitec.readxplorer.parser.common.RefSeqFetcher;
-import de.cebitec.readxplorer.parser.mappings.CommonsMappingParser;
-import de.cebitec.readxplorer.parser.mappings.ReadPairClassifierI;
-import de.cebitec.readxplorer.parser.mappings.SamBamParser;
-import de.cebitec.readxplorer.parser.output.SamBamSorter;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -721,7 +721,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
     @Override
     public void update( Object args ) {
         if( args instanceof String ) {
-            this.notifyObservers(args);
+            this.notifyObservers( args );
         }
     }
 

@@ -18,7 +18,6 @@
 package de.cebitec.readxplorer.ui.importer;
 
 
-import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readxplorer.api.objects.NewJobDialogI;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.common.ParserI;
@@ -27,6 +26,7 @@ import de.cebitec.readxplorer.parser.reference.BioJavaGff3Parser;
 import de.cebitec.readxplorer.parser.reference.BioJavaParser;
 import de.cebitec.readxplorer.parser.reference.FastaReferenceParser;
 import de.cebitec.readxplorer.parser.reference.ReferenceParserI;
+import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
 import java.awt.Component;
 import java.io.File;
 import java.sql.Timestamp;
@@ -53,7 +53,7 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
     private File refFeatureFile = null;
     private String referenceName = null;
     private final ReferenceParserI[] availableParsers = new ReferenceParserI[]{ new BioJavaParser( BioJavaParser.EMBL ),
-                                                                          new BioJavaParser( BioJavaParser.GENBANK ), new BioJavaGff3Parser(), new BioJavaGff2Parser(), new FastaReferenceParser() };
+                                                                                new BioJavaParser( BioJavaParser.GENBANK ), new BioJavaGff3Parser(), new BioJavaGff2Parser(), new FastaReferenceParser() };
     private ReferenceParserI currentParser;
 
 

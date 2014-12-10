@@ -18,12 +18,12 @@
 package de.cebitec.readxplorer.tools.detailedviewer;
 
 
+import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.ui.TopComponentExtended;
 import de.cebitec.readxplorer.ui.controller.ViewController;
 import de.cebitec.readxplorer.ui.datavisualisation.basePanel.BasePanel;
 import de.cebitec.readxplorer.ui.datavisualisation.basePanel.BasePanelFactory;
 import de.cebitec.readxplorer.ui.datavisualisation.histogramviewer.HistogramViewer;
-import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import java.awt.CardLayout;
 import java.util.logging.Logger;
 import org.netbeans.api.settings.ConvertAsProperties;

@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.rnatrimming.correlationAnalysis;
 
 
-import de.cebitec.readxplorer.rnatrimming.correlationAnalysis.CorrelationAnalysisAction.CorrelationCoefficient;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.rnatrimming.correlationAnalysis.CorrelationAnalysisAction.CorrelationCoefficient;
 import java.awt.Component;
 import java.util.List;
 import javax.swing.event.ChangeListener;

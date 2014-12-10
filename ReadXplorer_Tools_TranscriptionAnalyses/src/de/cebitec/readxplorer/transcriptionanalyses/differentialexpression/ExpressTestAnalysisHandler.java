@@ -91,7 +91,7 @@ public class ExpressTestAnalysisHandler extends DeAnalysisHandler implements
         et.addObserver( this );
         PersistentFeature[] regionNames = expressTestAnalysisData.getFeatures();
         int[] start = expressTestAnalysisData.getStart();
-        int[] stop  = expressTestAnalysisData.getStop();
+        int[] stop = expressTestAnalysisData.getStop();
         int[] indexA = expressTestAnalysisData.getGroupA();
         int[] indexB = expressTestAnalysisData.getGroupB();
         int[][] groupA = new int[indexA.length][];

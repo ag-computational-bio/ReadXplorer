@@ -18,9 +18,9 @@
 package de.cebitec.readxplorer.rnatrimming.correlationAnalysis;
 
 
-import de.cebitec.readxplorer.rnatrimming.correlationAnalysis.CorrelationAnalysisAction.CorrelationCoefficient;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.rnatrimming.correlationAnalysis.CorrelationAnalysisAction.CorrelationCoefficient;
 import java.util.List;
 import org.openide.util.NbBundle;
 

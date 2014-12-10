@@ -20,7 +20,6 @@ package de.cebitec.readxplorer.ui.tablevisualization;
 
 import de.cebitec.readxplorer.ui.TopComponentExtended;
 import de.cebitec.readxplorer.ui.TopComponentHelper;
-import de.cebitec.readxplorer.ui.tablevisualization.Bundle;
 import javax.swing.JPanel;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;

@@ -20,12 +20,11 @@ package de.cebitec.readxplorer.plotting;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readxplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.readxplorer.ui.controller.ViewController;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
+import de.cebitec.readxplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
 import java.awt.Point;
 import java.util.Collection;
-import java.util.Iterator;
 import org.jfree.chart.ChartMouseEvent;
 import org.jfree.chart.ChartMouseListener;
 import org.jfree.chart.entity.XYItemEntity;

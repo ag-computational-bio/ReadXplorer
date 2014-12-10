@@ -61,7 +61,7 @@ public class ResultDeAnalysis {
     public List<List<Object>> getTableContentsContainingRowNames() {
         List<Object> rnames = getRownames();
         List<List<Object>> data = getTableContents();
-        for( int i=0; i<rnames.size(); i++ ) {
+        for( int i = 0; i < rnames.size(); i++ ) {
             data.get( i ).add( 0, rnames.get( i ) );
         }
         return data;
@@ -172,10 +172,10 @@ public class ResultDeAnalysis {
     private List<List<Object>> convertRresults( final RVector currentRVector ) {
 
         List<List<Object>> current = new ArrayList<>();
-        for( int i=0; i<currentRVector.size(); i++ ) {
+        for( int i = 0; i < currentRVector.size(); i++ ) {
 
             List<Object> converted = convertNames( currentRVector.at( i ) );
-            for( int j=0; j<converted.size(); j++ ) {
+            for( int j = 0; j < converted.size(); j++ ) {
 
 //                if( j>=current.size() )
 //                    current.add( new ArrayList<>() );

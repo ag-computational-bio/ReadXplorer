@@ -18,6 +18,8 @@
 package de.cebitec.readxplorer.parser.mappings;
 
 
+import de.cebitec.readxplorer.parser.TrackJob;
+import de.cebitec.readxplorer.parser.common.ParsedTrack;
 import de.cebitec.readxplorer.utils.Benchmark;
 import de.cebitec.readxplorer.utils.DiscreteCountingDistribution;
 import de.cebitec.readxplorer.utils.ErrorLimit;
@@ -31,8 +33,6 @@ import de.cebitec.readxplorer.utils.StatsContainer;
 import de.cebitec.readxplorer.utils.classification.Classification;
 import de.cebitec.readxplorer.utils.classification.MappingClass;
 import de.cebitec.readxplorer.utils.classification.TotalCoverage;
-import de.cebitec.readxplorer.parser.TrackJob;
-import de.cebitec.readxplorer.parser.common.ParsedTrack;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

@@ -37,11 +37,11 @@ import de.cebitec.readxplorer.transcriptomeanalyses.main.TSSDetectionResults;
 import de.cebitec.readxplorer.transcriptomeanalyses.main.TranscriptomeAnalysesTopComponentTopComponent;
 import de.cebitec.readxplorer.transcriptomeanalyses.mainWizard.FivePrimeEnrichedTracksVisualPanel;
 import de.cebitec.readxplorer.transcriptomeanalyses.mainWizard.WizardPropertyStrings;
+import de.cebitec.readxplorer.ui.analysis.ResultTablePanel;
+import de.cebitec.readxplorer.ui.controller.ViewController;
 import de.cebitec.readxplorer.ui.importer.TranscriptomeTableViewI;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
-import de.cebitec.readxplorer.ui.analysis.ResultTablePanel;
-import de.cebitec.readxplorer.ui.controller.ViewController;
 import java.awt.HeadlessException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -748,16 +748,16 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
         }
 
         if( secondSheetMap.containsKey( TABLE_TYPE ) ) {
-            if( secondSheetMap.get( TABLE_TYPE ).equals(de.cebitec.readxplorer.transcriptomeanalyses.enums.TableType.TSS_TABLE.toString() ) ) {
+            if( secondSheetMap.get( TABLE_TYPE ).equals( de.cebitec.readxplorer.transcriptomeanalyses.enums.TableType.TSS_TABLE.toString() ) ) {
                 setUpTSSDataStructuresAndTable( reference, transcAnalysesTopComp, model, secondSheetMap, secondSheetMapThirdCol );
             }
-            if( secondSheetMap.get( TABLE_TYPE ).equals(de.cebitec.readxplorer.transcriptomeanalyses.enums.TableType.NOVEL_TRANSCRIPTS_TABLE.toString() ) ) {
+            if( secondSheetMap.get( TABLE_TYPE ).equals( de.cebitec.readxplorer.transcriptomeanalyses.enums.TableType.NOVEL_TRANSCRIPTS_TABLE.toString() ) ) {
                 setUpNovelTranscriptsStructuresAndTable( reference, transcAnalysesTopComp, model, secondSheetMap, secondSheetMapThirdCol );
             }
-            if( secondSheetMap.get( TABLE_TYPE ).equals(de.cebitec.readxplorer.transcriptomeanalyses.enums.TableType.RPKM_TABLE.toString() ) ) {
+            if( secondSheetMap.get( TABLE_TYPE ).equals( de.cebitec.readxplorer.transcriptomeanalyses.enums.TableType.RPKM_TABLE.toString() ) ) {
                 setUpRpkmStructuresAndTable( transcAnalysesTopComp, model, secondSheetMap, secondSheetMapThirdCol );
             }
-            if( secondSheetMap.get( TABLE_TYPE ).equals(de.cebitec.readxplorer.transcriptomeanalyses.enums.TableType.OPERON_TABLE.toString() ) ) {
+            if( secondSheetMap.get( TABLE_TYPE ).equals( de.cebitec.readxplorer.transcriptomeanalyses.enums.TableType.OPERON_TABLE.toString() ) ) {
                 setUpOperonStructuresAndTable( reference, transcAnalysesTopComp, model, secondSheetMap, secondSheetMapThirdCol );
             }
         }

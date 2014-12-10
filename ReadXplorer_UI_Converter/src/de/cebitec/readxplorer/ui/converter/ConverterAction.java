@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.ui.converter;
 
 
-import de.cebitec.readxplorer.utils.VisualisationUtils;
 import de.cebitec.readxplorer.parser.output.ConverterI;
+import de.cebitec.readxplorer.utils.VisualisationUtils;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -65,7 +65,7 @@ public final class ConverterAction implements ActionListener {
     @SuppressWarnings( "unchecked" )
     public void actionPerformed( ActionEvent e ) {
 
-        panels = new ArrayList<>( 10);
+        panels = new ArrayList<>( 10 );
         panels.add( new ConverterWizardPanel() );
         WizardDescriptor wizardDescriptor = new WizardDescriptor( new WizardDescriptor.ArrayIterator<>( VisualisationUtils.getWizardPanels( panels ) ) );
         // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()

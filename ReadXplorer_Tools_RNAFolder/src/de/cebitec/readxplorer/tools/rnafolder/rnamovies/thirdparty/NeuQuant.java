@@ -370,6 +370,7 @@ public class NeuQuant {
             network[i][1] >>= netbiasshift;
             network[i][2] >>= netbiasshift;
             network[i][3] = i; /* record colour no */
+
         }
     }
 

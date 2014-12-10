@@ -20,9 +20,9 @@ package de.cebitec.readxplorer.rnatrimming.correlationAnalysis;
 
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
-import de.cebitec.readxplorer.utils.VisualisationUtils;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.ui.dialogmenus.SelectReadClassWizardPanel;
+import de.cebitec.readxplorer.utils.VisualisationUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;

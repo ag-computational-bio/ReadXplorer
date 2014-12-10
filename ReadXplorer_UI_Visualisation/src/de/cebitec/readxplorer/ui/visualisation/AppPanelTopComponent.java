@@ -18,7 +18,6 @@
 package de.cebitec.readxplorer.ui.visualisation;
 
 
-import de.cebitec.readxplorer.utils.VisualisationUtils;
 import de.cebitec.readxplorer.api.ApplicationFrameI;
 import de.cebitec.readxplorer.api.cookies.CloseRefGenCookie;
 import de.cebitec.readxplorer.api.cookies.CloseTrackCookie;
@@ -30,6 +29,7 @@ import de.cebitec.readxplorer.ui.datavisualisation.basePanel.BasePanel;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.ui.datavisualisation.trackviewer.MultipleTrackViewer;
 import de.cebitec.readxplorer.ui.datavisualisation.trackviewer.TrackViewer;
+import de.cebitec.readxplorer.utils.VisualisationUtils;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;

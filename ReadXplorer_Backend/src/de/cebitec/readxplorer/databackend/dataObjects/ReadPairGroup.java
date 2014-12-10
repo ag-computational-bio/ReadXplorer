@@ -108,7 +108,8 @@ public class ReadPairGroup implements ObjectWithId {
      * @param type        type of the read pair this mapping is belonging to (
      * @param bothVisible true, if both mappings of the pair are visible
      * <p>
-     * @see de.cebitec.readxplorer.utils.Properties     */
+     * @see de.cebitec.readxplorer.utils.Properties
+     */
     public void addPersistentDirectAccessMapping( Mapping mapping, Mapping mate, ReadPairType type, boolean bothVisible ) {
 
         boolean stored = false;
@@ -180,7 +181,6 @@ public class ReadPairGroup implements ObjectWithId {
 //    public void setExcludedFeatureTypes( List<FeatureType> excludedFeatureTypes ) {
 //        this.excludedFeatureTypes = excludedFeatureTypes;
 //    }
-
 
     @Override
     public long getId() {

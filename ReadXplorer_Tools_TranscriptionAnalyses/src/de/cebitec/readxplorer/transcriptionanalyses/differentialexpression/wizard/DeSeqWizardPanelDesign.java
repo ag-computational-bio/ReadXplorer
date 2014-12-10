@@ -145,7 +145,7 @@ public class DeSeqWizardPanelDesign implements
                 if( currentCell == null ) {
                     throw new WizardValidationException( null, "Please fill out the complete row or remove it.", null );
                 }
-                if( !stringBefore.isEmpty( ) && !currentCell.equals( stringBefore ) ) {
+                if( !stringBefore.isEmpty() && !currentCell.equals( stringBefore ) ) {
                     differentCondsUsed = true;
                 }
                 rowAsStringArray[i - 1] = currentCell;

@@ -19,8 +19,8 @@ package de.cebitec.readxplorer.transcriptionanalyses.wizard;
 
 
 import de.cebitec.readxplorer.api.objects.JobPanel;
-import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
+import de.cebitec.readxplorer.utils.GeneralUtils;
 import java.util.prefs.Preferences;
 import org.openide.util.NbPreferences;
 

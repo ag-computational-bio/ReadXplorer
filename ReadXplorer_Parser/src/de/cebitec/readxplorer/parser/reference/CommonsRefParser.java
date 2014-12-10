@@ -20,7 +20,6 @@ package de.cebitec.readxplorer.parser.reference;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 

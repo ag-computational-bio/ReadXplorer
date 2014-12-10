@@ -28,8 +28,6 @@ import de.cebitec.readxplorer.databackend.dataObjects.CoverageManager;
 import de.cebitec.readxplorer.databackend.dataObjects.Difference;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataObjects.ReferenceGap;
-import de.cebitec.readxplorer.utils.ColorProperties;
-import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.datavisualisation.GenomeGapManager;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.AbstractViewer;
@@ -37,6 +35,8 @@ import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PaintingAreaIn
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PhysicalBaseBounds;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.SequenceBar;
 import de.cebitec.readxplorer.ui.datavisualisation.basePanel.BasePanel;
+import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.utils.SequenceUtils;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Graphics;
@@ -48,9 +48,6 @@ import java.util.Iterator;
 import java.util.List;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
-//import org.openide.util.NbBundle;
-//import org.openide.windows.IOProvider;
-//import org.openide.windows.InputOutput;
 
 
 /**

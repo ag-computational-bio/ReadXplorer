@@ -20,14 +20,14 @@ package de.cebitec.readxplorer.ui.datavisualisation.abstractviewer;
 
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.utils.ColorProperties;
-import de.cebitec.readxplorer.utils.classification.Classification;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfo;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.datavisualisation.LogicalBoundsListener;
 import de.cebitec.readxplorer.ui.datavisualisation.MousePositionListener;
 import de.cebitec.readxplorer.ui.datavisualisation.basePanel.BasePanel;
 import de.cebitec.readxplorer.ui.dialogmenus.MenuItemFactory;
+import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.utils.classification.Classification;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;

@@ -109,12 +109,12 @@ public final class ExpressTestVisualPanelNormalization extends JPanel {
     public int[] getSelectedFeatures() {
 
         int[] selected = featureTable.getSelectedRows();
-        int[] selectedFeatures = new int[ selected.length ];
-        for( int i=0; i<selected.length; i++ ) {
+        int[] selectedFeatures = new int[selected.length];
+        for( int i = 0; i < selected.length; i++ ) {
             int idx = featureTable.convertRowIndexToModel( selected[i] );
             selectedFeatures[i] = features.get( idx ).getId();
         }
-        
+
         return selectedFeatures;
 
     }

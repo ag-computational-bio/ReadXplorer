@@ -18,7 +18,6 @@
 package de.cebitec.readxplorer.ui.importer;
 
 
-import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readxplorer.api.objects.NewJobDialogI;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.common.ParserI;
@@ -26,6 +25,7 @@ import de.cebitec.readxplorer.parser.mappings.JokToBamDirectParser;
 import de.cebitec.readxplorer.parser.mappings.MappingParserI;
 import de.cebitec.readxplorer.parser.mappings.SamBamParser;
 import de.cebitec.readxplorer.ui.dialogmenus.ImportTrackBasePanel;
+import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
 import java.awt.Component;
 import java.io.File;
 import java.util.ArrayList;

@@ -165,7 +165,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
                 Vector<Vector<Object>> tableContents;
                 switch( usedTool ) {
                     case ExportCountTable:
-                        //fallthrough, since handling is same as for DESeq2
+                    //fallthrough, since handling is same as for DESeq2
                     case DeSeq2:
                         colNames.add( 0, "Feature" );
                         tableContents = transformData( currentResult.getTableContentsContainingRowNames() );
@@ -204,9 +204,9 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
     }
 
 
-
     /**
      * Temporary method in order to workaround the <code>Vector</code> mess
+     * <p>
      * @param data
      */
     private static Vector<Vector<Object>> transformData( List<List<Object>> data ) {
@@ -227,7 +227,6 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
         return newData;
 
     }
-
 
 
     /**

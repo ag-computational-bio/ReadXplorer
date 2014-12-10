@@ -19,8 +19,8 @@ package de.cebitec.readxplorer.ui.datavisualisation;
 
 
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.ui.datavisualisation.basePanel.AdjustmentPanelListenerI;
+import de.cebitec.readxplorer.utils.Observer;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;

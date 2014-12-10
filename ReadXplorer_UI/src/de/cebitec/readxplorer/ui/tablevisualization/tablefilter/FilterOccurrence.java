@@ -49,7 +49,7 @@ class FilterOccurrence<E extends DefaultTableModel> {
 
 
     FilterOccurrence( String selectedButton, int occurrenceCount, TableRightClickFilter<E> tableRightClickFilter,
-                             int trackColumn, int posColumn ) {
+                      int trackColumn, int posColumn ) {
         this.selectedButton = selectedButton;
         this.occurrenceCount = occurrenceCount;
         this.tableRightClickFilter = tableRightClickFilter;

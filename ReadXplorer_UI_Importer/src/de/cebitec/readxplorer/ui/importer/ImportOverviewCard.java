@@ -21,7 +21,6 @@ package de.cebitec.readxplorer.ui.importer;
 import de.cebitec.readxplorer.parser.ReadPairJobContainer;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.TrackJob;
-import java.util.Iterator;
 import java.util.List;
 import org.openide.util.NbBundle;
 

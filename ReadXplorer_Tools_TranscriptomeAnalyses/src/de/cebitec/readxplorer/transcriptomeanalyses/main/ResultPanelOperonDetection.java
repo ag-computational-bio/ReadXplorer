@@ -15,17 +15,17 @@ import de.cebitec.readxplorer.transcriptomeanalyses.datastructures.OperonAdjacen
 import de.cebitec.readxplorer.transcriptomeanalyses.enums.TableType;
 import de.cebitec.readxplorer.transcriptomeanalyses.featureTableExport.SequinTableFormatExporter;
 import de.cebitec.readxplorer.transcriptomeanalyses.featureTableExport.SequinTableSettingsWizardPanel;
-import de.cebitec.readxplorer.utils.LineWrapCellRenderer;
-import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.utils.SequenceUtils;
-import de.cebitec.readxplorer.utils.UneditableTableModel;
-import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readxplorer.ui.analysis.ResultTablePanel;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.ui.tablevisualization.TableComparatorProvider;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
+import de.cebitec.readxplorer.utils.LineWrapCellRenderer;
+import de.cebitec.readxplorer.utils.Observer;
+import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.utils.UneditableTableModel;
+import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
 import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.File;
@@ -381,7 +381,7 @@ public class ResultPanelOperonDetection extends ResultTablePanel implements
                         line = br.readLine();
                     }
                     // skip header line !
-                    while( line != null && !line.isEmpty( ) ) {
+                    while( line != null && !line.isEmpty() ) {
 
                         String[] split = line.split( "\t" );
                         String locus = split[0];

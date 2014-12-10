@@ -162,7 +162,7 @@ public class BioJavaGff3Parser implements ReferenceParserI {
                             key = attrIt.next();
                             if( key instanceof Term ) {
                                 keyString = ((Term) key).getName();
-                                value = attributes.get(key);
+                                value = attributes.get( key );
                                 if( value instanceof List && !((Collection) value).isEmpty() ) {
                                     attribute = ((List) value).get( 0 ); //currently only one item per tag is supported, except for parent
                                     if( attribute instanceof String ) { //TODO: think about some way to keep all provided data - write it to product field?

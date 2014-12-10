@@ -66,13 +66,13 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
             countData[i++] = data.pollFirstCountData();
         }
         List<List<Object>> tableContents = new ArrayList<>();
-        for( i=0; i < feature.length; i++ ) {
+        for( i = 0; i < feature.length; i++ ) {
             boolean allZero = true;
             Integer[] tmp = new Integer[data.getSelectedTracks().size() + 3];
             tmp[0] = feature[i].getChromId();
             tmp[1] = feature[i].getStart();
             tmp[2] = feature[i].getStop();
-            for( int j=3; j<data.getSelectedTracks().size()+3; j++ ) {
+            for( int j = 3; j < data.getSelectedTracks().size() + 3; j++ ) {
                 int value = countData[j - 3][i];
                 if( value != 0 ) {
                     allZero = false;
@@ -85,11 +85,11 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
             }
             progressHandle.progress( i );
         }
-        List<Object> colNames = new ArrayList<>( trackDescriptions.length + 3);
-            colNames.add( "Chromosome" );
-            colNames.add( "Start" );
-            colNames.add( "Stop" );
-            colNames.addAll( Arrays.asList( trackDescriptions ) );
+        List<Object> colNames = new ArrayList<>( trackDescriptions.length + 3 );
+        colNames.add( "Chromosome" );
+        colNames.add( "Start" );
+        colNames.add( "Stop" );
+        colNames.addAll( Arrays.asList( trackDescriptions ) );
 //        Vector rowNames = new Vector( regionNamesList );
 
         results = new ArrayList<>();

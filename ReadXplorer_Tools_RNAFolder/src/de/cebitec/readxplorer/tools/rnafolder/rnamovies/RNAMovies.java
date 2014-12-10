@@ -255,7 +255,7 @@ public class RNAMovies extends JPanel implements ActionContainer {
             name = ((String) enumer.nextElement()).trim();
         }
 
-        if( name.isEmpty( ) ) {
+        if( name.isEmpty() ) {
             throw new IllegalArgumentException( "No Movie Data found!" );
         }
 

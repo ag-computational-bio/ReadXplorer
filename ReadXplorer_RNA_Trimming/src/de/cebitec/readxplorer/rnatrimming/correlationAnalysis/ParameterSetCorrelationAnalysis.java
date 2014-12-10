@@ -18,11 +18,11 @@
 package de.cebitec.readxplorer.rnatrimming.correlationAnalysis;
 
 
-import de.cebitec.readxplorer.rnatrimming.correlationAnalysis.CorrelationAnalysisAction.CorrelationCoefficient;
 import de.cebitec.readxplorer.databackend.ParameterSetI;
 import de.cebitec.readxplorer.databackend.ParameterSetWithReadClasses;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.rnatrimming.correlationAnalysis.CorrelationAnalysisAction.CorrelationCoefficient;
 import java.util.List;
 
 

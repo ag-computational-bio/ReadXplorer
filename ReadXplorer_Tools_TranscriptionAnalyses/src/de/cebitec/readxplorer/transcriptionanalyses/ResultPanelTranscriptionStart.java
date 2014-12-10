@@ -18,13 +18,6 @@
 package de.cebitec.readxplorer.transcriptionanalyses;
 
 
-import de.cebitec.readxplorer.utils.SequenceUtils;
-import de.cebitec.readxplorer.utils.UneditableTableModel;
-import de.cebitec.readxplorer.ui.analysis.ResultTablePanel;
-import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
-import de.cebitec.readxplorer.ui.tablevisualization.TableComparatorProvider;
-import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
-import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
@@ -32,6 +25,13 @@ import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readxplorer.transcriptionanalyses.dataStructures.DetectedFeatures;
 import de.cebitec.readxplorer.transcriptionanalyses.dataStructures.TransStartUnannotated;
 import de.cebitec.readxplorer.transcriptionanalyses.dataStructures.TranscriptionStart;
+import de.cebitec.readxplorer.ui.analysis.ResultTablePanel;
+import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
+import de.cebitec.readxplorer.ui.tablevisualization.TableComparatorProvider;
+import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
+import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
+import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.utils.UneditableTableModel;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.DefaultListSelectionModel;

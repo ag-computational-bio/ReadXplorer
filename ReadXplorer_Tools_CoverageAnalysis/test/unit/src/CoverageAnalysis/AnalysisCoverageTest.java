@@ -18,10 +18,10 @@
 package CoverageAnalysis;
 
 
-import de.cebitec.readxplorer.tools.coverageanalysis.ParameterSetCoverageAnalysis;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.dataObjects.CoverageAndDiffResult;
 import de.cebitec.readxplorer.databackend.dataObjects.CoverageManager;
+import de.cebitec.readxplorer.tools.coverageanalysis.ParameterSetCoverageAnalysis;
 import de.cebitec.readxplorer.utils.classification.Classification;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.utils.classification.MappingClass;

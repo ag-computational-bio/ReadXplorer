@@ -19,9 +19,9 @@ package de.cebitec.readxplorer.ui.datavisualisation.trackviewer;
 
 
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
+import de.cebitec.readxplorer.ui.datavisualisation.basePanel.LegendAndOptionsProvider;
 import de.cebitec.readxplorer.utils.ColorProperties;
 import de.cebitec.readxplorer.utils.Properties;
-import de.cebitec.readxplorer.ui.datavisualisation.basePanel.LegendAndOptionsProvider;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;

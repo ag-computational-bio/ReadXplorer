@@ -323,7 +323,7 @@ public class GeneralUtils {
      * <p>
      * @return String
      */
-    public static String implodeMap( String valueDelim, String entryDelim, Map<?,?> map ) {
+    public static String implodeMap( String valueDelim, String entryDelim, Map<?, ?> map ) {
         String asImplodedString;
         if( (map == null) || (map.isEmpty()) ) {
             asImplodedString = "";
@@ -335,7 +335,7 @@ public class GeneralUtils {
                 if( !firstLine ) {
                     sb.append( entryDelim );
                 }
-                Map.Entry<?,?> line = (Map.Entry) it.next();
+                Map.Entry<?, ?> line = (Map.Entry) it.next();
                 sb.append( line.getKey() );
                 sb.append( valueDelim );
                 sb.append( line.getValue() );

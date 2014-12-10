@@ -47,13 +47,13 @@ public class FieldAdapter implements ConfigListener {
         try {
             field = configurable.getClass().getDeclaredField( name );
             if( value instanceof Boolean ) {
-                field.setBoolean(configurable, ((Boolean) value));
+                field.setBoolean( configurable, ((Boolean) value) );
             }
             else if( value instanceof Integer ) {
-                field.setInt(configurable, ((Integer) value));
+                field.setInt( configurable, ((Integer) value) );
             }
             else if( value instanceof Float ) {
-                field.setFloat(configurable, ((Float) value));
+                field.setFloat( configurable, ((Float) value) );
             }
             else if( value instanceof BoundedRangeModel ) {
                 field.setInt( configurable, ((BoundedRangeModel) e.getValue()).getValue() );

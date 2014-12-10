@@ -18,9 +18,6 @@
 package de.cebitec.readxplorer.ui.importer.actions;
 
 
-import de.cebitec.readxplorer.ui.visualisation.TableVisualizationHelper;
-import de.cebitec.readxplorer.utils.UneditableTableModel;
-import de.cebitec.readxplorer.utils.VisualisationUtils;
 import de.cebitec.readxplorer.api.cookies.LoginCookie;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.parser.common.ParsingException;
@@ -33,6 +30,9 @@ import de.cebitec.readxplorer.ui.importer.dataTable.ImportTableWizardPanel;
 import de.cebitec.readxplorer.ui.tablevisualization.PosTablePanel;
 import de.cebitec.readxplorer.ui.tablevisualization.TableTopComponent;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
+import de.cebitec.readxplorer.ui.visualisation.TableVisualizationHelper;
+import de.cebitec.readxplorer.utils.UneditableTableModel;
+import de.cebitec.readxplorer.utils.VisualisationUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;

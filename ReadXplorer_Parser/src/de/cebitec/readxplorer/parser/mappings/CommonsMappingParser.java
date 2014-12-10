@@ -104,7 +104,8 @@ public final class CommonsMappingParser {
                         if( bases.charAt( j ) != refBases.charAt( j ) ) {
                             ++differences;
                         }
-                    }   refPos += currentCount;
+                    }
+                    refPos += currentCount;
                     readPos += currentCount;
                     break;
                 case "=":
@@ -134,10 +135,10 @@ public final class CommonsMappingParser {
                     refPos += currentCount;
                     //readPos remains the same
                     break;
-            //H = hard bases are not present in the read string and pos in record, so don't inc. absPos
+                //H = hard bases are not present in the read string and pos in record, so don't inc. absPos
                 case "S":
                     readPos += currentCount;
-                //refPos remains the same
+                    //refPos remains the same
                     break;
             }
         }
@@ -196,7 +197,8 @@ public final class CommonsMappingParser {
                             }
                             diffs.add( new ParsedDiff( refPos + j + start, base ) );
                         }
-                    }   refPos += currentCount;
+                    }
+                    refPos += currentCount;
                     readPos += currentCount;
                     break;
                 case "=":
@@ -213,7 +215,8 @@ public final class CommonsMappingParser {
                             base = SequenceUtils.getDnaComplement( base );
                         }
                         diffs.add( new ParsedDiff( refPos + j + start, base ) );
-                    }   refPos += currentCount;
+                    }
+                    refPos += currentCount;
                     readPos += currentCount;
                     break;
                 case "D":
@@ -221,7 +224,8 @@ public final class CommonsMappingParser {
                     differences += currentCount;
                     for( int j = 0; j < currentCount; ++j ) {
                         diffs.add( new ParsedDiff( refPos + j + start, '_' ) );
-                    }   refPos += currentCount;
+                    }
+                    refPos += currentCount;
                     // readPos remains the same
                     break;
                 case "I":
@@ -233,20 +237,20 @@ public final class CommonsMappingParser {
                             base = SequenceUtils.getDnaComplement( base );
                         }
                         gaps.add( new ParsedReferenceGap( refPos + start, base, getOrderForGap( refPos + start, gapOrderIndex ) ) );
-                }   //refPos remains the same
+                    }   //refPos remains the same
                     readPos += currentCount;
                     break;
                 case "N":
                 case "P":
                     //increase position for padded and skipped reference bases
-                refPos += currentCount;
-                //readPos remains the same
-                break;
-                    //H = hard clipping does not contribute to differences
+                    refPos += currentCount;
+                    //readPos remains the same
+                    break;
+                //H = hard clipping does not contribute to differences
                 case "S":
                     //increase read position for soft clipped bases which are present in the read
-                //refPos remains the same
-                readPos += currentCount;
+                    //refPos remains the same
+                    readPos += currentCount;
                     break;
             }
         }
@@ -383,7 +387,8 @@ public final class CommonsMappingParser {
                         newreadSeq = readSeq;
                         ++readPos;
                         //     Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read "+newreadSeq+" refseq "+ refSeq + "cigar" + cigar);
-                    }   break;
+                    }
+                    break;
                 case "I":
                     //insertion of the  read
                     int numberOfInsertions = Integer.parseInt( numOfBases );
@@ -401,7 +406,8 @@ public final class CommonsMappingParser {
                         ++refpos;
 
                         //   Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read "+newreadSeq+" refseq "+ refSeq);
-                    }   break;
+                    }
+                    break;
                 case "M":
                 case "=":
                 case "X":
@@ -420,7 +426,8 @@ public final class CommonsMappingParser {
                         //soft clipping of the first bases
                         readPos += Integer.parseInt( numOfBases );
                         softclipped = Integer.parseInt( numOfBases );
-                    }   break;
+                    }
+                    break;
                 default:
                     Logger.getLogger( CommonsMappingParser.class.getName() ).log( Level.WARNING, NbBundle.getMessage( CommonsMappingParser.class, "CommonMethod.CIGAR ", op ) );
                     break;

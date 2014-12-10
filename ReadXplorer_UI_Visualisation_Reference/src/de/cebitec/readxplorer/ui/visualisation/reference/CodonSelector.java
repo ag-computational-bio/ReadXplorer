@@ -18,10 +18,10 @@
 package de.cebitec.readxplorer.ui.visualisation.reference;
 
 
+import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.utils.CodonUtilities;
 import de.cebitec.readxplorer.utils.Pair;
 import de.cebitec.readxplorer.utils.Properties;
-import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.GridLayout;

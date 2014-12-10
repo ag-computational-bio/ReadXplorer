@@ -22,14 +22,14 @@ import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
-import de.cebitec.readxplorer.ui.visualisation.AppPanelTopComponent;
-import de.cebitec.readxplorer.utils.VisualisationUtils;
 import de.cebitec.readxplorer.ui.TopComponentExtended;
 import de.cebitec.readxplorer.ui.controller.ViewController;
 import de.cebitec.readxplorer.ui.dialogmenus.explorer.CustomOutlineCellRenderer;
 import de.cebitec.readxplorer.ui.dialogmenus.explorer.StandardItem;
 import de.cebitec.readxplorer.ui.dialogmenus.explorer.StandardNode;
 import de.cebitec.readxplorer.ui.login.LoginWizardAction;
+import de.cebitec.readxplorer.ui.visualisation.AppPanelTopComponent;
+import de.cebitec.readxplorer.utils.VisualisationUtils;
 import java.awt.EventQueue;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -530,7 +530,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
             List<PersistentTrack> allTracksForThisGenome = genomesAndTracks.get( genome );
             List<PersistentTrack> tracksToShow = new ArrayList<>();
             for( PersistentTrack track : allTracksForThisGenome ) {
-                if( trackIds.contains((long) track.getId()) ) {
+                if( trackIds.contains( (long) track.getId() ) ) {
                     tracksToShow.add( track );
                 }
             }

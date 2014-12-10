@@ -50,7 +50,7 @@ public class ExpressTest implements ExpressTestI {
         this.meanCache = new HashMap<>( 1024 );
         this.observers = new LinkedList<>();
         this.colNames = Arrays.asList( new Object[]{ "Region", "Start",
-            "Stop", "MeanA", "VarA", "MeanB", "VarB", "RatioAB", "RatioBA", "Confidence" } );
+                                                     "Stop", "MeanA", "VarA", "MeanB", "VarB", "RatioAB", "RatioBA", "Confidence" } );
 
     }
 
@@ -80,18 +80,18 @@ public class ExpressTest implements ExpressTestI {
         }
 
         //Compute mean and variance between the replicates of each group
-        double [] meanCountsA;
-        double [] meanCountsB;
+        double[] meanCountsA;
+        double[] meanCountsB;
         if( useHousekeepingGenesForNormalization ) {
             final int[][] houseKeepingA = new int[groupA.length][normalizationFeatures.length];
             final int[][] houseKeepingB = new int[groupB.length][normalizationFeatures.length];
             Arrays.parallelSort( normalizationFeatures ); // necessary for later binary search
-            for( int i=0, j=0; i<regionLength; i++ ) {
+            for( int i = 0, j = 0; i < regionLength; i++ ) {
                 if( Arrays.binarySearch( normalizationFeatures, regionNames[i].getId() ) > 0 ) {
-                    for( int k=0; k<groupA.length; k++ ) {
+                    for( int k = 0; k < groupA.length; k++ ) {
                         houseKeepingA[k][j] = groupA[k][i];
                     }
-                    for( int k=0; k<groupB.length; k++ ) {
+                    for( int k = 0; k < groupB.length; k++ ) {
                         houseKeepingB[k][j] = groupB[k][i];
                     }
                     j++;
@@ -129,13 +129,13 @@ public class ExpressTest implements ExpressTestI {
 
         ExpressTest.MeanVarianceGroup meanVarGroupA = computeMeanAndVar( groupA, normalizationRatiosA );
         ExpressTest.MeanVarianceGroup meanVarGroupB = computeMeanAndVar( groupB, normalizationRatiosB );
-        final double[] varA  = meanVarGroupA.getVar();
-        final double[] varB  = meanVarGroupB.getVar();
+        final double[] varA = meanVarGroupA.getVar();
+        final double[] varB = meanVarGroupB.getVar();
         final double[] meanA = meanVarGroupA.getMean();
         final double[] meanB = meanVarGroupB.getMean();
 
-        final double[] varANormalized  = meanVarGroupA.getVarNormalized();
-        final double[] varBNormalized  = meanVarGroupB.getVarNormalized();
+        final double[] varANormalized = meanVarGroupA.getVarNormalized();
+        final double[] varBNormalized = meanVarGroupB.getVarNormalized();
         final double[] meanANormalized = meanVarGroupA.getMeanNormalized();
         final double[] meanBNormalized = meanVarGroupB.getMeanNormalized();
 
@@ -146,7 +146,7 @@ public class ExpressTest implements ExpressTestI {
 
         for( int i = 0; i < regionLength; i++ ) {
             //Filter out regions with low mean values
-            if( meanA[i] > cutOff  ||  meanB[i] > cutOff ) {
+            if( meanA[i] > cutOff || meanB[i] > cutOff ) {
                 regionNamesList.add( regionNames[i] );
 
                 List<Object> currentResult = new ArrayList<>( 20 );
@@ -179,14 +179,14 @@ public class ExpressTest implements ExpressTestI {
                 currentResult.add( computeRatio( meanB[i], meanA[i] ) );
                 currentResultNormalized.add( computeRatio( meanBNormalized[i], meanANormalized[i] ) );
 
-                if( groupA.length < 2  &&  groupB.length < 2 ) {
-                    currentResult.add(-1.0d);
+                if( groupA.length < 2 && groupB.length < 2 ) {
+                    currentResult.add( -1.0d );
                 }
                 else {
                     currentResult.add( computeConfidence( meanA[i], meanB[i], varA[i], varB[i] ) );
                 }
-                if( groupA.length < 2  &&  groupB.length < 2 ) {
-                    currentResultNormalized.add(-1.0d);
+                if( groupA.length < 2 && groupB.length < 2 ) {
+                    currentResultNormalized.add( -1.0d );
                 }
                 else {
                     currentResultNormalized.add( computeConfidence( meanANormalized[i], meanBNormalized[i], varANormalized[i], varBNormalized[i] ) );
@@ -199,13 +199,13 @@ public class ExpressTest implements ExpressTestI {
         rowNames = regionNamesList;
 
         ProcessingLog log = ProcessingLog.getInstance();
-            log.addProperty( "Average mean counts", averageMeanCounts );
-            log.addProperty( "Use house keeping genes for normalization", useHousekeepingGenesForNormalization );
+        log.addProperty( "Average mean counts", averageMeanCounts );
+        log.addProperty( "Use house keeping genes for normalization", useHousekeepingGenesForNormalization );
         if( useHousekeepingGenesForNormalization ) {
             log.addProperty( "Used house keeping genes", normalizationFeatures );
         }
-            log.addProperty( "Normalization ratios for group A", normalizationRatiosA );
-            log.addProperty( "Normalization ratios for group B", normalizationRatiosB );
+        log.addProperty( "Normalization ratios for group A", normalizationRatiosA );
+        log.addProperty( "Normalization ratios for group B", normalizationRatiosB );
         notifyObservers( ExpressTestStatus.FINISHED );
 
     }
@@ -227,8 +227,8 @@ public class ExpressTest implements ExpressTestI {
     private static double[] calculateNormalizationRatios( final double[] meanCounts, final double totalMeanCount ) {
 
         final int l = meanCounts.length;
-        final double[] ret = new double[ l ];
-        for( int i=0; i<l; i++ ) {
+        final double[] ret = new double[l];
+        for( int i = 0; i < l; i++ ) {
             ret[i] = totalMeanCount / meanCounts[i];
         }
 
@@ -268,8 +268,8 @@ public class ExpressTest implements ExpressTestI {
 
     private static double[] calculateMeanCountsForEachReplicate( final int[][] group ) {
 
-        final double [] meanCounts = new double[ group.length ];
-        for( int i=0; i<group.length; i++ ) {
+        final double[] meanCounts = new double[group.length];
+        for( int i = 0; i < group.length; i++ ) {
             meanCounts[i] = calculateMeanCountForReplicate( group[i] );
         }
 
@@ -281,23 +281,23 @@ public class ExpressTest implements ExpressTestI {
     private ExpressTest.MeanVarianceGroup computeMeanAndVar( int[][] group, double[] normalizationRatios ) {
 
         double[] mean = new double[group[0].length];
-        double[] var  = new double[group[0].length];
+        double[] var = new double[group[0].length];
         double[] meanNormalized = new double[group[0].length];
-        double[] varNormalized  = new double[group[0].length];
+        double[] varNormalized = new double[group[0].length];
 
-        for( int j=0; j<group[0].length; j++ ) {
+        for( int j = 0; j < group[0].length; j++ ) {
 
             double[] rowValues = new double[group.length];
             double[] rowValuesNormalized = new double[group.length];
-            for( int i=0; i<group.length; i++ ) {
+            for( int i = 0; i < group.length; i++ ) {
                 rowValues[i] = group[i][j];
                 rowValuesNormalized[i] = (group[i][j] * normalizationRatios[i]);
             }
 
             mean[j] = mean( rowValues );
-            var[j]  = round( variance( rowValues ) );
+            var[j] = round( variance( rowValues ) );
             meanNormalized[j] = mean( rowValuesNormalized );
-            varNormalized[j]  = round( variance( rowValuesNormalized ) );
+            varNormalized[j] = round( variance( rowValuesNormalized ) );
 
         }
 
