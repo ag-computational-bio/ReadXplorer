@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.tools.referenceEditor;
+package de.cebitec.readxplorer.tools.referenceeditor;
 
 
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.SequenceUtils;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.NotifyDescriptor;
 import org.openide.awt.ActionID;
@@ -32,16 +32,16 @@ import org.openide.windows.TopComponent;
  * Top component which displays the reference editor.
  */
 @ConvertAsProperties(
-         dtd = "-//de.cebitec.readXplorer.tools.referenceEditor//ReferenceEditor//EN",
+         dtd = "-//de.cebitec.readxplorer.tools.referenceeditor//ReferenceEditor//EN",
          autostore = false
 )
 @TopComponent.Description(
          preferredID = "ReferenceEditorTopComponent",
-         iconBase = "de/cebitec/readXplorer/tools/referenceEditor/openRefEditor.png",
+         iconBase = "de/cebitec/readxplorer/tools/referenceeditor/openRefEditor.png",
          persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
 @TopComponent.Registration( mode = "editor", openAtStartup = false )
-@ActionID( category = "Window", id = "de.cebitec.readXplorer.tools.referenceEditor.ReferenceEditorTopComponent" )
+@ActionID( category = "Window", id = "de.cebitec.readxplorer.tools.referenceeditor.ReferenceEditorTopComponent" )
 @ActionReference( path = "Menu/Window" /*, position = 333 */ )
 @TopComponent.OpenActionRegistration(
          displayName = "#CTL_ReferenceEditorAction",
