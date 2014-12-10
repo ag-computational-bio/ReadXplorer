@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.converter;
+package de.cebitec.readxplorer.ui.converter;
 
 
-import de.cebitec.readxplorer.parser.output.ConverterI;
 import de.cebitec.readXplorer.util.VisualisationUtils;
+import de.cebitec.readxplorer.parser.output.ConverterI;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -42,8 +42,8 @@ import org.openide.util.NbBundle.Messages;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 @ActionID( category = "File",
-           id = "de.cebitec.readXplorer.ui.converter.ConverterAction" )
-@ActionRegistration( iconBase = "de/cebitec/readXplorer/ui/converter/import.png",
+           id = "de.cebitec.readxplorer.ui.converter.ConverterAction" )
+@ActionRegistration( iconBase = "de/cebitec/readxplorer/ui/converter/import.png",
                      displayName = "#CTL_ConverterAction" )
 @ActionReferences( {
     @ActionReference( path = "Menu/File", position = 1487, separatorAfter = 1493 ),
@@ -65,7 +65,7 @@ public final class ConverterAction implements ActionListener {
     @SuppressWarnings( "unchecked" )
     public void actionPerformed( ActionEvent e ) {
 
-        panels = new ArrayList<>();
+        panels = new ArrayList<>( 10);
         panels.add( new ConverterWizardPanel() );
         WizardDescriptor wizardDescriptor = new WizardDescriptor( new WizardDescriptor.ArrayIterator<>( VisualisationUtils.getWizardPanels( panels ) ) );
         // {0} will be replaced by WizardDescriptor.Panel.getComponent().getName()

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.converter;
+package de.cebitec.readxplorer.ui.converter;
 
 
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
