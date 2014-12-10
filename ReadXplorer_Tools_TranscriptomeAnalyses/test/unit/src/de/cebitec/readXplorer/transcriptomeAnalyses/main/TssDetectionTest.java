@@ -7,9 +7,12 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 
+import de.cebitec.readxplorer.transcriptomeanalyses.main.StatisticsOnMappingData;
+import de.cebitec.readxplorer.transcriptomeanalyses.main.TssDetection;
+import de.cebitec.readxplorer.transcriptomeanalyses.main.ParameterSetFiveEnrichedAnalyses;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
+import de.cebitec.readxplorer.transcriptomeanalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.io.File;
 import java.sql.Timestamp;
