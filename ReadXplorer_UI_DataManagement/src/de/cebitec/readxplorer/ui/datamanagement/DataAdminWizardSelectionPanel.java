@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.dataAdministration;
+package de.cebitec.readxplorer.ui.datamanagement;
 
 
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
@@ -24,7 +24,7 @@ import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readxplorer.parser.Job;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.TrackJob;
-import de.cebitec.readXplorer.ui.dataAdministration.actions.DataAdminWizardAction;
+import de.cebitec.readxplorer.ui.datamanagement.actions.DataAdminWizardAction;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readxplorer.view.dialogmenus.ChangeListeningFinishWizardPanel;
 import java.awt.Component;

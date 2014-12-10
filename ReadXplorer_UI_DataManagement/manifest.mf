@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
 OpenIDE-Module: de.cebitec.readXplorer.ui.dataAdministration
-OpenIDE-Module-Localizing-Bundle: de/cebitec/readXplorer/ui/dataAdministration/Bundle.properties
+OpenIDE-Module-Localizing-Bundle: de/cebitec/readxplorer/ui/datamanagement/Bundle.properties
 OpenIDE-Module-Specification-Version: 1.1

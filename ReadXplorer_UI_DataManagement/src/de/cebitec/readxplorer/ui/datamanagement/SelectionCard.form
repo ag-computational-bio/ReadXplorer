@@ -30,7 +30,7 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
       <SubComponents>
-        <Component class="de.cebitec.readXplorer.ui.dataAdministration.ReferenceView" name="refGenView">
+        <Component class="de.cebitec.readxplorer.ui.datamanagement.ReferenceView" name="refGenView">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="References">
@@ -39,7 +39,7 @@
             </Constraint>
           </Constraints>
         </Component>
-        <Component class="de.cebitec.readXplorer.ui.dataAdministration.TrackView" name="mappingView">
+        <Component class="de.cebitec.readxplorer.ui.datamanagement.TrackView" name="mappingView">
           <Constraints>
             <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
               <JTabbedPaneConstraints tabName="Tracks">

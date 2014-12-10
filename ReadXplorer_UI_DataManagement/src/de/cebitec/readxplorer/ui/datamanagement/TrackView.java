@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.dataAdministration;
+package de.cebitec.readxplorer.ui.datamanagement;
 
 
 import de.cebitec.readxplorer.parser.TrackJob;
@@ -132,9 +132,11 @@ public class TrackView extends javax.swing.JPanel implements TableModelListener 
         });
         jobTable.setFillsViewportHeight(true);
         jScrollPane1.setViewportView(jobTable);
-        jobTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(TrackView.class, "JobTable.delete")); // NOI18N
-        jobTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(TrackView.class, "JobTable.description")); // NOI18N
-        jobTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(TrackView.class, "JobTable.date")); // NOI18N
+        if (jobTable.getColumnModel().getColumnCount() > 0) {
+            jobTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(TrackView.class, "JobTable.delete")); // NOI18N
+            jobTable.getColumnModel().getColumn(1).setHeaderValue(org.openide.util.NbBundle.getMessage(TrackView.class, "JobTable.description")); // NOI18N
+            jobTable.getColumnModel().getColumn(2).setHeaderValue(org.openide.util.NbBundle.getMessage(TrackView.class, "JobTable.date")); // NOI18N
+        }
         jobTable.getModel().addTableModelListener(this);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);

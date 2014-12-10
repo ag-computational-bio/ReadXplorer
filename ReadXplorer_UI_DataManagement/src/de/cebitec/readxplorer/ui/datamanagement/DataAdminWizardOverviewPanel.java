@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.dataAdministration;
+package de.cebitec.readxplorer.ui.datamanagement;
 
 
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.TrackJob;
-import de.cebitec.readXplorer.ui.dataAdministration.actions.DataAdminWizardAction;
+import de.cebitec.readxplorer.ui.datamanagement.actions.DataAdminWizardAction;
 import java.awt.Component;
 import java.util.List;
 import javax.swing.event.ChangeListener;

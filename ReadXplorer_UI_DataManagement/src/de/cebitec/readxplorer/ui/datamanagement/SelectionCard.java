@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.dataAdministration;
+package de.cebitec.readxplorer.ui.datamanagement;
 
 
 import de.cebitec.readxplorer.api.objects.JobPanel;
@@ -89,8 +89,8 @@ public class SelectionCard extends JobPanel {
     private void initComponents() {
 
         jTabbedPane1 = new javax.swing.JTabbedPane();
-        refGenView = new de.cebitec.readXplorer.ui.dataAdministration.ReferenceView();
-        mappingView = new de.cebitec.readXplorer.ui.dataAdministration.TrackView();
+        refGenView = new de.cebitec.readxplorer.ui.datamanagement.ReferenceView();
+        mappingView = new de.cebitec.readxplorer.ui.datamanagement.TrackView();
 
         jTabbedPane1.addTab("References", refGenView);
         jTabbedPane1.addTab("Tracks", mappingView);
@@ -110,8 +110,8 @@ public class SelectionCard extends JobPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTabbedPane jTabbedPane1;
-    private de.cebitec.readXplorer.ui.dataAdministration.TrackView mappingView;
-    private de.cebitec.readXplorer.ui.dataAdministration.ReferenceView refGenView;
+    private de.cebitec.readxplorer.ui.datamanagement.TrackView mappingView;
+    private de.cebitec.readxplorer.ui.datamanagement.ReferenceView refGenView;
     // End of variables declaration//GEN-END:variables
 
 

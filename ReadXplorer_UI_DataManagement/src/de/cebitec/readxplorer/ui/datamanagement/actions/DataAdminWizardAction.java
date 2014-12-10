@@ -15,17 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.dataAdministration.actions;
+package de.cebitec.readxplorer.ui.datamanagement.actions;
 
 
 import de.cebitec.centrallookup.CentralLookup;
+import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readxplorer.api.cookies.LoginCookie;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.TrackJob;
-import de.cebitec.readXplorer.ui.dataAdministration.DataAdminWizardOverviewPanel;
-import de.cebitec.readXplorer.ui.dataAdministration.DataAdminWizardSelectionPanel;
-import de.cebitec.readXplorer.ui.dataAdministration.DeletionThread;
-import de.cebitec.readXplorer.util.VisualisationUtils;
+import de.cebitec.readxplorer.ui.datamanagement.DataAdminWizardOverviewPanel;
+import de.cebitec.readxplorer.ui.datamanagement.DataAdminWizardSelectionPanel;
+import de.cebitec.readxplorer.ui.datamanagement.DeletionThread;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -46,10 +46,10 @@ import org.openide.util.RequestProcessor;
 
 @ActionID(
          category = "File",
-         id = "de.cebitec.readXplorer.ui.dataAdministration.actions.DataAdminWizardAction"
+         id = "de.cebitec.readxplorer.ui.datamanagement.actions.DataAdminWizardAction"
 )
 @ActionRegistration(
-         iconBase = "de/cebitec/readXplorer/ui/dataAdministration/manage.png",
+         iconBase = "de/cebitec/readxplorer/ui/datamanagement/manage.png",
          displayName = "#CTL_DataAdminWizardAction"
 )
 @ActionReferences( {
@@ -59,7 +59,7 @@ import org.openide.util.RequestProcessor;
 @NbBundle.Messages( "CTL_DataAdminWizardAction=Manage data" )
 public final class DataAdminWizardAction implements ActionListener {
 
-    private final LoginCookie context;
+//    private final LoginCookie context;
     private List<WizardDescriptor.Panel<WizardDescriptor>> panels;
 
     public static final String PROP_REFS2DEL = "refdel";
@@ -67,7 +67,7 @@ public final class DataAdminWizardAction implements ActionListener {
 
 
     public DataAdminWizardAction( LoginCookie context ) {
-        this.context = context;
+//        this.context = context;
     }
 
 
@@ -80,7 +80,7 @@ public final class DataAdminWizardAction implements ActionListener {
             return;
         }
         if( panels == null ) {
-            panels = new ArrayList<>();
+            panels = new ArrayList<>( 2 );
             panels.add( new DataAdminWizardSelectionPanel() );
             panels.add( new DataAdminWizardOverviewPanel() );
         }

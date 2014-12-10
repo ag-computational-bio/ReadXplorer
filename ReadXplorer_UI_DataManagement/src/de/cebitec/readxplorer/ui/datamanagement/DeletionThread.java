@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.ui.dataAdministration;
+package de.cebitec.readxplorer.ui.datamanagement;
 
 
 import de.cebitec.centrallookup.CentralLookup;
