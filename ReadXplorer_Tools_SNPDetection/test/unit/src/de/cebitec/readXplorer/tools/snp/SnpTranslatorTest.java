@@ -18,11 +18,11 @@
 package de.cebitec.readXplorer.tools.snp;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.CodonSnp;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.databackend.dataObjects.Snp;
+import de.cebitec.readxplorer.databackend.dataObjects.CodonSnp;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataObjects.Snp;
 import de.cebitec.readXplorer.util.SequenceComparison;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.io.File;

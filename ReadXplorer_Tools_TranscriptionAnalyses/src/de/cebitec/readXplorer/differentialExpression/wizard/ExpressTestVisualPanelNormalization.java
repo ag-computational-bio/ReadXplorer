@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.ui.visualisation.reference.FeatureTableModel;
 import java.util.List;
 import javax.swing.ButtonGroup;

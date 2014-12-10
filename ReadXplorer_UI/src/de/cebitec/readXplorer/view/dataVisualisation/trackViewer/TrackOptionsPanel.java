@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.view.dataVisualisation.trackViewer;
 
 
-import de.cebitec.readXplorer.databackend.connector.TrackConnector;
+import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.LegendAndOptionsProvider;

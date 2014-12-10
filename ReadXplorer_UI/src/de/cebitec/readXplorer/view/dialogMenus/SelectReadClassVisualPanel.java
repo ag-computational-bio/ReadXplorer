@@ -19,7 +19,7 @@ package de.cebitec.readXplorer.view.dialogMenus;
 
 
 import de.cebitec.readxplorer.api.objects.JobPanel;
-import de.cebitec.readXplorer.databackend.ParametersReadClasses;
+import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.classification.Classification;

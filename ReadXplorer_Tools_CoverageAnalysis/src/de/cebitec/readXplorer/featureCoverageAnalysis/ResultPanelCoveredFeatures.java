@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.featureCoverageAnalysis;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.readXplorer.util.UneditableTableModel;

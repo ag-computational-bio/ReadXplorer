@@ -18,10 +18,10 @@
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
 
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.util.ArrayList;
 import java.util.List;

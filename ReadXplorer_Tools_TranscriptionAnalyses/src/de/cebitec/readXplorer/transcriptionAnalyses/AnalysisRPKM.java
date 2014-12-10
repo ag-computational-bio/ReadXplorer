@@ -19,13 +19,13 @@ package de.cebitec.readXplorer.transcriptionAnalyses;
 
 
 import de.cebitec.readxplorer.api.objects.AnalysisI;
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readXplorer.databackend.dataObjects.MappingResult;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
+import de.cebitec.readxplorer.databackend.connector.TrackConnector;
+import de.cebitec.readxplorer.databackend.dataObjects.Mapping;
+import de.cebitec.readxplorer.databackend.dataObjects.MappingResult;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.RPKMvalue;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.classification.FeatureType;

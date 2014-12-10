@@ -19,15 +19,15 @@ package de.cebitec.readXplorer.transcriptionAnalyses;
 
 
 import de.cebitec.readxplorer.api.objects.AnalysisI;
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.Coverage;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResult;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
+import de.cebitec.readxplorer.databackend.connector.TrackConnector;
+import de.cebitec.readxplorer.databackend.dataObjects.Coverage;
+import de.cebitec.readxplorer.databackend.dataObjects.CoverageAndDiffResult;
+import de.cebitec.readxplorer.databackend.dataObjects.CoverageManager;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.DetectedFeatures;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.TranscriptionStart;
 import de.cebitec.readXplorer.util.DiscreteCountingDistribution;

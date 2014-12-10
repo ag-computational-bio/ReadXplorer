@@ -18,10 +18,10 @@
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
 
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import java.util.Iterator;
 import java.util.List;
 import javax.swing.DefaultListModel;
@@ -130,8 +130,8 @@ public final class SelectTrackVisualPanel extends JPanel implements
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JList<de.cebitec.readXplorer.databackend.dataObjects.PersistentReference> referenceList;
-    private javax.swing.JList<de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack> trackList;
+    private javax.swing.JList<de.cebitec.readxplorer.databackend.dataObjects.PersistentReference> referenceList;
+    private javax.swing.JList<de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack> trackList;
     // End of variables declaration//GEN-END:variables
 
 

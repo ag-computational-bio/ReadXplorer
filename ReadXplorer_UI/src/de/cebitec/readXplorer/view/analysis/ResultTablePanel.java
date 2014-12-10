@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.view.analysis;
 
 
-import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
+import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.view.tableVisualization.TablePanel;
 
 

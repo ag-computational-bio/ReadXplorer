@@ -18,8 +18,11 @@
 package de.cebitec.readXplorer.databackend;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.IntervalRequest;
+import de.cebitec.readxplorer.databackend.SamBamFileReader;
+import de.cebitec.readxplorer.databackend.ParametersReadClasses;
+import de.cebitec.readxplorer.databackend.dataObjects.CoverageManager;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.classification.MappingClass;
 import java.io.File;

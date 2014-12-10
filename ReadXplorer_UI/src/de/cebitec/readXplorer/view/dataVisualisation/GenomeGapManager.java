@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.view.dataVisualisation;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.ReferenceGap;
+import de.cebitec.readxplorer.databackend.dataObjects.ReferenceGap;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;

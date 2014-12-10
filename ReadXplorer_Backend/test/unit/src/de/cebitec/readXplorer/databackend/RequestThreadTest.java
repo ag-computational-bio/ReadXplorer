@@ -18,6 +18,8 @@
 package de.cebitec.readXplorer.databackend;
 
 
+import de.cebitec.readxplorer.databackend.RequestThread;
+import de.cebitec.readxplorer.databackend.IntervalRequest;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;

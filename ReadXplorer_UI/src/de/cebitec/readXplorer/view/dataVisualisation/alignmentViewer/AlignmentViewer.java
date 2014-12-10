@@ -18,12 +18,12 @@
 package de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer;
 
 
-import de.cebitec.readXplorer.databackend.IntervalRequest;
-import de.cebitec.readXplorer.databackend.ThreadListener;
-import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readXplorer.databackend.dataObjects.MappingResult;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.IntervalRequest;
+import de.cebitec.readxplorer.databackend.ThreadListener;
+import de.cebitec.readxplorer.databackend.connector.TrackConnector;
+import de.cebitec.readxplorer.databackend.dataObjects.Mapping;
+import de.cebitec.readxplorer.databackend.dataObjects.MappingResult;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;

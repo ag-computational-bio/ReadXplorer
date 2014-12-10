@@ -2,8 +2,8 @@
 package de.cebitec.readxplorer.vcf.visualization;
 
 
-import de.cebitec.readXplorer.databackend.ThreadListener;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.ThreadListener;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.AbstractViewer;
 import de.cebitec.readXplorer.view.dataVisualisation.abstractViewer.PhysicalBaseBounds;

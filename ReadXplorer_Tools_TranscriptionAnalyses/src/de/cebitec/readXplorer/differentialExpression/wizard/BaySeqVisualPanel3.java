@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.differentialExpression.Group;
 import java.util.ArrayList;
 import java.util.Iterator;

@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.tools.referenceEditor;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

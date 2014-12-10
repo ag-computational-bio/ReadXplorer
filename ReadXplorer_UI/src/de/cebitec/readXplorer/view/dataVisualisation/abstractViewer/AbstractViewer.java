@@ -18,8 +18,8 @@
 package de.cebitec.readXplorer.view.dataVisualisation.abstractViewer;
 
 
-import de.cebitec.readXplorer.databackend.ParametersReadClasses;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.ParametersReadClasses;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.classification.Classification;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfo;

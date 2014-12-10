@@ -18,8 +18,8 @@
 package de.cebitec.readXplorer.view.dataVisualisation.histogramViewer;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.Difference;
-import de.cebitec.readXplorer.databackend.dataObjects.ReferenceGap;
+import de.cebitec.readxplorer.databackend.dataObjects.Difference;
+import de.cebitec.readxplorer.databackend.dataObjects.ReferenceGap;
 import de.cebitec.readXplorer.view.dataVisualisation.GenomeGapManager;
 import java.util.Collection;
 import java.util.logging.Level;

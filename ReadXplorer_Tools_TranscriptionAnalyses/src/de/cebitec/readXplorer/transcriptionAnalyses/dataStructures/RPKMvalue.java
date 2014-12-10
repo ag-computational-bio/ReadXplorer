@@ -18,8 +18,8 @@
 package de.cebitec.readXplorer.transcriptionAnalyses.dataStructures;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.TrackResultEntry;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataObjects.TrackResultEntry;
 
 
 /**

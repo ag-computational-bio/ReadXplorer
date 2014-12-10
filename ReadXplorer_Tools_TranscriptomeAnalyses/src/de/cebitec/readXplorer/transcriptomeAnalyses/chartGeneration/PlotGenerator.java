@@ -2,7 +2,7 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ChartType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.ElementsOfInterest;

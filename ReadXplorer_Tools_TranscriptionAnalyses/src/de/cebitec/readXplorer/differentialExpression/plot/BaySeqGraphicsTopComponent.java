@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.differentialExpression.plot;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.differentialExpression.BaySeq;
 import de.cebitec.readXplorer.differentialExpression.BaySeqAnalysisHandler;
 import de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler;

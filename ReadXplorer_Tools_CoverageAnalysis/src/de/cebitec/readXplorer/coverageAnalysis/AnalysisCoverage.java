@@ -19,9 +19,9 @@ package de.cebitec.readXplorer.coverageAnalysis;
 
 
 import de.cebitec.readxplorer.api.objects.AnalysisI;
-import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResult;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
+import de.cebitec.readxplorer.databackend.connector.TrackConnector;
+import de.cebitec.readxplorer.databackend.dataObjects.CoverageAndDiffResult;
+import de.cebitec.readxplorer.databackend.dataObjects.CoverageManager;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.util.SequenceUtils;

@@ -18,11 +18,11 @@
 package de.cebitec.readXplorer.view.dataVisualisation.referenceViewer;
 
 
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeatureI;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeatureI;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.polyTree.Node;

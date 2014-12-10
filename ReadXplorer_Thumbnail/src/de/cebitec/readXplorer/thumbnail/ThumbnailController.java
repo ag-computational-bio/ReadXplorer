@@ -19,13 +19,13 @@ package de.cebitec.readXplorer.thumbnail;
 
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
-import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException;
-import de.cebitec.readXplorer.databackend.connector.MultiTrackConnector;
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
+import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException;
+import de.cebitec.readxplorer.databackend.connector.MultiTrackConnector;
+import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.thumbnail.Actions.ASyncSliderCookie;
 import de.cebitec.readXplorer.thumbnail.Actions.OpenThumbCookie;
 import de.cebitec.readXplorer.thumbnail.Actions.RemoveCookie;

@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.tools.referenceEditor;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.NotifyDescriptor;

@@ -18,8 +18,8 @@
 package de.cebitec.readXplorer.transcriptionAnalyses;
 
 
-import de.cebitec.readXplorer.databackend.ParameterSetI;
-import de.cebitec.readXplorer.databackend.ParametersReadClasses;
+import de.cebitec.readxplorer.databackend.ParameterSetI;
+import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 
 
 /**

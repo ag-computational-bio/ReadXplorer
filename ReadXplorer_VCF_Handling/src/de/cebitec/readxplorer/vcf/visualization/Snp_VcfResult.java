@@ -7,9 +7,9 @@
 package de.cebitec.readxplorer.vcf.visualization;
 
 
-import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

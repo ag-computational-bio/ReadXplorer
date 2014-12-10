@@ -18,11 +18,11 @@
 package de.cebitec.readXplorer.view.dataVisualisation.basePanel;
 
 
-import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
-import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
+import de.cebitec.readxplorer.databackend.connector.TrackConnector;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.ColorUtils;
 import de.cebitec.readXplorer.util.Observer;

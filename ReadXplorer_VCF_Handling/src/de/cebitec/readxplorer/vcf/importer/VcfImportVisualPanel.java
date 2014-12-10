@@ -8,8 +8,8 @@ package de.cebitec.readxplorer.vcf.importer;
 
 
 import de.cebitec.readxplorer.api.objects.JobPanel;
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import java.io.File;
 import org.openide.WizardDescriptor;

@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.tools.detailedViewer;
 
 
-import de.cebitec.readXplorer.databackend.connector.TrackConnector;
+import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.view.TopComponentExtended;
 import de.cebitec.readXplorer.view.controller.ViewController;
 import de.cebitec.readXplorer.view.dataVisualisation.basePanel.BasePanel;

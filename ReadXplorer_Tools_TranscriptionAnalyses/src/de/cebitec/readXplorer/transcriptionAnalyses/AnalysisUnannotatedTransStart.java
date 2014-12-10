@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.transcriptionAnalyses;
 
 
-import de.cebitec.readXplorer.databackend.connector.TrackConnector;
+import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.DetectedFeatures;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.TransStartUnannotated;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.TranscriptionStart;

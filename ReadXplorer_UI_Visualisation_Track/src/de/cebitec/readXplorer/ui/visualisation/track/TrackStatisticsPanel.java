@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.ui.visualisation.track;
 
 
-import de.cebitec.readXplorer.databackend.connector.TrackConnector;
+import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readXplorer.util.StatsContainer;
 import de.cebitec.readXplorer.util.classification.MappingClass;
 import de.cebitec.readXplorer.util.classification.TotalCoverage;

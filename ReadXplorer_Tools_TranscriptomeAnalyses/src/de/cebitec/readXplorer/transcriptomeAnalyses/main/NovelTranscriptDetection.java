@@ -3,9 +3,9 @@ package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 
 import de.cebitec.readxplorer.api.objects.AnalysisI;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelTranscript;
 import de.cebitec.readXplorer.util.Observer;
 import java.util.ArrayList;

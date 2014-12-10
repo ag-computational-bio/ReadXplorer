@@ -18,12 +18,12 @@
 package de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer;
 
 
-import de.cebitec.readXplorer.databackend.SamBamFileReader;
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.Difference;
-import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readXplorer.databackend.dataObjects.ObjectWithId;
-import de.cebitec.readXplorer.databackend.dataObjects.ReferenceGap;
+import de.cebitec.readxplorer.databackend.SamBamFileReader;
+import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readxplorer.databackend.dataObjects.Difference;
+import de.cebitec.readxplorer.databackend.dataObjects.Mapping;
+import de.cebitec.readxplorer.databackend.dataObjects.ObjectWithId;
+import de.cebitec.readxplorer.databackend.dataObjects.ReferenceGap;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.ColorUtils;
 import de.cebitec.readXplorer.util.SamAlignmentBlock;

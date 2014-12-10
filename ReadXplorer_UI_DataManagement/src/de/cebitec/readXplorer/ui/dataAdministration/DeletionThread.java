@@ -19,8 +19,8 @@ package de.cebitec.readXplorer.ui.dataAdministration;
 
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.connector.StorageException;
+import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readxplorer.databackend.connector.StorageException;
 import de.cebitec.readXplorer.parser.ReferenceJob;
 import de.cebitec.readXplorer.parser.TrackJob;
 import java.io.IOException;

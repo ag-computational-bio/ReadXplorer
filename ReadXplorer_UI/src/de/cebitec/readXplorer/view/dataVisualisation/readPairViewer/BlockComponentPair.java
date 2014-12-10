@@ -18,9 +18,9 @@
 package de.cebitec.readXplorer.view.dataVisualisation.readPairViewer;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readXplorer.databackend.dataObjects.ReadPair;
-import de.cebitec.readXplorer.databackend.dataObjects.ReadPairGroup;
+import de.cebitec.readxplorer.databackend.dataObjects.Mapping;
+import de.cebitec.readxplorer.databackend.dataObjects.ReadPair;
+import de.cebitec.readxplorer.databackend.dataObjects.ReadPairGroup;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.ReadPairType;
 import de.cebitec.readXplorer.util.classification.Classification;

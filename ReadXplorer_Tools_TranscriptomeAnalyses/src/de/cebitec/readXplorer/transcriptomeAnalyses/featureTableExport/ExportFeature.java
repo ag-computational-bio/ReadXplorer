@@ -6,7 +6,7 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

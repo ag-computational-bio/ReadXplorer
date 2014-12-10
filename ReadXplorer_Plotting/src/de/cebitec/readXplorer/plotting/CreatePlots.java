@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.plotting;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.util.Pair;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;

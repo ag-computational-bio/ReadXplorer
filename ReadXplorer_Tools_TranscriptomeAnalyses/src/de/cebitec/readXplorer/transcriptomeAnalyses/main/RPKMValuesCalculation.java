@@ -2,9 +2,9 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.RPKMvalue;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.io.BufferedReader;

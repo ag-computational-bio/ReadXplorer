@@ -19,7 +19,7 @@ package de.cebitec.readXplorer.correlationAnalysis;
 
 
 import de.cebitec.readXplorer.correlationAnalysis.CorrelationAnalysisAction.CorrelationCoefficient;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import java.awt.Component;
 import java.util.List;
 import javax.swing.event.ChangeListener;

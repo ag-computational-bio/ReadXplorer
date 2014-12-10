@@ -2,9 +2,9 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 
-import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelTranscript;
 import de.cebitec.readXplorer.transcriptomeAnalyses.enums.TableType;
 import de.cebitec.readXplorer.transcriptomeAnalyses.mainWizard.WizardPropertyStrings;

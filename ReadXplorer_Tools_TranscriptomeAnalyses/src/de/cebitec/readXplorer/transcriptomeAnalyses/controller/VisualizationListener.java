@@ -2,7 +2,7 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.controller;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.ChartsGenerationSelectChatTypeWizardPanel;
 import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.PlotGenerator;
 import de.cebitec.readXplorer.transcriptomeAnalyses.chartGeneration.SouthPanel;

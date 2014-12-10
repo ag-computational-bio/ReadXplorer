@@ -18,16 +18,16 @@
 package de.cebitec.readXplorer.differentialExpression;
 
 
-import de.cebitec.readXplorer.databackend.AnalysesHandler;
-import de.cebitec.readXplorer.databackend.ParametersReadClasses;
-import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.DataVisualisationI;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.AnalysesHandler;
+import de.cebitec.readxplorer.databackend.ParametersReadClasses;
+import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
+import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
+import de.cebitec.readxplorer.databackend.connector.TrackConnector;
+import de.cebitec.readxplorer.databackend.dataObjects.DataVisualisationI;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.differentialExpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.readXplorer.differentialExpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readXplorer.differentialExpression.GnuR.UnknownGnuRException;

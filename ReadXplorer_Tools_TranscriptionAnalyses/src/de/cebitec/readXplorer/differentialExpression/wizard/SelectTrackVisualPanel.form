@@ -70,7 +70,7 @@
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JList&lt;&gt;(references)"/>
             <AuxValue name="JavaCodeGenerator_InitCodePost" type="java.lang.String" value="referenceList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);&#xa;referenceList.addListSelectionListener(this);"/>
-            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;de.cebitec.readXplorer.databackend.dataObjects.PersistentReference&gt;"/>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;de.cebitec.readxplorer.databackend.dataObjects.PersistentReference&gt;"/>
           </AuxValues>
         </Component>
       </SubComponents>
@@ -104,7 +104,7 @@
           </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JList&lt;&gt;(trackListModel)"/>
-            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack&gt;"/>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack&gt;"/>
           </AuxValues>
         </Component>
       </SubComponents>

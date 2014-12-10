@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

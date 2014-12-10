@@ -18,13 +18,13 @@
 package de.cebitec.readXplorer.view.dataVisualisation.trackViewer;
 
 
-import de.cebitec.readXplorer.databackend.IntervalRequest;
-import de.cebitec.readXplorer.databackend.ThreadListener;
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResult;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.IntervalRequest;
+import de.cebitec.readxplorer.databackend.ThreadListener;
+import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readxplorer.databackend.connector.TrackConnector;
+import de.cebitec.readxplorer.databackend.dataObjects.CoverageAndDiffResult;
+import de.cebitec.readxplorer.databackend.dataObjects.CoverageManager;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.ColorUtils;
 import de.cebitec.readXplorer.util.Pair;

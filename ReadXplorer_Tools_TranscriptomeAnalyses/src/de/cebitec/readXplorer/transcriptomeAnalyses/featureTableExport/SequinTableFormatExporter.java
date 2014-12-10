@@ -6,7 +6,7 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.featureTableExport;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.NovelTranscript;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.TranscriptionStart;

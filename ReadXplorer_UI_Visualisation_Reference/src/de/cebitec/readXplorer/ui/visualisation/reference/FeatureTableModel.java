@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.ui.visualisation.reference;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import javax.swing.table.AbstractTableModel;
 
 

@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.view.dataVisualisation.referenceViewer;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.view.controller.ViewController;
 import java.awt.event.MouseEvent;
 import javax.swing.JPopupMenu;

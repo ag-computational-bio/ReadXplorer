@@ -18,12 +18,12 @@
 package de.cebitec.readXplorer.view.dataVisualisation.readPairViewer;
 
 
-import de.cebitec.readXplorer.databackend.IntervalRequest;
-import de.cebitec.readXplorer.databackend.ParametersReadClasses;
-import de.cebitec.readXplorer.databackend.ThreadListener;
-import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.databackend.dataObjects.ReadPairResultPersistent;
+import de.cebitec.readxplorer.databackend.IntervalRequest;
+import de.cebitec.readxplorer.databackend.ParametersReadClasses;
+import de.cebitec.readxplorer.databackend.ThreadListener;
+import de.cebitec.readxplorer.databackend.connector.TrackConnector;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataObjects.ReadPairResultPersistent;
 import de.cebitec.readXplorer.util.Benchmark;
 import de.cebitec.readXplorer.util.ColorProperties;
 import de.cebitec.readXplorer.util.Properties;

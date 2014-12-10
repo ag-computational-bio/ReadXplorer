@@ -2,7 +2,7 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.datastructures;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.TrackResultEntry;
+import de.cebitec.readxplorer.databackend.dataObjects.TrackResultEntry;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;

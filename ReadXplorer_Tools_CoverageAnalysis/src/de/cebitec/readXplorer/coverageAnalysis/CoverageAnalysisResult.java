@@ -18,9 +18,9 @@
 package de.cebitec.readXplorer.coverageAnalysis;
 
 
-import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.exporter.tables.ExportDataI;
 import de.cebitec.readXplorer.util.GeneralUtils;
 import java.util.ArrayList;

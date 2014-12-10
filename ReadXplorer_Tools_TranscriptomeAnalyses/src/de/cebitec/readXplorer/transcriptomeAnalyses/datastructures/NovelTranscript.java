@@ -2,7 +2,7 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.datastructures;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.TrackChromResultEntry;
+import de.cebitec.readxplorer.databackend.dataObjects.TrackChromResultEntry;
 
 
 /**

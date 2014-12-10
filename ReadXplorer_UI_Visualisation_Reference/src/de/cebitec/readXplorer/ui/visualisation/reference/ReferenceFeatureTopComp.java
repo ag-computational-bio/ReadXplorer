@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.ui.visualisation.reference;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import de.cebitec.readXplorer.util.polyTree.Node;
 import de.cebitec.readXplorer.view.TopComponentExtended;

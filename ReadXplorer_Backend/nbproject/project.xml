@@ -98,9 +98,9 @@
                 </test-type>
             </test-dependencies>
             <public-packages>
-                <package>de.cebitec.readXplorer.databackend</package>
-                <package>de.cebitec.readXplorer.databackend.connector</package>
-                <package>de.cebitec.readXplorer.databackend.dataObjects</package>
+                <package>de.cebitec.readxplorer.databackend</package>
+                <package>de.cebitec.readxplorer.databackend.connector</package>
+                <package>de.cebitec.readxplorer.databackend.dataObjects</package>
             </public-packages>
         </data>
     </configuration>

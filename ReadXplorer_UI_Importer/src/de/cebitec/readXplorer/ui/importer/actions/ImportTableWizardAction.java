@@ -19,7 +19,7 @@ package de.cebitec.readXplorer.ui.importer.actions;
 
 
 import de.cebitec.readxplorer.api.cookies.LoginCookie;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.parser.common.ParsingException;
 import de.cebitec.readXplorer.parser.tables.CsvTableParser;
 import de.cebitec.readXplorer.parser.tables.TableParserI;

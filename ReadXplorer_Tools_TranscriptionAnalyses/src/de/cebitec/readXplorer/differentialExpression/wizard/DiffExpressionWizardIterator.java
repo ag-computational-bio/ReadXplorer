@@ -19,8 +19,8 @@ package de.cebitec.readXplorer.differentialExpression.wizard;
 
 
 import de.cebitec.readxplorer.api.cookies.LoginCookie;
-import de.cebitec.readXplorer.databackend.ParametersReadClasses;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.ParametersReadClasses;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.differentialExpression.BaySeqAnalysisHandler;
 import de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler;
 import de.cebitec.readXplorer.differentialExpression.DeSeq2AnalysisHandler;

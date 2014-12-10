@@ -18,10 +18,10 @@
 package de.cebitec.readXplorer.differentialExpression;
 
 
-import de.cebitec.readXplorer.databackend.ParametersReadClasses;
-import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readXplorer.databackend.dataObjects.MappingResult;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.ParametersReadClasses;
+import de.cebitec.readxplorer.databackend.dataObjects.Mapping;
+import de.cebitec.readxplorer.databackend.dataObjects.MappingResult;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.util.Observer;
 import java.util.Collections;
 import java.util.HashMap;

@@ -18,10 +18,10 @@
 package de.cebitec.readXplorer.view.dataVisualisation.trackViewer;
 
 
-import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.Coverage;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.connector.TrackConnector;
+import de.cebitec.readxplorer.databackend.dataObjects.Coverage;
+import de.cebitec.readxplorer.databackend.dataObjects.CoverageManager;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.util.ColorUtils;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.util.classification.Classification;

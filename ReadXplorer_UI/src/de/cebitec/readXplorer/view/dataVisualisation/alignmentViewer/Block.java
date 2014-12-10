@@ -18,8 +18,8 @@
 package de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
-import de.cebitec.readXplorer.databackend.dataObjects.ReferenceGap;
+import de.cebitec.readxplorer.databackend.dataObjects.Mapping;
+import de.cebitec.readxplorer.databackend.dataObjects.ReferenceGap;
 import de.cebitec.readXplorer.util.SamAlignmentBlock;
 import de.cebitec.readXplorer.view.dataVisualisation.GenomeGapManager;
 import java.util.ArrayList;

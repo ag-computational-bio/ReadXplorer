@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.differentialExpression.plot;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler;
 import de.cebitec.readXplorer.differentialExpression.ResultDeAnalysis;
 import de.cebitec.readXplorer.plotting.ChartExporter;

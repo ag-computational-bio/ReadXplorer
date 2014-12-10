@@ -19,16 +19,16 @@ package de.cebitec.readXplorer.correlationAnalysis;
 
 
 import de.cebitec.readXplorer.correlationAnalysis.CorrelationAnalysisAction.CorrelationCoefficient;
-import de.cebitec.readXplorer.databackend.IntervalRequest;
-import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI;
-import de.cebitec.readXplorer.databackend.SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException;
-import de.cebitec.readXplorer.databackend.ThreadListener;
-import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.Coverage;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResult;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.IntervalRequest;
+import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
+import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI.UserCanceledTrackPathUpdateException;
+import de.cebitec.readxplorer.databackend.ThreadListener;
+import de.cebitec.readxplorer.databackend.connector.TrackConnector;
+import de.cebitec.readxplorer.databackend.dataObjects.Coverage;
+import de.cebitec.readxplorer.databackend.dataObjects.CoverageAndDiffResult;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.SequenceUtils;
 import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
 import java.util.ArrayList;

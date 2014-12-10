@@ -18,9 +18,9 @@
 package de.cebitec.readXplorer.ui.converter;
 
 
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readXplorer.parser.output.ConverterI;
 import de.cebitec.readXplorer.parser.output.JokToBamConverter;
 import de.cebitec.readXplorer.util.GeneralUtils;
@@ -365,7 +365,7 @@ public class ConverterSetupCard extends FileSelectionPanel {
     }//GEN-LAST:event_chromComboBoxActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox<de.cebitec.readXplorer.databackend.dataObjects.PersistentChromosome> chromComboBox;
+    private javax.swing.JComboBox<de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome> chromComboBox;
     private javax.swing.JLabel chromComboLabel;
     private javax.swing.JComboBox<ConverterI> converterComboBox;
     private javax.swing.JLabel converterLabel;
@@ -377,7 +377,7 @@ public class ConverterSetupCard extends FileSelectionPanel {
     private javax.swing.JScrollPane multiTrackScrollPane;
     private javax.swing.JButton openFileButton;
     private javax.swing.JCheckBox refCheckBox;
-    private javax.swing.JComboBox<de.cebitec.readXplorer.databackend.dataObjects.PersistentReference> refComboBox;
+    private javax.swing.JComboBox<de.cebitec.readxplorer.databackend.dataObjects.PersistentReference> refComboBox;
     private javax.swing.JLabel refComboLabel;
     private javax.swing.JLabel refSelectionLabel;
     private javax.swing.JTextField referenceLengthField;

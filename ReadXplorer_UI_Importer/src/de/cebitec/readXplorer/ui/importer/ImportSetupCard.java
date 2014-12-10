@@ -19,7 +19,7 @@ package de.cebitec.readXplorer.ui.importer;
 
 
 import de.cebitec.readxplorer.api.objects.NewJobDialogI;
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.parser.ReadPairJobContainer;
 import de.cebitec.readXplorer.parser.ReferenceJob;
 import de.cebitec.readXplorer.parser.TrackJob;

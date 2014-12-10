@@ -20,8 +20,8 @@ package de.cebitec.readXplorer.view.controller;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readxplorer.api.ApplicationFrameI;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.Properties;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManagerFactory;

@@ -18,9 +18,9 @@
 package de.cebitec.readXplorer.coverageAnalysis;
 
 
-import de.cebitec.readXplorer.databackend.ParameterSetI;
-import de.cebitec.readXplorer.databackend.ParameterSetWithReadClasses;
-import de.cebitec.readXplorer.databackend.ParametersReadClasses;
+import de.cebitec.readxplorer.databackend.ParameterSetI;
+import de.cebitec.readxplorer.databackend.ParameterSetWithReadClasses;
+import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 
 
 /**

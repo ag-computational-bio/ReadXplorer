@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.correlationAnalysis;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.TrackChromResultEntry;
+import de.cebitec.readxplorer.databackend.dataObjects.TrackChromResultEntry;
 
 
 /**

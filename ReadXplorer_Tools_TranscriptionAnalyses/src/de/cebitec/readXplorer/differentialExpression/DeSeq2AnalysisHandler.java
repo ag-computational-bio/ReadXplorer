@@ -18,8 +18,8 @@
 package de.cebitec.readXplorer.differentialExpression;
 
 
-import de.cebitec.readXplorer.databackend.ParametersReadClasses;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.ParametersReadClasses;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.differentialExpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.readXplorer.differentialExpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readXplorer.differentialExpression.GnuR.UnknownGnuRException;

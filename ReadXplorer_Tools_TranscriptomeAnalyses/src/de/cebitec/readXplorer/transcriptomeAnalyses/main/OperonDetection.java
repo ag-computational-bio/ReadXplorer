@@ -2,7 +2,7 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.Operon;
 import de.cebitec.readXplorer.transcriptomeAnalyses.datastructures.OperonAdjacency;
 import de.cebitec.readXplorer.util.classification.FeatureType;

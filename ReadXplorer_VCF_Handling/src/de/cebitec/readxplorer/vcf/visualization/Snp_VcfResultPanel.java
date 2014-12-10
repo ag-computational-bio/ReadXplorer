@@ -7,7 +7,7 @@
 package de.cebitec.readxplorer.vcf.visualization;
 
 
-import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
+import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
 import de.cebitec.readXplorer.util.UneditableTableModel;
 import de.cebitec.readXplorer.view.analysis.ResultTablePanel;
 import de.cebitec.readXplorer.view.tableVisualization.TableUtils;

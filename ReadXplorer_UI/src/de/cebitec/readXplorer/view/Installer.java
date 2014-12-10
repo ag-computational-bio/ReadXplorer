@@ -20,7 +20,7 @@ package de.cebitec.readXplorer.view;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readxplorer.api.cookies.LoginCookie;
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readXplorer.view.login.LogoutAction;
 import java.awt.event.ActionEvent;
 import java.io.IOException;

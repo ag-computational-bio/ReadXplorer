@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.view.tableVisualization.tableFilter;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;

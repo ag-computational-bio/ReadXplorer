@@ -18,8 +18,8 @@
 package de.cebitec.readXplorer.differentialExpression.wizard;
 
 
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
+import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readXplorer.differentialExpression.DeAnalysisHandler.Tool;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import javax.swing.event.ChangeListener;

@@ -19,16 +19,16 @@ package de.cebitec.readXplorer.tools.snp;
 
 
 import de.cebitec.readxplorer.api.objects.AnalysisI;
-import de.cebitec.readXplorer.databackend.IntervalRequest;
-import de.cebitec.readXplorer.databackend.SamBamFileReader;
-import de.cebitec.readXplorer.databackend.connector.TrackConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageAndDiffResult;
-import de.cebitec.readXplorer.databackend.dataObjects.CoverageManager;
-import de.cebitec.readXplorer.databackend.dataObjects.Difference;
-import de.cebitec.readXplorer.databackend.dataObjects.GapCount;
-import de.cebitec.readXplorer.databackend.dataObjects.ReferenceGap;
-import de.cebitec.readXplorer.databackend.dataObjects.Snp;
-import de.cebitec.readXplorer.databackend.dataObjects.SnpI;
+import de.cebitec.readxplorer.databackend.IntervalRequest;
+import de.cebitec.readxplorer.databackend.SamBamFileReader;
+import de.cebitec.readxplorer.databackend.connector.TrackConnector;
+import de.cebitec.readxplorer.databackend.dataObjects.CoverageAndDiffResult;
+import de.cebitec.readxplorer.databackend.dataObjects.CoverageManager;
+import de.cebitec.readxplorer.databackend.dataObjects.Difference;
+import de.cebitec.readxplorer.databackend.dataObjects.GapCount;
+import de.cebitec.readxplorer.databackend.dataObjects.ReferenceGap;
+import de.cebitec.readxplorer.databackend.dataObjects.Snp;
+import de.cebitec.readxplorer.databackend.dataObjects.SnpI;
 import de.cebitec.readXplorer.util.Observer;
 import de.cebitec.readXplorer.util.SequenceComparison;
 import de.cebitec.readXplorer.util.SequenceUtils;

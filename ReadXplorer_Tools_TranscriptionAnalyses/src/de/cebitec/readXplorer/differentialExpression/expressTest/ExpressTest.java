@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.differentialExpression.expressTest;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.differentialExpression.ProcessingLog;
 import java.util.ArrayList;
 import java.util.Arrays;

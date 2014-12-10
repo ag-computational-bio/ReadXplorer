@@ -2,7 +2,7 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.main;
 
 
-import de.cebitec.readXplorer.databackend.ParameterSetI;
+import de.cebitec.readxplorer.databackend.ParameterSetI;
 import java.io.File;
 
 

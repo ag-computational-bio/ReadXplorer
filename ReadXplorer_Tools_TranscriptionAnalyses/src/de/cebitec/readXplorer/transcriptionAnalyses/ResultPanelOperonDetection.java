@@ -23,8 +23,8 @@ package de.cebitec.readXplorer.transcriptionAnalyses;
  * Created on 27.01.2012, 14:31:03
  */
 
-import de.cebitec.readXplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readXplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.Operon;
 import de.cebitec.readXplorer.transcriptionAnalyses.dataStructures.OperonAdjacency;

@@ -19,9 +19,9 @@ package de.cebitec.readXplorer.view.dialogMenus;
 
 
 import de.cebitec.readxplorer.api.objects.JobPanel;
-import de.cebitec.readXplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.databackend.connector.ReferenceConnector;
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.view.dialogMenus.explorer.CustomOutlineCellRenderer;
 import de.cebitec.readXplorer.view.dialogMenus.explorer.StandardItem;
 import de.cebitec.readXplorer.view.dialogMenus.explorer.StandardNode;

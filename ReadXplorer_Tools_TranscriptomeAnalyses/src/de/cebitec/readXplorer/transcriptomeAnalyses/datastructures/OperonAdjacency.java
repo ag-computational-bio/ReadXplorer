@@ -2,7 +2,7 @@
 package de.cebitec.readXplorer.transcriptomeAnalyses.datastructures;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentFeature;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 
 
 /**

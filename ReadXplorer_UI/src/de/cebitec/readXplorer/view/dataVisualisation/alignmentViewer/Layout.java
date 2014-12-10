@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.view.dataVisualisation.alignmentViewer;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.Mapping;
+import de.cebitec.readxplorer.databackend.dataObjects.Mapping;
 import de.cebitec.readXplorer.util.classification.Classification;
 import de.cebitec.readXplorer.view.dataVisualisation.GenomeGapManager;
 import java.util.ArrayList;

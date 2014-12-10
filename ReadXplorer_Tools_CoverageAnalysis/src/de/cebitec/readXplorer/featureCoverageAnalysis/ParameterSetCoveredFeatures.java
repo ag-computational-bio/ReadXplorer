@@ -18,9 +18,9 @@
 package de.cebitec.readXplorer.featureCoverageAnalysis;
 
 
-import de.cebitec.readXplorer.databackend.ParameterSetI;
-import de.cebitec.readXplorer.databackend.ParametersFeatureTypesAndReadClasses;
-import de.cebitec.readXplorer.databackend.ParametersReadClasses;
+import de.cebitec.readxplorer.databackend.ParameterSetI;
+import de.cebitec.readxplorer.databackend.ParametersFeatureTypesAndReadClasses;
+import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readXplorer.util.classification.FeatureType;
 import java.util.Set;
 

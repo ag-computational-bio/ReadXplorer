@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.transcriptionAnalyses.wizard;
 
 
-import de.cebitec.readXplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.view.dialogMenus.OpenTracksWizardPanel;
 import de.cebitec.readXplorer.view.dialogMenus.SelectFeatureTypeWizardPanel;
 import de.cebitec.readXplorer.view.dialogMenus.SelectReadClassWizardPanel;
