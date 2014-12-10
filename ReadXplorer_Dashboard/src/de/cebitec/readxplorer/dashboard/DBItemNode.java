@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.dashboard;
 
 
-import de.cebitec.readxplorer.view.dialogmenus.explorer.StandardNode;
+import de.cebitec.readxplorer.ui.dialogmenus.explorer.StandardNode;
 import java.beans.IntrospectionException;
 import javax.swing.Action;
 
@@ -44,7 +44,7 @@ public class DBItemNode extends StandardNode {
         super( bean, children );
         setDisplayName( bean.getTitle() );
         setShortDescription( bean.getDescription() );
-        setIconBaseWithExtension( "de/cebitec/readXplorer/ui/visualisation/refOpen.png" );
+        setIconBaseWithExtension( "de/cebitec/readxplorer/ui/visualisation/refOpen.png" );
     }
 
 
@@ -60,7 +60,7 @@ public class DBItemNode extends StandardNode {
         super( bean );
         setDisplayName( bean.getTitle() );
         setShortDescription( bean.getDescription() );
-        setIconBaseWithExtension( "de/cebitec/readXplorer/ui/visualisation/trackOpen.png" );
+        setIconBaseWithExtension( "de/cebitec/readxplorer/ui/visualisation/trackOpen.png" );
 
 
     //public DBItemNode(DBItem bean, Children children, Lookup lkp) throws IntrospectionException {

@@ -18,18 +18,18 @@
 package de.cebitec.readxplorer.dashboard;
 
 
-import de.cebitec.readxplorer.ui.visualisation.AppPanelTopComponent;
-import de.cebitec.readxplorer.utils.VisualisationUtils;
-import de.cebitec.readxplorer.view.TopComponentExtended;
-import de.cebitec.readxplorer.view.controller.ViewController;
-import de.cebitec.readxplorer.view.dialogmenus.explorer.CustomOutlineCellRenderer;
-import de.cebitec.readxplorer.view.dialogmenus.explorer.StandardItem;
-import de.cebitec.readxplorer.view.dialogmenus.explorer.StandardNode;
-import de.cebitec.readxplorer.view.login.LoginWizardAction;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.ui.visualisation.AppPanelTopComponent;
+import de.cebitec.readxplorer.utils.VisualisationUtils;
+import de.cebitec.readxplorer.ui.TopComponentExtended;
+import de.cebitec.readxplorer.ui.controller.ViewController;
+import de.cebitec.readxplorer.ui.dialogmenus.explorer.CustomOutlineCellRenderer;
+import de.cebitec.readxplorer.ui.dialogmenus.explorer.StandardItem;
+import de.cebitec.readxplorer.ui.dialogmenus.explorer.StandardNode;
+import de.cebitec.readxplorer.ui.login.LoginWizardAction;
 import java.awt.EventQueue;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -67,14 +67,14 @@ import org.openide.windows.TopComponent;
  * @author Evgeny Anisiforov, Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 @ConvertAsProperties(
-         dtd = "-//de.cebitec.readXplorer.dashboard//DashboardWindow//EN",
+         dtd = "-//de.cebitec.readxplorer.dashboard//DashboardWindow//EN",
          autostore = false )
 @TopComponent.Description(
          preferredID = "DashboardWindowTopComponent",
          //iconBase="SET/PATH/TO/ICON/HERE",
          persistenceType = TopComponent.PERSISTENCE_ALWAYS )
 @TopComponent.Registration( mode = "editor", openAtStartup = true )
-@ActionID( category = "Tools", id = "de.cebitec.readXplorer.dashboard.DashboardWindowTopComponent" )
+@ActionID( category = "Tools", id = "de.cebitec.readxplorer.dashboard.DashboardWindowTopComponent" )
 @ActionReference( path = "Menu/Tools", position = 1 )
 @TopComponent.OpenActionRegistration(
          displayName = "#CTL_DashboardWindowAction",
