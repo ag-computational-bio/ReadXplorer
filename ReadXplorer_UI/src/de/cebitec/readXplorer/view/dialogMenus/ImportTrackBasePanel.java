@@ -20,8 +20,8 @@ package de.cebitec.readXplorer.view.dialogMenus;
 
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.parser.ReferenceJob;
-import de.cebitec.readXplorer.parser.mappings.MappingParserI;
+import de.cebitec.readxplorer.parser.ReferenceJob;
+import de.cebitec.readxplorer.parser.mappings.MappingParserI;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import java.io.File;
 import java.util.ArrayList;

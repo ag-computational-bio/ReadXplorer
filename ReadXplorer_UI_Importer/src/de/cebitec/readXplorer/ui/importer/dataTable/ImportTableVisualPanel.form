@@ -128,9 +128,9 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="tableComboBoxActionPerformed"/>
       </Events>
       <AuxValues>
-        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JComboBox&lt;&gt;(new javax.swing.DefaultComboBoxModel&lt;&gt;(de.cebitec.readXplorer.parser.tables.TableType.values()))"/>
+        <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JComboBox&lt;&gt;(new javax.swing.DefaultComboBoxModel&lt;&gt;(de.cebitec.readxplorer.parser.tables.TableType.values()))"/>
         <AuxValue name="JavaCodeGenerator_InitCodePre" type="java.lang.String" value="tableComboBox.setSelectedIndex(0);"/>
-        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;de.cebitec.readXplorer.parser.tables.TableType&gt;"/>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;de.cebitec.readxplorer.parser.tables.TableType&gt;"/>
       </AuxValues>
     </Component>
     <Component class="javax.swing.JTextField" name="fileTextField">

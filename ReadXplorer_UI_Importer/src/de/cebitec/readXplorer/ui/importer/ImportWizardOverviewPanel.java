@@ -18,9 +18,9 @@
 package de.cebitec.readXplorer.ui.importer;
 
 
-import de.cebitec.readXplorer.parser.ReadPairJobContainer;
-import de.cebitec.readXplorer.parser.ReferenceJob;
-import de.cebitec.readXplorer.parser.TrackJob;
+import de.cebitec.readxplorer.parser.ReadPairJobContainer;
+import de.cebitec.readxplorer.parser.ReferenceJob;
+import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readXplorer.ui.importer.actions.ImportWizardAction;
 import java.awt.Component;
 import java.util.List;

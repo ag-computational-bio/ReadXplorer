@@ -3,7 +3,7 @@ package de.cebitec.readXplorer.ui.importer;
 
 
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.parser.tables.TableType;
+import de.cebitec.readxplorer.parser.tables.TableType;
 import java.util.List;
 import java.util.Map;
 import javax.swing.table.DefaultTableModel;

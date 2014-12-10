@@ -19,11 +19,11 @@ package de.cebitec.readXplorer.ui.importer;
 
 
 import de.cebitec.readxplorer.api.objects.NewJobDialogI;
-import de.cebitec.readXplorer.parser.ReferenceJob;
-import de.cebitec.readXplorer.parser.common.ParserI;
-import de.cebitec.readXplorer.parser.mappings.JokToBamDirectParser;
-import de.cebitec.readXplorer.parser.mappings.MappingParserI;
-import de.cebitec.readXplorer.parser.mappings.SamBamParser;
+import de.cebitec.readxplorer.parser.ReferenceJob;
+import de.cebitec.readxplorer.parser.common.ParserI;
+import de.cebitec.readxplorer.parser.mappings.JokToBamDirectParser;
+import de.cebitec.readxplorer.parser.mappings.MappingParserI;
+import de.cebitec.readxplorer.parser.mappings.SamBamParser;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readXplorer.view.dialogMenus.ImportTrackBasePanel;
 import java.awt.Component;

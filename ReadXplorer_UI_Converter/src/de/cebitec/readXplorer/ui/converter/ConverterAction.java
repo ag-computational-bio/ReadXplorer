@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.ui.converter;
 
 
-import de.cebitec.readXplorer.parser.output.ConverterI;
+import de.cebitec.readxplorer.parser.output.ConverterI;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;

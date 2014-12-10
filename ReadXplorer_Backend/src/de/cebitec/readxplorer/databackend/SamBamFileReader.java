@@ -26,7 +26,7 @@ import de.cebitec.readxplorer.databackend.dataObjects.Mapping;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataObjects.ReadPairGroup;
 import de.cebitec.readxplorer.databackend.dataObjects.ReferenceGap;
-import de.cebitec.readXplorer.parser.mappings.CommonsMappingParser;
+import de.cebitec.readxplorer.parser.mappings.CommonsMappingParser;
 import de.cebitec.readXplorer.util.IndexFileNotificationPanel;
 import de.cebitec.readXplorer.util.Observable;
 import de.cebitec.readXplorer.util.Observer;

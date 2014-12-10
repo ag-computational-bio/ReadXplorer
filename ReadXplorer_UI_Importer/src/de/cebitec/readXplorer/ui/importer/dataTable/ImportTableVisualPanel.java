@@ -21,11 +21,11 @@ package de.cebitec.readXplorer.ui.importer.dataTable;
 import de.cebitec.readxplorer.api.objects.JobPanel;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.parser.tables.CsvPreferenceForUsers;
-import de.cebitec.readXplorer.parser.tables.CsvTableParser;
-import de.cebitec.readXplorer.parser.tables.TableParserI;
-import de.cebitec.readXplorer.parser.tables.TableType;
-import de.cebitec.readXplorer.parser.tables.XlsTranscriptomeTableParser;
+import de.cebitec.readxplorer.parser.tables.CsvPreferenceForUsers;
+import de.cebitec.readxplorer.parser.tables.CsvTableParser;
+import de.cebitec.readxplorer.parser.tables.TableParserI;
+import de.cebitec.readxplorer.parser.tables.TableType;
+import de.cebitec.readxplorer.parser.tables.XlsTranscriptomeTableParser;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
 import java.awt.Graphics;
@@ -80,7 +80,7 @@ public final class ImportTableVisualPanel extends JobPanel {
 
         descriptionScrollPane = new javax.swing.JScrollPane();
         descriptionTextArea = new javax.swing.JTextArea();
-        tableComboBox = new javax.swing.JComboBox<>(new javax.swing.DefaultComboBoxModel<>(de.cebitec.readXplorer.parser.tables.TableType.values()));
+        tableComboBox = new javax.swing.JComboBox<>(new javax.swing.DefaultComboBoxModel<>(de.cebitec.readxplorer.parser.tables.TableType.values()));
         fileTextField = new javax.swing.JTextField();
         fileButton = new javax.swing.JButton();
         de.cebitec.readxplorer.databackend.dataObjects.PersistentReference[] refArray = new de.cebitec.readxplorer.databackend.dataObjects.PersistentReference[0];
@@ -323,7 +323,7 @@ public final class ImportTableVisualPanel extends JobPanel {
     private javax.swing.JLabel refLabel;
     private javax.swing.JButton statsAndParamsButton;
     private javax.swing.JTextField statsAndParamsFileTextField;
-    private javax.swing.JComboBox<de.cebitec.readXplorer.parser.tables.TableType> tableComboBox;
+    private javax.swing.JComboBox<de.cebitec.readxplorer.parser.tables.TableType> tableComboBox;
     private javax.swing.JLabel tableLabel;
     // End of variables declaration//GEN-END:variables
 

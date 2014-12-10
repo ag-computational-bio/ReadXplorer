@@ -18,6 +18,7 @@
 package de.cebitec.readXplorer.parser.common;
 
 
+import de.cebitec.readxplorer.parser.common.ParsedClassification;
 import net.sf.samtools.SAMFileHeader;
 import org.junit.After;
 import org.junit.AfterClass;

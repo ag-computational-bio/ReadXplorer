@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.ui.importer;
 
 
-import de.cebitec.readXplorer.parser.TrackJob;
+import de.cebitec.readxplorer.parser.TrackJob;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.ListSelectionModel;

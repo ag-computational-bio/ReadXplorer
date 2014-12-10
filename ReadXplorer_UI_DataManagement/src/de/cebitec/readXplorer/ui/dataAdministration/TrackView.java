@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.ui.dataAdministration;
 
 
-import de.cebitec.readXplorer.parser.TrackJob;
+import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readXplorer.view.dialogMenus.ChangeListeningWizardPanel;
 import java.util.ArrayList;
 import java.util.List;

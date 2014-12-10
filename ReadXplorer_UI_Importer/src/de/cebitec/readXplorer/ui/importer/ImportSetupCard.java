@@ -20,10 +20,10 @@ package de.cebitec.readXplorer.ui.importer;
 
 import de.cebitec.readxplorer.api.objects.NewJobDialogI;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.parser.ReadPairJobContainer;
-import de.cebitec.readXplorer.parser.ReferenceJob;
-import de.cebitec.readXplorer.parser.TrackJob;
-import de.cebitec.readXplorer.parser.mappings.ReadPairClassifierI;
+import de.cebitec.readxplorer.parser.ReadPairJobContainer;
+import de.cebitec.readxplorer.parser.ReferenceJob;
+import de.cebitec.readxplorer.parser.TrackJob;
+import de.cebitec.readxplorer.parser.mappings.ReadPairClassifierI;
 import de.cebitec.readXplorer.ui.importer.actions.ImportWizardAction;
 import de.cebitec.readXplorer.view.dialogMenus.ImportTrackBasePanel;
 import java.awt.Component;

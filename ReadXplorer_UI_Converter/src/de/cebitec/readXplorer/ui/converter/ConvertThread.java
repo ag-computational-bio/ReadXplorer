@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.ui.converter;
 
 
-import de.cebitec.readXplorer.parser.output.ConverterI;
+import de.cebitec.readxplorer.parser.output.ConverterI;
 import de.cebitec.readXplorer.util.Observer;
 import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.progress.ProgressHandleFactory;

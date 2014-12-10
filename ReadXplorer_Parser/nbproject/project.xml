@@ -56,6 +56,13 @@
                 <package>de.cebitec.readXplorer.parser.reference</package>
                 <package>de.cebitec.readXplorer.parser.reference.Filter</package>
                 <package>de.cebitec.readXplorer.parser.tables</package>
+                <package>de.cebitec.readxplorer.parser</package>
+                <package>de.cebitec.readxplorer.parser.common</package>
+                <package>de.cebitec.readxplorer.parser.mappings</package>
+                <package>de.cebitec.readxplorer.parser.output</package>
+                <package>de.cebitec.readxplorer.parser.reference</package>
+                <package>de.cebitec.readxplorer.parser.reference.Filter</package>
+                <package>de.cebitec.readxplorer.parser.tables</package>
             </public-packages>
         </data>
     </configuration>

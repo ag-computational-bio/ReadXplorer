@@ -18,8 +18,8 @@
 package de.cebitec.readXplorer.ui.dataAdministration;
 
 
-import de.cebitec.readXplorer.parser.ReferenceJob;
-import de.cebitec.readXplorer.parser.TrackJob;
+import de.cebitec.readxplorer.parser.ReferenceJob;
+import de.cebitec.readxplorer.parser.TrackJob;
 import java.util.Iterator;
 import java.util.List;
 import org.openide.util.NbBundle;

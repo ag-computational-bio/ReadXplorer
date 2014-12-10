@@ -18,12 +18,12 @@
 package de.cebitec.readXplorer.readPairClassifier;
 
 
-import de.cebitec.readXplorer.parser.ReadPairJobContainer;
-import de.cebitec.readXplorer.parser.TrackJob;
-import de.cebitec.readXplorer.parser.common.ParsedClassification;
-import de.cebitec.readXplorer.parser.common.ParsedReadPairContainer;
-import de.cebitec.readXplorer.parser.common.ParsingException;
-import de.cebitec.readXplorer.parser.mappings.CommonsMappingParser;
+import de.cebitec.readxplorer.parser.ReadPairJobContainer;
+import de.cebitec.readxplorer.parser.TrackJob;
+import de.cebitec.readxplorer.parser.common.ParsedClassification;
+import de.cebitec.readxplorer.parser.common.ParsedReadPairContainer;
+import de.cebitec.readxplorer.parser.common.ParsingException;
+import de.cebitec.readxplorer.parser.mappings.CommonsMappingParser;
 import de.cebitec.readXplorer.util.Benchmark;
 import de.cebitec.readXplorer.util.DiscreteCountingDistribution;
 import de.cebitec.readXplorer.util.Properties;

@@ -18,7 +18,7 @@
 package de.cebitec.readXplorer.ui.importer;
 
 
-import de.cebitec.readXplorer.parser.ReferenceJob;
+import de.cebitec.readxplorer.parser.ReferenceJob;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.ListSelectionModel;

@@ -20,8 +20,8 @@ package de.cebitec.readXplorer.ui.dataAdministration.actions;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readxplorer.api.cookies.LoginCookie;
-import de.cebitec.readXplorer.parser.ReferenceJob;
-import de.cebitec.readXplorer.parser.TrackJob;
+import de.cebitec.readxplorer.parser.ReferenceJob;
+import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readXplorer.ui.dataAdministration.DataAdminWizardOverviewPanel;
 import de.cebitec.readXplorer.ui.dataAdministration.DataAdminWizardSelectionPanel;
 import de.cebitec.readXplorer.ui.dataAdministration.DeletionThread;

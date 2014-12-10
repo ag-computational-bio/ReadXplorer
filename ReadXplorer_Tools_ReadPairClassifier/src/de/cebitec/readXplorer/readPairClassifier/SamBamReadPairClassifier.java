@@ -18,16 +18,16 @@
 package de.cebitec.readXplorer.readPairClassifier;
 
 
-import de.cebitec.readXplorer.parser.ReadPairJobContainer;
-import de.cebitec.readXplorer.parser.TrackJob;
-import de.cebitec.readXplorer.parser.common.ParsedClassification;
-import de.cebitec.readXplorer.parser.common.ParsedReadPairContainer;
-import de.cebitec.readXplorer.parser.common.ParsingException;
-import de.cebitec.readXplorer.parser.common.RefSeqFetcher;
-import de.cebitec.readXplorer.parser.mappings.CommonsMappingParser;
-import de.cebitec.readXplorer.parser.mappings.ReadPairClassifierI;
-import de.cebitec.readXplorer.parser.mappings.SamBamParser;
-import de.cebitec.readXplorer.parser.output.SamBamSorter;
+import de.cebitec.readxplorer.parser.ReadPairJobContainer;
+import de.cebitec.readxplorer.parser.TrackJob;
+import de.cebitec.readxplorer.parser.common.ParsedClassification;
+import de.cebitec.readxplorer.parser.common.ParsedReadPairContainer;
+import de.cebitec.readxplorer.parser.common.ParsingException;
+import de.cebitec.readxplorer.parser.common.RefSeqFetcher;
+import de.cebitec.readxplorer.parser.mappings.CommonsMappingParser;
+import de.cebitec.readxplorer.parser.mappings.ReadPairClassifierI;
+import de.cebitec.readxplorer.parser.mappings.SamBamParser;
+import de.cebitec.readxplorer.parser.output.SamBamSorter;
 import de.cebitec.readXplorer.util.Benchmark;
 import de.cebitec.readXplorer.util.DiscreteCountingDistribution;
 import de.cebitec.readXplorer.util.ErrorLimit;

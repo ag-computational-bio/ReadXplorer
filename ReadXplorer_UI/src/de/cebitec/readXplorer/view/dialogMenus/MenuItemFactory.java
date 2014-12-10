@@ -20,7 +20,7 @@ package de.cebitec.readXplorer.view.dialogMenus;
 
 import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readXplorer.parser.output.OutputWriter;
+import de.cebitec.readxplorer.parser.output.OutputWriter;
 import de.cebitec.readXplorer.util.CodonUtilities;
 import de.cebitec.readXplorer.util.fileChooser.StoreStringFileChooser;
 import de.cebitec.readXplorer.view.dataVisualisation.BoundsInfoManager;

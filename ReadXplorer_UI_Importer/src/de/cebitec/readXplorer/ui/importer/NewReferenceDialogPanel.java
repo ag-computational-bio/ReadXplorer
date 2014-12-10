@@ -19,13 +19,13 @@ package de.cebitec.readXplorer.ui.importer;
 
 
 import de.cebitec.readxplorer.api.objects.NewJobDialogI;
-import de.cebitec.readXplorer.parser.ReferenceJob;
-import de.cebitec.readXplorer.parser.common.ParserI;
-import de.cebitec.readXplorer.parser.reference.BioJavaGff2Parser;
-import de.cebitec.readXplorer.parser.reference.BioJavaGff3Parser;
-import de.cebitec.readXplorer.parser.reference.BioJavaParser;
-import de.cebitec.readXplorer.parser.reference.FastaReferenceParser;
-import de.cebitec.readXplorer.parser.reference.ReferenceParserI;
+import de.cebitec.readxplorer.parser.ReferenceJob;
+import de.cebitec.readxplorer.parser.common.ParserI;
+import de.cebitec.readxplorer.parser.reference.BioJavaGff2Parser;
+import de.cebitec.readxplorer.parser.reference.BioJavaGff3Parser;
+import de.cebitec.readxplorer.parser.reference.BioJavaParser;
+import de.cebitec.readxplorer.parser.reference.FastaReferenceParser;
+import de.cebitec.readxplorer.parser.reference.ReferenceParserI;
 import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
 import java.awt.Component;
 import java.io.File;

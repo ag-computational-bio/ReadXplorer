@@ -20,9 +20,9 @@ package de.cebitec.readXplorer.ui.importer.actions;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readxplorer.api.cookies.LoginCookie;
-import de.cebitec.readXplorer.parser.ReadPairJobContainer;
-import de.cebitec.readXplorer.parser.ReferenceJob;
-import de.cebitec.readXplorer.parser.TrackJob;
+import de.cebitec.readxplorer.parser.ReadPairJobContainer;
+import de.cebitec.readxplorer.parser.ReferenceJob;
+import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readXplorer.ui.importer.ImportThread;
 import de.cebitec.readXplorer.ui.importer.ImportWizardOverviewPanel;
 import de.cebitec.readXplorer.ui.importer.ImportWizardSetupPanel;
