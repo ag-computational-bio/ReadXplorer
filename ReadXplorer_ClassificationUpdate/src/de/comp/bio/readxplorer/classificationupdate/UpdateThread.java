@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.comp.bio.readxplorer.classificationUpdate;
+package de.comp.bio.readxplorer.classificationupdate;
 
 
 import de.cebitec.centrallookup.CentralLookup;
@@ -86,7 +86,7 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
         this.showMsg( "Notification: Your current JVM config allows up to " + GeneralUtils.formatNumber( rt.maxMemory() / 1000000 ) + " MB of memory to be allocated." );
         this.showMsg( "Currently the platform is using " + GeneralUtils.formatNumber( (rt.totalMemory() - rt.freeMemory()) / 1000000 ) + " MB of memory." );
         this.showMsg( "Please be aware that you might need to change the -J-d64 and -J-Xmx value of your JVM to process large updates successfully." );
-        this.showMsg( "The value can be configured in the ../readXplorer/etc/readXplorer.conf file in the application folder." );
+        this.showMsg( "The value can be configured in the ../readxplorer/etc/readxplorer.conf file in the application folder." );
         this.showMsg( "" );
 
         this.updateTracks();

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.comp.bio.readxplorer.classificationUpdate;
+package de.comp.bio.readxplorer.classificationupdate;
 
 
 import de.cebitec.centrallookup.CentralLookup;
@@ -56,7 +56,7 @@ import org.openide.util.RequestProcessor;
 @Messages( "CTL_UpdateReadClassificationAction=Update Read Classification" )
 public final class UpdateReadClassificationAction implements ActionListener {
 
-    private final LoginCookie context;
+//    private final LoginCookie context;
     private List<WizardDescriptor.Panel<WizardDescriptor>> panels;
 
 
@@ -67,7 +67,7 @@ public final class UpdateReadClassificationAction implements ActionListener {
      * @param context The user needs to be logged into a DB to use this action
      */
     public UpdateReadClassificationAction( LoginCookie context ) {
-        this.context = context;
+//        this.context = context;
     }
 
 
@@ -81,7 +81,7 @@ public final class UpdateReadClassificationAction implements ActionListener {
         }
 
         if( panels == null ) {
-            panels = new ArrayList<>();
+            panels = new ArrayList<>( 1 );
             panels.add( new UpdateReadClassWizardPanel( "" ) );
         }
         WizardDescriptor wizardDescriptor = new WizardDescriptor( new WizardDescriptor.ArrayIterator<>( VisualisationUtils.getWizardPanels( panels ) ) );
