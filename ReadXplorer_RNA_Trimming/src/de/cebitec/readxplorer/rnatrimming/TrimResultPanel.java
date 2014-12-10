@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.rnatrimming;
 
 
-import de.cebitec.readXplorer.util.GeneralUtils;
-import de.cebitec.readXplorer.util.TextAreaOutputStream;
+import de.cebitec.readxplorer.utils.GeneralUtils;
+import de.cebitec.readxplorer.utils.TextAreaOutputStream;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;

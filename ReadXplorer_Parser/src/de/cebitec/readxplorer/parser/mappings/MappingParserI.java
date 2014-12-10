@@ -21,8 +21,8 @@ package de.cebitec.readxplorer.parser.mappings;
 import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readxplorer.parser.common.ParserI;
 import de.cebitec.readxplorer.parser.common.ParsingException;
-import de.cebitec.readXplorer.util.Observable;
-import de.cebitec.readXplorer.util.StatsContainer;
+import de.cebitec.readxplorer.utils.Observable;
+import de.cebitec.readxplorer.utils.StatsContainer;
 import java.util.Map;
 
 

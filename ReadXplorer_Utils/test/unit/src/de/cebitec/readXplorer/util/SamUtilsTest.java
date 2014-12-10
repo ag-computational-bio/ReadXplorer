@@ -18,6 +18,8 @@
 package de.cebitec.readXplorer.util;
 
 
+import de.cebitec.readxplorer.utils.SamUtils;
+import de.cebitec.readxplorer.utils.SamAlignmentBlock;
 import java.util.ArrayList;
 import java.util.List;
 import net.sf.samtools.Cigar;

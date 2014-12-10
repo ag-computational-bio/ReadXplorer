@@ -21,7 +21,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialExpression;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
-import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.view.dialogmenus;
 
 
-import de.cebitec.readXplorer.util.GeneralUtils;
+import de.cebitec.readxplorer.utils.GeneralUtils;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeListener;

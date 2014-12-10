@@ -19,8 +19,8 @@ package de.cebitec.readxplorer.view.dialogmenus;
 
 
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
-import de.cebitec.readXplorer.util.classification.FeatureType;
-import de.cebitec.readXplorer.util.classification.MappingClass;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.utils.classification.MappingClass;
 import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbPreferences;

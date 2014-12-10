@@ -21,7 +21,7 @@ package de.cebitec.readxplorer.view.login;
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readxplorer.api.cookies.LoginCookie;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readXplorer.util.VisualisationUtils;
+import de.cebitec.readxplorer.utils.VisualisationUtils;
 import de.cebitec.readxplorer.view.dialogmenus.LoadingDialog;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;

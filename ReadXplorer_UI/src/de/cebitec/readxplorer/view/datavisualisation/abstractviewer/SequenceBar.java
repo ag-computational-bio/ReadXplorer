@@ -20,8 +20,8 @@ package de.cebitec.readxplorer.view.datavisualisation.abstractviewer;
 
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.util.ColorProperties;
-import de.cebitec.readXplorer.util.SequenceUtils;
+import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.view.datavisualisation.BoundsInfo;
 import de.cebitec.readxplorer.view.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.view.datavisualisation.GenomeGapManager;

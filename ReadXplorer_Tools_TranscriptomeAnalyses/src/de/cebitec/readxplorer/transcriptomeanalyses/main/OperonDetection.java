@@ -5,7 +5,7 @@ package de.cebitec.readxplorer.transcriptomeanalyses.main;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.transcriptomeanalyses.datastructures.Operon;
 import de.cebitec.readxplorer.transcriptomeanalyses.datastructures.OperonAdjacency;
-import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;

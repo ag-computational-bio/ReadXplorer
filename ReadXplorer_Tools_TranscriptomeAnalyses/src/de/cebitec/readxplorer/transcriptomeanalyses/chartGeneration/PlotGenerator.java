@@ -7,7 +7,7 @@ import de.cebitec.readxplorer.transcriptomeanalyses.datastructures.Transcription
 import de.cebitec.readxplorer.transcriptomeanalyses.enums.ChartType;
 import de.cebitec.readxplorer.transcriptomeanalyses.enums.ElementsOfInterest;
 import de.cebitec.readxplorer.transcriptomeanalyses.main.ParameterSetFiveEnrichedAnalyses;
-import de.cebitec.readXplorer.util.SequenceUtils;
+import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.erichseifert.gral.data.DataSeries;
 import de.erichseifert.gral.data.DataSource;
 import de.erichseifert.gral.data.DataTable;

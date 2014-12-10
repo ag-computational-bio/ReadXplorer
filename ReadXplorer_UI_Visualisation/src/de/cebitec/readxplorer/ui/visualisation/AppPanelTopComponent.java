@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.ui.visualisation;
 
 
-import de.cebitec.readXplorer.util.VisualisationUtils;
+import de.cebitec.readxplorer.utils.VisualisationUtils;
 import de.cebitec.readxplorer.api.ApplicationFrameI;
 import de.cebitec.readxplorer.api.cookies.CloseRefGenCookie;
 import de.cebitec.readxplorer.api.cookies.CloseTrackCookie;

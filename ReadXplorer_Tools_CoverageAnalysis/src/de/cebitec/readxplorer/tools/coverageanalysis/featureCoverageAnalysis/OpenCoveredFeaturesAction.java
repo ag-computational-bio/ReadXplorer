@@ -18,9 +18,9 @@
 package de.cebitec.readxplorer.tools.coverageanalysis.featureCoverageAnalysis;
 
 
-import de.cebitec.readXplorer.util.Pair;
-import de.cebitec.readXplorer.util.VisualisationUtils;
-import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readxplorer.utils.Pair;
+import de.cebitec.readxplorer.utils.VisualisationUtils;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.view.dialogmenus.OpenTracksVisualPanel;
 import de.cebitec.readxplorer.view.dialogmenus.OpenTracksWizardPanel;

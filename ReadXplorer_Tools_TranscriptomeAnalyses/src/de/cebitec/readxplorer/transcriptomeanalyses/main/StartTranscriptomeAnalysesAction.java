@@ -8,7 +8,7 @@ import de.cebitec.readxplorer.transcriptomeanalyses.enums.StartCodon;
 import de.cebitec.readxplorer.transcriptomeanalyses.mainWizard.FivePrimeEnrichedTracksVisualPanel;
 import de.cebitec.readxplorer.transcriptomeanalyses.mainWizard.TranscriptomeAnalysisWizardIterator;
 import de.cebitec.readxplorer.transcriptomeanalyses.mainWizard.WizardPropertyStrings;
-import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

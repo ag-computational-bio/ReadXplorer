@@ -23,7 +23,7 @@ import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.GnuR.UnknownGnuRException;
-import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;

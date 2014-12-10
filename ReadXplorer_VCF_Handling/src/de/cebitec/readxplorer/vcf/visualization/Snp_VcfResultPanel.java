@@ -8,7 +8,7 @@ package de.cebitec.readxplorer.vcf.visualization;
 
 
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;
-import de.cebitec.readXplorer.util.UneditableTableModel;
+import de.cebitec.readxplorer.utils.UneditableTableModel;
 import de.cebitec.readxplorer.view.analysis.ResultTablePanel;
 import de.cebitec.readxplorer.view.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.view.tablevisualization.tablefilter.TableRightClickFilter;

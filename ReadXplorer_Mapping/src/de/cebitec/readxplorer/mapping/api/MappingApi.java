@@ -18,10 +18,10 @@
 package de.cebitec.readxplorer.mapping.api;
 
 
-import de.cebitec.readXplorer.util.CommandLineUtils;
-import de.cebitec.readXplorer.util.FileUtils;
-import de.cebitec.readXplorer.util.Properties;
-import de.cebitec.readXplorer.util.SimpleOutput;
+import de.cebitec.readxplorer.utils.CommandLineUtils;
+import de.cebitec.readxplorer.utils.FileUtils;
+import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.utils.SimpleOutput;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.JOptionPane;
@@ -115,7 +115,7 @@ public class MappingApi {
             ProgressHandle ph = ProgressHandleFactory.createHandle( Bundle.MSG_MappingApi_mapFastaFile_Start() );
             ph.start();
 
-            String basename = de.cebitec.readXplorer.util.FileUtils.getFilePathWithoutExtension( fasta );
+            String basename = de.cebitec.readxplorer.utils.FileUtils.getFilePathWithoutExtension( fasta );
             File fastafile = new File( basename );
             basename = fastafile.getName();
             new CommandLineUtils( out ).runCommandAndWaitUntilEnded( MappingApi.getMapperPath(), reference, fasta, basename, mappingParameters );

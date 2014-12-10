@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.databackend.dataObjects;
 
 
-import de.cebitec.readXplorer.util.SequenceUtils;
+import de.cebitec.readxplorer.utils.SequenceUtils;
 import java.util.ArrayList;
 import java.util.List;
 

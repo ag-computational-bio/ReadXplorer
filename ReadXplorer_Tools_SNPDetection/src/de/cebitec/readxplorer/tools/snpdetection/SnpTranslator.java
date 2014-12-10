@@ -25,12 +25,12 @@ import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataObjects.Snp;
-import de.cebitec.readXplorer.util.CodonUtilities;
-import de.cebitec.readXplorer.util.SequenceComparison;
-import de.cebitec.readXplorer.util.SequenceUtils;
-import de.cebitec.readXplorer.util.classification.FeatureType;
-import de.cebitec.readXplorer.util.polyTree.Node;
-import de.cebitec.readXplorer.util.polyTree.NodeVisitor;
+import de.cebitec.readxplorer.utils.CodonUtilities;
+import de.cebitec.readxplorer.utils.SequenceComparison;
+import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.utils.polyTree.Node;
+import de.cebitec.readxplorer.utils.polyTree.NodeVisitor;
 import java.util.ArrayList;
 import java.util.List;
 

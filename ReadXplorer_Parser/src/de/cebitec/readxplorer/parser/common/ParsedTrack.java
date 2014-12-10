@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.parser.common;
 
 
 import de.cebitec.readxplorer.parser.TrackJob;
-import de.cebitec.readXplorer.util.StatsContainer;
+import de.cebitec.readxplorer.utils.StatsContainer;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.HashMap;

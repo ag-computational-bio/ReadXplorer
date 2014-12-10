@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.databackend;
 
 
-import de.cebitec.readXplorer.util.FastaUtils;
+import de.cebitec.readxplorer.utils.FastaUtils;
 import de.cebitec.readxplorer.databackend.connector.MultiTrackConnector;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.StorageException;

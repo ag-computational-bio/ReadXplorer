@@ -23,7 +23,7 @@ import de.cebitec.readxplorer.parser.common.ParsedReference;
 import de.cebitec.readxplorer.parser.common.ParserI;
 import de.cebitec.readxplorer.parser.common.ParsingException;
 import de.cebitec.readxplorer.parser.reference.Filter.FeatureFilter;
-import de.cebitec.readXplorer.util.Observable;
+import de.cebitec.readxplorer.utils.Observable;
 
 
 /**

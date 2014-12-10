@@ -4,7 +4,7 @@ package de.cebitec.readxplorer.transcriptomeanalyses.main;
 
 import de.cebitec.readxplorer.databackend.ParameterSetI;
 import de.cebitec.readxplorer.databackend.ParametersFeatureTypes;
-import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.util.Set;
 
 

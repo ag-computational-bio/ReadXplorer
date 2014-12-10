@@ -21,7 +21,7 @@ package de.cebitec.readxplorer.tools.coverageanalysis.featureCoverageAnalysis;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readxplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
-import de.cebitec.readXplorer.util.UneditableTableModel;
+import de.cebitec.readxplorer.utils.UneditableTableModel;
 import de.cebitec.readxplorer.view.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.view.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.view.tablevisualization.tablefilter.TableRightClickFilter;

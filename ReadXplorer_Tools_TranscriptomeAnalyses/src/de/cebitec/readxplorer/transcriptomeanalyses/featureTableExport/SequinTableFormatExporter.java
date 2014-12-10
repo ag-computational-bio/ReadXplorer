@@ -11,7 +11,7 @@ import de.cebitec.readxplorer.transcriptomeanalyses.datastructures.NovelTranscri
 import de.cebitec.readxplorer.transcriptomeanalyses.datastructures.Operon;
 import de.cebitec.readxplorer.transcriptomeanalyses.datastructures.TranscriptionStart;
 import de.cebitec.readxplorer.transcriptomeanalyses.enums.TableType;
-import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;

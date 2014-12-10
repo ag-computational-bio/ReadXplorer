@@ -7,7 +7,7 @@
 package de.cebitec.readxplorer.vcf.visualization;
 
 
-import de.cebitec.readXplorer.util.TabWithCloseX;
+import de.cebitec.readxplorer.utils.TabWithCloseX;
 import de.cebitec.readxplorer.view.TopComponentExtended;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;

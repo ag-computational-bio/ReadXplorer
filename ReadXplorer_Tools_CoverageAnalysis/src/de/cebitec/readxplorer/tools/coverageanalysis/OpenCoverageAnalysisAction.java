@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.tools.coverageanalysis;
 
 
-import de.cebitec.readXplorer.util.Pair;
-import de.cebitec.readXplorer.util.VisualisationUtils;
+import de.cebitec.readxplorer.utils.Pair;
+import de.cebitec.readxplorer.utils.VisualisationUtils;
 import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.view.dialogmenus.OpenTracksWizardPanel;
 import de.cebitec.readxplorer.view.dialogmenus.SelectReadClassWizardPanel;

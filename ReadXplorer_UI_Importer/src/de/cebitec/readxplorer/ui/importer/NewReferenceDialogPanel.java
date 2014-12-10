@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.ui.importer;
 
 
-import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
+import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readxplorer.api.objects.NewJobDialogI;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.common.ParserI;

@@ -66,10 +66,10 @@
                 </test-type>
             </test-dependencies>
             <public-packages>
-                <package>de.cebitec.readXplorer.util</package>
-                <package>de.cebitec.readXplorer.util.classification</package>
-                <package>de.cebitec.readXplorer.util.fileChooser</package>
-                <package>de.cebitec.readXplorer.util.polyTree</package>
+                <package>de.cebitec.readxplorer.utils</package>
+                <package>de.cebitec.readxplorer.utils.classification</package>
+                <package>de.cebitec.readxplorer.utils.fileChooser</package>
+                <package>de.cebitec.readxplorer.utils.polyTree</package>
             </public-packages>
         </data>
     </configuration>

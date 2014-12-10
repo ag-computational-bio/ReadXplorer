@@ -18,19 +18,19 @@
 package de.cebitec.readxplorer.parser.mappings;
 
 
-import de.cebitec.readXplorer.util.Benchmark;
-import de.cebitec.readXplorer.util.DiscreteCountingDistribution;
-import de.cebitec.readXplorer.util.ErrorLimit;
-import de.cebitec.readXplorer.util.MessageSenderI;
-import de.cebitec.readXplorer.util.Observable;
-import de.cebitec.readXplorer.util.Observer;
-import de.cebitec.readXplorer.util.Pair;
-import de.cebitec.readXplorer.util.PositionUtils;
-import de.cebitec.readXplorer.util.Properties;
-import de.cebitec.readXplorer.util.StatsContainer;
-import de.cebitec.readXplorer.util.classification.Classification;
-import de.cebitec.readXplorer.util.classification.MappingClass;
-import de.cebitec.readXplorer.util.classification.TotalCoverage;
+import de.cebitec.readxplorer.utils.Benchmark;
+import de.cebitec.readxplorer.utils.DiscreteCountingDistribution;
+import de.cebitec.readxplorer.utils.ErrorLimit;
+import de.cebitec.readxplorer.utils.MessageSenderI;
+import de.cebitec.readxplorer.utils.Observable;
+import de.cebitec.readxplorer.utils.Observer;
+import de.cebitec.readxplorer.utils.Pair;
+import de.cebitec.readxplorer.utils.PositionUtils;
+import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.utils.StatsContainer;
+import de.cebitec.readxplorer.utils.classification.Classification;
+import de.cebitec.readxplorer.utils.classification.MappingClass;
+import de.cebitec.readxplorer.utils.classification.TotalCoverage;
 import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readxplorer.parser.common.ParsedTrack;
 import java.util.ArrayList;

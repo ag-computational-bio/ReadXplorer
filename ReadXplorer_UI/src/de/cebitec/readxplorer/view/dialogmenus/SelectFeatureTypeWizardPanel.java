@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.view.dialogmenus;
 
 
-import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.util.HashSet;
 import java.util.List;
 import java.util.prefs.Preferences;

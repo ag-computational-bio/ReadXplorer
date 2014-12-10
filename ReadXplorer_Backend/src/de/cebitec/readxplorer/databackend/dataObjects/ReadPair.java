@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.databackend.dataObjects;
 
 
-import de.cebitec.readXplorer.util.ColorProperties;
-import de.cebitec.readXplorer.util.ReadPairType;
+import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.utils.ReadPairType;
 import java.awt.Color;
 
 

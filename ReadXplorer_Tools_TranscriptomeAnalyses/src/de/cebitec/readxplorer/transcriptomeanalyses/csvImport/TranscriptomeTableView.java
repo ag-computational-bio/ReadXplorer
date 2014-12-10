@@ -38,8 +38,8 @@ import de.cebitec.readxplorer.transcriptomeanalyses.main.TranscriptomeAnalysesTo
 import de.cebitec.readxplorer.transcriptomeanalyses.mainWizard.FivePrimeEnrichedTracksVisualPanel;
 import de.cebitec.readxplorer.transcriptomeanalyses.mainWizard.WizardPropertyStrings;
 import de.cebitec.readxplorer.ui.importer.TranscriptomeTableViewI;
-import de.cebitec.readXplorer.util.GeneralUtils;
-import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readxplorer.utils.GeneralUtils;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.view.analysis.ResultTablePanel;
 import de.cebitec.readxplorer.view.controller.ViewController;
 import java.awt.HeadlessException;

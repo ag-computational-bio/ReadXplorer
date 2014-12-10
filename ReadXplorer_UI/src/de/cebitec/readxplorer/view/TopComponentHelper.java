@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.view;
 
 
-import de.cebitec.readXplorer.util.TabWithCloseX;
+import de.cebitec.readxplorer.utils.TabWithCloseX;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import java.util.ArrayList;

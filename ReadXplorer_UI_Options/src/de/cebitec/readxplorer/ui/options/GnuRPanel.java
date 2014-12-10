@@ -18,10 +18,10 @@
 package de.cebitec.readxplorer.ui.options;
 
 
-import de.cebitec.readXplorer.util.Downloader;
-import de.cebitec.readXplorer.util.Observer;
-import de.cebitec.readXplorer.util.Properties;
-import de.cebitec.readXplorer.util.Unzip;
+import de.cebitec.readxplorer.utils.Downloader;
+import de.cebitec.readxplorer.utils.Observer;
+import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.utils.Unzip;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.event.KeyEvent;

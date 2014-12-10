@@ -31,7 +31,7 @@ import de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.Expre
 import de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.GnuR;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.Group;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.ProcessingLog;
-import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.view.dialogmenus.SelectReadClassWizardPanel;
 import java.awt.Component;
 import java.awt.event.ActionEvent;

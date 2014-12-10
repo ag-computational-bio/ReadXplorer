@@ -18,10 +18,10 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.plot;
 
 
-import de.cebitec.readXplorer.util.Observer;
-import de.cebitec.readXplorer.util.Pair;
-import de.cebitec.readXplorer.util.classification.FeatureType;
-import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
+import de.cebitec.readxplorer.utils.Observer;
+import de.cebitec.readxplorer.utils.Pair;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readxplorer.view.TopComponentExtended;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.plotting.ChartExporter;

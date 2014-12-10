@@ -26,11 +26,11 @@ import de.cebitec.readxplorer.transcriptomeanalyses.motifSearch.PromotorSearchPa
 import de.cebitec.readxplorer.transcriptomeanalyses.motifSearch.RbsAnalysisParameters;
 import de.cebitec.readxplorer.transcriptomeanalyses.motifSearch.RbsAnalysisWizardIterator;
 import de.cebitec.readxplorer.transcriptomeanalyses.motifSearch.RbsMotifSearchPanel;
-import de.cebitec.readXplorer.util.GeneralUtils;
-import de.cebitec.readXplorer.util.Observer;
-import de.cebitec.readXplorer.util.SequenceUtils;
-import de.cebitec.readXplorer.util.UneditableTableModel;
-import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
+import de.cebitec.readxplorer.utils.GeneralUtils;
+import de.cebitec.readxplorer.utils.Observer;
+import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.utils.UneditableTableModel;
+import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readxplorer.view.analysis.ResultTablePanel;
 import de.cebitec.readxplorer.view.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;

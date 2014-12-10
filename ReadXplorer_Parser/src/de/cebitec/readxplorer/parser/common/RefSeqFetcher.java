@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.parser.common;
 
 
-import de.cebitec.readXplorer.util.Observable;
-import de.cebitec.readXplorer.util.Observer;
+import de.cebitec.readxplorer.utils.Observable;
+import de.cebitec.readxplorer.utils.Observer;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.nio.charset.Charset;

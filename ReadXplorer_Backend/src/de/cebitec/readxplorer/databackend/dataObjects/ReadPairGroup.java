@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.databackend.dataObjects;
 
 
-import de.cebitec.readXplorer.util.ReadPairType;
-import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readxplorer.utils.ReadPairType;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -109,8 +109,7 @@ public class ReadPairGroup implements ObjectWithId {
      * @param type        type of the read pair this mapping is belonging to (
      * @param bothVisible true, if both mappings of the pair are visible
      * <p>
-     * @see de.cebitec.readXplorer.util.Properties)
-     */
+     * @see de.cebitec.readxplorer.utils.Properties     */
     public void addPersistentDirectAccessMapping( Mapping mapping, Mapping mate, ReadPairType type, boolean bothVisible ) {
 
         boolean stored = false;

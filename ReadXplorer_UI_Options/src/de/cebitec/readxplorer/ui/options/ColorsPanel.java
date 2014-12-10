@@ -18,11 +18,11 @@
 package de.cebitec.readxplorer.ui.options;
 
 
-import de.cebitec.readXplorer.util.ColorProperties;
-import de.cebitec.readXplorer.util.ColorUtils;
-import de.cebitec.readXplorer.util.classification.Classification;
-import de.cebitec.readXplorer.util.classification.ComparisonClass;
-import de.cebitec.readXplorer.util.classification.MappingClass;
+import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.utils.ColorUtils;
+import de.cebitec.readxplorer.utils.classification.Classification;
+import de.cebitec.readxplorer.utils.classification.ComparisonClass;
+import de.cebitec.readxplorer.utils.classification.MappingClass;
 import java.awt.Color;
 import java.util.HashMap;
 import java.util.Map;

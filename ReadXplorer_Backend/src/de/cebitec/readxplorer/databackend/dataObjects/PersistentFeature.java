@@ -18,12 +18,12 @@
 package de.cebitec.readxplorer.databackend.dataObjects;
 
 
-import de.cebitec.readXplorer.util.PositionUtils;
-import de.cebitec.readXplorer.util.Properties;
-import de.cebitec.readXplorer.util.SequenceUtils;
-import de.cebitec.readXplorer.util.classification.FeatureType;
-import de.cebitec.readXplorer.util.polyTree.Node;
-import de.cebitec.readXplorer.util.polyTree.Polytree;
+import de.cebitec.readxplorer.utils.PositionUtils;
+import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.utils.polyTree.Node;
+import de.cebitec.readxplorer.utils.polyTree.Polytree;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;

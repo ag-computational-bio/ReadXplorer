@@ -3,8 +3,8 @@ package de.cebitec.readxplorer.transcriptomeanalyses.motifSearch;
 
 
 import de.cebitec.readxplorer.transcriptomeanalyses.enums.PurposeEnum;
-import de.cebitec.readXplorer.util.Observable;
-import de.cebitec.readXplorer.util.Observer;
+import de.cebitec.readxplorer.utils.Observable;
+import de.cebitec.readxplorer.utils.Observer;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.io.File;

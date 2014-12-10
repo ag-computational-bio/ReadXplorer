@@ -2,7 +2,7 @@
 package de.cebitec.readxplorer.transcriptomeanalyses.main;
 
 
-import de.cebitec.readXplorer.util.TabWithCloseX;
+import de.cebitec.readxplorer.utils.TabWithCloseX;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
 import javax.swing.JPanel;

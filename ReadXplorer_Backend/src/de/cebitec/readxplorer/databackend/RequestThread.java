@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.databackend;
 
 
-import de.cebitec.readXplorer.util.classification.Classification;
+import de.cebitec.readxplorer.utils.classification.Classification;
 import java.util.ArrayList;
 import java.util.List;
 

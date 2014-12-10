@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.view.datavisualisation.histogramviewer;
 
 
-import de.cebitec.readXplorer.util.ColorProperties;
+import de.cebitec.readxplorer.utils.ColorProperties;
 import java.awt.Color;
 import java.awt.Graphics;
 import javax.swing.JComponent;

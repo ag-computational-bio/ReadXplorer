@@ -19,9 +19,9 @@ package de.cebitec.readxplorer.rnatrimming.correlationAnalysis;
 
 
 import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
-import de.cebitec.readXplorer.util.GeneralUtils;
-import de.cebitec.readXplorer.util.SequenceUtils;
-import de.cebitec.readXplorer.util.UneditableTableModel;
+import de.cebitec.readxplorer.utils.GeneralUtils;
+import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.utils.UneditableTableModel;
 import de.cebitec.readxplorer.view.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.view.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.view.tablevisualization.tablefilter.TableRightClickFilter;

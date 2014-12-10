@@ -22,7 +22,7 @@ import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.mappings.MappingParserI;
-import de.cebitec.readXplorer.util.VisualisationUtils;
+import de.cebitec.readxplorer.utils.VisualisationUtils;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;

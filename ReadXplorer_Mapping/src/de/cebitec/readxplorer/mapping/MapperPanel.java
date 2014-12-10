@@ -19,8 +19,8 @@ package de.cebitec.readxplorer.mapping;
 
 
 import de.cebitec.readxplorer.mapping.api.MappingApi;
-import de.cebitec.readXplorer.util.FileUtils;
-import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readxplorer.utils.FileUtils;
+import de.cebitec.readxplorer.utils.Properties;
 import java.io.File;
 import java.util.prefs.Preferences;
 import javax.swing.filechooser.FileNameExtensionFilter;

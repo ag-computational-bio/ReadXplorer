@@ -23,7 +23,7 @@ import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readxplorer.transcriptionanalyses.dataStructures.RPKMvalue;
 import de.cebitec.readxplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
-import de.cebitec.readXplorer.util.UneditableTableModel;
+import de.cebitec.readxplorer.utils.UneditableTableModel;
 import de.cebitec.readxplorer.view.analysis.ResultTablePanel;
 import de.cebitec.readxplorer.view.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.view.tablevisualization.tablefilter.TableRightClickFilter;

@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.databackend.dataObjects;
 
 
-import de.cebitec.readXplorer.util.Observable;
-import de.cebitec.readXplorer.util.Observer;
+import de.cebitec.readxplorer.utils.Observable;
+import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import java.io.File;

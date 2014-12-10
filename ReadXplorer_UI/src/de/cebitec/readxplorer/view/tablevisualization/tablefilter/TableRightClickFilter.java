@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.view.tablevisualization.tablefilter;
 
 
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
-import de.cebitec.readXplorer.util.GenerateRowSorter;
+import de.cebitec.readxplorer.utils.GenerateRowSorter;
 import java.awt.Dialog;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

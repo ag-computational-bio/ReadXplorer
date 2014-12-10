@@ -7,7 +7,7 @@ import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.transcriptomeanalyses.datastructures.NovelTranscript;
-import de.cebitec.readXplorer.util.Observer;
+import de.cebitec.readxplorer.utils.Observer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

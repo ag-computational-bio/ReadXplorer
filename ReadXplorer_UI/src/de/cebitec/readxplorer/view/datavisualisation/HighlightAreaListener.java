@@ -19,10 +19,10 @@ package de.cebitec.readxplorer.view.datavisualisation;
 
 
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.util.CodonUtilities;
-import de.cebitec.readXplorer.util.Pair;
-import de.cebitec.readXplorer.util.Properties;
-import de.cebitec.readXplorer.util.SequenceUtils;
+import de.cebitec.readxplorer.utils.CodonUtilities;
+import de.cebitec.readxplorer.utils.Pair;
+import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.view.datavisualisation.abstractviewer.JRegion;
 import de.cebitec.readxplorer.view.datavisualisation.abstractviewer.PatternFilter;
 import de.cebitec.readxplorer.view.datavisualisation.abstractviewer.Region;

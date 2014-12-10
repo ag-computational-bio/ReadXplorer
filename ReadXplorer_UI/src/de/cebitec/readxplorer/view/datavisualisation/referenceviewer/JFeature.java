@@ -19,8 +19,8 @@ package de.cebitec.readxplorer.view.datavisualisation.referenceviewer;
 
 
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
-import de.cebitec.readXplorer.util.ColorProperties;
-import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.view.dialogmenus.MenuItemFactory;
 import java.awt.Color;
 import java.awt.Dimension;

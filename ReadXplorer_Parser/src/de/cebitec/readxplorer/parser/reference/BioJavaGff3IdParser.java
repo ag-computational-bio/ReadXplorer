@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.parser.reference;
 
 
 import de.cebitec.readxplorer.parser.common.ParsingException;
-import de.cebitec.readXplorer.util.Observer;
+import de.cebitec.readxplorer.utils.Observer;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;

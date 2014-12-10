@@ -18,19 +18,19 @@
 package de.cebitec.readxplorer.readpairclassifier;
 
 
-import de.cebitec.readXplorer.util.Benchmark;
-import de.cebitec.readXplorer.util.DiscreteCountingDistribution;
-import de.cebitec.readXplorer.util.ErrorLimit;
-import de.cebitec.readXplorer.util.GeneralUtils;
-import de.cebitec.readXplorer.util.MessageSenderI;
-import de.cebitec.readXplorer.util.Observable;
-import de.cebitec.readXplorer.util.Observer;
-import de.cebitec.readXplorer.util.Pair;
-import de.cebitec.readXplorer.util.Properties;
-import de.cebitec.readXplorer.util.ReadPairType;
-import de.cebitec.readXplorer.util.SamUtils;
-import de.cebitec.readXplorer.util.SequenceUtils;
-import de.cebitec.readXplorer.util.StatsContainer;
+import de.cebitec.readxplorer.utils.Benchmark;
+import de.cebitec.readxplorer.utils.DiscreteCountingDistribution;
+import de.cebitec.readxplorer.utils.ErrorLimit;
+import de.cebitec.readxplorer.utils.GeneralUtils;
+import de.cebitec.readxplorer.utils.MessageSenderI;
+import de.cebitec.readxplorer.utils.Observable;
+import de.cebitec.readxplorer.utils.Observer;
+import de.cebitec.readxplorer.utils.Pair;
+import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.utils.ReadPairType;
+import de.cebitec.readxplorer.utils.SamUtils;
+import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.utils.StatsContainer;
 import de.cebitec.readxplorer.parser.ReadPairJobContainer;
 import de.cebitec.readxplorer.parser.TrackJob;
 import de.cebitec.readxplorer.parser.common.ParsedClassification;

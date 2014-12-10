@@ -18,6 +18,7 @@
 package de.cebitec.readXplorer.util;
 
 
+import de.cebitec.readxplorer.utils.FileUtils;
 import java.io.File;
 import org.junit.After;
 import org.junit.AfterClass;

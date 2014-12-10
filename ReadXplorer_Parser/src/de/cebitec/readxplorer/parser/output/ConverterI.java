@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.parser.output;
 
 
 import de.cebitec.readxplorer.parser.common.ParserI;
-import de.cebitec.readXplorer.util.Observable;
+import de.cebitec.readxplorer.utils.Observable;
 
 
 /**

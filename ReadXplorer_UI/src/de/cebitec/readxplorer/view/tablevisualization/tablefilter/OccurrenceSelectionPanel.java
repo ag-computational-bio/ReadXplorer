@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.view.tablevisualization.tablefilter;
 
 
-import de.cebitec.readXplorer.util.GeneralUtils;
+import de.cebitec.readxplorer.utils.GeneralUtils;
 import javax.swing.JOptionPane;
 import org.openide.util.NbBundle;
 

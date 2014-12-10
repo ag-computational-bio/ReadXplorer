@@ -18,11 +18,11 @@
 package de.cebitec.readxplorer.parser.output;
 
 
-import de.cebitec.readXplorer.util.Benchmark;
-import de.cebitec.readXplorer.util.Observable;
-import de.cebitec.readXplorer.util.Observer;
-import de.cebitec.readXplorer.util.Pair;
-import de.cebitec.readXplorer.util.SamUtils;
+import de.cebitec.readxplorer.utils.Benchmark;
+import de.cebitec.readxplorer.utils.Observable;
+import de.cebitec.readxplorer.utils.Observer;
+import de.cebitec.readxplorer.utils.Pair;
+import de.cebitec.readxplorer.utils.SamUtils;
 import de.cebitec.readxplorer.parser.TrackJob;
 import java.io.File;
 import java.util.ArrayList;

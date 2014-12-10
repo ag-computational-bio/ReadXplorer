@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.ui.visualisation.reference;
 
 
-import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
 import de.cebitec.readxplorer.view.TopComponentExtended;
 import de.cebitec.readxplorer.view.datavisualisation.BoundsInfo;
 import de.cebitec.readxplorer.view.datavisualisation.MousePositionListener;

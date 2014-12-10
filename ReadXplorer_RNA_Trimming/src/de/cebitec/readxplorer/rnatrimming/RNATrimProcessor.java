@@ -20,7 +20,7 @@ package de.cebitec.readxplorer.rnatrimming;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readxplorer.mapping.api.MappingApi;
-import de.cebitec.readXplorer.util.SimpleOutput;
+import de.cebitec.readxplorer.utils.SimpleOutput;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -92,7 +92,7 @@ public class RNATrimProcessor {
      */
     private String extractUnmappedReadsAndTrim( File samfile, TrimMethod method ) {
         //set path to the fasta file to be created
-        String fastaPath = de.cebitec.readXplorer.util.FileUtils.getFilePathWithoutExtension( samfile ) + "_" + method.getShortDescription() + ".redo.fastq";
+        String fastaPath = de.cebitec.readxplorer.utils.FileUtils.getFilePathWithoutExtension( samfile ) + "_" + method.getShortDescription() + ".redo.fastq";
 
         //set up the progress handle to indicate progress to the user
         ProgressHandle ph = ProgressHandleFactory.createHandle(
@@ -108,7 +108,7 @@ public class RNATrimProcessor {
         ph.start();
 
         //count the number of lines in the samfile, to estimate the progress
-        int lines = de.cebitec.readXplorer.util.FileUtils.countLinesInFile( samfile );
+        int lines = de.cebitec.readxplorer.utils.FileUtils.countLinesInFile( samfile );
         ph.switchToDeterminate( lines );
 
         //int allReads = 0;
@@ -184,7 +184,7 @@ public class RNATrimProcessor {
     private String extractOriginalSequencesInSamFile( String sampath, boolean writeOnlyMapped ) {
         //set path to the fasta file to be created
         File samfile = new File( sampath );
-        String newPath = de.cebitec.readXplorer.util.FileUtils.getFilePathWithoutExtension( samfile ) + "_with_originals.sam";
+        String newPath = de.cebitec.readxplorer.utils.FileUtils.getFilePathWithoutExtension( samfile ) + "_with_originals.sam";
 
         this.showMsg( NbBundle.getMessage( RNATrimProcessor.class, "MSG_TrimProcessor.extractOriginalSequencesInSamFile.Start", sampath ) );
 
@@ -202,7 +202,7 @@ public class RNATrimProcessor {
         ph.start();
 
         //count the number of lines in the samfile, to estimate the progress
-        int lines = de.cebitec.readXplorer.util.FileUtils.countLinesInFile( samfile );
+        int lines = de.cebitec.readxplorer.utils.FileUtils.countLinesInFile( samfile );
         ph.switchToDeterminate( lines );
 
         int currentline = 0;

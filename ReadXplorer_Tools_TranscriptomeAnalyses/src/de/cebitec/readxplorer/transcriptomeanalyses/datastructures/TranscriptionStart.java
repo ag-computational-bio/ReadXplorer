@@ -4,7 +4,7 @@ package de.cebitec.readxplorer.transcriptomeanalyses.datastructures;
 
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataObjects.TrackChromResultEntry;
-import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
 
 
 /**

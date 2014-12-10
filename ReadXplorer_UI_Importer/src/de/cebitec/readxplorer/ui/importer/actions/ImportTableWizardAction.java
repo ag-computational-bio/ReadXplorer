@@ -19,8 +19,8 @@ package de.cebitec.readxplorer.ui.importer.actions;
 
 
 import de.cebitec.readxplorer.ui.visualisation.TableVisualizationHelper;
-import de.cebitec.readXplorer.util.UneditableTableModel;
-import de.cebitec.readXplorer.util.VisualisationUtils;
+import de.cebitec.readxplorer.utils.UneditableTableModel;
+import de.cebitec.readxplorer.utils.VisualisationUtils;
 import de.cebitec.readxplorer.api.cookies.LoginCookie;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.parser.common.ParsingException;

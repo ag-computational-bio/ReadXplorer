@@ -18,9 +18,9 @@
 package de.cebitec.readxplorer.parser.common;
 
 
-import de.cebitec.readXplorer.util.Properties;
-import de.cebitec.readXplorer.util.classification.FeatureType;
-import de.cebitec.readXplorer.util.polyTree.Node;
+import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.utils.polyTree.Node;
 import java.util.ArrayList;
 import java.util.List;
 

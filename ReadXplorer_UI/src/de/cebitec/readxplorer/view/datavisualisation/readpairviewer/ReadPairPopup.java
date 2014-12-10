@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.view.datavisualisation.readpairviewer;
 
 
-import de.cebitec.readXplorer.util.ReadPairType;
+import de.cebitec.readxplorer.utils.ReadPairType;
 import de.cebitec.readxplorer.databackend.dataObjects.Mapping;
 import de.cebitec.readxplorer.databackend.dataObjects.ReadPair;
 import de.cebitec.readxplorer.databackend.dataObjects.ReadPairGroup;

@@ -15,11 +15,11 @@ import de.cebitec.readxplorer.transcriptomeanalyses.datastructures.OperonAdjacen
 import de.cebitec.readxplorer.transcriptomeanalyses.enums.TableType;
 import de.cebitec.readxplorer.transcriptomeanalyses.featureTableExport.SequinTableFormatExporter;
 import de.cebitec.readxplorer.transcriptomeanalyses.featureTableExport.SequinTableSettingsWizardPanel;
-import de.cebitec.readXplorer.util.LineWrapCellRenderer;
-import de.cebitec.readXplorer.util.Observer;
-import de.cebitec.readXplorer.util.SequenceUtils;
-import de.cebitec.readXplorer.util.UneditableTableModel;
-import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
+import de.cebitec.readxplorer.utils.LineWrapCellRenderer;
+import de.cebitec.readxplorer.utils.Observer;
+import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.utils.UneditableTableModel;
+import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readxplorer.view.analysis.ResultTablePanel;
 import de.cebitec.readxplorer.view.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;

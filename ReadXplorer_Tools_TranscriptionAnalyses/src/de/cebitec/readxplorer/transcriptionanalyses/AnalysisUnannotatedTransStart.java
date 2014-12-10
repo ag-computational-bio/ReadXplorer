@@ -22,7 +22,7 @@ import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.transcriptionanalyses.dataStructures.DetectedFeatures;
 import de.cebitec.readxplorer.transcriptionanalyses.dataStructures.TransStartUnannotated;
 import de.cebitec.readxplorer.transcriptionanalyses.dataStructures.TranscriptionStart;
-import de.cebitec.readXplorer.util.classification.Classification;
+import de.cebitec.readxplorer.utils.classification.Classification;
 import java.util.List;
 
 

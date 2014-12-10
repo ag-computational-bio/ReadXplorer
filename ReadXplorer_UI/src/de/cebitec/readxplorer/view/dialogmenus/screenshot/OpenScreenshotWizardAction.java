@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.view.dialogmenus.screenshot;
 
 
-import de.cebitec.readXplorer.util.ScreenshotUtils;
-import de.cebitec.readXplorer.util.VisualisationUtils;
+import de.cebitec.readxplorer.utils.ScreenshotUtils;
+import de.cebitec.readxplorer.utils.VisualisationUtils;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

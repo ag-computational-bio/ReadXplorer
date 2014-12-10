@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.ui.options;
 
 
-import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readxplorer.utils.Properties;
 import java.util.prefs.Preferences;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;

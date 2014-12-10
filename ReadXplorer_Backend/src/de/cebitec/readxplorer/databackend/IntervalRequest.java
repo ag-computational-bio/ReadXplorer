@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.databackend;
 
 
-import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readxplorer.utils.Properties;
 
 
 /**

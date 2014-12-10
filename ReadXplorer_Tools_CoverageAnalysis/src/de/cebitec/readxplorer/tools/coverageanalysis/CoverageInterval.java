@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.tools.coverageanalysis;
 
 
-import de.cebitec.readXplorer.util.Properties;
-import de.cebitec.readXplorer.util.SequenceUtils;
+import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.utils.SequenceUtils;
 
 
 /**

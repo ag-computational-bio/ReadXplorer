@@ -20,7 +20,7 @@ package de.cebitec.readxplorer.ui.options;
 
 import de.cebitec.common.sequencetools.geneticcode.GeneticCode;
 import de.cebitec.common.sequencetools.geneticcode.GeneticCodeFactory;
-import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readxplorer.utils.Properties;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;

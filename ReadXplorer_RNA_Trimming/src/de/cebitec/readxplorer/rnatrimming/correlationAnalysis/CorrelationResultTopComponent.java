@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.rnatrimming.correlationAnalysis;
 
 
-import de.cebitec.readXplorer.util.TabWithCloseX;
+import de.cebitec.readxplorer.utils.TabWithCloseX;
 import de.cebitec.readxplorer.view.TopComponentExtended;
 import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
 import java.awt.event.ContainerEvent;

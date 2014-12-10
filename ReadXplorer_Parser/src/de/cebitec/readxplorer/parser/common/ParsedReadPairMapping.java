@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.parser.common;
 
 
-import de.cebitec.readXplorer.util.ReadPairType;
+import de.cebitec.readxplorer.utils.ReadPairType;
 
 
 /**

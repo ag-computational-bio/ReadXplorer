@@ -20,7 +20,7 @@ package de.cebitec.readxplorer.mapping;
 
 import de.cebitec.centrallookup.CentralLookup;
 import de.cebitec.readxplorer.mapping.api.MappingApi;
-import de.cebitec.readXplorer.util.SimpleIO;
+import de.cebitec.readxplorer.utils.SimpleIO;
 import java.io.IOException;
 import java.util.logging.Logger;
 import org.openide.util.Exceptions;

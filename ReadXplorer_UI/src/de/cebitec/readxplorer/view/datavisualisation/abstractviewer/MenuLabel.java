@@ -18,9 +18,9 @@
 package de.cebitec.readxplorer.view.datavisualisation.abstractviewer;
 
 
-import de.cebitec.readXplorer.util.ColorProperties;
-import de.cebitec.readXplorer.util.Observable;
-import de.cebitec.readXplorer.util.Observer;
+import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.utils.Observable;
+import de.cebitec.readxplorer.utils.Observer;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;

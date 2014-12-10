@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.view.datavisualisation.abstractviewer;
 
 
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.view.datavisualisation.BoundsInfo;
 import de.cebitec.readxplorer.view.datavisualisation.HighlightAreaListener;
 import java.util.ArrayList;

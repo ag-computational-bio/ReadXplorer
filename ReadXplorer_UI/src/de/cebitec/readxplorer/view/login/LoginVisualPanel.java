@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.view.login;
 
 
-import de.cebitec.readXplorer.util.Properties;
-import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
+import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;

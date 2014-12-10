@@ -22,7 +22,7 @@ import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.util.Observer;
+import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.view.datavisualisation.abstractviewer.AbstractViewer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

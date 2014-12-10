@@ -20,7 +20,7 @@ package de.cebitec.readxplorer.view.tablevisualization;
 
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.parser.tables.TableType;
-import de.cebitec.readXplorer.util.UneditableTableModel;
+import de.cebitec.readxplorer.utils.UneditableTableModel;
 import de.cebitec.readxplorer.view.tablevisualization.tablefilter.TableRightClickFilter;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.event.ListSelectionEvent;

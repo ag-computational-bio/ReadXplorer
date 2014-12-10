@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.ui.datamanagement.actions;
 
 
 import de.cebitec.centrallookup.CentralLookup;
-import de.cebitec.readXplorer.util.VisualisationUtils;
+import de.cebitec.readxplorer.utils.VisualisationUtils;
 import de.cebitec.readxplorer.api.cookies.LoginCookie;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.TrackJob;

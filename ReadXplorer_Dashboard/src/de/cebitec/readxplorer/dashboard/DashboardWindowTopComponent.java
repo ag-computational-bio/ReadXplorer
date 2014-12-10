@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.dashboard;
 
 
 import de.cebitec.readxplorer.ui.visualisation.AppPanelTopComponent;
-import de.cebitec.readXplorer.util.VisualisationUtils;
+import de.cebitec.readxplorer.utils.VisualisationUtils;
 import de.cebitec.readxplorer.view.TopComponentExtended;
 import de.cebitec.readxplorer.view.controller.ViewController;
 import de.cebitec.readxplorer.view.dialogmenus.explorer.CustomOutlineCellRenderer;

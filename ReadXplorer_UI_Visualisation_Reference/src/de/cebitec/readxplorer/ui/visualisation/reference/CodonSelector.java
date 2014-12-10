@@ -18,9 +18,9 @@
 package de.cebitec.readxplorer.ui.visualisation.reference;
 
 
-import de.cebitec.readXplorer.util.CodonUtilities;
-import de.cebitec.readXplorer.util.Pair;
-import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readxplorer.utils.CodonUtilities;
+import de.cebitec.readxplorer.utils.Pair;
+import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
 import java.awt.BorderLayout;
 import java.awt.Component;

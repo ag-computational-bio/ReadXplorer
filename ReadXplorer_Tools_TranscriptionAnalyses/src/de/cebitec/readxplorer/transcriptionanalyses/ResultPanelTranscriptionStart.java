@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.transcriptionanalyses;
 
 
-import de.cebitec.readXplorer.util.SequenceUtils;
-import de.cebitec.readXplorer.util.UneditableTableModel;
+import de.cebitec.readxplorer.utils.SequenceUtils;
+import de.cebitec.readxplorer.utils.UneditableTableModel;
 import de.cebitec.readxplorer.view.analysis.ResultTablePanel;
 import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.view.tablevisualization.TableComparatorProvider;

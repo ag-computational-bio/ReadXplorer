@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.exporter.tables;
 
 
-import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
+import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;

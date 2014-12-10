@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.readpairclassifier;
 
 
-import de.cebitec.readXplorer.util.ReadPairType;
+import de.cebitec.readxplorer.utils.ReadPairType;
 import net.sf.samtools.SAMRecord;
 
 

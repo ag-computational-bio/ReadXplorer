@@ -13,7 +13,7 @@ import de.cebitec.readxplorer.transcriptomeanalyses.main.ParameterSetFiveEnriche
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.transcriptomeanalyses.datastructures.TranscriptionStart;
-import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;

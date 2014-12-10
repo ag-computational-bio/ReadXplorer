@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialExpression;
 
 
-import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readxplorer.utils.Properties;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.Calendar;

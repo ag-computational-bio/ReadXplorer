@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.ui.importer;
 
 
 import de.cebitec.readxplorer.api.objects.NewJobDialogI;
-import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readxplorer.utils.Properties;
 import java.io.File;
 import javax.swing.JFileChooser;
 import org.openide.DialogDisplayer;

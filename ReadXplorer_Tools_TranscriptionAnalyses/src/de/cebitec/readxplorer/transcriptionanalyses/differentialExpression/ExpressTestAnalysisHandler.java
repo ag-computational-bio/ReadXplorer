@@ -28,7 +28,7 @@ import de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.expre
 import de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.expressTest.ExpressTestI;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.expressTest.ExpressTestObserver;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.expressTest.ExpressTestStatus;
-import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;

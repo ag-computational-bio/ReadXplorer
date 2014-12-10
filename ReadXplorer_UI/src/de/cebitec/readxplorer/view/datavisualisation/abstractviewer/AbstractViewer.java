@@ -20,8 +20,8 @@ package de.cebitec.readxplorer.view.datavisualisation.abstractviewer;
 
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.util.ColorProperties;
-import de.cebitec.readXplorer.util.classification.Classification;
+import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.utils.classification.Classification;
 import de.cebitec.readxplorer.view.datavisualisation.BoundsInfo;
 import de.cebitec.readxplorer.view.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.view.datavisualisation.LogicalBoundsListener;

@@ -20,11 +20,11 @@ package de.cebitec.readxplorer.view.dialogmenus;
 
 import de.cebitec.readxplorer.api.objects.JobPanel;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
-import de.cebitec.readXplorer.util.GeneralUtils;
-import de.cebitec.readXplorer.util.Properties;
-import de.cebitec.readXplorer.util.classification.Classification;
-import de.cebitec.readXplorer.util.classification.FeatureType;
-import de.cebitec.readXplorer.util.classification.MappingClass;
+import de.cebitec.readxplorer.utils.GeneralUtils;
+import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.utils.classification.Classification;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.utils.classification.MappingClass;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;

@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialExpression;
 
 
-import de.cebitec.readXplorer.util.Observer;
-import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
+import de.cebitec.readxplorer.utils.Observer;
+import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
 import de.cebitec.readxplorer.view.TopComponentExtended;
 import java.io.File;
 import java.io.FileWriter;

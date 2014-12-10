@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.mapping;
 
 
-import de.cebitec.readXplorer.util.FileUtils;
+import de.cebitec.readxplorer.utils.FileUtils;
 import java.io.File;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;

@@ -18,9 +18,9 @@
 package de.cebitec.readxplorer.databackend.dataObjects;
 
 
-import de.cebitec.readXplorer.util.classification.Classification;
-import de.cebitec.readXplorer.util.classification.FeatureType;
-import de.cebitec.readXplorer.util.classification.MappingClass;
+import de.cebitec.readxplorer.utils.classification.Classification;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.utils.classification.MappingClass;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.ui.visualisation.reference;
 
 
-import de.cebitec.readXplorer.util.classification.FeatureType;
-import de.cebitec.readXplorer.util.polyTree.Node;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.utils.polyTree.Node;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.view.TopComponentExtended;
 import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.JFeature;

@@ -19,8 +19,8 @@ package de.cebitec.readxplorer.view.datavisualisation.abstractviewer;
 
 
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.util.Properties;
-import de.cebitec.readXplorer.util.SequenceUtils;
+import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.utils.SequenceUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;

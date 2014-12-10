@@ -21,7 +21,7 @@ package de.cebitec.readxplorer.view.datavisualisation.readpairviewer;
 import de.cebitec.readxplorer.databackend.dataObjects.Mapping;
 import de.cebitec.readxplorer.databackend.dataObjects.ReadPair;
 import de.cebitec.readxplorer.databackend.dataObjects.ReadPairGroup;
-import de.cebitec.readXplorer.util.classification.Classification;
+import de.cebitec.readxplorer.utils.classification.Classification;
 import de.cebitec.readxplorer.view.datavisualisation.GenomeGapManager;
 import de.cebitec.readxplorer.view.datavisualisation.alignmentviewer.BlockContainer;
 import de.cebitec.readxplorer.view.datavisualisation.alignmentviewer.BlockI;

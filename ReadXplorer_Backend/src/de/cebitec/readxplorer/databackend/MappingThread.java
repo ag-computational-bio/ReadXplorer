@@ -26,7 +26,7 @@ import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readxplorer.databackend.dataObjects.ReadPairGroup;
 import de.cebitec.readxplorer.databackend.dataObjects.ReadPairResultPersistent;
-import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readxplorer.utils.Properties;
 import java.io.File;
 import java.sql.Timestamp;
 import java.util.ArrayList;

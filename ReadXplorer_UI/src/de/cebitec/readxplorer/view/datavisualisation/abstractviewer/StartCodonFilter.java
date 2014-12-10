@@ -19,11 +19,11 @@ package de.cebitec.readxplorer.view.datavisualisation.abstractviewer;
 
 
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readXplorer.util.CodonUtilities;
-import de.cebitec.readXplorer.util.Pair;
-import de.cebitec.readXplorer.util.PositionUtils;
-import de.cebitec.readXplorer.util.Properties;
-import de.cebitec.readXplorer.util.SequenceUtils;
+import de.cebitec.readxplorer.utils.CodonUtilities;
+import de.cebitec.readxplorer.utils.Pair;
+import de.cebitec.readxplorer.utils.PositionUtils;
+import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.utils.SequenceUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;

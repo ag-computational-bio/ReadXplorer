@@ -21,8 +21,8 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.plot
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.DeAnalysisHandler;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.ResultDeAnalysis;
-import de.cebitec.readXplorer.util.GeneralUtils;
-import de.cebitec.readXplorer.util.Pair;
+import de.cebitec.readxplorer.utils.GeneralUtils;
+import de.cebitec.readxplorer.utils.Pair;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

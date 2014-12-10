@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.parser.reference.Filter;
 
 
 import de.cebitec.readxplorer.parser.common.ParsedFeature;
-import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
 
 
 /**

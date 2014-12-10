@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.transcriptionanalyses;
 
 
 import de.cebitec.readxplorer.transcriptionanalyses.dataStructures.RPKMvalue;
-import de.cebitec.readXplorer.util.GeneralUtils;
+import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.view.TopComponentExtended;
 import java.awt.BorderLayout;
 import java.awt.event.ComponentEvent;

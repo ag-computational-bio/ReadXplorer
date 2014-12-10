@@ -12,14 +12,14 @@ import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readxplorer.transcriptomeanalyses.datastructures.Operon;
 import de.cebitec.readxplorer.transcriptomeanalyses.enums.AnalysisStatus;
-import de.cebitec.readXplorer.util.GeneralUtils;
-import de.cebitec.readXplorer.util.Observable;
-import de.cebitec.readXplorer.util.Observer;
-import de.cebitec.readXplorer.util.Pair;
-import de.cebitec.readXplorer.util.Properties;
-import de.cebitec.readXplorer.util.classification.Classification;
-import de.cebitec.readXplorer.util.classification.FeatureType;
-import de.cebitec.readXplorer.util.classification.MappingClass;
+import de.cebitec.readxplorer.utils.GeneralUtils;
+import de.cebitec.readxplorer.utils.Observable;
+import de.cebitec.readxplorer.utils.Observer;
+import de.cebitec.readxplorer.utils.Pair;
+import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.utils.classification.Classification;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.utils.classification.MappingClass;
 import de.cebitec.readxplorer.view.datavisualisation.referenceviewer.ReferenceViewer;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements
     private final PersistentTrack selectedTrack;
     private final PersistentReference reference;
     private final double fraction;
-    private final List<de.cebitec.readXplorer.util.Observer> observer = new ArrayList<>();
+    private final List<de.cebitec.readxplorer.utils.Observer> observer = new ArrayList<>();
     private List<Set<Integer>> region2Exclude;
     protected Map<Integer, List<Integer>> forwardCDSs, reverseCDSs;
     private StatisticsOnMappingData stats;
@@ -190,8 +190,8 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements
 
     @Override
     public void notifyObservers( Object data ) {
-        List<de.cebitec.readXplorer.util.Observer> tmpObserver = new ArrayList<>( observer );
-        for( de.cebitec.readXplorer.util.Observer currentObserver : tmpObserver ) {
+        List<de.cebitec.readxplorer.utils.Observer> tmpObserver = new ArrayList<>( observer );
+        for( de.cebitec.readxplorer.utils.Observer currentObserver : tmpObserver ) {
             currentObserver.update( data );
         }
     }

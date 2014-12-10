@@ -7,7 +7,7 @@ import de.cebitec.readxplorer.api.cookies.LoginCookie;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readxplorer.ui.visualisation.AppPanelTopComponent;
-import de.cebitec.readXplorer.util.VisualisationUtils;
+import de.cebitec.readxplorer.utils.VisualisationUtils;
 import de.cebitec.readxplorer.view.controller.ViewController;
 import de.cebitec.readxplorer.view.datavisualisation.basePanel.BasePanel;
 import de.cebitec.readxplorer.view.datavisualisation.basePanel.BasePanelFactory;

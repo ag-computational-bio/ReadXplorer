@@ -24,7 +24,7 @@ import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readxplorer.transcriptionanalyses.dataStructures.Operon;
 import de.cebitec.readxplorer.transcriptionanalyses.dataStructures.OperonAdjacency;
-import de.cebitec.readXplorer.util.GeneralUtils;
+import de.cebitec.readxplorer.utils.GeneralUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

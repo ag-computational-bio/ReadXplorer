@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.transcriptionanalyses.wizard;
 
 
-import de.cebitec.readXplorer.util.Properties;
+import de.cebitec.readxplorer.utils.Properties;
 import de.cebitec.readxplorer.view.dialogmenus.ChangeListeningWizardPanel;
 import java.util.prefs.Preferences;
 import org.openide.WizardDescriptor;

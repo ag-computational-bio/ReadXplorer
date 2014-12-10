@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.databackend.dataObjects;
 
 
-import de.cebitec.readXplorer.util.SequenceComparison;
+import de.cebitec.readxplorer.utils.SequenceComparison;
 import java.util.ArrayList;
 import java.util.List;
 

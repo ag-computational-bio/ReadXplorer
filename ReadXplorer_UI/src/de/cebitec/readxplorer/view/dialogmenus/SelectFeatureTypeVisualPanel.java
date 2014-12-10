@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.view.dialogmenus;
 
 
 import de.cebitec.readxplorer.api.objects.JobPanel;
-import de.cebitec.readXplorer.util.classification.FeatureType;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

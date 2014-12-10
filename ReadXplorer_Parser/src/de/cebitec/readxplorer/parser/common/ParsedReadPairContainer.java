@@ -18,9 +18,9 @@
 package de.cebitec.readxplorer.parser.common;
 
 
-import de.cebitec.readXplorer.util.Pair;
-import de.cebitec.readXplorer.util.ReadPairType;
-import de.cebitec.readXplorer.util.StatsContainer;
+import de.cebitec.readxplorer.utils.Pair;
+import de.cebitec.readxplorer.utils.ReadPairType;
+import de.cebitec.readxplorer.utils.StatsContainer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

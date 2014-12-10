@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.view.datavisualisation.basePanel;
 
 
-import de.cebitec.readXplorer.util.ColorProperties;
-import de.cebitec.readXplorer.util.GeneralUtils;
+import de.cebitec.readxplorer.utils.ColorProperties;
+import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.view.datavisualisation.abstractviewer.AbstractViewer;
 import java.awt.BorderLayout;
 import java.awt.Dimension;

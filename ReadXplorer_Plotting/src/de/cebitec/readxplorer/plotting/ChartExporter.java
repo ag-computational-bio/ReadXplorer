@@ -18,8 +18,8 @@
 package de.cebitec.readxplorer.plotting;
 
 
-import de.cebitec.readXplorer.util.Observable;
-import de.cebitec.readXplorer.util.Observer;
+import de.cebitec.readxplorer.utils.Observable;
+import de.cebitec.readxplorer.utils.Observer;
 import java.awt.Rectangle;
 import java.io.IOException;
 import java.io.OutputStream;

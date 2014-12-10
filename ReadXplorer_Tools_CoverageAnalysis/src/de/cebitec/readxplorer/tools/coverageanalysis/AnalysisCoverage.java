@@ -22,9 +22,9 @@ import de.cebitec.readxplorer.api.objects.AnalysisI;
 import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataObjects.CoverageAndDiffResult;
 import de.cebitec.readxplorer.databackend.dataObjects.CoverageManager;
-import de.cebitec.readXplorer.util.Observer;
-import de.cebitec.readXplorer.util.Properties;
-import de.cebitec.readXplorer.util.SequenceUtils;
+import de.cebitec.readxplorer.utils.Observer;
+import de.cebitec.readxplorer.utils.Properties;
+import de.cebitec.readxplorer.utils.SequenceUtils;
 import java.util.ArrayList;
 import java.util.List;
 

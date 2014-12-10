@@ -18,9 +18,9 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.wizard;
 
 
-import de.cebitec.readXplorer.util.GeneralUtils;
-import de.cebitec.readXplorer.util.classification.FeatureType;
-import de.cebitec.readXplorer.util.fileChooser.ReadXplorerFileChooser;
+import de.cebitec.readxplorer.utils.GeneralUtils;
+import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
 import java.io.File;
 import java.util.List;
 import javax.swing.JPanel;
