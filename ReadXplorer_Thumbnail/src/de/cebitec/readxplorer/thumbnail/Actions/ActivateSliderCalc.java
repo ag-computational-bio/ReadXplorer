@@ -15,10 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.thumbnail.Actions;
+package de.cebitec.readxplorer.thumbnail.Actions;
 
 
-import de.cebitec.readXplorer.thumbnail.ThumbnailController;
+import de.cebitec.readxplorer.thumbnail.ThumbnailController;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JCheckBoxMenuItem;

@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 OpenIDE-Module: de.cebitec.readXplorer.thumbnail
-OpenIDE-Module-Layer: de/cebitec/readXplorer/thumbnail/layer.xml
-OpenIDE-Module-Localizing-Bundle: de/cebitec/readXplorer/thumbnail/Bundle.properties
+OpenIDE-Module-Layer: de/cebitec/readxplorer/thumbnail/layer.xml
+OpenIDE-Module-Localizing-Bundle: de/cebitec/readxplorer/thumbnail/Bundle.properties
 OpenIDE-Module-Requires: org.openide.windows.WindowManager
 OpenIDE-Module-Specification-Version: 1.0.1
 

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.thumbnail;
+package de.cebitec.readxplorer.thumbnail;
 
 
 import de.cebitec.centrallookup.CentralLookup;
@@ -26,10 +26,10 @@ import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
-import de.cebitec.readXplorer.thumbnail.Actions.ASyncSliderCookie;
-import de.cebitec.readXplorer.thumbnail.Actions.OpenThumbCookie;
-import de.cebitec.readXplorer.thumbnail.Actions.RemoveCookie;
-import de.cebitec.readXplorer.thumbnail.Actions.SyncSliderCookie;
+import de.cebitec.readxplorer.thumbnail.Actions.ASyncSliderCookie;
+import de.cebitec.readxplorer.thumbnail.Actions.OpenThumbCookie;
+import de.cebitec.readxplorer.thumbnail.Actions.RemoveCookie;
+import de.cebitec.readxplorer.thumbnail.Actions.SyncSliderCookie;
 import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.readXplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.readXplorer.util.ColorProperties;

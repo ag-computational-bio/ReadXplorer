@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.thumbnail;
+package de.cebitec.readxplorer.thumbnail;
 
 
 import de.cebitec.readxplorer.databackend.ThreadListener;

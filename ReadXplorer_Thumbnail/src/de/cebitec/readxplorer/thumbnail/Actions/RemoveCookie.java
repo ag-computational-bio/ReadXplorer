@@ -15,8 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-@HelpSetRegistration( helpSet = "thumbnail-hs.xml", position = 3308 )
-package de.cebitec.readXplorer.thumbnail.docs;
+package de.cebitec.readxplorer.thumbnail.Actions;
 
 
-import org.netbeans.api.javahelp.HelpSetRegistration;
+/**
+ *
+ * @author Denis
+ */
+public interface RemoveCookie {
+
+    public void removeTracks();
+
+
+}

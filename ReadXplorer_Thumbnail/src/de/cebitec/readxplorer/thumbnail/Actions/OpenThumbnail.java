@@ -15,16 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.thumbnail.Actions;
+package de.cebitec.readxplorer.thumbnail.Actions;
 
 
-/**
- *
- * @author denis
- */
-public interface ASyncSliderCookie {
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-    public void async();
+
+public final class OpenThumbnail implements ActionListener {
+
+    private final OpenThumbCookie openCookie;
+
+
+    public OpenThumbnail( OpenThumbCookie context ) {
+        this.openCookie = context;
+    }
+
+
+    @Override
+    public void actionPerformed( ActionEvent ev ) {
+        openCookie.open();
+    }
 
 
 }
