@@ -15,17 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.featureCoverageAnalysis;
+package de.cebitec.readxplorer.tools.coverageanalysis.featureCoverageAnalysis;
 
 
-import de.cebitec.readxplorer.databackend.AnalysesHandler;
-import de.cebitec.readxplorer.databackend.ParametersReadClasses;
-import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
-import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.connector.TrackConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.DataVisualisationI;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readXplorer.util.Pair;
 import de.cebitec.readXplorer.util.VisualisationUtils;
 import de.cebitec.readXplorer.util.classification.FeatureType;
@@ -34,6 +26,14 @@ import de.cebitec.readXplorer.view.dialogMenus.OpenTracksVisualPanel;
 import de.cebitec.readXplorer.view.dialogMenus.OpenTracksWizardPanel;
 import de.cebitec.readXplorer.view.dialogMenus.SelectFeatureTypeWizardPanel;
 import de.cebitec.readXplorer.view.dialogMenus.SelectReadClassWizardPanel;
+import de.cebitec.readxplorer.databackend.AnalysesHandler;
+import de.cebitec.readxplorer.databackend.ParametersReadClasses;
+import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
+import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readxplorer.databackend.connector.TrackConnector;
+import de.cebitec.readxplorer.databackend.dataObjects.DataVisualisationI;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
@@ -65,7 +65,7 @@ import org.openide.windows.WindowManager;
          category = "Tools",
          id = "de.cebitec.readXplorer.genomeAnalyses.OpenCoveredFeaturesAction" )
 @ActionRegistration(
-         iconBase = "de/cebitec/readXplorer/featureCoverageAnalysis/coveredFeatures.png",
+         iconBase = "de/cebitec/readxplorer/tools/coverageanalysis/featureCoverageAnalysis/coveredFeatures.png",
          displayName = "#CTL_OpenCoveredFeaturesAction" )
 @ActionReferences( {
     @ActionReference( path = "Menu/Tools", position = 146 ),

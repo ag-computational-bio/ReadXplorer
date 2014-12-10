@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.featureCoverageAnalysis;
+package de.cebitec.readxplorer.tools.coverageanalysis.featureCoverageAnalysis;
 
 
 import de.cebitec.readXplorer.view.TopComponentExtended;
@@ -40,7 +40,7 @@ import org.openide.windows.TopComponent;
          autostore = false )
 @TopComponent.Description(
          preferredID = "CoveredFeaturesAnalysisTopComponent",
-         iconBase = "de/cebitec/readXplorer/genomeAnalyses/coveredFeatures.png",
+         iconBase = "de/cebitec/readxplorer/genomeAnalyses/coveredFeatures.png",
          persistenceType = TopComponent.PERSISTENCE_ALWAYS )
 @TopComponent.Registration( mode = "output", openAtStartup = false )
 @ActionID( category = "Window", id = "de.cebitec.readXplorer.genomeAnalyses.CoveredFeaturesAnalysisTopComponent" )

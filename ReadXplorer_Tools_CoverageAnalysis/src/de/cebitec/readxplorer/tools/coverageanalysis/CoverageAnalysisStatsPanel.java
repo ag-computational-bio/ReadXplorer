@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.coverageAnalysis;
+package de.cebitec.readxplorer.tools.coverageanalysis;
 
 
 import java.util.Map;
@@ -89,7 +89,9 @@ public class CoverageAnalysisStatsPanel extends javax.swing.JPanel {
             }
         });
         coverageAnalysisStatsPane1.setViewportView(coverageAnalysisStatsTable);
-        coverageAnalysisStatsTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(CoverageAnalysisStatsPanel.class, "CoverageAnalysisStatsPanel.coverageAnalysisStatsTable.columnModel.title0")); // NOI18N
+        if (coverageAnalysisStatsTable.getColumnModel().getColumnCount() > 0) {
+            coverageAnalysisStatsTable.getColumnModel().getColumn(0).setHeaderValue(org.openide.util.NbBundle.getMessage(CoverageAnalysisStatsPanel.class, "CoverageAnalysisStatsPanel.coverageAnalysisStatsTable.columnModel.title0")); // NOI18N
+        }
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);

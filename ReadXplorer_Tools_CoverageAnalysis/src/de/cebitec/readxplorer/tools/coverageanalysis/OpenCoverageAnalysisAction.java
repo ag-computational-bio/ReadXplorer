@@ -15,9 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.coverageAnalysis;
+package de.cebitec.readxplorer.tools.coverageanalysis;
 
 
+import de.cebitec.readXplorer.util.Pair;
+import de.cebitec.readXplorer.util.VisualisationUtils;
+import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
+import de.cebitec.readXplorer.view.dialogMenus.OpenTracksWizardPanel;
+import de.cebitec.readXplorer.view.dialogMenus.SelectReadClassWizardPanel;
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
@@ -26,11 +31,6 @@ import de.cebitec.readxplorer.databackend.connector.TrackConnector;
 import de.cebitec.readxplorer.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
-import de.cebitec.readXplorer.util.Pair;
-import de.cebitec.readXplorer.util.VisualisationUtils;
-import de.cebitec.readXplorer.view.dataVisualisation.referenceViewer.ReferenceViewer;
-import de.cebitec.readXplorer.view.dialogMenus.OpenTracksWizardPanel;
-import de.cebitec.readXplorer.view.dialogMenus.SelectReadClassWizardPanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.MessageFormat;
@@ -61,7 +61,7 @@ import org.openide.windows.WindowManager;
          category = "Tools",
          id = "CoverageAnalysis.OpenCoverageAnalysisAction" )
 @ActionRegistration(
-         iconBase = "de/cebitec/readXplorer/coverageAnalysis/coveredIntervals.png",
+         iconBase = "de/cebitec/readxplorer/tools/coverageanalysis/coveredIntervals.png",
          displayName = "#CTL_OpenCoverageAnalysisAction" )
 @ActionReferences( {
     @ActionReference( path = "Menu/Tools", position = 149 ),
