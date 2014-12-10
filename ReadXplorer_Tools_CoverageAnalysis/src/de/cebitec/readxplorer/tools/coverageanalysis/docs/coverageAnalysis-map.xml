@@ -18,6 +18,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 <!DOCTYPE map PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp Map Version 2.0//EN" "http://java.sun.com/products/javahelp/map_2_0.dtd">
 <map version="2.0">
-    <mapID target="de.cebitec.readxplorer.coverageAnalysis.about" url="coverageAnalysis-about.html"/>
+    <mapID target="de.cebitec.readxplorer.coverageanalysis.about" url="coverageAnalysis-about.html"/>
     <mapID target="de.cebitec.readxplorer.featureCoverageAnalysis.about" url="featureCoverageAnalysis-about.html"/>
 </map>

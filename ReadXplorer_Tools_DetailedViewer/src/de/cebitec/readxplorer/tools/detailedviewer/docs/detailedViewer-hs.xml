@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <helpset version="2.0">
     <title>Detailed Viewer (Histogram, Alignment, Read Pair Viewer)</title>
     <maps>
-        <homeID>de.cebitec.readxplorer.tools.detailedViewer.about</homeID>
+        <homeID>de.cebitec.readxplorer.tools.detailedviewer.about</homeID>
         <mapref location="detailedViewer-map.xml"/>
     </maps>
     <view mergetype="javax.help.AppendMerge">

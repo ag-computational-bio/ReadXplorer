@@ -72,7 +72,7 @@ public class Installer extends ModuleInstall {
          if (outputWindow != null && outputWindow.isOpened())
          {
          logger.log(Level.FINE, "LOG_WindowOpen", OUTPUT_ID);
-         final String FOLDER = "Actions/View/";
+         final String FOLDER = "Actions/ui/";
          final String INSTANCE_FILE = "org-netbeans-core-actions-LogAction";
 
          //Use Lookup to find the instance in the file system

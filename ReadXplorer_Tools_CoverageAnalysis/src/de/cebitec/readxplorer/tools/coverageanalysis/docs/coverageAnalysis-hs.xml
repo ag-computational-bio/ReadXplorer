@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <helpset version="2.0">
     <title>Coverage Analyses Help</title>
     <maps>
-        <homeID>de.cebitec.readxplorer.coverageAnalysis.about</homeID>
+        <homeID>de.cebitec.readxplorer.coverageanalysis.about</homeID>
         <mapref location="coverageAnalysis-map.xml"/>
     </maps>
     <view mergetype="javax.help.AppendMerge">
