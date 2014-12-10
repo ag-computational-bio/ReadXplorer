@@ -28,7 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
-                <attr name="type" stringvalue="de.cebitec.readxplorer.ui.dataVisualisation.referenceViewer.ReferenceViewer"/>
+                <attr name="type" stringvalue="de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer"/>
             </file>
         </folder>
     </folder>

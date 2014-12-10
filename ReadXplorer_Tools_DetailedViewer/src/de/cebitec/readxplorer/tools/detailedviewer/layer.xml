@@ -20,11 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <filesystem>
     <folder name="Actions">
         <folder name="Tools">
-            <file name="de-cebitec-readxplorer-tools-detailedViewer-OpenDetailedViewer.instance">
+            <file name="de-cebitec-readxplorer-tools-detailedviewer-OpenDetailedViewer.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
-                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.tools.detailedViewer.Bundle#CTL_OpenDetailedViewer"/>
-                <attr name="iconBase" stringvalue="de/cebitec/readxplorer/tools/detailedViewer/detailedViewer.png"/>
-                <attr name="injectable" stringvalue="de.cebitec.readxplorer.tools.detailedViewer.OpenDetailedViewer"/>
+                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.tools.detailedviewer.Bundle#CTL_OpenDetailedViewer"/>
+                <attr name="iconBase" stringvalue="de/cebitec/readxplorer/tools/detailedviewer/detailedViewer.png"/>
+                <attr name="injectable" stringvalue="de.cebitec.readxplorer.tools.detailedviewer.OpenDetailedViewer"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="ANY"/>
@@ -32,31 +32,31 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             </file>
         </folder>
         <folder name="Window">
-            <file name="de-cebitec-readxplorer-tools-detailedViewer-DetailedViewerAction.instance">
-                <attr name="component" methodvalue="de.cebitec.readxplorer.tools.detailedViewer.DetailedViewerTopComponent.findInstance"/>
-                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.tools.detailedViewer.Bundle#CTL_DetailedViewerAction"/>
-                <attr name="iconBase" stringvalue="de/cebitec/readxplorer/tools/detailedViewer/detailedViewer.png"/>
+            <file name="de-cebitec-readxplorer-tools-detailedviewer-DetailedViewerAction.instance">
+                <attr name="component" methodvalue="de.cebitec.readxplorer.tools.detailedviewer.DetailedViewerTopComponent.findInstance"/>
+                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.tools.detailedviewer.Bundle#CTL_DetailedViewerAction"/>
+                <attr name="iconBase" stringvalue="de/cebitec/readxplorer/tools/detailedviewer/detailedViewer.png"/>
                 <attr name="instanceCreate" methodvalue="org.openide.windows.TopComponent.openAction"/>
             </file>
         </folder>
     </folder>
     <folder name="Menu">
         <folder name="Tools">
-            <file name="de-cebitec-readxplorer-tools-detailedViewer-OpenDetailedViewer.shadow">
-                <attr name="originalFile" stringvalue="Actions/Tools/de-cebitec-readxplorer-tools-detailedViewer-OpenDetailedViewer.instance"/>
+            <file name="de-cebitec-readxplorer-tools-detailedviewer-OpenDetailedViewer.shadow">
+                <attr name="originalFile" stringvalue="Actions/Tools/de-cebitec-readxplorer-tools-detailedviewer-OpenDetailedViewer.instance"/>
                 <attr name="position" intvalue="159"/>
             </file>
         </folder><!--
         <folder name="Window">
             <file name="DetailedViewerAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/Window/de-cebitec-readxplorer-tools-detailedViewer-DetailedViewerAction.instance"/>
+                <attr name="originalFile" stringvalue="Actions/Window/de-cebitec-readxplorer-tools-detailedviewer-DetailedViewerAction.instance"/>
             </file>
         </folder>-->
     </folder>
     <folder name="Toolbars">
         <folder name="Tools">
-            <file name="de-cebitec-readxplorer-tools-detailedViewer-OpenDetailedViewer.shadow">
-                <attr name="originalFile" stringvalue="Actions/Tools/de-cebitec-readxplorer-tools-detailedViewer-OpenDetailedViewer.instance"/>
+            <file name="de-cebitec-readxplorer-tools-detailedviewer-OpenDetailedViewer.shadow">
+                <attr name="originalFile" stringvalue="Actions/Tools/de-cebitec-readxplorer-tools-detailedviewer-OpenDetailedViewer.instance"/>
                 <attr name="position" intvalue="275"/>
             </file>
         </folder>

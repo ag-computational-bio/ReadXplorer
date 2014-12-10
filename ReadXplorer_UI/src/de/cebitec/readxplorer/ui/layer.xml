@@ -20,17 +20,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <filesystem>
     <folder name="Actions">
         <folder name="File">
-            <file name="de-cebitec-readxplorer-view-login-LoginWizardAction.instance">
+            <file name="de-cebitec-readxplorer-ui-login-LoginWizardAction.instance">
                 <attr name="delegate" newvalue="de.cebitec.readxplorer.ui.login.LoginWizardAction"/>
                 <attr name="displayName" bundlevalue="de.cebitec.readxplorer.ui.login.Bundle#CTL_LoginWizardAction"/>
-                <attr name="iconBase" stringvalue="de/cebitec/readxplorer/view/login/login.png"/>
+                <attr name="iconBase" stringvalue="de/cebitec/readxplorer/ui/login/login.png"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
             </file>
-            <file name="de-cebitec-readxplorer-view-login-LogoutAction.instance">
+            <file name="de-cebitec-readxplorer-ui-login-LogoutAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
                 <attr name="displayName" bundlevalue="de.cebitec.readxplorer.ui.login.Bundle#CTL_LogoutAction"/>
-                <attr name="iconBase" stringvalue="de/cebitec/readxplorer/view/login/logout.png"/>
+                <attr name="iconBase" stringvalue="de/cebitec/readxplorer/ui/login/logout.png"/>
                 <attr name="injectable" stringvalue="de.cebitec.readxplorer.ui.login.LogoutAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
@@ -41,12 +41,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </folder>
     <folder name="Menu">
         <folder name="File">
-            <file name="de-cebitec-readxplorer-view-login-LoginWizardAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/File/de-cebitec-readxplorer-view-login-LoginWizardAction.instance"/>
+            <file name="de-cebitec-readxplorer-ui-login-LoginWizardAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/File/de-cebitec-readxplorer-ui-login-LoginWizardAction.instance"/>
                 <attr name="position" intvalue="0"/>
             </file>
-            <file name="de-cebitec-readxplorer-view-login-LogoutAction.shadow">
-                <attr name="originalFile" stringvalue="Actions/File/de-cebitec-readxplorer-view-login-LogoutAction.instance"/>
+            <file name="de-cebitec-readxplorer-ui-login-LogoutAction.shadow">
+                <attr name="originalFile" stringvalue="Actions/File/de-cebitec-readxplorer-ui-login-LogoutAction.instance"/>
                 <attr name="position" intvalue="700"/>
             </file>
             <file name="org-openide-actions-SaveAction.shadow_hidden"/>
@@ -64,12 +64,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </folder>
     <folder name="Services">
         <folder name="AutoupdateType">
-            <file name="de_cebitec_readxplorer_view_update_center.instance">
-                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.ui.Bundle#Services/AutoupdateType/de_cebitec_readxplorer_view_update_center.instance"/>
+            <file name="de_cebitec_readxplorer_ui_update_center.instance">
+                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.ui.Bundle#Services/AutoupdateType/de_cebitec_readxplorer_ui_update_center.instance"/>
                 <attr name="enabled" boolvalue="true"/>
                 <attr name="instanceCreate" methodvalue="org.netbeans.modules.autoupdate.updateprovider.AutoupdateCatalogFactory.createUpdateProvider"/>
                 <attr name="instanceOf" stringvalue="org.netbeans.spi.autoupdate.UpdateProvider"/>
-                <attr name="url" bundlevalue="de.cebitec.readxplorer.ui.Bundle#de_cebitec_readxplorer_view_update_center"/>
+                <attr name="url" bundlevalue="de.cebitec.readxplorer.ui.Bundle#de_cebitec_readxplorer_ui_update_center"/>
             </file>
         </folder>
     </folder>
