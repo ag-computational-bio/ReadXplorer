@@ -198,7 +198,7 @@
                 <package>de.cebitec.common.parser.genbank.parsers</package>
                 <package>de.cebitec.common.sequencetools.geneticcode</package>
                 <package>de.cebitec.common.utilities.parser</package>
-                <package>de.cebitec.readXplorer.libs</package>
+                <package>de.cebitec.readxplorer.libs</package>
                 <package>de.erichseifert.gral.data</package>
                 <package>de.erichseifert.gral.data.comparators</package>
                 <package>de.erichseifert.gral.data.filters</package>
