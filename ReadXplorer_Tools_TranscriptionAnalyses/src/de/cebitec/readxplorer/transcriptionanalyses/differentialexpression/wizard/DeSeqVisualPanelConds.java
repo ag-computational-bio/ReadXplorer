@@ -52,7 +52,7 @@ public final class DeSeqVisualPanelConds extends JPanel {
 
     public void updateTrackList( List<PersistentTrack> selectedTracks ) {
         if( !this.selectedTracks.equals( selectedTracks ) ) {
-            this.selectedTracks = selectedTracks;
+            this.selectedTracks = new ArrayList<>(selectedTracks );
             trackListModel.clear();
             conditionOneModel.clear();
             conditionTwoModel.clear();
@@ -77,12 +77,7 @@ public final class DeSeqVisualPanelConds extends JPanel {
 
 
     public boolean workingWithoutReplicates() {
-        if( conditionOneModel.getSize() > 1 && conditionTwoModel.getSize() > 1 ) {
-            return false;
-        }
-        else {
-            return true;
-        }
+        return !(conditionOneModel.getSize() > 1 && conditionTwoModel.getSize() > 1);
     }
 
 

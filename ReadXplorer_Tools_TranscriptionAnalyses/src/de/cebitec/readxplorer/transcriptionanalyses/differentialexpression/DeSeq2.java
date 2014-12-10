@@ -67,12 +67,12 @@ public class DeSeq2 {
             //First the count data for each track is handed over seperatly.
             while( analysisData.hasCountData() ) {
                 gnuR.assign( "inputData" + i, analysisData.pollFirstCountData() );
-                concatenate.append( "inputData" ).append( i++ ).append( "," );
+                concatenate.append( "inputData" ).append( i++ ).append( ',' );
             }
             concatenate.deleteCharAt( concatenate.length() - 1 );
-            concatenate.append( ")" );
+            concatenate.append( ')' );
             //Then the big count data matrix is created from the single track data handed over.
-            gnuR.eval( "inputData <- matrix(" + concatenate.toString() + "," + numberOfFeatures + ")" );
+            gnuR.eval( "inputData <- matrix(" + concatenate.toString() + ',' + numberOfFeatures + ')' );
             //The colum names are handed over to Gnu R...
             gnuR.assign( "columNames", analysisData.getTrackDescriptions() );
             //...and assigned to the count data matrix.
@@ -86,12 +86,12 @@ public class DeSeq2 {
             gnuR.eval( "inputData <- inputData[rowSums(inputData) > 0,]" );
 
             //Now we need to hand over the experimental design behind the data.
-            concatenate = new StringBuilder();
+            concatenate = new StringBuilder( 1000 );
             //First all sub designs are assigned to an individual variable.
             while( analysisData.hasNextSubDesign() ) {
                 DeSeqAnalysisData.ReturnTupel subDesign = analysisData.getNextSubDesign();
                 gnuR.assign( subDesign.getKey(), subDesign.getValue() );
-                concatenate.append( subDesign.getKey() ).append( "," );
+                concatenate.append( subDesign.getKey() ).append( ',' );
             }
             concatenate.deleteCharAt( concatenate.length() - 1 );
 
@@ -106,7 +106,7 @@ public class DeSeq2 {
             }
             else {
                 //If this is just a two conditons experiment we only create the conds array
-                gnuR.eval( "conds <- factor(" + concatenate.toString() + ")" );
+                gnuR.eval( "conds <- factor(" + concatenate.toString() + ')' );
                 gnuR.eval( "design <- data.frame(row.names = colnames(inputData),conds)" );
                 //Now everything is set up and the count data object on which the main
                 //analysis will be performed can be created

@@ -52,7 +52,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements
 
     public void updateTrackList( List<PersistentTrack> selectedTracks ) {
         if( !this.selectedTracks.equals( selectedTracks ) ) {
-            this.selectedTracks = selectedTracks;
+            this.selectedTracks = new ArrayList<>(selectedTracks );
             currentGroupNumber = 1;
             selectedIndex = -1;
             currentGroupBeingCreated = null;

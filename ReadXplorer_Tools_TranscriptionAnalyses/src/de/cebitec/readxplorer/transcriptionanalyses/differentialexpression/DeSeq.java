@@ -60,12 +60,12 @@ public class DeSeq {
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
         gnuR.loadPackage( "DESeq" );
-        List<ResultDeAnalysis> results = new ArrayList<>();
+        final List<ResultDeAnalysis> results = new ArrayList<>();
         //A lot of bad things can happen during the data processing by Gnu R.
         //So we need to prepare for this.
         try {
             //Load an R image containing the plotting functions
-            try( InputStream jarPath = DeSeq.class.getResourceAsStream( "/de/cebitec/readxplorer/differentialExpression/DeSeqPlot.rdata" ) ) {
+            try( InputStream jarPath = DeSeq.class.getResourceAsStream( "/de/cebitec/readxplorer/transcriptionanalyses/differentialexpression/DeSeqPlot.rdata" ) ) {
                 File to = File.createTempFile( "ReadXplorer_", ".rdata" );
                 to.deleteOnExit();
                 Files.copy( jarPath, to.toPath(), StandardCopyOption.REPLACE_EXISTING );

@@ -69,12 +69,12 @@ import org.openide.windows.TopComponent;
 /**
  * TopComponent, which displays all graphics available for a baySeq analysis.
  */
-@ConvertAsProperties( dtd = "-//de.cebitec.readxplorer.transcriptionanalyses.differentialExpression//BaySeqGraphics//EN",
+@ConvertAsProperties( dtd = "-//de.cebitec.readxplorer.transcriptionanalyses.differentialexpression//BaySeqGraphics//EN",
                       autostore = false )
 @TopComponent.Description( preferredID = "BaySeqGraphicsTopComponent",
                            persistenceType = TopComponent.PERSISTENCE_NEVER )
 @TopComponent.Registration( mode = "bottomSlidingSide", openAtStartup = false )
-@ActionID( category = "Window", id = "de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.BaySeqGraphicsTopComponent" )
+@ActionID( category = "Window", id = "de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.BaySeqGraphicsTopComponent" )
 @ActionReference( path = "Menu/Window" )
 @TopComponent.OpenActionRegistration( displayName = "#CTL_BaySeqGraphicsAction",
                                       preferredID = "BaySeqGraphicsTopComponent" )
@@ -91,10 +91,10 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
     private BaySeqAnalysisHandler baySeqAnalysisHandler;
     private JSVGCanvas svgCanvas;
     private ComboBoxModel<BaySeqAnalysisHandler.Plot> cbm;
-    private DefaultListModel<PersistentTrack> samplesA = new DefaultListModel<>();
-    private DefaultListModel<PersistentTrack> samplesB = new DefaultListModel<>();
+    private final DefaultListModel<PersistentTrack> samplesA = new DefaultListModel<>();
+    private final DefaultListModel<PersistentTrack> samplesB = new DefaultListModel<>();
     private File currentlyDisplayed;
-    private ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating plot" );
+    private final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating plot" );
     private ResultDeAnalysis result;
     private List<Group> groups;
     private ChartPanel chartPanel;

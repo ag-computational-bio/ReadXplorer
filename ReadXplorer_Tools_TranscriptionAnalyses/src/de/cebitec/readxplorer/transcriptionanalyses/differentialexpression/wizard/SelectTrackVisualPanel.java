@@ -172,12 +172,7 @@ public final class SelectTrackVisualPanel extends JPanel implements
         }
         else {
             List<PersistentTrack> selectedTracks = trackList.getSelectedValuesList();
-            if( selectedTracks.size() >= 2 ) {
-                return true;
-            }
-            else {
-                return false;
-            }
+            return selectedTracks.size() >= 2;
         }
     }
 

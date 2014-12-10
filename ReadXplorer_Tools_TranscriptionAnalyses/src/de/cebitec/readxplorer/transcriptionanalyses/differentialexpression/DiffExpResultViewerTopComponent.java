@@ -39,6 +39,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 import javax.swing.ComboBoxModel;
@@ -70,13 +71,13 @@ import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpressio
 /**
  * Top component which displays the results of differential expression analyses.
  */
-@ConvertAsProperties( dtd = "-//de.cebitec.readxplorer.transcriptionanalyses.differentialExpression//DiffExpResultViewer//EN",
+@ConvertAsProperties( dtd = "-//de.cebitec.readxplorer.transcriptionanalyses.differentialexpression//DiffExpResultViewer//EN",
                       autostore = false )
 @TopComponent.Description( preferredID = "DiffExpResultViewerTopComponent",
                            //iconBase="SET/PATH/TO/ICON/HERE",
                            persistenceType = TopComponent.PERSISTENCE_NEVER )
 @TopComponent.Registration( mode = "bottomSlidingSide", openAtStartup = false )
-@ActionID( category = "Window", id = "de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.DiffExpResultViewerTopComponent" )
+@ActionID( category = "Window", id = "de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DiffExpResultViewerTopComponent" )
 @ActionReference( path = "Menu/Window" /*
  * , position = 333
  */ )
@@ -440,9 +441,7 @@ public final class DiffExpResultViewerTopComponent extends TopComponentExtended
             TableRowSorter<DefaultTableModel> trs = GenerateRowSorter.createRowSorter( dtm );
             topCountsTable.setRowSorter( trs );
             if( usedTool == ExpressTest ) {
-                List<RowSorter.SortKey> sortKeys = new ArrayList<>();
-                sortKeys.add( new RowSorter.SortKey( 8, SortOrder.DESCENDING ) );
-                trs.setSortKeys( sortKeys );
+                trs.setSortKeys( Collections.singletonList( new RowSorter.SortKey( 8, SortOrder.DESCENDING ) ) );
                 trs.sort();
             }
         }
