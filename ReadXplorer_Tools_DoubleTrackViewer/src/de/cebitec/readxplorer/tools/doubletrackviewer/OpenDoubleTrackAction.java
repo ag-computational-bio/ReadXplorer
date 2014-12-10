@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readXplorer.tools.doubleTrackViewer;
+package de.cebitec.readxplorer.tools.doubletrackviewer;
 
 
 import de.cebitec.readXplorer.ui.visualisation.AppPanelTopComponent;
@@ -32,8 +32,8 @@ import org.openide.util.NbBundle;
 
 
 @ActionID( category = "Tools",
-           id = "de.cebitec.readXplorer.tools.doubleTrackViewer.OpenDoubleTrackAction" )
-@ActionRegistration( iconBase = "de/cebitec/readXplorer/tools/doubleTrackViewer/doubleTrack.png",
+           id = "de.cebitec.readxplorer.tools.doubletrackviewer.OpenDoubleTrackAction" )
+@ActionRegistration( iconBase = "de/cebitec/readxplorer/tools/doubletrackviewer/doubleTrack.png",
                      displayName = "#CTL_OpenDoubleTrackAction" )
 @ActionReferences( {
     @ActionReference( path = "Menu/Tools", position = 162 ),
