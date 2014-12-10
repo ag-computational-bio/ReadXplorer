@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package de.cebitec.readxplorer.vcf.visualization;
+package de.cebitec.readxplorer.vcf.handling.visualization;
 
 
 import de.cebitec.readxplorer.utils.TabWithCloseX;
@@ -26,7 +26,7 @@ import org.openide.windows.WindowManager;
  * @author vetz
  */
 @ConvertAsProperties(
-         dtd = "-//de.cebitec.readxplorer.vcf.visualization//Snp_VcfResultTopComponent//EN",
+         dtd = "-//de.cebitec.readxplorer.vcf.handling.visualization//Snp_VcfResultTopComponent//EN",
          autostore = false )
 @TopComponent.Description(
          preferredID = "Snp_VcfResultTopComponent",

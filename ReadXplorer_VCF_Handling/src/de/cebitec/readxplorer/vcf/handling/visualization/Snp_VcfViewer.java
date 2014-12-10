@@ -1,5 +1,5 @@
 
-package de.cebitec.readxplorer.vcf.visualization;
+package de.cebitec.readxplorer.vcf.handling.visualization;
 
 
 import de.cebitec.readxplorer.databackend.ThreadListener;

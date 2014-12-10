@@ -18,10 +18,10 @@
 package de.cebitec.readxplorer.databackend.dataObjects;
 
 
-import de.cebitec.readxplorer.utils.Observable;
-import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.databackend.SaveFileFetcherForGUI;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readxplorer.utils.Observable;
+import de.cebitec.readxplorer.utils.Observer;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.sql.Timestamp;
@@ -112,7 +112,7 @@ public class PersistentReference implements Observable {
         this.chromosomes = ProjectConnector.getInstance().getRefGenomeConnector( id ).getChromosomesForGenome();
         this.noChromosomes = this.chromosomes.size();
         this.timestamp = timestamp;
-        this.observers = new ArrayList<>();
+        this.observers = new ArrayList<>( 10 );
         if( checkFile ) {
             this.checkRef( activeChromId );
         }

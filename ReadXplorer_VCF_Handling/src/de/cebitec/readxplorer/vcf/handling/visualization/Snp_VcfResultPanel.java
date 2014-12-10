@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package de.cebitec.readxplorer.vcf.visualization;
+package de.cebitec.readxplorer.vcf.handling.visualization;
 
 
 import de.cebitec.readxplorer.databackend.ResultTrackAnalysis;

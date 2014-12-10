@@ -1,5 +1,5 @@
 
-package de.cebitec.readxplorer.vcf.importer;
+package de.cebitec.readxplorer.vcf.handling.importer;
 
 
 import de.cebitec.readxplorer.view.dialogmenus.ChangeListeningFinishWizardPanel;

@@ -1,5 +1,5 @@
 
-package de.cebitec.readxplorer.vcf.visualization;
+package de.cebitec.readxplorer.vcf.handling.visualization;
 
 
 import de.cebitec.readxplorer.view.datavisualisation.basePanel.BasePanel;
@@ -15,7 +15,7 @@ import org.openide.windows.TopComponent;
  * Top component which displays something.
  */
 @ConvertAsProperties(
-         dtd = "-//de.cebitec.readxplorer.vcf.visualization//SNP_VCFViewer//EN",
+         dtd = "-//de.cebitec.readxplorer.vcf.handling.visualization//SNP_VCFViewer//EN",
          autostore = false
 )
 @TopComponent.Description(
@@ -24,7 +24,7 @@ import org.openide.windows.TopComponent;
          persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
 @TopComponent.Registration( mode = "editor", openAtStartup = false )
-@ActionID( category = "Window", id = "de.cebitec.readxplorer.vcf.visualization.SNP_VCFViewerTopComponent" )
+@ActionID( category = "Window", id = "de.cebitec.readxplorer.vcf.handling.visualization.SNP_VCFViewerTopComponent" )
 @ActionReference( path = "Menu/Window" /*, position = 333 */ )
 @TopComponent.OpenActionRegistration(
          displayName = "#CTL_SNP_VCFViewerAction",

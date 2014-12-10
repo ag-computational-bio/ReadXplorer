@@ -1,5 +1,5 @@
 
-package de.cebitec.readxplorer.vcf.importer;
+package de.cebitec.readxplorer.vcf.handling.importer;
 
 
 import de.cebitec.centrallookup.CentralLookup;
@@ -8,13 +8,13 @@ import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readxplorer.ui.visualisation.AppPanelTopComponent;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
+import de.cebitec.readxplorer.vcf.handling.visualization.Snp_VcfResult;
+import de.cebitec.readxplorer.vcf.handling.visualization.Snp_VcfResultPanel;
+import de.cebitec.readxplorer.vcf.handling.visualization.Snp_VcfResultTopComponent;
+import de.cebitec.readxplorer.vcf.handling.visualization.Snp_VcfViewer;
 import de.cebitec.readxplorer.view.controller.ViewController;
 import de.cebitec.readxplorer.view.datavisualisation.basePanel.BasePanel;
 import de.cebitec.readxplorer.view.datavisualisation.basePanel.BasePanelFactory;
-import de.cebitec.readxplorer.vcf.visualization.Snp_VcfResult;
-import de.cebitec.readxplorer.vcf.visualization.Snp_VcfResultPanel;
-import de.cebitec.readxplorer.vcf.visualization.Snp_VcfResultTopComponent;
-import de.cebitec.readxplorer.vcf.visualization.Snp_VcfViewer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -41,10 +41,10 @@ import org.openide.windows.WindowManager;
 
 @ActionID(
          category = "File",
-         id = "de.cebitec.readxplorer.vcf.importer.VcfImportAction"
+         id = "de.cebitec.readxplorer.vcf.handling.importer.VcfImportAction"
 )
 @ActionRegistration(
-         iconBase = "de/cebitec/readxplorer/vcf/importer/import.png",
+         iconBase = "de/cebitec/readxplorer/vcf/handling/importer/import.png",
          displayName = "#CTL_VcfImportAction"
 )
 @ActionReference( path = "Menu/File", position = 1487, separatorAfter = 1493 )
@@ -56,10 +56,10 @@ import org.openide.windows.WindowManager;
 public final class VcfImportAction implements ActionListener {
 
 
-    private final LoginCookie context;
+//    private final LoginCookie context;
     private List<VariantContext> variantCList;
 
-    private final Map<Integer, PersistentTrack> trackMap = new HashMap<>();
+    private final Map<Integer, PersistentTrack> trackMap = new HashMap<>( 24 );
     private PersistentReference reference;
     private boolean combineTracks;
 
@@ -73,7 +73,7 @@ public final class VcfImportAction implements ActionListener {
     //private VcfImportVisualPanel visualPanel = new VcfImportVisualPanel();
 
     public VcfImportAction( LoginCookie context ) {
-        this.context = context;
+//        this.context = context;
     }
 
 
@@ -94,7 +94,7 @@ public final class VcfImportAction implements ActionListener {
             return;
         }
 
-        List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>();
+        List<WizardDescriptor.Panel<WizardDescriptor>> panels = new ArrayList<>( 3 );
         panels.add( new VcfImportWizardPanel() );
         wiz = new WizardDescriptor( new WizardDescriptor.ArrayIterator<>( VisualisationUtils.getWizardPanels( panels ) ) );
         // {0} will be replaced by WizardDesriptor.Panel.getComponent().getName()

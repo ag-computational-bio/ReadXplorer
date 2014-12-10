@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package de.cebitec.readxplorer.vcf.importer;
+package de.cebitec.readxplorer.vcf.handling.importer;
 
 
 import de.cebitec.readxplorer.api.objects.JobPanel;
@@ -12,7 +12,6 @@ import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
 import java.io.File;
-import org.openide.WizardDescriptor;
 
 
 /**
@@ -21,7 +20,6 @@ import org.openide.WizardDescriptor;
  */
 public final class VcfImportVisualPanel extends JobPanel {
 
-    private WizardDescriptor wiz;
     private File vcfFile = null;
 
 
@@ -131,7 +129,7 @@ public final class VcfImportVisualPanel extends JobPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton chooseButton;
     private javax.swing.JTextField fileTextField;
-    private javax.swing.JComboBox<PersistentReference> jComboBox1;
+    private javax.swing.JComboBox<de.cebitec.readxplorer.databackend.dataObjects.PersistentReference> jComboBox1;
     // End of variables declaration//GEN-END:variables
 
 
