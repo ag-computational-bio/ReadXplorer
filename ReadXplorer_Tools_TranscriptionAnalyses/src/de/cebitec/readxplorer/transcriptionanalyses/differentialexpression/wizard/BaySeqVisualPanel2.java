@@ -50,7 +50,7 @@ public final class BaySeqVisualPanel2 extends JPanel {
 
     public void updateTrackList( List<PersistentTrack> selectedTracks ) {
         if( !this.selectedTracks.equals( selectedTracks ) ) {
-            this.selectedTracks = selectedTracks;
+            this.selectedTracks = new ArrayList<>( selectedTracks );
             resetTrackList();
         }
 
@@ -194,7 +194,7 @@ public final class BaySeqVisualPanel2 extends JPanel {
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JButton removeReplicates;
     private javax.swing.JTextField replicateStructureField;
-    private javax.swing.JList trackList;
+    private javax.swing.JList<PersistentTrack> trackList;
     // End of variables declaration//GEN-END:variables
 
 

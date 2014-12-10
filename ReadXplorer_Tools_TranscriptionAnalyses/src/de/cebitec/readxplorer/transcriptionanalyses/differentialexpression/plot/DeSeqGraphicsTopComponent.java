@@ -64,14 +64,14 @@ import org.openide.windows.TopComponent;
  * TopComponent, which displays all graphics available for a DESeq analysis.
  */
 @ConvertAsProperties(
-         dtd = "-//de.cebitec.readxplorer.transcriptionanalyses.differentialExpression//DeSeqGraphics//EN",
+         dtd = "-//de.cebitec.readxplorer.transcriptionanalyses.differentialexpression//DeSeqGraphics//EN",
          autostore = false )
 @TopComponent.Description(
          preferredID = "DeSeqGraphicsTopComponent",
          //iconBase="SET/PATH/TO/ICON/HERE",
          persistenceType = TopComponent.PERSISTENCE_NEVER )
 @TopComponent.Registration( mode = "bottomSlidingSide", openAtStartup = false )
-@ActionID( category = "Window", id = "de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.DeSeqGraphicsTopComponent" )
+@ActionID( category = "Window", id = "de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DeSeqGraphicsTopComponent" )
 @ActionReference( path = "Menu/Window" /*, position = 333 */ )
 @TopComponent.OpenActionRegistration(
          displayName = "#CTL_DeSeqGraphicsAction",

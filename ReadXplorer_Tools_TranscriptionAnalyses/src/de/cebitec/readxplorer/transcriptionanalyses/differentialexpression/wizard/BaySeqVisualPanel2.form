@@ -82,6 +82,7 @@
           </Properties>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JList(trackListModel)"/>
+            <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;PersistentTrack&gt;"/>
           </AuxValues>
         </Component>
       </SubComponents>

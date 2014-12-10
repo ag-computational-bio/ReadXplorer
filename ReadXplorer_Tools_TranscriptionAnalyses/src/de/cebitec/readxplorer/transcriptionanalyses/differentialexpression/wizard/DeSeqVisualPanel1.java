@@ -54,12 +54,7 @@ public final class DeSeqVisualPanel1 extends JPanel {
     public boolean moreThanTwoConditions() {
         ButtonModel bm = btGroup.getSelection();
         String ac = bm.getActionCommand();
-        if( ac.equals( "two" ) ) {
-            return false;
-        }
-        else {
-            return true;
-        }
+        return !"two".equals( ac );
     }
 
 

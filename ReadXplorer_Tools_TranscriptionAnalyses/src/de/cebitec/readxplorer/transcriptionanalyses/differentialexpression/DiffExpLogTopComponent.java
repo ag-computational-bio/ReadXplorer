@@ -41,14 +41,14 @@ import org.openide.windows.TopComponent;
  * Top component which displays something.
  */
 @ConvertAsProperties(
-         dtd = "-//de.cebitec.readxplorer.transcriptionanalyses.differentialExpression//DiffExpLog//EN",
+         dtd = "-//de.cebitec.readxplorer.transcriptionanalyses.differentialexpression//DiffExpLog//EN",
          autostore = false )
 @TopComponent.Description(
          preferredID = "DiffExpLogTopComponent",
          //iconBase="SET/PATH/TO/ICON/HERE",
          persistenceType = TopComponent.PERSISTENCE_NEVER )
 @TopComponent.Registration( mode = "output", openAtStartup = false )
-@ActionID( category = "Window", id = "de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.DiffExpLogTopComponent" )
+@ActionID( category = "Window", id = "de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DiffExpLogTopComponent" )
 @ActionReference( path = "Menu/Window" /*, position = 333 */ )
 @TopComponent.OpenActionRegistration(
          displayName = "#CTL_DiffExpLogAction",

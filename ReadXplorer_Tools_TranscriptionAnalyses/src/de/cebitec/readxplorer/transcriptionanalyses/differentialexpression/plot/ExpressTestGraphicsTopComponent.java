@@ -50,7 +50,7 @@ import org.openide.windows.TopComponent;
  * TopComponent, which displays all graphics available for the express test.
  */
 @ConvertAsProperties(
-         dtd = "-//de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.plot//Plot//EN",
+         dtd = "-//de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.plot//Plot//EN",
          autostore = false )
 @TopComponent.Description(
          preferredID = "PlotTopComponent",
@@ -59,7 +59,7 @@ import org.openide.windows.TopComponent;
 @TopComponent.Registration( mode = "editor", openAtStartup = false )
 //@ActionID(category = "Tools", id = "de.cebitec.readxplorer.differentialExpression.plot.PlotTopComponent")
 //@ActionReference(path = "Menu/Tools")
-@ActionID( category = "Window", id = "de.cebitec.readxplorer.transcriptionanalyses.differentialExpression.plot.PlotTopComponent" )
+@ActionID( category = "Window", id = "de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.plot.PlotTopComponent" )
 @ActionReference( path = "Menu/Window" )
 @TopComponent.OpenActionRegistration(
          displayName = "#CTL_PlotAction",
