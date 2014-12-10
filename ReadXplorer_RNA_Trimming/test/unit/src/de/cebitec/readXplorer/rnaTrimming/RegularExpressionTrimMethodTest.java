@@ -18,6 +18,8 @@
 package de.cebitec.readXplorer.rnaTrimming;
 
 
+import de.cebitec.readxplorer.rnatrimming.TrimMethodResult;
+import de.cebitec.readxplorer.rnatrimming.RegularExpressionTrimMethod;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
