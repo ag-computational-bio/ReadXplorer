@@ -345,4 +345,9 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
     }
 
 
+    protected ReferenceConnector getReferenceConnector() {
+        return referenceConnector;
+    }
+
+
 }

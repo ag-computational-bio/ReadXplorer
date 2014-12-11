@@ -19,12 +19,15 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
+import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
+import de.cebitec.readxplorer.utils.polyTree.Node;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
@@ -51,14 +54,14 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
 
     @Override
     protected List<ResultDeAnalysis> processWithTool() throws GnuR.PackageNotLoadableException, GnuR.JRILibraryNotInPathException, IllegalStateException, GnuR.UnknownGnuRException {
+
         prepareFeatures( data );
         prepareCountData( data, getAllCountData() );
 
         final PersistentFeature[] feature = data.getFeatures();
 
-        ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating Count Data Table" );
+        final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating Count Data Table" );
         progressHandle.start( feature.length );
-        String[] trackDescriptions = data.getTrackDescriptions();
         final int[][] countData = new int[data.getSelectedTracks().size()][];
         final List<Object> regionNamesList = new ArrayList<>();
         int i = 0;
@@ -66,14 +69,31 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
             countData[i++] = data.pollFirstCountData();
         }
         List<List<Object>> tableContents = new ArrayList<>();
-        for( i = 0; i < feature.length; i++ ) {
+
+        final ReferenceConnector referenceConnector = getReferenceConnector();
+        //This offset must correspond to the additional fields added by hand
+        final int offset = 6;
+        for( i = 0; i < data.getFeatures().length; i++ ) {
+
             boolean allZero = true;
-            Integer[] tmp = new Integer[data.getSelectedTracks().size() + 3];
-            tmp[0] = feature[i].getChromId();
-            tmp[1] = feature[i].getStart();
-            tmp[2] = feature[i].getStop();
-            for( int j = 3; j < data.getSelectedTracks().size() + 3; j++ ) {
-                int value = countData[j - 3][i];
+            final Object[] tmp = new Object[data.getSelectedTracks().size() + offset];
+            /*
+            * Here the additional fields are added. If one field is added or
+            * remove the "offset" value must be changed accordingly.
+            */
+            tmp[0] = referenceConnector.getChromosomeForGenome( feature[i].getChromId() );
+            if( feature[i].isFwdStrand() ) {
+                tmp[1] = "fw";
+            }
+            else {
+                tmp[1] = "rv";
+            }
+            tmp[2] = feature[i].getStart();
+            tmp[3] = feature[i].getStop();
+            tmp[4] = calculateExonLength( feature[i] );
+            tmp[5] = feature[i].getLength();
+            for( int j = offset; j < data.getSelectedTracks().size() + offset; j++ ) {
+                int value = countData[j - offset][i];
                 if( value != 0 ) {
                     allZero = false;
                 }
@@ -85,18 +105,43 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
             }
             progressHandle.progress( i );
         }
-        List<Object> colNames = new ArrayList<>( trackDescriptions.length + 3 );
+
+        String[] trackDescriptions = data.getTrackDescriptions();
+        List<Object> colNames = new ArrayList<>( trackDescriptions.length + 10 );
         colNames.add( "Chromosome" );
+        colNames.add( "Strand" );
         colNames.add( "Start" );
         colNames.add( "Stop" );
+        colNames.add( "Exon length" );
+        colNames.add( "Gene length" );
         colNames.addAll( Arrays.asList( trackDescriptions ) );
-//        Vector rowNames = new Vector( regionNamesList );
 
-        results = new ArrayList<>();
-        results.add( new ResultDeAnalysis( tableContents, colNames, regionNamesList, "Count Data Table" ) );
+        results = Collections.singletonList( new ResultDeAnalysis( tableContents, colNames, regionNamesList, "Count Data Table" ) );
         progressHandle.finish();
 
         return results;
+
+    }
+
+
+    private static int calculateExonLength( PersistentFeature feature ) {
+
+        int length = 0;
+        for( Node n : feature.getNodeChildren() ) {
+
+            FeatureType nodeType = n.getNodeType();
+            if( nodeType == FeatureType.EXON ) {
+                PersistentFeature current = (PersistentFeature) n;
+                length += current.getLength();
+            }
+            else {
+                PersistentFeature current = (PersistentFeature) n;
+                length += calculateExonLength( current );
+            }
+
+        }
+
+        return length;
 
     }
 
