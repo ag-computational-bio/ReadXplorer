@@ -4,18 +4,14 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
       <groupId>de.comp.bio</groupId>
-      <artifactId>readxplorer-parent</artifactId>
-      <version>2.1</version>
+      <artifactId>readxplorer</artifactId>
+      <version>2.1-SNAPSHOT</version>
   </parent>
 
   <artifactId>readxplorer-branding</artifactId>
   <packaging>nbm</packaging>
+  <name>${project.displayname} - Branding</name>
 
-  <name>readxplorer-branding</name>
-
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
 
   <dependencies>
     <dependency>
@@ -24,6 +20,7 @@
       <version>${netbeans.version}</version>
     </dependency>
   </dependencies>
+
 
   <build>
       <plugins>

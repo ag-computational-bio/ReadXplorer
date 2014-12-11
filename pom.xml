@@ -7,8 +7,25 @@
     <artifactId>readxplorer</artifactId>
     <version>2.1-SNAPSHOT</version>
     <packaging>pom</packaging>
+    <name>ReadXplorer</name>
 
-    <name>readxplorer</name>
+
+    <modules>
+        <module>branding</module>
+        <module>application</module>
+        <module>readxplorer-api</module>
+        <module>centrallookup</module>
+    </modules>
+
+
+    <properties>
+        <netbeans.version>RELEASE80</netbeans.version>
+        <brandingToken>readxplorer</brandingToken>
+        <project.displayname>ReadXplorer</project.displayname>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <module.version.api>1.0.1</module.version.api>
+    </properties>
+
 
     <repositories>
         <!--
@@ -55,14 +72,4 @@
         </pluginManagement>
     </build>
 
-    <modules>
-        <module>branding</module>
-        <module>application</module>
-        <module>readxplorer-api</module>
-    </modules>
-
-    <properties>
-        <netbeans.version>RELEASE80</netbeans.version>
-        <brandingToken>readxplorer</brandingToken>
-    </properties>
 </project>
