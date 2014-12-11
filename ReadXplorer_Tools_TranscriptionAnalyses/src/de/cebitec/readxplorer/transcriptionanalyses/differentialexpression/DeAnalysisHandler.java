@@ -42,7 +42,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -201,22 +200,20 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
     }
 
 
-    protected void prepareCountData( DeAnalysisData analysisData, Map<Integer, Map<PersistentFeature, Integer>> allCountData ) {
-        for( Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext(); ) {
-            Integer key = it.next().getId();
-            Integer[] data = new Integer[getPersAnno().size()];
+    protected void prepareCountData( final DeAnalysisData analysisData, final Map<Integer, Map<PersistentFeature, Integer>> allCountData ) {
+
+        for( PersistentTrack pt : selectedTracks ) {
+            Integer key = pt.getId();
+            int[] data = new int[getPersAnno().size()];
             Map<PersistentFeature, Integer> currentTrack = allCountData.get( key );
             int j = 0;
-            for( Iterator<PersistentFeature> it1 = getPersAnno().iterator(); it1.hasNext(); j++ ) {
-                PersistentFeature persistentFeature = it1.next();
+            for( PersistentFeature persistentFeature : getPersAnno() ) {
+                j++;
                 data[j] = currentTrack.get( persistentFeature );
             }
             analysisData.addCountDataForTrack( data );
         }
-        //Kill all the references to allCountData...
-        allCountData = null;
-        //...so the GC will clean them up and free lots of memory.
-        System.gc();
+
     }
 
 

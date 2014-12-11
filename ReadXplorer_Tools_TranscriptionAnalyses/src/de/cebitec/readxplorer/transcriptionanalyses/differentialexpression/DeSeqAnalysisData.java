@@ -94,8 +94,8 @@ public class DeSeqAnalysisData extends DeAnalysisData {
     public String[] getLevels() {
         if( levels == null ) {
             levels = new HashSet<>();
-            for( Iterator<String> it = design.keySet().iterator(); it.hasNext(); ) {
-                String[] current = design.get( it.next() );
+            for( String key : design.keySet() ) {
+                String[] current = design.get( key );
                 levels.addAll( Arrays.asList( current ) );
             }
 

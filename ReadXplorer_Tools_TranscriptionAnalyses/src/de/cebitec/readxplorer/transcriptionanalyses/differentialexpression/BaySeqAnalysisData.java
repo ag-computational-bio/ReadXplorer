@@ -55,11 +55,9 @@ public class BaySeqAnalysisData extends DeAnalysisData {
     public int[] getNextGroup() {
         int[] ret = new int[0];
         if( !(nextGroup >= groups.size()) ) {
-            Integer[] current = groups.get( nextGroup++ ).getIntegerRepresentation();
+            int[] current = groups.get( nextGroup++ ).getIntegerRepresentation();
             ret = new int[current.length];
-            for( int i = 0; i < current.length; i++ ) {
-                ret[i] = current[i];
-            }
+            System.arraycopy( current, 0, ret, 0, current.length );
         }
         return ret;
     }

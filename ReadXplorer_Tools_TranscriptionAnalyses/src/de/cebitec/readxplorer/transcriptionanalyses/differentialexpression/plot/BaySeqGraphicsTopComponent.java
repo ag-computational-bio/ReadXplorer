@@ -394,12 +394,12 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
         if( selectedPlot == BaySeqAnalysisHandler.Plot.MACD ) {
             progressHandle.start();
             progressHandle.switchToIndeterminate();
-            List<Integer> sampleA = new ArrayList<>();
-            List<Integer> sampleB = new ArrayList<>();
             Group selectedGroup = groups.get( groupComboBox.getSelectedIndex() );
-            Integer[] integerRep = selectedGroup.getIntegerRepresentation();
-            int integerGroupA = integerRep[0];
+            final int[] integerRep = selectedGroup.getIntegerRepresentation();
+            final int integerGroupA = integerRep[0];
             Integer integerGroupB = null;
+            final List<Integer> sampleA = new ArrayList<>( integerRep.length + 1 );
+            final List<Integer> sampleB = new ArrayList<>( integerRep.length + 1 );
             sampleA.add( 0 );
             for( int i = 1; i < integerRep.length; i++ ) {
                 int currentInteger = integerRep[i];

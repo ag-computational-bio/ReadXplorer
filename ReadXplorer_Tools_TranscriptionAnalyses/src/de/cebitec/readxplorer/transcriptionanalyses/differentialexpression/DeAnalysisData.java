@@ -20,7 +20,6 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -48,7 +47,7 @@ public class DeAnalysisData {
      * secound Integer array holds the count data for the selected track with
      * the secound lowest id an so on.
      */
-    private final Queue<Integer[]> countData;
+    private final Queue<int[]> countData;
     /**
      * The tracks selected by the user to perform the analysis on.
      */
@@ -76,28 +75,22 @@ public class DeAnalysisData {
      *
      * @param data count data
      */
-    public void addCountDataForTrack( Integer[] data ) {
+    public void addCountDataForTrack( int[] data ) {
         countData.add( data );
     }
 
 
     /**
      * Return the first count data value on the Queue and removes it. So this
-     * method will give you back the cound data added bei the
-     *
-     * @see addCountDataForTrack() method. The count data added first will also
-     * be the first this method returns. This method also converts the count
-     * data from an Integer array to an int array so that they can be handed
-     * over to Gnu R directly.
+     * method will give you back the cound data added bei the @see addCountDataForTrack() method.
+     * The count data added first will also be the first this method returns.
+     * 
      * @return count data as int[]
      */
     public int[] pollFirstCountData() {
-        Integer[] cdata = countData.poll();
-        int[] ret = new int[cdata.length];
-        for( int i = 0; i < cdata.length; i++ ) {
-            ret[i] = cdata[i];
-        }
-        return ret;
+
+        return countData.poll();
+
     }
 
 
@@ -120,9 +113,9 @@ public class DeAnalysisData {
     public int[] getStart() {
         int[] ret = new int[featureData.size()];
         int i = 0;
-        for( Iterator<String> it = featureData.keySet().iterator(); it.hasNext(); i++ ) {
-            String key = it.next();
+        for( String key : featureData.keySet() ) {
             ret[i] = featureData.get( key ).getStart();
+            i++;
         }
         return ret;
     }
@@ -136,9 +129,9 @@ public class DeAnalysisData {
     public int[] getStop() {
         int[] ret = new int[featureData.size()];
         int i = 0;
-        for( Iterator<String> it = featureData.keySet().iterator(); it.hasNext(); i++ ) {
-            String key = it.next();
+        for( String key : featureData.keySet() ) {
             ret[i] = featureData.get( key ).getStop();
+            i++;
         }
         return ret;
     }
@@ -164,8 +157,9 @@ public class DeAnalysisData {
     public PersistentFeature[] getFeatures() {
         PersistentFeature[] features = new PersistentFeature[featureData.keySet().size()];
         int i = 0;
-        for( Iterator<String> it = featureData.keySet().iterator(); it.hasNext(); i++ ) {
-            features[i] = featureData.get( it.next() );
+        for( String key : featureData.keySet() ) {
+            features[i] = featureData.get( key );
+            i++;
         }
         return features;
     }

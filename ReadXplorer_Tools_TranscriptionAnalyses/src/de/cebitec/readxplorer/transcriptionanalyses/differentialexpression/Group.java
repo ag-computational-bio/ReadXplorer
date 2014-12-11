@@ -24,14 +24,14 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
  */
 public class Group {
 
-    private final Integer[] integerRepresentation;
+    private final int[] integerRepresentation;
     private final int id;
     private final String stringRepresentation;
 
     private static int nextUnusedID = 0;
 
 
-    public Group( final Integer[] integerRepresentation, final String stringRepresentation ) {
+    public Group( final int[] integerRepresentation, final String stringRepresentation ) {
         id = nextUnusedID++;
         this.integerRepresentation = integerRepresentation;
         this.stringRepresentation = stringRepresentation;
@@ -48,7 +48,7 @@ public class Group {
     }
 
 
-    public Integer[] getIntegerRepresentation() {
+    public int[] getIntegerRepresentation() {
         return integerRepresentation;
     }
 

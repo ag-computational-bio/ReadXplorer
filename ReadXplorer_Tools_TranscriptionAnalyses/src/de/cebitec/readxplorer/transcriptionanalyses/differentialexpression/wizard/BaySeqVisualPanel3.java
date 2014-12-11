@@ -37,7 +37,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements
     private final DefaultListModel<String> groupListModel = new DefaultListModel<>();
     private final List<Group> createdGroups = new ArrayList<>();
     private List<PersistentTrack> selectedTracks = new ArrayList<>();
-    private Integer[] currentGroupBeingCreated = null;
+    private int[] currentGroupBeingCreated = null;
     private int currentGroupNumber = 1;
     private int selectedIndex = -1;
 
@@ -58,7 +58,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements
             currentGroupBeingCreated = null;
             createdGroups.clear();
             groupListModel.clear();
-            Integer[] defaultGroup = new Integer[selectedTracks.size()];
+            int[] defaultGroup = new int[selectedTracks.size()];
             StringBuilder strBuilder = new StringBuilder( "{" );
             for( Iterator<PersistentTrack> it = selectedTracks.iterator(); it.hasNext(); ) {
                 PersistentTrack persistentTrack = it.next();
@@ -96,7 +96,6 @@ public final class BaySeqVisualPanel3 extends JPanel implements
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane3 = new javax.swing.JScrollPane();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         trackList = new javax.swing.JList(trackListModel);
@@ -170,7 +169,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
-                        .addGap(58, 470, Short.MAX_VALUE))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
@@ -189,7 +188,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                 .addComponent(removeModelButton))
                                             .addComponent(groupCreationField)))
-                                    .addComponent(jScrollPane5, javax.swing.GroupLayout.DEFAULT_SIZE, 322, Short.MAX_VALUE))
+                                    .addComponent(jScrollPane5))
                                 .addContainerGap())))))
         );
         layout.setVerticalGroup(
@@ -221,7 +220,7 @@ public final class BaySeqVisualPanel3 extends JPanel implements
 
     private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
         if( currentGroupBeingCreated == null ) {
-            currentGroupBeingCreated = new Integer[selectedTracks.size()];
+            currentGroupBeingCreated = new int[selectedTracks.size()];
         }
         if( !trackList.isSelectionEmpty() ) {
             List<PersistentTrack> tracks = trackList.getSelectedValuesList();
@@ -276,7 +275,6 @@ public final class BaySeqVisualPanel3 extends JPanel implements
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JScrollPane jScrollPane5;
     private javax.swing.JButton removeModelButton;
