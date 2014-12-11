@@ -15,6 +15,11 @@
         <module>application</module>
         <module>readxplorer-api</module>
         <module>centrallookup</module>
+        <module>readxplorer-backend</module>
+        <module>readxplorer-utils</module>
+        <module>readxplorer-classificationupdate</module>
+        <module>readxplorer-dashboard</module>
+        <module>readxplorer-exporter</module>
     </modules>
 
 
@@ -24,6 +29,7 @@
         <project.displayname>ReadXplorer</project.displayname>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <module.version.api>1.0.1</module.version.api>
+        <module.version.centrallookup>1.0.1</module.version.centrallookup>
     </properties>
 
 
