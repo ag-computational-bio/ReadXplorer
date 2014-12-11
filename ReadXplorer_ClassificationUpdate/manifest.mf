@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-AutoUpdate-Show-In-Client: true
-OpenIDE-Module: de.compbio.readxplorer.classificationupdate
-OpenIDE-Module-Localizing-Bundle: de/comp/bio/readxplorer/classificationupdate/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.0.1
-
