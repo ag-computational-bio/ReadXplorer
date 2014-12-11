@@ -142,10 +142,10 @@ public class GnuR extends Rengine {
      * @param packageName
      */
     public void loadPackage( String packageName ) throws PackageNotLoadableException {
-        REXP result = this.eval( "library(" + packageName + ")" );
+        REXP result = this.eval( "library(" + packageName + ')' );
         if( result == null ) {
             this.eval( "install.packages(\"" + packageName + "\")" );
-            result = this.eval( "library(" + packageName + ")" );
+            result = this.eval( "library(" + packageName + ')' );
             if( result == null ) {
                 throw new PackageNotLoadableException( packageName );
             }
@@ -213,7 +213,7 @@ public class GnuR extends Rengine {
 
     @Override
     public boolean assign( String string, double[] doubles ) {
-        StringBuilder sb = new StringBuilder().append( '[' );
+        StringBuilder sb = new StringBuilder( doubles.length * 20 ).append( '[' );
         for( int i = 0; i < doubles.length; i++ ) {
             sb.append( doubles[i] ).append( ';' );
         }
@@ -226,7 +226,7 @@ public class GnuR extends Rengine {
 
     @Override
     public boolean assign( String string, int[] ints ) {
-        StringBuilder sb = new StringBuilder().append( '[' );
+        StringBuilder sb = new StringBuilder( ints.length * 12 ).append( '[' );
         for( int i = 0; i < ints.length; i++ ) {
             sb.append( ints[i] ).append( ';' );
         }
@@ -239,7 +239,7 @@ public class GnuR extends Rengine {
 
     @Override
     public boolean assign( String string, boolean[] blns ) {
-        StringBuilder sb = new StringBuilder().append( '[' );
+        StringBuilder sb = new StringBuilder( blns.length * 6 ).append( '[' );
         for( int i = 0; i < blns.length; i++ ) {
             sb.append( blns[i] ).append( ';' );
         }
@@ -252,7 +252,7 @@ public class GnuR extends Rengine {
 
     @Override
     public boolean assign( String string, String[] strings ) {
-        StringBuilder sb = new StringBuilder().append( '[' );
+        StringBuilder sb = new StringBuilder( strings.length * 20 ).append( '[' );
         for( String string1 : strings ) {
             sb.append( string1 ).append( ';' );
         }

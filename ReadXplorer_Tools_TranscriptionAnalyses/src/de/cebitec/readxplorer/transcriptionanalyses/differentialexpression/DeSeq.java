@@ -75,7 +75,7 @@ public class DeSeq {
             }
             catch( IOException ex ) {
                 currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: Unable to load plotting functions. You woun't be able to plot your results!", currentTimestamp );
+                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: Unable to load plotting functions. You won't be able to plot your results!", currentTimestamp );
             }
 
             //Handing over the count data to Gnu R.
@@ -84,12 +84,12 @@ public class DeSeq {
             //First the count data for each track is handed over seperatly.
             while( analysisData.hasCountData() ) {
                 gnuR.assign( "inputData" + i, analysisData.pollFirstCountData() );
-                concatenate.append( "inputData" ).append( i++ ).append( "," );
+                concatenate.append( "inputData" ).append( i++ ).append( ',' );
             }
             concatenate.deleteCharAt( concatenate.length() - 1 );
-            concatenate.append( ")" );
+            concatenate.append( ')' );
             //Then the big count data matrix is created from the single track data handed over.
-            gnuR.eval( "inputData <- matrix(" + concatenate.toString() + "," + numberOfFeatures + ")" );
+            gnuR.eval( "inputData <- matrix(" + concatenate.toString() + ',' + numberOfFeatures + ')' );
             //The colum names are handed over to Gnu R...
             gnuR.assign( "columNames", analysisData.getTrackDescriptions() );
             //...and assigned to the count data matrix.
@@ -103,7 +103,7 @@ public class DeSeq {
             gnuR.eval( "inputData <- inputData[rowSums(inputData) > 0,]" );
 
             //Now we need to hand over the experimental design behind the data.
-            concatenate = new StringBuilder();
+            concatenate = new StringBuilder( 1000 );
             //First all sub designs are assigned to an individual variable.
             while( analysisData.hasNextSubDesign() ) {
                 DeSeqAnalysisData.ReturnTupel subDesign = analysisData.getNextSubDesign();
@@ -120,14 +120,14 @@ public class DeSeq {
 
             if( analysisData.moreThanTwoConditions() ) {
                 //The individual variables are then used to create the design element
-                gnuR.eval( "design <- data.frame(row.names = colnames(inputData)," + concatenate.toString() + ")" );
+                gnuR.eval( "design <- data.frame(row.names = colnames(inputData)," + concatenate.toString() + ')' );
                 //Now everything is set up and the count data object on which the main
                 //analysis will be performed can be created
                 gnuR.eval( "cD <- newCountDataSet(inputData, design)" );
             }
             else {
                 //If this is just a two conditons experiment we only create the conds array
-                gnuR.eval( "conds <- factor(" + concatenate.toString() + ")" );
+                gnuR.eval( "conds <- factor(" + concatenate.toString() + ')' );
                 //Now everything is set up and the count data object on which the main
                 //analysis will be performed can be created
                 gnuR.eval( "cD <- newCountDataSet(inputData, conds)" );
@@ -174,10 +174,10 @@ public class DeSeq {
 
             if( analysisData.moreThanTwoConditions() ) {
                 //Handing over the first fitting group to Gnu R...
-                concatenate = new StringBuilder();
+                concatenate = new StringBuilder( 1000 );
                 List<String> fittingGroupOne = analysisData.getFittingGroupOne();
                 for( String current : fittingGroupOne ) {
-                    concatenate.append( current ).append( "+" );
+                    concatenate.append( current ).append( '+' );
                 }
                 concatenate.deleteCharAt( concatenate.length() - 1 );
                 gnuR.eval( "fit1 <- fitNbinomGLMs( cD, count ~ " + concatenate.toString() + " )" );
@@ -186,7 +186,7 @@ public class DeSeq {
                 concatenate = new StringBuilder();
                 List<String> fittingGroupTwo = analysisData.getFittingGroupTwo();
                 for( String current : fittingGroupTwo ) {
-                    concatenate.append( current ).append( "+" );
+                    concatenate.append( current ).append( '+' );
                 }
                 concatenate.deleteCharAt( concatenate.length() - 1 );
                 gnuR.eval( "fit0 <- fitNbinomGLMs( cD, count ~ " + concatenate.toString() + " )" );

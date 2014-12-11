@@ -80,7 +80,6 @@ public class BaySeq {
             throws JRILibraryNotInPathException, PackageNotLoadableException,
                    IllegalStateException, UnknownGnuRException {
         gnuR = GnuR.SecureGnuRInitiliser.getGnuRinstance( key );
-        int numberofGroups;
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
         gnuR.loadPackage( "baySeq" );
@@ -106,11 +105,11 @@ public class BaySeq {
             StringBuilder concatenate = new StringBuilder( "c(" );
             while( bseqData.hasCountData() ) {
                 gnuR.assign( "inputData" + i, bseqData.pollFirstCountData() );
-                concatenate.append( "inputData" ).append( i++ ).append( "," );
+                concatenate.append( "inputData" ).append( i++ ).append( ',' );
             }
             concatenate.deleteCharAt( concatenate.length() - 1 );
             concatenate.append( ")" );
-            gnuR.eval( "inputData <- matrix(" + concatenate.toString() + "," + numberOfFeatures + ")" );
+            gnuR.eval( "inputData <- matrix(" + concatenate.toString() + ',' + numberOfFeatures + ')' );
             gnuR.assign( "inputFeaturesStart", bseqData.getStart() );
             gnuR.assign( "inputFeaturesStop", bseqData.getStop() );
             gnuR.assign( "inputFeaturesID", bseqData.getFeatureNames() );
@@ -121,21 +120,21 @@ public class BaySeq {
             gnuR.eval( "cD@libsizes <- getLibsizes(cD, estimationType = \"quantile\")" );
             gnuR.assign( "replicates", bseqData.getReplicateStructure() );
             gnuR.eval( "replicates(cD) <- as.factor(c(replicates))" );
-            concatenate = new StringBuilder();
-            numberofGroups = 0;
+            concatenate = new StringBuilder( 1000 );
+            int numberofGroups = 0;
             while( bseqData.hasGroups() ) {
                 numberofGroups++;
                 gnuR.assign( "group" + numberofGroups, bseqData.getNextGroup() );
-                concatenate.append( "group" ).append( numberofGroups ).append( "=" ).append( "group" ).append( numberofGroups ).append( "," );
+                concatenate.append( "group" ).append( numberofGroups ).append( "=" ).append( "group" ).append( numberofGroups ).append( ',' );
             }
             concatenate.deleteCharAt( concatenate.length() - 1 );
-            gnuR.eval( "groups(cD) <- list(" + concatenate.toString() + ")" );
+            gnuR.eval( "groups(cD) <- list(" + concatenate.toString() + ')' );
             //parameter samplesize could be added.
             gnuR.eval( "cD <- getPriors.NB(cD, cl = cl)" );
             gnuR.eval( "cD <- getLikelihoods.NB(cD, nullData = TRUE, cl = cl)" );
             int resultIndex = 0;
             for( int j = 1; j <= numberofGroups; j++ ) {
-                gnuR.eval( "tCounts" + resultIndex + " <- topCounts(cD , group = " + j + " , number = " + numberOfFeatures + ")" );
+                gnuR.eval( "tCounts" + resultIndex + " <- topCounts(cD , group = " + j + " , number = " + numberOfFeatures + ')' );
                 REXP result = gnuR.eval( "tCounts" + resultIndex );
                 RVector rvec = result.asVector();
                 REXP colNames = gnuR.eval( "colnames(tCounts" + resultIndex + ")" );
@@ -147,8 +146,8 @@ public class BaySeq {
                 gnuR.eval( "tCounts" + resultIndex + " <- topCounts(cD , group = " + j + " , number = " + numberOfFeatures + " , normaliseData=TRUE)" );
                 REXP result = gnuR.eval( "tCounts" + resultIndex );
                 RVector rvec = result.asVector();
-                REXP colNames = gnuR.eval( "colnames(tCounts" + resultIndex + ")" );
-                REXP rowNames = gnuR.eval( "rownames(tCounts" + resultIndex + ")" );
+                REXP colNames = gnuR.eval( "colnames(tCounts" + resultIndex + ')' );
+                REXP rowNames = gnuR.eval( "rownames(tCounts" + resultIndex + ')' );
                 results.add( new ResultDeAnalysis( rvec, colNames, rowNames, "Normalized result of model " + j, bseqData ) );
                 resultIndex++;
             }
@@ -186,12 +185,12 @@ public class BaySeq {
         if( !validateSamples( samplesA, samplesB ) ) {
             throw new SamplesNotValidException();
         }
-        StringBuilder samplesABuilder = new StringBuilder();
-        samplesABuilder.append( (samplesA[0] + 1) ).append( ":" ).append( (samplesA[samplesA.length - 1] + 1) );
-        StringBuilder samplesBBuilder = new StringBuilder();
-        samplesBBuilder.append( (samplesB[0] + 1) ).append( ":" ).append( (samplesB[samplesB.length - 1] + 1) );
+        StringBuilder samplesABuilder = new StringBuilder( 1000 );
+        samplesABuilder.append( (samplesA[0] + 1) ).append( ':' ).append( (samplesA[samplesA.length - 1] + 1) );
+        StringBuilder samplesBBuilder = new StringBuilder( 1000 );
+        samplesBBuilder.append( (samplesB[0] + 1) ).append( ':' ).append( (samplesB[samplesB.length - 1] + 1) );
         gnuR.storePlot( file, "plotMA.CD(cD, samplesA = " + samplesABuilder.toString() + ", "
-                              + "samplesB = " + samplesBBuilder.toString() + ")" );
+                              + "samplesB = " + samplesBBuilder.toString() + ')' );
     }
 
 
@@ -216,15 +215,15 @@ public class BaySeq {
         if( !validateSamples( samplesA, samplesB ) ) {
             throw new SamplesNotValidException();
         }
-        StringBuilder samplesABuilder = new StringBuilder();
-        samplesABuilder.append( (samplesA[0] + 1) ).append( ":" ).append( (samplesA[samplesA.length - 1] + 1) );
-        StringBuilder samplesBBuilder = new StringBuilder();
-        samplesBBuilder.append( (samplesB[0] + 1) ).append( ":" ).append( (samplesB[samplesB.length - 1] + 1) );
+        StringBuilder samplesABuilder = new StringBuilder( 1000 );
+        samplesABuilder.append( (samplesA[0] + 1) ).append( ':' ).append( (samplesA[samplesA.length - 1] + 1) );
+        StringBuilder samplesBBuilder = new StringBuilder( 1000 );
+        samplesBBuilder.append( (samplesB[0] + 1) ).append( ':' ).append( (samplesB[samplesB.length - 1] + 1) );
         gnuR.storePlot( file, "plotPosteriors(cD, group = " + group.getGnuRID()
                               + ", samplesA = " + samplesABuilder.toString()
                               + ", samplesB = " + samplesBBuilder.toString()
                               + ", col = c(rep(\"blue\", 100), rep(\"black\", 900))"
-                              + ")" );
+                              + ')' );
     }
 
 
@@ -239,7 +238,7 @@ public class BaySeq {
      * @param group the underlying group for the plot.
      */
     public void plotPriors( File file, Group group ) throws IllegalStateException, PackageNotLoadableException {
-        gnuR.storePlot( file, "plotPriors(cD, group = " + group.getGnuRID() + ")" );
+        gnuR.storePlot( file, "plotPriors(cD, group = " + group.getGnuRID() + ')' );
     }
 
 
