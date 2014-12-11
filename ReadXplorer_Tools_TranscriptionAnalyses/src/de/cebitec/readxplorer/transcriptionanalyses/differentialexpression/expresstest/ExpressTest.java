@@ -22,10 +22,8 @@ import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.ProcessingLog;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import javax.swing.JOptionPane;
 
 
@@ -40,17 +38,17 @@ public class ExpressTest implements ExpressTestI {
     private List<List<Object>> resultsNormalized;
     private List<Object> rowNames;
     private final List<Object> colNames;
-    private final Map<double[], Double> meanCache;
+//    private final Map<double[], Double> meanCache;
     private int[] normalizationFeatures;
     private boolean useHousekeepingGenesForNormalization = false;
 
 
     public ExpressTest() {
 
-        this.meanCache = new HashMap<>( 1024 );
+//        this.meanCache = new HashMap<>( 1024 );
         this.observers = new LinkedList<>();
         this.colNames = Arrays.asList( new Object[]{ "Region", "Start",
-                                                     "Stop", "MeanA", "VarA", "MeanB", "VarB", "RatioAB", "RatioBA", "Confidence" } );
+            "Stop", "MeanA", "VarA", "MeanB", "VarB", "RatioAB", "RatioBA", "Confidence" } );
 
     }
 
@@ -256,12 +254,12 @@ public class ExpressTest implements ExpressTestI {
 
     private static double calculateMeanCountForReplicate( final int[] replicate ) {
 
-        double ret = 0d;
-        for( int i = 0; i < replicate.length; i++ ) {
-            ret += replicate[i];
+        double sum = 0d;
+        for( int count : replicate ) {
+            sum += count;
         }
 
-        return ret / replicate.length;
+        return sum / replicate.length;
 
     }
 
@@ -278,12 +276,12 @@ public class ExpressTest implements ExpressTestI {
     }
 
 
-    private ExpressTest.MeanVarianceGroup computeMeanAndVar( int[][] group, double[] normalizationRatios ) {
+    private ExpressTest.MeanVarianceGroup computeMeanAndVar( final int[][] group, final double[] normalizationRatios ) {
 
-        double[] mean = new double[group[0].length];
-        double[] var = new double[group[0].length];
-        double[] meanNormalized = new double[group[0].length];
-        double[] varNormalized = new double[group[0].length];
+        final double[] mean = new double[group[0].length];
+        final double[] var  = new double[group[0].length];
+        final double[] meanNormalized = new double[group[0].length];
+        final double[] varNormalized  = new double[group[0].length];
 
         for( int j = 0; j < group[0].length; j++ ) {
 
@@ -306,25 +304,33 @@ public class ExpressTest implements ExpressTestI {
     }
 
 
-    private static double round( double d ) {
+    private static double round( final double d ) {
 
         return Math.round( d );
 
     }
 
 
-    private double mean( final double[] values ) {
+    private static double mean( final double[] values ) {
 
-        if( meanCache.containsKey( values ) ) {
-            return meanCache.get( values );
-        }
+/**
+ * Deactivated
+ * as computations of List hashcodes are even more expensive than actual computations of the means!
+ * For arrays, it doesn't even make sense, as by default no deep hashcode computation is used but
+ * the object reference.
+ * Please, have a look at the standard java hashcode implementations of List/Array to double check.
+ */
+
+//        if( meanCache.containsKey( values ) ) {
+//            return meanCache.get( values );
+//        }
 
         double mean = 0d;
         for( double value : values ) {
             mean += value;
         }
         mean /= values.length;
-        meanCache.put( values, mean );
+//        meanCache.put( values, mean );
 
         return mean;
 
@@ -338,7 +344,7 @@ public class ExpressTest implements ExpressTestI {
             var += Math.pow( value - mean( values ), 2 );
         }
 
-        return var / values.length - 1;
+        return var / (values.length - 1);
 
     }
 
