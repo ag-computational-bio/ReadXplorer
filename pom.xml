@@ -20,6 +20,7 @@
         <module>readxplorer-classificationupdate</module>
         <module>readxplorer-dashboard</module>
         <module>readxplorer-exporter</module>
+        <module>readxplorer-mapping</module>
     </modules>
 
 
