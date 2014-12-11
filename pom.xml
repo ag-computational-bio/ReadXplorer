@@ -23,6 +23,7 @@
         <module>readxplorer-mapping</module>
         <module>readxplorer-parser</module>
         <module>readxplorer-plotting</module>
+        <module>readxplorer-rnatrimming</module>
     </modules>
 
 
