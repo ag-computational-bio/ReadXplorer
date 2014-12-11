@@ -87,7 +87,7 @@ public class ExpressTest implements ExpressTestI {
             final int[][] houseKeepingB = new int[groupB.length][normalizationFeatures.length];
             Arrays.parallelSort( normalizationFeatures ); // necessary for later binary search
             for( int i = 0, j = 0; i < regionLength; i++ ) {
-                if( Arrays.binarySearch( normalizationFeatures, regionNames[i].getId() ) > 0 ) {
+                if( Arrays.binarySearch( normalizationFeatures, regionNames[i].getId() ) >= 0 ) {
                     for( int k = 0; k < groupA.length; k++ ) {
                         houseKeepingA[k][j] = groupA[k][i];
                     }
@@ -306,7 +306,7 @@ public class ExpressTest implements ExpressTestI {
     }
 
 
-    private double round( double d ) {
+    private static double round( double d ) {
 
         return Math.round( d );
 
