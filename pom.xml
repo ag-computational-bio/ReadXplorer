@@ -24,6 +24,7 @@
         <module>readxplorer-parser</module>
         <module>readxplorer-plotting</module>
         <module>readxplorer-rnatrimming</module>
+        <module>readxplorer-thumbnail</module>
     </modules>
 
 
