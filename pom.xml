@@ -21,6 +21,7 @@
         <module>readxplorer-dashboard</module>
         <module>readxplorer-exporter</module>
         <module>readxplorer-mapping</module>
+        <module>readxplorer-parser</module>
     </modules>
 
 
