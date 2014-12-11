@@ -22,6 +22,7 @@
         <module>readxplorer-exporter</module>
         <module>readxplorer-mapping</module>
         <module>readxplorer-parser</module>
+        <module>readxplorer-plotting</module>
     </modules>
 
 
