@@ -2,13 +2,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>de.comp.bio.readxplorer</groupId>
+        <groupId>bio.comp.jlu.readxplorer</groupId>
         <artifactId>readxplorer</artifactId>
         <version>2.1-SNAPSHOT</version>
     </parent>
 
 
-    <groupId>de.comp.bio.readxplorer</groupId>
+    <groupId>bio.comp.jlu.readxplorer</groupId>
     <artifactId>readxplorer-thumbnail</artifactId>
     <version>1.0.1</version>
     <packaging>nbm</packaging>
@@ -37,7 +37,7 @@
             <version>${netbeans.version}</version>
         </dependency>
         <dependency>
-            <groupId>de.comp.bio.readxplorer</groupId>
+            <groupId>bio.comp.jlu.readxplorer</groupId>
             <artifactId>centrallookup</artifactId>
             <version>${module.version.centrallookup}</version>
         </dependency>
@@ -62,7 +62,7 @@
             <version>${netbeans.version}</version>
         </dependency>
         <dependency>
-            <groupId>de.comp.bio.readxplorer</groupId>
+            <groupId>bio.comp.jlu.readxplorer</groupId>
             <artifactId>readxplorer-centrallookup</artifactId>
             <version>1.0.1</version>
         </dependency>

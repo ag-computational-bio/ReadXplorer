@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.comp.bio.readxplorer.classificationupdate;
+package bio.jlu.comp.readxplorer.classificationupdate;
 
 
 /**
