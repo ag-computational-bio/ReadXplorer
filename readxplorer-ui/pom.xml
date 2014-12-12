@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>de.comp.bio.readxplorer</groupId>
+        <artifactId>readxplorer</artifactId>
+        <version>2.1-SNAPSHOT</version>
+    </parent>
+
+
+    <artifactId>readxplorer-ui</artifactId>
+    <version>1.1.1</version>
+    <packaging>nbm</packaging>
+    <name>${project.displayname} - UI</name>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-api-annotations-common</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-centrallookup</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-databackend</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-api</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-exporter</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-parser</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-utils</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-util</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-settings</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-windows</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
+    </dependencies>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>nbm-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <publicPackages>
+                        <publicPackage>de.cebitec.readxplorer.ui.dialogmenus.explorer</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.datavisualisation.histogramviewer</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.datavisualisation.basePanel</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.login</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.datavisualisation.referenceviewer</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.datavisualisation.abstractviewer</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.dialogmenus.screenshot</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.tablevisualization.tablefilter</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.dialogmenus</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.datavisualisation</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.analysis</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.tablevisualization</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.datavisualisation.trackviewer</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.controller</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.ui.datavisualisation.readpairviewer</publicPackage>
+                    </publicPackages>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <useDefaultManifestFile>true</useDefaultManifestFile>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

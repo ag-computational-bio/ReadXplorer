@@ -26,6 +26,7 @@
         <module>readxplorer-rnatrimming</module>
         <module>readxplorer-thumbnail</module>
         <module>readxplorer-vcfhandling</module>
+        <module>readxplorer-ui</module>
     </modules>
 
 
