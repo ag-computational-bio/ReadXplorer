@@ -31,6 +31,7 @@
         <module>readxplorer-ui-datamanagement</module>
         <module>readxplorer-ui-importer</module>
         <module>readxplorer-ui-options</module>
+        <module>readxplorer-ui-visualisation</module>
     </modules>
 
 
