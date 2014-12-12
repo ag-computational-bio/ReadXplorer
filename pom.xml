@@ -32,6 +32,7 @@
         <module>readxplorer-ui-importer</module>
         <module>readxplorer-ui-options</module>
         <module>readxplorer-ui-visualisation</module>
+        <module>readxplorer-ui-visualisation-reference</module>
     </modules>
 
 
