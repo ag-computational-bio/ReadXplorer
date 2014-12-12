@@ -33,6 +33,7 @@
         <module>readxplorer-ui-options</module>
         <module>readxplorer-ui-visualisation</module>
         <module>readxplorer-ui-visualisation-reference</module>
+        <module>readxplorer-ui-visualisation-track</module>
     </modules>
 
 
