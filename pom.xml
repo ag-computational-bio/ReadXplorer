@@ -28,6 +28,7 @@
         <module>readxplorer-vcfhandling</module>
         <module>readxplorer-ui</module>
         <module>readxplorer-ui-converter</module>
+        <module>readxplorer-ui-datamanagement</module>
     </modules>
 
 
