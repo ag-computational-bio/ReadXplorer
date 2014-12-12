@@ -29,6 +29,7 @@
         <module>readxplorer-ui</module>
         <module>readxplorer-ui-converter</module>
         <module>readxplorer-ui-datamanagement</module>
+        <module>readxplorer-ui-importer</module>
     </modules>
 
 
