@@ -2,13 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>de.comp.bio</groupId>
+        <groupId>de.comp.bio.readxplorer</groupId>
         <artifactId>readxplorer</artifactId>
         <version>2.1-SNAPSHOT</version>
     </parent>
 
 
-    <groupId>de.cebitec.readxplorer</groupId>
     <artifactId>readxplorer-rnatrimming</artifactId>
     <version>1.0.4</version>
     <packaging>nbm</packaging>
@@ -25,19 +24,81 @@
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-modules-javahelp</artifactId>
             <version>${netbeans.version}</version>
-            <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>de.cebitec</groupId>
+            <groupId>de.comp.bio.readxplorer</groupId>
             <artifactId>centrallookup</artifactId>
             <version>${module.version.centrallookup}</version>
-            <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>de.comp.bio</groupId>
+            <groupId>de.comp.bio.readxplorer</groupId>
             <artifactId>readxplorer-api</artifactId>
             <version>${module.version.api}</version>
-            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>de.comp.bio.readxplorer</groupId>
+            <artifactId>readxplorer-mapping</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-util</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>de.comp.bio.readxplorer</groupId>
+            <artifactId>readxplorer-centrallookup</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.utgenome.thirdparty</groupId>
+            <artifactId>picard</artifactId>
+            <version>1.102.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-api-progress</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.3.176</version>
+        </dependency>
+        <dependency>
+            <groupId>org.swinglabs</groupId>
+            <artifactId>swing-layout</artifactId>
+            <version>1.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-settings</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-windows</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-databackend</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.3</version>
+        </dependency>
+        <dependency>
+            <groupId>de.comp.bio.readxplorer</groupId>
+            <artifactId>readxplorer-exporter</artifactId>
+            <version>1.0.4</version>
         </dependency>
     </dependencies>
 

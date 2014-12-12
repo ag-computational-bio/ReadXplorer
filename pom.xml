@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>de.comp.bio</groupId>
+    <groupId>de.comp.bio.readxplorer</groupId>
     <artifactId>readxplorer</artifactId>
     <version>2.1-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -25,6 +25,7 @@
         <module>readxplorer-plotting</module>
         <module>readxplorer-rnatrimming</module>
         <module>readxplorer-thumbnail</module>
+        <module>readxplorer-vcfhandling</module>
     </modules>
 
 
@@ -39,15 +40,15 @@
 
 
     <repositories>
-        <!--
-        Repository hosting NetBeans modules, especially APIs.
-        Versions are based on IDE releases, e.g.: RELEASE691
-        To create your own repository, use: nbm:populate-repository
-        -->
         <repository>
             <id>netbeans</id>
             <name>NetBeans</name>
             <url>http://bits.netbeans.org/nexus/content/groups/netbeans/</url>
+        </repository>
+        <repository>
+            <id>biojava-maven-repo</id>
+            <name>BioJava repository</name>
+            <url>http://www.biojava.org/download/maven/</url>
         </repository>
     </repositories>
 
