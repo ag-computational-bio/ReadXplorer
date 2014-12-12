@@ -28,7 +28,6 @@ import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -78,62 +77,46 @@ public class TribbleBEDParser implements ReferenceParserI {
         refGenome.setFeatureFilter( filter );
         final Map<String, ParsedChromosome> chromMap = CommonsRefParser.generateStringMap( refGenome.getChromosomes() );
         //at first store all eonxs in one data structure and add them to the ref genome at the end
-        Map<FeatureType, List<ParsedFeature>> featMap = new HashMap<>();
+//        Map<FeatureType, List<ParsedFeature>> featMap = new HashMap<>();
 
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Start reading file  \"{0}\"", referenceJob.getFile() );
         try {
-            String parsedType;
-            String locusTag;
-            String product;
-            int start;
-            int stop;
-            int strand;
-            String ecNumber;
-            String geneName;
-            List<ParsedFeature> subFeatures;
-            int subStart;
-            int subStop;
-            ParsedFeature currentFeature;
-            ParsedChromosome currentChrom;
-            List<Exon> exons;
 
-            BEDCodec bedCodec = new BEDCodec( BEDCodec.StartOffset.ZERO );
-            AbstractFeatureReader<BEDFeature, LineIterator> reader = AbstractFeatureReader.getFeatureReader( referenceJob.getFile().getAbsolutePath(), bedCodec, false );
+            final BEDCodec bedCodec = new BEDCodec( BEDCodec.StartOffset.ZERO );
+            final AbstractFeatureReader<BEDFeature, LineIterator> reader = AbstractFeatureReader.getFeatureReader( referenceJob.getFile().getAbsolutePath(), bedCodec, false );
             if( bedCodec.canDecode( referenceJob.getFile().getAbsolutePath() ) ) {
 
                 Object header = reader.getHeader(); //TODO: something to do with the header?
 
                 Iterator<BEDFeature> featIt = reader.iterator();
                 while( reader.hasIndex() ) {
-                    BEDFeature feat = featIt.next();
+                    final BEDFeature feat = featIt.next();
 
                     if( chromMap.containsKey( feat.getChr() ) ) {
-                        currentChrom = chromMap.get( feat.getChr() );
-                        subFeatures = new ArrayList<>();
 
-                        start = feat.getStart();
-                        stop = feat.getEnd();
-                        geneName = feat.getName();
-                        strand = feat.getStrand().equals( Strand.POSITIVE ) ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV;
-                        locusTag = feat.getDescription();
-                        ecNumber = feat.getDescription(); //TODO: check this and test it
-                        product = feat.getDescription();
-                        parsedType = feat.getType();
+                        final int start = feat.getStart();
+                        final int stop = feat.getEnd();
+                        final int strand = feat.getStrand().equals( Strand.POSITIVE ) ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV;
+                        final String geneName = feat.getName();
+                        final String locusTag = feat.getDescription();
+                        final String ecNumber = feat.getDescription(); //TODO: check this and test it
+                        final String product = feat.getDescription();
+                        final String parsedType = feat.getType();
 
                         /*
                          * If the type of the feature is unknown to readxplorer (see below),
                          * an undefined type is used.
                          */
-                        FeatureType type = FeatureType.getFeatureType( parsedType );
+                        final FeatureType type = FeatureType.getFeatureType( parsedType );
                         if( type == FeatureType.UNDEFINED ) {
                             this.notifyObservers( referenceJob.getFile().getName()
                                                   + ": Using unknown feature type for " + parsedType );
                         }
 
-                        exons = feat.getExons();
-                        for( Exon exon : exons ) {
-                            subStart = exon.getCdStart();
-                            subStop = exon.getCdEnd();
+                        final List<ParsedFeature> subFeatures = new ArrayList<>();
+                        for( Exon exon : feat.getExons() ) {
+                            int subStart = exon.getCdStart();
+                            int subStop = exon.getCdEnd();
 //                            exon.getNumber();
 
                             subFeatures.add( new ParsedFeature( type, subStart, subStop, strand, locusTag, product, ecNumber, geneName, null, null ) );
@@ -143,7 +126,8 @@ public class TribbleBEDParser implements ReferenceParserI {
 //                        feat.getScore();
 //                        feat.getColor();
 
-                        currentFeature = new ParsedFeature( type, start, stop, strand, locusTag, product, ecNumber, geneName, subFeatures, null );
+                        ParsedFeature currentFeature = new ParsedFeature( type, start, stop, strand, locusTag, product, ecNumber, geneName, subFeatures, null );
+                        ParsedChromosome currentChrom = chromMap.get( feat.getChr() );
                         currentChrom.addFeature( currentFeature );
 
                     }
