@@ -38,6 +38,7 @@
         <module>readxplorer-tools-detailedviewer</module>
         <module>readxplorer-tools-doubletrackviewer</module>
         <module>readxplorer-tools-readpairclassifier</module>
+        <module>readxplorer-tools-referenceeditor</module>
     </modules>
 
 
