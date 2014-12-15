@@ -41,10 +41,10 @@ import org.openide.windows.WindowManager;
 
 @ActionID(
          category = "File",
-         id = "de.cebitec.readxplorer.vcf.handling.importer.VcfImportAction"
+         id = "de.cebitec.readxplorer.vcfhandling.importer.VcfImportAction"
 )
 @ActionRegistration(
-         iconBase = "de/cebitec/readxplorer/vcf/handling/importer/import.png",
+         iconBase = "de/cebitec/readxplorer/vcfhandling/importer/import.png",
          displayName = "#CTL_VcfImportAction"
 )
 @ActionReference( path = "Menu/File", position = 1487, separatorAfter = 1493 )

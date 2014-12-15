@@ -67,6 +67,11 @@
             <artifactId>readxplorer-utils</artifactId>
             <version>1.0.4</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-ui-visualisation</artifactId>
+            <version>1.0.2</version>
+        </dependency>
     </dependencies>
 
 
