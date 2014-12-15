@@ -36,6 +36,7 @@
         <module>readxplorer-ui-visualisation-track</module>
         <module>readxplorer-tools-coverageanalysis</module>
         <module>readxplorer-tools-detailedviewer</module>
+        <module>readxplorer-tools-doubletrackviewer</module>
     </modules>
 
 
