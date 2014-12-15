@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) 2014 Institute for Bioinformatics and Systems Biology, University Giessen, Germany
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<actions>
+    <menu name="File" mnemonic="F">
+        <action class="de.unibi.bibiserv.rnamovies.actions.OpenAction"
+                key="O" modifier="2"
+                toolBar="true"/>
+        <action class="de.unibi.bibiserv.rnamovies.actions.ImportAction"
+                key="I" modifier="2"/>
+        <action class="de.unibi.bibiserv.rnamovies.actions.Export"
+                key="S" modifier="2"/>
+        <separator/>
+        <action class="de.unibi.bibiserv.rnamovies.actions.Config"
+                key="C" modifier="2"/>
+        <separator/>
+        <action class="de.unibi.bibiserv.rnamovies.actions.Quit"
+                key="Q" modifier="2"/>
+    </menu>
+    <menu name="Movie" mnemonic="M">
+        <action class="de.unibi.bibiserv.rnamovies.actions.StartAction"
+                key="P" modifier="0"
+                toolBar="true"/>
+        <action class="de.unibi.bibiserv.rnamovies.actions.StopAction"
+                key="S" modifier="0"
+                toolBar="true"/>
+        <action class="de.unibi.bibiserv.rnamovies.actions.BSkip"
+                key="B" modifier="0"
+                toolBar="true"/>
+        <action class="de.unibi.bibiserv.rnamovies.actions.FSkip"
+                key="F" modifier="0"
+                toolBar="true"/>
+        <separator/>
+        <action class="de.unibi.bibiserv.rnamovies.actions.Goto"
+                key="G" modifier="2"
+                toolBar="false"/>
+    </menu>
+    <menu name="View" mnemonic="V">
+        <action class="de.unibi.bibiserv.rnamovies.actions.ZoomIn"
+                key="Z" modifier="2"/>
+        <action class="de.unibi.bibiserv.rnamovies.actions.ZoomOut"
+                key="U" modifier="2"/>
+        <action class="de.unibi.bibiserv.rnamovies.actions.ZoomFit"
+                key="F" modifier="2"/>
+        <separator/>
+        <action class="de.unibi.bibiserv.rnamovies.actions.Reset"
+                key="R" modifier="2"/>
+    </menu>
+    <menu name="Help" mnemonic="H">
+        <action class="de.unibi.bibiserv.rnamovies.actions.About"
+                key="A" modifier="2"
+                toolBar="false"/>
+    </menu>
+</actions>
