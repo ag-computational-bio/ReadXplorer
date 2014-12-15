@@ -41,6 +41,7 @@
         <module>readxplorer-tools-referenceeditor</module>
         <module>readxplorer-tools-rnafolder</module>
         <module>readxplorer-tools-snpdetection</module>
+        <module>readxplorer-tools-transcriptionanalyses</module>
     </modules>
 
 
