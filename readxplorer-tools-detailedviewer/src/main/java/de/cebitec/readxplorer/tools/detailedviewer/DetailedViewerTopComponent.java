@@ -78,19 +78,21 @@ public final class DetailedViewerTopComponent extends TopComponentExtended {
     private static String READPAIRCARD = "readPair";
 
     private String selectedViewer;
-    private  ViewController viewCon;
+    private final ViewController viewCon;
 
 
     public DetailedViewerTopComponent() {
-        initComponents();
-        setName( Bundle.CTL_DetailedViewerTopComponent() );
-        setToolTipText( Bundle.HINT_DetailedViewerTopComponent() );
-        this.viewCon = Utilities.actionsGlobalContext().lookup( ViewController.class );
+
+        this( Utilities.actionsGlobalContext().lookup( ViewController.class ) );
+
     }
 
 
     public DetailedViewerTopComponent( ViewController viewCon ) {
-        this();
+
+        initComponents();
+        setName( Bundle.CTL_DetailedViewerTopComponent() );
+        setToolTipText( Bundle.HINT_DetailedViewerTopComponent() );
         this.viewCon = viewCon;
 
     }
