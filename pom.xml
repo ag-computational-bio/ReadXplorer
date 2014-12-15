@@ -37,6 +37,7 @@
         <module>readxplorer-tools-coverageanalysis</module>
         <module>readxplorer-tools-detailedviewer</module>
         <module>readxplorer-tools-doubletrackviewer</module>
+        <module>readxplorer-tools-readpairclassifier</module>
     </modules>
 
 
