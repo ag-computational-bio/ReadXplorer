@@ -18,11 +18,79 @@
 
     <dependencies>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-utils</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>bio.comp.jlu.readxplorer</groupId>
+            <artifactId>readxplorer-centrallookup</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-ui</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-databackend</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-ui-importer</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-ui-visualisation-reference</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-exporter</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+        <dependency>
+          <groupId>de.erichseifert.gral</groupId>
+          <artifactId>gral-core</artifactId>
+          <version>0.10</version>
+        </dependency>
+        <dependency>
+            <groupId>jsc</groupId>
+            <artifactId>jsc.distribution</artifactId>
+            <version>0.10</version>
+        </dependency>
+        <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-api-annotations-common</artifactId>
             <version>${netbeans.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-dialogs</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-util</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-windows</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
     </dependencies>
+
+
+    <repositories>
+        <repository>
+          <id>erichseifert.de</id>
+          <url>http://mvn.erichseifert.de/maven2</url>
+        </repository>
+    </repositories>
 
 
     <build>

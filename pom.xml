@@ -42,7 +42,6 @@
         <module>readxplorer-tools-rnafolder</module>
         <module>readxplorer-tools-snpdetection</module>
         <module>readxplorer-tools-transcriptionanalyses</module>
-        <module>readxplorer-tools-transcrptomeanalyses</module>
         <module>readxplorer-tools-transcriptomeanalyses</module>
     </modules>
 
@@ -59,14 +58,29 @@
 
     <repositories>
         <repository>
+            <id>central</id>
+            <name>Maven Repository Switchboard</name>
+            <layout>default</layout>
+            <url>http://repo1.maven.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
             <id>netbeans</id>
             <name>NetBeans</name>
             <url>http://bits.netbeans.org/nexus/content/groups/netbeans/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
         <repository>
             <id>biojava-maven-repo</id>
             <name>BioJava repository</name>
             <url>http://www.biojava.org/download/maven/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
         </repository>
     </repositories>
 
