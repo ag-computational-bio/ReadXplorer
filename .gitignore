@@ -26,3 +26,4 @@ nbdist/
 nbactions.xml
 nb-configuration.xml
 
+!/branding/src/main/nbm-branding/core/core.jar/
