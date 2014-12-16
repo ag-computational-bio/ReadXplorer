@@ -20,50 +20,50 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <filesystem>
     <folder name="Actions">
         <folder name="Edit">
-            <file name="de-cebitec-readxplorer-thumbnail-Actions-ASyncSliders.instance">
-                <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
-                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.thumbnail.Actions.Bundle#CTL_AsyncSliders"/>
-                <attr name="injectable" stringvalue="de.cebitec.readxplorer.thumbnail.Actions.AsyncSliders"/>
-                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
+            <file name="de-cebitec-readxplorer-thumbnail-actions-ASyncSliders.instance">
+                <attr name="delegate" methodvalue="org.openide.awt.actions.inject"/>
+                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.thumbnail.actions.Bundle#CTL_AsyncSliders"/>
+                <attr name="injectable" stringvalue="de.cebitec.readxplorer.thumbnail.actions.AsyncSliders"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
-                <attr name="type" stringvalue="de.cebitec.readxplorer.thumbnail.Actions.ASyncSliderCookie"/>
+                <attr name="type" stringvalue="de.cebitec.readxplorer.thumbnail.actions.ASyncSliderCookie"/>
             </file>
-            <file name="de-cebitec-readxplorer-thumbnail-Actions-SyncSliders.instance">
-                <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
-                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.thumbnail.Actions.Bundle#CTL_SyncSliders"/>
-                <attr name="injectable" stringvalue="de.cebitec.readxplorer.thumbnail.Actions.SyncSliders"/>
-                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
+            <file name="de-cebitec-readxplorer-thumbnail-actions-SyncSliders.instance">
+                <attr name="delegate" methodvalue="org.openide.awt.actions.inject"/>
+                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.thumbnail.actions.Bundle#CTL_SyncSliders"/>
+                <attr name="injectable" stringvalue="de.cebitec.readxplorer.thumbnail.actions.SyncSliders"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
-                <attr name="type" stringvalue="de.cebitec.readxplorer.thumbnail.Actions.SyncSliderCookie"/>
+                <attr name="type" stringvalue="de.cebitec.readxplorer.thumbnail.actions.SyncSliderCookie"/>
             </file>
         </folder>
         <folder name="RemoveTracks">
-            <file name="de-cebitec-readxplorer-thumbnail-Actions-RemoveFeatureAction.instance">
-                <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
-                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.thumbnail.Actions.Bundle#CTL_RemoveTracksAction"/>
-                <attr name="injectable" stringvalue="de.cebitec.readxplorer.thumbnail.Actions.RemoveFeatureAction"/>
-                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
+            <file name="de-cebitec-readxplorer-thumbnail-actions-RemoveFeatureAction.instance">
+                <attr name="delegate" methodvalue="org.openide.awt.actions.inject"/>
+                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.thumbnail.actions.Bundle#CTL_RemoveTracksAction"/>
+                <attr name="injectable" stringvalue="de.cebitec.readxplorer.thumbnail.actions.RemoveFeatureAction"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
-                <attr name="type" stringvalue="de.cebitec.readxplorer.thumbnail.Actions.RemoveCookie"/>
+                <attr name="type" stringvalue="de.cebitec.readxplorer.thumbnail.actions.RemoveCookie"/>
             </file>
         </folder>
         <folder name="Tools">
-            <file name="de-cebitec-readxplorer-thumbnail-Actions-ActivateSliderCalc.instance">
-                <attr name="delegate" newvalue="de.cebitec.readxplorer.thumbnail.Actions.ActivateSliderCalc"/>
+            <file name="de-cebitec-readxplorer-thumbnail-actions-ActivateSliderCalc.instance">
+                <attr name="delegate" newvalue="de.cebitec.readxplorer.thumbnail.actions.ActivateSliderCalc"/>
                 <attr name="noIconInMenu" boolvalue="true"/>
             </file>
-            <file name="de-cebitec-readxplorer-thumbnail-Actions-OpenThumbnail.instance">
-                <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
-                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.thumbnail.Actions.Bundle#CTL_OpenThumbnail"/>
+            <file name="de-cebitec-readxplorer-thumbnail-actions-OpenThumbnail.instance">
+                <attr name="delegate" methodvalue="org.openide.awt.actions.inject"/>
+                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.thumbnail.actions.Bundle#CTL_OpenThumbnail"/>
                 <attr name="iconBase" stringvalue="de/cebitec/readxplorer/thumbnail/thumbOpen.png"/>
-                <attr name="injectable" stringvalue="de.cebitec.readxplorer.thumbnail.Actions.OpenThumbnail"/>
-                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
+                <attr name="injectable" stringvalue="de.cebitec.readxplorer.thumbnail.actions.OpenThumbnail"/>
+                <attr name="instanceCreate" methodvalue="org.openide.awt.actions.context"/>
                 <attr name="noIconInMenu" boolvalue="false"/>
                 <attr name="selectionType" stringvalue="EXACTLY_ONE"/>
-                <attr name="type" stringvalue="de.cebitec.readxplorer.thumbnail.Actions.OpenThumbCookie"/>
+                <attr name="type" stringvalue="de.cebitec.readxplorer.thumbnail.actions.OpenThumbCookie"/>
             </file>
         </folder>
         <folder name="Window">
@@ -83,39 +83,39 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <folder name="Tools">
             <folder name="Thumbnail">
                 <attr name="position" intvalue="500"/>
-                <file name="de-cebitec-readxplorer-thumbnail-Actions-OpenThumbnail.shadow">
-                    <attr name="originalFile" stringvalue="Actions/Tools/de-cebitec-readxplorer-thumbnail-Actions-OpenThumbnail.instance"/>
+                <file name="de-cebitec-readxplorer-thumbnail-actions-OpenThumbnail.shadow">
+                    <attr name="originalFile" stringvalue="Actions/Tools/de-cebitec-readxplorer-thumbnail-actions-OpenThumbnail.instance"/>
                     <attr name="position" intvalue="100"/>
                 </file>
                 <folder name="Slider">
                     <attr name="position" intvalue="150"/>
-                    <file name="de-cebitec-readxplorer-thumbnail-Actions-ActivateSliderCalc.shadow">
-                        <attr name="originalFile" stringvalue="Actions/Tools/de-cebitec-readxplorer-thumbnail-Actions-ActivateSliderCalc.instance"/>
+                    <file name="de-cebitec-readxplorer-thumbnail-actions-ActivateSliderCalc.shadow">
+                        <attr name="originalFile" stringvalue="Actions/Tools/de-cebitec-readxplorer-thumbnail-actions-ActivateSliderCalc.instance"/>
 
                     </file>
                 </folder>
-                <file name="de-cebitec-readxplorer-thumbnail-Actions-OpenThumbnail-separatorAfter.instance">
+                <file name="de-cebitec-readxplorer-thumbnail-actions-OpenThumbnail-separatorAfter.instance">
                     <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                     <attr name="position" intvalue="200"/>
                 </file>
-                <file name="de-cebitec-readxplorer-thumbnail-Actions-SyncSliders.shadow">
-                    <attr name="originalFile" stringvalue="Actions/Edit/de-cebitec-readxplorer-thumbnail-Actions-SyncSliders.instance"/>
+                <file name="de-cebitec-readxplorer-thumbnail-actions-SyncSliders.shadow">
+                    <attr name="originalFile" stringvalue="Actions/Edit/de-cebitec-readxplorer-thumbnail-actions-SyncSliders.instance"/>
                     <attr name="position" intvalue="300"/>
                 </file>
-                <file name="de-cebitec-readxplorer-thumbnail-Actions-ASyncSliders.shadow">
-                    <attr name="originalFile" stringvalue="Actions/Edit/de-cebitec-readxplorer-thumbnail-Actions-ASyncSliders.instance"/>
+                <file name="de-cebitec-readxplorer-thumbnail-actions-ASyncSliders.shadow">
+                    <attr name="originalFile" stringvalue="Actions/Edit/de-cebitec-readxplorer-thumbnail-actions-ASyncSliders.instance"/>
                     <attr name="position" intvalue="350"/>
                 </file>
-                <file name="de-cebitec-readxplorer-thumbnail-Actions-SyncSliders-separatorAfter.instance">
+                <file name="de-cebitec-readxplorer-thumbnail-actions-SyncSliders-separatorAfter.instance">
                     <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                     <attr name="position" intvalue="400"/>
                 </file>
-                <file name="de-cebitec-readxplorer-thumbnail-Actions-RemoveTracksAction-separatorBefore.instance">
+                <file name="de-cebitec-readxplorer-thumbnail-actions-RemoveTracksAction-separatorBefore.instance">
                     <attr name="instanceClass" stringvalue="javax.swing.JSeparator"/>
                     <attr name="position" intvalue="600"/>
                 </file>
-                <file name="de-cebitec-readxplorer-thumbnail-Actions-RemoveTracksAction.shadow">
-                    <attr name="originalFile" stringvalue="Actions/RemoveTracks/de-cebitec-readxplorer-thumbnail-Actions-RemoveFeatureAction.instance"/>
+                <file name="de-cebitec-readxplorer-thumbnail-actions-RemoveTracksAction.shadow">
+                    <attr name="originalFile" stringvalue="Actions/RemoveTracks/de-cebitec-readxplorer-thumbnail-actions-RemoveFeatureAction.instance"/>
                     <attr name="position" intvalue="700"/>
                 </file>
             </folder>
@@ -124,8 +124,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </folder>
     <folder name="Toolbars">
         <folder name="Tools">
-            <file name="de-cebitec-readxplorer-thumbnail-Actions-OpenThumbnail.shadow">
-                <attr name="originalFile" stringvalue="Actions/Tools/de-cebitec-readxplorer-thumbnail-Actions-OpenThumbnail.instance"/>
+            <file name="de-cebitec-readxplorer-thumbnail-actions-OpenThumbnail.shadow">
+                <attr name="originalFile" stringvalue="Actions/Tools/de-cebitec-readxplorer-thumbnail-actions-OpenThumbnail.instance"/>
                 <attr name="position" intvalue="400"/>
             </file>
         </folder>

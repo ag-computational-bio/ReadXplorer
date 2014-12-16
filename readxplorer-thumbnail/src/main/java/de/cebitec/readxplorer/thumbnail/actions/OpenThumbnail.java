@@ -15,16 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.thumbnail.Actions;
+package de.cebitec.readxplorer.thumbnail.actions;
 
 
-/**
- *
- * @author denis
- */
-public interface OpenThumbCookie {
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-    public void open();
+
+public final class OpenThumbnail implements ActionListener {
+
+    private final OpenThumbCookie openCookie;
+
+
+    public OpenThumbnail( OpenThumbCookie context ) {
+        this.openCookie = context;
+    }
+
+
+    @Override
+    public void actionPerformed( ActionEvent ev ) {
+        openCookie.open();
+    }
 
 
 }

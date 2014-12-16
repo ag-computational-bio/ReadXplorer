@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.thumbnail.Actions;
+package de.cebitec.readxplorer.thumbnail.actions;
 
 
 /**
  *
  * @author denis
  */
-public interface ASyncSliderCookie {
+public interface OpenThumbCookie {
 
-    public void async();
+    public void open();
 
 
 }

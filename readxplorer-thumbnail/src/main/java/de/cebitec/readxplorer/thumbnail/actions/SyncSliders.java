@@ -15,26 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.thumbnail.Actions;
+package de.cebitec.readxplorer.thumbnail.actions;
 
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 
-public final class RemoveFeatureAction implements ActionListener {
+public final class SyncSliders implements ActionListener {
 
-    private final RemoveCookie context;
+    private final SyncSliderCookie context;
 
 
-    public RemoveFeatureAction( RemoveCookie context ) {
+    public SyncSliders( SyncSliderCookie context ) {
         this.context = context;
     }
 
 
     @Override
     public void actionPerformed( ActionEvent ev ) {
-        context.removeTracks();
+        context.syncSliders();
     }
 
 
