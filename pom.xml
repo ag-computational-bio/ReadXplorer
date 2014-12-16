@@ -59,9 +59,8 @@
     <repositories>
         <repository>
             <id>central</id>
-            <name>Maven Repository Switchboard</name>
-            <layout>default</layout>
-            <url>http://repo1.maven.org/maven2</url>
+            <name>Central Repository</name>
+            <url>http://repo.maven.apache.org/maven2/</url>
             <snapshots>
                 <enabled>false</enabled>
             </snapshots>

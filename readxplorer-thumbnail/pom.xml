@@ -37,11 +37,6 @@
             <version>${netbeans.version}</version>
         </dependency>
         <dependency>
-            <groupId>bio.comp.jlu.readxplorer</groupId>
-            <artifactId>centrallookup</artifactId>
-            <version>${module.version.centrallookup}</version>
-        </dependency>
-        <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util</artifactId>
             <version>${netbeans.version}</version>
@@ -85,6 +80,11 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-ui-visualisation</artifactId>
             <version>1.0.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-dialogs</artifactId>
+            <version>RELEASE80</version>
         </dependency>
     </dependencies>
 

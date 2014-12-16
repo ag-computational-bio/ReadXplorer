@@ -35,11 +35,6 @@
             <version>${netbeans.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.utgenome.thirdparty</groupId>
-            <artifactId>picard</artifactId>
-            <version>1.102.0</version>
-        </dependency>
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-utils</artifactId>
             <version>1.0.4</version>

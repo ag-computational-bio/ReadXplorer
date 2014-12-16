@@ -16,6 +16,31 @@
 
     <dependencies>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-api</artifactId>
+            <version>${module.version.api}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-ui</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-centrallookup</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-utils</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-databackend</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+        <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-api-annotations-common</artifactId>
             <version>${netbeans.version}</version>
@@ -26,14 +51,9 @@
             <version>${netbeans.version}</version>
         </dependency>
         <dependency>
-            <groupId>bio.comp.jlu.readxplorer</groupId>
-            <artifactId>centrallookup</artifactId>
-            <version>${module.version.centrallookup}</version>
-        </dependency>
-        <dependency>
-            <groupId>bio.comp.jlu.readxplorer</groupId>
-            <artifactId>readxplorer-api</artifactId>
-            <version>${module.version.api}</version>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-util</artifactId>
+            <version>${netbeans.version}</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
@@ -41,19 +61,14 @@
             <version>${netbeans.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>readxplorer-ui</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>readxplorer-centrallookup</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.netbeans.api</groupId>
-            <artifactId>org-openide-util</artifactId>
-            <version>RELEASE80</version>
+            <artifactId>org-netbeans-api-progress</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>bio.comp.jlu.readxplorer</groupId>
+            <artifactId>readxplorer-parser</artifactId>
+            <version>1.1.1</version>
         </dependency>
     </dependencies>
 

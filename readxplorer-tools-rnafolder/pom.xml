@@ -62,6 +62,16 @@
             <version>1.1.1</version>
         </dependency>
         <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-awt</artifactId>
+            <version>RELEASE80</version>
+        </dependency>
+        <dependency>
+            <groupId>bio.comp.jlu.readxplorer</groupId>
+            <artifactId>readxplorer-utils</artifactId>
+            <version>1.0.4</version>
+        </dependency>
+        <dependency>
             <groupId>javax</groupId>
             <artifactId>javaee-api</artifactId>
             <version>7.0</version>

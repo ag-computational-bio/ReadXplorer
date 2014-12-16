@@ -37,11 +37,6 @@
         </dependency>
         <dependency>
             <groupId>bio.comp.jlu.readxplorer</groupId>
-            <artifactId>centrallookup</artifactId>
-            <version>${module.version.centrallookup}</version>
-        </dependency>
-        <dependency>
-            <groupId>bio.comp.jlu.readxplorer</groupId>
             <artifactId>readxplorer-api</artifactId>
             <version>${module.version.api}</version>
         </dependency>
@@ -64,6 +59,26 @@
             <groupId>bio.comp.jlu.readxplorer</groupId>
             <artifactId>readxplorer-centrallookup</artifactId>
             <version>1.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-api-progress</artifactId>
+            <version>RELEASE80</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-awt</artifactId>
+            <version>RELEASE80</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-dialogs</artifactId>
+            <version>RELEASE80</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-modules</artifactId>
+            <version>RELEASE80</version>
         </dependency>
     </dependencies>
 

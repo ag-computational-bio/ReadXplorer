@@ -70,11 +70,24 @@
             <artifactId>org-openide-io</artifactId>
             <version>${netbeans.version}</version>
         </dependency>
+        <dependency>
+            <groupId>bio.comp.jlu.external.picard</groupId>
+            <artifactId>picard</artifactId>
+            <version>1.110</version>
+            <type>jar</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.java.contract</groupId>
+                    <artifactId>cofoja</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 
 
     <build>
         <plugins>
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
@@ -85,6 +98,16 @@
                         <publicPackage>de.cebitec.readxplorer.utils.classification</publicPackage>
                         <publicPackage>de.cebitec.readxplorer.utils.fileChooser</publicPackage>
                         <publicPackage>de.cebitec.readxplorer.utils.polyTree</publicPackage>
+                        <publicPackage>de.cebitec.common.*</publicPackage>
+                        <publicPackage>net.sf.picard.*</publicPackage>
+                        <publicPackage>net.sf.samtools.*</publicPackage>
+                        <publicPackage>org.broad.tribble.*</publicPackage>
+                        <publicPackage>org.apache.commons.logging.*</publicPackage>
+                        <publicPackage>org.apache.batik.*</publicPackage>
+                        <publicPackage>org.w3c.dom.*</publicPackage>
+                        <publicPackage>org.xml.sax.*</publicPackage>
+                        <publicPackage>javax.xml.parsers.*</publicPackage>
+                        <publicPackage>org.testng.*</publicPackage>
                     </publicPackages>
                 </configuration>
             </plugin>
