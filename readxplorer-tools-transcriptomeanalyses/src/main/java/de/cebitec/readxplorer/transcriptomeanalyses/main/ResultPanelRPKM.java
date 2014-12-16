@@ -11,7 +11,6 @@ import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
-import de.cebitec.readxplorer.ui.visualisation.reference.ReferenceFeatureTopComp;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
 import java.util.HashMap;
 import javax.swing.DefaultListSelectionModel;
@@ -35,12 +34,12 @@ public class ResultPanelRPKM extends ResultTablePanel {
     public static final String FEATURES_TOTAL = "Total number of reference features";
     private RPKMAnalysisResult rpkmCalcResult;
     private final HashMap<String, Object> filterStatisticsMap;
-    private PersistentFeature feature;
-    private final boolean statistics = false;
+//    private PersistentFeature feature;
+//    private final boolean statistics = false;
     private BoundsInfoManager boundsInfoManager;
-    private ReferenceViewer referenceViewer;
+//    private ReferenceViewer referenceViewer;
     private final TableRightClickFilter<UneditableTableModel> tableFilter;
-    private ReferenceFeatureTopComp refComp;
+//    private ReferenceFeatureTopComp refComp;
 
 
     /**
@@ -161,19 +160,19 @@ public class ResultPanelRPKM extends ResultTablePanel {
     // End of variables declaration//GEN-END:variables
 
 
-    /**
-     * Updates the navigator bar of all viewers to the start position of the
-     * selected feature.
-     */
-    private void showFeatureStartPosition() {
-        DefaultListSelectionModel model = (DefaultListSelectionModel) this.rpkmTable.getSelectionModel();
-        int selectedView = model.getLeadSelectionIndex();
-        int selectedModel = this.rpkmTable.convertRowIndexToModel( selectedView );
-        feature = (PersistentFeature) this.rpkmTable.getModel().getValueAt( selectedModel, 0 );
-        int pos = feature.getStartOnStrand();
-
-        getBoundsInfoManager().navigatorBarUpdated( pos );
-    }
+//    /**
+//     * Updates the navigator bar of all viewers to the start position of the
+//     * selected feature.
+//     */
+//    private void showFeatureStartPosition() {
+//        DefaultListSelectionModel model = (DefaultListSelectionModel) this.rpkmTable.getSelectionModel();
+//        int selectedView = model.getLeadSelectionIndex();
+//        int selectedModel = this.rpkmTable.convertRowIndexToModel( selectedView );
+//        feature = (PersistentFeature) this.rpkmTable.getModel().getValueAt( selectedModel, 0 );
+//        int pos = feature.getStartOnStrand();
+//
+//        getBoundsInfoManager().navigatorBarUpdated( pos );
+//    }
 
 
     /**
@@ -185,7 +184,7 @@ public class ResultPanelRPKM extends ResultTablePanel {
      */
     public void setReferenceViewer( ReferenceViewer referenceViewer ) {
         this.boundsInfoManager = referenceViewer.getBoundsInformationManager();
-        this.referenceViewer = referenceViewer;
+//        this.referenceViewer = referenceViewer;
     }
 
 
@@ -213,10 +212,8 @@ public class ResultPanelRPKM extends ResultTablePanel {
 //                @Override
 //                public void run() {
             DefaultTableModel model = (DefaultTableModel) rpkmTable.getModel();
-
-            PersistentFeature feat;
             for( RPKMvalue rpkm : rpkmCalcResult.getResults() ) {
-                feat = rpkm.getFeature();
+                PersistentFeature feat = rpkm.getFeature();
                 Object[] rowData = new Object[nbColumns];
                 int i = 0;
                 rowData[i++] = feat.getLocus();

@@ -39,7 +39,7 @@ public class VisualizationListener implements ActionListener {
     boolean isGaToCtSelected, isGcToAtSelected;
     private final PersistentReference persistentReference;
     private MultiPurposeTopComponent topComponent;
-    private TSSDetectionResults tssResult;
+//    private TSSDetectionResults tssResult;
     ParameterSetFiveEnrichedAnalyses params;
 
 

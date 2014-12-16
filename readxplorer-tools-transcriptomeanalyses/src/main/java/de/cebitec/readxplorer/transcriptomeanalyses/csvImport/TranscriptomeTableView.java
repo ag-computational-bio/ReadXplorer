@@ -148,14 +148,12 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
 
         int trackID = (Integer) fstSheet.get( 1 ).get( fstSheet.get( 0 ).size() - 1 );
         int chromId = (Integer) fstSheet.get( 1 ).get( fstSheet.get( 0 ).size() - 3 );
-
         this.initConnectors( chromId, trackID );
+
         if( refConnector != null ) {
             try {
                 this.initFeatureData();
 
-                String tmp;
-                String replaced;
                 double mappingCount = 0;
                 double mappingMeanLength = 0;
                 double mappingsPerMillion = 0;
@@ -167,37 +165,37 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                     for( List<?> columns : sndSheet ) {
                         if( columns.get( 0 ) != null ) {
                             if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.MAPPINGS_COUNT ) ) {
-                                tmp = (String) columns.get( 1 );
-                                replaced = tmp.replaceAll( ",", "." );
+                                String tmp = (String) columns.get( 1 );
+                                String replaced = tmp.replaceAll( ",", "." );
                                 mappingCount = Double.valueOf( replaced );
                             }
                             else if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH ) ) {
-                                tmp = (String) columns.get( 1 );
-                                replaced = tmp.replaceAll( ",", "." );
+                                String tmp = (String) columns.get( 1 );
+                                String replaced = tmp.replaceAll( ",", "." );
                                 mappingMeanLength = Double.valueOf( replaced );
                             }
                             else if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.MAPPINGS_MILLION ) ) {
-                                tmp = (String) columns.get( 1 );
-                                replaced = tmp.replaceAll( ",", "." );
+                                String tmp = (String) columns.get( 1 );
+                                String replaced = tmp.replaceAll( ",", "." );
                                 mappingsPerMillion = Double.valueOf( replaced );
                             }
                             else if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_OVERSPANNING_READS ) ) {
-                                tmp = (String) columns.get( 1 );
-                                replaced = tmp.replaceAll( ",", "." );
+                                String tmp = (String) columns.get( 1 );
+                                String replaced = tmp.replaceAll( ",", "." );
                                 backgroundThreshold = Double.valueOf( replaced );
                             }
                             else if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.TSS_FRACTION ) ) {
-                                tmp = (String) columns.get( 1 );
-                                replaced = tmp.replaceAll( ",", "." );
+                                String tmp = (String) columns.get( 1 );
+                                String replaced = tmp.replaceAll( ",", "." );
                                 fraction = Double.valueOf( replaced );
                             }
                             else if( columns.get( 0 ).equals( WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_OP ) ) {
-                                tmp = (String) columns.get( 1 );
-                                includeBestMatchedReads_OP = !tmp.equals( "no" );
+                                String tmp = (String) columns.get( 1 );
+                                includeBestMatchedReads_OP = !"no".equals( tmp );
                             }
                             else if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.TSS_MANUALLY_SET_THRESHOLD ) ) {
-                                tmp = (String) columns.get( 1 );
-                                isThresholdSettedManually = !tmp.equals( "no" );
+                                String tmp = (String) columns.get( 1 );
+                                isThresholdSettedManually = !"no".equals( tmp );
                             }
                         }
                     }
@@ -207,24 +205,21 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                 params.setThresholdManuallySet( isThresholdSettedManually );
                 StatisticsOnMappingData stats = new StatisticsOnMappingData( trackConnector, mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold );
 
-                List<Operon> operons = new ArrayList<>();
-                List<OperonAdjacency> adjacencies;
-                Operon operon;
-
+                List<Operon> operons = new ArrayList<>( fstSheet.size() );
                 for( int row = 1; row < fstSheet.size(); row++ ) {
-                    adjacencies = new ArrayList<>();
-                    operon = new Operon( trackID );
+                    final Operon operon = new Operon( trackID );
                     // getAll Adjacencies, put them in operon.
                     int transcriptStart = (Integer) fstSheet.get( row ).get( 0 );
                     operon.setStartPositionOfTranscript( transcriptStart );
 
-                    String firstFeatures = (String) fstSheet.get( row ).get( 1 );
-                    String[] splittedFeatures = firstFeatures.split( "\n" );
-                    String secondFeatures = (String) fstSheet.get( row ).get( 2 );
-                    String[] splitedSecFeatures = secondFeatures.split( "\n" );
-                    String spanningReadCount = (String) fstSheet.get( row ).get( 8 );
-                    String[] splitedSpanningReadCounts = spanningReadCount.split( "\n" );
+                    final String firstFeatures = (String) fstSheet.get( row ).get( 1 );
+                    final String[] splittedFeatures = firstFeatures.split( "\n" );
+                    final String secondFeatures = (String) fstSheet.get( row ).get( 2 );
+                    final String[] splitedSecFeatures = secondFeatures.split( "\n" );
+                    final String spanningReadCount = (String) fstSheet.get( row ).get( 8 );
+                    final String[] splitedSpanningReadCounts = spanningReadCount.split( "\n" );
 
+                    List<OperonAdjacency> adjacencies = new ArrayList<>( splitedSecFeatures.length );
                     for( int i = 0; i < splittedFeatures.length; i++ ) {
                         String firstFeature = splittedFeatures[i];
                         String secondFeature = splitedSecFeatures[i];
@@ -234,13 +229,10 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                         adjacencies.add( adj );
                     }
 
-                    boolean isFwd;
                     String direction = (String) fstSheet.get( row ).get( 3 );
                     String withoutNewLine = direction.substring( 0, direction.length() - 1 );
-                    isFwd = withoutNewLine.equals( "Fwd" );
-
+                    boolean isFwd = withoutNewLine.equals( "Fwd" );
                     boolean isFalsPositive = (Boolean) fstSheet.get( row ).get( 6 );
-
                     boolean isConsidered = (Boolean) fstSheet.get( row ).get( 7 );
 
                     operon.addAllOperonAdjacencies( adjacencies );
@@ -292,24 +284,21 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                     }
                 }
                 ParameterSetWholeTranscriptAnalyses params = new ParameterSetWholeTranscriptAnalyses( true, false, false, true, null, 0, 0, false, 0, false, includeBestMatchedReads_RPKM, false );
-                List<RPKMvalue> rpkms = new ArrayList<>();
-                RPKMvalue rpkm = null;
+                List<RPKMvalue> rpkms = new ArrayList<>( fstSheet.size() );
                 for( int row = 1; row < fstSheet.size(); row++ ) {
 
                     String featureLocus = (String) fstSheet.get( row ).get( 0 );
                     int known5Utr = (Integer) fstSheet.get( row ).get( 6 );
 
                     String rpkmString = (String) fstSheet.get( row ).get( 7 );
-                    String replaced = rpkmString.replaceAll( ",", "." );
-                    double rpkmValue = Double.valueOf( replaced );
+                    double rpkmValue = Double.valueOf( rpkmString.replaceAll( ",", "." ) );
 
                     String logRpkmString = (String) fstSheet.get( row ).get( 8 );
-                    replaced = logRpkmString.replaceAll( ",", "." );
-                    double logRpkm = Double.valueOf( replaced );
+                    double logRpkm = Double.valueOf( logRpkmString.replaceAll( ",", "." ) );
 
                     int readCount = (Integer) fstSheet.get( row ).get( 9 );
 
-                    rpkm = new RPKMvalue( featureMap.get( featureLocus ), rpkmValue, logRpkm, readCount, trackID, chromId );
+                    RPKMvalue rpkm = new RPKMvalue( featureMap.get( featureLocus ), rpkmValue, logRpkm, readCount, trackID, chromId );
                     rpkm.setLongestKnownUtrLength( known5Utr );
                     rpkms.add( rpkm );
                 }
@@ -346,8 +335,6 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
             try {
                 this.initFeatureData();
 
-                String tmp;
-                String replaced;
                 double mappingCount = 0;
                 boolean includeBestMatchedReads = false;
                 boolean includeRatioValue = false;
@@ -363,52 +350,52 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                     for( List<?> columns : sndSheet ) {
                         if( columns.get( 0 ) != null ) {
                             if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.MAPPINGS_COUNT ) ) {
-                                tmp = (String) columns.get( 1 );
-                                replaced = tmp.replaceAll( ",", "." );
+                                String tmp = (String) columns.get( 1 );
+                                String replaced = tmp.replaceAll( ",", "." );
                                 mappingCount = Double.valueOf( replaced );
                             }
                             else if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH ) ) {
-                                tmp = (String) columns.get( 1 );
-                                replaced = tmp.replaceAll( ",", "." );
+                                String tmp = (String) columns.get( 1 );
+                                String replaced = tmp.replaceAll( ",", "." );
                                 mappingMeanLength = Double.valueOf( replaced );
                             }
                             else if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.MAPPINGS_MILLION ) ) {
-                                tmp = (String) columns.get( 1 );
-                                replaced = tmp.replaceAll( ",", "." );
+                                String tmp = (String) columns.get( 1 );
+                                String replaced = tmp.replaceAll( ",", "." );
                                 mappingsPerMillion = Double.valueOf( replaced );
                             }
                             else if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_STACKSIZE ) ) {
-                                tmp = (String) columns.get( 1 );
-                                replaced = tmp.replaceAll( ",", "." );
+                                String tmp = (String) columns.get( 1 );
+                                String replaced = tmp.replaceAll( ",", "." );
                                 backgroundThreshold = Double.valueOf( replaced );
                             }
                             else if( columns.get( 0 ).equals( WizardPropertyStrings.PROP_Fraction ) ) {
 
-                                tmp = (String) columns.get( 1 );
-                                replaced = tmp.replaceAll( ",", "." );
+                                String tmp = (String) columns.get( 1 );
+                                String replaced = tmp.replaceAll( ",", "." );
                                 fraction = Double.valueOf( replaced );
                             }
                             else if( columns.get( 0 ).equals( NovelRegionResultPanel.NOVELREGION_DETECTION_MIN_LENGTH ) ) {
-                                tmp = (String) columns.get( 1 );
+                                String tmp = (String) columns.get( 1 );
                                 minBoundary = Integer.valueOf( tmp );
                             }
                             else if( columns.get( 0 ).equals( WizardPropertyStrings.PROP_INCLUDE_RATIO_VALUE_IN_NOVEL_REGION_DETECTION ) ) {
-                                tmp = (String) columns.get( 1 );
-                                if( tmp.equals( "yes" ) ) {
+                                String tmp = (String) columns.get( 1 );
+                                if( "yes".equals( tmp ) ) {
                                     includeRatioValue = true;
                                 }
                             }
                             else if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.TSS_MANUALLY_SET_THRESHOLD ) ) {
-                                tmp = (String) columns.get( 1 );
-                                isThresholdSettedManually = !tmp.equals( "no" );
+                                String tmp = (String) columns.get( 1 );
+                                isThresholdSettedManually = !"no".equals( tmp );
                             }
                             else if( columns.get( 0 ).equals( WizardPropertyStrings.PROP_RATIO_NOVELREGION_DETECTION ) ) {
-                                tmp = (String) columns.get( 1 );
+                                String tmp = (String) columns.get( 1 );
                                 ratio = Integer.valueOf( tmp );
                             }
                             else if( columns.get( 0 ).equals( WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_NR ) ) {
-                                tmp = (String) columns.get( 1 );
-                                includeBestMatchedReads = !tmp.equals( "no" );
+                                String tmp = (String) columns.get( 1 );
+                                includeBestMatchedReads = !"no".equals( tmp );
                             }
                         }
                     }
@@ -417,23 +404,22 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                 params.setThresholdManuallySet( isThresholdSettedManually );
                 StatisticsOnMappingData stats = new StatisticsOnMappingData( trackConnector, mappingMeanLength, mappingsPerMillion, mappingCount, backgroundThreshold );
 
-                List<NovelTranscript> novelRegions = new ArrayList<>();
+                List<NovelTranscript> novelRegions = new ArrayList<>( fstSheet.size() );
                 NovelRegionResult novelRegionResults = new NovelRegionResult( refConnector.getRefGenome(), stats, trackMap, novelRegions, false );
                 novelRegionResults.setParameters( params );
-                NovelTranscript novelRegion;
                 for( int row = 1; row < fstSheet.size(); row++ ) {
 
                     int novelRegStartPos = (Integer) fstSheet.get( row ).get( 0 );
 
                     String strand = (String) fstSheet.get( row ).get( 1 );
-                    boolean isFwd = strand.equals( "Fwd" );
+                    boolean isFwd = "Fwd".equals( strand );
                     boolean isFP = (Boolean) fstSheet.get( row ).get( 2 );
                     boolean isSelectedForBlast = (Boolean) fstSheet.get( row ).get( 3 );
                     boolean isFinished = (Boolean) fstSheet.get( row ).get( 4 );
                     int dropOff = (Integer) fstSheet.get( row ).get( 6 );
                     int length = (Integer) fstSheet.get( row ).get( 7 );
 
-                    novelRegion = new NovelTranscript( isFwd, novelRegStartPos, dropOff, (String) fstSheet.get( row ).get( 5 ),
+                    NovelTranscript novelRegion = new NovelTranscript( isFwd, novelRegStartPos, dropOff, (String) fstSheet.get( row ).get( 5 ),
                                                        length, (String) fstSheet.get( row ).get( 8 ), isFP, isSelectedForBlast, trackID, chromId );
                     novelRegion.setIsConsidered( isFinished );
                     novelRegions.add( novelRegion );
@@ -476,8 +462,6 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
             try {
                 this.initFeatureData();
 
-                String replaced;
-                String tmp;
                 double mappingCount = 0;
                 double mappingMeanLength = 0;
                 double mappingsPerMillion = 0;
@@ -503,48 +487,48 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
 
                         if( columns.get( 0 ) != null ) {
                             if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.MAPPINGS_COUNT ) ) {
-                                tmp = (String) columns.get( 1 );
-                                replaced = tmp.replaceAll( ",", "." );
+                                String tmp = (String) columns.get( 1 );
+                                String replaced = tmp.replaceAll( ",", "." );
                                 mappingCount = Double.valueOf( replaced );
                             }
                             else if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.AVERAGE_MAPPINGS_LENGTH ) ) {
-                                tmp = (String) columns.get( 1 );
-                                replaced = tmp.replaceAll( ",", "." );
+                                String tmp = (String) columns.get( 1 );
+                                String replaced = tmp.replaceAll( ",", "." );
                                 mappingMeanLength = Double.valueOf( replaced );
                             }
                             else if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.MAPPINGS_MILLION ) ) {
-                                tmp = (String) columns.get( 1 );
-                                replaced = tmp.replaceAll( ",", "." );
+                                String tmp = (String) columns.get( 1 );
+                                String replaced = tmp.replaceAll( ",", "." );
                                 mappingsPerMillion = Double.valueOf( replaced );
                             }
                             else if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.BACKGROUND_THRESHOLD_MIN_STACKSIZE ) ) {
-                                tmp = (String) columns.get( 1 );
-                                replaced = tmp.replaceAll( ",", "." );
+                                String tmp = (String) columns.get( 1 );
+                                String replaced = tmp.replaceAll( ",", "." );
                                 backgroundThreshold = Double.valueOf( replaced );
                             }
                             else if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.TSS_FRACTION ) ) {
-                                tmp = (String) columns.get( 1 );
-                                replaced = tmp.replaceAll( ",", "." );
+                                String tmp = (String) columns.get( 1 );
+                                String replaced = tmp.replaceAll( ",", "." );
                                 fraction = Double.valueOf( replaced );
                             }
                             else if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.TSS_RATIO ) ) {
-                                tmp = (String) columns.get( 1 );
+                                String tmp = (String) columns.get( 1 );
                                 ratio = Integer.valueOf( tmp );
                             }
                             else if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.TSS_EXCLUSION_OF_INTERNAL_TSS ) ) {
-                                tmp = (String) columns.get( 1 );
-                                isInternalExclusion = !tmp.equals( "no" );
+                                String tmp = (String) columns.get( 1 );
+                                isInternalExclusion = !"no".equals( tmp );
                             }
                             else if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.TSS_MANUALLY_SET_THRESHOLD ) ) {
-                                tmp = (String) columns.get( 1 );
-                                isThresholdSettedManually = !tmp.equals( "no" );
+                                String tmp = (String) columns.get( 1 );
+                                isThresholdSettedManually = !"no".equals( tmp );
                             }
                             else if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.TSS_KEEP_ALL_INTRAGENIC_TSS ) ) {
-                                tmp = (String) columns.get( 1 );
-                                isKeepingAllIntragenicTSS = !tmp.equals( "no" );
+                                String tmp = (String) columns.get( 1 );
+                                isKeepingAllIntragenicTSS = !"no".equals( tmp );
                             }
                             else if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.TSS_KEEP_ALL_INTRAGENIC_TSS ) ) {
-                                tmp = (String) columns.get( 2 );
+                                String tmp = (String) columns.get( 2 );
                                 try {
                                     isKeepingAllIntragenicTss_Limit = Integer.parseInt( tmp );
                                 }
@@ -553,11 +537,11 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                                 }
                             }
                             else if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.TSS_KEEP_ONLY_ASSIGNED_INTRAGENIC_TSS ) ) {
-                                tmp = (String) columns.get( 1 );
-                                isKeepingOnlyAssignedIntragenicTSS = !tmp.equals( "no" );
+                                String tmp = (String) columns.get( 1 );
+                                isKeepingOnlyAssignedIntragenicTSS = !"no".equals( tmp );
                             }
                             else if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.TSS_KEEP_ONLY_ASSIGNED_INTRAGENIC_TSS ) ) {
-                                tmp = (String) columns.get( 2 );
+                                String tmp = (String) columns.get( 2 );
                                 try {
                                     isKeepingOnlyAssignedIntragenicTssLimitDistance = Integer.parseInt( tmp );
                                 }
@@ -566,28 +550,28 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                                 }
                             }
                             else if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.TSS_LIMITATION_FOR_DISTANCE_OFUPSTREM_REGION ) ) {
-                                tmp = (String) columns.get( 1 );
+                                String tmp = (String) columns.get( 1 );
                                 rangeForKeepingTSS = Integer.valueOf( tmp );
                             }
                             else if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.TSS_RANGE_FOR_LEADERLESS_DETECTION ) ) {
-                                tmp = (String) columns.get( 1 );
+                                String tmp = (String) columns.get( 1 );
                                 rangeForLeaderlessDetection = Integer.valueOf( tmp );
                             }
                             else if( columns.get( 0 ).equals( ResultPanelTranscriptionStart.TSS_PERCENTAGE_FOR_CDSSHIFT_ANALYSIS ) ) {
-                                tmp = (String) columns.get( 1 );
-                                replaced = tmp.replaceAll( ",", "." );
+                                String tmp = (String) columns.get( 1 );
+                                String replaced = tmp.replaceAll( ",", "." );
                                 cdsPercentageValue = Integer.valueOf( replaced );
                             }
                             else if( columns.get( 0 ).equals( WizardPropertyStrings.PROP_INCLUDE_BEST_MATCHED_READS_TSS ) ) {
-                                tmp = (String) columns.get( 1 );
-                                includeBestMatchedReads = !tmp.equals( "no" );
+                                String tmp = (String) columns.get( 1 );
+                                includeBestMatchedReads = !"no".equals( tmp );
                             }
                             else if( columns.get( 0 ).equals( WizardPropertyStrings.PROP_MAX_DIST_FOR_3_UTR_ANTISENSE_DETECTION ) ) {
-                                tmp = (String) columns.get( 1 );
+                                String tmp = (String) columns.get( 1 );
                                 maxDistantaseFor3UtrAntisenseDetection = Integer.valueOf( tmp );
                             }
                             else if( columns.get( 0 ).equals( WizardPropertyStrings.PROP_VALID_START_CODONS ) ) {
-                                tmp = (String) columns.get( 1 );
+                                String tmp = (String) columns.get( 1 );
 
                                 if( !tmp.isEmpty() ) {
                                     String[] startCodons = tmp.split( ";" );
@@ -611,11 +595,10 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                                 }
                             }
                             else if( columns.get( 0 ).equals( FivePrimeEnrichedTracksVisualPanel.PROP_SELECTED_FEAT_TYPES_FADE_OUT ) ) {
-                                tmp = (String) columns.get( 1 );
-                                List<FeatureType> types = new ArrayList<>();
-
+                                String tmp = (String) columns.get( 1 );
                                 if( !tmp.isEmpty() ) {
                                     String[] typeStings = tmp.split( ";" );
+                                    List<FeatureType> types = new ArrayList<>( typeStings.length );
 
                                     for( String type : typeStings ) {
                                         if( type.equals( FeatureType.MISC_RNA.toString() ) ) {
@@ -646,15 +629,11 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                 List<TranscriptionStart> tss = new ArrayList<>();
                 TSSDetectionResults tssResult = new TSSDetectionResults( stats, tss, trackMap, refConnector.getRefGenome() );
                 tssResult.setParameters( params );
-                TranscriptionStart ts;
 
                 fstSheet.remove( 0 );
                 for( List<?> list : fstSheet ) {
                     int tssPosition = (Integer) list.get( 0 );
-                    boolean isFwd = false;
-                    if( list.get( 1 ).equals( "Fwd" ) ) {
-                        isFwd = true;
-                    }
+                    boolean isFwd = "Fwd".equals( list.get( 1 ) );
                     String comment = (String) list.get( 2 );
                     int readStarts = (Integer) list.get( 3 );
                     String relCountStr = (String) list.get( 4 );
@@ -690,7 +669,7 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                     boolean isSelected = (Boolean) list.get( 21 );
                     boolean isConsidered = (Boolean) list.get( 22 );
 
-                    ts = new TranscriptionStart( tssPosition,
+                    TranscriptionStart ts = new TranscriptionStart( tssPosition,
                                                  isFwd, readStarts, relCount,
                                                  detectedGene, offset,
                                                  dist2Start, dist2Stop,
@@ -829,7 +808,7 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                 boolean isKeepingAllIntragenicTSS;
                 isKeepingAllIntragenicTSS = !tmp.equals( "no" );
 
-                Integer isKeepingAllIntragenicTss_Limit = 0;
+                int isKeepingAllIntragenicTss_Limit = 0;
                 tmp = secondSheetMapThirdCol.get( ResultPanelTranscriptionStart.TSS_KEEP_ALL_INTRAGENIC_TSS );
                 try {
                     isKeepingAllIntragenicTss_Limit = Integer.parseInt( tmp );
@@ -839,10 +818,9 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                 }
 
                 tmp = secondSheetMap.get( ResultPanelTranscriptionStart.TSS_KEEP_ONLY_ASSIGNED_INTRAGENIC_TSS );
-                boolean isKeepingOnlyAssignedIntragenicTSS;
-                isKeepingOnlyAssignedIntragenicTSS = !tmp.equals( "no" );
+                boolean isKeepingOnlyAssignedIntragenicTSS = !tmp.equals( "no" );
 
-                Integer isKeepingOnlyAssignedIntragenicTssLimitDistance = 0;
+                int isKeepingOnlyAssignedIntragenicTssLimitDistance = 0;
                 tmp = secondSheetMapThirdCol.get( ResultPanelTranscriptionStart.TSS_KEEP_ONLY_ASSIGNED_INTRAGENIC_TSS );
                 try {
                     isKeepingOnlyAssignedIntragenicTssLimitDistance = Integer.parseInt( tmp );
@@ -891,11 +869,11 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                     }
                 }
                 tmp = secondSheetMap.get( FivePrimeEnrichedTracksVisualPanel.PROP_SELECTED_FEAT_TYPES_FADE_OUT );
-                List<FeatureType> types = new ArrayList<>();
+
                 Set<FeatureType> featTypes = null;
                 if( !tmp.isEmpty() ) {
                     String[] typeStings = tmp.split( ";" );
-
+                    List<FeatureType> types = new ArrayList<>( typeStings.length );
                     for( String type : typeStings ) {
                         if( type.equals( FeatureType.MISC_RNA.toString() ) ) {
                             types.add( FeatureType.MISC_RNA );
@@ -923,14 +901,12 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                 TSSDetectionResults tssResult = new TSSDetectionResults( stats, null, trackMap, refConnector.getRefGenome() );
                 tssResult.setParameters( params );
                 List<TranscriptionStart> tss = new ArrayList<>();
-                TranscriptionStart ts;
 //                progressHandle.progress("Initialize table ... ", 20);
 
                 for( int row = 1; row < model.getRowCount(); row++ ) {
 
                     tmp = (String) model.getValueAt( row, 13 );
-                    boolean isInternalTSS;
-                    isInternalTSS = !tmp.equals( "false" );
+                    boolean isInternalTSS = !tmp.equals( "false" );
 
                     PersistentFeature detectedGene = null;
                     PersistentFeature downstreamNextGene = null;
@@ -945,9 +921,8 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                         }
                     }
 
-                    boolean isFwd;
                     tmp = (String) model.getValueAt( row, 1 );
-                    isFwd = tmp.equals( "Fwd" );
+                    boolean isFwd = "Fwd".equals( tmp );
 
                     tmp = (String) model.getValueAt( row, 0 );
                     int tssPosition = Integer.valueOf( tmp );
@@ -955,7 +930,7 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                     String comment = (String) model.getValueAt( row, 2 );
 
                     int readStarts;
-                    String readStartsString = (String) model.getValueAt( row, 3 );
+                    final String readStartsString = (String) model.getValueAt( row, 3 );
                     if( readStartsString.equals( "-" ) || readStartsString.isEmpty() ) {
                         readStarts = 0;
                     }
@@ -963,88 +938,54 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
                         readStarts = Integer.valueOf( readStartsString );
                     }
 
-                    double relCount;
                     tmp = (String) model.getValueAt( row, 4 );
-                    if( tmp.equals( "-" ) || readStartsString.isEmpty() ) {
-                        relCount = 0.0;
-                    }
-                    else {
-                        replaced = tmp.replaceAll( ",", "." );
-                        relCount = Double.valueOf( replaced );
-                    }
+                    double relCount;
+                    relCount = (readStartsString.isEmpty()  ||  tmp.equals( "-" )) ? 0.0d : Double.valueOf( tmp.replaceAll( ",", "." ) );
 
                     tmp = (String) model.getValueAt( row, 7 );
-                    int offset;
-                    if( tmp.equals( "-" ) || readStartsString.isEmpty() ) {
-                        offset = 0;
-                    }
-                    else {
-                        offset = Integer.valueOf( tmp );
-                    }
+                    int offset = (readStartsString.isEmpty()  ||  "-".equals( tmp )) ? 0 : Integer.valueOf( tmp );
 
-                    int dist2Start;
                     tmp = (String) model.getValueAt( row, 8 );
-                    if( tmp.equals( "-" ) || readStartsString.isEmpty() ) {
-                        dist2Start = 0;
-                    }
-                    else {
-                        dist2Start = Integer.valueOf( tmp );
-                    }
+                    int dist2Start = (tmp.equals( "-" ) || readStartsString.isEmpty()) ? 0 : Integer.valueOf( tmp );
 
-                    int dist2Stop;
                     tmp = (String) model.getValueAt( row, 9 );
-                    if( tmp.equals( "-" ) || readStartsString.isEmpty() ) {
-                        dist2Stop = 0;
-                    }
-                    else {
-                        dist2Stop = Integer.valueOf( tmp );
-                    }
+                    int dist2Stop = (tmp.equals( "-" ) || readStartsString.isEmpty()) ? 0 : Integer.valueOf( tmp );
 
                     tmp = (String) model.getValueAt( row, 11 );
-                    boolean isLeaderless;
-                    isLeaderless = !tmp.equals( "false" );
+                    boolean isLeaderless = !tmp.equals( "false" );
 
                     tmp = (String) model.getValueAt( row, 12 );
                     boolean isCdsShift;
                     isCdsShift = !tmp.equals( "false" );
 
                     tmp = (String) model.getValueAt( row, 14 );
-                    boolean isIntergenic;
-                    isIntergenic = !tmp.equals( "false" );
+                    boolean isIntergenic = !tmp.equals( "false" );
 
                     tmp = (String) model.getValueAt( row, 15 );
-                    boolean isPutAntisense;
-                    isPutAntisense = !tmp.equals( "false" );
+                    boolean isPutAntisense = !tmp.equals( "false" );
 
                     tmp = (String) model.getValueAt( row, 16 );
-                    boolean is5PrimeAntisense;
-                    is5PrimeAntisense = !tmp.equals( "false" );
+                    boolean is5PrimeAntisense = !tmp.equals( "false" );
 
                     tmp = (String) model.getValueAt( row, 17 );
-                    boolean is3PrimeAntisense;
-                    is3PrimeAntisense = !tmp.equals( "false" );
+                    boolean is3PrimeAntisense = !tmp.equals( "false" );
 
                     tmp = (String) model.getValueAt( row, 18 );
-                    boolean isIntragenicAntisense;
-                    isIntragenicAntisense = !tmp.equals( "false" );
+                    boolean isIntragenicAntisense = !tmp.equals( "false" );
 
                     tmp = (String) model.getValueAt( row, 19 );
-                    boolean isAssignedToStableRna;
-                    isAssignedToStableRna = !tmp.equals( "false" );
+                    boolean isAssignedToStableRna = !tmp.equals( "false" );
 
                     tmp = (String) model.getValueAt( row, 20 );
-                    boolean isFalsePositive;
-                    isFalsePositive = !tmp.equals( "false" );
+                    boolean isFalsePositive = !tmp.equals( "false" );
 
                     tmp = (String) model.getValueAt( row, 21 );
-                    boolean isSelected;
-                    isSelected = !tmp.equals( "false" );
+                    boolean isSelected = !tmp.equals( "false" );
 
                     tmp = (String) model.getValueAt( row, 22 );
-                    boolean isConsidered;
-                    isConsidered = !tmp.equals( "false" );
+                    boolean isConsidered = !tmp.equals( "false" );
 
-                    ts = new TranscriptionStart( tssPosition,
+                    TranscriptionStart ts = new TranscriptionStart( tssPosition,
                                                  isFwd, readStarts, relCount,
                                                  detectedGene, offset,
                                                  dist2Start, dist2Stop,
@@ -1096,23 +1037,20 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
             includeBestMatchedReads_RPKM = !tmp.equals( "no" );
 
             ParameterSetWholeTranscriptAnalyses params = new ParameterSetWholeTranscriptAnalyses( true, false, false, true, null, 0, 0, false, 0, false, includeBestMatchedReads_RPKM, false );
-            List<RPKMvalue> rpkms = new ArrayList<>();
-            RPKMvalue rpkm;
+            List<RPKMvalue> rpkms = new ArrayList<>( model.getRowCount() );
             for( int row = 1; row < model.getRowCount(); row++ ) {
 
                 String featureLocus = (String) model.getValueAt( row, 0 );
                 String knownFiveUtr = (String) model.getValueAt( row, 6 );
                 int known5Utr = Integer.valueOf( knownFiveUtr );
                 String rpkmString = (String) model.getValueAt( row, 7 );
-                String replaced = rpkmString.replaceAll( ",", "." );
-                double rpkmValue = Double.valueOf( replaced );
+                double rpkmValue = Double.valueOf( rpkmString.replaceAll( ",", "." ) );
                 String logRpkmString = (String) model.getValueAt( row, 8 );
-                replaced = logRpkmString.replaceAll( ",", "." );
-                double logRpkm = Double.valueOf( replaced );
+                double logRpkm = Double.valueOf( logRpkmString.replaceAll( ",", "." ) );
                 String readCountString = (String) model.getValueAt( row, 9 );
                 int readCount = Integer.valueOf( readCountString );
 
-                rpkm = new RPKMvalue( featureMap.get( featureLocus ), rpkmValue, logRpkm, readCount, trackID, chromId );
+                RPKMvalue rpkm = new RPKMvalue( featureMap.get( featureLocus ), rpkmValue, logRpkm, readCount, trackID, chromId );
                 rpkm.setLongestKnownUtrLength( known5Utr );
                 rpkms.add( rpkm );
             }

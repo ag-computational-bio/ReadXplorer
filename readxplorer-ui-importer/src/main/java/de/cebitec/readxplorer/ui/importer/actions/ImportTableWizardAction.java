@@ -112,7 +112,6 @@ public final class ImportTableWizardAction implements ActionListener {
 
             //parse file in readable format for a table
             final File tableFile = new File( fileLocation );
-            List<List<?>> tableData = new ArrayList<>();
             try {
 //                List<List<?>> tableData = parser.parseTable(tableFile);
 
@@ -135,7 +134,7 @@ public final class ImportTableWizardAction implements ActionListener {
                     else if( parser instanceof CsvTableParser ) {
                         CsvTableParser csvParser = (CsvTableParser) parser;
                         final File parametersFile = new File( statsFileLocation );
-                        tableData = csvParser.parseTable( tableFile );
+                        List<List<?>> tableData = csvParser.parseTable( tableFile );
                         csvParser.setTableModel( TableType.STATS_TABLE );
                         List<List<?>> tableData2 = parser.parseTable( parametersFile );
                         tableView.processCsvInput( tableData, tableData2, tableType, ref );
@@ -143,7 +142,7 @@ public final class ImportTableWizardAction implements ActionListener {
                     }
                 }
                 else {
-                    tableData = parser.parseTable( tableFile );
+                    List<List<?>> tableData = parser.parseTable( tableFile );
 
                     final UneditableTableModel tableModel = TableUtils.transformDataToTableModel( tableData );
 

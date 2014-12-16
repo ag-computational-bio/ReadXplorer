@@ -82,7 +82,7 @@ public class CsvTableParser implements CsvParserI {
         if( autoDelimiter ) {
 
             //try all available csv preferences
-            List<CsvPreference> csvPreferences = new ArrayList<>();
+            List<CsvPreference> csvPreferences = new ArrayList<>( 5 );
             csvPreferences.add( CsvPreference.STANDARD_PREFERENCE );
             csvPreferences.add( CsvPreference.EXCEL_PREFERENCE );
             csvPreferences.add( CsvPreference.EXCEL_NORTH_EUROPE_PREFERENCE );
@@ -122,13 +122,12 @@ public class CsvTableParser implements CsvParserI {
      * @param csvPreference The CsvPreference to use for parsing.
      * <p>
      * @return Table in form of a list, which contains the row lists of Objects.
+     * @throws de.cebitec.readxplorer.parser.common.ParsingException
      */
     public List<List<?>> parseTable( File fileToRead, CsvPreference csvPreference ) throws ParsingException {
-        ICsvListReader listReader = null;
+
         List<List<?>> tableData = new ArrayList<>();
-        try {
-            try {
-                listReader = new CsvListReader( new FileReader( fileToRead ), csvPreference ); //Preference could be parsed as option
+        try( ICsvListReader listReader = new CsvListReader( new FileReader( fileToRead ), csvPreference );) { //Preference could be parsed as option
 
                 final String[] header = listReader.getHeader( true );
                 tableData.add( Arrays.asList( header ) );
@@ -159,16 +158,14 @@ public class CsvTableParser implements CsvParserI {
                     generalProcessors = DEFAULT_TABLE_PROCESSOR;
                 }
 
-                int length;
-                List<Object> rowData;
-                CellProcessor[] processors;
                 while( listReader.read() != null ) {
+                    int length;
                     if( (length = listReader.length()) > 0 ) {
-                        processors = generalProcessors.clone();
+                        CellProcessor[] processors = generalProcessors.clone();
                         int numProcessorsToAdd = length - processors.length;
                         if( numProcessorsToAdd >= 0 ) {
                             processors = ArrayUtils.addAll( processors, new CellProcessor[numProcessorsToAdd] );
-                            rowData = listReader.executeProcessors( processors );
+                            List<Object> rowData = listReader.executeProcessors( processors );
                             tableData.add( rowData );
                         }
                         else {
@@ -177,13 +174,6 @@ public class CsvTableParser implements CsvParserI {
                         }
                     }
                 }
-
-            }
-            finally {
-                if( listReader != null ) {
-                    listReader.close();
-                }
-            }
         }
         catch( FileNotFoundException ex ) {
             Exceptions.printStackTrace( ex );
@@ -194,7 +184,9 @@ public class CsvTableParser implements CsvParserI {
         catch( SuperCsvException ex ) {
             tableData = null;
         }
+
         return tableData;
+
     }
 
 

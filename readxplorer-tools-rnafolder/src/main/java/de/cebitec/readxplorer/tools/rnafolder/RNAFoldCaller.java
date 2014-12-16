@@ -66,7 +66,7 @@ public class RNAFoldCaller {
             final URL wsdl = new URL( "http://bibiserv.techfak.uni-bielefeld.de/wsdl/RNAfold.wsdl" );
 
             /* declare where to find the describing WSDL */
-            if( selSequence.isEmpty() || selSequence == null ) {
+            if( selSequence == null  ||  selSequence.isEmpty() ) {
                 throw new RNAFoldException( NbBundle.getMessage( RNAFoldCaller.class, "RFException.HighlightError" ) );
                 //System.err.println("java RNAfoldCOrig -F <FastaFile> [-T <double>] \n"); //return popup with msg
             }

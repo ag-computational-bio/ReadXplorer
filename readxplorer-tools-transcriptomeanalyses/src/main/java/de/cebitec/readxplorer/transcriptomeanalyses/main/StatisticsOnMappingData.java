@@ -202,14 +202,12 @@ public class StatisticsOnMappingData implements Observer {
      * @param start                     start of certain region
      */
     private void checkOperonAdjacency( TreeMap<Integer, OperonAdjacency> putativeOperonAdjacencies, Map<Integer, List<Integer>> features, int stop, int start ) {
-        PersistentFeature feat1;
-        PersistentFeature feat2;
         if( features.containsKey( stop ) && features.containsKey( start ) ) {
             for( int featureIDrev1 : features.get( start ) ) {
-                feat1 = allFeatures.get( featureIDrev1 );
+                PersistentFeature feat1 = allFeatures.get( featureIDrev1 );
 
                 for( int featureIDrev2 : features.get( stop ) ) {
-                    feat2 = allFeatures.get( featureIDrev2 );
+                    PersistentFeature feat2 = allFeatures.get( featureIDrev2 );
 
                     if( feat1.getType() != FeatureType.MISC_RNA && feat2.getType() != FeatureType.MISC_RNA && featureIDrev1 != featureIDrev2 ) {
                         if( putativeOperonAdjacencies.get( featureIDrev1 ) != null ) {
@@ -256,13 +254,12 @@ public class StatisticsOnMappingData implements Observer {
      * @return the simmulated background threshold
      */
     public int simulateBackgroundThreshold( double fraction ) {
-        int genomeSize = PersistentReference.calcWholeGenomeLength( refGenome.getChromosomes() );
-        int doubleGenomeSize = genomeSize * 2;
+        final int genomeSize = PersistentReference.calcWholeGenomeLength( refGenome.getChromosomes() );
+        final int doubleGenomeSize = genomeSize * 2;
         int maxRandomVariableValue = 0; // Das ist der Wert der größten Zufallsvariable
         int backgroundCutoff = 0;
 
         int bgtotal = 0;
-        int bgcount;
 
         int[] bin = new int[doubleGenomeSize];
         HashMap<Integer, Integer> relativeCountsOfRandomVariables = new HashMap<>();
@@ -276,7 +273,7 @@ public class StatisticsOnMappingData implements Observer {
 
         // dermining Maximum coverage count for a mapping
         for( int pos = 0; pos < doubleGenomeSize; pos++ ) {
-            bgcount = bin[pos]; // Zufallsvariable an Stelle pos
+            int bgcount = bin[pos]; // Zufallsvariable an Stelle pos
             if( relativeCountsOfRandomVariables.containsKey( bgcount ) ) {
                 relativeCountsOfRandomVariables.put( bgcount, relativeCountsOfRandomVariables.get( bgcount ) + 1 );
             }
@@ -288,7 +285,7 @@ public class StatisticsOnMappingData implements Observer {
             }
         }
 
-        double mean = (uniqueCounts / doubleGenomeSize); // y number of mappings, x genomesize y/x = mü and s^2 Erwartungswert und Varianz!
+//        double mean = (uniqueCounts / doubleGenomeSize); // y number of mappings, x genomesize y/x = mü and s^2 Erwartungswert und Varianz!
         System.out.println( "Limit: " + (int) (genomeSize / 1000 * fraction) );
         for( int num = maxRandomVariableValue; num >= 0; num-- ) {
             // # we expect ~ one start per kb, and we want less than $fraction false positives
