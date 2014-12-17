@@ -7,7 +7,7 @@ import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readxplorer.transcriptomeanalyses.datastructures.NovelTranscript;
 import de.cebitec.readxplorer.transcriptomeanalyses.enums.TableType;
-import de.cebitec.readxplorer.transcriptomeanalyses.mainWizard.WizardPropertyStrings;
+import de.cebitec.readxplorer.transcriptomeanalyses.mainwizard.WizardPropertyStrings;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import java.util.ArrayList;

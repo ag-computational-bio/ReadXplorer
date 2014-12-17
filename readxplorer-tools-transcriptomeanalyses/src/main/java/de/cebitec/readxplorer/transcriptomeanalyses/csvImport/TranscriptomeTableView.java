@@ -34,9 +34,9 @@ import de.cebitec.readxplorer.transcriptomeanalyses.main.ResultPanelRPKM;
 import de.cebitec.readxplorer.transcriptomeanalyses.main.ResultPanelTranscriptionStart;
 import de.cebitec.readxplorer.transcriptomeanalyses.main.StatisticsOnMappingData;
 import de.cebitec.readxplorer.transcriptomeanalyses.main.TSSDetectionResults;
-import de.cebitec.readxplorer.transcriptomeanalyses.main.TranscriptomeAnalysesTopComponentTopComponent;
-import de.cebitec.readxplorer.transcriptomeanalyses.mainWizard.FivePrimeEnrichedTracksVisualPanel;
-import de.cebitec.readxplorer.transcriptomeanalyses.mainWizard.WizardPropertyStrings;
+import de.cebitec.readxplorer.transcriptomeanalyses.main.TranscriptomeAnalysesTopComponent;
+import de.cebitec.readxplorer.transcriptomeanalyses.mainwizard.FivePrimeEnrichedTracksVisualPanel;
+import de.cebitec.readxplorer.transcriptomeanalyses.mainwizard.WizardPropertyStrings;
 import de.cebitec.readxplorer.ui.analysis.ResultTablePanel;
 import de.cebitec.readxplorer.ui.controller.ViewController;
 import de.cebitec.readxplorer.ui.importer.TranscriptomeTableViewI;
@@ -65,7 +65,7 @@ import org.openide.windows.WindowManager;
 public class TranscriptomeTableView implements TranscriptomeTableViewI {
 
     private static final String TABLE_TYPE = "Table Type";
-    private TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
+    private TranscriptomeAnalysesTopComponent transcAnalysesTopComp;
 
     private PersistentTrack track;
     private ReferenceConnector refConnector;
@@ -112,12 +112,12 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
 
     @Override
     public void processCsvInput( List<List<?>> tableData, List<List<?>> tableData2, TableType type, PersistentReference ref ) {
-        TopComponent findTopComponent = WindowManager.getDefault().findTopComponent( TranscriptomeAnalysesTopComponentTopComponent.PREFERRED_ID );
+        TopComponent findTopComponent = WindowManager.getDefault().findTopComponent(TranscriptomeAnalysesTopComponent.PREFERRED_ID );
         if( findTopComponent != null ) {
-            this.transcAnalysesTopComp = (TranscriptomeAnalysesTopComponentTopComponent) findTopComponent;
+            this.transcAnalysesTopComp = (TranscriptomeAnalysesTopComponent) findTopComponent;
         }
         else {
-            transcAnalysesTopComp = new TranscriptomeAnalysesTopComponentTopComponent();
+            transcAnalysesTopComp = new TranscriptomeAnalysesTopComponent();
         }
         transcAnalysesTopComp.open();
 
@@ -140,7 +140,7 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
     }
 
 
-    public void setUpOperonTable( List<List<?>> fstSheet, List<List<?>> sndSheet, PersistentReference reference, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp ) {
+    public void setUpOperonTable( List<List<?>> fstSheet, List<List<?>> sndSheet, PersistentReference reference, TranscriptomeAnalysesTopComponent transcAnalysesTopComp ) {
         ResultPanelOperonDetection resultPanel = new ResultPanelOperonDetection();
         resultPanel.setPersistentReference( reference );
 //        resultPanel.setReferenceViewer(reference);
@@ -259,7 +259,7 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
     }
 
 
-    public void setUpRPKMTable( List<List<?>> fstSheet, List<List<?>> sndSheet, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp ) {
+    public void setUpRPKMTable( List<List<?>> fstSheet, List<List<?>> sndSheet, TranscriptomeAnalysesTopComponent transcAnalysesTopComp ) {
         ResultPanelRPKM resultPanel = new ResultPanelRPKM();
 
         int trackID = (Integer) fstSheet.get( 1 ).get( fstSheet.get( 1 ).size() - 1 );
@@ -321,7 +321,7 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
     }
 
 
-    public void setUpNovelTranscriptsTable( List<List<?>> fstSheet, List<List<?>> sndSheet, PersistentReference reference, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp ) {
+    public void setUpNovelTranscriptsTable( List<List<?>> fstSheet, List<List<?>> sndSheet, PersistentReference reference, TranscriptomeAnalysesTopComponent transcAnalysesTopComp ) {
         NovelRegionResultPanel novelRegionsResultsPanel = new NovelRegionResultPanel();
 //        novelRegionsResultsPanel.setReferenceViewer(reference);
         novelRegionsResultsPanel.setPersistentReference( reference );
@@ -447,10 +447,10 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
      *
      * @param refViewer             ReferenceViewer
      * @param transcAnalysesTopComp
-     *                              TranscriptomeAnalysesTopComponentTopComponent
+     *                              TranscriptomeAnalysesTopComponent
      *
      */
-    public void setUpTSSTable( List<List<?>> fstSheet, List<List<?>> sndSheet, PersistentReference ref, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp ) {
+    public void setUpTSSTable( List<List<?>> fstSheet, List<List<?>> sndSheet, PersistentReference ref, TranscriptomeAnalysesTopComponent transcAnalysesTopComp ) {
         ResultPanelTranscriptionStart tssResultsPanel = new ResultPanelTranscriptionStart();
         checkAndOpenRefViewer( ref, tssResultsPanel );
         tssResultsPanel.setPersistentReference( ref );
@@ -718,12 +718,12 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
     @Override
     public void processXlsInput( PersistentReference reference, DefaultTableModel model, Map<String, String> secondSheetMap, Map<String, String> secondSheetMapThirdCol ) {
 
-        TopComponent findTopComponent = WindowManager.getDefault().findTopComponent( TranscriptomeAnalysesTopComponentTopComponent.PREFERRED_ID );
+        TopComponent findTopComponent = WindowManager.getDefault().findTopComponent(TranscriptomeAnalysesTopComponent.PREFERRED_ID );
         if( findTopComponent != null ) {
-            this.transcAnalysesTopComp = (TranscriptomeAnalysesTopComponentTopComponent) findTopComponent;
+            this.transcAnalysesTopComp = (TranscriptomeAnalysesTopComponent) findTopComponent;
         }
         else {
-            transcAnalysesTopComp = new TranscriptomeAnalysesTopComponentTopComponent();
+            transcAnalysesTopComp = new TranscriptomeAnalysesTopComponent();
         }
 
         if( secondSheetMap.containsKey( TABLE_TYPE ) ) {
@@ -752,11 +752,11 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
      *
      * @param refeference           ReferenceViewer
      * @param transcAnalysesTopComp
-     *                              TranscriptomeAnalysesTopComponentTopComponent
-     *                              TranscriptomeAnalysesTopComponentTopComponent
+     *                              TranscriptomeAnalysesTopComponent
+                              TranscriptomeAnalysesTopComponent
      */
     public void setUpTSSDataStructuresAndTable( PersistentReference reference,
-                                                TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp,
+                                                TranscriptomeAnalysesTopComponent transcAnalysesTopComp,
                                                 DefaultTableModel model, Map<String, String> secondSheetMap,
                                                 Map<String, String> secondSheetMapThirdCol ) {
         ResultPanelTranscriptionStart tssResultsPanel = new ResultPanelTranscriptionStart();
@@ -1019,7 +1019,7 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
     }
 
 
-    public void setUpRpkmStructuresAndTable( TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, DefaultTableModel model, Map<String, String> secondSheetMap,
+    public void setUpRpkmStructuresAndTable( TranscriptomeAnalysesTopComponent transcAnalysesTopComp, DefaultTableModel model, Map<String, String> secondSheetMap,
                                              Map<String, String> secondSheetMapThirdCol ) {
         ResultPanelRPKM resultPanel = new ResultPanelRPKM();
 
@@ -1069,7 +1069,7 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
     }
 
 
-    public void setUpOperonStructuresAndTable( PersistentReference reference, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, DefaultTableModel model, Map<String, String> secondSheetMap,
+    public void setUpOperonStructuresAndTable( PersistentReference reference, TranscriptomeAnalysesTopComponent transcAnalysesTopComp, DefaultTableModel model, Map<String, String> secondSheetMap,
                                                Map<String, String> secondSheetMapThirdCol ) {
         ResultPanelOperonDetection resultPanel = new ResultPanelOperonDetection();
         resultPanel.setPersistentReference( reference );
@@ -1177,7 +1177,7 @@ public class TranscriptomeTableView implements TranscriptomeTableViewI {
     }
 
 
-    public void setUpNovelTranscriptsStructuresAndTable( PersistentReference reference, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, DefaultTableModel model, Map<String, String> secondSheetMap,
+    public void setUpNovelTranscriptsStructuresAndTable( PersistentReference reference, TranscriptomeAnalysesTopComponent transcAnalysesTopComp, DefaultTableModel model, Map<String, String> secondSheetMap,
                                                          Map<String, String> secondSheetMapThirdCol ) {
         NovelRegionResultPanel novelRegionsResultsPanel = new NovelRegionResultPanel();
         novelRegionsResultsPanel.setPersistentReference( reference );

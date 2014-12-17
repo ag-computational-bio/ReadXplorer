@@ -51,7 +51,7 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements
     private TssDetection tssDetection;
     private ResultPanelTranscriptionStart transcriptionStartResultPanel;
     private final ReferenceViewer refViewer;
-    private final TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
+    private final TranscriptomeAnalysesTopComponent transcAnalysesTopComp;
     private final Map<Integer, PersistentTrack> trackMap;
     private ProgressHandle progressHandleParsingFeatures;
     /**
@@ -68,12 +68,12 @@ public class FiveEnrichedDataAnalysesHandler extends Thread implements
      *                              paramaters for 5'-enriched based datasets analysis.
      * @param refViewer             ReferenceViewer
      * @param transcAnalysesTopComp
-     *                              TranscriptomeAnalysesTopComponentTopComponent output widow for computed
-     *                              results.
+     *                              TranscriptomeAnalysesTopComponent output widow for computed
+                              results.
      * @param trackMap              contains all PersistentTracks used for this
      *                              analysis-run.
      */
-    public FiveEnrichedDataAnalysesHandler( PersistentTrack selectedTrack, ParameterSetFiveEnrichedAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, Map<Integer, PersistentTrack> trackMap ) {
+    public FiveEnrichedDataAnalysesHandler( PersistentTrack selectedTrack, ParameterSetFiveEnrichedAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponent transcAnalysesTopComp, Map<Integer, PersistentTrack> trackMap ) {
         this.selectedTrack = selectedTrack;
         this.reference = refViewer.getReference();
         this.parameters = parameterset;

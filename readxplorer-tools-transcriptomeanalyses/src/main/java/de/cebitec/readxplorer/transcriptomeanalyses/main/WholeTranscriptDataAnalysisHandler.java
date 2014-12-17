@@ -54,7 +54,7 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements
     private OperonDetection operonDetection;
     private NovelTranscriptDetection newRegionDetection;
     private final ReferenceViewer refViewer;
-    private final TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
+    private final TranscriptomeAnalysesTopComponent transcAnalysesTopComp;
     private final Map<Integer, PersistentTrack> trackMap;
     private ProgressHandle progressHandle;
     /**
@@ -75,12 +75,12 @@ public class WholeTranscriptDataAnalysisHandler extends Thread implements
      *                              paramaters for whole transcript dataset analysis.
      * @param refViewer             ReferenceViewer
      * @param transcAnalysesTopComp
-     *                              TranscriptomeAnalysesTopComponentTopComponent output widow for computed
-     *                              results.
+     *                              TranscriptomeAnalysesTopComponent output widow for computed
+                              results.
      * @param trackMap              contains all PersistentTracks used for this
      *                              analysis-run.
      */
-    public WholeTranscriptDataAnalysisHandler( PersistentTrack selectedTrack, ParameterSetWholeTranscriptAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp, Map<Integer, PersistentTrack> trackMap ) {
+    public WholeTranscriptDataAnalysisHandler( PersistentTrack selectedTrack, ParameterSetWholeTranscriptAnalyses parameterset, ReferenceViewer refViewer, TranscriptomeAnalysesTopComponent transcAnalysesTopComp, Map<Integer, PersistentTrack> trackMap ) {
         this.selectedTrack = selectedTrack;
         this.reference = refViewer.getReference();
         this.fraction = parameterset.getFraction();

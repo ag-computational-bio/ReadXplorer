@@ -8,7 +8,7 @@ import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readxplorer.transcriptomeanalyses.datastructures.Operon;
 import de.cebitec.readxplorer.transcriptomeanalyses.datastructures.OperonAdjacency;
 import de.cebitec.readxplorer.transcriptomeanalyses.enums.TableType;
-import de.cebitec.readxplorer.transcriptomeanalyses.mainWizard.WizardPropertyStrings;
+import de.cebitec.readxplorer.transcriptomeanalyses.mainwizard.WizardPropertyStrings;
 import de.cebitec.readxplorer.utils.GeneralUtils;
 import java.util.ArrayList;
 import java.util.HashMap;

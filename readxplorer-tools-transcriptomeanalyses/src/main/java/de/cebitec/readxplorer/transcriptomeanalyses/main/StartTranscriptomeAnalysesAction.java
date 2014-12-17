@@ -5,9 +5,9 @@ package de.cebitec.readxplorer.transcriptomeanalyses.main;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readxplorer.transcriptomeanalyses.enums.StartCodon;
-import de.cebitec.readxplorer.transcriptomeanalyses.mainWizard.FivePrimeEnrichedTracksVisualPanel;
-import de.cebitec.readxplorer.transcriptomeanalyses.mainWizard.TranscriptomeAnalysisWizardIterator;
-import de.cebitec.readxplorer.transcriptomeanalyses.mainWizard.WizardPropertyStrings;
+import de.cebitec.readxplorer.transcriptomeanalyses.mainwizard.FivePrimeEnrichedTracksVisualPanel;
+import de.cebitec.readxplorer.transcriptomeanalyses.mainwizard.TranscriptomeAnalysisWizardIterator;
+import de.cebitec.readxplorer.transcriptomeanalyses.mainwizard.WizardPropertyStrings;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
 import java.awt.event.ActionEvent;
@@ -50,15 +50,15 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
     private int minBoundaryLength;
     private int increaseRatioValue;
     private boolean isBgThresholdSetManually;
-    private final TranscriptomeAnalysesTopComponentTopComponent transcAnalysesTopComp;
+    private final TranscriptomeAnalysesTopComponent transcAnalysesTopComp;
     private File referenceFile;
 
 
     public StartTranscriptomeAnalysesAction( ReferenceViewer reference ) {
         this.refViewer = reference;
         this.referenceId = this.refViewer.getReference().getId();
-        TopComponent findTopComponent = WindowManager.getDefault().findTopComponent( TranscriptomeAnalysesTopComponentTopComponent.PREFERRED_ID );
-        this.transcAnalysesTopComp = (TranscriptomeAnalysesTopComponentTopComponent) findTopComponent;
+        TopComponent findTopComponent = WindowManager.getDefault().findTopComponent( TranscriptomeAnalysesTopComponent.PREFERRED_ID );
+        this.transcAnalysesTopComp = (TranscriptomeAnalysesTopComponent) findTopComponent;
     }
 
 

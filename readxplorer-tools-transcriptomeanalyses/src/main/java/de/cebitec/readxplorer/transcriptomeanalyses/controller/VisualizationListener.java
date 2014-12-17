@@ -3,17 +3,17 @@ package de.cebitec.readxplorer.transcriptomeanalyses.controller;
 
 
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.transcriptomeanalyses.chartGeneration.ChartsGenerationSelectChatTypeWizardPanel;
-import de.cebitec.readxplorer.transcriptomeanalyses.chartGeneration.PlotGenerator;
-import de.cebitec.readxplorer.transcriptomeanalyses.chartGeneration.SouthPanel;
+import de.cebitec.readxplorer.transcriptomeanalyses.chartgeneration.ChartsGenerationSelectChatTypeWizardPanel;
+import de.cebitec.readxplorer.transcriptomeanalyses.chartgeneration.PlotGenerator;
+import de.cebitec.readxplorer.transcriptomeanalyses.chartgeneration.SouthPanel;
 import de.cebitec.readxplorer.transcriptomeanalyses.datastructures.TranscriptionStart;
 import de.cebitec.readxplorer.transcriptomeanalyses.enums.ChartType;
 import de.cebitec.readxplorer.transcriptomeanalyses.enums.ElementsOfInterest;
 import de.cebitec.readxplorer.transcriptomeanalyses.enums.PurposeEnum;
 import de.cebitec.readxplorer.transcriptomeanalyses.main.ParameterSetFiveEnrichedAnalyses;
 import de.cebitec.readxplorer.transcriptomeanalyses.main.TSSDetectionResults;
-import de.cebitec.readxplorer.transcriptomeanalyses.motifSearch.MultiPurposeTopComponent;
-import de.cebitec.readxplorer.transcriptomeanalyses.motifSearch.RbsAnalysisWizardIterator;
+import de.cebitec.readxplorer.transcriptomeanalyses.motifsearch.MultiPurposeTopComponent;
+import de.cebitec.readxplorer.transcriptomeanalyses.motifsearch.RbsAnalysisWizardIterator;
 import de.erichseifert.gral.data.DataTable;
 import de.erichseifert.gral.ui.InteractivePanel;
 import java.awt.BorderLayout;
