@@ -26,7 +26,7 @@ import de.cebitec.readxplorer.parser.tables.TableParserI;
 import de.cebitec.readxplorer.parser.tables.TableType;
 import de.cebitec.readxplorer.parser.tables.XlsTranscriptomeTableParser;
 import de.cebitec.readxplorer.ui.importer.TranscriptomeTableViewI;
-import de.cebitec.readxplorer.ui.importer.dataTable.ImportTableWizardPanel;
+import de.cebitec.readxplorer.ui.importer.datatable.ImportTableWizardPanel;
 import de.cebitec.readxplorer.ui.tablevisualization.PosTablePanel;
 import de.cebitec.readxplorer.ui.tablevisualization.TableTopComponent;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
