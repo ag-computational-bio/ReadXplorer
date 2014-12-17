@@ -15,11 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.rnatrimming.correlationAnalysis;
+package de.cebitec.readxplorer.rnatrimming.correlationanalysis;
 
 
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
-import de.cebitec.readxplorer.rnatrimming.correlationAnalysis.CorrelationAnalysisAction.CorrelationCoefficient;
+import de.cebitec.readxplorer.rnatrimming.correlationanalysis.CorrelationAnalysisAction.CorrelationCoefficient;
 import java.awt.Component;
 import java.util.List;
 import javax.swing.event.ChangeListener;

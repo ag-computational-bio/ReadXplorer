@@ -65,14 +65,14 @@
     <Component class="javax.swing.JLabel" name="intervalLengthLabel">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readxplorer/rnatrimming/correlationAnalysis/Bundle.properties" key="ParameterSelectionCard.intervalLengthLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/rnatrimming/correlationanalysis/Bundle.properties" key="ParameterSelectionCard.intervalLengthLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="minimumCorrelationLabel">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readxplorer/rnatrimming/correlationAnalysis/Bundle.properties" key="ParameterSelectionCard.minimumCorrelationLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/rnatrimming/correlationanalysis/Bundle.properties" key="ParameterSelectionCard.minimumCorrelationLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
@@ -106,7 +106,7 @@
     <Component class="javax.swing.JLabel" name="minimumPeakCoverageLabel">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readxplorer/rnatrimming/correlationAnalysis/Bundle.properties" key="ParameterSelectionCard.minimumPeakCoverageLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/rnatrimming/correlationanalysis/Bundle.properties" key="ParameterSelectionCard.minimumPeakCoverageLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
@@ -127,7 +127,7 @@
     <Component class="javax.swing.JLabel" name="correlationLabel">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readxplorer/rnatrimming/correlationAnalysis/Bundle.properties" key="ParameterSelectionCard.correlationLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/rnatrimming/correlationanalysis/Bundle.properties" key="ParameterSelectionCard.correlationLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>

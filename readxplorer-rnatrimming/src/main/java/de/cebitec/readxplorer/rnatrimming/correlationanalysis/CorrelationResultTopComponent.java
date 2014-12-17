@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.rnatrimming.correlationAnalysis;
+package de.cebitec.readxplorer.rnatrimming.correlationanalysis;
 
 
 import de.cebitec.readxplorer.ui.TopComponentExtended;
@@ -38,18 +38,18 @@ import org.openide.windows.WindowManager;
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 @ConvertAsProperties(
-         dtd = "-//de.cebitec.readxplorer.rnatrimming.correlationAnalysis//CorrelationResult//EN",
-         autostore = false )
+    dtd = "-//de.cebitec.readxplorer.rnatrimming.correlationanalysis//CorrelationResult//EN",
+    autostore = false )
 @TopComponent.Description(
-         preferredID = "CorrelationResultTopComponent",
-         //iconBase="SET/PATH/TO/ICON/HERE",
-         persistenceType = TopComponent.PERSISTENCE_ALWAYS )
+    preferredID = "CorrelationResultTopComponent",
+    //iconBase="SET/PATH/TO/ICON/HERE",
+    persistenceType = TopComponent.PERSISTENCE_ALWAYS )
 @TopComponent.Registration( mode = "output", openAtStartup = false )
-@ActionID( category = "Window", id = "de.cebitec.readxplorer.rnatrimming.correlationAnalysis.CorrelationResultTopComponent" )
+@ActionID( category = "Window", id = "de.cebitec.readxplorer.rnatrimming.correlationanalysis.CorrelationResultTopComponent" )
 @ActionReference( path = "Menu/Window"/* , position = 951*/ )
 @TopComponent.OpenActionRegistration(
-         displayName = "#CTL_CorrelationResultAction",
-         preferredID = "CorrelationResultTopComponent" )
+    displayName = "#CTL_CorrelationResultAction",
+    preferredID = "CorrelationResultTopComponent" )
 @Messages( {
     "CTL_CorrelationResultAction=CorrelationResult",
     "CTL_CorrelationResultTopComponent=Correlation Analysis Window",
