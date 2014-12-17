@@ -13,8 +13,8 @@
     <modules>
         <module>branding</module>
         <module>application</module>
-        <module>readxplorer-api</module>
         <module>centrallookup</module>
+        <module>readxplorer-api</module>
         <module>readxplorer-backend</module>
         <module>readxplorer-utils</module>
         <module>readxplorer-classificationupdate</module>
@@ -63,18 +63,28 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-branding</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-centrallookup</artifactId>
                 <version>1.0.1</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>readxplorer-databackend</artifactId>
-                <version>1.1.1</version>
+                <artifactId>readxplorer-classificationupdate</artifactId>
+                    <version>1.0.1</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>readxplorer-utils</artifactId>
-                <version>1.0.4</version>
+                <artifactId>readxplorer-dashboard</artifactId>
+                    <version>1.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-databackend</artifactId>
+                <version>1.1.1</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -98,8 +108,58 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-rnatrimming</artifactId>
+                <version>1.0.4</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-thumbnail</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-tools-coverageanalysis</artifactId>
+                <version>1.0.4</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-tools-detailedviewer</artifactId>
+                <version>1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-tools-doubletrackviewer</artifactId>
+                <version>1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-tools-readpairclassifier</artifactId>
                 <version>1.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-tools-referenceeditor</artifactId>
+                <version>1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-tools-rnafolder</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-tools-snpdetection</artifactId>
+                <version>1.0.4</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-tools-transcriptionanalyses</artifactId>
+                <version>1.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-tools-transcriptomeanalyses</artifactId>
+                <version>1.0</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -108,7 +168,22 @@
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-ui-converter</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-ui-datamanagement</artifactId>
+                <version>1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-ui-importer</artifactId>
+                <version>1.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-ui-options</artifactId>
                 <version>1.1.1</version>
             </dependency>
             <dependency>
@@ -120,6 +195,21 @@
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-ui-visualisation-reference</artifactId>
                 <version>1.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-ui-visualisation-track</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-utils</artifactId>
+                <version>1.0.4</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-vcfhandling</artifactId>
+                <version>1.0</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -151,6 +241,7 @@
             </snapshots>
         </repository>
     </repositories>
+
 
     <build>
         <pluginManagement>
