@@ -54,9 +54,8 @@
             <version>2.2.0</version>
         </dependency>
         <dependency>
-            <groupId>bio.comp.jlu.readxplorer</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-utils</artifactId>
-            <version>1.0.4</version>
         </dependency>
     </dependencies>
 

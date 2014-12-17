@@ -51,9 +51,77 @@
         <brandingToken>readxplorer</brandingToken>
         <project.displayname>ReadXplorer</project.displayname>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <module.version.api>1.0.1</module.version.api>
-        <module.version.centrallookup>1.0.1</module.version.centrallookup>
     </properties>
+
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-api</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-centrallookup</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-databackend</artifactId>
+                <version>1.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-utils</artifactId>
+                <version>1.0.4</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-exporter</artifactId>
+                <version>1.0.4</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-mapping</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-parser</artifactId>
+                <version>1.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-plotting</artifactId>
+                <version>1.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-tools-readpairclassifier</artifactId>
+                <version>1.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-ui</artifactId>
+                <version>1.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-ui-importer</artifactId>
+                <version>1.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-ui-visualisation</artifactId>
+                <version>1.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>readxplorer-ui-visualisation-reference</artifactId>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 
     <repositories>

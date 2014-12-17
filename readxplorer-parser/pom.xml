@@ -38,7 +38,6 @@
         <dependency>
             <groupId>bio.comp.jlu.readxplorer</groupId>
             <artifactId>readxplorer-utils</artifactId>
-            <version>1.0.4</version>
         </dependency>
         <dependency>
             <groupId>de.cebitec.common</groupId>

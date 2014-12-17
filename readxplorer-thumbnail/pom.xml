@@ -49,7 +49,6 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-databackend</artifactId>
-            <version>1.1.1</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
@@ -57,34 +56,29 @@
             <version>${netbeans.version}</version>
         </dependency>
         <dependency>
-            <groupId>bio.comp.jlu.readxplorer</groupId>
+            <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-centrallookup</artifactId>
-            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-ui</artifactId>
-            <version>1.1.1</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-utils</artifactId>
-            <version>1.0.4</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-ui-visualisation-reference</artifactId>
-            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-ui-visualisation</artifactId>
-            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-dialogs</artifactId>
-            <version>RELEASE80</version>
+            <version>${netbeans.version}</version>
         </dependency>
     </dependencies>
 
