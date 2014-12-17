@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.tools.coverageanalysis.featureCoverageAnalysis;
+package de.cebitec.readxplorer.tools.coverageanalysis.featurecoverageanalysis;
 
 
 import de.cebitec.readxplorer.ui.TopComponentExtended;
@@ -36,18 +36,18 @@ import org.openide.windows.TopComponent;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 @ConvertAsProperties(
-         dtd = "-//de.cebitec.readxplorer.genomeAnalyses//CoveredFeaturesAnalysis//EN",
-         autostore = false )
+    dtd = "-//de.cebitec.readxplorer.tools.coverageanalysis.featurecoverageanalysis//CoveredFeaturesAnalysis//EN",
+    autostore = false )
 @TopComponent.Description(
-         preferredID = "CoveredFeaturesAnalysisTopComponent",
-         iconBase = "de/cebitec/readxplorer/genomeAnalyses/coveredFeatures.png",
-         persistenceType = TopComponent.PERSISTENCE_ALWAYS )
+    preferredID = "CoveredFeaturesAnalysisTopComponent",
+    iconBase = "de/cebitec/readxplorer/tools/coverageanalysis/featurecoverageanalysis/coveredFeatures.png",
+    persistenceType = TopComponent.PERSISTENCE_ALWAYS )
 @TopComponent.Registration( mode = "output", openAtStartup = false )
-@ActionID( category = "Window", id = "de.cebitec.readxplorer.genomeAnalyses.CoveredFeaturesAnalysisTopComponent" )
+@ActionID( category = "Window", id = "de.cebitec.readxplorer.tools.coverageanalysis.featurecoverageanalysis.CoveredFeaturesAnalysisTopComponent" )
 @ActionReference( path = "Menu/Window" /*, position = 333 */ )
 @TopComponent.OpenActionRegistration(
-         displayName = "#CTL_CoveredFeaturesAnalysisAction",
-         preferredID = "FeatureCoverageAnalysisTopComponent" )
+    displayName = "#CTL_CoveredFeaturesAnalysisAction",
+    preferredID = "FeatureCoverageAnalysisTopComponent" )
 @Messages( {
     "CTL_CoveredFeaturesAnalysisAction=FeatureCoverageAnalysis",
     "CTL_CoveredFeaturesAnalysisTopComponent=Feature Coverage Analysis Window",

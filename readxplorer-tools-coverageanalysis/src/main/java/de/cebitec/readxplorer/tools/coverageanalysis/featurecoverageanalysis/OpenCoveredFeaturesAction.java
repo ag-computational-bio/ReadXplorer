@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.tools.coverageanalysis.featureCoverageAnalysis;
+package de.cebitec.readxplorer.tools.coverageanalysis.featurecoverageanalysis;
 
 
 import de.cebitec.readxplorer.databackend.AnalysesHandler;
@@ -62,11 +62,11 @@ import org.openide.windows.WindowManager;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 @ActionID(
-         category = "Tools",
-         id = "de.cebitec.readxplorer.genomeAnalyses.OpenCoveredFeaturesAction" )
+    category = "Tools",
+    id = "de.cebitec.readxplorer.tools.coverageanalysis.featurecoverageanalysis.OpenCoveredFeaturesAction" )
 @ActionRegistration(
-         iconBase = "de/cebitec/readxplorer/tools/coverageanalysis/featureCoverageAnalysis/coveredFeatures.png",
-         displayName = "#CTL_OpenCoveredFeaturesAction" )
+    iconBase = "de/cebitec/readxplorer/tools/coverageanalysis/featurecoverageanalysis/coveredFeatures.png",
+    displayName = "#CTL_OpenCoveredFeaturesAction" )
 @ActionReferences( {
     @ActionReference( path = "Menu/Tools", position = 146 ),
     @ActionReference( path = "Toolbars/Tools", position = 231 )

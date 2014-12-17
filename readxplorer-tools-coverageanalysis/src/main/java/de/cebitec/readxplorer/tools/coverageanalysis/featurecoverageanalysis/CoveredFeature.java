@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.tools.coverageanalysis.featureCoverageAnalysis;
+package de.cebitec.readxplorer.tools.coverageanalysis.featurecoverageanalysis;
 
 
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;

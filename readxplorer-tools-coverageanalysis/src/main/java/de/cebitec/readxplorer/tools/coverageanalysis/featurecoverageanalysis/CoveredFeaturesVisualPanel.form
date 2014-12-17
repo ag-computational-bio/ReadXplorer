@@ -62,28 +62,28 @@
     <Component class="javax.swing.JTextField" name="minCoveragePercentField">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readxplorer/tools/coverageanalysis/featureCoverageAnalysis/Bundle.properties" key="CoveredFeaturesVisualPanel.minCoveragePercentField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/tools/coverageanalysis/featurecoverageanalysis/Bundle.properties" key="CoveredFeaturesVisualPanel.minCoveragePercentField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="minCoveragePercentLabel">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readxplorer/tools/coverageanalysis/featureCoverageAnalysis/Bundle.properties" key="CoveredFeaturesVisualPanel.minCoveragePercentLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/tools/coverageanalysis/featurecoverageanalysis/Bundle.properties" key="CoveredFeaturesVisualPanel.minCoveragePercentLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="minCoverageCountLabel">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readxplorer/tools/coverageanalysis/featureCoverageAnalysis/Bundle.properties" key="CoveredFeaturesVisualPanel.minCoverageCountLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/tools/coverageanalysis/featurecoverageanalysis/Bundle.properties" key="CoveredFeaturesVisualPanel.minCoverageCountLabel.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="minCoverageCountField">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readxplorer/tools/coverageanalysis/featureCoverageAnalysis/Bundle.properties" key="CoveredFeaturesVisualPanel.minCoverageCountField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/tools/coverageanalysis/featurecoverageanalysis/Bundle.properties" key="CoveredFeaturesVisualPanel.minCoverageCountField.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
@@ -107,7 +107,7 @@
             <Property name="lineWrap" type="boolean" value="true"/>
             <Property name="rows" type="int" value="3"/>
             <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-              <ResourceString bundle="de/cebitec/readxplorer/tools/coverageanalysis/featureCoverageAnalysis/Bundle.properties" key="CoveredFeaturesVisualPanel.tssTextArea.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+              <ResourceString bundle="de/cebitec/readxplorer/tools/coverageanalysis/featurecoverageanalysis/Bundle.properties" key="CoveredFeaturesVisualPanel.tssTextArea.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
             </Property>
             <Property name="wrapStyleWord" type="boolean" value="true"/>
           </Properties>
@@ -117,7 +117,7 @@
     <Component class="javax.swing.JCheckBox" name="detectUncoveredBox">
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="de/cebitec/readxplorer/tools/coverageanalysis/featureCoverageAnalysis/Bundle.properties" key="CoveredFeaturesVisualPanel.detectUncoveredBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+          <ResourceString bundle="de/cebitec/readxplorer/tools/coverageanalysis/featurecoverageanalysis/Bundle.properties" key="CoveredFeaturesVisualPanel.detectUncoveredBox.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>
