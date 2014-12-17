@@ -65,20 +65,20 @@ import org.openide.windows.WindowManager;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 @ConvertAsProperties(
-         dtd = "-//de.cebitec.readxplorer.ui.visualisation//AppPanel//EN",
-         autostore = false
+    dtd = "-//de.cebitec.readxplorer.ui.visualisation//AppPanel//EN",
+    autostore = false
 )
 @TopComponent.Description(
-         preferredID = "AppPanelTopComponent",
-         //iconBase="SET/PATH/TO/ICON/HERE",
-         persistenceType = TopComponent.PERSISTENCE_ALWAYS
+    preferredID = "AppPanelTopComponent",
+    //iconBase="SET/PATH/TO/ICON/HERE",
+    persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
 @TopComponent.Registration( mode = "editor", openAtStartup = false )
 @ActionID( category = "Window", id = "de.cebitec.readxplorer.ui.visualisation.AppPanelTopComponent" )
 @ActionReference( path = "Menu/Window" /*, position = 333 */ )
 @TopComponent.OpenActionRegistration(
-         displayName = "#CTL_AppPanelAction",
-         preferredID = "AppPanelTopComponent"
+    displayName = "#CTL_AppPanelAction",
+    preferredID = "AppPanelTopComponent"
 )
 @Messages( {
     "CTL_AppPanelAction=AppPanel",
