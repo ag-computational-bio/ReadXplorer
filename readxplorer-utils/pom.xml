@@ -104,6 +104,7 @@
                         <publicPackage>org.broadinstitute.*</publicPackage>
                         <publicPackage>org.apache.commons.logging.*</publicPackage>
                         <publicPackage>org.apache.batik.*</publicPackage>
+                        <publicPackage>org.apache.xerces.*</publicPackage>
                         <publicPackage>org.w3c.dom.*</publicPackage>
                         <publicPackage>org.xml.sax.*</publicPackage>
                         <publicPackage>javax.xml.parsers.*</publicPackage>
