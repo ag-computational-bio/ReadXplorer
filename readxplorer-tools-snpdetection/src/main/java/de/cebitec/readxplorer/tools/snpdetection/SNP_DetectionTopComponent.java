@@ -34,10 +34,10 @@ import org.openide.windows.TopComponent;
  * @author jwinneba, rhilker
  */
 @ConvertAsProperties( dtd = "-//de.cebitec.readxplorer.tools.snpdetection//SNP_Detection//EN",
-                      autostore = false )
+    autostore = false )
 @TopComponent.Description( preferredID = "SNP_DetectionTopComponent",
-                           iconBase = "de/cebitec/readxplorer/tools/snpdetection/snpDetection.png",
-                           persistenceType = TopComponent.PERSISTENCE_ALWAYS )
+    iconBase = "de/cebitec/readxplorer/tools/snpdetection/snpDetection.png",
+    persistenceType = TopComponent.PERSISTENCE_ALWAYS )
 @TopComponent.Registration( mode = "output", openAtStartup = false )
 @ActionID( category = "Window", id = "de.cebitec.readxplorer.tools.snpdetection.SNP_DetectionTopComponent" )
 @ActionReference( path = "Menu/Window", position = 950 )

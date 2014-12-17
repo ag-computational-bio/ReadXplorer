@@ -62,7 +62,7 @@ import org.openide.windows.WindowManager;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 @ActionID( category = "Tools",
-           id = "de.cebitec.readxplorer.tools.snpdetection.OpenSnpDetectionAction" )
+    id = "de.cebitec.readxplorer.tools.snpdetection.OpenSnpDetectionAction" )
 @ActionRegistration( iconBase = "de/cebitec/readxplorer/tools/snpdetection/snpDetection.png",
                      displayName = "#CTL_OpenSNPDetection" )
 @ActionReferences( {
