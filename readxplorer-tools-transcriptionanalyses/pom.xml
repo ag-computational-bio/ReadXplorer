@@ -19,6 +19,10 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-centrallookup</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-api</artifactId>
         </dependency>
         <dependency>
@@ -34,18 +38,8 @@
             <artifactId>readxplorer-exporter</artifactId>
         </dependency>
         <dependency>
-            <groupId>batik</groupId>
-            <artifactId>batik-swing</artifactId>
-            <version>1.6-1</version>
-        </dependency>
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-plotting</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-netbeans-api-annotations-common</artifactId>
-            <version>${netbeans.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -54,6 +48,21 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-ui</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>batik</groupId>
+            <artifactId>batik-swing</artifactId>
+            <version>1.6-1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.nuiton.thirdparty</groupId>
+            <artifactId>JRI</artifactId>
+            <version>0.9-6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-api-annotations-common</artifactId>
+            <version>${netbeans.version}</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
@@ -76,18 +85,9 @@
             <version>${netbeans.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.nuiton.thirdparty</groupId>
-            <artifactId>JRI</artifactId>
-            <version>0.9-6</version>
-        </dependency>
-        <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-dialogs</artifactId>
             <version>${netbeans.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>readxplorer-centrallookup</artifactId>
         </dependency>
     </dependencies>
 

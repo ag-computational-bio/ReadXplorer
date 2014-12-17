@@ -16,9 +16,20 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-netbeans-api-annotations-common</artifactId>
-            <version>${netbeans.version}</version>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-databackend</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-centrallookup</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-ui</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-ui-visualisation-reference</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -40,20 +51,9 @@
             <version>1.0.13</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>readxplorer-databackend</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>readxplorer-centrallookup</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>readxplorer-ui</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>readxplorer-ui-visualisation-reference</artifactId>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-api-annotations-common</artifactId>
+            <version>${netbeans.version}</version>
         </dependency>
     </dependencies>
 

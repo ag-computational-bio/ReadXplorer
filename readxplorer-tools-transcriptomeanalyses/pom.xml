@@ -19,6 +19,14 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-parser</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-utils</artifactId>
         </dependency>
         <dependency>
@@ -84,14 +92,6 @@
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-awt</artifactId>
             <version>${netbeans.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>readxplorer-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>readxplorer-parser</artifactId>
         </dependency>
     </dependencies>
 

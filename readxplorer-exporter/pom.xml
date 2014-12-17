@@ -18,6 +18,20 @@
 
     <dependencies>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.supercsv</groupId>
+            <artifactId>super-csv</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>jexcelapi</groupId>
+            <artifactId>jxl</artifactId>
+            <version>2.6</version>
+        </dependency>
+        <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-api-annotations-common</artifactId>
             <version>${netbeans.version}</version>
@@ -34,11 +48,6 @@
             <version>${netbeans.version}</version>
         </dependency>
         <dependency>
-            <groupId>jexcelapi</groupId>
-            <artifactId>jxl</artifactId>
-            <version>2.6</version>
-        </dependency>
-        <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util</artifactId>
             <version>${netbeans.version}</version>
@@ -47,15 +56,6 @@
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-awt</artifactId>
             <version>${netbeans.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.supercsv</groupId>
-            <artifactId>super-csv</artifactId>
-            <version>2.2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>readxplorer-utils</artifactId>
         </dependency>
     </dependencies>
 

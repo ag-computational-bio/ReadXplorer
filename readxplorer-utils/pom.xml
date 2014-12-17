@@ -41,6 +41,17 @@
             <version>0.4.0-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>bio.comp.jlu.external.picard</groupId>
+            <artifactId>picard</artifactId>
+            <version>1.110</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.java.contract</groupId>
+                    <artifactId>cofoja</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-api-progress</artifactId>
             <version>${netbeans.version}</version>
@@ -69,18 +80,6 @@
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-io</artifactId>
             <version>${netbeans.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>bio.comp.jlu.external.picard</groupId>
-            <artifactId>picard</artifactId>
-            <version>1.110</version>
-            <type>jar</type>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.google.java.contract</groupId>
-                    <artifactId>cofoja</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 

@@ -12,6 +12,15 @@
     <version>1.0.1</version>
     <packaging>nbm</packaging>
     <name>${project.displayname} - API</name>
+    
+
+    <dependencies>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-api-annotations-common</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
+    </dependencies>
 
 
     <build>
@@ -37,11 +46,5 @@
             </plugin>
         </plugins>
     </build>
-    <dependencies>
-        <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-netbeans-api-annotations-common</artifactId>
-            <version>${netbeans.version}</version>
-        </dependency>
-    </dependencies>
+
 </project>

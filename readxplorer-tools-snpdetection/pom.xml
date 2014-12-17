@@ -18,9 +18,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-netbeans-api-annotations-common</artifactId>
-            <version>${netbeans.version}</version>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-exporter</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -33,11 +32,6 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-utils</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.netbeans.api</groupId>
-            <artifactId>org-openide-util</artifactId>
-            <version>${netbeans.version}</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -54,10 +48,6 @@
             <version>${netbeans.version}</version>
         </dependency>
         <dependency>
-            <groupId>bio.comp.jlu.readxplorer</groupId>
-            <artifactId>readxplorer-exporter</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-awt</artifactId>
             <version>${netbeans.version}</version>
@@ -65,6 +55,16 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-io</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-api-annotations-common</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-util</artifactId>
             <version>${netbeans.version}</version>
         </dependency>
     </dependencies>
