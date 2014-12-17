@@ -35,18 +35,18 @@ import org.openide.windows.TopComponent;
  * @author -Rolf Hilker-
  */
 @ConvertAsProperties(
-         dtd = "-//de.cebitec.readxplorer.transcriptionanalyses//TranscriptionAnalyses//EN",
-         autostore = false )
+    dtd = "-//de.cebitec.readxplorer.transcriptionanalyses//TranscriptionAnalyses//EN",
+    autostore = false )
 @TopComponent.Description(
-         preferredID = "TranscriptionAnalysesTopComponent",
-         iconBase = "de/cebitec/readxplorer/transcriptionanalyses/transcriptionAnalyses.png",
-         persistenceType = TopComponent.PERSISTENCE_ALWAYS )
+    preferredID = "TranscriptionAnalysesTopComponent",
+    iconBase = "de/cebitec/readxplorer/transcriptionanalyses/transcriptionAnalyses.png",
+persistenceType = TopComponent.PERSISTENCE_ALWAYS )
 @TopComponent.Registration( mode = "output", openAtStartup = false )
 @ActionID( category = "Window", id = "de.cebitec.readxplorer.transcriptionanalyses.TranscriptionAnalysesTopComponent" )
 @ActionReference( path = "Menu/Window" /*, position = 333 */ )
 @TopComponent.OpenActionRegistration(
-         displayName = "#CTL_TranscriptionAnalysesAction",
-         preferredID = "TranscriptionAnalysesTopComponent" )
+    displayName = "#CTL_TranscriptionAnalysesAction",
+    preferredID = "TranscriptionAnalysesTopComponent" )
 @Messages( {
     "CTL_TranscriptionAnalysesAction=TranscriptionAnalyses",
     "CTL_TranscriptionAnalysesTopComponent=TranscriptionAnalyses Window",

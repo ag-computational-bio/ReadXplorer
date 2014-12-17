@@ -61,9 +61,9 @@ import org.openide.windows.WindowManager;
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */
 @ActionID( category = "Tools",
-           id = "de.cebitec.readxplorer.transcriptionanalyses.OpenTranscriptionAnalysesAction" )
+    id = "de.cebitec.readxplorer.transcriptionanalyses.OpenTranscriptionAnalysesAction" )
 @ActionRegistration( iconBase = "de/cebitec/readxplorer/transcriptionanalyses/transcriptionAnalyses.png",
-                     displayName = "#CTL_OpenTranscriptionAnalysesAction" )
+    displayName = "#CTL_OpenTranscriptionAnalysesAction" )
 @ActionReferences( {
     @ActionReference( path = "Menu/Tools", position = 142, separatorAfter = 150 ),
     @ActionReference( path = "Toolbars/Tools", position = 187 )

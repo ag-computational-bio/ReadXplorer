@@ -72,17 +72,17 @@ import static de.cebitec.readxplorer.transcriptionanalyses.differentialexpressio
  * Top component which displays the results of differential expression analyses.
  */
 @ConvertAsProperties( dtd = "-//de.cebitec.readxplorer.transcriptionanalyses.differentialexpression//DiffExpResultViewer//EN",
-                      autostore = false )
+    autostore = false )
 @TopComponent.Description( preferredID = "DiffExpResultViewerTopComponent",
-                           //iconBase="SET/PATH/TO/ICON/HERE",
-                           persistenceType = TopComponent.PERSISTENCE_NEVER )
+    //iconBase="SET/PATH/TO/ICON/HERE",
+    persistenceType = TopComponent.PERSISTENCE_NEVER )
 @TopComponent.Registration( mode = "bottomSlidingSide", openAtStartup = false )
 @ActionID( category = "Window", id = "de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.DiffExpResultViewerTopComponent" )
 @ActionReference( path = "Menu/Window" /*
  * , position = 333
  */ )
 @TopComponent.OpenActionRegistration( displayName = "#CTL_DiffExpResultViewerAction",
-                                      preferredID = "DiffExpResultViewerTopComponent" )
+    preferredID = "DiffExpResultViewerTopComponent" )
 @Messages( {
     "CTL_DiffExpResultViewerAction=DiffExpResultViewer",
     "# {0} - tool",

@@ -70,18 +70,18 @@ import org.openide.windows.TopComponent;
  * TopComponent, which displays all graphics available for a baySeq analysis.
  */
 @ConvertAsProperties( dtd = "-//de.cebitec.readxplorer.transcriptionanalyses.differentialexpression//BaySeqGraphics//EN",
-                      autostore = false )
+    autostore = false )
 @TopComponent.Description( preferredID = "BaySeqGraphicsTopComponent",
-                           persistenceType = TopComponent.PERSISTENCE_NEVER )
+    persistenceType = TopComponent.PERSISTENCE_NEVER )
 @TopComponent.Registration( mode = "bottomSlidingSide", openAtStartup = false )
 @ActionID( category = "Window", id = "de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.BaySeqGraphicsTopComponent" )
 @ActionReference( path = "Menu/Window" )
 @TopComponent.OpenActionRegistration( displayName = "#CTL_BaySeqGraphicsAction",
-                                      preferredID = "BaySeqGraphicsTopComponent" )
+    preferredID = "BaySeqGraphicsTopComponent" )
 @Messages( {
     "CTL_BaySeqGraphicsAction=BaySeqGraphics",
     "CTL_BaySeqGraphicsTopComponent=BaySeq Graphics",
-    "HINT_BaySeqGraphicsTopComponent=This is a baySeq graphics window"
+"HINT_BaySeqGraphicsTopComponent=This is a baySeq graphics window"
 } )
 public final class BaySeqGraphicsTopComponent extends TopComponentExtended
         implements Observer, ItemListener {
