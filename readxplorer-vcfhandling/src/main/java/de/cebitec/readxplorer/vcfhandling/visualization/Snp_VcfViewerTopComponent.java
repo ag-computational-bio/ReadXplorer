@@ -15,20 +15,20 @@ import org.openide.windows.TopComponent;
  * Top component which displays something.
  */
 @ConvertAsProperties(
-         dtd = "-//de.cebitec.readxplorer.vcf.handling.visualization//SNP_VCFViewer//EN",
-         autostore = false
+    dtd = "-//de.cebitec.readxplorer.vcfhandling.visualization//SNP_VCFViewer//EN",
+    autostore = false
 )
 @TopComponent.Description(
-         preferredID = "SNP_VCFViewerTopComponent",
-         //iconBase="SET/PATH/TO/ICON/HERE",
-         persistenceType = TopComponent.PERSISTENCE_ALWAYS
+    preferredID = "SNP_VCFViewerTopComponent",
+    //iconBase="SET/PATH/TO/ICON/HERE",
+    persistenceType = TopComponent.PERSISTENCE_ALWAYS
 )
 @TopComponent.Registration( mode = "editor", openAtStartup = false )
-@ActionID( category = "Window", id = "de.cebitec.readxplorer.vcf.handling.visualization.SNP_VCFViewerTopComponent" )
+@ActionID( category = "Window", id = "de.cebitec.readxplorer.vcfhandling.visualization.SNP_VCFViewerTopComponent" )
 @ActionReference( path = "Menu/Window" /*, position = 333 */ )
 @TopComponent.OpenActionRegistration(
-         displayName = "#CTL_SNP_VCFViewerAction",
-         preferredID = "SNP_VCFViewerTopComponent"
+    displayName = "#CTL_SNP_VCFViewerAction",
+    preferredID = "SNP_VCFViewerTopComponent"
 )
 @Messages( {
     "CTL_SNP_VCFViewerAction=SNP_VCFViewer",

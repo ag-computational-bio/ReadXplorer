@@ -26,7 +26,7 @@ import org.openide.windows.WindowManager;
  * @author vetz
  */
 @ConvertAsProperties(
-         dtd = "-//de.cebitec.readxplorer.vcf.handling.visualization//Snp_VcfResultTopComponent//EN",
+         dtd = "-//de.cebitec.readxplorer.vcfhandling.visualization//Snp_VcfResultTopComponent//EN",
          autostore = false )
 @TopComponent.Description(
          preferredID = "Snp_VcfResultTopComponent",
