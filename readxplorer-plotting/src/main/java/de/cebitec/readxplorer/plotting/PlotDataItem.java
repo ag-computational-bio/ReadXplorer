@@ -29,7 +29,7 @@ import org.jfree.data.xy.XYDataItem;
  */
 public class PlotDataItem extends XYDataItem {
 
-    private PersistentFeature feature;
+    private final PersistentFeature feature;
     private Paint paint;
 
 
