@@ -101,6 +101,7 @@
                         <publicPackage>net.sf.picard.*</publicPackage>
                         <publicPackage>net.sf.samtools.*</publicPackage>
                         <publicPackage>org.broad.tribble.*</publicPackage>
+                        <publicPackage>org.broadinstitute.*</publicPackage>
                         <publicPackage>org.apache.commons.logging.*</publicPackage>
                         <publicPackage>org.apache.batik.*</publicPackage>
                         <publicPackage>org.w3c.dom.*</publicPackage>
