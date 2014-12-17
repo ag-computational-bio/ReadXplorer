@@ -24,7 +24,7 @@ import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.JFeature;
 import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceViewer;
 import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
-import de.cebitec.readxplorer.utils.polyTree.Node;
+import de.cebitec.readxplorer.utils.polytree.Node;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;

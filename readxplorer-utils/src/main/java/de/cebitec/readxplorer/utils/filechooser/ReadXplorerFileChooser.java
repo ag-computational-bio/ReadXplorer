@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.cebitec.readxplorer.utils.fileChooser;
+package de.cebitec.readxplorer.utils.filechooser;
 
 
 import de.cebitec.readxplorer.utils.Properties;

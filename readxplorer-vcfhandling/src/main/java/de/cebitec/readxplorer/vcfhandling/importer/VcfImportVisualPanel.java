@@ -10,7 +10,7 @@ package de.cebitec.readxplorer.vcfhandling.importer;
 import de.cebitec.readxplorer.api.objects.JobPanel;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
+import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.io.File;
 
 

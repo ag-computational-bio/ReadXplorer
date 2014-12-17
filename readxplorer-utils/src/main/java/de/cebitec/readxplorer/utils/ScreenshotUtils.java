@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.utils;
 
 
-import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
+import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;

@@ -37,7 +37,7 @@ import de.cebitec.readxplorer.utils.GeneralUtils;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
-import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
+import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.event.ActionEvent;

@@ -27,7 +27,7 @@ import de.cebitec.readxplorer.parser.tables.TableParserI;
 import de.cebitec.readxplorer.parser.tables.TableType;
 import de.cebitec.readxplorer.parser.tables.XlsTranscriptomeTableParser;
 import de.cebitec.readxplorer.ui.dialogmenus.ChangeListeningWizardPanel;
-import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
+import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.awt.Graphics;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ScrollPaneConstants;

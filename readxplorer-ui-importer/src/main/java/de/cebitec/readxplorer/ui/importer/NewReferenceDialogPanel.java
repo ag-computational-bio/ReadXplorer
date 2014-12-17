@@ -26,7 +26,7 @@ import de.cebitec.readxplorer.parser.reference.BioJavaGff3Parser;
 import de.cebitec.readxplorer.parser.reference.BioJavaParser;
 import de.cebitec.readxplorer.parser.reference.FastaReferenceParser;
 import de.cebitec.readxplorer.parser.reference.ReferenceParserI;
-import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
+import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.awt.Component;
 import java.io.File;
 import java.sql.Timestamp;

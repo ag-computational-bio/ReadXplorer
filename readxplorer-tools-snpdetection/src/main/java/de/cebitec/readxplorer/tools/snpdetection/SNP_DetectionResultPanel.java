@@ -36,7 +36,7 @@ import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickF
 import de.cebitec.readxplorer.utils.LineWrapCellRenderer;
 import de.cebitec.readxplorer.utils.SequenceComparison;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
-import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
+import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;

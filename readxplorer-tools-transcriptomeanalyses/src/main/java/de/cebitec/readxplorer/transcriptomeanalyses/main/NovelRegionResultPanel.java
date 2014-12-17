@@ -18,7 +18,7 @@ import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickD
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
-import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
+import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.awt.Component;
 import java.io.BufferedWriter;
 import java.io.File;

@@ -95,8 +95,8 @@
                     <publicPackages>
                         <publicPackage>de.cebitec.readxplorer.utils</publicPackage>
                         <publicPackage>de.cebitec.readxplorer.utils.classification</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.utils.fileChooser</publicPackage>
-                        <publicPackage>de.cebitec.readxplorer.utils.polyTree</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.utils.filechooser</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.utils.polytree</publicPackage>
                         <publicPackage>de.cebitec.common.*</publicPackage>
                         <publicPackage>net.sf.picard.*</publicPackage>
                         <publicPackage>net.sf.samtools.*</publicPackage>

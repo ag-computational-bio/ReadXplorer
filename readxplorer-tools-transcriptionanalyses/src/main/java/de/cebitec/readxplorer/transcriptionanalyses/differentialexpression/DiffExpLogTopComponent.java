@@ -20,7 +20,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 import de.cebitec.readxplorer.ui.TopComponentExtended;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
+import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;

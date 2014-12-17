@@ -25,7 +25,7 @@ import de.cebitec.readxplorer.ui.tablevisualization.TableUtils;
 import de.cebitec.readxplorer.ui.tablevisualization.tablefilter.TableRightClickFilter;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
-import de.cebitec.readxplorer.utils.fileChooser.StoreStringFileChooser;
+import de.cebitec.readxplorer.utils.filechooser.StoreStringFileChooser;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

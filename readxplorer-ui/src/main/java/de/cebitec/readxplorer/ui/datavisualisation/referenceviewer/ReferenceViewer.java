@@ -29,9 +29,9 @@ import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.PaintingAreaIn
 import de.cebitec.readxplorer.ui.datavisualisation.basePanel.BasePanel;
 import de.cebitec.readxplorer.utils.ColorProperties;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
-import de.cebitec.readxplorer.utils.polyTree.Node;
-import de.cebitec.readxplorer.utils.polyTree.NodeVisitor;
-import de.cebitec.readxplorer.utils.polyTree.Polytree;
+import de.cebitec.readxplorer.utils.polytree.Node;
+import de.cebitec.readxplorer.utils.polytree.NodeVisitor;
+import de.cebitec.readxplorer.utils.polytree.Polytree;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;

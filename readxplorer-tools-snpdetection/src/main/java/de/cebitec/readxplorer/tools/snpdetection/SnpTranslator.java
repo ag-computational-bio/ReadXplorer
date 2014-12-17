@@ -29,8 +29,8 @@ import de.cebitec.readxplorer.utils.CodonUtilities;
 import de.cebitec.readxplorer.utils.SequenceComparison;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
-import de.cebitec.readxplorer.utils.polyTree.Node;
-import de.cebitec.readxplorer.utils.polyTree.NodeVisitor;
+import de.cebitec.readxplorer.utils.polytree.Node;
+import de.cebitec.readxplorer.utils.polytree.NodeVisitor;
 import java.util.ArrayList;
 import java.util.List;
 

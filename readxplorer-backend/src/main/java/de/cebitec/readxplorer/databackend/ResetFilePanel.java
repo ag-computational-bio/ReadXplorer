@@ -18,7 +18,7 @@
 package de.cebitec.readxplorer.databackend;
 
 
-import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
+import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import org.openide.util.NbBundle;
 
 

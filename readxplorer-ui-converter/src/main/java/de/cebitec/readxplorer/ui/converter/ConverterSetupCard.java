@@ -25,7 +25,7 @@ import de.cebitec.readxplorer.parser.output.ConverterI;
 import de.cebitec.readxplorer.parser.output.JokToBamConverter;
 import de.cebitec.readxplorer.ui.dialogmenus.FileSelectionPanel;
 import de.cebitec.readxplorer.utils.GeneralUtils;
-import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
+import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.io.File;
 import java.util.Collection;
 import javax.swing.DefaultComboBoxModel;

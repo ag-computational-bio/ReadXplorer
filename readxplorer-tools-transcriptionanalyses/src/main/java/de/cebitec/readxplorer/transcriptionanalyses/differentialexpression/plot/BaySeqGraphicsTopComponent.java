@@ -29,7 +29,7 @@ import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.Group
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.ResultDeAnalysis;
 import de.cebitec.readxplorer.ui.TopComponentExtended;
 import de.cebitec.readxplorer.utils.Observer;
-import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
+import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.awt.BorderLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;

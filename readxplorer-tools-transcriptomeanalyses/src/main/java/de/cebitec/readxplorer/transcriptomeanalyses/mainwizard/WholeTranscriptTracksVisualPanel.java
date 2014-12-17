@@ -4,7 +4,7 @@ package de.cebitec.readxplorer.transcriptomeanalyses.mainwizard;
 
 import de.cebitec.readxplorer.transcriptomeanalyses.verifier.DoubleVerifier;
 import de.cebitec.readxplorer.transcriptomeanalyses.verifier.IntegerVerifier;
-import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
+import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.io.File;
 import java.util.prefs.Preferences;
 import javax.swing.JPanel;

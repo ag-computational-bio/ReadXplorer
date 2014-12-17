@@ -25,7 +25,7 @@ import de.cebitec.readxplorer.utils.LineWrapCellRenderer;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.UneditableTableModel;
-import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
+import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.awt.Component;
 import java.io.BufferedReader;
 import java.io.File;

@@ -19,7 +19,7 @@ package de.cebitec.readxplorer.ui.login;
 
 
 import de.cebitec.readxplorer.utils.Properties;
-import de.cebitec.readxplorer.utils.fileChooser.ReadXplorerFileChooser;
+import de.cebitec.readxplorer.utils.filechooser.ReadXplorerFileChooser;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;

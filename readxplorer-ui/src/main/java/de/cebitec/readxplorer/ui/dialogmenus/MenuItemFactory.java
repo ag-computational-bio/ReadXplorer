@@ -24,7 +24,7 @@ import de.cebitec.readxplorer.parser.output.OutputWriter;
 import de.cebitec.readxplorer.ui.datavisualisation.BoundsInfoManager;
 import de.cebitec.readxplorer.ui.datavisualisation.abstractviewer.Region;
 import de.cebitec.readxplorer.utils.CodonUtilities;
-import de.cebitec.readxplorer.utils.fileChooser.StoreStringFileChooser;
+import de.cebitec.readxplorer.utils.filechooser.StoreStringFileChooser;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.ClipboardOwner;
