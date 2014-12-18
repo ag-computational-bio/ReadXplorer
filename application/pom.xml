@@ -166,6 +166,10 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
+                <configuration>
+                    <installerLicenseFile>../License-GPLv3.txt</installerLicenseFile>
+                    <etcConfFile>src/main/resources/readxplorer.conf</etcConfFile>
+                </configuration>
             </plugin>
             <!-- Permits NbModuleSuite to be run in integration-test phase: -->
             <plugin>
