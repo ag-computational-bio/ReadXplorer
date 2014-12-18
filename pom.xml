@@ -54,6 +54,7 @@
         <project.displayname>ReadXplorer</project.displayname>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.url>www.readxplorer.org</project.url>
+        <netbeans.hint.license>gpl30</netbeans.hint.license>
     </properties>
 
 
@@ -267,7 +268,7 @@
                     <configuration>
                         <brandingToken>${brandingToken}</brandingToken>
                         <cluster>${brandingToken}</cluster>
-                        <licenseName>GPL v3</licenseName>
+                        <licenseName>GPLv3</licenseName>
                         <licenseFile>${basedir}/License-GPLv3</licenseFile>
                     </configuration>
                 </plugin>
