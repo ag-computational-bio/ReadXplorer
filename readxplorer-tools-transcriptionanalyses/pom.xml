@@ -50,14 +50,13 @@
             <artifactId>readxplorer-ui</artifactId>
         </dependency>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-libs-jri</artifactId>
+        </dependency>
+        <dependency>
             <groupId>batik</groupId>
             <artifactId>batik-swing</artifactId>
             <version>1.6-1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.nuiton.thirdparty</groupId>
-            <artifactId>JRI</artifactId>
-            <version>0.9-6</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
