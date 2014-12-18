@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <folder name="Tools">
             <file name="de-cebitec-readxplorer-tools-doubletrackviewer-OpenDoubleTrackAction.instance">
                 <attr name="delegate" methodvalue="org.openide.awt.Actions.inject"/>
-                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.tools.doubletrackviewer.Bundle#CTL_OpenMultiTrackAction"/>
+                <attr name="displayName" bundlevalue="de.cebitec.readxplorer.tools.doubletrackviewer.Bundle#CTL_OpenDoubleTrackAction"/>
                 <attr name="iconBase" stringvalue="de/cebitec/readxplorer/tools/doubletrackviewer/doubleTrack.png"/>
                 <attr name="injectable" stringvalue="de.cebitec.readxplorer.tools.doubletrackviewer.OpenDoubleTrackAction"/>
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.context"/>
