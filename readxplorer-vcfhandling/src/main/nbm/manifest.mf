@@ -1,3 +1,5 @@
 Manifest-Version: 1.0
+OpenIDE-Module: de.cebitec.readxplorer.vcfhandling
+OpenIDE-Module-Requires: org.openide.windows.WindowManager
 OpenIDE-Module-Localizing-Bundle: de/cebitec/readxplorer/vcfhandling/Bundle.properties
 

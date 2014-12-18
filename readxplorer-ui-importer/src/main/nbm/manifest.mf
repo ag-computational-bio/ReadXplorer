@@ -1,3 +1,5 @@
 Manifest-Version: 1.0
+OpenIDE-Module: de.cebitec.readxplorer.ui.importer
+OpenIDE-Module-Requires: org.netbeans.api.javahelp.Help
 OpenIDE-Module-Localizing-Bundle: de/cebitec/readxplorer/ui/importer/Bundle.properties
 

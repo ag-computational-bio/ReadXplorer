@@ -1,3 +1,5 @@
 Manifest-Version: 1.0
-OpenIDE-Module-Localizing-Bundle: de/cebitec/readxplorer/backend/Bundle.properties
+OpenIDE-Module: de.cebitec.readxplorer.databackend
+OpenIDE-Module-Requires: org.netbeans.api.javahelp.Help
+OpenIDE-Module-Localizing-Bundle: de/cebitec/readxplorer/databackend/Bundle.properties
 

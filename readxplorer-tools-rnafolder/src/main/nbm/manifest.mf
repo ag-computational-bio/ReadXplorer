@@ -1,4 +1,6 @@
 Manifest-Version: 1.0
-OpenIDE-Module-Localizing-Bundle: de/cebitec/readxplorer/tools/rnafolder/Bundle.properties
+OpenIDE-Module: de.cebitec.readxplorer.tools.rnafolder
 OpenIDE-Module-Layer: de/cebitec/readxplorer/tools/rnafolder/layer.xml
+OpenIDE-Module-Requires: org.openide.windows.WindowManager
+OpenIDE-Module-Localizing-Bundle: de/cebitec/readxplorer/tools/rnafolder/Bundle.properties
 

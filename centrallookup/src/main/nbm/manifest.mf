@@ -1,3 +1,4 @@
 Manifest-Version: 1.0
+OpenIDE-Module: de.cebitec.centrallookup
 OpenIDE-Module-Localizing-Bundle: de/cebitec/centrallookup/Bundle.properties
 

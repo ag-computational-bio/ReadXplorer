@@ -1,3 +1,4 @@
 Manifest-Version: 1.0
+OpenIDE-Module: de.cebitec.readxplorer.ui.options
 OpenIDE-Module-Localizing-Bundle: de/cebitec/readxplorer/ui/options/Bundle.properties
 
