@@ -254,10 +254,11 @@
                     <configuration>
                         <brandingToken>${brandingToken}</brandingToken>
                         <cluster>${brandingToken}</cluster>
+                        <licenseName>GPL v3</licenseName>
+                        <licenseFile>${basedir}/License-GPLv3</licenseFile>
                     </configuration>
                 </plugin>
                 <plugin>
-                    <!-- NetBeans 6.9+ requires JDK 6, starting NetBeans 7.4 source 1.7 is required -->
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>2.5.1</version>
