@@ -221,7 +221,7 @@ public class StatsContainer {
      * @param type  the read pair type of the stats to increase
      * @param value the value to add to the corresponding stats
      */
-    public void incReadPairStats( ReadPairType type, int value ) {
+    public void incReadPairStats( final ReadPairType type, final int value ) {
 
         if( type == ReadPairType.PERFECT_PAIR || type == ReadPairType.PERFECT_UNQ_PAIR ) {
             this.increaseValue( NO_READ_PAIRS, value );

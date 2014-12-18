@@ -81,6 +81,12 @@
             <artifactId>org-openide-io</artifactId>
             <version>${netbeans.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-modules</artifactId>
+            <version>RELEASE80</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 
 
