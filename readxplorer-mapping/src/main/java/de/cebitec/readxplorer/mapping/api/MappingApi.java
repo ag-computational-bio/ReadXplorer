@@ -140,15 +140,15 @@ public class MappingApi {
         if( !FileUtils.fileExistsAndIsExecutable( MappingApi.getMapperPath() ) ) {
             if( !FileUtils.fileExists( MappingApi.getMapperPath() ) ) {
                 JOptionPane.showMessageDialog( null,
-                                               "Please check your mapper configuration and provide a correct path to a mapping script!",
-                                               "Warning", JOptionPane.INFORMATION_MESSAGE );
+                   "Please check your mapper configuration and provide a correct path to a mapping script!",
+                   "Warning", JOptionPane.INFORMATION_MESSAGE );
                 return false;
             }
             else {
                 JOptionPane.showMessageDialog( null,
-                                               "Please check your mapper configuration and permissions on the mapping script!\n"
-                                               + "For Unix systems: try executing chmod u+rx,g+rx,a+rx bwa_mapper.sh to set execution permissions!",
-                                               "Warning", JOptionPane.INFORMATION_MESSAGE );
+                   "Please check your mapper configuration and permissions on the mapping script!\n"
+                   + "For Unix systems: try executing chmod u+rx,g+rx,a+rx bwa_mapper.sh to set execution permissions!",
+                   "Warning", JOptionPane.INFORMATION_MESSAGE );
                 return false;
             }
         }

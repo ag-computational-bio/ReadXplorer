@@ -36,7 +36,6 @@ import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle;
-import org.openide.util.NbBundle.Messages;
 
 
 /**
@@ -45,12 +44,11 @@ import org.openide.util.NbBundle.Messages;
  * @author Evgeny Anisiforov <evgeny at cebitec.uni-bielefeld.de>
  */
 @ActionID(
-         category = "Tools",
-         id = "de.cebitec.readxplorer.mapping.MappingAction" )
+    category = "Tools",
+    id = "de.cebitec.readxplorer.mapping.MappingAction" )
 @ActionRegistration(
-         displayName = "#CTL_MappingAction" )
+    displayName = "#CTL_MappingAction" )
 @ActionReference( path = "Menu/Tools", position = 154 )
-@Messages( "CTL_MappingAction=Map reads" )
 public final class MappingAction implements ActionListener {
 
     static String PROP_SOURCEPATH = "PROP_SOURCEPATH";
@@ -58,7 +56,7 @@ public final class MappingAction implements ActionListener {
     static String PROP_MAPPINGPARAM = "PROP_MAPPINGPARAM";
 
 
-    private final LoginCookie context;
+//    private final LoginCookie context;
     private List<WizardDescriptor.Panel<WizardDescriptor>> panels;
 
 
@@ -69,7 +67,7 @@ public final class MappingAction implements ActionListener {
      * @param context a LoginCookie, because it only works when logged into a DB
      */
     public MappingAction( LoginCookie context ) {
-        this.context = context;
+//        this.context = context;
     }
 
 
@@ -82,7 +80,7 @@ public final class MappingAction implements ActionListener {
         }
         if( MappingApi.checkMapperConfig() ) {
             if( panels == null ) {
-                panels = new ArrayList<>();
+                panels = new ArrayList<>( 2 );
                 panels.add( new MappingSelectionPanel() );
                 panels.add( new MappingOverviewPanel() );
             }

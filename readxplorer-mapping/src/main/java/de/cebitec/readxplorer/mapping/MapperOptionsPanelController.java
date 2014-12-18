@@ -40,7 +40,6 @@ import org.openide.util.Lookup;
          iconBase = "de/cebitec/readxplorer/mapping/mapper.png",
          keywords = "#AdvancedOption_Keywords_Mapper",
          keywordsCategory = "General/Mapper" )
-@org.openide.util.NbBundle.Messages( { "AdvancedOption_DisplayName_Mapper=Mapper", "AdvancedOption_Keywords_Mapper=Mapper Mapping " } )
 public final class MapperOptionsPanelController extends OptionsPanelController {
 
     private MapperPanel panel;
