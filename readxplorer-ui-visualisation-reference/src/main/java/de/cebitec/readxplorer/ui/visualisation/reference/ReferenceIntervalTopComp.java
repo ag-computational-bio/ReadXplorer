@@ -185,11 +185,10 @@ public final class ReferenceIntervalTopComp extends TopComponentExtended
     // End of variables declaration//GEN-END:variables
     /**
      * Gets default instance. Do not use directly: reserved for *.settings files
-     * only,
-     * i.e. deserialization routines; otherwise you could get a non-deserialized
-     * instance.
+     * only, i.e. deserialization routines;
+     * otherwise you could get a non-deserialized instance.
      * To obtain the singleton instance, use {@link #findInstance}.
-     * <p>
+     *
      * @return the singleton instance of this class
      */
     public static synchronized ReferenceIntervalTopComp getDefault() {
@@ -201,9 +200,9 @@ public final class ReferenceIntervalTopComp extends TopComponentExtended
 
 
     /**
-     * Obtain the ReferenceIntervalTopComp instance. Never call
-     * {@link #getDefault} directly!
-     * <p>
+     * Obtain the ReferenceIntervalTopComp instance.
+     * Never call {@link #getDefault} directly!
+     *
      * @return the singleton instance of this class
      */
     public static synchronized ReferenceIntervalTopComp findInstance() {

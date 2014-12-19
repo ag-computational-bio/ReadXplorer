@@ -74,13 +74,13 @@ public final class ExpressTestGraphicsTopComponent extends TopComponentExtended
 
     private static final long serialVersionUID = 1L;
 
-    private DefaultComboBoxModel<PlotTypes> cbmPlotType = new DefaultComboBoxModel<>( PlotTypes.values() );
-    private DefaultComboBoxModel<String> cbmDataSet;
+    private final DefaultComboBoxModel<PlotTypes> cbmPlotType = new DefaultComboBoxModel<>( PlotTypes.values() );
+    private final DefaultComboBoxModel<String> cbmDataSet;
     private DeAnalysisHandler analysisHandler;
     private List<ResultDeAnalysis> results;
     private DeAnalysisHandler.Tool usedTool;
     private ChartPanel chartPanel;
-    private ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating plot" );
+    private final ProgressHandle progressHandle = ProgressHandleFactory.createHandle( "Creating plot" );
     private ProgressHandle svgExportProgressHandle;
 
 

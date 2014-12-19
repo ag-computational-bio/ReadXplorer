@@ -182,7 +182,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                             List<PersistentTrack> tracks = genomesAndTracks.get( genome );
 
                             if( tracks != null ) {
-                                List<DBItem> trackItems = new ArrayList<>();
+                                List<DBItem> trackItems = new ArrayList<>( tracks.size() );
                                 for( PersistentTrack track : tracks ) {
                                     trackItems.add( new DBItem( track ) );
                                 }
@@ -528,7 +528,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
 
             //open tracks for this genome now
             List<PersistentTrack> allTracksForThisGenome = genomesAndTracks.get( genome );
-            List<PersistentTrack> tracksToShow = new ArrayList<>();
+            List<PersistentTrack> tracksToShow = new ArrayList<>( allTracksForThisGenome.size() );
             for( PersistentTrack track : allTracksForThisGenome ) {
                 if( trackIds.contains( (long) track.getId() ) ) {
                     tracksToShow.add( track );

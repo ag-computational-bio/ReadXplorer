@@ -58,9 +58,8 @@ import org.openide.windows.WindowManager;
 
 
 /**
- * Top component which displays the main work area of ReadXplorer, which
- * contains the
- * reference and track viewers.
+ * Top component which displays the main work area of ReadXplorer,
+ * which contains the reference and track viewers.
  * <p>
  * @author Rolf Hilker <rhilker at cebitec.uni-bielefeld.de>
  */

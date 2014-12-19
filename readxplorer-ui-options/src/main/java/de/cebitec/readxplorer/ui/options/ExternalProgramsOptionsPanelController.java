@@ -24,15 +24,16 @@ import javax.swing.JComponent;
 import org.netbeans.spi.options.OptionsPanelController;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
+import org.openide.util.NbBundle.Messages;
 
 
 @OptionsPanelController.TopLevelRegistration(
-         categoryName = "#OptionsCategory_Name_ExternalPrograms",
-         iconBase = "de/cebitec/readxplorer/ui/options/externalTools.jpg",
-         keywords = "#OptionsCategory_Keywords_ExternalPrograms",
-         keywordsCategory = "ExternalPrograms"
+    categoryName = "#OptionsCategory_Name_ExternalPrograms",
+    iconBase = "de/cebitec/readxplorer/ui/options/externalTools.jpg",
+    keywords = "#OptionsCategory_Keywords_ExternalPrograms",
+    keywordsCategory = "ExternalPrograms"
 )
-@org.openide.util.NbBundle.Messages( { "OptionsCategory_Name_ExternalPrograms=External Programs", "OptionsCategory_Keywords_ExternalPrograms=external_programs" } )
+@Messages( { "OptionsCategory_Name_ExternalPrograms=External Programs", "OptionsCategory_Keywords_ExternalPrograms=external_programs" } )
 public final class ExternalProgramsOptionsPanelController extends OptionsPanelController {
 
     private ExternalProgramsPanel panel;
