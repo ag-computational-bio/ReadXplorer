@@ -93,10 +93,11 @@
                     </publicPackages>
                     <licenseFile>../License-GPLv3.txt</licenseFile>
                     <nbmResource>
-                        <directory>src/main/resources/</directory>
-                        <targetPath>release/mapper</targetPath>
+                        <directory>src/main/resources/mappers</directory>
+                        <targetPath>modules/mapping</targetPath>
                         <includes>
-                            <include>**/*.sh</include>
+                            <include>bwa_mapper.sh</include>
+                            <include>remote_mapper.sh</include>
                         </includes>
                     </nbmResource>
                 </configuration>

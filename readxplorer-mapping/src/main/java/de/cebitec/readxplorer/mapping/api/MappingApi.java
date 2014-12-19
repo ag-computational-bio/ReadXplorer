@@ -59,8 +59,8 @@ public class MappingApi {
         String path = NbPreferences.forModule( Object.class ).get( Properties.MAPPER_PATH, "" );
 
         //try to locate bwa_mapper.sh, if we are not on windows (bwa_mapper.sh works only on unix systems)
-        if( (path.isEmpty()) && (!System.getProperty( "os.name" ).toLowerCase().contains( "win" )) ) {
-            File result = InstalledFileLocator.getDefault().locate( "Mapper/bwa_mapper.sh", "ReadXplorer_Mapping", false );
+        if( (path.isEmpty())  &&  (!System.getProperty( "os.name" ).toLowerCase().contains( "win" )) ) {
+            File result = InstalledFileLocator.getDefault().locate( "mappers/bwa_mapper.sh", "de.cebitec.readxplorer.mapping", false );
             if( result != null ) {
                 //try to set executable permission, if we are the owner
                 result.setExecutable( true, false );
