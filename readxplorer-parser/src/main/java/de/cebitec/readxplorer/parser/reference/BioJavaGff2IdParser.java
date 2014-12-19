@@ -55,14 +55,14 @@ public class BioJavaGff2IdParser implements IdParserI {
      * @throws ParsingException
      */
     @Override
-    public List<String> getSequenceIds( File gff2File ) throws ParsingException {
+    public List<String> getSequenceIds( final File gff2File ) throws ParsingException {
         seqIds = new ArrayList<>();
-        try( BufferedReader reader = new BufferedReader( new FileReader( gff2File ) ) ) {
+        try( BufferedReader br = new BufferedReader( new FileReader( gff2File ) ) ) {
 
             GFFParser gff2Parser = new GFFParser();
             GFFHandler handler = new GFFHandler();
 
-            gff2Parser.parse( reader, handler );
+            gff2Parser.parse( br, handler );
 
         }
         catch( IOException | BioException | ParserException ex ) {
@@ -73,21 +73,21 @@ public class BioJavaGff2IdParser implements IdParserI {
 
 
     @Override
-    public void registerObserver( Observer observer ) {
+    public void registerObserver( final Observer observer ) {
         this.observers.add( observer );
 
     }
 
 
     @Override
-    public void removeObserver( Observer observer ) {
+    public void removeObserver( final Observer observer ) {
         this.observers.remove( observer );
 
     }
 
 
     @Override
-    public void notifyObservers( Object data ) {
+    public void notifyObservers( final Object data ) {
         for( Observer observer : this.observers ) {
             observer.update( data );
         }
@@ -113,7 +113,7 @@ public class BioJavaGff2IdParser implements IdParserI {
 
 
         @Override
-        public void recordLine( GFFRecord gffr ) {
+        public void recordLine( final GFFRecord gffr ) {
             if( !seqIds.contains( gffr.getSeqName() ) ) {
                 seqIds.add( gffr.getSeqName() );
             }

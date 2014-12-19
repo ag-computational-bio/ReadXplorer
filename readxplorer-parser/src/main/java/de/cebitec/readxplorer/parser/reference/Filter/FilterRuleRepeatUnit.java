@@ -30,12 +30,7 @@ public class FilterRuleRepeatUnit implements FilterRuleI {
 
     @Override
     public boolean appliesRule( ParsedFeature feature ) {
-        if( feature.getType() == FeatureType.REPEAT_UNIT ) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return feature.getType() == FeatureType.REPEAT_UNIT;
     }
 
 

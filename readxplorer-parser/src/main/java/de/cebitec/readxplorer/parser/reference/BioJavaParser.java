@@ -127,48 +127,25 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
 
     @Override
     @SuppressWarnings( "unchecked" )
-    public ParsedReference parseReference( ReferenceJob refGenJob, FeatureFilter filter ) throws ParsingException {
+    public ParsedReference parseReference( final ReferenceJob refGenJob, final FeatureFilter filter ) throws ParsingException {
 
-        ParsedReference refGenome = new ParsedReference();
+        final ParsedReference refGenome = new ParsedReference();
         refGenome.setFeatureFilter( filter );
         //at first store all exons in one data structure and add them to the ref genome at the end
-        Map<FeatureType, List<ParsedFeature>> featMap = new HashMap<>();
+        final Map<FeatureType, List<ParsedFeature>> featMap = new HashMap<>();
 
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Start reading file  \"{0}\"", refGenJob.getFile() );
-        try( BufferedReader in = new BufferedReader( new FileReader( refGenJob.getFile() ) ) ) {
+        try( final BufferedReader br = new BufferedReader( new FileReader( refGenJob.getFile() ) ) ) {
 
-            Namespace ns = RichObjectFactory.getDefaultNamespace();
-            SymbolTokenization dna = DNATools.getDNA().getTokenization( "token" );
-            RichSequenceBuilderFactory factory = RichSequenceBuilderFactory.THRESHOLD;
+            final Namespace ns = RichObjectFactory.getDefaultNamespace();
+            final SymbolTokenization dna = DNATools.getDNA().getTokenization( "token" );
+            final RichSequenceBuilderFactory factory = RichSequenceBuilderFactory.THRESHOLD;
 
             refGenome.setDescription( refGenJob.getDescription() );
             refGenome.setName( refGenJob.getName() );
             refGenome.setTimestamp( refGenJob.getTimestamp() );
 
-            RichStreamReader seqIter = new RichStreamReader( in, seqFormat, dna, factory, ns );
-            RichSequence seq;
-            Iterator<Feature> featIt;
-            RichFeature feature;
-            String parsedType;
-            String locusTag;
-            String product;
-            int start;
-            int stop;
-            int strand;
-            String ecNumber;
-            String geneName;
-            List<ParsedFeature> subFeatures;
-            Location location;
-            Iterator<Note> noteIter;
-            Note note;
-            String name;
-            String value;
-            Iterator<Location> subFeatureIter;
-            Location subLocation;
-            int subStart;
-            int subStop;
-            ParsedFeature currentFeature;
-            ParsedChromosome chrom;
+            final RichStreamReader seqIter = new RichStreamReader( br, seqFormat, dna, factory, ns );
 
             //Convert Genbank and EMBL to indexed fasta
             this.notifyObservers( "Converting " + refGenJob.getFile() + " into indexed fasta..." );
@@ -193,28 +170,21 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
             //Store features in DB
             while( seqIter.hasNext() ) {
                 try {
-                    chrom = new ParsedChromosome();
-                    seq = seqIter.nextRichSequence();
+                    ParsedChromosome chrom = new ParsedChromosome();
+                    RichSequence seq = seqIter.nextRichSequence();
                     chrom.setName( seq.getName() );
                     chrom.setChromLength( seq.length() );
 
                     // iterate through all features
-                    featIt = seq.getFeatureSet().iterator();
-                    while( featIt.hasNext() ) {
-                        locusTag = "unknown locus tag";
-                        geneName = "";
-                        ecNumber = "";
-                        product = "";
+                    for( Feature feature : seq.getFeatureSet() ) {
 
-                        feature = (RichFeature) featIt.next();
+                        final RichFeature richFeature = (RichFeature) feature;
+                        Location location = richFeature.getLocation();
 
-                        // attributes of feature that should be stored
-                        subFeatures = new ArrayList<>();
-                        location = feature.getLocation();
-
-                        parsedType = feature.getType();
+                        final int strand;
+                        final String parsedType = richFeature.getType();
                         try {
-                            strand = feature.getStrand().equals( StrandedFeature.POSITIVE ) ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV;
+                            strand = richFeature.getStrand().equals( StrandedFeature.POSITIVE ) ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV;
                         }
                         catch( IllegalStateException e ) {
                             this.sendMsgIfAllowed( e.getMessage() );
@@ -222,11 +192,13 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                         }
 
                         //Determine feature tags
-                        noteIter = feature.getRichAnnotation().getNoteSet().iterator();
-                        while( noteIter.hasNext() ) {
-                            note = noteIter.next();
-                            name = note.getTerm().getName();
-                            value = note.getValue();
+                        String locusTag = "unknown locus tag";
+                        String geneName = "";
+                        String ecNumber = "";
+                        String product = "";
+                        for( final Note note : richFeature.getRichAnnotation().getNoteSet() ) {
+                            String name = note.getTerm().getName();
+                            String value = note.getValue();
 
                             if( name.equals( "locus_tag" ) ) {
                                 locusTag = value;
@@ -289,18 +261,21 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
 //                            subFeatures.add(new ParsedFeature(type, subStart, subStop, strand,
 //                                    locusTag, product, ecNumber, geneName, new ArrayList<ParsedFeature>(), null));
 //                        }
-                        start = location.getMin();
-                        stop = location.getMax();
+                        final int start = location.getMin();
+                        final int stop  = location.getMax();
+
                         boolean featAcrossBorder = false;
                         int index = 0;
+                        // attributes of feature that should be stored
+                        List<ParsedFeature> subFeatures = new ArrayList<>();
                         if( location.toString().contains( "join" ) ) {
-                            subFeatureIter = location.blockIterator();
-                            while( subFeatureIter.hasNext() ) {
 
-                                subLocation = subFeatureIter.next(); //TODO: check if handling here is correct
+                            Iterator<Location> subFeatureIter = location.blockIterator();
+                            while( subFeatureIter.hasNext() ) {
+                                Location subLocation = subFeatureIter.next(); //TODO: check if handling here is correct
                                 //array always contains at least 2 entries
-                                subStart = subLocation.getMin();
-                                subStop = subLocation.getMax();
+                                int subStart = subLocation.getMin();
+                                int subStop = subLocation.getMax();
                                 subFeatures.add( new ParsedFeature( type, subStart, subStop, strand,
                                                                     locusTag, product, ecNumber, geneName, new ArrayList<ParsedFeature>(), null ) );
                                 featAcrossBorder = subStart == 1 && index > 0; //feature across circular chrom start, separate in two features
@@ -318,7 +293,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
                             }
                         }
                         else {
-                            currentFeature = new ParsedFeature( type, start, stop, strand, locusTag, product, ecNumber, geneName, subFeatures, null );
+                            ParsedFeature currentFeature = new ParsedFeature( type, start, stop, strand, locusTag, product, ecNumber, geneName, subFeatures, null );
                             if( !featMap.containsKey( type ) ) {
                                 featMap.put( type, new ArrayList<ParsedFeature>() );
                             }
@@ -358,7 +333,8 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
      * <p>
      * @return The list of top level features containing all subfeatures
      */
-    public List<ParsedFeature> createFeatureHierarchy( Map<FeatureType, List<ParsedFeature>> featureMap ) {
+    public List<ParsedFeature> createFeatureHierarchy( final Map<FeatureType, List<ParsedFeature>> featureMap ) {
+
         List<ParsedFeature> featList = new ArrayList<>();
         List<ParsedFeature> rnaList = new ArrayList<>();
         List<ParsedFeature> cdsList = new ArrayList<>();
@@ -423,23 +399,26 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
      * @return The feature list with the parents, now knowing their children and
      *         all features without a parent
      */
-    private List<ParsedFeature> addSubfeatures( List<ParsedFeature> subFeatures, List<ParsedFeature> features ) {
+    private List<ParsedFeature> addSubfeatures( final List<ParsedFeature> subFeatures, final List<ParsedFeature> features ) {
+
         List<ParsedFeature> mergedList = new ArrayList<>();
         int lastIndex = 0;
         boolean added = false;
-        ParsedFeature feature;
         Collections.sort( features );
         Collections.sort( subFeatures );
-        for( ParsedFeature subFeature : subFeatures ) {
+        for( final ParsedFeature subFeature : subFeatures ) {
             //since the features are sorted in this.features we can do this in linear time
             for( int i = lastIndex; i < features.size(); ++i ) {
-                feature = features.get( i );
-                if( feature.getStrand() == subFeature.getStrand() && feature.getStart() <= subFeature.getStart()
+                final ParsedFeature feature = features.get( i );
+                if( feature.getStrand() == subFeature.getStrand()
+                    && feature.getStart() <= subFeature.getStart()
                     && feature.getStop() >= subFeature.getStop() ) {
+
                     feature.addSubFeature( subFeature );
                     added = true;
                     lastIndex = i == 0 ? 0 : --i;
                     break;
+
                 }
                 else if( feature.getStart() > subFeature.getStop() ) {
                     break;
@@ -475,19 +454,19 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
 
 
     @Override
-    public void registerObserver( Observer observer ) {
+    public void registerObserver( final Observer observer ) {
         this.observers.add( observer );
     }
 
 
     @Override
-    public void removeObserver( Observer observer ) {
+    public void removeObserver( final Observer observer ) {
         this.observers.remove( observer );
     }
 
 
     @Override
-    public void notifyObservers( Object data ) {
+    public void notifyObservers( final Object data ) {
         for( Observer observer : this.observers ) {
             observer.update( data );
         }
@@ -501,7 +480,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
      * @param msg The message to send
      */
     @Override
-    public void sendMsgIfAllowed( String msg ) {
+    public void sendMsgIfAllowed( final String msg ) {
         if( this.errorLimit.allowOutput() ) {
             this.notifyObservers( msg );
         }

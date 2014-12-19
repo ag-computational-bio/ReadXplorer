@@ -76,7 +76,7 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
 
 
     @Override
-    public Boolean parseInput( TrackJob trackJob, Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError {
+    public Boolean parseInput( final TrackJob trackJob, final Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError {
 
         Boolean success = this.preprocessData( trackJob );
 
@@ -108,14 +108,15 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
      * @throws OutOfMemoryError
      */
     @Override
-    public Boolean convert( TrackJob trackJob, Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError {
-        Iterator<String> it = chromLengthMap.keySet().iterator();
-        boolean success;
+    public Boolean convert( final TrackJob trackJob, final Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError {
+
+        final boolean success;
+        final Iterator<String> it = chromLengthMap.keySet().iterator();
         if( it.hasNext() ) {
-            String chromName = it.next(); //ok, since SARUMAN only supports mapping on a single reference sequence
+            final String chromName = it.next(); //ok, since SARUMAN only supports mapping on a single reference sequence
 
             //Convert jok file to bam
-            JokToBamConverter jokConverter = new JokToBamConverter();
+            final JokToBamConverter jokConverter = new JokToBamConverter();
             List<File> jobs = new ArrayList<>();
             jobs.add( trackJob.getFile() );
             jokConverter.registerObserver( this );
@@ -164,7 +165,7 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
 
 
     @Override
-    public void notifyObservers( Object data ) {
+    public void notifyObservers( final Object data ) {
         for( Observer observer : this.observers ) {
             observer.update( data );
         }

@@ -61,6 +61,7 @@ public class BioJavaGff3Parser implements ReferenceParserI {
     // name of this parser for use in ComboBoxes
     private static final String parserName = "GFF3 file";
     private static final String fileDescription = "GFF3 file";
+    private static final String UNKNOWN_LOCUS_TAG = "unknown locus tag";
     private final ArrayList<Observer> observers = new ArrayList<>();
 
 
@@ -77,7 +78,7 @@ public class BioJavaGff3Parser implements ReferenceParserI {
      * @throws ParsingException
      */
     @Override
-    public ParsedReference parseReference( final ReferenceJob referenceJob, FeatureFilter filter ) throws ParsingException {
+    public ParsedReference parseReference( final ReferenceJob referenceJob, final FeatureFilter filter ) throws ParsingException {
 
         FastaReferenceParser fastaParser = new FastaReferenceParser();
         for( Observer observer : this.observers ) {
@@ -117,29 +118,19 @@ public class BioJavaGff3Parser implements ReferenceParserI {
 
                 @Override
                 @SuppressWarnings( "unchecked" )
-                public void recordLine( GFF3Record gffr ) {
+                public void recordLine( final GFF3Record gffr ) {
 
-                    final String UNKNOWN_LOCUS_TAG = "unknown locus tag";
-                    String parsedType;
+
                     String locusTag = UNKNOWN_LOCUS_TAG;
                     String geneName = "";
                     String product = "";
                     String ecNumber = "";
                     String identifier = "";
-                    int start;
-                    int stop;
-                    int strand;
                     List<String> parentIds = new ArrayList<>();
-                    ParsedChromosome currentChrom;
 
                     if( chromMap.containsKey( gffr.getSequenceID() ) ) {
-                        currentChrom = chromMap.get( gffr.getSequenceID() );
 
-                        parsedType = gffr.getType().getName();
-                        start = gffr.getStart();
-                        stop = gffr.getEnd();
-                        strand = gffr.getStrand().equals( StrandedFeature.POSITIVE ) ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV;
-
+                        final ParsedChromosome currentChrom = chromMap.get( gffr.getSequenceID() );
                         //phase can be used for translation within incomplete annotated genes. a given phase shows where to start in such a case
 //                        int phase = gffr.getPhase(); //0, 1, 2 or -1, if not used
 //                        if (phase >= 0 && phase <= 2) {
@@ -150,23 +141,18 @@ public class BioJavaGff3Parser implements ReferenceParserI {
 //                            }
 //                        } // else ignore phase as it is not used
 
-                        Map attributes = gffr.getAnnotation().asMap();
-                        Iterator attrIt = attributes.keySet().iterator();
-                        Object key;
-                        String keyString;
-                        Object value;
-                        Object attribute;
-                        String attrString;
+                        final Map<?,?> attributes = gffr.getAnnotation().asMap();
+                        final Iterator<?> attrIt = attributes.keySet().iterator();
 
                         while( attrIt.hasNext() ) {
-                            key = attrIt.next();
+                            final Object key = attrIt.next();
                             if( key instanceof Term ) {
-                                keyString = ((Term) key).getName();
-                                value = attributes.get( key );
+                                final String keyString = ((Term) key).getName();
+                                final Object value = attributes.get( key );
                                 if( value instanceof List && !((Collection) value).isEmpty() ) {
-                                    attribute = ((List) value).get( 0 ); //currently only one item per tag is supported, except for parent
+                                    final Object attribute = ((List) value).get( 0 ); //currently only one item per tag is supported, except for parent
                                     if( attribute instanceof String ) { //TODO: think about some way to keep all provided data - write it to product field?
-                                        attrString = (String) attribute;
+                                        final String attrString = (String) attribute;
                                         if( keyString.equalsIgnoreCase( "ID" ) ) {
                                             identifier = attrString;
                                             if( locusTag.equals( UNKNOWN_LOCUS_TAG ) ) {
@@ -223,12 +209,16 @@ public class BioJavaGff3Parser implements ReferenceParserI {
                             }
                         }
 
+                        String parsedType = gffr.getType().getName();
                         FeatureType type = FeatureType.getFeatureType( parsedType );
                         if( type == FeatureType.UNDEFINED ) {
                             notifyObservers( referenceJob.getFile().getName()
                                              + ": Using unknown feature type for " + parsedType );
                         }
 
+                        int start = gffr.getStart();
+                        int stop = gffr.getEnd();
+                        int strand = gffr.getStrand().equals( StrandedFeature.POSITIVE ) ? SequenceUtils.STRAND_FWD : SequenceUtils.STRAND_REV;
                         ParsedFeature currentFeature = new ParsedFeature( type, start, stop, strand,
                                                                           locusTag, product, ecNumber, geneName, null, parentIds, identifier );
                         currentChrom.addFeature( currentFeature );
@@ -267,19 +257,19 @@ public class BioJavaGff3Parser implements ReferenceParserI {
 
 
     @Override
-    public void registerObserver( Observer observer ) {
+    public void registerObserver( final Observer observer ) {
         this.observers.add( observer );
     }
 
 
     @Override
-    public void removeObserver( Observer observer ) {
+    public void removeObserver( final Observer observer ) {
         this.observers.remove( observer );
     }
 
 
     @Override
-    public void notifyObservers( Object data ) {
+    public void notifyObservers( final Object data ) {
         for( Observer observer : this.observers ) {
             observer.update( data );
         }

@@ -87,7 +87,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
      */
     @Override
     @SuppressWarnings( "unchecked" )
-    public void setDataToConvert( Object... data ) throws IllegalArgumentException {
+    public void setDataToConvert( final Object... data ) throws IllegalArgumentException {
         boolean works = true;
         if( data.length >= 3 ) {
             if( data[0] instanceof List ) {
@@ -129,10 +129,10 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
      * Actually converts the jok file into a bam file.
      */
     private boolean convertJokToBam() throws ParsingException {
+
         boolean success = true;
-        long startTime = System.currentTimeMillis();
-        long finish;
-        for( File currentFile : jokFiles ) {
+        final long startTime = System.currentTimeMillis();
+        for( final File currentFile : jokFiles ) {
             String fileName = currentFile.getName();
             int noReads = 0;
             try {
@@ -142,58 +142,48 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
                 try( BufferedReader br = new BufferedReader( new FileReader( currentFile ) ) ) {
                     outputFile = SamUtils.getFileWithBamExtension( currentFile, "" );
                     outFileName = outputFile.getName();
-                    BAMFileWriter bamFileWriter = new BAMFileWriter( outputFile );
+                    final BAMFileWriter bamFileWriter = new BAMFileWriter( outputFile );
                     bamFileWriter.setSortOrder( SAMFileHeader.SortOrder.coordinate, false );
-                    SAMFileHeader fileHeader = new SAMFileHeader();
+                    final SAMFileHeader fileHeader = new SAMFileHeader();
                     List<SAMSequenceRecord> samRecords = new ArrayList<>();
-                    SAMSequenceRecord seqRecord = new SAMSequenceRecord( refSeqName, refSeqLength );
+                    final SAMSequenceRecord seqRecord = new SAMSequenceRecord( refSeqName, refSeqLength );
                     samRecords.add( seqRecord );
                     fileHeader.setTextHeader( "@HD VN:1.4 SO:coordinate" );
                     fileHeader.setSequenceDictionary( new SAMSequenceDictionary( samRecords ) );
                     bamFileWriter.setHeader( fileHeader );
-                    String[] tokens;
-                    int lineno = 0;
+                    int lineNo = 0;
+//                    int counter = 0;
+//                    int emtpy = 0;
                     String line;
-                    byte direction;
-                    String readSeq;
-                    String refSeq;
-                    String readwithoutGaps;
-                    String readName;
-                    int start;
-                    int stop;
-                    String cigar;
-                    SAMRecord samRecord;
-                    int counter = 0;
-                    int emtpy = 0;
                     while( (line = br.readLine()) != null ) {
-                        lineno++;
+                        lineNo++;
 
                         // tokenize input line
-                        tokens = line.split( "\\t+", 8 );
+                        final String[] tokens = line.split( "\\t+", 8 );
                         if( tokens.length == 7 ) { // if the length is not correct the read is not parsed
                             // cast tokens
-                            readName = tokens[0];
+                            final String readName = tokens[0];
+                            final int start;
+                            final int stop;
                             try {
-                                start = Integer.parseInt( tokens[1] );
-                                stop = Integer.parseInt( tokens[2] );
-                                ++start;
-                                ++stop; // some people (no names here...) start counting at 0, I count genome position starting with 1
+                                start = Integer.parseInt( tokens[1] ) + 1;
+                                stop  = Integer.parseInt( tokens[2] ) + 1; // some people (no names here...) start counting at 0, I count genome position starting with 1
                             }
                             catch( NumberFormatException e ) { //
                                 if( !tokens[1].equals( "*" ) ) {
                                     this.sendMsgIfAllowed( "Value for current start position in "
-                                                           + outFileName + " line " + lineno + " is not a number or *. "
+                                                           + outFileName + " line " + lineNo + " is not a number or *. "
                                                            + "Found start: " + tokens[1] );
                                 }
                                 if( !tokens[2].equals( "*" ) ) {
                                     this.sendMsgIfAllowed( "Value for current stop position in "
-                                                           + outFileName + " line " + lineno + " is not a number or *. "
+                                                           + outFileName + " line " + lineNo + " is not a number or *. "
                                                            + "Found stop: " + tokens[2] );
                                 }
                                 continue; //*'s are ignored = unmapped read
                             }
 
-                            direction = 0;
+                            final byte direction;
                             switch( tokens[3] ) {
                                 case ">>":
                                     direction = 1;
@@ -201,30 +191,27 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
                                 case "<<":
                                     direction = -1;
                                     break;
+                                default:
+                                    direction = 0;
                             }
-                            readSeq = tokens[4];
-                            refSeq = tokens[5];
+                            String readSeq = tokens[4];
+                            String refSeq = tokens[5];
 
                             // report empty mappings saruman should not be producing anymore
-                            if( !CommonsMappingParser.checkReadJok( this, readSeq, readName, refSeq, refSeqLength, start, stop, direction, fileName, lineno ) ) {
-                                emtpy++;
+                            if( !CommonsMappingParser.checkReadJok( this, readSeq, readName, refSeq, refSeqLength, start, stop, direction, fileName, lineNo ) ) {
+//                                emtpy++;
                                 continue; //continue, and ignore read, if it contains inconsistent information
                             }
 
                             // parse read
                             //generate read without gaps
-                            if( readSeq.contains( "_" ) ) {
-                                readwithoutGaps = readSeq.replaceAll( "_+", "" );
-                            }
-                            else {
-                                readwithoutGaps = readSeq;
-                            }
+                            final String readwithoutGaps = readSeq.contains( "_" ) ? readSeq.replaceAll( "_+", "" ) : readSeq;
                             //Saruman flips only the read string by mapping so we can get the native read direction
-                            //                    readwithoutGaps = (direction == -1 ? SequenceUtils.getReverseComplement(readwithoutGaps) : readwithoutGaps);
+                            // readwithoutGaps = (direction == -1 ? SequenceUtils.getReverseComplement(readwithoutGaps) : readwithoutGaps);
 
-                            cigar = this.createCigar( readSeq, refSeq );
+                            String cigar = this.createCigar( readSeq, refSeq );
 
-                            samRecord = new SAMRecord( fileHeader );
+                            SAMRecord samRecord = new SAMRecord( fileHeader );
                             samRecord.setReadName( readName );
 
                             samRecord.setReadNegativeStrandFlag( direction != 1 ); //needed or set with flags?
@@ -250,15 +237,15 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
 
                         }
                         else {
-                            this.sendMsgIfAllowed( NbBundle.getMessage( JokToBamConverter.class, "Converter.Convert.MissingData", lineno, line ) );
+                            this.sendMsgIfAllowed( NbBundle.getMessage( JokToBamConverter.class, "Converter.Convert.MissingData", lineNo, line ) );
                         }
 
                         // Reads with an error already skip this part because of "continue" statements
                         if( ++noReads % 500000 == 0 ) {
-                            finish = System.currentTimeMillis();
-                            this.notifyObservers( Benchmark.calculateDuration( startTime, finish, lineno + " reads converted..." ) );
+                            long finish = System.currentTimeMillis();
+                            this.notifyObservers( Benchmark.calculateDuration( startTime, finish, lineNo + " reads converted..." ) );
                         }
-                        counter++;
+//                        counter++;
                     }
                     bamFileWriter.close();
                 }
@@ -270,7 +257,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
                 }
 
                 this.notifyObservers( "Converting track..." );
-                finish = System.currentTimeMillis();
+                long finish = System.currentTimeMillis();
                 msg = NbBundle.getMessage( JokToBamConverter.class, "Converter.Convert.Finished", outFileName );
                 this.notifyObservers( Benchmark.calculateDuration( startTime, finish, msg ) );
 
@@ -294,24 +281,24 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
      * <p>
      * @return
      */
-    private String createCigar( String readSeq, String refSeq ) {
-        StringBuilder cigarBuilder = new StringBuilder( readSeq.length() );
+    private String createCigar( final String readSeq, final String refSeq ) {
+
+        final StringBuilder cigarBuilder = new StringBuilder( readSeq.length() );
 
         int counter = 0;
         byte lastBase = 0;
-        byte currentBase;
-        char base;
 
         /* 0 (M) = alignment match (both, match or mismatch), 1 (I) = insertion,
          * 2 (D) = deletion, 3 (N) = skipped, 4 (S) = soft clipped, 5 (H) = hard clipped,
          * 6 (P) = padding, 7 (=) = sequene match, 8 (X) = sequence mismatch */
         for( int i = 0; i < readSeq.length(); i++ ) {
+            byte currentBase;
             if( readSeq.charAt( i ) == refSeq.charAt( i ) ) { //match
                 currentBase = 7;
             }
             else {
                 if( refSeq.charAt( i ) != '_' ) { //a base in the genome, most frequent case
-                    base = readSeq.charAt( i );
+                    char base = readSeq.charAt( i );
                     if( base != '_' ) { //ACGT or N in the read as well
                         currentBase = 8;
                     }
@@ -323,6 +310,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
                     currentBase = 1;
                 }
             }
+
             if( lastBase != currentBase && i > 0 ) {
                 cigarBuilder.append( counter ).append( this.getCigarOpChar( lastBase ) );
                 counter = 0;
@@ -351,8 +339,9 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
      * <p>
      * @return the character representation of the cigar operation
      */
-    private char getCigarOpChar( byte cigarOp ) {
-        char alignmentValue;
+    private char getCigarOpChar( final byte cigarOp ) {
+
+        final char alignmentValue;
         switch( cigarOp ) {
             case 0:
                 alignmentValue = 'M';
@@ -420,7 +409,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
 
 
     @Override
-    public void notifyObservers( Object data ) {
+    public void notifyObservers( final Object data ) {
         for( Observer observer : this.observers ) {
             observer.update( data );
         }
@@ -440,7 +429,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
      * @param msg the msg to send (can be an error or any other message).
      */
     @Override
-    public void sendMsgIfAllowed( String msg ) {
+    public void sendMsgIfAllowed( final String msg ) {
         if( this.errorLimit.allowOutput() ) {
             this.notifyObservers( msg );
         }

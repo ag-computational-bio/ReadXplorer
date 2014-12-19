@@ -30,12 +30,7 @@ public class FilterRuleCDS implements FilterRuleI {
 
     @Override
     public boolean appliesRule( ParsedFeature feature ) {
-        if( feature.getType() == FeatureType.CDS ) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return feature.getType() == FeatureType.CDS;
     }
 
 

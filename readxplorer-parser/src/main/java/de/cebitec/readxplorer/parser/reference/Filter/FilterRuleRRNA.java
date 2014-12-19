@@ -30,12 +30,7 @@ public class FilterRuleRRNA implements FilterRuleI {
 
     @Override
     public boolean appliesRule( ParsedFeature feature ) {
-        if( feature.getType() == FeatureType.RRNA ) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return feature.getType() == FeatureType.RRNA;
     }
 
 

@@ -51,7 +51,7 @@ public class FastaReferenceParser implements ReferenceParserI {
     private static final String[] fileExtension = new String[]{ "fas", "fasta", "fna", "fa" };
     private static final String fileDescription = "Fasta File";
     private final ArrayList<Observer> observers = new ArrayList<>();
-    private String errorMsg;
+//    private String errorMsg;
 
 
     /**
@@ -85,8 +85,9 @@ public class FastaReferenceParser implements ReferenceParserI {
      * @throws de.cebitec.readxplorer.parser.common.ParsingException
      */
     @Override
-    public ParsedReference parseReference( ReferenceJob referenceJob, FeatureFilter filter ) throws ParsingException {
-        ParsedReference refGenome = new ParsedReference();
+    public ParsedReference parseReference( final ReferenceJob referenceJob, final FeatureFilter filter ) throws ParsingException {
+
+        final ParsedReference refGenome = new ParsedReference();
         int chromCounter = 0;
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Start reading file  \"{0}\"", referenceJob.getFile() );
         try {
@@ -126,7 +127,7 @@ public class FastaReferenceParser implements ReferenceParserI {
      * @param chromName name of the chromosome
      * @param reference reference genome to which the chromosome shall be added
      */
-    private void createChromosome( String chromName, long chromLength, ParsedReference reference ) {
+    private void createChromosome( final String chromName, final long chromLength, final ParsedReference reference ) {
         ParsedChromosome chrom = new ParsedChromosome( chromName, chromLength, false );
         reference.addChromosome( chrom );
     }
@@ -154,19 +155,19 @@ public class FastaReferenceParser implements ReferenceParserI {
 
 
     @Override
-    public void registerObserver( Observer observer ) {
+    public void registerObserver( final Observer observer ) {
         this.observers.add( observer );
     }
 
 
     @Override
-    public void removeObserver( Observer observer ) {
+    public void removeObserver( final Observer observer ) {
         this.observers.remove( observer );
     }
 
 
     @Override
-    public void notifyObservers( Object data ) {
+    public void notifyObservers( final Object data ) {
         for( Observer observer : this.observers ) {
             observer.update( data );
         }

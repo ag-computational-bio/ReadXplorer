@@ -133,7 +133,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
      * @throws OutOfMemoryError
      */
     @Override
-    public Boolean preprocessData( TrackJob trackJob ) throws ParsingException, OutOfMemoryError {
+    public Boolean preprocessData( final TrackJob trackJob ) throws ParsingException, OutOfMemoryError {
         SamBamSorter sorter = new SamBamSorter();
         sorter.registerObserver( this );
         boolean success = sorter.sortSamBam( trackJob, SAMFileHeader.SortOrder.queryname, SamUtils.SORT_READNAME_STRING );
@@ -165,7 +165,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
      * @throws OutOfMemoryError
      */
     @Override
-    public Boolean parseInput( TrackJob trackJob, Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError {
+    public Boolean parseInput( final TrackJob trackJob, final Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError {
 
         //new algorithm:
        /* 1. sort by read name
@@ -183,17 +183,14 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
                                         + "C:\\Users\\UserName\\AppData\\Local\\Temp needs to have enough free space)." );
         }
 
-        File fileSortedByReadName = trackJob.getFile(); //sorted by read name bam file
-        File outputFile;
-        long startTime = System.currentTimeMillis();
-        long finish;
+        final File fileSortedByReadName = trackJob.getFile(); //sorted by read name bam file
+        final long startTime = System.currentTimeMillis();
         this.notifyObservers( NbBundle.getMessage( SamBamParser.class, "Parser.Parsing.Start", fileSortedByReadName.getName() ) );
 
-        int lineno = 0;
+
         int noReads = 0;
         int noSkippedReads = 0;
-
-        try( SAMFileReader samReader = new SAMFileReader( fileSortedByReadName ) ) {
+        try( final SAMFileReader samReader = new SAMFileReader( fileSortedByReadName ) ) {
             samReader.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
             SAMFileHeader.SortOrder sortOrder = samReader.getFileHeader().getSortOrder();
             SAMRecordIterator samItor = samReader.iterator();
@@ -203,24 +200,23 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
             Pair<SAMFileWriter, File> writerAndFile = SamUtils.createSamBamWriter(
                     fileSortedByReadName, header, false, SamUtils.EXTENDED_STRING );
             SAMFileWriter bamWriter = writerAndFile.getFirst();
-            outputFile = writerAndFile.getSecond();
+            final File outputFile = writerAndFile.getSecond();
             trackJob.setFile( outputFile );
 
             //record and read name specific variables
-            SAMRecord record;
-            String readName;
             String lastReadName = "";
-            Map<SAMRecord, Integer> diffMap = new HashMap<>(); //mapping of record to number of differences
+            final Map<SAMRecord, Integer> diffMap = new HashMap<>(); //mapping of record to number of differences
             ParsedClassification classificationData = new ParsedClassification( sortOrder ); //classification data for all reads with same read name
 
+            int lineno = 0;
             while( samItor.hasNext() ) {
                 try {
                     ++lineno;
-                    record = samItor.next();
+                    final SAMRecord record = samItor.next();
 
                     if( !record.getReadUnmappedFlag() && chromLengthMap.containsKey( record.getReferenceName() ) ) {
 
-                        readName = record.getReadName();
+                        String readName = record.getReadName();
                         if( record.getReadPairedFlag() ) {
                             if( record.getFirstOfPairFlag() ) {
                                 readName += "/1";
@@ -265,7 +261,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
                 }
 
                 if( lineno % 500000 == 0 ) {
-                    finish = System.currentTimeMillis();
+                    long finish = System.currentTimeMillis();
                     this.notifyObservers( Benchmark.calculateDuration( startTime, finish, lineno + " mappings processed in " ) );
                 }
                 System.err.flush();
@@ -282,7 +278,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
             samItor.close();
             bamWriter.close();
 
-            try( SAMFileReader samReaderNew = new SAMFileReader( outputFile ) ) {
+            try( final SAMFileReader samReaderNew = new SAMFileReader( outputFile ) ) {
                 samReaderNew.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
                 SamUtils utils = new SamUtils();
                 utils.registerObserver( this );
@@ -309,7 +305,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
         }
 
         this.notifyObservers( "Reads skipped during parsing due to inconsistent data: " + noSkippedReads );
-        finish = System.currentTimeMillis();
+        long finish = System.currentTimeMillis();
         String msg = NbBundle.getMessage( SamBamParser.class, "Parser.Parsing.Successfully", fileSortedByReadName.getName() );
         this.notifyObservers( Benchmark.calculateDuration( startTime, finish, msg ) );
         statsContainer.increaseValue( StatsContainer.NO_READS, noReads );
@@ -331,7 +327,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
 
 
     @Override
-    public void notifyObservers( Object data ) {
+    public void notifyObservers( final Object data ) {
         for( Observer observer : this.observers ) {
             observer.update( data );
         }
@@ -351,7 +347,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
      * @param msg The message to send
      */
     @Override
-    public void sendMsgIfAllowed( String msg ) {
+    public void sendMsgIfAllowed( final String msg ) {
         if( this.errorLimit.allowOutput() ) {
             this.notifyObservers( msg );
         }

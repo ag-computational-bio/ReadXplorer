@@ -75,12 +75,12 @@ public class SamBamSorter implements Observable {
         "MSG_SamBamSorter.sort.Finish=Finished sorting file by {0}. ",
         "# {0} - track file",
         "MSG_SamBamSorter.sort.Failed=Failed sorting file {0}, therefore the file cannot be imported." } )
-    public boolean sortSamBam( TrackJob trackJob, SAMFileHeader.SortOrder sortOrder, String sortOrderMsg ) {
+    public boolean sortSamBam( final TrackJob trackJob, final SAMFileHeader.SortOrder sortOrder, final String sortOrderMsg ) {
+
         boolean success = true;
         this.notifyObservers( Bundle.MSG_SamBamSorter_sort_Start( sortOrderMsg ) );
-        long start = System.currentTimeMillis();
-        long finish;
-        int lineno = 0;
+        final long start = System.currentTimeMillis();
+        int lineNo = 0;
         String msg;
         Pair<SAMFileWriter, File> writerAndFile = null;
 
@@ -95,9 +95,9 @@ public class SamBamSorter implements Observable {
                 while( samItor.hasNext() ) {
                     try {
                         writer.addAlignment( samItor.next() );
-                        if( ++lineno % 500000 == 0 ) {
-                            finish = System.currentTimeMillis();
-                            this.notifyObservers( Benchmark.calculateDuration( start, finish, lineno + " mappings processed in " ) );
+                        if( ++lineNo % 500000 == 0 ) {
+                            long finish = System.currentTimeMillis();
+                            this.notifyObservers( Benchmark.calculateDuration( start, finish, lineNo + " mappings processed in " ) );
                         }
                     }
                     catch( SAMFormatException e ) {
@@ -127,26 +127,26 @@ public class SamBamSorter implements Observable {
             this.notifyObservers( e.getMessage() );
             msg = Bundle.MSG_SamBamSorter_sort_Failed( trackJob.getFile() );
         }
-        finish = System.currentTimeMillis();
+        long finish = System.currentTimeMillis();
         this.notifyObservers( Benchmark.calculateDuration( start, finish, msg ) );
         return success;
     }
 
 
     @Override
-    public void registerObserver( Observer observer ) {
+    public void registerObserver( final Observer observer ) {
         this.observers.add( observer );
     }
 
 
     @Override
-    public void removeObserver( Observer observer ) {
+    public void removeObserver( final Observer observer ) {
         this.observers.remove( observer );
     }
 
 
     @Override
-    public void notifyObservers( Object data ) {
+    public void notifyObservers( final Object data ) {
         for( Observer observer : this.observers ) {
             observer.update( data );
         }

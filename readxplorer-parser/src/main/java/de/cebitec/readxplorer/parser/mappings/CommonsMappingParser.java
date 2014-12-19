@@ -83,7 +83,7 @@ public final class CommonsMappingParser {
      * <p>
      * @throws NumberFormatException
      */
-    public static int countDiffsAndGaps( String cigar, String readSeq, String refSeq, boolean isRevStrand ) throws NumberFormatException {
+    public static int countDiffsAndGaps( final String cigar, final String readSeq, final String refSeq, final boolean isRevStrand ) throws NumberFormatException {
 
         int differences = 0;
         int refPos = 0;
@@ -92,10 +92,9 @@ public final class CommonsMappingParser {
         final String[] charCigar = cigar.split( "\\d+" );
 
         for( int i = 1; i < charCigar.length; ++i ) {
-            String op = charCigar[i];
-            int currentCount = Integer.valueOf( num[i - 1] );
 
-            switch( op ) {
+            final int currentCount = Integer.valueOf( num[i - 1] );
+            switch( charCigar[i] ) {
                 case "M":
                     //check, count and add diffs for deviating Ms
                     String bases = readSeq.substring( readPos, readPos + currentCount ).toUpperCase();//bases of the read interval under investigation
@@ -169,21 +168,22 @@ public final class CommonsMappingParser {
      * <p>
      * @throws NumberFormatException
      */
-    public static DiffAndGapResult createDiffsAndGaps( String cigar, String readSeq, String refSeq, boolean isRevStrand, int start ) throws NumberFormatException {
+    public static DiffAndGapResult createDiffsAndGaps( final String cigar, final String readSeq, final String refSeq, final boolean isRevStrand, final int start ) throws NumberFormatException {
 
-        Map<Integer, Integer> gapOrderIndex = new HashMap<>();
-        List<ParsedDiff> diffs = new ArrayList<>();
-        List<ParsedReferenceGap> gaps = new ArrayList<>();
-        int differences = 0;
+
         final String[] num = cigar.split( cigarRegex );
         final String[] charCigar = cigar.split( "\\d+" );
+        final List<ParsedDiff> diffs = new ArrayList<>();
+        final List<ParsedReferenceGap> gaps = new ArrayList<>();
+        final Map<Integer, Integer> gapOrderIndex = new HashMap<>();
+
         int refPos = 0;
         int readPos = 0;
-
+        int differences = 0;
         for( int i = 1; i < charCigar.length; ++i ) {
-            String op = charCigar[i];
-            int currentCount = Integer.valueOf( num[i - 1] );
-            switch( op ) {
+
+            final int currentCount = Integer.valueOf( num[i - 1] );
+            switch( charCigar[i] ) {
                 case "M":
                     //check, count and add diffs for deviating Ms
                     String bases = readSeq.substring( readPos, readPos + currentCount ).toUpperCase();//bases of the read interval under investigation
@@ -272,35 +272,32 @@ public final class CommonsMappingParser {
      * <p>
      * @return the diff and gap result for the read
      */
-    public static DiffAndGapResult createDiffsAndGaps( String readSeq, String refSeq, int start, byte direction ) {
+    public static DiffAndGapResult createDiffsAndGaps( String readSeq, String refSeq, int start, final byte direction ) {
 
-        Map<Integer, Integer> gapOrderIndex = new HashMap<>();
-        List<ParsedDiff> diffs = new ArrayList<>();
-        List<ParsedReferenceGap> gaps = new ArrayList<>();
-        int errors = 0;
-        char base;
-        ParsedReferenceGap gap;
-        ParsedDiff diff;
+        final Map<Integer, Integer> gapOrderIndex = new HashMap<>();
+        final List<ParsedDiff> diffs = new ArrayList<>();
+        final List<ParsedReferenceGap> gaps = new ArrayList<>();
         readSeq = readSeq.toUpperCase();
         refSeq = refSeq.toUpperCase();
 
+        int errors = 0;
         for( int i = 0; i < readSeq.length(); i++ ) {
             if( readSeq.charAt( i ) != refSeq.charAt( i ) ) {
-                ++errors;
-                base = readSeq.charAt( i );
+                errors++;
+                char base = readSeq.charAt( i );
                 if( direction == SequenceUtils.STRAND_REV ) {
                     base = SequenceUtils.getDnaComplement( base );
                 }
                 if( refSeq.charAt( i ) == '_' ) {
                     // store a lower case char, if this is a gap in genome
-                    gap = new ParsedReferenceGap( start, base, getOrderForGap( start, gapOrderIndex ) );
+                    ParsedReferenceGap gap = new ParsedReferenceGap( start, base, getOrderForGap( start, gapOrderIndex ) );
                     gaps.add( gap );
                     // note: do not increase position. that means that next base of read is mapped
                     // to the same position as this gap. two subsequent gaps map to the same position!
                 }
                 else {
                     // store the char from input file, if this is a modification in the read
-                    diff = new ParsedDiff( start, base );
+                    ParsedDiff diff = new ParsedDiff( start, base );
                     diffs.add( diff );
                     ++start;
                 }
@@ -452,33 +449,32 @@ public final class CommonsMappingParser {
      * @param start        the start of the mapping
      * @param stop         the stop of the mapping
      * @param filename     the file name of which the mapping originates
-     * @param lineno       the line number in the file
-     * <p>
+     * @param lineno       the line number in the filelineNo<p>
      * @return true, if the read is consistent, false otherwise
      */
-    public static boolean checkRead( MessageSenderI parent,
-                                     String readSeq,
-                                     int refSeqLength,
-                                     int start,
-                                     int stop,
-                                     String filename,
-                                     int lineno ) {
+    public static boolean checkRead( final MessageSenderI parent,
+                                     final String readSeq,
+                                     final int refSeqLength,
+                                     final int start,
+                                     final int stop,
+                                     final String filename,
+                                     final int lineNo ) {
 
         boolean isConsistent = true;
         if( readSeq == null || readSeq.isEmpty() ) {
             parent.sendMsgIfAllowed( NbBundle.getMessage( CommonsMappingParser.class,
-                                                          "Parser.checkMapping.ErrorReadEmpty", filename, lineno, readSeq ) );
+                                                          "Parser.checkMapping.ErrorReadEmpty", filename, lineNo, readSeq ) );
             isConsistent = false;
         }
         if( refSeqLength < start || refSeqLength < stop ) {
             parent.sendMsgIfAllowed( NbBundle.getMessage( CommonsMappingParser.class,
                                                           "Parser.checkMapping.ErrorReadPosition",
-                                                          filename, lineno, start, stop, refSeqLength ) );
+                                                          filename, lineNo, start, stop, refSeqLength ) );
             isConsistent = false;
         }
         if( start >= stop ) {
             parent.sendMsgIfAllowed( NbBundle.getMessage( CommonsMappingParser.class,
-                                                          "Parser.checkMapping.ErrorStartStop", filename, lineno, start, stop ) );
+                                                          "Parser.checkMapping.ErrorStartStop", filename, lineNo, start, stop ) );
             isConsistent = false;
         }
 
@@ -506,14 +502,14 @@ public final class CommonsMappingParser {
      * @return true, if the read is consistent, false otherwise
      */
     public static boolean checkReadSam(
-            MessageSenderI parent,
-            String readSeq,
-            int refSeqLength,
-            String cigar,
-            int start,
-            int stop,
-            String filename,
-            int lineno ) {
+            final MessageSenderI parent,
+            final String readSeq,
+            final int refSeqLength,
+            final String cigar,
+            final int start,
+            final int stop,
+            final String filename,
+            final int lineno ) {
 
         boolean isConsistent = CommonsMappingParser.checkRead( parent, readSeq, refSeqLength, start, stop, filename, lineno );
         if( !cigar.matches( "[MHISDPXN=\\d]+" ) ) {
@@ -551,16 +547,16 @@ public final class CommonsMappingParser {
      * @return true, if the read is consistent, false otherwise
      */
     public static boolean checkReadJok(
-            MessageSenderI parent,
-            String readSeq,
-            String readname,
-            String refSeq,
-            int refSeqLength,
-            int start,
-            int stop,
-            int direction,
-            String filename,
-            int lineno ) {
+            final MessageSenderI parent,
+            final String readSeq,
+            final String readname,
+            final String refSeq,
+            final int refSeqLength,
+            final int start,
+            final int stop,
+            final int direction,
+            final String filename,
+            final int lineno ) {
 
         boolean isConsistent = CommonsMappingParser.checkRead( parent, readSeq, refSeqLength, start, stop, filename, lineno );
 
@@ -596,29 +592,28 @@ public final class CommonsMappingParser {
      * @return
      */
     public static int countStopPosition( String cigar, Integer startPosition, Integer readLength ) {
-        int stopPosition;
+
         int numberofDeletion = 0;
         int numberofInsertion = 0;
         int numberofSoftclipped = 0;
-        String[] num = cigar.split( cigarRegex );
-        String[] charCigar = cigar.split( "\\d+" );
-        String op;
-        String numOfBases;
+        final String[] num = cigar.split( cigarRegex );
+        final String[] charCigar = cigar.split( "\\d+" );
         for( int i = 1; i < charCigar.length; i++ ) {
-            op = charCigar[i];
-            numOfBases = num[i - 1];
+            String op = charCigar[i];
+            int numOfBases = Integer.parseInt( num[i - 1] );
             if( op.contains( "D" ) || op.contains( "N" ) || op.contains( "P" ) ) {
-                numberofDeletion += Integer.parseInt( numOfBases );
+                numberofDeletion += numOfBases;
             }
             if( op.contains( "I" ) ) {
-                numberofInsertion += Integer.parseInt( numOfBases );
+                numberofInsertion += numOfBases;
             }
             if( op.contains( "S" ) ) {
-                numberofSoftclipped += Integer.parseInt( numOfBases );
+                numberofSoftclipped += numOfBases;
             }
         }
-        stopPosition = startPosition + readLength - 1 + numberofDeletion - numberofInsertion - numberofSoftclipped;
-        return stopPosition;
+
+        return startPosition + readLength - 1 + numberofDeletion - numberofInsertion - numberofSoftclipped;
+
     }
 
 
@@ -629,7 +624,7 @@ public final class CommonsMappingParser {
      * <p>
      * @return The read name without its pair tag
      */
-    public static String getReadNameWithoutPairTag( String readNameFull ) {
+    public static String getReadNameWithoutPairTag( final String readNameFull ) {
         String readName;
         String[] nameParts = readNameFull.split( " " );
         if( nameParts.length == 2 && (nameParts[1].startsWith( "1" ) || nameParts[1].startsWith( "2" )) ) {
@@ -655,13 +650,15 @@ public final class CommonsMappingParser {
      * @return Either '1' for first read of pair, '2' for second read of pair
      *         or '0' for a single end mapping
      */
-    public static char getReadPairTag( SAMRecord record ) {
-        String readName = record.getReadName();
+    public static char getReadPairTag( final SAMRecord record ) {
+
+        final String readName = record.getReadName();
         char pairTag = Properties.EXT_UNDEFINED;
 
         if( readName.length() > 2 ) {
-            char lastChar = readName.charAt( readName.length() - 1 );
-            char prevLastChar = readName.charAt( readName.length() - 2 );
+
+            final char lastChar = readName.charAt( readName.length() - 1 );
+            final char prevLastChar = readName.charAt( readName.length() - 2 );
 
             if( prevLastChar == Properties.EXT_SEPARATOR ) {
                 if( lastChar == Properties.EXT_A1 || lastChar == Properties.EXT_B1 ) {
@@ -703,7 +700,7 @@ public final class CommonsMappingParser {
      * <p>
      * @return true, if the read is in the casava format > 1.8, false otherwise
      */
-    public static boolean isCasavaLarger1Dot8Format( String readName ) {
+    public static boolean isCasavaLarger1Dot8Format( final String readName ) {
         String[] nameParts = readName.split( " " );
         return nameParts.length == 2 && (nameParts[1].startsWith( Properties.EXT_A1_STRING )
                                          || nameParts[1].startsWith( Properties.EXT_A2_STRING ));
@@ -721,9 +718,10 @@ public final class CommonsMappingParser {
      * @return The elongated read name or the original one, if it already had a
      *         paired read ending
      */
-    public static String elongatePairedReadName( SAMRecord record ) {
+    public static String elongatePairedReadName( final SAMRecord record ) {
+
         String readName = record.getReadName();
-        char pairTag = readName.charAt( readName.length() - 1 );
+        final char pairTag = readName.charAt( readName.length() - 1 );
         if( record.getReadPairedFlag() && pairTag != Properties.EXT_A1 && pairTag != Properties.EXT_B1
             && pairTag != Properties.EXT_A2 && pairTag != Properties.EXT_B2
             && !isCasavaLarger1Dot8Format( readName ) ) {
@@ -743,7 +741,7 @@ public final class CommonsMappingParser {
      * @param isFstFile if true: "/1" is appended. If false: "/2" is appended
      *                  to the read name.
      */
-    public static void checkOrAddPairTag( SAMRecord record, boolean isFstFile ) {
+    public static void checkOrAddPairTag( final SAMRecord record, final boolean isFstFile ) {
         char pairTag = CommonsMappingParser.getReadPairTag( record );
         if( pairTag == Properties.EXT_UNDEFINED ) {
             String pairEnding = "/" + (isFstFile ? Properties.EXT_A1 : Properties.EXT_A2);
@@ -761,7 +759,7 @@ public final class CommonsMappingParser {
      * <p>
      * @return
      */
-    public static boolean isMappedSequence( int flag, int startPosition ) {
+    public static boolean isMappedSequence( final int flag, final int startPosition ) {
         boolean isMapped = true;
         if( flag >= 4 ) {
             String binaryValue = Integer.toBinaryString( flag );
@@ -785,16 +783,16 @@ public final class CommonsMappingParser {
      * <p>
      * @throws AssertionError
      */
-    public static void addClassificationData( Map<SAMRecord, Integer> recordToDiffMap,
-                                              ParsedClassification classification ) throws AssertionError {
+    public static void addClassificationData( final Map<SAMRecord, Integer> recordToDiffMap,
+                                             final ParsedClassification classification ) throws AssertionError {
 
-        int lowestDiffRate = classification.getMinMismatches();
-        Map<Integer, Integer> mismatchCountMap = classification.getMismatchCountMap();
+        final int lowestDiffRate = classification.getMinMismatches();
+        final Map<Integer, Integer> mismatchCountMap = classification.getMismatchCountMap();
 
         for( Map.Entry<SAMRecord, Integer> entry : recordToDiffMap.entrySet() ) {
-            SAMRecord record = entry.getKey();
-            Integer differences = entry.getValue();
-            int nextMappingPos = classification.getNextMappingStart( record.getAlignmentStart() );
+            final SAMRecord record = entry.getKey();
+            final int differences = entry.getValue();
+            final int nextMappingPos = classification.getNextMappingStart( record.getAlignmentStart() );
 
             if( nextMappingPos > 0 ) {
                 record.setAttribute( SAMTag.CP.name(), nextMappingPos );
@@ -849,8 +847,8 @@ public final class CommonsMappingParser {
      *                           records
      * @param samBamWriter       writer to write the SAM records to
      */
-    public static void writeSamRecord( Map<SAMRecord, Integer> diffMap, ParsedClassification classificationData,
-                                       SAMFileWriter samBamWriter ) {
+    public static void writeSamRecord( final Map<SAMRecord, Integer> diffMap, ParsedClassification classificationData,
+                                       final SAMFileWriter samBamWriter ) {
 
         //store data and clear data structure, if new read name is reached - file needs to be sorted by read name
         CommonsMappingParser.addClassificationData( diffMap, classificationData );
@@ -873,7 +871,7 @@ public final class CommonsMappingParser {
      * @param chromLengthMap     chromosome length map
      * @param fileName           mapping file name from which the record
      *                           originates
-     * @param lineno             the line number of the current record in the
+     * @param lineNo             the line number of the current record in the
      *                           file
      * @param refSeqFetcher      a fetcher for the reference sequence
      * @param diffMap            map of sam records to the number of differences
@@ -885,15 +883,15 @@ public final class CommonsMappingParser {
      * @return <code>true</code>, if the mapping data is consistent,
      *         <code>false</code> otherwise
      */
-    public static boolean classifyRead( SAMRecord record, MessageSenderI messageSender, Map<String, Integer> chromLengthMap, String fileName, int lineno,
-                                        RefSeqFetcher refSeqFetcher, Map<SAMRecord, Integer> diffMap, ParsedClassification classificationData ) {
-        String cigar = record.getCigarString();
-        String readSeq = record.getReadString();
-        int start = record.getAlignmentStart();
-        int stop = record.getAlignmentEnd();
+    public static boolean classifyRead( final SAMRecord record, MessageSenderI messageSender, final Map<String, Integer> chromLengthMap, final String fileName, final int lineNo,
+                                       final RefSeqFetcher refSeqFetcher, final Map<SAMRecord, Integer> diffMap, final ParsedClassification classificationData ) {
+        final String cigar   = record.getCigarString();
+        final String readSeq = record.getReadString();
+        final int start = record.getAlignmentStart();
+        final int stop  = record.getAlignmentEnd();
 
         boolean isConsistent = CommonsMappingParser.checkReadSam( messageSender, readSeq, chromLengthMap.get( record.getReferenceName() ),
-                                                                  cigar, start, stop, fileName, lineno );
+                                                                  cigar, start, stop, fileName, lineNo );
 //            ++noSkippedReads;
 //            continue; //continue, and ignore read, if it contains inconsistent information
 

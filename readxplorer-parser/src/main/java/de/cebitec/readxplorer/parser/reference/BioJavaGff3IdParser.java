@@ -58,11 +58,11 @@ public class BioJavaGff3IdParser implements IdParserI {
     public List<String> getSequenceIds( final File gff3File ) throws ParsingException {
         seqIds = new ArrayList<>();
 
-        try( BufferedReader reader = new BufferedReader( new FileReader( gff3File ) ) ) {
+        try( BufferedReader br = new BufferedReader( new FileReader( gff3File ) ) ) {
 
             GFF3Parser gff3Parser = new GFF3Parser();
             GFF3Handler handler = new GFF3Handler();
-            gff3Parser.parse( reader, handler, new Ontology.Impl( "Ontologyname", "name of ontology" ) );
+            gff3Parser.parse( br, handler, new Ontology.Impl( "Ontologyname", "name of ontology" ) );
 
         }
         catch( IOException | BioException | ParserException ex ) {
@@ -74,19 +74,19 @@ public class BioJavaGff3IdParser implements IdParserI {
 
 
     @Override
-    public void registerObserver( Observer observer ) {
+    public void registerObserver( final Observer observer ) {
         this.observers.add( observer );
     }
 
 
     @Override
-    public void removeObserver( Observer observer ) {
+    public void removeObserver( final Observer observer ) {
         this.observers.remove( observer );
     }
 
 
     @Override
-    public void notifyObservers( Object data ) {
+    public void notifyObservers( final Object data ) {
         for( Observer observer : this.observers ) {
             observer.update( data );
         }
@@ -111,7 +111,7 @@ public class BioJavaGff3IdParser implements IdParserI {
 
 
         @Override
-        public void recordLine( GFF3Record gffr ) {
+        public void recordLine( final GFF3Record gffr ) {
             if( !seqIds.contains( gffr.getSequenceID() ) ) {
                 seqIds.add( gffr.getSequenceID() );
             }

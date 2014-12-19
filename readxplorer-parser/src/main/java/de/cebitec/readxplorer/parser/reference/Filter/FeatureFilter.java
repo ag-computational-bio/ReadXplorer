@@ -20,7 +20,6 @@ package de.cebitec.readxplorer.parser.reference.Filter;
 
 import de.cebitec.readxplorer.parser.common.ParsedFeature;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 
 /**
@@ -59,9 +58,7 @@ public class FeatureFilter {
 
         if( !whitelist.isEmpty() ) {
             // valid if one of the rules applies
-            Iterator<FilterRuleI> it = whitelist.iterator();
-            while( it.hasNext() ) {
-                FilterRuleI rule = it.next();
+            for( FilterRuleI rule : whitelist ) {
                 if( rule.appliesRule( feature ) ) {
                     whitelistAccepted = true;
                     break;
@@ -75,9 +72,7 @@ public class FeatureFilter {
 
         if( !blacklist.isEmpty() ) {
             // valid if no rule applies
-            Iterator<FilterRuleI> it = blacklist.iterator();
-            while( it.hasNext() ) {
-                FilterRuleI rule = it.next();
+            for( FilterRuleI rule : blacklist ) {
                 if( rule.appliesRule( feature ) ) {
                     blacklistAccepted = false;
                     break;
@@ -89,12 +84,7 @@ public class FeatureFilter {
             blacklistAccepted = true;
         }
 
-        if( blacklistAccepted && whitelistAccepted ) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return blacklistAccepted && whitelistAccepted;
 
     }
 

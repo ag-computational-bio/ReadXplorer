@@ -27,6 +27,7 @@ import de.cebitec.readxplorer.parser.reference.Filter.FeatureFilter;
 import de.cebitec.readxplorer.utils.Observer;
 import de.cebitec.readxplorer.utils.SequenceUtils;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -34,6 +35,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.broad.tribble.AbstractFeatureReader;
+import org.broad.tribble.TribbleException;
 import org.broad.tribble.annotation.Strand;
 import org.broad.tribble.bed.BEDCodec;
 import org.broad.tribble.bed.BEDFeature;
@@ -70,7 +72,7 @@ public class TribbleBEDParser implements ReferenceParserI {
      * @throws ParsingException
      */
     @Override
-    public ParsedReference parseReference( ReferenceJob referenceJob, FeatureFilter filter ) throws ParsingException {
+    public ParsedReference parseReference( final ReferenceJob referenceJob, final FeatureFilter filter ) throws ParsingException {
 
         FastaReferenceParser fastaParser = new FastaReferenceParser();
         ParsedReference refGenome = fastaParser.parseReference( referenceJob, filter );
@@ -88,10 +90,10 @@ public class TribbleBEDParser implements ReferenceParserI {
 
                 Object header = reader.getHeader(); //TODO: something to do with the header?
 
-                Iterator<BEDFeature> featIt = reader.iterator();
+                final Iterator<BEDFeature> featIt = reader.iterator();
                 while( reader.hasIndex() ) {
-                    final BEDFeature feat = featIt.next();
 
+                    final BEDFeature feat = featIt.next();
                     if( chromMap.containsKey( feat.getChr() ) ) {
 
                         final int start = feat.getStart();
@@ -135,7 +137,7 @@ public class TribbleBEDParser implements ReferenceParserI {
             }
 
         }
-        catch( Exception ex ) {
+        catch( IOException | TribbleException ex ) {
             throw new ParsingException( ex );
         }
 

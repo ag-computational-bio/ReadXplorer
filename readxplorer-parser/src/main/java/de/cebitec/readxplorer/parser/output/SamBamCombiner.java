@@ -93,13 +93,13 @@ public class SamBamCombiner implements CombinerI {
 
         boolean success = true;
 
-        long startTime = System.currentTimeMillis();
+        final long startTime = System.currentTimeMillis();
         //only proceed if the second track job contains a file
-        File fileToExtend = trackJob1.getFile();
-        File file2 = trackJob2.getFile();
+        final File fileToExtend = trackJob1.getFile();
+        final File file2 = trackJob2.getFile();
         if( file2.exists() ) { //if all reads already in same file this file is null and no combination needed
-            String fileName = fileToExtend.getName();
 
+            String fileName = fileToExtend.getName();
             this.notifyObservers( NbBundle.getMessage( SamBamCombiner.class, "Combiner.Combine.Start", fileName + " and " + file2.getName() ) );
 
             SAMFileReader samBamReader = new SAMFileReader( fileToExtend );
@@ -162,9 +162,9 @@ public class SamBamCombiner implements CombinerI {
      *                         if
      *                         this is the file containing read2 of the pairs
      */
-    private void readAndWrite( SAMRecordIterator samBamItor, SAMFileWriter samBamFileWriter, boolean isFstFile ) {
-        long startTime = System.currentTimeMillis();
-        long finish;
+    private void readAndWrite( final SAMRecordIterator samBamItor, final SAMFileWriter samBamFileWriter, final boolean isFstFile ) {
+
+        final long startTime = System.currentTimeMillis();
         int noReads = 0;
         SAMRecord record = new SAMRecord( null );
         while( samBamItor.hasNext() ) {
@@ -182,7 +182,7 @@ public class SamBamCombiner implements CombinerI {
                 } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored
             }
             if( ++noReads % 500000 == 0 ) {
-                finish = System.currentTimeMillis();
+                long finish = System.currentTimeMillis();
                 this.notifyObservers( Benchmark.calculateDuration( startTime, finish, noReads + " reads converted..." ) );
             }
         }
@@ -190,19 +190,19 @@ public class SamBamCombiner implements CombinerI {
 
 
     @Override
-    public void registerObserver( Observer observer ) {
+    public void registerObserver( final Observer observer ) {
         this.observers.add( observer );
     }
 
 
     @Override
-    public void removeObserver( Observer observer ) {
+    public void removeObserver( final Observer observer ) {
         this.observers.remove( observer );
     }
 
 
     @Override
-    public void notifyObservers( Object data ) {
+    public void notifyObservers( final Object data ) {
         for( Observer observer : this.observers ) {
             observer.update( data );
         }

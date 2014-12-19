@@ -89,28 +89,17 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
         "StatsParser.Finished=Finished creating track statistics for {0}. ",
         "# {0} - track file path",
         "StatsParser.Start=Start creating track statistics for {0}" } )
-    public ParsedTrack createTrackStats( TrackJob trackJob, Map<String, Integer> chromLengthMap ) {
+    public ParsedTrack createTrackStats( final TrackJob trackJob, final Map<String, Integer> chromLengthMap ) {
 
-        long startTime = System.currentTimeMillis();
-        long finish;
-        String fileName = trackJob.getFile().getName();
+        final long startTime = System.currentTimeMillis();
+        final String fileName = trackJob.getFile().getName();
         this.notifyObservers( Bundle.StatsParser_Start( fileName ) );
-
 //        int noMappings = 0;
 //        long starti = System.currentTimeMillis();
-        int lineno = 0;
 
         String lastReadSeq = "";
         List<Integer> readsDifferentPos = new ArrayList<>();
         int seqCount = 0;
-        int start;
-        int stop;
-        String refName;
-        String readName;
-        String readSeq;
-        String cigar;
-        MappingClass mappingClass;
-        int mapCount;
         //Map with one covered interval list for each mapping class
         Map<String, Map<Classification, List<Pair<Integer, Integer>>>> classToCoveredIntervalsMap = new HashMap<>();
         for( String chromName : chromLengthMap.keySet() ) {
@@ -123,57 +112,45 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
             mapClassMap.get( TotalCoverage.TOTAL_COVERAGE ).add( new Pair<>( 0, 0 ) );
             classToCoveredIntervalsMap.put( chromName, mapClassMap );
         }
-        Byte classification;
-        Integer mappingCount;
 //        HashMap<String, Object> readNameSet = new HashMap<>();
-
 //        String[] nameArray;
 //        String shortReadName;
 
-        try( SAMFileReader sam = new SAMFileReader( trackJob.getFile() ) ) {
-            sam.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
-            SAMRecordIterator samItor = sam.iterator();
+        try( final SAMFileReader sam = new SAMFileReader( trackJob.getFile() ) ) {
 
-            SAMRecord record;
+            sam.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
+            final SAMRecordIterator samItor = sam.iterator();
+
+            int lineNo = 0;
             while( samItor.hasNext() ) {
                 try {
-                    ++lineno;
+                    ++lineNo;
 
-                    record = samItor.next();
-                    readName = record.getReadName();
-                    refName = record.getReferenceName();
+                    final SAMRecord record = samItor.next();
+//                    String readName = record.getReadName();
+                    final String refName = record.getReferenceName();
                     if( !record.getReadUnmappedFlag() && chromLengthMap.containsKey( refName ) ) {
 
-                        cigar = record.getCigarString();
-                        start = record.getAlignmentStart();
-                        stop = record.getAlignmentEnd();
-                        readSeq = record.getReadString();
+                        String cigar = record.getCigarString();
+                        int start = record.getAlignmentStart();
+                        int stop = record.getAlignmentEnd();
+                        String readSeq = record.getReadString();
 
-                        if( !CommonsMappingParser.checkReadSam( this, readSeq, chromLengthMap.get( refName ), cigar, start, stop, fileName, lineno ) ) {
+                        if( !CommonsMappingParser.checkReadSam( this, readSeq, chromLengthMap.get( refName ), cigar, start, stop, fileName, lineNo ) ) {
                             continue; //continue, and ignore read, if it contains inconsistent information
                         }
 
                         //statistics calculations: count no mappings in classifications and distinct sequences ////////////
-                        mappingCount = (Integer) record.getAttribute( Properties.TAG_MAP_COUNT );
-                        if( mappingCount != null ) {
-                            mapCount = mappingCount;
-                        }
-                        else {
-                            mapCount = 0;
-                        }
 
+                        Integer mappingCount = (Integer) record.getAttribute( Properties.TAG_MAP_COUNT );
+                        int mapCount = mappingCount != null ? mappingCount : 0;
                         if( mapCount == 1 ) {
                             statsContainer.increaseValue( StatsContainer.NO_UNIQ_MAPPINGS, mapCount );
                         }
                         statsContainer.increaseValue( StatsContainer.NO_MAPPINGS, 1 );
 
-                        classification = Byte.valueOf( record.getAttribute( Properties.TAG_READ_CLASS ).toString() );
-                        if( classification != null ) {
-                            mappingClass = MappingClass.getFeatureType( classification );
-                        }
-                        else {
-                            mappingClass = MappingClass.COMMON_MATCH;
-                        }
+                        Byte classification = Byte.valueOf( record.getAttribute( Properties.TAG_READ_CLASS ).toString() );
+                        MappingClass mappingClass = classification != null ? MappingClass.getFeatureType( classification ) : MappingClass.COMMON_MATCH;
                         readLengthDistribution.increaseDistribution( readSeq.length() );
 
                         if( !lastReadSeq.equals( readSeq ) ) { //same seq counted multiple times when multiple reads with same sequence
@@ -208,18 +185,18 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
 //                        }
                     }
                 }
-                catch( Exception e ) {
+                catch( NumberFormatException nfe ) {
                     //skip error messages, if too many occur to prevent bug in the output panel
-                    if( e.getMessage() == null || !e.getMessage().contains( "MAPQ should be 0" ) ) {
+                    if( nfe.getMessage() == null || !nfe.getMessage().contains( "MAPQ should be 0" ) ) {
                         //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored
                         this.sendMsgIfAllowed( NbBundle.getMessage( SamBamStatsParser.class,
-                                                                    "Parser.Parsing.CorruptData", lineno, e.toString() ) );
-                        Exceptions.printStackTrace( e );
+                                                                    "Parser.Parsing.CorruptData", lineNo, nfe.toString() ) );
+                        Exceptions.printStackTrace( nfe );
                     }
                 }
-                if( (lineno % 500000) == 0 ) {//output process info only on every XX line
-                    finish = System.currentTimeMillis();
-                    this.notifyObservers( Benchmark.calculateDuration( startTime, finish, lineno + " mappings processed in " ) );
+                if( (lineNo % 500000) == 0 ) {//output process info only on every XX line
+                    long finish = System.currentTimeMillis();
+                    this.notifyObservers( Benchmark.calculateDuration( startTime, finish, lineNo + " mappings processed in " ) );
                 }
                 System.err.flush();
             }
@@ -244,7 +221,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
         statsContainer.setReadLengthDistribution( readLengthDistribution );
         track.setStatsContainer( statsContainer );
 
-        finish = System.currentTimeMillis();
+        long finish = System.currentTimeMillis();
         String msg = Bundle.StatsParser_Finished( fileName );
         this.notifyObservers( Benchmark.calculateDuration( startTime, finish, msg ) );
 
@@ -265,7 +242,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
 
 
     @Override
-    public void notifyObservers( Object data ) {
+    public void notifyObservers( final Object data ) {
         for( Observer observer : this.observers ) {
             observer.update( data );
         }
@@ -273,7 +250,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
 
 
     @Override
-    public void sendMsgIfAllowed( String msg ) {
+    public void sendMsgIfAllowed( final String msg ) {
         if( this.errorLimit.allowOutput() ) {
             this.notifyObservers( msg );
         }
