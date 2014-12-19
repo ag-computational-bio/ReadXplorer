@@ -54,6 +54,10 @@
             <artifactId>readxplorer-libs-jri</artifactId>
         </dependency>
         <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-libs-jfreechart</artifactId>
+        </dependency>
+        <dependency>
             <groupId>batik</groupId>
             <artifactId>batik-swing</artifactId>
             <version>1.6-1</version>
