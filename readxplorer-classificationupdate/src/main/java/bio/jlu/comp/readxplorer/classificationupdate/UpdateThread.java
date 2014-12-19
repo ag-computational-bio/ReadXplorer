@@ -83,13 +83,13 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
         //get system JVM info:
         Runtime rt = Runtime.getRuntime();
 
-        this.showMsg( "Notification: Your current JVM config allows up to " + GeneralUtils.formatNumber( rt.maxMemory() / 1000000 ) + " MB of memory to be allocated." );
-        this.showMsg( "Currently the platform is using " + GeneralUtils.formatNumber( (rt.totalMemory() - rt.freeMemory()) / 1000000 ) + " MB of memory." );
-        this.showMsg( "Please be aware that you might need to change the -J-d64 and -J-Xmx value of your JVM to process large updates successfully." );
-        this.showMsg( "The value can be configured in the ../readxplorer/etc/readxplorer.conf file in the application folder." );
-        this.showMsg( "" );
+        showMsg( "Notification: Your current JVM config allows up to " + GeneralUtils.formatNumber( rt.maxMemory() / 1000000 ) + " MB of memory to be allocated." );
+        showMsg( "Currently the platform is using " + GeneralUtils.formatNumber( (rt.totalMemory() - rt.freeMemory()) / 1000000 ) + " MB of memory." );
+        showMsg( "Please be aware that you might need to change the -J-d64 and -J-Xmx value of your JVM to process large updates successfully." );
+        showMsg( "The value can be configured in the ../readxplorer/etc/readxplorer.conf file in the application folder." );
+        showMsg( "" );
 
-        this.updateTracks();
+        updateTracks();
 
         return null;
     }
@@ -116,17 +116,17 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
             workunits = 0;
 
             io.getOut().println( "Starting update of read mapping classification for all tracks in the current database:" );
-            for( TrackJob trackJob : trackJobs ) {
+            for( final TrackJob trackJob : trackJobs ) {
                 try {
                     ph.progress( "Re-calculate classification of track " + trackJob.getName(), workunits );
                     io.getOut().println( "Re-calculate classification of track " + trackJob.getName() );
-                    SamBamParser parser = new SamBamParser();
+                    final SamBamParser parser = new SamBamParser();
                     parser.registerObserver( this );
                     Map<String, Integer> chromLengthMap = this.getChromLengthMap( trackJob );
                     StatsContainer statsContainer = new StatsContainer();
                     statsContainer.prepareForTrack();
                     parser.setStatsContainer( statsContainer );
-                    Boolean success = parser.parseInput( trackJob, chromLengthMap );
+                    boolean success = parser.parseInput( trackJob, chromLengthMap );
                     parser.removeObserver( this );
                     if( success ) {
                         try {
@@ -186,19 +186,17 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
 
 
     private List<TrackJob> getTrackJobs() {
-        ProjectConnector projectConnector = ProjectConnector.getInstance();
-        List<PersistentTrack> tracks = projectConnector.getTracks();
-        List<TrackJob> trackJobs = new ArrayList<>();
-        Map<Integer, ReferenceJob> idToRefMap = new HashMap<>();
 
-        List<PersistentReference> refs = ProjectConnector.getInstance().getGenomes();
-        for( PersistentReference ref : refs ) {
+        ProjectConnector projectConnector = ProjectConnector.getInstance();
+        Map<Integer, ReferenceJob> idToRefMap = new HashMap<>();
+        for( final PersistentReference ref : projectConnector.getGenomes() ) {
             // File and parser parameter meaningless in this context
             ReferenceJob refJob = new ReferenceJob( ref.getId(), ref.getFastaFile(), null, ref.getDescription(), ref.getName(), ref.getTimeStamp() );
             idToRefMap.put( refJob.getID(), refJob );
         }
 
-        for( PersistentTrack dbTrack : tracks ) {
+        List<TrackJob> trackJobs = new ArrayList<>();
+        for( final PersistentTrack dbTrack : projectConnector.getTracks() ) {
             // File and parser, refgenjob, runjob parameters meaningless in this context
             TrackJob trackJob = new TrackJob( dbTrack.getId(), new File( dbTrack.getFilePath() ),
                                               dbTrack.getDescription(), idToRefMap.get( dbTrack.getRefGenID() ),
@@ -217,7 +215,7 @@ public class UpdateThread extends SwingWorker<Object, Object> implements
      * @param trackJob The track job for which the chromosome sequences and
      *                 lengths are needed.
      */
-    private Map<String, Integer> getChromLengthMap( TrackJob trackJob ) {
+    private Map<String, Integer> getChromLengthMap( final TrackJob trackJob ) {
         Map<String, Integer> chromLengthMap = new HashMap<>();
         int id = trackJob.getRefGen().getID();
         Map<Integer, PersistentChromosome> chromIdMap = ProjectConnector.getInstance().getRefGenomeConnector( id ).getRefGenome().getChromosomes();

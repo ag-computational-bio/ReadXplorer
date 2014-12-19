@@ -117,7 +117,8 @@ public class CsvExporter implements TableExporterI {
 
         String[] header = new String[0];
 
-        for( int i = 0; i < exportData.size(); ++i ) {
+        final int l = exportData.size();
+        for( int i = 0; i < l; i++ ) {
             try( CsvListWriter csvWriter = new CsvListWriter( new FileWriter( this.createOutputFile( file, sheetNames.get( i ) ) ), CsvPreference.TAB_PREFERENCE ) ) {
                 this.progressHandle.progress( "Storing line", this.rowNumberGlobal++ );
                 csvWriter.writeHeader( headers.get( i ).toArray( header ) );
@@ -188,7 +189,7 @@ public class CsvExporter implements TableExporterI {
      * @return The new file including the file number, if more than one file
      *         are stored
      */
-    private File createOutputFile( File file, String dataSheetName ) {
+    private File createOutputFile( final File file, final String dataSheetName ) {
         File newFile = file;
         if( fileCount++ > 0 ) {
             String newPath = file.getAbsolutePath().substring( 0, file.getAbsolutePath().length() - 4 );
