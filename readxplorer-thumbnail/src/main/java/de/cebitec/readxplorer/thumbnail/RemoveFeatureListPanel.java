@@ -40,7 +40,7 @@ public class RemoveFeatureListPanel extends javax.swing.JPanel {
 
 
     private PersistentFeature[] fillList() {
-        return selectedFeatures.toArray( new PersistentFeature[0] );
+        return selectedFeatures.toArray( new PersistentFeature[selectedFeatures.size()] );
     }
 
 
@@ -50,8 +50,8 @@ public class RemoveFeatureListPanel extends javax.swing.JPanel {
     }
 
 
-    public Object[] getSelectedValues() {
-        return jList1.getSelectedValues();
+    public List<PersistentFeature> getSelectedValues() {
+        return jList1.getSelectedValuesList();
     }
 
 
@@ -66,7 +66,7 @@ public class RemoveFeatureListPanel extends javax.swing.JPanel {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList(this.fillList());
+        jList1 = new javax.swing.JList<>(this.fillList());
         jLabel1 = new javax.swing.JLabel();
 
         jScrollPane1.setViewportView(jList1);
@@ -98,7 +98,7 @@ public class RemoveFeatureListPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JList jList1;
+    private javax.swing.JList<PersistentFeature> jList1;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 

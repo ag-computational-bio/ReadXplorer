@@ -308,7 +308,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
      */
     private BasePanel createTrackPanel( PersistentTrack track, ViewController controller, CheckBoxActionListener cbListener ) {
         BoundsInfoManager boundsManager = new BoundsInfoManager( controller.getCurrentRefGen() );
-        BasePanel basePanel = new BasePanel( boundsManager, controller );
+        final BasePanel basePanel = new BasePanel( boundsManager, controller );
         basePanel.setName( track.getDescription() );
         controller.addMousePositionListener( basePanel );
 
@@ -389,7 +389,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
     @Override
     public void addFeatureToList( PersistentFeature feature, final ReferenceViewer refViewer ) {
         if( !selectedFeatures.containsKey( refViewer ) ) {
-            ArrayList<PersistentFeature> list = new ArrayList<>();
+            ArrayList<PersistentFeature> list = new ArrayList<>( 1 );
             list.add( feature );
             selectedFeatures.put( refViewer, list );
         }
@@ -421,8 +421,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
                     openRefGenDialog.setVisible( true );
                     //Removes all Selected Features from Scene and ArrayLists
                     if( dialogDescriptor.getValue().equals( DialogDescriptor.OK_OPTION ) ) {
-                        for( Object f : rfp.getSelectedValues() ) {
-                            PersistentFeature feat = (PersistentFeature) f;
+                        for( final PersistentFeature feat : rfp.getSelectedValues() ) {
                             removeCertainFeature( feat );
                             if( featureToLayoutWidget.containsKey( feat ) && featureToTrackpanelList.containsKey( feat ) ) {
                                 activeTopComp.getScene().removeChild( featureToLayoutWidget.get( feat ) );
@@ -631,7 +630,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         featureToLayoutWidget.put( feature, layoutWidg );
 
         //Save all BasePanels for feature in List to put into HashMap
-        List<BasePanel> bps = new ArrayList<>();
+        List<BasePanel> bps = new ArrayList<>( 10 );
         CheckBoxActionListener cbListener = new CheckBoxActionListener();
         for( PersistentTrack track : refCon.getAssociatedTracks() ) {
             BasePanel trackPanel = createTrackPanel( track, controller, cbListener );
@@ -683,7 +682,7 @@ public class ThumbnailController extends MouseAdapter implements IThumbnailView,
         private void startCompare( ActionEvent e ) {
             try {
                 BasePanel secondTrackBP = (BasePanel) ((Component) e.getSource()).getParent().getParent();
-                ArrayList<PersistentTrack> trackList = new ArrayList<>();
+                ArrayList<PersistentTrack> trackList = new ArrayList<>( 2 );
                 trackList.add( trackPanelToTrack.get( firstTrackPanelToCompare ) );
                 trackList.add( trackPanelToTrack.get( secondTrackBP ) );
                 this.compareTwoTracks( trackList, currentFeature );
