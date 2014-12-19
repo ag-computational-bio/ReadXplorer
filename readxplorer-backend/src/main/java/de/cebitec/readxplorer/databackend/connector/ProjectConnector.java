@@ -50,7 +50,6 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
@@ -455,14 +454,14 @@ public class ProjectConnector extends Observable {
         try {
             con.setAutoCommit( false );
             Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Deleting all database tables" );
-            ResultSet rs = con.prepareStatement( "show tables" ).executeQuery();
-            while( rs.next() ) {
-                String table = rs.getString( 1 );
-                con.prepareStatement( "drop table " + table ).executeUpdate();
+            try( ResultSet rs = con.prepareStatement( "show tables" ).executeQuery() ) {
+                while( rs.next() ) {
+                    String table = rs.getString( 1 );
+                    con.prepareStatement( "drop table " + table ).executeUpdate();
+                }
+                con.commit();
+                con.setAutoCommit( true );
             }
-            con.commit();
-            con.setAutoCommit( true );
-
             Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Successfully deleted all data" );
         }
         catch( SQLException ex ) {
@@ -521,7 +520,7 @@ public class ProjectConnector extends Observable {
      * <p>
      * @throws StorageException
      */
-    public int addRefGenome( ParsedReference reference ) throws StorageException {
+    public int addRefGenome( final ParsedReference reference ) throws StorageException {
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Start storing reference sequence  \"{0}\"", reference.getName() );
 
         try {
@@ -560,7 +559,7 @@ public class ProjectConnector extends Observable {
      * <p>
      * @param reference the reference data to store
      */
-    private void storeGenome( ParsedReference reference ) {
+    private void storeGenome( final ParsedReference reference ) {
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "start storing reference sequence data..." );
         try( PreparedStatement insertGenome = con.prepareStatement( SQLStatements.INSERT_REFGENOME ) ) {
 
@@ -598,7 +597,7 @@ public class ProjectConnector extends Observable {
      * @param chromNumber the chromosome number of the new chromosome
      * @param refID       the reference id of the chromosome
      */
-    private void storeChromosome( ParsedChromosome chromosome, int chromNumber, int refID ) {
+    private void storeChromosome( final ParsedChromosome chromosome, final int chromNumber, final int refID ) {
 
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "start storing chromosome data..." );
         try( PreparedStatement insertChromosome = con.prepareStatement( SQLStatements.INSERT_CHROMOSOME ) ) {
@@ -630,11 +629,11 @@ public class ProjectConnector extends Observable {
      * <p>
      * @param reference the reference containing the features to store
      */
-    private void storeFeatures( ParsedReference reference ) {
+    private void storeFeatures( final ParsedReference reference ) {
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "start inserting features..." );
-        try( PreparedStatement insertFeature = con.prepareStatement( SQLStatements.INSERT_FEATURE ) ) {
+        try( final PreparedStatement insertFeature = con.prepareStatement( SQLStatements.INSERT_FEATURE ) ) {
 
-            for( ParsedChromosome chrom : reference.getChromosomes() ) {
+            for( final ParsedChromosome chrom : reference.getChromosomes() ) {
 
                 int latestId = (int) GenericSQLQueries.getLatestIDFromDB( SQLStatements.GET_LATEST_FEATURE_ID, con );
 
@@ -643,12 +642,8 @@ public class ProjectConnector extends Observable {
                 chrom.distributeFeatureIds();
 
                 int batchCounter = 1;
-                Iterator<ParsedFeature> featIt = chrom.getFeatures().iterator();
-                ParsedFeature feature;
-                while( featIt.hasNext() ) {
-
+                for( ParsedFeature feature : chrom.getFeatures() ) {
                     batchCounter++;
-                    feature = featIt.next();
                     insertFeature.setLong( 1, feature.getId() );
                     insertFeature.setLong( 2, chrom.getID() );
                     insertFeature.setString( 3, feature.getParentIdsConcat() );
@@ -696,7 +691,7 @@ public class ProjectConnector extends Observable {
      * <p>
      * @param track the track job containing the track information to store
      */
-    public void storeBamTrack( ParsedTrack track ) {
+    public void storeBamTrack( final ParsedTrack track ) {
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "start storing bam track data..." );
 
         try( PreparedStatement insertTrack = con.prepareStatement( SQLStatements.INSERT_TRACK ) ) {
@@ -726,7 +721,7 @@ public class ProjectConnector extends Observable {
      *                       track ID
      * @param trackID        the track id whose data shall be stored
      */
-    public void storeTrackStatistics( StatsContainer statsContainer, int trackID ) {
+    public void storeTrackStatistics( final StatsContainer statsContainer, final int trackID ) {
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Start storing track statistics..." );
 
         Map<String, Integer> statsMap = statsContainer.getStatsMap();
@@ -745,19 +740,32 @@ public class ProjectConnector extends Observable {
         // get latest id for statistic
         long latestID = GenericSQLQueries.getLatestIDFromDB( SQLStatements.GET_LATEST_STATISTICS_ID, con );
 
-        for( Map.Entry<String, Integer> entry : statsMap.entrySet() ) {
-            try( PreparedStatement insertStats = con.prepareStatement( SQLStatements.INSERT_STATISTICS ); ) {
+        // TODO check nonsense PreparedStatement fix
+        try( PreparedStatement insertStats = con.prepareStatement( SQLStatements.INSERT_STATISTICS ); ) {
+            insertStats.setInt( 2, trackID );
+            for( Map.Entry<String, Integer> entry : statsMap.entrySet() ) {
                 insertStats.setLong( 1, latestID++ );
-                insertStats.setInt( 2, trackID );
                 insertStats.setString( 3, entry.getKey() );
                 insertStats.setInt( 4, entry.getValue() );
                 insertStats.executeUpdate();
-
-            }
-            catch( SQLException ex ) {
-                this.rollbackOnError( this.getClass().getName(), ex );
             }
         }
+        catch( SQLException ex ) {
+            this.rollbackOnError( this.getClass().getName(), ex );
+        }
+//        for( Map.Entry<String, Integer> entry : statsMap.entrySet() ) {
+//            try( PreparedStatement insertStats = con.prepareStatement( SQLStatements.INSERT_STATISTICS ); ) {
+//                insertStats.setLong( 1, latestID++ );
+//                insertStats.setInt( 2, trackID );
+//                insertStats.setString( 3, entry.getKey() );
+//                insertStats.setInt( 4, entry.getValue() );
+//                insertStats.executeUpdate();
+//
+//            }
+//            catch( SQLException ex ) {
+//                this.rollbackOnError( this.getClass().getName(), ex );
+//            }
+//        }
 
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "...done storing track statistics data" );
     }
@@ -773,17 +781,27 @@ public class ProjectConnector extends Observable {
     public void deleteSpecificTrackStatistics( List<String> keys, int trackID ) {
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Start deleting specific track statistics..." );
 
-        for( String key : keys ) {
-            try( PreparedStatement deleteStats = con.prepareStatement( SQLStatements.DELETE_SPECIFIC_TRACK_STATISTIC ) ) {
-                deleteStats.setLong( 1, trackID );
+        try( PreparedStatement deleteStats = con.prepareStatement( SQLStatements.DELETE_SPECIFIC_TRACK_STATISTIC ) ) {
+            deleteStats.setLong( 1, trackID );
+            for( String key : keys ) {
                 deleteStats.setString( 2, key );
                 deleteStats.execute();
-
-            }
-            catch( SQLException ex ) {
-                this.rollbackOnError( this.getClass().getName(), ex );
             }
         }
+        catch( SQLException ex ) {
+            this.rollbackOnError( this.getClass().getName(), ex );
+        }
+//        for( String key : keys ) {
+//            try( PreparedStatement deleteStats = con.prepareStatement( SQLStatements.DELETE_SPECIFIC_TRACK_STATISTIC ) ) {
+//                deleteStats.setLong( 1, trackID );
+//                deleteStats.setString( 2, key );
+//                deleteStats.execute();
+//
+//            }
+//            catch( SQLException ex ) {
+//                this.rollbackOnError( this.getClass().getName(), ex );
+//            }
+//        }
 
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "...done deleting specific track statistics." );
     }
@@ -796,13 +814,13 @@ public class ProjectConnector extends Observable {
      * @param distribution the count distribution to store
      * @param trackID      track id of this track
      */
-    public void insertCountDistribution( DiscreteCountingDistribution distribution, int trackID ) {
+    public void insertCountDistribution( final DiscreteCountingDistribution distribution, final int trackID ) {
 
         int[] countDistribution = distribution.getDiscreteCountingDistribution();
         try( PreparedStatement insert = con.prepareStatement( SQLStatements.INSERT_COUNT_DISTRIBUTION ) ) {
+            insert.setInt( 1, trackID );
+            insert.setByte( 2, distribution.getType() );
             for( int i = 0; i < countDistribution.length; ++i ) {
-                insert.setInt( 1, trackID );
-                insert.setByte( 2, distribution.getType() );
                 insert.setInt( 3, i );
                 insert.setInt( 4, countDistribution[i] );
                 insert.addBatch();
@@ -823,7 +841,7 @@ public class ProjectConnector extends Observable {
      * @param track1Id track id of first track of the pair
      * @param track2Id track id of second track of the pair
      */
-    public void setReadPairIdsForTrackIds( long track1Id, long track2Id ) {
+    public void setReadPairIdsForTrackIds( final long track1Id, final long track2Id ) {
 
         try {
             //not 0, because 0 is the value when a track is not a sequence pair track!
@@ -860,7 +878,7 @@ public class ProjectConnector extends Observable {
      * @param lockStatement sql statement to lock some tables
      * @param domainName    name of the domain to lock for logging
      */
-    private void lockDomainTables( String lockStatement, String domainName ) {
+    private void lockDomainTables( final String lockStatement, final String domainName ) {
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "start locking {0} domain tables...", domainName );
         try( PreparedStatement lock = con.prepareStatement( lockStatement ) ) {
             lock.execute();
@@ -917,7 +935,7 @@ public class ProjectConnector extends Observable {
      * @param domainName   name of the domain to enable, if not needed here,
      *                     pass <code>null</code>
      */
-    private void enableDomainIndices( String sqlStatement, String domainName ) {
+    private void enableDomainIndices( final String sqlStatement, final String domainName ) {
         if( domainName != null ) {
             Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "started enabling {0} data domain indices", domainName );
         }
@@ -939,7 +957,7 @@ public class ProjectConnector extends Observable {
      * <p>
      * @return The reference genome connector for the given reference id
      */
-    public ReferenceConnector getRefGenomeConnector( int refGenID ) {
+    public ReferenceConnector getRefGenomeConnector( final int refGenID ) {
 
         // only return new object, if no suitable connector was created before
         if( !refConnectors.containsKey( refGenID ) ) {
@@ -949,7 +967,7 @@ public class ProjectConnector extends Observable {
     }
 
 
-    public TrackConnector getTrackConnector( PersistentTrack track ) throws FileNotFoundException {
+    public TrackConnector getTrackConnector( final PersistentTrack track ) throws FileNotFoundException {
         // only return new object, if no suitable connector was created before
         int trackID = track.getId();
         if( !trackConnectors.containsKey( trackID ) ) {
@@ -959,7 +977,7 @@ public class ProjectConnector extends Observable {
     }
 
 
-    public TrackConnector getTrackConnector( List<PersistentTrack> tracks, boolean combineTracks ) throws FileNotFoundException {
+    public TrackConnector getTrackConnector( final List<PersistentTrack> tracks, final boolean combineTracks ) throws FileNotFoundException {
         // makes sure the track id is not already used
         int id = 9999;
         for( PersistentTrack track : tracks ) {
@@ -971,7 +989,7 @@ public class ProjectConnector extends Observable {
     }
 
 
-    public MultiTrackConnector getMultiTrackConnector( PersistentTrack track ) throws FileNotFoundException {
+    public MultiTrackConnector getMultiTrackConnector( final PersistentTrack track ) throws FileNotFoundException {
         // only return new object, if no suitable connector was created before
         int trackID = track.getId();
         if( !multiTrackConnectors.containsKey( trackID ) ) { //old solution, which does not work anymore
@@ -981,7 +999,7 @@ public class ProjectConnector extends Observable {
     }
 
 
-    public MultiTrackConnector getMultiTrackConnector( List<PersistentTrack> tracks ) throws FileNotFoundException {
+    public MultiTrackConnector getMultiTrackConnector( final List<PersistentTrack> tracks ) throws FileNotFoundException {
         // makes sure the track id is not already used
         int id = 9999;
         for( PersistentTrack track : tracks ) {
@@ -998,7 +1016,7 @@ public class ProjectConnector extends Observable {
      * <p>
      * @param trackId track id of the track connector to remove
      */
-    public void removeTrackConnector( int trackId ) {
+    public void removeTrackConnector( final int trackId ) {
         if( trackConnectors.containsKey( trackId ) ) {
             trackConnectors.remove( trackId );
         }
@@ -1010,7 +1028,7 @@ public class ProjectConnector extends Observable {
      * <p>
      * @param trackId track id of the multi track connector to remove
      */
-    public void removeMultiTrackConnector( int trackId ) {
+    public void removeMultiTrackConnector( final int trackId ) {
         if( multiTrackConnectors.containsKey( trackId ) ) {
             multiTrackConnectors.remove( trackId );
         }
@@ -1026,11 +1044,9 @@ public class ProjectConnector extends Observable {
      *         id.
      */
     public HashMap<Integer, String> getOpenedTrackNames() {
-        HashMap<Integer, String> namesList = new HashMap<>();
-        Iterator<Integer> it = this.trackConnectors.keySet().iterator();
-        int nextId;
-        while( it.hasNext() ) {
-            nextId = it.next();
+
+        HashMap<Integer, String> namesList = new HashMap<>( trackConnectors.size() );
+        for( int nextId : trackConnectors.keySet() ) {
             namesList.put( nextId, this.trackConnectors.get( nextId ).getAssociatedTrackName() );
         }
         return namesList;
@@ -1099,9 +1115,8 @@ public class ProjectConnector extends Observable {
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Reading reference genome data from database" );
         List<PersistentReference> refGens = new ArrayList<>();
 
-        try( PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_GENOMES ) ) {
-
-            ResultSet rs = fetch.executeQuery();
+        try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_GENOMES ) ;
+             final ResultSet rs = fetch.executeQuery() ) {
             while( rs.next() ) {
                 int id = rs.getInt( FieldNames.REF_GEN_ID );
                 String description = rs.getString( FieldNames.REF_GEN_DESCRIPTION );
@@ -1112,8 +1127,6 @@ public class ProjectConnector extends Observable {
                 File fastaFile = new File( fileName );
                 refGens.add( new PersistentReference( id, name, description, timestamp, fastaFile ) );
             }
-            rs.close();
-
         }
         catch( SQLException e ) {
             Logger.getLogger( ProjectConnector.class.getName() ).log( Level.SEVERE, null, e );
@@ -1141,9 +1154,9 @@ public class ProjectConnector extends Observable {
      *         respective reference.
      */
     public Map<PersistentReference, List<PersistentTrack>> getGenomesAndTracks() {
-        List<PersistentReference> genomes = this.getGenomes();
-        List<PersistentTrack> tracks = this.getTracks();
-        Map<Integer, List<PersistentTrack>> tracksByReferenceId = new HashMap<>();
+        final List<PersistentReference> genomes = this.getGenomes();
+        final List<PersistentTrack> tracks = this.getTracks();
+        final Map<Integer, List<PersistentTrack>> tracksByReferenceId = new HashMap<>( tracks.size() );
         for( PersistentTrack t : tracks ) {
             List<PersistentTrack> list = tracksByReferenceId.get( t.getRefGenID() );
             if( list == null ) {
@@ -1153,7 +1166,7 @@ public class ProjectConnector extends Observable {
             list.add( t );
         }
 
-        Map<PersistentReference, List<PersistentTrack>> tracksByReference = new HashMap<>();
+        Map<PersistentReference, List<PersistentTrack>> tracksByReference = new HashMap<>( genomes.size() );
         for( PersistentReference reference : genomes ) {
             List<PersistentTrack> currentTrackList = tracksByReferenceId.get( reference.getId() );
             //if the current reference genome does not have any tracks,
@@ -1177,10 +1190,8 @@ public class ProjectConnector extends Observable {
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Reading track data from database" );
         List<PersistentTrack> tracks = new ArrayList<>();
 
-        try {
-            PreparedStatement fetchTracks = con.prepareStatement( SQLStatements.FETCH_TRACKS );
-            ResultSet rs = fetchTracks.executeQuery();
-
+        try( final PreparedStatement fetchTracks = con.prepareStatement( SQLStatements.FETCH_TRACKS );
+             final ResultSet rs = fetchTracks.executeQuery(); ) {
             while( rs.next() ) {
                 int id = rs.getInt( FieldNames.TRACK_ID );
                 String description = rs.getString( FieldNames.TRACK_DESCRIPTION );
@@ -1190,7 +1201,6 @@ public class ProjectConnector extends Observable {
                 int readPairId = rs.getInt( FieldNames.TRACK_READ_PAIR_ID );
                 tracks.add( new PersistentTrack( id, filePath, description, date, refGenID, -1, readPairId ) );
             }
-
         }
         catch( SQLException ex ) {
             Logger.getLogger( ProjectConnector.class.getName() ).log( Level.SEVERE, null, ex );
@@ -1205,25 +1215,23 @@ public class ProjectConnector extends Observable {
      *                <p>
      * @return The track for the given track id in a fresh track object
      */
-    public PersistentTrack getTrack( int trackID ) {
+    public PersistentTrack getTrack( final int trackID ) {
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Reading track data from database" );
         PersistentTrack track = null;
 
-        try {
-            PreparedStatement fetchTracks = con.prepareStatement( SQLStatements.FETCH_TRACK );
+        try( final PreparedStatement fetchTracks = con.prepareStatement( SQLStatements.FETCH_TRACK ); ) {
             fetchTracks.setInt( 1, trackID );
-            ResultSet rs = fetchTracks.executeQuery();
-
-            while( rs.next() ) {
-                int id = rs.getInt( FieldNames.TRACK_ID );
-                String description = rs.getString( FieldNames.TRACK_DESCRIPTION );
-                Timestamp date = rs.getTimestamp( FieldNames.TRACK_TIMESTAMP );
-                int refGenID = rs.getInt( FieldNames.TRACK_REFERENCE_ID );
-                String filePath = rs.getString( FieldNames.TRACK_PATH );
-                int readPairId = rs.getInt( FieldNames.TRACK_READ_PAIR_ID );
-                track = new PersistentTrack( id, filePath, description, date, refGenID, readPairId );
+            try( final ResultSet rs = fetchTracks.executeQuery(); ){
+                while( rs.next() ) {
+                    int id = rs.getInt( FieldNames.TRACK_ID );
+                    String description = rs.getString( FieldNames.TRACK_DESCRIPTION );
+                    Timestamp date = rs.getTimestamp( FieldNames.TRACK_TIMESTAMP );
+                    int refGenID = rs.getInt( FieldNames.TRACK_REFERENCE_ID );
+                    String filePath = rs.getString( FieldNames.TRACK_PATH );
+                    int readPairId = rs.getInt( FieldNames.TRACK_READ_PAIR_ID );
+                    track = new PersistentTrack( id, filePath, description, date, refGenID, readPairId );
+                }
             }
-
         }
         catch( SQLException ex ) {
             Logger.getLogger( ProjectConnector.class.getName() ).log( Level.SEVERE, null, ex );
@@ -1249,7 +1257,7 @@ public class ProjectConnector extends Observable {
      * <p>
      * @throws StorageException
      */
-    public void deleteTrack( int trackID ) throws StorageException {
+    public void deleteTrack( final int trackID ) throws StorageException {
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Starting deletion of track with id \"{0}\"", trackID );
         try( PreparedStatement deleteStatistics = con.prepareStatement( SQLStatements.DELETE_STATISTIC_FROM_TRACK );
              PreparedStatement deleteCountDistributions = con.prepareStatement( SQLStatements.DELETE_COUNT_DISTRIBUTIONS_FROM_TRACK );
@@ -1292,12 +1300,12 @@ public class ProjectConnector extends Observable {
      * <p>
      * @throws StorageException
      */
-    public void deleteGenome( int refGenID ) throws StorageException {
+    public void deleteGenome( final int refGenID ) throws StorageException {
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Starting deletion of reference genome with id \"{0}\"", refGenID );
         ReferenceConnector refCon = this.getRefGenomeConnector( refGenID );
         try( PreparedStatement deleteFeatures = con.prepareStatement( SQLStatements.DELETE_FEATURES_FROM_CHROMOSOME );
              PreparedStatement deleteChrom = con.prepareStatement( SQLStatements.DELETE_CHROMOSOME );
-             PreparedStatement deleteGenome = con.prepareStatement( SQLStatements.DELETE_GENOME ) ) {
+             PreparedStatement deleteGenome = con.prepareStatement( SQLStatements.DELETE_GENOME ); ) {
 
             con.setAutoCommit( false );
 
@@ -1350,7 +1358,7 @@ public class ProjectConnector extends Observable {
      * <p>
      * @throws StorageException
      */
-    public void resetTrackPath( PersistentTrack track ) throws StorageException {
+    public void resetTrackPath( final PersistentTrack track ) throws StorageException {
 
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Preparing statements for storing track data" );
 
@@ -1385,7 +1393,7 @@ public class ProjectConnector extends Observable {
      * <p>
      * @throws StorageException
      */
-    public void resetRefPath( File fastaFile, PersistentReference ref ) throws StorageException {
+    public void resetRefPath( final File fastaFile, final PersistentReference ref ) throws StorageException {
 
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Preparing statements for storing track data" );
 
@@ -1427,8 +1435,9 @@ public class ProjectConnector extends Observable {
     private void checkDBVersion() {
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Checking DB version..." );
 
-        try( PreparedStatement fetchDBVersion = con.prepareStatement( SQLStatements.FETCH_DB_VERSION ) ) {
-            ResultSet rs = fetchDBVersion.executeQuery();
+        try( final PreparedStatement fetchDBVersion = con.prepareStatement( SQLStatements.FETCH_DB_VERSION );
+             final ResultSet rs = fetchDBVersion.executeQuery(); ) {
+
             boolean updateNeeded = false;
             int dbVersion = 0;
             if( rs.next() ) {
@@ -1509,46 +1518,47 @@ public class ProjectConnector extends Observable {
      * <p>
      * @return The complete statistics for the track specified by the given id.
      */
-    private StatsContainer getTrackStats( int wantedTrackId ) {
+    private StatsContainer getTrackStats( final int wantedTrackId ) {
+
         StatsContainer statsContainer = new StatsContainer();
         statsContainer.prepareForTrack();
         statsContainer.prepareForReadPairTrack();
 
-        try( PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_STATS_FOR_TRACK ) ) {
+        try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_STATS_FOR_TRACK ) ) {
             fetch.setInt( 1, wantedTrackId );
-            ResultSet rs = fetch.executeQuery();
-            while( rs.next() ) {
-                //General data
-                statsContainer.increaseValue( MappingClass.PERFECT_MATCH.getTypeString(), rs.getInt( FieldNames.STATISTICS_NUMBER_PERFECT_MAPPINGS ) );
-                statsContainer.increaseValue( MappingClass.BEST_MATCH.getTypeString(), rs.getInt( FieldNames.STATISTICS_NUMBER_BM_MAPPINGS ) );
-                statsContainer.increaseValue( MappingClass.COMMON_MATCH.getTypeString(), rs.getInt( FieldNames.STATISTICS_NUMBER_OF_MAPPINGS ) );
-                statsContainer.increaseValue( MappingClass.PERFECT_MATCH.getTypeString() + StatsContainer.COVERAGE_STRING, rs.getInt( FieldNames.STATISTICS_PERFECT_COVERAGE_OF_GENOME ) );
-                statsContainer.increaseValue( MappingClass.BEST_MATCH.getTypeString() + StatsContainer.COVERAGE_STRING, rs.getInt( FieldNames.STATISTICS_BM_COVERAGE_OF_GENOME ) );
-                statsContainer.increaseValue( MappingClass.COMMON_MATCH.getTypeString() + StatsContainer.COVERAGE_STRING, rs.getInt( FieldNames.STATISTICS_COMPLETE_COVERAGE_OF_GENOME ) );
-                statsContainer.increaseValue( StatsContainer.NO_READS, rs.getInt( FieldNames.STATISTICS_NUMBER_READS ) );
-                statsContainer.increaseValue( StatsContainer.NO_REPEATED_SEQ, rs.getInt( FieldNames.STATISTICS_NUMBER_OF_REPEATED_SEQ ) );
-                statsContainer.increaseValue( StatsContainer.NO_UNIQUE_SEQS, rs.getInt( FieldNames.STATISTICS_NUMBER_OF_UNIQUE_SEQ ) );
-                statsContainer.increaseValue( StatsContainer.NO_UNIQ_MAPPINGS, rs.getInt( FieldNames.STATISTICS_NUMBER_UNIQUE_MAPPINGS ) );
-                statsContainer.increaseValue( StatsContainer.AVERAGE_READ_LENGTH, rs.getInt( FieldNames.STATISTICS_AVERAGE_READ_LENGTH ) );
-                //Read pair data
-                statsContainer.increaseValue( StatsContainer.NO_LARGE_DIST_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_LARGE_DIST_PAIRS ) );
-                statsContainer.increaseValue( StatsContainer.NO_LARGE_ORIENT_WRONG_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_LARGE_ORIENT_WRONG_PAIRS ) );
-                statsContainer.increaseValue( StatsContainer.NO_ORIENT_WRONG_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_ORIENT_WRONG_PAIRS ) );
-                statsContainer.increaseValue( StatsContainer.NO_PERF_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_PERFECT_SEQUENCE_PAIRS ) );
-                statsContainer.increaseValue( StatsContainer.NO_READ_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_SEQUENCE_PAIRS ) );
-                statsContainer.increaseValue( StatsContainer.NO_SINGLE_MAPPIGNS, rs.getInt( FieldNames.STATISTICS_NUM_SINGLE_MAPPINGS ) );
-                statsContainer.increaseValue( StatsContainer.NO_SMALL_DIST_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_SMALL_DIST_PAIRS ) );
-                statsContainer.increaseValue( StatsContainer.NO_SMALL_ORIENT_WRONG_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_SMALL_ORIENT_WRONG_PAIRS ) );
-                statsContainer.increaseValue( StatsContainer.NO_UNIQUE_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_UNIQUE_SEQUENCE_PAIRS ) );
-                statsContainer.increaseValue( StatsContainer.NO_UNIQ_LARGE_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_UNIQ_LARGE_PAIRS ) );
-                statsContainer.increaseValue( StatsContainer.NO_UNIQ_ORIENT_WRONG_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_UNIQ_ORIENT_WRNG_PAIRS ) );
-                statsContainer.increaseValue( StatsContainer.NO_UNIQ_PERF_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_UNIQUE_PERFECT_SEQUENCE_PAIRS ) );
-                statsContainer.increaseValue( StatsContainer.NO_UNIQ_SMALL_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_UNIQ_SMALL_PAIRS ) );
-                statsContainer.increaseValue( StatsContainer.NO_UNIQ_WRNG_ORIENT_LARGE_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_UNIQ_LARGE_ORIENT_WRNG_PAIRS ) );
-                statsContainer.increaseValue( StatsContainer.NO_UNIQ_WRNG_ORIENT_SMALL_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_UNIQ_SMALL_ORIENT_WRNG_PAIRS ) );
-                statsContainer.increaseValue( StatsContainer.AVERAGE_READ_PAIR_SIZE, rs.getInt( FieldNames.STATISTICS_AVERAGE_SEQ_PAIR_LENGTH ) );
+            try( final ResultSet rs = fetch.executeQuery(); ) {
+                while( rs.next() ) {
+                    //General data
+                    statsContainer.increaseValue( MappingClass.PERFECT_MATCH.getTypeString(), rs.getInt( FieldNames.STATISTICS_NUMBER_PERFECT_MAPPINGS ) );
+                    statsContainer.increaseValue( MappingClass.BEST_MATCH.getTypeString(), rs.getInt( FieldNames.STATISTICS_NUMBER_BM_MAPPINGS ) );
+                    statsContainer.increaseValue( MappingClass.COMMON_MATCH.getTypeString(), rs.getInt( FieldNames.STATISTICS_NUMBER_OF_MAPPINGS ) );
+                    statsContainer.increaseValue( MappingClass.PERFECT_MATCH.getTypeString() + StatsContainer.COVERAGE_STRING, rs.getInt( FieldNames.STATISTICS_PERFECT_COVERAGE_OF_GENOME ) );
+                    statsContainer.increaseValue( MappingClass.BEST_MATCH.getTypeString() + StatsContainer.COVERAGE_STRING, rs.getInt( FieldNames.STATISTICS_BM_COVERAGE_OF_GENOME ) );
+                    statsContainer.increaseValue( MappingClass.COMMON_MATCH.getTypeString() + StatsContainer.COVERAGE_STRING, rs.getInt( FieldNames.STATISTICS_COMPLETE_COVERAGE_OF_GENOME ) );
+                    statsContainer.increaseValue( StatsContainer.NO_READS, rs.getInt( FieldNames.STATISTICS_NUMBER_READS ) );
+                    statsContainer.increaseValue( StatsContainer.NO_REPEATED_SEQ, rs.getInt( FieldNames.STATISTICS_NUMBER_OF_REPEATED_SEQ ) );
+                    statsContainer.increaseValue( StatsContainer.NO_UNIQUE_SEQS, rs.getInt( FieldNames.STATISTICS_NUMBER_OF_UNIQUE_SEQ ) );
+                    statsContainer.increaseValue( StatsContainer.NO_UNIQ_MAPPINGS, rs.getInt( FieldNames.STATISTICS_NUMBER_UNIQUE_MAPPINGS ) );
+                    statsContainer.increaseValue( StatsContainer.AVERAGE_READ_LENGTH, rs.getInt( FieldNames.STATISTICS_AVERAGE_READ_LENGTH ) );
+                    //Read pair data
+                    statsContainer.increaseValue( StatsContainer.NO_LARGE_DIST_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_LARGE_DIST_PAIRS ) );
+                    statsContainer.increaseValue( StatsContainer.NO_LARGE_ORIENT_WRONG_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_LARGE_ORIENT_WRONG_PAIRS ) );
+                    statsContainer.increaseValue( StatsContainer.NO_ORIENT_WRONG_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_ORIENT_WRONG_PAIRS ) );
+                    statsContainer.increaseValue( StatsContainer.NO_PERF_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_PERFECT_SEQUENCE_PAIRS ) );
+                    statsContainer.increaseValue( StatsContainer.NO_READ_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_SEQUENCE_PAIRS ) );
+                    statsContainer.increaseValue( StatsContainer.NO_SINGLE_MAPPIGNS, rs.getInt( FieldNames.STATISTICS_NUM_SINGLE_MAPPINGS ) );
+                    statsContainer.increaseValue( StatsContainer.NO_SMALL_DIST_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_SMALL_DIST_PAIRS ) );
+                    statsContainer.increaseValue( StatsContainer.NO_SMALL_ORIENT_WRONG_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_SMALL_ORIENT_WRONG_PAIRS ) );
+                    statsContainer.increaseValue( StatsContainer.NO_UNIQUE_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_UNIQUE_SEQUENCE_PAIRS ) );
+                    statsContainer.increaseValue( StatsContainer.NO_UNIQ_LARGE_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_UNIQ_LARGE_PAIRS ) );
+                    statsContainer.increaseValue( StatsContainer.NO_UNIQ_ORIENT_WRONG_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_UNIQ_ORIENT_WRNG_PAIRS ) );
+                    statsContainer.increaseValue( StatsContainer.NO_UNIQ_PERF_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_UNIQUE_PERFECT_SEQUENCE_PAIRS ) );
+                    statsContainer.increaseValue( StatsContainer.NO_UNIQ_SMALL_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_UNIQ_SMALL_PAIRS ) );
+                    statsContainer.increaseValue( StatsContainer.NO_UNIQ_WRNG_ORIENT_LARGE_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_UNIQ_LARGE_ORIENT_WRNG_PAIRS ) );
+                    statsContainer.increaseValue( StatsContainer.NO_UNIQ_WRNG_ORIENT_SMALL_PAIRS, rs.getInt( FieldNames.STATISTICS_NUM_UNIQ_SMALL_ORIENT_WRNG_PAIRS ) );
+                    statsContainer.increaseValue( StatsContainer.AVERAGE_READ_PAIR_SIZE, rs.getInt( FieldNames.STATISTICS_AVERAGE_SEQ_PAIR_LENGTH ) );
+                }
             }
-            rs.close();
 
         }
         catch( SQLException e ) {
@@ -1575,60 +1585,60 @@ public class ProjectConnector extends Observable {
         //add column chromosome id to features
         this.runSqlStatement( GenericSQLQueries.genAddColumnString( FieldNames.TABLE_FEATURES, FieldNames.FEATURE_CHROMOSOME_ID, BIGINT_UNSIGNED ) );
 
-        List<PersistentReference> refList = this.getGenomesDbUpgrade();
-
-        for( PersistentReference ref : refList ) {
-            try( PreparedStatement fetchRefSeq = con.prepareStatement( SQLStatements.FETCH_REF_SEQ ); ) {
+        for( final PersistentReference ref : getGenomesDbUpgrade() ) {
+            try( final PreparedStatement fetchRefSeq = con.prepareStatement( SQLStatements.FETCH_REF_SEQ ); ) {
 
                 fetchRefSeq.setInt( 1, ref.getId() );
-                ResultSet rs = fetchRefSeq.executeQuery();
-                if( rs.next() ) {
+                try( final ResultSet rs = fetchRefSeq.executeQuery(); ) {
+                    if( rs.next() ) {
 
-                    String refSeq = rs.getString( FieldNames.REF_GEN_SEQUENCE );
-                    String chromName = rs.getString( FieldNames.REF_GEN_NAME );
+                        String refSeq = rs.getString( FieldNames.REF_GEN_SEQUENCE );
+                        String chromName = rs.getString( FieldNames.REF_GEN_NAME );
 
-                    String preparedRefName = ref.getName().replace( ':', '-' ).
-                            replace( '/', '-' ).
-                            replace( '\\', '-' ).
-                            replace( '*', '-' ).
-                            replace( '?', '-' ).
-                            replace( '|', '-' ).
-                            replace( '<', '-' ).
-                            replace( '>', '-' ).
-                            replace( '"', '_' ).
-                            replace( " ", "_" );
-                    String pathString = new File( dbLocation ).getParent().concat( "\\" + preparedRefName.concat( ".fasta" ) );
-                    Path fastaPath = new File( pathString ).toPath();
-                    try( FastaLineWriter fastaWriter = FastaLineWriter.fileWriter( fastaPath ) ) {
-                        fastaWriter.writeHeader( ref.getName() );
-                        fastaWriter.appendSequence( refSeq );
-                        PreparedStatement updateRefFile = con.prepareStatement( SQLStatements.UPDATE_REF_FILE );
-                        updateRefFile.setString( 1, pathString );
-                        updateRefFile.setInt( 2, ref.getId() );
-                        updateRefFile.execute();
-                        FastaUtils fastaUtils = new FastaUtils();
-                        fastaUtils.getIndexedFasta( fastaPath.toFile() );
+                        String preparedRefName = ref.getName()
+                                .replace( ':', '-' )
+                                .replace( '/', '-' )
+                                .replace( '\\', '-' )
+                                .replace( '*', '-' )
+                                .replace( '?', '-' )
+                                .replace( '|', '-' )
+                                .replace( '<', '-' )
+                                .replace( '>', '-' )
+                                .replace( '"', '_' )
+                                .replace( " ", "_" );
+                        String pathString = new File( dbLocation ).getParent().concat( "\\" + preparedRefName.concat( ".fasta" ) );
+                        Path fastaPath = new File( pathString ).toPath();
+                        try( final FastaLineWriter fastaWriter = FastaLineWriter.fileWriter( fastaPath ) ) {
+                            fastaWriter.writeHeader( ref.getName() );
+                            fastaWriter.appendSequence( refSeq );
+                            PreparedStatement updateRefFile = con.prepareStatement( SQLStatements.UPDATE_REF_FILE );
+                            updateRefFile.setString( 1, pathString );
+                            updateRefFile.setInt( 2, ref.getId() );
+                            updateRefFile.execute();
+                            FastaUtils fastaUtils = new FastaUtils();
+                            fastaUtils.getIndexedFasta( fastaPath.toFile() );
+                        }
+                        catch( IOException ex ) {
+                            JOptionPane.showMessageDialog( new JPanel(), "Reference fasta file cannot be written to disk! Change the permissions in the DB folder!",
+                                                           "Reference fasta cannot be written to DB folder", JOptionPane.ERROR_MESSAGE );
+                            throw new SQLException( "Cannot update reference table, since fasta file is missing. Please retry after changing the permissions in the DB folder!" );
+                        }
+
+                        ParsedChromosome newChrom = new ParsedChromosome();
+                        newChrom.setName( chromName );
+                        newChrom.setChromLength( refSeq.length() );
+
+                        this.storeChromosome( newChrom, 1, ref.getId() );
+
+                        //Update chromosome ids of the features for this reference
+                        //Since there is exactly one chrom for the current genome, we can query it as follows:
+                        PersistentChromosome chrom = getRefGenomeConnector( ref.getId() ).getChromosomesForGenome().values().iterator().next();
+
+                        PreparedStatement updateFeatureTable = con.prepareStatement( SQLStatements.UPDATE_FEATURE_TABLE );
+                        updateFeatureTable.setInt( 1, chrom.getId() );
+                        updateFeatureTable.setInt( 2, ref.getId() );
+                        updateFeatureTable.executeUpdate();
                     }
-                    catch( IOException ex ) {
-                        JOptionPane.showMessageDialog( new JPanel(), "Reference fasta file cannot be written to disk! Change the permissions in the DB folder!",
-                                                       "Reference fasta cannot be written to DB folder", JOptionPane.ERROR_MESSAGE );
-                        throw new SQLException( "Cannot update reference table, since fasta file is missing. Please retry after changing the permissions in the DB folder!" );
-                    }
-
-                    ParsedChromosome newChrom = new ParsedChromosome();
-                    newChrom.setName( chromName );
-                    newChrom.setChromLength( refSeq.length() );
-
-                    this.storeChromosome( newChrom, 1, ref.getId() );
-
-                    //Update chromosome ids of the features for this reference
-                    //Since there is exactly one chrom for the current genome, we can query it as follows:
-                    PersistentChromosome chrom = getRefGenomeConnector( ref.getId() ).getChromosomesForGenome().values().iterator().next();
-
-                    PreparedStatement updateFeatureTable = con.prepareStatement( SQLStatements.UPDATE_FEATURE_TABLE );
-                    updateFeatureTable.setInt( 1, chrom.getId() );
-                    updateFeatureTable.setInt( 2, ref.getId() );
-                    updateFeatureTable.executeUpdate();
                 }
             }
             catch( SQLException e ) {
@@ -1664,9 +1674,8 @@ public class ProjectConnector extends Observable {
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Reading reference genome data from database" );
         List<PersistentReference> refGens = new ArrayList<>();
 
-        try( PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_GENOMES ) ) {
-
-            ResultSet rs = fetch.executeQuery();
+        try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_GENOMES );
+             final ResultSet rs = fetch.executeQuery();) {
             while( rs.next() ) {
                 int id = rs.getInt( FieldNames.REF_GEN_ID );
                 String description = rs.getString( FieldNames.REF_GEN_DESCRIPTION );
@@ -1677,8 +1686,6 @@ public class ProjectConnector extends Observable {
                 File fastaFile = new File( fileName );
                 refGens.add( new PersistentReference( id, 1, name, description, timestamp, fastaFile, false ) );
             }
-            rs.close();
-
         }
         catch( SQLException e ) {
             Logger.getLogger( ProjectConnector.class.getName() ).log( Level.SEVERE, null, e );
@@ -1702,8 +1709,8 @@ public class ProjectConnector extends Observable {
      * @return Converts the given track list into a map of tracks to their track
      *         id.
      */
-    public static Map<Integer, PersistentTrack> getTrackMap( List<PersistentTrack> tracks ) {
-        Map<Integer, PersistentTrack> trackMap = new HashMap<>();
+    public static Map<Integer, PersistentTrack> getTrackMap( final List<PersistentTrack> tracks ) {
+        Map<Integer, PersistentTrack> trackMap = new HashMap<>( tracks.size() );
         for( PersistentTrack track : tracks ) {
             trackMap.put( track.getId(), track );
         }

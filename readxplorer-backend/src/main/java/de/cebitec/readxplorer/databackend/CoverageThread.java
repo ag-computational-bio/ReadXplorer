@@ -264,18 +264,18 @@ public class CoverageThread extends RequestThread {
      * @return the coverage of multiple tracks combined in one
      *         CoverageAndDiffResult object.
      */
-    CoverageAndDiffResult loadCoverageMultiple( IntervalRequest request ) {
+    CoverageAndDiffResult loadCoverageMultiple( final IntervalRequest request ) {
         int from = request.getTotalFrom(); // calcCenterLeft(request);
         int to = request.getTotalTo(); // calcCenterRight(request);
 
         CoverageManager covManager = new CoverageManager( from, to );
-        List<Difference> diffs = new ArrayList<>();
-        List<ReferenceGap> gaps = new ArrayList<>();
+        List<Difference> diffs = new ArrayList<>( tracks.size() );
+        List<ReferenceGap> gaps = new ArrayList<>( tracks.size() );
         covManager.incArraysToIntervalSize();
 
         //get coverage of all tracks
         if( tracks.size() > 1 ) {
-            for( PersistentTrack track : tracks ) {
+            for( final PersistentTrack track : tracks ) {
                 CoverageAndDiffResult intermedRes = this.getCoverageAndDiffsFromFile( request, track );
                 covManager = this.mergeMultCoverages( covManager, intermedRes.getCovManager() );
                 diffs.addAll( intermedRes.getDiffs() );
@@ -352,11 +352,11 @@ public class CoverageThread extends RequestThread {
      * <p>
      * @return The merged coverage manager
      */
-    private CoverageManager mergeMultCoverages( CoverageManager covManager1, CoverageManager covManager2 ) {
+    private CoverageManager mergeMultCoverages( final CoverageManager covManager1, final CoverageManager covManager2 ) {
         List<Classification> includedClasses = covManager1.getIncludedClassifications();
-        for( Classification classification : includedClasses ) {
-            Coverage cov1 = covManager1.getCoverage( classification );
-            Coverage cov2 = covManager2.getCoverage( classification );
+        for( final Classification classification : includedClasses ) {
+            final Coverage cov1 = covManager1.getCoverage( classification );
+            final Coverage cov2 = covManager2.getCoverage( classification );
             for( int i = cov1.getLeftBound(); i <= cov1.getRightBound(); ++i ) {
                 cov1.setFwdCoverage( i, cov1.getFwdCov( i ) + cov2.getFwdCov( i ) );
                 cov1.setRevCoverage( i, cov1.getRevCov( i ) + cov2.getRevCov( i ) );
@@ -384,7 +384,7 @@ public class CoverageThread extends RequestThread {
     }
 
 
-    private void makeThreadSleep( int msToSleep ) {
+    private void makeThreadSleep( final int msToSleep ) {
         try {
             Thread.sleep( msToSleep );
         }

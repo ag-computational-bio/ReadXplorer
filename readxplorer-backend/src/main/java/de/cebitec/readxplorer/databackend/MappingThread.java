@@ -94,14 +94,15 @@ public class MappingThread extends RequestThread {
      * <p>
      * @return the collection of mappings for the given interval
      */
-    List<Mapping> loadMappings( IntervalRequest request ) {
-        List<Mapping> mappingList = new ArrayList<>();
-        if( request.getFrom() < request.getTo() && request.getFrom() > 0 && request.getTo() > 0 ) {
+    List<Mapping> loadMappings( final IntervalRequest request ) {
+        ArrayList<Mapping> mappingList = new ArrayList<>();
+        if( request.getFrom() < request.getTo()  &&  request.getFrom() > 0  &&  request.getTo() > 0 ) {
 
             Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
             Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: Reading mapping data from file...", currentTimestamp );
 
-            for( PersistentTrack track : tracks ) {
+            mappingList.ensureCapacity( tracks.size() );
+            for( final PersistentTrack track : tracks ) {
                 SamBamFileReader externalDataReader = new SamBamFileReader( new File( track.getFilePath() ), track.getId(), refGenome );
                 Collection<Mapping> intermedRes = externalDataReader.getMappingsFromBam( request );
                 externalDataReader.close();
@@ -128,13 +129,13 @@ public class MappingThread extends RequestThread {
      * <p>
      * @return list of reduced mappings. Diffs and gaps are never included.
      */
-    public List<Mapping> loadReducedMappings( IntervalRequest request ) {
+    public List<Mapping> loadReducedMappings( final IntervalRequest request ) {
 
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: Reading mapping data from file...", currentTimestamp );
 
-        List<Mapping> mappings = new ArrayList<>();
-        for( PersistentTrack track : tracks ) {
+        List<Mapping> mappings = new ArrayList<>( tracks.size() );
+        for( final PersistentTrack track : tracks ) {
             SamBamFileReader externalDataReader = new SamBamFileReader( new File( track.getFilePath() ), track.getId(), refGenome );
             Collection<Mapping> intermedRes = externalDataReader.getReducedMappingsFromBam( request );
             externalDataReader.close();
@@ -159,12 +160,13 @@ public class MappingThread extends RequestThread {
      * @return the collection of read pair mappings for the given interval
      *         and typeFlag
      */
-    public Collection<ReadPairGroup> getReadPairMappings( IntervalRequest request ) {
-        Collection<ReadPairGroup> readPairs = new ArrayList<>();
+    public Collection<ReadPairGroup> getReadPairMappings( final IntervalRequest request ) {
+        ArrayList<ReadPairGroup> readPairs = new ArrayList<>();
         int from = request.getFrom();
         int to = request.getTo();
 
         if( from > 0 && to > 0 && from < to ) {
+            readPairs.ensureCapacity( tracks.size() );
             for( PersistentTrack track : tracks ) {
                 SamBamFileReader reader = new SamBamFileReader( new File( track.getFilePath() ), track.getId(), refGenome );
                 Collection<ReadPairGroup> intermedRes = reader.getReadPairMappingsFromBam( request );

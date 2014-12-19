@@ -84,7 +84,7 @@ public class SamBamFileReader implements Observable {
     private final PersistentReference reference;
     private final SamUtils samUtils;
     private SAMFileReader samFileReader;
-    private String header;
+//    private String header;
     private final List<Observer> observers;
 //    long startTime;
 //    long finish;
@@ -118,7 +118,7 @@ public class SamBamFileReader implements Observable {
     private void initializeReader() {
         samFileReader = new SAMFileReader( this.dataFile );
         samFileReader.setValidationStringency( SAMFileReader.ValidationStringency.LENIENT );
-        header = samFileReader.getFileHeader().getTextHeader();
+//        header = samFileReader.getFileHeader().getTextHeader();
         this.checkIndex();
     }
 
@@ -178,36 +178,26 @@ public class SamBamFileReader implements Observable {
                     request.getChromId() ).getName(), request.getTotalFrom(), request.getTotalTo(), false );
             String refSubSeq;
             int id = 0;
-            String cigar;
-            SAMRecord record;
-            int start;
-            int stop;
-            boolean isFwdStrand;
-            Byte classification;
-            MappingClass mappingClass;
-            Integer numMappingsForRead;
-            Mapping mapping;
-            int numReplicates = 1;
-            int mappingQuality;
+//            int numReplicates = 1;
 
             while( samRecordIterator.hasNext() ) {
-                record = samRecordIterator.next();
+                SAMRecord record = samRecordIterator.next();
 
                 if( !record.getReadUnmappedFlag() ) {
-                    start = record.getAlignmentStart();
-                    stop = record.getAlignmentEnd();
+                    int start = record.getAlignmentStart();
+                    int stop = record.getAlignmentEnd();
 //            start = start < 0 ? 0 : start;
 //            stop = stop >= refSeq.length() ? refSeq.length() : stop;
-                    isFwdStrand = !record.getReadNegativeStrandFlag();
-                    classification = Byte.valueOf( record.getAttribute( Properties.TAG_READ_CLASS ).toString() );
-                    mappingClass = MappingClass.getFeatureType( classification );
-                    numMappingsForRead = (Integer) record.getAttribute( Properties.TAG_MAP_COUNT );
-                    mappingQuality = record.getMappingQuality();
+                    boolean isFwdStrand = !record.getReadNegativeStrandFlag();
+                    Byte classification = Byte.valueOf( record.getAttribute( Properties.TAG_READ_CLASS ).toString() );
+                    MappingClass mappingClass = MappingClass.getFeatureType( classification );
+                    Integer numMappingsForRead = (Integer) record.getAttribute( Properties.TAG_MAP_COUNT );
+                    int mappingQuality = record.getMappingQuality();
 
                     //only add mappings, which are valid according to the read classification parameters
                     if( this.isIncludedMapping( mappingClass, numMappingsForRead, mappingQuality, readClassParams ) ) {
 
-                        mapping = this.getMappingForValues( mappingClass, numMappingsForRead, id++,
+                        Mapping mapping = this.getMappingForValues( mappingClass, numMappingsForRead, id++,
                                                             start, stop, isFwdStrand, mappingQuality, record.getBaseQualities() );
                         mapping.setAlignmentBlocks( samUtils.getAlignmentBlocks( record.getCigar(), start ) );
                         // We must alway check for Diffs and Gaps even if "classification != MappingClass.PERFECT_MATCH"
@@ -215,7 +205,7 @@ public class SamBamFileReader implements Observable {
                         if( this.hasNeededDiffs( request, mappingClass ) ) {
 
                             //find check alignment via cigar string and add diffs to mapping
-                            cigar = record.getCigarString();
+                            String cigar = record.getCigarString();
                             if( cigar.contains( "M" ) ) { //TODO: check if this check is faster or the version in other methods here
                                 refSubSeq = reference.getChromSequence( request.getChromId(), start, stop );
                             }
@@ -286,7 +276,7 @@ public class SamBamFileReader implements Observable {
      * @return the reduced mappings for the given interval. Diffs and gaps are
      *         never included.
      */
-    public Collection<Mapping> getReducedMappingsFromBam( IntervalRequest request ) {
+    public Collection<Mapping> getReducedMappingsFromBam( final IntervalRequest request ) {
         int from = request.getTotalFrom();
         int to = request.getTotalTo();
         ParametersReadClasses readClassParams = request.getReadClassParams();
@@ -296,32 +286,21 @@ public class SamBamFileReader implements Observable {
             this.checkIndex();
 
             SAMRecordIterator samRecordIterator = samFileReader.query( reference.getChromosome( request.getChromId() ).getName(), from, to, false );
-            SAMRecord record;
-            int start;
-            int stop;
-            Byte classification;
-            Integer numMappingsForRead;
-            boolean isFwdStrand;
-            Mapping mapping;
-            MappingClass mappingClass;
-            int mappingQuality;
-
             while( samRecordIterator.hasNext() ) {
-                record = samRecordIterator.next();
+                final SAMRecord record = samRecordIterator.next();
                 if( !record.getReadUnmappedFlag() ) {
-                    classification = Byte.valueOf( record.getAttribute( Properties.TAG_READ_CLASS ).toString() );
-                    mappingClass = MappingClass.getFeatureType( classification );
-                    numMappingsForRead = (Integer) record.getAttribute( Properties.TAG_MAP_COUNT );
-                    mappingQuality = record.getMappingQuality();
+                    Byte classification = Byte.valueOf( record.getAttribute( Properties.TAG_READ_CLASS ).toString() );
+                    MappingClass mappingClass = MappingClass.getFeatureType( classification );
+                    Integer numMappingsForRead = (Integer) record.getAttribute( Properties.TAG_MAP_COUNT );
+                    int mappingQuality = record.getMappingQuality();
 
                     //only add mappings, which are valid according to the read classification paramters
                     if( this.isIncludedMapping( mappingClass, numMappingsForRead, mappingQuality, readClassParams ) ) {
 
-                        start = record.getAlignmentStart();
-                        stop = record.getAlignmentEnd();
-                        isFwdStrand = !record.getReadNegativeStrandFlag();
-                        mapping = new Mapping( start, stop, isFwdStrand );
-                        mappings.add( mapping );
+                        int start = record.getAlignmentStart();
+                        int stop = record.getAlignmentEnd();
+                        boolean isFwdStrand = !record.getReadNegativeStrandFlag();
+                        mappings.add( new Mapping( start, stop, isFwdStrand ) );
                     }
                 }
             }
@@ -348,7 +327,7 @@ public class SamBamFileReader implements Observable {
      * <p>
      * @return the coverage for the given interval
      */
-    public Collection<ReadPairGroup> getReadPairMappingsFromBam( IntervalRequest request ) {
+    public Collection<ReadPairGroup> getReadPairMappingsFromBam( final IntervalRequest request ) {
         Map<Long, ReadPairGroup> readPairs = new HashMap<>();
         Collection<ReadPairGroup> readPairGroups = new ArrayList<>();
 
@@ -360,60 +339,40 @@ public class SamBamFileReader implements Observable {
             this.checkIndex();
 
             SAMRecordIterator samRecordIterator = samFileReader.query( reference.getChromosome( request.getChromId() ).getName(), from, to, false );
-            String refSubSeq;
             int id = 0;
-            String cigar;
-            SAMRecord record;
-            int startPos; //in the genome, to get the index: -1
-            int stop;
-            boolean isFwdStrand;
-            Byte classification;
-            MappingClass mappingClass;
-            Integer numMappingsForRead;
-            Integer pairId;
-            Integer pairType;
-            long readPairId;
-            ReadPairType readPairType;
-            int mateStart;
-            int mateStop;
-            boolean bothVisible;
-            Mapping mapping;
-            Mapping mate;
-            ReadPairGroup newGroup;
-            int mappingQuality;
-
             while( samRecordIterator.hasNext() ) {
-                record = samRecordIterator.next();
+                final SAMRecord record = samRecordIterator.next();
 
                 if( !record.getReadUnmappedFlag() ) {
-                    classification = Byte.valueOf( record.getAttribute( Properties.TAG_READ_CLASS ).toString() );
-                    mappingClass = MappingClass.getFeatureType( classification );
-                    numMappingsForRead = (Integer) record.getAttribute( Properties.TAG_MAP_COUNT );
-                    mappingQuality = record.getMappingQuality();
+                    Byte classification = Byte.valueOf( record.getAttribute( Properties.TAG_READ_CLASS ).toString() );
+                    MappingClass mappingClass = MappingClass.getFeatureType( classification );
+                    Integer numMappingsForRead = (Integer) record.getAttribute( Properties.TAG_MAP_COUNT );
+                    int mappingQuality = record.getMappingQuality();
 
                     if( this.isIncludedMapping( mappingClass, numMappingsForRead, mappingQuality, readClassParams ) ) {
 
-                        startPos = record.getAlignmentStart();
-                        stop = record.getAlignmentEnd();
+                        int startPos = record.getAlignmentStart(); //in the genome, to get the index: -1
+                        int stop = record.getAlignmentEnd();
                         //            start = start < 0 ? 0 : start;
                         //            stop = stop >= refSeq.length() ? refSeq.length() : stop;
-                        isFwdStrand = !record.getReadNegativeStrandFlag();
-                        pairId = (Integer) record.getAttribute( Properties.TAG_READ_PAIR_ID );
-                        pairType = (Integer) record.getAttribute( Properties.TAG_READ_PAIR_TYPE );
-                        mateStart = record.getMateAlignmentStart();
-                        bothVisible = mateStart > from && mateStart < to;
+                        boolean isFwdStrand = !record.getReadNegativeStrandFlag();
+                        Integer pairId = (Integer) record.getAttribute( Properties.TAG_READ_PAIR_ID );
+                        Integer pairType = (Integer) record.getAttribute( Properties.TAG_READ_PAIR_TYPE );
+                        int mateStart = record.getMateAlignmentStart();
+                        boolean bothVisible = mateStart > from && mateStart < to;
 
-                        mapping = this.getMappingForValues( mappingClass, numMappingsForRead, id++,
+                        Mapping mapping = this.getMappingForValues( mappingClass, numMappingsForRead, id++,
                                                             startPos, stop, isFwdStrand, mappingQuality, record.getBaseQualities() );
                         if( pairId != null && pairType != null ) { //since both data fields are always written together
                             // add new readPair if not exists
-                            readPairId = pairId;
-                            readPairType = ReadPairType.getReadPairType( pairType );
+                            long readPairId = pairId;
+                            ReadPairType readPairType = ReadPairType.getReadPairType( pairType );
                             if( !readPairs.containsKey( readPairId ) ) {
-                                newGroup = new ReadPairGroup();
+                                ReadPairGroup newGroup = new ReadPairGroup();
                                 newGroup.setReadPairId( pairId );
                                 readPairs.put( readPairId, newGroup );
                             } //TODO: check where ids are needed
+                            Mapping mate;
                             try {
                                 mate = this.getMappingForValues( MappingClass.COMMON_MATCH, -1, -1, mateStart, -1, !record.getMateNegativeStrandFlag(), new Byte( "0" ), new byte[0] );
                             }
@@ -426,13 +385,8 @@ public class SamBamFileReader implements Observable {
                         if( this.hasNeededDiffs( request, mappingClass ) ) {
 
                             //check alignment via cigar string and add diffs to mapping
-                            cigar = record.getCigarString();
-                            if( cigar.contains( "M" ) ) {
-                                refSubSeq = reference.getChromSequence( request.getChromId(), startPos, stop );
-                            }
-                            else {
-                                refSubSeq = null;
-                            }
+                            String cigar = record.getCigarString();
+                            String refSubSeq = cigar.contains( "M" ) ? reference.getChromSequence( request.getChromId(), startPos, stop ) : null;
                             this.createDiffsAndGaps( record, refSubSeq, mapping );
                         }
                     }
@@ -483,7 +437,7 @@ public class SamBamFileReader implements Observable {
      * <p>
      * @return the coverage for the given interval
      */
-    public CoverageAndDiffResult getReadStartsFromBam( IntervalRequest request ) {
+    public CoverageAndDiffResult getReadStartsFromBam( final IntervalRequest request ) {
 
         int from = request.getTotalFrom();
         int to = request.getTotalTo();
@@ -499,32 +453,25 @@ public class SamBamFileReader implements Observable {
         try {
             this.checkIndex();
             SAMRecordIterator samRecordIterator = samFileReader.query( reference.getChromosome( request.getChromId() ).getName(), from, to, false );
-
-            SAMRecord record;
-            boolean isFwdStrand;
-            Byte classification;
-            MappingClass mappingClass;
-            Integer numMappingsForRead;
-            int startPos; //in the genome, to get the index: -1
-            int mappingQuality;
             while( samRecordIterator.hasNext() ) {
-                record = samRecordIterator.next();
+                SAMRecord record = samRecordIterator.next();
 
                 if( !record.getReadUnmappedFlag() ) {
-                    classification = Byte.valueOf( record.getAttribute( Properties.TAG_READ_CLASS ).toString() );
-                    mappingClass = MappingClass.getFeatureType( classification );
-                    numMappingsForRead = (Integer) record.getAttribute( Properties.TAG_MAP_COUNT );
-                    mappingQuality = record.getMappingQuality();
+                    Byte classification = Byte.valueOf( record.getAttribute( Properties.TAG_READ_CLASS ).toString() );
+                    MappingClass mappingClass = MappingClass.getFeatureType( classification );
+                    Integer numMappingsForRead = (Integer) record.getAttribute( Properties.TAG_MAP_COUNT );
+                    int mappingQuality = record.getMappingQuality();
 
                     if( this.isIncludedMapping( mappingClass, numMappingsForRead, mappingQuality, readClassParams ) ) {
 
+                        boolean isFwdStrand;
                         if( readClassParams.isStrandBothOption() ) {
                             isFwdStrand = readClassParams.isStrandBothFwdOption();
                         }
                         else {
                             isFwdStrand = !record.getReadNegativeStrandFlag();
                         }
-                        startPos = isFwdStrand ? record.getAlignmentStart() : record.getAlignmentEnd();
+                        int startPos = isFwdStrand ? record.getAlignmentStart() : record.getAlignmentEnd(); //in the genome, to get the index: -1
 
                         this.increaseCoverage( mappingClass, isFwdStrand,
                                                startPos, startPos, coverage );
@@ -569,33 +516,23 @@ public class SamBamFileReader implements Observable {
 
         List<Difference> diffs = new ArrayList<>();
         List<ReferenceGap> gaps = new ArrayList<>();
-        DiffAndGapResult diffsAndGaps;
-
         CoverageAndDiffResult result = new CoverageAndDiffResult( coverage, diffs, gaps, request );
         try {
             this.checkIndex();
 
             SAMRecordIterator samRecordIterator = samFileReader.query( reference.getChromosome( request.getChromId() ).getName(), from, to, false );
-
-            SAMRecord record;
-            boolean isFwdStrand;
-            Byte classification;
-            MappingClass mappingClass;
-            Integer numMappingsForRead;
-            int startPos; //in the genome, to get the index: -1
-            int stop;
-            int mappingQuality;
             while( samRecordIterator.hasNext() ) {
-                record = samRecordIterator.next();
+                SAMRecord record = samRecordIterator.next();
 
                 if( !record.getReadUnmappedFlag() ) {
-                    classification = Byte.valueOf( record.getAttribute( Properties.TAG_READ_CLASS ).toString() );
-                    mappingClass = MappingClass.getFeatureType( classification );
-                    numMappingsForRead = (Integer) record.getAttribute( Properties.TAG_MAP_COUNT );
-                    mappingQuality = record.getMappingQuality();
+                    Byte classification = Byte.valueOf( record.getAttribute( Properties.TAG_READ_CLASS ).toString() );
+                    MappingClass mappingClass = MappingClass.getFeatureType( classification );
+                    Integer numMappingsForRead = (Integer) record.getAttribute( Properties.TAG_MAP_COUNT );
+                    int mappingQuality = record.getMappingQuality();
 
                     if( this.isIncludedMapping( mappingClass, numMappingsForRead, mappingQuality, readClassParams ) ) {
 
+                        boolean isFwdStrand;
                         if( readClassParams.isStrandBothOption() ) {
                             isFwdStrand = readClassParams.isStrandBothFwdOption();
                         }
@@ -609,7 +546,7 @@ public class SamBamFileReader implements Observable {
                         }
 
                         // add read start
-                        startPos = isFwdStrand ? record.getAlignmentStart() : record.getAlignmentEnd();
+                        int startPos = isFwdStrand ? record.getAlignmentStart() : record.getAlignmentEnd(); //in the genome, to get the index: -1
                         if( readClassParams.isStrandBothOption() ) {
                             isFwdStrand = readClassParams.isStrandBothFwdOption();
                         }
@@ -630,8 +567,8 @@ public class SamBamFileReader implements Observable {
                         }
 
                         if( this.hasNeededDiffs( request, mappingClass ) ) {
-                            stop = record.getAlignmentEnd();
-                            diffsAndGaps = this.createDiffsAndGaps( record,
+                            int stop = record.getAlignmentEnd();
+                            DiffAndGapResult diffsAndGaps = this.createDiffsAndGaps( record,
                                                                     reference.getChromSequence( request.getChromId(), startPos, stop ), null );
                             diffs.addAll( diffsAndGaps.getDiffs() );
                             gaps.addAll( diffsAndGaps.getGaps() );
@@ -667,7 +604,7 @@ public class SamBamFileReader implements Observable {
     public CoverageAndDiffResult getCoverageFromBam( IntervalRequest request ) {
 //        startTime = System.currentTimeMillis();
         int from = request.getTotalFrom();
-        int to = request.getTotalTo();
+        int to   = request.getTotalTo();
         ParametersReadClasses readClassParams = request.getReadClassParams();
 
         CoverageManager coverage = new CoverageManager( from, to );
@@ -675,35 +612,24 @@ public class SamBamFileReader implements Observable {
 
         List<Difference> diffs = new ArrayList<>();
         List<ReferenceGap> gaps = new ArrayList<>();
-        DiffAndGapResult diffsAndGaps;
-
         CoverageAndDiffResult result = new CoverageAndDiffResult( coverage, diffs, gaps, request );
         try {
             this.checkIndex();
 
             SAMRecordIterator samRecordIterator = samFileReader.query( reference.getChromosome( request.getChromId() ).getName(), from, to, false );
-
-            SAMRecord record;
-            boolean isFwdStrand;
-            Byte classification;
-            MappingClass mappingClass;
-            Integer numMappingsForRead;
-            int startPos; //in the genome, to get the index: -1
-            int stop;
-            int mappingQuality;
             while( samRecordIterator.hasNext() ) {
-                record = samRecordIterator.next();
+                SAMRecord record = samRecordIterator.next();
 
                 if( !record.getReadUnmappedFlag() ) {
-                    classification = Byte.valueOf( record.getAttribute( Properties.TAG_READ_CLASS ).toString() );
-                    mappingClass = MappingClass.getFeatureType( classification );
-                    numMappingsForRead = (Integer) record.getAttribute( Properties.TAG_MAP_COUNT );
-                    mappingQuality = record.getMappingQuality();
+                    Byte classification = Byte.valueOf( record.getAttribute( Properties.TAG_READ_CLASS ).toString() );
+                    MappingClass mappingClass = MappingClass.getFeatureType( classification );
+                    Integer numMappingsForRead = (Integer) record.getAttribute( Properties.TAG_MAP_COUNT );
+                    int mappingQuality = record.getMappingQuality();
 
                     if( this.isIncludedMapping( mappingClass, numMappingsForRead, mappingQuality, readClassParams ) ) {
-                        isFwdStrand = !record.getReadNegativeStrandFlag();
+                        boolean isFwdStrand = !record.getReadNegativeStrandFlag();
                         //This enables us to handle split reads correctly.
-                        startPos = record.getAlignmentStart();
+                        int startPos = record.getAlignmentStart(); //in the genome, to get the index: -1
                         List<SamAlignmentBlock> alignmentBlocks = samUtils.getAlignmentBlocks( record.getCigar(), startPos );
                         for( SamAlignmentBlock block : alignmentBlocks ) {
                             this.increaseCoverage( mappingClass, isFwdStrand,
@@ -711,8 +637,8 @@ public class SamBamFileReader implements Observable {
                         }
 
                         if( this.hasNeededDiffs( request, mappingClass ) ) {
-                            stop = record.getAlignmentEnd();
-                            diffsAndGaps = this.createDiffsAndGaps( record,
+                            int stop = record.getAlignmentEnd();
+                            DiffAndGapResult diffsAndGaps = this.createDiffsAndGaps( record,
                                                                     reference.getChromSequence( request.getChromId(), startPos, stop ), null );
                             diffs.addAll( diffsAndGaps.getDiffs() );
                             gaps.addAll( diffsAndGaps.getGaps() );
@@ -781,43 +707,35 @@ public class SamBamFileReader implements Observable {
     private DiffAndGapResult createDiffsAndGaps( SAMRecord record, String refSeq,
                                                  Mapping mapping ) throws NumberFormatException {
 
-        Map<Integer, Integer> gapOrderIndex = new HashMap<>();
-        List<Difference> diffs = new ArrayList<>();
-        List<ReferenceGap> gaps = new ArrayList<>();
+        final Map<Integer, Integer> gapOrderIndex = new HashMap<>();
+        final List<Difference> diffs = new ArrayList<>();
+        final List<ReferenceGap> gaps = new ArrayList<>();
         int differences = 0;
-        String cigar = record.getCigarString();
-        String readSeq = record.getReadString();
-        boolean isFwdStrand = !record.getReadNegativeStrandFlag();
-        int start = record.getAlignmentStart();
-        byte[] baseQualities = record.getBaseQualities();
-        Byte mappingQuality = (byte) (record.getMappingQuality() >= DEFAULT_MAP_QUAL ? UNKNOWN_CALCULATED_MAP_QUAL : record.getMappingQuality());
-        String[] num = cigar.split( cigarRegex );
-        String[] charCigar = cigar.split( "\\d+" );
-        String op;//operation
-        char base; //currently visited base
-        String bases; //bases of the read interval under investigation
-        String refBases; //bases of the reference corresponding to the read interval under investigation
-        int currentCount;
+        final String cigar = record.getCigarString();
+        final String readSeq = record.getReadString();
+        final boolean isFwdStrand = !record.getReadNegativeStrandFlag();
+        final int start = record.getAlignmentStart();
+        final byte[] baseQualities = record.getBaseQualities();
+        final Byte mappingQuality = (byte) (record.getMappingQuality() >= DEFAULT_MAP_QUAL ? UNKNOWN_CALCULATED_MAP_QUAL : record.getMappingQuality());
+        final String[] num = cigar.split( cigarRegex );
+        final String[] charCigar = cigar.split( "\\d+" );
         int refPos = 0;
         int readPos = 0;
-        byte baseQuality;
-
-        for( int i = 1; i < charCigar.length; ++i ) {
-            op = charCigar[i];
-            currentCount = Integer.valueOf( num[i - 1] );
-            switch( op ) {
+        for( int i = 1; i < charCigar.length; i++ ) {
+            int currentCount = Integer.valueOf( num[i - 1] );
+            switch( charCigar[i] ) {
                 case "M":
                     //check, count and add diffs for deviating Ms
-                    bases = readSeq.substring( readPos, readPos + currentCount ).toUpperCase();
-                    refBases = refSeq.substring( refPos, refPos + currentCount );
-                    for( int j = 0; j < bases.length(); ++j ) {
-                        base = bases.charAt( j );
+                    String bases = readSeq.substring( readPos, readPos + currentCount ).toUpperCase(); //bases of the read interval under investigation
+                    String refBases = refSeq.substring( refPos, refPos + currentCount ); //bases of the reference corresponding to the read interval under investigation
+                    for( int j = 0; j < bases.length(); j++ ) {
+                        char base = bases.charAt( j ); //currently visited base
                         if( base != refBases.charAt( j ) ) {
-                            ++differences;
+                            differences++;
                             if( !isFwdStrand ) {
                                 base = SequenceUtils.getDnaComplement( base );
                             }
-                            baseQuality = baseQualities.length == 0 ? -1 : baseQualities[j];
+                            byte baseQuality = baseQualities.length == 0 ? -1 : baseQualities[j];
                             Difference d = new Difference( refPos + j + start, base, isFwdStrand, 1, baseQuality, mappingQuality );
                             this.addDiff( mapping, diffs, d );
                         }
@@ -833,12 +751,12 @@ public class SamBamFileReader implements Observable {
                 case "X":
                     //count and create diffs for mismatches
                     differences += currentCount;
-                    for( int j = 0; j < currentCount; ++j ) {
-                        base = Character.toUpperCase( readSeq.charAt( readPos + j ) );
+                    for( int j = 0; j < currentCount; j++ ) {
+                        char base = Character.toUpperCase( readSeq.charAt( readPos + j ) );
                         if( !isFwdStrand ) {
                             base = SequenceUtils.getDnaComplement( base );
                         }
-                        baseQuality = baseQualities.length == 0 ? -1 : baseQualities[j];
+                        byte baseQuality = baseQualities.length == 0 ? -1 : baseQualities[j];
                         Difference d = new Difference( refPos + j + start, base, isFwdStrand, 1, baseQuality, mappingQuality );
                         this.addDiff( mapping, diffs, d );
 
@@ -849,8 +767,8 @@ public class SamBamFileReader implements Observable {
                 case "D":
                     // count and add diff gaps for deletions in reference
                     differences += currentCount;
-                    for( int j = 0; j < currentCount; ++j ) {
-                        baseQuality = baseQualities.length == 0 ? -1 : baseQualities[j];
+                    for( int j = 0; j < currentCount; j++ ) {
+                        byte baseQuality = baseQualities.length == 0 ? -1 : baseQualities[j];
                         Difference d = new Difference( refPos + j + start, '-', isFwdStrand, 1, baseQuality, mappingQuality );
                         this.addDiff( mapping, diffs, d );
                     }
@@ -860,12 +778,12 @@ public class SamBamFileReader implements Observable {
                 case "I":
                     // count and add reference gaps for insertions
                     differences += currentCount;
-                    for( int j = 0; j < currentCount; ++j ) {
-                        base = Character.toUpperCase( readSeq.charAt( readPos + j ) );
+                    for( int j = 0; j < currentCount; j++ ) {
+                        char base = Character.toUpperCase( readSeq.charAt( readPos + j ) );
                         if( !isFwdStrand ) {
                             base = SequenceUtils.getDnaComplement( base );
                         }
-                        baseQuality = baseQualities.length == 0 ? -1 : baseQualities[j];
+                        byte baseQuality = baseQualities.length == 0 ? -1 : baseQualities[j];
                         ReferenceGap gap = new ReferenceGap( refPos + start, base,
                                                              CommonsMappingParser.getOrderForGap( refPos + start, gapOrderIndex ),
                                                              isFwdStrand, 1, baseQuality, mappingQuality );

@@ -102,15 +102,14 @@ public class PersistentFeature extends Node implements PersistentFeatureI,
      * @return A list of parent ids.
      */
     private List<Integer> separateParentIds( String parentIds ) {
-        List<Integer> parentIdList = new ArrayList<>();
         String[] parentIdArray = parentIds.split( ";" );
-        for( int i = 0; i < parentIdArray.length; ++i ) {
+        List<Integer> parentIdList = new ArrayList<>( parentIdArray.length );
+        for( String parentId : parentIdArray ) {
             try {
-                if( !parentIdArray[i].equals( Properties.NO_PARENT_STRING ) ) {
-                    parentIdList.add( Integer.parseInt( parentIdArray[i] ) );
+                if( !Properties.NO_PARENT_STRING.equals( parentId ) ) {
+                    parentIdList.add( Integer.parseInt( parentId ) );
                 }
-            }
-            catch( NumberFormatException e ) {
+            }catch( NumberFormatException e ) {
                 //ignore and continue
             }
         }
@@ -395,7 +394,7 @@ public class PersistentFeature extends Node implements PersistentFeatureI,
          * @return The map of feature ids to their corresponding feature
          */
         public static Map<Integer, PersistentFeature> getFeatureMap( List<PersistentFeature> features ) {
-            Map<Integer, PersistentFeature> featureMap = new HashMap<>();
+            Map<Integer, PersistentFeature> featureMap = new HashMap<>( features.size() );
             for( PersistentFeature feature : features ) {
                 featureMap.put( feature.getId(), feature ); //ids are unique
             }
@@ -412,7 +411,7 @@ public class PersistentFeature extends Node implements PersistentFeatureI,
          * @return The map of feature locus to the corresponding feature
          */
         public static Map<String, PersistentFeature> getFeatureLocusMap( List<PersistentFeature> features ) {
-            Map<String, PersistentFeature> featureMap = new HashMap<>();
+            Map<String, PersistentFeature> featureMap = new HashMap<>( features.size() );
             for( PersistentFeature feature : features ) {
                 featureMap.put( feature.getLocus(), feature ); //not necessarily unique, but should be found at the same position
             }
@@ -451,22 +450,18 @@ public class PersistentFeature extends Node implements PersistentFeatureI,
          */
         public static List<Polytree> createFeatureTrees( List<PersistentFeature> features ) {
             PersistentFeature.Utils.addParentFeatures( features );
-            List<Polytree> featTrees = new ArrayList<>();
-            Polytree tree;
-            List<Node> roots;
-            List<Node> omitList = new ArrayList<>();
-            List<Node> parentList;
+            List<Polytree> featTrees = new ArrayList<>( features.size() );
+            List<Node> omitList = new ArrayList<>( 10 );
             for( PersistentFeature feat : features ) {
-
                 if( feat.isRoot() && !omitList.contains( feat ) ) {
-                    roots = new ArrayList<>();
+                    List<Node> roots = new ArrayList<>( 10 );
                     roots.add( feat );
-                    tree = new Polytree( roots );
+                    Polytree tree = new Polytree( roots );
                     featTrees.add( tree );
 
                     //check root children for more than one parent and add other parents to roots
                     for( Node child : feat.getNodeChildren() ) {
-                        parentList = child.getParents();
+                        List<Node> parentList = child.getParents();
                         if( parentList.size() > 1 ) {
                             for( Node parent : parentList ) {
                                 if( !roots.contains( parent ) ) {
@@ -509,9 +504,8 @@ public class PersistentFeature extends Node implements PersistentFeatureI,
         public static void addParentFeatures( Map<Integer, PersistentFeature> features,
                                               List<PersistentFeature> featuresSorted ) {
 
-            List<Integer> ids;
             for( PersistentFeature feature : featuresSorted ) {
-                ids = feature.getParentIds();
+                List<Integer> ids = feature.getParentIds();
                 for( int id : ids ) {
                     if( features.containsKey( id ) ) {
                         features.get( id ).addChild( feature );
@@ -534,7 +528,7 @@ public class PersistentFeature extends Node implements PersistentFeatureI,
          *         the <code>selectedFeatureTypes</code> are returned
          */
         public static List<PersistentFeature> filterFeatureTypes( List<PersistentFeature> featuresToFilter, Set<FeatureType> selectedFeatureTypes ) {
-            List<PersistentFeature> newFeatures = new ArrayList<>();
+            List<PersistentFeature> newFeatures = new ArrayList<>( featuresToFilter.size() );
             for( PersistentFeature feature : featuresToFilter ) {
                 if( selectedFeatureTypes.contains( feature.getType() ) ) {
                     newFeatures.add( feature );

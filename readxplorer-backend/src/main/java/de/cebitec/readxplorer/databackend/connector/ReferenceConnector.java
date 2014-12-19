@@ -81,19 +81,19 @@ public class ReferenceConnector {
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Loading reference genome with id  \"{0}\" from database", refGenID );
         PersistentReference reference = null;
 
-        try( PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_SINGLE_GENOME ) ) {
+        try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_SINGLE_GENOME ) ) {
             fetch.setLong( 1, refGenID );
 
-            ResultSet rs = fetch.executeQuery();
-            if( rs.next() ) {
-                String name = rs.getString( FieldNames.REF_GEN_NAME );
-                String description = rs.getString( FieldNames.REF_GEN_DESCRIPTION );
-                Timestamp time = rs.getTimestamp( FieldNames.REF_GEN_TIMESTAMP );
-                File fastaFile = new File( rs.getString( FieldNames.REF_GEN_FASTA_FILE ) );
+            try( final ResultSet rs = fetch.executeQuery() ) {
+                if( rs.next() ) {
+                    String name = rs.getString( FieldNames.REF_GEN_NAME );
+                    String description = rs.getString( FieldNames.REF_GEN_DESCRIPTION );
+                    Timestamp time = rs.getTimestamp( FieldNames.REF_GEN_TIMESTAMP );
+                    File fastaFile = new File( rs.getString( FieldNames.REF_GEN_FASTA_FILE ) );
 
-                reference = new PersistentReference( refGenID, name, description, time, fastaFile );
+                    reference = new PersistentReference( refGenID, name, description, time, fastaFile );
+                }
             }
-            rs.close();
 
         }
         catch( SQLException ex ) {
@@ -111,19 +111,19 @@ public class ReferenceConnector {
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Loading chromosomes for reference with id  \"{0}\" from database", refGenID );
 
         Map<Integer, PersistentChromosome> chromosomes = new HashMap<>();
-        try( PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_CHROMOSOMES ) ) {
+        try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_CHROMOSOMES ) ) {
             fetch.setLong( 1, refGenID );
 
-            ResultSet rs = fetch.executeQuery();
-            while( rs.next() ) {
-                int id = rs.getInt( FieldNames.CHROM_ID );
-                int chromNumber = rs.getInt( FieldNames.CHROM_NUMBER );
-                String name = rs.getString( FieldNames.CHROM_NAME );
-                int chromLength = rs.getInt( FieldNames.CHROM_LENGTH );
+            try( final ResultSet rs = fetch.executeQuery() ) {
+                while( rs.next() ) {
+                    int id = rs.getInt( FieldNames.CHROM_ID );
+                    int chromNumber = rs.getInt( FieldNames.CHROM_NUMBER );
+                    String name = rs.getString( FieldNames.CHROM_NAME );
+                    int chromLength = rs.getInt( FieldNames.CHROM_LENGTH );
 
-                chromosomes.put( id, new PersistentChromosome( id, chromNumber, refGenID, name, chromLength ) );
+                    chromosomes.put( id, new PersistentChromosome( id, chromNumber, refGenID, name, chromLength ) );
+                }
             }
-            rs.close();
 
         }
         catch( SQLException ex ) {
@@ -139,22 +139,22 @@ public class ReferenceConnector {
      * <p>
      * @return One chromosome of this reference without its sequence.
      */
-    public PersistentChromosome getChromosomeForGenome( int chromId ) {
+    public PersistentChromosome getChromosomeForGenome( final int chromId ) {
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Loading chromosome for reference with id  \"{0}\" from database", refGenID );
 
         PersistentChromosome chrom = null;
-        try( PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_CHROMOSOME ) ) {
+        try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_CHROMOSOME ) ) {
             fetch.setLong( 1, chromId );
 
-            ResultSet rs = fetch.executeQuery();
-            while( rs.next() ) {
-                int chromNumber = rs.getInt( FieldNames.CHROM_NUMBER );
-                String name = rs.getString( FieldNames.CHROM_NAME );
-                int chromLength = rs.getInt( FieldNames.CHROM_LENGTH );
+            try( final ResultSet rs = fetch.executeQuery() ) {
+                while( rs.next() ) {
+                    int chromNumber = rs.getInt( FieldNames.CHROM_NUMBER );
+                    String name = rs.getString( FieldNames.CHROM_NAME );
+                    int chromLength = rs.getInt( FieldNames.CHROM_LENGTH );
 
-                chrom = new PersistentChromosome( chromId, chromNumber, refGenID, name, chromLength );
+                    chrom = new PersistentChromosome( chromId, chromNumber, refGenID, name, chromLength );
+                }
             }
-            rs.close();
 
         }
         catch( SQLException ex ) {
@@ -177,10 +177,10 @@ public class ReferenceConnector {
      * <p>
      * @return the list of all features found in the interval of interest
      */
-    public List<PersistentFeature> getFeaturesForRegion( int from, int to, FeatureType featureType, int chromId ) {
+    public List<PersistentFeature> getFeaturesForRegion( final int from, final int to, final FeatureType featureType, final int chromId ) {
         List<PersistentFeature> features = new ArrayList<>();
         try {
-            PreparedStatement fetch;
+            final PreparedStatement fetch;
             if( featureType == FeatureType.ANY ) {
                 fetch = con.prepareStatement( SQLStatements.FETCH_FEATURES_FOR_CHROM_INTERVAL );
                 fetch.setLong( 1, chromId );
@@ -195,23 +195,23 @@ public class ReferenceConnector {
                 fetch.setInt( 4, featureType.getTypeByte() );
             }
 
-            ResultSet rs = fetch.executeQuery();
-            while( rs.next() ) {
-                int id = rs.getInt( FieldNames.FEATURE_ID );
-                String parentIds = rs.getString( FieldNames.FEATURE_PARENT_IDS );
-                parentIds = parentIds.equals( "0" ) ? "" : parentIds;
-                String ecnum = rs.getString( FieldNames.FEATURE_EC_NUM );
-                String locus = rs.getString( FieldNames.FEATURE_LOCUS_TAG );
-                String product = rs.getString( FieldNames.FEATURE_PRODUCT );
-                int start = rs.getInt( FieldNames.FEATURE_START );
-                int stop = rs.getInt( FieldNames.FEATURE_STOP );
-                boolean isFwdStrand = rs.getInt( FieldNames.FEATURE_STRAND ) == SequenceUtils.STRAND_FWD;
-                FeatureType type = FeatureType.getFeatureType( rs.getInt( FieldNames.FEATURE_TYPE ) );
-                String gene = rs.getString( FieldNames.FEATURE_GENE );
+            try( final ResultSet rs = fetch.executeQuery() ) {
+                while( rs.next() ) {
+                    int id = rs.getInt( FieldNames.FEATURE_ID );
+                    String parentIds = rs.getString( FieldNames.FEATURE_PARENT_IDS );
+                    parentIds = parentIds.equals( "0" ) ? "" : parentIds;
+                    String ecnum = rs.getString( FieldNames.FEATURE_EC_NUM );
+                    String locus = rs.getString( FieldNames.FEATURE_LOCUS_TAG );
+                    String product = rs.getString( FieldNames.FEATURE_PRODUCT );
+                    int start = rs.getInt( FieldNames.FEATURE_START );
+                    int stop = rs.getInt( FieldNames.FEATURE_STOP );
+                    boolean isFwdStrand = rs.getInt( FieldNames.FEATURE_STRAND ) == SequenceUtils.STRAND_FWD;
+                    FeatureType type = FeatureType.getFeatureType( rs.getInt( FieldNames.FEATURE_TYPE ) );
+                    String gene = rs.getString( FieldNames.FEATURE_GENE );
 
-                features.add( new PersistentFeature( id, chromId, parentIds, ecnum, locus, product, start, stop, isFwdStrand, type, gene ) );
+                    features.add( new PersistentFeature( id, chromId, parentIds, ecnum, locus, product, start, stop, isFwdStrand, type, gene ) );
+                }
             }
-            rs.close();
             fetch.close();
 
         }
@@ -234,7 +234,7 @@ public class ReferenceConnector {
      * <p>
      * @return the list of all features found in the interval of interest
      */
-    public List<PersistentFeature> getFeaturesForRegion( int from, int to, Set<FeatureType> featureTypes, int chromId ) {
+    public List<PersistentFeature> getFeaturesForRegion( final int from, final int to, final Set<FeatureType> featureTypes, final int chromId ) {
         List<PersistentFeature> features = new ArrayList<>();
         for( FeatureType featureType : featureTypes ) {
             features.addAll( getFeaturesForRegion( from, to, featureType, chromId ) );
@@ -257,7 +257,7 @@ public class ReferenceConnector {
      * @return the list of all features found in the interval of interest
      *         including their parent and children relationships
      */
-    public List<PersistentFeature> getFeaturesForRegionInclParents( int from, int to, FeatureType featureType, int chromId ) {
+    public List<PersistentFeature> getFeaturesForRegionInclParents( final int from, final int to, final FeatureType featureType, final int chromId ) {
         List<PersistentFeature> features = this.getFeaturesForRegion( from, to, FeatureType.ANY, chromId );
         PersistentFeature.Utils.addParentFeatures( features );
         features = PersistentFeature.Utils.filterFeatureTypes( features, featureType );
@@ -278,7 +278,7 @@ public class ReferenceConnector {
      * @return the list of all features found in the interval of interest
      *         including their parent and children relationships
      */
-    public List<PersistentFeature> getFeaturesForRegionInclParents( int from, int to, Set<FeatureType> featureTypes, int chromId ) {
+    public List<PersistentFeature> getFeaturesForRegionInclParents( final int from, final int to, final Set<FeatureType> featureTypes, final int chromId ) {
         List<PersistentFeature> features = new ArrayList<>();
         for( FeatureType featureType : featureTypes ) {
             features.addAll( this.getFeaturesForRegionInclParents( from, to, featureType, chromId ) );
@@ -297,9 +297,9 @@ public class ReferenceConnector {
      * <p>
      * @return the list of all features found in the interval of interest
      */
-    public List<PersistentFeature> getFeaturesForClosedInterval( int left, int right, int chromId ) {
+    public List<PersistentFeature> getFeaturesForClosedInterval( final int left, final int right, final int chromId ) {
         List<PersistentFeature> features = new ArrayList<>();
-        try( PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_FEATURES_FOR_CLOSED_GENOME_INTERVAL ) ) {
+        try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_FEATURES_FOR_CLOSED_GENOME_INTERVAL ) ) {
 
             fetch.setInt( 1, chromId );
             fetch.setInt( 2, left );
@@ -307,22 +307,22 @@ public class ReferenceConnector {
             fetch.setInt( 4, left );
             fetch.setInt( 5, right );
 
-            ResultSet rs = fetch.executeQuery();
-            while( rs.next() ) {
-                int id = rs.getInt( FieldNames.FEATURE_ID );
-                String parentIds = rs.getString( FieldNames.FEATURE_PARENT_IDS );
-                String ecnum = rs.getString( FieldNames.FEATURE_EC_NUM );
-                String locus = rs.getString( FieldNames.FEATURE_LOCUS_TAG );
-                String product = rs.getString( FieldNames.FEATURE_PRODUCT );
-                int start = rs.getInt( FieldNames.FEATURE_START );
-                int stop = rs.getInt( FieldNames.FEATURE_STOP );
-                boolean isFwdStrand = rs.getInt( FieldNames.FEATURE_STRAND ) == SequenceUtils.STRAND_FWD;
-                FeatureType type = FeatureType.getFeatureType( rs.getInt( FieldNames.FEATURE_TYPE ) );
-                String gene = rs.getString( FieldNames.FEATURE_GENE );
+            try( final ResultSet rs = fetch.executeQuery() ) {
+                while( rs.next() ) {
+                    int id = rs.getInt( FieldNames.FEATURE_ID );
+                    String parentIds = rs.getString( FieldNames.FEATURE_PARENT_IDS );
+                    String ecnum = rs.getString( FieldNames.FEATURE_EC_NUM );
+                    String locus = rs.getString( FieldNames.FEATURE_LOCUS_TAG );
+                    String product = rs.getString( FieldNames.FEATURE_PRODUCT );
+                    int start = rs.getInt( FieldNames.FEATURE_START );
+                    int stop = rs.getInt( FieldNames.FEATURE_STOP );
+                    boolean isFwdStrand = rs.getInt( FieldNames.FEATURE_STRAND ) == SequenceUtils.STRAND_FWD;
+                    FeatureType type = FeatureType.getFeatureType( rs.getInt( FieldNames.FEATURE_TYPE ) );
+                    String gene = rs.getString( FieldNames.FEATURE_GENE );
 
-                features.add( new PersistentFeature( id, chromId, parentIds, ecnum, locus, product, start, stop, isFwdStrand, type, gene ) );
+                    features.add( new PersistentFeature( id, chromId, parentIds, ecnum, locus, product, start, stop, isFwdStrand, type, gene ) );
+                }
             }
-            rs.close();
 
         }
         catch( SQLException ex ) {
@@ -337,21 +337,21 @@ public class ReferenceConnector {
      * @return the tracks associated to this reference connector.
      */
     public List<PersistentTrack> getAssociatedTracks() {
-        try( PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_TRACKS_FOR_GENOME ) ) {
+        try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_TRACKS_FOR_GENOME ) ) {
             this.associatedTracks.clear();
             fetch.setLong( 1, refGenID );
 
-            ResultSet rs = fetch.executeQuery();
-            while( rs.next() ) {
-                int id = rs.getInt( FieldNames.TRACK_ID );
-                String description = rs.getString( FieldNames.TRACK_DESCRIPTION );
-                Timestamp date = rs.getTimestamp( FieldNames.TRACK_TIMESTAMP );
-                int refGenomeID = rs.getInt( FieldNames.TRACK_REFERENCE_ID );
-                String filePath = rs.getString( FieldNames.TRACK_PATH );
-                int readPairId = rs.getInt( FieldNames.TRACK_READ_PAIR_ID );
-                associatedTracks.add( new PersistentTrack( id, filePath, description, date, refGenomeID, readPairId ) );
+            try( final ResultSet rs = fetch.executeQuery() ) {
+                while( rs.next() ) {
+                    int id = rs.getInt( FieldNames.TRACK_ID );
+                    String description = rs.getString( FieldNames.TRACK_DESCRIPTION );
+                    Timestamp date = rs.getTimestamp( FieldNames.TRACK_TIMESTAMP );
+                    int refGenomeID = rs.getInt( FieldNames.TRACK_REFERENCE_ID );
+                    String filePath = rs.getString( FieldNames.TRACK_PATH );
+                    int readPairId = rs.getInt( FieldNames.TRACK_READ_PAIR_ID );
+                    associatedTracks.add( new PersistentTrack( id, filePath, description, date, refGenomeID, readPairId ) );
+                }
             }
-            rs.close();
         }
         catch( SQLException ex ) {
             Logger.getLogger( ReferenceConnector.class.getName() ).log( Level.SEVERE, null, ex );
@@ -371,7 +371,7 @@ public class ReferenceConnector {
     public HashMap<Integer, String> getAssociatedTrackNames() {
         this.getAssociatedTracks(); //ensures the tracks are already in the list
 
-        HashMap<Integer, String> namesList = new HashMap<>();
+        HashMap<Integer, String> namesList = new HashMap<>( associatedTracks.size() );
         for( PersistentTrack track : associatedTracks ) {
             namesList.put( track.getId(), track.getDescription() );
         }
@@ -388,7 +388,7 @@ public class ReferenceConnector {
      * @return true, if this reference genome has at least one feature of the
      *         given type, false otherwise
      */
-    public boolean hasFeatures( List<FeatureType> typeList ) {
+    public boolean hasFeatures( final List<FeatureType> typeList ) {
         for( FeatureType featureType : typeList ) {
             if( hasFeatures( featureType ) ) {
                 return true;
@@ -407,12 +407,12 @@ public class ReferenceConnector {
      * @return true, if this reference genome has at least one feature of the
      *         given type, false otherwise
      */
-    public boolean hasFeatures( FeatureType type ) {
-        Map<Integer, PersistentChromosome> chromosomesForGenome = getChromosomesForGenome();
-        for( PersistentChromosome chromosome : chromosomesForGenome.values() ) {
+    public boolean hasFeatures( final FeatureType type ) {
+
+        for( final PersistentChromosome chromosome : getChromosomesForGenome().values() ) {
             int currentID = chromosome.getId();
             try {
-                PreparedStatement fetch;
+                final PreparedStatement fetch;
                 if( type == FeatureType.ANY ) {
                     fetch = con.prepareStatement( SQLStatements.CHECK_IF_FEATURES_EXIST );
                     fetch.setLong( 1, currentID );
@@ -425,6 +425,7 @@ public class ReferenceConnector {
                 ResultSet rs = fetch.executeQuery();
                 if( rs.next() ) {
                     //If at least one entry exists we can exit early.
+                    rs.close();
                     return true;
                 }
             }

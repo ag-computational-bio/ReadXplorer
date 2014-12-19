@@ -72,7 +72,7 @@ public class TrackConnector {
      * <p>
      * @throws FileNotFoundException
      */
-    protected TrackConnector( PersistentTrack track ) throws FileNotFoundException {
+    protected TrackConnector( final PersistentTrack track ) throws FileNotFoundException {
         this.associatedTracks = new ArrayList<>();
         this.associatedTracks.add( track );
         this.initTrackConnector( track.getId(), false );
@@ -92,7 +92,7 @@ public class TrackConnector {
      * <p>
      * @throws FileNotFoundException
      */
-    protected TrackConnector( int id, List<PersistentTrack> tracks, boolean combineTracks ) throws FileNotFoundException {
+    protected TrackConnector( final int id, final List<PersistentTrack> tracks, final boolean combineTracks ) throws FileNotFoundException {
         if( tracks.size() > 2 && !combineTracks ) {
             throw new UnsupportedOperationException( "More than two tracks not supported yet." );
         }
@@ -108,8 +108,8 @@ public class TrackConnector {
      * @param combineTracks true, if the data of these tracks is to be combined,
      *                      false if it should be kept separated
      */
-    private void initTrackConnector( int trackId, boolean combineTracks ) throws FileNotFoundException {
-        for( PersistentTrack track : associatedTracks ) {
+    private void initTrackConnector( final int trackId, final boolean combineTracks ) throws FileNotFoundException {
+        for( final PersistentTrack track : associatedTracks ) {
             if( !new File( track.getFilePath() ).exists() ) {
                 throw new FileNotFoundException( track.getFilePath() );
             }
@@ -143,7 +143,7 @@ public class TrackConnector {
      * @param combineTracks true, if the coverage of both tracks should be
      *                      combined
      */
-    private void startDataThreads( boolean combineTracks ) {
+    private void startDataThreads( final boolean combineTracks ) {
         this.coverageThread = new CoverageThread( this.associatedTracks, combineTracks );
         this.coverageThreadAnalyses = new CoverageThreadAnalyses( this.associatedTracks, combineTracks );
         this.mappingThread = new MappingThread( this.associatedTracks );
@@ -235,20 +235,20 @@ public class TrackConnector {
      * <p>
      * @return The complete statistics for the track specified by the given id.
      */
-    public StatsContainer getTrackStats( int wantedTrackId ) {
+    public StatsContainer getTrackStats( final int wantedTrackId ) {
         StatsContainer statsContainer = new StatsContainer();
         statsContainer.prepareForTrack();
         statsContainer.prepareForReadPairTrack();
 
-        try( PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_STATS_FOR_TRACK ) ) {
+        try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_STATS_FOR_TRACK ) ) {
             fetch.setInt( 1, wantedTrackId );
-            ResultSet rs = fetch.executeQuery();
-            while( rs.next() ) {
-                String statsKey = rs.getString( FieldNames.STATISTICS_KEY );
-                int statsValue = rs.getInt( FieldNames.STATISTICS_VALUE );
-                statsContainer.increaseValue( statsKey, statsValue );
+            try( final ResultSet rs = fetch.executeQuery() ) {
+                while( rs.next() ) {
+                    String statsKey = rs.getString( FieldNames.STATISTICS_KEY );
+                    int statsValue = rs.getInt( FieldNames.STATISTICS_VALUE );
+                    statsContainer.increaseValue( statsKey, statsValue );
+                }
             }
-            rs.close();
 
         }
         catch( SQLException e ) {
@@ -278,7 +278,7 @@ public class TrackConnector {
      * @return The list of descriptions of all tracks stored in this connector.
      */
     public List<String> getAssociatedTrackNames() {
-        List<String> trackNames = new ArrayList<>();
+        List<String> trackNames = new ArrayList<>( associatedTracks.size() );
         for( PersistentTrack track : this.associatedTracks ) {
             trackNames.add( track.getDescription() );
         }
@@ -291,7 +291,7 @@ public class TrackConnector {
      *         this connector.
      */
     public List<Integer> getTrackIds() {
-        List<Integer> trackIds = new ArrayList<>();
+        List<Integer> trackIds = new ArrayList<>( associatedTracks.size() );
         for( PersistentTrack track : this.associatedTracks ) {
             trackIds.add( track.getId() );
         }
@@ -362,16 +362,16 @@ public class TrackConnector {
      * @return the second track id of a read pair beyond this track
      *         connectors track id
      */
-    public int getTrackIdToReadPairId( int readPairId ) {
+    public int getTrackIdToReadPairId( final int readPairId ) {
         int num = 0;
-        try {
-            PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_TRACK_ID_TO_READ_PAIR_ID );
+        try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_TRACK_ID_TO_READ_PAIR_ID ) ){
             fetch.setLong( 1, readPairId );
             fetch.setLong( 2, trackID );
 
-            ResultSet rs = fetch.executeQuery();
-            if( rs.next() ) {
-                num = rs.getInt( FieldNames.TRACK_ID );
+            try( final ResultSet rs = fetch.executeQuery() ) {
+                if( rs.next() ) {
+                    num = rs.getInt( FieldNames.TRACK_ID );
+                }
             }
         }
         catch( SQLException ex ) {
@@ -391,23 +391,23 @@ public class TrackConnector {
      * <p>
      * @return a {@link DiscreteCountingDistribution} for this track.
      */
-    public DiscreteCountingDistribution getCountDistribution( byte type ) {
+    public DiscreteCountingDistribution getCountDistribution( final byte type ) {
         DiscreteCountingDistribution countDistribution = new DiscreteCountingDistribution();
         countDistribution.setType( type );
 
-        for( PersistentTrack track : associatedTracks ) {
+        for( final PersistentTrack track : associatedTracks ) {
             try( PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_COUNT_DISTRIBUTION ) ) {
 
                 fetch.setInt( 1, track.getId() );
                 fetch.setByte( 2, type );
 
-                ResultSet rs = fetch.executeQuery();
-                while( rs.next() ) {
-                    int intervalId = rs.getInt( FieldNames.COUNT_DISTRIBUTION_COV_INTERVAL_ID );
-                    int count = rs.getInt( FieldNames.COUNT_DISTRIBUTION_BIN_COUNT );
-                    countDistribution.setCountForIndex( intervalId, countDistribution.getDiscreteCountingDistribution()[intervalId] + count );
+                try( final ResultSet rs = fetch.executeQuery() ) {
+                    while( rs.next() ) {
+                        int intervalId = rs.getInt( FieldNames.COUNT_DISTRIBUTION_COV_INTERVAL_ID );
+                        int count = rs.getInt( FieldNames.COUNT_DISTRIBUTION_BIN_COUNT );
+                        countDistribution.setCountForIndex( intervalId, countDistribution.getDiscreteCountingDistribution()[intervalId] + count );
+                    }
                 }
-                rs.close();
 
             }
             catch( SQLException ex ) {
