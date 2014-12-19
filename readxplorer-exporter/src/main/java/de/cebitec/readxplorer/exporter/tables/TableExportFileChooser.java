@@ -40,11 +40,6 @@ public class TableExportFileChooser extends ReadXplorerFileChooser {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String[] CSV_EXTENSIONS = new String[]{ "csv", "CSV", "Csv" };
-    public static final String[] XLS_EXTENSIONS = new String[]{ "xls", "XLS", "Xls" };
-    public static final String CSV_DESCRIPTION = "csv";
-    public static final String XLS_DESCRIPTION = "xls";
-
     private ProgressHandle progressHandle;
 
 
@@ -159,6 +154,12 @@ public class TableExportFileChooser extends ReadXplorerFileChooser {
         //this is a save dialog, so nothing to do here
         //refactor when open option is needed and add funcationality
     }
+
+
+    public static final String[] CSV_EXTENSIONS = new String[]{ "csv", "CSV", "Csv" };
+    public static final String[] XLS_EXTENSIONS = new String[]{ "xls", "XLS", "Xls" };
+    public static final String CSV_DESCRIPTION = "csv";
+    public static final String XLS_DESCRIPTION = "xls";
 
 
     /**

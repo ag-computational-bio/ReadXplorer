@@ -19,7 +19,6 @@ package de.cebitec.readxplorer.exporter.tables;
 
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -54,14 +53,13 @@ public class TableToExcel implements ExportDataI {
 
 
     private void setData( DefaultTableModel tableModel ) {
-        final Vector dataVector = tableModel.getDataVector();
-        final int columnCount = tableModel.getColumnCount();
-        columnName = new ArrayList<>( columnCount );
+        Vector dataVector = tableModel.getDataVector();
+        int columnCount = tableModel.getColumnCount();
+        columnName = new ArrayList<>();
         for( int i = 0; i < columnCount; i++ ) {
             columnName.add( tableModel.getColumnName( i ) );
         }
-        tableContent = new ArrayList<>( dataVector.size() );
-
+        tableContent = new ArrayList<>();
         for( Iterator<Vector> it = dataVector.iterator(); it.hasNext(); ) {
             Vector row = it.next();
             tableContent.add( new ArrayList<>( row ) );
@@ -71,19 +69,25 @@ public class TableToExcel implements ExportDataI {
 
     @Override
     public List<String> dataSheetNames() {
-        return Collections.singletonList( tableName );
+        List<String> ret = new ArrayList<>();
+        ret.add( tableName );
+        return ret;
     }
 
 
     @Override
     public List<List<String>> dataColumnDescriptions() {
-        return Collections.singletonList( columnName );
+        List<List<String>> ret = new ArrayList<>();
+        ret.add( columnName );
+        return ret;
     }
 
 
     @Override
     public List<List<List<Object>>> dataToExcelExportList() {
-        return Collections.singletonList( tableContent );
+        List<List<List<Object>>> ret = new ArrayList<>();
+        ret.add( tableContent );
+        return ret;
     }
 
 

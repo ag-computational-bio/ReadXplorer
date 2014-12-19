@@ -123,19 +123,25 @@ public class ExcelExporter implements TableExporterI {
 
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Starting to write Excel file...{0}", file.getAbsolutePath() );
 
-        final WorkbookSettings wbSettings = new WorkbookSettings();
-            wbSettings.setLocale( new Locale( "en", "EN" ) );
-        final WritableWorkbook workbook = Workbook.createWorkbook( file, wbSettings );
+        WorkbookSettings wbSettings = new WorkbookSettings();
+        wbSettings.setLocale( new Locale( "en", "EN" ) );
 
+        WritableWorkbook workbook = Workbook.createWorkbook( file, wbSettings );
+        WritableSheet sheet = null;
+        int currentPage;
         int totalPage = 0;
+        boolean dataLeft;
+        String sheetName;
+        List<List<Object>> sheetData;
+        List<String> headerRow;
+
         for( int i = 0; i < exportData.size(); ++i ) {
-            String sheetName = sheetNames.get( i );
-            List<List<Object>> sheetData = exportData.get( i );
-            List<String> headerRow = headers.get( i );
-            boolean dataLeft = true;
-            int currentPage = 0;
+            sheetName = sheetNames.get( i );
+            sheetData = exportData.get( i );
+            headerRow = headers.get( i );
+            dataLeft = true;
+            currentPage = 0;
             while( dataLeft ) { //only 65536 rows allowed per sheet in xls format
-                WritableSheet sheet = null;
                 if( !sheetData.isEmpty() ) {
                     if( currentPage++ > 0 ) {
                         sheetName += "I";
@@ -184,7 +190,7 @@ public class ExcelExporter implements TableExporterI {
         for( String header : headerRow ) {
             this.addColumn( sheet, "LABEL", header, column++, row );
         }
-        row++;
+        ++row;
         this.progressHandle.progress( "Storing line", this.rowNumberGlobal++ );
 
         String objectType;
@@ -207,7 +213,7 @@ public class ExcelExporter implements TableExporterI {
             if( this.rowNumberGlobal++ % 100 == 0 ) {
                 this.progressHandle.progress( "Storing line", this.rowNumberGlobal );
             }
-            row++;
+            ++row;
         }
 
         if( dataLeft ) {
@@ -250,55 +256,54 @@ public class ExcelExporter implements TableExporterI {
      * Writes a single column in a given excel sheet.
      * <p>
      * @param sheet     the sheet to write to
-     * @param cellType  the celltype of the cell to write
-     * @param cellValue the value to be written in the column
+     * @param celltype  the celltype of the cell to write
+     * @param cellvalue the value to be written in the column
      * @param column    column number
      * @param row       row number
      * <p>
      * @throws WriteException
      * @throws OutOfMemoryError
      */
-    public void addColumn( final WritableSheet sheet, final String cellType, Object cellValue, final int column, final int row ) throws WriteException, OutOfMemoryError {
-
-        final WritableFont arial = new WritableFont( WritableFont.ARIAL, 10 );
-        final WritableFont arialbold = new WritableFont( WritableFont.ARIAL, 10, WritableFont.BOLD );
-        if( cellValue == null ) {
+    public void addColumn( WritableSheet sheet, String celltype, Object cellvalue, int column, int row ) throws WriteException, OutOfMemoryError {
+        WritableFont arialbold = new WritableFont( WritableFont.ARIAL, 10, WritableFont.BOLD );
+        WritableFont arial = new WritableFont( WritableFont.ARIAL, 10 );
+        if( cellvalue == null ) {
             Label label = new Label( column, row, "n/a" );
             sheet.addCell( label );
         }
-        else if( cellType.equals( "LABEL" ) ) {
+        else if( celltype.equals( "LABEL" ) ) {
             WritableCellFormat header = new WritableCellFormat( arialbold );
-            Label label = new Label( column, row, (String) cellValue, header );
+            Label label = new Label( column, row, (String) cellvalue, header );
             sheet.addCell( label );
         }
-        else if( cellType.equals( "STRING" ) ) {
-            cellValue = cellValue instanceof Character ? String.valueOf( cellValue ) : cellValue;
-            cellValue = cellValue instanceof CharSequence ? String.valueOf( cellValue ) : cellValue;
-            cellValue = cellValue instanceof Double ? cellValue.toString() : cellValue;
+        else if( celltype.equals( "STRING" ) ) {
+            cellvalue = cellvalue instanceof Character ? String.valueOf( cellvalue ) : cellvalue;
+            cellvalue = cellvalue instanceof CharSequence ? String.valueOf( cellvalue ) : cellvalue;
+            cellvalue = cellvalue instanceof Double ? cellvalue.toString() : cellvalue;
             WritableCellFormat string = new WritableCellFormat( arial );
-            Label label = new Label( column, row, (String) cellValue, string );
+            Label label = new Label( column, row, (String) cellvalue, string );
             sheet.addCell( label );
         }
-        else if( cellType.equals( "INTEGER" ) ) {
+        else if( celltype.equals( "INTEGER" ) ) {
             WritableCellFormat integerFormat = new WritableCellFormat( NumberFormats.INTEGER );
-            Integer value = Integer.parseInt( cellValue.toString() );
+            Integer value = Integer.parseInt( cellvalue.toString() );
             Number number = new Number( column, row, value, integerFormat );
             sheet.addCell( number );
         }
-        else if( cellType.equals( "DOUBLE" ) ) {
-            Double value = Double.parseDouble( cellValue.toString() );
+        else if( celltype.equals( "DOUBLE" ) ) {
+            Double value = Double.parseDouble( cellvalue.toString() );
             Number number = new Number( column, row, value );
             sheet.addCell( number );
         }
-        else if( cellType.equals( "FLOAT" ) ) {
+        else if( celltype.equals( "FLOAT" ) ) {
             WritableCellFormat integerFormat = new WritableCellFormat( NumberFormats.FLOAT );
-            Float value = Float.parseFloat( cellValue.toString() );
+            Float value = Float.parseFloat( cellvalue.toString() );
             Number number = new Number( column, row, value, integerFormat );
             sheet.addCell( number );
         }
-        else if( cellType.equals( "UNKNOWN" ) ) {
+        else if( celltype.equals( "UNKNOWN" ) ) {
             WritableCellFormat string = new WritableCellFormat( arial );
-            Label label = new Label( column, row, cellValue.toString(), string );
+            Label label = new Label( column, row, cellvalue.toString(), string );
             sheet.addCell( label );
         }
     }
