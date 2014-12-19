@@ -208,8 +208,8 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
             Map<PersistentFeature, Integer> currentTrack = allCountData.get( key );
             int j = 0;
             for( PersistentFeature persistentFeature : getPersAnno() ) {
-                j++;
                 data[j] = currentTrack.get( persistentFeature );
+                j++;
             }
             analysisData.addCountDataForTrack( data );
         }
