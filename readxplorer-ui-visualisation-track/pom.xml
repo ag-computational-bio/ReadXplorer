@@ -62,6 +62,7 @@
                     <publicPackages>
                         <publicPackage>de.cebitec.readxplorer.ui.visualisation.track</publicPackage>
                     </publicPackages>
+                    <licenseFile>../License-GPLv3.txt</licenseFile>
                 </configuration>
             </plugin>
             <plugin>

@@ -130,6 +130,7 @@
                         <publicPackage>de.cebitec.readxplorer.ui.datavisualisation.alignmentviewer</publicPackage>
                         <publicPackage>de.cebitec.readxplorer.ui.datavisualisation.readpairviewer</publicPackage>
                     </publicPackages>
+                    <licenseFile>../License-GPLv3.txt</licenseFile>
                 </configuration>
             </plugin>
             <plugin>

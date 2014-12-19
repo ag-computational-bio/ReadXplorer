@@ -110,6 +110,7 @@
                         <publicPackage>de.cebitec.readxplorer.ui.importer.actions</publicPackage>
                         <publicPackage>de.cebitec.readxplorer.ui.importer.dataTable</publicPackage>
                     </publicPackages>
+                    <licenseFile>../License-GPLv3.txt</licenseFile>
                 </configuration>
             </plugin>
             <plugin>

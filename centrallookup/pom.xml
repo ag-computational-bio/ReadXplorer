@@ -50,6 +50,7 @@
                     <publicPackages>
                         <publicPackage>de.cebitec.centrallookup</publicPackage>
                     </publicPackages>
+                    <licenseFile>../License-GPLv3.txt</licenseFile>
                 </configuration>
             </plugin>
             <plugin>

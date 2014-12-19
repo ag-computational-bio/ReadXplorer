@@ -169,6 +169,7 @@
                 <configuration>
                     <installerLicenseFile>../License-GPLv3.txt</installerLicenseFile>
                     <etcConfFile>src/main/resources/readxplorer.conf</etcConfFile>
+                    <licenseFile>../License-GPLv3.txt</licenseFile>
                 </configuration>
             </plugin>
             <!-- Permits NbModuleSuite to be run in integration-test phase: -->

@@ -275,7 +275,7 @@
                         <brandingToken>${brandingToken}</brandingToken>
                         <cluster>${brandingToken}</cluster>
                         <licenseName>GPLv3</licenseName>
-                        <licenseFile>${basedir}/License-GPLv3</licenseFile>
+                        <licenseFile>License-GPLv3</licenseFile>
                     </configuration>
                 </plugin>
                 <plugin>

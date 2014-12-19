@@ -91,12 +91,12 @@
                     <publicPackages>
                         <publicPackage>de.cebitec.readxplorer.mapping.api</publicPackage>
                     </publicPackages>
-
+                    <licenseFile>../License-GPLv3.txt</licenseFile>
                     <nbmResource>
                         <directory>src/main/resources/</directory>
-                        <targetPath>Mapper</targetPath>
+                        <targetPath>release/mapper</targetPath>
                         <includes>
-                            <include>*.sh</include>
+                            <include>**/*.sh</include>
                         </includes>
                     </nbmResource>
                 </configuration>

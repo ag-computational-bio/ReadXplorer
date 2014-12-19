@@ -53,6 +53,7 @@
                     <publicPackages>
                         <publicPackage>de.cebitec.readxplorer.readpairclassifier</publicPackage>
                     </publicPackages>
+                    <licenseFile>../License-GPLv3.txt</licenseFile>
                 </configuration>
             </plugin>
             <plugin>

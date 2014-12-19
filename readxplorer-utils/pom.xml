@@ -116,6 +116,7 @@
                         <publicPackage>javax.xml.parsers.*</publicPackage>
                         <publicPackage>org.testng.*</publicPackage>
                     </publicPackages>
+                    <licenseFile>../License-GPLv3.txt</licenseFile>
                 </configuration>
             </plugin>
             <plugin>

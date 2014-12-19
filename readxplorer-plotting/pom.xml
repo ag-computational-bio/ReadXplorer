@@ -58,6 +58,7 @@
                         <publicPackage>de.cebitec.readxplorer.plotting</publicPackage>
                         <publicPackage>org.jfree.*</publicPackage>
                     </publicPackages>
+                    <licenseFile>../License-GPLv3.txt</licenseFile>
                 </configuration>
             </plugin>
             <plugin>

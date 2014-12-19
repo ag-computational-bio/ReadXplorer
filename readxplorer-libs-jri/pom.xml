@@ -40,6 +40,7 @@
                     <publicPackages>
                         <publicPackage>org.rosuda.JRI</publicPackage>
                     </publicPackages>
+                    <licenseFile>../License-GPLv3.txt</licenseFile>
                     <nbmResource>
                         <directory>src/main/resources/libs</directory>
                         <targetPath>modules/lib</targetPath>

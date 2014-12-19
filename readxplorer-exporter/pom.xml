@@ -70,6 +70,7 @@
                     <publicPackages>
                         <publicPackage>de.cebitec.readxplorer.exporter.tables</publicPackage>
                     </publicPackages>
+                    <licenseFile>../License-GPLv3.txt</licenseFile>
                 </configuration>
             </plugin>
             <plugin>

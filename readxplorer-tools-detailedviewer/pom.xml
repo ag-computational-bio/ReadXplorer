@@ -72,6 +72,7 @@
                     <publicPackages>
                         <publicPackage>de.cebitec.readxplorer.tools.detailedviewer</publicPackage>
                     </publicPackages>
+                    <licenseFile>../License-GPLv3.txt</licenseFile>
                 </configuration>
             </plugin>
             <plugin>
