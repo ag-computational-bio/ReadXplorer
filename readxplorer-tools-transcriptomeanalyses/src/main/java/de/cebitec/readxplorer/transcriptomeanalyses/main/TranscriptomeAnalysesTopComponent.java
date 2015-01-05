@@ -30,17 +30,17 @@ import org.openide.windows.WindowManager;
 @ActionReference( path = "Menu/Window" /*, position = 333 */ )
 @TopComponent.OpenActionRegistration(
     displayName = "#CTL_TranscriptomeAnalysesTopComponentAction",
-    preferredID = "TranscriptomeAnalysesTopComponentTopComponent" )
+    preferredID = "TranscriptomeAnalysesTopComponent" )
 @Messages( {
     "CTL_TranscriptomeAnalysesTopComponentAction=TranscriptomeAnalysesTopComponent",
-    "CTL_TranscriptomeAnalysesTopComponentTopComponent=Analyses Result Window",
-    "HINT_TranscriptomeAnalysesTopComponentTopComponent=This is a TranscriptomeAnalysesTopComponent window"
+    "CTL_TranscriptomeAnalysesTopComponent=Analyses Result Window",
+    "HINT_TranscriptomeAnalysesTopComponent=This is a TranscriptomeAnalysesTopComponent window"
 } )
 public final class TranscriptomeAnalysesTopComponent extends TopComponent {
 
 
     private static final long serialVersionUID = 1L;
-    public static final String PREFERRED_ID = "TranscriptomeAnalysesTopComponentTopComponent";
+    public static final String PREFERRED_ID = "TranscriptomeAnalysesTopComponent";
 
 
     /**
@@ -51,8 +51,8 @@ public final class TranscriptomeAnalysesTopComponent extends TopComponent {
 
 
         initComponents();
-        setName( Bundle.CTL_TranscriptomeAnalysesTopComponentTopComponent() );
-        setToolTipText( Bundle.HINT_TranscriptomeAnalysesTopComponentTopComponent() );
+        setName( Bundle.CTL_TranscriptomeAnalysesTopComponent() );
+        setToolTipText( Bundle.HINT_TranscriptomeAnalysesTopComponent() );
         putClientProperty( TopComponent.PROP_KEEP_PREFERRED_SIZE_WHEN_SLIDED_IN, Boolean.TRUE );
 
         // add listener to close TopComponent when no tabs are shown

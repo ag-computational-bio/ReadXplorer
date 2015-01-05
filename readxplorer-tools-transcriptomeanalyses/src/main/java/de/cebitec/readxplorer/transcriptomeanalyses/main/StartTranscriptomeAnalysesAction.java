@@ -46,10 +46,10 @@ public final class StartTranscriptomeAnalysesAction implements ActionListener {
     private WholeTranscriptDataAnalysisHandler wholeTranscriptAnalysesHandler;
     private boolean performFivePrimeAnalyses;
     private boolean performWholeTrascriptomeAnalyses, performOperonDetection, performNovelRegionDetection, performRpkmAnalysis, ratioInclusion;
-    private double fraction = 0.05;
+    private double fraction = 0.05d;
     private int minBoundaryLength;
     private int increaseRatioValue;
-    private boolean isBgThresholdSetManually;
+//    private boolean isBgThresholdSetManually;
     private final TranscriptomeAnalysesTopComponent transcAnalysesTopComp;
     private File referenceFile;
 
