@@ -24,29 +24,24 @@ import de.cebitec.readxplorer.ui.datavisualisation.referenceviewer.ReferenceView
 import de.cebitec.readxplorer.ui.visualisation.AppPanelTopComponent;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import org.openide.awt.ActionID;
-import org.openide.awt.ActionReference;
-import org.openide.awt.ActionReferences;
-import org.openide.awt.ActionRegistration;
-import org.openide.util.NbBundle;
 
 
-@ActionID( category = "Tools",
-           id = "de.cebitec.readxplorer.tools.doubletrackviewer.OpenDoubleTrackAction" )
-@ActionRegistration( iconBase = "de/cebitec/readxplorer/tools/doubletrackviewer/doubleTrack.png",
-                     displayName = "#CTL_OpenDoubleTrackAction" )
-@ActionReferences( {
-    @ActionReference( path = "Menu/Tools", position = 162 ),
-    @ActionReference( path = "Toolbars/Tools", position = 287 )
-} )
-@NbBundle.Messages( "CTL_OpenDoubleTrackAction=Double Track Viewer" )
+//@ActionID( category = "Tools",
+//    id = "de.cebitec.readxplorer.tools.doubletrackviewer.OpenDoubleTrackAction" )
+//@ActionRegistration( iconBase = "de/cebitec/readxplorer/tools/doubletrackviewer/doubleTrack.png",
+//     displayName = "#CTL_OpenDoubleTrackAction" )
+//@ActionReferences( {
+//    @ActionReference( path = "Menu/Tools", position = 162 ),
+//    @ActionReference( path = "Toolbars/Tools", position = 287 )
+//} )
+//@NbBundle.Messages( "CTL_OpenDoubleTrackAction=Double Track Viewer" )
 public final class OpenDoubleTrackAction implements ActionListener {
 
-    private final ReferenceViewer context;
+//    private final ReferenceViewer context;
 
 
     public OpenDoubleTrackAction( ReferenceViewer context ) {
-        this.context = context;
+//        this.context = context;
     }
 
 
