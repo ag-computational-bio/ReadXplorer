@@ -44,7 +44,6 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-tools-readpairclassifier</artifactId>
-            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

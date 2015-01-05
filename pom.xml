@@ -57,7 +57,7 @@
         <project.url>www.readxplorer.org</project.url>
         <netbeans.hint.license>gpl30</netbeans.hint.license>
     </properties>
-    
+
 
     <dependencyManagement>
         <dependencies>
@@ -84,7 +84,7 @@
             <dependency>
                 <groupId>${project.groupId}</groupId>
                 <artifactId>readxplorer-dashboard</artifactId>
-                    <version>1.1.0-SNAPSHOT</version>
+                <version>1.1.0-SNAPSHOT</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
