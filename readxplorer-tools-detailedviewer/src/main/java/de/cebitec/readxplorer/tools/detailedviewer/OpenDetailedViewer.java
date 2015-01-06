@@ -36,11 +36,11 @@ import org.openide.util.NbBundle;
 
 public final class OpenDetailedViewer implements ActionListener {
 
-    private final List<TrackViewer> context;
+//    private final List<TrackViewer> context;
 
 
     public OpenDetailedViewer( List<TrackViewer> context ) {
-        this.context = context;
+//        this.context = context;
     }
 
 
@@ -52,10 +52,10 @@ public final class OpenDetailedViewer implements ActionListener {
             //Get ViewController from AppPanelTopComponent-Lookup
             ViewController viewCon = parentAppPanel.getLookup().lookup( ViewController.class );
             List<BasePanel> trackPanels = viewCon.getOpenTracks();
-            List<AbstractViewer> openTrackViewers = this.getTrackViewerList( viewCon.getOpenTracks() );
+            List<AbstractViewer> openTrackViewers = getTrackViewerList( viewCon.getOpenTracks() );
 
             if( trackPanels.size() > 1 ) {
-                JList trackList = new JList( openTrackViewers.toArray() );
+                JList<AbstractViewer> trackList = new JList<>( openTrackViewers.toArray( new AbstractViewer[ openTrackViewers.size() ] ) );
                 DialogDescriptor.Confirmation dd = new DialogDescriptor.Confirmation( trackList, NbBundle.getMessage( OpenDetailedViewer.class, "CTL_OpenDetailedViewer" ) );
                 dd.setOptionType( DialogDescriptor.OK_CANCEL_OPTION );
                 DialogDisplayer.getDefault().notify( dd );
@@ -79,7 +79,7 @@ public final class OpenDetailedViewer implements ActionListener {
 
 
     private List<AbstractViewer> getTrackViewerList( List<BasePanel> openTracks ) {
-        List<AbstractViewer> viewerList = new ArrayList<>();
+        List<AbstractViewer> viewerList = new ArrayList<>( openTracks.size() );
         for( BasePanel basePanel : openTracks ) {
             viewerList.add( basePanel.getViewer() );
         }
