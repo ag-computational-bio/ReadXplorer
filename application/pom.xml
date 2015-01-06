@@ -170,6 +170,8 @@
                     <etcConfFile>src/main/resources/readxplorer.conf</etcConfFile>
                     <licenseFile>../License-GPLv3.txt</licenseFile>
                     <installerLicenseFile>../License-GPLv3.txt</installerLicenseFile>
+                    <installerOsSolaris>false</installerOsSolaris>
+                    <installerPack200Enable>false</installerPack200Enable>
                 </configuration>
             </plugin>
             <!-- Permits NbModuleSuite to be run in integration-test phase: -->
