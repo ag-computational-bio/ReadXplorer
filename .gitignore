@@ -3,6 +3,20 @@
 ### Java ###
 *.class
 
+# Package Files #
+*.jar
+*.war
+*.ear
+
+### Maven ###
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+
+
 ### NetBeans ###
 nbproject/private/
 build/
@@ -12,3 +26,4 @@ nbdist/
 nbactions.xml
 nb-configuration.xml
 
+!/branding/src/main/nbm-branding/core/core.jar/

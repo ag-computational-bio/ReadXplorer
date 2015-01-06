@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>bio.comp.jlu.readxplorer</groupId>
+        <artifactId>readxplorer</artifactId>
+        <version>2.1.0-SNAPSHOT</version>
+    </parent>
+
+
+    <artifactId>readxplorer-parser</artifactId>
+    <version>1.2.0-SNAPSHOT</version>
+    <packaging>nbm</packaging>
+    <name>${project.displayname} - Parser</name>
+
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-utils</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.supercsv</groupId>
+            <artifactId>super-csv</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sourceforge.jexcelapi</groupId>
+            <artifactId>jxl</artifactId>
+            <version>2.6</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.biojava</groupId>
+            <artifactId>core</artifactId>
+            <version>1.9.1</version>
+        </dependency>
+        <dependency>
+            <groupId>de.cebitec.common</groupId>
+            <artifactId>parser.embl</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-api-annotations-common</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-util</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
+    </dependencies>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>nbm-maven-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <publicPackages>
+                        <publicPackage>de.cebitec.readxplorer.parser</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.parser.common</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.parser.mappings</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.parser.output</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.parser.reference</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.parser.reference.Filter</publicPackage>
+                        <publicPackage>de.cebitec.readxplorer.parser.tables</publicPackage>
+                    </publicPackages>
+                    <licenseFile>../License-GPLv3.txt</licenseFile>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <useDefaultManifestFile>true</useDefaultManifestFile>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

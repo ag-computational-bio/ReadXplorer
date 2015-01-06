@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module: de.cebitec.readxplorer.libs
-OpenIDE-Module-Install: de/cebitec/readxplorer/libs/Installer.class
-OpenIDE-Module-Localizing-Bundle: de/cebitec/readxplorer/libs/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.0.3
-

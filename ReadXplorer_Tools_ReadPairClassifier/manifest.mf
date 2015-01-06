@@ -1,6 +1,0 @@
-Manifest-Version: 1.0
-OpenIDE-Module-Install: de/cebitec/readxplorer/readpairclassifier/Installer.class
-OpenIDE-Module: de.cebitec.readxplorer.readpairclassifier
-OpenIDE-Module-Localizing-Bundle: de/cebitec/readxplorer/readpairclassifier/Bundle.properties
-OpenIDE-Module-Specification-Version: 1.0.2
-
