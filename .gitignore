@@ -15,7 +15,7 @@ pom.xml.releaseBackup
 pom.xml.versionsBackup
 pom.xml.next
 release.properties
-
+application/nbactions-deployment.xml
 
 ### NetBeans ###
 nbproject/private/
