@@ -27,11 +27,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.rosuda.JRI.REXP;
-import org.rosuda.JRI.RVector;
+import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.Rserve.RserveException;
 
 
 /**
@@ -48,11 +47,10 @@ public class DeSeq2 {
 
 
     public List<ResultDeAnalysis> process( DeSeqAnalysisData analysisData,
-                                           int numberOfFeatures, int numberOfTracks, File saveFile, UUID key )
+                                           int numberOfFeatures, int numberOfTracks, File saveFile)
             throws PackageNotLoadableException, JRILibraryNotInPathException,
-                   IllegalStateException, UnknownGnuRException {
-        gnuR = GnuR.SecureGnuRInitiliser.getGnuRinstance( key );
-        gnuR.clearGnuR();
+                   IllegalStateException, UnknownGnuRException, RserveException {
+        gnuR = new GnuR();
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
         gnuR.loadPackage( "DESeq2" );
@@ -117,11 +115,11 @@ public class DeSeq2 {
             E = gnuR.eval( "res <- results(dds)" );
             E = gnuR.eval( "res <- res[order(res$padj),]" );
 
-            REXP currentResult1 = gnuR.eval( "as.data.frame(res)" );
-            RVector tableContents1 = currentResult1.asVector();
-            REXP colNames1 = gnuR.eval( "colnames(res)" );
-            REXP rowNames1 = gnuR.eval( "rownames(res)" );
-            results.add( new ResultDeAnalysis( tableContents1, colNames1, rowNames1, "Results", analysisData ) );
+//            REXP currentResult1 = gnuR.eval( "as.data.frame(res)" );
+//            RVector tableContents1 = currentResult1.asVector();
+//            REXP colNames1 = gnuR.eval( "colnames(res)" );
+//            REXP rowNames1 = gnuR.eval( "rownames(res)" );
+//            results.add( new ResultDeAnalysis( tableContents1, colNames1, rowNames1, "Results", analysisData ) );
 
             if( saveFile != null ) {
                 String path = saveFile.getAbsolutePath();
@@ -142,27 +140,25 @@ public class DeSeq2 {
     /**
      * Releases the Gnu R instance and removes the reference to it.
      */
-    public void shutdown( UUID key ) {
-        if( gnuR != null ) {
-            gnuR.releaseGnuRInstance( key );
-            gnuR = null;
-        }
+    public void shutdown() throws RserveException {
+        gnuR.clearGnuR();
+        gnuR.detach();
     }
 
 
-    public void saveResultsAsCSV( int index, File saveFile ) {
+    public void saveResultsAsCSV( int index, File saveFile ) throws RserveException {
         String path = saveFile.getAbsolutePath();
         path = path.replace( "\\", "/" );
         gnuR.eval( "write.csv(res" + index + ",file=\"" + path + "\")" );
     }
 
 
-    public void plotDispEsts( File file ) throws IllegalStateException, PackageNotLoadableException {
+    public void plotDispEsts( File file ) throws IllegalStateException, PackageNotLoadableException, RserveException {
         gnuR.storePlot( file, "plotDispEsts(dds)" );
     }
 
 
-    public void plotHist( File file ) throws IllegalStateException, PackageNotLoadableException {
+    public void plotHist( File file ) throws IllegalStateException, PackageNotLoadableException, RserveException {
         gnuR.storePlot( file, "hist(res$pval, breaks=100, col=\"skyblue\", border=\"slateblue\", main=\"\")" );
     }
 

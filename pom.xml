@@ -43,7 +43,6 @@
         <module>readxplorer-tools-snpdetection</module>
         <module>readxplorer-tools-transcriptionanalyses</module>
         <module>readxplorer-tools-transcriptomeanalyses</module>
-        <module>readxplorer-libs-jri</module>
         <module>readxplorer-libs-h2</module>
         <module>readxplorer-libs-jfreechart</module>
     </modules>

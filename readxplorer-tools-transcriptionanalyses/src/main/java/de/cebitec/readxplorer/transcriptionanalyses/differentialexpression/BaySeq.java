@@ -27,11 +27,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.rosuda.JRI.REXP;
-import org.rosuda.JRI.RVector;
+import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.Rserve.RserveException;
 
 
 /**
@@ -76,10 +75,10 @@ public class BaySeq {
      *         not normalised results and then all the normalised ones.
      */
     public List<ResultDeAnalysis> process( BaySeqAnalysisData bseqData,
-                                           int numberOfFeatures, int numberOfTracks, File saveFile, UUID key )
+                                           int numberOfFeatures, int numberOfTracks, File saveFile)
             throws JRILibraryNotInPathException, PackageNotLoadableException,
-                   IllegalStateException, UnknownGnuRException {
-        gnuR = GnuR.SecureGnuRInitiliser.getGnuRinstance( key );
+                   IllegalStateException, UnknownGnuRException, RserveException {
+        gnuR = new GnuR();
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
         gnuR.loadPackage( "baySeq" );
@@ -136,20 +135,20 @@ public class BaySeq {
             for( int j = 1; j <= numberofGroups; j++ ) {
                 gnuR.eval( "tCounts" + resultIndex + " <- topCounts(cD , group = " + j + " , number = " + numberOfFeatures + ')' );
                 REXP result = gnuR.eval( "tCounts" + resultIndex );
-                RVector rvec = result.asVector();
-                REXP colNames = gnuR.eval( "colnames(tCounts" + resultIndex + ")" );
-                REXP rowNames = gnuR.eval( "rownames(tCounts" + resultIndex + ")" );
-                results.add( new ResultDeAnalysis( rvec, colNames, rowNames, "Result of model " + j, bseqData ) );
-                resultIndex++;
+//                RVector rvec = result.asVector();
+//                REXP colNames = gnuR.eval( "colnames(tCounts" + resultIndex + ")" );
+//                REXP rowNames = gnuR.eval( "rownames(tCounts" + resultIndex + ")" );
+//                results.add( new ResultDeAnalysis( rvec, colNames, rowNames, "Result of model " + j, bseqData ) );
+//                resultIndex++;
             }
             for( int j = 1; j <= numberofGroups; j++ ) {
-                gnuR.eval( "tCounts" + resultIndex + " <- topCounts(cD , group = " + j + " , number = " + numberOfFeatures + " , normaliseData=TRUE)" );
-                REXP result = gnuR.eval( "tCounts" + resultIndex );
-                RVector rvec = result.asVector();
-                REXP colNames = gnuR.eval( "colnames(tCounts" + resultIndex + ')' );
-                REXP rowNames = gnuR.eval( "rownames(tCounts" + resultIndex + ')' );
-                results.add( new ResultDeAnalysis( rvec, colNames, rowNames, "Normalized result of model " + j, bseqData ) );
-                resultIndex++;
+//                gnuR.eval( "tCounts" + resultIndex + " <- topCounts(cD , group = " + j + " , number = " + numberOfFeatures + " , normaliseData=TRUE)" );
+//                REXP result = gnuR.eval( "tCounts" + resultIndex );
+//                RVector rvec = result.asVector();
+//                REXP colNames = gnuR.eval( "colnames(tCounts" + resultIndex + ')' );
+//                REXP rowNames = gnuR.eval( "rownames(tCounts" + resultIndex + ')' );
+//                results.add( new ResultDeAnalysis( rvec, colNames, rowNames, "Normalized result of model " + j, bseqData ) );
+//                resultIndex++;
             }
             if( saveFile != null ) {
                 gnuR.saveDataToFile( saveFile );
@@ -181,7 +180,7 @@ public class BaySeq {
      * @throws SamplesNotValidException if SamplesA and samplesB are the same
      */
     public void plotMACD( File file, int[] samplesA, int[] samplesB ) throws SamplesNotValidException,
-                                                                             IllegalStateException, PackageNotLoadableException {
+                                                                             IllegalStateException, PackageNotLoadableException, RserveException {
         if( !validateSamples( samplesA, samplesB ) ) {
             throw new SamplesNotValidException();
         }
@@ -211,7 +210,7 @@ public class BaySeq {
      * @throws SamplesNotValidException if SamplesA and samplesB are the same
      */
     public void plotPosteriors( File file, Group group, int[] samplesA, int[] samplesB ) throws SamplesNotValidException,
-                                                                                                IllegalStateException, PackageNotLoadableException {
+                                                                                                IllegalStateException, PackageNotLoadableException, RserveException {
         if( !validateSamples( samplesA, samplesB ) ) {
             throw new SamplesNotValidException();
         }
@@ -237,12 +236,12 @@ public class BaySeq {
      * @param file  a File the created SVG image should be saved to.
      * @param group the underlying group for the plot.
      */
-    public void plotPriors( File file, Group group ) throws IllegalStateException, PackageNotLoadableException {
+    public void plotPriors( File file, Group group ) throws IllegalStateException, PackageNotLoadableException, RserveException {
         gnuR.storePlot( file, "plotPriors(cD, group = " + group.getGnuRID() + ')' );
     }
 
 
-    public void saveResultsAsCSV( int index, File saveFile ) {
+    public void saveResultsAsCSV( int index, File saveFile ) throws RserveException {
         String path = saveFile.getAbsolutePath();
         path = path.replace( "\\", "/" );
         gnuR.eval( "write.csv(tCounts" + index + ",file=\"" + path + "\")" );
@@ -278,11 +277,9 @@ public class BaySeq {
     /**
      * Releases the Gnu R instance and removes the reference to it.
      */
-    public void shutdown( UUID key ) {
-        if( gnuR != null ) {
-            gnuR.releaseGnuRInstance( key );
-            gnuR = null;
-        }
+    public void shutdown() throws RserveException {
+        gnuR.clearGnuR();
+        gnuR.detach();
     }
 
 
