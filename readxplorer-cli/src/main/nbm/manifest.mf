@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+OpenIDE-Module: bio.comp.jlu.readxplorer.cli
+OpenIDE-Module-Install: bio/comp/jlu/readxplorer/cli/Installer.class
+OpenIDE-Module-Localizing-Bundle: bio/comp/jlu/readxplorer/cli/Bundle.properties
+
