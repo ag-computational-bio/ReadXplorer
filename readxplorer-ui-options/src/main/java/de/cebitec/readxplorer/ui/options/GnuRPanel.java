@@ -623,36 +623,6 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         th.start();
     }
 
-
-    private void setPath() {
-        String bit = System.getProperty( "sun.arch.data.model" );
-        String r_dll = "";
-
-        if( bit.equals( "32" ) ) {
-            r_dll = r_dir.getAbsolutePath() + File.separator + "bin" + File.separator + "i386";
-        }
-        if( bit.equals( "64" ) ) {
-            r_dll = r_dir.getAbsolutePath() + File.separator + "bin" + File.separator + "x64";
-        }
-
-        try( InputStream jarPath = GnuRPanel.class.getResourceAsStream( "/de/cebitec/readxplorer/options/setPath.ps1" ) ) {
-            File to = File.createTempFile( "ReadXplorer_", ".ps1" );
-            to.deleteOnExit();
-            Files.copy( jarPath, to.toPath(), StandardCopyOption.REPLACE_EXISTING );
-            ProcessBuilder pb = new ProcessBuilder( "powershell.exe", "-ExecutionPolicy", "RemoteSigned", "-File", to.getAbsolutePath(), "-Directory", r_dll, "-Rhome", r_dir.getAbsolutePath() );
-            pb.redirectInput( ProcessBuilder.Redirect.from( new File( "NUL" ) ) );
-            Process start = pb.start();
-            start.waitFor();
-            messages.setText( "Setup completed. Please restart ReadXplorer!" );
-            jProgressBar1.setIndeterminate( false );
-            jProgressBar1.setValue( 100 );
-        }
-        catch( IOException | InterruptedException ex ) {
-            Exceptions.printStackTrace( ex );
-        }
-    }
-
-
     @Override
     public void update( Object args ) {
         if( args instanceof Downloader.Status ) {
@@ -716,7 +686,9 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                             jProgressBar1.setValue( 0 );
                             break;
                         case FINISHED:
-                            setPath();
+                            messages.setText( "Setup completed. Please restart ReadXplorer!" );
+                            jProgressBar1.setIndeterminate( false );
+                            jProgressBar1.setValue( 100 );
                             JOptionPane.showMessageDialog( null, "Changes will only take effect after you restart the application" );
                             break;
                         case NO_RIGHTS:
