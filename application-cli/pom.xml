@@ -12,7 +12,7 @@
 
     <artifactId>readxplorer-app-cli</artifactId>
     <packaging>nbm-application</packaging>
-    <name>${project.displayname} - CLI</name>
+    <name>${project.displayname} - App - CLI</name>
     <description>This module is responsible for the build process of the CLI version of ReadXplorer.</description>
 
 
@@ -44,6 +44,10 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-classificationupdate</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>readxplorer-cli</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
