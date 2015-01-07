@@ -61,9 +61,11 @@ import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.NotificationDisplayer;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
+import org.rosuda.REngine.Rserve.RserveException;
 
 
 /**
@@ -470,6 +472,10 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
                 Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
+            } catch (IllegalStateException ex) {
+                Exceptions.printStackTrace(ex);
+            } catch (RserveException ex) {
+                Exceptions.printStackTrace(ex);
             }
         }
     }//GEN-LAST:event_plotButtonActionPerformed

@@ -29,7 +29,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
+import org.rosuda.REngine.Rserve.RserveException;
 
 
 /**
@@ -40,7 +40,6 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
 
     private DeSeq2 deSeq2;
     private final DeSeqAnalysisData deSeqAnalysisData;
-    private final UUID key;
 
 
     public static enum Plot {
@@ -71,10 +70,9 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
 
     public DeSeq2AnalysisHandler( List<PersistentTrack> selectedTracks, Map<String, String[]> design,
                                   List<String> fittingGroupOne, List<String> fittingGroupTwo, Integer refGenomeID, boolean workingWithoutReplicates,
-                                  File saveFile, Set<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams, UUID key ) {
+                                  File saveFile, Set<FeatureType> selectedFeatures, int startOffset, int stopOffset, ParametersReadClasses readClassParams) {
         super( selectedTracks, refGenomeID, saveFile, selectedFeatures, startOffset, stopOffset, readClassParams );
         deSeq2 = new DeSeq2( this.getRefGenomeID() );
-        this.key = key;
         deSeqAnalysisData = new DeSeqAnalysisData( selectedTracks.size(),
                                                    design, false, fittingGroupOne, fittingGroupTwo,
                                                    workingWithoutReplicates );
@@ -82,11 +80,11 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
 
 
     @Override
-    protected List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException, JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException {
+    protected List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException, JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException, RserveException {
         List<ResultDeAnalysis> results;
         prepareFeatures( deSeqAnalysisData );
         prepareCountData( deSeqAnalysisData, getAllCountData() );
-        results = deSeq2.process( deSeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile(), key );
+        results = deSeq2.process( deSeqAnalysisData, getPersAnno().size(), getSelectedTracks().size(), getSaveFile());
         return results;
 
     }
@@ -98,13 +96,13 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
 
 
     @Override
-    public void endAnalysis() {
-        deSeq2.shutdown( key );
+    public void endAnalysis() throws RserveException {
+        deSeq2.shutdown();
         deSeq2 = null;
     }
 
 
-    public File plot( Plot plot ) throws IOException, IllegalStateException, PackageNotLoadableException {
+    public File plot( Plot plot ) throws IOException, IllegalStateException, PackageNotLoadableException, RserveException {
         File file = File.createTempFile( "ReadXplorer_Plot_", ".svg" );
         file.deleteOnExit();
         if( plot == Plot.DispEsts ) {

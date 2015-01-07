@@ -31,11 +31,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.rosuda.JRI.REXP;
-import org.rosuda.JRI.RVector;
+import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPVector;
+import org.rosuda.REngine.RList;
+import org.rosuda.REngine.Rserve.RserveException;
 
 
 /**
@@ -52,11 +53,10 @@ public class DeSeq {
 
 
     public List<ResultDeAnalysis> process( DeSeqAnalysisData analysisData,
-                                           int numberOfFeatures, int numberOfTracks, File saveFile, UUID key )
+                                           int numberOfFeatures, int numberOfTracks, File saveFile)
             throws PackageNotLoadableException, JRILibraryNotInPathException,
-                   IllegalStateException, UnknownGnuRException {
-        gnuR = GnuR.SecureGnuRInitiliser.getGnuRinstance( key );
-        gnuR.clearGnuR();
+                   IllegalStateException, UnknownGnuRException, RserveException {
+        gnuR = new GnuR();
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
         gnuR.loadPackage( "DESeq" );
@@ -138,36 +138,39 @@ public class DeSeq {
 
             //For multi condition testing estimateDispersions does not converge most of the
             //times. So we relax the settings in every step a little more.
-            if( analysisData.moreThanTwoConditions() ) {
-                REXP res = gnuR.eval( "cD <- estimateDispersions(cD)" );
-                if( res == null ) {
-                    res = gnuR.eval( "cD <- estimateDispersions(cD,fitType=\"local\")" );
-                    if( res == null ) {
-                        res = gnuR.eval( "cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\")" );
-                        if( res == null ) {
-                            gnuR.eval( "cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\",fitType=\"local\")" );
+            if (analysisData.moreThanTwoConditions()) {
+                try {
+                    gnuR.eval("cD <- estimateDispersions(cD)");
+                } catch (RserveException e) {
+                    try {
+                        gnuR.eval("cD <- estimateDispersions(cD,fitType=\"local\")");
+                    } catch (RserveException e2) {
+                        try {
+                            gnuR.eval("cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\")");
+                        } catch (RserveException e3) {
+                            gnuR.eval("cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\",fitType=\"local\")");
                         }
                     }
                 }
-            }
-            else {
-                if( analysisData.isWorkingWithoutReplicates() ) {
+            } else {
+                if (analysisData.isWorkingWithoutReplicates()) {
                     // If there are no replicates for each condition we need to tell
                     // the function to ignore this fact.
-                    REXP res = gnuR.eval( "cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\")" );
-                    //For some reasons the above computation fails on some data sets.
-                    //In those cases the following computation should do the trick.
-                    if( res == null ) {
-                        gnuR.eval( "cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\",fitType=\"local\")" );
+                    try {
+                        gnuR.eval("cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\")");
+                    } catch (RserveException e) {
+                        //For some reasons the above computation fails on some data sets.
+                        //In those cases the following computation should do the trick.
+                        gnuR.eval("cD <- estimateDispersions(cD, method=\"blind\", sharingMode=\"fit-only\",fitType=\"local\")");
                     }
-                }
-                else {
+                } else {
                     //The dispersion is estimated
-                    REXP res = gnuR.eval( "cD <- estimateDispersions(cD)" );
-                    //For some reasons the above computation fails on some data sets.
-                    //In those cases the following computation should do the trick.
-                    if( res == null ) {
-                        gnuR.eval( "cD <- estimateDispersions(cD,fitType=\"local\")" );
+                    try {
+                        gnuR.eval("cD <- estimateDispersions(cD)");
+                    } catch (RserveException e) {
+                        //For some reasons the above computation fails on some data sets.
+                        //In those cases the following computation should do the trick.
+                        gnuR.eval("cD <- estimateDispersions(cD,fitType=\"local\")");
                     }
                 }
             }
@@ -204,7 +207,7 @@ public class DeSeq {
                 gnuR.eval( "tmp0 <- data.frame(fit1,pvalsGLM,padjGLM)" );
                 gnuR.eval( "res0 <- data.frame(rownames(tmp0),tmp0)" );
                 REXP currentResult1 = gnuR.eval( "res0" );
-                RVector tableContents1 = currentResult1.asVector();
+                List<REXPVector> tableContents1 = currentResult1.asList();
                 REXP colNames1 = gnuR.eval( "colnames(res0)" );
                 REXP rowNames1 = gnuR.eval( "rownames(res0)" );
                 results.add( new ResultDeAnalysis( tableContents1, colNames1, rowNames1, "Fitting Group One", analysisData ) );
@@ -212,17 +215,17 @@ public class DeSeq {
                 gnuR.eval( "tmp1 <- data.frame(fit0,pvalsGLM,padjGLM)" );
                 gnuR.eval( "res1 <- data.frame(rownames(tmp1),tmp1)" );
                 REXP currentResult0 = gnuR.eval( "res1" );
-                RVector tableContents0 = currentResult0.asVector();
+                List<REXPVector> tableContents0 = currentResult0.asList();
                 REXP colNames0 = gnuR.eval( "colnames(res1)" );
                 REXP rowNames0 = gnuR.eval( "rownames(res1)" );
                 results.add( new ResultDeAnalysis( tableContents0, colNames0, rowNames0, "Fitting Group Two", analysisData ) );
 
             }
             else {
-                //Significant results sorted by the most significantly differentially expressed genes
+//           //Significant results sorted by the most significantly differentially expressed genes
                 gnuR.eval( "res0 <- res[order(res$pval), ]" );
                 REXP result = gnuR.eval( "res0" );
-                RVector rvec = result.asVector();
+                List<REXPVector> rvec = result.asList();
                 REXP colNames = gnuR.eval( "colnames(res0)" );
                 REXP rowNames = gnuR.eval( "rownames(res0)" );
                 results.add( new ResultDeAnalysis( rvec, colNames, rowNames,
@@ -231,7 +234,7 @@ public class DeSeq {
                 //Significant results sorted by the most strongly down regulated genes
                 gnuR.eval( "res1 <- res[order(res$foldChange, -res$baseMean), ]" );
                 result = gnuR.eval( "res1" );
-                rvec = result.asVector();
+                rvec = result.asList();
                 colNames = gnuR.eval( "colnames(res1)" );
                 rowNames = gnuR.eval( "rownames(res1)" );
                 results.add( new ResultDeAnalysis( rvec, colNames, rowNames,
@@ -240,7 +243,7 @@ public class DeSeq {
                 //Significant results sorted by the most strongly up regulated genes
                 gnuR.eval( "res2 <- res[order(-res$foldChange, -res$baseMean), ]" );
                 result = gnuR.eval( "res2" );
-                rvec = result.asVector();
+                rvec = result.asList();
                 colNames = gnuR.eval( "colnames(res2)" );
                 rowNames = gnuR.eval( "rownames(res2)" );
                 results.add( new ResultDeAnalysis( rvec, colNames, rowNames,
@@ -265,32 +268,30 @@ public class DeSeq {
     /**
      * Releases the Gnu R instance and removes the reference to it.
      */
-    public void shutdown( UUID key ) {
-        if( gnuR != null ) {
-            gnuR.releaseGnuRInstance( key );
-            gnuR = null;
-        }
+    public void shutdown() throws RserveException {
+        gnuR.clearGnuR();
+        gnuR.detach();
     }
 
 
-    public void saveResultsAsCSV( int index, File saveFile ) {
+    public void saveResultsAsCSV( int index, File saveFile ) throws RserveException {
         String path = saveFile.getAbsolutePath();
         path = path.replace( "\\", "/" );
         gnuR.eval( "write.csv(res" + index + ",file=\"" + path + "\")" );
     }
 
 
-    public void plotDispEsts( File file ) throws IllegalStateException, PackageNotLoadableException {
+    public void plotDispEsts( File file ) throws IllegalStateException, PackageNotLoadableException, RserveException {
         gnuR.storePlot( file, "plotDispEsts(cD)" );
     }
 
 
-    public void plotDE( File file ) throws IllegalStateException, PackageNotLoadableException {
+    public void plotDE( File file ) throws IllegalStateException, PackageNotLoadableException, RserveException {
         gnuR.storePlot( file, "plotDE(res)" );
     }
 
 
-    public void plotHist( File file ) throws IllegalStateException, PackageNotLoadableException {
+    public void plotHist( File file ) throws IllegalStateException, PackageNotLoadableException, RserveException {
         gnuR.storePlot( file, "hist(res$pval, breaks=100, col=\"skyblue\", border=\"slateblue\", main=\"\")" );
     }
 

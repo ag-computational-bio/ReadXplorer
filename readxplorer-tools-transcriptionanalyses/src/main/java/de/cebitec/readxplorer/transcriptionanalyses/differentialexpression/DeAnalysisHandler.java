@@ -48,6 +48,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import org.openide.util.Exceptions;
+import org.rosuda.REngine.Rserve.RserveException;
 
 
 /**
@@ -97,16 +99,17 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
 
 
         public static Tool[] usableTools() {
-            if( GnuR.SecureGnuRInitiliser.isGnuRSetUpCorrect() && GnuR.SecureGnuRInitiliser.isGnuRInstanceFree() ) {
-                return Tool.values();
-                //If one Tool should not be available to the user return something like :
-                //new Tool[]{ ExpressTest, DeSeq, BaySeq, ExportCountTable };
-
-            }
-            else {
-                Tool[] ret = new Tool[]{ ExpressTest, ExportCountTable };
-                return ret;
-            }
+//            if( GnuR.SecureGnuRInitiliser.isGnuRSetUpCorrect() && GnuR.SecureGnuRInitiliser.isGnuRInstanceFree() ) {
+//                return Tool.values();
+//                //If one Tool should not be available to the user return something like :
+//                //new Tool[]{ ExpressTest, DeSeq, BaySeq, ExportCountTable };
+//
+//            }
+//            else {
+//                Tool[] ret = new Tool[]{ ExpressTest, ExportCountTable };
+//                return ret;
+            return Tool.values();
+//            }
         }
 
 
@@ -224,7 +227,8 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
      * @return
      */
     protected abstract List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException,
-                                                                       JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException;
+                                                                       JRILibraryNotInPathException, IllegalStateException,
+                                                                       UnknownGnuRException, RserveException;
 
 
     /**
@@ -232,7 +236,7 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
      * the analysis are closed. So you should clean up everything and release
      * the Gnu R instance at this point.
      */
-    public abstract void endAnalysis();
+    public abstract void endAnalysis() throws RserveException;
 
 
     public void setResults( List<ResultDeAnalysis> results ) {
@@ -295,7 +299,11 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
     public void removeObserver( Observer observer ) {
         this.observerList.remove( observer );
         if( this.observerList.isEmpty() ) {
-            endAnalysis();
+            try {
+                endAnalysis();
+            } catch (RserveException ex) {
+                Exceptions.printStackTrace(ex);
+            }
             this.interrupt();
         }
     }
@@ -333,6 +341,10 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
             }
             catch( JRILibraryNotInPathException ex ) {
+                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
+            } catch (RserveException ex) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
                 Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
