@@ -13,6 +13,7 @@
     <artifactId>readxplorer-app-cli</artifactId>
     <packaging>nbm-application</packaging>
     <name>${project.displayname} - CLI</name>
+    <description>This module is responsible for the build process of the CLI version of ReadXplorer.</description>
 
 
     <properties>
@@ -123,11 +124,19 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
                 <configuration>
-                    <etcConfFile>src/main/resources/readxplorer-cli.conf</etcConfFile>
+                    <author>Oliver Schwengers</author>
+                    <licenseName>GPLv3</licenseName>
                     <licenseFile>../License-GPLv3.txt</licenseFile>
                     <installerLicenseFile>../License-GPLv3.txt</installerLicenseFile>
+                    <installerOsWindows>false</installerOsWindows>
+                    <installerOsMacosx>false</installerOsMacosx>
                     <installerOsSolaris>false</installerOsSolaris>
                     <installerPack200Enable>false</installerPack200Enable>
+                    <etcConfFile>src/main/resources/readxplorer-cli.conf</etcConfFile>
+                    <installDirName>${brandingToken}-cli</installDirName>
+                    <userSettings>
+                        <releaseVersion>${project.version}</releaseVersion>
+                    </userSettings>
                 </configuration>
             </plugin>
             <!-- Permits NbModuleSuite to be run in integration-test phase: -->
