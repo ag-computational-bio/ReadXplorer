@@ -13,6 +13,7 @@
     <modules>
         <module>branding</module>
         <module>application</module>
+        <module>application-cli</module>
         <module>centrallookup</module>
         <module>readxplorer-api</module>
         <module>readxplorer-backend</module>
