@@ -123,7 +123,7 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
                 <configuration>
-                    <etcConfFile>src/main/resources/readxplorer.conf</etcConfFile>
+                    <etcConfFile>src/main/resources/readxplorer-cli.conf</etcConfFile>
                     <licenseFile>../License-GPLv3.txt</licenseFile>
                     <installerLicenseFile>../License-GPLv3.txt</installerLicenseFile>
                     <installerOsSolaris>false</installerOsSolaris>
