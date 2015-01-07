@@ -13,6 +13,7 @@
     <artifactId>readxplorer-app</artifactId>
     <packaging>nbm-application</packaging>
     <name>${project.displayname} - App</name>
+    <description>This module is responsible for the build process of the GUI version of ReadXplorer.</description>
 
 
     <properties>
@@ -166,11 +167,17 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
                 <configuration>
-                    <etcConfFile>src/main/resources/readxplorer.conf</etcConfFile>
+                    <author>Rolf Hilker</author>
+                    <licenseName>GPLv3</licenseName>
                     <licenseFile>../License-GPLv3.txt</licenseFile>
                     <installerLicenseFile>../License-GPLv3.txt</installerLicenseFile>
                     <installerOsSolaris>false</installerOsSolaris>
                     <installerPack200Enable>false</installerPack200Enable>
+                    <etcConfFile>src/main/resources/readxplorer.conf</etcConfFile>
+                    <installDirName>${brandingToken}-cli</installDirName>
+                    <userSettings>
+                        <releaseVersion>${project.version}</releaseVersion>
+                    </userSettings>
                 </configuration>
             </plugin>
             <!-- Permits NbModuleSuite to be run in integration-test phase: -->
