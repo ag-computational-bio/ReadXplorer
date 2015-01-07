@@ -132,6 +132,7 @@
                     <installerOsMacosx>false</installerOsMacosx>
                     <installerOsSolaris>false</installerOsSolaris>
                     <installerPack200Enable>false</installerPack200Enable>
+                    <brandingToken>${brandingToken}-cli</brandingToken>
                     <etcConfFile>src/main/resources/readxplorer-cli.conf</etcConfFile>
                     <installDirName>${brandingToken}-cli</installDirName>
                     <userSettings>
@@ -147,7 +148,7 @@
                 <configuration>
                     <systemPropertyVariables>
                         <all.clusters>${all.clusters}</all.clusters>
-                        <branding.token>${brandingToken}</branding.token>
+                        <branding.token>${brandingToken}-cli</branding.token>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
@@ -174,7 +175,6 @@
                             <execution>
                                 <id>extra</id>
                                 <goals>
-                                    <goal>autoupdate</goal>
                                     <goal>build-installers</goal>
                                 </goals>
                             </execution>
