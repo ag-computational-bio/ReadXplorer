@@ -56,6 +56,7 @@ public class DeSeq {
                                            int numberOfFeatures, int numberOfTracks, File saveFile)
             throws PackageNotLoadableException, JRILibraryNotInPathException,
                    IllegalStateException, UnknownGnuRException, RserveException {
+        GnuR.startRServe();
         gnuR = new GnuR();
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
