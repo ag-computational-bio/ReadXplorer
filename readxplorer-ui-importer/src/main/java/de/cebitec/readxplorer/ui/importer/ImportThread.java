@@ -66,12 +66,13 @@ public class ImportThread extends SwingWorker<Object, Object> implements
         Observer {
 
     private final InputOutput io;
+    private final ProgressHandle ph;
     private final List<ReferenceJob> referenceJobs;
     private final List<TrackJob> tracksJobs;
     private final List<ReadPairJobContainer> readPairJobs;
-    private final ProgressHandle ph;
-    private int workunits;
+
     private boolean noErrors = true;
+    private int workunits;
     private Map<String, Integer> chromLengthMap;
 
 
@@ -139,30 +140,27 @@ public class ImportThread extends SwingWorker<Object, Object> implements
     private void processRefGenomeJobs() {
         if( !referenceJobs.isEmpty() ) {
             io.getOut().println( NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.start.ref" ) + ":" );
-            long start;
-            long finish;
-            String msg;
 
             for( Iterator<ReferenceJob> it = referenceJobs.iterator(); it.hasNext(); ) {
-                start = System.currentTimeMillis();
-                ReferenceJob r = it.next();
+                final long start = System.currentTimeMillis();
+                ReferenceJob rj = it.next();
                 ph.progress( workunits++ );
 
                 try {
                     // parsing
-                    ParsedReference refGen = this.parseRefJob( r );
-                    io.getOut().println( "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.parsed" ) );
+                    ParsedReference refGen = this.parseRefJob( rj );
+                    io.getOut().println( "\"" + rj.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.parsed" ) );
 
                     // storing
                     try {
-                        storeRefGenome( refGen, r );
-                        finish = System.currentTimeMillis();
-                        msg = "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.stored" );
+                        storeRefGenome( refGen, rj );
+                        final long finish = System.currentTimeMillis();
+                        String msg = "\"" + rj.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.stored" );
                         io.getOut().println( Benchmark.calculateDuration( start, finish, msg ) );
                     }
                     catch( StorageException ex ) {
                         // if something went wrong, mark all dependent track jobs
-                        io.getOut().println( "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.failed" ) + "!" );
+                        io.getOut().println( "\"" + rj.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.failed" ) + "!" );
                         this.noErrors = false;
                         Logger.getLogger( ImportThread.class.getName() ).log( Level.SEVERE, null, ex );
                     }
@@ -170,12 +168,12 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                 }
                 catch( ParsingException ex ) {
                     // if something went wrong, mark all dependent track jobs
-                    io.getOut().println( "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.failed" ) + "!" );
+                    io.getOut().println( "\"" + rj.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.failed" ) + "!" );
                     this.noErrors = false;
                     Logger.getLogger( ImportThread.class.getName() ).log( Level.INFO, null, ex );
                 }
                 catch( OutOfMemoryError ex ) {
-                    io.getOut().println( "\"" + r.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.outOfMemory" ) + "!" );
+                    io.getOut().println( "\"" + rj.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.outOfMemory" ) + "!" );
                 }
 
                 it.remove();
@@ -227,12 +225,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
 
             io.getOut().println( NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.start.readPairs" ) + ":" );
 
-            long start;
-            long finish;
-            String msg;
-
             for( Iterator<ReadPairJobContainer> it = readPairJobs.iterator(); it.hasNext(); ) {
-                start = System.currentTimeMillis();
                 ReadPairJobContainer readPairJobContainer = it.next();
 
                 int distance = readPairJobContainer.getDistance();
@@ -282,8 +275,7 @@ public class ImportThread extends SwingWorker<Object, Object> implements
                             }
                             File lastWorkFile = trackJob1.getFile(); //file which was created in the last step of the import process
 
-                            boolean isTwoTracks = trackJob2 != null;
-                            if( isTwoTracks ) { //only combine, if data is not already combined
+                            if( trackJob2 != null ) { //only combine, if data is not already combined
                                 File inputFile2 = trackJob2.getFile();
                                 inputFile2.setReadOnly();
                                 trackJob2.getParser().registerObserver( this );

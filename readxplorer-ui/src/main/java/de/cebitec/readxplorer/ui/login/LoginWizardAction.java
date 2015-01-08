@@ -54,16 +54,17 @@ import org.openide.windows.WindowManager;
 public final class LoginWizardAction implements ActionListener {
 
     private static final long serialVersionUID = 1L;
-    private List<WizardDescriptor.Panel<WizardDescriptor>> panels;
+    
     private LoadingDialog loading;
     private LoginWizardPanel loginPanel;
+    private List<WizardDescriptor.Panel<WizardDescriptor>> panels;
 
 
     @Override
     public void actionPerformed( ActionEvent e ) {
         final CentralLookup cl = CentralLookup.getDefault();
         // check if user is already logged in
-        Boolean loggedIn = cl.lookup( LoginCookie.class ) != null ? Boolean.TRUE : Boolean.FALSE;
+        boolean loggedIn = cl.lookup( LoginCookie.class ) != null ? Boolean.TRUE : Boolean.FALSE;
 
         if( loggedIn ) { //logout from other db
             LogoutAction logoutAction = new LogoutAction( cl.lookup( LoginCookie.class ) );

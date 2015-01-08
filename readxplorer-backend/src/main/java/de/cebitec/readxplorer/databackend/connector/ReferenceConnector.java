@@ -183,17 +183,14 @@ public class ReferenceConnector {
             final PreparedStatement fetch;
             if( featureType == FeatureType.ANY ) {
                 fetch = con.prepareStatement( SQLStatements.FETCH_FEATURES_FOR_CHROM_INTERVAL );
-                fetch.setLong( 1, chromId );
-                fetch.setInt( 2, from );
-                fetch.setInt( 3, to );
             }
             else {
                 fetch = con.prepareStatement( SQLStatements.FETCH_SPECIFIED_FEATURES_FOR_CHROM_INTERVAL );
-                fetch.setLong( 1, chromId );
-                fetch.setInt( 2, from );
-                fetch.setInt( 3, to );
                 fetch.setInt( 4, featureType.getTypeByte() );
             }
+            fetch.setLong( 1, chromId );
+            fetch.setInt( 2, from );
+            fetch.setInt( 3, to );
 
             try( final ResultSet rs = fetch.executeQuery() ) {
                 while( rs.next() ) {
@@ -368,10 +365,10 @@ public class ReferenceConnector {
      * @return the names of all tracks of this reference hashed to their track
      *         id.
      */
-    public HashMap<Integer, String> getAssociatedTrackNames() {
+    public Map<Integer, String> getAssociatedTrackNames() {
         this.getAssociatedTracks(); //ensures the tracks are already in the list
 
-        HashMap<Integer, String> namesList = new HashMap<>( associatedTracks.size() );
+        Map<Integer, String> namesList = new HashMap<>( associatedTracks.size() );
         for( PersistentTrack track : associatedTracks ) {
             namesList.put( track.getId(), track.getDescription() );
         }
@@ -415,13 +412,12 @@ public class ReferenceConnector {
                 final PreparedStatement fetch;
                 if( type == FeatureType.ANY ) {
                     fetch = con.prepareStatement( SQLStatements.CHECK_IF_FEATURES_EXIST );
-                    fetch.setLong( 1, currentID );
                 }
                 else {
                     fetch = con.prepareStatement( SQLStatements.CHECK_IF_FEATURES_OF_TYPE_EXIST );
-                    fetch.setLong( 1, currentID );
                     fetch.setLong( 2, type.getTypeByte() );
                 }
+                fetch.setLong( 1, currentID );
                 ResultSet rs = fetch.executeQuery();
                 if( rs.next() ) {
                     //If at least one entry exists we can exit early.

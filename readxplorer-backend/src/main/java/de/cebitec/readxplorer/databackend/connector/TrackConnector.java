@@ -53,14 +53,15 @@ import java.util.logging.Logger;
  */
 public class TrackConnector {
 
-    private List<PersistentTrack> associatedTracks;
+//    public static int FIXED_INTERVAL_LENGTH = 1000;
+
     private int trackID;
+    private List<PersistentTrack> associatedTracks;
     private CoverageThread coverageThread;
     private MappingThread mappingThread;
     private CoverageThreadAnalyses coverageThreadAnalyses;
     private MappingThreadAnalyses mappingThreadAnalyses;
     private Connection con;
-    public static int FIXED_INTERVAL_LENGTH = 1000;
     private PersistentReference refGenome;
 
 

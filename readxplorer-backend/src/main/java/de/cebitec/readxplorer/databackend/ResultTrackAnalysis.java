@@ -38,14 +38,15 @@ import java.util.Map;
  */
 public abstract class ResultTrackAnalysis<T> implements ExportDataI {
 
-    private Map<Integer, PersistentTrack> trackMap;
-    private final PersistentReference reference;
-    private List<String> trackNameList;
-    private ParameterSetI<T> parameters;
-    private Map<String, Integer> statsMap;
     private final boolean combineTracks;
     private final int trackColumn;
     private final int filterColumn;
+    private final PersistentReference reference;
+    
+    private ParameterSetI<T> parameters;
+    private List<String> trackNameList;
+    private Map<String, Integer> statsMap;
+    private Map<Integer, PersistentTrack> trackMap;
 
 
     /**

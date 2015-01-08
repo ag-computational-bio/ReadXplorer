@@ -67,26 +67,27 @@ import org.openide.util.NbBundle;
  *
  * @author ddoppmeier, rhilker
  */
-public class ProjectConnector extends Observable {
+public final class ProjectConnector extends Observable {
+
+    private static final int DB_VERSION_NO = 3;
+    private static final int BATCH_SIZE = 100000; //TODO test larger batch sizes
+    private static final int FEATURE_BATCH_SIZE = BATCH_SIZE;
+    private static final String BIGINT_UNSIGNED = "BIGINT UNSIGNED";
+//    private final static String INT_UNSIGNED = "INT UNSIGNED";
+    private static final String VARCHAR400 = "VARCHAR(400)";
+    private static final String VARCHAR1000 = "VARCHAR(1000)";
 
     private static ProjectConnector dbConnector;
-    private static final int DB_VERSION_NO = 3;
+    private final Map<Integer, TrackConnector> trackConnectors;
+    private final Map<Integer, MultiTrackConnector> multiTrackConnectors;
+//    private List<MultiTrackConnector> multiTrackConnectors;
+    private final Map<Integer, ReferenceConnector> refConnectors;
+
     private Connection con;
     private String url;
     private String user;
     private String password;
     private String adapter;
-    private final HashMap<Integer, TrackConnector> trackConnectors;
-    private final HashMap<Integer, MultiTrackConnector> multiTrackConnectors;
-//    private List<MultiTrackConnector> multiTrackConnectors;
-    private final HashMap<Integer, ReferenceConnector> refConnectors;
-    private static final int BATCH_SIZE = 100000; //TODO: test larger batch sizes
-    private final static int FEATURE_BATCH_SIZE = BATCH_SIZE;
-    private final static String BIGINT_UNSIGNED = "BIGINT UNSIGNED";
-    private final static String INT_UNSIGNED = "INT UNSIGNED";
-    private static final String VARCHAR400 = "VARCHAR(400)";
-    private static final String VARCHAR1000 = "VARCHAR(1000)";
-
     private String dbLocation;
 
 
@@ -241,9 +242,8 @@ public class ProjectConnector extends Observable {
     /**
      * Makes sure that an H2 DB is in a correct up-to-date state.
      * Either creates all tables necessary for a ReadXplorer DB or updates them,
-     * if
-     * anything is missing/different. If no changes are necessary nothing is
-     * altered.
+     * if anything is missing/different.
+     * If no changes are necessary nothing is altered.
      */
     private void setupDatabaseH2() {
 
@@ -323,8 +323,7 @@ public class ProjectConnector extends Observable {
     /**
      * Any additional columns which were added to existing tables in newer
      * ReadXplorer versions should be checked by this method to ensure correct
-     * database
-     * structure and avoiding errors when SQL statements request one of these
+     * database structure and avoiding errors when SQL statements request one of these
      * columns, which are not existent in older databases.
      */
     private void checkDBStructure() {
@@ -393,20 +392,20 @@ public class ProjectConnector extends Observable {
      * <p>
      * @param statement sql statement to run
      */
-    private void runSqlStatementIgnoreErrors( String statement ) {
-
-        try {
-            con.prepareStatement( statement ).executeUpdate();
-        }
-        catch( SQLException ex ) {
-            //ignore
-        }
-    }
+//    private void runSqlStatementIgnoreErrors( String statement ) {
+//
+//        try {
+//            con.prepareStatement( statement ).executeUpdate();
+//        }
+//        catch( SQLException ex ) {
+//            //ignore
+//        }
+//    }
 
 
     /**
-     * Checks if a rollback is needed or if the SQLException originated from a
-     * duplicate column name error.
+     * Checks if a rollback is needed or
+     * if the SQLException originated from a duplicate column name error.
      * <p>
      * @param ex SQL exception to check
      */
@@ -418,9 +417,8 @@ public class ProjectConnector extends Observable {
 
 
     /**
-     * If the current transaction tried to make changes in the DB, these changes
-     * are
-     * rolled back.
+     * If the current transaction tried to make changes in the DB,
+     * these changes are rolled back.
      * <p>
      * @param className name of the class in which the error occured
      * @param ex        the exception, which was thrown
@@ -450,25 +448,25 @@ public class ProjectConnector extends Observable {
      * Never use this in productive environment.
      */
 
-    private void deleteAllTables() {
-        try {
-            con.setAutoCommit( false );
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Deleting all database tables" );
-            try( ResultSet rs = con.prepareStatement( "show tables" ).executeQuery() ) {
-                while( rs.next() ) {
-                    String table = rs.getString( 1 );
-                    con.prepareStatement( "drop table " + table ).executeUpdate();
-                }
-                con.commit();
-                con.setAutoCommit( true );
-            }
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Successfully deleted all data" );
-        }
-        catch( SQLException ex ) {
-            this.rollbackOnError( this.getClass().getName(), ex );
-            Logger.getLogger( ProjectConnector.class.getName() ).log( Level.SEVERE, "Deletion of data failed", ex );
-        }
-    }
+//    private void deleteAllTables() {
+//        try {
+//            con.setAutoCommit( false );
+//            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Deleting all database tables" );
+//            try( ResultSet rs = con.prepareStatement( "show tables" ).executeQuery() ) {
+//                while( rs.next() ) {
+//                    String table = rs.getString( 1 );
+//                    con.prepareStatement( "drop table " + table ).executeUpdate();
+//                }
+//                con.commit();
+//                con.setAutoCommit( true );
+//            }
+//            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Successfully deleted all data" );
+//        }
+//        catch( SQLException ex ) {
+//            this.rollbackOnError( this.getClass().getName(), ex );
+//            Logger.getLogger( ProjectConnector.class.getName() ).log( Level.SEVERE, "Deletion of data failed", ex );
+//        }
+//    }
 
 
     /**
@@ -642,10 +640,10 @@ public class ProjectConnector extends Observable {
                 chrom.distributeFeatureIds();
 
                 int batchCounter = 1;
+                insertFeature.setLong( 2, chrom.getID() );
                 for( ParsedFeature feature : chrom.getFeatures() ) {
                     batchCounter++;
                     insertFeature.setLong( 1, feature.getId() );
-                    insertFeature.setLong( 2, chrom.getID() );
                     insertFeature.setString( 3, feature.getParentIdsConcat() );
                     insertFeature.setInt( 4, feature.getType().getTypeByte() );
                     insertFeature.setInt( 5, feature.getStart() );
@@ -658,8 +656,8 @@ public class ProjectConnector extends Observable {
                     insertFeature.addBatch();
 
                     if( batchCounter == FEATURE_BATCH_SIZE ) {
-                        batchCounter = 1;
                         insertFeature.executeBatch();
+                        batchCounter = 1;
                     }
                 }
                 insertFeature.executeBatch();

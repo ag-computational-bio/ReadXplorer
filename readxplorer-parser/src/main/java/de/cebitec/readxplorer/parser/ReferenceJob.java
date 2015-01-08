@@ -33,7 +33,7 @@ import java.util.List;
  */
 public class ReferenceJob implements Job {
 
-    private Integer id;
+    private int id;
     private String name;
     private File file;
     private File gffFile;
@@ -54,7 +54,7 @@ public class ReferenceJob implements Job {
      * @param name        the name of the reference
      * @param timestamp   the timestamp of the import
      */
-    public ReferenceJob( Integer id, File file, ReferenceParserI parser, String description, String name, Timestamp timestamp ) {
+    public ReferenceJob( int id, File file, ReferenceParserI parser, String description, String name, Timestamp timestamp ) {
         this.id = id;
         this.name = name;
         this.file = file;
@@ -81,7 +81,7 @@ public class ReferenceJob implements Job {
      * @param name        the name of the reference
      * @param timestamp   the timestamp of the import
      */
-    public ReferenceJob( Integer id, File fastaFile, File gffFile, ReferenceParserI parser, String description, String name, Timestamp timestamp ) {
+    public ReferenceJob( int id, File fastaFile, File gffFile, ReferenceParserI parser, String description, String name, Timestamp timestamp ) {
         this( id, fastaFile, parser, description, name, timestamp );
         this.gffFile = gffFile;
     }
@@ -158,7 +158,7 @@ public class ReferenceJob implements Job {
 
 
     public boolean isPersistent() {
-        return id != null;
+        return id != 0;
     }
 
 
