@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -43,7 +42,7 @@ import org.openide.util.NbBundle;
  * <p>
  * @author -Rolf Hilker-
  */
-public class GeneralUtils {
+public final class GeneralUtils {
 
     /**
      * Calculates the percentage increase of value 1 to value 2. In case value1
@@ -56,16 +55,15 @@ public class GeneralUtils {
      * <p>
      * @return the percentage increase
      */
-    public static int calculatePercentageIncrease( int value1, int value2 ) {
-        int percentDiff;
+    public static int calculatePercentageIncrease( final int value1, final int value2 ) {
+
         if( value1 == 0 ) {
             int absoluteDiff = value2 - value1;
-            percentDiff = (int) (absoluteDiff * 1.5); //weight factor
+            return (int) (absoluteDiff * 1.5d); //weight factor
         }
         else {
-            percentDiff = (int) Math.ceil( ((double) value2 / (double) value1) * 100.0 ) - 100;
+            return (int) Math.ceil( ((double) value2 / value1) * 100d ) - 100;
         }
-        return percentDiff;
     }
 
 
@@ -158,10 +156,10 @@ public class GeneralUtils {
      * @return <code>true</code> if it is a valid input string,
      *         <code>false</code> otherwise
      */
-    public static boolean isValidRangeInput( String input, int min, int max ) {
+    public static boolean isValidRangeInput( final String input, final int min, final int max ) {
         try {
             int tmp = Integer.parseInt( input );
-            return tmp >= min && tmp <= max;
+            return tmp >= min  &&  tmp <= max;
         }
         catch( NumberFormatException e ) {
             return false;
@@ -177,7 +175,7 @@ public class GeneralUtils {
      * @return <code>true</code> if it is a valid input string,
      *         <code>false</code> otherwise
      */
-    public static boolean isValidByteInput( String text ) {
+    public static boolean isValidByteInput( final String text ) {
         try {
             return Byte.parseByte( text ) >= 0;
         }
@@ -197,7 +195,7 @@ public class GeneralUtils {
      * @return <code>true</code> if it is a valid percentage value,
      *         <code>false</code> otherwise
      */
-    public static boolean isValidPercentage( String input ) {
+    public static boolean isValidPercentage( final String input ) {
         if( GeneralUtils.isValidPositiveNumberInput( input ) ) {
             int value = Integer.valueOf( input );
             if( value <= 100 ) {
@@ -216,8 +214,8 @@ public class GeneralUtils {
      * <p>
      * @return time as hours, minutes and seconds
      */
-    public static ArrayList<Integer> getTime( long timeInMillis ) {
-        ArrayList<Integer> timeList = new ArrayList<>();
+    public static List<Integer> getTime( final long timeInMillis ) {
+        List<Integer> timeList = new ArrayList<>( 3 );
         int remdr = (int) (timeInMillis % (24L * 60 * 60 * 1000));
 
         final int hours = remdr / (60 * 60 * 1000);
@@ -239,8 +237,7 @@ public class GeneralUtils {
 
     /**
      * Generates a string, which concatenates the list of strings for user
-     * friendly
-     * displaying in the gui with an " and ".
+     * friendly displaying in the gui with an " and ".
      * <p>
      * @param strings   the list of strings, which should be concatenated
      * @param maxLength maximum length of the string to return or 0, if no
@@ -250,7 +247,7 @@ public class GeneralUtils {
      *         string is too long it is cut at the maxLength position and "..." is
      *         appended.
      */
-    public static String generateConcatenatedString( List<String> strings, int maxLength ) {
+    public static String generateConcatenatedString( final List<String> strings, final int maxLength ) {
         String concatString = implode( " and ", strings.toArray() );
         if( maxLength > 0 && concatString.length() > maxLength ) {
             concatString = concatString.substring( 0, maxLength ).concat( "..." );
@@ -296,21 +293,21 @@ public class GeneralUtils {
      * <p>
      * @return String
      */
-    public static String implode( String delim, Object[] array ) {
-        String asImplodedString;
+    public static String implode( final String delim, final Object[] array ) {
+
         if( array.length == 0 ) {
-            asImplodedString = "";
+            return "";
         }
         else {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder( array.length * 20 );
             sb.append( array[0] );
-            for( int i = 1; i < array.length; i++ ) {
+            for( Object obj : array ) {
                 sb.append( delim );
-                sb.append( array[i] );
+                sb.append( obj );
             }
-            asImplodedString = sb.toString();
+            return sb.toString();
         }
-        return asImplodedString;
+
     }
 
 
@@ -323,27 +320,26 @@ public class GeneralUtils {
      * <p>
      * @return String
      */
-    public static String implodeMap( String valueDelim, String entryDelim, Map<?, ?> map ) {
-        String asImplodedString;
+    public static String implodeMap( final String valueDelim, final String entryDelim, final Map<?, ?> map ) {
+
         if( (map == null) || (map.isEmpty()) ) {
-            asImplodedString = "";
+            return "";
         }
         else {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder( map.size() * 30 );
             Boolean firstLine = true;
-            for( Iterator<?> it = map.entrySet().iterator(); it.hasNext(); ) {
+            for( Map.Entry<?,?> line : map.entrySet() ) {
                 if( !firstLine ) {
                     sb.append( entryDelim );
                 }
-                Map.Entry<?, ?> line = (Map.Entry) it.next();
                 sb.append( line.getKey() );
                 sb.append( valueDelim );
                 sb.append( line.getValue() );
                 firstLine = false;
             }
-            asImplodedString = sb.toString();
+            return sb.toString();
         }
-        return asImplodedString;
+
     }
 
 
@@ -424,9 +420,8 @@ public class GeneralUtils {
      */
     public static String enshortenReadName( String readName ) {
         String shortReadName = readName;
-        String[] nameArray;
         if( readName.startsWith( "@" ) ) {
-            nameArray = readName.split( ":" );
+            String[] nameArray = readName.split( ":" );
             if( nameArray.length == 5 ) {
                 shortReadName = nameArray[2] + nameArray[3] + nameArray[4];
                 if( shortReadName.contains( "#" ) ) {
@@ -473,28 +468,24 @@ public class GeneralUtils {
      * @return The splitted read name array
      */
     public static String[] splitReadName( String readName, NameStyle specialStyle ) {
-        String[] nameArray;
+
         if( specialStyle == NameStyle.STYLE_ILLUMINA ) {
-            nameArray = readName.split( ":|#" );
+            return readName.split( ":|#" );
         }
         else {
             int length = readName.length() / 5 + 1;
-            nameArray = new String[length];
-            int index;
-            int end;
+            String[] nameArray = new String[length];
             for( int i = 0; i < length; i++ ) {
-                index = i * 5;
-                end = index + 5;
-                if( end < readName.length() ) {
+                int index = i * 5;
+                int end = index + 5;
+                if( end < readName.length() )
                     nameArray[i] = readName.substring( index, end );
-                }
-                else {
+                else
                     nameArray[i] = readName.substring( index, readName.length() );
-                }
             }
+            return nameArray;
         }
 
-        return nameArray;
     }
 
 //    /**
@@ -550,9 +541,5 @@ public class GeneralUtils {
 //        String[] splittedName = GeneralUtils.splitReadName(readName, style);
 //        GeneralUtils.generateStringMap(map, splittedName, valueToStore);
 //    }
-
-    private GeneralUtils() {
-    }
-
 
 }
