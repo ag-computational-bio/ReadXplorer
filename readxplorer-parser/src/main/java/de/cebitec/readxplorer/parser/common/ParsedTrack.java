@@ -36,7 +36,7 @@ public class ParsedTrack {
 
     private final TrackJob trackJob;
     private Map<String, Integer> readNameToSeqIDMap1;
-    private Map<String, Integer> readNameToSeqIDMap2;
+//    private Map<String, Integer> readNameToSeqIDMap2;
     private boolean isFirstTrack;
     private int batchPos;
     /**
@@ -54,7 +54,7 @@ public class ParsedTrack {
     public ParsedTrack( TrackJob trackJob ) {
         this.trackJob = trackJob;
         this.readNameToSeqIDMap1 = new HashMap<>();
-        this.readNameToSeqIDMap2 = new HashMap<>();
+//        this.readNameToSeqIDMap2 = new HashMap<>();
     }
 
 
@@ -135,7 +135,7 @@ public class ParsedTrack {
      *                   pair
      */
     public void setReadnameToSeqIdMap2( HashMap<String, Integer> seqToIdMap ) {
-        this.readNameToSeqIDMap2 = seqToIdMap;
+//        this.readNameToSeqIDMap2 = seqToIdMap;
     }
 
 
