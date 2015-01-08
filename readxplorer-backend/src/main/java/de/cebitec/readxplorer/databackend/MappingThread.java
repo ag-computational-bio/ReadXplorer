@@ -49,7 +49,7 @@ import java.util.logging.Logger;
  */
 public class MappingThread extends RequestThread {
 
-//    public static int FIXED_INTERVAL_LENGTH = 1000;
+    public static int FIXED_INTERVAL_LENGTH = 1000;
     private final List<PersistentTrack> tracks;
     ConcurrentLinkedQueue<IntervalRequest> requestQueue;
     private List<Mapping> currentMappings;

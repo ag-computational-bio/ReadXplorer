@@ -176,6 +176,7 @@ public class SamBamFileReader implements Observable {
 
             SAMRecordIterator samRecordIterator = samFileReader.query( reference.getChromosome(
                     request.getChromId() ).getName(), request.getTotalFrom(), request.getTotalTo(), false );
+            String refSubSeq;
             int id = 0;
 //            int numReplicates = 1;
 
@@ -205,7 +206,6 @@ public class SamBamFileReader implements Observable {
 
                             //find check alignment via cigar string and add diffs to mapping
                             String cigar = record.getCigarString();
-                            String refSubSeq;
                             if( cigar.contains( "M" ) ) { //TODO: check if this check is faster or the version in other methods here
                                 refSubSeq = reference.getChromSequence( request.getChromId(), start, stop );
                             }
@@ -504,7 +504,7 @@ public class SamBamFileReader implements Observable {
      */
     public CoverageAndDiffResult getCoverageAndReadStartsFromBam( IntervalRequest request ) {
 
-//        byte trackNeeded = request.getWhichTrackNeeded();
+        byte trackNeeded = request.getWhichTrackNeeded();
         int from = request.getTotalFrom();
         int to = request.getTotalTo();
         ParametersReadClasses readClassParams = request.getReadClassParams();
@@ -740,12 +740,12 @@ public class SamBamFileReader implements Observable {
                             this.addDiff( mapping, diffs, d );
                         }
                     }
-                    refPos  += currentCount;
+                    refPos += currentCount;
                     readPos += currentCount;
                     break;
                 case "=":
                     //only increase position for matches
-                    refPos  += currentCount;
+                    refPos += currentCount;
                     readPos += currentCount;
                     break;
                 case "X":
@@ -761,7 +761,7 @@ public class SamBamFileReader implements Observable {
                         this.addDiff( mapping, diffs, d );
 
                     }
-                    refPos  += currentCount;
+                    refPos += currentCount;
                     readPos += currentCount;
                     break;
                 case "D":
