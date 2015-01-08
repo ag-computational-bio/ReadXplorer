@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package bio.comp.jlu.readxplorer.cli;
+package bio.comp.jlu.readxplorer.cli.imports;
 
 
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
@@ -68,18 +68,18 @@ import org.openide.util.NbBundle;
  *
  * @author Oliver Schwengers <oschweng@cebitec.uni-bielefeld.de>
  */
-public final class ImportReferenceArgsProcessor implements ArgsProcessor {
+public final class ImportTrackArgsProcessor implements ArgsProcessor {
 
-    private static final Logger LOG = Logger.getLogger( ImportReferenceArgsProcessor.class.getName() );
+    private static final Logger LOG = Logger.getLogger( ImportTrackArgsProcessor.class.getName() );
 
 
     @Arg( shortName = 'v', longName = "verbose" )
     @Description( displayName = "Verbose", shortDescription = "The H2 database file which should be connected to." )
     public boolean verboseArg;
 
-    @Arg( shortName = 'r', longName = "ref-import" )
-    @Description( displayName = "Reference Import", shortDescription = "Import a reference genome." )
-    public boolean importRefArg;
+    @Arg( shortName = 't', longName = "track-import" )
+    @Description( displayName = "Track Import", shortDescription = "Import a track." )
+    public boolean importTrackArg;
 
     @Arg( shortName = 'd', longName = "db" )
     @Description( displayName = "Database", shortDescription = "The H2 database file which should be connected to." )

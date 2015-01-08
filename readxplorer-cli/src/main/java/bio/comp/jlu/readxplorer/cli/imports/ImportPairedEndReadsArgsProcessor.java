@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package bio.comp.jlu.readxplorer.cli;
+package bio.comp.jlu.readxplorer.cli.imports;
 
 
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
