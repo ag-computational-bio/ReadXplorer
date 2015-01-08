@@ -22,8 +22,8 @@ import de.cebitec.readxplorer.parser.common.ParsingException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.table.DefaultTableModel;
 import org.openide.util.Exceptions;
 
@@ -36,8 +36,8 @@ public class XlsTranscriptomeTableParser extends XlsTableParser {
 
     private TableType tableType;
     private DefaultTableModel model;
-    private HashMap<String, String> secondSheetMap;
-    private HashMap<String, String> secondSheetMapThirdCol;
+    private Map<String, String> secondSheetMap;
+    private Map<String, String> secondSheetMapThirdCol;
 
 
     /**
@@ -79,14 +79,13 @@ public class XlsTranscriptomeTableParser extends XlsTableParser {
             ExcelToTable exlToTable = null;
             try {
                 exlToTable = new ExcelToTable( fileToRead );
+                this.model = exlToTable.dataToDataTableImport();
+                this.secondSheetMap = exlToTable.getSecondSheetData();
+                this.secondSheetMapThirdCol = exlToTable.getSecondSheetDataThirdColumn();
             }
             catch( IOException ex ) {
                 Exceptions.printStackTrace( ex );
             }
-
-            this.model = exlToTable.dataToDataTableImport();
-            this.secondSheetMap = exlToTable.getSecondSheetData();
-            this.secondSheetMapThirdCol = exlToTable.getSecondSheetDataThirdColumn();
 
         }
         else {
@@ -102,12 +101,12 @@ public class XlsTranscriptomeTableParser extends XlsTableParser {
     }
 
 
-    public HashMap<String, String> getSecondSheetMap() {
+    public Map<String, String> getSecondSheetMap() {
         return secondSheetMap;
     }
 
 
-    public HashMap<String, String> getSecondSheetMapThirdCol() {
+    public Map<String, String> getSecondSheetMapThirdCol() {
         return secondSheetMapThirdCol;
     }
 

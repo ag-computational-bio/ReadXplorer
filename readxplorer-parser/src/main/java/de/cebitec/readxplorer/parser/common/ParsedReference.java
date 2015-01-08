@@ -35,7 +35,7 @@ import java.util.List;
  */
 public class ParsedReference {
 
-    public static String FINISHED = "ParsingFinished";
+//    public static String FINISHED = "ParsingFinished";
 
     private final List<ParsedChromosome> chromosomes;
     private String description;

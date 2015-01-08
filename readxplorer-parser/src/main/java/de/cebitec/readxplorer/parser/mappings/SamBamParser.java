@@ -154,12 +154,12 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
      * @param trackJob       the track job to parse
      * @param chromLengthMap the map of chromosome names to chromosome sequence
      * <p>
-     * @return a direct access data container constisting of:
+     * @return a direct access data container consisting of:
      *         a classification map: The key is the readname and each name
      *         links to a pair consisting of the number of occurrences of the read name
      *         in the dataset (no mappings) and the lowest diff rate among all hits.
      *         Remember that replicates are not needed, they can be deduced from the
-     *         reads querried from an interval!
+     *         reads queried from an interval!
      * <p>
      * @throws ParsingException
      * @throws OutOfMemoryError
@@ -167,8 +167,8 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
     @Override
     public Boolean parseInput( final TrackJob trackJob, final Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError {
 
-        //new algorithm:
-       /* 1. sort by read name
+        /* New Algorithm:
+         * 1. sort by read name
          * 2. iterate all mappings, store record data including diffs for all with same read name
          * 3. when read name finished: add mappings to bam writer with classification
          * 4. CommonsMappingParser.addClassificationData(record, differences, classificationMap);

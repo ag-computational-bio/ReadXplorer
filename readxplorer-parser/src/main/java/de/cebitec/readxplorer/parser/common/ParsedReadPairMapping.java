@@ -22,9 +22,9 @@ import de.cebitec.readxplorer.utils.ReadPairType;
 
 
 /**
- * Container for a parsed sequence pair mapping. The seqPairID allows for
- * identifying
- * all other mappings of this sequence pair.
+ * Container for a parsed sequence pair mapping.
+ * The seqPairID allows for identifying all other
+ * mappings of this sequence pair.
  * <p>
  * @author Rolf Hilker
  */

@@ -53,9 +53,9 @@ public class CsvTableParser implements CsvParserI {
     private boolean autoDelimiter;
     private CsvPreference csvPref;
     //different CellProcessors for different tables
-    public static final CellProcessor[] DEFAULT_TABLE_PROCESSOR = new CellProcessor[0];
-    public static final CellProcessor[] POS_TABLE_PROCESSOR = new CellProcessor[]{ new ParseInt() };
-    public static CellProcessor[] TABLE_PROCESSOR;
+    private static final CellProcessor[] DEFAULT_TABLE_PROCESSOR = new CellProcessor[0];
+    private static final CellProcessor[] POS_TABLE_PROCESSOR = new CellProcessor[]{ new ParseInt() };
+//    private static CellProcessor[] TABLE_PROCESSOR;
     private TableType tableModel;
 
 
@@ -245,7 +245,7 @@ public class CsvTableParser implements CsvParserI {
 
     @Override
     public void setCellProscessors( CellProcessor[] cellProcessors ) {
-        CsvTableParser.TABLE_PROCESSOR = cellProcessors;
+//        CsvTableParser.TABLE_PROCESSOR = cellProcessors;
     }
 
 

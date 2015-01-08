@@ -37,7 +37,7 @@ public class ParsedReadPairContainer {
     private int trackId1;
     private int trackId2;
     private String description;
-    private final HashMap<Pair<Long, Long>, ParsedReadPairMapping> parsedReadPairs;
+    private final Map<Pair<Long, Long>, ParsedReadPairMapping> parsedReadPairs;
     private final List<Pair<Long, Long>> mappingToPairIDList;
     private final StatsContainer statsContainer;
 
@@ -98,7 +98,7 @@ public class ParsedReadPairContainer {
     }
 
 
-    public HashMap<Pair<Long, Long>, ParsedReadPairMapping> getParsedReadPairs() {
+    public Map<Pair<Long, Long>, ParsedReadPairMapping> getParsedReadPairs() {
         return parsedReadPairs;
     }
 

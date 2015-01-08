@@ -59,11 +59,6 @@ public final class CommonsMappingParser {
     public static final String cigarRegex = "[MIDNSPXH=]+";
 
 
-    private CommonsMappingParser() {
-
-    }
-
-
     /**
      * Counts the differences to the reference sequence for a cigar string and
      * the belonging read sequence. If the operation "M" is not used in the
@@ -99,23 +94,23 @@ public final class CommonsMappingParser {
                     //check, count and add diffs for deviating Ms
                     String bases = readSeq.substring( readPos, readPos + currentCount ).toUpperCase();//bases of the read interval under investigation
                     String refBases = refSeq.substring( refPos, refPos + currentCount );//bases of the reference corresponding to the read interval under investigation
-                    for( int j = 0; j < bases.length(); ++j ) {
+                    for( int j = 0; j < bases.length(); j++ ) {
                         if( bases.charAt( j ) != refBases.charAt( j ) ) {
-                            ++differences;
+                            differences++;
                         }
                     }
-                    refPos += currentCount;
+                    refPos  += currentCount;
                     readPos += currentCount;
                     break;
                 case "=":
                     //increase position for matches, skipped regions (N) and padded regions (P)
-                    refPos += currentCount;
+                    refPos  += currentCount;
                     readPos += currentCount;
                     break;
                 case "X":
                     //count and create diffs for mismatches
                     differences += currentCount;
-                    refPos += currentCount;
+                    refPos  += currentCount;
                     readPos += currentCount;
                     break;
                 case "D":
@@ -143,6 +138,7 @@ public final class CommonsMappingParser {
         }
 
         return differences;
+
     }
 
 
@@ -170,7 +166,6 @@ public final class CommonsMappingParser {
      */
     public static DiffAndGapResult createDiffsAndGaps( final String cigar, final String readSeq, final String refSeq, final boolean isRevStrand, final int start ) throws NumberFormatException {
 
-
         final String[] num = cigar.split( cigarRegex );
         final String[] charCigar = cigar.split( "\\d+" );
         final List<ParsedDiff> diffs = new ArrayList<>();
@@ -188,41 +183,41 @@ public final class CommonsMappingParser {
                     //check, count and add diffs for deviating Ms
                     String bases = readSeq.substring( readPos, readPos + currentCount ).toUpperCase();//bases of the read interval under investigation
                     String refBases = refSeq.substring( refPos, refPos + currentCount ); //bases of the reference belonging to the read interval under investigation
-                    for( int j = 0; j < bases.length(); ++j ) {
+                    for( int j = 0; j < bases.length(); j++ ) {
                         char base = bases.charAt( j );
                         if( base != refBases.charAt( j ) ) {
-                            ++differences;
+                            differences++;
                             if( isRevStrand ) {
                                 base = SequenceUtils.getDnaComplement( base );
                             }
                             diffs.add( new ParsedDiff( refPos + j + start, base ) );
                         }
                     }
-                    refPos += currentCount;
+                    refPos  += currentCount;
                     readPos += currentCount;
                     break;
                 case "=":
                     //only increase position for matches
-                    refPos += currentCount;
+                    refPos  += currentCount;
                     readPos += currentCount;
                     break;
                 case "X":
                     //count and create diffs for mismatches
                     differences += currentCount;
-                    for( int j = 0; j < currentCount; ++j ) {
+                    for( int j = 0; j < currentCount; j++ ) {
                         char base = readSeq.charAt( readPos + j );
                         if( isRevStrand ) {
                             base = SequenceUtils.getDnaComplement( base );
                         }
                         diffs.add( new ParsedDiff( refPos + j + start, base ) );
                     }
-                    refPos += currentCount;
+                    refPos  += currentCount;
                     readPos += currentCount;
                     break;
                 case "D":
                     // count and add diff gaps for deletions in read
                     differences += currentCount;
-                    for( int j = 0; j < currentCount; ++j ) {
+                    for( int j = 0; j < currentCount; j++ ) {
                         diffs.add( new ParsedDiff( refPos + j + start, '_' ) );
                     }
                     refPos += currentCount;
@@ -231,7 +226,7 @@ public final class CommonsMappingParser {
                 case "I":
                     // count and add reference gaps for insertions
                     differences += currentCount;
-                    for( int j = 0; j < currentCount; ++j ) {
+                    for( int j = 0; j < currentCount; j++ ) {
                         char base = readSeq.charAt( readPos + j );
                         if( isRevStrand ) {
                             base = SequenceUtils.getDnaComplement( base );
@@ -256,6 +251,7 @@ public final class CommonsMappingParser {
         }
 
         return new DiffAndGapResult( diffs, gaps, differences );
+
     }
 
 
@@ -277,8 +273,8 @@ public final class CommonsMappingParser {
         final Map<Integer, Integer> gapOrderIndex = new HashMap<>();
         final List<ParsedDiff> diffs = new ArrayList<>();
         final List<ParsedReferenceGap> gaps = new ArrayList<>();
+        refSeq  = refSeq.toUpperCase();
         readSeq = readSeq.toUpperCase();
-        refSeq = refSeq.toUpperCase();
 
         int errors = 0;
         for( int i = 0; i < readSeq.length(); i++ ) {
@@ -303,11 +299,12 @@ public final class CommonsMappingParser {
                 }
             }
             else {
-                ++start;
+                start++;
             }
         }
 
         return new DiffAndGapResult( diffs, gaps, errors );
+
     }
 
 
@@ -325,6 +322,7 @@ public final class CommonsMappingParser {
      * @return the new gap order index for the gap (starting with 0)
      */
     public static int getOrderForGap( int gapPos, Map<Integer, Integer> gapOrderIndex ) {
+
         if( !gapOrderIndex.containsKey( gapPos ) ) {
             gapOrderIndex.put( gapPos, 0 );
         }
@@ -334,6 +332,7 @@ public final class CommonsMappingParser {
         gapOrderIndex.put( gapPos, order + 1 );
 
         return order;
+
     }
 
 
@@ -353,6 +352,7 @@ public final class CommonsMappingParser {
      *         XXXTODO:CHeck this
      */
     public static String[] createMappingOfRefAndRead( String cigar, String refSeq, String readSeq ) {
+
         String newRefSeqwithGaps = null;
         String newreadSeq = null;
 
@@ -380,9 +380,9 @@ public final class CommonsMappingParser {
                         else {
                             readSeq = readSeq.substring( 0, readPos ).concat( "_" );
                         }
-                        --numberofDeletion;
+                        numberofDeletion--;
                         newreadSeq = readSeq;
-                        ++readPos;
+                        readPos++;
                         //     Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read "+newreadSeq+" refseq "+ refSeq + "cigar" + cigar);
                     }
                     break;
@@ -399,8 +399,8 @@ public final class CommonsMappingParser {
                             refSeq = refSeq.substring( 0, refpos ).concat( "_" );
                         }
                         newRefSeqwithGaps = refSeq;
-                        --numberOfInsertions;
-                        ++refpos;
+                        numberOfInsertions--;
+                        refpos++;
 
                         //   Logger.getLogger(this.getClass().getName()).log(Level.INFO, "read "+newreadSeq+" refseq "+ refSeq);
                     }
@@ -410,7 +410,7 @@ public final class CommonsMappingParser {
                 case "X":
                     //for match/mismatch thr positions just move forward
                     readPos += Integer.parseInt( numOfBases );
-                    refpos += Integer.parseInt( numOfBases );
+                    refpos  += Integer.parseInt( numOfBases );
                     newRefSeqwithGaps = refSeq;
                     newreadSeq = readSeq;
                     break;
@@ -435,6 +435,7 @@ public final class CommonsMappingParser {
         refAndRead[0] = newRefSeqwithGaps;
         refAndRead[1] = newreadSeq;
         return refAndRead;
+
     }
 
 
@@ -479,6 +480,7 @@ public final class CommonsMappingParser {
         }
 
         return isConsistent;
+
     }
 
 
@@ -502,6 +504,7 @@ public final class CommonsMappingParser {
      * @return true, if the read is consistent, false otherwise
      */
     public static boolean checkReadSam(
+
             final MessageSenderI parent,
             final String readSeq,
             final int refSeqLength,
@@ -519,6 +522,7 @@ public final class CommonsMappingParser {
         }
 
         return isConsistent;
+
     }
 
 
@@ -547,6 +551,7 @@ public final class CommonsMappingParser {
      * @return true, if the read is consistent, false otherwise
      */
     public static boolean checkReadJok(
+
             final MessageSenderI parent,
             final String readSeq,
             final String readname,
@@ -577,6 +582,7 @@ public final class CommonsMappingParser {
         }
 
         return isConsistent;
+
     }
 
 
@@ -625,16 +631,15 @@ public final class CommonsMappingParser {
      * @return The read name without its pair tag
      */
     public static String getReadNameWithoutPairTag( final String readNameFull ) {
-        String readName;
+
         String[] nameParts = readNameFull.split( " " );
         if( nameParts.length == 2 && (nameParts[1].startsWith( "1" ) || nameParts[1].startsWith( "2" )) ) {
-            readName = nameParts[0];
+            return nameParts[0];
         }
         else {
-            readName = readNameFull.substring( 0, readNameFull.length() - 2 );
+            return readNameFull.substring( 0, readNameFull.length() - 2 );
         }
 
-        return readName;
     }
 
 
@@ -663,14 +668,12 @@ public final class CommonsMappingParser {
             if( prevLastChar == Properties.EXT_SEPARATOR ) {
                 if( lastChar == Properties.EXT_A1 || lastChar == Properties.EXT_B1 ) {
                     pairTag = Properties.EXT_A1;
-
                 }
                 else if( lastChar == Properties.EXT_A2 || lastChar == Properties.EXT_B2 ) {
                     pairTag = Properties.EXT_A2;
                 }
             }
             else {
-
                 //check for casava > 1.8 paired read
                 String[] nameParts = readName.split( " " );
                 if( nameParts.length == 2 ) {
@@ -689,6 +692,7 @@ public final class CommonsMappingParser {
             pairTag = record.getFirstOfPairFlag() ? Properties.EXT_A1 : Properties.EXT_A2;
         }
         return pairTag;
+
     }
 
 
@@ -701,9 +705,11 @@ public final class CommonsMappingParser {
      * @return true, if the read is in the casava format > 1.8, false otherwise
      */
     public static boolean isCasavaLarger1Dot8Format( final String readName ) {
+
         String[] nameParts = readName.split( " " );
-        return nameParts.length == 2 && (nameParts[1].startsWith( Properties.EXT_A1_STRING )
-                                         || nameParts[1].startsWith( Properties.EXT_A2_STRING ));
+        return nameParts.length == 2  &&  (nameParts[1].startsWith( Properties.EXT_A1_STRING )
+                                      ||  nameParts[1].startsWith( Properties.EXT_A2_STRING ));
+
     }
 
 
@@ -722,12 +728,15 @@ public final class CommonsMappingParser {
 
         String readName = record.getReadName();
         final char pairTag = readName.charAt( readName.length() - 1 );
-        if( record.getReadPairedFlag() && pairTag != Properties.EXT_A1 && pairTag != Properties.EXT_B1
-            && pairTag != Properties.EXT_A2 && pairTag != Properties.EXT_B2
-            && !isCasavaLarger1Dot8Format( readName ) ) {
+        if( record.getReadPairedFlag()  &&  pairTag != Properties.EXT_A1
+            &&  pairTag != Properties.EXT_B1
+            &&  pairTag != Properties.EXT_A2
+            &&  pairTag != Properties.EXT_B2
+            &&  !isCasavaLarger1Dot8Format( readName ) ) {
             readName += "/" + (record.getFirstOfPairFlag() ? Properties.EXT_A1 : Properties.EXT_A2);
         }
         return readName;
+
     }
 
 
@@ -742,11 +751,13 @@ public final class CommonsMappingParser {
      *                  to the read name.
      */
     public static void checkOrAddPairTag( final SAMRecord record, final boolean isFstFile ) {
+
         char pairTag = CommonsMappingParser.getReadPairTag( record );
         if( pairTag == Properties.EXT_UNDEFINED ) {
             String pairEnding = "/" + (isFstFile ? Properties.EXT_A1 : Properties.EXT_A2);
             record.setReadName( record.getReadName().concat( pairEnding ) );
         }
+
     }
 
 
@@ -760,15 +771,17 @@ public final class CommonsMappingParser {
      * @return
      */
     public static boolean isMappedSequence( final int flag, final int startPosition ) {
-        boolean isMapped = true;
+
         if( flag >= 4 ) {
             String binaryValue = Integer.toBinaryString( flag );
             int binaryLength = binaryValue.length();
             String b = binaryValue.substring( binaryLength - 3, binaryLength - 2 );
-
-            isMapped = !b.equals( "1" ) && startPosition != 0;
+            return !b.equals( "1" ) && startPosition != 0;
         }
-        return isMapped;
+        else {
+            return true;
+        }
+
     }
 
 
@@ -831,6 +844,7 @@ public final class CommonsMappingParser {
             }
             record.setAttribute( Properties.TAG_MAP_COUNT, classification.getNumberOccurrences() );
         }
+
     }
 
 
@@ -858,6 +872,7 @@ public final class CommonsMappingParser {
 
         //reset data structures for next read name
         diffMap.clear();
+
     }
 
 
@@ -885,6 +900,7 @@ public final class CommonsMappingParser {
      */
     public static boolean classifyRead( final SAMRecord record, MessageSenderI messageSender, final Map<String, Integer> chromLengthMap, final String fileName, final int lineNo,
                                        final RefSeqFetcher refSeqFetcher, final Map<SAMRecord, Integer> diffMap, final ParsedClassification classificationData ) {
+
         final String cigar   = record.getCigarString();
         final String readSeq = record.getReadString();
         final int start = record.getAlignmentStart();
@@ -915,6 +931,7 @@ public final class CommonsMappingParser {
             classificationData.updateMismatchCountMap( mismatches );
         }
         return isConsistent;
+
     }
 
 //    /**

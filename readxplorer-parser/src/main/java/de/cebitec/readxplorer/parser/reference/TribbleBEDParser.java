@@ -56,7 +56,7 @@ public class TribbleBEDParser implements ReferenceParserI {
     // name of this parser for use in ComboBoxes
     private static final String parserName = "BED file";
     private static final String fileDescription = "BED file";
-    private final ArrayList<Observer> observers = new ArrayList<>();
+    private final List<Observer> observers = new ArrayList<>();
 
 
     /**

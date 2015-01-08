@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.table.DefaultTableModel;
 import jxl.Cell;
 import jxl.Sheet;
@@ -26,11 +27,11 @@ import jxl.read.biff.BiffException;
  */
 public class ExcelToTable implements ExcelImportDataI {
 
-    private String tableName;
+//    private String tableName;
     private final List<String> columnNames;
     private Object[][] fileContentFirstSheet;
-    private HashMap<String, String> fileContentSecondSheet;
-    private HashMap<String, String> fileContentSecondSheetThirdColumn;
+    private Map<String, String> fileContentSecondSheet;
+    private Map<String, String> fileContentSecondSheetThirdColumn;
 
 
     /**
@@ -57,13 +58,12 @@ public class ExcelToTable implements ExcelImportDataI {
      * @throws IOException
      */
     private void fetchSheetTableAndParameters( File file ) throws IOException {
-        File inputWorkbook = file;
-        Workbook w;
+
         try {
-            w = Workbook.getWorkbook( inputWorkbook );
+            Workbook wb = Workbook.getWorkbook( file );
 
             // Get the first sheet
-            Sheet sheet = w.getSheet( 0 );
+            Sheet sheet = wb.getSheet( 0 );
 
             this.fileContentFirstSheet = new Object[sheet.getRows()][sheet.getColumns()];
 
@@ -85,7 +85,7 @@ public class ExcelToTable implements ExcelImportDataI {
             }
 
             // read second Sheet!
-            sheet = w.getSheet( 1 );
+            sheet = wb.getSheet( 1 );
             //handle.progress("Read first sheed with table content ... ", 9);
             fileContentSecondSheet = new HashMap<>();
             fileContentSecondSheetThirdColumn = new HashMap<>();
@@ -97,7 +97,7 @@ public class ExcelToTable implements ExcelImportDataI {
                 fileContentSecondSheetThirdColumn.put( cellX.getContents(), cellZ.getContents() );
             }
 
-            w.close();
+            wb.close();
         }
         catch( BiffException e ) {
         }
@@ -117,12 +117,12 @@ public class ExcelToTable implements ExcelImportDataI {
      *
      * @return HashMap<firstColumn Entry, secondColumn Entry>
      */
-    public HashMap<String, String> getSecondSheetData() {
+    public Map<String, String> getSecondSheetData() {
         return this.fileContentSecondSheet;
     }
 
 
-    public HashMap<String, String> getSecondSheetDataThirdColumn() {
+    public Map<String, String> getSecondSheetDataThirdColumn() {
         return this.fileContentSecondSheetThirdColumn;
     }
 

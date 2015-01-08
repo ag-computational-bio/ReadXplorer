@@ -26,7 +26,7 @@ import de.cebitec.readxplorer.utils.classification.FeatureType;
  *
  * @author ddoppmeier
  */
-public class FilterRuleTRNA implements FilterRuleI {
+public final class FilterRuleTRNA implements FilterRuleI {
 
     @Override
     public boolean appliesRule( ParsedFeature feature ) {

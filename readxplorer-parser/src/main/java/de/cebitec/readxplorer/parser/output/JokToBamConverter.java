@@ -241,7 +241,8 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
                         }
 
                         // Reads with an error already skip this part because of "continue" statements
-                        if( ++noReads % 500000 == 0 ) {
+                        noReads++;
+                        if( noReads % 500000 == 0 ) {
                             long finish = System.currentTimeMillis();
                             this.notifyObservers( Benchmark.calculateDuration( startTime, finish, lineNo + " reads converted..." ) );
                         }
@@ -315,7 +316,7 @@ public class JokToBamConverter implements ConverterI, Observable, Observer,
                 cigarBuilder.append( counter ).append( this.getCigarOpChar( lastBase ) );
                 counter = 0;
             }
-            ++counter;
+            counter++;
             lastBase = currentBase;
         }
         //append cigar operations for last bases

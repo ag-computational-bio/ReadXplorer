@@ -20,6 +20,7 @@ package de.cebitec.readxplorer.parser.reference.Filter;
 
 import de.cebitec.readxplorer.parser.common.ParsedFeature;
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -29,10 +30,10 @@ import java.util.ArrayList;
 public class FeatureFilter {
 
     // valid feature if one of the whitelist rules is applied
-    private final ArrayList<FilterRuleI> whitelist;
+    private final List<FilterRuleI> whitelist;
     // valid features have to apply all blacklist rules
     // e.g. o FilterRuleCDS added to the blacklist means, that a CDS Type feature is not accepted
-    private final ArrayList<FilterRuleI> blacklist;
+    private final List<FilterRuleI> blacklist;
 
 
     public FeatureFilter() {

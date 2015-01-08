@@ -181,7 +181,8 @@ public class SamBamCombiner implements CombinerI {
                     this.notifyObservers( e.getMessage() );
                 } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored
             }
-            if( ++noReads % 500000 == 0 ) {
+            noReads++;
+            if( noReads % 500000 == 0 ) {
                 long finish = System.currentTimeMillis();
                 this.notifyObservers( Benchmark.calculateDuration( startTime, finish, noReads + " reads converted..." ) );
             }
