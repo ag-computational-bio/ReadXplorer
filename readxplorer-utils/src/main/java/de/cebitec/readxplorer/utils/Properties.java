@@ -188,7 +188,16 @@ public class Properties {
      * The CRAN Mirror used by Gnu R to load missing packages
      */
     public static final String CRAN_MIRROR = "CRAN_MIRROR";
-
+    
+    /**
+     * The RServe host we will connect to for GNU R computations
+     */
+    public static final String RSERVE_HOST = "RSERVE_HOST";
+    /**
+     * The RServe port we will connect to for GNU R computations
+     */
+    public static final String RSERVE_PORT = "RSERVE_PORT";
+    
     public static final String MAPPER_PATH = "MAPPER_PATH";
 
     /**
