@@ -31,7 +31,7 @@ public class AnalysisResult implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private final IntervalRequest request;
+    private IntervalRequest request;
 
 
     /**

@@ -33,7 +33,6 @@ import java.util.logging.Logger;
  */
 public class GenericSQLQueries {
 
-
     private GenericSQLQueries() {
         //not for instantiation
     }
@@ -53,22 +52,21 @@ public class GenericSQLQueries {
      * @return the value calculated for the given sqlStatement
      */
     public static int getIntegerFromDB( String sqlStatement, String identifier, Connection con, long trackID ) {
-
         int num = -1;
         try( PreparedStatement fetch = con.prepareStatement( sqlStatement ) ) {
             fetch.setLong( 1, trackID );
-            try( ResultSet rs = fetch.executeQuery() ) {
-                if( rs.next() ) {
-                    num = rs.getInt( identifier );
-                }
+
+            ResultSet rs = fetch.executeQuery();
+            if( rs.next() ) {
+                num = rs.getInt( identifier );
             }
+            rs.close();
         }
         catch( SQLException ex ) {
             Logger.getLogger( GenericSQLQueries.class.getName() ).log( Level.SEVERE, null, ex );
         }
 
         return num;
-
     }
 
 
@@ -81,26 +79,23 @@ public class GenericSQLQueries {
      * @return the latest id of the querried table increased by one
      */
     public static long getLatestIDFromDB( String sqlStatement, Connection con ) {
-
         long id = 0;
-        try( PreparedStatement latestID = con.prepareStatement( sqlStatement );
-             ResultSet rs = latestID.executeQuery() ) {
+        try( PreparedStatement latestID = con.prepareStatement( sqlStatement ) ) {
 
+            ResultSet rs = latestID.executeQuery();
             if( rs.next() ) {
                 id = rs.getLong( "LATEST_ID" );
             }
+            rs.close();
         }
         catch( SQLException ex ) {
             Logger.getLogger( GenericSQLQueries.class.getName() ).log( Level.SEVERE, null, ex );
         }
-        id++;
-        return id;
-
+        return ++id;
     }
 
 
     public static String generateAddColumnString( String table, String column ) {
-
         return "IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = "
                + table
                + " AND COLUMN_NAME =" + column + ")"
@@ -110,7 +105,6 @@ public class GenericSQLQueries {
                + " ADD COLUMN "
                + column + " BIGINT UNSIGNED "
                + " END";
-
     }
 
 
@@ -124,12 +118,10 @@ public class GenericSQLQueries {
      * @return SQL command
      */
     public static String genAddColumnString( String table, String column, String type ) {
-
         return "ALTER TABLE "
                + table
                + " ADD COLUMN IF NOT EXISTS "
                + column + " " + type;
-
     }
 
 
@@ -142,12 +134,10 @@ public class GenericSQLQueries {
      * @return SQL command
      */
     public static String genRemoveColumnString( String table, String column ) {
-
         return "ALTER TABLE "
                + table
                + " DROP COLUMN IF EXISTS "
                + column;
-        
     }
 
 
