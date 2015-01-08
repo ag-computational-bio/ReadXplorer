@@ -50,7 +50,7 @@ public class FastaReferenceParser implements ReferenceParserI {
     private static final String parsername = "Fasta file";
     private static final String[] fileExtension = new String[]{ "fas", "fasta", "fna", "fa" };
     private static final String fileDescription = "Fasta File";
-    private final ArrayList<Observer> observers = new ArrayList<>();
+    private final List<Observer> observers = new ArrayList<>();
 //    private String errorMsg;
 
 

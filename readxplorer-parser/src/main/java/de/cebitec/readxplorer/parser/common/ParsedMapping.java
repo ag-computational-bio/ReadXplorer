@@ -22,11 +22,11 @@ import java.util.List;
 
 
 /**
- * Container for a parsed mapping. It contains all data a mapping should have.
+ * Container for a parsed mapping.
+ * It contains all data a mapping should have.
  * ID, start, stop (start is always the smaller value), direction (1 for fwd and
- * -1 for rev),
- * errors, diffs, gaps, bestmapping and number of replicates. Also the read
- * sequence can be stored here,
+ * -1 for rev), errors, diffs, gaps, bestmapping and number of replicates.
+ * Also the read sequence can be stored here,
  * but should be removed when not needed anymore.
  *
  * @author ddoppmeier, rhilker
@@ -93,7 +93,7 @@ public class ParsedMapping {
 
 
     public void increaseCounter() {
-        ++numOfReplicates;
+        numOfReplicates++;
     }
 
 

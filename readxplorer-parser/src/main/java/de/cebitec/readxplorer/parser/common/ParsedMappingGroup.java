@@ -25,14 +25,13 @@ import java.util.List;
 
 /**
  * The dna sequence of all parsed mappings in this group is always identical,
- * but
- * positions and direction deviate.
+ * but positions and direction deviate.
  * <p>
  * @author ddoppmeier
  */
 public class ParsedMappingGroup {
 
-    private final ArrayList<ParsedMapping> mappings;
+    private final List<ParsedMapping> mappings;
     private int minError;
     private boolean bestMappingTagged;
 

@@ -95,7 +95,8 @@ public class SamBamSorter implements Observable {
                 while( samItor.hasNext() ) {
                     try {
                         writer.addAlignment( samItor.next() );
-                        if( ++lineNo % 500000 == 0 ) {
+                        lineNo++;
+                        if( lineNo % 500000 == 0 ) {
                             long finish = System.currentTimeMillis();
                             this.notifyObservers( Benchmark.calculateDuration( start, finish, lineNo + " mappings processed in " ) );
                         }

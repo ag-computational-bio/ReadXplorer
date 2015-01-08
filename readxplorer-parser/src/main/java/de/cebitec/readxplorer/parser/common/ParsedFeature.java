@@ -245,7 +245,7 @@ public class ParsedFeature extends Node implements Comparable<ParsedFeature> {
     public String getParentIdsConcat() {
         StringBuilder builder = new StringBuilder( 20 );
         for( String parentId : parentIds ) {
-            builder.append( parentId ).append( ";" );
+            builder.append( parentId ).append( ';' );
         }
         return builder.length() > 0 ? builder.substring( 0, builder.length() - 1 ) : Properties.NO_PARENT_STRING;
     }

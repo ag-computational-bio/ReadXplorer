@@ -68,8 +68,7 @@ public class XlsTableParser implements TableParserI {
         try {
             WorkbookSettings wbSettings = new WorkbookSettings();
             wbSettings.setLocale( new Locale( "en", "EN" ) );
-            Workbook workbook;
-            workbook = Workbook.getWorkbook( fileToRead );
+            Workbook workbook = Workbook.getWorkbook( fileToRead );
             boolean fstSheet = true;
             String headerStartFstSheet = "";
             for( Sheet sheet : workbook.getSheets() ) { //TODO: filter stats and parametersheet

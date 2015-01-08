@@ -32,7 +32,7 @@ import java.util.Map;
  */
 public class ParsedChromosome {
 
-    public static String FINISHED = "ParsingFinished";
+//    public static String FINISHED = "ParsingFinished";
     private List<ParsedFeature> features;
     private List<ParsedFeature> finalFeatures;
     private Map<String, Integer> featureIdMap;

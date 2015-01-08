@@ -94,7 +94,7 @@ public class BioJavaParser implements ReferenceParserI, MessageSenderI {
     private final String parserName;
     private final String fileDescription;
     private final RichSequenceFormat seqFormat;
-    private final ArrayList<Observer> observers = new ArrayList<>();
+    private final List<Observer> observers = new ArrayList<>();
     private final ErrorLimit errorLimit;
 
 

@@ -62,7 +62,7 @@ public class BioJavaGff3Parser implements ReferenceParserI {
     private static final String parserName = "GFF3 file";
     private static final String fileDescription = "GFF3 file";
     private static final String UNKNOWN_LOCUS_TAG = "unknown locus tag";
-    private final ArrayList<Observer> observers = new ArrayList<>();
+    private final List<Observer> observers = new ArrayList<>();
 
 
     /**

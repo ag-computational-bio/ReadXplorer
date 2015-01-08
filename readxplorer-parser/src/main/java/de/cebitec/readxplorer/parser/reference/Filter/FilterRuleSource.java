@@ -28,7 +28,7 @@ import de.cebitec.readxplorer.utils.classification.FeatureType;
  * This filter rule returns true for features of the sequence type
  * FeatureType.SOURCE.
  */
-public class FilterRuleSource implements FilterRuleI {
+public final class FilterRuleSource implements FilterRuleI {
 
     @Override
     public boolean appliesRule( ParsedFeature feature ) {

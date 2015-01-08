@@ -26,7 +26,7 @@ import de.cebitec.readxplorer.utils.classification.FeatureType;
  *
  * @author ddoppmeier
  */
-public class FilterRuleCDS implements FilterRuleI {
+public final class FilterRuleCDS implements FilterRuleI {
 
     @Override
     public boolean appliesRule( ParsedFeature feature ) {

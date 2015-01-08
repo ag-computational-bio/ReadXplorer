@@ -40,26 +40,29 @@ public class OutputWriter {
      */
     public static String generateFasta( String sequence, String... headerParameters ) {
 
-        String header = ">";
+        StringBuilder sb = new StringBuilder( sequence.length() + (sequence.length()/80)*4 + headerParameters.length*50 );
+
+        sb.append( '>' );
         for( int i = 0; i < headerParameters.length; ++i ) {
-            header = header.concat( headerParameters[i] ).concat( " " );
+            sb.append( headerParameters[i] ).append( ' ' );
         }
+        sb.append( "\r\n" );
 
         final int lineLength = 80;
         final int seqLength = sequence.length();
-        String formattedSeq = "";
         int i = 0;
-        int end = 0;
         while( i < seqLength ) {
-            end = i + lineLength;
+            int end = i + lineLength;
 
             if( end > seqLength ) {
                 end = i + (seqLength - i);
             }
-            formattedSeq = formattedSeq.concat( sequence.substring( i, end ).concat( "\r\n" ) );
+            sb.append( sequence.substring( i, end ) ).append( "\r\n" );
             i += lineLength;
         }
-        return header.concat( "\r\n" ).concat( formattedSeq );
+
+        return sb.toString();
+
     }
 
 

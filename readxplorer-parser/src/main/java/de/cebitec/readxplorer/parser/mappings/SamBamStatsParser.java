@@ -124,7 +124,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
             int lineNo = 0;
             while( samItor.hasNext() ) {
                 try {
-                    ++lineNo;
+                    lineNo++;
 
                     final SAMRecord record = samItor.next();
 //                    String readName = record.getReadName();
@@ -169,7 +169,7 @@ public class SamBamStatsParser implements Observable, MessageSenderI {
                             readsDifferentPos.add( start );
                             seqCount = 0;
                         }
-                        ++seqCount;
+                        seqCount++;
                         lastReadSeq = readSeq;
 
                         statsContainer.increaseValue( mappingClass.getTypeString(), mapCount );

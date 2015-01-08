@@ -26,9 +26,8 @@ import java.util.Map;
 
 
 /**
- * Container for all mappings belonging to one track. Contains statistics as
- * well
- * as a all mappings.
+ * Container for all mappings belonging to one track.
+ * Contains statistics as well as a all mappings.
  *
  * @author ddoppmeier, rhilker
  */
@@ -41,7 +40,7 @@ public class ParsedMappingContainer {
     private int numUniqueSeq = 0; //mappingseq only occurs once in data set
     private int numUniqueMappings = 0; //calculate number of unique mappings (map only to one position, but have replicates)
     private int numReads = 0;
-    private final HashMap<Integer, ParsedMappingGroup> mappings;
+    private final Map<Integer, ParsedMappingGroup> mappings;
     private boolean lastMappingContainer = false;
     private boolean firstMappingContainer = false;
     private int sumReadLength;
@@ -60,15 +59,15 @@ public class ParsedMappingContainer {
 
 
     public void addParsedMapping( ParsedMapping mapping, int sequenceID ) {
-        ++this.numOfMappings;
+        this.numOfMappings++;
         if( !this.mappings.containsKey( sequenceID ) ) {
             ParsedMappingGroup mappingGroup = new ParsedMappingGroup();
             mappings.put( sequenceID, mappingGroup );
-            ++this.numUniqueSeq;
+            this.numUniqueSeq++;
         }
         this.mappings.get( sequenceID ).addParsedMapping( mapping );
         if( this.mappings.get( sequenceID ).getMappings().size() == 2 ) {
-            --this.numUniqueSeq;
+            this.numUniqueSeq--;
         }
     }
 
@@ -132,9 +131,9 @@ public class ParsedMappingContainer {
             while( mappingIt.hasNext() ) {
                 ParsedMapping mapping = mappingIt.next();
                 if( mapping.isBestMapping() == true ) {
-                    ++numberOfBM;
+                    numberOfBM++;
                     if( mapping.getErrors() == 0 ) {
-                        ++numberOfPerfect;
+                        numberOfPerfect++;
                     }
                 }
                 numberOfMappings += mapping.getNumReplicates();
