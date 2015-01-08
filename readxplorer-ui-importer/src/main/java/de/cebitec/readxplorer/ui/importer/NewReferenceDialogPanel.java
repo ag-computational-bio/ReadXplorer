@@ -82,7 +82,7 @@ public class NewReferenceDialogPanel extends JPanel implements NewJobDialogI {
      *         data.
      */
     public ReferenceJob getReferenceJob() {
-        return new ReferenceJob( null, refSeqFile, refFeatureFile, currentParser,
+        return new ReferenceJob( 0, refSeqFile, refFeatureFile, currentParser,
                                  descriptionField.getText(), referenceName,
                                  new Timestamp( System.currentTimeMillis() ) );
     }

@@ -23,10 +23,7 @@ package de.cebitec.readxplorer.utils;
  * <p>
  * @author Rolf Hilker
  */
-public class Properties {
-
-    private Properties() {
-    }
+public final class Properties {
 
 
     // different adapter types for a project and or database
@@ -83,7 +80,7 @@ public class Properties {
     /**
      * Value for obtaining read starts instead of coverage (9).
      */
-    public static byte READ_STARTS = 9;
+    public static final byte READ_STARTS = 9;
     /**
      * Value for viewing all mappings as if they came from the fwd. strand
      * (10). This should only be used in combination with {@link STRAND_BOTH}
@@ -91,7 +88,7 @@ public class Properties {
      * or
      * the rev. strand ()
      */
-    public static byte STRAND_FWD_ANALYSIS = 10;
+    public static final byte STRAND_FWD_ANALYSIS = 10;
 
     /**
      * Value for read start distribution = 5.

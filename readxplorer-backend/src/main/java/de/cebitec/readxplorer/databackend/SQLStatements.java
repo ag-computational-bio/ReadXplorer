@@ -71,7 +71,7 @@ public class SQLStatements {
      * Only needed as long as older databases are floating around and did not
      * already drop this index which is not necessary anymore.
      */
-    public static String DROP_INDEX = "DROP INDEX IF EXISTS ";
+    public static final String DROP_INDEX = "DROP INDEX IF EXISTS ";
 
     //////////////////  statements for data insertion  ////////////////////////
 
@@ -257,7 +257,7 @@ public class SQLStatements {
     /**
      * Delete a chromosome from the chromosome table.
      */
-    public static String DELETE_CHROMOSOME
+    public static final String DELETE_CHROMOSOME
             = "DELETE FROM "
               + FieldNames.TABLE_CHROMOSOME
               + " WHERE "
@@ -331,7 +331,7 @@ public class SQLStatements {
     /**
      * Fetch the number of chromosomes for a reference.
      */
-    public static String FETCH_NUMBER_CHROMS_FOR_REF
+    public static final String FETCH_NUMBER_CHROMS_FOR_REF
             = "SELECT "
               + "COUNT(" + FieldNames.TABLE_CHROMOSOME + "." + FieldNames.CHROM_ID + ") as NUM "
               + " FROM "
@@ -521,7 +521,7 @@ public class SQLStatements {
     /**
      * @param trackId track id of one track of a read pair
      */
-    public static String FETCH_READ_PAIR_TO_TRACK_ID
+    public static final String FETCH_READ_PAIR_TO_TRACK_ID
             = "SELECT "
               + FieldNames.TRACK_READ_PAIR_ID + " AS NUM "
               + "FROM "
@@ -535,7 +535,7 @@ public class SQLStatements {
      * @param readPairId read pair id
      * @param trackId    track id of one of the two tracks of the pair
      */
-    public static String FETCH_TRACK_ID_TO_READ_PAIR_ID
+    public static final String FETCH_TRACK_ID_TO_READ_PAIR_ID
             = "SELECT "
               + FieldNames.TRACK_ID + " "
               + "FROM "
@@ -576,7 +576,7 @@ public class SQLStatements {
               + FieldNames.COUNT_DISTRIBUTION_DISTRIBUTION_TYPE + " = ? ";
 
 
-    public static String INIT_FEATURE_PARENT_ID
+    public static final String INIT_FEATURE_PARENT_ID
             = "UPDATE "
               + FieldNames.TABLE_FEATURES
               + " SET "
@@ -594,7 +594,7 @@ public class SQLStatements {
               + " SET NOT NULL";
 
 
-    public static String INIT_FASTAFILE
+    public static final String INIT_FASTAFILE
             = "UPDATE "
               + FieldNames.TABLE_REFERENCE
               + " SET "
