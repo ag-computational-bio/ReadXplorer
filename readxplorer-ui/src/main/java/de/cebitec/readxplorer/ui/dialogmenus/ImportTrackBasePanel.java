@@ -23,16 +23,8 @@ import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.mappings.MappingParserI;
 import de.cebitec.readxplorer.utils.VisualisationUtils;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import net.sf.samtools.SAMFileHeader;
-import net.sf.samtools.SAMFileReader;
-import net.sf.samtools.SAMSequenceDictionary;
-import net.sf.samtools.SAMSequenceRecord;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
-import org.openide.util.NbBundle;
 
 
 /**
@@ -57,54 +49,6 @@ public abstract class ImportTrackBasePanel extends FileSelectionPanel {
      * DB.
      */
     public ImportTrackBasePanel() {
-    }
-
-
-    /**
-     *
-     * Checks a given sam/bam file for the currently selected reference and
-     * displays an error message in case the selected reference does not occur
-     * in the sequence dictionary of the sam/bam file.
-     * <p>
-     * @param samBamFile the sam/bam file to check for the reference
-     * <p>
-     * @deprecated Use this method again, after refining it for single
-     * chromosomes
-     */
-    @Deprecated
-    public void checkSeqDictonary( File samBamFile ) {
-        try( SAMFileReader samReader = new SAMFileReader( samBamFile ) ) {
-            SAMFileHeader header = samReader.getFileHeader();
-            int refIdx = header.getSequenceDictionary().getSequenceIndex( this.getReferenceJob().getName() );
-            if( refIdx != -1 ) {
-                String msg = NbBundle.getMessage( ImportTrackBasePanel.class, "MSG_ErrorReference",
-                                                  this.getReferenceJob().getName(),
-                                                  samBamFile.getAbsolutePath(),
-                                                  this.createRefDictionaryString( header.getSequenceDictionary() ) );
-                NotifyDescriptor nd = new NotifyDescriptor.Message( msg, NotifyDescriptor.ERROR_MESSAGE );
-                nd.setTitle( NbBundle.getMessage( ImportTrackBasePanel.class, "TITLE_ErrorReference" ) );
-                DialogDisplayer.getDefault().notify( nd ); //TODO: add to is required info set!
-            }
-        }
-    }
-
-
-    /**
-     * Creates a concatenated string of all reference names contained in the
-     * given sequence dictionary. All names are separated by a new line (\n).
-     * <p>
-     * @param sequenceDictionary The sequence dictionary whose reference names
-     *                           should be concatenated
-     * <p>
-     * @return The concatenated reference names
-     */
-    private String createRefDictionaryString( SAMSequenceDictionary sequenceDictionary ) {
-        StringBuilder concatenatedDictionary = new StringBuilder( 100 );
-        concatenatedDictionary.append( "\n" );
-        for( SAMSequenceRecord ref : sequenceDictionary.getSequences() ) {
-            concatenatedDictionary.append( ref.getSequenceName() ).append( "\n" );
-        }
-        return concatenatedDictionary.toString();
     }
 
 
