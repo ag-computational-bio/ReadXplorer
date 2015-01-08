@@ -40,14 +40,12 @@ public class GnuR extends RConnection {
      * The Cran Mirror used to receive additional packages.
      */
     private String cranMirror;
-    
-    private static ProcessBuilder pb;
-    private static Process process;
 
     /**
      * Creates a new instance of the class and initiates the cranMirror.
      */
-    public GnuR() throws RserveException {
+    private GnuR(String host, int port) throws RserveException {
+        super(host, port);
         setDefaultCranMirror();
     }
 
@@ -245,8 +243,23 @@ public class GnuR extends RConnection {
         this.eval("dev.off()");
     }
 
-    public static void startRServe() {
-        if (pb == null && process == null) {
+    /**
+     * The next free port that will be used to start a new RServe instance. Per
+     * default RServe starts on port 6311 in order to not interfear with already
+     * running instances we start one port above
+     */
+    private static int nextFreePort = 6312;
+
+    public static GnuR startRServe() throws RserveException {
+        String host = NbPreferences.forModule(Object.class).get(Properties.RSERVE_HOST, "localhost");
+        String portString = NbPreferences.forModule(Object.class).get(Properties.RSERVE_PORT, "");
+        int port;
+
+        //If = In case of a local auto setup
+        //Else = Manuel setup
+        if (host.equals("localhost") && portString.isEmpty()) {
+            ProcessBuilder pb;
+            port = nextFreePort++;
             String bit = System.getProperty("sun.arch.data.model");
             String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
             String user_dir = System.getProperty("netbeans.user");
@@ -265,13 +278,17 @@ public class GnuR extends RConnection {
                 commands.add(startupBat);
                 commands.add(r_dir.getAbsolutePath());
                 commands.add(arch);
+                commands.add(String.valueOf(port));
                 pb = new ProcessBuilder(commands);
                 try {
-                    process = pb.start();
+                    pb.start();
                 } catch (IOException ex) {
                     Exceptions.printStackTrace(ex);
                 }
             }
+        } else {
+            port = Integer.parseInt(portString);
         }
+        return new GnuR(host, port);
     }
 }

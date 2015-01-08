@@ -55,9 +55,8 @@ public class DeSeq {
     public List<ResultDeAnalysis> process( DeSeqAnalysisData analysisData,
                                            int numberOfFeatures, int numberOfTracks, File saveFile)
             throws PackageNotLoadableException, JRILibraryNotInPathException,
-                   IllegalStateException, UnknownGnuRException, RserveException {
-        GnuR.startRServe();
-        gnuR = new GnuR();
+                   IllegalStateException, UnknownGnuRException, RserveException {      
+        gnuR = GnuR.startRServe();
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
         gnuR.loadPackage( "DESeq" );
@@ -270,8 +269,7 @@ public class DeSeq {
      * Releases the Gnu R instance and removes the reference to it.
      */
     public void shutdown() throws RserveException {
-        gnuR.clearGnuR();
-        gnuR.detach();
+        gnuR.shutdown();
     }
 
 

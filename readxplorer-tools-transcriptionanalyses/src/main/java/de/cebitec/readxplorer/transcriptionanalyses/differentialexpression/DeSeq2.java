@@ -50,7 +50,7 @@ public class DeSeq2 {
                                            int numberOfFeatures, int numberOfTracks, File saveFile)
             throws PackageNotLoadableException, JRILibraryNotInPathException,
                    IllegalStateException, UnknownGnuRException, RserveException {
-        gnuR = new GnuR();
+        gnuR = GnuR.startRServe();
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
         gnuR.loadPackage( "DESeq2" );
@@ -141,8 +141,7 @@ public class DeSeq2 {
      * Releases the Gnu R instance and removes the reference to it.
      */
     public void shutdown() throws RserveException {
-        gnuR.clearGnuR();
-        gnuR.detach();
+        gnuR.shutdown();
     }
 
 

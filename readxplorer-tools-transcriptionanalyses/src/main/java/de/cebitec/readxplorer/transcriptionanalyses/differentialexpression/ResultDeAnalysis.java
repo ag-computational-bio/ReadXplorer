@@ -19,8 +19,11 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import org.openide.util.Exceptions;
 import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REXPVector;
 
 
@@ -67,9 +70,9 @@ public class ResultDeAnalysis {
 
 
     public List<List<Object>> getTableContents() {
-//        if( tableContents == null ) {
-//            tableContents = convertRresults( rawTableContents );
-//        }
+        if( tableContents == null ) {
+            tableContents = convertRresults( rawTableContents );
+        }
         return tableContents;
     }
 
@@ -77,7 +80,6 @@ public class ResultDeAnalysis {
     public List<Object> getColnames() {
         if( colNames == null ) {
             colNames = convertNames( rawColNames );
-//            colNames.insertElementAt("Chromosome", 1);
         }
         return colNames;
     }
@@ -104,100 +106,70 @@ public class ResultDeAnalysis {
     private List<Object> convertNames( REXP currentValues ) {
 
         List<Object> current = new ArrayList<>();
-//        switch( currentValues.getType() ) {
-//
-//            case REXP.XT_ARRAY_DOUBLE:
-//                double[] currentDoubleValues = currentValues.asDoubleArray();
-//                for( int j = 0; j < currentDoubleValues.length; j++ ) {
-//                    current.add( currentDoubleValues[j] );
-//                }
-//                break;
-//
-//            case REXP.XT_ARRAY_INT:
-//                int[] currentIntValues = currentValues.asIntArray();
-//                for( int j = 0; j < currentIntValues.length; j++ ) {
-//                    current.add( currentIntValues[j] );
-//                }
-//                break;
-//
-//            case REXP.XT_ARRAY_STR:
-//                String[] currentStringValues = currentValues.asStringArray();
-//                for( String name : currentStringValues ) {
-//                    if( dEAdata.existsPersistentFeatureForGNURName( name ) ) {
-//                        current.add( dEAdata.getPersistentFeatureByGNURName( name ) );
-//                    }
-//                    else {
-//                        current.add( name );
-//                    }
-//                }
-//                break;
-//
-//            case REXP.XT_ARRAY_BOOL_INT:
-//                int[] currentBoolValues = currentValues.asIntArray();
-//                for( int j = 0; j < currentBoolValues.length; j++ ) {
-//                    current.add( currentBoolValues[j] == 1 );
-//                }
-//                break;
-//
-//            case REXP.XT_FACTOR:
-//                RFactor factor = currentValues.asFactor();
-//                for( int j = 0; j < factor.size(); j++ ) {
-//                    String name = factor.at( j );
-//                    if( dEAdata.existsPersistentFeatureForGNURName( name ) ) {
-//                        current.add( dEAdata.getPersistentFeatureByGNURName( name ) );
-//                    }
-//                    else {
-//                        current.add( name );
-//                    }
-//                }
-//                break;
-//
-//        }
-
+        try {
+            if (currentValues.isString()) {
+                String[] currentStringValues = currentValues.asStrings();
+                for (String name : currentStringValues) {
+                    if (dEAdata.existsPersistentFeatureForGNURName(name)) {
+                        current.add(dEAdata.getPersistentFeatureByGNURName(name));
+                    } else {
+                        current.add(name);
+                    }
+                }
+            } else {
+                Object currentValuesAsObject = currentValues.asNativeJavaObject();
+                if(currentValuesAsObject instanceof double[]){
+                    double[] tmp = (double[]) currentValuesAsObject;
+                    for (int i = 0; i < tmp.length; i++) {
+                        current.add(tmp[i]);
+                    }
+                }
+            }
+        } catch (REXPMismatchException ex) {
+            Exceptions.printStackTrace(ex);
+        }
         return current;
 
     }
 
 
-//    /**
-//     * Converts and RVector of data into a Vector of Vectors = table content.
-//     *
-//     * @param currentRVector The RVector to convert
-//     * <p>
-//     * @return A Vector of Vectors = table content, generated from the given
-//     *         RVector.
-//     */
-//    private List<List<Object>> convertRresults( final RVector currentRVector ) {
-//
-//        List<List<Object>> current = new ArrayList<>();
-//        for( int i = 0; i < currentRVector.size(); i++ ) {
-//
-//            List<Object> converted = convertNames( currentRVector.at( i ) );
-//            for( int j = 0; j < converted.size(); j++ ) {
-//
-////                if( j>=current.size() )
-////                    current.add( new ArrayList<>() );
-//                try {
-//                    current.get( j );
-//                }
-//                catch( ArrayIndexOutOfBoundsException e ) {
+    /**
+     * Converts and RVector of data into a Vector of Vectors = table content.
+     *
+     * @param currentRVector The RVector to convert
+     * <p>
+     * @return A Vector of Vectors = table content, generated from the given
+     *         RVector.
+     */
+    private List<List<Object>> convertRresults( final List<REXPVector> currentRVector ) {
+
+        List<List<Object>> current = new ArrayList<>();
+        for (REXPVector currentRVector1 : currentRVector) {
+            List<Object> converted = convertNames(currentRVector1);
+            for( int j = 0; j < converted.size(); j++ ) {
+
+//                if( j>=current.size() )
 //                    current.add( new ArrayList<>() );
-//                }
-//                current.get( j ).add( converted.get( j ) );
-//            }
-//
+                try {
+                    current.get( j );
+                }
+                catch( IndexOutOfBoundsException e ) {
+                    current.add( new ArrayList<>() );
+                }
+                current.get( j ).add( converted.get( j ) );
+            }
+        }
+
+        // assign chromosomes to the column next to the PersistentFeature column
+        // TODO: This makes this converter methode to specific. It was
+        // intended to convert any GNU R table but the following code assumes
+        // that the first column always contains a PersistentFeature which is not
+        // always true (e.g. DESeq2). I have to finde a better solution.
+//        for (int i = 0; i < current.size(); i++) {
+//            current.get(i).insertElementAt(chromMap.get(((PersistentFeature) current.get(i).get(0)).getChromId()), 1);
 //        }
-//
-//        // assign chromosomes to the column next to the PersistentFeature column
-//        // TODO: This makes this converter methode to specific. It was
-//        // intended to convert any GNU R table but the following code assumes
-//        // that the first column always contains a PersistentFeature which is not
-//        // always true (e.g. DESeq2). I have to finde a better solution.
-////        for (int i = 0; i < current.size(); i++) {
-////            current.get(i).insertElementAt(chromMap.get(((PersistentFeature) current.get(i).get(0)).getChromId()), 1);
-////        }
-//        return current;
-//    }
+        return current;
+    }
 
 
 }
