@@ -25,6 +25,7 @@ import org.openide.util.Exceptions;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REXPVector;
+import org.rosuda.REngine.RFactor;
 
 
 /**
@@ -102,8 +103,7 @@ public class ResultDeAnalysis {
      * This way the primitive data types are automatically converted to their
      * corresponding Object presentation.
      */
-
-    private List<Object> convertNames( REXP currentValues ) {
+    private List<Object> convertNames(REXP currentValues) {
 
         List<Object> current = new ArrayList<>();
         try {
@@ -116,12 +116,33 @@ public class ResultDeAnalysis {
                         current.add(name);
                     }
                 }
-            } else {
+            } else if (currentValues.isNumeric()) {
                 Object currentValuesAsObject = currentValues.asNativeJavaObject();
-                if(currentValuesAsObject instanceof double[]){
+                if (currentValuesAsObject instanceof double[]) {
                     double[] tmp = (double[]) currentValuesAsObject;
                     for (int i = 0; i < tmp.length; i++) {
                         current.add(tmp[i]);
+                    }
+                }
+                if (currentValuesAsObject instanceof int[]) {
+                    int[] tmp = (int[]) currentValuesAsObject;
+                    for (int i = 0; i < tmp.length; i++) {
+                        current.add(tmp[i]);
+                    }
+                }
+                if (currentValuesAsObject instanceof float[]) {
+                    float[] tmp = (float[]) currentValuesAsObject;
+                    for (int i = 0; i < tmp.length; i++) {
+                        current.add(tmp[i]);
+                    }
+                } else if (currentValuesAsObject instanceof String[]) {
+                    String[] currentStringValues = (String[]) currentValuesAsObject;
+                    for (String name : currentStringValues) {
+                        if (dEAdata.existsPersistentFeatureForGNURName(name)) {
+                            current.add(dEAdata.getPersistentFeatureByGNURName(name));
+                        } else {
+                            current.add(name);
+                        }
                     }
                 }
             }
@@ -129,7 +150,6 @@ public class ResultDeAnalysis {
             Exceptions.printStackTrace(ex);
         }
         return current;
-
     }
 
 

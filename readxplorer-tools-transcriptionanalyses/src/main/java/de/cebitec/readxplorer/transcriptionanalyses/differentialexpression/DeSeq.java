@@ -35,7 +35,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.rosuda.REngine.REXP;
 import org.rosuda.REngine.REXPVector;
-import org.rosuda.REngine.RList;
 import org.rosuda.REngine.Rserve.RserveException;
 
 
@@ -222,7 +221,7 @@ public class DeSeq {
 
             }
             else {
-//           //Significant results sorted by the most significantly differentially expressed genes
+           //Significant results sorted by the most significantly differentially expressed genes
                 gnuR.eval( "res0 <- res[order(res$pval), ]" );
                 REXP result = gnuR.eval( "res0" );
                 List<REXPVector> rvec = result.asList();
