@@ -101,7 +101,6 @@ public class BaySeq {
                 if (processors > 1) {
                     processors--;
                 }
-
                 currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
                 Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Gnu R running on " + processors + " cores.", currentTimestamp);
                 gnuR.eval("cl <- makeCluster(" + processors + ", \"SOCK\")");

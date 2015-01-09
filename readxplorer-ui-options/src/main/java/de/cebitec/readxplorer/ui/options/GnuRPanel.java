@@ -36,6 +36,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -49,8 +50,10 @@ final class GnuRPanel extends OptionsPanel implements Observer {
 
     private static final long serialVersionUID = 1L;
 
+    private static final String MANUAL_BUTTON_SELECTED = "MANUAL_BUTTON_SELECTED";
     private final GnuROptionsPanelController controller;
     private final Preferences pref;
+    private final Preferences prefGnuRPanel;
     private Downloader downloader;
     private Unzip unzip;
     private File zipFile;
@@ -408,6 +411,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     GnuRPanel( GnuROptionsPanelController controller ) {
         this.controller = controller;
         this.pref = NbPreferences.forModule( Object.class );
+        this.prefGnuRPanel = NbPreferences.forModule( GnuRPanel.class );
         initComponents();
         String source_uri = pref.get( Properties.CRAN_MIRROR, DEFAULT_CRAN_MIRROR ) + SOURCE_URI;
         sourceFileTextField.setText( source_uri );
@@ -672,15 +676,31 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         cranMirror.setText( pref.get( Properties.CRAN_MIRROR, DEFAULT_CRAN_MIRROR ) );
         rServeHost.setText( pref.get( Properties.RSERVE_HOST, DEFAULT_RSERVE_HOST ) );
         rServePort.setText( pref.get( Properties.RSERVE_PORT, "auto" ) );
+        boolean manualButtonSelected = prefGnuRPanel.getBoolean(MANUAL_BUTTON_SELECTED, false);
+        if (manualButtonSelected) {
+            autoOrmanual.setSelected(manualButton.getModel(), true);
+            rServeHost.setEditable(true);
+            rServePort.setEditable(true);
+        }
     }
 
 
     @Override
     void store() {
         pref.put(Properties.CRAN_MIRROR, cranMirror.getText());
+        prefGnuRPanel.putBoolean(MANUAL_BUTTON_SELECTED, manualButton.isSelected());
         if (manualButton.isSelected()) {
             pref.put(Properties.RSERVE_HOST, rServeHost.getText());
             pref.put(Properties.RSERVE_PORT, rServePort.getText());
+        } else {
+            pref.remove(Properties.RSERVE_HOST);
+            pref.remove(Properties.RSERVE_PORT);
+        }
+        try {
+            prefGnuRPanel.sync();
+        } catch (BackingStoreException ex) {
+            Timestamp timestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: Could not save preferences for GNU R options.", timestamp);
         }
     }
 
