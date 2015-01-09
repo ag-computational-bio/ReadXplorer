@@ -18,7 +18,6 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.UnknownGnuRException;
 import java.io.File;
@@ -49,8 +48,7 @@ public class DeSeq2 {
 
     public List<ResultDeAnalysis> process( DeSeqAnalysisData analysisData,
                                            int numberOfFeatures, int numberOfTracks, File saveFile)
-            throws PackageNotLoadableException, JRILibraryNotInPathException,
-                   IllegalStateException, UnknownGnuRException, RserveException {
+            throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException {
         gnuR = GnuR.startRServe();
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
@@ -142,7 +140,11 @@ public class DeSeq2 {
      * Releases the Gnu R instance and removes the reference to it.
      */
     public void shutdown() throws RserveException {
-        gnuR.shutdown();
+        //Might happen that gnuR is null if something went wrong during Rserve
+        //startup or connection process.
+        if (gnuR != null) {
+            gnuR.shutdown();
+        }
     }
 
 

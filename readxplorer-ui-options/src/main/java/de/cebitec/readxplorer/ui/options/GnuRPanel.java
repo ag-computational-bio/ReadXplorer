@@ -38,9 +38,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
+import javax.swing.InputVerifier;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
@@ -413,6 +416,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         this.pref = NbPreferences.forModule( Object.class );
         this.prefGnuRPanel = NbPreferences.forModule( GnuRPanel.class );
         initComponents();
+        portWarningMessage.setText("");
         String source_uri = pref.get( Properties.CRAN_MIRROR, DEFAULT_CRAN_MIRROR ) + SOURCE_URI;
         sourceFileTextField.setText( source_uri );
         jProgressBar1.setMaximum( 100 );
@@ -431,6 +435,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         else {
             messages.setText( "Auto installation is only supported under Windows 7 & 8." );
         }
+        rServePort.setInputVerifier(new PortInputVerifier());
     }
 
 
@@ -481,6 +486,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         jSeparator2 = new javax.swing.JSeparator();
         jLabel5 = new javax.swing.JLabel();
         rServePort = new javax.swing.JTextField();
+        portWarningMessage = new javax.swing.JLabel();
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.jLabel1.text_1")); // NOI18N
 
@@ -544,6 +550,9 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         rServePort.setEditable(false);
         rServePort.setText(org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.rServePort.text")); // NOI18N
 
+        portWarningMessage.setForeground(new java.awt.Color(255, 0, 0));
+        org.openide.awt.Mnemonics.setLocalizedText(portWarningMessage, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.portWarningMessage.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -562,6 +571,11 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                     .addComponent(jSeparator2)
                     .addComponent(rServeHost)
                     .addComponent(rServePort)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jProgressBar1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(63, 63, 63))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel4)
@@ -570,11 +584,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                             .addComponent(jLabel3)
                             .addComponent(jLabel5))
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jProgressBar1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(63, 63, 63)))
+                    .addComponent(portWarningMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -612,6 +622,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(rServePort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(portWarningMessage)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -668,6 +680,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         rServeHost.setEditable(false);
         rServePort.setEditable(false);
         installButton.setEnabled(true);
+        portWarningMessage.setText("");
     }//GEN-LAST:event_autoButtonActionPerformed
 
 
@@ -675,7 +688,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     void load() {
         cranMirror.setText( pref.get( Properties.CRAN_MIRROR, DEFAULT_CRAN_MIRROR ) );
         rServeHost.setText( pref.get( Properties.RSERVE_HOST, DEFAULT_RSERVE_HOST ) );
-        rServePort.setText( pref.get( Properties.RSERVE_PORT, "auto" ) );
+        rServePort.setText( String.valueOf(pref.getInt( Properties.RSERVE_PORT, 0) ) );
         boolean manualButtonSelected = prefGnuRPanel.getBoolean(MANUAL_BUTTON_SELECTED, false);
         if (manualButtonSelected) {
             autoOrmanual.setSelected(manualButton.getModel(), true);
@@ -688,10 +701,11 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     @Override
     void store() {
         pref.put(Properties.CRAN_MIRROR, cranMirror.getText());
+        pref.putBoolean(Properties.RSERVE_MANUAL_SETUP, manualButton.isSelected());
         prefGnuRPanel.putBoolean(MANUAL_BUTTON_SELECTED, manualButton.isSelected());
         if (manualButton.isSelected()) {
             pref.put(Properties.RSERVE_HOST, rServeHost.getText());
-            pref.put(Properties.RSERVE_PORT, rServePort.getText());
+            pref.putInt(Properties.RSERVE_PORT, Integer.parseInt(rServePort.getText()));
         } else {
             pref.remove(Properties.RSERVE_HOST);
             pref.remove(Properties.RSERVE_PORT);
@@ -719,6 +733,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JRadioButton manualButton;
     private javax.swing.JLabel messages;
+    private javax.swing.JLabel portWarningMessage;
     private javax.swing.JTextField rServeHost;
     private javax.swing.JTextField rServePort;
     private javax.swing.JTextField sourceFileTextField;
@@ -801,10 +816,9 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                             jProgressBar1.setValue( 0 );
                             break;
                         case FINISHED:
-                            messages.setText( "Setup completed. Please restart ReadXplorer!" );
+                            messages.setText( "Setup complete!" );
                             jProgressBar1.setIndeterminate( false );
                             jProgressBar1.setValue( 100 );
-                            JOptionPane.showMessageDialog( null, "Changes will only take effect after you restart the application" );
                             break;
                         case NO_RIGHTS:
                             messages.setText( "Can not write to user dir. Please check permissions." );
@@ -824,5 +838,21 @@ final class GnuRPanel extends OptionsPanel implements Observer {
 
     }
 
+    class PortInputVerifier extends InputVerifier {
+
+        @Override
+        public boolean verify(JComponent input) {
+            JTextField textField = (JTextField) input;
+            String text = textField.getText();
+            try {
+                Integer.parseInt(text);
+            } catch (NumberFormatException ex) {
+                portWarningMessage.setText("Please enter a valid port number.");
+                return false;
+            }
+            portWarningMessage.setText("");
+            return true;
+        }
+    }
 
 }

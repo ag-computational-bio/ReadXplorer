@@ -102,14 +102,6 @@ public class GnuR extends RConnection {
 
     }
 
-    public static class JRILibraryNotInPathException extends Exception {
-
-        public JRILibraryNotInPathException() {
-            super("JRI native library can't be found in the PATH. Please add it to the PATH and try again.");
-        }
-
-    }
-
     public static class UnknownGnuRException extends Exception {
 
         public UnknownGnuRException(Exception e) {
@@ -146,84 +138,6 @@ public class GnuR extends RConnection {
         super.assign(symbol, value, env);
     }
 
-//    @Override
-//    public synchronized REXP eval( String string ) {
-//        return eval( string, true );
-//    }
-//
-//    
-//
-//    @Override
-//    public synchronized REXP eval( String string, boolean bln ) {
-//        ProcessingLog.getInstance().logGNURoutput( "> " + string + "\n" );
-//        return super.eval( string, bln );
-//    }
-//
-//
-//    @Override
-//    public boolean assign( String string, String string1 ) {
-//        ProcessingLog.getInstance().logGNURoutput( "> assign: \"" + string1 + "\" to variable \"" + string + "\"\n" );
-//        return super.assign( string, string1 );
-//    }
-//
-//
-//    @Override
-//    public boolean assign( String string, REXP rexp ) {
-//        ProcessingLog.getInstance().logGNURoutput( "> assign: \"" + rexp.asString() + "\" to variable \"" + string + "\"\n" );
-//        return super.assign( string, rexp );
-//    }
-//
-//
-//    @Override
-//    public boolean assign( String string, double[] doubles ) {
-//        StringBuilder sb = new StringBuilder( doubles.length * 20 ).append( '[' );
-//        for( int i = 0; i < doubles.length; i++ ) {
-//            sb.append( doubles[i] ).append( ';' );
-//        }
-//        sb.deleteCharAt( sb.length() - 1 );
-//        sb.append( ']' );
-//        ProcessingLog.getInstance().logGNURoutput( "> assign: \"" + sb.toString() + "\" to variable \"" + string + "\"\n" );
-//        return super.assign( string, doubles );
-//    }
-//
-//
-//    @Override
-//    public boolean assign( String string, int[] ints ) {
-//        StringBuilder sb = new StringBuilder( ints.length * 12 ).append( '[' );
-//        for( int i = 0; i < ints.length; i++ ) {
-//            sb.append( ints[i] ).append( ';' );
-//        }
-//        sb.deleteCharAt( sb.length() - 1 );
-//        sb.append( ']' );
-//        ProcessingLog.getInstance().logGNURoutput( "> assign: \"" + sb.toString() + "\" to variable \"" + string + "\"\n" );
-//        return super.assign( string, ints );
-//    }
-//
-//
-//    @Override
-//    public boolean assign( String string, boolean[] blns ) {
-//        StringBuilder sb = new StringBuilder( blns.length * 6 ).append( '[' );
-//        for( int i = 0; i < blns.length; i++ ) {
-//            sb.append( blns[i] ).append( ';' );
-//        }
-//        sb.deleteCharAt( sb.length() - 1 );
-//        sb.append( ']' );
-//        ProcessingLog.getInstance().logGNURoutput( "> assign: \"" + sb.toString() + "\" to variable \"" + string + "\"\n" );
-//        return super.assign( string, blns );
-//    }
-//
-//
-//    @Override
-//    public boolean assign( String string, String[] strings ) {
-//        StringBuilder sb = new StringBuilder( strings.length * 20 ).append( '[' );
-//        for( String string1 : strings ) {
-//            sb.append( string1 ).append( ';' );
-//        }
-//        sb.deleteCharAt( sb.length() - 1 );
-//        sb.append( ']' );
-//        ProcessingLog.getInstance().logGNURoutput( "> assign: \"" + sb.toString() + "\" to variable \"" + string + "\"\n" );
-//        return super.assign( string, strings );
-//    }
     /**
      * Store an SVG file of a given plot using this GnuR instance.
      * <p>
@@ -254,17 +168,16 @@ public class GnuR extends RConnection {
     private static int nextFreePort = 6312;
 
     public static GnuR startRServe() throws RserveException {
-        String host = NbPreferences.forModule(Object.class).get(Properties.RSERVE_HOST, "localhost");
-        String portString = NbPreferences.forModule(Object.class).get(Properties.RSERVE_PORT, "");
+        String host;
         int port;
-        boolean runningLocal = false;
+        boolean runningLocal = NbPreferences.forModule(Object.class).getBoolean(Properties.RSERVE_MANUAL_SETUP, true);
 
         //If = In case of a local auto setup
         //Else = Manuel setup
-        if (host.equals("localhost") && portString.isEmpty()) {
+        if (runningLocal) {
             ProcessBuilder pb;
             port = nextFreePort++;
-            runningLocal = true;
+            host = "localhost";
             String bit = System.getProperty("sun.arch.data.model");
             String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
             String user_dir = System.getProperty("netbeans.user");
@@ -292,8 +205,17 @@ public class GnuR extends RConnection {
                 }
             }
         } else {
-            port = Integer.parseInt(portString);
+            port = NbPreferences.forModule(Object.class).getInt(Properties.RSERVE_PORT, 6311);
+            host = NbPreferences.forModule(Object.class).get(Properties.RSERVE_HOST, "localhost");
         }
         return new GnuR(host, port, runningLocal);
+    }
+    
+    public static boolean gnuRSetupCorrect(){
+            String user_dir = System.getProperty("netbeans.user");
+            File r_dir = new File(user_dir + File.separator + "R");
+            String startupBat = r_dir.getAbsolutePath() + File.separator + "bin" + File.separator + "startup.bat";
+            File batFile = new File(startupBat);
+            return (batFile.exists() && batFile.canExecute());
     }
 }
