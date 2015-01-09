@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPVector;
 import org.rosuda.REngine.Rserve.RserveException;
 
 
@@ -111,15 +112,15 @@ public class DeSeq2 {
                 gnuR.eval( "dds <- DESeqDataSetFromMatrix(countData = inputData, colData = design, design = ~ conds)" );
             }
 
-            REXP E = gnuR.eval( "dds <- DESeq(dds)" );
-            E = gnuR.eval( "res <- results(dds)" );
-            E = gnuR.eval( "res <- res[order(res$padj),]" );
+            gnuR.eval( "dds <- DESeq(dds)" );
+            gnuR.eval( "res <- results(dds)" );
+            gnuR.eval( "res <- res[order(res$padj),]" );
 
-//            REXP currentResult1 = gnuR.eval( "as.data.frame(res)" );
-//            RVector tableContents1 = currentResult1.asVector();
-//            REXP colNames1 = gnuR.eval( "colnames(res)" );
-//            REXP rowNames1 = gnuR.eval( "rownames(res)" );
-//            results.add( new ResultDeAnalysis( tableContents1, colNames1, rowNames1, "Results", analysisData ) );
+            REXP currentResult1 = gnuR.eval( "as.data.frame(res)" );
+            List<REXPVector> tableContents1 = currentResult1.asList();
+            REXP colNames1 = gnuR.eval( "colnames(res)" );
+            REXP rowNames1 = gnuR.eval( "rownames(res)" );
+            results.add( new ResultDeAnalysis( tableContents1, colNames1, rowNames1, "Results", analysisData ) );
 
             if( saveFile != null ) {
                 String path = saveFile.getAbsolutePath();
