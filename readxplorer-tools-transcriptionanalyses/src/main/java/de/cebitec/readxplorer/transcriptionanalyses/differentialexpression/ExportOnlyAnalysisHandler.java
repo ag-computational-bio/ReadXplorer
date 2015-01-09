@@ -53,7 +53,7 @@ public class ExportOnlyAnalysisHandler extends DeAnalysisHandler {
 
 
     @Override
-    protected List<ResultDeAnalysis> processWithTool() throws GnuR.PackageNotLoadableException, GnuR.JRILibraryNotInPathException, IllegalStateException, GnuR.UnknownGnuRException {
+    protected List<ResultDeAnalysis> processWithTool() throws GnuR.PackageNotLoadableException, IllegalStateException, GnuR.UnknownGnuRException {
 
         prepareFeatures( data );
         prepareCountData( data, getAllCountData() );

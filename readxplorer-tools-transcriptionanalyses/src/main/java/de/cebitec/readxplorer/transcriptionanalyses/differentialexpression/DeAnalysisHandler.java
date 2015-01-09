@@ -28,7 +28,6 @@ import de.cebitec.readxplorer.databackend.dataObjects.DataVisualisationI;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentChromosome;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentFeature;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.UnknownGnuRException;
 import de.cebitec.readxplorer.utils.Observable;
@@ -99,20 +98,16 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
 
 
         public static Tool[] usableTools() {
-//            if( GnuR.SecureGnuRInitiliser.isGnuRSetUpCorrect() && GnuR.SecureGnuRInitiliser.isGnuRInstanceFree() ) {
-//                return Tool.values();
-//                //If one Tool should not be available to the user return something like :
-//                //new Tool[]{ ExpressTest, DeSeq, BaySeq, ExportCountTable };
-//
-//            }
-//            else {
-//                Tool[] ret = new Tool[]{ ExpressTest, ExportCountTable };
-//                return ret;
-            return Tool.values();
-//            }
+            if(GnuR.gnuRSetupCorrect()) {
+                return Tool.values();
+                //If one Tool should not be available to the user return something like :
+                //new Tool[]{ ExpressTest, DeSeq, BaySeq, ExportCountTable };
+            }
+            else {
+                Tool[] ret = new Tool[]{ ExpressTest, ExportCountTable };
+                return ret;
+            }
         }
-
-
     }
 
 
@@ -227,8 +222,9 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
      * @return
      */
     protected abstract List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException,
-                                                                       JRILibraryNotInPathException, IllegalStateException,
-                                                                       UnknownGnuRException, RserveException;
+                                                                       IllegalStateException,
+                                                                       UnknownGnuRException, 
+                                                                       RserveException;
 
 
     /**
@@ -327,27 +323,20 @@ public abstract class DeAnalysisHandler extends Thread implements Observable,
         if( ++resultsReceivedBack == getCollectCoverageDataInstances().size() ) {
             try {
                 results = processWithTool();
-            }
-            catch( PackageNotLoadableException | UnknownGnuRException ex ) {
+            } catch( PackageNotLoadableException | UnknownGnuRException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
                 Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
                 notifyObservers( AnalysisStatus.ERROR );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
                 this.interrupt();
-            }
-            catch( IllegalStateException ex ) {
+            } catch( IllegalStateException ex ) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
                 Logger.getLogger( this.getClass().getName() ).log( Level.WARNING, "{0}: " + ex.getMessage(), currentTimestamp );
-                JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
-            }
-            catch( JRILibraryNotInPathException ex ) {
-                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
             } catch (RserveException ex) {
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
                 Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
-                JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
+                JOptionPane.showMessageDialog( null, ex.getMessage(), "RServe error", JOptionPane.WARNING_MESSAGE );
             }
             notifyObservers( AnalysisStatus.FINISHED );
         }

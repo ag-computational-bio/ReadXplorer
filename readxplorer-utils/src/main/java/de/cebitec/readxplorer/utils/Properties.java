@@ -197,6 +197,10 @@ public class Properties {
      * The RServe port we will connect to for GNU R computations
      */
     public static final String RSERVE_PORT = "RSERVE_PORT";
+    /**
+     * Is RServe manuala configured
+     */
+    public static final String RSERVE_MANUAL_SETUP = "RSERVE_MANUAL_SETUP";
     
     public static final String MAPPER_PATH = "MAPPER_PATH";
 

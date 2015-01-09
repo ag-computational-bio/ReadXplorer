@@ -20,7 +20,6 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 import de.cebitec.readxplorer.databackend.ParametersReadClasses;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
-import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.JRILibraryNotInPathException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.UnknownGnuRException;
 import de.cebitec.readxplorer.utils.classification.FeatureType;
@@ -80,7 +79,7 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
 
 
     @Override
-    protected List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException, JRILibraryNotInPathException, IllegalStateException, UnknownGnuRException, RserveException {
+    protected List<ResultDeAnalysis> processWithTool() throws PackageNotLoadableException, IllegalStateException, UnknownGnuRException, RserveException {
         List<ResultDeAnalysis> results;
         prepareFeatures( deSeqAnalysisData );
         prepareCountData( deSeqAnalysisData, getAllCountData() );
