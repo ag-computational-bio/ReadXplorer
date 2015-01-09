@@ -30,7 +30,6 @@ import de.cebitec.readxplorer.parser.reference.FastaReferenceParser;
 import de.cebitec.readxplorer.parser.reference.Filter.FeatureFilter;
 import de.cebitec.readxplorer.parser.reference.Filter.FilterRuleSource;
 import de.cebitec.readxplorer.parser.reference.ReferenceParserI;
-import de.cebitec.readxplorer.ui.importer.ImportThread;
 import de.cebitec.readxplorer.utils.Benchmark;
 import de.cebitec.readxplorer.utils.Properties;
 import java.io.File;
@@ -151,7 +150,7 @@ public final class ImportTrackArgsProcessor implements ArgsProcessor {
      */
     private void importRefGenome( final ReferenceJob rj, final PrintStream ps ) throws CommandException {
 
-        ps.println( NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.start.ref" ) + ":" );
+        ps.println( NbBundle.getMessage( ImportTrackArgsProcessor.class, "MSG_ImportThread.import.start.ref" ) + ":" );
         final long start = System.currentTimeMillis();
         try {
 
@@ -162,7 +161,7 @@ public final class ImportTrackArgsProcessor implements ArgsProcessor {
             filter.addBlacklistRule( new FilterRuleSource() );
             ParsedReference refGenome = parser.parseReference( rj, filter );
             LOG.log( Level.INFO, "Finished parsing reference genome from source \"{0}\"", rj.getFile().getAbsolutePath() );
-            ps.println( "\"" + rj.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.parsed" ) );
+            ps.println( "\"" + rj.getName() + "\" " + NbBundle.getMessage( ImportTrackArgsProcessor.class, "MSG_ImportThread.import.parsed" ) );
 
 
             // stores reference sequence in the db
@@ -175,7 +174,7 @@ public final class ImportTrackArgsProcessor implements ArgsProcessor {
             // print benchmarks
             if( verboseArg ) {
                 final long finish = System.currentTimeMillis();
-                String msg = "\"" + rj.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.stored" );
+                String msg = "\"" + rj.getName() + "\" " + NbBundle.getMessage( ImportTrackArgsProcessor.class, "MSG_ImportThread.import.stored" );
                 ps.println( Benchmark.calculateDuration( start, finish, msg ) );
             }
 
@@ -183,14 +182,14 @@ public final class ImportTrackArgsProcessor implements ArgsProcessor {
         catch( ParsingException | StorageException ex ) {
             LOG.log( Level.SEVERE, null, ex );
 //            ps.println( "\"" + rj.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.failed" ) + "!" );
-            CommandException ce = new CommandException( 1, "\"" + rj.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.failed" ) );
+            CommandException ce = new CommandException( 1, "\"" + rj.getName() + "\" " + NbBundle.getMessage( ImportTrackArgsProcessor.class, "MSG_ImportThread.import.failed" ) );
                 ce.initCause( ex );
             throw ce;
         }
         catch( OutOfMemoryError ex ) {
             LOG.log( Level.SEVERE, null, ex );
 //            ps.println( "\"" + rj.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.outOfMemory" ) + "!" );
-            CommandException ce = new CommandException( 1, "\"" + rj.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.outOfMemory" ) );
+            CommandException ce = new CommandException( 1, "\"" + rj.getName() + "\" " + NbBundle.getMessage( ImportTrackArgsProcessor.class, "MSG_ImportThread.import.outOfMemory" ) );
                 ce.initCause( ex );
             throw ce;
         }
