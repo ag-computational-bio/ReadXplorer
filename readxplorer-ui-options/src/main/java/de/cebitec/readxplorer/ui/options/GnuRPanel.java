@@ -470,8 +470,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         sourceFileTextField = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
         rServeHost = new javax.swing.JTextField();
-        jRadioButton1 = new javax.swing.JRadioButton();
-        jRadioButton2 = new javax.swing.JRadioButton();
+        autoButton = new javax.swing.JRadioButton();
+        manualButton = new javax.swing.JRadioButton();
         jLabel4 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
         jSeparator2 = new javax.swing.JSeparator();
@@ -516,20 +516,20 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         rServeHost.setEditable(false);
         rServeHost.setText(org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.rServeHost.text")); // NOI18N
 
-        autoOrmanual.add(jRadioButton1);
-        jRadioButton1.setSelected(true);
-        org.openide.awt.Mnemonics.setLocalizedText(jRadioButton1, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.jRadioButton1.text")); // NOI18N
-        jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
+        autoOrmanual.add(autoButton);
+        autoButton.setSelected(true);
+        org.openide.awt.Mnemonics.setLocalizedText(autoButton, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.autoButton.text")); // NOI18N
+        autoButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton1ActionPerformed(evt);
+                autoButtonActionPerformed(evt);
             }
         });
 
-        autoOrmanual.add(jRadioButton2);
-        org.openide.awt.Mnemonics.setLocalizedText(jRadioButton2, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.jRadioButton2.text")); // NOI18N
-        jRadioButton2.addActionListener(new java.awt.event.ActionListener() {
+        autoOrmanual.add(manualButton);
+        org.openide.awt.Mnemonics.setLocalizedText(manualButton, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.manualButton.text")); // NOI18N
+        manualButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton2ActionPerformed(evt);
+                manualButtonActionPerformed(evt);
             }
         });
 
@@ -548,9 +548,9 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jRadioButton1)
+                        .addComponent(autoButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jRadioButton2))
+                        .addComponent(manualButton))
                     .addComponent(jSeparator1)
                     .addComponent(cranMirror)
                     .addComponent(messages, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -580,8 +580,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 .addComponent(jLabel4)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jRadioButton1)
-                    .addComponent(jRadioButton2))
+                    .addComponent(autoButton)
+                    .addComponent(manualButton))
                 .addGap(18, 18, 18)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
@@ -654,37 +654,38 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         this.sourceFileTextField.setText( cranMirror.getText() + SOURCE_URI );
     }//GEN-LAST:event_cranMirrorKeyReleased
 
-    private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
+    private void manualButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualButtonActionPerformed
         rServeHost.setEditable(true);
         rServePort.setEditable(true);
         installButton.setEnabled(false);
-    }//GEN-LAST:event_jRadioButton2ActionPerformed
+    }//GEN-LAST:event_manualButtonActionPerformed
 
-    private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
+    private void autoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoButtonActionPerformed
         rServeHost.setEditable(false);
         rServePort.setEditable(false);
         installButton.setEnabled(true);
-    }//GEN-LAST:event_jRadioButton1ActionPerformed
+    }//GEN-LAST:event_autoButtonActionPerformed
 
 
     @Override
     void load() {
         cranMirror.setText( pref.get( Properties.CRAN_MIRROR, DEFAULT_CRAN_MIRROR ) );
         rServeHost.setText( pref.get( Properties.RSERVE_HOST, DEFAULT_RSERVE_HOST ) );
-        rServePort.setText("auto");
+        rServePort.setText( pref.get( Properties.RSERVE_PORT, "auto" ) );
     }
 
 
     @Override
     void store() {
         pref.put(Properties.CRAN_MIRROR, cranMirror.getText());
-        if (jRadioButton2.isSelected()) {
+        if (manualButton.isSelected()) {
             pref.put(Properties.RSERVE_HOST, rServeHost.getText());
             pref.put(Properties.RSERVE_PORT, rServePort.getText());
         }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JRadioButton autoButton;
     private javax.swing.ButtonGroup autoOrmanual;
     private javax.swing.JTextField cranMirror;
     private javax.swing.JButton installButton;
@@ -694,10 +695,9 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JProgressBar jProgressBar1;
-    private javax.swing.JRadioButton jRadioButton1;
-    private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
+    private javax.swing.JRadioButton manualButton;
     private javax.swing.JLabel messages;
     private javax.swing.JTextField rServeHost;
     private javax.swing.JTextField rServePort;

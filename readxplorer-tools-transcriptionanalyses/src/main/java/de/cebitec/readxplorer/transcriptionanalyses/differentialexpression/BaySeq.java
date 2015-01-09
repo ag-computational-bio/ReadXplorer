@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPVector;
 import org.rosuda.REngine.Rserve.RserveException;
 
 
@@ -82,24 +83,31 @@ public class BaySeq {
         Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
         Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: GNU R is processing data.", currentTimestamp );
         gnuR.loadPackage( "baySeq" );
-        gnuR.loadPackage( "snow" );
-        //Gnu R is configured to use all your processor cores aside from one up to a maximum of eight. So the
-        //computation will speed up a little bit but still leave you at least one core
-        //for your other work.
-        int processors = Runtime.getRuntime().availableProcessors();
-        if( processors > MAX_PROCESSORS ) {
-            processors = MAX_PROCESSORS;
-        }
-        if( processors > 1 ) {
-            processors--;
-        }
+
         List<ResultDeAnalysis> results = new ArrayList<>();
         //A lot of bad things can happen during the data processing by Gnu R.
         //So we need to prepare for this.
         try {
-            currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "{0}: Gnu R running on " + processors + " cores.", currentTimestamp );
-            gnuR.eval( "cl <- makeCluster(" + processors + ", \"SOCK\")" );
+            //Gnu R is configured to use all your processor cores aside from one up to a maximum of eight. So the
+            //computation will speed up a little bit but still leave you at least one core
+            //for your other work.
+            if (gnuR.runningLocal) {
+                gnuR.loadPackage("snow");
+                gnuR.loadPackage("parallel");
+                int processors = Runtime.getRuntime().availableProcessors();
+                if (processors > MAX_PROCESSORS) {
+                    processors = MAX_PROCESSORS;
+                }
+                if (processors > 1) {
+                    processors--;
+                }
+
+                currentTimestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "{0}: Gnu R running on " + processors + " cores.", currentTimestamp);
+                gnuR.eval("cl <- makeCluster(" + processors + ", \"SOCK\")");
+            } else {
+                gnuR.eval("cl <- NULL");
+            }
             int i = 1;
             StringBuilder concatenate = new StringBuilder( "c(" );
             while( bseqData.hasCountData() ) {
@@ -116,7 +124,7 @@ public class BaySeq {
             gnuR.eval( "colnames(features) <- c(\"locus\", \"start\", \"stop\")" );
             gnuR.eval( "seglens <- features$stop - features$start + 1" );
             gnuR.eval( "cD <- new(\"countData\", data = inputData, seglens = seglens, annotation = features)" );
-            gnuR.eval( "cD@libsizes <- getLibsizes(cD, estimationType = \"quantile\")" );
+            gnuR.eval( "libsizes(cD) <- getLibsizes(cD)" );
             gnuR.assign( "replicates", bseqData.getReplicateStructure() );
             gnuR.eval( "replicates(cD) <- as.factor(c(replicates))" );
             concatenate = new StringBuilder( 1000 );
@@ -135,20 +143,20 @@ public class BaySeq {
             for( int j = 1; j <= numberofGroups; j++ ) {
                 gnuR.eval( "tCounts" + resultIndex + " <- topCounts(cD , group = " + j + " , number = " + numberOfFeatures + ')' );
                 REXP result = gnuR.eval( "tCounts" + resultIndex );
-//                RVector rvec = result.asVector();
-//                REXP colNames = gnuR.eval( "colnames(tCounts" + resultIndex + ")" );
-//                REXP rowNames = gnuR.eval( "rownames(tCounts" + resultIndex + ")" );
-//                results.add( new ResultDeAnalysis( rvec, colNames, rowNames, "Result of model " + j, bseqData ) );
-//                resultIndex++;
+                List<REXPVector> rvec = result.asList();
+                REXP colNames = gnuR.eval( "colnames(tCounts" + resultIndex + ")" );
+                REXP rowNames = gnuR.eval( "rownames(tCounts" + resultIndex + ")" );
+                results.add( new ResultDeAnalysis( rvec, colNames, rowNames, "Result of model " + j, bseqData ) );
+                resultIndex++;
             }
             for( int j = 1; j <= numberofGroups; j++ ) {
-//                gnuR.eval( "tCounts" + resultIndex + " <- topCounts(cD , group = " + j + " , number = " + numberOfFeatures + " , normaliseData=TRUE)" );
-//                REXP result = gnuR.eval( "tCounts" + resultIndex );
-//                RVector rvec = result.asVector();
-//                REXP colNames = gnuR.eval( "colnames(tCounts" + resultIndex + ')' );
-//                REXP rowNames = gnuR.eval( "rownames(tCounts" + resultIndex + ')' );
-//                results.add( new ResultDeAnalysis( rvec, colNames, rowNames, "Normalized result of model " + j, bseqData ) );
-//                resultIndex++;
+                gnuR.eval( "tCounts" + resultIndex + " <- topCounts(cD , group = " + j + " , number = " + numberOfFeatures + " , normaliseData=TRUE)" );
+                REXP result = gnuR.eval( "tCounts" + resultIndex );
+                List<REXPVector> rvec = result.asList();
+                REXP colNames = gnuR.eval( "colnames(tCounts" + resultIndex + ')' );
+                REXP rowNames = gnuR.eval( "rownames(tCounts" + resultIndex + ')' );
+                results.add( new ResultDeAnalysis( rvec, colNames, rowNames, "Normalized result of model " + j, bseqData ) );
+                resultIndex++;
             }
             if( saveFile != null ) {
                 gnuR.saveDataToFile( saveFile );

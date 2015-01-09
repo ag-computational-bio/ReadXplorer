@@ -40,12 +40,15 @@ public class GnuR extends RConnection {
      * The Cran Mirror used to receive additional packages.
      */
     private String cranMirror;
+    
+    public final boolean runningLocal;
 
     /**
      * Creates a new instance of the class and initiates the cranMirror.
      */
-    private GnuR(String host, int port) throws RserveException {
+    private GnuR(String host, int port, boolean runningLocal) throws RserveException {
         super(host, port);
+        this.runningLocal = runningLocal;
         setDefaultCranMirror();
     }
 
@@ -254,12 +257,14 @@ public class GnuR extends RConnection {
         String host = NbPreferences.forModule(Object.class).get(Properties.RSERVE_HOST, "localhost");
         String portString = NbPreferences.forModule(Object.class).get(Properties.RSERVE_PORT, "");
         int port;
+        boolean runningLocal = false;
 
         //If = In case of a local auto setup
         //Else = Manuel setup
         if (host.equals("localhost") && portString.isEmpty()) {
             ProcessBuilder pb;
             port = nextFreePort++;
+            runningLocal = true;
             String bit = System.getProperty("sun.arch.data.model");
             String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
             String user_dir = System.getProperty("netbeans.user");
@@ -289,6 +294,6 @@ public class GnuR extends RConnection {
         } else {
             port = Integer.parseInt(portString);
         }
-        return new GnuR(host, port);
+        return new GnuR(host, port, runningLocal);
     }
 }
