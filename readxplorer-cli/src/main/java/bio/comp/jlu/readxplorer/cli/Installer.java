@@ -19,7 +19,6 @@ package bio.comp.jlu.readxplorer.cli;
 
 
 import java.util.logging.Logger;
-import org.openide.LifecycleManager;
 import org.openide.modules.ModuleInstall;
 
 
@@ -36,8 +35,6 @@ public class Installer extends ModuleInstall {
     public void restored() {
 
         LOG.info( "start readxplorer-cli..." );
-
-        LifecycleManager.getDefault().exit();
 
         LOG.info( "stop readxplorer-cli..." );
 
