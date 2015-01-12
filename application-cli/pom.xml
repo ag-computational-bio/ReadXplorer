@@ -97,6 +97,7 @@
                     <installerOsMacosx>false</installerOsMacosx>
                     <installerOsSolaris>false</installerOsSolaris>
                     <installerPack200Enable>false</installerPack200Enable>
+                    <brandingToken>${brandingToken}-cli</brandingToken>
                     <etcConfFile>src/main/resources/readxplorer-cli.conf</etcConfFile>
                     <installDirName>${brandingToken}-cli</installDirName>
                     <userSettings>
