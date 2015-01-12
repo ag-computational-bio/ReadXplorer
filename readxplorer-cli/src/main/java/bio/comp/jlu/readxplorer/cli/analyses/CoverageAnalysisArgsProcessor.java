@@ -30,9 +30,10 @@ import org.netbeans.spi.sendopts.Env;
  *
  * @author Oliver Schwengers <oliver.schwengers@computational.bio.uni-giessen.de
  */
-public class AnalysesArgsProcessor implements ArgsProcessor {
+public class CoverageAnalysisArgsProcessor implements ArgsProcessor {
 
-    private final static Logger LOG = Logger.getLogger( AnalysesArgsProcessor.class.getName() );
+    private final static Logger LOG = Logger.getLogger( CoverageAnalysisArgsProcessor.class.getName() );
+
 
     /** Decide annotations or code.
      * Annotations are much cleaner and more intuitive but comes
