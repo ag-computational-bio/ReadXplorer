@@ -28,10 +28,8 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeSet;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -51,7 +49,7 @@ public class SNP_Phylogeny {
 
     InputOutput io;
     SnpDetectionResult snpData;
-    HashMap<Integer, HashMap<String, Snp>> sortedSnps;
+    Map<Integer, Map<String, Snp>> sortedSnps;
 
 
     public SNP_Phylogeny( SnpDetectionResult snpData ) {
@@ -63,23 +61,21 @@ public class SNP_Phylogeny {
 
     private void createAlignment( SnpDetectionResult snpData ) {
 
-        int numberOfTracks;
-        HashMap<Integer, HashMap<Integer, String>> bases = new HashMap<>();
-        HashMap<Integer, String> refBases = new HashMap<>();
-        List<SnpI> snps = snpData.getSnpList();
+        Map<Integer, Map<Integer, String>> bases = new HashMap<>();
+        Map<Integer, String> refBases = new HashMap<>();
         Map<Integer, PersistentTrack> trackNames = snpData.getTrackMap();
         List<Integer> trackIdsWithSnps = new ArrayList<>();
 
-        for( SnpI snpi : snps ) {
+        for( SnpI snpi : snpData.getSnpList() ) {
 
-            Snp snp = (Snp) snpi;
+            final Snp snp = (Snp) snpi;
 
             // get numberOfTracks (with snpData)
             if( !trackIdsWithSnps.contains( snp.getTrackId() ) ) {
                 trackIdsWithSnps.add( snp.getTrackId() );
             }
 
-            int position = snp.getPosition();
+            final int position = snp.getPosition();
 
             // save reference base
             if( !refBases.containsKey( position ) ) {
@@ -88,22 +84,20 @@ public class SNP_Phylogeny {
 
             // save bases per track in a hashmap again hashed to their position
             if( !bases.containsKey( position ) ) {
-                HashMap<Integer, String> track = new HashMap<>();
+                Map<Integer, String> track = new HashMap<>();
                 bases.put( position, track );
             }
-            HashMap<Integer, String> track = bases.get( position );
+            Map<Integer, String> track = bases.get( position );
             track.put( snp.getTrackId(), snp.getBase() );
         }
 
-        numberOfTracks = trackIdsWithSnps.size();
+        int numberOfTracks = trackIdsWithSnps.size();
 
 
         // add reference base to all position maps, where it is missing for at least one track
-        Iterator<Entry<Integer, HashMap<Integer, String>>> positionIterator = bases.entrySet().iterator();
-        while( positionIterator.hasNext() ) {
+        for( Map.Entry<Integer, Map<Integer, String>> posToBaseMap : bases.entrySet() ) {
 
-            Map.Entry<Integer, HashMap<Integer, String>> posToBaseMap = positionIterator.next();
-            HashMap<Integer, String> positionEntry = posToBaseMap.getValue();
+            Map<Integer, String> positionEntry = posToBaseMap.getValue();
             // fill positions without snpData with reference base
 
             for( int trackId : trackIdsWithSnps ) {
@@ -113,10 +107,10 @@ public class SNP_Phylogeny {
             }
         }
 
-        HashMap<Integer, Integer> trackIdToIndex = this.getTrackIdToIndexMap( trackIdsWithSnps );
+        Map<Integer, Integer> trackIdToIndex = this.getTrackIdToIndexMap( trackIdsWithSnps );
         String[] alignment = new String[numberOfTracks + 1];
-        for( Integer l : new TreeSet<>( bases.keySet() ) ) {
-            HashMap<Integer, String> snpsAtPosMap = bases.get( l );
+        for( Integer position : new TreeSet<>( bases.keySet() ) ) {
+            Map<Integer, String> snpsAtPosMap = bases.get( position );
             for( Integer trackId : new TreeSet<>( snpsAtPosMap.keySet() ) ) {
                 if( alignment[trackIdToIndex.get( trackId )] == null ) {
                     alignment[trackIdToIndex.get( trackId )] = ">" + trackNames.get( trackId ).getDescription() + System.getProperty( "line.separator" );
@@ -138,17 +132,15 @@ public class SNP_Phylogeny {
      */
     private File createMultipleFastaFile( String[] alignment ) {
 
-        File file;
-        FileWriter writer;
-
-        file = new File( "./alignment.fasta" ); //todo: delete again?
+        File file = new File( "./alignment.fasta" ); //todo: delete again?
         if( file.exists() ) {
             file.delete();
         }
-        try {
+        try( FileWriter fw = new FileWriter( file, true ) ) {
             // new FileWriter(file) - falls die Datei bereits existiert
             // wird diese überschrieben
-            writer = new FileWriter( file, true );
+
+            final String lineSep = System.getProperty( "line.separator" );
 //            int track = 0;
             for( String s : alignment ) {
                 if( s != null ) {
@@ -156,13 +148,13 @@ public class SNP_Phylogeny {
 //                    writer.write(System.getProperty("line.separator"));
 //                    track++;
 
-                    writer.write( s );
-                    writer.write( System.getProperty( "line.separator" ) );
+                    fw.write( s );
+                    fw.write( lineSep );
                 }
             }
-            writer.write( System.getProperty( "line.separator" ) );
-            writer.flush();
-            writer.close();
+            fw.write( lineSep );
+            fw.flush();
+            fw.close();
         }
         catch( IOException e ) {
             JOptionPane.showMessageDialog( new JPanel(), NbBundle.getMessage( SNP_Phylogeny.class, "SNP_Phylogeny.ERROR.Write_Alignment" ),
@@ -223,13 +215,15 @@ public class SNP_Phylogeny {
      * <p>
      * @return mapping from each track id to a corresponding index.
      */
-    private HashMap<Integer, Integer> getTrackIdToIndexMap( List<Integer> trackIdList ) {
-        HashMap<Integer, Integer> trackIdToIndexMap = new HashMap<>();
+    private Map<Integer, Integer> getTrackIdToIndexMap( List<Integer> trackIdList ) {
+
+        Map<Integer, Integer> trackIdToIndexMap = new HashMap<>();
         int i = 0;
         for( int trackId : trackIdList ) {
             trackIdToIndexMap.put( trackId, i++ );
         }
         return trackIdToIndexMap;
+        
     }
 
 
