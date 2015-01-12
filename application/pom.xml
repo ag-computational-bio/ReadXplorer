@@ -110,10 +110,6 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>readxplorer-tools-transcriptomeanalyses</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>readxplorer-ui</artifactId>
         </dependency>
         <dependency>
