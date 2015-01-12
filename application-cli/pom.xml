@@ -23,7 +23,17 @@
     <dependencies>
         <dependency>
             <groupId>org.netbeans.modules</groupId>
+            <artifactId>org-netbeans-core-startup</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.modules</groupId>
             <artifactId>org-netbeans-bootstrap</artifactId>
+            <version>${netbeans.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-modules</artifactId>
             <version>${netbeans.version}</version>
         </dependency>
         <dependency>
@@ -33,22 +43,12 @@
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
-            <artifactId>org-openide-util-lookup</artifactId>
+            <artifactId>org-openide-util</artifactId>
             <version>${netbeans.version}</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
-            <artifactId>org-openide-modules</artifactId>
-            <version>${netbeans.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.netbeans.modules</groupId>
-            <artifactId>org-netbeans-core-startup</artifactId>
-            <version>${netbeans.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.netbeans.modules</groupId>
-            <artifactId>org-netbeans-modules-utilities</artifactId>
+            <artifactId>org-openide-util-lookup</artifactId>
             <version>${netbeans.version}</version>
         </dependency>
 
@@ -98,6 +98,7 @@
                     <installerOsSolaris>false</installerOsSolaris>
                     <installerPack200Enable>false</installerPack200Enable>
                     <brandingToken>${brandingToken}-cli</brandingToken>
+                    <cluster>${brandingToken}-cli</cluster>
                     <etcConfFile>src/main/resources/readxplorer-cli.conf</etcConfFile>
                     <installDirName>${brandingToken}-cli</installDirName>
                     <userSettings>
