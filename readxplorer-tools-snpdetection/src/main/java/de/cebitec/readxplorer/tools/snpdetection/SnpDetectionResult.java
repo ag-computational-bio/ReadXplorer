@@ -77,12 +77,12 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
     @Override
     public List<List<List<Object>>> dataToExcelExportList() {
 
-        List<List<List<Object>>> allData = new ArrayList<>();
-        List<List<Object>> snpExportData = new ArrayList<>();
+        List<List<List<Object>>> allData = new ArrayList<>( 2 );
+        List<List<Object>> snpExportData = new ArrayList<>( snpList.size() );
         final String intergenic = "Intergenic";
 
         for( SnpI snpi : this.snpList ) {
-            List<Object> snpExport = new ArrayList<>();
+            List<Object> snpExport = new ArrayList<>( 25 );
             Snp snp = (Snp) snpi;
 
             snpExport.add( snp.getPosition() );
@@ -111,12 +111,10 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
             String ecNo = "";
             String product = "";
 
-            List<CodonSnp> codons;
             //determine amino acid substitutions among snp substitutions
             if( snp.getType() == SequenceComparison.SUBSTITUTION ) {
 
-                codons = snp.getCodons();
-
+                List<CodonSnp> codons = snp.getCodons();
                 if( codons.isEmpty() ) {
                     aminoAcidsSnp = intergenic;
                     aminoAcidsRef = intergenic;
@@ -147,7 +145,8 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
                 }
             }
             else {
-                codons = snp.getCodons();
+
+                List<CodonSnp> codons = snp.getCodons();
                 if( !codons.isEmpty() ) {
                     if( snp.getType().equals( SequenceComparison.INSERTION ) ) {
                         effect = String.valueOf( SequenceComparison.INSERTION.getType() );
@@ -205,7 +204,7 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
         //create statistics sheet
         ParameterSetSNPs params = (ParameterSetSNPs) this.getParameters();
 
-        List<List<Object>> statisticsExportData = new ArrayList<>();
+        List<List<Object>> statisticsExportData = new ArrayList<>( 30 );
 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "SNP detection for tracks:",
                                                                       GeneralUtils.generateConcatenatedString( this.getTrackNameList(), 0 ) ) );
@@ -253,7 +252,7 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
     @Override
     public List<List<String>> dataColumnDescriptions() {
 
-        List<List<String>> dataColumnDescriptionsList = new ArrayList<>();
+        List<List<String>> dataColumnDescriptionsList = new ArrayList<>( 2 );
 
         List<String> dataColumnDescriptions = new ArrayList<>( 25 );
         dataColumnDescriptions.add( "Position" );

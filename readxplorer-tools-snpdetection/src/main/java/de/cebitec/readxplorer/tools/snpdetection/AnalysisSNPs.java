@@ -280,11 +280,10 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
             }
         }
 
-        int relativeGapPos;
         for( ReferenceGap gap : gaps ) {
             if( gap.getPosition() >= coverage.getLeftBound() && gap.getPosition() < coverage.getRightBound()
                 && (gap.getBaseQuality() == -1 || gap.getBaseQuality() > analysisParams.getMinBaseQuality()) ) {
-                relativeGapPos = gap.getPosition() - coverage.getLeftBound();
+                int relativeGapPos = gap.getPosition() - coverage.getLeftBound();
                 if( gapCounts[relativeGapPos] == null ) {
                     gapCounts[relativeGapPos] = new GapCount();
                 }
@@ -333,7 +332,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
 
                         int cov = coverage.getTotalCoverage( excludedClasses, absPos, true ) + coverage.getTotalCoverage( excludedClasses, absPos, false );
                         if( cov == 0 ) {
-                            ++cov;
+                            cov++;
                             Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "found uncovered position in diffs: {0}", absPos );
                         }
                         int frequency = (diffCount * 100) / cov;
@@ -372,16 +371,14 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
                 }
             }
 
-            List<int[][]> gapOrderList;
-            int[][] gapCountArray;
 
             for( int i = 0; i < gapCounts.length; i++ ) {
                 if( gapCounts[i] != null ) {
-                    gapOrderList = gapCounts[i].getGapOrderCount();
+                    List<int[][]> gapOrderList = gapCounts[i].getGapOrderCount();
                     int absPos = i + coverage.getLeftBound();
 
                     for( int j = 0; j < gapOrderList.size(); j++ ) {
-                        gapCountArray = gapOrderList.get( j );
+                        int[][] gapCountArray = gapOrderList.get( j );
 
                         // i=0..5 is ACGTN (DIFFS) ...
                         int diffCount = 0;
@@ -409,7 +406,7 @@ class AnalysisSNPs implements Observer, AnalysisI<List<SnpI>> {
 
                                 int cov = coverage.getTotalCoverage( excludedClasses, absPos, true ) + coverage.getTotalCoverage( excludedClasses, absPos, false );
                                 if( cov == 0 ) {
-                                    ++cov;
+                                    cov++;
                                     Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "found uncovered position in gaps: {0}", absPos );
                                 }
                                 int frequency = (diffCount * 100) / cov;

@@ -183,7 +183,7 @@ public class SnpTranslator {
      * <p>
      * @return list of CodonSnps for the current snp position "pos"
      */
-    private List<CodonSnp> calcSnpList( List<PersistentFeature> featuresFound, Snp snp ) {
+    private List<CodonSnp> calcSnpList( final List<PersistentFeature> featuresFound, final Snp snp ) {
 
         int pos = snp.getPosition();
         posDirectAtLeftChromBorder = pos < 2; //pos is never smaller than 1, 1 is min
@@ -369,12 +369,12 @@ public class SnpTranslator {
             @Override
             public void visit( Node node ) {
 
-                PersistentFeature subFeature = (PersistentFeature) node;
+                final PersistentFeature subFeature = (PersistentFeature) node;
                 final boolean fwdStrand = feature.isFwdStrand();
                 if( subFeature.getType() == type ) {
                     subFeatureFound = true;
-                    int featureStartOnStrand = fwdStrand ? subFeature.getStart() : subFeature.getStop();
-                    int featureStart = subFeature.getStart();
+                    final int featureStartOnStrand = fwdStrand ? subFeature.getStart() : subFeature.getStop();
+                    final int featureStart = subFeature.getStart();
 
                     if( subFeature.getStop() >= pos && featureStart <= pos ) {
                         subPos += (Math.abs( pos - featureStartOnStrand ) + 1);

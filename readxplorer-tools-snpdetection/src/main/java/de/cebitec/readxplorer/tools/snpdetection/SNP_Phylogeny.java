@@ -26,10 +26,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -64,18 +65,16 @@ public class SNP_Phylogeny {
         Map<Integer, Map<Integer, String>> bases = new HashMap<>();
         Map<Integer, String> refBases = new HashMap<>();
         Map<Integer, PersistentTrack> trackNames = snpData.getTrackMap();
-        List<Integer> trackIdsWithSnps = new ArrayList<>();
+        Set<Integer> trackIdsWithSnps = new HashSet<>( snpData.getSnpList().size() );
 
         for( SnpI snpi : snpData.getSnpList() ) {
 
             final Snp snp = (Snp) snpi;
 
             // get numberOfTracks (with snpData)
-            if( !trackIdsWithSnps.contains( snp.getTrackId() ) ) {
-                trackIdsWithSnps.add( snp.getTrackId() );
-            }
+            trackIdsWithSnps.add( snp.getTrackId() );
 
-            final int position = snp.getPosition();
+            final Integer position = snp.getPosition();
 
             // save reference base
             if( !refBases.containsKey( position ) ) {
@@ -100,7 +99,7 @@ public class SNP_Phylogeny {
             Map<Integer, String> positionEntry = posToBaseMap.getValue();
             // fill positions without snpData with reference base
 
-            for( int trackId : trackIdsWithSnps ) {
+            for( Integer trackId : trackIdsWithSnps ) {
                 if( !positionEntry.containsKey( trackId ) ) {
                     positionEntry.put( trackId, String.valueOf( refBases.get( posToBaseMap.getKey() ) ) );
                 }
@@ -109,11 +108,12 @@ public class SNP_Phylogeny {
 
         Map<Integer, Integer> trackIdToIndex = this.getTrackIdToIndexMap( trackIdsWithSnps );
         String[] alignment = new String[numberOfTracks + 1];
+        final String lineSep = System.getProperty( "line.separator" );
         for( Integer position : new TreeSet<>( bases.keySet() ) ) {
             Map<Integer, String> snpsAtPosMap = bases.get( position );
             for( Integer trackId : new TreeSet<>( snpsAtPosMap.keySet() ) ) {
                 if( alignment[trackIdToIndex.get( trackId )] == null ) {
-                    alignment[trackIdToIndex.get( trackId )] = ">" + trackNames.get( trackId ).getDescription() + System.getProperty( "line.separator" );
+                    alignment[trackIdToIndex.get( trackId )] = ">" + trackNames.get( trackId ).getDescription() + lineSep;
                 }
                 alignment[trackIdToIndex.get( trackId )] += snpsAtPosMap.get( trackId );
             }
@@ -215,7 +215,7 @@ public class SNP_Phylogeny {
      * <p>
      * @return mapping from each track id to a corresponding index.
      */
-    private Map<Integer, Integer> getTrackIdToIndexMap( List<Integer> trackIdList ) {
+    private Map<Integer, Integer> getTrackIdToIndexMap( Collection<Integer> trackIdList ) {
 
         Map<Integer, Integer> trackIdToIndexMap = new HashMap<>();
         int i = 0;
@@ -223,7 +223,7 @@ public class SNP_Phylogeny {
             trackIdToIndexMap.put( trackId, i++ );
         }
         return trackIdToIndexMap;
-        
+
     }
 
 
