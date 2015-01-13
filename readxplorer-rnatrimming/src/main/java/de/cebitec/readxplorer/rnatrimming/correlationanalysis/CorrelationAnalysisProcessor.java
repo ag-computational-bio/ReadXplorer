@@ -247,8 +247,8 @@ public class CorrelationAnalysisProcessor implements ThreadListener {
             //ignore areas containing zeros
             while( (this.currentPosition < maximumCoveredPosition - analysisParams.getIntervalLength())
                    && allCoverageEqualZero( strand, this.currentPosition ) ) {
-                ++this.currentPosition;
-                ++this.currentTotalPos;
+                this.currentPosition++;
+                this.currentTotalPos++;
             }
 
             //compute correlation

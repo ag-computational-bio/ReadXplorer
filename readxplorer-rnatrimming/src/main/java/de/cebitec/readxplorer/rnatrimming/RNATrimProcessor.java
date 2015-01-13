@@ -29,7 +29,6 @@ import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
-import net.sf.samtools.SAMFileHeader;
 import net.sf.samtools.SAMFileReader;
 import net.sf.samtools.SAMFileWriter;
 import net.sf.samtools.SAMFileWriterFactory;
@@ -209,10 +208,8 @@ public class RNATrimProcessor {
         try( SAMFileReader samBamReader = new SAMFileReader( samfile ) ) {
             SAMRecordIterator samItor = samBamReader.iterator();
 
-            SAMFileHeader header = samBamReader.getFileHeader();
             SAMFileWriterFactory factory = new SAMFileWriterFactory();
-            File outputFile = new File( newPath );
-            SAMFileWriter writer = factory.makeSAMWriter( header, false, outputFile );
+            SAMFileWriter writer = factory.makeSAMWriter( samBamReader.getFileHeader(), false, new File( newPath ) );
             this.trimProcessResult.setTrimmedMappedReads( 0 );
             while( samItor.hasNext() && (!this.canceled) ) {
                 currentline++;
@@ -237,7 +234,7 @@ public class RNATrimProcessor {
                             record.setAttribute( "tl", tl ); // tl = trimmed from left
                             record.setAttribute( "tr", tr ); // tr = trimmed from right
                         }
-                        catch( Exception e ) {
+                        catch( Exception ex ) {
                         }
 
                     }
@@ -295,7 +292,7 @@ public class RNATrimProcessor {
         tc.requestActive();
         final TrimResultPanel resultView = tc.openResultTab( shortFileName );
         this.trimProcessResult = new TrimProcessResult();
-        HashMap<String, Object> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put( "referencePath", referencePath );
         params.put( "sourcePath", sourcePath );
         params.put( "maximumTrim", maximumTrim );
@@ -336,7 +333,7 @@ public class RNATrimProcessor {
                 showMsg( "Extract unmapped reads to a file..." );
                 String fasta = extractUnmappedReadsAndTrim( new File( sourcePath ), method );
                 String sam = null;
-                String extractedSam = null;
+//                String extractedSam = null;
                 try {
                     if( !canceled )
                         sam = MappingApi.mapFastaFile( new SimpleOutput() {
@@ -354,8 +351,8 @@ public class RNATrimProcessor {
 
 
                         }, referencePath, fasta, mappingParam );
-                    if( !canceled )
-                        extractedSam = extractOriginalSequencesInSamFile( sam, true );
+//                    if( !canceled )
+//                        extractedSam = extractOriginalSequencesInSamFile( sam, true );
                     if( !canceled )
                         FileUtils.delete( sam );
                     if( !canceled )
