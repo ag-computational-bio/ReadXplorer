@@ -170,11 +170,11 @@ public class GnuR extends RConnection {
     public static GnuR startRServe() throws RserveException {
         String host;
         int port;
-        boolean runningLocal = NbPreferences.forModule(Object.class).getBoolean(Properties.RSERVE_MANUAL_SETUP, true);
+        boolean manualSetup = NbPreferences.forModule(Object.class).getBoolean(Properties.RSERVE_MANUAL_SETUP, false);
 
         //If = In case of a local auto setup
         //Else = Manuel setup
-        if (runningLocal) {
+        if (!manualSetup) {
             ProcessBuilder pb;
             port = nextFreePort++;
             host = "localhost";
@@ -208,14 +208,20 @@ public class GnuR extends RConnection {
             port = NbPreferences.forModule(Object.class).getInt(Properties.RSERVE_PORT, 6311);
             host = NbPreferences.forModule(Object.class).get(Properties.RSERVE_HOST, "localhost");
         }
-        return new GnuR(host, port, runningLocal);
+        return new GnuR(host, port, manualSetup);
     }
     
     public static boolean gnuRSetupCorrect(){
+        boolean manualSetup = NbPreferences.forModule(Object.class).getBoolean(Properties.RSERVE_MANUAL_SETUP, false);
+        
+        if(!manualSetup) {
             String user_dir = System.getProperty("netbeans.user");
             File r_dir = new File(user_dir + File.separator + "R");
             String startupBat = r_dir.getAbsolutePath() + File.separator + "bin" + File.separator + "startup.bat";
             File batFile = new File(startupBat);
             return (batFile.exists() && batFile.canExecute());
+        } else {           
+            return true;
+        }
     }
 }

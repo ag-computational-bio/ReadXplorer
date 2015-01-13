@@ -161,6 +161,8 @@ public class BaySeq {
         } //We don't know what errors Gnu R might cause, so we have to catch all.
         //The new generated exception can than be caught an handelt by the DeAnalysisHandler
         catch( Exception e ) {
+            //If something goes wrong try to shutdown Rserve so that no instance keeps running
+            this.shutdown();
             throw new UnknownGnuRException( e );
         }
         currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );

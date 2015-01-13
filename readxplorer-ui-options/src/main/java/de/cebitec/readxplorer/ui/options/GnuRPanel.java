@@ -688,7 +688,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     void load() {
         cranMirror.setText( pref.get( Properties.CRAN_MIRROR, DEFAULT_CRAN_MIRROR ) );
         rServeHost.setText( pref.get( Properties.RSERVE_HOST, DEFAULT_RSERVE_HOST ) );
-        rServePort.setText( String.valueOf(pref.getInt( Properties.RSERVE_PORT, 0) ) );
+        rServePort.setText( String.valueOf(pref.getInt( Properties.RSERVE_PORT, 6311) ) );
         boolean manualButtonSelected = prefGnuRPanel.getBoolean(MANUAL_BUTTON_SELECTED, false);
         if (manualButtonSelected) {
             autoOrmanual.setSelected(manualButton.getModel(), true);
