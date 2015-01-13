@@ -293,20 +293,13 @@ public class ExpressTest implements ExpressTestI {
             }
 
             mean[j] = mean( rowValues );
-            var[j] = round( variance( rowValues ) );
+            var[j] = Math.round( variance( rowValues ) );
             meanNormalized[j] = mean( rowValuesNormalized );
-            varNormalized[j] = round( variance( rowValuesNormalized ) );
+            varNormalized[j] = Math.round( variance( rowValuesNormalized ) );
 
         }
 
         return new ExpressTest.MeanVarianceGroup( mean, var, meanNormalized, varNormalized );
-
-    }
-
-
-    private static double round( final double d ) {
-
-        return Math.round( d );
 
     }
 

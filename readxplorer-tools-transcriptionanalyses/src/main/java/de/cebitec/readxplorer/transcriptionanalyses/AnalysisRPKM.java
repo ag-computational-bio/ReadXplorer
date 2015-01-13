@@ -34,6 +34,7 @@ import de.cebitec.readxplorer.utils.polytree.NodeVisitor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -47,7 +48,7 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
     private final TrackConnector trackConnector;
     private final List<RPKMvalue> rpkmValues;
     private final List<PersistentFeature> genomeFeatures;
-    private final HashMap<Integer, RPKMvalue> featureReadCount;
+    private final Map<Integer, RPKMvalue> featureReadCount;
     private double totalMappedReads = 0;
 
     private int lastMappingIdx;
@@ -130,24 +131,23 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
      *                      feature count
      */
     public void updateReadCountForFeatures( MappingResult mappingResult ) {
-        List<Mapping> mappings = mappingResult.getMappings();
-        PersistentFeature feature;
-        boolean fstFittingMapping;
-        int currentChromId = mappingResult.getRequest().getChromId();
-        boolean isStrandBothOption = parametersRPKM.getReadClassParams().isStrandBothOption();
-        boolean isFeatureStrand = parametersRPKM.getReadClassParams().isStrandFeatureOption();
-        boolean analysisStrand;
 
-        for( int i = 0; i < this.genomeFeatures.size(); ++i ) {
-            feature = this.genomeFeatures.get( i );
+        final List<Mapping> mappings = mappingResult.getMappings();
+        final int noMappings = mappings.size();
+        final int currentChromId = mappingResult.getRequest().getChromId();
+        final boolean isStrandBothOption = parametersRPKM.getReadClassParams().isStrandBothOption();
+        final boolean isFeatureStrand = parametersRPKM.getReadClassParams().isStrandFeatureOption();
+
+        for( PersistentFeature feature : this.genomeFeatures ) {
+
             if( feature.getChromId() == currentChromId ) {
 
                 int featStart = feature.getStart();
                 int featStop = feature.getStop();
-                analysisStrand = isFeatureStrand ? feature.isFwdStrand() : !feature.isFwdStrand();
-                fstFittingMapping = true;
+                boolean analysisStrand = isFeatureStrand ? feature.isFwdStrand() : !feature.isFwdStrand();
+                boolean fstFittingMapping = true;
 
-                for( int j = this.lastMappingIdx; j < mappings.size(); ++j ) {
+                for( int j = this.lastMappingIdx; j < noMappings; j++ ) {
                     Mapping mapping = mappings.get( j );
 
                     //mappings identified within a feature
@@ -158,7 +158,7 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
                             fstFittingMapping = false;
                         }
                         if( isStrandBothOption || analysisStrand == mapping.isFwdStrand() ) {
-                            ++this.currentCount;
+                            this.currentCount++;
                         }
 
                         //still mappings left, but need next feature
@@ -208,12 +208,10 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
          * tRNA and rRNA are same level than mRNA
          */
         Set<FeatureType> selFeatureTypes = parametersRPKM.getSelFeatureTypes();
-        PersistentFeature feature;
-        double rpkm;
-        int readCount;
         for( Integer id : this.featureReadCount.keySet() ) {
-            feature = this.featureReadCount.get( id ).getFeature();
-            readCount = this.featureReadCount.get( id ).getReadCount();
+
+            PersistentFeature feature = this.featureReadCount.get( id ).getFeature();
+            int readCount = this.featureReadCount.get( id ).getReadCount();
             if( selFeatureTypes.contains( feature.getType() )
                 && readCount >= parametersRPKM.getMinReadCount()
                 && readCount <= parametersRPKM.getMaxReadCount() ) {
@@ -243,12 +241,13 @@ public class AnalysisRPKM implements Observer, AnalysisI<List<RPKMvalue>> {
                     noFeatureReads = this.featureReadCount.get( id ).getReadCount();
                 }
 
-                rpkm = 0;
+                double rpkm = 0;
                 if( noFeatureReads > 0 ) {
                     rpkm = noFeatureReads * 1000000000 / (this.totalMappedReads * geneExonLength);
                 }//1000000000 = 1000000 -> normalization factor * 1000 -> factor for KB of exon length
                 this.rpkmValues.add( new RPKMvalue( feature, rpkm, (int) noFeatureReads, trackConnector.getTrackID() ) );
             }
+
         }
     }
 
