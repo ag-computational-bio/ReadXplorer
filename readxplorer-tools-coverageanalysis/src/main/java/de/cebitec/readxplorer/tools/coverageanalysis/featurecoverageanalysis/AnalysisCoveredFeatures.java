@@ -32,6 +32,7 @@ import de.cebitec.readxplorer.utils.classification.Classification;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -45,11 +46,9 @@ public class AnalysisCoveredFeatures implements Observer,
     private final TrackConnector trackConnector;
     private final ParameterSetCoveredFeatures analysisParams;
     private final List<PersistentFeature> genomeFeatures;
-    private final HashMap<Integer, CoveredFeature> coveredFeatureCount; //feature id to count of covered positions for feature
+    private final Map<Integer, CoveredFeature> coveredFeatureCount; //feature id to count of covered positions for feature
     private final List<CoveredFeature> detectedFeatures;
     private int summedCov = 0;
-
-    private final int lastFeatureIdx;
 
 
     /**
@@ -77,7 +76,6 @@ public class AnalysisCoveredFeatures implements Observer,
         this.detectedFeatures = new ArrayList<>();
         this.coveredFeatureCount = new HashMap<>();
         this.genomeFeatures = new ArrayList<>();
-        this.lastFeatureIdx = 0;
 
         this.initDatastructures();
     }
@@ -95,7 +93,7 @@ public class AnalysisCoveredFeatures implements Observer,
         }
 
         PersistentFeature feature;
-        for( int i = 0; i < this.genomeFeatures.size(); ++i ) {
+        for( int i = 0; i < this.genomeFeatures.size(); i++ ) {
             feature = this.genomeFeatures.get( i );
             this.coveredFeatureCount.put( feature.getId(), new CoveredFeature( feature, trackConnector.getTrackID() ) );
         }
@@ -136,22 +134,14 @@ public class AnalysisCoveredFeatures implements Observer,
         boolean isFeatureStrand = analysisParams.getReadClassParams().isStrandFeatureOption();
         boolean analysisStrand;
 
-        PersistentFeature feature;
-        int noCoveredBases;
-        int featureStart;
-        int featureStop;
-        int coveredBases;
-        int meanCov = 0;
-
         //coverage identified within an feature
-        for( int i = 0; i < this.genomeFeatures.size(); ++i ) {
-            noCoveredBases = 0;
-            feature = this.genomeFeatures.get( i );
+        for( PersistentFeature genomeFeature : this.genomeFeatures ) {
+            int noCoveredBases = 0;
+            PersistentFeature feature = genomeFeature;
             summedCov = 0;
-
             if( feature.getChromId() == coverageAndDiffResult.getRequest().getChromId() ) {
-                featureStart = feature.getStart();
-                featureStop = feature.getStop();
+                int featureStart = feature.getStart();
+                int featureStop = feature.getStop();
 
                 if( featureStart < rightBound ) {
 //                    if (featureStop >= rightBound) {
@@ -159,7 +149,7 @@ public class AnalysisCoveredFeatures implements Observer,
 //                    }
 
                     if( isStrandBothOption ) {
-                        for( int j = featureStart; j <= featureStop; ++j ) {
+                        for( int j = featureStart; j <= featureStop; j++ ) {
                             if( this.checkCanIncreaseAndSumBothStrands( covManager, j ) ) {
                                 ++noCoveredBases;
                             }
@@ -176,9 +166,9 @@ public class AnalysisCoveredFeatures implements Observer,
 
                     //store covered features
                     CoveredFeature coveredFeature = coveredFeatureCount.get( feature.getId() );
-                    coveredBases = this.coveredFeatureCount.get( feature.getId() ).getNoCoveredBases();
+                    int coveredBases = this.coveredFeatureCount.get( feature.getId() ).getNoCoveredBases();
                     if( noCoveredBases > 0 ) {
-                        meanCov = (coveredFeature.getMeanCoverage() + (summedCov / noCoveredBases));
+                        int meanCov = (coveredFeature.getMeanCoverage() + (summedCov / noCoveredBases));
                         if( coveredFeature.getMeanCoverage() > 0 ) {
                             meanCov /= 2;
                         }
@@ -199,10 +189,10 @@ public class AnalysisCoveredFeatures implements Observer,
      * at at least the given minimum percentage of bases of the feature.
      */
     private void findCoveredFeatures() {
-        int percentCovered;
+
         if( analysisParams.isGetCoveredFeatures() ) {
             for( Integer id : this.coveredFeatureCount.keySet() ) {
-                percentCovered = this.coveredFeatureCount.get( id ).getPercentCovered();
+                int percentCovered = this.coveredFeatureCount.get( id ).getPercentCovered();
                 if( percentCovered > analysisParams.getMinCoveredPercent() ) {
                     this.detectedFeatures.add( this.coveredFeatureCount.get( id ) );
                 }
@@ -210,12 +200,13 @@ public class AnalysisCoveredFeatures implements Observer,
         }
         else {
             for( Integer id : this.coveredFeatureCount.keySet() ) {
-                percentCovered = this.coveredFeatureCount.get( id ).getPercentCovered();
+                int percentCovered = this.coveredFeatureCount.get( id ).getPercentCovered();
                 if( percentCovered <= analysisParams.getMinCoveredPercent() ) {
                     this.detectedFeatures.add( this.coveredFeatureCount.get( id ) );
                 }
             }
         }
+        
     }
 
 

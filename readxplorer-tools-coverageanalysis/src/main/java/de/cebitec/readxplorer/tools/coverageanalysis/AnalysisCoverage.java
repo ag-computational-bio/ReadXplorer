@@ -262,7 +262,7 @@ public class AnalysisCoverage implements Observer,
      */
     private int[] sumValues( int[] intArray1, int[] intArray2 ) {
         int[] sumArray = new int[intArray1.length];
-        for( int i = 0; i < intArray1.length; ++i ) {
+        for( int i = 0; i < intArray1.length; i++ ) {
             sumArray[i] = intArray1[i] + intArray2[i];
         }
         return sumArray;
