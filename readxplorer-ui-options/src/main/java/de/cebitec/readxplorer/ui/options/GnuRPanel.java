@@ -53,10 +53,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String MANUAL_BUTTON_SELECTED = "MANUAL_BUTTON_SELECTED";
     private final GnuROptionsPanelController controller;
     private final Preferences pref;
-    private final Preferences prefGnuRPanel;
     private Downloader downloader;
     private Unzip unzip;
     private File zipFile;
@@ -66,6 +64,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     private static final String R_ZIP = "R.zip";
     private static final String DEFAULT_CRAN_MIRROR = "ftp://ftp.cebitec.uni-bielefeld.de/pub/readxplorer_repo/R/";
     private static final String DEFAULT_RSERVE_HOST = "localhost";
+    private static final int DEFAULT_RSERVE_PORT = 6311;
     private final String license = "		    GNU GENERAL PUBLIC LICENSE\n"
                                    + "		       Version 2, June 1991\n"
                                    + "\n"
@@ -414,9 +413,8 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     GnuRPanel( GnuROptionsPanelController controller ) {
         this.controller = controller;
         this.pref = NbPreferences.forModule( Object.class );
-        this.prefGnuRPanel = NbPreferences.forModule( GnuRPanel.class );
         initComponents();
-        portWarningMessage.setText("");
+        warningMessage.setText("");
         String source_uri = pref.get( Properties.CRAN_MIRROR, DEFAULT_CRAN_MIRROR ) + SOURCE_URI;
         sourceFileTextField.setText( source_uri );
         jProgressBar1.setMaximum( 100 );
@@ -436,6 +434,7 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             messages.setText( "Auto installation is only supported under Windows 7 & 8." );
         }
         rServePort.setInputVerifier(new PortInputVerifier());
+        rServeStartupScript.setInputVerifier(new ScriptInputVerifier());
     }
 
 
@@ -480,13 +479,16 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         jLabel3 = new javax.swing.JLabel();
         rServeHost = new javax.swing.JTextField();
         autoButton = new javax.swing.JRadioButton();
-        manualButton = new javax.swing.JRadioButton();
+        manualRemoteButton = new javax.swing.JRadioButton();
+        manualLocalButton = new javax.swing.JRadioButton();
         jLabel4 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
-        jSeparator2 = new javax.swing.JSeparator();
         jLabel5 = new javax.swing.JLabel();
         rServePort = new javax.swing.JTextField();
-        portWarningMessage = new javax.swing.JLabel();
+        warningMessage = new javax.swing.JLabel();
+        jSeparator3 = new javax.swing.JSeparator();
+        jLabel6 = new javax.swing.JLabel();
+        rServeStartupScript = new javax.swing.JTextField();
 
         org.openide.awt.Mnemonics.setLocalizedText(jLabel1, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.jLabel1.text_1")); // NOI18N
 
@@ -535,11 +537,19 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             }
         });
 
-        autoOrmanual.add(manualButton);
-        org.openide.awt.Mnemonics.setLocalizedText(manualButton, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.manualButton.text")); // NOI18N
-        manualButton.addActionListener(new java.awt.event.ActionListener() {
+        autoOrmanual.add(manualRemoteButton);
+        org.openide.awt.Mnemonics.setLocalizedText(manualRemoteButton, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.manualRemoteButton.text")); // NOI18N
+        manualRemoteButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                manualButtonActionPerformed(evt);
+                manualRemoteButtonActionPerformed(evt);
+            }
+        });
+
+        autoOrmanual.add(manualLocalButton);
+        org.openide.awt.Mnemonics.setLocalizedText(manualLocalButton, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.manualLocalButton.text")); // NOI18N
+        manualLocalButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                manualLocalButtonActionPerformed(evt);
             }
         });
 
@@ -550,8 +560,13 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         rServePort.setEditable(false);
         rServePort.setText(org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.rServePort.text")); // NOI18N
 
-        portWarningMessage.setForeground(new java.awt.Color(255, 0, 0));
-        org.openide.awt.Mnemonics.setLocalizedText(portWarningMessage, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.portWarningMessage.text")); // NOI18N
+        warningMessage.setForeground(new java.awt.Color(255, 0, 0));
+        org.openide.awt.Mnemonics.setLocalizedText(warningMessage, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.warningMessage.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(jLabel6, org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.jLabel6.text")); // NOI18N
+
+        rServeStartupScript.setEditable(false);
+        rServeStartupScript.setText(org.openide.util.NbBundle.getMessage(GnuRPanel.class, "GnuRPanel.rServeStartupScript.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -560,31 +575,34 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(autoButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(manualButton))
                     .addComponent(jSeparator1)
                     .addComponent(cranMirror)
                     .addComponent(messages, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(sourceFileTextField)
-                    .addComponent(jSeparator2)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(63, 63, 63))
+                    .addComponent(jSeparator3)
+                    .addComponent(rServeStartupScript)
                     .addComponent(rServeHost)
                     .addComponent(rServePort)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jProgressBar1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(63, 63, 63))
+                    .addComponent(warningMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel4)
                             .addComponent(jLabel1)
                             .addComponent(installButton)
+                            .addComponent(jLabel6)
                             .addComponent(jLabel3)
-                            .addComponent(jLabel5))
+                            .addComponent(jLabel5)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(autoButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(manualLocalButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(manualRemoteButton)))
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(portWarningMessage, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jProgressBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -595,10 +613,11 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(autoButton)
-                    .addComponent(manualButton))
+                    .addComponent(manualRemoteButton)
+                    .addComponent(manualLocalButton))
                 .addGap(18, 18, 18)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cranMirror, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -611,19 +630,23 @@ final class GnuRPanel extends OptionsPanel implements Observer {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(sourceFileTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(messages, javax.swing.GroupLayout.PREFERRED_SIZE, 14, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(messages)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(rServeStartupScript, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(rServeHost, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(rServePort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(portWarningMessage)
+                .addComponent(warningMessage)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -670,30 +693,57 @@ final class GnuRPanel extends OptionsPanel implements Observer {
         this.sourceFileTextField.setText( cranMirror.getText() + SOURCE_URI );
     }//GEN-LAST:event_cranMirrorKeyReleased
 
-    private void manualButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualButtonActionPerformed
+    private void manualRemoteButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualRemoteButtonActionPerformed
+        manualRemoteButtonSelected();
+    }//GEN-LAST:event_manualRemoteButtonActionPerformed
+
+    private void manualRemoteButtonSelected() {
+        rServeStartupScript.setEditable(false);
         rServeHost.setEditable(true);
         rServePort.setEditable(true);
         installButton.setEnabled(false);
-    }//GEN-LAST:event_manualButtonActionPerformed
+    }
 
     private void autoButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_autoButtonActionPerformed
+        autoButtonSelected();
+    }//GEN-LAST:event_autoButtonActionPerformed
+
+    private void autoButtonSelected() {
+        rServeStartupScript.setEditable(false);
         rServeHost.setEditable(false);
         rServePort.setEditable(false);
         installButton.setEnabled(true);
-        portWarningMessage.setText("");
-    }//GEN-LAST:event_autoButtonActionPerformed
+        warningMessage.setText("");
+    }
+
+    private void manualLocalButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_manualLocalButtonActionPerformed
+        manualLocalButtonSelected();
+    }//GEN-LAST:event_manualLocalButtonActionPerformed
+
+    private void manualLocalButtonSelected() {
+        rServeStartupScript.setEditable(true);
+        rServeHost.setEditable(false);
+        rServePort.setEditable(true);
+        installButton.setEnabled(false);
+    }
 
 
     @Override
     void load() {
-        cranMirror.setText( pref.get( Properties.CRAN_MIRROR, DEFAULT_CRAN_MIRROR ) );
-        rServeHost.setText( pref.get( Properties.RSERVE_HOST, DEFAULT_RSERVE_HOST ) );
-        rServePort.setText( String.valueOf(pref.getInt( Properties.RSERVE_PORT, 6311) ) );
-        boolean manualButtonSelected = prefGnuRPanel.getBoolean(MANUAL_BUTTON_SELECTED, false);
-        if (manualButtonSelected) {
-            autoOrmanual.setSelected(manualButton.getModel(), true);
-            rServeHost.setEditable(true);
-            rServePort.setEditable(true);
+        cranMirror.setText(pref.get(Properties.CRAN_MIRROR, DEFAULT_CRAN_MIRROR));
+        rServeHost.setText(pref.get(Properties.RSERVE_HOST, DEFAULT_RSERVE_HOST));
+        rServePort.setText(String.valueOf(pref.getInt(Properties.RSERVE_PORT, DEFAULT_RSERVE_PORT)));
+        boolean manualRemoteButtonSelected = pref.getBoolean(Properties.RSERVE_MANUAL_REMOTE_SETUP, false);
+        if (manualRemoteButtonSelected) {
+            autoOrmanual.setSelected(manualRemoteButton.getModel(), true);
+            manualRemoteButtonSelected();
+        } else {
+            boolean manualLocalButtonSelected = pref.getBoolean(Properties.RSERVE_MANUAL_LOCAL_SETUP, false);
+            if (manualLocalButtonSelected) {
+                autoOrmanual.setSelected(manualLocalButton.getModel(), true);
+                rServeStartupScript.setText(pref.get(Properties.RSERVE_STARTUP_SCRIPT, ""));
+                manualLocalButtonSelected();
+            }
         }
     }
 
@@ -701,20 +751,20 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     @Override
     void store() {
         pref.put(Properties.CRAN_MIRROR, cranMirror.getText());
-        pref.putBoolean(Properties.RSERVE_MANUAL_SETUP, manualButton.isSelected());
-        prefGnuRPanel.putBoolean(MANUAL_BUTTON_SELECTED, manualButton.isSelected());
-        if (manualButton.isSelected()) {
+        pref.putBoolean(Properties.RSERVE_MANUAL_REMOTE_SETUP, manualRemoteButton.isSelected());
+        pref.putBoolean(Properties.RSERVE_MANUAL_LOCAL_SETUP, manualLocalButton.isSelected());
+        if (manualRemoteButton.isSelected()) {
             pref.put(Properties.RSERVE_HOST, rServeHost.getText());
             pref.putInt(Properties.RSERVE_PORT, Integer.parseInt(rServePort.getText()));
+            pref.remove(Properties.RSERVE_STARTUP_SCRIPT);
+        } else if (manualLocalButton.isSelected()){
+            pref.put(Properties.RSERVE_STARTUP_SCRIPT, rServeStartupScript.getText());
+            pref.putInt(Properties.RSERVE_PORT, Integer.parseInt(rServePort.getText()));
+            pref.remove(Properties.RSERVE_HOST);           
         } else {
             pref.remove(Properties.RSERVE_HOST);
             pref.remove(Properties.RSERVE_PORT);
-        }
-        try {
-            prefGnuRPanel.sync();
-        } catch (BackingStoreException ex) {
-            Timestamp timestamp = new Timestamp(Calendar.getInstance().getTime().getTime());
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "{0}: Could not save preferences for GNU R options.", timestamp);
+            pref.remove(Properties.RSERVE_STARTUP_SCRIPT);
         }
     }
 
@@ -728,15 +778,18 @@ final class GnuRPanel extends OptionsPanel implements Observer {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JProgressBar jProgressBar1;
     private javax.swing.JSeparator jSeparator1;
-    private javax.swing.JSeparator jSeparator2;
-    private javax.swing.JRadioButton manualButton;
+    private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JRadioButton manualLocalButton;
+    private javax.swing.JRadioButton manualRemoteButton;
     private javax.swing.JLabel messages;
-    private javax.swing.JLabel portWarningMessage;
     private javax.swing.JTextField rServeHost;
     private javax.swing.JTextField rServePort;
+    private javax.swing.JTextField rServeStartupScript;
     private javax.swing.JTextField sourceFileTextField;
+    private javax.swing.JLabel warningMessage;
     // End of variables declaration//GEN-END:variables
 
 
@@ -847,12 +900,28 @@ final class GnuRPanel extends OptionsPanel implements Observer {
             try {
                 Integer.parseInt(text);
             } catch (NumberFormatException ex) {
-                portWarningMessage.setText("Please enter a valid port number.");
+                warningMessage.setText("Please enter a valid port number.");
                 return false;
             }
-            portWarningMessage.setText("");
+            warningMessage.setText("");
             return true;
         }
     }
+    
+    class ScriptInputVerifier extends InputVerifier {
 
+        @Override
+        public boolean verify(JComponent input) {
+            JTextField textField = (JTextField) input;
+            String text = textField.getText();
+            File script = new File(text);
+            if (script.exists() && script.canExecute()) {
+                warningMessage.setText("");
+                return true;
+            } else {
+                warningMessage.setText("Please enter a valid startup script.");
+                return false;
+            }
+        }
+    }
 }

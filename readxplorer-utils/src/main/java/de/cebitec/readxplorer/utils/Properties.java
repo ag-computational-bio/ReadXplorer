@@ -185,22 +185,30 @@ public class Properties {
     public static final String EXT_A2_STRING = String.valueOf( EXT_A2 );
 
     /**
-     * The CRAN Mirror used by Gnu R to load missing packages
+     * The CRAN Mirror used by Gnu R to load missing packages.
      */
     public static final String CRAN_MIRROR = "CRAN_MIRROR";
     
     /**
-     * The RServe host we will connect to for GNU R computations
+     * The RServe host we will connect to for GNU R computations.
      */
     public static final String RSERVE_HOST = "RSERVE_HOST";
     /**
-     * The RServe port we will connect to for GNU R computations
+     * The RServe port we will connect to for GNU R computations.
      */
     public static final String RSERVE_PORT = "RSERVE_PORT";
     /**
-     * Is RServe manuala configured
+     * Holds the full path to the Rserve startup script if manual local setup is used.
      */
-    public static final String RSERVE_MANUAL_SETUP = "RSERVE_MANUAL_SETUP";
+    public static final String RSERVE_STARTUP_SCRIPT = "RSERVE_STARTUP_SCRIPT";
+    /**
+     * Is Rserve manually configured to connect to a remote server.
+     */
+    public static final String RSERVE_MANUAL_REMOTE_SETUP = "RSERVE_MANUAL_REMOTE_SETUP";
+    /**
+     * Is Rserve manually configured to connect to a local server with custom startup script.
+     */
+    public static final String RSERVE_MANUAL_LOCAL_SETUP = "RSERVE_MANUAL_LOCAL_SETUP";
     
     public static final String MAPPER_PATH = "MAPPER_PATH";
 

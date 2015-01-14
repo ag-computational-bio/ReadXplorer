@@ -170,32 +170,22 @@ public class GnuR extends RConnection {
     public static GnuR startRServe() throws RserveException {
         String host;
         int port;
-        boolean manualSetup = NbPreferences.forModule(Object.class).getBoolean(Properties.RSERVE_MANUAL_SETUP, false);
+        boolean manualLocalSetup = NbPreferences.forModule(Object.class).getBoolean(Properties.RSERVE_MANUAL_LOCAL_SETUP, false);
+        boolean manualRemoteSetup = NbPreferences.forModule(Object.class).getBoolean(Properties.RSERVE_MANUAL_REMOTE_SETUP, false);
 
-        //If = In case of a local auto setup
-        //Else = Manuel setup
-        if (!manualSetup) {
+        if (manualRemoteSetup) {
+            port = NbPreferences.forModule(Object.class).getInt(Properties.RSERVE_PORT, 6311);
+            host = NbPreferences.forModule(Object.class).get(Properties.RSERVE_HOST, "localhost");
+        } else {
             ProcessBuilder pb;
-            port = nextFreePort++;
             host = "localhost";
-            String bit = System.getProperty("sun.arch.data.model");
-            String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
-            String user_dir = System.getProperty("netbeans.user");
-            File r_dir = new File(user_dir + File.separator + "R");
 
-            if (os.contains("windows")) {
-                String startupBat = r_dir.getAbsolutePath() + File.separator + "bin" + File.separator + "startup.bat";
-                String arch = "";
-                if (bit.equals("32")) {
-                    arch = "i386";
-                }
-                if (bit.equals("64")) {
-                    arch = "x64";
-                }
+            if (manualLocalSetup) {
+                port = NbPreferences.forModule(Object.class).getInt(Properties.RSERVE_PORT, 6311);
+                String startUpScript = NbPreferences.forModule(Object.class).get(Properties.RSERVE_STARTUP_SCRIPT, "");
                 List<String> commands = new ArrayList<>();
-                commands.add(startupBat);
-                commands.add(r_dir.getAbsolutePath());
-                commands.add(arch);
+                commands.add("/bin/bash");
+                commands.add(startUpScript);
                 commands.add(String.valueOf(port));
                 pb = new ProcessBuilder(commands);
                 try {
@@ -203,24 +193,49 @@ public class GnuR extends RConnection {
                 } catch (IOException ex) {
                     Exceptions.printStackTrace(ex);
                 }
+            } else {
+                port = nextFreePort++;
+                String bit = System.getProperty("sun.arch.data.model");
+                String os = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
+                String user_dir = System.getProperty("netbeans.user");
+                File r_dir = new File(user_dir + File.separator + "R");
+                if (os.contains("windows")) {
+                    String startupBat = r_dir.getAbsolutePath() + File.separator + "bin" + File.separator + "startup.bat";
+                    String arch = "";
+                    if (bit.equals("32")) {
+                        arch = "i386";
+                    }
+                    if (bit.equals("64")) {
+                        arch = "x64";
+                    }
+                    List<String> commands = new ArrayList<>();
+                    commands.add(startupBat);
+                    commands.add(r_dir.getAbsolutePath());
+                    commands.add(arch);
+                    commands.add(String.valueOf(port));
+                    pb = new ProcessBuilder(commands);
+                    try {
+                        pb.start();
+                    } catch (IOException ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
+                }
             }
-        } else {
-            port = NbPreferences.forModule(Object.class).getInt(Properties.RSERVE_PORT, 6311);
-            host = NbPreferences.forModule(Object.class).get(Properties.RSERVE_HOST, "localhost");
         }
-        return new GnuR(host, port, manualSetup);
+        return new GnuR(host, port, !manualRemoteSetup);
     }
-    
-    public static boolean gnuRSetupCorrect(){
-        boolean manualSetup = NbPreferences.forModule(Object.class).getBoolean(Properties.RSERVE_MANUAL_SETUP, false);
-        
-        if(!manualSetup) {
+
+    public static boolean gnuRSetupCorrect() {
+        boolean manualLocalSetup = NbPreferences.forModule(Object.class).getBoolean(Properties.RSERVE_MANUAL_LOCAL_SETUP, false);
+        boolean manualRemoteSetup = NbPreferences.forModule(Object.class).getBoolean(Properties.RSERVE_MANUAL_REMOTE_SETUP, false);
+
+        if (!(manualLocalSetup || manualRemoteSetup)) {
             String user_dir = System.getProperty("netbeans.user");
             File r_dir = new File(user_dir + File.separator + "R");
             String startupBat = r_dir.getAbsolutePath() + File.separator + "bin" + File.separator + "startup.bat";
             File batFile = new File(startupBat);
             return (batFile.exists() && batFile.canExecute());
-        } else {           
+        } else {
             return true;
         }
     }
