@@ -85,7 +85,7 @@ public class FieldNames {
     public static final String TRACK_READ_PAIR_ID = "SEQUENCE_PAIR_ID";
     public static final String TRACK_DESCRIPTION = "DESCRIPTION";
     public static final String TRACK_TIMESTAMP = "CREATIONTIME";
-    public static final String TRACK_PATH = "PATH";
+    public static final String TRACK_PATH = "PATH"; // path to bam (mapping) file.
 
     // statistics table fields
     public static final String STATISTICS_ID = "ID";

@@ -32,7 +32,7 @@ import java.util.List;
 public class PersistentTrack {
 
     private int id;
-    private String path;
+    private String path; // path to bam (mapping ) 
     private String description;
     private Timestamp date;
     private int refGenID;
