@@ -69,25 +69,29 @@ import org.openide.util.NbBundle;
  */
 public class ProjectConnector extends Observable {
 
-    private static ProjectConnector dbConnector;
+    private static final Logger LOG = Logger.getLogger( ProjectConnector.class.getName() );
+
+    private static final int BATCH_SIZE = 100000; //TODO: test larger batch sizes
+    private static final int FEATURE_BATCH_SIZE = BATCH_SIZE;
     private static final int DB_VERSION_NO = 3;
-    private Connection con;
+
+    private static final String BIGINT_UNSIGNED = "BIGINT UNSIGNED";
+    private static final String INT_UNSIGNED = "INT UNSIGNED";
+    private static final String VARCHAR400 = "VARCHAR(400)";
+    private static final String VARCHAR1000 = "VARCHAR(1000)";
+
+    private final Map<Integer, TrackConnector> trackConnectors;
+    private final Map<Integer, MultiTrackConnector> multiTrackConnectors;
+    private final Map<Integer, ReferenceConnector> refConnectors;
+
+    private static ProjectConnector dbConnector;
+
     private String url;
     private String user;
     private String password;
     private String adapter;
-    private final HashMap<Integer, TrackConnector> trackConnectors;
-    private final HashMap<Integer, MultiTrackConnector> multiTrackConnectors;
-//    private List<MultiTrackConnector> multiTrackConnectors;
-    private final HashMap<Integer, ReferenceConnector> refConnectors;
-    private static final int BATCH_SIZE = 100000; //TODO: test larger batch sizes
-    private final static int FEATURE_BATCH_SIZE = BATCH_SIZE;
-    private final static String BIGINT_UNSIGNED = "BIGINT UNSIGNED";
-    private final static String INT_UNSIGNED = "INT UNSIGNED";
-    private static final String VARCHAR400 = "VARCHAR(400)";
-    private static final String VARCHAR1000 = "VARCHAR(1000)";
-
     private String dbLocation;
+    private Connection con;
 
 
     /**
@@ -95,10 +99,11 @@ public class ProjectConnector extends Observable {
      * Contains the methods to communicate with the data base.
      */
     private ProjectConnector() {
+
         trackConnectors = new HashMap<>();
         multiTrackConnectors = new HashMap<>();
-//        multiTrackConnectors = new ArrayList<>();
         refConnectors = new HashMap<>();
+
     }
 
 
@@ -106,8 +111,10 @@ public class ProjectConnector extends Observable {
      * Clears all track an reference connector lists of this ProjectConnector.
      */
     private void cleanUp() {
+
         trackConnectors.clear();
         refConnectors.clear();
+
     }
 
 
@@ -127,17 +134,17 @@ public class ProjectConnector extends Observable {
      *         false otherwise
      */
     public boolean isConnected() {
+
         if( con != null ) {
             try {
                 return con.isValid( 0 );
             }
-            catch( SQLException ex ) {
-                return false;
+            catch( SQLException e ) {
             }
         }
-        else {
-            return false;
-        }
+
+        return false;
+
     }
 
 
@@ -145,19 +152,20 @@ public class ProjectConnector extends Observable {
      * Disconnects the current DB connection.
      */
     public void disconnect() {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Closing database connection" );
+
+        LOG.info( "Closing database connection" );
         try {
             con.close();
         }
         catch( SQLException ex ) {
-            Logger.getLogger( ProjectConnector.class.getName() ).log( Level.SEVERE, null, ex );
+            LOG.log( Level.SEVERE, null, ex );
         }
         finally {
             con = null;
-            this.cleanUp();
+            cleanUp();
 
             // notify observers about the change of the database
-            this.notifyObserversAbout( "disconnect" );
+            notifyObserversAbout( "disconnect" );
         }
     }
 
@@ -176,27 +184,28 @@ public class ProjectConnector extends Observable {
      * @throws JdbcSQLException
      */
     public void connect( String adapter, String projectLocation, String hostname, String user, String password ) throws SQLException, JdbcSQLException {
+
         this.adapter = adapter;
         this.dbLocation = projectLocation;
         if( adapter.equalsIgnoreCase( Properties.ADAPTER_MYSQL ) ) {
             this.url = "jdbc:" + adapter + "://" + hostname + "/" + projectLocation;
             this.user = user;
             this.password = password;
-            this.connectMySql( url, user, password );
-            this.setupMySQLDatabase();
+            connectMySql( url, user, password );
+            setupMySQLDatabase();
         }
         else if( adapter.equalsIgnoreCase( Properties.ADAPTER_H2 ) ) {
             //CACHE_SIZE is measured in KB
             this.url = "jdbc:" + adapter + ":" + projectLocation + ";AUTO_SERVER=TRUE;MULTI_THREADED=1;CACHE_SIZE=200000";
             //;FILE_LOCK=SERIALIZED"; that works temporary but now using AUTO_SERVER
 
-            this.connectH2DataBase( url );
-            this.setupDatabaseH2();
-//        } else { //means: if (adapter.equalsIgnoreCase(Properties.ADAPTER_DIRECT_ACCESS)) {
-//            this.connectToProject(projectLocation);
+            connectH2DataBase( url );
+            setupDatabaseH2();
+
         }
         // notify observers about the change of the database
-        this.notifyObserversAbout( "connect" );
+        notifyObserversAbout( "connect" );
+
     }
 
 
@@ -210,10 +219,12 @@ public class ProjectConnector extends Observable {
      * @throws SQLException
      */
     private void connectMySql( String url, String user, String password ) throws SQLException {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Connecting to database" );
+
+        LOG.info( "Connecting to database" );
         con = DriverManager.getConnection( url, user, password );
         con.setAutoCommit( true );
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Successfully connected to database" );
+        LOG.info( "Successfully connected to database" );
+
     }
 
 
@@ -226,17 +237,14 @@ public class ProjectConnector extends Observable {
      * @throws JdbcSQLException
      */
     private void connectH2DataBase( String url ) throws SQLException, JdbcSQLException {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Connecting to database" );
+
+        LOG.info( "Connecting to database" );
         con = DriverManager.getConnection( url );
         con.setAutoCommit( true );
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Successfully connected to database" );
+        LOG.info( "Successfully connected to database" );
+
     }
 
-//    private void connectToProject(String projectLocation) {
-//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Connecting to project");
-//        //TODO: write code for connecting to a project...
-//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Successfully connected to project");
-//    }
 
     /**
      * Makes sure that an H2 DB is in a correct up-to-date state.
@@ -248,11 +256,10 @@ public class ProjectConnector extends Observable {
     private void setupDatabaseH2() {
 
         try {
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Setting up tables and indices if not existent" );
+            LOG.info( "Setting up tables and indices if not existent" );
 
             con.setAutoCommit( false );
             //create tables if not exist yet
-//            con.prepareStatement(SQLStatements.SETUP_PROJECT_FOLDER).executeUpdate();
 
             con.prepareStatement( H2SQLStatements.SETUP_REFERENCE_GENOME ).executeUpdate();
 
@@ -273,16 +280,17 @@ public class ProjectConnector extends Observable {
 
             con.prepareStatement( SQLStatements.SETUP_DB_VERSION_TABLE ).executeUpdate();
 
-            this.checkDBStructure();
+            checkDBStructure();
 
             con.commit();
             con.setAutoCommit( true );
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Finished creating tables and indices if not existent before" );
+            LOG.info( "Finished creating tables and indices if not existent before" );
 
         }
         catch( SQLException ex ) {
-            this.rollbackOnError( this.getClass().getName(), ex );
+            rollbackOnError( ProjectConnector.class.getName(), ex );
         }
+
     }
 
 
@@ -295,11 +303,10 @@ public class ProjectConnector extends Observable {
     private void setupMySQLDatabase() {
 
         try {
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Setting up tables and indices if not existent" );
+            LOG.info( "Setting up tables and indices if not existent" );
 
             con.setAutoCommit( false );
             //create tables if not exist yet
-//            con.prepareStatement(SQLStatements.SETUP_PROJECT_FOLDER).executeUpdate();
             con.prepareStatement( MySQLStatements.SETUP_REFERENCE_GENOME ).executeUpdate();
             con.prepareStatement( MySQLStatements.SETUP_FEATURES ).executeUpdate();
             con.prepareStatement( MySQLStatements.SETUP_TRACKS ).execute();
@@ -307,16 +314,17 @@ public class ProjectConnector extends Observable {
             con.prepareStatement( MySQLStatements.SETUP_COUNT_DISTRIBUTION ).executeUpdate();
             con.prepareStatement( MySQLStatements.SETUP_CHROMOSOME ).executeUpdate();
 
-            this.checkDBStructure();
+            checkDBStructure();
 
             con.commit();
             con.setAutoCommit( true );
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Finished creating tables and indices if not existent before" );
+            LOG.info( "Finished creating tables and indices if not existent before" );
 
         }
         catch( SQLException ex ) {
-            this.rollbackOnError( this.getClass().getName(), ex );
+            rollbackOnError( ProjectConnector.class.getName(), ex );
         }
+
     }
 
 
@@ -329,45 +337,46 @@ public class ProjectConnector extends Observable {
      */
     private void checkDBStructure() {
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Checking DB structure..." );
+        LOG.info( "Checking DB structure..." );
 
         //remove all old tables not used anymore
-        this.runSqlStatement( SQLStatements.DROP_TABLE + "STATICS" );
-        this.runSqlStatement( SQLStatements.DROP_TABLE + "SUBFEATURES" );
-        this.runSqlStatement( SQLStatements.DROP_TABLE + "COVERAGE_DISTRIBUTION" );
-        this.runSqlStatement( SQLStatements.DROP_TABLE + "POSITIONS" );
+        runSqlStatement( SQLStatements.DROP_TABLE + "STATICS" );
+        runSqlStatement( SQLStatements.DROP_TABLE + "SUBFEATURES" );
+        runSqlStatement( SQLStatements.DROP_TABLE + "COVERAGE_DISTRIBUTION" );
+        runSqlStatement( SQLStatements.DROP_TABLE + "POSITIONS" );
 
         //add read pair id column in tracks if not existent
-        this.runSqlStatement( GenericSQLQueries.genAddColumnString(
+        runSqlStatement( GenericSQLQueries.genAddColumnString(
                 FieldNames.TABLE_TRACK, FieldNames.TRACK_READ_PAIR_ID, BIGINT_UNSIGNED ) );
 
-        this.runSqlStatement( GenericSQLQueries.genAddColumnString(
+        runSqlStatement( GenericSQLQueries.genAddColumnString(
                 FieldNames.TABLE_FEATURES, FieldNames.FEATURE_GENE, "VARCHAR (20)" ) );
 
-        this.runSqlStatement( GenericSQLQueries.genAddColumnString(
+        runSqlStatement( GenericSQLQueries.genAddColumnString(
                 FieldNames.TABLE_TRACK, FieldNames.TRACK_PATH, VARCHAR400 ) );
 
 
-        //delete old "RUN_ID" field from the database to avoid problems with null values in insert statement
-        // an error will be raised by the query, if the field does not exist
-        // (simply ignore the error)
-        this.runSqlStatement( GenericSQLQueries.genRemoveColumnString(
+        /** delete old "RUN_ID" field from the database to avoid problems with null values in insert statement
+        * an error will be raised by the query, if the field does not exist
+        * (simply ignore the error)
+        */
+        runSqlStatement( GenericSQLQueries.genRemoveColumnString(
                 FieldNames.TABLE_TRACK, "RUN_ID" ) );
 
         //Add column parent id to feature table
-        this.runSqlStatement( GenericSQLQueries.genAddColumnString( FieldNames.TABLE_FEATURES, FieldNames.FEATURE_PARENT_IDS, VARCHAR1000 ) );
-        this.runSqlStatement( SQLStatements.INIT_FEATURE_PARENT_ID );
-        this.runSqlStatement( SQLStatements.NOT_NULL_FEATURE_PARENT_ID );
+        runSqlStatement( GenericSQLQueries.genAddColumnString( FieldNames.TABLE_FEATURES, FieldNames.FEATURE_PARENT_IDS, VARCHAR1000 ) );
+        runSqlStatement( SQLStatements.INIT_FEATURE_PARENT_ID );
+        runSqlStatement( SQLStatements.NOT_NULL_FEATURE_PARENT_ID );
         //Drop old PARENT_ID column
-        this.runSqlStatement( GenericSQLQueries.genRemoveColumnString(
+        runSqlStatement( GenericSQLQueries.genRemoveColumnString(
                 FieldNames.TABLE_FEATURES, "PARENT_ID" ) );
 
         //Drop unneeded indexes
-        this.runSqlStatement( SQLStatements.DROP_INDEX + "INDEXPOS" );
+        runSqlStatement( SQLStatements.DROP_INDEX + "INDEXPOS" );
 
-        this.checkDBVersion();
+        checkDBVersion();
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Finished checking DB structure." );
+        LOG.info( "Finished checking DB structure." );
 
     }
 
@@ -383,24 +392,9 @@ public class ProjectConnector extends Observable {
             con.prepareStatement( statement ).executeUpdate();
         }
         catch( SQLException ex ) {
-            this.checkRollback( ex );
+            checkRollback( ex );
         }
-    }
 
-
-    /**
-     * Runs a single sql statement and ignores any errors
-     * <p>
-     * @param statement sql statement to run
-     */
-    private void runSqlStatementIgnoreErrors( String statement ) {
-
-        try {
-            con.prepareStatement( statement ).executeUpdate();
-        }
-        catch( SQLException ex ) {
-            //ignore
-        }
     }
 
 
@@ -412,7 +406,7 @@ public class ProjectConnector extends Observable {
      */
     private void checkRollback( SQLException ex ) {
         if( !ex.getMessage().contains( "Duplicate column name" ) ) {
-            this.rollbackOnError( this.getClass().getName(), ex );
+            rollbackOnError( ProjectConnector.class.getName(), ex );
         }
     }
 
@@ -427,46 +421,21 @@ public class ProjectConnector extends Observable {
      */
     public void rollbackOnError( String className, Exception ex ) {
 
-        Logger.getLogger( ProjectConnector.class.getName() ).log( Level.SEVERE, "Error occured. Trying to recover", ex );
+        LOG.log( Level.SEVERE, "Error occured. Trying to recover", ex );
         try {
             if( !con.isClosed() ) {
                 //connection is still open. try rollback
                 con.rollback();
-                Logger.getLogger( ProjectConnector.class.getName() ).log( Level.INFO, "Successfully rolled back" );
+                LOG.info( "Successfully rolled back" );
             }
             else {
                 //connection was closed before, open a new one
-                this.connectMySql( url, user, password );
+                connectMySql( url, user, password );
             }
 
         }
         catch( SQLException ex1 ) {
-            Logger.getLogger( ProjectConnector.class.getName() ).log( Level.INFO, "Rollback failed", ex1 );
-        }
-    }
-
-    /*
-     * Method only for development of database and testing of import functionality.
-     * Never use this in productive environment.
-     */
-
-    private void deleteAllTables() {
-        try {
-            con.setAutoCommit( false );
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Deleting all database tables" );
-            try( ResultSet rs = con.prepareStatement( "show tables" ).executeQuery() ) {
-                while( rs.next() ) {
-                    String table = rs.getString( 1 );
-                    con.prepareStatement( "drop table " + table ).executeUpdate();
-                }
-                con.commit();
-                con.setAutoCommit( true );
-            }
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Successfully deleted all data" );
-        }
-        catch( SQLException ex ) {
-            this.rollbackOnError( this.getClass().getName(), ex );
-            Logger.getLogger( ProjectConnector.class.getName() ).log( Level.SEVERE, "Deletion of data failed", ex );
+            LOG.log( Level.INFO, "Rollback failed", ex1 );
         }
     }
 
@@ -475,7 +444,8 @@ public class ProjectConnector extends Observable {
      * Unlocks tables in mysql fashion.
      */
     private void unlockTables() {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "start unlocking tables" );
+
+        LOG.info( "start unlocking tables" );
         try( Statement unlock = con.createStatement() ) {
             con.setAutoCommit( false );
             unlock.execute( MySQLStatements.UNLOCK_TABLES );
@@ -483,9 +453,9 @@ public class ProjectConnector extends Observable {
             con.setAutoCommit( true );
         }
         catch( SQLException ex ) {
-            this.rollbackOnError( this.getClass().getName(), ex );
+            rollbackOnError( ProjectConnector.class.getName(), ex );
         }
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "done unlocking tables" );
+        LOG.info( "done unlocking tables" );
     }
 
 
@@ -493,10 +463,12 @@ public class ProjectConnector extends Observable {
      * Disables all indices belonging to the domain of genomic references.
      */
     private void disableReferenceIndices() {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "start disabling reference data domain indexing..." );
-        this.disableDomainIndices( MySQLStatements.DISABLE_REFERENCE_INDICES, null );
-        this.disableDomainIndices( MySQLStatements.DISABLE_FEATURE_INDICES, null );
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "...done disabling reference data domain indexing" );
+
+        LOG.info( "start disabling reference data domain indexing..." );
+        disableDomainIndices( MySQLStatements.DISABLE_REFERENCE_INDICES, null );
+        disableDomainIndices( MySQLStatements.DISABLE_FEATURE_INDICES, null );
+        LOG.info( "...done disabling reference data domain indexing" );
+
     }
 
 
@@ -504,10 +476,12 @@ public class ProjectConnector extends Observable {
      * Enables all indices belonging to the domain of genomic references.
      */
     private void enableReferenceIndices() {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "start enabling reference data domain indexing..." );
-        this.enableDomainIndices( MySQLStatements.ENABLE_REFERENCE_INDICES, null );
-        this.enableDomainIndices( MySQLStatements.ENABLE_FEATURE_INDICES, null );
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "...done enabling reference data domain indexing" );
+
+        LOG.info( "start enabling reference data domain indexing..." );
+        enableDomainIndices( MySQLStatements.ENABLE_REFERENCE_INDICES, null );
+        enableDomainIndices( MySQLStatements.ENABLE_FEATURE_INDICES, null );
+        LOG.info( "...done enabling reference data domain indexing" );
+
     }
 
 
@@ -521,34 +495,35 @@ public class ProjectConnector extends Observable {
      * @throws StorageException
      */
     public int addRefGenome( final ParsedReference reference ) throws StorageException {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Start storing reference sequence  \"{0}\"", reference.getName() );
+
+        LOG.log( Level.INFO, "Start storing reference sequence  \"{0}\"", reference.getName() );
 
         try {
             con.setAutoCommit( false );
 
             if( adapter.equalsIgnoreCase( Properties.ADAPTER_MYSQL ) ) {
-                this.lockReferenceDomainTables();
-                this.disableReferenceIndices();
+                lockReferenceDomainTables();
+                disableReferenceIndices();
             }
 
-            this.storeGenome( reference );
-            this.storeFeatures( reference );
+            storeGenome( reference );
+            storeFeatures( reference );
 
             if( adapter.equalsIgnoreCase( Properties.ADAPTER_MYSQL ) ) {
-                this.enableReferenceIndices();
-                this.unlockTables();
+                enableReferenceIndices();
+                unlockTables();
             }
 
             con.setAutoCommit( true );
         }
         catch( SQLException ex ) {
-            this.rollbackOnError( this.getClass().getName(), ex );
+            rollbackOnError( ProjectConnector.class.getName(), ex );
         }
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "finished storing reference sequence \"{0}\"", reference.getName() );
+        LOG.log( Level.INFO, "finished storing reference sequence \"{0}\"", reference.getName() );
 
         // notify observers about the change of the database
-        this.notifyObserversAbout( "addRefGenome" );
+        notifyObserversAbout( "addRefGenome" );
 
         return reference.getID();
     }
@@ -560,7 +535,8 @@ public class ProjectConnector extends Observable {
      * @param reference the reference data to store
      */
     private void storeGenome( final ParsedReference reference ) {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "start storing reference sequence data..." );
+
+        LOG.info( "start storing reference sequence data..." );
         try( PreparedStatement insertGenome = con.prepareStatement( SQLStatements.INSERT_REFGENOME ) ) {
 
             int id = (int) GenericSQLQueries.getLatestIDFromDB( SQLStatements.GET_LATEST_REFERENCE_ID, con );
@@ -576,17 +552,18 @@ public class ProjectConnector extends Observable {
 
             List<ParsedChromosome> chromosomes = reference.getChromosomes();
             for( int i = 0; i < chromosomes.size(); i++ ) {
-                this.storeChromosome( chromosomes.get( i ), i + 1, reference.getID() );
+                storeChromosome( chromosomes.get( i ), i + 1, reference.getID() );
             }
 
             con.commit();
 
         }
         catch( SQLException ex ) {
-            this.rollbackOnError( this.getClass().getName(), ex );
+            rollbackOnError( ProjectConnector.class.getName(), ex );
         }
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "...done inserting reference sequence data" );
+        LOG.info( "...done inserting reference sequence data" );
+
     }
 
 
@@ -599,7 +576,7 @@ public class ProjectConnector extends Observable {
      */
     private void storeChromosome( final ParsedChromosome chromosome, final int chromNumber, final int refID ) {
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "start storing chromosome data..." );
+        LOG.info( "start storing chromosome data..." );
         try( PreparedStatement insertChromosome = con.prepareStatement( SQLStatements.INSERT_CHROMOSOME ) ) {
 
             int id = (int) GenericSQLQueries.getLatestIDFromDB( SQLStatements.GET_LATEST_CHROMOSOME_ID, con );
@@ -617,10 +594,11 @@ public class ProjectConnector extends Observable {
 
         }
         catch( SQLException ex ) {
-            this.rollbackOnError( this.getClass().getName(), ex );
+            rollbackOnError( ProjectConnector.class.getName(), ex );
         }
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "...done inserting chromosome data" );
+        LOG.info( "...done inserting chromosome data" );
+
     }
 
 
@@ -630,7 +608,8 @@ public class ProjectConnector extends Observable {
      * @param reference the reference containing the features to store
      */
     private void storeFeatures( final ParsedReference reference ) {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "start inserting features..." );
+
+        LOG.info( "start inserting features..." );
         try( final PreparedStatement insertFeature = con.prepareStatement( SQLStatements.INSERT_FEATURE ) ) {
 
             for( final ParsedChromosome chrom : reference.getChromosomes() ) {
@@ -642,10 +621,10 @@ public class ProjectConnector extends Observable {
                 chrom.distributeFeatureIds();
 
                 int batchCounter = 1;
+                insertFeature.setLong( 2, chrom.getID() );
                 for( ParsedFeature feature : chrom.getFeatures() ) {
                     batchCounter++;
                     insertFeature.setLong( 1, feature.getId() );
-                    insertFeature.setLong( 2, chrom.getID() );
                     insertFeature.setString( 3, feature.getParentIdsConcat() );
                     insertFeature.setInt( 4, feature.getType().getTypeByte() );
                     insertFeature.setInt( 5, feature.getStart() );
@@ -668,19 +647,20 @@ public class ProjectConnector extends Observable {
 
         }
         catch( SQLException ex ) {
-            this.rollbackOnError( this.getClass().getName(), ex );
-            Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, ex.getMessage() );
+            rollbackOnError( ProjectConnector.class.getName(), ex );
+            LOG.log( Level.SEVERE, ex.getMessage() );
         }
         catch( Exception e ) {
-            Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, e.getMessage() );
+            LOG.log( Level.SEVERE, e.getMessage() );
         }
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "...done inserting features" );
+        LOG.info( "...done inserting features" );
+
     }
 
 
     private void lockReferenceDomainTables() {
-        this.lockDomainTables( MySQLStatements.LOCK_TABLE_REFERENCE_DOMAIN, "reference" );
+        lockDomainTables( MySQLStatements.LOCK_TABLE_REFERENCE_DOMAIN, "reference" );
     }
 
 
@@ -692,7 +672,8 @@ public class ProjectConnector extends Observable {
      * @param track the track job containing the track information to store
      */
     public void storeBamTrack( final ParsedTrack track ) {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "start storing bam track data..." );
+
+        LOG.info( "start storing bam track data..." );
 
         try( PreparedStatement insertTrack = con.prepareStatement( SQLStatements.INSERT_TRACK ) ) {
             insertTrack.setLong( 1, track.getID() );
@@ -704,13 +685,14 @@ public class ProjectConnector extends Observable {
 
         }
         catch( SQLException ex ) {
-            this.rollbackOnError( this.getClass().getName(), ex );
+            rollbackOnError( ProjectConnector.class.getName(), ex );
         }
 
         // notify observers about the change of the database
-        this.notifyObserversAbout( "storeTrack" );
+        notifyObserversAbout( "storeTrack" );
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "...done storing bam track data" );
+        LOG.info( "...done storing bam track data" );
+
     }
 
 
@@ -722,18 +704,19 @@ public class ProjectConnector extends Observable {
      * @param trackID        the track id whose data shall be stored
      */
     public void storeTrackStatistics( final StatsContainer statsContainer, final int trackID ) {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Start storing track statistics..." );
+
+        LOG.info( "Start storing track statistics..." );
 
         Map<String, Integer> statsMap = statsContainer.getStatsMap();
 
         DiscreteCountingDistribution readLengthDistribution = statsContainer.getReadLengthDistribution();
         if( !readLengthDistribution.isEmpty() ) {
-            this.insertCountDistribution( readLengthDistribution, trackID );
+            insertCountDistribution( readLengthDistribution, trackID );
             statsMap.put( StatsContainer.AVERAGE_READ_LENGTH, readLengthDistribution.getAverageValue() );
         }
         DiscreteCountingDistribution readPairLengthDistribution = statsContainer.getReadPairSizeDistribution();
         if( !readPairLengthDistribution.isEmpty() ) {
-            this.insertCountDistribution( readPairLengthDistribution, trackID );
+            insertCountDistribution( readPairLengthDistribution, trackID );
             statsMap.put( StatsContainer.AVERAGE_READ_PAIR_SIZE, readPairLengthDistribution.getAverageValue() );
         }
 
@@ -751,23 +734,11 @@ public class ProjectConnector extends Observable {
             }
         }
         catch( SQLException ex ) {
-            this.rollbackOnError( this.getClass().getName(), ex );
+            rollbackOnError( ProjectConnector.class.getName(), ex );
         }
-//        for( Map.Entry<String, Integer> entry : statsMap.entrySet() ) {
-//            try( PreparedStatement insertStats = con.prepareStatement( SQLStatements.INSERT_STATISTICS ); ) {
-//                insertStats.setLong( 1, latestID++ );
-//                insertStats.setInt( 2, trackID );
-//                insertStats.setString( 3, entry.getKey() );
-//                insertStats.setInt( 4, entry.getValue() );
-//                insertStats.executeUpdate();
-//
-//            }
-//            catch( SQLException ex ) {
-//                this.rollbackOnError( this.getClass().getName(), ex );
-//            }
-//        }
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "...done storing track statistics data" );
+        LOG.info( "...done storing track statistics data" );
+
     }
 
 
@@ -779,7 +750,8 @@ public class ProjectConnector extends Observable {
      * @param trackID the track id whose data shall be stored
      */
     public void deleteSpecificTrackStatistics( List<String> keys, int trackID ) {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Start deleting specific track statistics..." );
+
+        LOG.info( "Start deleting specific track statistics..." );
 
         try( PreparedStatement deleteStats = con.prepareStatement( SQLStatements.DELETE_SPECIFIC_TRACK_STATISTIC ) ) {
             deleteStats.setLong( 1, trackID );
@@ -789,21 +761,11 @@ public class ProjectConnector extends Observable {
             }
         }
         catch( SQLException ex ) {
-            this.rollbackOnError( this.getClass().getName(), ex );
+            rollbackOnError( ProjectConnector.class.getName(), ex );
         }
-//        for( String key : keys ) {
-//            try( PreparedStatement deleteStats = con.prepareStatement( SQLStatements.DELETE_SPECIFIC_TRACK_STATISTIC ) ) {
-//                deleteStats.setLong( 1, trackID );
-//                deleteStats.setString( 2, key );
-//                deleteStats.execute();
-//
-//            }
-//            catch( SQLException ex ) {
-//                this.rollbackOnError( this.getClass().getName(), ex );
-//            }
-//        }
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "...done deleting specific track statistics." );
+        LOG.info( "...done deleting specific track statistics." );
+
     }
 
 
@@ -830,7 +792,7 @@ public class ProjectConnector extends Observable {
 
         }
         catch( SQLException ex ) {
-            Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, null, ex );
+            LOG.log( Level.SEVERE, null, ex );
         }
     }
 
@@ -859,7 +821,7 @@ public class ProjectConnector extends Observable {
 
         }
         catch( SQLException ex ) {
-            this.rollbackOnError( this.getClass().getName(), ex );
+            rollbackOnError( ProjectConnector.class.getName(), ex );
         }
     }
 
@@ -868,7 +830,7 @@ public class ProjectConnector extends Observable {
      * Locks all tables involved when adding a track in mysql fashion.
      */
     private void lockTrackDomainTables() {
-        this.lockDomainTables( MySQLStatements.LOCK_TABLE_TRACK_DOMAIN, "track" );
+        lockDomainTables( MySQLStatements.LOCK_TABLE_TRACK_DOMAIN, "track" );
     }
 
 
@@ -879,28 +841,34 @@ public class ProjectConnector extends Observable {
      * @param domainName    name of the domain to lock for logging
      */
     private void lockDomainTables( final String lockStatement, final String domainName ) {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "start locking {0} domain tables...", domainName );
+
+        LOG.log( Level.INFO, "start locking {0} domain tables...", domainName );
         try( PreparedStatement lock = con.prepareStatement( lockStatement ) ) {
             lock.execute();
         }
         catch( SQLException ex ) {
-            this.rollbackOnError( this.getClass().getName(), ex );
+            rollbackOnError( ProjectConnector.class.getName(), ex );
         }
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "...done locking {0} domain tables...", domainName );
+        LOG.log( Level.INFO, "...done locking {0} domain tables...", domainName );
+
     }
 
 
     private void disableTrackDomainIndices() {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "started disabling track data domain indices" );
-        this.disableDomainIndices( MySQLStatements.DISABLE_TRACK_INDICES, null );
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "finished disabling track data domain indices" );
+
+        LOG.info( "started disabling track data domain indices" );
+        disableDomainIndices( MySQLStatements.DISABLE_TRACK_INDICES, null );
+        LOG.info( "finished disabling track data domain indices" );
+
     }
 
 
     private void enableTrackDomainIndices() {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "started enabling track data domain indices" );
-        this.enableDomainIndices( MySQLStatements.ENABLE_TRACK_INDICES, null );
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "finished enabling track data domain indices" );
+
+        LOG.info( "started enabling track data domain indices" );
+        enableDomainIndices( MySQLStatements.ENABLE_TRACK_INDICES, null );
+        LOG.info( "finished enabling track data domain indices" );
+
     }
 
 
@@ -912,18 +880,20 @@ public class ProjectConnector extends Observable {
      *                     pass <code>null</code>
      */
     private void disableDomainIndices( String sqlStatement, String domainName ) {
+
         if( domainName != null ) {
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "started disabling {0} data domain indices", domainName );
+            LOG.log( Level.INFO, "started disabling {0} data domain indices", domainName );
         }
+
         try( PreparedStatement disableDomainIndices = con.prepareStatement( sqlStatement ) ) {
             disableDomainIndices.execute();
         }
         catch( SQLException ex ) {
-            this.rollbackOnError( this.getClass().getName(), ex );
+            rollbackOnError( ProjectConnector.class.getName(), ex );
         }
 
         if( domainName != null ) {
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "finished disabling {0} data domain indices", domainName );
+            LOG.log( Level.INFO, "finished disabling {0} data domain indices", domainName );
         }
     }
 
@@ -936,19 +906,21 @@ public class ProjectConnector extends Observable {
      *                     pass <code>null</code>
      */
     private void enableDomainIndices( final String sqlStatement, final String domainName ) {
+
         if( domainName != null ) {
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "started enabling {0} data domain indices", domainName );
+            LOG.log( Level.INFO, "started enabling {0} data domain indices", domainName );
         }
         try( PreparedStatement enableDomainIndices = con.prepareStatement( sqlStatement ) ) {
             enableDomainIndices.execute();
         }
         catch( SQLException ex ) {
-            this.rollbackOnError( this.getClass().getName(), ex );
+            rollbackOnError( ProjectConnector.class.getName(), ex );
         }
 
         if( domainName != null ) {
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "finished enabling {0} data domain indices", domainName );
+            LOG.log( Level.INFO, "finished enabling {0} data domain indices", domainName );
         }
+
     }
 
 
@@ -1043,13 +1015,14 @@ public class ProjectConnector extends Observable {
      * @return the names of all currently opened tracks hashed to their track
      *         id.
      */
-    public HashMap<Integer, String> getOpenedTrackNames() {
+    public Map<Integer, String> getOpenedTrackNames() {
 
-        HashMap<Integer, String> namesList = new HashMap<>( trackConnectors.size() );
+        Map<Integer, String> namesList = new HashMap<>( trackConnectors.size() );
         for( int nextId : trackConnectors.keySet() ) {
-            namesList.put( nextId, this.trackConnectors.get( nextId ).getAssociatedTrackName() );
+            namesList.put( nextId, trackConnectors.get( nextId ).getAssociatedTrackName() );
         }
         return namesList;
+
     }
 
 
@@ -1057,53 +1030,7 @@ public class ProjectConnector extends Observable {
         return con;
     }
 
-//    /**
-//     * Stores the project folder location in the database.
-//     * @param projectFolder the path to the project folder associated to this database
-//     */
-//    public boolean storeProjectFolder(String projectFolder) {
-//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "start storing project folder...");
-//
-//        try (PreparedStatement insertProjectFolder = con.prepareStatement(SQLStatements.INSERT_PROJECT_FOLDER)) {
-//
-//            // store project folder
-//            insertProjectFolder.setString(1, projectFolder);
-//            insertProjectFolder.execute();
-//
-//            con.commit();
-//
-//        } catch (SQLException ex) {
-//            this.rollbackOnError(this.getClass().getName(), ex);
-//            return false;
-//        }
-//
-//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "...done inserting project folder");
-//        return true;
-//    }
 
-//    /**
-//     * Fetches the project folder associated to this project. Not every project
-//     * needs to have a project folder. If everything is imported into the database
-//     * this folder is never set.
-//     * @return the project folder associated to this project or an empty string,
-//     * if it was not set yet.
-//     */
-//    public String getProjectFolder() {
-//
-//        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Reading project folder from database");
-//        String projectFolder = "";
-//        try {
-//            PreparedStatement fetchProjectFolder = con.prepareStatement(SQLStatements.FETCH_PROJECT_FOLDER);
-//            ResultSet results = fetchProjectFolder.executeQuery();
-//            if (results.next()) {
-//                projectFolder = results.getString(FieldNames.PROJECT_FOLDER_PATH);
-//            }
-//        } catch (SQLException e) {
-//            Logger.getLogger(ProjectConnector.class.getName()).log(Level.SEVERE, null, e);
-//        }
-//
-//        return projectFolder;
-//    }
     /**
      * @return All references stored in the db with their associated data. All
      *         references are re-queried from the DB and returned in new, independent
@@ -1112,10 +1039,11 @@ public class ProjectConnector extends Observable {
      * @throws OutOfMemoryError
      */
     public List<PersistentReference> getGenomes() {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Reading reference genome data from database" );
+
+        LOG.info( "Reading reference genome data from database" );
         List<PersistentReference> refGens = new ArrayList<>();
 
-        try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_GENOMES ) ;
+        try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_GENOMES );
              final ResultSet rs = fetch.executeQuery() ) {
             while( rs.next() ) {
                 int id = rs.getInt( FieldNames.REF_GEN_ID );
@@ -1129,7 +1057,7 @@ public class ProjectConnector extends Observable {
             }
         }
         catch( SQLException e ) {
-            Logger.getLogger( ProjectConnector.class.getName() ).log( Level.SEVERE, null, e );
+            LOG.log( Level.SEVERE, null, e );
         }
 
         return refGens;
@@ -1143,7 +1071,7 @@ public class ProjectConnector extends Observable {
      * @return Array of genomes
      */
     public PersistentReference[] getGenomesAsArray() {
-        List<PersistentReference> references = this.getGenomes();
+        List<PersistentReference> references = getGenomes();
         PersistentReference[] refArray = new PersistentReference[references.size()];
         return references.toArray( refArray );
     }
@@ -1154,16 +1082,17 @@ public class ProjectConnector extends Observable {
      *         respective reference.
      */
     public Map<PersistentReference, List<PersistentTrack>> getGenomesAndTracks() {
-        final List<PersistentReference> genomes = this.getGenomes();
-        final List<PersistentTrack> tracks = this.getTracks();
+
+        final List<PersistentReference> genomes = getGenomes();
+        final List<PersistentTrack> tracks = getTracks();
         final Map<Integer, List<PersistentTrack>> tracksByReferenceId = new HashMap<>( tracks.size() );
-        for( PersistentTrack t : tracks ) {
-            List<PersistentTrack> list = tracksByReferenceId.get( t.getRefGenID() );
+        for( PersistentTrack pt : tracks ) {
+            List<PersistentTrack> list = tracksByReferenceId.get( pt.getRefGenID() );
             if( list == null ) {
                 list = new ArrayList<>();
-                tracksByReferenceId.put( t.getRefGenID(), list );
+                tracksByReferenceId.put( pt.getRefGenID(), list );
             }
-            list.add( t );
+            list.add( pt );
         }
 
         Map<PersistentReference, List<PersistentTrack>> tracksByReference = new HashMap<>( genomes.size() );
@@ -1187,7 +1116,8 @@ public class ProjectConnector extends Observable {
      *         objects each time the method is called.
      */
     public List<PersistentTrack> getTracks() {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Reading track data from database" );
+
+        LOG.info( "Reading track data from database" );
         List<PersistentTrack> tracks = new ArrayList<>();
 
         try( final PreparedStatement fetchTracks = con.prepareStatement( SQLStatements.FETCH_TRACKS );
@@ -1203,7 +1133,7 @@ public class ProjectConnector extends Observable {
             }
         }
         catch( SQLException ex ) {
-            Logger.getLogger( ProjectConnector.class.getName() ).log( Level.SEVERE, null, ex );
+            LOG.log( Level.SEVERE, null, ex );
         }
 
         return tracks;
@@ -1216,12 +1146,13 @@ public class ProjectConnector extends Observable {
      * @return The track for the given track id in a fresh track object
      */
     public PersistentTrack getTrack( final int trackID ) {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Reading track data from database" );
+
+        LOG.info( "Reading track data from database" );
         PersistentTrack track = null;
 
         try( final PreparedStatement fetchTracks = con.prepareStatement( SQLStatements.FETCH_TRACK ); ) {
             fetchTracks.setInt( 1, trackID );
-            try( final ResultSet rs = fetchTracks.executeQuery(); ){
+            try( final ResultSet rs = fetchTracks.executeQuery(); ) {
                 while( rs.next() ) {
                     int id = rs.getInt( FieldNames.TRACK_ID );
                     String description = rs.getString( FieldNames.TRACK_DESCRIPTION );
@@ -1234,10 +1165,11 @@ public class ProjectConnector extends Observable {
             }
         }
         catch( SQLException ex ) {
-            Logger.getLogger( ProjectConnector.class.getName() ).log( Level.SEVERE, null, ex );
+            LOG.log( Level.SEVERE, null, ex );
         }
 
         return track;
+
     }
 
 
@@ -1258,7 +1190,8 @@ public class ProjectConnector extends Observable {
      * @throws StorageException
      */
     public void deleteTrack( final int trackID ) throws StorageException {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Starting deletion of track with id \"{0}\"", trackID );
+
+        LOG.log( Level.INFO, "Starting deletion of track with id \"{0}\"", trackID );
         try( PreparedStatement deleteStatistics = con.prepareStatement( SQLStatements.DELETE_STATISTIC_FROM_TRACK );
              PreparedStatement deleteCountDistributions = con.prepareStatement( SQLStatements.DELETE_COUNT_DISTRIBUTIONS_FROM_TRACK );
              PreparedStatement deleteTrack = con.prepareStatement( SQLStatements.DELETE_TRACK ); ) {
@@ -1269,17 +1202,17 @@ public class ProjectConnector extends Observable {
             deleteCountDistributions.setInt( 1, trackID );
             deleteTrack.setInt( 1, trackID );
 
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Deleting Statistics..." );
+            LOG.info( "Deleting Statistics..." );
             deleteStatistics.execute();
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Deleting Count Distributions..." );
+            LOG.info( "Deleting Count Distributions..." );
             deleteCountDistributions.execute();
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Deleting Track..." );
+            LOG.info( "Deleting Track..." );
             deleteTrack.execute();
 
             con.commit();
 
             con.setAutoCommit( true );
-            this.trackConnectors.remove( trackID );
+            trackConnectors.remove( trackID );
 
         }
         catch( SQLException ex ) {
@@ -1287,9 +1220,10 @@ public class ProjectConnector extends Observable {
         }
 
         // notify observers about the change of the database
-        this.notifyObserversAbout( "deleteTrack" );
+        notifyObserversAbout( "deleteTrack" );
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Finished deletion of track \"{0}\"", trackID );
+        LOG.log( Level.INFO, "Finished deletion of track \"{0}\"", trackID );
+
     }
 
 
@@ -1301,8 +1235,9 @@ public class ProjectConnector extends Observable {
      * @throws StorageException
      */
     public void deleteGenome( final int refGenID ) throws StorageException {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Starting deletion of reference genome with id \"{0}\"", refGenID );
-        ReferenceConnector refCon = this.getRefGenomeConnector( refGenID );
+
+        LOG.log( Level.INFO, "Starting deletion of reference genome with id \"{0}\"", refGenID );
+        ReferenceConnector refCon = getRefGenomeConnector( refGenID );
         try( PreparedStatement deleteFeatures = con.prepareStatement( SQLStatements.DELETE_FEATURES_FROM_CHROMOSOME );
              PreparedStatement deleteChrom = con.prepareStatement( SQLStatements.DELETE_CHROMOSOME );
              PreparedStatement deleteGenome = con.prepareStatement( SQLStatements.DELETE_GENOME ); ) {
@@ -1315,21 +1250,21 @@ public class ProjectConnector extends Observable {
                 deleteFeatures.setLong( 1, chrom.getId() );
                 deleteChrom.setInt( 1, chrom.getId() );
 
-                Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Deleting features for chromosome {0}...", chrom.getName() );
+                LOG.log( Level.INFO, "Deleting features for chromosome {0}...", chrom.getName() );
                 deleteFeatures.execute();
 
-                Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Deleting chromosome {0}...", chrom.getName() );
+                LOG.log( Level.INFO, "Deleting chromosome {0}...", chrom.getName() );
                 deleteChrom.execute();
 
             }
 
             deleteGenome.setLong( 1, refGenID );
-            Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Deleting Genome {0}...", refCon.getRefGenome().getName() );
+            LOG.log( Level.INFO, "Deleting Genome {0}...", refCon.getRefGenome().getName() );
             deleteGenome.execute();
 
             con.commit();
             con.setAutoCommit( true );
-            this.refConnectors.remove( refGenID );
+            refConnectors.remove( refGenID );
 
         }
         catch( SQLException ex ) {
@@ -1337,9 +1272,10 @@ public class ProjectConnector extends Observable {
         }
 
         // notify observers about the change of the database
-        this.notifyObserversAbout( "deleteGenomes" );
+        notifyObserversAbout( "deleteGenomes" );
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Finished deletion of reference genome with id \"{0}\"", refGenID );
+        LOG.log( Level.INFO, "Finished deletion of reference genome with id \"{0}\"", refGenID );
+
     }
 
 
@@ -1347,7 +1283,7 @@ public class ProjectConnector extends Observable {
      * @return The database adapter string for this project
      */
     public String getAdapter() {
-        return this.adapter;
+        return adapter;
     }
 
 
@@ -1360,11 +1296,11 @@ public class ProjectConnector extends Observable {
      */
     public void resetTrackPath( final PersistentTrack track ) throws StorageException {
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Preparing statements for storing track data" );
+        LOG.info( "Preparing statements for storing track data" );
 
         if( adapter.equalsIgnoreCase( Properties.ADAPTER_MYSQL ) ) {
-            this.lockTrackDomainTables();
-            this.disableTrackDomainIndices();
+            lockTrackDomainTables();
+            disableTrackDomainIndices();
         }
 
         try( PreparedStatement resetTrackPath = con.prepareStatement( SQLStatements.RESET_TRACK_PATH ) ) {
@@ -1373,15 +1309,16 @@ public class ProjectConnector extends Observable {
             resetTrackPath.execute();
         }
         catch( SQLException ex ) {
-            this.rollbackOnError( this.getClass().getName(), ex );
+            rollbackOnError( ProjectConnector.class.getName(), ex );
         }
 
         if( adapter.equalsIgnoreCase( Properties.ADAPTER_MYSQL ) ) {
-            this.enableTrackDomainIndices();
-            this.unlockTables();
+            enableTrackDomainIndices();
+            unlockTables();
         }
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Track \"{0}\" has been updated successfully", track.getDescription() );
+        LOG.log( Level.INFO, "Track \"{0}\" has been updated successfully", track.getDescription() );
+
     }
 
 
@@ -1395,11 +1332,11 @@ public class ProjectConnector extends Observable {
      */
     public void resetRefPath( final File fastaFile, final PersistentReference ref ) throws StorageException {
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Preparing statements for storing track data" );
+        LOG.info( "Preparing statements for storing track data" );
 
         if( adapter.equalsIgnoreCase( Properties.ADAPTER_MYSQL ) ) {
-            this.lockReferenceDomainTables();
-            this.disableReferenceIndices();
+            lockReferenceDomainTables();
+            disableReferenceIndices();
         }
 
         try( PreparedStatement resetRefPath = con.prepareStatement( SQLStatements.RESET_REF_PATH ) ) {
@@ -1409,21 +1346,22 @@ public class ProjectConnector extends Observable {
             ref.resetFastaPath( fastaFile );
         }
         catch( SQLException ex ) {
-            this.rollbackOnError( this.getClass().getName(), ex );
+            rollbackOnError( ProjectConnector.class.getName(), ex );
         }
 
         if( adapter.equalsIgnoreCase( Properties.ADAPTER_MYSQL ) ) {
-            this.enableReferenceIndices();
-            this.unlockTables();
+            enableReferenceIndices();
+            unlockTables();
         }
 
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Reference file for \"{0}\" has been updated successfully", ref.getName() );
+        LOG.log( Level.INFO, "Reference file for \"{0}\" has been updated successfully", ref.getName() );
+
     }
 
 
     private void notifyObserversAbout( final String message ) {
-        this.setChanged();
-        this.notifyObservers( message );
+        setChanged();
+        notifyObservers( message );
     }
 
 
@@ -1433,7 +1371,8 @@ public class ProjectConnector extends Observable {
      * number will be set after a successful update.
      */
     private void checkDBVersion() {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Checking DB version..." );
+
+        LOG.info( "Checking DB version..." );
 
         try( final PreparedStatement fetchDBVersion = con.prepareStatement( SQLStatements.FETCH_DB_VERSION );
              final ResultSet rs = fetchDBVersion.executeQuery(); ) {
@@ -1447,7 +1386,7 @@ public class ProjectConnector extends Observable {
             //restructure statistics table
             if( dbVersion < 3 ) {
                 updateNeeded = true;
-                this.restructureStatisticsTable();
+                restructureStatisticsTable();
             }
 
             ResultSet fileColumn = con.getMetaData().getColumns( con.getCatalog(), "PUBLIC", FieldNames.TABLE_REFERENCE, FieldNames.REF_GEN_FASTA_FILE );
@@ -1456,7 +1395,7 @@ public class ProjectConnector extends Observable {
             //move references to chromosome table
             if( dbVersion < 2 || columnFastafileMissing ) {
                 updateNeeded = true;
-                this.createChromsFromRefs();
+                createChromsFromRefs();
             }
 
             if( updateNeeded ) {
@@ -1474,9 +1413,10 @@ public class ProjectConnector extends Observable {
 
         }
         catch( SQLException ex ) {
-            Logger.getLogger( TrackConnector.class.getName() ).log( Level.SEVERE, null, ex );
+            LOG.log( Level.SEVERE, null, ex );
         }
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Done checking DB version and updated to latest version" );
+        LOG.info( "Done checking DB version and updated to latest version" );
+
     }
 
 
@@ -1498,7 +1438,7 @@ public class ProjectConnector extends Observable {
             trackIdToStatsMap.put( track.getId(), projectConnector.getTrackStats( track.getId() ) );
         }
 
-        this.runSqlStatement( SQLStatements.DROP_TABLE + "STATISTICS" );
+        runSqlStatement( SQLStatements.DROP_TABLE + "STATISTICS" );
         con.prepareStatement( SQLStatements.SETUP_STATISTICS ).executeUpdate();
 
         for( PersistentTrack track : tracks ) {
@@ -1507,6 +1447,7 @@ public class ProjectConnector extends Observable {
                 projectConnector.storeTrackStatistics( statsContainer, track.getId() );
             }
         }
+
     }
 
 
@@ -1562,12 +1503,13 @@ public class ProjectConnector extends Observable {
 
         }
         catch( SQLException e ) {
-            Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, null, e );
+            LOG.log( Level.SEVERE, null, e );
             JOptionPane.showMessageDialog( new JPanel(), "Unfortunately, the Statistics table seems to be broken. In this case the DB has to be re-created"
                                                          + " to get the correct statistics entries for each track again.",
                                            "Statistics table format error", JOptionPane.ERROR_MESSAGE );
         }
         return statsContainer;
+
     }
 
 
@@ -1580,10 +1522,11 @@ public class ProjectConnector extends Observable {
      * This method is intended for DBs < version 2.
      */
     private void createChromsFromRefs() throws SQLException {
+
         //Add column fastafile to reference table
-        this.runSqlStatement( GenericSQLQueries.genAddColumnString( FieldNames.TABLE_REFERENCE, FieldNames.REF_GEN_FASTA_FILE, "VARCHAR(600)" ) );
+        runSqlStatement( GenericSQLQueries.genAddColumnString( FieldNames.TABLE_REFERENCE, FieldNames.REF_GEN_FASTA_FILE, "VARCHAR(600)" ) );
         //add column chromosome id to features
-        this.runSqlStatement( GenericSQLQueries.genAddColumnString( FieldNames.TABLE_FEATURES, FieldNames.FEATURE_CHROMOSOME_ID, BIGINT_UNSIGNED ) );
+        runSqlStatement( GenericSQLQueries.genAddColumnString( FieldNames.TABLE_FEATURES, FieldNames.FEATURE_CHROMOSOME_ID, BIGINT_UNSIGNED ) );
 
         for( final PersistentReference ref : getGenomesDbUpgrade() ) {
             try( final PreparedStatement fetchRefSeq = con.prepareStatement( SQLStatements.FETCH_REF_SEQ ); ) {
@@ -1628,7 +1571,7 @@ public class ProjectConnector extends Observable {
                         newChrom.setName( chromName );
                         newChrom.setChromLength( refSeq.length() );
 
-                        this.storeChromosome( newChrom, 1, ref.getId() );
+                        storeChromosome( newChrom, 1, ref.getId() );
 
                         //Update chromosome ids of the features for this reference
                         //Since there is exactly one chrom for the current genome, we can query it as follows:
@@ -1645,20 +1588,22 @@ public class ProjectConnector extends Observable {
                 JOptionPane.showMessageDialog( new JPanel(), "Unfortunately, the DB seems to have a broken reference table. In this case the DB has to be re-created.",
                                                "Reference table format error", JOptionPane.ERROR_MESSAGE );
             }
+
         }
 
         //set default value for references without file and set column not null
-        this.runSqlStatement( SQLStatements.INIT_FASTAFILE );
-        this.runSqlStatement( SQLStatements.NOT_NULL_FASTAFILE );
+        runSqlStatement( SQLStatements.INIT_FASTAFILE );
+        runSqlStatement( SQLStatements.NOT_NULL_FASTAFILE );
 
         //after setting all chromosome ids of the features, now we can delete the REFERENCE_ID
-        this.runSqlStatement( SQLStatements.NOT_NULL_CHROMOSOME_ID );
+        runSqlStatement( SQLStatements.NOT_NULL_CHROMOSOME_ID );
         //Drop old REFERENCE_ID column
-        this.runSqlStatement( GenericSQLQueries.genRemoveColumnString(
+        runSqlStatement( GenericSQLQueries.genRemoveColumnString(
                 FieldNames.TABLE_FEATURES, FieldNames.FEATURE_REFGEN_ID ) );
         //Drop old ref seq column for this DB
-        this.runSqlStatement( GenericSQLQueries.genRemoveColumnString(
+        runSqlStatement( GenericSQLQueries.genRemoveColumnString(
                 FieldNames.TABLE_REFERENCE, FieldNames.REF_GEN_SEQUENCE ) );
+
     }
 
 
@@ -1671,11 +1616,12 @@ public class ProjectConnector extends Observable {
      * @throws OutOfMemoryError
      */
     public List<PersistentReference> getGenomesDbUpgrade() throws OutOfMemoryError {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Reading reference genome data from database" );
+
+        LOG.info( "Reading reference genome data from database" );
         List<PersistentReference> refGens = new ArrayList<>();
 
         try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_GENOMES );
-             final ResultSet rs = fetch.executeQuery();) {
+             final ResultSet rs = fetch.executeQuery(); ) {
             while( rs.next() ) {
                 int id = rs.getInt( FieldNames.REF_GEN_ID );
                 String description = rs.getString( FieldNames.REF_GEN_DESCRIPTION );
@@ -1688,10 +1634,11 @@ public class ProjectConnector extends Observable {
             }
         }
         catch( SQLException e ) {
-            Logger.getLogger( ProjectConnector.class.getName() ).log( Level.SEVERE, null, e );
+            LOG.log( Level.SEVERE, null, e );
         }
 
         return refGens;
+        
     }
 
 
@@ -1699,7 +1646,7 @@ public class ProjectConnector extends Observable {
      * @return The location of the database
      */
     public String getDBLocation() {
-        return this.dbLocation;
+        return dbLocation;
     }
 
 
@@ -1710,11 +1657,13 @@ public class ProjectConnector extends Observable {
      *         id.
      */
     public static Map<Integer, PersistentTrack> getTrackMap( final List<PersistentTrack> tracks ) {
+
         Map<Integer, PersistentTrack> trackMap = new HashMap<>( tracks.size() );
         for( PersistentTrack track : tracks ) {
             trackMap.put( track.getId(), track );
         }
         return trackMap;
+
     }
 
 
