@@ -48,9 +48,12 @@ public class ProcessingLog {
 
 
     public synchronized void logGNURoutput( String output ) {
-        gnuRprocessing.append( output );
+        gnuRprocessing.append( output ).append( "\n" );
     }
-
+    
+    public synchronized void logGNURinput( String input ) {
+        gnuRprocessing.append( "> " ).append( input ).append( "\n" );
+    }
 
     public synchronized void setProperties( Map<String, Object> properties ) {
         if( this.properties == null ) {

@@ -17,11 +17,18 @@
 package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 
 import de.cebitec.readxplorer.utils.Properties;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
 import org.rosuda.REngine.REXP;
@@ -84,7 +91,7 @@ public class GnuR extends RConnection {
      * @param packageName
      */
     public void loadPackage(String packageName) throws PackageNotLoadableException, RserveException {
-        REXP result = this.eval("library(" + packageName + ')');
+        REXP result = this.eval("library(" + packageName + ")");
         if (result == null) {
             this.eval("install.packages(\"" + packageName + "\")");
             result = this.eval("library(" + packageName + ')');
@@ -113,7 +120,7 @@ public class GnuR extends RConnection {
 
     @Override
     public REXP eval(String cmd) throws RserveException {
-        ProcessingLog.getInstance().logGNURoutput("> " + cmd + "\n");
+        ProcessingLog.getInstance().logGNURinput( cmd );
         return super.eval(cmd);
     }
 
@@ -149,9 +156,6 @@ public class GnuR extends RConnection {
      * @throws IllegalStateException
      */
     public void storePlot(File file, String plotIdentifier) throws PackageNotLoadableException, IllegalStateException, RserveException {
-        if (this == null) {
-            throw new IllegalStateException("Shutdown was already called!");
-        }
         this.loadPackage("grDevices");
         String path = file.getAbsolutePath();
         path = path.replace("\\", "\\\\");
@@ -189,7 +193,42 @@ public class GnuR extends RConnection {
                 commands.add(String.valueOf(port));
                 pb = new ProcessBuilder(commands);
                 try {
-                    pb.start();
+                    final Process start = pb.start();
+                    new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            try {
+                                BufferedReader reader
+                                        = new BufferedReader(new InputStreamReader(start.getInputStream()));
+                                String line = null;
+                                while ((line = reader.readLine()) != null) {
+                                    ProcessingLog.getInstance().logGNURoutput(line);
+                                }
+                            } catch (IOException ex) {
+                                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: Could not create InputStream reader for RServe process.", currentTimestamp );
+                            }
+                        }
+                    }).start();
+
+                    new Thread(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            try {
+                                BufferedReader reader
+                                        = new BufferedReader(new InputStreamReader(start.getErrorStream()));
+                                String line = null;
+                                while ((line = reader.readLine()) != null) {
+                                    ProcessingLog.getInstance().logGNURoutput(line);
+                                }
+                            } catch (IOException ex) {
+                                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: Could not create ErrorStream reader for RServe process.", currentTimestamp );
+                            }
+                        }
+                    }).start();
                 } catch (IOException ex) {
                     Exceptions.printStackTrace(ex);
                 }
@@ -220,6 +259,11 @@ public class GnuR extends RConnection {
                         Exceptions.printStackTrace(ex);
                     }
                 }
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {
+                Exceptions.printStackTrace(ex);
             }
         }
         return new GnuR(host, port, !manualRemoteSetup);
