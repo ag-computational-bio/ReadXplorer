@@ -20,5 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <toc version="2.0">
     <tocitem text="SNP and DIP Detection Help">
         <tocitem text="SNP and DIP Detection" target="de.cebitec.readxplorer.tools.snp.about"/>
+        <tocitem text="Amino Acid Classification" target="de.cebitec.readxplorer.tools.snp.aa.classification"/>
     </tocitem>
 </toc>
