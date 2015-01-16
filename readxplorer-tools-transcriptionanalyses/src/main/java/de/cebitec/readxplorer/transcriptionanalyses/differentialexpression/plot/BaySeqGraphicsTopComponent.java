@@ -65,6 +65,8 @@ import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RserveException;
 
 
@@ -472,10 +474,10 @@ public final class BaySeqGraphicsTopComponent extends TopComponentExtended
                 Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
                 Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
                 JOptionPane.showMessageDialog( null, ex.getMessage(), "Gnu R Error", JOptionPane.WARNING_MESSAGE );
-            } catch (IllegalStateException ex) {
-                Exceptions.printStackTrace(ex);
-            } catch (RserveException ex) {
-                Exceptions.printStackTrace(ex);
+            } catch (IllegalStateException | REXPMismatchException | REngineException ex) {
+                Date currentTimestamp = new Timestamp( Calendar.getInstance().getTime().getTime() );
+                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, "{0}: " + ex.getMessage(), currentTimestamp );
+                JOptionPane.showMessageDialog( null, ex.getMessage(), "RServe Error", JOptionPane.WARNING_MESSAGE );
             }
         }
     }//GEN-LAST:event_plotButtonActionPerformed

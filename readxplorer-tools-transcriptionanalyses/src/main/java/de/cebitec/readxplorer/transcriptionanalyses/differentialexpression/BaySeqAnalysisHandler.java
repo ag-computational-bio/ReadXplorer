@@ -28,6 +28,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RserveException;
 
 
@@ -90,7 +92,8 @@ public class BaySeqAnalysisHandler extends DeAnalysisHandler {
 
 
     public File plot( Plot plot, Group group, int[] samplesA, int[] samplesB ) throws IOException, SamplesNotValidException,
-                                                                                      IllegalStateException, PackageNotLoadableException, RserveException {
+                                                                                      IllegalStateException, PackageNotLoadableException, 
+                                                                                      RserveException, REngineException, REXPMismatchException {
         File file = File.createTempFile( "ReadXplorer_Plot_", ".svg" );
         file.deleteOnExit();
         if( plot == Plot.MACD ) {

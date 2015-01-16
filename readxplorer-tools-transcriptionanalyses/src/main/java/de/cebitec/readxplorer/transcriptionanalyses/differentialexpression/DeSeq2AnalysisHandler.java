@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RserveException;
 
 
@@ -101,7 +103,8 @@ public class DeSeq2AnalysisHandler extends DeAnalysisHandler {
     }
 
 
-    public File plot( Plot plot ) throws IOException, IllegalStateException, PackageNotLoadableException, RserveException {
+    public File plot( Plot plot ) throws IOException, IllegalStateException, PackageNotLoadableException, 
+                                            RserveException, REngineException, REXPMismatchException {
         File file = File.createTempFile( "ReadXplorer_Plot_", ".svg" );
         file.deleteOnExit();
         if( plot == Plot.DispEsts ) {

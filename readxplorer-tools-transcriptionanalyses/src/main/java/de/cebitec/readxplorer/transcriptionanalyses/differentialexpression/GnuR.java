@@ -19,8 +19,11 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 import de.cebitec.readxplorer.utils.Properties;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,6 +35,7 @@ import java.util.logging.Logger;
 import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
 import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RConnection;
 import org.rosuda.REngine.Rserve.RserveException;
@@ -155,13 +159,30 @@ public class GnuR extends RConnection {
      * de.cebitec.readxplorer.differentialExpression.GnuR.PackageNotLoadableException
      * @throws IllegalStateException
      */
-    public void storePlot(File file, String plotIdentifier) throws PackageNotLoadableException, IllegalStateException, RserveException {
+    public void storePlot(File file, String plotIdentifier) throws PackageNotLoadableException, IllegalStateException, 
+                                                                    RserveException, REngineException, REXPMismatchException, 
+                                                                    FileNotFoundException, IOException {
         this.loadPackage("grDevices");
-        String path = file.getAbsolutePath();
-        path = path.replace("\\", "\\\\");
-        this.eval("svg(filename=\"" + path + "\")");
-        this.eval(plotIdentifier);
-        this.eval("dev.off()");
+
+        if (runningLocal) {
+            String path = file.getAbsolutePath();
+            path = path.replace("\\", "\\\\");
+            this.eval("svg(filename=\"" + path + "\")");
+            this.eval(plotIdentifier);
+            this.eval("dev.off()");
+        } else {
+            this.eval("tmpFile <- tempfile(pattern =\"ReadXplorer_Plot_\", tmpdir = tempdir(), fileext =\".svg\")");
+            this.eval("svg(filename=tmpFile)");
+            this.eval(plotIdentifier);
+            this.eval("dev.off()");
+            this.eval("r=readBin(tmpFile,\"raw\",30720*1024)");
+            this.eval("unlink(tmpFile)");
+            REXP pictureData = this.parseAndEval("r");
+            byte[] asBytes = pictureData.asBytes();
+            try (OutputStream os = new FileOutputStream(file)) {
+                os.write(asBytes);
+            }
+        }
     }
 
     /**

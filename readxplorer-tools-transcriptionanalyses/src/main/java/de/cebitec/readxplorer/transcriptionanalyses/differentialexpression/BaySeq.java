@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.UnknownGnuRException;
 import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -29,7 +30,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REXPVector;
+import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RserveException;
 
 
@@ -187,7 +190,9 @@ public class BaySeq {
      * @throws SamplesNotValidException if SamplesA and samplesB are the same
      */
     public void plotMACD( File file, int[] samplesA, int[] samplesB ) throws SamplesNotValidException,
-                                                                             IllegalStateException, PackageNotLoadableException, RserveException {
+                                                                             IllegalStateException, PackageNotLoadableException, 
+                                                                             RserveException, REngineException, REXPMismatchException, 
+                                                                             IOException {
         if( !validateSamples( samplesA, samplesB ) ) {
             throw new SamplesNotValidException();
         }
@@ -217,7 +222,9 @@ public class BaySeq {
      * @throws SamplesNotValidException if SamplesA and samplesB are the same
      */
     public void plotPosteriors( File file, Group group, int[] samplesA, int[] samplesB ) throws SamplesNotValidException,
-                                                                                                IllegalStateException, PackageNotLoadableException, RserveException {
+                                                                                                IllegalStateException, PackageNotLoadableException, 
+                                                                                                RserveException, REngineException, REXPMismatchException, 
+                                                                                                IOException {
         if( !validateSamples( samplesA, samplesB ) ) {
             throw new SamplesNotValidException();
         }
@@ -243,7 +250,9 @@ public class BaySeq {
      * @param file  a File the created SVG image should be saved to.
      * @param group the underlying group for the plot.
      */
-    public void plotPriors( File file, Group group ) throws IllegalStateException, PackageNotLoadableException, RserveException {
+    public void plotPriors( File file, Group group ) throws IllegalStateException, PackageNotLoadableException, 
+                                                            RserveException, REngineException, REXPMismatchException, 
+                                                            IOException {
         gnuR.storePlot( file, "plotPriors(cD, group = " + group.getGnuRID() + ')' );
     }
 

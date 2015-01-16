@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.transcriptionanalyses.differentialexpression;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.PackageNotLoadableException;
 import de.cebitec.readxplorer.transcriptionanalyses.differentialexpression.GnuR.UnknownGnuRException;
 import java.io.File;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -29,7 +30,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPMismatchException;
 import org.rosuda.REngine.REXPVector;
+import org.rosuda.REngine.REngineException;
 import org.rosuda.REngine.Rserve.RserveException;
 
 
@@ -157,12 +160,14 @@ public class DeSeq2 {
     }
 
 
-    public void plotDispEsts( File file ) throws IllegalStateException, PackageNotLoadableException, RserveException {
+    public void plotDispEsts( File file ) throws IllegalStateException, PackageNotLoadableException, 
+                                            RserveException, REngineException, REXPMismatchException, IOException {
         gnuR.storePlot( file, "plotDispEsts(dds)" );
     }
 
 
-    public void plotHist( File file ) throws IllegalStateException, PackageNotLoadableException, RserveException {
+    public void plotHist( File file ) throws IllegalStateException, PackageNotLoadableException, 
+                                            RserveException, REngineException, REXPMismatchException, IOException {
         gnuR.storePlot( file, "hist(res$pval, breaks=100, col=\"skyblue\", border=\"slateblue\", main=\"\")" );
     }
 
