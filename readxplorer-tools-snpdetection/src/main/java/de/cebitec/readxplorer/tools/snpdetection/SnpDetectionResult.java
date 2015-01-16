@@ -199,9 +199,9 @@ public class SnpDetectionResult extends ResultTrackAnalysis<ParameterSetSNPs> {
             snpExport.add( aminoAcidsSnp );
             snpExport.add( codonsRef );
             snpExport.add( codonsSNP );
+            snpExport.add( effect );
             snpExport.add( snp.getAverageBaseQual() );
             snpExport.add( snp.getAverageMappingQual() );
-            snpExport.add( effect );
             snpExport.add( geneId );
             snpExport.add( locus );
             snpExport.add( ecNo );

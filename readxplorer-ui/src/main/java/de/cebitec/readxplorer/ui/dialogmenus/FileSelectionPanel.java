@@ -190,7 +190,6 @@ public class FileSelectionPanel extends JPanel {
         }
         else {
             fileTextField.setText( getMappingFile() != null ? getMappingFile().getAbsolutePath() : "" );
-            getMappingFiles().clear();
             multiTrackList.setModel( new DefaultListModel<String>() );
         }
     }

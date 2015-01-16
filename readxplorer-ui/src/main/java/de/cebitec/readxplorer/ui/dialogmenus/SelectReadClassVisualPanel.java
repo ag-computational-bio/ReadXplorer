@@ -372,7 +372,7 @@ public class SelectReadClassVisualPanel extends JobPanel {
         if( !checkBoxCommon.isSelected() ) {
             excludedClasses.add( MappingClass.COMMON_MATCH );
         }
-        if( !checkBoxUnique.isSelected() ) {
+        if( checkBoxUnique.isSelected() ) {
             excludedClasses.add( FeatureType.MULTIPLE_MAPPED_READ );
         }
         if( !checkBoxSinglePerfect.isSelected() ) {

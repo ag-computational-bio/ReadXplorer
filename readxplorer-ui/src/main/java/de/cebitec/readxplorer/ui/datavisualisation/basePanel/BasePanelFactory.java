@@ -412,10 +412,10 @@ public class BasePanelFactory {
      * @return The panel displaying the title on a gray background
      */
     private JPanel getTitlePanel( String title ) {
-        JPanel p = new JPanel(new GridBagLayout());
+        JPanel p = new JPanel( new GridBagLayout() );
         p.add( new JLabel( title ) );
         p.setBackground( ColorProperties.TITLE_BACKGROUND );
-        p.setPreferredSize(new Dimension(p.getPreferredSize().width, 18));
+        p.setPreferredSize( new Dimension( p.getPreferredSize().width, 18 ) );
         return p;
     }
 
