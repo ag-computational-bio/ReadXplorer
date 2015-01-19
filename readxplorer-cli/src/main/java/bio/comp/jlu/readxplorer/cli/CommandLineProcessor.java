@@ -18,13 +18,18 @@
 package bio.comp.jlu.readxplorer.cli;
 
 
+import bio.comp.jlu.readxplorer.cli.imports.ImportReferenceCallable;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
+import de.cebitec.readxplorer.databackend.connector.StorageException;
+import de.cebitec.readxplorer.utils.Benchmark;
 import de.cebitec.readxplorer.utils.Properties;
 import java.io.File;
 import java.io.PrintStream;
 import java.sql.SQLException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -200,7 +205,39 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
 
         // import reference
         printInfo( ps, "import reference genome..." );
+        try {
 
+            final long startTime = System.currentTimeMillis();
+            Future<ImportReferenceCallable.ImportReferenceResults> refFuture = es.submit( new ImportReferenceCallable( referenceFile, verboseArg ) );
+            ImportReferenceCallable.ImportReferenceResults result = refFuture.get();
+
+            // print (concurrent) output sequently
+            for( String msg : result.getOutput() ) {
+                ps.println( msg );
+            }
+
+            // stores reference sequence in the db
+            if( verboseArg )
+                ps.println( "store reference to db..." );
+            LOG.log( Level.FINE, "start storing reference to db..." );
+            ProjectConnector.getInstance().addRefGenome( result.getParsedReference() );
+            if( verboseArg )
+                ps.println( "...finished!" );
+            LOG.log( Level.INFO, "...stored reference genome source \"{0}\"", result.getParsedReference().getName() );
+
+            // print benchmarks
+            if( verboseArg ) {
+                final long endTime = System.currentTimeMillis();
+                ps.println( Benchmark.calculateDuration( startTime, endTime, "import reference duration: " ) );
+            }
+
+        }
+        catch( InterruptedException | ExecutionException | StorageException ex ) {
+            LOG.log( Level.SEVERE, null, ex );
+            CommandException ce = new CommandException( 1, "import failed!" );
+                ce.initCause( ex );
+            throw ce;
+        }
 
         // import tracks
         printInfo( ps, "import tracks..." );

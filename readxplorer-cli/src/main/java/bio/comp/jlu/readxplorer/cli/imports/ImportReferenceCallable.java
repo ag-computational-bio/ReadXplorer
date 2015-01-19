@@ -18,9 +18,7 @@
 package bio.comp.jlu.readxplorer.cli.imports;
 
 
-import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.connector.StorageException;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
+import bio.comp.jlu.readxplorer.cli.imports.ImportReferenceCallable.ImportReferenceResults;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.common.ParsedReference;
 import de.cebitec.readxplorer.parser.common.ParsingException;
@@ -31,13 +29,15 @@ import de.cebitec.readxplorer.parser.reference.FastaReferenceParser;
 import de.cebitec.readxplorer.parser.reference.Filter.FeatureFilter;
 import de.cebitec.readxplorer.parser.reference.Filter.FilterRuleSource;
 import de.cebitec.readxplorer.parser.reference.ReferenceParserI;
-import de.cebitec.readxplorer.utils.Benchmark;
-import java.io.PrintStream;
+import java.io.File;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.api.sendopts.CommandException;
-import org.openide.util.NbBundle;
 
 
 /**
@@ -61,101 +61,56 @@ import org.openide.util.NbBundle;
  *
  * @author Oliver Schwengers <oschweng@cebitec.uni-bielefeld.de>
  */
-public final class ImportReferenceCallable implements Callable<PersistentReference> {
+public final class ImportReferenceCallable implements Callable<ImportReferenceResults> {
 
     private static final Logger LOG = Logger.getLogger( ImportReferenceCallable.class.getName() );
 
     private final boolean verbosity;
 
+    private final File referenceFile;
 
-    protected ImportReferenceCallable( boolean verbosity ) {
 
+
+
+    public ImportReferenceCallable( File referenceFile, boolean verbosity ) {
+
+        this.referenceFile = referenceFile;
         this.verbosity = verbosity;
 
     }
 
 
     @Override
-    public PersistentReference call() throws CommandException {
+    public ImportReferenceResults call() throws CommandException {
 
-        PersistentReference pr;
-//        final PrintStream ps = env.getOutputStream();
-//        try {
-//
-//            ProjectConnector.getInstance().connect( Properties.ADAPTER_H2, dbFileArg, null, null, null );
-//
-//            final int l = referenceFileArgs.length;
-//            final ReferenceParserI refParser = selectParser( fileTypeArg );
-//            for( int i=0; i<l; i++ ) {
-//
-//                ReferenceJob rj = new ReferenceJob( 0, new File(referenceFileArgs[i]), refParser,
-//                    descriptionArgs[i], nameArgs[i], new Timestamp( System.currentTimeMillis() ) );
-//
-//                importRefGenome( rj, ps );
-//
-//            }
-//
-//            ProjectConnector.getInstance().disconnect();
-//
-//        }
-//        catch( SQLException ex ) {
-//
-//            CommandException ce = new CommandException( 1 );
-//                ce.initCause( ex );
-//            throw ce;
-//
-//        }
-
-        return null;
-
-    }
-
-
-    /**
-     * Processes reference genome job.
-     */
-    private void importRefGenome( final ReferenceJob rj, final PrintStream ps ) throws CommandException {
-
-        ps.println(NbBundle.getMessage(ImportReferenceCallable.class, "MSG_ImportThread.import.start.ref" ) + ":" );
-        final long start = System.currentTimeMillis();
         try {
 
+            final ReferenceParserI refParser = selectParser( referenceFile.getName().substring( referenceFile.getName().lastIndexOf( '.' ) ) );
+            final ImportReferenceResults result = new ImportReferenceResults();
+            final ReferenceJob rj = new ReferenceJob( 0, referenceFile, refParser,
+                "", referenceFile.getName(), new Timestamp( System.currentTimeMillis() ) );
+
             // parse reference genome
-            LOG.log( Level.INFO, "Start parsing reference genome from source \"{0}\"", rj.getFile().getAbsolutePath() );
-            ReferenceParserI parser = rj.getParser();
+            LOG.log( Level.FINE, "start parsing reference genome from source {0}...", referenceFile.getName() );
             FeatureFilter filter = new FeatureFilter();
-            filter.addBlacklistRule( new FilterRuleSource() );
-            ParsedReference refGenome = parser.parseReference( rj, filter );
-            LOG.log( Level.INFO, "Finished parsing reference genome from source \"{0}\"", rj.getFile().getAbsolutePath() );
-            ps.println("\"" + rj.getName() + "\" " + NbBundle.getMessage(ImportReferenceCallable.class, "MSG_ImportThread.import.parsed" ) );
+                filter.addBlacklistRule( new FilterRuleSource() );
+            ParsedReference parsedRefGenome = refParser.parseReference( rj, filter );
+            result.setParsedReference( parsedRefGenome );
+            LOG.log( Level.FINE, "parsed reference genome file {0}...", referenceFile.getName() );
+            result.addOutput( "parsed reference genome from file " + referenceFile.getName() );
 
-
-            // stores reference sequence in the db
-            LOG.log( Level.INFO, "Start storing reference genome from source \"{0}\"", rj.getFile().getAbsolutePath() );
-            int refGenID = ProjectConnector.getInstance().addRefGenome( refGenome );
-            rj.setPersistent( refGenID );
-            LOG.log( Level.INFO, "Finished storing reference genome from source \"{0}\"", rj.getFile().getAbsolutePath() );
-
-
-            // print benchmarks
-            if( verbosity ) {
-                final long finish = System.currentTimeMillis();
-                String msg = "\"" + rj.getName() + "\" " + NbBundle.getMessage(ImportReferenceCallable.class, "MSG_ImportThread.import.stored" );
-                ps.println( Benchmark.calculateDuration( start, finish, msg ) );
-            }
+            return result;
 
         }
-        catch( ParsingException | StorageException ex ) {
+        catch( ParsingException ex ) {
             LOG.log( Level.SEVERE, null, ex );
-//            ps.println( "\"" + rj.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.failed" ) + "!" );
-            CommandException ce = new CommandException( 1, "\"" + rj.getName() + "\" " + NbBundle.getMessage(ImportReferenceCallable.class, "MSG_ImportThread.import.failed" ) );
+            CommandException ce = new CommandException( 1, "import failed!" );
                 ce.initCause( ex );
             throw ce;
         }
         catch( OutOfMemoryError ex ) {
             LOG.log( Level.SEVERE, null, ex );
-//            ps.println( "\"" + rj.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.outOfMemory" ) + "!" );
-            CommandException ce = new CommandException( 1, "\"" + rj.getName() + "\" " + NbBundle.getMessage(ImportReferenceCallable.class, "MSG_ImportThread.import.outOfMemory" ) );
+            CommandException ce = new CommandException( 1, "out of memory!" );
                 ce.initCause( ex );
             throw ce;
         }
@@ -178,6 +133,37 @@ public final class ImportReferenceCallable implements Callable<PersistentReferen
             case "fasta":
             default:
                 return new FastaReferenceParser();
+        }
+
+    }
+
+
+
+
+    public class ImportReferenceResults {
+
+        private final List<String> output;
+        private ParsedReference pr;
+
+
+        ImportReferenceResults() {
+            this.output = new ArrayList<>( 10 );
+        }
+
+        void addOutput( String msg ) {
+            output.add( msg );
+        }
+
+        public List<String> getOutput() {
+            return Collections.unmodifiableList( output );
+        }
+
+        void setParsedReference( ParsedReference pr ) {
+            this.pr = pr;
+        }
+
+        public ParsedReference getParsedReference() {
+            return pr;
         }
 
     }
