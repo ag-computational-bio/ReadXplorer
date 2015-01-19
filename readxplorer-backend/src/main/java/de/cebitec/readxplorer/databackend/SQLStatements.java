@@ -45,7 +45,8 @@ public class SQLStatements {
 //            + " ("
 //            + FieldNames.PROJECT_FOLDER_PATH + " VARCHAR(400) NOT NULL "
 //            + ") ";
-    public final static String SETUP_STATISTICS
+    
+    public static final String SETUP_STATISTICS
             = "CREATE TABLE IF NOT EXISTS " + FieldNames.TABLE_STATISTICS + " "
               + "( "
               + FieldNames.STATISTICS_ID + " BIGINT UNSIGNED PRIMARY KEY, "
@@ -81,7 +82,7 @@ public class SQLStatements {
 //            + FieldNames.PROJECT_FOLDER_PATH
 //            + ") "
 //            + " VALUES (?); ";
-    public final static String INSERT_REFGENOME
+    public static final String INSERT_REFGENOME
             = "INSERT INTO " + FieldNames.TABLE_REFERENCE + " "
               + "("
               + FieldNames.REF_GEN_ID + ", "
@@ -93,7 +94,7 @@ public class SQLStatements {
               + "VALUES (?,?,?,?,?)";
 
 
-    public final static String INSERT_CHROMOSOME
+    public static final String INSERT_CHROMOSOME
             = "INSERT INTO " + FieldNames.TABLE_CHROMOSOME + " "
               + "("
               + FieldNames.CHROM_ID + ", "
@@ -105,7 +106,7 @@ public class SQLStatements {
               + "VALUES (?,?,?,?,?)";
 
 
-    public final static String INSERT_FEATURE
+    public static final String INSERT_FEATURE
             = "INSERT INTO " + FieldNames.TABLE_FEATURES + " "
               + "("
               + FieldNames.FEATURE_ID + ", "
@@ -123,7 +124,7 @@ public class SQLStatements {
               + "VALUES (?,?,?,?,?,?,?,?,?,?,?) ";
 
 
-    public final static String INSERT_TRACK
+    public static final String INSERT_TRACK
             = "INSERT INTO " + FieldNames.TABLE_TRACK
               + " ("
               + FieldNames.TRACK_ID + ", "
@@ -159,7 +160,7 @@ public class SQLStatements {
     /**
      * Insert statistics data of one track into statistics table.
      */
-    public final static String INSERT_STATISTICS
+    public static final String INSERT_STATISTICS
             = "INSERT INTO " + FieldNames.TABLE_STATISTICS + " "
               + "("
               + FieldNames.STATISTICS_ID + ", "
@@ -169,7 +170,7 @@ public class SQLStatements {
               + "VALUES (?,?,?,?)";
 
     /**
-     * Update exisiting row of track statistics with sequence pair statistics
+     * Update exisiting row of track statistics with read pair statistics
      */
     public static final String INSERT_READPAIR_STATISTICS
             = "UPDATE " + FieldNames.TABLE_STATISTICS
@@ -219,20 +220,20 @@ public class SQLStatements {
               + " SET " + FieldNames.DB_VERSION_DB_VERSION_NO + " = ? ";
 
 
-    public final static String DELETE_TRACK
+    public static final String DELETE_TRACK
             = "DELETE FROM "
               + FieldNames.TABLE_TRACK
               + " WHERE "
               + FieldNames.TRACK_ID + " = ? ";
 
 
-    public final static String DELETE_STATISTIC_FROM_TRACK
+    public static final String DELETE_STATISTIC_FROM_TRACK
             = "DELETE FROM "
               + FieldNames.TABLE_STATISTICS
               + " WHERE "
               + FieldNames.STATISTICS_TRACK_ID + " = ? ";
 
-    public final static String DELETE_SPECIFIC_TRACK_STATISTIC
+    public static final String DELETE_SPECIFIC_TRACK_STATISTIC
             = "DELETE FROM "
               + FieldNames.TABLE_STATISTICS
               + " WHERE "
@@ -248,7 +249,7 @@ public class SQLStatements {
     /**
      * Delete all genomic features of a chromosome from the feature table.
      */
-    public final static String DELETE_FEATURES_FROM_CHROMOSOME
+    public static final String DELETE_FEATURES_FROM_CHROMOSOME
             = "DELETE FROM "
               + FieldNames.TABLE_FEATURES
               + " WHERE "
@@ -266,7 +267,7 @@ public class SQLStatements {
     /**
      * Delete a reference genome from the reference table.
      */
-    public final static String DELETE_GENOME
+    public static final String DELETE_GENOME
             = "DELETE FROM "
               + FieldNames.TABLE_REFERENCE
               + " WHERE "
@@ -374,7 +375,7 @@ public class SQLStatements {
               + FieldNames.REF_GEN_ID + " = ? ";
 
 
-    public final static String FETCH_TRACKS
+    public static final String FETCH_TRACKS
             = "SELECT "
               + " * "
               + "FROM "
@@ -387,7 +388,7 @@ public class SQLStatements {
               + FieldNames.TRACK_ID + " = ? ";
 
 
-    public final static String FETCH_SINGLE_GENOME
+    public static final String FETCH_SINGLE_GENOME
             = "SELECT "
               + "R." + FieldNames.REF_GEN_ID + ", "
               + "R." + FieldNames.REF_GEN_NAME + ", "
@@ -400,7 +401,7 @@ public class SQLStatements {
               + FieldNames.REF_GEN_ID + " = ?";
 
     //Select ID from first feature belonging to the referece genome
-    public final static String CHECK_IF_FEATURES_EXIST
+    public static final String CHECK_IF_FEATURES_EXIST
             = "SELECT "
               + FieldNames.FEATURE_ID
               + " FROM "
@@ -408,7 +409,7 @@ public class SQLStatements {
               + " WHERE "
               + FieldNames.FEATURE_CHROMOSOME_ID + " = ? LIMIT 1";
 
-    public final static String CHECK_IF_FEATURES_OF_TYPE_EXIST
+    public static final String CHECK_IF_FEATURES_OF_TYPE_EXIST
             = "SELECT "
               + FieldNames.FEATURE_ID
               + " FROM "
@@ -417,7 +418,7 @@ public class SQLStatements {
               + FieldNames.FEATURE_CHROMOSOME_ID + " = ? and "
               + FieldNames.FEATURE_TYPE + " = ?";
 
-    public final static String FETCH_FEATURES_FOR_CHROM_INTERVAL
+    public static final String FETCH_FEATURES_FOR_CHROM_INTERVAL
             = "SELECT "
               + FieldNames.FEATURE_ID + ", "
               + FieldNames.FEATURE_PARENT_IDS + ", "
@@ -437,7 +438,7 @@ public class SQLStatements {
               + FieldNames.FEATURE_START + " <= ? "
               + " ORDER BY " + FieldNames.FEATURE_START;
 
-    public final static String FETCH_SPECIFIED_FEATURES_FOR_CHROM_INTERVAL
+    public static final String FETCH_SPECIFIED_FEATURES_FOR_CHROM_INTERVAL
             = "SELECT "
               + FieldNames.FEATURE_ID + ", "
               + FieldNames.FEATURE_PARENT_IDS + ", "
@@ -458,7 +459,7 @@ public class SQLStatements {
               + FieldNames.FEATURE_TYPE + " = ? "
               + " ORDER BY " + FieldNames.FEATURE_START;
 
-    public final static String FETCH_FEATURES_FOR_CLOSED_GENOME_INTERVAL
+    public static final String FETCH_FEATURES_FOR_CLOSED_GENOME_INTERVAL
             = "SELECT "
               + FieldNames.FEATURE_ID + ", "
               + FieldNames.FEATURE_PARENT_IDS + ", "
@@ -479,7 +480,7 @@ public class SQLStatements {
               + " ORDER BY " + FieldNames.FEATURE_START;
 
 
-    public final static String FETCH_TRACKS_FOR_GENOME
+    public static final String FETCH_TRACKS_FOR_GENOME
             = "SELECT * "
               + " FROM "
               + FieldNames.TABLE_TRACK
@@ -487,7 +488,7 @@ public class SQLStatements {
               + FieldNames.TRACK_REFERENCE_ID + " = ? ";
 
 
-    public final static String GET_LATEST_STATISTICS_ID
+    public static final String GET_LATEST_STATISTICS_ID
             = "SELECT "
               + "MAX(" + FieldNames.STATISTICS_ID + ") AS LATEST_ID "
               + "FROM "
@@ -495,7 +496,7 @@ public class SQLStatements {
 
 
     /////////////////// statistics calculations and queries //////////////////////////
-    public final static String CHECK_FOR_TRACK_IN_STATS_CALCULATE
+    public static final String CHECK_FOR_TRACK_IN_STATS_CALCULATE
             = "SELECT "
               + "COUNT(S." + FieldNames.STATISTICS_TRACK_ID + ") as NUM "
               + " FROM "
@@ -509,9 +510,13 @@ public class SQLStatements {
               + FieldNames.TABLE_STATISTICS
               + " WHERE "
               + FieldNames.STATISTICS_TRACK_ID + " = ?";
+    
+    public static final String FETCH_ALL_STATS
+            = "SELECT * FROM "
+              + FieldNames.TABLE_STATISTICS;
 
 
-//    public final static String FETCH_GENOMEID_FOR_TRACK =
+//    public static final String FETCH_GENOMEID_FOR_TRACK =
 //            "SELECT "
 //            + FieldNames.TRACK_REFERENCE_ID + " "
 //            + "FROM "
@@ -545,19 +550,19 @@ public class SQLStatements {
               + FieldNames.TRACK_ID + " != ? ";
 
 
-    public final static String GET_LATEST_REFERENCE_ID
+    public static final String GET_LATEST_REFERENCE_ID
             = "SELECT MAX(" + FieldNames.REF_GEN_ID + ") AS LATEST_ID FROM " + FieldNames.TABLE_REFERENCE;
 
 
-    public final static String GET_LATEST_CHROMOSOME_ID
+    public static final String GET_LATEST_CHROMOSOME_ID
             = "SELECT MAX(" + FieldNames.CHROM_ID + ") AS LATEST_ID FROM " + FieldNames.TABLE_CHROMOSOME;
 
 
-    public final static String GET_LATEST_FEATURE_ID
+    public static final String GET_LATEST_FEATURE_ID
             = "SELECT MAX(" + FieldNames.FEATURE_ID + ") AS LATEST_ID FROM " + FieldNames.TABLE_FEATURES;
 
 
-    public final static String GET_LATEST_TRACK_ID
+    public static final String GET_LATEST_TRACK_ID
             = "SELECT MAX(" + FieldNames.TRACK_ID + ") AS LATEST_ID FROM " + FieldNames.TABLE_TRACK;
 
 

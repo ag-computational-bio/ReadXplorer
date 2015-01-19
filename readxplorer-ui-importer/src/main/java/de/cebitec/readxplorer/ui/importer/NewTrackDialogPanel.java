@@ -134,7 +134,7 @@ public class NewTrackDialogPanel extends ImportTrackBasePanel implements
         multiTrackList = new javax.swing.JList<>();
         multiTrackListLabel = new javax.swing.JLabel();
 
-        setMinimumSize(new java.awt.Dimension(484, 300));
+        setMinimumSize(new java.awt.Dimension(484, 270));
 
         mappingTypeLabel.setText(org.openide.util.NbBundle.getMessage(NewTrackDialogPanel.class, "NewTrackDialogPanel.mappingTypeLabel.text")); // NOI18N
 
@@ -243,11 +243,9 @@ public class NewTrackDialogPanel extends ImportTrackBasePanel implements
                 .addComponent(alreadyImportedBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(multiTrackScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(multiTrackListLabel)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                    .addComponent(multiTrackListLabel)
+                    .addComponent(multiTrackScrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(64, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -267,10 +265,10 @@ public class NewTrackDialogPanel extends ImportTrackBasePanel implements
             public void open( String fileLocation ) {
 
                 // file chosen
+                getMappingFiles().clear();
                 updateGuiForMultipleFiles( this.getSelectedFiles().length > 1, multiTrackScrollPane, multiTrackList, multiTrackListLabel, mappingFileField );
                 if( useMultipleImport() ) {
                     File[] files = this.getSelectedFiles();
-                    getMappingFiles().clear();
 
                     for( int i = 0; i < files.length; ++i ) {
                         addFile( files[i], mappingFileField );

@@ -49,10 +49,10 @@ import java.util.logging.Logger;
  */
 public class ReferenceConnector {
 
+    private static final Logger LOG = Logger.getLogger( ReferenceConnector.class.getName() );
+
     private final int refGenID;
     private final Connection con;
-//    private String projectFolder;
-//    private boolean isFolderSet = false;
     private final List<PersistentTrack> associatedTracks;
 
 
@@ -63,12 +63,13 @@ public class ReferenceConnector {
      * @param refGenID id of the associated reference genome
      */
     ReferenceConnector( int refGenID ) {
-        this.refGenID = refGenID;
+
         ProjectConnector projectConnector = ProjectConnector.getInstance();
+
+        this.refGenID = refGenID;
         this.con = projectConnector.getConnection();
         this.associatedTracks = new ArrayList<>();
-//        this.projectFolder = projectConnector.getProjectFolder();
-//        this.isFolderSet = !this.projectFolder.isEmpty();
+
     }
 
 
@@ -78,7 +79,8 @@ public class ReferenceConnector {
      *         need to be fetched from the DB again.
      */
     public PersistentReference getRefGenome() {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Loading reference genome with id  \"{0}\" from database", refGenID );
+
+        LOG.log( Level.INFO, "Loading reference genome with id  \"{0}\" from database", refGenID );
         PersistentReference reference = null;
 
         try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_SINGLE_GENOME ) ) {
@@ -97,10 +99,11 @@ public class ReferenceConnector {
 
         }
         catch( SQLException ex ) {
-            Logger.getLogger( ReferenceConnector.class.getName() ).log( Level.SEVERE, null, ex );
+            LOG.log( Level.SEVERE, null, ex );
         }
 
         return reference;
+
     }
 
 
@@ -108,7 +111,8 @@ public class ReferenceConnector {
      * @return All chromosomes of this reference without their sequence.
      */
     public Map<Integer, PersistentChromosome> getChromosomesForGenome() {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Loading chromosomes for reference with id  \"{0}\" from database", refGenID );
+
+        LOG.log( Level.INFO, "Loading chromosomes for reference with id  \"{0}\" from database", refGenID );
 
         Map<Integer, PersistentChromosome> chromosomes = new HashMap<>();
         try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_CHROMOSOMES ) ) {
@@ -127,10 +131,11 @@ public class ReferenceConnector {
 
         }
         catch( SQLException ex ) {
-            Logger.getLogger( ReferenceConnector.class.getName() ).log( Level.SEVERE, null, ex );
+            LOG.log( Level.SEVERE, null, ex );
         }
 
         return chromosomes;
+
     }
 
 
@@ -140,7 +145,8 @@ public class ReferenceConnector {
      * @return One chromosome of this reference without its sequence.
      */
     public PersistentChromosome getChromosomeForGenome( final int chromId ) {
-        Logger.getLogger( this.getClass().getName() ).log( Level.INFO, "Loading chromosome for reference with id  \"{0}\" from database", refGenID );
+
+        LOG.log( Level.INFO, "Loading chromosome for reference with id  \"{0}\" from database", refGenID );
 
         PersistentChromosome chrom = null;
         try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_CHROMOSOME ) ) {
@@ -158,10 +164,11 @@ public class ReferenceConnector {
 
         }
         catch( SQLException ex ) {
-            Logger.getLogger( ReferenceConnector.class.getName() ).log( Level.SEVERE, null, ex );
+            LOG.log( Level.SEVERE, null, ex );
         }
 
         return chrom;
+
     }
 
 
@@ -178,6 +185,7 @@ public class ReferenceConnector {
      * @return the list of all features found in the interval of interest
      */
     public List<PersistentFeature> getFeaturesForRegion( final int from, final int to, final FeatureType featureType, final int chromId ) {
+
         List<PersistentFeature> features = new ArrayList<>();
         try {
             final PreparedStatement fetch;
@@ -216,10 +224,11 @@ public class ReferenceConnector {
 
         }
         catch( SQLException ex ) {
-            Logger.getLogger( ReferenceConnector.class.getName() ).log( Level.SEVERE, null, ex );
+            LOG.log( Level.SEVERE, null, ex );
         }
 
         return features;
+
     }
 
 
@@ -235,11 +244,13 @@ public class ReferenceConnector {
      * @return the list of all features found in the interval of interest
      */
     public List<PersistentFeature> getFeaturesForRegion( final int from, final int to, final Set<FeatureType> featureTypes, final int chromId ) {
+
         List<PersistentFeature> features = new ArrayList<>();
         for( FeatureType featureType : featureTypes ) {
             features.addAll( getFeaturesForRegion( from, to, featureType, chromId ) );
         }
         return features;
+
     }
 
 
@@ -258,10 +269,11 @@ public class ReferenceConnector {
      *         including their parent and children relationships
      */
     public List<PersistentFeature> getFeaturesForRegionInclParents( final int from, final int to, final FeatureType featureType, final int chromId ) {
-        List<PersistentFeature> features = this.getFeaturesForRegion( from, to, FeatureType.ANY, chromId );
+
+        List<PersistentFeature> features = getFeaturesForRegion( from, to, FeatureType.ANY, chromId );
         PersistentFeature.Utils.addParentFeatures( features );
-        features = PersistentFeature.Utils.filterFeatureTypes( features, featureType );
-        return features;
+        return PersistentFeature.Utils.filterFeatureTypes( features, featureType );
+
     }
 
 
@@ -279,11 +291,13 @@ public class ReferenceConnector {
      *         including their parent and children relationships
      */
     public List<PersistentFeature> getFeaturesForRegionInclParents( final int from, final int to, final Set<FeatureType> featureTypes, final int chromId ) {
+
         List<PersistentFeature> features = new ArrayList<>();
         for( FeatureType featureType : featureTypes ) {
-            features.addAll( this.getFeaturesForRegionInclParents( from, to, featureType, chromId ) );
+            features.addAll( getFeaturesForRegionInclParents( from, to, featureType, chromId ) );
         }
         return features;
+
     }
 
 
@@ -298,6 +312,7 @@ public class ReferenceConnector {
      * @return the list of all features found in the interval of interest
      */
     public List<PersistentFeature> getFeaturesForClosedInterval( final int left, final int right, final int chromId ) {
+
         List<PersistentFeature> features = new ArrayList<>();
         try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_FEATURES_FOR_CLOSED_GENOME_INTERVAL ) ) {
 
@@ -326,10 +341,11 @@ public class ReferenceConnector {
 
         }
         catch( SQLException ex ) {
-            Logger.getLogger( ReferenceConnector.class.getName() ).log( Level.SEVERE, null, ex );
+            LOG.log( Level.SEVERE, null, ex );
         }
 
         return features;
+
     }
 
 
@@ -337,8 +353,9 @@ public class ReferenceConnector {
      * @return the tracks associated to this reference connector.
      */
     public List<PersistentTrack> getAssociatedTracks() {
+
         try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_TRACKS_FOR_GENOME ) ) {
-            this.associatedTracks.clear();
+            associatedTracks.clear();
             fetch.setLong( 1, refGenID );
 
             try( final ResultSet rs = fetch.executeQuery() ) {
@@ -354,10 +371,11 @@ public class ReferenceConnector {
             }
         }
         catch( SQLException ex ) {
-            Logger.getLogger( ReferenceConnector.class.getName() ).log( Level.SEVERE, null, ex );
+            LOG.log( Level.SEVERE, null, ex );
         }
 
         return associatedTracks;
+
     }
 
 
@@ -368,14 +386,16 @@ public class ReferenceConnector {
      * @return the names of all tracks of this reference hashed to their track
      *         id.
      */
-    public HashMap<Integer, String> getAssociatedTrackNames() {
-        this.getAssociatedTracks(); //ensures the tracks are already in the list
+    public Map<Integer, String> getAssociatedTrackNames() {
 
-        HashMap<Integer, String> namesList = new HashMap<>( associatedTracks.size() );
+        getAssociatedTracks(); //ensures the tracks are already in the list
+
+        Map<Integer, String> namesList = new HashMap<>( associatedTracks.size() );
         for( PersistentTrack track : associatedTracks ) {
             namesList.put( track.getId(), track.getDescription() );
         }
         return namesList;
+
     }
 
 
@@ -389,12 +409,14 @@ public class ReferenceConnector {
      *         given type, false otherwise
      */
     public boolean hasFeatures( final List<FeatureType> typeList ) {
+
         for( FeatureType featureType : typeList ) {
             if( hasFeatures( featureType ) ) {
                 return true;
             }
         }
         return false;
+
     }
 
 
@@ -430,12 +452,13 @@ public class ReferenceConnector {
                 }
             }
             catch( SQLException ex ) {
-                Logger.getLogger( ReferenceConnector.class.getName() ).log( Level.SEVERE, null, ex );
+                LOG.log( Level.SEVERE, null, ex );
                 return false;
             }
         }
         //Tried all chromosomes, no entry found
         return false;
+
     }
 
 

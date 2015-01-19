@@ -112,6 +112,9 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
         multiTrackList = new javax.swing.JList<>();
         multiTrackListLabel = new javax.swing.JLabel();
 
+        setMinimumSize(new java.awt.Dimension(494, 290));
+        setPreferredSize(new java.awt.Dimension(494, 290));
+
         refGenLabel.setText(org.openide.util.NbBundle.getMessage(NewReadPairTracksDialogPanel.class, "NewReadPairTracksDialogPanel.refGenLabel.text")); // NOI18N
 
         mappingFile1Label.setText(org.openide.util.NbBundle.getMessage(NewReadPairTracksDialogPanel.class, "NewReadPairTracksDialogPanel.mappingFile1Label.text")); // NOI18N
@@ -322,7 +325,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
                 .addComponent(alreadyImportedBox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(multiTrackScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
+                    .addComponent(multiTrackScrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(multiTrackListLabel)
                         .addGap(0, 0, Short.MAX_VALUE)))
@@ -409,10 +412,11 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
     /**
      * Opens a file chooser for selecting a read pair mapping file.
      * <p>
-     * @param isFstFile true, if this is the first file, false if it is the
-     *                  second.
+     * @param isRead1File true, if this is the first file (normally containing
+     * the read 1 / left reads of the pairs), false if it contains the second /
+     * read 2 / right reads of the pairs.
      */
-    private void openFileChooser( final boolean isFstFile ) {
+    private void openFileChooser( final boolean isRead1File ) {
         ReadXplorerFileChooser fc = new ReadXplorerFileChooser( getCurrentParser().getFileExtensions(), getCurrentParser().getInputFileDescription() ) {
             private static final long serialVersionUID = 1L;
 
@@ -427,15 +431,14 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
             public void open( String fileLocation ) {
 
                 // file chosen
+                if( isRead1File ) {
+                    getMappingFiles().clear();
+                } else {
+                    mappingFiles2.clear();
+                }
                 updateGuiForMultipleFiles( this.getSelectedFiles().length > 1, multiTrackScrollPane, multiTrackList, multiTrackListLabel, mappingFile1Field );
                 if( useMultipleImport() ) {
                     File[] files = this.getSelectedFiles();
-                    if( isFstFile ) {
-                        getMappingFiles().clear();
-                    }
-                    else {
-                        mappingFiles2.clear();
-                    }
 
                     for( int i = 0; i < files.length; ++i ) {
                         this.addFile( files[i] );
@@ -466,7 +469,7 @@ public class NewReadPairTracksDialogPanel extends ImportTrackBasePanel
                                   "ErrorMsg=Could not open the given file! (Are the permissions set correctly?)" } )
             private void addFile( File file ) {
                 if( file.canRead() ) {
-                    if( isFstFile ) {
+                    if( isRead1File ) {
                         getMappingFiles().add( file );
                         mappingFile1Field.setText( file.getAbsolutePath() );
                         nameField.setText( file.getName() );

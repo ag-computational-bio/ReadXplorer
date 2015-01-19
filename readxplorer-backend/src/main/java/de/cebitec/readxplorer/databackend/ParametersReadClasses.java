@@ -144,7 +144,7 @@ public class ParametersReadClasses {
             String isAllowed = isClassificationAllowed( classType ) ? "yes" : "no";
             statisticsExportData.add( ResultTrackAnalysis.createTableRow( classType.getTypeString() + " included:", isAllowed ) );
         }
-        String isAllowed = isClassificationAllowed( FeatureType.MULTIPLE_MAPPED_READ ) ? "no" : "yes"; //here it's opposite
+        String isAllowed = isClassificationAllowed( FeatureType.MULTIPLE_MAPPED_READ ) ? "yes" : "no"; 
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( FeatureType.MULTIPLE_MAPPED_READ.getTypeString() + ":", isAllowed ) );
         statisticsExportData.add( ResultTrackAnalysis.createTableRow( "Mapping strand selection:", this.getStrandOptionString() ) );
     }

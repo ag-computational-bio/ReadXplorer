@@ -45,7 +45,6 @@ import java.awt.event.MouseListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -181,7 +180,7 @@ public class BlockComponent extends JComponent {
             private String getHeader() {
                 Mapping mapping = (Mapping) BlockComponent.this.block.getObjectWithId();
                 final String strand = mapping.isFwdStrand() ? ">>" : "<<";
-                HashMap<Integer, String> trackNames = ProjectConnector.getInstance().getOpenedTrackNames();
+                Map<Integer, String> trackNames = ProjectConnector.getInstance().getOpenedTrackNames();
                 String name = "Reference seq from ";
                 if( trackNames.containsKey( mapping.getTrackId() ) ) {
                     name += trackNames.get( mapping.getTrackId() );

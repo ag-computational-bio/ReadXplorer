@@ -166,12 +166,12 @@ public abstract class ReadXplorerFileChooser extends JFileChooser {
      * @param fileLocation the file location to store the file
      * @param this         the JFileChooser
      */
+    @NbBundle.Messages( {"ReadxplorerFileChooser_FileExists=File already exists. Do you want to overwrite the existing file?",
+                         "ReadXplorerFileChooser_Dialog=Overwrite File Dialog"} )
     private boolean checkFileExists( final String fileLocation, final JFileChooser jfc ) {
         File file = new File( fileLocation );
         if( file.exists() ) {
-            final int overwriteFile = JOptionPane.showConfirmDialog( jfc, NbBundle.getMessage( ReadXplorerFileChooser.class,
-                                                                                               "readxplorerFileChooser.FileExists" ), NbBundle.getMessage( ReadXplorerFileChooser.class,
-                                                                                                                                                           "readxplorerFileChooser.Dialog" ), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE );
+            final int overwriteFile = JOptionPane.showConfirmDialog( jfc, Bundle.ReadxplorerFileChooser_FileExists(), Bundle.ReadXplorerFileChooser_Dialog(), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE );
             if( overwriteFile == JOptionPane.YES_OPTION ) {
                 this.save( fileLocation );
             }

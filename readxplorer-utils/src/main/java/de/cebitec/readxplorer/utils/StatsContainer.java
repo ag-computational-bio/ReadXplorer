@@ -21,6 +21,7 @@ package de.cebitec.readxplorer.utils;
 import de.cebitec.readxplorer.utils.classification.Classification;
 import de.cebitec.readxplorer.utils.classification.MappingClass;
 import de.cebitec.readxplorer.utils.classification.TotalCoverage;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -166,17 +167,7 @@ public class StatsContainer {
      * Fills the stats map with all available entries for a track.
      */
     public void prepareForTrack() {
-        for( MappingClass mappingClass : MappingClass.values() ) {
-            this.statsMap.put( mappingClass.getTypeString(), 0 );
-            this.statsMap.put( mappingClass.getTypeString() + StatsContainer.COVERAGE_STRING, 0 );
-        }
-        this.statsMap.put( TotalCoverage.TOTAL_COVERAGE.getTypeString() + StatsContainer.COVERAGE_STRING, 0 );
-        this.statsMap.put( NO_MAPPINGS, 0 );
-        this.statsMap.put( NO_UNIQUE_SEQS, 0 );
-        this.statsMap.put( NO_REPEATED_SEQ, 0 );
-        this.statsMap.put( NO_UNIQ_MAPPINGS, 0 );
-        this.statsMap.put( NO_READS, 0 );
-        this.statsMap.put( AVERAGE_READ_LENGTH, 0 );
+        prepareForStats(getListOfTrackStatistics());
     }
 
 
@@ -184,22 +175,18 @@ public class StatsContainer {
      * Fills the stats map with all available entries for a read pair track.
      */
     public void prepareForReadPairTrack() {
-        this.statsMap.put( NO_READ_PAIRS, 0 );
-        this.statsMap.put( NO_PERF_PAIRS, 0 );
-        this.statsMap.put( NO_ORIENT_WRONG_PAIRS, 0 );
-        this.statsMap.put( NO_SMALL_DIST_PAIRS, 0 );
-        this.statsMap.put( NO_SMALL_ORIENT_WRONG_PAIRS, 0 );
-        this.statsMap.put( NO_LARGE_DIST_PAIRS, 0 );
-        this.statsMap.put( NO_LARGE_ORIENT_WRONG_PAIRS, 0 );
-        this.statsMap.put( NO_SINGLE_MAPPIGNS, 0 );
-        this.statsMap.put( NO_UNIQUE_PAIRS, 0 );
-        this.statsMap.put( NO_UNIQ_PERF_PAIRS, 0 );
-        this.statsMap.put( NO_UNIQ_SMALL_PAIRS, 0 );
-        this.statsMap.put( NO_UNIQ_LARGE_PAIRS, 0 );
-        this.statsMap.put( NO_UNIQ_ORIENT_WRONG_PAIRS, 0 );
-        this.statsMap.put( NO_UNIQ_WRNG_ORIENT_SMALL_PAIRS, 0 );
-        this.statsMap.put( NO_UNIQ_WRNG_ORIENT_LARGE_PAIRS, 0 );
-        this.statsMap.put( AVERAGE_READ_PAIR_SIZE, 0 );
+        prepareForStats(getListOfReadPairStatistics());
+    }
+    
+    /**
+     * Prepares the container for a predefined list of statistics identifiers.
+     * @param statsIdList The list of statistics identifiers to store in this
+     * container
+     */
+    private void prepareForStats(List<String> statsIdList) {
+        for( String statsId : statsIdList ) {
+            this.statsMap.put( statsId, 0 );
+        }
     }
 
 
@@ -276,5 +263,53 @@ public class StatsContainer {
         }
     }
 
+    /**
+     * @return The list of track statistics identifiers stored in this 
+     * container.
+     */
+    public static List<String> getListOfTrackStatistics() {
+        List<String> statsList = new ArrayList<>();
+        
+        for( MappingClass mappingClass : MappingClass.values() ) {
+            statsList.add( mappingClass.getTypeString() );
+            statsList.add( mappingClass.getTypeString() + StatsContainer.COVERAGE_STRING );
+        }
+        statsList.add( TotalCoverage.TOTAL_COVERAGE.getTypeString() + StatsContainer.COVERAGE_STRING );
+        statsList.add( NO_MAPPINGS );
+        statsList.add( NO_UNIQUE_SEQS );
+        statsList.add( NO_REPEATED_SEQ );
+        statsList.add( NO_UNIQ_MAPPINGS );
+        statsList.add( NO_READS );
+        statsList.add( AVERAGE_READ_LENGTH );
+        
+        return statsList;
+    }
+    
+    /**
+     * @return The list of additional read pair track statistics identifiers
+     * stored in this container.
+     */
+    public static List<String> getListOfReadPairStatistics() {
+        List<String> statsList = new ArrayList<>();
+        
+        statsList.add( NO_READ_PAIRS );
+        statsList.add( NO_PERF_PAIRS );
+        statsList.add( NO_ORIENT_WRONG_PAIRS );
+        statsList.add( NO_SMALL_DIST_PAIRS );
+        statsList.add( NO_SMALL_ORIENT_WRONG_PAIRS );
+        statsList.add( NO_LARGE_DIST_PAIRS );
+        statsList.add( NO_LARGE_ORIENT_WRONG_PAIRS );
+        statsList.add( NO_SINGLE_MAPPIGNS );
+        statsList.add( NO_UNIQUE_PAIRS );
+        statsList.add( NO_UNIQ_PERF_PAIRS );
+        statsList.add( NO_UNIQ_SMALL_PAIRS );
+        statsList.add( NO_UNIQ_LARGE_PAIRS );
+        statsList.add( NO_UNIQ_ORIENT_WRONG_PAIRS );
+        statsList.add( NO_UNIQ_WRNG_ORIENT_SMALL_PAIRS );
+        statsList.add( NO_UNIQ_WRNG_ORIENT_LARGE_PAIRS );
+        statsList.add( AVERAGE_READ_PAIR_SIZE );
+        
+        return statsList;
+    }
 
 }

@@ -53,15 +53,18 @@ import java.util.logging.Logger;
  */
 public class TrackConnector {
 
-    private List<PersistentTrack> associatedTracks;
+    private static final Logger LOG = Logger.getLogger( TrackConnector.class.getName() );
+
+    public static int FIXED_INTERVAL_LENGTH = 1000;
+
     private int trackID;
     private CoverageThread coverageThread;
     private MappingThread mappingThread;
     private CoverageThreadAnalyses coverageThreadAnalyses;
     private MappingThreadAnalyses mappingThreadAnalyses;
     private Connection con;
-    public static int FIXED_INTERVAL_LENGTH = 1000;
     private PersistentReference refGenome;
+    private List<PersistentTrack> associatedTracks;
 
 
     /**
@@ -73,9 +76,11 @@ public class TrackConnector {
      * @throws FileNotFoundException
      */
     protected TrackConnector( final PersistentTrack track ) throws FileNotFoundException {
+
         this.associatedTracks = new ArrayList<>();
         this.associatedTracks.add( track );
-        this.initTrackConnector( track.getId(), false );
+        initTrackConnector( track.getId(), false );
+
     }
 
 
@@ -93,11 +98,13 @@ public class TrackConnector {
      * @throws FileNotFoundException
      */
     protected TrackConnector( final int id, final List<PersistentTrack> tracks, final boolean combineTracks ) throws FileNotFoundException {
+
         if( tracks.size() > 2 && !combineTracks ) {
             throw new UnsupportedOperationException( "More than two tracks not supported yet." );
         }
-        this.associatedTracks = tracks;
-        this.initTrackConnector( id, combineTracks );
+        associatedTracks = tracks;
+        initTrackConnector( id, combineTracks );
+
     }
 
 
@@ -109,6 +116,7 @@ public class TrackConnector {
      *                      false if it should be kept separated
      */
     private void initTrackConnector( final int trackId, final boolean combineTracks ) throws FileNotFoundException {
+
         for( final PersistentTrack track : associatedTracks ) {
             if( !new File( track.getFilePath() ).exists() ) {
                 throw new FileNotFoundException( track.getFilePath() );
@@ -116,24 +124,16 @@ public class TrackConnector {
         }
 
         this.trackID = trackId;
-        this.con = ProjectConnector.getInstance().getConnection();
+        con = ProjectConnector.getInstance().getConnection();
 
         ReferenceConnector refConnector = ProjectConnector.getInstance().getRefGenomeConnector(
-                this.associatedTracks.get( 0 ).getRefGenID() );
-        this.refGenome = refConnector.getRefGenome();
+                associatedTracks.get( 0 ).getRefGenID() );
+        refGenome = refConnector.getRefGenome();
 
-        this.startDataThreads( combineTracks );
+        startDataThreads( combineTracks );
+
     }
 
-//    /**
-//     * Just for JUnit test purposes, after testing, comment it out!
-//     * @param trackId
-//     * @throws FileNotFoundException
-//     */
-//    public TrackConnector(int trackId) throws FileNotFoundException {
-//        this.trackID = trackId;
-//        this.refGenome = null;
-//    }
 
     /**
      * Starts a thread for retrieving coverage information for a list of tracks.
@@ -144,14 +144,16 @@ public class TrackConnector {
      *                      combined
      */
     private void startDataThreads( final boolean combineTracks ) {
-        this.coverageThread = new CoverageThread( this.associatedTracks, combineTracks );
-        this.coverageThreadAnalyses = new CoverageThreadAnalyses( this.associatedTracks, combineTracks );
-        this.mappingThread = new MappingThread( this.associatedTracks );
-        this.mappingThreadAnalyses = new MappingThreadAnalyses( this.associatedTracks );
-        this.coverageThread.start();
-        this.coverageThreadAnalyses.start();
-        this.mappingThread.start();
-        this.mappingThreadAnalyses.start();
+
+       mappingThread = new MappingThread( associatedTracks );
+       coverageThread = new CoverageThread( associatedTracks, combineTracks );
+       mappingThreadAnalyses = new MappingThreadAnalyses( associatedTracks );
+       coverageThreadAnalyses = new CoverageThreadAnalyses( associatedTracks, combineTracks );
+       coverageThread.start();
+       coverageThreadAnalyses.start();
+       mappingThread.start();
+       mappingThreadAnalyses.start();
+
     }
 
 
@@ -169,8 +171,10 @@ public class TrackConnector {
      * @param request the coverage request including the receiving object
      */
     public void addCoverageRequest( IntervalRequest request ) {
+
         coverageThread.addRequest( request );
         //Currently we can only catch the diffs for one track, but not, if this is a multiple track connector
+
     }
 
 
@@ -183,8 +187,10 @@ public class TrackConnector {
      * @param request the coverage request including the receiving object
      */
     public void addCoverageAnalysisRequest( IntervalRequest request ) {
+
         coverageThreadAnalyses.addRequest( request );
         //Currently we can only catch the diffs for one track, but not, if this is a multiple track connector
+
     }
 
 
@@ -201,7 +207,7 @@ public class TrackConnector {
      * @param request the mapping request including the receiving object
      */
     public void addMappingRequest( IntervalRequest request ) {
-        this.mappingThread.addRequest( request );
+        mappingThread.addRequest( request );
     }
 
 
@@ -215,7 +221,7 @@ public class TrackConnector {
      * @param request the mapping request including the receiving object
      */
     public void addMappingAnalysisRequest( IntervalRequest request ) {
-        this.mappingThreadAnalyses.addRequest( request );
+        mappingThreadAnalyses.addRequest( request );
     }
 
 
@@ -225,7 +231,7 @@ public class TrackConnector {
      * @return The complete statistics for the main track of this connector.
      */
     public StatsContainer getTrackStats() {
-        return this.getTrackStats( trackID );
+        return getTrackStats( trackID );
     }
 
 
@@ -236,6 +242,7 @@ public class TrackConnector {
      * @return The complete statistics for the track specified by the given id.
      */
     public StatsContainer getTrackStats( final int wantedTrackId ) {
+
         StatsContainer statsContainer = new StatsContainer();
         statsContainer.prepareForTrack();
         statsContainer.prepareForReadPairTrack();
@@ -252,9 +259,10 @@ public class TrackConnector {
 
         }
         catch( SQLException e ) {
-            Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, null, e );
+            LOG.log( Level.SEVERE, null, e );
         }
         return statsContainer;
+
     }
 
 
@@ -278,11 +286,13 @@ public class TrackConnector {
      * @return The list of descriptions of all tracks stored in this connector.
      */
     public List<String> getAssociatedTrackNames() {
+
         List<String> trackNames = new ArrayList<>( associatedTracks.size() );
-        for( PersistentTrack track : this.associatedTracks ) {
+        for( PersistentTrack track : associatedTracks ) {
             trackNames.add( track.getDescription() );
         }
         return trackNames;
+
     }
 
 
@@ -291,11 +301,13 @@ public class TrackConnector {
      *         this connector.
      */
     public List<Integer> getTrackIds() {
+
         List<Integer> trackIds = new ArrayList<>( associatedTracks.size() );
-        for( PersistentTrack track : this.associatedTracks ) {
+        for( PersistentTrack track : associatedTracks ) {
             trackIds.add( track.getId() );
         }
         return trackIds;
+
     }
 
 
@@ -304,7 +316,7 @@ public class TrackConnector {
      *         to thread
      */
     public CoverageThread getCoverageThread() {
-        return this.coverageThread;
+        return coverageThread;
     }
 
 
@@ -343,8 +355,7 @@ public class TrackConnector {
      *         or <code>0</code> if this track is not a read pair track.
      */
     public Integer getReadPairToTrackID() {
-        int value = GenericSQLQueries.getIntegerFromDB( SQLStatements.FETCH_READ_PAIR_TO_TRACK_ID, SQLStatements.GET_NUM, con, trackID );
-        return value;
+        return GenericSQLQueries.getIntegerFromDB( SQLStatements.FETCH_READ_PAIR_TO_TRACK_ID, SQLStatements.GET_NUM, con, trackID );
     }
 
 
@@ -352,7 +363,7 @@ public class TrackConnector {
      * @return True, if this is a read pair track, false otherwise.
      */
     public boolean isReadPairTrack() {
-        return this.getReadPairToTrackID() != 0;
+        return getReadPairToTrackID() != 0;
     }
 
 
@@ -363,8 +374,9 @@ public class TrackConnector {
      *         connectors track id
      */
     public int getTrackIdToReadPairId( final int readPairId ) {
+
         int num = 0;
-        try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_TRACK_ID_TO_READ_PAIR_ID ) ){
+        try( final PreparedStatement fetch = con.prepareStatement( SQLStatements.FETCH_TRACK_ID_TO_READ_PAIR_ID ) ) {
             fetch.setLong( 1, readPairId );
             fetch.setLong( 2, trackID );
 
@@ -375,10 +387,11 @@ public class TrackConnector {
             }
         }
         catch( SQLException ex ) {
-            Logger.getLogger( SQLStatements.class.getName() ).log( Level.SEVERE, null, ex );
+            LOG.log( Level.SEVERE, null, ex );
         }
 
         return num;
+
     }
 
 
@@ -392,6 +405,7 @@ public class TrackConnector {
      * @return a {@link DiscreteCountingDistribution} for this track.
      */
     public DiscreteCountingDistribution getCountDistribution( final byte type ) {
+
         DiscreteCountingDistribution countDistribution = new DiscreteCountingDistribution();
         countDistribution.setType( type );
 
@@ -411,11 +425,11 @@ public class TrackConnector {
 
             }
             catch( SQLException ex ) {
-                Logger.getLogger( this.getClass().getName() ).log( Level.SEVERE, null, ex );
+                LOG.log( Level.SEVERE, null, ex );
             }
         }
 
-        if( this.associatedTracks.size() > 1 ) {
+        if( associatedTracks.size() > 1 ) {
             int[] distribution = countDistribution.getDiscreteCountingDistribution();
             for( int i = 0; i < distribution.length; ++i ) {
                 distribution[i] = (int) Math.ceil( (double) distribution[i] / associatedTracks.size() );
@@ -423,6 +437,7 @@ public class TrackConnector {
         }
 
         return countDistribution;
+
     }
 
 
@@ -430,7 +445,7 @@ public class TrackConnector {
      * @return the reference genome associated to this connector
      */
     public PersistentReference getRefGenome() {
-        return this.refGenome;
+        return refGenome;
     }
 
 
@@ -439,7 +454,7 @@ public class TrackConnector {
      *         connector
      */
     public int getActiveChromeLength() {
-        return this.refGenome.getActiveChromLength();
+        return refGenome.getActiveChromLength();
     }
 
 
@@ -464,7 +479,7 @@ public class TrackConnector {
 
 
     public File getTrackPath() {
-        return new File( this.associatedTracks.get( 0 ).getFilePath() );
+        return new File( associatedTracks.get( 0 ).getFilePath() );
     }
 
 

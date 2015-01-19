@@ -109,7 +109,7 @@ public class SelectReadClassWizardPanel extends ChangeListeningWizardPanel {
         String isCommonMatchSelected = readClassParams.isClassificationAllowed( MappingClass.COMMON_MATCH ) ? "1" : "0";
         String isSinglePerfectSelected = readClassParams.isClassificationAllowed( MappingClass.SINGLE_PERFECT_MATCH ) ? "1" : "0";
         String isSingleBestMatchSelected = readClassParams.isClassificationAllowed( MappingClass.SINGLE_BEST_MATCH ) ? "1" : "0";
-        String isUniqueSelected = readClassParams.isClassificationAllowed( FeatureType.MULTIPLE_MAPPED_READ ) ? "1" : "0";
+        String isUniqueSelected = readClassParams.isClassificationAllowed( FeatureType.MULTIPLE_MAPPED_READ ) ? "0" : "1";
         String minMappingQuality = String.valueOf( readClassParams.getMinMappingQual() );
         String strandOption = String.valueOf( readClassParams.getStrandOption() );
         Preferences pref = NbPreferences.forModule( Object.class );

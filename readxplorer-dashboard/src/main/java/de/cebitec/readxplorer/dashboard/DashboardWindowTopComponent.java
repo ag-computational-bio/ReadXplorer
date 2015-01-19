@@ -18,10 +18,12 @@
 package de.cebitec.readxplorer.dashboard;
 
 
+import de.cebitec.readxplorer.databackend.TrackStatisticsGenerator;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.ReferenceConnector;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
+import de.cebitec.readxplorer.exporter.tables.TableExportFileChooser;
 import de.cebitec.readxplorer.ui.TopComponentExtended;
 import de.cebitec.readxplorer.ui.controller.ViewController;
 import de.cebitec.readxplorer.ui.dialogmenus.explorer.CustomOutlineCellRenderer;
@@ -299,12 +301,16 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
         selectButtonPanel = new javax.swing.JPanel();
         selectAllButton = new javax.swing.JButton();
         deselectAllButton = new javax.swing.JButton();
+        storeButtonPanel = new javax.swing.JPanel();
+        storeStatsButton = new javax.swing.JButton();
+        storeStatsLabel = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
         openDBButton = new javax.swing.JButton();
         createDBButton = new javax.swing.JButton();
 
         org.openide.awt.Mnemonics.setLocalizedText(quickstartLabel, org.openide.util.NbBundle.getMessage(DashboardWindowTopComponent.class, "DashboardWindowTopComponent.quickstartLabel.text")); // NOI18N
 
+        explorerSplitPane.setDividerLocation(200);
         explorerSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
         explorerPanel.setLayout(new java.awt.BorderLayout());
@@ -356,12 +362,45 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                 .addComponent(deselectAllButton))
         );
 
+        storeButtonPanel.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
+        org.openide.awt.Mnemonics.setLocalizedText(storeStatsButton, org.openide.util.NbBundle.getMessage(DashboardWindowTopComponent.class, "DashboardWindowTopComponent.storeStatsButton.text")); // NOI18N
+        storeStatsButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                storeStatsButtonActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(storeStatsLabel, org.openide.util.NbBundle.getMessage(DashboardWindowTopComponent.class, "DashboardWindowTopComponent.storeStatsLabel.text")); // NOI18N
+
+        javax.swing.GroupLayout storeButtonPanelLayout = new javax.swing.GroupLayout(storeButtonPanel);
+        storeButtonPanel.setLayout(storeButtonPanelLayout);
+        storeButtonPanelLayout.setHorizontalGroup(
+            storeButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, storeButtonPanelLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(storeStatsLabel))
+            .addGroup(storeButtonPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(storeStatsButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        storeButtonPanelLayout.setVerticalGroup(
+            storeButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(storeButtonPanelLayout.createSequentialGroup()
+                .addGap(9, 9, 9)
+                .addComponent(storeStatsLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(storeStatsButton))
+        );
+
         javax.swing.GroupLayout buttonPanelLayout = new javax.swing.GroupLayout(buttonPanel);
         buttonPanel.setLayout(buttonPanelLayout);
         buttonPanelLayout.setHorizontalGroup(
             buttonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(buttonPanelLayout.createSequentialGroup()
-                .addContainerGap(356, Short.MAX_VALUE)
+                .addComponent(storeButtonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 231, Short.MAX_VALUE)
                 .addComponent(openButton, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 241, Short.MAX_VALUE)
                 .addComponent(selectButtonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -371,8 +410,9 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
             .addGroup(buttonPanelLayout.createSequentialGroup()
                 .addGroup(buttonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(openButton, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(selectButtonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(0, 160, Short.MAX_VALUE))
+                    .addComponent(selectButtonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(storeButtonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         explorerSplitPane.setRightComponent(buttonPanel);
@@ -430,7 +470,7 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
                 .addGap(1, 1, 1)
                 .addComponent(quickstartLabel)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(explorerSplitPane)
+                .addComponent(explorerSplitPane, javax.swing.GroupLayout.DEFAULT_SIZE, 325, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -562,6 +602,10 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
         StandardItem.setSelectionOfAllItems( ov, em.getRootContext().getChildren().getNodes(), false );
     }//GEN-LAST:event_deselectAllButtonActionPerformed
 
+    private void storeStatsButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_storeStatsButtonActionPerformed
+        storeTrackStatistics();
+    }//GEN-LAST:event_storeStatsButtonActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel buttonPanel;
     private javax.swing.JButton createDBButton;
@@ -574,6 +618,9 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
     private javax.swing.JLabel quickstartLabel;
     private javax.swing.JButton selectAllButton;
     private javax.swing.JPanel selectButtonPanel;
+    private javax.swing.JPanel storeButtonPanel;
+    private javax.swing.JButton storeStatsButton;
+    private javax.swing.JLabel storeStatsLabel;
     // End of variables declaration//GEN-END:variables
 
 
@@ -616,5 +663,13 @@ public final class DashboardWindowTopComponent extends TopComponentExtended
         loginAction.actionPerformed( evt );
     }
 
+    /**
+     * Opens a TableFileChooser and fetches the track statistics for all tracks 
+     * stored in the DB to store their statistics in a table file.
+     */
+    private void storeTrackStatistics() {
+        TableExportFileChooser fileChooser = new TableExportFileChooser( 
+                TableExportFileChooser.getTableFileExtensions(), new TrackStatisticsGenerator() );
+    }
 
 }

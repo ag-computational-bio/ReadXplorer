@@ -55,6 +55,7 @@ import java.awt.FlowLayout;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
@@ -411,9 +412,10 @@ public class BasePanelFactory {
      * @return The panel displaying the title on a gray background
      */
     private JPanel getTitlePanel( String title ) {
-        JPanel p = new JPanel();
+        JPanel p = new JPanel( new GridBagLayout() );
         p.add( new JLabel( title ) );
         p.setBackground( ColorProperties.TITLE_BACKGROUND );
+        p.setPreferredSize( new Dimension( p.getPreferredSize().width, 18 ) );
         return p;
     }
 
