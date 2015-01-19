@@ -814,7 +814,6 @@ public class ProjectConnector extends Observable {
                 setReadPairIds.setLong( 2, track1Id );
                 setReadPairIds.execute();
 
-                setReadPairIds.setInt( 1, readPairId );
                 setReadPairIds.setLong( 2, track2Id );
                 setReadPairIds.execute();
             }
