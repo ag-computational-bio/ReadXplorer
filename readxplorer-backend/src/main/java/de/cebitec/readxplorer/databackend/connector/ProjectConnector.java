@@ -151,7 +151,7 @@ public class ProjectConnector extends Observable {
     /**
      * Disconnects the current DB connection.
      */
-    public void disconnect() {
+    public synchronized void disconnect() {
 
         LOG.info( "Closing database connection" );
         try {
@@ -183,7 +183,7 @@ public class ProjectConnector extends Observable {
      * @throws SQLException
      * @throws JdbcSQLException
      */
-    public void connect( String adapter, String projectLocation, String hostname, String user, String password ) throws SQLException, JdbcSQLException {
+    public synchronized void connect( String adapter, String projectLocation, String hostname, String user, String password ) throws SQLException, JdbcSQLException {
 
         this.adapter = adapter;
         this.dbLocation = projectLocation;
@@ -419,7 +419,7 @@ public class ProjectConnector extends Observable {
      * @param className name of the class in which the error occured
      * @param ex        the exception, which was thrown
      */
-    public void rollbackOnError( String className, Exception ex ) {
+    public synchronized void rollbackOnError( String className, Exception ex ) {
 
         LOG.log( Level.SEVERE, "Error occured. Trying to recover", ex );
         try {
@@ -494,7 +494,7 @@ public class ProjectConnector extends Observable {
      * <p>
      * @throws StorageException
      */
-    public int addRefGenome( final ParsedReference reference ) throws StorageException {
+    public synchronized int addRefGenome( final ParsedReference reference ) throws StorageException {
 
         LOG.log( Level.INFO, "Start storing reference sequence  \"{0}\"", reference.getName() );
 
@@ -671,7 +671,7 @@ public class ProjectConnector extends Observable {
      * <p>
      * @param track the track job containing the track information to store
      */
-    public void storeBamTrack( final ParsedTrack track ) {
+    public synchronized void storeBamTrack( final ParsedTrack track ) {
 
         LOG.info( "start storing bam track data..." );
 
@@ -703,7 +703,7 @@ public class ProjectConnector extends Observable {
      *                       track ID
      * @param trackID        the track id whose data shall be stored
      */
-    public void storeTrackStatistics( final StatsContainer statsContainer, final int trackID ) {
+    public synchronized void storeTrackStatistics( final StatsContainer statsContainer, final int trackID ) {
 
         LOG.info( "Start storing track statistics..." );
 
@@ -749,7 +749,7 @@ public class ProjectConnector extends Observable {
      *                for the given track
      * @param trackID the track id whose data shall be stored
      */
-    public void deleteSpecificTrackStatistics( List<String> keys, int trackID ) {
+    public synchronized void deleteSpecificTrackStatistics( List<String> keys, int trackID ) {
 
         LOG.info( "Start deleting specific track statistics..." );
 
@@ -803,7 +803,7 @@ public class ProjectConnector extends Observable {
      * @param track1Id track id of first track of the pair
      * @param track2Id track id of second track of the pair
      */
-    public void setReadPairIdsForTrackIds( final long track1Id, final long track2Id ) {
+    public synchronized void setReadPairIdsForTrackIds( final long track1Id, final long track2Id ) {
 
         try {
             //not 0, because 0 is the value when a track is not a sequence pair track!
@@ -961,7 +961,7 @@ public class ProjectConnector extends Observable {
     }
 
 
-    public MultiTrackConnector getMultiTrackConnector( final PersistentTrack track ) throws FileNotFoundException {
+    public synchronized MultiTrackConnector getMultiTrackConnector( final PersistentTrack track ) throws FileNotFoundException {
         // only return new object, if no suitable connector was created before
         int trackID = track.getId();
         if( !multiTrackConnectors.containsKey( trackID ) ) { //old solution, which does not work anymore
@@ -971,7 +971,7 @@ public class ProjectConnector extends Observable {
     }
 
 
-    public MultiTrackConnector getMultiTrackConnector( final List<PersistentTrack> tracks ) throws FileNotFoundException {
+    public synchronized MultiTrackConnector getMultiTrackConnector( final List<PersistentTrack> tracks ) throws FileNotFoundException {
         // makes sure the track id is not already used
         int id = 9999;
         for( PersistentTrack track : tracks ) {
@@ -988,7 +988,7 @@ public class ProjectConnector extends Observable {
      * <p>
      * @param trackId track id of the track connector to remove
      */
-    public void removeTrackConnector( final int trackId ) {
+    public synchronized void removeTrackConnector( final int trackId ) {
         if( trackConnectors.containsKey( trackId ) ) {
             trackConnectors.remove( trackId );
         }
@@ -1000,7 +1000,7 @@ public class ProjectConnector extends Observable {
      * <p>
      * @param trackId track id of the multi track connector to remove
      */
-    public void removeMultiTrackConnector( final int trackId ) {
+    public synchronized void removeMultiTrackConnector( final int trackId ) {
         if( multiTrackConnectors.containsKey( trackId ) ) {
             multiTrackConnectors.remove( trackId );
         }
@@ -1038,7 +1038,7 @@ public class ProjectConnector extends Observable {
      * <p>
      * @throws OutOfMemoryError
      */
-    public List<PersistentReference> getGenomes() {
+    public synchronized List<PersistentReference> getGenomes() {
 
         LOG.info( "Reading reference genome data from database" );
         List<PersistentReference> refGens = new ArrayList<>();
@@ -1081,7 +1081,7 @@ public class ProjectConnector extends Observable {
      * @return A map of all tracks in the connected DB mapped on their
      *         respective reference.
      */
-    public Map<PersistentReference, List<PersistentTrack>> getGenomesAndTracks() {
+    public synchronized Map<PersistentReference, List<PersistentTrack>> getGenomesAndTracks() {
 
         final List<PersistentReference> genomes = getGenomes();
         final List<PersistentTrack> tracks = getTracks();
@@ -1115,7 +1115,7 @@ public class ProjectConnector extends Observable {
      *         tracks are re-queried from the DB and returned in new, independent
      *         objects each time the method is called.
      */
-    public List<PersistentTrack> getTracks() {
+    public synchronized List<PersistentTrack> getTracks() {
 
         LOG.info( "Reading track data from database" );
         List<PersistentTrack> tracks = new ArrayList<>();
@@ -1145,7 +1145,7 @@ public class ProjectConnector extends Observable {
      *                <p>
      * @return The track for the given track id in a fresh track object
      */
-    public PersistentTrack getTrack( final int trackID ) {
+    public synchronized PersistentTrack getTrack( final int trackID ) {
 
         LOG.info( "Reading track data from database" );
         PersistentTrack track = null;
@@ -1177,7 +1177,7 @@ public class ProjectConnector extends Observable {
      * @return the latest track id used in the database + 1 = the next id to
      *         use.
      */
-    public int getLatestTrackId() {
+    public synchronized int getLatestTrackId() {
         return (int) GenericSQLQueries.getLatestIDFromDB( SQLStatements.GET_LATEST_TRACK_ID, con );
     }
 
@@ -1189,7 +1189,7 @@ public class ProjectConnector extends Observable {
      * <p>
      * @throws StorageException
      */
-    public void deleteTrack( final int trackID ) throws StorageException {
+    public synchronized void deleteTrack( final int trackID ) throws StorageException {
 
         LOG.log( Level.INFO, "Starting deletion of track with id \"{0}\"", trackID );
         try( PreparedStatement deleteStatistics = con.prepareStatement( SQLStatements.DELETE_STATISTIC_FROM_TRACK );
@@ -1234,7 +1234,7 @@ public class ProjectConnector extends Observable {
      * <p>
      * @throws StorageException
      */
-    public void deleteGenome( final int refGenID ) throws StorageException {
+    public synchronized void deleteGenome( final int refGenID ) throws StorageException {
 
         LOG.log( Level.INFO, "Starting deletion of reference genome with id \"{0}\"", refGenID );
         ReferenceConnector refCon = getRefGenomeConnector( refGenID );
@@ -1294,7 +1294,7 @@ public class ProjectConnector extends Observable {
      * <p>
      * @throws StorageException
      */
-    public void resetTrackPath( final PersistentTrack track ) throws StorageException {
+    public synchronized void resetTrackPath( final PersistentTrack track ) throws StorageException {
 
         LOG.info( "Preparing statements for storing track data" );
 
@@ -1330,7 +1330,7 @@ public class ProjectConnector extends Observable {
      * <p>
      * @throws StorageException
      */
-    public void resetRefPath( final File fastaFile, final PersistentReference ref ) throws StorageException {
+    public synchronized void resetRefPath( final File fastaFile, final PersistentReference ref ) throws StorageException {
 
         LOG.info( "Preparing statements for storing track data" );
 
@@ -1615,7 +1615,7 @@ public class ProjectConnector extends Observable {
      * <p>
      * @throws OutOfMemoryError
      */
-    public List<PersistentReference> getGenomesDbUpgrade() throws OutOfMemoryError {
+    public synchronized List<PersistentReference> getGenomesDbUpgrade() throws OutOfMemoryError {
 
         LOG.info( "Reading reference genome data from database" );
         List<PersistentReference> refGens = new ArrayList<>();
@@ -1638,7 +1638,7 @@ public class ProjectConnector extends Observable {
         }
 
         return refGens;
-        
+
     }
 
 
