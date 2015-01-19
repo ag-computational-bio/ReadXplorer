@@ -15,28 +15,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package bio.comp.jlu.readxplorer.cli;
+package bio.comp.jlu.readxplorer.cli.analyses;
 
 
+import java.util.List;
 import java.util.logging.Logger;
-import org.openide.modules.ModuleInstall;
 
 
 /**
  *
- * @author Oliver Schwengers <oliver.Schwengers@computational.bio.uni-giessen.de>
+ * @author Oliver Schwengers <oliver.schwengers@computational.bio.uni-giessen.de
  */
-public class Installer extends ModuleInstall {
+public class TSSAnalysisCallable extends AnalysisCallable {
 
-    private final static Logger LOG = Logger.getLogger( Installer.class.getName() );
+    private final static Logger LOG = Logger.getLogger( TSSAnalysisCallable.class.getName() );
+
+
+    public TSSAnalysisCallable( boolean verbosity ) {
+        super( verbosity );
+    }
+
+
 
 
     @Override
-    public void restored() {
+    public List<String> call() throws Exception {
 
-        LOG.info( "start readxplorer-cli..." );
+        LOG.fine( "start TSS analysis" );
+        // calc coverage analyses
 
-        LOG.info( "stop readxplorer-cli..." );
+        return null;
 
     }
 

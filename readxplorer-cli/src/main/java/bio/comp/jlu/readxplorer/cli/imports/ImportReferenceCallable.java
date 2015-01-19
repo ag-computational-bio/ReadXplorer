@@ -20,6 +20,7 @@ package bio.comp.jlu.readxplorer.cli.imports;
 
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.StorageException;
+import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.common.ParsedReference;
 import de.cebitec.readxplorer.parser.common.ParsingException;
@@ -31,23 +32,16 @@ import de.cebitec.readxplorer.parser.reference.Filter.FeatureFilter;
 import de.cebitec.readxplorer.parser.reference.Filter.FilterRuleSource;
 import de.cebitec.readxplorer.parser.reference.ReferenceParserI;
 import de.cebitec.readxplorer.utils.Benchmark;
-import de.cebitec.readxplorer.utils.Properties;
-import java.io.File;
 import java.io.PrintStream;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.api.sendopts.CommandException;
-import org.netbeans.spi.sendopts.Arg;
-import org.netbeans.spi.sendopts.ArgsProcessor;
-import org.netbeans.spi.sendopts.Description;
-import org.netbeans.spi.sendopts.Env;
 import org.openide.util.NbBundle;
 
 
 /**
- * The <code>ImportReferenceArgsProcessor</code> class is responsible for the
+ * The <code>ImportReferenceCallable</code> class is responsible for the
  * import of a reference genome in the cli version.
  *
  * The following options are available:
@@ -67,80 +61,52 @@ import org.openide.util.NbBundle;
  *
  * @author Oliver Schwengers <oschweng@cebitec.uni-bielefeld.de>
  */
-public final class ImportReferenceArgsProcessor implements ArgsProcessor {
+public final class ImportReferenceCallable implements Callable<PersistentReference> {
 
-    private static final Logger LOG = Logger.getLogger( ImportReferenceArgsProcessor.class.getName() );
+    private static final Logger LOG = Logger.getLogger( ImportReferenceCallable.class.getName() );
+
+    private final boolean verbosity;
 
 
-    @Arg( shortName = 'v', longName = "verbose" )
-    @Description( displayName = "Verbose", shortDescription = "The H2 database file which should be connected to." )
-    public boolean verboseArg;
+    protected ImportReferenceCallable( boolean verbosity ) {
 
-    @Arg( shortName = 'r', longName = "ref-import" )
-    @Description( displayName = "Reference Import", shortDescription = "Import a reference genome." )
-    public boolean importRefArg;
+        this.verbosity = verbosity;
 
-    @Arg( shortName = 'd', longName = "db" )
-    @Description( displayName = "Database", shortDescription = "The H2 database file which should be connected to." )
-    public String dbFileArg;
-
-    @Arg( shortName = 't', longName = "file-type" )
-    @Description( displayName = "File type", shortDescription = "The sequence file type. One of (embl|genbank|gff3|gff2|gtf|fasta)" )
-    public String fileTypeArg;
-
-    @Arg( shortName = 'f', longName = "files" )
-    @Description( displayName = "Reference Genome Files", shortDescription = "The path to the reference files." )
-    public String[] referenceFileArgs;
-
-    @Arg( shortName = 'n', longName = "names" )
-    @Description( displayName = "Reference Names", shortDescription = "The names of the sequence files." )
-    public String[] nameArgs;
-
-    @Arg( longName = "description" )
-    @Description( displayName = "Description", shortDescription = "The description of the sequence files." )
-    public String[] descriptionArgs;
+    }
 
 
     @Override
-    public void process( final Env env ) throws CommandException {
+    public PersistentReference call() throws CommandException {
 
-        if( nameArgs.length != referenceFileArgs.length ) {
-            CommandException ce = new CommandException( 1, "number of name arguments differ from number of sequence files!" );
-            throw ce;
-        }
+        PersistentReference pr;
+//        final PrintStream ps = env.getOutputStream();
+//        try {
+//
+//            ProjectConnector.getInstance().connect( Properties.ADAPTER_H2, dbFileArg, null, null, null );
+//
+//            final int l = referenceFileArgs.length;
+//            final ReferenceParserI refParser = selectParser( fileTypeArg );
+//            for( int i=0; i<l; i++ ) {
+//
+//                ReferenceJob rj = new ReferenceJob( 0, new File(referenceFileArgs[i]), refParser,
+//                    descriptionArgs[i], nameArgs[i], new Timestamp( System.currentTimeMillis() ) );
+//
+//                importRefGenome( rj, ps );
+//
+//            }
+//
+//            ProjectConnector.getInstance().disconnect();
+//
+//        }
+//        catch( SQLException ex ) {
+//
+//            CommandException ce = new CommandException( 1 );
+//                ce.initCause( ex );
+//            throw ce;
+//
+//        }
 
-        if( descriptionArgs.length != referenceFileArgs.length ) {
-            CommandException ce = new CommandException( 1, "number of description arguments differ from number of sequence files!" );
-            throw ce;
-        }
-
-
-        final PrintStream ps = env.getOutputStream();
-        try {
-
-            ProjectConnector.getInstance().connect( Properties.ADAPTER_H2, dbFileArg, null, null, null );
-
-            final int l = referenceFileArgs.length;
-            final ReferenceParserI refParser = selectParser( fileTypeArg );
-            for( int i=0; i<l; i++ ) {
-
-                ReferenceJob rj = new ReferenceJob( 0, new File(referenceFileArgs[i]), refParser,
-                    descriptionArgs[i], nameArgs[i], new Timestamp( System.currentTimeMillis() ) );
-
-                importRefGenome( rj, ps );
-
-            }
-
-            ProjectConnector.getInstance().disconnect();
-
-        }
-        catch( SQLException ex ) {
-
-            CommandException ce = new CommandException( 1 );
-                ce.initCause( ex );
-            throw ce;
-
-        }
+        return null;
 
     }
 
@@ -150,7 +116,7 @@ public final class ImportReferenceArgsProcessor implements ArgsProcessor {
      */
     private void importRefGenome( final ReferenceJob rj, final PrintStream ps ) throws CommandException {
 
-        ps.println( NbBundle.getMessage( ImportReferenceArgsProcessor.class, "MSG_ImportThread.import.start.ref" ) + ":" );
+        ps.println(NbBundle.getMessage(ImportReferenceCallable.class, "MSG_ImportThread.import.start.ref" ) + ":" );
         final long start = System.currentTimeMillis();
         try {
 
@@ -161,7 +127,7 @@ public final class ImportReferenceArgsProcessor implements ArgsProcessor {
             filter.addBlacklistRule( new FilterRuleSource() );
             ParsedReference refGenome = parser.parseReference( rj, filter );
             LOG.log( Level.INFO, "Finished parsing reference genome from source \"{0}\"", rj.getFile().getAbsolutePath() );
-            ps.println( "\"" + rj.getName() + "\" " + NbBundle.getMessage( ImportReferenceArgsProcessor.class, "MSG_ImportThread.import.parsed" ) );
+            ps.println("\"" + rj.getName() + "\" " + NbBundle.getMessage(ImportReferenceCallable.class, "MSG_ImportThread.import.parsed" ) );
 
 
             // stores reference sequence in the db
@@ -172,9 +138,9 @@ public final class ImportReferenceArgsProcessor implements ArgsProcessor {
 
 
             // print benchmarks
-            if( verboseArg ) {
+            if( verbosity ) {
                 final long finish = System.currentTimeMillis();
-                String msg = "\"" + rj.getName() + "\" " + NbBundle.getMessage( ImportReferenceArgsProcessor.class, "MSG_ImportThread.import.stored" );
+                String msg = "\"" + rj.getName() + "\" " + NbBundle.getMessage(ImportReferenceCallable.class, "MSG_ImportThread.import.stored" );
                 ps.println( Benchmark.calculateDuration( start, finish, msg ) );
             }
 
@@ -182,14 +148,14 @@ public final class ImportReferenceArgsProcessor implements ArgsProcessor {
         catch( ParsingException | StorageException ex ) {
             LOG.log( Level.SEVERE, null, ex );
 //            ps.println( "\"" + rj.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.failed" ) + "!" );
-            CommandException ce = new CommandException( 1, "\"" + rj.getName() + "\" " + NbBundle.getMessage( ImportReferenceArgsProcessor.class, "MSG_ImportThread.import.failed" ) );
+            CommandException ce = new CommandException( 1, "\"" + rj.getName() + "\" " + NbBundle.getMessage(ImportReferenceCallable.class, "MSG_ImportThread.import.failed" ) );
                 ce.initCause( ex );
             throw ce;
         }
         catch( OutOfMemoryError ex ) {
             LOG.log( Level.SEVERE, null, ex );
 //            ps.println( "\"" + rj.getName() + "\" " + NbBundle.getMessage( ImportThread.class, "MSG_ImportThread.import.outOfMemory" ) + "!" );
-            CommandException ce = new CommandException( 1, "\"" + rj.getName() + "\" " + NbBundle.getMessage( ImportReferenceArgsProcessor.class, "MSG_ImportThread.import.outOfMemory" ) );
+            CommandException ce = new CommandException( 1, "\"" + rj.getName() + "\" " + NbBundle.getMessage(ImportReferenceCallable.class, "MSG_ImportThread.import.outOfMemory" ) );
                 ce.initCause( ex );
             throw ce;
         }

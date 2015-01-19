@@ -19,12 +19,13 @@ package bio.comp.jlu.readxplorer.cli;
 
 
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentReference;
-import de.cebitec.readxplorer.databackend.dataObjects.PersistentTrack;
 import de.cebitec.readxplorer.utils.Properties;
+import java.io.File;
 import java.io.PrintStream;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.netbeans.api.sendopts.CommandException;
@@ -34,7 +35,7 @@ import org.netbeans.spi.sendopts.Description;
 import org.netbeans.spi.sendopts.Env;
 
 
-public final class CommandLineProcessor implements ArgsProcessor {
+public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory {
 
     private static final Logger LOG = Logger.getLogger( CommandLineProcessor.class.getName() );
 
@@ -43,79 +44,141 @@ public final class CommandLineProcessor implements ArgsProcessor {
     }
 
 
+    /**
+     * Mandatory options
+     */
+    @Arg( shortName = 'r', longName = "reference" )
+    @Description( displayName = "Reference", shortDescription = "Reference genome to import / analysis." )
+    public String referenceArg;
+
+    @Arg( shortName = 't', longName = "tracks" )
+    @Description( displayName = "Tracks", shortDescription = "Tracks to import / analysis." )
+    public String[] tracksArgs;
+
+    @Arg( shortName = 'p', longName = "matepairtracks" )
+    @Description( displayName = "Mate Pair Tracks", shortDescription = "Mate Pair Tracks to import / analysis." )
+    public String[] matePairTracksArgs;
+
+
+    /**
+     * Optional options
+     */
     @Arg( shortName = 'v', longName = "verbose" )
     @Description( displayName = "Verbose", shortDescription = "Increase verbosity." )
     public boolean verboseArg;
 
-    @Arg( shortName = 'd', longName = "db" )
-    @Description( displayName = "Database", shortDescription = "The H2 database to store imported data." )
+    @Arg( shortName = 'm', longName = "multithreading" )
+    @Description( displayName = "Verbose", shortDescription = "Execute imports and analysis concurrently." )
+    public boolean multiThreadingArg;
+
+    @Arg( longName = "db" )
+    @Description( displayName = "Database", shortDescription = "H2 database to store imported data." )
     public String dbFileArg;
 
-    @Arg( shortName = 't', longName = "test" )
-    @Description( displayName = "Test", shortDescription = "This is a test argument." )
-    public String testArg;
+
+    /**
+     * Analysis options
+     */
+    @Arg( longName = "snp" )
+    @Description( displayName = "SNP", shortDescription = "Single Nucleotide Polymorphism analysis." )
+    public boolean snpAnalysis;
+
+    @Arg( longName = "tss" )
+    @Description( displayName = "TSS", shortDescription = "Transcription Start Site analysis." )
+    public boolean tssAnalysis;
+
+    @Arg( longName = "rpkm" )
+    @Description( displayName = "RPKM", shortDescription = "XXX analysis." )
+    public boolean rpkmAnalysis;
 
 
     @Override
     public void process( final Env env ) throws CommandException {
-        LOG.log( Level.INFO, "trigger Test processor" );
+        LOG.log( Level.FINE, "triggered command line processor" );
 
         final PrintStream ps = env.getOutputStream();
             ps.println( "trigger " + getClass().getName() );
 
 
-        LOG.config( "verbose=" + Boolean.toString( verboseArg ) );
-        LOG.config( "test=" + testArg );
+        // print optional arguments...
+        printConfig( ps, "verbosity=" + (verboseArg ? "on" : "off") );
+        printConfig( ps, "multi-threading=" + (multiThreadingArg ? "on" : "off") );
+        printConfig( ps, "db file=" + dbFileArg );
 
-        LOG.config( "db file=" + dbFileArg );
 
+        // test reference file
+        final File referenceFile;
+        if( referenceArg != null ) {
+
+            referenceFile = new File( referenceArg );
+            if( !referenceFile.canRead() ) {
+                throw new CommandException( 1, "Wrong reference file path!" );
+            }
+            LOG.fine( "reference file to import: " + referenceFile.getName() );
+
+        }
+        else {
+            // print usage
+            return;
+        }
+
+
+        // test track file
+        final File[] trackFiles;
+        if( tracksArgs != null ) {
+
+            printInfo( ps, "track files to import:" );
+            trackFiles = new File[ tracksArgs.length ];
+            for( int i=0; i<trackFiles.length; i++ ) {
+                String trackPath = tracksArgs[i];
+                trackFiles[i] = new File( trackPath );
+                if( !referenceFile.canRead() ) {
+                    throw new CommandException( 1, "Wrong path for track file " + (i+1) + "("+trackPath+")!" );
+                }
+                printInfo( ps, "\tadd " + trackFiles[i].getName() );
+            }
+
+        }
+        else {
+            // print usage
+            return;
+        }
+
+
+        // test mate pair track files
+        final File[] matePairTrackFiles;
+        final boolean importMatePairReads;
+        if( matePairTracksArgs != null ) {
+
+            if( matePairTracksArgs.length != tracksArgs.length )
+                throw new CommandException( 1, "Mate pair track count ("+matePairTracksArgs.length+") does not match track count (" +matePairTracksArgs.length+")!" );
+
+            printInfo( ps, "mate pair files to import:" );
+            matePairTrackFiles = new File[ matePairTracksArgs.length ];
+            for( int i=0; i<matePairTrackFiles.length; i++ ) {
+                String peTrackPath = matePairTracksArgs[i];
+                matePairTrackFiles[i] = new File( peTrackPath );
+                if( !referenceFile.canRead() )
+                    throw new CommandException( 1, "Wrong path for mate pair track file " + (i+1) + "("+peTrackPath+")!" );
+                printInfo( ps, "\tadd " + trackFiles[i].getName() );
+            }
+            importMatePairReads = true;
+
+        }
+        else {
+            importMatePairReads = false;
+        }
+
+
+        // setup ProjectConnector
+        final ProjectConnector pc;
         try {
 
-            ProjectConnector pc = ProjectConnector.getInstance();
+            pc = ProjectConnector.getInstance();
+            if( dbFileArg == null  ||  dbFileArg.isEmpty() )
+                dbFileArg = System.getProperty( "user.dir") + "/tmp-db";
                 pc.connect( Properties.ADAPTER_H2, dbFileArg, null, null, null );
-            LOG.log( Level.FINE, "connected to {0}", dbFileArg );
-            ps.println( "connected to " + dbFileArg );
-
-
-            LOG.fine( "read reference genomes..." );
-            List<PersistentReference> refGenomes = pc.getGenomes();
-            LOG.fine( "# reference genomes: " + refGenomes.size() );
-            for( PersistentReference refGenome : refGenomes) {
-
-                ps.println( "ref genome: " + refGenome.getId() );
-                LOG.log( Level.FINE, "ref genome: {0}", refGenome.getId() );
-                if( verboseArg ) {
-                    ps.println( "\tname: " + refGenome.getName() );
-                    ps.println( "\tdesc: " + refGenome.getDescription() );
-                    ps.println( "\t# chrom: " + refGenome.getNoChromosomes() );
-                    ps.println( "\tlength: " + refGenome.getGenomeLength() );
-                    ps.println( "\tdate: " + refGenome.getTimeStamp() );
-                    ps.println();
-                }
-
-            }
-
-
-            LOG.fine( "read tracks..." );
-            List<PersistentTrack> tracks = pc.getTracks();
-            LOG.fine( "# tracks: " + tracks.size() );
-            for( PersistentTrack track : tracks ) {
-                ps.println( "track: " + track.getId() );
-                LOG.log( Level.FINE, "track: {0}", track.getId() );
-                if( verboseArg ) {
-                    ps.println( "\tdesc: " + track.getDescription() );
-                    ps.println( "\t# chrom: " + track.getActiveChromId() );
-                    ps.println( "\tfile: " + track.getFilePath() );
-                    ps.println( "\tref genome id: " + track.getRefGenID() );
-                    ps.println( "\tdate: " + track.getTimestamp() );
-                }
-                ps.println();
-
-            }
-
-            pc.disconnect();
-            ps.println( "disconnected from " + dbFileArg );
-            LOG.log( Level.FINE, "disconnected from {0}", dbFileArg );
+            LOG.log( Level.CONFIG, "connected to {0}", dbFileArg );
 
         }
         catch( SQLException ex ) {
@@ -125,6 +188,72 @@ public final class CommandLineProcessor implements ArgsProcessor {
             throw ce;
 
         }
+
+
+        /**
+         * Get a thread pool.
+         * If multi-threading flag is not set, number of threads is fixed to 1
+         * thus multithreading is not active.
+         */
+        final ExecutorService es = Executors.newFixedThreadPool( multiThreadingArg ? Runtime.getRuntime().availableProcessors() : 1, this );
+
+
+        // import reference
+        printInfo( ps, "import reference genome..." );
+
+
+        // import tracks
+        printInfo( ps, "import tracks..." );
+
+
+        // run analyses
+        printInfo( ps, "start analyses..." );
+
+
+        try {
+
+            pc.disconnect();
+            if( verboseArg )
+                ps.println( "disconnected from " + dbFileArg );
+            LOG.log( Level.FINE, "disconnected from {0}", dbFileArg );
+
+        }
+        catch( Exception ex ) {
+
+            CommandException ce = new CommandException( 1 );
+                ce.initCause( ex );
+            throw ce;
+
+        }
+
+    }
+
+
+    private void printInfo( PrintStream ps, String msg ) {
+
+        LOG.info( msg );
+        if( verboseArg )
+            ps.println( msg );
+
+    }
+
+
+    private void printConfig( PrintStream ps, String msg ) {
+
+        LOG.config( msg );
+        if( verboseArg )
+            ps.println( msg );
+
+    }
+
+
+    @Override
+    public Thread newThread( Runnable r ) {
+
+        Thread t = new Thread( r, "readxplorer-cli-worker" );
+            t.setDaemon( true );
+            t.setPriority( Thread.MIN_PRIORITY );
+        return t;
 
     }
 

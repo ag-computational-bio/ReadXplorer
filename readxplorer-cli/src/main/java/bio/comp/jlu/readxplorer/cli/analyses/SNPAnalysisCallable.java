@@ -18,35 +18,35 @@
 package bio.comp.jlu.readxplorer.cli.analyses;
 
 
+import java.util.List;
 import java.util.logging.Logger;
-import org.netbeans.api.sendopts.CommandException;
-import org.netbeans.spi.sendopts.Arg;
-import org.netbeans.spi.sendopts.ArgsProcessor;
-import org.netbeans.spi.sendopts.Description;
-import org.netbeans.spi.sendopts.Env;
 
 
 /**
  *
  * @author Oliver Schwengers <oliver.schwengers@computational.bio.uni-giessen.de
  */
-public class CoverageAnalysisArgsProcessor implements ArgsProcessor {
+public class SNPAnalysisCallable extends AnalysisCallable {
 
-    private final static Logger LOG = Logger.getLogger( CoverageAnalysisArgsProcessor.class.getName() );
+    private final static Logger LOG = Logger.getLogger( SNPAnalysisCallable.class.getName() );
 
 
-    /** Decide annotations or code.
-     * Annotations are much cleaner and more intuitive but comes
-     * with the cost of no current possibility to
-     * group and thus combine several dependent options.
-     */
-    @Arg( shortName = 'a', longName = "analysis" )
-    @Description( displayName = "file", shortDescription = "this is a file option for testing purposes only!" )
-    public String analysisOption;
+    public SNPAnalysisCallable( boolean verbosity ) {
+        super( verbosity );
+    }
+
+
 
 
     @Override
-    public void process( Env env ) throws CommandException {
+    public List<String> call() throws Exception {
+
+        LOG.fine( "start SNP analysis" );
+        // calc coverage analyses
+
+        return null;
+
     }
+
 
 }
