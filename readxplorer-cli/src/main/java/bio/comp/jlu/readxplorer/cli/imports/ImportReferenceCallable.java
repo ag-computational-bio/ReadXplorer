@@ -18,7 +18,7 @@
 package bio.comp.jlu.readxplorer.cli.imports;
 
 
-import bio.comp.jlu.readxplorer.cli.imports.ImportReferenceCallable.ImportReferenceResults;
+import bio.comp.jlu.readxplorer.cli.imports.ImportReferenceCallable.ImportReferenceResult;
 import de.cebitec.readxplorer.parser.ReferenceJob;
 import de.cebitec.readxplorer.parser.common.ParsedReference;
 import de.cebitec.readxplorer.parser.common.ParsingException;
@@ -61,43 +61,44 @@ import org.netbeans.api.sendopts.CommandException;
  *
  * @author Oliver Schwengers <oschweng@cebitec.uni-bielefeld.de>
  */
-public final class ImportReferenceCallable implements Callable<ImportReferenceResults> {
+public final class ImportReferenceCallable implements Callable<ImportReferenceResult> {
 
     private static final Logger LOG = Logger.getLogger( ImportReferenceCallable.class.getName() );
-
-    private final boolean verbosity;
 
     private final File referenceFile;
 
 
 
 
-    public ImportReferenceCallable( File referenceFile, boolean verbosity ) {
+    public ImportReferenceCallable( File referenceFile ) {
 
         this.referenceFile = referenceFile;
-        this.verbosity = verbosity;
 
     }
 
 
+
+
     @Override
-    public ImportReferenceResults call() throws CommandException {
+    public ImportReferenceResult call() throws CommandException {
 
         try {
 
+            // create necessary (mockup) objects
             final ReferenceParserI refParser = selectParser( referenceFile.getName().substring( referenceFile.getName().lastIndexOf( '.' ) ) );
-            final ImportReferenceResults result = new ImportReferenceResults();
-            final ReferenceJob rj = new ReferenceJob( 0, referenceFile, refParser,
+            final ReferenceJob referenceJob = new ReferenceJob( 0, referenceFile, refParser,
                 "", referenceFile.getName(), new Timestamp( System.currentTimeMillis() ) );
+            final ImportReferenceResult result = new ImportReferenceResult();
+                result.setReferenceJob( referenceJob );
 
             // parse reference genome
-            LOG.log( Level.FINE, "start parsing reference genome from source {0}...", referenceFile.getName() );
+            LOG.log( Level.FINE, "parsing reference file: {0}...", referenceFile.getName() );
             FeatureFilter filter = new FeatureFilter();
                 filter.addBlacklistRule( new FilterRuleSource() );
-            ParsedReference parsedRefGenome = refParser.parseReference( rj, filter );
+            ParsedReference parsedRefGenome = refParser.parseReference( referenceJob, filter );
             result.setParsedReference( parsedRefGenome );
-            LOG.log( Level.FINE, "parsed reference genome file {0}...", referenceFile.getName() );
-            result.addOutput( "parsed reference genome from file " + referenceFile.getName() );
+            LOG.log( Level.FINE, "parsed reference file: {0}", referenceFile.getName() );
+            result.addOutput( "parsed reference file " + referenceFile.getName() );
 
             return result;
 
@@ -140,27 +141,48 @@ public final class ImportReferenceCallable implements Callable<ImportReferenceRe
 
 
 
-    public class ImportReferenceResults {
+    public class ImportReferenceResult {
 
         private final List<String> output;
+        private ReferenceJob    rj;
         private ParsedReference pr;
 
 
-        ImportReferenceResults() {
+        ImportReferenceResult() {
             this.output = new ArrayList<>( 10 );
         }
+
+
+
 
         void addOutput( String msg ) {
             output.add( msg );
         }
 
+
         public List<String> getOutput() {
             return Collections.unmodifiableList( output );
         }
 
+
+
+
+        void setReferenceJob( ReferenceJob rj ) {
+            this.rj = rj;
+        }
+
+
+        public ReferenceJob getReferenceJob() {
+            return rj;
+        }
+
+
+
+
         void setParsedReference( ParsedReference pr ) {
             this.pr = pr;
         }
+
 
         public ParsedReference getParsedReference() {
             return pr;

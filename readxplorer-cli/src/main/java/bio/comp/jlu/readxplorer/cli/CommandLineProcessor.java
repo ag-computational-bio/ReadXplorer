@@ -19,13 +19,17 @@ package bio.comp.jlu.readxplorer.cli;
 
 
 import bio.comp.jlu.readxplorer.cli.imports.ImportReferenceCallable;
+import bio.comp.jlu.readxplorer.cli.imports.ImportReferenceCallable.ImportReferenceResult;
+import bio.comp.jlu.readxplorer.cli.imports.ImportTrackCallable;
 import de.cebitec.readxplorer.databackend.connector.ProjectConnector;
 import de.cebitec.readxplorer.databackend.connector.StorageException;
-import de.cebitec.readxplorer.utils.Benchmark;
+import de.cebitec.readxplorer.parser.common.ParsedTrack;
 import de.cebitec.readxplorer.utils.Properties;
 import java.io.File;
 import java.io.PrintStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -99,6 +103,7 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
 
     @Override
     public void process( final Env env ) throws CommandException {
+
         LOG.log( Level.FINE, "triggered command line processor" );
 
         final PrintStream ps = env.getOutputStream();
@@ -117,13 +122,13 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
 
             referenceFile = new File( referenceArg );
             if( !referenceFile.canRead() ) {
-                throw new CommandException( 1, "Wrong reference file path!" );
+                throw new CommandException( 1, "Cannot read reference file!" );
             }
             LOG.fine( "reference file to import: " + referenceFile.getName() );
 
         }
         else {
-            // print usage
+            env.usage();
             return;
         }
 
@@ -136,22 +141,23 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
             trackFiles = new File[ tracksArgs.length ];
             for( int i=0; i<trackFiles.length; i++ ) {
                 String trackPath = tracksArgs[i];
-                trackFiles[i] = new File( trackPath );
-                if( !referenceFile.canRead() ) {
-                    throw new CommandException( 1, "Wrong path for track file " + (i+1) + "("+trackPath+")!" );
+                File trackFile = new File( trackPath );
+                if( !trackFile.canRead() ) {
+                    throw new CommandException( 1, "Cannot read track file " + (i+1) + "("+trackPath+")!" );
                 }
+                trackFiles[i] = trackFile;
                 printInfo( ps, "\tadd " + trackFiles[i].getName() );
             }
 
         }
         else {
-            // print usage
+            env.usage();
             return;
         }
 
 
         // test mate pair track files
-        final File[] matePairTrackFiles;
+        File[] matePairTrackFiles;
         final boolean importMatePairReads;
         if( matePairTracksArgs != null ) {
 
@@ -164,7 +170,7 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
                 String peTrackPath = matePairTracksArgs[i];
                 matePairTrackFiles[i] = new File( peTrackPath );
                 if( !referenceFile.canRead() )
-                    throw new CommandException( 1, "Wrong path for mate pair track file " + (i+1) + "("+peTrackPath+")!" );
+                    throw new CommandException( 1, "Cannot read mate pair track file " + (i+1) + "("+peTrackPath+")!" );
                 printInfo( ps, "\tadd " + trackFiles[i].getName() );
             }
             importMatePairReads = true;
@@ -176,15 +182,12 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
 
 
         // setup ProjectConnector
-        final ProjectConnector pc;
+        final ProjectConnector pc = ProjectConnector.getInstance();
         try {
-
-            pc = ProjectConnector.getInstance();
             if( dbFileArg == null  ||  dbFileArg.isEmpty() )
                 dbFileArg = System.getProperty( "user.dir") + "/tmp-db";
-                pc.connect( Properties.ADAPTER_H2, dbFileArg, null, null, null );
+            pc.connect( Properties.ADAPTER_H2, dbFileArg, null, null, null );
             LOG.log( Level.CONFIG, "connected to {0}", dbFileArg );
-
         }
         catch( SQLException ex ) {
 
@@ -204,43 +207,68 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
 
 
         // import reference
-        printInfo( ps, "import reference genome..." );
+        final ImportReferenceResult referenceResult;
         try {
-
-            final long startTime = System.currentTimeMillis();
-            Future<ImportReferenceCallable.ImportReferenceResults> refFuture = es.submit( new ImportReferenceCallable( referenceFile, verboseArg ) );
-            ImportReferenceCallable.ImportReferenceResults result = refFuture.get();
+            printInfo( ps, "import reference genome..." );
+            Future<ImportReferenceResult> refFuture = es.submit( new ImportReferenceCallable( referenceFile ) );
+            referenceResult = refFuture.get();
 
             // print (concurrent) output sequently
-            for( String msg : result.getOutput() ) {
-                ps.println( msg );
+            for( String msg : referenceResult.getOutput() ) {
+                printInfo( ps, msg );
             }
-
+            
             // stores reference sequence in the db
-            if( verboseArg )
-                ps.println( "store reference to db..." );
             LOG.log( Level.FINE, "start storing reference to db..." );
-            ProjectConnector.getInstance().addRefGenome( result.getParsedReference() );
-            if( verboseArg )
-                ps.println( "...finished!" );
-            LOG.log( Level.INFO, "...stored reference genome source \"{0}\"", result.getParsedReference().getName() );
-
-            // print benchmarks
-            if( verboseArg ) {
-                final long endTime = System.currentTimeMillis();
-                ps.println( Benchmark.calculateDuration( startTime, endTime, "import reference duration: " ) );
-            }
-
+            pc.addRefGenome( referenceResult.getParsedReference() );
+            printInfo( ps, "\tstored reference to db..." );
+            LOG.log( Level.FINE, "...stored reference genome source \"{0}\"", referenceResult.getParsedReference().getName() );
+            printInfo( ps, "...finished!" );
         }
         catch( InterruptedException | ExecutionException | StorageException ex ) {
             LOG.log( Level.SEVERE, null, ex );
-            CommandException ce = new CommandException( 1, "import failed!" );
+            CommandException ce = new CommandException( 1, "reference import failed!" );
                 ce.initCause( ex );
             throw ce;
         }
 
+
         // import tracks
-        printInfo( ps, "import tracks..." );
+        if( !importMatePairReads ) {
+
+            try {
+                printInfo( ps, "import tracks..." );
+                // submit track parse jobs for (concurrent) execution
+                List<Future<ImportTrackCallable.ImportTrackResults>> futures = new ArrayList<>( trackFiles.length );
+                for( File trackFile : trackFiles ) {
+                    Future<ImportTrackCallable.ImportTrackResults> future = es.submit( new ImportTrackCallable( referenceResult, trackFile ) );
+                    futures.add( future );
+                }
+
+                // store parsed tracks sequently to db
+                for( Future<ImportTrackCallable.ImportTrackResults> future : futures ) {
+                    ImportTrackCallable.ImportTrackResults result = future.get();
+                    for( String msg : referenceResult.getOutput() ) {
+                        printInfo( ps, msg );
+                    }
+                    ParsedTrack pt = result.getParsedTrack();
+                    pc.storeBamTrack( pt );
+                    pc.storeTrackStatistics( pt.getStatsContainer(), pt.getID() );
+                    printInfo( ps, "\tstored parsed track ("+result.getParsedTrack().getTrackName()+") to db" );
+                }
+                printInfo( ps, "...finished!" );
+            }
+            catch( InterruptedException | ExecutionException ex ) {
+                LOG.log( Level.SEVERE, null, ex );
+                CommandException ce = new CommandException( 1, "track import failed!" );
+                    ce.initCause( ex );
+                throw ce;
+            }
+
+        }
+        else {
+            // TODO implement mate pair import
+        }
 
 
         // run analyses
@@ -248,12 +276,10 @@ public final class CommandLineProcessor implements ArgsProcessor, ThreadFactory 
 
 
         try {
-
             pc.disconnect();
             if( verboseArg )
                 ps.println( "disconnected from " + dbFileArg );
             LOG.log( Level.FINE, "disconnected from {0}", dbFileArg );
-
         }
         catch( Exception ex ) {
 
