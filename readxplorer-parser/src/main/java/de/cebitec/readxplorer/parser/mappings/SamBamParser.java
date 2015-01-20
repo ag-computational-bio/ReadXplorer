@@ -77,10 +77,10 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
      * the disk next to the original file. Original files are not changed!
      */
     public SamBamParser() {
-        this.observers = new ArrayList<>();
-        this.statsContainer = new StatsContainer();
-        this.statsContainer.prepareForTrack();
-        this.errorLimit = new ErrorLimit( 100 );
+        observers = new ArrayList<>();
+        statsContainer = new StatsContainer();
+        statsContainer.prepareForTrack();
+        errorLimit = new ErrorLimit( 100 );
     }
 
 
@@ -116,7 +116,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
      * @throws OutOfMemoryError
      */
     @Override
-    public Boolean convert( TrackJob trackJob, Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError {
+    public boolean convert( TrackJob trackJob, Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError {
         return true;
     }
 
@@ -133,7 +133,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
      * @throws OutOfMemoryError
      */
     @Override
-    public Boolean preprocessData( final TrackJob trackJob ) throws ParsingException, OutOfMemoryError {
+    public boolean preprocessData( final TrackJob trackJob ) throws ParsingException, OutOfMemoryError {
         SamBamSorter sorter = new SamBamSorter();
         sorter.registerObserver( this );
         boolean success = sorter.sortSamBam( trackJob, SAMFileHeader.SortOrder.queryname, SamUtils.SORT_READNAME_STRING );
@@ -165,7 +165,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
      * @throws OutOfMemoryError
      */
     @Override
-    public Boolean parseInput( final TrackJob trackJob, final Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError {
+    public boolean parseInput( final TrackJob trackJob, final Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError {
 
         /* New Algorithm:
          * 1. sort by read name
@@ -175,8 +175,8 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
          * 5. clear data structures and contine with next read name...
          */
 
-        this.refSeqFetcher = new RefSeqFetcher( trackJob.getRefGen().getFile(), this );
-        Boolean success = this.preprocessData( trackJob );
+        refSeqFetcher = new RefSeqFetcher( trackJob.getRefGen().getFile(), this );
+        boolean success = preprocessData( trackJob );
         if( !success ) {
             throw new ParsingException( "Sorting of the input file by read name was not successful, please try again and make sure to have enough "
                                         + "free space in your systems temp directory to store intermediate files for sorting (e.g. on Windows 7 the hard disk containing: "
@@ -185,7 +185,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
 
         final File fileSortedByReadName = trackJob.getFile(); //sorted by read name bam file
         final long startTime = System.currentTimeMillis();
-        this.notifyObservers( NbBundle.getMessage( SamBamParser.class, "Parser.Parsing.Start", fileSortedByReadName.getName() ) );
+        notifyObservers( NbBundle.getMessage( SamBamParser.class, "Parser.Parsing.Start", fileSortedByReadName.getName() ) );
 
 
         int noReads = 0;
@@ -211,7 +211,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
             int lineno = 0;
             while( samItor.hasNext() ) {
                 try {
-                    ++lineno;
+                    lineno++;
                     final SAMRecord record = samItor.next();
 
                     if( !record.getReadUnmappedFlag() && chromLengthMap.containsKey( record.getReferenceName() ) ) {
@@ -229,13 +229,13 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
                         if( !lastReadName.equals( readName ) ) {
                             CommonsMappingParser.writeSamRecord( diffMap, classificationData, bamWriter );
                             classificationData = new ParsedClassification( sortOrder );
-                            ++noReads;
+                            noReads++ ;
                         }
 
                         boolean classified = CommonsMappingParser.classifyRead( record, this, chromLengthMap,
                                                                                 fileSortedByReadName.getName(), lineno, refSeqFetcher, diffMap, classificationData );
                         if( !classified ) {
-                            ++noSkippedReads;
+                            noSkippedReads++;
                             continue; //continue, and ignore read, if it contains inconsistent information
                         }
                         lastReadName = readName;
@@ -255,26 +255,26 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
                 }
                 catch( SAMFormatException | StringIndexOutOfBoundsException e ) {
                     if( !e.getMessage().contains( "MAPQ should be 0" ) ) {
-                        this.sendMsgIfAllowed( NbBundle.getMessage( SamBamParser.class,
+                        sendMsgIfAllowed( NbBundle.getMessage( SamBamParser.class,
                                                                     "Parser.Parsing.CorruptData", lineno, e.toString() ) );
                     } //all reads with the "MAPQ should be 0" error are just ordinary unmapped reads and thus ignored
                 }
 
                 if( lineno % 500000 == 0 ) {
                     long finish = System.currentTimeMillis();
-                    this.notifyObservers( Benchmark.calculateDuration( startTime, finish, lineno + " mappings processed in " ) );
+                    notifyObservers( Benchmark.calculateDuration( startTime, finish, lineno + " mappings processed in " ) );
                 }
                 System.err.flush();
             }
 
             CommonsMappingParser.writeSamRecord( diffMap, classificationData, bamWriter );
-            ++noReads;
+            noReads++;
 
             if( errorLimit.getSkippedCount() > 0 ) {
                 this.notifyObservers( "... " + errorLimit.getSkippedCount() + " more errors occurred" );
             }
 
-            this.notifyObservers( "Writing extended bam file..." );
+            notifyObservers( "Writing extended bam file..." );
             samItor.close();
             bamWriter.close();
 
@@ -286,10 +286,10 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
             }
         }
         catch( RuntimeEOFException e ) {
-            this.notifyObservers( "Last read in the file is incomplete, ignoring it." );
+            notifyObservers( "Last read in the file is incomplete, ignoring it." );
         }
         catch( Exception e ) {
-            this.notifyObservers( e.getMessage() != null ? e.getMessage() : e );
+            notifyObservers( e.getMessage() != null ? e.getMessage() : e );
             Exceptions.printStackTrace( e );
         }
 
@@ -299,15 +299,15 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
                 GeneralUtils.deleteOldWorkFile( fileSortedByReadName );
             }
             catch( IOException e ) {
-                this.notifyObservers( e.getMessage() != null ? e.getMessage() : e );
+                notifyObservers( e.getMessage() != null ? e.getMessage() : e );
                 Exceptions.printStackTrace( e );
             }
         }
 
-        this.notifyObservers( "Reads skipped during parsing due to inconsistent data: " + noSkippedReads );
+        notifyObservers( "Reads skipped during parsing due to inconsistent data: " + noSkippedReads );
         long finish = System.currentTimeMillis();
         String msg = NbBundle.getMessage( SamBamParser.class, "Parser.Parsing.Successfully", fileSortedByReadName.getName() );
-        this.notifyObservers( Benchmark.calculateDuration( startTime, finish, msg ) );
+        notifyObservers( Benchmark.calculateDuration( startTime, finish, msg ) );
         statsContainer.increaseValue( StatsContainer.NO_READS, noReads );
 
         return success;
@@ -316,19 +316,19 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
 
     @Override
     public void registerObserver( Observer observer ) {
-        this.observers.add( observer );
+        observers.add( observer );
     }
 
 
     @Override
     public void removeObserver( Observer observer ) {
-        this.observers.remove( observer );
+        observers.remove( observer );
     }
 
 
     @Override
     public void notifyObservers( final Object data ) {
-        for( Observer observer : this.observers ) {
+        for( Observer observer : observers ) {
             observer.update( data );
         }
     }
@@ -336,7 +336,7 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
 
     @Override
     public void update( Object args ) {
-        this.notifyObservers( args );
+        notifyObservers( args );
     }
 
 
@@ -348,8 +348,8 @@ public class SamBamParser implements MappingParserI, Observer, MessageSenderI {
      */
     @Override
     public void sendMsgIfAllowed( final String msg ) {
-        if( this.errorLimit.allowOutput() ) {
-            this.notifyObservers( msg );
+        if( errorLimit.allowOutput() ) {
+            notifyObservers( msg );
         }
     }
 

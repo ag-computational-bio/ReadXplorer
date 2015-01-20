@@ -39,7 +39,6 @@ public interface PreprocessorI {
      * @throws ParsingException
      * @throws OutOfMemoryError
      */
-    public Object preprocessData( TrackJob trackJob ) throws ParsingException, OutOfMemoryError;
-
-
+    public boolean preprocessData( TrackJob trackJob ) throws ParsingException, OutOfMemoryError;
+    
 }

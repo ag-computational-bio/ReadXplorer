@@ -146,7 +146,7 @@ public class SamBamReadPairClassifier implements ReadPairClassifierI, Observer,
      * @throws OutOfMemoryError
      */
     @Override
-    public Boolean preprocessData( TrackJob trackJob ) throws ParsingException, OutOfMemoryError {
+    public boolean preprocessData( TrackJob trackJob ) throws ParsingException, OutOfMemoryError {
         SamBamSorter sorter = new SamBamSorter();
         sorter.registerObserver( this );
         boolean success = sorter.sortSamBam( trackJob, SAMFileHeader.SortOrder.queryname, SamUtils.SORT_READNAME_STRING );

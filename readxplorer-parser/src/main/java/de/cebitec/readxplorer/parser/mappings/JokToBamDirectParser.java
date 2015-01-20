@@ -70,15 +70,15 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
      * @throws OutOfMemoryError
      */
     @Override
-    public Boolean preprocessData( TrackJob trackJob ) throws ParsingException, OutOfMemoryError {
+    public boolean preprocessData( TrackJob trackJob ) throws ParsingException, OutOfMemoryError {
         return true;
     }
 
 
     @Override
-    public Boolean parseInput( final TrackJob trackJob, final Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError {
+    public boolean parseInput( final TrackJob trackJob, final Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError {
 
-        Boolean success = this.preprocessData( trackJob );
+        Boolean success = preprocessData( trackJob );
 
         if( success ) {
             //parse the newly converted bam file
@@ -108,7 +108,7 @@ public class JokToBamDirectParser implements MappingParserI, Observer {
      * @throws OutOfMemoryError
      */
     @Override
-    public Boolean convert( final TrackJob trackJob, final Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError {
+    public boolean convert( final TrackJob trackJob, final Map<String, Integer> chromLengthMap ) throws ParsingException, OutOfMemoryError {
 
         final boolean success;
         final Iterator<String> it = chromLengthMap.keySet().iterator();
